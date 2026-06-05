@@ -54,14 +54,31 @@ object StoreCatalog {
   private val io = Executors.newSingleThreadExecutor()
   private val main = Handler(Looper.getMainLooper())
 
+  private const val TAG = "ImmortalStore"
+
   fun loadCatalog(context: Context, onResult: (List<CatalogApp>) -> Unit) {
     io.execute {
-      val json =
+      // Asset-first: the bundled catalog always renders instantly and offline,
+      // so the store is never empty even if the network or remote file fails.
+      val bundled =
+          runCatching {
+                context.assets.open("catalog.json").use { it.readBytes().toString(Charsets.UTF_8) }
+              }
+              .mapCatching { parse(it) }
+              .onFailure { android.util.Log.w(TAG, "bundled catalog failed", it) }
+              .getOrDefault(emptyList())
+      if (bundled.isNotEmpty()) main.post { onResult(bundled) }
+
+      // Then refresh from the hosted catalog if reachable and newer-shaped.
+      val remote =
           runCatching { httpGet(CATALOG_URL) }
-              .getOrNull()
-              ?: context.assets.open("catalog.json").use { it.readBytes().toString(Charsets.UTF_8) }
-      val apps = runCatching { parse(json) }.getOrDefault(emptyList())
-      main.post { onResult(apps) }
+              .onFailure { android.util.Log.w(TAG, "remote catalog fetch failed", it) }
+              .mapCatching { parse(it) }
+              .onFailure { android.util.Log.w(TAG, "remote catalog parse failed", it) }
+              .getOrDefault(emptyList())
+      android.util.Log.i(TAG, "catalog loaded: bundled=${bundled.size} remote=${remote.size}")
+      if (remote.isNotEmpty()) main.post { onResult(remote) }
+      else if (bundled.isEmpty()) main.post { onResult(emptyList()) }
     }
   }
 

@@ -66,8 +66,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -701,25 +703,47 @@ private fun PortalHomeTile(onClick: () -> Unit) {
   // Bridge to Meta's stock launcher — the only context allowed to open the
   // trusted-caller apps (Contacts, Camera, Photos), so this is how the user
   // reaches calling. Tapping Portal's home button returns to Immortal.
+  BuiltInTile(
+      label = "Calls",
+      background = Color(0xFF1FA463),
+      glyph = ICON_CALL,
+      onClick = onClick,
+  )
+}
+
+// Material-style glyph paths (24x24 viewport), rendered crisply as vectors.
+private const val ICON_CALL =
+    "M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+private const val ICON_DOWNLOAD = "M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"
+
+/** A built-in launcher tile: a rounded colour tile with a centered white vector
+ * glyph, styled to sit naturally beside real app icons. */
+@Composable
+private fun BuiltInTile(
+    label: String,
+    background: Color,
+    glyph: String,
+    onClick: () -> Unit,
+) {
+  val path = remember(glyph) { PathParser().parsePathString(glyph).toPath() }
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.clickable { onClick() }.padding(4.dp),
   ) {
     Surface(
-        color = Color(0xFF2E7D5B),
+        color = background,
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier.size(88.dp),
     ) {
-      Box(contentAlignment = Alignment.Center) { Text("📞", fontSize = 38.sp) }
+      Box(contentAlignment = Alignment.Center) {
+        Canvas(Modifier.size(46.dp)) {
+          val s = size.minDimension / 24f
+          scale(s, s, pivot = Offset.Zero) { drawPath(path, Color.White) }
+        }
+      }
     }
     Spacer(Modifier.size(8.dp))
-    Text(
-        "Calls",
-        color = Color.White,
-        fontSize = 15.sp,
-        maxLines = 1,
-        textAlign = TextAlign.Center,
-    )
+    Text(label, color = Color.White, fontSize = 15.sp, maxLines = 1, textAlign = TextAlign.Center)
   }
 }
 
@@ -986,28 +1010,12 @@ private fun UpdateTile(status: String?, onClick: () -> Unit) {
 
 @Composable
 private fun StoreTile(onClick: () -> Unit) {
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.clickable { onClick() }.padding(4.dp),
-  ) {
-    Surface(
-        color = MaterialTheme.colorScheme.primary,
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.size(88.dp),
-    ) {
-      Box(contentAlignment = Alignment.Center) {
-        Text("▼", color = Color.White, fontSize = 40.sp)
-      }
-    }
-    Spacer(Modifier.size(8.dp))
-    Text(
-        "App Store",
-        color = Color.White,
-        fontSize = 15.sp,
-        maxLines = 1,
-        textAlign = TextAlign.Center,
-    )
-  }
+  BuiltInTile(
+      label = "App Store",
+      background = Color(0xFF2D6CDF),
+      glyph = ICON_DOWNLOAD,
+      onClick = onClick,
+  )
 }
 
 @Composable
