@@ -107,7 +107,7 @@ class ApkInstallActivity : ComponentActivity() {
   private fun doInstall(apk: File, pkg: String, originalUri: Uri, setStatus: (String) -> Unit) {
     when {
       InstallDaemon.installPaused(this) ->
-          setStatus("Install paused — reinstall Immortal to restore")
+          setStatus("Paused — connect to your computer and run the Immortal installer again")
       InstallDaemon.isAvailable(this) -> {
         setStatus("Installing…")
         thread {
@@ -183,7 +183,7 @@ private fun InstallPrompt(
         Spacer(Modifier.size(22.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
           Text(
-              if (status?.contains("✓") == true || status?.startsWith("Install paused") == true)
+              if (status?.contains("✓") == true || status?.startsWith("Paused") == true)
                   "Close"
               else "Cancel",
               color = Color(0xFF8AB4F8),

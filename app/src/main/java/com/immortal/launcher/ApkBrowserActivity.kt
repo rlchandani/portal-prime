@@ -114,7 +114,7 @@ private fun ApkBrowserScreen() {
           val key = a.file.absolutePath
           when {
             InstallDaemon.installPaused(context) ->
-                status[key] = "Paused — reinstall Immortal to restore"
+                status[key] = "Paused — connect to your computer to add apps"
             InstallDaemon.isAvailable(context) -> {
               status[key] = "Installing…"
               thread {
@@ -137,8 +137,9 @@ private fun PausedNote() {
       colors = CardDefaults.cardColors(containerColor = Color(0x33FFB300)),
   ) {
     Text(
-        "⚠ One-tap install is paused. This is expected on Gen-1 Portals after a reboot — " +
-            "reinstall Immortal to restore.",
+        "Installing new apps is paused. On first-gen Portals this happens after a reboot — " +
+            "connect to your computer and run the Immortal installer again to add apps. " +
+            "Everything else keeps working.",
         style = MaterialTheme.typography.bodySmall,
         color = Color(0xFFFFD180),
         modifier = Modifier.padding(16.dp),

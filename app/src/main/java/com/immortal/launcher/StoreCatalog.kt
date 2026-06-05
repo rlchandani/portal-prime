@@ -120,7 +120,7 @@ object StoreCatalog {
     // Gen-1 with the daemon down: the system installer is broken, so don't even
     // download — tell the user how to re-enable installs (it's not a bug).
     if (InstallDaemon.installPaused(context)) {
-      status(app.packageName, "Paused — re-run Immortal setup")
+      status(app.packageName, "Paused — connect to your computer to add apps")
       return
     }
     status(app.packageName, "Resolving…")

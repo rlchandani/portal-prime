@@ -54,6 +54,27 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n com.immortal.launcher/.HomeActivity
 ```
 
+## On first-gen Portals (Portal+ Gen-1, Android 9)
+
+Immortal runs on the original Portal+ too — launcher, screensaver, and app store all work. There's
+one quirk worth knowing up front, because it's a quirk of that hardware's older software, not a
+fault in Immortal:
+
+**The first-gen Portal's built-in Android installer is broken** (it opens a dialog with no
+buttons), so apps can't be installed the normal way. Immortal works around this with a small helper
+that the provisioning kit starts over USB — after that, the app store, "Install with Immortal," and
+sideloading all install silently with no dialog.
+
+That helper can't survive a reboot on this generation (a limitation of running without root on
+Android 9 — the same reason tools like Shizuku need re-starting). So **after the Portal restarts,
+installing *new* apps is paused until you reconnect it to a computer and run the installer again** —
+a 30-second step. Everything else keeps working across reboots: your home screen, screensaver, and
+every app you've already installed. Because Portals have no battery and stay plugged in, they
+reboot rarely, so in practice you set up your apps once and seldom touch this again. Immortal shows
+a clear note in the store when installs are paused, so it's never a mystery.
+
+Newer Portals (Portal Go, Mini, gen-2) have a working installer and don't need any of this.
+
 ## Releasing
 
 Hosted from this repo:

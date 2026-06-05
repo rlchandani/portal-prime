@@ -164,13 +164,14 @@ private fun PausedBanner() {
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
       Text(
-          "⚠ One-tap install is paused",
+          "Installing new apps is paused",
           fontSize = 16.sp,
           fontWeight = FontWeight.SemiBold,
           color = Color(0xFFFFD180),
       )
       Text(
-          "This is expected on Gen-1 Portals after a reboot — reinstall Immortal to restore.",
+          "On first-gen Portals this happens after a reboot. Connect to your computer and " +
+              "run the Immortal installer again to add apps. Everything else keeps working.",
           style = MaterialTheme.typography.bodySmall,
           color = Color(0xFFEEEEEE),
           modifier = Modifier.padding(top = 6.dp),

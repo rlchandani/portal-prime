@@ -81,7 +81,7 @@ object UpdateManager {
   fun installUpdate(context: Context, info: UpdateInfo, status: (String) -> Unit) {
     if (InstallDaemon.installPaused(context)) {
       // Gen-1 with the daemon down — the broken system installer can't apply it.
-      status("Re-run setup to update")
+      status("Paused — connect to your computer to update")
       return
     }
     status("Downloading update…")

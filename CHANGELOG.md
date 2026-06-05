@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9 (2026-06-05)
+
+Clearer messaging when app installs are paused on a first-gen Portal.
+
+- Rewrote the paused-install copy across the store banner, the per-app status, the "Install with Immortal" card, the "Install an APK" browser, and the self-updater. The old wording ("reinstall Immortal to restore") was misleading — reinstalling the app doesn't restart the install helper. The new copy is accurate and consistent: installing new apps is paused after a reboot; reconnect to a computer and re-run the installer to add apps; everything else keeps working.
+- No functional change — installs, the daemon, and Shizuku support are unchanged from 1.8.
+
 ## 1.8 (2026-06-05)
 
 Universal installer — make sideloading work on the Gen-1 Portal+, whose built-in Android installer dialog is broken (renders with no buttons).
