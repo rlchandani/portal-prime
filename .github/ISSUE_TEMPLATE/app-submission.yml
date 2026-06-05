@@ -1,0 +1,65 @@
+name: App submission
+description: Submit a Portal app to be listed in the Immortal Store
+title: "[App] <your app name>"
+labels: ["app-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to the Immortal Store! Fill this in and a maintainer
+        will review it. See [SUBMISSIONS.md](../../blob/main/SUBMISSIONS.md) for details.
+  - type: input
+    id: name
+    attributes:
+      label: App name
+      placeholder: My Portal App
+    validations: { required: true }
+  - type: input
+    id: package
+    attributes:
+      label: Package name
+      placeholder: com.example.myapp
+    validations: { required: true }
+  - type: dropdown
+    id: source
+    attributes:
+      label: Source
+      options: [Direct APK URL, F-Droid]
+    validations: { required: true }
+  - type: input
+    id: link
+    attributes:
+      label: APK URL (for Direct) or F-Droid ID
+      placeholder: https://github.com/you/app/releases/latest/download/app.apk  —  or  —  com.example.myapp
+    validations: { required: true }
+  - type: input
+    id: versioncode
+    attributes:
+      label: Pinned versionCode (optional — use the arm64 build for multi-ABI apps)
+      placeholder: "123"
+  - type: input
+    id: description
+    attributes:
+      label: One-line description
+      placeholder: What the app does, in one sentence.
+    validations: { required: true }
+  - type: input
+    id: homepage
+    attributes:
+      label: Homepage / repo (optional)
+      placeholder: https://github.com/you/app
+  - type: dropdown
+    id: models
+    attributes:
+      label: Tested on which Portal models?
+      multiple: true
+      options: [Portal Go, Portal Mini, Portal (gen-2), Portal+, Portal TV, Portal (Gen-1)]
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmations
+      options:
+        - label: This app runs on Portal (arm64, API 29, no GMS) and I've tested it.
+          required: true
+        - label: The download link is stable and is not malware.
+          required: true

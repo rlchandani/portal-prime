@@ -22,7 +22,8 @@ Package: `com.immortal.launcher` · Target: Meta Portal (Android 10 / API 29, ar
 - **App Store** (`StoreActivity` / `StoreCatalog`) — renders a hosted JSON catalog
   ([`catalog.json`](catalog.json)) by category and installs apps via `PackageInstaller`. F-Droid
   entries resolve the current APK at install time so the catalog never goes stale; your own apps
-  use a direct `apkUrl`.
+  use a direct `apkUrl`. **The store is open to community submissions** — built a Portal app?
+  [Get it listed](SUBMISSIONS.md).
 - **Self-update** (`UpdateManager`) — Immortal polls [`version.json`](version.json); when it
   advertises a higher `versionCode`, it downloads and installs the new build over itself. No
   cable, no laptop.
