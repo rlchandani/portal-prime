@@ -544,8 +544,19 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
       delay(1000)
     }
   }
+  val context = androidx.compose.ui.platform.LocalContext.current
   val weather by produceState(initialValue = "") {
-    value = withContext(Dispatchers.IO) { fetchWeather() }
+    // Retry soon on failure (e.g. a transient geolocation rate-limit), then
+    // refresh periodically. Location is cached after the first success.
+    while (true) {
+      val w = withContext(Dispatchers.IO) { Weather.fetch(context) }
+      if (w.isNotBlank()) {
+        value = w
+        delay(30L * 60 * 1000) // refresh every 30 min
+      } else {
+        delay(60L * 1000) // retry in 1 min
+      }
+    }
   }
   val battery = batteryState()
 
@@ -1150,38 +1161,3 @@ private fun loadApps(context: Context): List<AppEntry> {
       .sortedBy { it.label.lowercase(Locale.getDefault()) }
 }
 
-private fun fetchWeather(): String =
-    runCatching {
-          fun get(spec: String): String {
-            val c = URL(spec).openConnection() as HttpURLConnection
-            c.connectTimeout = 8000
-            c.readTimeout = 8000
-            c.setRequestProperty("User-Agent", "PortalLauncher/1.0")
-            return c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-          }
-          val geo = JSONObject(get("https://ipapi.co/json/"))
-          val lat = geo.getDouble("latitude")
-          val lon = geo.getDouble("longitude")
-          val w =
-              JSONObject(
-                  get(
-                      "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
-                          "&current=temperature_2m,weather_code&temperature_unit=fahrenheit"))
-          val cur = w.getJSONObject("current")
-          val temp = cur.getDouble("temperature_2m").toInt()
-          val code = cur.getInt("weather_code")
-          val emoji =
-              when (code) {
-                0 -> "☀️"
-                1, 2 -> "🌤️"
-                3 -> "☁️"
-                in 45..48 -> "🌫️"
-                in 51..67 -> "🌦️"
-                in 71..77 -> "🌨️"
-                in 80..82 -> "🌧️"
-                in 95..99 -> "⛈️"
-                else -> "🌡️"
-              }
-          "$emoji $temp°"
-        }
-        .getOrDefault("")

@@ -260,20 +260,9 @@ class PhotoFrameController(
 
   private fun fetchWeather() {
     io.execute {
-      runCatching {
-            val geo = JSONObject(httpGet("https://ipapi.co/json/"))
-            val lat = geo.getDouble("latitude")
-            val lon = geo.getDouble("longitude")
-            val w =
-                JSONObject(
-                    httpGet(
-                        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
-                            "&current=temperature_2m,weather_code&temperature_unit=fahrenheit"))
-            val cur = w.getJSONObject("current")
-            val temp = cur.getDouble("temperature_2m").toInt()
-            weatherText = "${weatherEmoji(cur.getInt("weather_code"))} $temp°"
-          }
-          .onFailure { weatherText = "" }
+      // Shared resilient fetch: cached location + multi-provider geolocation.
+      val w = Weather.fetch(context)
+      if (w.isNotBlank()) weatherText = w
     }
   }
 
@@ -294,18 +283,6 @@ class PhotoFrameController(
     return c.inputStream.use { BitmapFactory.decodeStream(it) }
   }
 
-  private fun weatherEmoji(code: Int): String =
-      when (code) {
-        0 -> "☀️"
-        1, 2 -> "🌤️"
-        3 -> "☁️"
-        in 45..48 -> "🌫️"
-        in 51..67 -> "🌦️"
-        in 71..77 -> "🌨️"
-        in 80..82 -> "🌧️"
-        in 95..99 -> "⛈️"
-        else -> "🌡️"
-      }
 
   private val MATCH = FrameLayout.LayoutParams.MATCH_PARENT
   private val WRAP = FrameLayout.LayoutParams.WRAP_CONTENT
