@@ -177,7 +177,11 @@ private fun FolderPicker(onPick: (String) -> Unit, onCancel: () -> Unit) {
         modifier = Modifier.fillMaxWidth().weight(1f).focusRequester(firstFocus).focusGroup()) {
       if (current == null) {
         if (roots.isEmpty()) {
-          item { Hint("No storage found. If you plugged in a USB drive, give it a moment.") }
+          item {
+            Hint(
+                "No folders found yet. Add some photos to your Portal's storage and they'll " +
+                    "show up here.")
+          }
         }
         items(roots) { root ->
           SimpleRow(icon = "🖴", title = root.label, subtitle = root.path) {

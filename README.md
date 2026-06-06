@@ -5,7 +5,9 @@ keeping it alive after Meta wound the platform down. Immortal turns a Portal int
 own: your launcher, your screensaver, and an app store that installs a curated catalog
 on-device, with remote self-update so it improves over time without a cable.
 
-Package: `com.immortal.launcher` · Target: Meta Portal (Android 10 / API 29, arm64, no GMS).
+Package: `com.immortal.launcher` · Target: Meta Portal — **Android 9** (API 28: the 2018 Portal /
+Portal+ and the Portal TV) and **Android 10** (API 29: the 2019 and 2021 models), arm64, no Google
+services. Touch models and the remote-driven **Portal TV** are both supported.
 
 ## What's in it
 
@@ -16,14 +18,22 @@ Package: `com.immortal.launcher` · Target: Meta Portal (Android 10 / API 29, ar
   another — name them, rename them, and drag apps back out, just like a phone. A green **Calls**
   tile bridges to the stock dialer/contacts for WhatsApp and Messenger calling.
 - **Screensaver** (`PhotoDreamService` / `PhotoFrameController`) — a photo frame with stock-style
-  clock/battery/date/weather widgets over a rotating photo feed. Swipe to change photos, tap to
-  exit. The image source is pluggable (keyless Lorem Picsum by default, Unsplash-ready); weather
-  is keyless Open-Meteo + IP geolocation.
-- **App Store** (`StoreActivity` / `StoreCatalog`) — renders a hosted JSON catalog
-  ([`catalog.json`](catalog.json)) by category and installs apps. F-Droid entries resolve the
-  current APK at install time so the catalog never goes stale; your own apps use a direct
-  `apkUrl`. **The store is open to community submissions** — built a Portal app?
-  [Get it listed](SUBMISSIONS.md).
+  clock/battery/date/weather widgets. Point it at a folder of **your own photos and videos**, or
+  use the keyless built-in feed (Lorem Picsum, Unsplash-ready); weather is keyless Open-Meteo + IP
+  geolocation. It cooperates with the Portal's presence sensor so it runs as a **permanent frame**
+  while someone's around (and on mains power), and on the battery-powered **Portal Go** an optional
+  "sleep when nobody's around" setting saves power. Swipe to change photos, tap to exit.
+- **App Store** (`StoreActivity` / `StoreCatalog`) — a hosted JSON catalog
+  ([`catalog.json`](catalog.json), schema v2) rendered with app icons, search, per-app detail
+  pages (author, source, website, credit), device-compatibility badges, and an "Updates" section
+  for installed apps. F-Droid entries resolve the current APK at install time so the catalog never
+  goes stale; your own apps use a direct `apkUrl`. **The store is open to community submissions** —
+  every catalog PR is CI-validated. Built a Portal app? [Get it listed](SUBMISSIONS.md).
+- **Help tour** (`HelpActivity`) — a friendly, non-technical walkthrough on a Help tile (and once
+  on first launch), so anyone can pick up a revived Portal.
+- **Portal TV support** — full remote/D-pad navigation across the whole UI, a Calls tile that
+  bridges to the TV's stock home, and an Immortal tile that appears on that stock home so you can
+  hop back.
 - **Universal installer** — on the Gen-1 Portal+ (Android 9) the *built-in* Android installer
   dialog is broken (renders with no buttons), so sideloading normally fails. Immortal ships a
   shell-privileged silent-install daemon (started by the kit) that fixes this for the whole
@@ -75,7 +85,14 @@ every app you've already installed. Because Portals have no battery and stay plu
 reboot rarely, so in practice you set up your apps once and seldom touch this again. Immortal shows
 a clear note in the store when installs are paused, so it's never a mystery.
 
-Newer Portals (Portal Go, Mini, gen-2) have a working installer and don't need any of this.
+The **Portal TV** is the same generation (Android 9), so the same install mechanics apply. It has
+no touchscreen, but Immortal is fully driveable with the TV remote — the home grid, folders, App
+Store, and screensaver settings all navigate with the D-pad.
+
+Newer Portals (Portal Go, Mini, gen-2) have a working installer and don't need any of this — though
+their silent-install helper also stops after a reboot, so a new app installed then goes through the
+system dialog (and some Play-Store split apps won't parse there) until you re-run the kit. The store
+shows a note when that happens.
 
 ### Play-Store apps via Aurora on a first-gen Portal
 
@@ -111,6 +128,25 @@ Hosted from this repo:
 Release builds must be signed with the **same** key every time (in-place self-update is
 signature-checked). Signing is configured via a git-ignored `keystore.properties`; keep that key
 backed up safely — losing it means devices can no longer self-update.
+
+## Limitations (the honest list)
+
+These are hardware/firmware limits of the Portal itself, confirmed on-device — not things a future
+Immortal release can fix:
+
+- **No Google Play Services.** The Portal never had them, and they can't be added (it would need
+  Google's own signed software, or system-level write access we don't have). Aurora Store installs
+  plenty of apps that work fine, but anything that depends on Google for sign-in, push
+  notifications, or DRM may be limited or won't run. microG isn't an option either — the firmware
+  has no signature-spoofing support.
+- **The bootloader can't be unlocked, so there's no root.** Meta ships the standard "OEM unlocking"
+  developer toggle, but the bootloader hard-refuses (`Flashing Unlock is not allowed`) even with it
+  enabled, and there's no manufacturer unlock program. This is why the first-gen install helper
+  can't be made permanent — root was the only path, and it's welded shut.
+- **USB-C thumb drives don't mount reliably.** On the Portal Go the port switches to host mode and a
+  drive powers up and enumerates, but the storage stack doesn't bind it, so it doesn't appear as a
+  folder. Put screensaver photos on the device's own storage instead (e.g. copy them across while
+  it's plugged into your computer).
 
 ## Disclaimer
 

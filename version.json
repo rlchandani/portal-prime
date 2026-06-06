@@ -1,6 +1,6 @@
 {
-  "versionCode": 22,
-  "versionName": "1.21",
+  "versionCode": 23,
+  "versionName": "1.22",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.21 — a friendly Help tour. A new Help tile (and a one-time welcome on first launch) walks anyone through Immortal in plain language: getting around, making video calls, the photo frame, the app store and Aurora, what to do after a restart to re-enable installs, the honest limits, and how to join the community on GitHub."
+  "notes": "Immortal 1.22 — launch polish. Honest screensaver wording (photos live on your Portal's own storage; USB/SD only where a model supports it) and README updates covering the redesigned store, Portal TV remote support, the photo frame, and an honest limitations list (no Google Play Services, locked bootloader/no root, USB drives don't mount)."
 }

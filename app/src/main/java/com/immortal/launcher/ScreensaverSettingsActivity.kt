@@ -171,9 +171,10 @@ private fun ScreensaverSettingsScreen() {
         }
       }
       Text(
-          "Tip: copy photos and videos onto a USB-C drive, plug it into your Portal, and pick it " +
-              "here. If a folder can't be read (e.g. the drive is unplugged), Immortal shows its " +
-              "built-in photos instead.",
+          "Tip: put your photos and videos in a folder on your Portal and pick it here — for " +
+              "example, copy them across while it's connected to your computer. (An SD card or " +
+              "USB-C drive can work too on models that support one.) If a folder can't be read, " +
+              "Immortal shows its built-in photos instead.",
           color = Color(0xFF7C7C7C),
           fontSize = 13.sp,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
@@ -269,7 +270,7 @@ private fun ScreensaverSettingsScreen() {
 
 private fun folderSubtitle(usesFolder: Boolean, name: String?, count: Int?): String =
     when {
-      !usesFolder -> "Pick a folder on the Portal, an SD card, or a USB drive."
+      !usesFolder -> "Pick a folder of your photos and videos on your Portal."
       count == null -> "${name ?: "Selected folder"} — scanning…"
       count < 0 -> "${name ?: "Selected folder"} — can't read it; showing built-in photos"
       count == 0 -> "${name ?: "Selected folder"} — no photos or videos found"
