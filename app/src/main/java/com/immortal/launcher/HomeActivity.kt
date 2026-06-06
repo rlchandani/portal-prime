@@ -143,25 +143,7 @@ class HomeActivity : ComponentActivity() {
                 startActivity(Intent(this, PhotoFramePreviewActivity::class.java))
               }
             },
-            onExitHome = {
-              // Open the STOCK Portal home — the only caller Meta trusts to
-              // launch Contacts/calling/camera. Cold start redirects (bounces
-              // back here) while its task spins up, so we fire twice: the first
-              // creates the task, the second (after a beat) brings it forward so
-              // it stays. Home button returns to Immortal.
-              val stock =
-                  Intent(Intent.ACTION_MAIN)
-                      .addCategory(Intent.CATEGORY_LAUNCHER)
-                      .setComponent(
-                          ComponentName(
-                              "com.facebook.alohaapps.launcher",
-                              "com.facebook.aloha.app.home.touch.HomeActivity"))
-                      .addFlags(
-                          Intent.FLAG_ACTIVITY_NEW_TASK or
-                              Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-              runCatching { startActivity(stock) }
-              window.decorView.postDelayed({ runCatching { startActivity(stock) } }, 600)
-            },
+            onExitHome = { launchStockHome() },
             onUninstall = { pkg ->
               // System uninstall dialog; no special permission needed.
               runCatching {
@@ -197,6 +179,52 @@ class HomeActivity : ComponentActivity() {
       hide(WindowInsetsCompat.Type.systemBars())
       systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
+  }
+
+  /**
+   * The "Calls" tile bridges to the STOCK Portal home — the only caller Meta trusts
+   * to launch Contacts/calling/camera. We try the touchscreen Portals' launcher
+   * first (the verified host on those models); if it isn't present (e.g. the Portal
+   * TV, which uses a different "ripleyhome" launcher), we fall back to whatever stock
+   * HOME activity this device actually has, so the bridge works on any Portal.
+   *
+   * Cold start bounces back here while the task spins up, so we fire twice: the
+   * first creates the task, the second (after a beat) brings it forward to stay.
+   */
+  private fun launchStockHome() {
+    fun fire(component: ComponentName): Boolean =
+        runCatching {
+              val intent =
+                  Intent(Intent.ACTION_MAIN)
+                      .addCategory(Intent.CATEGORY_LAUNCHER)
+                      .setComponent(component)
+                      .addFlags(
+                          Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+              startActivity(intent)
+              window.decorView.postDelayed({ runCatching { startActivity(intent) } }, 600)
+            }
+            .isSuccess
+
+    // 1) Touchscreen Portals' stock launcher (the Contacts/calling host).
+    val touch =
+        ComponentName(
+            "com.facebook.alohaapps.launcher", "com.facebook.aloha.app.home.touch.HomeActivity")
+    if (fire(touch)) return
+
+    // 2) Fallback: this device's real stock HOME (e.g. the Portal TV's ripleyhome),
+    //    excluding ourselves and the system fallback homes.
+    val stock =
+        packageManager
+            .queryIntentActivities(
+                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME), 0)
+            .map { it.activityInfo }
+            .firstOrNull {
+              it.packageName != packageName &&
+                  it.packageName != "com.android.settings" &&
+                  it.packageName != "com.android.tv.settings" &&
+                  !it.name.contains("FallbackHome", ignoreCase = true)
+            }
+    if (stock != null) fire(ComponentName(stock.packageName, stock.name))
   }
 }
 
@@ -1207,7 +1235,7 @@ private fun loadApps(context: Context): List<AppEntry> {
   return pm.queryIntentActivities(intent, 0)
       .filter {
         val pkg = it.activityInfo.packageName
-        pkg != context.packageName && pkg !in Curation.hiddenPackages
+        pkg != context.packageName && !Curation.isHidden(pkg, "")
       }
       .mapNotNull { ri ->
         runCatching {

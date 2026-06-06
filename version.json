@@ -1,6 +1,6 @@
 {
-  "versionCode": 14,
-  "versionName": "1.13",
+  "versionCode": 15,
+  "versionName": "1.14",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.13 — remote-control (D-pad) navigation for the Portal TV: every screen is navigable with the remote, with a clear highlight on the selected item."
+  "notes": "Immortal 1.14 — Portal TV polish: the Calls tile now bridges to the stock TV home, the grid hides internal entries (boot flow, stock home) and folds Picture Mode into Settings, Chrome (which doesn't render on the TV) is hidden there in favour of the working Vewd browser, and the screensaver settings rows no longer overflow — the time-per-item control is now a stepper you can navigate past with the remote."
 }

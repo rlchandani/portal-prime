@@ -13,9 +13,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
@@ -196,20 +198,14 @@ private fun ScreensaverSettingsScreen() {
           )
         }
         Divider()
-        Column(modifier = Modifier.fillMaxWidth().padding(18.dp)) {
-          Text("Time per item: ${settings.intervalSec}s", color = Color.White, fontSize = 17.sp)
-          val sliderSrc = remember { MutableInteractionSource() }
-          Slider(
-              value = settings.intervalSec.toFloat(),
-              onValueChange = { settings = settings.copy(intervalSec = it.toInt()) },
-              onValueChangeFinished = {
-                ScreensaverConfig.setInterval(context, settings.intervalSec)
-              },
-              valueRange = 5f..120f,
-              interactionSource = sliderSrc,
-              modifier = Modifier.padding(top = 4.dp).focusRing(sliderSrc, RoundedCornerShape(8.dp)),
-          )
-        }
+        IntervalStepper(
+            seconds = settings.intervalSec,
+            onChange = { v ->
+              val clamped = ScreensaverConfig.clampInterval(v)
+              ScreensaverConfig.setInterval(context, clamped)
+              settings = settings.copy(intervalSec = clamped)
+            },
+        )
         Divider()
         ToggleRow("Shuffle order", settings.shuffle) {
           ScreensaverConfig.setShuffle(context, it)
@@ -227,7 +223,7 @@ private fun ScreensaverSettingsScreen() {
           color = Color(0xFF2E6BE6),
           shape = RoundedCornerShape(16.dp),
           modifier =
-              Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp)) {
+              Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
                 context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
               },
       ) {
@@ -284,7 +280,7 @@ private fun Divider() {
 private fun SelectableRow(title: String, subtitle: String, selected: Boolean, onClick: () -> Unit) {
   Row(
       modifier =
-          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(12.dp)) { onClick() }
+          Modifier.fillMaxWidth().tvFocusableRow { onClick() }
               .padding(start = 18.dp, end = 12.dp, top = 14.dp, bottom = 14.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
@@ -306,13 +302,55 @@ private fun SelectableRow(title: String, subtitle: String, selected: Boolean, on
 private fun ToggleRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit) {
   Row(
       modifier =
-          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(12.dp)) { onChange(!checked) }
-              .padding(horizontal = 18.dp, vertical = 8.dp),
+          Modifier.fillMaxWidth().tvFocusableRow { onChange(!checked) }
+              .padding(horizontal = 18.dp, vertical = 14.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Text(title, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
     // Visual only — the row toggles it (so the remote's center button works).
     Switch(checked = checked, onCheckedChange = null)
+  }
+}
+
+/**
+ * Remote-friendly replacement for a slider: focusable, with LEFT/RIGHT adjusting the
+ * value and UP/DOWN passing through so the remote can move off it (a focused Slider
+ * traps all four directions). On touch it's still adjustable via the on-screen arrows.
+ */
+@Composable
+private fun IntervalStepper(seconds: Int, onChange: (Int) -> Unit) {
+  val src = remember { MutableInteractionSource() }
+  val focused by src.collectIsFocusedAsState()
+  Row(
+      modifier =
+          Modifier.fillMaxWidth()
+              .onKeyEvent { e ->
+                if (e.type == KeyEventType.KeyDown) {
+                  when (e.key) {
+                    Key.DirectionLeft -> {
+                      onChange(seconds - 5)
+                      true
+                    }
+                    Key.DirectionRight -> {
+                      onChange(seconds + 5)
+                      true
+                    }
+                    else -> false // let UP/DOWN/CENTER move focus away
+                  }
+                } else false
+              }
+              .focusable(interactionSource = src)
+              .background(if (focused) Color(0x402E6BE6) else Color.Transparent)
+              .padding(horizontal = 18.dp, vertical = 14.dp),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text("Time per item", color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text(
+        "◀   ${seconds}s   ▶",
+        color = if (focused) Color.White else Color(0xFFBBBBBB),
+        fontSize = 17.sp,
+        fontWeight = FontWeight.SemiBold,
+    )
   }
 }
 
@@ -322,7 +360,7 @@ private fun TextButtonRow(label: String, onClick: () -> Unit) {
       label,
       color = Color(0xFF8AB4F8),
       fontSize = 16.sp,
-      modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(8.dp)) { onClick() }.padding(18.dp),
+      modifier = Modifier.fillMaxWidth().tvFocusableRow { onClick() }.padding(18.dp),
   )
 }
 

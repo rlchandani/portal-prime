@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.14 (2026-06-05)
+
+Portal TV polish, from end-to-end testing on the device with its remote.
+
+- **Calls tile** now bridges to the stock Portal TV home (`ripleyhome`) when the touchscreen call UI isn't available, so the remote can still reach calls and the stock app grid.
+- **Grid curation:** hide internal/non-user entries (the TV boot flow `rcbootflow` and the stock home), and fold the TV's **Picture Mode** into the Settings folder.
+- **Browser:** Chrome ships on every Portal but renders blank and is undriveable by the remote on the TV, so it's hidden there (device `ripley`) in favour of the working Vewd browser. It stays available on the touch models where it works.
+- **Screensaver settings on the remote:** focused rows no longer grow outside their card (filled highlight instead of scale), and the time-per-item control is now a left/right stepper you can navigate past — previously the slider trapped focus.
+
 ## 1.9 (2026-06-05)
 
 Clearer messaging when app installs are paused on a first-gen Portal.

@@ -9,6 +9,7 @@ package com.immortal.launcher
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -51,6 +52,21 @@ fun Modifier.tvFocusable(
           BorderStroke(if (focused) 3.dp else 0.dp, if (focused) ringColor else Color.Transparent),
           shape,
       )
+      .clickable(interactionSource = source, indication = null, onClick = onClick)
+}
+
+/**
+ * Focus treatment for full-width list rows: a filled highlight instead of a ring +
+ * scale, so the row doesn't grow outside its container on the TV. Center clicks it.
+ */
+@Composable
+fun Modifier.tvFocusableRow(
+    focusFill: Color = Color(0x402E6BE6),
+    onClick: () -> Unit,
+): Modifier {
+  val source = remember { MutableInteractionSource() }
+  val focused by source.collectIsFocusedAsState()
+  return this.background(if (focused) focusFill else Color.Transparent)
       .clickable(interactionSource = source, indication = null, onClick = onClick)
 }
 

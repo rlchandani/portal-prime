@@ -213,8 +213,7 @@ private fun FolderRow(dir: File, onClick: () -> Unit) {
       }
   Row(
       modifier =
-          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(12.dp)) { onClick() }
-              .padding(vertical = 8.dp),
+          Modifier.fillMaxWidth().tvFocusableRow { onClick() }.padding(vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(12.dp),
   ) {
@@ -308,7 +307,10 @@ private fun PrimaryButton(label: String, subtitle: String?, onClick: () -> Unit)
   Surface(
       color = Color(0xFF2E6BE6),
       shape = RoundedCornerShape(14.dp),
-      modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp)) { onClick() },
+      modifier =
+          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
+            onClick()
+          },
   ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -326,8 +328,7 @@ private fun PrimaryButton(label: String, subtitle: String?, onClick: () -> Unit)
 private fun SimpleRow(icon: String, title: String, subtitle: String, onClick: () -> Unit) {
   Row(
       modifier =
-          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(12.dp)) { onClick() }
-              .padding(vertical = 6.dp),
+          Modifier.fillMaxWidth().tvFocusableRow { onClick() }.padding(vertical = 6.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(14.dp),
   ) {
