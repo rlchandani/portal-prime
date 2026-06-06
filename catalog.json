@@ -1,48 +1,236 @@
 {
-  "schemaVersion": 1,
-  "updated": "2026-06-04",
-  "note": "Portal app catalog. Host this file on a public URL (e.g. GitHub raw) and point the store's CATALOG_URL at it. Entries with source 'fdroid' resolve the current APK at install time via the F-Droid API, so they never go stale. Entries with source 'url' use a direct apkUrl (use this for your own custom Portal apps). Multi-ABI apps (e.g. VLC) ship separate per-architecture APKs on F-Droid; pin the arm64-v8a build with 'versionCode' since Portal is arm64.",
+  "schemaVersion": 2,
+  "updated": "2026-06-06",
+  "note": "Portal app catalog, schema v2. All v2 fields are ADDITIVE so v1 clients keep working. Entries with source 'fdroid' resolve the current APK at install time via the F-Droid API, so they never go stale. Entries with source 'url' use a direct apkUrl (use this for your own custom Portal apps). Multi-ABI apps (e.g. VLC) ship separate per-architecture APKs on F-Droid; pin the arm64-v8a build with 'versionCode' since Portal is arm64. New in v2: iconUrl (https PNG; omit to get a monogram tile), author, homepage, submittedBy (community credit), longDescription (detail page), devices (['touch','tv'] — omit when the app runs on every Portal). minSdk drives the compatibility badge: the first-gen Portal/Portal+ and Portal TV are API 28, the 2019/2021 models are API 29.",
   "categories": [
     {
       "name": "Media & Entertainment",
       "apps": [
-        { "name": "VLC", "packageName": "org.videolan.vlc", "source": "fdroid", "fdroidId": "org.videolan.vlc", "versionCode": 13070106, "minSdk": 21, "description": "Plays virtually any video or audio file or network stream." },
-        { "name": "Jellyfin", "packageName": "org.jellyfin.mobile", "source": "fdroid", "fdroidId": "org.jellyfin.mobile", "minSdk": 21, "description": "Client for your own Jellyfin media server — movies, shows, music." },
-        { "name": "SmartTube", "packageName": "app.smarttube.fdroid", "source": "fdroid", "fdroidId": "app.smarttube.fdroid", "minSdk": 21, "description": "Ad-free YouTube built for the big screen — ideal for Portal TV." },
-        { "name": "AntennaPod", "packageName": "de.danoeh.antennapod", "source": "fdroid", "fdroidId": "de.danoeh.antennapod", "minSdk": 19, "description": "Full-featured podcast manager and player." },
-        { "name": "Transistor", "packageName": "org.y20k.transistor", "source": "fdroid", "fdroidId": "org.y20k.transistor", "minSdk": 25, "description": "Simple internet radio — add stations by stream URL." }
+        {
+          "name": "VLC",
+          "packageName": "org.videolan.vlc",
+          "source": "fdroid",
+          "fdroidId": "org.videolan.vlc",
+          "versionCode": 13070106,
+          "minSdk": 21,
+          "description": "Plays virtually any video or audio file or network stream.",
+          "longDescription": "The classic do-everything media player. Plays local files, USB drives, and network streams (SMB, NFS, HTTP, DLNA), with wide codec support and no ads or tracking.",
+          "iconUrl": "https://f-droid.org/repo/org.videolan.vlc/en-US/icon.png",
+          "author": "VideoLAN",
+          "homepage": "https://www.videolan.org/vlc/"
+        },
+        {
+          "name": "Jellyfin",
+          "packageName": "org.jellyfin.mobile",
+          "source": "fdroid",
+          "fdroidId": "org.jellyfin.mobile",
+          "minSdk": 21,
+          "description": "Client for your own Jellyfin media server — movies, shows, music.",
+          "longDescription": "Connects your Portal to a Jellyfin media server on your network: movies, TV shows, and music with artwork and resume support. A great way to turn the Portal into a kitchen or bedside theater.",
+          "iconUrl": "https://f-droid.org/repo/org.jellyfin.mobile/en-US/icon.png",
+          "author": "Jellyfin Project",
+          "homepage": "https://jellyfin.org"
+        },
+        {
+          "name": "SmartTube",
+          "packageName": "app.smarttube.fdroid",
+          "source": "fdroid",
+          "fdroidId": "app.smarttube.fdroid",
+          "minSdk": 21,
+          "description": "Ad-free YouTube built for the big screen — ideal for Portal TV.",
+          "longDescription": "A YouTube client designed for TVs and remotes: no ads, SponsorBlock, adjustable speed, and a lean interface. Made for the Portal TV's remote, and works on the touch models too.",
+          "iconUrl": "https://f-droid.org/repo/app.smarttube.fdroid/en-US/icon.png",
+          "author": "yuliskov",
+          "homepage": "https://github.com/yuliskov/SmartTube"
+        },
+        {
+          "name": "AntennaPod",
+          "packageName": "de.danoeh.antennapod",
+          "source": "fdroid",
+          "fdroidId": "de.danoeh.antennapod",
+          "minSdk": 19,
+          "description": "Full-featured podcast manager and player.",
+          "longDescription": "Subscribe, download, and stream podcasts with queue management, playback speed control, and chapter support. Completely open source.",
+          "iconUrl": "https://f-droid.org/repo/de.danoeh.antennapod/en-US/icon.png",
+          "author": "AntennaPod team",
+          "homepage": "https://antennapod.org"
+        },
+        {
+          "name": "Transistor",
+          "packageName": "org.y20k.transistor",
+          "source": "fdroid",
+          "fdroidId": "org.y20k.transistor",
+          "minSdk": 25,
+          "description": "Simple internet radio — add stations by stream URL.",
+          "longDescription": "A minimal internet-radio player: search stations or paste a stream URL, then tap to listen. Perfect for an always-on kitchen radio.",
+          "iconUrl": "https://f-droid.org/repo/org.y20k.transistor/en-US/icon.png",
+          "author": "y20k",
+          "homepage": "https://codeberg.org/y20k/transistor"
+        }
       ]
     },
     {
       "name": "Smart Home & Ambient",
       "apps": [
-        { "name": "Home Assistant", "packageName": "io.homeassistant.companion.android.minimal", "source": "fdroid", "fdroidId": "io.homeassistant.companion.android.minimal", "minSdk": 21, "description": "Control your smart home dashboard. No-GMS minimal build." },
-        { "name": "Breezy Weather", "packageName": "org.breezyweather", "source": "fdroid", "fdroidId": "org.breezyweather", "minSdk": 21, "description": "Clean, detailed weather with multiple data sources." }
+        {
+          "name": "Home Assistant",
+          "packageName": "io.homeassistant.companion.android.minimal",
+          "source": "fdroid",
+          "fdroidId": "io.homeassistant.companion.android.minimal",
+          "minSdk": 21,
+          "description": "Control your smart home dashboard. No-GMS minimal build.",
+          "longDescription": "The official Home Assistant companion app (minimal build, no Google services required). Pin your dashboards to a Portal on the wall or counter for an always-ready smart-home controller.",
+          "iconUrl": "https://f-droid.org/repo/io.homeassistant.companion.android.minimal/en-US/icon.png",
+          "author": "Home Assistant",
+          "homepage": "https://www.home-assistant.io"
+        },
+        {
+          "name": "Breezy Weather",
+          "packageName": "org.breezyweather",
+          "source": "fdroid",
+          "fdroidId": "org.breezyweather",
+          "minSdk": 21,
+          "description": "Clean, detailed weather with multiple data sources.",
+          "longDescription": "Beautiful, detailed forecasts — hourly graphs, precipitation, air quality, and alerts — from your choice of providers. Pairs nicely with the photo-frame Portal on a desk.",
+          "iconUrl": "https://f-droid.org/repo/org.breezyweather/en-US/icon.png",
+          "author": "Breezy Weather contributors",
+          "homepage": "https://github.com/breezy-weather/breezy-weather"
+        }
       ]
     },
     {
       "name": "Productivity",
       "apps": [
-        { "name": "Tasks.org", "packageName": "org.tasks", "source": "fdroid", "fdroidId": "org.tasks", "minSdk": 23, "description": "To-do lists and reminders with optional sync." },
-        { "name": "Markor", "packageName": "net.gsantner.markor", "source": "fdroid", "fdroidId": "net.gsantner.markor", "minSdk": 18, "description": "Fast, offline notes and to-do in plain text / Markdown." },
-        { "name": "Feeder", "packageName": "com.nononsenseapps.feeder", "source": "fdroid", "fdroidId": "com.nononsenseapps.feeder", "minSdk": 23, "description": "A clean RSS reader — turn the Portal into a news board." },
-        { "name": "Fossify Calendar", "packageName": "org.fossify.calendar", "source": "fdroid", "fdroidId": "org.fossify.calendar", "minSdk": 23, "description": "Private, offline calendar and agenda." }
+        {
+          "name": "Tasks.org",
+          "packageName": "org.tasks",
+          "source": "fdroid",
+          "fdroidId": "org.tasks",
+          "minSdk": 23,
+          "description": "To-do lists and reminders with optional sync.",
+          "longDescription": "A powerful open-source to-do list with reminders, tags, and optional CalDAV/Google Tasks sync. A family task board for the kitchen Portal.",
+          "iconUrl": "https://f-droid.org/repo/org.tasks/en-US/icon.png",
+          "author": "Alex Baker",
+          "homepage": "https://tasks.org"
+        },
+        {
+          "name": "Markor",
+          "packageName": "net.gsantner.markor",
+          "source": "fdroid",
+          "fdroidId": "net.gsantner.markor",
+          "minSdk": 18,
+          "description": "Fast, offline notes and to-do in plain text / Markdown.",
+          "longDescription": "Notes, to-dos, and journals stored as plain text and Markdown files on the device — fast, offline, and yours. Good for shared shopping lists.",
+          "iconUrl": "https://f-droid.org/repo/net.gsantner.markor/en-US/icon.png",
+          "author": "Gregor Santner",
+          "homepage": "https://github.com/gsantner/markor"
+        },
+        {
+          "name": "Feeder",
+          "packageName": "com.nononsenseapps.feeder",
+          "source": "fdroid",
+          "fdroidId": "com.nononsenseapps.feeder",
+          "minSdk": 23,
+          "description": "A clean RSS reader — turn the Portal into a news board.",
+          "longDescription": "Follow any site that publishes a feed. Offline reading, background sync, and a clean reading view that suits the Portal's screen.",
+          "iconUrl": "https://f-droid.org/repo/com.nononsenseapps.feeder/en-US/icon.png",
+          "author": "Jonas Kalderstam",
+          "homepage": "https://github.com/spacecowboy/Feeder"
+        },
+        {
+          "name": "Fossify Calendar",
+          "packageName": "org.fossify.calendar",
+          "source": "fdroid",
+          "fdroidId": "org.fossify.calendar",
+          "minSdk": 23,
+          "description": "Private, offline calendar and agenda.",
+          "longDescription": "A simple, private calendar with month/week/agenda views, events, and reminders — no account needed. Makes a great family wall calendar.",
+          "iconUrl": "https://f-droid.org/repo/org.fossify.calendar/en-US/icon.png",
+          "author": "Fossify",
+          "homepage": "https://github.com/FossifyOrg/Calendar"
+        }
       ]
     },
     {
       "name": "Utilities & Power Tools",
       "apps": [
-        { "name": "Aurora Store", "packageName": "com.aurora.store", "source": "fdroid", "fdroidId": "com.aurora.store", "minSdk": 21, "description": "Install Play Store apps anonymously — no Google account or GMS. On a Gen-1 Portal, pair with Shizuku (set Aurora's installer to Shizuku) so installs work." },
-        { "name": "Shizuku", "packageName": "moe.shizuku.privileged.api", "source": "url", "apkUrl": "https://github.com/RikkaApps/Shizuku/releases/download/v13.6.0/shizuku-v13.6.0.r1086.2650830c-release.apk", "minSdk": 23, "description": "Lets apps like Aurora install silently on a Gen-1 Portal. After installing, run the kit's --shizuku step to start it (re-run after a reboot)." },
-        { "name": "Material Files", "packageName": "me.zhanghai.android.files", "source": "fdroid", "fdroidId": "me.zhanghai.android.files", "minSdk": 21, "description": "A clean, capable file manager." },
-        { "name": "Fossify Gallery", "packageName": "org.fossify.gallery", "source": "fdroid", "fdroidId": "org.fossify.gallery", "minSdk": 23, "description": "Browse local photos and videos, no ads." },
-        { "name": "Termux", "packageName": "com.termux", "source": "fdroid", "fdroidId": "com.termux", "minSdk": 24, "description": "A full Linux terminal environment on the device." }
+        {
+          "name": "Aurora Store",
+          "packageName": "com.aurora.store",
+          "source": "fdroid",
+          "fdroidId": "com.aurora.store",
+          "minSdk": 21,
+          "description": "Install Play Store apps anonymously — no Google account or GMS.",
+          "longDescription": "Browse and install Play Store apps without a Google account or Google services. On a first-gen Portal, pair it with Shizuku (set Aurora's installer to Shizuku) so installs work. Note: some modern split-APK apps need Immortal's silent install helper running to install cleanly on any Portal.",
+          "iconUrl": "https://f-droid.org/repo/com.aurora.store/en-US/icon.png",
+          "author": "Aurora OSS",
+          "homepage": "https://auroraoss.com"
+        },
+        {
+          "name": "Shizuku",
+          "packageName": "moe.shizuku.privileged.api",
+          "source": "url",
+          "apkUrl": "https://github.com/RikkaApps/Shizuku/releases/download/v13.6.0/shizuku-v13.6.0.r1086.2650830c-release.apk",
+          "minSdk": 23,
+          "description": "Lets apps like Aurora install silently on a Gen-1 Portal.",
+          "longDescription": "Gives selected apps shell-level powers over ADB — the piece that lets Aurora Store install apps silently on a first-gen Portal. After installing, run the kit's --shizuku step to start it, and re-run after a reboot.",
+          "author": "RikkaApps",
+          "homepage": "https://shizuku.rikka.app"
+        },
+        {
+          "name": "Material Files",
+          "packageName": "me.zhanghai.android.files",
+          "source": "fdroid",
+          "fdroidId": "me.zhanghai.android.files",
+          "minSdk": 21,
+          "description": "A clean, capable file manager.",
+          "longDescription": "Browse device storage, USB drives, and network shares (SMB/FTP/SFTP) with a polished Material interface. Open-source and ad-free.",
+          "iconUrl": "https://f-droid.org/repo/me.zhanghai.android.files/en-US/icon.png",
+          "author": "Hai Zhang",
+          "homepage": "https://github.com/zhanghai/MaterialFiles"
+        },
+        {
+          "name": "Fossify Gallery",
+          "packageName": "org.fossify.gallery",
+          "source": "fdroid",
+          "fdroidId": "org.fossify.gallery",
+          "minSdk": 23,
+          "description": "Browse local photos and videos, no ads.",
+          "longDescription": "A fast, private gallery for the photos and videos on the device (including USB media) — handy alongside Immortal's photo-frame screensaver.",
+          "iconUrl": "https://f-droid.org/repo/org.fossify.gallery/en-US/icon.png",
+          "author": "Fossify",
+          "homepage": "https://github.com/FossifyOrg/Gallery"
+        },
+        {
+          "name": "Termux",
+          "packageName": "com.termux",
+          "source": "fdroid",
+          "fdroidId": "com.termux",
+          "minSdk": 24,
+          "description": "A full Linux terminal environment on the device.",
+          "longDescription": "A complete terminal emulator and Linux package environment — ssh, python, git, and hundreds of packages, no root needed. For the tinkerers.",
+          "iconUrl": "https://f-droid.org/repo/com.termux/en-US/icon.png",
+          "author": "Termux",
+          "homepage": "https://termux.dev"
+        }
       ]
     },
     {
       "name": "Portal Originals",
       "apps": [
-        { "name": "Immortal", "packageName": "com.immortal.launcher", "source": "url", "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk", "minSdk": 24, "description": "The Immortal launcher, screensaver, and app store — the project itself." }
+        {
+          "name": "Immortal",
+          "packageName": "com.immortal.launcher",
+          "source": "url",
+          "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
+          "minSdk": 24,
+          "description": "The Immortal launcher, screensaver, and app store — the project itself.",
+          "longDescription": "The launcher you're using right now: home screen, photo-frame screensaver with local media support, this app store, and self-update. Community app submissions welcome — see the project page.",
+          "iconUrl": "https://raw.githubusercontent.com/starbrightlab/immortal/main/immortal-icon.png",
+          "author": "Starbright Lab",
+          "homepage": "https://github.com/starbrightlab/immortal",
+          "submittedBy": "starbrightlab"
+        }
       ]
     }
   ]
