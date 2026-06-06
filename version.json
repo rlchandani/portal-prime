@@ -1,6 +1,6 @@
 {
-  "versionCode": 10,
-  "versionName": "1.9",
+  "versionCode": 11,
+  "versionName": "1.10",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.9 — clearer messaging when app installs are paused on a first-gen Portal after a reboot. The app now tells you exactly what to do (reconnect and re-run the installer) instead of a misleading hint. No functional change."
+  "notes": "Immortal 1.10 — polish. The screensaver no longer shows a permanent 0% battery on Portals that don't have one, and the home header is rebalanced (weather and date stacked on the right)."
 }
