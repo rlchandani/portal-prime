@@ -1,6 +1,6 @@
 {
-  "versionCode": 13,
-  "versionName": "1.12",
+  "versionCode": 14,
+  "versionName": "1.13",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.12 — picking a screensaver folder is clearer: each folder shows its photo/video count and thumbnail previews, and inside a folder you see a preview of the media it contains."
+  "notes": "Immortal 1.13 — remote-control (D-pad) navigation for the Portal TV: every screen is navigable with the remote, with a clear highlight on the selected item."
 }
