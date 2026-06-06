@@ -31,12 +31,16 @@ object InstallDaemon {
 
   private fun queueDir(context: Context) = File(context.getExternalFilesDir(null), "installq")
 
+  /** Heartbeat freshness window (extracted as a pure function for testing). */
+  internal fun heartbeatFresh(tsSeconds: Long, nowSeconds: Long): Boolean =
+      (nowSeconds - tsSeconds) in 0..20
+
   /** True if the daemon is alive (it writes a unix-time heartbeat every ~2s). */
   fun isAvailable(context: Context): Boolean {
     val ts =
         runCatching { File(queueDir(context), ".heartbeat").readText().trim().toLong() }
             .getOrDefault(0L)
-    return (System.currentTimeMillis() / 1000 - ts) in 0..20
+    return heartbeatFresh(ts, System.currentTimeMillis() / 1000)
   }
 
   /**
@@ -46,7 +50,10 @@ object InstallDaemon {
    * system installer and don't need the daemon. Used to tell the two apart so a
    * paused daemon on a Gen-1 reads as "re-run setup", not a bug.
    */
-  fun legacyInstaller(): Boolean = Build.VERSION.SDK_INT < 29
+  /** Pure SDK check (extracted for testing): API < 29 == broken-installer Gen-1. */
+  internal fun isLegacy(sdkInt: Int): Boolean = sdkInt < 29
+
+  fun legacyInstaller(): Boolean = isLegacy(Build.VERSION.SDK_INT)
 
   /** Gen-1 with the daemon down: on-device installs are paused until it's restarted. */
   fun installPaused(context: Context): Boolean = legacyInstaller() && !isAvailable(context)
@@ -55,8 +62,15 @@ object InstallDaemon {
    * Queue [apk] for the daemon and block (on a background thread) until it
    * reports a result or [timeoutMs] elapses. Returns true on success.
    */
-  fun install(context: Context, apk: File, name: String, timeoutMs: Long = 180_000): Boolean {
-    val d = queueDir(context).apply { mkdirs() }
+  fun install(context: Context, apk: File, name: String, timeoutMs: Long = 180_000): Boolean =
+      install(queueDir(context), apk, name, timeoutMs)
+
+  /**
+   * The queue protocol against an explicit directory — extracted so the
+   * atomic-rename + poll-for-result behaviour is testable without a Context.
+   */
+  internal fun install(queueDir: File, apk: File, name: String, timeoutMs: Long = 180_000): Boolean {
+    val d = queueDir.apply { mkdirs() }
     val target = File(d, "$name.apk")
     val done = File(d, "$name.apk.done")
     val failed = File(d, "$name.apk.failed")

@@ -52,7 +52,9 @@ object StoreCatalog {
       "https://raw.githubusercontent.com/starbrightlab/immortal/main/catalog.json"
 
   private val io = Executors.newSingleThreadExecutor()
-  private val main = Handler(Looper.getMainLooper())
+  // Lazy so touching the pure helpers (parse/resolveApkUrl) in a unit test doesn't
+  // eagerly construct a main-looper Handler (unavailable off-device).
+  private val main by lazy { Handler(Looper.getMainLooper()) }
 
   private const val TAG = "ImmortalStore"
 
@@ -82,7 +84,7 @@ object StoreCatalog {
     }
   }
 
-  private fun parse(json: String): List<CatalogApp> {
+  internal fun parse(json: String): List<CatalogApp> {
     val out = mutableListOf<CatalogApp>()
     val cats = JSONObject(json).getJSONArray("categories")
     for (i in 0 until cats.length()) {
@@ -145,7 +147,7 @@ object StoreCatalog {
     }
   }
 
-  private fun resolveApkUrl(app: CatalogApp): String {
+  internal fun resolveApkUrl(app: CatalogApp): String {
     if (app.source == "url" && !app.apkUrl.isNullOrBlank()) return app.apkUrl!!
     val id = app.fdroidId ?: app.packageName
     // A pinned versionCode (e.g. the arm64 build of a multi-ABI app like VLC)

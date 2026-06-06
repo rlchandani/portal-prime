@@ -8,7 +8,6 @@
       "apps": [
         { "name": "VLC", "packageName": "org.videolan.vlc", "source": "fdroid", "fdroidId": "org.videolan.vlc", "versionCode": 13070106, "minSdk": 21, "description": "Plays virtually any video or audio file or network stream." },
         { "name": "Jellyfin", "packageName": "org.jellyfin.mobile", "source": "fdroid", "fdroidId": "org.jellyfin.mobile", "minSdk": 21, "description": "Client for your own Jellyfin media server — movies, shows, music." },
-        { "name": "NewPipe", "packageName": "org.schabi.newpipe", "source": "fdroid", "fdroidId": "org.schabi.newpipe", "minSdk": 21, "description": "Lightweight YouTube front-end with background play. No Google account." },
         { "name": "SmartTube", "packageName": "app.smarttube.fdroid", "source": "fdroid", "fdroidId": "app.smarttube.fdroid", "minSdk": 21, "description": "Ad-free YouTube built for the big screen — ideal for Portal TV." },
         { "name": "AntennaPod", "packageName": "de.danoeh.antennapod", "source": "fdroid", "fdroidId": "de.danoeh.antennapod", "minSdk": 19, "description": "Full-featured podcast manager and player." },
         { "name": "Transistor", "packageName": "org.y20k.transistor", "source": "fdroid", "fdroidId": "org.y20k.transistor", "minSdk": 25, "description": "Simple internet radio — add stations by stream URL." }

@@ -72,4 +72,10 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   debugImplementation(libs.androidx.compose.ui.tooling)
+
+  // Unit tests (pure JVM — no device/emulator). org.json provides a real
+  // implementation so JSON-parsing logic can be tested off-device (the android.jar
+  // stub used in unit tests otherwise throws "not mocked").
+  testImplementation(libs.junit)
+  testImplementation("org.json:json:20240303")
 }

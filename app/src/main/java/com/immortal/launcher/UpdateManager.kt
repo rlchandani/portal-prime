@@ -46,7 +46,9 @@ object UpdateManager {
       "https://raw.githubusercontent.com/starbrightlab/immortal/main/version.json"
 
   private val io = Executors.newSingleThreadExecutor()
-  private val main = Handler(Looper.getMainLooper())
+  // Lazy so touching the pure helpers (parseManifest/shouldUpdate/cacheBust) in a
+  // unit test doesn't eagerly construct a main-looper Handler (unavailable off-device).
+  private val main by lazy { Handler(Looper.getMainLooper()) }
 
   /** Returns an [UpdateInfo] on the main thread only if a newer build exists. */
   fun checkForUpdate(context: Context, onResult: (UpdateInfo?) -> Unit) {
@@ -55,27 +57,38 @@ object UpdateManager {
           runCatching {
                 // Cache-bust: GitHub raw caches ~5 min, which would delay update
                 // detection; a unique query param forces a fresh read each check.
-                val base = resolveUrl(context)
-                val url = base + (if (base.contains("?")) "&" else "?") + "t=" + System.currentTimeMillis()
-                val j = JSONObject(httpGet(url))
-                val info =
-                    UpdateInfo(
-                        versionCode = j.getLong("versionCode"),
-                        versionName = j.optString("versionName"),
-                        apkUrl = j.getString("apkUrl"),
-                        notes = j.optString("notes"),
-                    )
+                val url = cacheBust(resolveUrl(context), System.currentTimeMillis())
+                val info = parseManifest(httpGet(url))
                 android.util.Log.i(
                     "ImmortalUpdate",
                     "url=$url remote=${info.versionCode} installed=${installedVersionCode(context)}",
                 )
-                if (info.versionCode > installedVersionCode(context)) info else null
+                if (shouldUpdate(info.versionCode, installedVersionCode(context))) info else null
               }
               .onFailure { android.util.Log.w("ImmortalUpdate", "update check failed", it) }
               .getOrNull()
       main.post { onResult(available) }
     }
   }
+
+  /** Parse a `version.json` manifest (extracted as a pure function for testing). */
+  internal fun parseManifest(json: String): UpdateInfo {
+    val j = JSONObject(json)
+    return UpdateInfo(
+        versionCode = j.getLong("versionCode"),
+        versionName = j.optString("versionName"),
+        apkUrl = j.getString("apkUrl"),
+        notes = j.optString("notes"),
+    )
+  }
+
+  /** Whether the remote build is newer than what's installed. */
+  internal fun shouldUpdate(remoteVersionCode: Long, installedVersionCode: Long): Boolean =
+      remoteVersionCode > installedVersionCode
+
+  /** Append a cache-busting query param, preserving any existing query string. */
+  internal fun cacheBust(base: String, t: Long): String =
+      base + (if (base.contains("?")) "&" else "?") + "t=" + t
 
   /** Downloads and commits the update; status text is posted on the main thread. */
   fun installUpdate(context: Context, info: UpdateInfo, status: (String) -> Unit) {

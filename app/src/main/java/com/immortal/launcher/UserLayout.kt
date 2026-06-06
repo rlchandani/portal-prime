@@ -28,24 +28,31 @@ object UserLayout {
     val raw =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null)
             ?: return emptyMap()
-    return runCatching {
-          val obj = JSONObject(raw)
-          buildMap {
-            obj.keys().forEach { k -> put(k, obj.getString(k)) }
-          }
-        }
-        .getOrDefault(emptyMap())
+    return deserialize(raw)
   }
 
   fun save(context: Context, assignments: Map<String, String>) {
-    val obj = JSONObject()
-    assignments.forEach { (k, v) -> obj.put(k, v) }
     context
         .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit()
-        .putString(KEY, obj.toString())
+        .putString(KEY, serialize(assignments))
         .apply()
   }
+
+  /** JSON encode of the assignment map (extracted for testing). */
+  internal fun serialize(assignments: Map<String, String>): String {
+    val obj = JSONObject()
+    assignments.forEach { (k, v) -> obj.put(k, v) }
+    return obj.toString()
+  }
+
+  /** Tolerant decode — malformed/garbage input yields an empty map, never throws. */
+  internal fun deserialize(raw: String): Map<String, String> =
+      runCatching {
+            val obj = JSONObject(raw)
+            buildMap { obj.keys().forEach { k -> put(k, obj.getString(k)) } }
+          }
+          .getOrDefault(emptyMap())
 
   /** A folder name not already used by either the user map or the curated set. */
   fun nextFolderName(existing: Set<String>): String {
