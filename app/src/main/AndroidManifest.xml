@@ -21,6 +21,7 @@
 
     <application
         android:allowBackup="true"
+        android:requestLegacyExternalStorage="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -64,6 +65,22 @@
         <activity
             android:name=".PhotoFramePreviewActivity"
             android:exported="false"
+            android:theme="@style/Theme.SampleApp" />
+
+        <!-- Screensaver settings (source folder/USB, fit, interval, …), opened from
+             the Screensaver tile in the launcher's Settings folder. -->
+        <activity
+            android:name=".ScreensaverSettingsActivity"
+            android:exported="false"
+            android:label="Screensaver"
+            android:theme="@style/Theme.SampleApp" />
+
+        <!-- In-app folder browser for picking a screensaver source (the Portal has
+             no system document picker), reachable from the screensaver settings. -->
+        <activity
+            android:name=".FolderPickerActivity"
+            android:exported="false"
+            android:label="Choose a folder"
             android:theme="@style/Theme.SampleApp" />
 
         <!-- "Install an APK" file browser, opened from the App Store. -->

@@ -26,6 +26,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.VideoView
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
@@ -39,24 +40,30 @@ import org.json.JSONObject
  * The photo-frame UI + update logic, decoupled from any host. Used by both
  * [PhotoDreamService] (the real screensaver) and [PhotoFramePreviewActivity]
  * (an in-app preview you can launch on demand). Reproduces the stock Portal
- * idle screen: full-screen rotating photos with a clock / battery / date /
+ * idle screen: full-screen rotating media with a clock / battery / date /
  * weather cluster bottom-left.
  *
- * Image source is pluggable — leave [unsplashKey] blank for the no-key Lorem
- * Picsum feed, or supply a free Unsplash access key for curated photos. Weather
- * is Open-Meteo + IP geolocation (both keyless). All network is best-effort.
+ * Source is configurable via [ScreensaverConfig]:
+ *  - **default** — the built-in keyless photo feed (Lorem Picsum, or Unsplash if a
+ *    key is supplied). This is also the fallback whenever a local source is unset,
+ *    empty, or unreachable (e.g. a USB drive was unplugged), so the frame is never
+ *    blank.
+ *  - **folder** — photos and videos from a folder the user picked (internal, SD, or
+ *    a USB-C drive), read through the Storage Access Framework.
+ *
+ * Weather is Open-Meteo + IP geolocation (both keyless). All network is best-effort.
  */
 class PhotoFrameController(
     private val context: Context,
     private val unsplashKey: String = "",
     private val unsplashQuery: String = "nature,landscape,scenic",
-    private val rotateMs: Long = 30_000L,
     private val weatherRefreshMs: Long = 30 * 60_000L,
 ) {
   private val io = Executors.newSingleThreadExecutor()
   private val ui = Handler(Looper.getMainLooper())
 
   private lateinit var photo: ImageView
+  private lateinit var videoView: VideoView
   private lateinit var clock: TextView
   private lateinit var battery: TextView
   private lateinit var date: TextView
@@ -65,7 +72,17 @@ class PhotoFrameController(
   private lateinit var weatherDot: View
   private var weatherText: String = ""
 
-  // Photo history so swipes can go back as well as forward.
+  private var settings = ScreensaverConfig.Settings()
+
+  // Local-folder playback state.
+  private var localMode = false
+  private var playlist: List<MediaItem> = emptyList()
+  private var localIndex = -1
+  // Bumped on every advance so a slow image-decode or an old video's completion
+  // callback can tell it's been superseded and bow out.
+  private var gen = 0
+
+  // Web-feed history so swipes can go back as well as forward.
   private val history = ArrayList<Bitmap>()
   private var index = -1
 
@@ -73,8 +90,7 @@ class PhotoFrameController(
   var onExit: (() -> Unit)? = null
 
   // Deterministic gesture from raw down/up deltas (robust to synthetic input
-  // that omits MOVE events): clear horizontal swipe = prev/next photo, clear
-  // tap = exit, anything ambiguous is ignored.
+  // that omits MOVE events): clear horizontal swipe = prev/next, clear tap = exit.
   private var downX = 0f
   private var downY = 0f
 
@@ -100,14 +116,40 @@ class PhotoFrameController(
   val view: View by lazy { buildUi() }
 
   fun start() {
-    // No preset image: stay black and fade into the first photo (no jarring flash).
+    settings = ScreensaverConfig.load(context)
+    applyFit()
     tick.run()
-    rotate.run()
     refreshWeather.run()
+    if (settings.usesFolder) {
+      val path = settings.folderPath
+      if (path.isNullOrBlank()) {
+        startWeb()
+        return
+      }
+      io.execute {
+        val list =
+            if (LocalMedia.isAccessible(path)) LocalMedia.enumerate(path, settings.includeVideo)
+            else emptyList()
+        ui.post {
+          if (list.isNotEmpty()) {
+            playlist = if (settings.shuffle) list.shuffled() else list
+            localMode = true
+            localIndex = -1
+            advanceLocal(+1)
+          } else {
+            // Folder empty / unreachable → never leave the frame blank.
+            startWeb()
+          }
+        }
+      }
+    } else {
+      startWeb()
+    }
   }
 
   fun stop() {
     ui.removeCallbacksAndMessages(null)
+    if (this::videoView.isInitialized) runCatching { videoView.stopPlayback() }
     io.shutdownNow()
   }
 
@@ -119,6 +161,10 @@ class PhotoFrameController(
     photo = ImageView(context)
     photo.scaleType = ImageView.ScaleType.CENTER_CROP
     root.addView(photo, FrameLayout.LayoutParams(MATCH, MATCH))
+
+    videoView = VideoView(context)
+    videoView.visibility = View.GONE
+    root.addView(videoView, FrameLayout.LayoutParams(MATCH, MATCH, Gravity.CENTER))
 
     val scrim = View(context)
     scrim.background =
@@ -157,6 +203,13 @@ class PhotoFrameController(
     return root
   }
 
+  private fun applyFit() {
+    // Video letterboxes either way (VideoView limitation); images honour the choice.
+    photo.scaleType =
+        if (settings.fit == ScreensaverConfig.FIT_FIT) ImageView.ScaleType.FIT_CENTER
+        else ImageView.ScaleType.CENTER_CROP
+  }
+
   private fun text(sizeSp: Float, color: Int, light: Boolean): TextView {
     val t = TextView(context)
     t.textSize = sizeSp
@@ -173,6 +226,8 @@ class PhotoFrameController(
     v.setTextColor(0x88FFFFFF.toInt())
     return v
   }
+
+  private fun intervalMs(): Long = settings.intervalSec * 1000L
 
   // --- periodic loops ---------------------------------------------------------
   private val tick =
@@ -197,8 +252,8 @@ class PhotoFrameController(
   private val rotate =
       object : Runnable {
         override fun run() {
-          next()
-          ui.postDelayed(this, rotateMs)
+          webNext()
+          ui.postDelayed(this, intervalMs())
         }
       }
 
@@ -210,21 +265,92 @@ class PhotoFrameController(
         }
       }
 
-  // --- data -------------------------------------------------------------------
-  private fun batteryPct(): Int {
-    val i =
-        context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED)) ?: return -1
-    // Only Portal Go has a battery; the mains-powered Portals (Portal+, Mini,
-    // gen-2, TV) report no battery present but still publish a bogus level=0, so
-    // gate on EXTRA_PRESENT to avoid showing a permanent "0%". -1 hides the field.
-    if (!i.getBooleanExtra(BatteryManager.EXTRA_PRESENT, false)) return -1
-    val level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-    val scale = i.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-    return if (level >= 0 && scale > 0) level * 100 / scale else -1
+  // --- navigation (branches on the active source) -----------------------------
+  fun next() {
+    if (localMode) advanceLocal(+1) else webNext()
+  }
+
+  fun prev() {
+    if (localMode) advanceLocal(-1) else webPrev()
+  }
+
+  // --- local folder playback --------------------------------------------------
+  private val localTick =
+      object : Runnable {
+        override fun run() {
+          advanceLocal(+1)
+        }
+      }
+
+  private fun advanceLocal(dir: Int) {
+    ui.removeCallbacks(localTick)
+    if (playlist.isEmpty()) {
+      startWeb()
+      return
+    }
+    gen++
+    localIndex = ((localIndex + dir) % playlist.size + playlist.size) % playlist.size
+    val item = playlist[localIndex]
+    if (item.isVideo) showVideo(item.path, gen) else showLocalImage(item.path, gen)
+  }
+
+  private fun showLocalImage(path: String, g: Int) {
+    stopVideo()
+    io.execute {
+      val bmp = runCatching { BitmapFactory.decodeFile(path) }.getOrNull()
+      ui.post {
+        if (g != gen) return@post // superseded by a newer advance
+        if (bmp == null) {
+          advanceLocal(+1) // skip an unreadable file
+          return@post
+        }
+        photo.visibility = View.VISIBLE
+        show(bmp)
+        ui.postDelayed(localTick, intervalMs())
+      }
+    }
+  }
+
+  private fun showVideo(path: String, g: Int) {
+    photo.setImageDrawable(null)
+    photo.visibility = View.GONE
+    videoView.visibility = View.VISIBLE
+    runCatching {
+          videoView.setOnPreparedListener { mp ->
+            mp.isLooping = false
+            runCatching { mp.setVolume(0f, 0f) } // a screensaver shouldn't blare audio
+            if (g == gen) videoView.start()
+          }
+          videoView.setOnCompletionListener {
+            if (g == gen) advanceLocal(+1)
+          }
+          videoView.setOnErrorListener { _, _, _ ->
+            if (g == gen) advanceLocal(+1)
+            true
+          }
+          videoView.setVideoPath(path)
+          // Safety net: advance even if a clip is very long or never reports done.
+          ui.postDelayed(localTick, maxOf(intervalMs(), 5 * 60_000L))
+        }
+        .onFailure { if (g == gen) advanceLocal(+1) }
+  }
+
+  private fun stopVideo() {
+    if (this::videoView.isInitialized && videoView.visibility != View.GONE) {
+      runCatching { videoView.stopPlayback() }
+      videoView.visibility = View.GONE
+    }
+  }
+
+  // --- web feed (default + fallback) ------------------------------------------
+  private fun startWeb() {
+    localMode = false
+    stopVideo()
+    rotate.run()
   }
 
   /** Forward through history, loading a fresh photo when at the end. */
-  fun next() {
+  private fun webNext() {
     if (index in 0 until history.size - 1) {
       index++
       show(history[index])
@@ -234,7 +360,7 @@ class PhotoFrameController(
   }
 
   /** Back through history (no-op at the start). */
-  fun prev() {
+  private fun webPrev() {
     if (index > 0) {
       index--
       show(history[index])
@@ -245,6 +371,7 @@ class PhotoFrameController(
     io.execute {
       val bmp = runCatching { downloadBitmap(directImageUrl()) }.getOrNull() ?: return@execute
       ui.post {
+        photo.visibility = View.VISIBLE
         if (history.size >= 6) history.removeAt(0) // cap memory; GC reclaims
         history.add(bmp)
         index = history.size - 1
@@ -275,6 +402,19 @@ class PhotoFrameController(
     return JSONObject(json).getJSONObject("urls").getString("regular")
   }
 
+  // --- data -------------------------------------------------------------------
+  private fun batteryPct(): Int {
+    val i =
+        context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED)) ?: return -1
+    // Only Portal Go has a battery; the mains-powered Portals (Portal+, Mini,
+    // gen-2, TV) report no battery present but still publish a bogus level=0, so
+    // gate on EXTRA_PRESENT to avoid showing a permanent "0%". -1 hides the field.
+    if (!i.getBooleanExtra(BatteryManager.EXTRA_PRESENT, false)) return -1
+    val level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+    val scale = i.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+    return if (level >= 0 && scale > 0) level * 100 / scale else -1
+  }
+
   private fun fetchWeather() {
     io.execute {
       // Shared resilient fetch: cached location + multi-provider geolocation.
@@ -299,7 +439,6 @@ class PhotoFrameController(
     c.setRequestProperty("User-Agent", "PortalPhotoFrame/1.0")
     return c.inputStream.use { BitmapFactory.decodeStream(it) }
   }
-
 
   private val MATCH = FrameLayout.LayoutParams.MATCH_PARENT
   private val WRAP = FrameLayout.LayoutParams.WRAP_CONTENT

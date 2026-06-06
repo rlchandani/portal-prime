@@ -497,6 +497,17 @@ private fun LauncherScreen(
             onRename = { renaming = name },
             onMoveOut = { moveOut(it) },
             onDismiss = { openFolder = null },
+            extras =
+                if (name == "Settings")
+                    listOf(
+                        FolderExtra("Screensaver", ICON_IMAGE) {
+                          openFolder = null
+                          runCatching {
+                            context.startActivity(
+                                Intent(context, ScreensaverSettingsActivity::class.java))
+                          }
+                        })
+                else emptyList(),
         )
       }
     }
@@ -762,6 +773,11 @@ private const val ICON_CALL =
 private const val ICON_DOWNLOAD = "M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"
 private const val ICON_REFRESH =
     "M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+private const val ICON_IMAGE =
+    "M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
+
+/** A non-app tile injected into a folder (e.g. the Screensaver settings entry). */
+private data class FolderExtra(val label: String, val glyph: String, val onClick: () -> Unit)
 
 /** A built-in launcher tile: a rounded colour tile with a centered white vector
  * glyph, styled to sit naturally beside real app icons. */
@@ -846,6 +862,7 @@ private fun FolderOverlay(
     onRename: () -> Unit,
     onMoveOut: (String) -> Unit,
     onDismiss: () -> Unit,
+    extras: List<FolderExtra> = emptyList(),
 ) {
   // Rendered inside the launcher's own (immersive) window — NOT a Dialog, which
   // would spawn a separate window and momentarily reveal the system bars.
@@ -914,6 +931,16 @@ private fun FolderOverlay(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
+          extras.forEach { extra ->
+            item(key = "extra:${extra.label}") {
+              BuiltInTile(
+                  label = extra.label,
+                  background = Color(0xFF5B6BC0),
+                  glyph = extra.glyph,
+                  onClick = extra.onClick,
+              )
+            }
+          }
           items(apps, key = { it.component.packageName }) { app ->
             val pkg = app.component.packageName
             AppTile(
