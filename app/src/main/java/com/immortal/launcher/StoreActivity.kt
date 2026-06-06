@@ -16,9 +16,11 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import android.app.Activity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,9 +45,17 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -109,10 +119,30 @@ private fun StoreScreen() {
   }
 
   val categories = remember(apps) { apps.groupBy { it.category } }
+  val activity = context as? Activity
+  // Remote support: focus the list once it loads, and Back exits the store even when
+  // the focus system would otherwise swallow it.
+  val listFocus = remember { FocusRequester() }
+  LaunchedEffect(apps.isNotEmpty()) {
+    if (apps.isNotEmpty()) runCatching { listFocus.requestFocus() }
+  }
 
-  Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+  Surface(
+      modifier =
+          Modifier.fillMaxSize().onPreviewKeyEvent { e ->
+            if (e.key == Key.Back) {
+              if (e.type == KeyEventType.KeyUp) activity?.finish()
+              true
+            } else false
+          },
+      color = MaterialTheme.colorScheme.background,
+  ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(start = 32.dp, end = 32.dp, top = 72.dp),
+        modifier =
+            Modifier.fillMaxSize()
+                .padding(start = 32.dp, end = 32.dp, top = 72.dp)
+                .focusRequester(listFocus)
+                .focusGroup(),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
       item {
@@ -129,7 +159,7 @@ private fun StoreScreen() {
             color = Color(0xFF8AB4F8),
             fontSize = 15.sp,
             modifier =
-                Modifier.padding(top = 10.dp).clickable {
+                Modifier.padding(top = 10.dp).tvFocusable(RoundedCornerShape(8.dp)) {
                   context.startActivity(Intent(context, ApkBrowserActivity::class.java))
                 },
         )
@@ -219,9 +249,12 @@ private fun AppRow(
           )
         }
       } else {
+        val src = remember { MutableInteractionSource() }
         Button(
             onClick = onInstall,
-            modifier = Modifier.heightIn(min = 52.dp).width(120.dp),
+            interactionSource = src,
+            modifier =
+                Modifier.heightIn(min = 52.dp).width(120.dp).focusRing(src, RoundedCornerShape(20.dp)),
         ) {
           Text("Install")
         }

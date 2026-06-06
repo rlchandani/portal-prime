@@ -22,7 +22,14 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -231,6 +238,10 @@ private fun LauncherScreen(
   var editMode by remember { mutableStateOf(false) }
   var openFolder by remember { mutableStateOf<String?>(null) }
 
+  // Remote support: land focus on the grid at startup so the D-pad works on the TV.
+  val homeGridFocus = remember { FocusRequester() }
+  LaunchedEffect(Unit) { runCatching { homeGridFocus.requestFocus() } }
+
   // User-created folder assignments (via drag-drop), persisted, overlaying the
   // curated defaults: a user override wins over Curation.folderFor(). An empty
   // string is an explicit "ungrouped" override (used when dragging out of a
@@ -405,6 +416,7 @@ private fun LauncherScreen(
             columns = GridCells.Fixed(6),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.focusRequester(homeGridFocus).focusGroup(),
         ) {
           // Special + folder tiles persist in Manage mode (non-uninstallable);
           // only regular apps get a delete badge and become draggable.
@@ -580,7 +592,10 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
     Surface(
         color = Color(0x33FFFFFF),
         shape = androidx.compose.foundation.shape.CircleShape,
-        modifier = Modifier.size(56.dp).clickable { onScreensaver() },
+        modifier =
+            Modifier.size(56.dp).tvFocusable(androidx.compose.foundation.shape.CircleShape) {
+              onScreensaver()
+            },
     ) {
       Box(contentAlignment = Alignment.Center) { StackedPhotoIcon() }
     }
@@ -663,7 +678,10 @@ private fun EditButton(editMode: Boolean, modifier: Modifier = Modifier, onClick
   Surface(
       color = if (editMode) Color(0xFFE53935) else Color(0xCC2B2B2B),
       shape = androidx.compose.foundation.shape.CircleShape,
-      modifier = modifier.size(60.dp).clickable { onClick() },
+      modifier =
+          modifier.size(60.dp).tvFocusable(androidx.compose.foundation.shape.CircleShape) {
+            onClick()
+          },
   ) {
     Box(contentAlignment = Alignment.Center) {
       Text(if (editMode) "✓" else "✎", color = Color.White, fontSize = 28.sp)
@@ -791,7 +809,7 @@ private fun BuiltInTile(
   val path = remember(glyph) { PathParser().parsePathString(glyph).toPath() }
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.clickable { onClick() }.padding(4.dp),
+      modifier = Modifier.padding(4.dp).tvFocusable(RoundedCornerShape(22.dp)) { onClick() },
   ) {
     Surface(
         color = background,
@@ -819,7 +837,7 @@ private fun FolderTile(
 ) {
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = modifier.clickable { onClick() }.padding(4.dp),
+      modifier = modifier.padding(4.dp).tvFocusable(RoundedCornerShape(22.dp)) { onClick() },
   ) {
     Surface(
         color = Color(0xFF3A3A3A),
@@ -872,10 +890,24 @@ private fun FolderOverlay(
   var dragPkg by remember { mutableStateOf<String?>(null) }
   var dragPos by remember { mutableStateOf(Offset.Zero) }
 
+  // Remote support: Back closes the folder, and focus moves into the grid on open
+  // so the D-pad works immediately (the folder was previously unusable by remote).
+  BackHandler { onDismiss() }
+  val gridFocus = remember { FocusRequester() }
+  LaunchedEffect(Unit) { runCatching { gridFocus.requestFocus() } }
+
   Box(
       contentAlignment = Alignment.Center,
       modifier =
           Modifier.fillMaxSize()
+              // Remote BACK closes the folder. Intercept in the preview (tunnelling)
+              // phase so the focus system doesn't swallow it first.
+              .onPreviewKeyEvent { e ->
+                if (e.key == Key.Back || e.key == Key.Escape) {
+                  if (e.type == KeyEventType.KeyUp) onDismiss()
+                  true // consume down+up so the focus system doesn't eat it first
+                } else false
+              }
               .background(Color(0xCC000000))
               .clickable(interactionSource = noRipple, indication = null) { onDismiss() }
               // Drag an app out of the panel to remove it from the folder.
@@ -918,7 +950,10 @@ private fun FolderOverlay(
           Surface(
               color = Color(0x33FFFFFF),
               shape = androidx.compose.foundation.shape.CircleShape,
-              modifier = Modifier.size(40.dp).clickable { onRename() },
+              modifier =
+                  Modifier.size(40.dp).tvFocusable(androidx.compose.foundation.shape.CircleShape) {
+                    onRename()
+                  },
           ) {
             Box(contentAlignment = Alignment.Center) {
               Text("✎", color = Color.White, fontSize = 18.sp)
@@ -930,6 +965,7 @@ private fun FolderOverlay(
             columns = GridCells.Fixed(3),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.focusRequester(gridFocus).focusGroup(),
         ) {
           extras.forEach { extra ->
             item(key = "extra:${extra.label}") {
@@ -1067,7 +1103,7 @@ private fun UpdatesTile(update: UpdateInfo?, status: String?, onClick: () -> Uni
   val path = remember(glyph) { PathParser().parsePathString(glyph).toPath() }
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.clickable { onClick() }.padding(4.dp),
+      modifier = Modifier.padding(4.dp).tvFocusable(RoundedCornerShape(22.dp)) { onClick() },
   ) {
     Box {
       Surface(
@@ -1125,7 +1161,10 @@ private fun AppTile(
       horizontalAlignment = Alignment.CenterHorizontally,
       // In Manage mode the body tap is inert (drag to fold, ✕ to remove); the
       // icon launches normally otherwise.
-      modifier = modifier.clickable(enabled = !editMode) { onClick() }.padding(4.dp),
+      modifier =
+          modifier.padding(4.dp).tvFocusable(RoundedCornerShape(22.dp), enabled = !editMode) {
+            onClick()
+          },
   ) {
     Box {
       Image(

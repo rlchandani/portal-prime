@@ -7,12 +7,15 @@
 
 package com.immortal.launcher
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +43,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
@@ -103,14 +113,25 @@ private fun ScreensaverSettingsScreen() {
     context.startActivity(Intent(context, FolderPickerActivity::class.java))
   }
 
+  // Remote support: focus the first control on open; Back exits the screen.
+  val activity = context as? Activity
+  val firstFocus = remember { FocusRequester() }
+  LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
+
   Column(
       modifier =
           Modifier.fillMaxSize()
+              .onPreviewKeyEvent { e ->
+                if (e.key == Key.Back) {
+                  if (e.type == KeyEventType.KeyUp) activity?.finish()
+                  true
+                } else false
+              }
               .background(Color(0xFF101012))
               .verticalScroll(rememberScrollState())
               .padding(horizontal = 28.dp, vertical = 32.dp),
   ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp)) {
+    Column(modifier = Modifier.widthIn(max = 1100.dp).focusRequester(firstFocus).focusGroup()) {
       Text("Screensaver", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
       Text(
           "Choose what shows on the photo frame when your Portal is idle.",
@@ -177,6 +198,7 @@ private fun ScreensaverSettingsScreen() {
         Divider()
         Column(modifier = Modifier.fillMaxWidth().padding(18.dp)) {
           Text("Time per item: ${settings.intervalSec}s", color = Color.White, fontSize = 17.sp)
+          val sliderSrc = remember { MutableInteractionSource() }
           Slider(
               value = settings.intervalSec.toFloat(),
               onValueChange = { settings = settings.copy(intervalSec = it.toInt()) },
@@ -184,7 +206,8 @@ private fun ScreensaverSettingsScreen() {
                 ScreensaverConfig.setInterval(context, settings.intervalSec)
               },
               valueRange = 5f..120f,
-              modifier = Modifier.padding(top = 4.dp),
+              interactionSource = sliderSrc,
+              modifier = Modifier.padding(top = 4.dp).focusRing(sliderSrc, RoundedCornerShape(8.dp)),
           )
         }
         Divider()
@@ -204,7 +227,7 @@ private fun ScreensaverSettingsScreen() {
           color = Color(0xFF2E6BE6),
           shape = RoundedCornerShape(16.dp),
           modifier =
-              Modifier.fillMaxWidth().clickable {
+              Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp)) {
                 context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
               },
       ) {
@@ -260,7 +283,9 @@ private fun Divider() {
 @Composable
 private fun SelectableRow(title: String, subtitle: String, selected: Boolean, onClick: () -> Unit) {
   Row(
-      modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(start = 18.dp, end = 12.dp, top = 14.dp, bottom = 14.dp),
+      modifier =
+          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(12.dp)) { onClick() }
+              .padding(start = 18.dp, end = 12.dp, top = 14.dp, bottom = 14.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Column(modifier = Modifier.weight(1f)) {
@@ -272,18 +297,22 @@ private fun SelectableRow(title: String, subtitle: String, selected: Boolean, on
           modifier = Modifier.padding(top = 2.dp),
       )
     }
-    RadioButton(selected = selected, onClick = onClick)
+    // Visual only — the whole row is the focus/click target.
+    RadioButton(selected = selected, onClick = null)
   }
 }
 
 @Composable
 private fun ToggleRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit) {
   Row(
-      modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 8.dp),
+      modifier =
+          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(12.dp)) { onChange(!checked) }
+              .padding(horizontal = 18.dp, vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Text(title, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
-    Switch(checked = checked, onCheckedChange = onChange)
+    // Visual only — the row toggles it (so the remote's center button works).
+    Switch(checked = checked, onCheckedChange = null)
   }
 }
 
@@ -293,7 +322,7 @@ private fun TextButtonRow(label: String, onClick: () -> Unit) {
       label,
       color = Color(0xFF8AB4F8),
       fontSize = 16.sp,
-      modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(18.dp),
+      modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(8.dp)) { onClick() }.padding(18.dp),
   )
 }
 
@@ -312,7 +341,7 @@ private fun Segmented(
       Surface(
           color = if (on) Color(0xFF2E6BE6) else Color.Transparent,
           shape = RoundedCornerShape(10.dp),
-          modifier = Modifier.clickable { onSelect(value) },
+          modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp)) { onSelect(value) },
       ) {
         Text(
             label,

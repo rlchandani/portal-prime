@@ -19,6 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,8 +44,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -103,6 +111,8 @@ private fun FolderPicker(onPick: (String) -> Unit, onCancel: () -> Unit) {
       current?.let { if (roots.any { r -> r.path == it.absolutePath }) null else it.parentFile }
 
   BackHandler { if (current == null) onCancel() else current = up() }
+  val firstFocus = remember { FocusRequester() }
+  LaunchedEffect(current, granted) { if (granted) runCatching { firstFocus.requestFocus() } }
 
   val subdirs =
       remember(current, granted) {
@@ -119,6 +129,14 @@ private fun FolderPicker(onPick: (String) -> Unit, onCancel: () -> Unit) {
   Column(
       modifier =
           Modifier.fillMaxSize()
+              .onPreviewKeyEvent { e ->
+                if (e.key == Key.Back) {
+                  if (e.type == KeyEventType.KeyUp) {
+                    if (current == null) onCancel() else current = up()
+                  }
+                  true
+                } else false
+              }
               .background(Color(0xFF101012))
               .padding(horizontal = 28.dp, vertical = 28.dp),
   ) {
@@ -155,7 +173,8 @@ private fun FolderPicker(onPick: (String) -> Unit, onCancel: () -> Unit) {
       Spacer(Modifier.size(14.dp))
     }
 
-    LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth().weight(1f).focusRequester(firstFocus).focusGroup()) {
       if (current == null) {
         if (roots.isEmpty()) {
           item { Hint("No storage found. If you plugged in a USB drive, give it a moment.") }
@@ -180,7 +199,7 @@ private fun FolderPicker(onPick: (String) -> Unit, onCancel: () -> Unit) {
         "Cancel",
         color = Color(0xFF8AB4F8),
         fontSize = 16.sp,
-        modifier = Modifier.clickable { onCancel() }.padding(8.dp),
+        modifier = Modifier.tvFocusable(RoundedCornerShape(8.dp)) { onCancel() }.padding(8.dp),
     )
   }
 }
@@ -193,7 +212,9 @@ private fun FolderRow(dir: File, onClick: () -> Unit) {
         value = withContext(Dispatchers.IO) { LocalMedia.summarize(dir.absolutePath) }
       }
   Row(
-      modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(vertical = 8.dp),
+      modifier =
+          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(12.dp)) { onClick() }
+              .padding(vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(12.dp),
   ) {
@@ -287,7 +308,7 @@ private fun PrimaryButton(label: String, subtitle: String?, onClick: () -> Unit)
   Surface(
       color = Color(0xFF2E6BE6),
       shape = RoundedCornerShape(14.dp),
-      modifier = Modifier.fillMaxWidth().clickable { onClick() },
+      modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp)) { onClick() },
   ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -304,7 +325,9 @@ private fun PrimaryButton(label: String, subtitle: String?, onClick: () -> Unit)
 @Composable
 private fun SimpleRow(icon: String, title: String, subtitle: String, onClick: () -> Unit) {
   Row(
-      modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(vertical = 6.dp),
+      modifier =
+          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(12.dp)) { onClick() }
+              .padding(vertical = 6.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(14.dp),
   ) {
