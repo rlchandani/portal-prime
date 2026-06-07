@@ -65,11 +65,45 @@ a() { "$ADB" "$@"; }
 wait_for_device() {
   step "Looking for your Portal"
   a start-server >/dev/null 2>&1
-  local printed_plug=0 printed_auth=0 printed_adb=0
+  local printed_plug=0 printed_auth=0 printed_adb=0 printed_multi=0
   while true; do
-    local line state
-    line="$(a devices | awk 'NR>1 && NF{print; exit}')"
-    state="$(printf "%s" "$line" | awk '{print $2}')"
+    local line state devs n
+    if [ -n "${ANDROID_SERIAL:-}" ]; then
+      # Pinned (by the user, or by the multi-device prompt below): adb itself
+      # honours ANDROID_SERIAL, so just probe that device's state.
+      state="$(a get-state 2>/dev/null | tr -d '\r')"
+      [ "$state" = "device" ] || state=""
+    else
+      devs="$(a devices | awk 'NR>1 && $2=="device"{print $1}')"
+      n="$(printf "%s" "$devs" | grep -c . || true)"
+      if [ "$n" -gt 1 ]; then
+        # adb refuses every command when more than one device is attached —
+        # without this the run dies later at the first install with a bare
+        # "Install failed." Make the user pick up front instead.
+        if [ "$printed_multi" = 0 ]; then
+          warn "More than one device is connected:"
+          a devices -l | awk 'NR>1 && NF {print "      " $0}'
+          printed_multi=1
+        fi
+        if [ -t 0 ]; then
+          printf "  Type the serial of the Portal to set up (first column): "
+          read -r ANDROID_SERIAL || die "No serial given."
+          export ANDROID_SERIAL
+        else
+          die "Multiple devices are connected. Unplug the others, or re-run with ANDROID_SERIAL=<serial>."
+        fi
+        continue
+      elif [ "$n" = 1 ]; then
+        # Pin the one authorized device so a second one appearing mid-run
+        # (or a lingering unauthorized entry) can't break later commands.
+        ANDROID_SERIAL="$devs"
+        export ANDROID_SERIAL
+        state="device"
+      else
+        line="$(a devices | awk 'NR>1 && NF{print; exit}')"
+        state="$(printf "%s" "$line" | awk '{print $2}')"
+      fi
+    fi
     case "$state" in
       device)
         local model; model="$(a shell getprop ro.product.model 2>/dev/null | tr -d '\r')"
