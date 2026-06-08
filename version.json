@@ -1,6 +1,6 @@
 {
-  "versionCode": 29,
-  "versionName": "1.28",
+  "versionCode": 30,
+  "versionName": "1.29",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.28 — Gen-1 installs now survive a reboot: the kit disables the Meta overlay that made the stock install dialog white-on-white (found by u/keremimo on Reddit), so with the daemon down the system dialog works instead of pausing installs."
+  "notes": "Immortal 1.29 — Home-screen forecast: an optional weather forecast below your apps. Turn it on in Immortal Settings ▸ Weather and pick an hourly or 7-day view, then swipe between them. Off by default, so existing setups are unchanged. Thanks to tgnm (#3)."
 }
