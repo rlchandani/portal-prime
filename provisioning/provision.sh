@@ -163,7 +163,7 @@ install_client() {
   fi
   [ -n "$apk" ] || die "No client APK found matching '$APK_GLOB'. Drop your signed APK in apks/."
   step "Installing client app ($(basename "$apk"))"
-  a install -r "$apk" >/dev/null 2>&1 && ok "Installed $PKG" || die "Install failed."
+  a install -r -d "$apk" >/dev/null 2>&1 && ok "Installed $PKG" || die "Install failed."
 }
 
 start_installd() {
@@ -244,11 +244,20 @@ start_shizuku() {
   apkdir="$(a shell "dirname '$apkpath'" 2>/dev/null | tr -d '\r')"
   starter="$(a shell "ls $apkdir/lib/*/libshizuku.so 2>/dev/null" | tr -d '\r' | head -1)"
   [ -n "$starter" ] || { warn "Couldn't find Shizuku's starter — open the Shizuku app and tap Start once"; return; }
-  if a shell "$starter" 2>&1 | grep -q 'exit with 0'; then
-    ok "Shizuku server running"
-  else
-    warn "Shizuku didn't confirm startup — open the Shizuku app to check its status"
-  fi
+  a shell "$starter" >/dev/null 2>&1
+  # The starter printing "exit with 0" only means the STARTER process exited
+  # cleanly — NOT that shizuku_server survived (on some firmware, notably the
+  # Gen-1's Android 9, the server is killed right after). Verify the real server
+  # process is alive instead of trusting the starter's output. pgrep matches the
+  # server's cmdline and excludes itself, so there's no false self-match.
+  local sz_try=0
+  while [ "$sz_try" -lt 6 ]; do
+    if [ -n "$(a shell 'pgrep -f shizuku_server' 2>/dev/null | tr -d '\r')" ]; then
+      ok "Shizuku server running"; return
+    fi
+    sz_try=$((sz_try + 1)); sleep 1
+  done
+  warn "Shizuku server didn't stay up (some firmware kills it on launch). Open the Shizuku app once and tap Start — or skip Shizuku: set Aurora Store to its Session installer, which routes through Immortal's own silent-install daemon."
 }
 
 install_apps() {

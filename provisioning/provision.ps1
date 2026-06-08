@@ -129,7 +129,7 @@ function Install-Client {
   }
   if (-not $apk) { Die "No client APK found matching '$($cfg["APK_GLOB"])'. Drop your signed APK in apks\." }
   Step "Installing client app ($($apk.Name))"
-  A install -r $apk.FullName | Out-Null
+  A install -r -d $apk.FullName | Out-Null
   Ok "Installed $($cfg["PKG"])"
 }
 function Start-Installd {
@@ -178,8 +178,16 @@ function Start-Shizuku {
   $apkdir  = "$(A shell "dirname '$apkpath'")".Trim()
   $starter = "$(A shell "ls $apkdir/lib/*/libshizuku.so 2>/dev/null")".Trim() -split "`n" | Select-Object -First 1
   if (-not $starter) { Warn "Couldn't find Shizuku's starter - open the Shizuku app and tap Start once"; return }
-  if ((A shell "$starter") -match 'exit with 0') { Ok "Shizuku server running" }
-  else { Warn "Shizuku didn't confirm startup - open the Shizuku app to check its status" }
+  A shell "$starter" | Out-Null
+  # "exit with 0" only means the STARTER exited - not that shizuku_server survived
+  # (some firmware, e.g. the Gen-1's Android 9, kills it). Verify the real server
+  # process; pgrep matches its cmdline and excludes itself (no false self-match).
+  for ($i = 0; $i -lt 6; $i++) {
+    $up = (A shell 'pgrep -f shizuku_server') -replace "`r", ""
+    if ($up -match '\d') { Ok "Shizuku server running"; return }
+    Start-Sleep -Seconds 1
+  }
+  Warn "Shizuku server didn't stay up (some firmware kills it). Open the Shizuku app once and tap Start, or set Aurora Store to its Session installer (it routes through Immortal's silent-install daemon)."
 }
 function Install-Apps {
   # Silent adb-install of configured apps - the reliable path on models whose
