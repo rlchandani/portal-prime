@@ -1,6 +1,6 @@
 {
-  "versionCode": 35,
-  "versionName": "1.34",
+  "versionCode": 37,
+  "versionName": "1.36",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.34 — Calls now opens the Portal's calling screen reliably instead of bouncing back. New Screensaver power options (all off by default): turn the photo frame off entirely, turn the screen off after a set idle time, or schedule an overnight off window."
+  "notes": "Immortal 1.36 — A push-to-talk \"hey\" voice button in the header: tap to wake your assistant (no wake word needed), long-press to choose which assistant. The clock moved to the top-left corner. The provisioning kit now installs Shizuku on every Portal and can restore the original Amazon Alexa app. (Includes the 1.35 changes.)"
 }
