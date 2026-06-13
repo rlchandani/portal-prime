@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updated": "2026-06-12",
+  "updated": "2026-06-13",
   "note": "Portal app catalog, schema v2. All v2 fields are ADDITIVE so v1 clients keep working. Entries with source 'fdroid' resolve the current APK at install time via the F-Droid API, so they never go stale. Entries with source 'url' use a direct apkUrl (use this for your own custom Portal apps). Multi-ABI apps (e.g. VLC) ship separate per-architecture APKs on F-Droid; pin the arm64-v8a build with 'versionCode' since Portal is arm64. New in v2: iconUrl (https PNG; omit to get a monogram tile), author, homepage, submittedBy (community credit), longDescription (detail page), devices (['touch','tv'] — omit when the app runs on every Portal). minSdk drives the compatibility badge: the first-gen Portal/Portal+ and Portal TV are API 28, the 2019/2021 models are API 29.",
   "categories": [
     {
@@ -255,6 +255,19 @@
           "author": "veereshai",
           "homepage": "https://github.com/veereshai/HippoMuncher",
           "submittedBy": "veereshai"
+        },
+        {
+          "name": "ISS Tracker",
+          "packageName": "com.portal.isstracker",
+          "source": "url",
+          "apkUrl": "https://github.com/compscirunner/portal-iss-tracker/releases/latest/download/space-portal.apk",
+          "minSdk": 24,
+          "description": "NASA-branded space dashboard — live ISS video, ground track, crew & launches.",
+          "longDescription": "An always-on space dashboard built for the Portal: live ISS video feed, real-time ground track, current crew, space weather, upcoming launches, and Deep Space Network status — all from keyless public APIs, no Google services. Designed to live on the wall or counter and stay on all day.",
+          "iconUrl": "https://raw.githubusercontent.com/compscirunner/portal-iss-tracker/main/docs/icon.png",
+          "author": "compscirunner",
+          "homepage": "https://github.com/compscirunner/portal-iss-tracker",
+          "submittedBy": "compscirunner"
         }
       ]
     }
