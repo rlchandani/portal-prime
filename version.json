@@ -1,6 +1,6 @@
 {
-  "versionCode": 39,
-  "versionName": "1.38",
+  "versionCode": 40,
+  "versionName": "1.39",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.38 — Two fixes. Photo-frame screensaver: photos from a folder now display the right way up — portrait shots from phone cameras were appearing sideways (and some landscapes upside-down) because the camera's rotation tag wasn't being applied. Overnight sleep: tapping the screen during the overnight window now wakes the device and lets you use it normally, instead of waking briefly and immediately locking again."
+  "notes": "Immortal 1.39 — Photo-frame screensaver: the built-in web photo feed is now sharp on every Portal. The default feed was requesting a fixed 1280x800 image, so on displays with a different resolution — the portrait Portal Mini (800x1280) and the higher-resolution Portal+ 2nd gen (2160x1440) — the photo was stretched to fit and looked blurry. It now requests photos at the device's actual screen resolution and orientation, so they fill the screen crisply. (Thanks to the user who reported this.)"
 }

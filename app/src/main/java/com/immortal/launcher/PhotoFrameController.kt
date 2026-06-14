@@ -440,11 +440,17 @@ class PhotoFrameController(
   }
 
   private fun directImageUrl(): String {
+    val m = context.resources.displayMetrics
+    val w = m.widthPixels
+    val h = m.heightPixels
     if (unsplashKey.isBlank())
-        return "https://picsum.photos/1280/800?random=${System.currentTimeMillis()}"
+        return "https://picsum.photos/$w/$h?random=${System.currentTimeMillis()}"
+    // Match Unsplash crop to the screen aspect so portrait panels (e.g. Portal
+    // Mini at 800x1280) don't get a letterboxed/upscaled landscape shot.
+    val orientation = if (h > w) "portrait" else "landscape"
     val json =
         httpGet(
-            "https://api.unsplash.com/photos/random?orientation=landscape" +
+            "https://api.unsplash.com/photos/random?orientation=$orientation" +
                 "&query=$unsplashQuery&client_id=$unsplashKey")
     return JSONObject(json).getJSONObject("urls").getString("regular")
   }

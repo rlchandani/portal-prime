@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.39 (2026-06-14)
+
+One fix from a user bug report.
+
+- **Photo-frame screensaver: the built-in web photos are sharp on every Portal.** The default photo feed was requesting a fixed 1280×800 image, so on any display with a different resolution the picture was scaled to fit and looked blurry — notably the portrait **Portal Mini** (800×1280) and the higher-resolution **Portal+ 2nd gen** (2160×1440). It now requests photos at the device's actual screen resolution and orientation, so they fill the screen crisply. When an Unsplash key is configured, the feed also now picks a portrait or landscape crop to match the screen instead of always asking for landscape.
+
 ## 1.38 (2026-06-14)
 
 Two fixes from user bug reports.
