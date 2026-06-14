@@ -362,7 +362,21 @@ function Restore-Alexa {
   $patched = $null
   if ($cfg["FALCON_PATCHED_LOCAL"] -and (Test-Path $cfg["FALCON_PATCHED_LOCAL"])) {
     $patched = $cfg["FALCON_PATCHED_LOCAL"]; Ok "Using local patched falcon ($(Split-Path -Leaf $patched))"
+  } elseif ($cfg["FALCON_PATCHED_URL"]) {
+    # PRIMARY path: download the patched falcon directly. No bspatch (Windows ships none), no flaky
+    # firmware-dump fetch, no stock+diff checksum drift - just one cross-platform download.
+    Step "Downloading Alexa (falcon) - about 115 MB"
+    $patchedOut = Join-Path $work "falcon-patched.apk"
+    try { Invoke-WebRequest $cfg["FALCON_PATCHED_URL"] -OutFile $patchedOut }
+    catch { Warn "falcon download failed - check your connection, then re-run with -Alexa."; return }
+    $patched = $patchedOut
+    if ($cfg["FALCON_RESULT_SHA256"] -and (Get-Sha256 $patched) -ne $cfg["FALCON_RESULT_SHA256"]) {
+      Warn "falcon download looks corrupted (checksum mismatch). Delete the 'alexa' folder next to this script, then re-run with -Alexa."; return
+    }
+    Ok "Downloaded + verified"
   } else {
+    # FALLBACK (only when FALCON_PATCHED_URL is blank): reconstruct from public stock + our diff.
+    # Needs bspatch, which Windows does not ship - set BSPATCH_EXE or FALCON_PATCHED_LOCAL instead.
     $bspatch = $null
     if ($cfg["BSPATCH_EXE"] -and (Test-Path $cfg["BSPATCH_EXE"])) { $bspatch = $cfg["BSPATCH_EXE"] }
     elseif (Get-Command bspatch -ErrorAction SilentlyContinue) { $bspatch = (Get-Command bspatch).Source }

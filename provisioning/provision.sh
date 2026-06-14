@@ -499,7 +499,22 @@ restore_alexa() {
   #    reconstruct it byte-identically from the public stock APK + our diff.
   if [ -n "${FALCON_PATCHED_LOCAL:-}" ] && [ -f "$FALCON_PATCHED_LOCAL" ]; then
     patched="$FALCON_PATCHED_LOCAL"; ok "Using local patched falcon ($(basename "$patched"))"
+  elif [ -n "${FALCON_PATCHED_URL:-}" ]; then
+    # PRIMARY path: download the patched falcon directly. One cross-platform download — no bspatch
+    # (Windows has none), no flaky firmware-dump fetch, no stock+diff checksum drift. Resumable.
+    step "Downloading Alexa (falcon) — about 115 MB"
+    rm -f "$work/falcon-patched.apk"   # never resume onto a stale/partial file — fetch fresh
+    curl -fSL --retry 3 --retry-all-errors --retry-delay 2 --connect-timeout 30 \
+      -o "$work/falcon-patched.apk" "$FALCON_PATCHED_URL" \
+      || { warn "falcon download failed — check your connection, then re-run './provision.sh --alexa'."; return 1; }
+    patched="$work/falcon-patched.apk"
+    if [ -n "${FALCON_RESULT_SHA256:-}" ] && [ "$(sha256 "$patched")" != "$FALCON_RESULT_SHA256" ]; then
+      warn "falcon download looks corrupted (checksum mismatch). Delete the 'alexa' folder next to this script, then re-run './provision.sh --alexa'."; return 1
+    fi
+    ok "Downloaded + verified"
   else
+    # FALLBACK (only when FALCON_PATCHED_URL is blank): reconstruct from the public stock APK + our
+    # binary diff. Needs bspatch — macOS/Linux only (Windows ships none).
     command -v bspatch >/dev/null 2>&1 || { warn "bspatch not found (macOS ships it; Linux: apt/brew install bsdiff). Skipping Alexa."; return 1; }
     local stock="${FALCON_STOCK_LOCAL:-$work/stock-falcon.apk}"
     if [ ! -f "$stock" ] || { [ -n "${FALCON_STOCK_SHA256:-}" ] && [ "$(sha256 "$stock")" != "$FALCON_STOCK_SHA256" ]; }; then
