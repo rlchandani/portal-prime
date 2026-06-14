@@ -32,8 +32,8 @@ android {
     applicationId = "com.immortal.launcher"
     minSdk = 24
     targetSdk = 36
-    versionCode = 38
-    versionName = "1.37"
+    versionCode = 39
+    versionName = "1.38"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -75,6 +75,7 @@ dependencies {
   implementation(libs.androidx.compose.ui.graphics)
   implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.exifinterface)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   debugImplementation(libs.androidx.compose.ui.tooling)
 

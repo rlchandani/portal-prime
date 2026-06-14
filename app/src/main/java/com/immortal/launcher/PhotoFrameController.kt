@@ -13,6 +13,7 @@ import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.BatteryManager
@@ -27,6 +28,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.VideoView
+import androidx.exifinterface.media.ExifInterface
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
@@ -298,7 +300,7 @@ class PhotoFrameController(
   private fun showLocalImage(path: String, g: Int) {
     stopVideo()
     io.execute {
-      val bmp = runCatching { BitmapFactory.decodeFile(path) }.getOrNull()
+      val bmp = runCatching { decodeCorrected(path) }.getOrNull()
       ui.post {
         if (g != gen) return@post // superseded by a newer advance
         if (bmp == null) {
@@ -310,6 +312,50 @@ class PhotoFrameController(
         ui.postDelayed(localTick, intervalMs())
       }
     }
+  }
+
+  /**
+   * Decode a local image and apply its EXIF orientation. Phone cameras save the
+   * raw sensor buffer and record the intended rotation in an EXIF tag rather than
+   * baking it into the pixels, so [BitmapFactory.decodeFile] alone shows portrait
+   * shots sideways and some landscapes upside-down. The web feed is unaffected (its
+   * images carry no rotation flag), so this only matters for the folder source.
+   *
+   * Reading the tag is best-effort: a missing or unreadable EXIF block falls back to
+   * the upright orientation so a quirky file still shows (just unrotated) instead of
+   * being skipped.
+   */
+  private fun decodeCorrected(path: String): Bitmap? {
+    val bmp = BitmapFactory.decodeFile(path) ?: return null
+    val orientation =
+        runCatching {
+              ExifInterface(path)
+                  .getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            }
+            .getOrDefault(ExifInterface.ORIENTATION_NORMAL)
+    val matrix = Matrix()
+    when (orientation) {
+      ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+      ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+      ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+      ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.preScale(-1f, 1f)
+      ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.preScale(1f, -1f)
+      ExifInterface.ORIENTATION_TRANSPOSE -> {
+        matrix.postRotate(90f)
+        matrix.preScale(-1f, 1f)
+      }
+      ExifInterface.ORIENTATION_TRANSVERSE -> {
+        matrix.postRotate(-90f)
+        matrix.preScale(-1f, 1f)
+      }
+      else -> return bmp // NORMAL / UNDEFINED — already upright, no copy needed
+    }
+    // createBitmap allocates a second full-size bitmap; free the source once the
+    // rotated copy exists so peak memory stays at one image (Portal heaps are small
+    // and phone photos are large).
+    val rotated = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, matrix, true)
+    if (rotated != bmp) bmp.recycle()
+    return rotated
   }
 
   private fun showVideo(path: String, g: Int) {

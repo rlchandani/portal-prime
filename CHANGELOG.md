@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.38 (2026-06-14)
+
+Two fixes from user bug reports.
+
+- **Photo-frame screensaver: photos display the right way up.** Photos served from a folder are now rotated to match the orientation they were taken in. Portrait shots from phone cameras were showing sideways (and some landscapes upside-down) because phones store the raw sensor image plus a rotation tag in the file's EXIF metadata, and that tag wasn't being read — so the picture was drawn unrotated. The built-in web photo feed was never affected (those images carry no rotation tag).
+- **Overnight sleep: tapping the screen lets you use the device.** With Overnight sleep enabled, tapping the screen inside the overnight window woke it for a moment and then immediately locked again, on every tap. A deliberate tap now wakes the device and lets you use it normally; it returns to sleep a short while after you stop interacting. A stray wake with no interaction still goes back to sleep promptly.
+
 ## 1.36 (2026-06-13)
 
 Refinements to the "hey" voice button.

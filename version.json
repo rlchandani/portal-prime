@@ -1,6 +1,6 @@
 {
-  "versionCode": 38,
-  "versionName": "1.37",
+  "versionCode": 39,
+  "versionName": "1.38",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.37 — The Amazon Alexa setup app now lives in the Settings folder (labelled \"Alexa setup\") instead of the home grid — you only need it once, to link your account. The provisioning kit's Alexa setup is smoother too: it shows the amazon.com/code linking screen immediately and connects automatically the moment you finish signing in. (Includes the 1.36 changes.)"
+  "notes": "Immortal 1.38 — Two fixes. Photo-frame screensaver: photos from a folder now display the right way up — portrait shots from phone cameras were appearing sideways (and some landscapes upside-down) because the camera's rotation tag wasn't being applied. Overnight sleep: tapping the screen during the overnight window now wakes the device and lets you use it normally, instead of waking briefly and immediately locking again."
 }

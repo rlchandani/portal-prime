@@ -14,6 +14,9 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.BatteryManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -129,6 +132,20 @@ private data class AppEntry(
  * touch targets, landscape.
  */
 class HomeActivity : ComponentActivity() {
+  // Overnight re-sleep. Inside the overnight window a wake should normally go back
+  // to sleep, but a deliberate tap must let the user actually use the device. We
+  // can't tell the two apart synchronously in onResume — the waking tap is consumed
+  // by the framework and isn't delivered to us before resume — so we never lock
+  // immediately. Instead onResume arms a short grace timer; a stray wake gets no
+  // interaction and sleeps when it fires, while a real touch (dispatchTouchEvent)
+  // extends it to a normal screen-timeout, resetting on every interaction.
+  private val resleepHandler = Handler(Looper.getMainLooper())
+  private val resleep = Runnable {
+    // Re-check at fire time: the window may have ended while the screen was on.
+    if (SleepScheduler.isOvernightNow(this)) ScreenControl.sleep(this)
+  }
+  private var overnightWindow = false
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enterImmersive()
@@ -194,8 +211,31 @@ class HomeActivity : ComponentActivity() {
     SettingsGuard.reaffirmScreensaver(this)
     // Back on the launcher: the idle screen-off session is over.
     SleepScheduler.cancelIdle(this)
-    // If a stray wake landed us here inside the overnight window, go back to sleep.
-    if (SleepScheduler.isOvernightNow(this)) ScreenControl.sleep(this)
+    // Inside the overnight window, don't lock instantly — that traps a deliberate
+    // tap in a wake/re-lock loop. Arm a short grace instead; a real touch extends it
+    // (see dispatchTouchEvent), a stray wake just sleeps again when it fires. The
+    // ACTION_OVERNIGHT_START alarm still does the authoritative lock at window start.
+    overnightWindow = SleepScheduler.isOvernightNow(this)
+    if (overnightWindow) armResleep(OVERNIGHT_STRAY_WAKE_MS)
+  }
+
+  override fun onPause() {
+    super.onPause()
+    // Don't carry a pending re-sleep into another activity or a real sleep.
+    overnightWindow = false
+    resleepHandler.removeCallbacks(resleep)
+  }
+
+  // dispatchTouchEvent is the top of the input chain, so it sees every touch before
+  // Compose consumes it. Outside the overnight window this is a no-op.
+  override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+    if (overnightWindow) armResleep(OVERNIGHT_ACTIVE_TIMEOUT_MS)
+    return super.dispatchTouchEvent(ev)
+  }
+
+  private fun armResleep(delayMs: Long) {
+    resleepHandler.removeCallbacks(resleep)
+    resleepHandler.postDelayed(resleep, delayMs)
   }
 
   private fun enterImmersive() {
@@ -663,6 +703,13 @@ private fun LauncherScreen(
 
 private const val APP_KEY = "app:"
 private const val FOLDER_KEY = "folder:"
+
+// Overnight re-sleep timings. A wake with no interaction is treated as stray and
+// sleeps again after the short grace; once the user actually touches the screen we
+// switch to a normal screen-timeout so they can use the device, resetting it on
+// each interaction.
+private const val OVERNIGHT_STRAY_WAKE_MS = 5_000L
+private const val OVERNIGHT_ACTIVE_TIMEOUT_MS = 60_000L
 private const val UPDATE_CHECK_INTERVAL_MS = 6L * 60 * 60 * 1000 // 6 hours
 
 // --- tile sizing ----------------------------------------------------------------
