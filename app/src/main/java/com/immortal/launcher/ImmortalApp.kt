@@ -27,6 +27,9 @@ class ImmortalApp : Application() {
     // (broadcast). DREAMING_STOPPED stays here because it also drives the frame relaunch, and
     // we feed its verdict into the hub from DreamPolicy.
     PresenceHub.init(this)
+    // Latest now-playing state from the ImmortalCast companion (dormant unless it's
+    // installed and broadcasting); the screensaver/header read it from here.
+    NowPlayingHub.init(this)
     val receiver =
         object : BroadcastReceiver() {
           override fun onReceive(c: Context, intent: Intent) {

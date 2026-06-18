@@ -14,15 +14,18 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.Outline
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.BatteryManager
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewOutlineProvider
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -78,6 +81,14 @@ class PhotoFrameController(
   private lateinit var weatherDot: View
   private var weatherText: String = ""
 
+  // Now-playing card (driven by the ImmortalCast companion; hidden otherwise).
+  private lateinit var nowPlayingCard: LinearLayout
+  private lateinit var npArt: ImageView
+  private lateinit var npTitle: TextView
+  private lateinit var npArtist: TextView
+  private var lastArtUrl: String = ""
+  private var npListener: NowPlayingHub.Listener? = null
+
   private var settings = ScreensaverConfig.Settings()
 
   // Local-folder playback state.
@@ -132,6 +143,9 @@ class PhotoFrameController(
     applyFit()
     tick.run()
     refreshWeather.run()
+    // Listen for now-playing updates (replays the current track immediately).
+    npListener = NowPlayingHub.Listener { state -> ui.post { updateNowPlaying(state) } }
+    NowPlayingHub.addListener(npListener!!)
     when {
       settings.usesFolder -> {
         val path = settings.folderPath
@@ -187,6 +201,8 @@ class PhotoFrameController(
 
   fun stop() {
     ui.removeCallbacksAndMessages(null)
+    npListener?.let { NowPlayingHub.removeListener(it) }
+    npListener = null
     if (this::videoView.isInitialized) runCatching { videoView.stopPlayback() }
     io.shutdownNow()
   }
@@ -238,7 +254,74 @@ class PhotoFrameController(
     row.addView(weather)
     col.addView(row)
 
+    buildNowPlaying(root)
     return root
+  }
+
+  /** A now-playing card bottom-right (album art + track / artist), over the scrim.
+   *  Hidden until the ImmortalCast companion broadcasts a playing track. */
+  private fun buildNowPlaying(root: FrameLayout) {
+    nowPlayingCard = LinearLayout(context)
+    nowPlayingCard.orientation = LinearLayout.HORIZONTAL
+    nowPlayingCard.gravity = Gravity.CENTER_VERTICAL
+    nowPlayingCard.visibility = View.GONE
+    val lp = FrameLayout.LayoutParams(WRAP, WRAP, Gravity.BOTTOM or Gravity.END)
+    lp.setMargins(0, 0, dp(40), dp(44))
+    root.addView(nowPlayingCard, lp)
+
+    npArt = ImageView(context)
+    npArt.scaleType = ImageView.ScaleType.CENTER_CROP
+    npArt.clipToOutline = true
+    npArt.outlineProvider =
+        object : ViewOutlineProvider() {
+          override fun getOutline(v: View, o: Outline) {
+            o.setRoundRect(0, 0, v.width, v.height, dp(10).toFloat())
+          }
+        }
+    nowPlayingCard.addView(npArt, LinearLayout.LayoutParams(dp(72), dp(72)))
+
+    val npCol = LinearLayout(context)
+    npCol.orientation = LinearLayout.VERTICAL
+    val npColLp = LinearLayout.LayoutParams(WRAP, WRAP)
+    npColLp.setMarginStart(dp(16))
+    nowPlayingCard.addView(npCol, npColLp)
+
+    npTitle = text(26f, Color.WHITE, false)
+    npTitle.typeface = Typeface.DEFAULT_BOLD
+    npTitle.maxLines = 1
+    npTitle.ellipsize = TextUtils.TruncateAt.END
+    npTitle.maxWidth = dp(380)
+    npCol.addView(npTitle)
+
+    npArtist = text(18f, 0xCCFFFFFF.toInt(), false)
+    npArtist.maxLines = 1
+    npArtist.ellipsize = TextUtils.TruncateAt.END
+    npArtist.maxWidth = dp(380)
+    npCol.addView(npArtist)
+  }
+
+  /** Reflect the latest now-playing state (called on the main thread). */
+  private fun updateNowPlaying(s: NowPlayingState?) {
+    if (s == null || !s.active) {
+      nowPlayingCard.visibility = View.GONE
+      lastArtUrl = ""
+      return
+    }
+    nowPlayingCard.visibility = View.VISIBLE
+    npTitle.text = s.title
+    npArtist.text = s.artist
+    npArtist.visibility = if (s.artist.isBlank()) View.GONE else View.VISIBLE
+    if (s.artUrl != lastArtUrl) {
+      lastArtUrl = s.artUrl
+      npArt.setImageBitmap(null)
+      npArt.visibility = if (s.artUrl.isBlank()) View.GONE else View.VISIBLE
+      val want = s.artUrl
+      if (want.isNotBlank())
+          io.execute {
+            val bmp = runCatching { downloadBitmap(want) }.getOrNull()
+            ui.post { if (lastArtUrl == want) npArt.setImageBitmap(bmp) }
+          }
+    }
   }
 
   private fun applyFit() {
