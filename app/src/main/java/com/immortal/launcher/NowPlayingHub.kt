@@ -12,6 +12,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -32,8 +34,22 @@ object NowPlayingHub {
     fun onNowPlaying(state: NowPlayingState?)
   }
 
+  // A live track is only shown while broadcasts keep arriving. ImmortalCast resends
+  // the current track every ~30s; if we hear nothing for this long the companion has
+  // gone away (killed, uninstalled, crashed) and we drop the card rather than show a
+  // track that may no longer be playing.
+  private const val STALE_AFTER_MS = 90_000L
+
   private val listeners = CopyOnWriteArrayList<Listener>()
   private var app: Context? = null
+  private val handler = Handler(Looper.getMainLooper())
+  private val expire = Runnable {
+    if (current != null) {
+      current = null
+      Log.i(TAG, "now-playing: stale, clearing card")
+      listeners.forEach { runCatching { it.onNowPlaying(null) } }
+    }
+  }
 
   @Volatile
   var current: NowPlayingState? = null
@@ -48,6 +64,9 @@ object NowPlayingHub {
           override fun onReceive(c: Context, intent: Intent) {
             val state = NowPlayingState.fromIntent(intent)
             current = if (state.active) state else null
+            // (Re)arm the staleness timer only while something's actually playing.
+            handler.removeCallbacks(expire)
+            if (current != null) handler.postDelayed(expire, STALE_AFTER_MS)
             Log.i(TAG, "now-playing: ${state.state} ${state.artist} — ${state.title}")
             listeners.forEach { runCatching { it.onNowPlaying(current) } }
           }
