@@ -39,5 +39,8 @@ class ImmortalApp : Application() {
 
     // Arm the overnight screen-off window (and apply it if we're inside it now).
     SleepScheduler.applyOvernightNow(this)
+
+    // Bring up the WiFi fleet agent if provisioning enabled it (no-op otherwise).
+    FleetAgentService.ensureRunning(this)
   }
 }

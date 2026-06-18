@@ -268,7 +268,9 @@ object StoreCatalog {
     return c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
   }
 
-  private fun download(spec: String, dest: File) {
+  /** Download [spec] to [dest]. Internal so the fleet agent's headless install can
+   *  reuse the exact same fetch (resolve via [resolveApkUrl], then download). */
+  internal fun download(spec: String, dest: File) {
     val c = open(spec)
     c.inputStream.use { input -> dest.outputStream.use { input.copyTo(it) } }
   }

@@ -4,4 +4,5 @@
      LICENSE file in the root directory of this source tree. -->
 <resources>
     <string name="app_name">Immortal</string>
+    <string name="install_confirm_desc">Lets Immortal confirm the app-install dialog automatically, so apps deployed over WiFi from the fleet manager install without a tap on this Portal.</string>
 </resources>

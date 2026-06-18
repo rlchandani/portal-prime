@@ -78,6 +78,41 @@ object SettingsGuard {
     }
   }
 
+  /**
+   * Enable [InstallConfirmService] so the fleet agent's installs auto-confirm.
+   * APPENDS our component to `enabled_accessibility_services` — the Portal ships
+   * Meta accessibility services (presence, key events) in that same list, so we
+   * must never overwrite it. Requires `WRITE_SECURE_SETTINGS`; a silent no-op
+   * without it. Idempotent.
+   */
+  fun enableInstallConfirm(context: Context) {
+    runCatching {
+      val resolver = context.contentResolver
+      val comp = ComponentName(context, InstallConfirmService::class.java).flattenToString()
+      val current =
+          Settings.Secure.getString(resolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: ""
+      val parts = current.split(':').filter { it.isNotBlank() }
+      if (comp !in parts) {
+        Settings.Secure.putString(
+            resolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, (parts + comp).joinToString(":"))
+      }
+      Settings.Secure.putInt(resolver, Settings.Secure.ACCESSIBILITY_ENABLED, 1)
+    }
+  }
+
+  /** Whether [InstallConfirmService] is currently enabled (so dialog-mode installs
+   *  complete unattended). Lets the fleet dashboard show that a "dialog"-mode device
+   *  can still be deployed to without a tap. */
+  fun isInstallConfirmEnabled(context: Context): Boolean =
+      runCatching {
+            val comp = ComponentName(context, InstallConfirmService::class.java).flattenToString()
+            (Settings.Secure.getString(
+                    context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: "")
+                .split(':')
+                .any { it.equals(comp, ignoreCase = true) }
+          }
+          .getOrDefault(false)
+
   /** True if we hold WRITE_SECURE_SETTINGS (so self-healing is active). */
   fun canWriteSecureSettings(context: Context): Boolean =
       context.checkSelfPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS) ==

@@ -20,9 +20,26 @@
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Fleet Agent: a foreground service so WiFi device management survives a
+         reboot on these non-root Portals (where adb-over-WiFi can't). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Lets the headless fleet agent surface the package-installer confirm dialog
+         (which InstallConfirmService then auto-confirms) — holding it also exempts
+         the agent from Android 10's background-activity-start restriction. Granted
+         by provisioning; harmless if not held (the agent reports install mode). -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Lets the fleet agent's /logcat endpoint read system-wide logs. READ_LOGS is
+         signature|privileged|development; the "development" flag means provisioning
+         can grant it via `pm grant`. Without it the agent sees only its own logs. -->
+    <uses-permission android:name="android.permission.READ_LOGS"
+        tools:ignore="ProtectedPermissions" />
     <!-- "Install an APK" browser: list APKs the user downloaded. Pre-granted by
          the provisioning kit; also requested at runtime. -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Lets the fleet agent WRITE to /sdcard (e.g. pushing screensaver photos over
+         WiFi). With requestLegacyExternalStorage it governs legacy write access on
+         these Android-10 Portals. Granted by provisioning. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- "hey" trigger guard. Millennium's TriggerReceiver requires this permission, so only
          the launcher may fire the push-to-talk trigger (not arbitrary apps). It's signature-
@@ -209,6 +226,28 @@
         <receiver
             android:name=".SleepReceiver"
             android:exported="false" />
+
+        <!-- WiFi fleet-management agent. Reached over the LAN by the laptop tool;
+             started by ImmortalApp / BootReceiver, off until provisioning enables
+             it. Not exported (it's an HTTP server, not an Android-component entry). -->
+        <service
+            android:name=".FleetAgentService"
+            android:exported="false" />
+
+        <!-- Auto-confirms the package-installer dialog so fleet/agent installs need
+             no human tap. Scoped to the installer package (see the xml config).
+             Enabled via WRITE_SECURE_SETTINGS on provisioned devices. -->
+        <service
+            android:name=".InstallConfirmService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/install_confirm_accessibility" />
+        </service>
 
         <!-- Custom screensaver (Dream), set via secure setting screensaver_components. -->
         <service

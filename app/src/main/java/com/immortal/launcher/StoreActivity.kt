@@ -242,7 +242,13 @@ private fun BrowseScreen(
           color = Color(0xFFAAAAAA),
       )
       if (InstallDaemon.installPaused(context)) PausedBanner()
-      else if (InstallDaemon.silentInstallOffline(context)) SilentOffBanner()
+      // The silent daemon doesn't survive a reboot, so it's commonly down. That's
+      // only worth warning about when installs would actually need a manual tap —
+      // when auto-confirm (InstallConfirmService) is on, the system dialog is
+      // confirmed for us, so installs still complete hands-free and we stay quiet.
+      else if (InstallDaemon.silentInstallOffline(context) &&
+          !SettingsGuard.isInstallConfirmEnabled(context))
+          SilentOffBanner()
       Spacer(Modifier.height(10.dp))
       OutlinedTextField(
           value = query,
