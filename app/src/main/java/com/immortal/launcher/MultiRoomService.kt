@@ -139,11 +139,12 @@ class MultiRoomService : Service() {
     return NowPlayingState(PlaybackState.IDLE)
   }
 
-  /** Poll MA for our player's current track (the AirPlay fill-in). No-op without MA creds —
-   *  Snapcast-only Portals keep working exactly as before. */
+  /** Poll MA for our player's current track (the AirPlay fill-in). Always runs while the relay
+   *  is connected: [MaControl.nowPlaying] returns IDLE with no network when MA creds aren't set,
+   *  so Snapcast-only Portals are unaffected — and creds entered later are picked up on the next
+   *  poll without needing the service (or app) to restart. */
   private fun startMaPoller() {
     stopMaPoller()
-    if (ImmortalSettings.maUser(this).isBlank()) return
     polling = true
     maPoller =
         Thread(

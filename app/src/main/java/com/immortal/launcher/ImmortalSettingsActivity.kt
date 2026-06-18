@@ -590,7 +590,9 @@ private fun MultiRoomScreen(onBack: () -> Unit) {
             }
           }
           Text(
-              "Only used to send play/pause/skip to Music Assistant. Now-playing works without it.",
+              "Sends play/pause/skip to Music Assistant, and shows now-playing for AirPlay " +
+                  "sources (which don't carry it over Snapcast). Library/radio now-playing works " +
+                  "without it.",
               color = Color(0xFF7C7C7C),
               fontSize = 12.sp,
               modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 8.dp),
