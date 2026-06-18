@@ -22,7 +22,7 @@ import android.util.Log
 /**
  * Reads the device's *native* media session — whatever app is playing — and feeds
  * [NowPlayingHub]. This is the source of truth for the screensaver now-playing card
- * and the home-screen mini-player, replacing the old ImmortalCast broadcast. It also
+ * and the home-screen mini-player. It also
  * exposes transport so the header buttons can play/pause/skip the active app.
  *
  * Access to active sessions is gated on being an enabled notification listener (see
@@ -43,6 +43,13 @@ object MediaSessionReader {
 
   // Mutated only on the handler thread; read from the UI thread for transport.
   @Volatile private var active: MediaController? = null
+
+  // The session we last saw actually PLAYING. We keep showing it once it's paused (so
+  // "you paused your music, the card stays" works), but we do NOT resurrect a stale
+  // paused session we never saw playing — e.g. an old Spotify pause surfacing when the
+  // multi-room group stops. Cleared implicitly: a paused session not matching this is
+  // ignored, and the next thing to play overwrites it.
+  private var lastPlayingToken: MediaSession.Token? = null
 
   // Every active controller we've registered [genericCb] on, so we catch any
   // session's state/metadata transitions (not just the one we're currently showing).
@@ -141,11 +148,32 @@ object MediaSessionReader {
     reselect(controllers)
   }
 
-  /** Pick the active session (playing, else paused) and publish it. */
+  /**
+   * Pick the active session (playing, else paused) and publish it. When several sessions
+   * are in the same state, prefer one that ISN'T our own [MultiRoomService] relay: on the
+   * Portal driving playback, the Music Assistant app and our relay both publish the same
+   * track, but the MA app's session has working transport — our relay is the fallback
+   * that fills in the *other* rooms, where it's the only source.
+   */
   private fun reselect(controllers: List<MediaController>) {
+    fun isOwnRelay(c: MediaController) = c.packageName == appContext.packageName
+    // Prefer a PLAYING session (a real app over our own relay), and remember it.
+    val playing =
+        controllers
+            .filter { it.playbackState?.state == MediaPlaybackState.STATE_PLAYING }
+            .let { inState -> inState.firstOrNull { !isOwnRelay(it) } ?: inState.firstOrNull() }
     val chosen =
-        controllers.firstOrNull { it.playbackState?.state == MediaPlaybackState.STATE_PLAYING }
-            ?: controllers.firstOrNull { it.playbackState?.state == MediaPlaybackState.STATE_PAUSED }
+        if (playing != null) {
+          lastPlayingToken = playing.sessionToken
+          playing
+        } else {
+          // No one's playing: keep showing ONLY the session we last saw playing, now
+          // paused — never a stale paused session we never saw play.
+          controllers.firstOrNull {
+            it.playbackState?.state == MediaPlaybackState.STATE_PAUSED &&
+                it.sessionToken == lastPlayingToken
+          }
+        }
     active = chosen
     Log.i(
         TAG,

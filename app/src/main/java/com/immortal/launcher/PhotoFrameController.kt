@@ -260,7 +260,7 @@ class PhotoFrameController(
   }
 
   /** A now-playing card bottom-right (album art + track / artist), over the scrim.
-   *  Hidden until the ImmortalCast companion broadcasts a playing track. */
+   *  Hidden until something is playing. */
   private fun buildNowPlaying(root: FrameLayout) {
     nowPlayingCard = LinearLayout(context)
     nowPlayingCard.orientation = LinearLayout.HORIZONTAL
@@ -335,18 +335,11 @@ class PhotoFrameController(
       lastArtBitmap = null
       lastArtUrl = s.artUrl
       npArt.setImageBitmap(null)
-      val haveArt = s.art != null || s.artUrl.isNotBlank()
-      npArt.visibility = if (haveArt) View.VISIBLE else View.GONE
       val want = s.artUrl
-      val bytes = s.art
-      if (haveArt)
+      npArt.visibility = if (want.isNotBlank()) View.VISIBLE else View.GONE
+      if (want.isNotBlank())
           io.execute {
-            val bmp =
-                runCatching {
-                      if (bytes != null) BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                      else downloadBitmap(want)
-                    }
-                    .getOrNull()
+            val bmp = runCatching { downloadBitmap(want) }.getOrNull()
             ui.post { if (lastArtUrl == want) npArt.setImageBitmap(bmp) }
           }
     }

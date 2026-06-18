@@ -63,9 +63,7 @@ object ScreensaverConfig {
       // Battery models (Portal Go) only: pause the screensaver while unplugged so
       // the device can actually sleep, instead of showing photos until empty.
       val batterySaver: Boolean = true,
-      // Show the current track + album art on the frame while the ImmortalCast
-      // companion is playing synced music. Only meaningful (and only surfaced in
-      // settings) when that app is installed; harmless otherwise (no broadcast).
+      // Show the current track + album art on the frame while music is playing.
       val showNowPlaying: Boolean = true,
       // Whether the frame is pinned on (ALWAYS_ON) or follows the Portal's presence policy
       // (PRESENCE — the shared screensaver/music baseline). Defaults to ALWAYS_ON to preserve

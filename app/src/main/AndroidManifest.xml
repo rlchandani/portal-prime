@@ -23,6 +23,10 @@
     <!-- Fleet Agent: a foreground service so WiFi device management survives a
          reboot on these non-root Portals (where adb-over-WiFi can't). -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Multi-room now-playing: a media-session foreground service (see
+         MultiRoomService). Harmless/unused on the Portal's Android 9/10, where the
+         per-type FGS rules don't apply. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <!-- Lets the headless fleet agent surface the package-installer confirm dialog
          (which InstallConfirmService then auto-confirms) — holding it also exempts
          the agent from Android 10's background-activity-start restriction. Granted
@@ -233,6 +237,15 @@
         <service
             android:name=".FleetAgentService"
             android:exported="false" />
+
+        <!-- Multi-room now-playing relay: reads the Snapcast group's track off the
+             snapserver and publishes it as a media session so the now-playing card shows
+             on every Portal. Foreground so it survives backgrounding; started by
+             ImmortalApp when multi-room is configured. Not exported (no entry point). -->
+        <service
+            android:name=".MultiRoomService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
 
         <!-- Auto-confirms the package-installer dialog so fleet/agent installs need
              no human tap. Scoped to the installer package (see the xml config).

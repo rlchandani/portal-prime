@@ -47,5 +47,10 @@ class ImmortalApp : Application() {
 
     // Bring up the WiFi fleet agent if provisioning enabled it (no-op otherwise).
     FleetAgentService.ensureRunning(this)
+
+    // Start the multi-room now-playing relay if this Portal is set up as a Snapcast
+    // speaker (no-op until the user configures a server). Surfaces the group's track on
+    // the now-playing card even when the Music Assistant app isn't running here.
+    MultiRoomService.sync(this)
   }
 }
