@@ -937,14 +937,19 @@ private fun PlayPauseGlyph(playing: Boolean) {
   Canvas(modifier = Modifier.size(30.dp)) {
     val w = size.minDimension
     if (playing) {
-      val barW = w * 0.20f
-      drawRect(Color.White, topLeft = Offset(w * 0.28f, w * 0.22f), size = Size(barW, w * 0.56f))
-      drawRect(Color.White, topLeft = Offset(w * 0.52f, w * 0.22f), size = Size(barW, w * 0.56f))
+      // Two slim, fully-rounded bars with a clear gap between them — close-set square
+      // bars blur into a single block from across the room.
+      val barW = w * 0.13f
+      val top = w * 0.24f
+      val barH = w * 0.52f
+      val r = CornerRadius(barW * 0.5f, barW * 0.5f)
+      drawRoundRect(Color.White, topLeft = Offset(w * 0.30f, top), size = Size(barW, barH), cornerRadius = r)
+      drawRoundRect(Color.White, topLeft = Offset(w * 0.57f, top), size = Size(barW, barH), cornerRadius = r)
     } else {
       drawPath(
           Path().apply {
-            moveTo(w * 0.30f, w * 0.20f)
-            lineTo(w * 0.30f, w * 0.80f)
+            moveTo(w * 0.32f, w * 0.22f)
+            lineTo(w * 0.32f, w * 0.78f)
             lineTo(w * 0.80f, w * 0.50f)
             close()
           },
