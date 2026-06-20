@@ -1,6 +1,6 @@
 {
-  "versionCode": 43,
-  "versionName": "1.42",
+  "versionCode": 44,
+  "versionName": "1.43",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.42 — Top-bar app switcher, Home Assistant integration, and multi-room setup polish."
+  "notes": "Immortal 1.43: New clock faces with a picker (flip clock, big, bold, minimal) plus size options, self-hosted photo sources (Immich, network shares, WebDAV, web pages) you can set up from your phone with a QR code, a dimmed overnight night clock, and support for the latest iCloud shared-album links."
 }
