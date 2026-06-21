@@ -2,6 +2,8 @@
 
 `StoreActivity` / `StoreCatalog` — an on-device app store backed by a hosted JSON catalog.
 
+![The on-device App Store showing the Media & Entertainment category with install buttons](../img/app-store.png)
+
 ## What it is
 
 A hosted catalog ([`catalog.json`](https://github.com/starbrightlab/immortal/blob/main/catalog.json),
@@ -25,6 +27,10 @@ Two extra entry points catch APKs from elsewhere:
 - **"Install with Immortal"** (`ApkInstallActivity`) — catches any APK you open from Chrome or a
   file manager.
 - **"Install an APK"** (`ApkBrowserActivity`) — lists APKs already in your Downloads.
+
+!!! tip "Other ways to install"
+    For Play-Store apps (Aurora), F-Droid, and sideloading, see the
+    [Installing apps & app stores guide](../guides/installing-apps.md).
 
 ## Self-update
 
