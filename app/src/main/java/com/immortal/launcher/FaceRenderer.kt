@@ -53,10 +53,22 @@ class FaceRenderer(
 
   private var face: Face = Face("immortal-classic")
 
+  // Anti-burn-in drift radius (px). The always-on overlay is nudged within ±this by
+  // [tick] so no pixel stays lit in one spot for long; the overlay is oversized by the
+  // same amount (negative margins below) so the drift never bares a strip of the layer
+  // beneath at a screen edge — matters most for the full-bleed flip clock.
+  private val burnInMaxPx: Int by lazy { dp(6) }
+
   /** The overlay container, added above the photo layer by the host. */
   val view: FrameLayout by lazy {
     FrameLayout(context).apply {
-      layoutParams = FrameLayout.LayoutParams(MATCH, MATCH)
+      // MATCH_PARENT plus a negative margin on every edge makes the overlay slightly
+      // larger than the screen, so the burn-in drift (±[burnInMaxPx]) always keeps it
+      // fully covering the display.
+      layoutParams =
+          FrameLayout.LayoutParams(MATCH, MATCH).apply {
+            setMargins(-burnInMaxPx, -burnInMaxPx, -burnInMaxPx, -burnInMaxPx)
+          }
       // Let text shadows overflow their tight boxes instead of being clipped into hard rectangles.
       clipChildren = false
       clipToPadding = false
@@ -305,6 +317,10 @@ class FaceRenderer(
           weatherView?.text = weatherText
           weatherView?.visibility = if (hasWeather) View.VISIBLE else View.GONE
           weatherDivider?.visibility = if (hasWeather) View.VISIBLE else View.GONE
+          // Burn-in: drift the whole overlay a few px so no pixel stays lit in place.
+          val drift = AntiBurnIn.shift(now.time, burnInMaxPx.toFloat())
+          view.translationX = drift.x
+          view.translationY = drift.y
           ui.postDelayed(this, 1_000L)
         }
       }
