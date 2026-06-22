@@ -1,6 +1,6 @@
 {
-  "versionCode": 46,
-  "versionName": "1.45",
+  "versionCode": 47,
+  "versionName": "1.46",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Immortal 1.45: The phone remote gains media controls \u2014 a Now Playing tab with album art, title and artist, a scrubber, and play/pause/skip for whatever's playing on the Portal. It works with any media app, and from one phone you can control playback on every Portal on your Wi-Fi."
+  "notes": "Immortal 1.46 \u2014 screensaver polish. Photos now drift with a slow, tvOS-style Ken Burns zoom and pan, and your own photos (local folder or NAS) show a subtle \"place \u00b7 date\" caption read from their EXIF, with the place reverse-geocoded \u2014 no API key needed. Public iCloud and Google Photos shared albums that used to fall back to the built-in feed when their links expired now refresh and keep playing. The anti-burn-in pixel-shift is much gentler and can be switched off under Screensaver \u203a Display. Plus a reliability fix so the caption's location reliably resolves."
 }
