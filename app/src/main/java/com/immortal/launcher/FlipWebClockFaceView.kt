@@ -10,6 +10,7 @@ package com.immortal.launcher
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.view.MotionEvent
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -32,14 +33,19 @@ class FlipWebClockFaceView(
 
   @SuppressLint("SetJavaScriptEnabled")
   private val web =
-      WebView(context).apply {
+      // Touch is handled by the host (tap = exit, swipe = next). Overriding onTouchEvent/
+      // performClick (not just setOnTouchListener, which WebView ignores in its own onTouchEvent)
+      // is the only way to stop the WebView eating it.
+      object : WebView(context) {
+            override fun onTouchEvent(event: MotionEvent): Boolean = false
+            override fun performClick(): Boolean = false
+          }
+          .apply {
         // Matches the page's slate backdrop so there's no black flash before it paints.
         setBackgroundColor(0xFF0F1012.toInt())
         isVerticalScrollBarEnabled = false
         isHorizontalScrollBarEnabled = false
         overScrollMode = View.OVER_SCROLL_NEVER
-        // Touch is handled by the host (tap = exit, swipe = next); don't let the WebView eat it.
-        setOnTouchListener { _, _ -> false }
         settings.apply {
           javaScriptEnabled = true
           domStorageEnabled = true // the page persists its config via localStorage

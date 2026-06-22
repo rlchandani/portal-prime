@@ -293,12 +293,17 @@ class PhotoFrameController(
    *  whole frame; the host's touch handling still gives tap-to-exit. */
   @android.annotation.SuppressLint("SetJavaScriptEnabled")
   private fun startWebPage(url: String) {
-    val wv = android.webkit.WebView(context)
+    // Override onTouchEvent/performClick (not just setOnTouchListener, which WebView ignores in its
+    // own onTouchEvent) so the page never eats touch — the host needs it for tap-to-exit / swipe.
+    val wv =
+        object : android.webkit.WebView(context) {
+          override fun onTouchEvent(event: MotionEvent): Boolean = false
+          override fun performClick(): Boolean = false
+        }
     wv.setBackgroundColor(Color.BLACK)
     wv.isVerticalScrollBarEnabled = false
     wv.isHorizontalScrollBarEnabled = false
     wv.overScrollMode = View.OVER_SCROLL_NEVER
-    wv.setOnTouchListener { _, _ -> false } // host consumes touch for tap-to-exit
     wv.settings.apply {
       javaScriptEnabled = true
       domStorageEnabled = true
