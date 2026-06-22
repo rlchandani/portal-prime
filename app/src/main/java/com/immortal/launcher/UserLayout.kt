@@ -23,6 +23,8 @@ object UserLayout {
   private const val PREFS = "immortal_layout"
   private const val KEY = "assignments"
   private const val KEY_ORDER = "home_order"
+  private const val KEY_GRID_ORDER = "grid_order"
+  private const val KEY_GRID_SLOTS = "grid_slots"
 
   /** package id -> folder name (user override). */
   fun load(context: Context): Map<String, String> {
@@ -55,6 +57,60 @@ object UserLayout {
         .putString(KEY_ORDER, serializeOrder(order))
         .apply()
   }
+
+  /**
+   * Unified top-level home-grid order: stable keys for every movable tile — built-ins
+   * ("builtin:calls" etc.), widgets ("widget-tile:…"), folders ("folder:…"), and ungrouped apps
+   * ("app:…"). Lets the user drag ANY tile, not just apps. Reuses the tolerant order codec.
+   */
+  fun loadGridOrder(context: Context): List<String> {
+    val raw =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_GRID_ORDER, null)
+            ?: return emptyList()
+    return deserializeOrder(raw)
+  }
+
+  fun saveGridOrder(context: Context, order: List<String>) {
+    context
+        .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        .edit()
+        .putString(KEY_GRID_ORDER, serializeOrder(order))
+        .apply()
+  }
+
+  /**
+   * Free-placement home grid: a flat list of slots where each entry is a tile key or `null` (a
+   * blank cell the user left). Stored as a JSON array with "" standing in for a blank.
+   */
+  fun loadGridSlots(context: Context): List<String?> {
+    val raw =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_GRID_SLOTS, null)
+            ?: return emptyList()
+    return deserializeSlots(raw)
+  }
+
+  fun saveGridSlots(context: Context, slots: List<String?>) {
+    context
+        .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        .edit()
+        .putString(KEY_GRID_SLOTS, serializeSlots(slots))
+        .apply()
+  }
+
+  internal fun serializeSlots(slots: List<String?>): String =
+      org.json.JSONArray(slots.map { it ?: "" }).toString()
+
+  internal fun deserializeSlots(raw: String): List<String?> =
+      runCatching {
+            val arr = org.json.JSONArray(raw)
+            buildList {
+              for (i in 0 until arr.length()) {
+                val s = arr.optString(i)
+                add(if (s.isNullOrBlank()) null else s)
+              }
+            }
+          }
+          .getOrDefault(emptyList())
 
   /** JSON encode of the assignment map (extracted for testing). */
   internal fun serialize(assignments: Map<String, String>): String {

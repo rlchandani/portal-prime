@@ -77,17 +77,4 @@ class HomeWidgetStoreTest {
 
     assertEquals(listOf(original[1], added), HomeWidgetStore.withAdded(original, added))
   }
-
-  @Test
-  fun resized_updatesWidgetByStableKey() {
-    val custom =
-        HomeWidgetStore.HomeWidget(kind = HomeWidgetStore.KIND_TIMERS, customId = "timers:1")
-    val android = HomeWidgetStore.HomeWidget(2, "pkg", "Cls")
-
-    val resized = HomeWidgetStore.resized(listOf(custom, android), custom.key, 4, 3)
-
-    assertEquals(4, resized[0].spanX)
-    assertEquals(3, resized[0].spanY)
-    assertEquals(android, resized[1])
-  }
 }

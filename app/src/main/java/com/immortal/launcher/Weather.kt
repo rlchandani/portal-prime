@@ -47,7 +47,7 @@ object Weather {
           }
           .getOrDefault("")
 
-  /** Cached lat/lon, or a fresh geolocation (cached on success). */
+  /** Cached lat/lon, or a fresh geolocation (cached on success). Also caches the city name. */
   private fun location(context: Context): Pair<Double, Double>? {
     val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     prefs.getString("lat", null)?.toDoubleOrNull()?.let { la ->
@@ -59,7 +59,9 @@ object Weather {
                 val j = JSONObject(httpGet(url))
                 val la = j.optDouble("latitude", Double.NaN)
                 val lo = j.optDouble("longitude", Double.NaN)
-                if (!la.isNaN() && !lo.isNaN() && (la != 0.0 || lo != 0.0)) la to lo else null
+                val city = j.optString("city", "")
+                if (!la.isNaN() && !lo.isNaN() && (la != 0.0 || lo != 0.0)) Triple(la, lo, city)
+                else null
               }
               .getOrNull()
       if (coords != null) {
@@ -67,12 +69,38 @@ object Weather {
             .edit()
             .putString("lat", coords.first.toString())
             .putString("lon", coords.second.toString())
+            .putString("city", coords.third)
             .apply()
-        return coords
+        return coords.first to coords.second
       }
     }
     return null
   }
+
+  /** Last known city name (empty until geolocation has succeeded once). */
+  fun cachedCity(context: Context): String =
+      context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("city", "") ?: ""
+
+  /** Current conditions for the redesigned weather widget: city, rounded temp, and weather code. */
+  data class Current(val city: String, val temp: Int, val code: Int)
+
+  fun fetchCurrent(context: Context): Current? =
+      runCatching {
+            val (lat, lon) = location(context) ?: return null
+            val unit = if (ImmortalSettings.useFahrenheit(context)) "fahrenheit" else "celsius"
+            val w =
+                JSONObject(
+                    httpGet(
+                        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
+                            "&current=temperature_2m,weather_code&temperature_unit=$unit"))
+            val cur = w.getJSONObject("current")
+            Current(
+                city = cachedCity(context),
+                temp = cur.getDouble("temperature_2m").roundToInt(),
+                code = cur.getInt("weather_code"),
+            )
+          }
+          .getOrNull()
 
   /** One day of the multi-day forecast. [label] is "Today" then "Mon", "Tue", … */
   data class DayForecast(val label: String, val code: Int, val hi: Int, val lo: Int)

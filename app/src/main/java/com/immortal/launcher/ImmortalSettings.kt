@@ -111,6 +111,19 @@ object ImmortalSettings {
   fun setClockFormat(c: Context, fmt: String) =
       prefs(c).edit().putString("clock_format", fmt).apply()
 
+  // World-clock widget: which time zones to show (ordered). Defaults to a sensible set.
+  val DEFAULT_WORLD_CLOCK_ZONES =
+      listOf("America/New_York", "Europe/London", "Asia/Tokyo")
+
+  fun worldClockZones(c: Context): List<String> {
+    val raw = prefs(c).getString("world_clock_zones", null)
+    val list = raw?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+    return if (list.isNullOrEmpty()) DEFAULT_WORLD_CLOCK_ZONES else list
+  }
+
+  fun setWorldClockZones(c: Context, zones: List<String>) =
+      prefs(c).edit().putString("world_clock_zones", zones.joinToString(",")).apply()
+
   fun setShowMiniPlayer(c: Context, on: Boolean) =
       prefs(c).edit().putBoolean("show_mini_player", on).apply()
 

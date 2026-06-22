@@ -15,7 +15,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,8 +43,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -87,7 +91,13 @@ private fun ImmortalSettingsScreen() {
   var showMultiRoom by remember { mutableStateOf(false) }
   var showMqtt by remember { mutableStateOf(false) }
   var showHealth by remember { mutableStateOf(false) }
+  var showWorldClock by remember { mutableStateOf(false) }
   var bootSelected by remember { mutableStateOf(BootLaunch.packages(context).toSet()) }
+
+  if (showWorldClock) {
+    WorldClockScreen(onBack = { showWorldClock = false })
+    return
+  }
 
   if (showBootApps) {
     BootAppsScreen(
@@ -119,6 +129,7 @@ private fun ImmortalSettingsScreen() {
       onOpenMultiRoom = { showMultiRoom = true },
       onOpenMqtt = { showMqtt = true },
       onOpenHealth = { showHealth = true },
+      onOpenWorldClock = { showWorldClock = true },
   )
 }
 
@@ -129,6 +140,7 @@ private fun SettingsMain(
     onOpenMultiRoom: () -> Unit,
     onOpenMqtt: () -> Unit,
     onOpenHealth: () -> Unit,
+    onOpenWorldClock: () -> Unit,
 ) {
   val context = LocalContext.current
   var settings by remember { mutableStateOf(ImmortalSettings.load(context)) }
@@ -219,6 +231,8 @@ private fun SettingsMain(
           )
         }
       }
+
+      WallpaperSection()
 
       Spacer(Modifier.size(26.dp))
 
@@ -336,6 +350,26 @@ private fun SettingsMain(
         }
       }
 
+      Spacer(Modifier.size(26.dp))
+      SectionLabel("World clock")
+      Card {
+        Row(
+            modifier = Modifier.fillMaxWidth().tvFocusableRow { onOpenWorldClock() }.padding(18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Column(modifier = Modifier.weight(1f)) {
+            Text("World clock locations", color = Color.White, fontSize = 17.sp)
+            Text(
+                "Pick which cities the World Clock widget shows (first four are displayed).",
+                color = Color(0xFF9A9A9A),
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+          }
+          Text("›", color = Color(0xFF7C7C7C), fontSize = 26.sp)
+        }
+      }
+
       MultiRoomNavRow(onOpen = onOpenMultiRoom)
 
       MqttNavRow(onOpen = onOpenMqtt)
@@ -356,6 +390,133 @@ private fun SettingsMain(
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
+  }
+}
+
+@Composable
+private fun WallpaperSection() {
+  val context = LocalContext.current
+  var mode by remember { mutableStateOf(WallpaperConfig.load(context).mode) }
+  var grain by remember { mutableStateOf(WallpaperConfig.load(context).grain) }
+
+  Spacer(Modifier.size(26.dp))
+  SectionLabel("Wallpaper")
+  Card {
+    Column(modifier = Modifier.padding(18.dp)) {
+      Text("Background", color = Color.White, fontSize = 17.sp)
+      Text(
+          "A gradient, a photo, or sync with your screensaver (shown blurred). Tap to choose.",
+          color = Color(0xFF9A9A9A),
+          fontSize = 13.sp,
+          modifier = Modifier.padding(top = 2.dp),
+      )
+      Spacer(Modifier.size(14.dp))
+      Row(
+          modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+          horizontalArrangement = Arrangement.spacedBy(12.dp),
+      ) {
+        WallpaperSwatch("Dark", selected = mode == WallpaperConfig.DARK, onClick = {
+          mode = WallpaperConfig.DARK
+          WallpaperConfig.setMode(context, mode)
+        }) {
+          Spacer(Modifier.fillMaxSize().background(Color(0xFF1A1A1A)))
+        }
+        WallpaperConfig.GRADIENTS.forEach { (id, colors) ->
+          WallpaperSwatch(id.removePrefix("g_").replaceFirstChar { it.uppercase() }, selected = mode == id, onClick = {
+            mode = id
+            WallpaperConfig.setMode(context, id)
+          }) {
+            Spacer(Modifier.fillMaxSize().background(Brush.verticalGradient(colors.map { Color(it) })))
+          }
+        }
+        WallpaperConfig.PHOTOS.forEach { (id, label) ->
+          val thumb =
+              remember(id) {
+                runCatching {
+                      context.assets.open("photoframe_fallback/${id.removePrefix(WallpaperConfig.PHOTO_PREFIX)}")
+                          .use { android.graphics.BitmapFactory.decodeStream(it) }
+                          ?.let { android.graphics.Bitmap.createScaledBitmap(it, 96, 96, true).asImageBitmap() }
+                    }
+                    .getOrNull()
+              }
+          WallpaperSwatch(label, selected = mode == id, onClick = {
+            mode = id
+            WallpaperConfig.setMode(context, id)
+          }) {
+            if (thumb != null) {
+              Image(bitmap = thumb, contentDescription = null, modifier = Modifier.fillMaxSize())
+            } else {
+              Spacer(Modifier.fillMaxSize().background(Color(0xFF333740)))
+            }
+          }
+        }
+        WallpaperSwatch("Screensaver", selected = mode == WallpaperConfig.SCREENSAVER, onClick = {
+          mode = WallpaperConfig.SCREENSAVER
+          WallpaperConfig.setMode(context, WallpaperConfig.SCREENSAVER)
+        }) {
+          Spacer(
+              Modifier.fillMaxSize()
+                  .background(Brush.verticalGradient(listOf(Color(0xFF2C3E50), Color(0xFF4CA1AF)))))
+        }
+      }
+      Divider()
+      Row(
+          modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Column(modifier = Modifier.weight(1f)) {
+          Text("Film grain", color = Color.White, fontSize = 17.sp)
+          Text(
+              "Adds a subtle grain texture over the wallpaper.",
+              color = Color(0xFF9A9A9A),
+              fontSize = 13.sp,
+              modifier = Modifier.padding(top = 2.dp),
+          )
+        }
+        Segmented(
+            options = listOf("Off" to "off", "On" to "on"),
+            selected = if (grain) "on" else "off",
+            onSelect = {
+              val on = it == "on"
+              grain = on
+              WallpaperConfig.setGrain(context, on)
+            },
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun WallpaperSwatch(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    preview: @Composable () -> Unit,
+) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.tvFocusable(RoundedCornerShape(16.dp)) { onClick() },
+  ) {
+    androidx.compose.foundation.layout.Box(
+        modifier =
+            Modifier.size(74.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .border(
+                    width = if (selected) 3.dp else 1.dp,
+                    color = if (selected) Color(0xFF2E6BE6) else Color(0x33FFFFFF),
+                    shape = RoundedCornerShape(16.dp),
+                ),
+    ) {
+      preview()
+    }
+    Text(
+        label,
+        color = if (selected) Color.White else Color(0xFFBBBBBB),
+        fontSize = 12.sp,
+        maxLines = 1,
+        modifier = Modifier.padding(top = 6.dp),
+    )
   }
 }
 
@@ -1115,8 +1276,119 @@ private fun MqttScreen(onBack: () -> Unit) {
   }
 }
 
-private data class BootAppOption(val pkg: String, val label: String, val icon: ImageBitmap)
+/** A curated set of cities for the world-clock picker (label → IANA tz id). */
+private val WORLD_CLOCK_CITIES =
+    listOf(
+        "Cupertino" to "America/Los_Angeles",
+        "Denver" to "America/Denver",
+        "New York" to "America/New_York",
+        "São Paulo" to "America/Sao_Paulo",
+        "London" to "Europe/London",
+        "Paris" to "Europe/Paris",
+        "Berlin" to "Europe/Berlin",
+        "Cape Town" to "Africa/Johannesburg",
+        "Dubai" to "Asia/Dubai",
+        "Mumbai" to "Asia/Kolkata",
+        "Singapore" to "Asia/Singapore",
+        "Tokyo" to "Asia/Tokyo",
+        "Sydney" to "Australia/Sydney",
+    )
 
+/** The world-clock locations picker. Tapping a city toggles it; the widget shows the first four in
+ * selection order. Back returns to the main settings page. */
+@Composable
+private fun WorldClockScreen(onBack: () -> Unit) {
+  val context = LocalContext.current
+  var selected by remember { mutableStateOf(ImmortalSettings.worldClockZones(context)) }
+  val firstFocus = remember { FocusRequester() }
+  LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
+
+  Column(
+      modifier =
+          Modifier.fillMaxSize()
+              .onPreviewKeyEvent { e ->
+                if (e.key == Key.Back) {
+                  if (e.type == KeyEventType.KeyUp) onBack()
+                  true
+                } else false
+              }
+              .background(Color(0xFF101012))
+              .verticalScroll(rememberScrollState())
+              .padding(horizontal = 28.dp, vertical = 32.dp),
+  ) {
+    Column(modifier = Modifier.widthIn(max = 1100.dp).focusGroup()) {
+      Surface(
+          color = Color(0xFF1C1C1E),
+          shape = RoundedCornerShape(12.dp),
+          modifier =
+              Modifier.focusRequester(firstFocus).tvFocusable(RoundedCornerShape(12.dp)) { onBack() },
+      ) {
+        Text(
+            "‹  Back",
+            color = Color.White,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
+        )
+      }
+      Spacer(Modifier.size(18.dp))
+      Text("World clock", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
+      Text(
+          "Choose locations for the World Clock widget. The first four (in the order you pick them) are shown.",
+          color = Color(0xFF9A9A9A),
+          fontSize = 16.sp,
+          modifier = Modifier.padding(top = 6.dp),
+      )
+      Spacer(Modifier.size(26.dp))
+      Card {
+        WORLD_CLOCK_CITIES.forEachIndexed { i, (label, zone) ->
+          if (i > 0) Divider()
+          val on = zone in selected
+          val rank = selected.indexOf(zone)
+          Row(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .tvFocusableRow {
+                        selected = if (on) selected - zone else selected + zone
+                        ImmortalSettings.setWorldClockZones(context, selected)
+                      }
+                      .padding(horizontal = 18.dp, vertical = 14.dp),
+              verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Column(modifier = Modifier.weight(1f)) {
+              Text(label, color = Color.White, fontSize = 16.sp)
+              Text(
+                  zone.replace('_', ' '),
+                  color = Color(0xFF9A9A9A),
+                  fontSize = 13.sp,
+                  modifier = Modifier.padding(top = 2.dp),
+              )
+            }
+            if (on && rank in 0..3) {
+              Text(
+                  "#${rank + 1}",
+                  color = Color(0xFF8AB4F8),
+                  fontSize = 14.sp,
+                  fontWeight = FontWeight.SemiBold,
+                  modifier = Modifier.padding(end = 14.dp),
+              )
+            } else if (on) {
+              Text("hidden", color = Color(0xFF7C7C7C), fontSize = 13.sp, modifier = Modifier.padding(end = 14.dp))
+            }
+            Switch(checked = on, onCheckedChange = null)
+          }
+        }
+      }
+      Text(
+          "Tip: the widget shows up to four clocks. Re-pick a city to move it to the end of the order.",
+          color = Color(0xFF7C7C7C),
+          fontSize = 13.sp,
+          modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
+      )
+    }
+  }
+}
+
+private data class BootAppOption(val pkg: String, val label: String, val icon: ImageBitmap)
 /** Every launchable app except our own launcher, for the boot-launch picker. */
 private fun loadLaunchableApps(context: Context): List<BootAppOption> {
   val pm = context.packageManager

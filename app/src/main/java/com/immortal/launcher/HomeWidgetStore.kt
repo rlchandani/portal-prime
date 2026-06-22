@@ -76,12 +76,6 @@ object HomeWidgetStore {
   fun without(widgets: List<HomeWidget>, key: String): List<HomeWidget> =
       widgets.filterNot { it.key == key }
 
-  fun resized(widgets: List<HomeWidget>, key: String, spanX: Int, spanY: Int): List<HomeWidget> =
-      widgets.map {
-        if (it.key == key) it.copy(spanX = normalizeSpan(spanX), spanY = normalizeSpan(spanY))
-        else it
-      }
-
   fun normalizeSpan(span: Int): Int = span.coerceIn(1, MAX_SPAN)
 
   internal fun serialize(widgets: List<HomeWidget>): String {

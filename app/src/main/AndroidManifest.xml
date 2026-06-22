@@ -303,6 +303,13 @@
             android:name=".SleepReceiver"
             android:exported="false" />
 
+        <!-- Timer "time's up" alarm: an exact AlarmManager alarm fires here when a
+             countdown started in the Timers widget reaches zero, so it rings even if
+             neither the home screen nor the screensaver is in the foreground. -->
+        <receiver
+            android:name=".TimerAlarmReceiver"
+            android:exported="false" />
+
         <!-- WiFi fleet-management agent. Reached over the LAN by the laptop tool;
              started by ImmortalApp / BootReceiver, off until provisioning enables
              it. Not exported (it's an HTTP server, not an Android-component entry). -->

@@ -143,6 +143,8 @@ class PhotoFrameController(
 
   /** Hosts forward their touch events here. */
   fun onTouch(ev: MotionEvent) {
+    // While the timer alarm is showing, the slide-to-stop owns the touch stream.
+    if (faceRenderer.handleAlarmTouch(ev)) return
     when (ev.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
         downX = ev.x
