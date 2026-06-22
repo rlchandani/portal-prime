@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * Copyright (c) 2026 Starbright Lab.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -17,6 +17,7 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -43,10 +44,12 @@ import org.json.JSONObject
  * weather cluster bottom-left.
  *
  * Source is configurable via [ScreensaverConfig]:
- *  - **default** — the built-in keyless photo feed (Lorem Picsum, or Unsplash if a
- *    key is supplied). This is also the fallback whenever any other source is unset,
- *    empty, or unreachable (e.g. a USB drive was unplugged, a shared album was
- *    unshared), so the frame is never blank.
+ *  - **default** — the built-in keyless photo feed. This is also the fallback whenever
+ *    any other source is unset, empty, or unreachable (e.g. a USB drive was unplugged,
+ *    a shared album was unshared). It walks an ordered chain — Unsplash (if a key is
+ *    supplied) → Lorem Picsum → Wikimedia Commons featured landscapes → CC0 photos
+ *    bundled in the APK — showing the first image it can fetch, so the frame is never
+ *    blank even with no network or a third-party outage. See [fetchWebPhoto].
  *  - **folder** — photos and videos from a folder the user picked (internal, SD, or
  *    a USB-C drive), read through the Storage Access Framework.
  *  - **url** — a public share link to an iCloud Shared Album or a Google Photos
@@ -115,6 +118,17 @@ class PhotoFrameController(
   // Web-feed history so swipes can go back as well as forward.
   private val history = ArrayList<Bitmap>()
   private var index = -1
+
+  // Default-feed source-chain state (see [fetchWebPhoto]).
+  // Wikimedia Commons featured-landscape image list: fetched once per session, then cycled.
+  private var wikimediaUrls: List<String> = emptyList()
+  private var wikimediaIdx = 0
+  // Bundled offline photos (assets/[FALLBACK_DIR]): shuffled once, then cycled.
+  private var bundledNames: List<String> = emptyList()
+  private var bundledIdx = 0
+  // Per-source failure backoff so a dead remote (e.g. a Picsum outage) isn't retried
+  // every tick; the entry expires after [SOURCE_COOLDOWN_MS] so recovery self-heals.
+  private val sourceCooldownUntil = HashMap<String, Long>()
 
   /** Host (dream / preview activity) sets this to dismiss the frame on tap. */
   var onExit: (() -> Unit)? = null
@@ -802,7 +816,7 @@ class PhotoFrameController(
 
   private fun loadFresh() {
     io.execute {
-      val bmp = runCatching { downloadBitmap(directImageUrl()) }.getOrNull() ?: return@execute
+      val bmp = fetchWebPhoto() ?: return@execute
       ui.post {
         photo.visibility = View.VISIBLE
         if (history.size >= 6) history.removeAt(0) // cap memory; GC reclaims
@@ -811,6 +825,44 @@ class PhotoFrameController(
         show(bmp)
       }
     }
+  }
+
+  // The default feed (and the universal fallback for any other source that's unset,
+  // empty, or unreachable) walks an ordered chain of keyless sources and returns the
+  // first image it can fetch:
+  //   1. Unsplash  — only when an API key was supplied (richest, but rate-limited)
+  //   2. Picsum    — keyless; the historical default
+  //   3. Wikimedia — Commons "Featured pictures of landscapes"; keyless, and on
+  //                  infrastructure independent of Picsum (the point of having it)
+  //   4. Bundled   — CC0/public-domain photos shipped in the APK; can't fail, so a
+  //                  fresh device with no network yet — or a day every web source is
+  //                  down (e.g. the Picsum outage that prompted this) — is never blank.
+  private val webSources: List<Pair<String, () -> Bitmap?>> by lazy {
+    buildList {
+      if (unsplashKey.isNotBlank()) add("unsplash" to ::unsplashBitmap)
+      add("picsum" to ::picsumBitmap)
+      add("wikimedia" to ::wikimediaBitmap)
+      add("bundled" to ::bundledBitmap)
+    }
+  }
+
+  private fun fetchWebPhoto(): Bitmap? {
+    val now = System.currentTimeMillis()
+    for ((name, fetch) in webSources) {
+      if ((sourceCooldownUntil[name] ?: 0L) > now) continue // dead recently; skip until cooldown
+      val bmp = runCatching { fetch() }.getOrNull()
+      if (bmp != null) return bmp
+      Log.w(TAG, "screensaver photo source '$name' unavailable; backing off")
+      sourceCooldownUntil[name] = now + SOURCE_COOLDOWN_MS
+    }
+    // Everything failed or is cooling down (e.g. all remotes down *and* the bundled
+    // assets are unreadable). Retry the whole chain ignoring cooldowns rather than
+    // leave the frame blank.
+    for ((_, fetch) in webSources) {
+      runCatching { fetch() }.getOrNull()?.let { return it }
+    }
+    Log.w(TAG, "screensaver: no photo source available")
+    return null
   }
 
   private fun show(bmp: Bitmap) {
@@ -825,20 +877,76 @@ class PhotoFrameController(
         .start()
   }
 
-  private fun directImageUrl(): String {
+  // --- default-feed sources (tried in turn by [fetchWebPhoto]) ----------------
+  private fun picsumBitmap(): Bitmap? {
     val m = context.resources.displayMetrics
-    val w = m.widthPixels
-    val h = m.heightPixels
-    if (unsplashKey.isBlank())
-        return "https://picsum.photos/$w/$h?random=${System.currentTimeMillis()}"
-    // Match Unsplash crop to the screen aspect so portrait panels (e.g. Portal
+    return downloadBitmap(
+        "https://picsum.photos/${m.widthPixels}/${m.heightPixels}?random=${System.currentTimeMillis()}")
+  }
+
+  private fun unsplashBitmap(): Bitmap? {
+    val m = context.resources.displayMetrics
+    // Match the Unsplash crop to the screen aspect so portrait panels (e.g. Portal
     // Mini at 800x1280) don't get a letterboxed/upscaled landscape shot.
-    val orientation = if (h > w) "portrait" else "landscape"
+    val orientation = if (m.heightPixels > m.widthPixels) "portrait" else "landscape"
     val json =
         httpGet(
             "https://api.unsplash.com/photos/random?orientation=$orientation" +
                 "&query=$unsplashQuery&client_id=$unsplashKey")
-    return JSONObject(json).getJSONObject("urls").getString("regular")
+    return downloadBitmap(JSONObject(json).getJSONObject("urls").getString("regular"))
+  }
+
+  /**
+   * Keyless Wikimedia Commons feed: the curated "Featured pictures of landscapes"
+   * category. The file list is fetched once per session (then shuffled and cycled),
+   * so steady state is just a thumbnail download from Wikimedia's upload CDN.
+   */
+  private fun wikimediaBitmap(): Bitmap? {
+    if (wikimediaUrls.isEmpty()) wikimediaUrls = fetchWikimediaUrls()
+    if (wikimediaUrls.isEmpty()) return null
+    val url = wikimediaUrls[wikimediaIdx % wikimediaUrls.size]
+    wikimediaIdx++
+    return downloadBitmap(url)
+  }
+
+  private fun fetchWikimediaUrls(): List<String> {
+    val width = context.resources.displayMetrics.widthPixels.coerceIn(640, 1920)
+    val json =
+        httpGet(
+            "https://commons.wikimedia.org/w/api.php?action=query&format=json" +
+                "&generator=categorymembers&gcmtype=file&gcmlimit=200" +
+                "&gcmtitle=Category:Featured_pictures_of_landscapes" +
+                "&prop=imageinfo&iiprop=url&iiurlwidth=$width")
+    val pages =
+        JSONObject(json).optJSONObject("query")?.optJSONObject("pages") ?: return emptyList()
+    val urls = ArrayList<String>()
+    for (key in pages.keys()) {
+      val info = pages.getJSONObject(key).optJSONArray("imageinfo")?.optJSONObject(0) ?: continue
+      val url = info.optString("thumburl").ifBlank { info.optString("url") }
+      if (url.isNotBlank()) urls.add(url)
+    }
+    urls.shuffle()
+    return urls
+  }
+
+  /** Terminal fallback: CC0/public-domain photos bundled in the APK — never fails. */
+  private fun bundledBitmap(): Bitmap? {
+    if (bundledNames.isEmpty()) {
+      bundledNames =
+          runCatching {
+                context.assets.list(FALLBACK_DIR)?.filter { it.endsWith(".jpg", ignoreCase = true) }
+              }
+              .getOrNull()
+              .orEmpty()
+              .shuffled()
+    }
+    if (bundledNames.isEmpty()) return null
+    val name = bundledNames[bundledIdx % bundledNames.size]
+    bundledIdx++
+    return runCatching {
+          context.assets.open("$FALLBACK_DIR/$name").use { BitmapFactory.decodeStream(it) }
+        }
+        .getOrNull()
   }
 
   // --- data -------------------------------------------------------------------
@@ -846,7 +954,7 @@ class PhotoFrameController(
     val c = URL(spec).openConnection() as HttpURLConnection
     c.connectTimeout = 8000
     c.readTimeout = 8000
-    c.setRequestProperty("User-Agent", "PortalPhotoFrame/1.0")
+    c.setRequestProperty("User-Agent", USER_AGENT)
     return c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
   }
 
@@ -855,7 +963,7 @@ class PhotoFrameController(
     c.connectTimeout = 8000
     c.readTimeout = 12000
     c.instanceFollowRedirects = true
-    c.setRequestProperty("User-Agent", "PortalPhotoFrame/1.0")
+    c.setRequestProperty("User-Agent", USER_AGENT)
     headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
     return c.inputStream.use { BitmapFactory.decodeStream(it) }
   }
@@ -863,4 +971,15 @@ class PhotoFrameController(
   private val MATCH = FrameLayout.LayoutParams.MATCH_PARENT
   private val WRAP = FrameLayout.LayoutParams.WRAP_CONTENT
   private fun dp(v: Int): Int = (v * context.resources.displayMetrics.density).toInt()
+
+  private companion object {
+    const val TAG = "ImmortalPhotoFrame"
+    // Bundled fallback photos live under app/src/main/assets/<FALLBACK_DIR>/.
+    const val FALLBACK_DIR = "photoframe_fallback"
+    // How long to skip a web source after it fails, so a dead host (e.g. a Picsum
+    // outage) isn't re-hammered every tick. Expires on its own so recovery self-heals.
+    const val SOURCE_COOLDOWN_MS = 5 * 60_000L
+    // Descriptive UA — Wikimedia's API policy asks for an identifiable agent + contact.
+    const val USER_AGENT = "Immortal/1.0 (+https://github.com/starbrightlab/immortal)"
+  }
 }
