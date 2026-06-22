@@ -50,6 +50,11 @@
          WiFi). With requestLegacyExternalStorage it governs legacy write access on
          these Android-10 Portals. Granted by provisioning. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Home-screen widgets: normal apps cannot hold this directly, so Android
+         shows the one-time ACTION_APPWIDGET_BIND consent dialog the first time
+         Immortal hosts a widget. -->
+    <uses-permission android:name="android.permission.BIND_APPWIDGET"
+        tools:ignore="ProtectedPermissions" />
 
     <!-- "hey" trigger guard. Millennium's TriggerReceiver requires this permission, so only
          the launcher may fire the push-to-talk trigger (not arbitrary apps). It's signature-

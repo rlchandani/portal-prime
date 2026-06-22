@@ -7,6 +7,10 @@
 
 package com.immortal.launcher
 
+import android.app.Activity
+import android.appwidget.AppWidgetHost
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -14,7 +18,9 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.BatteryManager
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.MotionEvent
+import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -43,6 +49,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -50,6 +57,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -102,6 +110,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import kotlin.math.roundToInt
@@ -127,10 +136,25 @@ private data class AppEntry(
     val folder: String? = null,
 )
 
+private data class WidgetProviderEntry(
+    val label: String,
+    val packageLabel: String,
+    val icon: ImageBitmap?,
+    val info: AppWidgetProviderInfo,
+    val spanX: Int,
+    val spanY: Int,
+)
+
+private data class PendingWidgetAdd(
+    val appWidgetId: Int,
+    val provider: WidgetProviderEntry,
+)
+
 /** Calls→stock-home bridge: how many system Back presses reach Meta's launcher, and the gap
  *  between them (verified on the Portal TV — 5 presses lands on the stock launcher's Apps tab). */
 private const val STOCK_HOME_BACK_PRESSES = 5
 private const val STOCK_HOME_BACK_INTERVAL_MS = 300L
+private const val HOME_APP_WIDGET_HOST_ID = 0x4611
 
 /**
  * The custom Portal home launcher. Replaces the stock Aloha home (selected via
@@ -335,6 +359,9 @@ private fun LauncherScreen(
       }
   var editMode by remember { mutableStateOf(false) }
   var openFolder by remember { mutableStateOf<String?>(null) }
+  var showWidgetPicker by remember { mutableStateOf(false) }
+  var widgetStatus by remember { mutableStateOf<String?>(null) }
+  var widgets by remember { mutableStateOf(HomeWidgetStore.load(context)) }
 
   // Immortal Settings the home screen reflects (tile size, and the optional weather
   // widget's mode/unit), re-read on resume so a change applies the moment the user
@@ -343,6 +370,14 @@ private fun LauncherScreen(
   var weatherWidget by remember { mutableStateOf(ImmortalSettings.load(context).weatherWidget) }
   var weatherFahrenheit by remember { mutableStateOf(ImmortalSettings.useFahrenheit(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
+  val appWidgetManager = remember(context) { AppWidgetManager.getInstance(context) }
+  val appWidgetHost = remember(context) { AppWidgetHost(context, HOME_APP_WIDGET_HOST_ID) }
+  fun loadLiveWidgets(): List<HomeWidgetStore.HomeWidget> {
+    val loaded = HomeWidgetStore.load(context)
+    val live = loaded.filterLiveWidgets(appWidgetManager, appWidgetHost)
+    if (live.size != loaded.size) HomeWidgetStore.save(context, live)
+    return live
+  }
   DisposableEffect(lifecycleOwner) {
     val obs = LifecycleEventObserver { _, e ->
       if (e == Lifecycle.Event.ON_RESUME) {
@@ -350,10 +385,141 @@ private fun LauncherScreen(
         tileSize = s.tileSize
         weatherWidget = s.weatherWidget
         weatherFahrenheit = ImmortalSettings.useFahrenheit(context)
+        widgets = loadLiveWidgets()
       }
     }
     lifecycleOwner.lifecycle.addObserver(obs)
     onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+  DisposableEffect(lifecycleOwner, appWidgetHost) {
+    val obs = LifecycleEventObserver { _, e ->
+      when (e) {
+        Lifecycle.Event.ON_START -> runCatching { appWidgetHost.startListening() }
+        Lifecycle.Event.ON_STOP -> runCatching { appWidgetHost.stopListening() }
+        else -> Unit
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    runCatching { appWidgetHost.startListening() }
+    val live = widgets.filterLiveWidgets(appWidgetManager, appWidgetHost)
+    if (live.size != widgets.size) HomeWidgetStore.save(context, live)
+    widgets = live
+    onDispose {
+      lifecycleOwner.lifecycle.removeObserver(obs)
+      runCatching { appWidgetHost.stopListening() }
+    }
+  }
+
+  fun saveWidgets(next: List<HomeWidgetStore.HomeWidget>) {
+    widgets = next
+    HomeWidgetStore.save(context, next)
+  }
+
+  fun removeWidget(appWidgetId: Int) {
+    runCatching { appWidgetHost.deleteAppWidgetId(appWidgetId) }
+    saveWidgets(HomeWidgetStore.without(widgets, appWidgetId))
+    widgetStatus = "Widget removed"
+  }
+
+  fun commitWidget(pending: PendingWidgetAdd) {
+    val provider = pending.provider
+    val record =
+        HomeWidgetStore.HomeWidget(
+            appWidgetId = pending.appWidgetId,
+            providerPackage = provider.info.provider.packageName,
+            providerClass = provider.info.provider.className,
+            spanX = provider.spanX,
+            spanY = provider.spanY,
+        )
+    updateWidgetSizeOptions(appWidgetManager, record, tileDpFor(tileSize))
+    saveWidgets(HomeWidgetStore.withAdded(widgets, record))
+    showWidgetPicker = false
+    widgetStatus = "Added ${provider.label}"
+  }
+
+  var pendingBind by remember { mutableStateOf<PendingWidgetAdd?>(null) }
+  var pendingConfig by remember { mutableStateOf<PendingWidgetAdd?>(null) }
+  val configLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val pending = pendingConfig ?: return@rememberLauncherForActivityResult
+        pendingConfig = null
+        if (result.resultCode == Activity.RESULT_OK) {
+          commitWidget(pending)
+        } else {
+          runCatching { appWidgetHost.deleteAppWidgetId(pending.appWidgetId) }
+          widgetStatus = "Widget setup was cancelled"
+        }
+      }
+
+  fun configureOrCommit(pending: PendingWidgetAdd) {
+    val configure = pending.provider.info.configure
+    if (configure != null) {
+      pendingConfig = pending
+      val launched =
+          runCatching {
+                configLauncher.launch(
+                    Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+                        .setComponent(configure)
+                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pending.appWidgetId))
+                true
+              }
+              .getOrDefault(false)
+      if (!launched) {
+        pendingConfig = null
+        runCatching { appWidgetHost.deleteAppWidgetId(pending.appWidgetId) }
+        widgetStatus = "Widget setup could not open"
+      }
+    } else {
+      commitWidget(pending)
+    }
+  }
+
+  val bindLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val pending = pendingBind ?: return@rememberLauncherForActivityResult
+        pendingBind = null
+        if (result.resultCode == Activity.RESULT_OK) {
+          configureOrCommit(pending)
+        } else {
+          runCatching { appWidgetHost.deleteAppWidgetId(pending.appWidgetId) }
+          widgetStatus = "Widget permission was cancelled"
+        }
+      }
+
+  fun addWidget(provider: WidgetProviderEntry) {
+    val appWidgetId =
+        runCatching { appWidgetHost.allocateAppWidgetId() }
+            .getOrElse {
+              widgetStatus = "Widget host could not allocate an ID"
+              return
+            }
+    val pending = PendingWidgetAdd(appWidgetId, provider)
+    val bound =
+        runCatching {
+              appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, provider.info.provider)
+            }
+            .getOrDefault(false)
+    if (bound) {
+      configureOrCommit(pending)
+      return
+    }
+
+    pendingBind = pending
+    widgetStatus = "Allow Immortal to add widgets in the system dialog."
+    val launched =
+        runCatching {
+              bindLauncher.launch(
+                  Intent(AppWidgetManager.ACTION_APPWIDGET_BIND)
+                      .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                      .putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, provider.info.provider))
+              true
+            }
+            .getOrDefault(false)
+    if (!launched) {
+      pendingBind = null
+      runCatching { appWidgetHost.deleteAppWidgetId(appWidgetId) }
+      widgetStatus = "Android's widget permission dialog could not open"
+    }
   }
 
   // Remote support: land focus on the grid at startup so the D-pad works on the TV.
@@ -532,8 +698,9 @@ private fun LauncherScreen(
                     )
                   },
       ) {
+        val gridColumns = gridColumnsFor(tileSize)
         LazyVerticalGrid(
-            columns = GridCells.Fixed(gridColumnsFor(tileSize)),
+            columns = GridCells.Fixed(gridColumns),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
             modifier = Modifier.focusRequester(homeGridFocus).focusGroup(),
@@ -542,6 +709,21 @@ private fun LauncherScreen(
           // only regular apps get a delete badge and become draggable.
           item { PortalHomeTile(onExitHome) }
           item { StoreTile(onOpenStore) }
+          item { WidgetsTile { showWidgetPicker = true } }
+          items(
+              widgets,
+              key = { "widget:${it.appWidgetId}" },
+              span = { GridItemSpan(it.spanX.coerceIn(1, gridColumns)) },
+          ) { widget ->
+            WidgetTile(
+                widget = widget,
+                host = appWidgetHost,
+                manager = appWidgetManager,
+                editMode = editMode,
+                tileDp = LocalTileDp.current,
+                onRemove = { removeWidget(widget.appWidgetId) },
+            )
+          }
           items(folderNames, key = { it }) { name ->
             FolderTile(
                 name = name,
@@ -689,6 +871,22 @@ private fun LauncherScreen(
           onCancel = { renaming = null },
       )
     }
+
+    if (showWidgetPicker) {
+      val providers by
+          produceState(initialValue = emptyList<WidgetProviderEntry>(), reload, tileSize) {
+            value = withContext(Dispatchers.IO) { loadWidgetProviders(context, tileDpFor(tileSize)) }
+          }
+      WidgetPickerOverlay(
+          providers = providers,
+          status = widgetStatus,
+          onPick = { addWidget(it) },
+          onDismiss = {
+            showWidgetPicker = false
+            widgetStatus = null
+          },
+      )
+    }
   }
   } // CompositionLocalProvider(LocalTileDp)
 }
@@ -718,6 +916,12 @@ private fun gridColumnsFor(size: String): Int =
       ImmortalSettings.SIZE_LARGE -> 5
       else -> 6
     }
+
+private fun estimateWidgetSpan(minDp: Int, tileDp: Dp): Int {
+  if (minDp <= 0) return HomeWidgetStore.DEFAULT_SPAN_X
+  val tile = tileDp.value.coerceAtLeast(1f)
+  return HomeWidgetStore.normalizeSpan(((minDp + tile - 1f) / tile).toInt().coerceAtLeast(1))
+}
 
 @Composable
 private fun HeaderBar(onScreensaver: () -> Unit) {
@@ -1391,6 +1595,8 @@ private const val ICON_REFRESH =
     "M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
 private const val ICON_IMAGE =
     "M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
+private const val ICON_WIDGETS =
+    "M3 3h8v8H3V3zm10 0h8v5h-8V3zM3 13h5v8H3v-8zm7 0h11v8H10v-8z"
 private const val ICON_HELP =
     "M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"
 private const val ICON_GEAR =
@@ -1758,6 +1964,267 @@ private fun StoreTile(onClick: () -> Unit) {
 }
 
 @Composable
+private fun WidgetsTile(onClick: () -> Unit) {
+  BuiltInTile(
+      label = "Widgets",
+      background = Color(0xFF5B6BC0),
+      glyph = ICON_WIDGETS,
+      onClick = onClick,
+  )
+}
+
+@Composable
+private fun WidgetTile(
+    widget: HomeWidgetStore.HomeWidget,
+    host: AppWidgetHost,
+    manager: AppWidgetManager,
+    editMode: Boolean,
+    tileDp: Dp,
+    onRemove: () -> Unit,
+) {
+  val info = remember(widget.appWidgetId) { manager.getAppWidgetInfo(widget.appWidgetId) }
+  val height =
+      tileDp * widget.spanY.toFloat() +
+          20.dp * (widget.spanY - 1).coerceAtLeast(0).toFloat()
+
+  LaunchedEffect(widget, tileDp) {
+    updateWidgetSizeOptions(manager, widget, tileDp)
+  }
+
+  Box(modifier = Modifier.fillMaxWidth().height(height).padding(4.dp)) {
+    Surface(
+        color = Color(0xFF252527),
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.fillMaxSize(),
+    ) {
+      if (info != null) {
+        AndroidView(
+            factory = {
+              host.createView(it, widget.appWidgetId, info).apply {
+                setAppWidget(widget.appWidgetId, info)
+                setPadding(0, 0, 0, 0)
+                isFocusable = true
+                isFocusableInTouchMode = true
+                descendantFocusability = ViewGroup.FOCUS_AFTER_DESCENDANTS
+              }
+            },
+            update = { view ->
+              view.setAppWidget(widget.appWidgetId, info)
+              view.isEnabled = !editMode
+            },
+            modifier = Modifier.fillMaxSize(),
+        )
+      } else {
+        Box(
+            Modifier.fillMaxSize().background(Color(0xFF303033)),
+            contentAlignment = Alignment.Center,
+        ) {
+          Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            WidgetGlyph()
+            Text(
+                "Widget unavailable",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 10.dp),
+            )
+            Text(
+                widget.providerPackage,
+                color = Color(0xFF9A9A9A),
+                fontSize = 13.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 2.dp, start = 18.dp, end = 18.dp),
+            )
+          }
+        }
+      }
+    }
+    if (editMode) {
+      Box(Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp)).background(Color(0x66000000)))
+      Surface(
+          color = Color(0xFFE53935),
+          shape = CircleShape,
+          modifier =
+              Modifier.size(34.dp).align(Alignment.TopEnd).tvFocusable(CircleShape) { onRemove() },
+      ) {
+        Box(contentAlignment = Alignment.Center) {
+          Text("✕", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+      }
+      Surface(
+          color = Color(0xCC111111),
+          shape = RoundedCornerShape(10.dp),
+          modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
+      ) {
+        Text(
+            "Widget",
+            color = Color.White,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun WidgetPickerOverlay(
+    providers: List<WidgetProviderEntry>,
+    status: String?,
+    onPick: (WidgetProviderEntry) -> Unit,
+    onDismiss: () -> Unit,
+) {
+  val noRipple = remember { MutableInteractionSource() }
+  BackHandler { onDismiss() }
+  val gridFocus = remember { FocusRequester() }
+  LaunchedEffect(providers) { runCatching { gridFocus.requestFocus() } }
+
+  Box(
+      contentAlignment = Alignment.Center,
+      modifier =
+          Modifier.fillMaxSize()
+              .onPreviewKeyEvent { e ->
+                if (e.key == Key.Back || e.key == Key.Escape) {
+                  if (e.type == KeyEventType.KeyUp) onDismiss()
+                  true
+                } else false
+              }
+              .background(Color(0xDD000000))
+              .clickable(interactionSource = noRipple, indication = null) { onDismiss() },
+  ) {
+    Surface(
+        color = Color(0xFF1C1C1E),
+        shape = RoundedCornerShape(28.dp),
+        modifier =
+            Modifier.widthIn(max = 920.dp)
+                .fillMaxWidth(0.78f)
+                .heightIn(max = 620.dp)
+                .clickable(interactionSource = noRipple, indication = null) {},
+    ) {
+      Column(modifier = Modifier.padding(28.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+          Column(modifier = Modifier.weight(1f)) {
+            Text("Add widget", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                "Choose a widget provider installed on this Portal.",
+                color = Color(0xFF9A9A9A),
+                fontSize = 14.sp,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+          }
+          Surface(
+              color = Color(0x33FFFFFF),
+              shape = CircleShape,
+              modifier = Modifier.size(44.dp).tvFocusable(CircleShape) { onDismiss() },
+          ) {
+            Box(contentAlignment = Alignment.Center) { Text("✕", color = Color.White, fontSize = 20.sp) }
+          }
+        }
+        if (status != null) {
+          Text(
+              status,
+              color = Color(0xFF8AB4F8),
+              fontSize = 13.sp,
+              modifier = Modifier.padding(top = 14.dp),
+          )
+        }
+        Spacer(Modifier.size(20.dp))
+        if (providers.isEmpty()) {
+          Box(
+              modifier = Modifier.fillMaxWidth().height(220.dp),
+              contentAlignment = Alignment.Center,
+          ) {
+            Text(
+                "No widget providers are installed.",
+                color = Color(0xFFB8B8B8),
+                fontSize = 16.sp,
+            )
+          }
+        } else {
+          LazyVerticalGrid(
+              columns = GridCells.Fixed(3),
+              horizontalArrangement = Arrangement.spacedBy(14.dp),
+              verticalArrangement = Arrangement.spacedBy(14.dp),
+              modifier = Modifier.focusRequester(gridFocus).focusGroup(),
+          ) {
+            items(providers, key = { it.info.provider.flattenToString() }) { provider ->
+              WidgetProviderTile(provider = provider, onClick = { onPick(provider) })
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun WidgetProviderTile(provider: WidgetProviderEntry, onClick: () -> Unit) {
+  Surface(
+      color = Color(0xFF29292C),
+      shape = RoundedCornerShape(18.dp),
+      modifier = Modifier.tvFocusable(RoundedCornerShape(18.dp)) { onClick() },
+  ) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Surface(
+          color = Color(0xFF38383C),
+          shape = RoundedCornerShape(14.dp),
+          modifier = Modifier.size(58.dp),
+      ) {
+        Box(contentAlignment = Alignment.Center) {
+          if (provider.icon != null) {
+            Image(
+                bitmap = provider.icon,
+                contentDescription = null,
+                modifier = Modifier.size(42.dp).clip(RoundedCornerShape(10.dp)),
+            )
+          } else {
+            WidgetGlyph()
+          }
+        }
+      }
+      Column(modifier = Modifier.padding(start = 14.dp).weight(1f)) {
+        Text(
+            provider.label,
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            provider.packageLabel,
+            color = Color(0xFF9A9A9A),
+            fontSize = 12.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 3.dp),
+        )
+        Text(
+            "${provider.spanX} x ${provider.spanY}",
+            color = Color(0xFF7C7C7C),
+            fontSize = 11.sp,
+            modifier = Modifier.padding(top = 5.dp),
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun WidgetGlyph() {
+  val path = remember { PathParser().parsePathString(ICON_WIDGETS).toPath() }
+  Canvas(Modifier.size(28.dp)) {
+    val s = size.minDimension / 24f
+    scale(s, s, pivot = Offset.Zero) { drawPath(path, Color.White) }
+  }
+}
+
+@Composable
 private fun AppTile(
     app: AppEntry,
     editMode: Boolean,
@@ -1841,3 +2308,84 @@ private fun loadApps(context: Context): List<AppEntry> {
       .sortedBy { it.label.lowercase(Locale.getDefault()) }
 }
 
+private fun loadWidgetProviders(context: Context, tileDp: Dp): List<WidgetProviderEntry> {
+  val pm = context.packageManager
+  val density = context.resources.displayMetrics.densityDpi
+  return AppWidgetManager.getInstance(context)
+      .installedProviders
+      .mapNotNull { info ->
+        runCatching {
+              val packageLabel =
+                  pm.getApplicationLabel(pm.getApplicationInfo(info.provider.packageName, 0))
+                      .toString()
+              val icon =
+                  runCatching { info.loadIcon(context, density) }
+                      .getOrNull()
+                      ?: runCatching { pm.getApplicationIcon(info.provider.packageName) }.getOrNull()
+              val iconBitmap = icon?.toBitmap(96, 96)?.asImageBitmap()
+              WidgetProviderEntry(
+                  label = info.loadLabel(pm).toString().ifBlank { packageLabel },
+                  packageLabel = packageLabel,
+                  icon = iconBitmap,
+                  info = info,
+                  spanX =
+                      estimateWidgetSpan(appWidgetMinDp(context, info.minWidth), tileDp)
+                          .coerceAtLeast(HomeWidgetStore.DEFAULT_SPAN_X),
+                  spanY =
+                      estimateWidgetSpan(appWidgetMinDp(context, info.minHeight), tileDp)
+                          .coerceAtLeast(HomeWidgetStore.DEFAULT_SPAN_Y),
+              )
+            }
+            .getOrNull()
+      }
+      .sortedWith(
+          compareBy(
+              { it.packageLabel.lowercase(Locale.getDefault()) },
+              { it.label.lowercase(Locale.getDefault()) }))
+}
+
+private fun List<HomeWidgetStore.HomeWidget>.filterLiveWidgets(
+    manager: AppWidgetManager,
+    host: AppWidgetHost,
+): List<HomeWidgetStore.HomeWidget> {
+  val live = filter { manager.getAppWidgetInfo(it.appWidgetId) != null }
+  if (live.size != size) {
+    val liveIds = live.map { it.appWidgetId }.toSet()
+    filterNot { it.appWidgetId in liveIds }.forEach {
+      runCatching { host.deleteAppWidgetId(it.appWidgetId) }
+    }
+  }
+  return live
+}
+
+private fun updateWidgetSizeOptions(
+    manager: AppWidgetManager,
+    widget: HomeWidgetStore.HomeWidget,
+    tileDp: Dp,
+) {
+  val width =
+      (tileDp.value * widget.spanX + 16f * (widget.spanX - 1).coerceAtLeast(0)).roundToInt()
+  val height =
+      (tileDp.value * widget.spanY + 20f * (widget.spanY - 1).coerceAtLeast(0)).roundToInt()
+  runCatching {
+    manager.updateAppWidgetOptions(
+        widget.appWidgetId,
+        Bundle().apply {
+          putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, width)
+          putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, width)
+          putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, height)
+          putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, height)
+        })
+  }
+}
+
+private fun appWidgetMinDp(context: Context, raw: Int): Int {
+  if (raw <= 0) return 0
+  // Android 9/10 on Portal reports AppWidgetProviderInfo sizes as raw complex
+  // dimension values (for example, 10241 == 40dp). Newer framework builds may
+  // already hand back dp integers, so only decode values that are clearly not
+  // plain dp sizes.
+  if (raw < 1000) return raw
+  val metrics = context.resources.displayMetrics
+  return (TypedValue.complexToDimensionPixelSize(raw, metrics) / metrics.density).roundToInt()
+}
