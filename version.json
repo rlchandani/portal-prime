@@ -1,6 +1,6 @@
 {
-  "versionCode": 48,
-  "versionName": "1.47",
+  "versionCode": 49,
+  "versionName": "1.48",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Fixes the phone remote going partly unresponsive after an app update: Power, Back, Home, the touchpad, and page up/down now reliably reconnect when you open the remote (this also restores the Calls-to-home bridge and quick buttons, which share the same service). Also adds volume controls (with mute) to the remote's Media tab, a Screensaver button to the remote, and album art now shows in the home mini-player for tracks that provide it as a URI."
+  "notes": "This release is headlined by community contributor @MrFruitDude \u2014 huge thanks! It brings a whole suite of new home-screen features:\n\n- Home-screen widgets: add any Android app widget (Home Assistant, Chrome, calendars and more) right on your home screen, on a new free-placement, multi-page grid with a redesigned editing experience.\n- Wallpapers: pick a gradient, a bundled photo, or sync the background to your screensaver (shown blurred), with an optional film-grain texture.\n- World clock: choose which cities your World Clock widget shows.\n- Home-screen timers and alarms.\n\nAlso new: your phone now controls every setting on the Portal. The remote went from a handful of toggles to full control of the screensaver, calendar, display, audio and Home Assistant config \u2014 grouped and tidy, with \"Apply to all Portals\" for a wall of devices and saveable profiles. Editing keeps your place as you type and tells you if a change didn't reach the Portal. Under the hood, every setting now flows through one shared definition, so the on-device screens and the phone remote stay in lockstep."
 }
