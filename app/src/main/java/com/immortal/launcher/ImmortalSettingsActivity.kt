@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -517,61 +516,6 @@ private fun WallpaperSwatch(
         maxLines = 1,
         modifier = Modifier.padding(top = 6.dp),
     )
-  }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-  Text(
-      text.uppercase(),
-      color = Color(0xFF7C7C7C),
-      fontSize = 13.sp,
-      fontWeight = FontWeight.SemiBold,
-      modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
-  )
-}
-
-@Composable
-private fun Card(content: @Composable () -> Unit) {
-  Surface(
-      color = Color(0xFF1C1C1E),
-      shape = RoundedCornerShape(18.dp),
-      modifier = Modifier.fillMaxWidth(),
-  ) {
-    Column { content() }
-  }
-}
-
-@Composable
-private fun Divider() {
-  Spacer(Modifier.fillMaxWidth().height(1.dp).background(Color(0x14FFFFFF)))
-}
-
-@Composable
-private fun Segmented(
-    options: List<Pair<String, String>>,
-    selected: String,
-    onSelect: (String) -> Unit,
-) {
-  Row(
-      modifier = Modifier.background(Color(0xFF2A2A2C), RoundedCornerShape(12.dp)).padding(3.dp),
-      horizontalArrangement = Arrangement.spacedBy(2.dp),
-  ) {
-    options.forEach { (label, value) ->
-      val on = value == selected
-      Surface(
-          color = if (on) Color(0xFF2E6BE6) else Color.Transparent,
-          shape = RoundedCornerShape(10.dp),
-          modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp)) { onSelect(value) },
-      ) {
-        Text(
-            label,
-            color = if (on) Color.White else Color(0xFFBBBBBB),
-            fontSize = 15.sp,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-        )
-      }
-    }
   }
 }
 
