@@ -55,6 +55,10 @@ object ImmortalSettings {
       // Hide the system status bar (immersive). Default on — the clean wall-frame look,
       // and what provisioning seeds; swipe from the top still reveals it transiently.
       val hideStatusBar: Boolean = true,
+      // Cap the home-screen content width on large landscape displays (Portal+) instead of
+      // using the whole panel. Off by default — most users want the full screen; turning it
+      // on restores the centred, constrained grid.
+      val constrainPageWidth: Boolean = false,
       // Multi-room audio: when this Portal is a Snapcast speaker, surface what the
       // group is playing on the now-playing card (read from the Music Assistant /
       // snapserver at [snapcastHost]). Off until configured.
@@ -81,6 +85,7 @@ object ImmortalSettings {
         clockFormat = p.getString("clock_format", CLOCK_AUTO) ?: CLOCK_AUTO,
         showMiniPlayer = p.getBoolean("show_mini_player", true),
         hideStatusBar = p.getBoolean("hide_status_bar", true),
+        constrainPageWidth = p.getBoolean("constrain_page_width", false),
         multiRoomEnabled = p.getBoolean("multiroom_enabled", false),
         snapcastHost = p.getString("snapcast_host", "") ?: "",
         maPort = p.getInt("ma_port", DEFAULT_MA_PORT),
@@ -144,6 +149,9 @@ object ImmortalSettings {
 
   fun setHideStatusBar(c: Context, on: Boolean) =
       prefs(c).edit().putBoolean("hide_status_bar", on).apply()
+
+  fun setConstrainPageWidth(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("constrain_page_width", on).apply()
 
   /**
    * Whether the clock should render in 24-hour form. AUTO follows the device's

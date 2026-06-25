@@ -396,6 +396,8 @@ private fun LauncherScreen(
   // widget's mode/unit), re-read on resume so a change applies the moment the user
   // comes back to the home screen.
   var tileSize by remember { mutableStateOf(ImmortalSettings.load(context).tileSize) }
+  var constrainPageWidth by
+      remember { mutableStateOf(ImmortalSettings.load(context).constrainPageWidth) }
   var weatherWidget by remember { mutableStateOf(ImmortalSettings.load(context).weatherWidget) }
   var weatherFahrenheit by remember { mutableStateOf(ImmortalSettings.useFahrenheit(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -412,6 +414,7 @@ private fun LauncherScreen(
       if (e == Lifecycle.Event.ON_RESUME) {
         val s = ImmortalSettings.load(context)
         tileSize = s.tileSize
+        constrainPageWidth = s.constrainPageWidth
         weatherWidget = s.weatherWidget
         weatherFahrenheit = ImmortalSettings.useFahrenheit(context)
         widgets = loadLiveWidgets()
@@ -806,14 +809,15 @@ private fun LauncherScreen(
     Column(
         modifier =
             Modifier.fillMaxHeight()
-                // Cap the content width and center it so the grid stays
-                // comfortably sized on large displays (e.g. Portal+ 1920px)
-                // instead of stretching 6 columns across the whole panel. On the
-                // smaller models this is effectively full-width (unchanged).
-                // (widthIn must precede fillMaxWidth so the cap wins, then align
-                // centers the capped content.)
+                // Optionally cap the content width and center it so the grid stays
+                // comfortably sized on large displays (e.g. Portal+ 1920px) instead
+                // of stretching 6 columns across the whole panel. Off by default —
+                // most users want the full screen — and gated on the user's
+                // "Constrain page width" preference; uncapped, fillMaxWidth takes the
+                // whole panel. (widthIn must precede fillMaxWidth so the cap wins,
+                // then align centers the capped content.)
                 .align(Alignment.TopCenter)
-                .widthIn(max = 1264.dp)
+                .widthIn(max = if (constrainPageWidth) 1264.dp else Dp.Infinity)
                 .fillMaxWidth()
                 // Top is padded clear of the 60dp systemui status-bar window,
                 // which silently eats touches even while hidden in immersive —

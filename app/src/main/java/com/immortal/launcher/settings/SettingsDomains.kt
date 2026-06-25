@@ -429,6 +429,13 @@ object SettingsDomains {
                       help =
                           "Hidden by default for a cleaner full-screen look. Swipe down from the top to reveal it briefly."),
                   BoolSpec(
+                      "constrainPageWidth",
+                      "Constrain page width",
+                      get = { it.constrainPageWidth },
+                      set = ImmortalSettings::setConstrainPageWidth,
+                      help =
+                          "Cap the home screen width on large landscape displays instead of filling the whole panel. Off by default."),
+                  BoolSpec(
                       "multiRoomEnabled",
                       "Multi-room audio",
                       get = { it.multiRoomEnabled },
@@ -470,6 +477,7 @@ object SettingsDomains {
                   "tileSize" to "Home screen",
                   "showMiniPlayer" to "Home screen",
                   "hideStatusBar" to "Home screen",
+                  "constrainPageWidth" to "Home screen",
                   "clockFormat" to "Clock",
                   "multiRoomEnabled" to "Audio",
                   "snapcastHost" to "Audio",
