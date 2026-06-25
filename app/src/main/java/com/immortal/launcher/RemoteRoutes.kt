@@ -54,6 +54,7 @@ class RemoteRoutes(private val context: Context) {
         "/remote/presets" -> authed(req) { presets(req) }
         "/remote/preset" -> authed(req) { runPreset(req) }
         "/remote/devices" -> authed(req) { devices() }
+        "/remote/roster" -> authed(req) { roster(req) }
         "/remote/sources" -> authed(req) { sources(req) }
         "/remote/settings" -> authed(req) { settings(req) }
         else -> json(404, err("not_found"))
@@ -276,6 +277,29 @@ class RemoteRoutes(private val context: Context) {
                           .put("applied", JSONArray(applied.toList()))
                           .put("domain", SettingsRegistry.domain(domainId)!!.schemaJson(context)))
             }
+          }
+        }
+        else -> json(405, err("method_not_allowed"))
+      }
+
+  /**
+   * The phone's device roster, backed up here so any paired Portal's page can rehydrate the whole
+   * fleet — pair one device and the rest come back, instead of re-pairing all of them after a
+   * browser wipes its storage. GET returns the stored roster; POST replaces it with the phone's
+   * current `[{name, base, token}]`. Auth-gated like every input route: the on-screen PIN that
+   * mints a session is the same gate that releases the roster, so only someone who paired in
+   * person can read it. See [RemoteRoster] for the storage + sanitisation.
+   */
+  private fun roster(req: FleetHttpServer.Request): FleetHttpServer.Response =
+      when (req.method) {
+        "GET" -> json(200, ok().put("roster", RemoteRoster.load(context)))
+        "POST" -> {
+          val body = parseJson(req.bodyText())
+          val arr = body?.optJSONArray("roster")
+          if (arr == null) json(400, err("roster_required"))
+          else {
+            RemoteRoster.save(context, arr.toString())
+            json(200, ok().put("roster", RemoteRoster.load(context)))
           }
         }
         else -> json(405, err("method_not_allowed"))

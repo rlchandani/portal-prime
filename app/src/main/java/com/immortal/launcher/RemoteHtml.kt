@@ -13,6 +13,8 @@ package com.immortal.launcher
  * keyboard + a lower-half touchpad with scroll buttons), **Apps** (presets + app grid), **Setup**
  * (device add/switch + the screensaver/calendar source form that replaced the old standalone LAN
  * form). A per-device session token lives in localStorage; every API call sends it as a Bearer.
+ * The whole roster is also backed up to each paired Portal ([RemoteRoster]) so a fresh browser can
+ * pair one device and get them all back, instead of re-pairing the fleet after storage is evicted.
  *
  * Touchpad scrolling is discrete `▲ ▼` buttons (one big swipe each via `/remote/scroll`): the
  * Portal ignores a stream of tiny per-frame swipes, so a two-finger drag can't drive it.
@@ -313,6 +315,12 @@ object RemoteHtml {
   function activeIdx(){var i=parseInt(localStorage.getItem(AKEY)||'0',10),l=devicesList();return (i>=0&&i<l.length)?i:0;}
   function setActive(i){localStorage.setItem(AKEY,String(i));}
   function active(){return devicesList()[activeIdx()]||null;}
+  // Server-synced roster: each paired Portal keeps a backup of this phone's whole roster, so a fresh
+  // browser (storage evicted, different origin, changed IP) can pair ONE Portal and get them all
+  // back. We push on every roster change and pull-and-merge whenever we pair a device.
+  function syncRoster(){var l=devicesList(),body=JSON.stringify({roster:l});l.forEach(function(dv){fetch(dv.base+'/remote/roster',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+dv.token},body:body}).catch(function(){});});}
+  function mergeRoster(server){var l=devicesList(),have={},added=0;l.forEach(function(x){have[x.base]=1;});(server||[]).forEach(function(s){if(s&&s.base&&s.token&&!have[s.base]){l.push({name:s.name||'Portal',base:s.base,token:s.token});have[s.base]=1;added++;}});if(added)saveDevices(l);return added;}
+  function pullRoster(base,token){return fetch(base+'/remote/roster',{headers:{'Authorization':'Bearer '+token}}).then(function(r){return r.json();}).then(function(d){return mergeRoster(d&&d.roster);}).catch(function(){return 0;});}
   function show(view){
     document.getElementById('pairView').classList.toggle('hide',view!=='pair');
     document.getElementById('remoteView').classList.toggle('hide',view!=='remote');
@@ -345,7 +353,9 @@ object RemoteHtml {
         if(d.ok&&d.token){
           var l=devicesList().filter(function(x){return x.base!==location.origin;});
           l.unshift({name:d.name||'Portal',base:location.origin,token:d.token});
-          saveDevices(l);setActive(0);startActive();
+          saveDevices(l);setActive(0);
+          // Rehydrate the rest of the fleet this Portal remembers, then re-push the merged roster.
+          pullRoster(location.origin,d.token).then(function(){syncRoster();startActive();});
         } else document.getElementById('pairErr').textContent='That code didn\'t work. Check the Portal and try again.';
       })
       .catch(function(){document.getElementById('pairErr').textContent='Couldn\'t reach the Portal.';});
@@ -356,7 +366,7 @@ object RemoteHtml {
     sel.value=activeIdx();
   }
   function switchDevice(){setActive(parseInt(document.getElementById('devsel').value,10));document.getElementById('addPanel').classList.add('hide');loadApps();loadPresets();loadSources();}
-  function forgetDevice(){var l=devicesList();if(!l.length)return;l.splice(activeIdx(),1);saveDevices(l);setActive(0);if(l.length){renderDevSel();showTab('remote');}else{location.hash='';show('pair');}}
+  function forgetDevice(){var l=devicesList();if(!l.length)return;l.splice(activeIdx(),1);saveDevices(l);setActive(0);syncRoster();if(l.length){renderDevSel();showTab('remote');}else{location.hash='';show('pair');}}
   function toggleAdd(){var p=document.getElementById('addPanel');p.classList.toggle('hide');document.getElementById('addPair').classList.add('hide');if(!p.classList.contains('hide'))loadDiscovered();}
   function loadDiscovered(){
     api('/remote/devices').then(function(d){
@@ -382,6 +392,8 @@ object RemoteHtml {
         if(d.ok&&d.token){
           var l=devicesList();l.push({name:d.name||pendingPeer.name,base:pendingPeer.base,token:d.token});
           saveDevices(l);setActive(l.length-1);renderDevSel();
+          // Pull anything this peer already knows, then back the merged roster up to every Portal.
+          pullRoster(pendingPeer.base,d.token).then(function(){syncRoster();renderDevSel();});
           document.getElementById('addPanel').classList.add('hide');pendingPeer=null;showTab('remote');
         } else document.getElementById('addErr').textContent='That code didn\'t work.';
       })
@@ -413,7 +425,7 @@ object RemoteHtml {
       .then(function(d){
         if(!(d&&d.ok&&(d.applied||[]).indexOf('name')>=0)){msg.textContent='Couldn\'t save the name.';return;}
         var l=devicesList(),i=activeIdx();if(l[i]){l[i].name=v;saveDevices(l);}
-        renderDevSel();inp.value=v;msg.textContent='Saved.';
+        renderDevSel();inp.value=v;msg.textContent='Saved.';syncRoster();
       })
       .catch(function(){msg.textContent='Couldn\'t reach that device.';});
   }
@@ -827,7 +839,7 @@ object RemoteHtml {
   (function(){
     var m=location.hash.match(/pin=(\d{6})/);
     if(m){document.getElementById('pin').value=m[1];pair();}
-    else if(active())startActive();
+    else if(active()){startActive();pullRoster(active().base,active().token).then(function(n){if(n)renderDevSel();});}
     else show('pair');
   })();
 </script>

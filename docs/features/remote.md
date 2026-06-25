@@ -51,6 +51,17 @@ To control more Portals, tap **+ Device** on the remote: it lists the others fou
 (mDNS); pick one and enter the PIN from *its* Settings › Remote screen. Switch between paired
 devices from the dropdown; **Forget** drops the current one.
 
+### Reconnecting (pair one, restore all)
+
+The phone keeps its device roster in the browser's local storage and reconnects silently on its
+own. But that storage isn't forever — Safari evicts an un-installed site's storage after about a
+week, a new phone or a private tab starts empty, and a changed Portal IP looks like a brand-new
+site. To avoid re-pairing the whole fleet in those cases, each paired Portal keeps a **backup of
+your roster**: when storage is lost, just pair **one** Portal again with its PIN and the rest come
+back automatically. The phone re-uploads the merged roster to every Portal whenever it changes, so
+the backups stay current (and a device you **Forget** is dropped from them too). Tip: add the page
+to your home screen — an installed web app's storage isn't evicted, so you rarely hit this at all.
+
 ## Security
 
 - The remote is served by the fleet agent, which only accepts **LAN/loopback** peers.
@@ -59,10 +70,16 @@ devices from the dropdown; **Forget** drops the current one.
   the room can pair. (The fleet bearer token also works, so the laptop CLI can drive it.)
 - App icons are served unauthenticated (they aren't secrets), which keeps the token out of image
   URLs. Everything that reads the app list or sends input is authenticated.
-- **Multi-device** keeps each Portal's token on the phone (paired per-device) — tokens are never
-  shared between Portals, so one compromised device can't drive the others. The agent sends
+- **Multi-device** keeps each Portal's token on the phone (paired per-device). A Portal never mints
+  or shares another Portal's token itself — the phone is the only courier. The agent sends
   permissive CORS headers so one Portal's page can call the others, but the LAN peer guard and the
   per-device token remain the real gates (CORS is only a browser read-policy).
+- **Roster backup** (reconnecting, above) stores the phone's token list on each paired Portal so the
+  fleet survives a storage wipe. This is gated by the same PIN that pairing uses — reading the backup
+  is no more powerful than walking up to each Portal and pairing it in person — but it does mean a
+  Portal's app storage now holds the other Portals' session tokens, so it's a deliberate trade of a
+  little blast radius for not re-pairing a wall of devices every week. Revoking (Settings › Remote)
+  still drops a device's own sessions, and a stale restored token is forgotten on its first 401.
 
 ## How input works (and its limits)
 
@@ -117,4 +134,5 @@ All under the agent's port (default `8723`). `/remote/ui`, `/remote/pair`, `/rem
 | `GET`/`POST` | `/remote/presets` | list, or replace with `{"presets":[{id,name,steps[]}]}` |
 | `POST` | `/remote/preset` | `{"id":"…"}` → run a saved preset's steps in order |
 | `GET` | `/remote/devices` | this device's name + mDNS-discovered peers `[{name,host,port}]` |
+| `GET`/`POST` | `/remote/roster` | read or replace the phone's backed-up device roster `[{name,base,token}]` |
 | `GET`/`POST` | `/remote/sources` | read or set the screensaver photo source + calendar feed |

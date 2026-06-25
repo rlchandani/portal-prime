@@ -20,7 +20,9 @@ import org.json.JSONObject
  * advertises itself as `_immortal-remote._tcp` (friendly name + agent port) and simultaneously
  * browses for its peers, keeping a resolved list. The phone can't do mDNS itself, so [RemoteRoutes]
  * exposes the discovered peers at `/remote/devices`; the phone then pairs each (with its on-screen
- * PIN) and keeps the tokens locally — no token ever crosses between Portals.
+ * PIN) and keeps the tokens locally. A Portal never mints or shares another's token itself; the
+ * phone is the only courier — it may back its own roster up to each Portal ([RemoteRoster]) so
+ * pairing one restores the rest, but that backup is auth-gated by the same on-screen PIN.
  *
  * Best-effort: registration/resolve hiccups are logged and skipped, never fatal to the agent.
  */
