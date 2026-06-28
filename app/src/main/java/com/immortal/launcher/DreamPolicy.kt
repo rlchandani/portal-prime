@@ -86,11 +86,17 @@ object DreamPolicy {
     val now = System.currentTimeMillis()
     bridgeAt = now
     inStockHandoff = true
+    // commit() (synchronous), not apply(): the whole point of persisting the bridge is the case
+    // where Android kills our process during the stock-home handoff. apply() only schedules an
+    // async disk write, which QueuedWork is not guaranteed to flush before a low-memory kill — so
+    // the freshly-spawned process could read stale (zeroed) prefs and relaunch the frame over the
+    // call anyway. commit() flushes before we proceed to bring the stock home forward; the write is
+    // a single long+bool to a dedicated prefs file, fired once at a deliberate Calls tap.
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit()
         .putLong(KEY_BRIDGE_AT, now)
         .putBoolean(KEY_IN_STOCK_HANDOFF, true)
-        .apply()
+        .commit()
   }
 
   /** Called by [HomeActivity.onResume] when the user returns — clears persisted bridge. */
