@@ -20,6 +20,13 @@
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Gesture-wave-to-wake on the screensaver (GestureCamera). Optional feature so
+         camera-less models still install. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Ambient dashboard: show upcoming events from the device calendar (CalendarHelper). -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
     <!-- Fleet Agent: a foreground service so WiFi device management survives a
          reboot on these non-root Portals (where adb-over-WiFi can't). -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -194,6 +201,20 @@
             android:name=".DigitalClockPreviewActivity"
             android:exported="false"
             android:excludeFromRecents="true"
+            android:theme="@style/Theme.SampleApp" />
+
+        <!-- "Welcome": welcome-back overlay greetings / colors / sizes / TTS. -->
+        <activity
+            android:name=".WelcomeSettingsActivity"
+            android:exported="false"
+            android:label="Welcome"
+            android:theme="@style/Theme.SampleApp" />
+
+        <!-- "Sleep": screensaver sleep-timer + audio/app behaviour on sleep. -->
+        <activity
+            android:name=".SleepSettingsActivity"
+            android:exported="false"
+            android:label="Sleep"
             android:theme="@style/Theme.SampleApp" />
 
         <!-- Connect a self-hosted Immich server as the screensaver source. -->

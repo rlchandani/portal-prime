@@ -259,6 +259,7 @@ class SettingsDomainTest {
                 setOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword"),
             SettingsDomains.chime to emptySet(),
             SettingsDomains.digitalclock to emptySet(),
+            SettingsDomains.welcome to emptySet(),
         )
     rendered.forEach { (dom, exclude) ->
       val blank =
@@ -290,6 +291,30 @@ class SettingsDomainTest {
     val uncovered = fields - specKeys - managedElsewhere
     assertTrue(
         "ChimeConfig.Settings has persisted fields neither in the registry nor accounted for: $uncovered",
+        uncovered.isEmpty())
+  }
+
+  @Test
+  fun welcomeRegistry_coversEveryPersistedField_orExplicitlyAccountsForIt() {
+    // The registry has no FloatSpec, so the Float fields (opacity, text sizes, letter spacing) stay
+    // in the bespoke WelcomeSettingsActivity. The ARGB color ints use bespoke color pickers, the
+    // greeting texts are free-text editors, and the TTS voice is an on-device voice picker — all
+    // managed by the Activity. The 5 registry-ready fields (duration + 4 toggles) are spec'd.
+    val fields =
+        com.immortal.launcher.WelcomeConfig.Settings::class.java.declaredFields
+            .filter { !java.lang.reflect.Modifier.isStatic(it.modifiers) }
+            .map { it.name }
+            .toSet()
+    val specKeys = SettingsDomains.welcome.specs.map { it.key }.toSet()
+    val managedElsewhere =
+        setOf(
+            "greetingNight", "greetingMorning", "greetingAfternoon", "greetingEvening",
+            "userName", "greetingColor", "clockColor", "dateColor",
+            "backgroundOpacity", "greetingSize", "clockSize", "dateSize",
+            "greetingLetterSpacing", "ttsVoice")
+    val uncovered = fields - specKeys - managedElsewhere
+    assertTrue(
+        "WelcomeConfig.Settings has persisted fields neither in the registry nor accounted for: $uncovered",
         uncovered.isEmpty())
   }
 

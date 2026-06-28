@@ -13,6 +13,7 @@ import com.immortal.launcher.CalendarUrlEntryActivity
 import com.immortal.launcher.ChimeConfig
 import com.immortal.launcher.ChimeScheduler
 import com.immortal.launcher.DigitalClockConfig
+import com.immortal.launcher.WelcomeConfig
 import com.immortal.launcher.DreamPolicy
 import com.immortal.launcher.FaceCatalog
 import com.immortal.launcher.FacePickerActivity
@@ -331,6 +332,77 @@ object SettingsDomains {
                       get = { it.overnightNightClock },
                       set = ScreensaverConfig::setOvernightNightClock,
                       visible = { _, s -> s.overnightEnabled }),
+                  // ---- Fork-specific screensaver controls ----
+                  EnumSpec(
+                      "feed",
+                      "Photo feed",
+                      get = { it.feed },
+                      set = ScreensaverConfig::setFeed,
+                      options = ScreensaverConfig.FEEDS.map { it to ScreensaverConfig.feedLabel(it) },
+                      coerce = { v -> v.takeIf { it in ScreensaverConfig.FEEDS } },
+                      visible = { _, s -> s.source == ScreensaverConfig.SOURCE_DEFAULT },
+                      help = "Which online photo feed to use with the built-in source."),
+                  BoolSpec(
+                      "sleepTimerEnabled",
+                      "Sleep timer",
+                      get = { it.sleepTimerEnabled },
+                      set = ScreensaverConfig::setSleepTimerEnabled,
+                      help = "Turn the screensaver off after a set time."),
+                  IntSpec(
+                      "sleepTimerMin",
+                      "Sleep after",
+                      get = { it.sleepTimerMin },
+                      set = ScreensaverConfig::setSleepTimerMin,
+                      min = 1,
+                      max = 240,
+                      step = 5,
+                      format = { "$it min" },
+                      visible = { _, s -> s.sleepTimerEnabled }),
+                  BoolSpec(
+                      "pauseAudioOnSleep",
+                      "Pause audio on sleep",
+                      get = { it.pauseAudioOnSleep },
+                      set = ScreensaverConfig::setPauseAudioOnSleep,
+                      visible = { _, s -> s.sleepTimerEnabled }),
+                  BoolSpec(
+                      "closeAppOnSleep",
+                      "Close app on sleep",
+                      get = { it.closeAppOnSleep },
+                      set = ScreensaverConfig::setCloseAppOnSleep,
+                      visible = { _, s -> s.sleepTimerEnabled }),
+                  EnumSpec(
+                      "soundscape",
+                      "Ambient sound",
+                      get = { it.soundscape },
+                      set = ScreensaverConfig::setSoundscape,
+                      options = ScreensaverConfig.SOUNDSCAPES.map { it to ScreensaverConfig.soundscapeLabel(it) },
+                      coerce = { v -> v.takeIf { it in ScreensaverConfig.SOUNDSCAPES } },
+                      help = "Synthesised ambient sound played while the screensaver shows."),
+                  IntSpec(
+                      "soundscapeVolume",
+                      "Soundscape volume",
+                      get = { it.soundscapeVolume },
+                      set = ScreensaverConfig::setSoundscapeVolume,
+                      min = 0,
+                      max = 100,
+                      step = 5,
+                      format = { "$it%" },
+                      visible = { _, s -> s.soundscape != ScreensaverConfig.SOUND_OFF }),
+                  BoolSpec(
+                      "ambientDashboard",
+                      "Ambient dashboard",
+                      get = { it.ambientDashboard },
+                      set = ScreensaverConfig::setAmbientDashboard),
+                  BoolSpec(
+                      "gestureWave",
+                      "Gesture wave to wake",
+                      get = { it.gestureWave },
+                      set = ScreensaverConfig::setGestureWave),
+                  BoolSpec(
+                      "welcomeEnabled",
+                      "Welcome screen",
+                      get = { it.welcomeEnabled },
+                      set = ScreensaverConfig::setWelcomeEnabled),
               ),
           sections =
               mapOf(
@@ -341,13 +413,23 @@ object SettingsDomains {
                   "includeVideo" to "Display",
                   "showNowPlaying" to "Display",
                   "antiBurnIn" to "Display",
+                  "feed" to "Display",
+                  "ambientDashboard" to "Display",
+                  "gestureWave" to "Display",
+                  "welcomeEnabled" to "Display",
                   "batterySaver" to "Power & sleep",
                   "presenceMode" to "Power & sleep",
                   "idleSleepMin" to "Power & sleep",
                   "overnightEnabled" to "Power & sleep",
                   "overnightStartMin" to "Power & sleep",
                   "overnightEndMin" to "Power & sleep",
-                  "overnightNightClock" to "Power & sleep"),
+                  "overnightNightClock" to "Power & sleep",
+                  "sleepTimerEnabled" to "Sleep timer",
+                  "sleepTimerMin" to "Sleep timer",
+                  "pauseAudioOnSleep" to "Sleep timer",
+                  "closeAppOnSleep" to "Sleep timer",
+                  "soundscape" to "Audio",
+                  "soundscapeVolume" to "Audio"),
           defaults = { ScreensaverConfig.Settings() },
           // The screensaver's post-apply side effects, lifted from the route layer (the same
           // reaffirm + overnight reschedule that `RemoteRoutes.applyConfig` / `FleetRoutes` run).
@@ -948,6 +1030,57 @@ object SettingsDomains {
           },
       )
 
+  /**
+   * The welcome-back overlay ([WelcomeConfig]) shown when the screensaver starts. The registry
+   * models the scalar toggles and the display duration; the Float fields (opacity, text sizes,
+   * letter spacing) and the ARGB color ints and the free-text greetings / voice picker stay in the
+   * bespoke [WelcomeSettingsActivity] — the registry has no [FloatSpec], and color pickers / text
+   * editors / TTS voice enumeration are bespoke UI it can't render. Those fields are listed in the
+   * tripwire's `managedElsewhere`.
+   */
+  val welcome: SettingsDomain<WelcomeConfig.Settings> =
+      SettingsDomain(
+          id = "welcome",
+          title = "Welcome",
+          load = WelcomeConfig::load,
+          specs =
+              listOf(
+                  IntSpec(
+                      "durationMs",
+                      "Display duration",
+                      get = { it.durationMs },
+                      set = WelcomeConfig::setDuration,
+                      min = 1000,
+                      max = 10000,
+                      step = 200,
+                      format = { "${it / 1000.0}s" },
+                      help = "How long the welcome overlay shows before auto-dismissing."),
+                  BoolSpec(
+                      "showGreeting",
+                      "Show greeting",
+                      get = { it.showGreeting },
+                      set = WelcomeConfig::setShowGreeting,
+                      help = "Show a time-of-day greeting (\"Good morning\")."),
+                  BoolSpec(
+                      "showClock",
+                      "Show clock",
+                      get = { it.showClock },
+                      set = WelcomeConfig::setShowClock),
+                  BoolSpec(
+                      "showDate",
+                      "Show date",
+                      get = { it.showDate },
+                      set = WelcomeConfig::setShowDate),
+                  BoolSpec(
+                      "enableTts",
+                      "Speak greeting",
+                      get = { it.enableTts },
+                      set = WelcomeConfig::setEnableTts,
+                      help = "Speak the greeting through Android TTS when the overlay shows."),
+              ),
+          defaults = { WelcomeConfig.Settings() },
+      )
+
   val all: List<SettingsDomain<*>> =
-      listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime, digitalclock)
+      listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime, digitalclock, welcome)
 }

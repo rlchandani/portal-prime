@@ -55,12 +55,50 @@ object ScreensaverConfig {
   const val CAL_SIDE_LEFT = "left"
   const val CAL_SIDE_RIGHT = "right"
 
+  // Ambient soundscape played while the screensaver is showing. All are synthesized
+  // on-device (no audio assets, no streaming), so they work offline on the Portal.
+  const val SOUND_OFF = "off"
+  const val SOUND_RAIN = "rain"
+  const val SOUND_OCEAN = "ocean"
+  const val SOUND_FIREPLACE = "fireplace"
+  const val SOUND_WHITE = "white"
+  const val SOUND_PINK = "pink"
+  const val SOUND_BROWN = "brown"
+  val SOUNDSCAPES =
+      listOf(SOUND_OFF, SOUND_RAIN, SOUND_OCEAN, SOUND_FIREPLACE, SOUND_WHITE, SOUND_PINK, SOUND_BROWN)
+  fun soundscapeLabel(s: String): String = when (s) {
+    SOUND_RAIN -> "Rain"
+    SOUND_OCEAN -> "Ocean waves"
+    SOUND_FIREPLACE -> "Fireplace"
+    SOUND_WHITE -> "White noise"
+    SOUND_PINK -> "Pink noise"
+    SOUND_BROWN -> "Brown noise"
+    else -> "Off"
+  }
+
+  // Online photo feeds (used when source == SOURCE_DEFAULT). All keyless.
+  const val FEED_PICSUM = "picsum" // Lorem Picsum random photos (current default)
+  const val FEED_MET = "met" // The Met Museum Open Access
+  const val FEED_ARTIC = "artic" // Art Institute of Chicago
+  const val FEED_WIKIMEDIA = "wikimedia" // Wikimedia Picture of the Day
+  const val FEED_APOD = "apod" // NASA Astronomy Picture of the Day (DEMO_KEY)
+  val FEEDS = listOf(FEED_PICSUM, FEED_MET, FEED_ARTIC, FEED_WIKIMEDIA, FEED_APOD)
+  fun feedLabel(feed: String): String = when (feed) {
+    FEED_MET -> "The Met — art"
+    FEED_ARTIC -> "Art Institute of Chicago"
+    FEED_WIKIMEDIA -> "Wikimedia Picture of the Day"
+    FEED_APOD -> "NASA Astronomy Picture"
+    else -> "Random photos (Picsum)"
+  }
+
   data class Settings(
       // Master on/off for Immortal's photo-frame screensaver. When off, Immortal
       // stops asserting itself as the system Dream and lets the Portal sleep / lets
       // the user run their own screensaver (e.g. Home Assistant + Immich frame).
       val enabled: Boolean = true,
       val source: String = SOURCE_DEFAULT,
+      // Which online feed to use when source == SOURCE_DEFAULT.
+      val feed: String = FEED_PICSUM,
       val folderPath: String? = null,
       val albumUrl: String? = null,
       // Immich (self-hosted) connection. albumId/Name null = the whole library.
@@ -122,6 +160,11 @@ object ScreensaverConfig {
       // Idle screen-off (off by default): minutes the screensaver runs before the
       // screen turns off. 0 = never (Immortal's always-on photo frame).
       val idleSleepMin: Int = 0,
+      // Sleep timer: a one-shot countdown before sleep.
+      val sleepTimerEnabled: Boolean = false,
+      val sleepTimerMin: Int = 30,
+      val pauseAudioOnSleep: Boolean = true,
+      val closeAppOnSleep: Boolean = true,
       // Overnight screen-off (off by default): keep the screen off between two times
       // each night. Times are minutes-from-midnight (e.g. 22:00 = 1320).
       val overnightEnabled: Boolean = false,
@@ -131,6 +174,21 @@ object ScreensaverConfig {
       // clock as a bedside clock, kept on through the window. Only meaningful when
       // [overnightEnabled].
       val overnightNightClock: Boolean = false,
+      // Ambient soundscape (synthesized) played while the screensaver shows. Off by
+      // default; [soundscapeVolume] is 0..100.
+      val soundscape: String = SOUND_OFF,
+      val soundscapeVolume: Int = 40,
+      // Ambient dashboard: periodically interrupt the photos with a full-screen
+      // glanceable info card (clock, weather, next event). Off by default.
+      val ambientDashboard: Boolean = false,
+      // Experimental: wave a hand in front of the camera to advance the photo frame
+      // (Camera2 motion detection, never the gated Smart Camera SDK). Off by default;
+      // no-ops without the CAMERA permission.
+      val gestureWave: Boolean = false,
+      // Welcome-back overlay: shown for ~3s when the screensaver first starts
+      // (i.e. when presence is detected and the Portal wakes from sleep). Shows
+      // a greeting, the time, and the date. Dismissed by tap or auto-fade.
+      val welcomeEnabled: Boolean = true,
       // What to open when the user taps the frame to dismiss it. null = the Immortal
       // launcher (the original behaviour). Otherwise a flattened ComponentName of an
       // installed app — Home Assistant users typically point this at their HA app so a
@@ -184,6 +242,7 @@ object ScreensaverConfig {
     return Settings(
         enabled = p.getBoolean("enabled", true),
         source = p.getString("source", SOURCE_DEFAULT) ?: SOURCE_DEFAULT,
+        feed = p.getString("feed", FEED_PICSUM) ?: FEED_PICSUM,
         folderPath = p.getString("folder_path", null),
         albumUrl = p.getString("album_url", null),
         immichUrl = p.getString("immich_url", null),
@@ -222,14 +281,34 @@ object ScreensaverConfig {
             runCatching { FrameMode.valueOf(p.getString("presence_mode", FrameMode.ALWAYS_ON.name)!!) }
                 .getOrDefault(FrameMode.ALWAYS_ON),
         idleSleepMin = p.getInt("idle_sleep_min", 0),
+        sleepTimerEnabled = p.getBoolean("sleep_timer_enabled", false),
+        sleepTimerMin = p.getInt("sleep_timer_min", 30),
+        pauseAudioOnSleep = p.getBoolean("pause_audio_on_sleep", true),
+        closeAppOnSleep = p.getBoolean("close_app_on_sleep", true),
         overnightEnabled = p.getBoolean("overnight_enabled", false),
         overnightStartMin = p.getInt("overnight_start_min", 22 * 60),
         overnightEndMin = p.getInt("overnight_end_min", 7 * 60),
         overnightNightClock = p.getBoolean("overnight_night_clock", false),
+        soundscape = p.getString("soundscape", SOUND_OFF) ?: SOUND_OFF,
+        soundscapeVolume = p.getInt("soundscape_volume", 40).coerceIn(0, 100),
+        ambientDashboard = p.getBoolean("ambient_dashboard", false),
+        gestureWave = p.getBoolean("gesture_wave", false),
+        welcomeEnabled = p.getBoolean("welcome_enabled", true),
         dismissAppComponent = p.getString("dismiss_app_component", null),
         dismissHaDashboard = p.getString("dismiss_ha_dashboard", null),
     )
   }
+
+  fun setSoundscape(c: Context, s: String) = prefs(c).edit().putString("soundscape", s).apply()
+
+  fun setSoundscapeVolume(c: Context, v: Int) =
+      prefs(c).edit().putInt("soundscape_volume", v.coerceIn(0, 100)).apply()
+
+  fun setAmbientDashboard(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("ambient_dashboard", on).apply()
+
+  fun setGestureWave(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("gesture_wave", on).apply()
 
   /** Keep the idle timeout sane (0 = off, else 1…120 min). */
   fun clampIdle(min: Int): Int = if (min <= 0) 0 else min.coerceIn(1, 120)
@@ -294,6 +373,10 @@ object ScreensaverConfig {
       prefs(c).edit().putString("web_url", url.trim()).putString("source", SOURCE_WEBURL).apply()
 
   fun useDefault(c: Context) = prefs(c).edit().putString("source", SOURCE_DEFAULT).apply()
+
+  /** Pick the online feed and switch the source back to the default (online) feed. */
+  fun setFeed(c: Context, feed: String) =
+      prefs(c).edit().putString("feed", feed).putString("source", SOURCE_DEFAULT).apply()
 
   fun setFit(c: Context, fit: String) = prefs(c).edit().putString("fit", fit).apply()
 
@@ -361,6 +444,23 @@ object ScreensaverConfig {
 
   fun setIdleSleepMin(c: Context, min: Int) =
       prefs(c).edit().putInt("idle_sleep_min", clampIdle(min)).apply()
+
+  fun setSleepTimerEnabled(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("sleep_timer_enabled", on).apply()
+
+  fun setSleepTimerMin(c: Context, min: Int) =
+      prefs(c).edit().putInt("sleep_timer_min", clampSleepTimer(min)).apply()
+
+  fun setPauseAudioOnSleep(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("pause_audio_on_sleep", on).apply()
+
+  fun setCloseAppOnSleep(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("close_app_on_sleep", on).apply()
+
+  fun clampSleepTimer(min: Int): Int = min.coerceIn(1, 240)
+
+  fun setWelcomeEnabled(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("welcome_enabled", on).apply()
 
   fun setOvernightEnabled(c: Context, on: Boolean) =
       prefs(c).edit().putBoolean("overnight_enabled", on).apply()

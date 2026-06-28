@@ -18,6 +18,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
+import android.speech.tts.TextToSpeech
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
@@ -33,11 +34,14 @@ import androidx.exifinterface.media.ExifInterface
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
 import kotlin.math.abs
 import org.json.JSONObject
+
+private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
 
 /**
  * The photo-frame UI + update logic, decoupled from any host. Used by both
@@ -64,6 +68,8 @@ import org.json.JSONObject
  */
 class PhotoFrameController(
     private val context: Context,
+    /** Show the welcome-back overlay when [start] is called (set true for presence-triggered starts). */
+    val showWelcome: Boolean = false,
     private val unsplashKey: String = "",
     private val unsplashQuery: String = "nature,landscape,scenic",
     private val weatherRefreshMs: Long = 30 * 60_000L,
@@ -105,6 +111,31 @@ class PhotoFrameController(
   // The minute we last re-windowed the calendar, so the 1s tick only rebuilds it
   // when the clock minute changes (drops past events, refreshes Today/Tomorrow).
   private var lastCalMinute: Long = -1L
+
+  // Ambient dashboard: full-screen glanceable info card shown periodically (fork feature).
+  private var dashboardPanel: View? = null
+  private lateinit var dashClock: TextView
+  private lateinit var dashDate: TextView
+  private lateinit var dashWeather: TextView
+  private lateinit var dashEvent: TextView
+  private var dashboardVisible = false
+  // Weather string for the dashboard. The Face overlay fetches its own weather; this
+  // small keyless fetch feeds the ambient-dashboard card so it stays self-contained.
+  private var weatherText: String = ""
+
+  // Welcome-back overlay + TTS greeting (fork feature; off unless WelcomeConfig enables it).
+  private lateinit var welcomeOverlay: View
+  private var welcomeVisible = false
+  private val dismissWelcomeRunnable = Runnable { dismissWelcomeAnimated() }
+  private var tts: TextToSpeech? = null
+  @Volatile private var ttsReady = false
+  @Volatile private var pendingSpeech: String? = null
+
+  // Ambient soundscape (synthesized) played while the frame is up (fork feature).
+  private val soundscape = SoundscapePlayer()
+
+  // Optional contact-free "wave to advance" (Camera2 motion; opt-in, off by default).
+  private var gestureCamera: GestureCamera? = null
 
   private var settings = ScreensaverConfig.Settings()
 
@@ -177,6 +208,12 @@ class PhotoFrameController(
       MotionEvent.ACTION_UP -> {
         val dx = ev.x - downX
         val dy = ev.y - downY
+        // A tap while the welcome overlay is showing dismisses it early
+        // rather than exiting the screensaver.
+        if (welcomeVisible && abs(dx) < 48 && abs(dy) < 48) {
+          dismissWelcome()
+          return
+        }
         if (abs(dx) > 120 && abs(dx) > abs(dy) * 1.5f) {
           if (dx < 0) next() else prev()
         } else if (abs(dx) < 48 && abs(dy) < 48) {
@@ -197,6 +234,57 @@ class PhotoFrameController(
     // Build + drive the overlay from the user's selected face ([FaceCatalog]); faceOverride lets
     // the debug preview harness (and the overnight night clock) render a specific face instead.
     faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
+
+    // --- fork features layered on top of the Face overlay ---
+    // Only spin up TTS when the welcome overlay will actually speak. The greeting uses the
+    // Android TTS service selected on the device, keeping any neural engine out-of-process.
+    val welcomeCfg = WelcomeConfig.load(context)
+    val ttsEnabled = showWelcome && settings.welcomeEnabled && welcomeCfg.enableTts
+    if (ttsEnabled) {
+      tts = TextToSpeech(context) { status ->
+        if (status == TextToSpeech.SUCCESS && !ttsReady) {
+          tts?.language = Locale.US
+          tts?.setPitch(1.0f)
+          tts?.setSpeechRate(0.9f)
+          // Apply the user's chosen voice; if none chosen, auto-pick the highest-quality
+          // voice the device has so the greeting sounds as good as possible by default.
+          runCatching {
+            val voices = tts?.voices
+            val chosen =
+                if (welcomeCfg.ttsVoice.isNotBlank()) voices?.firstOrNull { it.name == welcomeCfg.ttsVoice }
+                else voices
+                    ?.filter { it.locale.language == Locale.US.language && !it.isNetworkConnectionRequired }
+                    ?.maxByOrNull { it.quality }
+            chosen?.let {
+              tts?.language = it.locale
+              tts?.voice = it
+            }
+          }
+          ttsReady = true
+          pendingSpeech?.let { text ->
+            speakWelcome(text, welcomeCfg)
+            pendingSpeech = null
+          }
+        }
+      }
+    }
+
+    // Start the ambient soundscape (no-op when set to Off).
+    runCatching { soundscape.start(settings.soundscape, settings.soundscapeVolume) }
+
+    // Optional "wave to advance" — wholly guarded; any failure just disables it so the
+    // always-on dream process is never put at risk.
+    if (settings.gestureWave) {
+      runCatching {
+        gestureCamera = GestureCamera(context) { ui.post { runCatching { next() } } }.also { it.start() }
+      }
+    }
+
+    // Feed the ambient dashboard's weather, and schedule its cycle (first card after ~45s).
+    refreshWeather.run()
+    if (settings.ambientDashboard) ui.postDelayed(dashboardCycle, 45_000L)
+
+    if (showWelcome && settings.welcomeEnabled) showWelcomeOverlay()
     when (source) {
       is PhotoFrameSource.WebPage -> {
         // Web-page source takes over the whole frame — no photo feed, no Immortal overlay.
@@ -337,7 +425,16 @@ class PhotoFrameController(
   }
 
   fun stop() {
+    ui.removeCallbacks(dashboardCycle)
     ui.removeCallbacksAndMessages(null)
+    runCatching { gestureCamera?.stop() }
+    gestureCamera = null
+    runCatching { soundscape.stop() }
+    tts?.stop()
+    tts?.shutdown()
+    tts = null
+    ttsReady = false
+    pendingSpeech = null
     cancelKenBurns()
     faceRenderer.stop()
     if (this::videoView.isInitialized) runCatching { videoView.stopPlayback() }
@@ -367,6 +464,17 @@ class PhotoFrameController(
 
     root.addView(faceRenderer.view)
     buildCalendar(root)
+
+    // Ambient dashboard panel — full-screen glanceable card, hidden until cycled in.
+    dashboardPanel = buildDashboardPanel().also {
+      it.visibility = View.GONE
+      root.addView(it, FrameLayout.LayoutParams(MATCH, MATCH))
+    }
+
+    // Welcome-back overlay — added last so it renders above photos and the Face overlay.
+    welcomeOverlay = buildWelcomeOverlay()
+    welcomeOverlay.visibility = View.GONE
+    root.addView(welcomeOverlay, FrameLayout.LayoutParams(MATCH, MATCH))
     return root
   }
 
@@ -552,6 +660,231 @@ class PhotoFrameController(
     photo.scaleType =
         if (settings.fit == ScreensaverConfig.FIT_FIT) ImageView.ScaleType.FIT_CENTER
         else ImageView.ScaleType.CENTER_CROP
+  }
+
+  // --- welcome-back overlay (fork) --------------------------------------------
+
+  private fun buildWelcomeOverlay(): View {
+    val welcomeCfg = WelcomeConfig.load(context)
+
+    val overlay = FrameLayout(context)
+    // Semi-opaque dark scrim so the photo is faintly visible behind the greeting.
+    val bgAlpha = (welcomeCfg.backgroundOpacity * 255).toInt()
+    overlay.setBackgroundColor((bgAlpha shl 24) or 0x000000)
+
+    val col = LinearLayout(context)
+    col.orientation = LinearLayout.VERTICAL
+    col.gravity = Gravity.CENTER_HORIZONTAL
+    // Add horizontal padding to prevent text cutoff at screen edges
+    col.setPadding(dp(40), dp(20), dp(40), dp(20))
+
+    val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    val greeting = when {
+      hour < 5  -> welcomeCfg.greetingNight
+      hour < 12 -> welcomeCfg.greetingMorning
+      hour < 17 -> welcomeCfg.greetingAfternoon
+      hour < 22 -> welcomeCfg.greetingEvening
+      else      -> welcomeCfg.greetingNight
+    }
+    val fullGreeting = if (welcomeCfg.userName.isNotBlank()) {
+      "$greeting, ${welcomeCfg.userName}"
+    } else {
+      greeting
+    }
+
+    if (welcomeCfg.showGreeting) {
+      val greetingView = text(welcomeCfg.greetingSize, welcomeCfg.greetingColor, false)
+      greetingView.text = fullGreeting
+      greetingView.gravity = Gravity.CENTER
+      greetingView.letterSpacing = welcomeCfg.greetingLetterSpacing
+      greetingView.maxLines = 2
+      val greetingLp = LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.MATCH_PARENT,
+          LinearLayout.LayoutParams.WRAP_CONTENT)
+      col.addView(greetingView, greetingLp)
+    }
+
+    if (welcomeCfg.showClock) {
+      val clockPattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm"
+      val clockView = text(welcomeCfg.clockSize, welcomeCfg.clockColor, true)
+      clockView.text = SimpleDateFormat(clockPattern, Locale.getDefault()).format(Date())
+      clockView.gravity = Gravity.CENTER
+      clockView.maxLines = 1
+      val clockLp = LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.MATCH_PARENT,
+          LinearLayout.LayoutParams.WRAP_CONTENT)
+      col.addView(clockView, clockLp)
+    }
+
+    if (welcomeCfg.showDate) {
+      val dateView = text(welcomeCfg.dateSize, welcomeCfg.dateColor, false)
+      dateView.text = SimpleDateFormat("EEEE, MMM d", Locale.getDefault()).format(Date())
+      dateView.gravity = Gravity.CENTER
+      dateView.maxLines = 1
+      val dateLp = LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.MATCH_PARENT,
+          LinearLayout.LayoutParams.WRAP_CONTENT)
+      dateLp.topMargin = dp(4)
+      col.addView(dateView, dateLp)
+    }
+
+    // Use MATCH_PARENT width with the padding above to ensure text stays visible
+    overlay.addView(col, FrameLayout.LayoutParams(MATCH, WRAP, Gravity.CENTER))
+    return overlay
+  }
+
+  private fun showWelcomeOverlay() {
+    val welcomeCfg = WelcomeConfig.load(context)
+    welcomeVisible = true
+    welcomeOverlay.alpha = 0f
+    welcomeOverlay.visibility = View.VISIBLE
+    welcomeOverlay.animate().alpha(1f).setDuration(500).start()
+
+    // Speak the greeting if TTS is enabled
+    if (welcomeCfg.enableTts) {
+      val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+      val greeting = when {
+        hour < 5  -> welcomeCfg.greetingNight
+        hour < 12 -> welcomeCfg.greetingMorning
+        hour < 17 -> welcomeCfg.greetingAfternoon
+        hour < 22 -> welcomeCfg.greetingEvening
+        else      -> welcomeCfg.greetingNight
+      }
+      val fullGreeting = if (welcomeCfg.userName.isNotBlank()) {
+        "$greeting, ${welcomeCfg.userName}"
+      } else {
+        greeting
+      }
+      // Speak immediately if TTS is ready, otherwise queue it
+      if (ttsReady) {
+        speakWelcome(fullGreeting, welcomeCfg)
+      } else {
+        pendingSpeech = fullGreeting
+      }
+    }
+
+    // Auto-dismiss after configured duration.
+    ui.postDelayed(dismissWelcomeRunnable, welcomeCfg.durationMs.toLong())
+  }
+
+  /** Dismiss immediately (e.g. on tap). */
+  private fun dismissWelcome() {
+    if (!welcomeVisible) return
+    ui.removeCallbacks(dismissWelcomeRunnable)
+    tts?.stop()
+    pendingSpeech = null
+    dismissWelcomeAnimated()
+  }
+
+  private fun dismissWelcomeAnimated() {
+    welcomeVisible = false
+    welcomeOverlay.animate()
+        .alpha(0f)
+        .setDuration(600)
+        .withEndAction { welcomeOverlay.visibility = View.GONE }
+        .start()
+  }
+
+  private fun speakWelcome(text: String, cfg: WelcomeConfig.Settings) {
+    val params = welcomeTtsParams(cfg)
+    runCatching {
+      tts?.speak(text, TextToSpeech.QUEUE_FLUSH, params, "welcome_greeting")
+    }.onFailure { Log.w(TAG, "Welcome TTS speak failed", it) }
+  }
+
+  private fun welcomeTtsParams(cfg: WelcomeConfig.Settings): android.os.Bundle? =
+      if (cfg.ttsVoice.isBlank()) {
+        null
+      } else {
+        android.os.Bundle().apply { putString(SHERPA_VOICE_PARAM, cfg.ttsVoice) }
+      }
+
+  // --- ambient dashboard (fork) -----------------------------------------------
+
+  private fun buildDashboardPanel(): View {
+    val panel = FrameLayout(context)
+    panel.setBackgroundColor(0xF20D0D12.toInt()) // near-opaque dark
+    val col = LinearLayout(context)
+    col.orientation = LinearLayout.VERTICAL
+    col.gravity = Gravity.CENTER
+    panel.addView(col, FrameLayout.LayoutParams(WRAP, WRAP, Gravity.CENTER))
+    dashClock = text(120f, Color.WHITE, true).also { it.gravity = Gravity.CENTER; col.addView(it) }
+    dashDate = text(28f, Color.WHITE, false).also { it.gravity = Gravity.CENTER; col.addView(it) }
+    dashWeather = text(26f, Color.WHITE, false).also {
+      it.gravity = Gravity.CENTER
+      (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(18)
+      col.addView(it)
+    }
+    dashEvent = text(22f, Color.WHITE, false).also {
+      it.gravity = Gravity.CENTER
+      (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(10)
+      col.addView(it)
+    }
+    return panel
+  }
+
+  /** Shows the dashboard card for a few seconds, then returns to the photos. */
+  private val dashboardCycle =
+      object : Runnable {
+        override fun run() {
+          if (!settings.ambientDashboard) return
+          showDashboard()
+          ui.postDelayed({ hideDashboard() }, 9_000L)
+          ui.postDelayed(this, 90_000L) // reappear roughly every 90s
+        }
+      }
+
+  private fun showDashboard() {
+    val panel = dashboardPanel ?: return
+    val now = Date()
+    val clockPattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm"
+    dashClock.text = SimpleDateFormat(clockPattern, Locale.getDefault()).format(now)
+    dashDate.text = SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).format(now)
+    dashWeather.text = weatherText
+    dashWeather.visibility = if (weatherText.isNotBlank()) View.VISIBLE else View.GONE
+    dashEvent.visibility = View.GONE
+    io.execute {
+      val ev = runCatching {
+        if (CalendarHelper.hasPermission(context)) CalendarHelper.upcoming(context).firstOrNull() else null
+      }.getOrNull()
+      ui.post {
+        if (ev != null) {
+          val cal = Calendar.getInstance().apply { timeInMillis = ev.begin }
+          val whenStr =
+              if (ev.allDay) SimpleDateFormat("MMM d", Locale.getDefault()).format(cal.time)
+              else SimpleDateFormat(if (ImmortalSettings.use24HourClock(context)) "HH:mm" else "h:mm a",
+                  Locale.getDefault()).format(cal.time)
+          dashEvent.text = "Next: $whenStr · ${ev.title}"
+          if (dashboardVisible) dashEvent.visibility = View.VISIBLE
+        }
+      }
+    }
+    panel.alpha = 0f
+    panel.visibility = View.VISIBLE
+    panel.animate().alpha(1f).setDuration(600).start()
+    dashboardVisible = true
+  }
+
+  private fun hideDashboard() {
+    val panel = dashboardPanel ?: return
+    panel.animate().alpha(0f).setDuration(600).withEndAction { panel.visibility = View.GONE }.start()
+    dashboardVisible = false
+  }
+
+  private val refreshWeather =
+      object : Runnable {
+        override fun run() {
+          fetchWeather()
+          ui.postDelayed(this, weatherRefreshMs)
+        }
+      }
+
+  private fun fetchWeather() {
+    io.execute {
+      // Shared resilient fetch: cached location + multi-provider geolocation.
+      val w = Weather.fetch(context)
+      if (w.isNotBlank()) weatherText = w
+    }
   }
 
   private fun text(sizeSp: Float, color: Int, light: Boolean): TextView {
