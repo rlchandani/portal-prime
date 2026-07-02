@@ -285,6 +285,20 @@
           "author": "rudysev",
           "homepage": "https://github.com/rudysev/portal-kasa",
           "submittedBy": "rudysev"
+        },
+        {
+          "name": "Jarvis (portal-assistant)",
+          "packageName": "com.portal.assistant",
+          "source": "url",
+          "apkUrl": "https://github.com/rudysev/portal-assistant/releases/download/v2.1.0/portal-assistant-v2.1.0.apk",
+          "versionCode": 3,
+          "minSdk": 28,
+          "description": "Hands-free voice assistant — ask anything, control the device, open apps. BYO Gemini key.",
+          "longDescription": "A conversational AI assistant built for the Portal, powered by the Gemini Live API. Talk to it in plain language and it answers out loud in a natural voice — web lookups, device control, opening apps — running as background voice with just a small orange bar over whatever's on screen, plus a live on-screen chat when the app is open. It knows the device's local time and approximate location, so questions like \"what's the weather?\" just work. Bring your own free Google Gemini API key (aistudio.google.com/apikey) — it stays on the device. Tap-to-talk works everywhere; the hands-free \"Hey Jarvis\" wake word needs the companion portal-wake app and is Gen 1 only.",
+          "iconUrl": "https://raw.githubusercontent.com/rudysev/portal-assistant/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+          "author": "rudysev",
+          "homepage": "https://github.com/rudysev/portal-assistant",
+          "submittedBy": "rudysev"
         }
       ]
     }
