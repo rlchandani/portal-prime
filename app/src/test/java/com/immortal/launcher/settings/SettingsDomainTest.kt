@@ -258,6 +258,7 @@ class SettingsDomainTest {
             SettingsDomains.immortal to
                 setOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword"),
             SettingsDomains.chime to emptySet(),
+            SettingsDomains.digitalclock to emptySet(),
         )
     rendered.forEach { (dom, exclude) ->
       val blank =
@@ -290,6 +291,19 @@ class SettingsDomainTest {
     assertTrue(
         "ChimeConfig.Settings has persisted fields neither in the registry nor accounted for: $uncovered",
         uncovered.isEmpty())
+  }
+
+  @Test
+  fun digitalClockRegistry_coversEveryPersistedField() {
+    // The on-device Clock screen renders its controls from this domain. Every field is a scalar
+    // bound by a spec — no managedElsewhere exceptions.
+    val fields =
+        com.immortal.launcher.DigitalClockConfig.Settings::class.java.declaredFields
+            .filter { !java.lang.reflect.Modifier.isStatic(it.modifiers) }
+            .map { it.name }
+            .toSet()
+    val specKeys = SettingsDomains.digitalclock.specs.map { it.key }.toSet()
+    assertEquals(fields, specKeys)
   }
 
   @Test

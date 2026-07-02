@@ -181,6 +181,21 @@
             android:label="Sounds"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- "Clock": digital clock screensaver style / color / layout settings. -->
+        <activity
+            android:name=".ClockSettingsActivity"
+            android:exported="false"
+            android:label="Clock"
+            android:theme="@style/Theme.SampleApp" />
+
+        <!-- Full-screen digital clock preview, opened from the Preview button in
+             Clock settings. Excluded from recents. -->
+        <activity
+            android:name=".DigitalClockPreviewActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- Connect a self-hosted Immich server as the screensaver source. -->
         <activity
             android:name=".ImmichConnectActivity"
@@ -403,6 +418,18 @@
         <!-- Custom screensaver (Dream), set via secure setting screensaver_components. -->
         <service
             android:name=".PhotoDreamService"
+            android:exported="true"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <!-- Digital clock screensaver (Dream); the active one is chosen in
+             SettingsGuard.reaffirmScreensaver from DigitalClockConfig.enabled. -->
+        <service
+            android:name=".DigitalClockDreamService"
             android:exported="true"
             android:permission="android.permission.BIND_DREAM_SERVICE">
             <intent-filter>

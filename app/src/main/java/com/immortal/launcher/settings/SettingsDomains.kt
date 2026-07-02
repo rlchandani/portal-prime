@@ -12,6 +12,7 @@ import com.immortal.launcher.CalendarFeed
 import com.immortal.launcher.CalendarUrlEntryActivity
 import com.immortal.launcher.ChimeConfig
 import com.immortal.launcher.ChimeScheduler
+import com.immortal.launcher.DigitalClockConfig
 import com.immortal.launcher.DreamPolicy
 import com.immortal.launcher.FaceCatalog
 import com.immortal.launcher.FacePickerActivity
@@ -775,6 +776,178 @@ object SettingsDomains {
           },
       )
 
+  /**
+   * The digital clock screensaver ([DigitalClockConfig]). When enabled, it replaces the photo-frame
+   * dream with a large customisable clock (style, color, font, size, layout, background, glow, date,
+   * seconds). The enum setters write the raw string straight to prefs (no normalising), so each
+   * [EnumSpec] carries a strict [EnumSpec.coerce] that rejects an unrecognised value — matching the
+   * Immortal display-enum pattern.
+   *
+   * Toggling [DigitalClockConfig.Settings.enabled] switches the active Dream between
+   * [DigitalClockDreamService] and [PhotoDreamService]; that side effect lives in [onApplied]
+   * (reaffirm the dream once per batch) rather than inline in the setter or the Activity.
+   */
+  val digitalclock: SettingsDomain<DigitalClockConfig.Settings> =
+      SettingsDomain(
+          id = "digitalclock",
+          title = "Clock",
+          load = DigitalClockConfig::load,
+          specs =
+              listOf(
+                  BoolSpec(
+                      "enabled",
+                      "Digital clock",
+                      get = { it.enabled },
+                      set = DigitalClockConfig::setEnabled,
+                      help = "Use a large clock instead of the photo frame screensaver."),
+                  EnumSpec(
+                      "style",
+                      "Clock style",
+                      get = { it.style },
+                      set = DigitalClockConfig::setStyle,
+                      options =
+                          listOf(
+                              DigitalClockConfig.STYLE_CLASSIC to "Classic",
+                              DigitalClockConfig.STYLE_FLIP to "Flip",
+                              DigitalClockConfig.STYLE_BOLD to "Bold",
+                              DigitalClockConfig.STYLE_NEON to "Neon",
+                              DigitalClockConfig.STYLE_SEGMENT to "Segment",
+                              DigitalClockConfig.STYLE_ANALOG to "Analog"),
+                      coerce = oneOf(
+                          DigitalClockConfig.STYLE_CLASSIC, DigitalClockConfig.STYLE_FLIP,
+                          DigitalClockConfig.STYLE_BOLD, DigitalClockConfig.STYLE_NEON,
+                          DigitalClockConfig.STYLE_SEGMENT, DigitalClockConfig.STYLE_ANALOG),
+                      visible = { _, s -> s.enabled }),
+                  EnumSpec(
+                      "color",
+                      "Color",
+                      get = { it.color },
+                      set = DigitalClockConfig::setColor,
+                      options =
+                          listOf(
+                              DigitalClockConfig.COLOR_WHITE to "White",
+                              DigitalClockConfig.COLOR_RED to "Red",
+                              DigitalClockConfig.COLOR_GREEN to "Green",
+                              DigitalClockConfig.COLOR_BLUE to "Blue",
+                              DigitalClockConfig.COLOR_YELLOW to "Yellow",
+                              DigitalClockConfig.COLOR_CYAN to "Cyan",
+                              DigitalClockConfig.COLOR_PINK to "Pink",
+                              DigitalClockConfig.COLOR_ORANGE to "Orange"),
+                      coerce = oneOf(
+                          DigitalClockConfig.COLOR_WHITE, DigitalClockConfig.COLOR_RED,
+                          DigitalClockConfig.COLOR_GREEN, DigitalClockConfig.COLOR_BLUE,
+                          DigitalClockConfig.COLOR_YELLOW, DigitalClockConfig.COLOR_CYAN,
+                          DigitalClockConfig.COLOR_PINK, DigitalClockConfig.COLOR_ORANGE),
+                      visible = { _, s -> s.enabled }),
+                  EnumSpec(
+                      "font",
+                      "Font",
+                      get = { it.font },
+                      set = DigitalClockConfig::setFont,
+                      options =
+                          listOf(
+                              DigitalClockConfig.FONT_LIGHT to "Light",
+                              DigitalClockConfig.FONT_NORMAL to "Normal",
+                              DigitalClockConfig.FONT_BOLD to "Bold",
+                              DigitalClockConfig.FONT_MONO to "Mono",
+                              DigitalClockConfig.FONT_SERIF to "Serif",
+                              DigitalClockConfig.FONT_SEGMENT_LED to "LED",
+                              DigitalClockConfig.FONT_DIGITAL_7 to "Digital",
+                              DigitalClockConfig.FONT_TECHNOLOGY to "Tech"),
+                      coerce = oneOf(
+                          DigitalClockConfig.FONT_LIGHT, DigitalClockConfig.FONT_NORMAL,
+                          DigitalClockConfig.FONT_BOLD, DigitalClockConfig.FONT_MONO,
+                          DigitalClockConfig.FONT_SERIF, DigitalClockConfig.FONT_SEGMENT_LED,
+                          DigitalClockConfig.FONT_DIGITAL_7, DigitalClockConfig.FONT_TECHNOLOGY),
+                      visible = { _, s -> s.enabled }),
+                  EnumSpec(
+                      "size",
+                      "Size",
+                      get = { it.size },
+                      set = DigitalClockConfig::setSize,
+                      options =
+                          listOf(
+                              DigitalClockConfig.SIZE_SMALL to "Small",
+                              DigitalClockConfig.SIZE_MEDIUM to "Medium",
+                              DigitalClockConfig.SIZE_LARGE to "Large",
+                              DigitalClockConfig.SIZE_XL to "XL"),
+                      coerce = oneOf(
+                          DigitalClockConfig.SIZE_SMALL, DigitalClockConfig.SIZE_MEDIUM,
+                          DigitalClockConfig.SIZE_LARGE, DigitalClockConfig.SIZE_XL),
+                      visible = { _, s -> s.enabled }),
+                  EnumSpec(
+                      "layout",
+                      "Position",
+                      get = { it.layout },
+                      set = DigitalClockConfig::setLayout,
+                      options =
+                          listOf(
+                              DigitalClockConfig.LAYOUT_CENTER to "Center",
+                              DigitalClockConfig.LAYOUT_TOP to "Top",
+                              DigitalClockConfig.LAYOUT_BOTTOM to "Bottom",
+                              DigitalClockConfig.LAYOUT_MINIMAL to "Minimal"),
+                      coerce = oneOf(
+                          DigitalClockConfig.LAYOUT_CENTER, DigitalClockConfig.LAYOUT_TOP,
+                          DigitalClockConfig.LAYOUT_BOTTOM, DigitalClockConfig.LAYOUT_MINIMAL),
+                      visible = { _, s -> s.enabled }),
+                  EnumSpec(
+                      "background",
+                      "Background",
+                      get = { it.background },
+                      set = DigitalClockConfig::setBackground,
+                      options =
+                          listOf(
+                              DigitalClockConfig.BG_BLACK to "Black",
+                              DigitalClockConfig.BG_GRADIENT to "Gradient",
+                              DigitalClockConfig.BG_RED to "Red"),
+                      coerce = oneOf(
+                          DigitalClockConfig.BG_BLACK, DigitalClockConfig.BG_GRADIENT,
+                          DigitalClockConfig.BG_RED),
+                      visible = { _, s -> s.enabled }),
+                  EnumSpec(
+                      "glow",
+                      "Glow",
+                      get = { it.glow },
+                      set = DigitalClockConfig::setGlow,
+                      options =
+                          listOf(
+                              DigitalClockConfig.GLOW_NONE to "None",
+                              DigitalClockConfig.GLOW_SOFT to "Soft",
+                              DigitalClockConfig.GLOW_STRONG to "Strong"),
+                      coerce = oneOf(
+                          DigitalClockConfig.GLOW_NONE, DigitalClockConfig.GLOW_SOFT,
+                          DigitalClockConfig.GLOW_STRONG),
+                      visible = { _, s -> s.enabled }),
+                  BoolSpec(
+                      "showDate",
+                      "Show date",
+                      get = { it.showDate },
+                      set = DigitalClockConfig::setShowDate,
+                      visible = { _, s -> s.enabled }),
+                  BoolSpec(
+                      "showSeconds",
+                      "Show seconds",
+                      get = { it.showSeconds },
+                      set = DigitalClockConfig::setShowSeconds,
+                      visible = { _, s -> s.enabled }),
+              ),
+          sections =
+              mapOf(
+                  "style" to "Clock style",
+                  "color" to "Appearance",
+                  "font" to "Appearance",
+                  "size" to "Appearance",
+                  "layout" to "Layout & background",
+                  "background" to "Layout & background",
+                  "glow" to "Layout & background",
+                  "showDate" to "Extras",
+                  "showSeconds" to "Extras"),
+          defaults = { DigitalClockConfig.Settings() },
+          onApplied = { c, keys ->
+            if ("enabled" in keys) SettingsGuard.reaffirmScreensaver(c)
+          },
+      )
+
   val all: List<SettingsDomain<*>> =
-      listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime)
+      listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime, digitalclock)
 }

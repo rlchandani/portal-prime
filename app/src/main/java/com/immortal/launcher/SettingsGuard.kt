@@ -66,7 +66,14 @@ object SettingsGuard {
         Settings.Secure.putInt(resolver, "screensaver_enabled", 0)
         return@runCatching
       }
-      val ours = ComponentName(context, PhotoDreamService::class.java).flattenToShortString()
+      // Use the digital-clock screensaver if enabled, otherwise the photo frame.
+      val dreamServiceClass =
+          if (DigitalClockConfig.load(context).enabled) {
+            DigitalClockDreamService::class.java
+          } else {
+            PhotoDreamService::class.java
+          }
+      val ours = ComponentName(context, dreamServiceClass).flattenToShortString()
       if (Settings.Secure.getString(resolver, "screensaver_components") != ours) {
         Settings.Secure.putString(resolver, "screensaver_components", ours)
       }
