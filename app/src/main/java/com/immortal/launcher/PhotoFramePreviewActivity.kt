@@ -70,7 +70,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
       return
     }
 
-    frame = PhotoFrameController(this)
+    frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false))
     frame.onExit = { finish() }
 
     if (nightClock) {
@@ -150,7 +150,10 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     super.onDestroy()
   }
 
-  private companion object {
+  companion object {
+    /** When true, the launched frame shows the welcome-back overlay (presence-triggered starts). */
+    const val EXTRA_SHOW_WELCOME = "show_welcome"
+
     // A soft glow for the overnight bedside clock — dim but still legible in a dark room.
     const val NIGHT_BRIGHTNESS = 0.08f
   }

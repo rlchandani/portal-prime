@@ -11,6 +11,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
@@ -67,10 +68,12 @@ object SleepScheduler {
   }
 
   const val ACTION_IDLE = "com.immortal.launcher.SLEEP_IDLE"
+  const val ACTION_SLEEP_TIMER = "com.immortal.launcher.SLEEP_TIMER"
   const val ACTION_OVERNIGHT_START = "com.immortal.launcher.OVERNIGHT_START"
   const val ACTION_OVERNIGHT_END = "com.immortal.launcher.OVERNIGHT_END"
 
   private const val RC_IDLE = 1001
+  private const val RC_SLEEP_TIMER = 1004
   private const val RC_OVERNIGHT_START = 1002
   private const val RC_OVERNIGHT_END = 1003
 
@@ -156,6 +159,24 @@ object SleepScheduler {
     nightSessionActive = true
     main.postDelayed(nightSessionElapsed, overnightSessionMs(context))
   }
+
+  // ----- one-shot sleep timer ------------------------------------------------
+
+  /** Arm a one-shot sleep timer. */
+  fun armSleepTimer(context: Context) {
+    val cfg = ScreensaverConfig.load(context)
+    if (!cfg.sleepTimerEnabled) {
+      cancelSleepTimer(context)
+      return
+    }
+    val minutes = ScreensaverConfig.clampSleepTimer(cfg.sleepTimerMin)
+    val at = System.currentTimeMillis() + minutes * 60_000L
+    setAlarm(context, at, ACTION_SLEEP_TIMER, RC_SLEEP_TIMER)
+    Log.i(TAG, "sleep timer armed for $minutes min")
+  }
+
+  /** Cancel the one-shot sleep timer. */
+  fun cancelSleepTimer(context: Context) = cancel(context, ACTION_SLEEP_TIMER, RC_SLEEP_TIMER)
 
   // ----- overnight window ----------------------------------------------------
 
@@ -255,6 +276,13 @@ object SleepScheduler {
     Log.i(TAG, "overnight scheduled ${cfg.overnightStartMin}→${cfg.overnightEndMin}")
   }
 
+  fun sleepNow(context: Context, pauseAudio: Boolean = true, closeApp: Boolean = true) {
+    if (pauseAudio) pauseAudio(context)
+    if (closeApp) closeCurrentApp(context)
+    SettingsGuard.setSystemScreensaverEnabled(context, false)
+    ScreenControl.sleep(context)
+  }
+
   /** Apply the right state immediately (on boot, app start, or a settings change). */
   fun applyOvernightNow(context: Context) {
     scheduleOvernight(context)
@@ -295,6 +323,35 @@ object SleepScheduler {
     } else {
       ScreenControl.sleep(context)
     }
+  }
+
+  private fun pauseAudio(context: Context) {
+    runCatching {
+      val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+      am.dispatchMediaKeyEvent(
+          android.view.KeyEvent(
+              android.view.KeyEvent.ACTION_DOWN,
+              android.view.KeyEvent.KEYCODE_MEDIA_PAUSE
+          )
+      )
+      am.dispatchMediaKeyEvent(
+          android.view.KeyEvent(
+              android.view.KeyEvent.ACTION_UP,
+              android.view.KeyEvent.KEYCODE_MEDIA_PAUSE
+          )
+      )
+      Log.i(TAG, "media pause dispatched")
+    }.onFailure { Log.w(TAG, "failed to dispatch media pause", it) }
+  }
+
+  private fun closeCurrentApp(context: Context) {
+    val intent =
+        Intent(context, HomeActivity::class.java)
+            .setAction("com.immortal.launcher.CLOSE_CURRENT_APP")
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    runCatching { context.startActivity(intent) }
+        .onSuccess { Log.i(TAG, "close-app intent sent") }
+        .onFailure { Log.w(TAG, "failed to send close-app intent", it) }
   }
 
   /** Show [PhotoFramePreviewActivity], which renders the dimmed night clock while in the window. */
