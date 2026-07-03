@@ -12,8 +12,9 @@
     powershell -ExecutionPolicy Bypass -File provision.ps1 -Status    # show state
     powershell -ExecutionPolicy Bypass -File provision.ps1 -OverlayFix # fix Gen-1 installer dialog
     powershell -ExecutionPolicy Bypass -File provision.ps1 -Alexa      # restore the original Amazon Alexa app
+    powershell -ExecutionPolicy Bypass -File provision.ps1 -UpdateHey  # refresh just the "hey" wake-word app (no ~115 MB falcon re-download)
 #>
-param([switch]$Restore, [switch]$Status, [switch]$Apps, [switch]$Shizuku, [switch]$OverlayFix, [switch]$Fleet, [switch]$WifiAdb, [switch]$Alexa)
+param([switch]$Restore, [switch]$Status, [switch]$Apps, [switch]$Shizuku, [switch]$OverlayFix, [switch]$Fleet, [switch]$WifiAdb, [switch]$Alexa, [switch]$UpdateHey)
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -377,6 +378,50 @@ function Set-Screensaver {
 # listener that can interfere with Messenger calls on Gen-1 Portal+.
 function Get-Sha256($path) { (Get-FileHash -Algorithm SHA256 -Path $path).Hash.ToLower() }
 
+# Installed versionCode of a package on the device, or "" if it isn't installed.
+function Get-HeyVc($pkg) {
+  $d = (A shell dumpsys package $pkg 2>$null) -join "`n"
+  if ($d -match 'versionCode=(\d+)') { $Matches[1] } else { "" }
+}
+
+# Install / refresh the "hey" (millennium) wake-word app to the CURRENT build, over any existing
+# install. The one-time, non-OTA way a device already in the field picks up a hey newer than the
+# one on it (builds shipped before hey's in-app OTA updater can't self-update). `install -r`
+# replaces the code but KEEPS app data - never uninstall hey, that would wipe its saved state
+# (incl. the license). Reinstalling the same version, or finding the device already newer, is a
+# harmless no-op we report as such; the version transition is printed so it's clear it landed.
+# Callers gate on INSTALL_ALEXA_WAKE_WORD - this only runs when hey is wanted.
+function Update-Hey($work) {
+  New-Item -ItemType Directory -Force -Path $work | Out-Null
+  $mp = if ($cfg["MILLENNIUM_PKG"]) { $cfg["MILLENNIUM_PKG"] } else { "com.millennium" }
+  $mapk = $null
+  if ($cfg["MILLENNIUM_APK_LOCAL"] -and (Test-Path $cfg["MILLENNIUM_APK_LOCAL"])) { $mapk = $cfg["MILLENNIUM_APK_LOCAL"] }
+  elseif ($cfg["MILLENNIUM_APK_URL"]) {
+    Step "Downloading the hey (millennium) app"
+    $dest = Join-Path $work "millennium.apk"
+    Remove-Item $dest -ErrorAction SilentlyContinue   # always fetch fresh
+    try { Invoke-WebRequest $cfg["MILLENNIUM_APK_URL"] -OutFile $dest; $mapk = $dest }
+    catch { Warn "hey download failed (Alexa text/voice still work; the wake word needs it)"; return }
+  }
+  if (-not ($mapk -and (Test-Path $mapk))) { Warn "No hey APK to install (set MILLENNIUM_APK_URL or MILLENNIUM_APK_LOCAL)"; return }
+
+  $before = Get-HeyVc $mp
+  if ($before) { Step "Installing hey (millennium) - replacing installed build $before" } else { Step "Installing hey (millennium)" }
+  $out = (A install -r $mapk 2>&1 | Out-String)
+  $after = Get-HeyVc $mp
+  if ($out -match "Success") {
+    if ($before -and $before -ne $after) { Ok "hey updated ($before -> $after)" }
+    elseif ($before) { Ok "hey reinstalled (already $after)" }
+    else { Ok "hey installed ($after)" }
+  }
+  elseif ($out -match "INSTALL_FAILED_VERSION_DOWNGRADE") { Ok "hey already current (installed $after is newer than the bundle)" }
+  elseif ($out -match "(?i)signature|INCOMPATIBLE") { Warn "hey is installed with a different signature - left as-is (a forced replace would wipe its saved state). Remove it by hand only if you know it isn't the release build." }
+  elseif ("$(A shell pm path $mp)".Trim()) { Warn "install -r reported an issue but hey is present ($after); continuing" }
+  else { Warn "hey install failed"; return }
+
+  if ("$(A shell pm path $mp)".Trim()) { A shell pm grant $mp android.permission.RECORD_AUDIO | Out-Null }
+}
+
 function Restore-Alexa {
   $fp = if ($cfg["FALCON_PKG"]) { $cfg["FALCON_PKG"] } else { "com.amazon.alexa.multimodal.falcon" }
   $sim = "$fp/com.amazon.alexa.multimodal.falcon.SIMActivity"
@@ -484,18 +529,7 @@ function Restore-Alexa {
   $mp = if ($cfg["MILLENNIUM_PKG"]) { $cfg["MILLENNIUM_PKG"] } else { "com.millennium" }
   $installWake = $cfg["INSTALL_ALEXA_WAKE_WORD"] -eq "true"
   if ($installWake) {
-    $mapk = $null
-    if ($cfg["MILLENNIUM_APK_LOCAL"] -and (Test-Path $cfg["MILLENNIUM_APK_LOCAL"])) { $mapk = $cfg["MILLENNIUM_APK_LOCAL"] }
-    elseif ($cfg["MILLENNIUM_APK_URL"]) {
-      Step "Downloading the hey (millennium) app"
-      try { Invoke-WebRequest $cfg["MILLENNIUM_APK_URL"] -OutFile (Join-Path $work "millennium.apk"); $mapk = Join-Path $work "millennium.apk" }
-      catch { Warn "millennium download failed (Alexa text/voice still works; wake word needs it)" }
-    }
-    if ($mapk -and (Test-Path $mapk)) {
-      Step "Installing hey (millennium)"
-      A install -r $mapk | Out-Null; Ok "millennium installed"
-    }
-    if ("$(A shell pm path $mp)".Trim()) { A shell pm grant $mp android.permission.RECORD_AUDIO | Out-Null }
+    Update-Hey $work   # force the current build over any existing install (see Update-Hey)
   } else {
     Step "Skipping the hey (millennium) wake-word app"
     if ("$(A shell pm path $mp)".Trim()) {
@@ -711,6 +745,13 @@ if ($OverlayFix) {
 if ($Alexa) {
   Wait-Device
   Restore-Alexa
+  exit 0
+}
+
+if ($UpdateHey) {
+  Wait-Device
+  Step "Updating the hey (millennium) wake-word app to the current release"
+  Update-Hey (Join-Path $ScriptDir "alexa")
   exit 0
 }
 

@@ -232,6 +232,7 @@ On the first run the kit snapshots the device's real stock launcher and screensa
 ./provision.sh --shizuku       # (re)start the Shizuku server
 ./provision.sh --fleet         # enable the WiFi fleet agent on this device
 ./provision.sh --alexa         # restore Alexa (first-gen) — see the voice guide
+./provision.sh --update-hey    # refresh just the "hey" wake-word app to the latest release
 ./provision.sh --wifi-adb      # enable raw adb-over-WiFi on demand
 ```
 

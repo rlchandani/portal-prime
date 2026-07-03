@@ -21,6 +21,8 @@
 #                             pauses Shizuku, resets on reboot)
 #   ./provision.sh --alexa    restore the original Amazon Alexa app; the "hey"
 #                             wake word is a separate config opt-in
+#   ./provision.sh --update-hey  refresh just the "hey" wake-word app to the current
+#                             release (no ~115 MB falcon re-download); leaves falcon as-is
 
 set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -509,6 +511,61 @@ sha256() {
   else echo ""; fi
 }
 
+# Installed versionCode of a package on the device, or empty if it isn't installed.
+hey_vc() { a shell dumpsys package "$1" 2>/dev/null | sed -n 's/.*versionCode=\([0-9]*\).*/\1/p' | head -1 | tr -d '\r'; }
+
+# Install / refresh the "hey" (millennium) wake-word app to the CURRENT build, over any existing
+# install. This is the one-time, non-OTA way a device already in the field picks up a hey newer
+# than the one on it (builds shipped before hey's in-app OTA updater existed can't self-update, so
+# a re-provision is how they get current). We `install -r` — replace the code but KEEP app data;
+# NEVER uninstall hey, that would wipe its saved state (incl. the license). Reinstalling the same
+# version, or finding the device already newer, is a harmless no-op we report as such; the version
+# transition is printed so it's clear the update landed. Callers gate on INSTALL_ALEXA_WAKE_WORD —
+# this only runs when hey is wanted (opted in, or the explicit --update-hey command). $1 = work dir.
+update_hey() {
+  local work="$1"; mkdir -p "$work"
+  local MP="${MILLENNIUM_PKG:-com.millennium}"
+  local mapk="${MILLENNIUM_APK_LOCAL:-}"
+  if [ -z "$mapk" ] && [ -n "${MILLENNIUM_APK_URL:-}" ]; then
+    step "Downloading the hey (millennium) app"
+    rm -f "$work/millennium.apk"   # always fetch fresh — never resume onto a stale/partial file
+    if curl -fSL --retry 3 --retry-all-errors --retry-delay 2 --connect-timeout 30 \
+         -o "$work/millennium.apk" "$MILLENNIUM_APK_URL" 2>/dev/null; then mapk="$work/millennium.apk"
+    else warn "hey download failed (Alexa text/voice still work; the wake word needs it)"; return 1; fi
+  fi
+  [ -n "$mapk" ] && [ -f "$mapk" ] || { warn "No hey APK to install (set MILLENNIUM_APK_URL or MILLENNIUM_APK_LOCAL)"; return 1; }
+
+  local before after out
+  before="$(hey_vc "$MP")"
+  step "Installing hey (millennium)${before:+ — replacing installed build $before}"
+  out="$(a install -r "$mapk" 2>&1)" || true
+  after="$(hey_vc "$MP")"
+  if printf '%s' "$out" | grep -q Success; then
+    if [ -n "$before" ] && [ "$before" != "$after" ]; then ok "hey updated ($before -> $after)"
+    elif [ -n "$before" ]; then ok "hey reinstalled (already $after)"
+    else ok "hey installed ($after)"; fi
+  elif printf '%s' "$out" | grep -q INSTALL_FAILED_VERSION_DOWNGRADE; then
+    ok "hey already current (installed $after is newer than the bundle)"
+  elif printf '%s' "$out" | grep -qiE 'signature|INCOMPATIBLE'; then
+    warn "hey is installed with a different signature — left as-is (a forced replace would wipe its saved state). Remove it by hand only if you know it isn't the release build."
+  elif a shell pm path "$MP" >/dev/null 2>&1; then
+    warn "install -r reported an issue but hey is present ($after); continuing"
+  else warn "hey install failed"; return 1; fi
+
+  a shell pm path "$MP" >/dev/null 2>&1 && a shell pm grant "$MP" android.permission.RECORD_AUDIO >/dev/null 2>&1
+  return 0
+}
+
+# Standalone entry: refresh hey to the current release WITHOUT the full falcon re-provision (which
+# re-downloads ~115 MB). The cheap way to sweep a fleet onto a new hey — running it is itself the
+# opt-in, so it installs regardless of INSTALL_ALEXA_WAKE_WORD; falcon and its Amazon registration
+# are left untouched.
+do_update_hey() {
+  resolve_adb; wait_for_device
+  step "Updating the hey (millennium) wake-word app to the current release"
+  update_hey "$SCRIPT_DIR/alexa"
+}
+
 restore_alexa() {
   local FP="${FALCON_PKG:-com.amazon.alexa.multimodal.falcon}"
   local SIM="$FP/com.amazon.alexa.multimodal.falcon.SIMActivity"
@@ -614,16 +671,7 @@ restore_alexa() {
   local MP="${MILLENNIUM_PKG:-com.millennium}"
   local install_wake="${INSTALL_ALEXA_WAKE_WORD:-false}"
   if [ "$install_wake" = true ]; then
-    local mapk="${MILLENNIUM_APK_LOCAL:-}"
-    if [ -z "$mapk" ] && [ -n "${MILLENNIUM_APK_URL:-}" ]; then
-      step "Downloading the hey (millennium) app"
-      if curl -fSL --retry 2 -o "$work/millennium.apk" "$MILLENNIUM_APK_URL" 2>/dev/null; then mapk="$work/millennium.apk"; else warn "millennium download failed (Alexa text/voice still works; wake word needs it)"; fi
-    fi
-    if [ -n "$mapk" ] && [ -f "$mapk" ]; then
-      step "Installing hey (millennium)"
-      a install -r "$mapk" >/dev/null 2>&1 && ok "millennium installed" || warn "millennium install failed"
-    fi
-    a shell pm path "$MP" >/dev/null 2>&1 && a shell pm grant "$MP" android.permission.RECORD_AUDIO >/dev/null 2>&1
+    update_hey "$work"   # force the current build over any existing install (see update_hey)
   else
     step "Skipping the hey (millennium) wake-word app"
     if a shell pm path "$MP" >/dev/null 2>&1; then
@@ -900,7 +948,8 @@ case "${1:-}" in
   --fleet|-f)   resolve_adb; wait_for_device; enable_fleet ;;
   --wifi-adb)   enable_wifi_adb_now ;;
   --alexa|-A)   resolve_adb; wait_for_device; restore_alexa ;;
-  --help|-h)    sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//' ;;
+  --update-hey) do_update_hey ;;
+  --help|-h)    sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//' ;;
   "")           do_provision ;;
   *)            die "Unknown option: $1 (use --restore, --status, or no argument)" ;;
 esac

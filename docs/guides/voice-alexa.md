@@ -57,7 +57,15 @@ Once linked, you can hide falcon's icon from the launcher — it runs headless.
     `./provision.sh --alexa`, to install the Millennium wake-word app and show the launcher mic
     button. This restores hands-free "Hey Alexa", but on at least one Gen-1 Portal+ it caused
     Facebook Messenger call microphone audio to cut in and out. Leave it off if Messenger calling
-    matters on that device.
+    matters on that device. When it *is* on, the current wake-word build is installed over any
+    older copy already on the device (`install -r`, which keeps its settings).
+
+!!! tip "Just updating the wake-word app"
+    On a device that already has the wake word, refresh **only** the "hey" app to the latest
+    release — without the ~115 MB falcon re-download — with `./provision.sh --update-hey`
+    (Windows: `-UpdateHey`). It installs over the existing copy, keeps its settings, and leaves
+    falcon and its Amazon link untouched. Handy for picking up a new hey on a device set up before
+    the app could update itself.
 
 !!! warning "Windows: the reconstruct path needs bspatch"
     macOS and Linux ship (or can install) `bspatch`. Windows doesn't, so on Windows use the hosted
