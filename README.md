@@ -25,7 +25,18 @@ services. Touch models and the remote-driven **Portal TV** are both supported.
   keyless built-in feed (Lorem Picsum, Unsplash-ready). Weather is keyless Open-Meteo + IP
   geolocation. It cooperates with the Portal's presence sensor so it runs as a **permanent frame**
   while someone's around (and on mains power), and on the battery-powered **Portal Go** an optional
-  "sleep when nobody's around" setting saves power. Swipe to change photos, tap to exit.
+  "sleep when nobody's around" setting saves power. Swipe to change photos, tap to exit. There's
+  also a **digital-clock** screensaver as an alternative to the photo frame, a **welcome-back**
+  greeting overlay, and an **ambient almanac** line fed by keyless on-device calendar packs
+  (Romanian name-days & Orthodox feasts, Irish holidays, prayer times).
+- **Tools** (`ToolsActivity`) — a **Tools** tile on the home grid gathers the built-in utilities:
+  **RTSP cameras**, **countdowns** (also shown as home-screen chips), a **reading lamp**,
+  **bedtime stories** read aloud, a Wi-Fi **intercom** to another Portal, **kitchen timers**,
+  **sticky/voice notes**, a **unit/currency converter**, **ISS pass** times, an **aurora outlook**,
+  and a Cloudflare **speed test**. All keyless and on-device.
+- **Ambient & sound** (`ChimeConfig` / `SunriseConfig`) — optional gentle audio cues (an hourly
+  chime, spoken time, a golden-hour tone) with a nightly quiet-hours window, and a **sunrise
+  wake-light** that eases the screen up in the morning. All off by default and configured on-device.
 - **App Store** (`StoreActivity` / `StoreCatalog`) — a hosted JSON catalog
   ([`catalog.json`](catalog.json), schema v2) rendered with app icons, search, per-app detail
   pages (author, source, website, credit), device-compatibility badges, and an "Updates" section
@@ -153,13 +164,14 @@ a Gen-1 Portal+). For apps that ship as split APKs, the Shizuku path above is th
 
 Hosted from this repo:
 
-- [`version.json`](version.json) — the self-update manifest. Bump `versionCode`/`versionName`,
-  build a signed release, and attach it as `immortal.apk` to a GitHub Release; devices update on
-  their next check. The asset **must** be named `immortal.apk` — the manifest's `apkUrl` (and the
-  store catalog) point at the stable `releases/latest/download/immortal.apk`, which 404s and breaks
-  self-update for every device if a release attaches only a versioned name. Use
-  [`scripts/publish-release.sh`](scripts/publish-release.sh) `<tag> <signed.apk>` to upload the
-  asset under both the stable and versioned names and verify the URL resolves.
+- [`version.json`](version.json) — the self-update manifest. Devices poll it and update when it
+  advertises a higher `versionCode`. Don't hand-edit it — one command cuts a release end to end:
+  [`scripts/cut-release.sh`](scripts/cut-release.sh) `<versionName> "<notes>"` bumps
+  `app/build.gradle.kts` and `version.json` in lockstep, builds and verifies the signed APK
+  (version match + same signing key as the published build), and publishes the GitHub Release with
+  the asset named **`immortal.apk`** — the stable `releases/latest/download/immortal.apk` the
+  manifest and store catalog point at. It fails fast at every gate. See
+  [docs/releasing.md](docs/releasing.md).
 - [`catalog.json`](catalog.json) — the app-store catalog. Edit and commit; clients pick it up on
   next open (a bundled copy ships as the offline fallback).
 

@@ -67,6 +67,8 @@ nav:
   - Features:
       - Launcher: features/launcher.md
       - Screensaver & photo frame: features/screensaver.md
+      - Tools: features/tools.md
+      - Ambient & sound: features/ambient-sound.md
       - App Store: features/app-store.md
       - Multi-room audio & now-playing: features/multi-room-audio.md
       - Smart home (Home Assistant / MQTT): features/smart-home.md

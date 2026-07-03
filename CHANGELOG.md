@@ -1,5 +1,23 @@
 # Changelog
 
+Immortal's per-release history lives in
+**[GitHub Releases](https://github.com/starbrightlab/immortal/releases)** — that's the canonical,
+always-current source. Every release is cut by [`scripts/cut-release.sh`](docs/releasing.md), which
+writes the same notes into the GitHub Release **and** into [`version.json`](version.json) (what a
+device shows when it offers the update), so the two can't drift.
+
+This file is **no longer updated per release.** A hand-maintained changelog sitting outside that one
+command is exactly the kind of thing that drifts — and did: it stalled at 1.43 while 1.44 through
+1.52 shipped. The rest of the project designs drift out with tripwires rather than policing it by
+hand, and the changelog should be no exception.
+
+The entries below are kept as an archive of the early history. For anything from **1.44 onward**, see
+the Releases page linked above.
+
+---
+
+## Archived history (up to 1.43)
+
 ## 1.43 (2026-06-20)
 
 Screensaver gets clock faces and a lot more places to pull photos from.

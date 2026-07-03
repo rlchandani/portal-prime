@@ -19,7 +19,9 @@ keeps improving without a cable.
 | Area | What it does |
 | --- | --- |
 | [Launcher](features/launcher.md) | A fullscreen app grid with clock/date/weather, folders, an app switcher, and a Calls tile. |
-| [Screensaver](features/screensaver.md) | A photo frame with clock faces and many photo sources (your own folder, Immich, SMB, WebDAV, web pages, iCloud albums, or a keyless built-in feed). |
+| [Screensaver](features/screensaver.md) | A photo frame with clock faces and many photo sources (your own folder, Immich, SMB, WebDAV, web pages, iCloud albums, or a keyless built-in feed), plus a digital-clock face, a welcome-back overlay, and an ambient almanac. |
+| [Tools](features/tools.md) | A screen of built-in utilities — cameras, kitchen timers, notes, a converter, ISS passes, a reading lamp, a Wi-Fi intercom, and more. |
+| [Ambient & sound](features/ambient-sound.md) | Hourly chimes and spoken time, quiet hours, and a gradual sunrise wake-light. |
 | [App Store](features/app-store.md) | A hosted, community-submittable catalog that installs apps on-device, with updates and self-update. |
 | [Multi-room audio](features/multi-room-audio.md) | Synced whole-home music across Portals, with now-playing and transport controls on every device in a group. |
 | [Smart home](features/smart-home.md) | Home Assistant integration over MQTT — state and control, including the screen. |

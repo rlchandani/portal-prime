@@ -62,9 +62,21 @@ The Kotlin package is flat; files are grouped by name prefix:
 
 - **Launcher / home grid:** `HomeActivity`, `UserLayout`, `QuickBar*`, `AppSwitcherActivity`
 - **Screensaver / photo frame:** `PhotoDreamService`, `PhotoFrameController`, `Screensaver*`,
-  `Face*` / `ClockFaces` / `FlipWebClockFaceView`, `DreamPolicy`, `PresenceState`, `AntiBurnIn`
+  `Face*` / `ClockFaces` / `FlipWebClockFaceView`, `DreamPolicy`, `PresenceState`, `AntiBurnIn`;
+  digital-clock face `DigitalClock*`; welcome overlay `Welcome*`; Dream selection in `SettingsGuard`
 - **Photo sources:** `LocalMedia`, `ImmichSource`, `SmbSource`, `DavSource`, `RemoteAlbum`,
   `Weather`, `CalendarFeed`
+- **Tools screen:** `ToolsActivity`, `HomeToolOverlays`, `CameraViewerActivity` / `CameraConfig`,
+  `LampActivity`, `BedtimeStoryActivity` / `Stories`, `IntercomActivity` / `LanAudio`,
+  `CountdownSettingsActivity` / `CountdownConfig`, plus the keyless helpers `Converter`, `IssPasses`,
+  `Aurora`, `PrayerTimes`
+- **Ambient & sound:** chimes `Chime*` / `ChimeConfig`; sunrise wake-light `Sunrise*` /
+  `SunriseConfig`; almanac packs `CalendarPacks` (+ `FeastDays`, `NameDays`, `IrishHolidays`,
+  `DailyContent`)
+- **Wallpaper (home background):** `WallpaperConfig`, `AmbientBackground` / `HomeBackground`,
+  `SkyColors`, `StarField`
+- **Accessibility / input:** back gesture `BackHelper`, `ImmortalBackGestureService`,
+  `SystemBackGestureService`; touch sounds `SystemSounds`
 - **App store / install:** `StoreActivity`, `StoreCatalog`, `UpdateManager`, `InstallDaemon`,
   `HeadlessInstaller`, `ApkInstallActivity`, `ApkBrowserActivity`, `InstallConfirmService`
 - **Fleet agent (on-device HTTP API):** `FleetAgentService`, `FleetHttpServer`, `FleetRoutes`,
@@ -92,7 +104,8 @@ definition drives three consumers automatically:
 2. **On-device UI** — `SettingsRenderer.SettingsList(domain, …)` renders the specs as Compose rows.
 3. **Phone remote** — the `/remote/settings` schema + the generic PWA renderer in `RemoteHtml`.
 
-The domains live in `SettingsDomains.kt`: `screensaver`, `calendar`, `immortal`, `mqtt`, `quickbar`.
+The domains live in `SettingsDomains.kt` (`SettingsDomains.all`): `screensaver`, `calendar`,
+`immortal`, `mqtt`, `quickbar`, `fleet`, `chime`, `digitalclock`, `welcome`, `sunrise`.
 
 ### Adding or changing a setting — the rules
 

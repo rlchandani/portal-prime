@@ -12,6 +12,22 @@ Swipe to change photos, tap to exit.
 Choose a screensaver clock face from a face picker (`FacePickerActivity`): **flip clock**,
 **big**, **bold**, or **minimal**, each with size options.
 
+## Digital-clock screensaver
+
+`DigitalClockConfig` / `DigitalClockDreamService` — an alternative screensaver that shows a large,
+customisable clock **instead of** the photo frame. Turn it on from the **Clock** settings screen
+(`ClockSettingsActivity`) and Immortal swaps the active screensaver to it automatically; a
+non-drag tap exits.
+
+- **Style** — classic, flip, bold, neon, seven-segment, or analog.
+- **Colour**, **font**, **size**, **position**, **background**, and **glow** — all pickable, with a
+  live preview. Show the date and/or seconds as you like.
+- Anti-burn-in slowly drifts the clock so a static display doesn't mark the panel.
+
+With this off, the screensaver is the [photo frame](#photo-sources) below; with it on, it's the
+clock. Everything else on this page (overnight behaviour, presence, welcome overlay) applies to
+whichever is showing.
+
 ## Photo sources
 
 Point the frame at whatever you like — most sources can be set up **from your phone** (pair the
@@ -44,3 +60,27 @@ dream/sleep lifecycle. The design notes go deep on this:
 During an overnight window the screensaver can show a **dimmed clock** instead of going fully
 dark — and a deliberate tap inside the window wakes the device for normal use, returning to
 sleep a short while after you stop interacting.
+
+## Welcome-back overlay
+
+When the screensaver starts, Immortal can show a brief **welcome-back overlay**
+(`WelcomeConfig`) — a time-of-day greeting ("Good morning", optionally with your name), the clock,
+and the date, optionally spoken aloud. It auto-dismisses after a few seconds. Turn it on with the
+**Welcome screen** toggle in the screensaver's Display settings, and tune the greeting, name, and
+timing on the **Welcome** settings screen (`WelcomeSettingsActivity`).
+
+## Ambient almanac & calendar packs
+
+The photo frame's dashboard can carry an **ambient almanac** line — a quiet daily fact fed by
+installable, keyless, on-device **calendar packs** plus a quote of the day (`CalendarPacks`,
+rendered by `PhotoFrameController`). Switch packs on per household under **More features → Almanac**
+on the [Settings](launcher.md#settings) screen (all off by default):
+
+| Pack | Adds |
+| --- | --- |
+| **Romanian name-days & Orthodox feasts** | Today's Orthodox feast and the name-days for the day. |
+| **Irish holidays** | Bank holidays and saints' days (St Patrick's, St Brigid's…). |
+| **Prayer times** | The next daily Islamic prayer time for your location. |
+
+Each pack contributes a line only when it has something for the day, and everything is computed
+on-device — no keys, no accounts.
