@@ -11,27 +11,31 @@ import android.content.Context
 import java.util.Calendar
 
 /**
- * Installable calendar packs — the name-day idea, broadened. A household adds the pack
- * that fits it: Romanian name-days + Orthodox feasts (the original, toggled by the
- * existing header flags), Irish bank holidays + saints, or daily Islamic prayer times.
- * Each pack contributes one or more lines to the home header; they're all keyless and
- * computed on-device.
+ * Installable calendar packs — the name-day idea, broadened. A household switches on the pack
+ * that fits it: Romanian name-days + Orthodox feasts, Irish bank holidays + saints, or daily
+ * Islamic prayer times. Each enabled pack contributes one or more lines to the ambient screensaver
+ * dashboard (and any future header); they're all keyless and computed on-device.
  *
- * The Romanian/Orthodox pack keeps using [ImmortalSettings] flags (so existing installs
- * are untouched); the newer packs store their on/off here.
+ * All packs store their on/off in a single [PREFS]; [AVAILABLE] drives the settings toggles and
+ * [headerLines] the display, so adding a pack is one entry in each.
  */
 object CalendarPacks {
 
   private const val PREFS = "immortal_packs"
 
+  const val ROMANIAN = "romanian"
   const val IRISH = "irish"
   const val PRAYER = "prayer"
 
   data class Pack(val id: String, val title: String, val blurb: String)
 
-  /** Packs the user can switch on (beyond the built-in Romanian/Orthodox header flags). */
+  /** Packs the user can switch on, in display order. */
   val AVAILABLE =
       listOf(
+          Pack(
+              ROMANIAN,
+              "Romanian name-days & Orthodox feasts",
+              "Today's name-days and the Orthodox feast calendar"),
           Pack(IRISH, "Irish holidays", "Bank holidays + saints' days (St Patrick's, St Brigid's…)"),
           Pack(PRAYER, "Prayer times", "Daily Islamic prayer times for your location"),
       )
@@ -45,7 +49,13 @@ object CalendarPacks {
 
   /** Header lines contributed by the enabled add-on packs, in display order. */
   fun headerLines(context: Context, now: Calendar = Calendar.getInstance()): List<String> {
-    val out = ArrayList<String>(2)
+    val out = ArrayList<String>(4)
+    if (isEnabled(context, ROMANIAN)) {
+      val feast = FeastDays.forToday(now)
+      if (feast.isNotEmpty()) out.add("🕯️ $feast")
+      val names = NameDays.todayLabel(now)
+      if (names.isNotEmpty()) out.add("🎉 $names")
+    }
     if (isEnabled(context, IRISH)) {
       val h = IrishHolidays.forToday(now)
       if (h.isNotEmpty()) out.add("🍀 $h")
