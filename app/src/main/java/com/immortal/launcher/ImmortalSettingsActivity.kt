@@ -11,6 +11,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -216,6 +217,8 @@ private fun ImmortalSettingsScreen() {
           onOpen = { context.startActivity(Intent(context, BootAppsActivity::class.java)) })
 
       DeviceHealthNavRow(onOpen = { context.startActivity(Intent(context, DeviceHealthActivity::class.java)) })
+
+      MoreFeaturesSection()
 
       Text(
           "Changes apply as soon as you go back to the home screen.",
@@ -559,6 +562,44 @@ private fun QuickButtonsSection() {
       fontSize = 13.sp,
       modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
   )
+}
+
+/**
+ * Almanac calendar packs, system touch sounds, and the back-gesture accessibility service —
+ * feature-integration steps 5-6. The packs feed the home header and the ambient screensaver
+ * dashboard once on; touch sounds needs the WRITE_SETTINGS grant; the back gesture can only be
+ * enabled from Android's Accessibility settings, so that row deep-links there and shows status.
+ */
+@Composable
+private fun MoreFeaturesSection() {
+  val context = LocalContext.current
+  Spacer(Modifier.size(26.dp))
+  SectionLabel("Almanac")
+  Card {
+    CalendarPacks.AVAILABLE.forEach { pack ->
+      var on by remember { mutableStateOf(CalendarPacks.isEnabled(context, pack.id)) }
+      ToggleRow(pack.title, on) { checked ->
+        on = checked
+        CalendarPacks.setEnabled(context, pack.id, checked)
+      }
+    }
+  }
+  Spacer(Modifier.size(26.dp))
+  SectionLabel("Sound & input")
+  Card {
+    var sounds by remember { mutableStateOf(SystemSounds.touchSoundsEnabled(context)) }
+    ToggleRow("Touch sounds", sounds) { checked ->
+      if (SystemSounds.canWrite(context)) {
+        SystemSounds.setTouchSounds(context, checked)
+        sounds = SystemSounds.touchSoundsEnabled(context)
+      } else {
+        SystemSounds.requestWriteAccess(context)
+      }
+    }
+    NavRow("Back gesture", if (BackHelper.isBackServiceEnabled(context)) "On" else "Off") {
+      runCatching { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
+    }
+  }
 }
 
 /**

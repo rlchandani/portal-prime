@@ -118,6 +118,7 @@ class PhotoFrameController(
   private lateinit var dashDate: TextView
   private lateinit var dashWeather: TextView
   private lateinit var dashEvent: TextView
+  private lateinit var dashAlmanac: TextView
   private var dashboardVisible = false
   // Weather string for the dashboard. The Face overlay fetches its own weather; this
   // small keyless fetch feeds the ambient-dashboard card so it stays self-contained.
@@ -820,6 +821,12 @@ class PhotoFrameController(
       (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(10)
       col.addView(it)
     }
+    // Almanac line(s): enabled calendar packs (Irish holidays, prayer times) + a quote of the day.
+    dashAlmanac = text(20f, Color.WHITE, false).also {
+      it.gravity = Gravity.CENTER
+      (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(14)
+      col.addView(it)
+    }
     return panel
   }
 
@@ -843,6 +850,21 @@ class PhotoFrameController(
     dashWeather.text = weatherText
     dashWeather.visibility = if (weatherText.isNotBlank()) View.VISIBLE else View.GONE
     dashEvent.visibility = View.GONE
+    dashAlmanac.visibility = View.GONE
+    io.execute {
+      val lines = buildList {
+        runCatching { CalendarPacks.headerLines(context) }.getOrDefault(emptyList()).forEach { add(it) }
+        val q = DailyContent.quoteOfDay()
+        add("“${q.text}”  — ${q.author}")
+      }
+      val txt = lines.joinToString("\n")
+      ui.post {
+        if (dashboardVisible && txt.isNotBlank()) {
+          dashAlmanac.text = txt
+          dashAlmanac.visibility = View.VISIBLE
+        }
+      }
+    }
     io.execute {
       val ev = runCatching {
         if (CalendarHelper.hasPermission(context)) CalendarHelper.upcoming(context).firstOrNull() else null
