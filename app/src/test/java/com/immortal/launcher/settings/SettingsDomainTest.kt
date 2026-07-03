@@ -386,4 +386,72 @@ class SettingsDomainTest {
       assertNull("enum '$key' must skip an unrecognised value", spec.coerce("not-a-real-value"))
     }
   }
+
+  @Test
+  fun everyPersistedConfig_isRegisteredAsADomain_orExplicitlyExcepted() {
+    // The per-domain tripwires above only fire for Configs that ARE registered — nothing forced a
+    // NEW *Config to be wired into the registry at all, which is how CameraConfig/TimerConfig/
+    // CountdownConfig/NotesConfig shipped with no on-device UI and no phone-remote exposure. This is
+    // the global gate: every *Config in the launcher source is either backed by a SettingsDomain
+    // (so the declarative registry renders it on-device AND on the remote for free) or is listed
+    // below with a reason. Adding a *Config without doing one of those turns this test red.
+    val dir = findLauncherSourceDir()
+    val configs =
+        (dir.listFiles { f -> f.name.endsWith("Config.kt") } ?: arrayOf())
+            .map { it.name.removeSuffix(".kt") }
+            .toSet()
+
+    // Scalar user settings that flow through a registered SettingsDomain (on-device + remote).
+    val registeredAsDomain =
+        setOf(
+            "ScreensaverConfig",
+            "ChimeConfig",
+            "DigitalClockConfig",
+            "WelcomeConfig",
+            "SunriseConfig",
+            "QuickBarConfig",
+            // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
+            "MqttConfig",
+            "FleetConfig",
+        )
+
+    // Deliberately NOT scalar domains: collections of user-created entries, or user content, edited
+    // in their own Activity. The registry models scalars — a GroupSpec is the planned remote home
+    // (see docs/design/feature-integration.md). Each STILL must be reachable from a home tile /
+    // NavSpec; that reachability is enforced by the integration work, not by this unit test.
+    val exemptCollectionsOrContent =
+        mapOf(
+            "CameraConfig" to "collection: saved RTSP cameras (CameraViewerActivity)",
+            "TimerConfig" to "collection: kitchen timer instances (home chips)",
+            "CountdownConfig" to "collection: countdown events (CountdownSettingsActivity)",
+            "NotesConfig" to "user content: sticky / voice note (AudioNote)",
+        )
+
+    val classified = registeredAsDomain + exemptCollectionsOrContent.keys
+    val unclassified = configs - classified
+    assertTrue(
+        "Persisted *Config with no registry home and no documented exception: $unclassified. " +
+            "Either register a SettingsDomain (renders on-device + on the phone remote), or add it " +
+            "to exemptCollectionsOrContent with a reason and wire a tile/NavSpec to reach it.",
+        unclassified.isEmpty())
+    val stale = classified - configs
+    assertTrue(
+        "Config-registration tripwire lists names with no matching *Config.kt (renamed/removed?): $stale",
+        stale.isEmpty())
+  }
+
+  /** Locate `.../com/immortal/launcher` from whatever working dir the test runner uses. */
+  private fun findLauncherSourceDir(): java.io.File {
+    val rel = "src/main/java/com/immortal/launcher"
+    var base: java.io.File? = java.io.File("").absoluteFile
+    repeat(6) {
+      val b = base ?: return@repeat
+      for (cand in listOf(java.io.File(b, rel), java.io.File(b, "app/$rel"))) {
+        if (cand.isDirectory) return cand
+      }
+      base = b.parentFile
+    }
+    throw IllegalStateException(
+        "could not locate $rel from ${java.io.File("").absolutePath}")
+  }
 }
