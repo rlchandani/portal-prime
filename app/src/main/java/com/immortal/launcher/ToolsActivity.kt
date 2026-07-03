@@ -28,7 +28,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -46,23 +49,39 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.SampleAppTheme
 
 /**
- * The "Tools" screen, opened from the built-in Tools tile on the home grid. A plain launcher for the
- * in-process tool Activities that don't each warrant their own home tile. See
- * docs/design/feature-integration.md (step 3).
+ * The full-page "Tools" screen, opened from the built-in Tools tile on the home grid. A plain
+ * launcher for the in-process tool features. See docs/design/feature-integration.md (step 3).
  *
- * Only tools with a real, launchable Activity are listed. Timers, voice notes, and the unit
- * converter shipped as data/logic with no screen (their UI lived in the unmerged ForkHome), so they
- * are intentionally absent until their Activities are built.
+ * Tools that already have their own Activity (cameras, countdowns, lamp, bedtime, intercom) launch
+ * it directly. Tools whose UI formerly lived only in ForkHome open as an in-page overlay hosted here
+ * (see [HomeToolOverlays]); this change adds the sky/space pair (ISS passes, aurora outlook).
  */
 class ToolsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { ToolsScreen() } }
+    setContent { SampleAppTheme(darkTheme = true) { ToolsRoot(::finish) } }
+  }
+}
+
+/** Which in-page tool overlay is showing over the list (or [ToolPage.LIST] for the list itself). */
+private enum class ToolPage {
+  LIST,
+  ISS,
+  AURORA,
+}
+
+@Composable
+private fun ToolsRoot(onExit: () -> Unit) {
+  var page by remember { mutableStateOf(ToolPage.LIST) }
+  when (page) {
+    ToolPage.LIST -> ToolsScreen(onExit = onExit, onOpen = { page = it })
+    ToolPage.ISS -> IssOverlay { page = ToolPage.LIST }
+    ToolPage.AURORA -> AuroraOverlay { page = ToolPage.LIST }
   }
 }
 
 @Composable
-private fun ToolsScreen() {
+private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
   val context = LocalContext.current
   val activity = context as? Activity
   val firstFocus = remember { FocusRequester() }
@@ -73,7 +92,7 @@ private fun ToolsScreen() {
           Modifier.fillMaxSize()
               .onPreviewKeyEvent { e ->
                 if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) activity?.finish()
+                  if (e.type == KeyEventType.KeyUp) onExit()
                   true
                 } else false
               }
@@ -106,6 +125,8 @@ private fun ToolsScreen() {
         ToolRow("Intercom", "Talk to another Portal on your Wi-Fi") {
           context.startActivity(Intent(context, IntercomActivity::class.java))
         }
+        ToolRow("ISS passes", "When the space station flies over") { onOpen(ToolPage.ISS) }
+        ToolRow("Aurora outlook", "Northern-lights chance for your location") { onOpen(ToolPage.AURORA) }
       }
     }
   }
