@@ -68,6 +68,7 @@ private enum class ToolPage {
   LIST,
   ISS,
   AURORA,
+  SPEEDTEST,
 }
 
 @Composable
@@ -77,6 +78,7 @@ private fun ToolsRoot(onExit: () -> Unit) {
     ToolPage.LIST -> ToolsScreen(onExit = onExit, onOpen = { page = it })
     ToolPage.ISS -> IssOverlay { page = ToolPage.LIST }
     ToolPage.AURORA -> AuroraOverlay { page = ToolPage.LIST }
+    ToolPage.SPEEDTEST -> SpeedTestOverlay { page = ToolPage.LIST }
   }
 }
 
@@ -127,6 +129,7 @@ private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
         }
         ToolRow("ISS passes", "When the space station flies over") { onOpen(ToolPage.ISS) }
         ToolRow("Aurora outlook", "Northern-lights chance for your location") { onOpen(ToolPage.AURORA) }
+        ToolRow("Speed test", "Check your internet speed (Cloudflare)") { onOpen(ToolPage.SPEEDTEST) }
       }
     }
   }

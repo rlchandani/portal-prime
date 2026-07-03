@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -179,6 +182,96 @@ private fun AuroraStat(label: String, value: String, modifier: Modifier = Modifi
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth()) {
       Text(value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
       Text(label, color = Color(0xFF9A9A9A), fontSize = 12.sp, textAlign = TextAlign.Center)
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ Speed test */
+
+@Composable
+internal fun SpeedTestOverlay(onDismiss: () -> Unit) {
+  var phase by remember { mutableStateOf(SpeedTest.Phase.PING) }
+  val r = remember { SpeedTest.Result() }
+  var runId by remember { mutableStateOf(0) }
+
+  LaunchedEffect(runId) {
+    r.reset()
+    phase = SpeedTest.Phase.PING
+    SpeedTest.run(result = r, onPhase = { phase = it })
+    phase = SpeedTest.Phase.DONE
+  }
+
+  BackHandler { onDismiss() }
+  Scrim(onDismiss) {
+    Surface(shape = RoundedCornerShape(28.dp), color = Color(0xFF1C1C1E)) {
+      Column(modifier = Modifier.width(380.dp).padding(24.dp)) {
+        Text("Speed test", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(
+            if (r.server.isNotEmpty()) r.server
+            else if (phase == SpeedTest.Phase.DONE) "Cloudflare" else "Finding server…",
+            color = Color(0xFF9A9A9A),
+            fontSize = 13.sp,
+            modifier = Modifier.padding(top = 2.dp),
+        )
+        Spacer(Modifier.size(22.dp))
+        Row(Modifier.fillMaxWidth()) {
+          SpeedMetric("Ping", r.pingMs, "ms", 0, active = phase == SpeedTest.Phase.PING, accent = Color(0xFFFFCA28), modifier = Modifier.weight(1f))
+          SpeedMetric("Jitter", r.jitterMs, "ms", 1, active = phase == SpeedTest.Phase.PING, accent = Color(0xFFFFCA28), modifier = Modifier.weight(1f))
+        }
+        Spacer(Modifier.size(20.dp))
+        SpeedMetric("↓  Download", r.downMbps, "Mbps", 1, active = phase == SpeedTest.Phase.DOWNLOAD, accent = Color(0xFF42A5F5), big = true)
+        Spacer(Modifier.size(16.dp))
+        SpeedMetric("↑  Upload", r.upMbps, "Mbps", 1, active = phase == SpeedTest.Phase.UPLOAD, accent = Color(0xFF66BB6A), big = true)
+        Spacer(Modifier.size(26.dp))
+        val busy = phase != SpeedTest.Phase.DONE
+        val label =
+            when (phase) {
+              SpeedTest.Phase.PING -> "Pinging…"
+              SpeedTest.Phase.DOWNLOAD -> "Testing download…"
+              SpeedTest.Phase.UPLOAD -> "Testing upload…"
+              SpeedTest.Phase.DONE -> "Run again"
+            }
+        Surface(
+            color = if (busy) Color(0x22FFFFFF) else MaterialTheme.colorScheme.primary,
+            shape = RoundedCornerShape(14.dp),
+            modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { if (!busy) runId++ },
+        ) {
+          Text(label, color = Color.White, fontSize = 16.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 13.dp))
+        }
+        Spacer(Modifier.size(10.dp))
+        CloseButton("Close", onDismiss)
+      }
+    }
+  }
+}
+
+@Composable
+private fun SpeedMetric(
+    label: String,
+    value: Double,
+    unit: String,
+    decimals: Int,
+    active: Boolean,
+    accent: Color,
+    modifier: Modifier = Modifier,
+    big: Boolean = false,
+) {
+  val shown = if (value > 0.0) String.format("%.${decimals}f", value) else "—"
+  if (big) {
+    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+      Text(label, color = Color(0xFFDADADA), fontSize = 17.sp, modifier = Modifier.weight(1f))
+      Text(shown, color = if (active) accent else Color.White, fontSize = 30.sp, fontWeight = FontWeight.Medium, lineHeight = 30.sp)
+      Spacer(Modifier.size(6.dp))
+      Text(unit, color = Color(0xFF9A9A9A), fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
+    }
+  } else {
+    Column(modifier) {
+      Text(label.uppercase(), color = Color(0xFF8A8A8A), fontSize = 12.sp, letterSpacing = 0.5.sp)
+      Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 4.dp)) {
+        Text(shown, color = if (active) accent else Color.White, fontSize = 24.sp, fontWeight = FontWeight.Medium, lineHeight = 24.sp)
+        Spacer(Modifier.size(4.dp))
+        Text(unit, color = Color(0xFF9A9A9A), fontSize = 12.sp, modifier = Modifier.padding(bottom = 3.dp))
+      }
     }
   }
 }
