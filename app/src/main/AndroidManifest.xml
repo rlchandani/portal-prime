@@ -237,6 +237,13 @@
             android:excludeFromRecents="true"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- "Tools": launcher screen for the in-process tool Activities, opened from the home tile. -->
+        <activity
+            android:name=".ToolsActivity"
+            android:exported="false"
+            android:label="Tools"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- "Cameras": RTSP/network camera viewer (VideoView, native RTSP). -->
         <activity
             android:name=".CameraViewerActivity"

@@ -602,6 +602,7 @@ private fun LauncherScreen(
         buildList {
           add(BUILTIN_CALLS)
           add(BUILTIN_STORE)
+          add(BUILTIN_TOOLS)
           widgets.forEach { add(WIDGET_KEY + it.key) }
           folderNames.forEach { add(FOLDER_KEY + it) }
           ungrouped.forEach { add(APP_KEY + it.component.packageName) }
@@ -957,6 +958,12 @@ private fun LauncherScreen(
                     HomeTileFrame(boundsMod, isDragged) { PortalHomeTile(onExitHome) }
                 key == BUILTIN_STORE ->
                     HomeTileFrame(boundsMod, isDragged) { StoreTile(onOpenStore) }
+                key == BUILTIN_TOOLS ->
+                    HomeTileFrame(boundsMod, isDragged) {
+                      ToolsTile {
+                        context.startActivity(Intent(context, ToolsActivity::class.java))
+                      }
+                    }
                 key == BUILTIN_UPDATES ->
                     HomeTileFrame(boundsMod, isDragged) {
                       UpdatesTile(update = update, status = updateStatus) {
@@ -1251,6 +1258,7 @@ private const val FOLDER_KEY = "folder:"
 private const val WIDGET_KEY = "widget-tile:"
 private const val BUILTIN_CALLS = "builtin:calls"
 private const val BUILTIN_STORE = "builtin:store"
+private const val BUILTIN_TOOLS = "builtin:tools"
 private const val BUILTIN_UPDATES = "builtin:updates"
 
 private const val UPDATE_CHECK_INTERVAL_MS = 6L * 60 * 60 * 1000 // 6 hours
@@ -2363,6 +2371,16 @@ private fun StoreTile(onClick: () -> Unit) {
       label = "App Store",
       background = Color(0xFF2D6CDF),
       glyph = ICON_DOWNLOAD,
+      onClick = onClick,
+  )
+}
+
+@Composable
+private fun ToolsTile(onClick: () -> Unit) {
+  BuiltInTile(
+      label = "Tools",
+      background = Color(0xFF5A5F6A),
+      glyph = ICON_WIDGETS,
       onClick = onClick,
   )
 }
