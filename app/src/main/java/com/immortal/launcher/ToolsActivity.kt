@@ -69,6 +69,9 @@ private enum class ToolPage {
   ISS,
   AURORA,
   SPEEDTEST,
+  TIMERS,
+  NOTES,
+  CONVERTER,
 }
 
 @Composable
@@ -79,6 +82,9 @@ private fun ToolsRoot(onExit: () -> Unit) {
     ToolPage.ISS -> IssOverlay { page = ToolPage.LIST }
     ToolPage.AURORA -> AuroraOverlay { page = ToolPage.LIST }
     ToolPage.SPEEDTEST -> SpeedTestOverlay { page = ToolPage.LIST }
+    ToolPage.TIMERS -> TimersOverlay { page = ToolPage.LIST }
+    ToolPage.NOTES -> NotesOverlay { page = ToolPage.LIST }
+    ToolPage.CONVERTER -> ConverterOverlay { page = ToolPage.LIST }
   }
 }
 
@@ -127,6 +133,9 @@ private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
         ToolRow("Intercom", "Talk to another Portal on your Wi-Fi") {
           context.startActivity(Intent(context, IntercomActivity::class.java))
         }
+        ToolRow("Timers", "Kitchen timers with a live countdown") { onOpen(ToolPage.TIMERS) }
+        ToolRow("Leave a note", "A sticky note or a quick voice memo") { onOpen(ToolPage.NOTES) }
+        ToolRow("Converter", "Units and currency") { onOpen(ToolPage.CONVERTER) }
         ToolRow("ISS passes", "When the space station flies over") { onOpen(ToolPage.ISS) }
         ToolRow("Aurora outlook", "Northern-lights chance for your location") { onOpen(ToolPage.AURORA) }
         ToolRow("Speed test", "Check your internet speed (Cloudflare)") { onOpen(ToolPage.SPEEDTEST) }

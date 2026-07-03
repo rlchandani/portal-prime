@@ -7,8 +7,19 @@
 
 package com.immortal.launcher
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.core.content.ContextCompat
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -274,6 +285,234 @@ private fun SpeedMetric(
       }
     }
   }
+}
+
+/* ------------------------------------------------------------------ Converter */
+
+@Composable
+internal fun ConverterOverlay(onDismiss: () -> Unit) {
+  val context = LocalContext.current
+  val categories = remember { Converter.UNIT_CATEGORIES.map { it.first } + "Currency" }
+  var category by remember { mutableStateOf(categories.first()) }
+  val units =
+      remember(category) {
+        if (category == "Currency") Converter.CURRENCIES
+        else Converter.UNIT_CATEGORIES.first { it.first == category }.second.keys.toList()
+      }
+  var from by remember(category) { mutableStateOf(units.first()) }
+  var to by remember(category) { mutableStateOf(units.getOrElse(1) { units.first() }) }
+  var input by remember { mutableStateOf("1") }
+  var result by remember { mutableStateOf("") }
+
+  LaunchedEffect(category, from, to, input) {
+    val v = input.toDoubleOrNull()
+    result =
+        when {
+          v == null -> ""
+          category == "Currency" ->
+              withContext(Dispatchers.IO) { Converter.convertCurrency(context, from, to, v) }
+                  ?.let { trimNum(it) } ?: "no rate (offline?)"
+          else -> trimNum(Converter.convert(category, from, to, v))
+        }
+  }
+
+  BackHandler { onDismiss() }
+  Scrim(onDismiss) {
+    ToolCard {
+      Text("🔢 Converter", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+      ChipRow(categories, category) { category = it }
+      TextField(
+          value = input,
+          onValueChange = { v -> input = v.filter { it.isDigit() || it == '.' || it == '-' } },
+          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth(),
+      )
+      Text("From", color = Color(0xFF8A8A8A), fontSize = 12.sp)
+      ChipRow(units, from) { from = it }
+      Text("To", color = Color(0xFF8A8A8A), fontSize = 12.sp)
+      ChipRow(units, to) { to = it }
+      Text(
+          if (result.isBlank()) "—" else "$result $to",
+          color = Color(0xFF69F0AE),
+          fontSize = 26.sp,
+          fontWeight = FontWeight.Bold,
+      )
+      CloseButton("Close", onDismiss)
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ Timers */
+
+@Composable
+internal fun TimersOverlay(onDismiss: () -> Unit) {
+  val context = LocalContext.current
+  var timers by remember { mutableStateOf(TimerConfig.load(context)) }
+  var now by remember { mutableStateOf(System.currentTimeMillis()) }
+  LaunchedEffect(Unit) {
+    while (true) {
+      now = System.currentTimeMillis()
+      delay(1000)
+    }
+  }
+  fun reload() {
+    timers = TimerConfig.load(context)
+  }
+
+  BackHandler { onDismiss() }
+  Scrim(onDismiss) {
+    ToolCard {
+      Text("⏲️ Timers", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+      Text("Start a timer", color = Color(0xFF8A8A8A), fontSize = 12.sp)
+      val presets = listOf(1, 3, 5, 10, 15, 30)
+      Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        presets.take(3).forEach { m ->
+          PillButton("${m}m", { TimerConfig.add(context, "$m min", m * 60_000L); reload() }, Modifier.weight(1f))
+        }
+      }
+      Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        presets.drop(3).forEach { m ->
+          PillButton("${m}m", { TimerConfig.add(context, "$m min", m * 60_000L); reload() }, Modifier.weight(1f))
+        }
+      }
+      val active = timers.filter { it.endAtMillis > now }.sortedBy { it.endAtMillis }
+      if (active.isEmpty()) Text("No timers running.", color = Color(0xFFB0B0B0), fontSize = 15.sp)
+      active.forEach { t ->
+        Surface(color = Color(0x18FFFFFF), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+          ) {
+            Text(t.label, color = Color.White, fontSize = 16.sp, modifier = Modifier.weight(1f))
+            Text(fmtClock(t.endAtMillis - now), color = Color(0xFFFFCA28), fontSize = 20.sp, fontWeight = FontWeight.Medium)
+            Spacer(Modifier.size(12.dp))
+            Surface(
+                color = Color(0x33FF5252),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp), focusScale = 1f) { TimerConfig.remove(context, t.id); reload() },
+            ) {
+              Text("Cancel", color = Color(0xFFFF8A80), fontSize = 13.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+            }
+          }
+        }
+      }
+      CloseButton("Close", onDismiss)
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ Leave a note */
+
+@Composable
+internal fun NotesOverlay(onDismiss: () -> Unit) {
+  val context = LocalContext.current
+  var text by remember { mutableStateOf(NotesConfig.loadText(context)) }
+  var saved by remember { mutableStateOf(false) }
+  val audio = remember { AudioNote(context) }
+  var recording by remember { mutableStateOf(false) }
+  var hasAudio by remember { mutableStateOf(NotesConfig.hasAudioNote(context)) }
+  DisposableEffect(Unit) { onDispose { audio.release() } }
+
+  fun beginRecord() {
+    if (audio.startRecording()) recording = true
+  }
+  val micPerm =
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) beginRecord()
+      }
+  fun record() {
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+        PackageManager.PERMISSION_GRANTED)
+        beginRecord()
+    else micPerm.launch(Manifest.permission.RECORD_AUDIO)
+  }
+
+  BackHandler { onDismiss() }
+  Scrim(onDismiss) {
+    ToolCard {
+      Text("📝 Leave a note", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+      TextField(
+          value = text,
+          onValueChange = { text = it; saved = false },
+          modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
+      )
+      PillButton(
+          if (saved) "Saved ✓" else "Save note",
+          { NotesConfig.saveText(context, text); saved = true },
+          Modifier.fillMaxWidth(),
+      )
+      Text("Voice memo", color = Color(0xFF8A8A8A), fontSize = 12.sp)
+      if (recording) {
+        PillButton(
+            "■ Stop recording",
+            { audio.stopRecording(); recording = false; hasAudio = NotesConfig.hasAudioNote(context) },
+            Modifier.fillMaxWidth(),
+        )
+      } else {
+        PillButton(if (hasAudio) "Re-record" else "● Record", { record() }, Modifier.fillMaxWidth())
+      }
+      if (hasAudio && !recording) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+          PillButton("▶ Play", { audio.play() }, Modifier.weight(1f))
+          PillButton("Delete", { NotesConfig.clearAudio(context); hasAudio = false }, Modifier.weight(1f))
+        }
+      }
+      CloseButton("Close", onDismiss)
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ small shared bits */
+
+/** A horizontally-scrolling row of selectable chips (category / unit pickers). */
+@Composable
+private fun ChipRow(options: List<String>, selected: String, onSelect: (String) -> Unit) {
+  Row(
+      modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+  ) {
+    options.forEach { opt ->
+      val on = opt == selected
+      Surface(
+          color = if (on) MaterialTheme.colorScheme.primary else Color(0x22FFFFFF),
+          shape = RoundedCornerShape(10.dp),
+          modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp), focusScale = 1f) { onSelect(opt) },
+      ) {
+        Text(opt, color = Color.White, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
+      }
+    }
+  }
+}
+
+/** A full-width-ish pill action button used by the timer / notes overlays. */
+@Composable
+private fun PillButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+  Surface(
+      color = Color(0x22FFFFFF),
+      shape = RoundedCornerShape(12.dp),
+      modifier = modifier.tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f) { onClick() },
+  ) {
+    Text(
+        label,
+        color = Color.White,
+        fontSize = 15.sp,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp).fillMaxWidth(),
+    )
+  }
+}
+
+/** Trim a converted number to at most 4 decimals, dropping trailing zeros. */
+private fun trimNum(v: Double): String = String.format("%.4f", v).trimEnd('0').trimEnd('.')
+
+/** Remaining-time as `m:ss` (or `h:mm:ss`). */
+private fun fmtClock(ms: Long): String {
+  val s = ms.coerceAtLeast(0L) / 1000
+  val h = s / 3600
+  val m = (s % 3600) / 60
+  val sec = s % 60
+  return if (h > 0) String.format("%d:%02d:%02d", h, m, sec) else String.format("%d:%02d", m, sec)
 }
 
 /* ------------------------------------------------------------------ shared scaffolding */
