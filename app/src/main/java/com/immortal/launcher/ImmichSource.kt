@@ -18,11 +18,13 @@ import org.json.JSONObject
  * library); the screensaver then downloads each through the shared remote path, sending the
  * same `x-api-key` header (see [authHeaders]).
  *
- * Verified against Immich **v2.5.2**:
+ * Verified against Immich **v2.5.2** and **v3.0.1**:
  *  - auth: header `x-api-key: <key>` (no key → 401)
- *  - albums:        `GET  /api/albums`            → `[{id, albumName, assetCount}]`
- *  - album assets:  `GET  /api/albums/{id}`       → `{assets: [{id, type}]}`
- *  - whole library: `POST /api/search/metadata`   → `{assets: {items: [{id, type}], nextPage}}`
+ *  - albums (picker): `GET  /api/albums`          → `[{id, albumName, assetCount}]`
+ *  - assets:        `POST /api/search/metadata`   → `{assets: {items: [{id, type}], nextPage}}`,
+ *    filtered by `albumIds` for a single album or unfiltered for the whole library. (Immich 3.0
+ *    dropped the `assets` array that `GET /api/albums/{id}` used to embed, so both paths now go
+ *    through search — see #135.)
  *  - image bytes:   `GET  /api/assets/{id}/thumbnail?size=preview` → JPEG sized to the screen
  *
  * Everything is best-effort: any failure returns null and the caller falls back to the default
@@ -74,24 +76,28 @@ object ImmichSource {
       runCatching {
             val b = normalizeBase(base)
             val headers = authHeaders(apiKey)
-            val ids =
-                if (albumId.isNullOrBlank()) libraryImageIds(b, headers, cap)
-                else albumImageIds(b, headers, albumId, cap)
+            val ids = searchImageIds(b, headers, cap, albumId?.takeIf { it.isNotBlank() })
             ids.map { previewUrl(b, it) }
           }
           .getOrNull()
 
-  private fun albumImageIds(base: String, headers: Map<String, String>, albumId: String, cap: Int): List<String> {
-    val body = httpGet("$base/api/albums/$albumId", headers) ?: return emptyList()
-    val assets = JSONObject(body).optJSONArray("assets") ?: return emptyList()
-    return imageIdsFrom(assets, cap)
-  }
-
-  private fun libraryImageIds(base: String, headers: Map<String, String>, cap: Int): List<String> {
+  /**
+   * Image asset ids via the paged `POST /api/search/metadata` endpoint. When [albumId] is given
+   * the search is filtered to that album (`albumIds`), otherwise it covers the whole library. This
+   * one path replaces the old album `GET /api/albums/{id}` embed, which stopped returning an
+   * `assets` array in Immich 3.0 (#135).
+   */
+  private fun searchImageIds(
+      base: String,
+      headers: Map<String, String>,
+      cap: Int,
+      albumId: String?,
+  ): List<String> {
     val out = ArrayList<String>()
     var page = 1
     while (out.size < cap) {
       val req = JSONObject().put("type", "IMAGE").put("size", 1000).put("page", page)
+      if (albumId != null) req.put("albumIds", JSONArray().put(albumId))
       val body = httpPostJson("$base/api/search/metadata", headers, req.toString()) ?: break
       val assets = JSONObject(body).optJSONObject("assets") ?: break
       val items = assets.optJSONArray("items") ?: break
