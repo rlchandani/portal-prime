@@ -57,11 +57,18 @@ object SleepScheduler {
   // any idle device instead of snapping back to the rest state.
   private const val OVERNIGHT_SESSION_DEFAULT_MS = 5L * 60_000
 
+  // How recently a real user wake (USER_PRESENT / a touch) must have happened for a redream landing
+  // inside the dark window to be read as "the user woke the device" rather than a stray dream cycle
+  // (issue #138). Covers the brief race where the dream-stop broadcast beats USER_PRESENT.
+  private const val USER_WAKE_GRACE_MS = 4000L
+
   // The renewable overnight "you have the device" session, owned here (was HomeActivity's Handler).
   // Lazy so loading this object (e.g. for the pure inWindow tests) doesn't touch the main Looper.
   private val main by lazy { Handler(Looper.getMainLooper()) }
   @Volatile private var nightSessionActive = false
   @Volatile private var nightSessionCtx: Context? = null
+  // When the user last unambiguously woke/touched the device (USER_PRESENT or a launcher touch).
+  @Volatile private var lastUserWakeAt = 0L
   private val nightSessionElapsed = Runnable {
     nightSessionActive = false
     nightSessionCtx?.let { if (isOvernightNow(it)) enterOvernightRest(it) }
@@ -127,11 +134,22 @@ object SleepScheduler {
     }
   }
 
-  /** A touch on the launcher: renew the overnight session so interaction keeps the screen up. */
+  /**
+   * A real user wake or touch (USER_PRESENT, or a launcher touch). Renews the overnight session so
+   * interaction keeps the screen up — and, crucially, *starts* one if we're inside the dark
+   * overnight window with none active yet. Without that start, a deliberate 3am tap wakes the
+   * screen and a racing redream immediately reblanks it (issue #138), because nothing had handed
+   * the user the device. The timestamp also lets [handleRedreamDuringOvernight] recognise a wake
+   * whose USER_PRESENT lands just after the dream-stop.
+   */
   fun onInteraction(context: Context) {
-    if (!nightSessionActive) return
-    main.removeCallbacks(nightSessionElapsed)
-    main.postDelayed(nightSessionElapsed, overnightSessionMs(context))
+    lastUserWakeAt = System.currentTimeMillis()
+    if (nightSessionActive) {
+      main.removeCallbacks(nightSessionElapsed)
+      main.postDelayed(nightSessionElapsed, overnightSessionMs(context))
+    } else if (isOvernightNow(context)) {
+      startNightSession(context)
+    }
   }
 
   /** The launcher is no longer foreground: drop any pending overnight re-sleep. */
@@ -196,28 +214,37 @@ object SleepScheduler {
   internal enum class OvernightRedream {
     /** Not in the window (or night-clock mode): let the normal frame relaunch proceed. */
     RELAUNCH,
-    /** The user deliberately woke the device (a session is live): leave the screen alone. */
+    /** The user deliberately woke the device (a session is live, or one just started): leave it. */
     LEAVE,
-    /** Dark window, no live session: re-blank directly, without launching an Activity. */
+    /** Dark window, no user around: re-blank directly, without launching an Activity. */
     REBLANK,
   }
 
   /**
-   * Pure (unit-tested) decision for [handleRedreamDuringOvernight]. A stray dream stop inside the
-   * dark window must not relaunch [PhotoFramePreviewActivity]: launching an Activity wakes the
-   * screen, and the activity then immediately blanks it again — a brief flash every time a
-   * sibling/system dream cycles overnight (issue #73). Night-clock mode still relaunches, because
-   * there the frame *is* the dimmed clock the window is meant to show.
+   * Pure (unit-tested) decision for [handleRedreamDuringOvernight]. Two things must both hold:
+   *
+   *  - A *stray* dream stop inside the dark window must not relaunch [PhotoFramePreviewActivity]:
+   *    launching an Activity wakes the screen, and the activity then immediately blanks it again —
+   *    a brief flash every time a sibling/system dream cycles overnight (issue #73). So with no
+   *    user around we [REBLANK] in place. Night-clock mode still relaunches, because there the
+   *    frame *is* the dimmed clock the window is meant to show.
+   *  - A *deliberate* dark-window wake must NOT be reblanked (issue #138). Every redream that
+   *    reaches here is already `interactive` (that is what makes the verdict REDREAM), so
+   *    interactivity alone can't tell a real wake from a stray cycle. [userWokeRecently] — a real
+   *    USER_PRESENT/touch within [USER_WAKE_GRACE_MS] — is the signal that distinguishes them, and
+   *    it means [LEAVE] (the caller then starts the renewable session).
    */
   internal fun classifyOvernightRedream(
       inWindow: Boolean,
       nightSessionActive: Boolean,
       nightClock: Boolean,
+      userWokeRecently: Boolean = false,
   ): OvernightRedream =
       when {
         !inWindow -> OvernightRedream.RELAUNCH
         nightSessionActive -> OvernightRedream.LEAVE
         nightClock -> OvernightRedream.RELAUNCH
+        userWokeRecently -> OvernightRedream.LEAVE
         else -> OvernightRedream.REBLANK
       }
 
@@ -244,15 +271,24 @@ object SleepScheduler {
    * relaunch (outside the window, or night-clock mode where the relaunch renders the clock).
    */
   fun handleRedreamDuringOvernight(context: Context): Boolean {
+    val userWokeRecently =
+        lastUserWakeAt > 0L && System.currentTimeMillis() - lastUserWakeAt in 0..USER_WAKE_GRACE_MS
     val decision =
         classifyOvernightRedream(
             inWindow = isOvernightNow(context),
             nightSessionActive = nightSessionActive,
             nightClock = ScreensaverConfig.load(context).overnightNightClock,
+            userWokeRecently = userWokeRecently,
         )
     return when (decision) {
       OvernightRedream.RELAUNCH -> false
-      OvernightRedream.LEAVE -> true
+      OvernightRedream.LEAVE -> {
+        // A deliberate dark-window wake whose USER_PRESENT raced behind this dream-stop: start the
+        // renewable session now so the screen returns to rest after idle instead of staying lit.
+        // A no-op when a session is already active (the other LEAVE case).
+        if (!nightSessionActive) startNightSession(context)
+        true
+      }
       OvernightRedream.REBLANK -> {
         // Keep the system Dream suppressed for the window, then blank without an Activity launch
         // (no flash). Mirrors enterOvernightRest's dark path minus the screen-on round-trip.

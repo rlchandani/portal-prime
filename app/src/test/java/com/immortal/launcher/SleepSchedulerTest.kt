@@ -57,6 +57,46 @@ class SleepSchedulerTest {
             inWindow = true, nightSessionActive = false, nightClock = true))
   }
 
+  @Test
+  fun redream_darkWindow_afterUserWake_leavesScreenAlone() {
+    // Issue #138: a deliberate dark-window wake whose USER_PRESENT raced behind this dream-stop.
+    // Every redream reaching here is already interactive, so the recent-user-wake signal is what
+    // distinguishes a real wake from a stray cycle — hand the user the device, don't reblank.
+    assertEquals(
+        SleepScheduler.OvernightRedream.LEAVE,
+        SleepScheduler.classifyOvernightRedream(
+            inWindow = true,
+            nightSessionActive = false,
+            nightClock = false,
+            userWokeRecently = true))
+  }
+
+  @Test
+  fun redream_darkWindow_strayCycle_stillReblanks() {
+    // Issue #73 stays fixed: with no recent user wake, an interactive stray dream cycle reblanks
+    // in place rather than flashing an Activity.
+    assertEquals(
+        SleepScheduler.OvernightRedream.REBLANK,
+        SleepScheduler.classifyOvernightRedream(
+            inWindow = true,
+            nightSessionActive = false,
+            nightClock = false,
+            userWokeRecently = false))
+  }
+
+  @Test
+  fun redream_nightClockWindow_afterUserWake_stillRelaunchesTheClock() {
+    // Night-clock precedence is unchanged: the clock Activity holds the screen either way, so a
+    // recent wake doesn't need the dark-window LEAVE path here.
+    assertEquals(
+        SleepScheduler.OvernightRedream.RELAUNCH,
+        SleepScheduler.classifyOvernightRedream(
+            inWindow = true,
+            nightSessionActive = false,
+            nightClock = true,
+            userWokeRecently = true))
+  }
+
   // ----- immediate overnight application (issue #73 intentional wake) -----
 
   @Test
