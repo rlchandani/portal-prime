@@ -384,7 +384,7 @@ disable_installer_overlay() {
   # Newer Portals (API >= 29) have a working installer dialog and don't ship this
   # overlay — skip them so we don't touch theming that isn't broken.
   [ "${sdk:-99}" -lt 29 ] 2>/dev/null || return
-  step "Fixing the on-device installer dialog (disabling Meta's white-on-white overlay)"
+  step "Fixing Meta's white-on-white overlays (installer dialog + system settings)"
   local did=0
   for ov in $INSTALLER_OVERLAY_PKGS; do
     # Only act on overlays actually present on this device.

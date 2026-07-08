@@ -304,7 +304,7 @@ function Disable-InstallerOverlay {
   if ($cfg["DISABLE_INSTALLER_OVERLAY"] -eq "false") { return }
   $sdk = [int]("$(A shell getprop ro.build.version.sdk)".Trim())
   if ($sdk -ge 29) { return }  # newer Portals have a working dialog; no overlay to fix
-  Step "Fixing the on-device installer dialog (disabling Meta's white-on-white overlay)"
+  Step "Fixing Meta's white-on-white overlays (installer dialog + system settings)"
   $did = $false
   foreach ($ov in ($cfg["INSTALLER_OVERLAY_PKGS"] -split "\s+")) {
     if (-not $ov) { continue }
