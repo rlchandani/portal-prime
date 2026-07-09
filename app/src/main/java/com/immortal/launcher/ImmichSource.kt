@@ -7,6 +7,7 @@
 
 package com.immortal.launcher
 
+import android.util.Log
 import java.net.HttpURLConnection
 import java.net.URL
 import org.json.JSONArray
@@ -30,9 +31,11 @@ import org.json.JSONObject
  *  - video stream:  `GET  /api/assets/{id}/video/playback` → the (server-transcoded) clip
  *
  * Everything is best-effort: any failure returns null and the caller falls back to the default
- * feed, so the frame is never blank.
+ * feed, so the frame is never blank — but every failure is logged under [TAG], because a silent
+ * fallback is undiagnosable from a user report (issue #142).
  */
 object ImmichSource {
+  private const val TAG = "ImmortalImmich"
 
   /** A library album, for the connection picker. */
   data class Album(val id: String, val name: String, val count: Int)
@@ -75,6 +78,7 @@ object ImmichSource {
               Album(o.getString("id"), o.optString("albumName", "Album"), o.optInt("assetCount", 0))
             }
           }
+          .onFailure { Log.w(TAG, "album list failed", it) }
           .getOrNull()
 
   /**
@@ -93,10 +97,14 @@ object ImmichSource {
             val b = normalizeBase(base)
             val headers = authHeaders(apiKey)
             val assets = searchAssets(b, headers, cap, albumId?.takeIf { it.isNotBlank() }, includeVideo)
+            if (assets.isEmpty()) {
+              Log.w(TAG, "search returned no assets (album=${albumId ?: "library"})")
+            }
             assets.map { (id, isVideo) ->
               Media(if (isVideo) playbackUrl(b, id) else previewUrl(b, id), isVideo)
             }
           }
+          .onFailure { Log.w(TAG, "media list failed (album=${albumId ?: "library"})", it) }
           .getOrNull()
 
   /**
@@ -157,7 +165,7 @@ object ImmichSource {
     c.readTimeout = 10000
     headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
     return if (c.responseCode in 200..299) c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-    else null
+    else null.also { logHttpFailure("GET", spec, c) }
   }
 
   private fun httpPostJson(spec: String, headers: Map<String, String>, json: String): String? {
@@ -170,6 +178,14 @@ object ImmichSource {
     headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
     c.outputStream.use { it.write(json.toByteArray(Charsets.UTF_8)) }
     return if (c.responseCode in 200..299) c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-    else null
+    else null.also { logHttpFailure("POST", spec, c) }
+  }
+
+  /** A rejected request is the one clue a user report can carry — keep the server's own words. */
+  private fun logHttpFailure(method: String, spec: String, c: HttpURLConnection) {
+    val detail =
+        runCatching { c.errorStream?.use { it.readBytes().toString(Charsets.UTF_8).take(300) } }
+            .getOrNull()
+    Log.w(TAG, "$method $spec -> HTTP ${c.responseCode}${detail?.let { ": $it" } ?: ""}")
   }
 }

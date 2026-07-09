@@ -350,7 +350,9 @@ class PhotoFrameController(
               remoteFailStreak = 0
               advanceRemote(+1)
             } else {
-              // Server unreachable / album empty → never leave the frame blank.
+              // Server unreachable / album empty → never leave the frame blank. Say so: the
+              // swap to the built-in feed is otherwise invisible in a user report (issue #142).
+              Log.w(TAG, "Immich gave no media (album=${source.albumId ?: "library"}); falling back to built-in feed")
               startWeb()
             }
           }
