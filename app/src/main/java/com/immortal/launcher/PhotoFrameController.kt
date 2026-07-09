@@ -160,9 +160,13 @@ class PhotoFrameController(
   // overlapping re-fetches.
   private var remoteReresolveStreak = 0
   private var remoteReresolving = false
-  // Auth headers sent with each remote image download — empty for public shares, the
-  // x-api-key for Immich. Applied in [advanceRemote]/[downloadBitmap].
+  // Auth headers sent with each remote fetch (image download or video stream) — empty for
+  // public shares, the x-api-key for Immich. Applied in [advanceRemote]/[downloadBitmap]/
+  // [showRemoteVideo].
   private var remoteHeaders: Map<String, String> = emptyMap()
+  // The subset of [remoteUrls] that are videos (Immich with "Play videos" on); these stream
+  // through the VideoView instead of the bitmap download. See [showRemoteVideo].
+  private var remoteVideos: Set<String> = emptySet()
   // Optional custom fetcher for the remote path: when set (SMB), each "url" is fetched through
   // this instead of an HTTP download, so SMB reuses all the remote advance/tick/fallback logic.
   private var remoteFetch: ((String) -> Bitmap?)? = null
@@ -332,10 +336,14 @@ class PhotoFrameController(
       }
       is PhotoFrameSource.Immich -> {
         io.execute {
-          val urls = ImmichSource.listImageUrls(source.url, source.key, source.albumId).orEmpty()
+          val media =
+              ImmichSource.listMedia(source.url, source.key, source.albumId, source.includeVideo)
+                  .orEmpty()
           ui.post {
-            if (urls.isNotEmpty()) {
-              remoteUrls = if (source.shuffle) urls.shuffled() else urls
+            if (media.isNotEmpty()) {
+              val ordered = if (source.shuffle) media.shuffled() else media
+              remoteUrls = ordered.map { it.url }
+              remoteVideos = media.filter { it.isVideo }.mapTo(HashSet()) { it.url }
               remoteHeaders = ImmichSource.authHeaders(source.key)
               remoteMode = true
               remoteIndex = -1
@@ -1195,6 +1203,10 @@ class PhotoFrameController(
     remoteIndex = ((remoteIndex + dir) % remoteUrls.size + remoteUrls.size) % remoteUrls.size
     val url = remoteUrls[remoteIndex]
     val g = gen
+    if (url in remoteVideos) {
+      showRemoteVideo(url, g)
+      return
+    }
     stopVideo()
     io.execute {
       val fetch = remoteFetch
@@ -1218,6 +1230,49 @@ class PhotoFrameController(
         ui.postDelayed(remoteTick, intervalMs())
       }
     }
+  }
+
+  /**
+   * Stream a remote video (an Immich playback URL) through the shared [videoView]. Mirrors the
+   * local [showVideo] — muted, advance on completion, skip on error — but the URI variant carries
+   * [remoteHeaders] so the server's auth (`x-api-key`) rides along with the stream.
+   */
+  private fun showRemoteVideo(url: String, g: Int) {
+    cancelKenBurns()
+    faceRenderer.setCaption(null, null)
+    photo.setImageDrawable(null)
+    photo.visibility = View.GONE
+    videoView.visibility = View.VISIBLE
+    runCatching {
+          videoView.setOnPreparedListener { mp ->
+            mp.isLooping = false
+            runCatching { mp.setVolume(0f, 0f) } // a screensaver shouldn't blare audio
+            if (g == gen) {
+              remoteFailStreak = 0
+              remoteReresolveStreak = 0
+              videoView.start()
+            }
+          }
+          videoView.setOnCompletionListener {
+            if (g == gen) advanceRemote(+1)
+          }
+          videoView.setOnErrorListener { _, _, _ ->
+            if (g == gen) {
+              remoteFailStreak++
+              advanceRemote(+1)
+            }
+            true
+          }
+          videoView.setVideoURI(android.net.Uri.parse(url), remoteHeaders)
+          // Safety net: advance even if a clip is very long or never reports done.
+          ui.postDelayed(remoteTick, maxOf(intervalMs(), 5 * 60_000L))
+        }
+        .onFailure {
+          if (g == gen) {
+            remoteFailStreak++
+            advanceRemote(+1)
+          }
+        }
   }
 
   /**
@@ -1265,6 +1320,7 @@ class PhotoFrameController(
     localMode = false
     remoteMode = false
     remoteHeaders = emptyMap()
+    remoteVideos = emptySet()
     remoteFetch = null
     smbSource?.let { s -> io.execute { runCatching { s.close() } } }
     smbSource = null

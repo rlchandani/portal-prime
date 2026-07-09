@@ -44,13 +44,15 @@ class PhotoFrameSourceTest {
                 shuffle = true,
             )))
     assertEquals(
-        PhotoFrameSource.Immich("http://immich", "key", albumId = "album", shuffle = false),
+        PhotoFrameSource.Immich(
+            "http://immich", "key", albumId = "album", includeVideo = false, shuffle = false),
         PhotoFrameSource.from(
             ScreensaverConfig.Settings(
                 source = ScreensaverConfig.SOURCE_IMMICH,
                 immichUrl = "http://immich",
                 immichKey = "key",
                 immichAlbumId = "album",
+                includeVideo = false,
             )))
   }
 
