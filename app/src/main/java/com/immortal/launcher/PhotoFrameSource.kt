@@ -26,6 +26,7 @@ sealed class PhotoFrameSource {
       val url: String,
       val key: String,
       val albumId: String?,
+      val includeVideo: Boolean,
       val shuffle: Boolean,
   ) : PhotoFrameSource()
 
@@ -77,6 +78,7 @@ sealed class PhotoFrameSource {
                   url = settings.immichUrl!!,
                   key = settings.immichKey!!,
                   albumId = settings.immichAlbumId,
+                  includeVideo = settings.includeVideo,
                   shuffle = settings.shuffle,
               )
           settings.usesDav ->

@@ -38,7 +38,7 @@ you don't type URLs and credentials on the Portal:
 | --- | --- |
 | Your own folder | Photos **and** videos from the device's own storage. EXIF rotation is honoured. |
 | iCloud shared album | Paste a shared-album link (supports Apple's newer CloudKit link format). |
-| [Immich](https://immich.app/) | A self-hosted photo library. |
+| [Immich](https://immich.app/) | A self-hosted photo library. Photos **and** videos (with "Play videos" on), from an album or the whole library. |
 | Network share (SMB) | A file server on your LAN. |
 | WebDAV | Any WebDAV server. |
 | Web page | Pull images from any web page. |
