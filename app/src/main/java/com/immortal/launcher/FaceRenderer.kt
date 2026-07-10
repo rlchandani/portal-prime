@@ -164,14 +164,17 @@ class FaceRenderer(
     // A full-bleed clock (e.g. the Fliqlo flip clock) owns the whole frame on its own near-black
     // background, so skip the scrim and the date/battery/weather widgets — none should overlay it.
     if (!fullBleed) {
-      // Legibility scrim under the bottom cluster, matching the original frame.
-      val scrim = View(context)
-      scrim.background =
-          GradientDrawable(
-              GradientDrawable.Orientation.BOTTOM_TOP,
-              intArrayOf(0xCC000000.toInt(), 0x00000000),
-          )
-      view.addView(scrim, 0, FrameLayout.LayoutParams(MATCH, dp(320), Gravity.BOTTOM))
+      // Legibility scrim under the bottom cluster, matching the original frame. Optional since
+      // issue #144 — art-frame setups with the widgets off want the photo clean to the edge.
+      if (ScreensaverConfig.load(context).showGradient) {
+        val scrim = View(context)
+        scrim.background =
+            GradientDrawable(
+                GradientDrawable.Orientation.BOTTOM_TOP,
+                intArrayOf(0xCC000000.toInt(), 0x00000000),
+            )
+        view.addView(scrim, 0, FrameLayout.LayoutParams(MATCH, dp(320), Gravity.BOTTOM))
+      }
       buildStandaloneWidgets(face)
       // Photo caption is photo metadata, so (like the widgets) it's skipped on a full-bleed clock.
       if (face.caption.enabled) buildCaption(face.caption)

@@ -275,6 +275,14 @@ object SettingsDomains {
                       "Reduce screen burn-in",
                       get = { it.antiBurnIn },
                       set = ScreensaverConfig::setAntiBurnIn),
+                  BoolSpec(
+                      "showGradient",
+                      "Legibility gradient",
+                      get = { it.showGradient },
+                      set = ScreensaverConfig::setShowGradient,
+                      help =
+                          "Darken the bottom of the frame so the clock and widgets stay readable " +
+                              "over bright photos. Turn off to show photos clean edge-to-edge."),
                   EnumSpec(
                       "presenceMode",
                       "Power",
@@ -415,6 +423,7 @@ object SettingsDomains {
                   "includeVideo" to "Display",
                   "showNowPlaying" to "Display",
                   "antiBurnIn" to "Display",
+                  "showGradient" to "Display",
                   "feed" to "Display",
                   "ambientDashboard" to "Display",
                   "gestureWave" to "Display",

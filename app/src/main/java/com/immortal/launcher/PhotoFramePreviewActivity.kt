@@ -14,6 +14,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.MotionEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -71,7 +72,21 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     }
 
     frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false))
-    frame.onExit = { finish() }
+    // Only the screensaver-continuation launch (DreamPolicy's force-wake handoff) honours the
+    // "open when dismissed" choice — to the user that frame IS the screensaver, so a tap must
+    // behave like PhotoDreamService's tap (issue #146). Deliberate on-demand starts (settings
+    // preview, face picker, header button, MQTT command) keep returning to where they came from.
+    // The night clock never launches anything — a 3am tap should just hand back, dark.
+    val launchDismissOnExit = intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock
+    frame.onExit = {
+      Log.i(TAG, "onExit (tap) -> finish(), launchDismiss=$launchDismissOnExit")
+      // The user tapped the frame: they're unambiguously here. Without this the continuation
+      // frame leaves PresenceHub stuck on DREAMING (finishing an Activity fires no dream-stop),
+      // so MQTT screen/state reported "dreaming" forever after the ~2-min handoff (issue #103).
+      PresenceHub.onInteraction(this)
+      if (launchDismissOnExit) ScreensaverDismiss.launchChosenApp(this)
+      finish()
+    }
 
     if (nightClock) {
       // Bedside clock: force the screen on for the window and dim it to a soft glow. Brightness is
@@ -151,8 +166,17 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   }
 
   companion object {
+    private const val TAG = "ImmortalFrame"
+
     /** When true, the launched frame shows the welcome-back overlay (presence-triggered starts). */
     const val EXTRA_SHOW_WELCOME = "show_welcome"
+
+    /**
+     * When true, a tap-to-dismiss honours the "open when dismissed" target ([ScreensaverDismiss]).
+     * Set only by [DreamPolicy]'s screensaver-continuation relaunch — on-demand previews keep the
+     * plain finish-back-to-caller behaviour.
+     */
+    const val EXTRA_LAUNCH_DISMISS_APP = "launch_dismiss_app"
 
     // A soft glow for the overnight bedside clock — dim but still legible in a dark room.
     const val NIGHT_BRIGHTNESS = 0.08f

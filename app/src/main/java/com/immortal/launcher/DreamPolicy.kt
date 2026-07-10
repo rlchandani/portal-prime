@@ -184,6 +184,9 @@ object DreamPolicy {
     runCatching {
       context.startActivity(
           Intent(context, PhotoFramePreviewActivity::class.java)
+              // The continuation frame IS the screensaver to the user, so a tap on it must honour
+              // the "open when dismissed" target like the dream's own tap handler (issue #146).
+              .putExtra(PhotoFramePreviewActivity.EXTRA_LAUNCH_DISMISS_APP, true)
               .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
     }
         .onFailure { Log.w(TAG, "frame relaunch failed", it) }
