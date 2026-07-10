@@ -667,10 +667,30 @@ class PhotoFrameController(
   }
 
   private fun applyFit() {
-    // Video letterboxes either way (VideoView limitation); images honour the choice.
+    // Video gets the same choice via [applyVideoFit], sized per-clip once its dimensions are known.
     photo.scaleType =
         if (settings.fit == ScreensaverConfig.FIT_FIT) ImageView.ScaleType.FIT_CENTER
         else ImageView.ScaleType.CENTER_CROP
+  }
+
+  /**
+   * Honour the fit setting for the shared [videoView]. VideoView always letterboxes inside its
+   * own bounds (its onMeasure shrinks to the clip's aspect even with EXACTLY specs), so "fill"
+   * can't be a scaleType like the photo layer: instead the view is sized to *cover* the screen
+   * (aspect-preserving, the video CENTER_CROP) and the parent clips the overflow. "Fit" — or an
+   * unknown clip/screen size — restores match-parent letterboxing.
+   */
+  private fun applyVideoFit(videoW: Int, videoH: Int) {
+    val lp = videoView.layoutParams as FrameLayout.LayoutParams
+    val host = videoView.parent as? View
+    val cover =
+        if (settings.fit == ScreensaverConfig.FIT_FILL)
+            videoCoverSize(videoW, videoH, host?.width ?: 0, host?.height ?: 0)
+        else null
+    lp.width = cover?.first ?: MATCH
+    lp.height = cover?.second ?: MATCH
+    lp.gravity = Gravity.CENTER
+    videoView.layoutParams = lp
   }
 
   // --- welcome-back overlay (fork) --------------------------------------------
@@ -1128,7 +1148,12 @@ class PhotoFrameController(
           videoView.setOnPreparedListener { mp ->
             mp.isLooping = false
             runCatching { mp.setVolume(0f, 0f) } // a screensaver shouldn't blare audio
-            if (g == gen) videoView.start()
+            // Some streams only report their real dimensions after prepare.
+            mp.setOnVideoSizeChangedListener { _, w, h -> if (g == gen) applyVideoFit(w, h) }
+            if (g == gen) {
+              applyVideoFit(mp.videoWidth, mp.videoHeight)
+              videoView.start()
+            }
           }
           videoView.setOnCompletionListener {
             if (g == gen) advanceLocal(+1)
@@ -1249,9 +1274,12 @@ class PhotoFrameController(
           videoView.setOnPreparedListener { mp ->
             mp.isLooping = false
             runCatching { mp.setVolume(0f, 0f) } // a screensaver shouldn't blare audio
+            // Some streams only report their real dimensions after prepare.
+            mp.setOnVideoSizeChangedListener { _, w, h -> if (g == gen) applyVideoFit(w, h) }
             if (g == gen) {
               remoteFailStreak = 0
               remoteReresolveStreak = 0
+              applyVideoFit(mp.videoWidth, mp.videoHeight)
               videoView.start()
             }
           }
@@ -1575,7 +1603,21 @@ class PhotoFrameController(
   private val MAX_RERESOLVE = 3
   private fun dp(v: Int): Int = (v * context.resources.displayMetrics.density).toInt()
 
-  private companion object {
+  internal companion object {
+    /**
+     * The view size (w × h) that makes a [videoW]×[videoH] clip cover a [screenW]×[screenH]
+     * screen with its aspect preserved — the geometry behind [applyVideoFit]'s fill mode. Null
+     * when any dimension is unknown (callers fall back to match-parent letterboxing). Clamped to
+     * at least the screen so rounding never leaves a hairline of background showing. Pure.
+     */
+    internal fun videoCoverSize(videoW: Int, videoH: Int, screenW: Int, screenH: Int): Pair<Int, Int>? {
+      if (videoW <= 0 || videoH <= 0 || screenW <= 0 || screenH <= 0) return null
+      val scale = maxOf(screenW.toDouble() / videoW, screenH.toDouble() / videoH)
+      return Pair(
+          Math.round(videoW * scale).toInt().coerceAtLeast(screenW),
+          Math.round(videoH * scale).toInt().coerceAtLeast(screenH))
+    }
+
     const val TAG = "ImmortalPhotoFrame"
     // Cap on the longest edge of any decoded photo. Full-res camera originals (tens of MP) decode
     // to bitmaps larger than the hardware Canvas can draw (~100MB), which crashes the launcher and

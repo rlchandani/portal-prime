@@ -87,6 +87,8 @@ class FleetScreensaverTest {
         listOf(
             "immichUrl",
             "immichKey",
+            "immichAlbumId",
+            "immichAlbumName",
             "smbHost",
             "smbShare",
             "smbPath",
@@ -112,6 +114,35 @@ class FleetScreensaverTest {
     assertEquals("immich", json.getString("source"))
     assertEquals("https://immich.example", json.getString("immichUrl"))
     assertEquals("secret-key", json.getString("immichKey"))
+  }
+
+  @Test
+  fun sourcesJson_reportsImmichAlbumChoice() {
+    val s =
+        ScreensaverConfig.Settings(
+            source = ScreensaverConfig.SOURCE_IMMICH,
+            immichUrl = "https://immich.example",
+            immichKey = "secret-key",
+            immichAlbumId = "album-1",
+            immichAlbumName = "Family")
+    val json = FleetScreensaver.sourcesJson(s)
+    assertEquals("album-1", json.getString("immichAlbumId"))
+    assertEquals("Family", json.getString("immichAlbumName"))
+  }
+
+  @Test
+  fun albumsJson_shapesPickerEntries() {
+    val json =
+        FleetScreensaver.albumsJson(
+            listOf(
+                ImmichSource.Album("a1", "Family", 120),
+                ImmichSource.Album("a2", "Holidays", 0)))
+    assertEquals(2, json.length())
+    assertEquals("a1", json.getJSONObject(0).getString("id"))
+    assertEquals("Family", json.getJSONObject(0).getString("name"))
+    assertEquals(120, json.getJSONObject(0).getInt("count"))
+    assertEquals("a2", json.getJSONObject(1).getString("id"))
+    assertEquals(0, json.getJSONObject(1).getInt("count"))
   }
 
   @Test

@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.content.Context
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -51,6 +52,8 @@ object FleetScreensaver {
           .put("source", currentSource(s))
           .put("immichUrl", s.immichUrl ?: "")
           .put("immichKey", s.immichKey ?: "")
+          .put("immichAlbumId", s.immichAlbumId ?: "")
+          .put("immichAlbumName", s.immichAlbumName ?: "")
           .put("smbHost", s.smbHost ?: "")
           .put("smbShare", s.smbShare ?: "")
           .put("smbPath", s.smbPath ?: "")
@@ -61,6 +64,15 @@ object FleetScreensaver {
           .put("davPass", s.davPass ?: "")
           .put("webUrl", s.webUrl ?: "")
           .put("albumUrl", s.albumUrl ?: "")
+
+  /** Immich album list → wire JSON for the remote's album picker (`/remote/immich/albums`). Pure. */
+  fun albumsJson(albums: List<ImmichSource.Album>): JSONArray {
+    val arr = JSONArray()
+    albums.forEach { a ->
+      arr.put(JSONObject().put("id", a.id).put("name", a.name).put("count", a.count))
+    }
+    return arr
+  }
 
   /** The active photo-source as a Setup-form key (immich/smb/dav/web/album/default). Pure. */
   internal fun currentSource(s: ScreensaverConfig.Settings): String =
@@ -134,6 +146,14 @@ object FleetScreensaver {
       if (url.isNotBlank() && key.isNotBlank()) {
         ScreensaverConfig.setImmich(context, url, key)
         applied.add("immich")
+        // The album choice rides along with the connection (the remote's picker always sends the
+        // creds too). Only when the key is present, so a creds-only push keeps the saved album;
+        // a blank id means "whole library", so clearing stays expressible.
+        if (body.has("immichAlbumId")) {
+          ScreensaverConfig.setImmichAlbum(
+              context, body.optString("immichAlbumId"), body.optString("immichAlbumName"))
+          applied.add("immichAlbum")
+        }
       }
     }
     run {

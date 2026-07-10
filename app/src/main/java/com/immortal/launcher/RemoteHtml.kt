@@ -274,7 +274,7 @@ object RemoteHtml {
           <label class=pick><input type=radio name=src value=dav onclick="showSrc('dav')"> WebDAV folder</label>
           <label class=pick><input type=radio name=src value=web onclick="showSrc('web')"> Web page</label>
           <label class=pick><input type=radio name=src value=album onclick="showSrc('album')"> Shared album link</label>
-          <div class=srcf id=f_immich><input id=immichUrl placeholder="Immich URL (http://192.168.x.x:2283)"><input id=immichKey placeholder="API key"></div>
+          <div class=srcf id=f_immich><input id=immichUrl placeholder="Immich URL (http://192.168.x.x:2283)"><input id=immichKey placeholder="API key"><div class=row><select id=immichAlbum><option value="">Whole library</option></select><button onclick=loadImmichAlbums()>Load albums</button></div><div id=immichAlbumMsg class=sub style="margin:4px 0 0"></div></div>
           <div class=srcf id=f_smb><input id=smbHost placeholder="Host or IP"><input id=smbShare placeholder="Share name"><input id=smbPath placeholder="Folder path (optional)"><input id=smbUser placeholder="Username (optional)"><input id=smbPass type=password placeholder="Password (optional)"></div>
           <div class=srcf id=f_dav><input id=davUrl placeholder="WebDAV URL"><input id=davUser placeholder="Username (optional)"><input id=davPass type=password placeholder="Password (optional)"></div>
           <div class=srcf id=f_web><input id=webUrl placeholder="Web page URL"></div>
@@ -795,16 +795,43 @@ object RemoteHtml {
       var s=d.sources||{},src=s.source||'default';
       var r=document.querySelector('input[name=src][value="'+src+'"]');if(r)r.checked=true;
       setVal('immichUrl',s.immichUrl);setVal('immichKey',s.immichKey);
+      seedImmichAlbum(s.immichAlbumId,s.immichAlbumName);
       setVal('smbHost',s.smbHost);setVal('smbShare',s.smbShare);setVal('smbPath',s.smbPath);setVal('smbUser',s.smbUser);setVal('smbPass',s.smbPass);
       setVal('davUrl',s.davUrl);setVal('davUser',s.davUser);setVal('davPass',s.davPass);
       setVal('webUrl',s.webUrl);setVal('albumUrl',s.albumUrl);
       showSrc(src);
     }).catch(function(){});
   }
+  // --- Immich album picker: the <select> holds album ids; each option carries the plain album
+  // name in data-name (the label adds a photo count). seedImmichAlbum shows the saved choice
+  // without a fetch; "Load albums" pulls the server's list through the Portal (the phone often
+  // can't reach Immich directly, and the key shouldn't ride through a third box anyway).
+  function albumOption(id,name,label){var o=document.createElement('option');o.value=id;o.textContent=label||name;o.setAttribute('data-name',name);return o;}
+  function seedImmichAlbum(id,name){
+    var sel=document.getElementById('immichAlbum');sel.innerHTML='';
+    sel.appendChild(albumOption('','','Whole library'));
+    if(id)sel.appendChild(albumOption(id,name||'Saved album'));
+    sel.value=id||'';
+  }
+  function loadImmichAlbums(){
+    var msg=document.getElementById('immichAlbumMsg');msg.textContent='Loading albums…';
+    api('/remote/immich/albums',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:gv('immichUrl'),key:gv('immichKey')})})
+      .then(function(d){
+        if(!d||!d.ok)throw 0;
+        var sel=document.getElementById('immichAlbum'),cur=sel.value;
+        sel.innerHTML='';sel.appendChild(albumOption('','','Whole library'));
+        (d.albums||[]).forEach(function(a){sel.appendChild(albumOption(a.id,a.name,a.name+' ('+a.count+')'));});
+        sel.value=cur;if(sel.value!==cur)sel.value='';
+        msg.textContent=(d.albums&&d.albums.length)?'':'No albums on the server yet.';
+      })
+      .catch(function(){msg.textContent='Couldn\'t load albums — check the URL and API key.';});
+  }
   function saveSources(){
     var src=(document.querySelector('input[name=src]:checked')||{}).value||'default';
     var body={source:src};
-    if(src==='immich'){body.immichUrl=gv('immichUrl');body.immichKey=gv('immichKey');}
+    if(src==='immich'){body.immichUrl=gv('immichUrl');body.immichKey=gv('immichKey');
+      var sel=document.getElementById('immichAlbum'),opt=sel.options[sel.selectedIndex];
+      body.immichAlbumId=sel.value;body.immichAlbumName=sel.value?(opt&&opt.getAttribute('data-name'))||'':'';}
     else if(src==='smb'){body.smbHost=gv('smbHost');body.smbShare=gv('smbShare');body.smbPath=gv('smbPath');body.smbUser=gv('smbUser');body.smbPass=gv('smbPass');}
     else if(src==='dav'){body.davUrl=gv('davUrl');body.davUser=gv('davUser');body.davPass=gv('davPass');}
     else if(src==='web'){body.webUrl=gv('webUrl');}

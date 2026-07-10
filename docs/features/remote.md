@@ -22,7 +22,9 @@ the same always-on [fleet agent](fleet.md) that already manages the device over 
 - **App launcher grid** — every launchable app on the Portal, tap to open.
 - **Screensaver & calendar setup** — set the photo source (Immich / NAS / WebDAV / web / album /
   default feed) and the calendar feed from the phone, instead of typing URLs and credentials on the
-  Portal. (This replaced the old standalone "set up from your phone" LAN form.)
+  Portal. For Immich, "Load albums" lists the server's albums (fetched via the Portal) so you can
+  pick one — or the whole library — from the phone. (This replaced the old standalone "set up from
+  your phone" LAN form.)
 - **Multiple devices** — one remote drives every Portal on your Wi-Fi. Other Portals are discovered
   automatically (mDNS); pick one from the device switcher and pair it with its on-screen PIN. The
   phone keeps a per-device token, so a token never crosses between Portals.
@@ -143,3 +145,4 @@ secrets); the rest require `Authorization: Bearer <session-or-fleet-token>`.
 | `GET` | `/remote/devices` | this device's name + mDNS-discovered peers `[{name,host,port}]` |
 | `GET`/`POST` | `/remote/roster` | read or replace the phone's backed-up device roster `[{name,base,token}]` |
 | `GET`/`POST` | `/remote/sources` | read or set the screensaver photo source + calendar feed |
+| `POST` | `/remote/immich/albums` | `{"url":"…","key":"…"}` (blank → stored connection) → `{albums:[{id,name,count}]}` for the album picker |

@@ -61,6 +61,7 @@ class RemoteRoutes(private val context: Context) {
         "/remote/devices" -> authed(req) { devices() }
         "/remote/roster" -> authed(req) { roster(req) }
         "/remote/sources" -> authed(req) { sources(req) }
+        "/remote/immich/albums" -> authed(req) { immichAlbums(req) }
         "/remote/settings" -> authed(req) { settings(req) }
         else -> json(404, err("not_found"))
       }
@@ -301,6 +302,24 @@ class RemoteRoutes(private val context: Context) {
         }
         else -> json(405, err("method_not_allowed"))
       }
+
+  /**
+   * List an Immich server's albums for the Setup form's album picker: POST `{"url":"…","key":"…"}`
+   * — the form's live field values, so the picker works before the connection is saved; blank
+   * fields fall back to the stored connection. Runs on the fleet server's pool thread, so the
+   * blocking fetch is fine here. 502 when the server can't be reached or rejects the key, so the
+   * form can hint at the problem instead of showing an empty list.
+   */
+  private fun immichAlbums(req: FleetHttpServer.Request): FleetHttpServer.Response {
+    if (req.method != "POST") return json(405, err("method_not_allowed"))
+    val body = parseJson(req.bodyText()) ?: return json(400, err("bad_json"))
+    val stored = ScreensaverConfig.load(context)
+    val url = body.optString("url").ifBlank { stored.immichUrl ?: "" }
+    val key = body.optString("key").ifBlank { stored.immichKey ?: "" }
+    if (url.isBlank() || key.isBlank()) return json(400, err("immich_credentials_required"))
+    val albums = ImmichSource.listAlbums(url, key) ?: return json(502, err("immich_unreachable"))
+    return json(200, ok().put("albums", FleetScreensaver.albumsJson(albums)))
+  }
 
   /**
    * Generic settings surface driven by the declarative [SettingsRegistry]. GET returns every
