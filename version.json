@@ -1,6 +1,6 @@
 {
-  "versionCode": 57,
-  "versionName": "1.63",
+  "versionCode": 58,
+  "versionName": "1.64",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "On-device media cache for the screensaver: Immich and WebDAV sources can now keep a screen-sized copy of each photo and video on the device and replay it locally, cutting repeat downloads from your server. Off by default \u2014 turn it on under Screensaver settings ('Store media on this device'). WebDAV sources can now play videos too."
+  "notes": "Media cache fixes: cached videos keep their true aspect ratio (no black bars), corrupt entries self-heal, and cache warming stops cleanly when the storage limit is reached. Adds diagnostics logging."
 }
