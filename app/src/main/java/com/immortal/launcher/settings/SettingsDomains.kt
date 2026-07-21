@@ -255,6 +255,12 @@ object SettingsDomains {
                       "Play videos",
                       get = { it.includeVideo },
                       set = ScreensaverConfig::setIncludeVideo),
+                  BoolSpec(
+                      "cropVertical",
+                      "Crop vertical photos (~20%)",
+                      get = { it.cropVertical },
+                      set = ScreensaverConfig::setCropVertical,
+                      help = "Trims ~20% off the top and bottom of portrait photos so they look less tall and narrow."),
                   // On-device cache: only meaningful for a network source that re-fetches the same
                   // assets every loop (Immich / WebDAV). Hidden for a local folder or the built-in
                   // feed, where there's nothing to save a round-trip on.

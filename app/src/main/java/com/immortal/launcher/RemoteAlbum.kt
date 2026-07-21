@@ -368,17 +368,75 @@ object RemoteAlbum {
     val raw = LH3_REGEX.findAll(html).map { it.value }.toList()
     if (raw.isEmpty()) return Album(null, emptyList())
 
-    // Strip the size suffix so we can ask Google for a screen-sized variant, and
-    // skip avatar-service URLs (`/a/` and `/a-/`) — those embed on every share page
-    // as the owner's profile picture and would otherwise lead the slideshow.
-    val sizeSuffix = "=w${screenW}-h${screenH}-no"
+    // Target the maximum screen dimension so both landscape and portrait photos render
+    // crisp without downscaling portrait photos to low resolution inside a bounding box.
+    val maxDim = maxOf(screenW, screenH)
+    val sizeSuffix = "=w${maxDim}-h${maxDim}-no"
     val seen = LinkedHashSet<String>()
     raw.forEach { u ->
       if (isGoogleAvatarUrl(u)) return@forEach
       val stripped = u.substringBefore('=')
       seen.add(stripped + sizeSuffix)
     }
+
+    // Crawl pagination tokens if the Google Photos album contains more photos than page 1.
+    val albumKey = extractGoogleAlbumKey(finalUrl, html)
+    var token = extractGoogleContinuationToken(html)
+    var page = 0
+    val maxPages = 100 // Cap to 100 pages (~10,000 photos) for memory/network safety
+
+    while (!token.isNullOrBlank() && !albumKey.isNullOrBlank() && page < maxPages) {
+      val rpcBody = fetchGoogleBatchRpc(albumKey, token) ?: break
+      val prevSize = seen.size
+      LH3_REGEX.findAll(rpcBody).forEach { m ->
+        val u = m.value
+        if (!isGoogleAvatarUrl(u)) {
+          val stripped = u.substringBefore('=')
+          seen.add(stripped + sizeSuffix)
+        }
+      }
+      val nextToken = extractGoogleContinuationToken(rpcBody)
+      if (nextToken == token || seen.size == prevSize) {
+        break
+      }
+      token = nextToken
+      page++
+    }
+
     return Album(extractGoogleTitle(html), seen.toList())
+  }
+
+  internal fun extractGoogleAlbumKey(url: String, html: String): String? {
+    val mUrl = Regex("""photos\.google\.com/share/([A-Za-z0-9_\-]+)""", RegexOption.IGNORE_CASE).find(url)
+    if (mUrl != null) return mUrl.groupValues[1]
+    val mHtml = Regex("""["'](AF1Qa1[A-Za-z0-9_\-]+)["']""").find(html)
+    return mHtml?.groupValues?.get(1)
+  }
+
+  internal fun extractGoogleContinuationToken(text: String): String? {
+    val m = Regex("""["'](C[A-Za-z0-9_\-]{30,})["']""").find(text)
+    return m?.groupValues?.get(1)
+  }
+
+  private fun fetchGoogleBatchRpc(albumKey: String, token: String): String? {
+    val spec = "https://photos.google.com/_/PhotosUi/data/batched/ds:1?rpcids=snAcAc&_reqid=1000&rt=c"
+    val reqData = """[[["snAcAc","[\"$albumKey\",\"$token\"]",null,"1"]]]"""
+    val body = "f.req=" + URLEncoder.encode(reqData, "UTF-8")
+    return postForm(spec, body)
+  }
+
+  private fun postForm(spec: String, body: String): String? {
+    val c = URL(spec).openConnection() as HttpURLConnection
+    c.connectTimeout = 8000
+    c.readTimeout = 10000
+    c.requestMethod = "POST"
+    c.doOutput = true
+    c.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+    c.setRequestProperty("User-Agent", USER_AGENT)
+    return runCatching {
+      c.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
+      c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
+    }.getOrNull()
   }
 
   internal fun isGoogleAvatarUrl(url: String): Boolean {

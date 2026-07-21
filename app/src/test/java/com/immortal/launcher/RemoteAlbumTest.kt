@@ -180,4 +180,20 @@ class RemoteAlbumTest {
             """.trimIndent())
     assertEquals("big", RemoteAlbum.pickBestDerivative(derivs, 1920, 1080))
   }
+
+  @Test
+  fun extractGoogleAlbumKey_parsesUrlAndHtml() {
+    val url = "https://photos.google.com/share/AF1Qa1b2c3d_Key456?key=SampleKey"
+    assertEquals("AF1Qa1b2c3d_Key456", RemoteAlbum.extractGoogleAlbumKey(url, ""))
+
+    val html = """var data = ["AF1Qa1b2c3d_KeyFromHtml"];"""
+    assertEquals("AF1Qa1b2c3d_KeyFromHtml", RemoteAlbum.extractGoogleAlbumKey("https://photos.app.goo.gl/short", html))
+  }
+
+  @Test
+  fun extractGoogleContinuationToken_findsLongToken() {
+    val sampleText = """AF_initDataCallback({key: 'ds:1', data: [["photo1"], "CAESa0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB"]});"""
+    val token = RemoteAlbum.extractGoogleContinuationToken(sampleText)
+    assertTrue(token != null && token.startsWith("CAESa"))
+  }
 }

@@ -213,6 +213,8 @@ object ScreensaverConfig {
       // dashboard path to deep-link to (e.g. "today-home/security"), and "" opens the
       // user's default dashboard. Only offered when an HA app is installed.
       val dismissHaDashboard: String? = null,
+      // Crop vertical (portrait) photos by ~20% (top & bottom) so they look less tall/panoramic.
+      val cropVertical: Boolean = false,
   ) {
     /** True when the idle screen-off timeout is active. */
     val idleSleepOn: Boolean
@@ -313,8 +315,12 @@ object ScreensaverConfig {
         welcomeEnabled = p.getBoolean("welcome_enabled", true),
         dismissAppComponent = p.getString("dismiss_app_component", null),
         dismissHaDashboard = p.getString("dismiss_ha_dashboard", null),
+        cropVertical = p.getBoolean("crop_vertical", false),
     )
   }
+
+  fun setCropVertical(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("crop_vertical", on).apply()
 
   fun setSoundscape(c: Context, s: String) = prefs(c).edit().putString("soundscape", s).apply()
 
