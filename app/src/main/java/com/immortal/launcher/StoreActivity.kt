@@ -29,6 +29,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -78,6 +79,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.immortal.launcher.ui.components.GlassTile
+import com.immortal.launcher.ui.theme.ContentSecondary
+import com.immortal.launcher.ui.theme.ContentTertiary
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
@@ -231,7 +235,7 @@ private fun BrowseScreen(
 
   LazyColumn(
       modifier = Modifier.fillMaxSize().padding(start = 32.dp, end = 32.dp).focusGroup(),
-      verticalArrangement = Arrangement.spacedBy(10.dp),
+      verticalArrangement = Arrangement.spacedBy(12.dp),
   ) {
     item {
       Spacer(Modifier.height(64.dp))
@@ -336,35 +340,36 @@ private fun AppCard(
   val compatible = StoreCatalog.isCompatible(app)
   val hasUpdate = app.packageName in updates.keys
 
-  Card(
+  GlassTile(
       modifier =
           modifier
               .fillMaxWidth()
-              .tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { onOpenDetail(app) },
-      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+              .tvFocusable(RoundedCornerShape(20.dp), focusScale = 1f) { onOpenDetail(app) },
+      cornerRadius = 20.dp,
   ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(14.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-      AppIcon(app, 52.dp)
-      Column(modifier = Modifier.weight(1f).padding(start = 14.dp, end = 14.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(app.name, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-          app.author?.let {
-            Text(
-                "  ·  $it",
-                fontSize = 12.sp,
-                color = Color(0xFF8A8A8A),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-          }
+      AppIcon(app, 72.dp)
+      Column(modifier = Modifier.weight(1f).padding(start = 16.dp, end = 16.dp)) {
+        Text(
+            app.name,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        app.author?.let {
+          Text(
+              it,
+              style = MaterialTheme.typography.labelSmall,
+              color = ContentTertiary,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+          )
         }
         Text(
             app.description,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color(0xFFB9B9B9),
+            style = MaterialTheme.typography.bodyMedium,
+            color = ContentSecondary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -390,11 +395,14 @@ private fun AppCard(
 @Composable
 private fun ActionButton(label: String, onClick: () -> Unit) {
   val src = remember { MutableInteractionSource() }
+  val pillShape = RoundedCornerShape(50)
   Button(
       onClick = onClick,
       interactionSource = src,
+      shape = pillShape,
+      contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
       modifier =
-          Modifier.heightIn(min = 48.dp).widthIn(min = 108.dp).focusRing(src, RoundedCornerShape(20.dp)),
+          Modifier.heightIn(min = 48.dp).widthIn(min = 108.dp).focusRing(src, pillShape),
   ) {
     Text(label)
   }
@@ -404,6 +412,7 @@ private fun ActionButton(label: String, onClick: () -> Unit) {
 private fun OpenButton(app: CatalogApp) {
   val context = LocalContext.current
   val src = remember { MutableInteractionSource() }
+  val pillShape = RoundedCornerShape(50)
   OutlinedButton(
       onClick = {
         runCatching {
@@ -413,8 +422,10 @@ private fun OpenButton(app: CatalogApp) {
         }
       },
       interactionSource = src,
+      shape = pillShape,
+      contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
       modifier =
-          Modifier.heightIn(min = 48.dp).widthIn(min = 108.dp).focusRing(src, RoundedCornerShape(20.dp)),
+          Modifier.heightIn(min = 48.dp).widthIn(min = 108.dp).focusRing(src, pillShape),
   ) {
     Text("Open")
   }
