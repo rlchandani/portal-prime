@@ -46,7 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
  * The full-page "Tools" screen, opened from the built-in Tools tile on the home grid. A plain
@@ -59,7 +59,7 @@ import com.immortal.launcher.ui.theme.SampleAppTheme
 class ToolsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { ToolsRoot(::finish) } }
+    setContent { PortalPrimeTheme(darkTheme = true) { ToolsRoot(::finish) } }
   }
 }
 

@@ -138,7 +138,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
@@ -198,7 +198,7 @@ class HomeActivity : ComponentActivity() {
       }
     }
     setContent {
-      SampleAppTheme(darkTheme = true) {
+      PortalPrimeTheme(darkTheme = true) {
         LauncherScreen(
             onLaunch = { cn ->
               runCatching {

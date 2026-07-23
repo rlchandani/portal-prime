@@ -58,7 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.util.Locale
 import kotlin.concurrent.thread
 
@@ -74,7 +74,7 @@ import kotlin.concurrent.thread
 class AppSwitcherActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { AppSwitcherScreen { finish() } } }
+    setContent { PortalPrimeTheme(darkTheme = true) { AppSwitcherScreen { finish() } } }
   }
 }
 

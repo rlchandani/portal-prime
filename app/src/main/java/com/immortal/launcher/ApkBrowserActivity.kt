@@ -47,7 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.io.File
 import kotlin.concurrent.thread
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +69,7 @@ private data class LocalApk(
 class ApkBrowserActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { ApkBrowserScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { ApkBrowserScreen() } }
   }
 }
 

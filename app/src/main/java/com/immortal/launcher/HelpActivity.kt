@@ -62,7 +62,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
  * A friendly, non-technical guided tour of Immortal. Opened from the Help tile,
@@ -76,7 +76,7 @@ class HelpActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     markSeen(this)
-    setContent { SampleAppTheme(darkTheme = true) { HelpTour() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { HelpTour() } }
   }
 
   companion object {

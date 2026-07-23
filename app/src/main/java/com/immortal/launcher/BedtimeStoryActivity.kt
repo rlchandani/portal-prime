@@ -42,7 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.util.Locale
 
 /**
@@ -54,7 +54,7 @@ class BedtimeStoryActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-    setContent { SampleAppTheme(darkTheme = true) { BedtimeScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { BedtimeScreen() } }
   }
 }
 

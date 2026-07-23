@@ -15,7 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
  * Activity wrappers for the Immortal settings sub-screens, so each is reached by a `NavSpec`
@@ -26,28 +26,28 @@ import com.immortal.launcher.ui.theme.SampleAppTheme
 class MultiRoomActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { MultiRoomScreen(onBack = { finish() }) } }
+    setContent { PortalPrimeTheme(darkTheme = true) { MultiRoomScreen(onBack = { finish() }) } }
   }
 }
 
 class MqttActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { MqttScreen(onBack = { finish() }) } }
+    setContent { PortalPrimeTheme(darkTheme = true) { MqttScreen(onBack = { finish() }) } }
   }
 }
 
 class DeviceHealthActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { DeviceHealthScreen(onBack = { finish() }) } }
+    setContent { PortalPrimeTheme(darkTheme = true) { DeviceHealthScreen(onBack = { finish() }) } }
   }
 }
 
 class WorldClockActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { WorldClockScreen(onBack = { finish() }) } }
+    setContent { PortalPrimeTheme(darkTheme = true) { WorldClockScreen(onBack = { finish() }) } }
   }
 }
 
@@ -55,7 +55,7 @@ class BootAppsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      SampleAppTheme(darkTheme = true) {
+      PortalPrimeTheme(darkTheme = true) {
         // The selection state lived in the parent screen before; the Activity owns it now.
         val context = LocalContext.current
         var selected by remember { mutableStateOf(BootLaunch.packages(context).toSet()) }

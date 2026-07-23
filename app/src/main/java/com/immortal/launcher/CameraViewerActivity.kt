@@ -46,7 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
  * RTSP/ONVIF camera viewer: full-screen live view of a saved camera stream, played by
@@ -56,7 +56,7 @@ import com.immortal.launcher.ui.theme.SampleAppTheme
 class CameraViewerActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { CameraViewerScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { CameraViewerScreen() } }
   }
 }
 

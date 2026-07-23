@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
  * "Control from your phone" — turns on the phone remote and shows a one-time PIN plus a
@@ -54,7 +54,7 @@ import com.immortal.launcher.ui.theme.SampleAppTheme
 class RemotePairActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { RemotePairScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { RemotePairScreen() } }
   }
 }
 

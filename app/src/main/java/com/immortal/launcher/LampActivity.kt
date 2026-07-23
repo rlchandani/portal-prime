@@ -49,7 +49,7 @@ class LampActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-    setContent { com.immortal.launcher.ui.theme.SampleAppTheme(darkTheme = true) { LampScreen(::applyBrightness) } }
+    setContent { com.immortal.launcher.ui.theme.PortalPrimeTheme(darkTheme = true) { LampScreen(::applyBrightness) } }
   }
 
   /** Drive the panel directly via the window so the lamp ignores the system auto-dim. */

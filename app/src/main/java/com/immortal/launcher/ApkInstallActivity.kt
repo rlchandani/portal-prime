@@ -45,7 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -93,7 +93,7 @@ class ApkInstallActivity : ComponentActivity() {
     val pkg = info?.packageName ?: "incoming"
 
     setContent {
-      SampleAppTheme(darkTheme = true) {
+      PortalPrimeTheme(darkTheme = true) {
         InstallPrompt(
             label = label,
             icon = icon,

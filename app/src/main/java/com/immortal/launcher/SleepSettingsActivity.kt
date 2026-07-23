@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.settings.SettingsDomains
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import kotlinx.coroutines.delay
 import kotlin.math.max
 import org.json.JSONObject
@@ -68,7 +68,7 @@ import org.json.JSONObject
 class SleepSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { SleepSettingsScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { SleepSettingsScreen() } }
   }
 }
 

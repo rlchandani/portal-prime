@@ -40,7 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import kotlin.concurrent.thread
 
 /**
@@ -51,7 +51,7 @@ import kotlin.concurrent.thread
 class SmbConnectActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { SmbConnectScreen(onDone = { finish() }) } }
+    setContent { PortalPrimeTheme(darkTheme = true) { SmbConnectScreen(onDone = { finish() }) } }
   }
 }
 

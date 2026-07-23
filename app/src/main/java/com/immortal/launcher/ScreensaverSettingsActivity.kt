@@ -52,7 +52,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.settings.SettingsDomain
 import com.immortal.launcher.settings.SettingsDomains
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import org.json.JSONObject
 
 /**
@@ -65,7 +65,7 @@ import org.json.JSONObject
 class ScreensaverSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { ScreensaverSettingsScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { ScreensaverSettingsScreen() } }
   }
 }
 

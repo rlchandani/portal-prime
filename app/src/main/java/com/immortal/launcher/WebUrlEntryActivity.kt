@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
  * Enter a web page URL to use as the screensaver — Immortal renders it fullscreen and the page
@@ -48,7 +48,7 @@ class WebUrlEntryActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      SampleAppTheme(darkTheme = true) {
+      PortalPrimeTheme(darkTheme = true) {
         WebUrlEntryScreen(
             onSave = { url ->
               ScreensaverConfig.setWebUrl(this, url)

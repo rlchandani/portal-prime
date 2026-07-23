@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
  * Portal-to-Portal LAN intercom / baby monitor (one-way audio). One Portal
@@ -53,7 +53,7 @@ import com.immortal.launcher.ui.theme.SampleAppTheme
 class IntercomActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { IntercomScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { IntercomScreen() } }
   }
 }
 

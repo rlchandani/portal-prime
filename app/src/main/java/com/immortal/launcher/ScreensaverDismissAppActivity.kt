@@ -53,7 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.util.Locale
 import kotlin.concurrent.thread
 
@@ -195,7 +195,7 @@ private data class PickEntry(
 class ScreensaverDismissAppActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { DismissAppScreen { finish() } } }
+    setContent { PortalPrimeTheme(darkTheme = true) { DismissAppScreen { finish() } } }
   }
 }
 

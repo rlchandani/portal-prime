@@ -48,7 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
  * The clock-face picker, on its own subpage (reached from a "Clock face" row in the main
@@ -59,7 +59,7 @@ import com.immortal.launcher.ui.theme.SampleAppTheme
 class FacePickerActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { FacePickerScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { FacePickerScreen() } }
   }
 }
 

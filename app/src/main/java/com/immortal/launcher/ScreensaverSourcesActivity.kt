@@ -54,7 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.immortal.launcher.ui.theme.SampleAppTheme
+import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import kotlin.concurrent.thread
 
 /**
@@ -66,7 +66,7 @@ import kotlin.concurrent.thread
 class ScreensaverSourcesActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SampleAppTheme(darkTheme = true) { ScreensaverSourcesScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = true) { ScreensaverSourcesScreen() } }
   }
 }
 
