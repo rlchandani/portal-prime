@@ -621,7 +621,11 @@ class FaceRenderer(
         col.clipChildren = false // shadows on the clock / meta text may overflow this column
         col.clipToPadding = false
         val lp = FrameLayout.LayoutParams(WRAP, WRAP, gravityFor(pos))
-        lp.setMargins(dp(40), dp(40), dp(40), dp(40))
+        val bottomInset = when (pos) {
+            GridPosition.BOTTOM_LEFT, GridPosition.BOTTOM_CENTER, GridPosition.BOTTOM_RIGHT -> dp(80)
+            else -> dp(40)
+        }
+        lp.setMargins(dp(40), dp(40), dp(40), bottomInset)
         view.addView(col, lp)
         col
       }
