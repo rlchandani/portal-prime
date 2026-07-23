@@ -164,17 +164,23 @@ class FaceRenderer(
     // A full-bleed clock (e.g. the Fliqlo flip clock) owns the whole frame on its own near-black
     // background, so skip the scrim and the date/battery/weather widgets — none should overlay it.
     if (!fullBleed) {
-      // Legibility scrim under the bottom cluster, matching the original frame. Optional since
-      // issue #144 — art-frame setups with the widgets off want the photo clean to the edge.
-      if (ScreensaverConfig.load(context).showGradient) {
-        val scrim = View(context)
-        scrim.background =
-            GradientDrawable(
-                GradientDrawable.Orientation.BOTTOM_TOP,
-                intArrayOf(0xCC000000.toInt(), 0x00000000),
-            )
-        view.addView(scrim, 0, FrameLayout.LayoutParams(MATCH, dp(320), Gravity.BOTTOM))
-      }
+      // Premium legibility scrim: a tall 4-stop gradient covers ~45% of the screen height so
+      // clock text stays readable over bright photos regardless of the showGradient setting.
+      // The old 2-stop conditional scrim is replaced here — the heavier bottom stop (alpha 200)
+      // anchors the clock cluster while the top end fades to fully transparent.
+      val scrimHeight = (context.resources.displayMetrics.heightPixels * 0.45f).toInt()
+      val premiumScrim = View(context)
+      premiumScrim.background =
+          GradientDrawable(
+              GradientDrawable.Orientation.TOP_BOTTOM,
+              intArrayOf(
+                  Color.TRANSPARENT,
+                  Color.argb(80, 0, 0, 0),   // subtle at ~1/3 point
+                  Color.argb(160, 0, 0, 0),  // stronger at ~2/3
+                  Color.argb(200, 0, 0, 0),  // solid-ish at bottom
+              ),
+          )
+      view.addView(premiumScrim, 0, FrameLayout.LayoutParams(MATCH, scrimHeight, Gravity.BOTTOM))
       buildStandaloneWidgets(face)
       // Photo caption is photo metadata, so (like the widgets) it's skipped on a full-bleed clock.
       if (face.caption.enabled) buildCaption(face.caption)
