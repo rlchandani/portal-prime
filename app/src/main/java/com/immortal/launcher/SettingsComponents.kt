@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -61,7 +62,7 @@ import androidx.compose.ui.unit.sp
 internal fun SectionLabel(text: String) {
   Text(
       text.uppercase(),
-      color = Color(0xFF7C7C7C),
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
       fontSize = 13.sp,
       fontWeight = FontWeight.SemiBold,
       modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
@@ -72,7 +73,7 @@ internal fun SectionLabel(text: String) {
 @Composable
 internal fun Card(content: @Composable () -> Unit) {
   Surface(
-      color = Color(0xFF1C1C1E),
+      color = MaterialTheme.colorScheme.surfaceContainer,
       shape = RoundedCornerShape(18.dp),
       modifier = Modifier.fillMaxWidth(),
   ) {
@@ -83,7 +84,7 @@ internal fun Card(content: @Composable () -> Unit) {
 /** A hairline divider between rows in a [Card]. */
 @Composable
 internal fun Divider() {
-  Spacer(Modifier.fillMaxWidth().height(1.dp).background(Color(0x14FFFFFF)))
+  Spacer(Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outline))
 }
 
 /**
@@ -103,7 +104,7 @@ internal fun ArrowButton(glyph: String, rowFocused: Boolean, onClick: () -> Unit
   ) {
     Text(
         glyph,
-        color = if (rowFocused) Color.White else Color(0xFFBBBBBB),
+        color = if (rowFocused) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
         fontSize = 20.sp,
         fontWeight = FontWeight.SemiBold,
     )
@@ -119,9 +120,9 @@ internal fun NavRow(title: String, value: String, onClick: () -> Unit) {
               .padding(start = 18.dp, end = 18.dp, top = 16.dp, bottom = 16.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(title, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
-    Text(value, color = Color(0xFF9A9A9A), fontSize = 15.sp)
-    Text("  ›", color = Color(0xFF7C7C7C), fontSize = 20.sp)
+    Text(title, color = MaterialTheme.colorScheme.onSurface, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text(value, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 15.sp)
+    Text("  ›", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 20.sp)
   }
 }
 
@@ -134,7 +135,7 @@ internal fun ToggleRow(title: String, checked: Boolean, onChange: (Boolean) -> U
               .padding(horizontal = 18.dp, vertical = 14.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(title, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text(title, color = MaterialTheme.colorScheme.onSurface, fontSize = 17.sp, modifier = Modifier.weight(1f))
     // Visual only — the row toggles it (so the remote's center button works).
     Switch(checked = checked, onCheckedChange = null)
   }
@@ -150,8 +151,8 @@ internal fun SelectableRow(title: String, subtitle: String, selected: Boolean, o
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Column(modifier = Modifier.weight(1f)) {
-      Text(title, color = Color.White, fontSize = 17.sp)
-      Text(subtitle, color = Color(0xFF9A9A9A), fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
+      Text(title, color = MaterialTheme.colorScheme.onSurface, fontSize = 17.sp)
+      Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
     }
     RadioButton(selected = selected, onClick = null)
   }
@@ -165,19 +166,19 @@ internal fun Segmented(
     onSelect: (String) -> Unit,
 ) {
   Row(
-      modifier = Modifier.background(Color(0xFF2A2A2C), RoundedCornerShape(12.dp)).padding(3.dp),
+      modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(12.dp)).padding(3.dp),
       horizontalArrangement = Arrangement.spacedBy(2.dp),
   ) {
     options.forEach { (label, value) ->
       val on = value == selected
       Surface(
-          color = if (on) Color(0xFF2E6BE6) else Color.Transparent,
+          color = if (on) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
           shape = RoundedCornerShape(10.dp),
           modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp)) { onSelect(value) },
       ) {
         Text(
             label,
-            color = if (on) Color.White else Color(0xFFBBBBBB),
+            color = if (on) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 15.sp,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
         )
@@ -214,15 +215,15 @@ internal fun Stepper(label: String, valueText: String, widthMin: Dp = 64.dp, onM
                 else false
               }
               .focusable(interactionSource = src)
-              .background(if (focused) Color(0x402E6BE6) else Color.Transparent)
+              .background(if (focused) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f) else Color.Transparent)
               .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(label, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text(label, color = MaterialTheme.colorScheme.onSurface, fontSize = 17.sp, modifier = Modifier.weight(1f))
     ArrowButton("◀", focused) { onMinus() } // left-pointing triangle
     Text(
         valueText,
-        color = if (focused) Color.White else Color(0xFFDDDDDD),
+        color = if (focused) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
         fontSize = 17.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
