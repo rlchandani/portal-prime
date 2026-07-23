@@ -1558,10 +1558,9 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
 }
 
 /**
- * Home-header mini-player: the play/pause control is a round button the same size as
- * the other header buttons, styled with the cover art (tap to toggle), with the
- * title/artist alongside. The text takes the available header width and only scrolls
- * (ticker) when a track genuinely overruns it. Driven by [NowPlayingHub].
+ * Home-header mini-player: premium card with rounded album art, glass-style card background,
+ * a subtle left PrimeBlue border indicating active playback, and refined typography.
+ * The art area is the play/pause touch target. Driven by [NowPlayingHub].
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -1578,11 +1577,30 @@ private fun MiniPlayer(state: NowPlayingState, modifier: Modifier = Modifier) {
         else null
   }
   val cover = state.artBitmap ?: urlArt
-  Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-    // The album art IS the play/pause button — same 56dp circle as the other header
-    // buttons, just filled with the cover instead of a flat tint.
+  // Card background: surfaceContainer-style dark translucent glass with 16dp rounded corners.
+  // A 2dp left border in PrimeBlue signals active playback.
+  Row(
+      modifier =
+          modifier
+              .clip(RoundedCornerShape(16.dp))
+              .background(Color(0x22FFFFFF)) // ~13% white — glass surface
+              .border(
+                  width = 2.dp,
+                  brush = Brush.verticalGradient(
+                      listOf(PrimeBlue, PrimeBlue.copy(alpha = 0.5f)),
+                  ),
+                  shape = RoundedCornerShape(16.dp),
+              )
+              .padding(horizontal = 10.dp, vertical = 7.dp),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    // Album art with 8dp rounded corners; tapping toggles playback.
     Box(
-        modifier = Modifier.size(56.dp).clip(CircleShape).tvFocusable(CircleShape) { NowPlayingHub.playPause() },
+        modifier =
+            Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .tvFocusable(RoundedCornerShape(8.dp)) { NowPlayingHub.playPause() },
         contentAlignment = Alignment.Center,
     ) {
       val bmp = cover
@@ -1591,32 +1609,38 @@ private fun MiniPlayer(state: NowPlayingState, modifier: Modifier = Modifier) {
             bitmap = bmp.asImageBitmap(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(56.dp),
+            modifier = Modifier.size(48.dp),
         )
       } else {
-        Box(Modifier.size(56.dp).background(Color(0x33FFFFFF)))
+        Box(Modifier.size(48.dp).background(Color(0x33FFFFFF)))
       }
-      Box(Modifier.size(56.dp).background(Color(0x3D000000)), contentAlignment = Alignment.Center) {
+      // Subtle dark scrim + play/pause glyph overlay on the art.
+      Box(
+          Modifier.size(48.dp).background(Color(0x3D000000)),
+          contentAlignment = Alignment.Center,
+      ) {
         PlayPauseGlyph(playing = state.state == PlaybackState.PLAYING)
       }
     }
-    Spacer(Modifier.size(14.dp))
+    Spacer(Modifier.size(12.dp))
     Column(modifier = Modifier.weight(1f)) {
+      // titleSmall equivalent: 14sp Bold, ContentPrimary
       Text(
           state.title,
-          color = Color.White,
-          fontSize = 18.sp,
-          fontWeight = FontWeight.Medium,
+          color = ContentPrimary,
+          fontSize = 14.sp,
+          fontWeight = FontWeight.Bold,
           maxLines = 1,
           modifier = Modifier.basicMarquee(),
       )
       if (state.artist.isNotBlank()) {
+        // labelSmall equivalent: 12sp, ContentSecondary
         Text(
             state.artist,
-            color = Color(0xFFB6B6B6),
-            fontSize = 14.sp,
+            color = ContentSecondary,
+            fontSize = 12.sp,
             maxLines = 1,
-            modifier = Modifier.padding(top = 1.dp).basicMarquee(),
+            modifier = Modifier.padding(top = 2.dp).basicMarquee(),
         )
       }
     }
@@ -2190,6 +2214,18 @@ private fun FolderOverlay(
   var dragPkg by remember { mutableStateOf<String?>(null) }
   var dragPos by remember { mutableStateOf(Offset.Zero) }
 
+  // Spring entrance animation: scale from 0.85 → 1.0 when the folder opens.
+  var entered by remember { mutableStateOf(false) }
+  LaunchedEffect(Unit) { entered = true }
+  val panelScale by animateFloatAsState(
+      targetValue = if (entered) 1f else 0.85f,
+      animationSpec = spring(
+          dampingRatio = Spring.DampingRatioMediumBouncy,
+          stiffness = Spring.StiffnessMedium,
+      ),
+      label = "folderEntranceScale",
+  )
+
   // Remote support: Back closes the folder, and focus moves into the grid on open
   // so the D-pad works immediately (the folder was previously unusable by remote).
   BackHandler { onDismiss() }
@@ -2208,7 +2244,8 @@ private fun FolderOverlay(
                   true // consume down+up so the focus system doesn't eat it first
                 } else false
               }
-              .background(Color(0xCC000000))
+              // Darker scrim: 90% opaque black for a more premium frosted look.
+              .background(Color(0xE6000000))
               .clickable(interactionSource = noRipple, indication = null) { onDismiss() }
               // Drag an app out of the panel to remove it from the folder.
               .pointerInput(apps) {
@@ -2232,22 +2269,32 @@ private fun FolderOverlay(
               },
   ) {
     Surface(
-        color = Color(0xFF1C1C1E),
-        shape = RoundedCornerShape(28.dp),
+        // Darker frosted glass: near-opaque black with 24dp corners.
+        color = Color(0xE6000000),
+        shape = RoundedCornerShape(24.dp),
         modifier =
             // The panel grows with the tile size (3 columns of LocalTileDp tiles
             // must fit) — at 88dp this is the original 420dp.
             Modifier.width(420.dp * (LocalTileDp.current / 88.dp))
+                .graphicsLayer { scaleX = panelScale; scaleY = panelScale }
                 .onGloballyPositioned { panel = it.boundsInWindow() }
                 .clickable(interactionSource = noRipple, indication = null) {},
     ) {
       Column(modifier = Modifier.padding(28.dp)) {
+        // titleMedium: centered folder name at 18sp.
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-          Text(name, color = Color.White, fontSize = 22.sp, modifier = Modifier.weight(1f))
+          Text(
+              name,
+              color = Color.White,
+              fontSize = 18.sp,
+              fontWeight = FontWeight.Medium,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.weight(1f),
+          )
           // Rename.
           Surface(
               color = Color(0x33FFFFFF),
@@ -2263,10 +2310,11 @@ private fun FolderOverlay(
           }
         }
         Spacer(Modifier.size(20.dp))
+        // App icons: 52dp size, 4dp spacing between items.
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.focusRequester(gridFocus).focusGroup(),
         ) {
           extras.forEach { extra ->
