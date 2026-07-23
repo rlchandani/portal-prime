@@ -332,35 +332,36 @@ class FaceRenderer(
     }
 
     val col = bucket(clock.position)
-    // Explicit WRAP: a vertical LinearLayout otherwise defaults children to MATCH_PARENT width.
+    // WRAP: PrimeDigitalClockFaceView reports its own fixed width via onMeasure.
     col.addView(
         made.view,
         LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
 
+    // Inner row: date + divider + weather grouped together, centered under the clock
     val row = LinearLayout(context)
     row.gravity = Gravity.CENTER_VERTICAL
-    row.clipChildren = false // let each field's shadow overflow rather than clip to a box
+    row.clipChildren = false
 
     if (clock.showDate) {
-      dateView =
-          textView(baseSp = 22f, spec = clock, light = false).also { row.addView(it) }
+      dateView = textView(baseSp = 22f, spec = clock, light = false).also { row.addView(it) }
     }
     if (face.battery.enabled && face.battery.position == clock.position) {
       batteryDivider = divider().also { row.addView(it) }
-      batteryView =
-          textView(baseSp = 22f, spec = clock, light = false).also { row.addView(it) }
+      batteryView = textView(baseSp = 22f, spec = clock, light = false).also { row.addView(it) }
     }
     if (face.weather.enabled && face.weather.position == clock.position) {
       weatherDivider = divider().also { row.addView(it) }
-      weatherView =
-          textView(baseSp = 22f, spec = clock, light = false).also { row.addView(it) }
+      weatherView = textView(baseSp = 22f, spec = clock, light = false).also { row.addView(it) }
     }
-    // Explicit WRAP width: a horizontal row added to a vertical LinearLayout otherwise defaults to
-    // MATCH_PARENT and gets constrained to the (often narrower) clock's width above it, clipping
-    // the date/battery/weather on the right. WRAP lets the row size to its own content.
-    if (row.childCount > 0)
-        col.addView(row, LinearLayout.LayoutParams(WRAP, LinearLayout.LayoutParams.WRAP_CONTENT))
+    // MATCH_PARENT width so the row spans the clock width; CENTER_HORIZONTAL centers
+    // the date+weather group within that width
+    if (row.childCount > 0) {
+      val wrapper = LinearLayout(context)
+      wrapper.gravity = Gravity.CENTER_HORIZONTAL
+      wrapper.addView(row, LinearLayout.LayoutParams(WRAP, LinearLayout.LayoutParams.WRAP_CONTENT))
+      col.addView(wrapper, LinearLayout.LayoutParams(MATCH, LinearLayout.LayoutParams.WRAP_CONTENT))
+    }
   }
 
   /** Weather / battery that aren't co-located with the clock get their own line in their bucket. */
