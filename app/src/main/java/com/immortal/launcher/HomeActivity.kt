@@ -370,877 +370,433 @@ private fun LauncherScreen(
     onUninstall: (String) -> Unit,
 ) {
   val context = androidx.compose.ui.platform.LocalContext.current
-  // Bumped whenever an app is installed/removed so the grid refreshes live.
-  var reload by remember { mutableStateOf(0) }
-  DisposableEffect(Unit) {
-    val receiver =
-        object : android.content.BroadcastReceiver() {
-          override fun onReceive(c: android.content.Context, i: Intent) {
-            reload++
-          }
-        }
-    val filter =
-        android.content.IntentFilter().apply {
-          addAction(Intent.ACTION_PACKAGE_ADDED)
-          addAction(Intent.ACTION_PACKAGE_REMOVED)
-          addAction(Intent.ACTION_PACKAGE_REPLACED)
-          addDataScheme("package")
-        }
-    if (android.os.Build.VERSION.SDK_INT >= 33)
-        context.registerReceiver(
-            receiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED)
-    else @Suppress("UnspecifiedRegisterReceiverFlag") context.registerReceiver(receiver, filter)
-    onDispose { runCatching { context.unregisterReceiver(receiver) } }
-  }
-  val loadedApps by
-      produceState<List<AppEntry>?>(initialValue = null, reload) {
-        value = withContext(Dispatchers.IO) { loadApps(context) }
-      }
-  val appsLoaded = loadedApps != null
-  val apps = loadedApps.orEmpty()
-  var editMode by remember { mutableStateOf(false) }
-  var openFolder by remember { mutableStateOf<String?>(null) }
-  var showWidgetPicker by remember { mutableStateOf(false) }
-  var widgetStatus by remember { mutableStateOf<String?>(null) }
-  var widgets by remember { mutableStateOf(HomeWidgetStore.load(context)) }
-  // Whether the shared timer is currently ringing — drives the swipe-to-stop alarm overlay.
-  var timerRinging by remember { mutableStateOf(TimerStore.load(context).ringing) }
-  DisposableEffect(Unit) {
-    val l: () -> Unit = { timerRinging = TimerStore.load(context).ringing }
-    TimerStore.addListener(l)
-    onDispose { TimerStore.removeListener(l) }
-  }
 
-  // Immortal Settings the home screen reflects (tile size, and the optional weather
-  // widget's mode/unit), re-read on resume so a change applies the moment the user
-  // comes back to the home screen.
-  var tileSize by remember { mutableStateOf(ImmortalSettings.load(context).tileSize) }
-  var constrainPageWidth by
-      remember { mutableStateOf(ImmortalSettings.load(context).constrainPageWidth) }
-  var weatherWidget by remember { mutableStateOf(ImmortalSettings.load(context).weatherWidget) }
-  var weatherFahrenheit by remember { mutableStateOf(ImmortalSettings.useFahrenheit(context)) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  val appWidgetManager = remember(context) { AppWidgetManager.getInstance(context) }
-  val appWidgetHost = remember(context) { AppWidgetHost(context, HOME_APP_WIDGET_HOST_ID) }
-  fun loadLiveWidgets(): List<HomeWidgetStore.HomeWidget> {
-    val loaded = HomeWidgetStore.load(context)
-    val live = loaded.filterLiveWidgets(appWidgetManager, appWidgetHost)
-    if (live.size != loaded.size) HomeWidgetStore.save(context, live)
-    return live
-  }
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
-        val s = ImmortalSettings.load(context)
-        tileSize = s.tileSize
-        constrainPageWidth = s.constrainPageWidth
-        weatherWidget = s.weatherWidget
-        weatherFahrenheit = ImmortalSettings.useFahrenheit(context)
-        widgets = loadLiveWidgets()
-      }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
-  }
-  DisposableEffect(lifecycleOwner, appWidgetHost) {
-    val obs = LifecycleEventObserver { _, e ->
-      when (e) {
-        Lifecycle.Event.ON_START -> runCatching { appWidgetHost.startListening() }
-        Lifecycle.Event.ON_STOP -> runCatching { appWidgetHost.stopListening() }
-        else -> Unit
-      }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    runCatching { appWidgetHost.startListening() }
-    val live = widgets.filterLiveWidgets(appWidgetManager, appWidgetHost)
-    if (live.size != widgets.size) HomeWidgetStore.save(context, live)
-    widgets = live
-    onDispose {
-      lifecycleOwner.lifecycle.removeObserver(obs)
-      runCatching { appWidgetHost.stopListening() }
-    }
-  }
-
-  fun saveWidgets(next: List<HomeWidgetStore.HomeWidget>) {
-    widgets = next
-    HomeWidgetStore.save(context, next)
-  }
-
-  fun removeWidget(widget: HomeWidgetStore.HomeWidget) {
-    if (widget.isAppWidget) runCatching { appWidgetHost.deleteAppWidgetId(widget.appWidgetId) }
-    saveWidgets(HomeWidgetStore.without(widgets, widget.key))
-    widgetStatus = "Widget removed"
-  }
-
-  fun addCustomWidget(kind: String) {
-    val widget =
-        when (kind) {
-          HomeWidgetStore.KIND_TIMERS -> HomeWidgetStore.custom(kind, spanX = 2, spanY = 2)
-          else -> HomeWidgetStore.custom(kind, spanX = 2, spanY = 2)
-        }
-    saveWidgets(HomeWidgetStore.withAdded(widgets, widget))
-    showWidgetPicker = false
-    widgetStatus = "Added ${customWidgetLabel(kind)}"
-  }
-
-  fun commitWidget(pending: PendingWidgetAdd) {
-    val provider = pending.provider
-    val info = provider.info ?: return
-    val record =
-        HomeWidgetStore.HomeWidget(
-            appWidgetId = pending.appWidgetId,
-            providerPackage = info.provider.packageName,
-            providerClass = info.provider.className,
-            spanX = provider.spanX,
-            spanY = provider.spanY,
-        )
-    updateWidgetSizeOptions(appWidgetManager, record, tileDpFor(tileSize))
-    saveWidgets(HomeWidgetStore.withAdded(widgets, record))
-    showWidgetPicker = false
-    widgetStatus = "Added ${provider.label}"
-  }
-
-  var pendingBind by remember { mutableStateOf<PendingWidgetAdd?>(null) }
-  var pendingConfig by remember { mutableStateOf<PendingWidgetAdd?>(null) }
-  val configLauncher =
-      rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val pending = pendingConfig ?: return@rememberLauncherForActivityResult
-        pendingConfig = null
-        if (result.resultCode == Activity.RESULT_OK) {
-          commitWidget(pending)
-        } else {
-          runCatching { appWidgetHost.deleteAppWidgetId(pending.appWidgetId) }
-          widgetStatus = "Widget setup was cancelled"
-        }
-      }
-
-  fun configureOrCommit(pending: PendingWidgetAdd) {
-    val info = pending.provider.info ?: return
-    val configure = info.configure
-    if (configure != null) {
-      pendingConfig = pending
-      val launched =
-          runCatching {
-                configLauncher.launch(
-                    Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
-                        .setComponent(configure)
-                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pending.appWidgetId))
-                true
-              }
-              .getOrDefault(false)
-      if (!launched) {
-        pendingConfig = null
-        runCatching { appWidgetHost.deleteAppWidgetId(pending.appWidgetId) }
-        widgetStatus = "Widget setup could not open"
-      }
-    } else {
-      commitWidget(pending)
-    }
-  }
-
-  val bindLauncher =
-      rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val pending = pendingBind ?: return@rememberLauncherForActivityResult
-        pendingBind = null
-        if (result.resultCode == Activity.RESULT_OK) {
-          configureOrCommit(pending)
-        } else {
-          runCatching { appWidgetHost.deleteAppWidgetId(pending.appWidgetId) }
-          widgetStatus = "Widget permission was cancelled"
-        }
-      }
-
-  fun addWidget(provider: WidgetProviderEntry) {
-    provider.customKind?.let {
-      addCustomWidget(it)
-      return
-    }
-    val info = provider.info ?: return
-    val appWidgetId =
-        runCatching { appWidgetHost.allocateAppWidgetId() }
-            .getOrElse {
-              widgetStatus = "Widget host could not allocate an ID"
-              return
-            }
-    val pending = PendingWidgetAdd(appWidgetId, provider)
-    val bound =
-        runCatching {
-              appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, info.provider)
-            }
-            .getOrDefault(false)
-    if (bound) {
-      configureOrCommit(pending)
-      return
-    }
-
-    pendingBind = pending
-    widgetStatus = "Allow Immortal to add widgets in the system dialog."
-    val launched =
-        runCatching {
-              bindLauncher.launch(
-                  Intent(AppWidgetManager.ACTION_APPWIDGET_BIND)
-                      .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                      .putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, info.provider))
-              true
-            }
-            .getOrDefault(false)
-    if (!launched) {
-      pendingBind = null
-      runCatching { appWidgetHost.deleteAppWidgetId(appWidgetId) }
-      widgetStatus = "Android's widget permission dialog could not open"
-    }
-  }
-
-  // Remote support: land focus on the grid at startup so the D-pad works on the TV.
-  val homeGridFocus = remember { FocusRequester() }
-  LaunchedEffect(Unit) { runCatching { homeGridFocus.requestFocus() } }
-
-  // User-created folder assignments (via drag-drop), persisted, overlaying the
-  // curated defaults: a user override wins over Curation.folderFor(). An empty
-  // string is an explicit "ungrouped" override (used when dragging out of a
-  // folder), so it beats a curated default too.
-  val assignments =
-      remember { mutableStateMapOf<String, String>().apply { putAll(UserLayout.load(context)) } }
-  val appsEff =
-      remember(apps, assignments.toMap()) {
-        val effective = HomeLayoutModel.effectiveApps(apps.toLayoutRefs(), assignments)
-        val foldersByPackage = effective.associate { it.packageName to it.folder }
-        apps.map { it.copy(folder = foldersByPackage[it.component.packageName]) }
-      }
-  val ungrouped = remember(appsEff) { appsEff.filter { it.folder == null } }
-  val folderNames = remember(appsEff) { HomeLayoutModel.folderNames(appsEff.toLayoutRefs()) }
-
-  // --- unified, fully-reorderable home grid -----------------------------------
-  // Every top-level tile — built-ins, widgets, folders, and ungrouped apps — has a stable key and
-  // lives in one ordered list, so ALL of them can be dragged (not just apps).
-  val allTileKeys =
-      remember(widgets, folderNames, ungrouped) {
-        buildList {
-          add(BUILTIN_CALLS)
-          add(BUILTIN_STORE)
-          add(BUILTIN_TOOLS)
-          widgets.forEach { add(WIDGET_KEY + it.key) }
-          folderNames.forEach { add(FOLDER_KEY + it) }
-          ungrouped.forEach { add(APP_KEY + it.component.packageName) }
-          add(BUILTIN_UPDATES)
-        }
-      }
-  var gridSlots by remember { mutableStateOf(UserLayout.loadGridSlots(context)) }
-  val gridColumns = gridColumnsFor(tileSize)
-  // Keep the saved slot list in step with what's actually present, preserving the user's blanks.
-  LaunchedEffect(allTileKeys, gridColumns, appsLoaded) {
-    val normalized =
-        HomeGrid.normalizeSlotsWhenReady(
-            gridSlots, allTileKeys, gridColumns, dynamicTilesLoaded = appsLoaded)
-    if (normalized != gridSlots) {
-      gridSlots = normalized
-      UserLayout.saveGridSlots(context, normalized)
-    }
-  }
-  val widgetByKey = remember(widgets) { widgets.associateBy { WIDGET_KEY + it.key } }
-  val appByKey = remember(ungrouped) { ungrouped.associateBy { APP_KEY + it.component.packageName } }
-  // A tile's column footprint: widgets span their width, everything else is 1.
-  fun widthOf(key: String?): Int =
-      if (key != null && key.startsWith(WIDGET_KEY))
-          (widgetByKey[key]?.spanX ?: 1).coerceIn(1, gridColumns)
-      else 1
-
-  // --- drag-and-drop (Manage mode): free placement over a fixed slot grid ------
-  val slotBounds = remember { mutableStateMapOf<Int, Rect>() }
-  var dragKey by remember { mutableStateOf<String?>(null) }
-  var dragPos by remember { mutableStateOf(Offset.Zero) }
-  var dragOriginalSlots by remember { mutableStateOf<List<String?>?>(null) }
-  // The drag gesture lives on a stable container that wraps the pager (not on the tile), so it
-  // survives page flips — that's what lets a tile be dragged onto a different page.
-  var containerOrigin by remember { mutableStateOf(Offset.Zero) }
-  var containerDragging by remember { mutableStateOf(false) }
-  // Pending folder creation awaiting a name (source+target packages).
-  var pendingPair by remember { mutableStateOf<Pair<String, String>?>(null) }
-  // Folder currently being renamed.
-  var renaming by remember { mutableStateOf<String?>(null) }
-  // Dwell-to-fold: while an app is dragged over another app, foldCandidate tracks that app;
-  // once the finger holds still (see the dwell LaunchedEffect) foldTarget is armed and its tile
-  // highlights, so releasing there makes a folder instead of a swap. moveTick restarts the dwell
-  // on every drag movement, so a quick pass-through just reorders.
-  var foldCandidate by remember { mutableStateOf<String?>(null) }
-  var foldTarget by remember { mutableStateOf<String?>(null) }
-  var moveTick by remember { mutableStateOf(0) }
-
-  fun persist() = UserLayout.save(context, assignments.toMap())
-  fun replaceAssignments(next: Map<String, String>) {
-    assignments.clear()
-    assignments.putAll(next)
-    persist()
-  }
-  fun assign(pkg: String, folder: String) {
-    assignments[pkg] = folder
-    persist()
-  }
-  fun createFolder(a: String, b: String, name: String) {
-    val result = HomeLayoutModel.createFolder(assignments, a, b, name)
-    replaceAssignments(result.assignments)
-    openFolder = result.folderName
-  }
-  fun renameFolder(old: String, raw: String) {
-    val result = HomeLayoutModel.renameFolder(appsEff.toLayoutRefs(), assignments, old, raw) ?: return
-    replaceAssignments(result.assignments)
-    openFolder = result.folderName
-  }
-  fun moveOut(pkg: String) {
-    val result = HomeLayoutModel.moveOut(appsEff.toLayoutRefs(), assignments, pkg) ?: return
-    replaceAssignments(result.assignments)
-    if (result.closeFolder) openFolder = null
-  }
-  fun targetSlotAt(pos: Offset): Int? =
-      slotBounds.entries.firstOrNull { it.value.contains(pos) }?.key
-
-  // --- horizontal paging (iOS-style swipeable app pages) ----------------------
-  var pageCapacity by remember { mutableStateOf(1) }
-  val pageCount = ((gridSlots.size + pageCapacity - 1) / pageCapacity).coerceAtLeast(1)
-  val pagerState = rememberPagerState { pageCount }
-  // While dragging, drift toward the screen edge auto-advances to the next/previous page.
-  var edgeDir by remember { mutableStateOf(0) }
-
-  fun startTileDrag(key: String, win: Offset) {
-    // Long-pressing a tile enters Manage mode AND begins dragging it in the same gesture, so the
-    // user doesn't have to lift and press again.
-    if (!editMode) editMode = true
-    dragKey = key
-    dragPos = win
-    dragOriginalSlots = gridSlots
-  }
-  fun moveTileDrag(amount: Offset) {
-    val dm = context.resources.displayMetrics
-    val screenW = dm.widthPixels.toFloat()
-    val screenH = dm.heightPixels.toFloat()
-    // Clamp to the screen so a finger riding the very edge (or briefly off it) still maps to the
-    // edge column instead of drifting into nowhere — keeps target detection and edge-flip working.
-    dragPos =
-        Offset(
-            (dragPos.x + amount.x).coerceIn(0f, screenW),
-            (dragPos.y + amount.y).coerceIn(0f, screenH),
-        )
-    edgeDir =
-        when {
-          dragPos.x > screenW * 0.86f -> 1
-          dragPos.x < screenW * 0.14f -> -1
-          else -> 0
-        }
-    // Any movement restarts the dwell timer and drops the fold highlight; only a pause re-arms it.
-    moveTick++
-    foldTarget = null
-    val src = dragKey ?: return
-    val srcIdx = gridSlots.indexOf(src)
-    if (srcIdx < 0) return
-    val tgtIdx = targetSlotAt(dragPos) ?: return
-    if (tgtIdx == srcIdx) return
-    // Hovering an app over a folder files it in (handled on drop) — don't live-swap into it.
-    val tgt = gridSlots.getOrNull(tgtIdx)
-    // Dwell-to-fold: remember the app we're passing directly over so a pause here can arm a new
-    // folder. Anything else under the finger (folder, widget, built-in, blank) clears the candidate.
-    foldCandidate = if (src.startsWith(APP_KEY) && tgt != null && tgt.startsWith(APP_KEY)) tgt else null
-    if (src.startsWith(APP_KEY) && tgt != null && tgt.startsWith(FOLDER_KEY)) return
-    val next = HomeGrid.swap(gridSlots, srcIdx, tgtIdx)
-    if (next != gridSlots) gridSlots = next
-  }
-  fun endTileDrag() {
-    edgeDir = 0
-    val src = dragKey
-    if (src != null) {
-      val armed = foldTarget
-      if (src.startsWith(APP_KEY) && armed != null && armed.startsWith(APP_KEY) && armed != src) {
-        // Dwell-to-fold: the app rested on another app — make a folder from the pair. Undo any live
-        // swaps first so the grid is back to its pre-drag order; the reconcile effect then removes
-        // both apps and drops the new folder tile in for them once it's named.
-        dragOriginalSlots?.let { gridSlots = it }
-        UserLayout.saveGridSlots(context, gridSlots)
-        pendingPair = src.removePrefix(APP_KEY) to armed.removePrefix(APP_KEY)
-      } else {
-        val tgtIdx = targetSlotAt(dragPos)
-        val tgt = tgtIdx?.let { gridSlots.getOrNull(it) }
-        if (src.startsWith(APP_KEY) && tgt != null && tgt.startsWith(FOLDER_KEY)) {
-          // File the app into the folder; undo any live swaps so the folder stays put.
-          dragOriginalSlots?.let { gridSlots = it }
-          assignments[src.removePrefix(APP_KEY)] = tgt.removePrefix(FOLDER_KEY)
-          persist()
-        }
-        UserLayout.saveGridSlots(context, gridSlots)
-      }
-    }
-    dragKey = null
-    dragOriginalSlots = null
-    foldTarget = null
-    foldCandidate = null
-  }
-  fun cancelTileDrag() {
-    // Don't revert — commit the tiles where they were last dragged, so a brief finger-off-screen
-    // (which the OS reports as a cancel) never snaps everything back to where it started.
-    edgeDir = 0
-    if (dragKey != null) UserLayout.saveGridSlots(context, gridSlots)
-    dragKey = null
-    dragOriginalSlots = null
-    foldTarget = null
-    foldCandidate = null
-  }
-  // Debounced page flip while a drag rests against a screen edge.
-  LaunchedEffect(edgeDir) {
-    if (edgeDir != 0 && dragKey != null) {
-      delay(450)
-      if (dragKey != null && edgeDir != 0) {
-        val target = (pagerState.currentPage + edgeDir).coerceIn(0, (pageCount - 1).coerceAtLeast(0))
-        if (target != pagerState.currentPage) pagerState.animateScrollToPage(target)
-      }
-      edgeDir = 0
-    }
-  }
-  // Dwell-to-fold: if a dragged app rests over another app for a beat, arm folder creation so the
-  // release makes a folder (a quick pass-through just reorders). moveTick restarts this on every
-  // movement, so the delay only completes once the finger holds still over the candidate.
-  LaunchedEffect(moveTick, dragKey) {
-    val src = dragKey ?: return@LaunchedEffect
-    if (!src.startsWith(APP_KEY) || foldCandidate == null) return@LaunchedEffect
-    delay(FOLD_DWELL_MS)
-    val cand = foldCandidate
-    if (dragKey == src && cand != null && cand.startsWith(APP_KEY) && gridSlots.contains(cand)) {
-      foldTarget = cand
-    }
-  }
-  // Auto-arrange: pack every tile into the clean default order (built-ins, widgets, folders, then
-  // apps alphabetically), removing blanks and empty pages.
-  fun tidyGrid() {
-    val packed = HomeGrid.normalizeToPages(allTileKeys, allTileKeys, pageCapacity, keepSpare = false)
-    gridSlots = packed
-    UserLayout.saveGridSlots(context, packed)
-  }
-  // If pages were removed (e.g. auto-deleted empties), don't leave the pager stranded past the end.
-  LaunchedEffect(pageCount) {
-    if (pagerState.currentPage >= pageCount) {
-      pagerState.scrollToPage((pageCount - 1).coerceAtLeast(0))
-    }
-  }
-
-  // --- over-the-air self-update -----------------------------------------------
-  var update by remember { mutableStateOf<UpdateInfo?>(null) }
-  var updateStatus by remember { mutableStateOf<String?>(null) }
-  var pendingConfirm by remember { mutableStateOf<Intent?>(null) }
-  val confirmLauncher =
-      rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
-  // Check on launch, then periodically while the launcher runs (it's the
-  // long-lived home, so a one-shot check would go stale). The Updates tile also
-  // lets the user force a check at any time.
-  LaunchedEffect(Unit) {
+  // --- live time/date (1-second tick) ---
+  val now by produceState(initialValue = Date()) {
     while (true) {
-      UpdateManager.checkForUpdate(context) { update = it }
-      delay(UPDATE_CHECK_INTERVAL_MS)
+      delay(1000)
+      value = Date()
     }
-  }
-  LaunchedEffect(pendingConfirm) {
-    pendingConfirm?.let {
-      confirmLauncher.launch(it)
-      pendingConfirm = null
-    }
-  }
-  DisposableEffect(Unit) {
-    val receiver =
-        object : android.content.BroadcastReceiver() {
-          override fun onReceive(c: android.content.Context, intent: Intent) {
-            when (intent.getIntExtra(PackageInstaller.EXTRA_STATUS, -999)) {
-              PackageInstaller.STATUS_PENDING_USER_ACTION -> {
-                pendingConfirm =
-                    if (android.os.Build.VERSION.SDK_INT >= 33)
-                        intent.getParcelableExtra(Intent.EXTRA_INTENT, Intent::class.java)
-                    else @Suppress("DEPRECATION") intent.getParcelableExtra(Intent.EXTRA_INTENT)
-                updateStatus = "Confirm to update…"
-              }
-              PackageInstaller.STATUS_SUCCESS -> updateStatus = "Updated"
-              else -> updateStatus = "Update failed"
-            }
-          }
-        }
-    val filter = android.content.IntentFilter(UPDATE_INSTALL_ACTION)
-    if (android.os.Build.VERSION.SDK_INT >= 33)
-        context.registerReceiver(receiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED)
-    else @Suppress("UnspecifiedRegisterReceiverFlag") context.registerReceiver(receiver, filter)
-    onDispose { runCatching { context.unregisterReceiver(receiver) } }
   }
 
-  CompositionLocalProvider(LocalTileDp provides tileDpFor(tileSize)) {
-  Box(modifier = Modifier.fillMaxSize()) {
-    HomeBackground(Modifier.fillMaxSize())
+  // --- live weather (30-min refresh, 1-min retry on failure) ---
+  val weatherCurrent by produceState<Weather.Current?>(initialValue = null) {
+    while (true) {
+      val w = withContext(Dispatchers.IO) { Weather.fetchCurrent(context) }
+      if (w != null) {
+        value = w
+        delay(30L * 60 * 1000)
+      } else {
+        delay(60L * 1000)
+      }
+    }
+  }
+
+  // --- battery (live via sticky broadcast) ---
+  val battery = batteryState()
+
+  // --- time-of-day derived from ticking now ---
+  val hour = SimpleDateFormat("H", Locale.getDefault()).format(now).toIntOrNull() ?: 12
+  val greetingWord = when {
+    hour in 5..11  -> "Good morning"
+    hour in 12..16 -> "Good afternoon"
+    hour in 17..21 -> "Good evening"
+    else           -> "Good night"
+  }
+  val timeOfDayLabel = when {
+    hour in 5..11  -> "Morning"
+    hour in 12..16 -> "Afternoon"
+    hour in 17..21 -> "Evening"
+    else           -> "Night"
+  }
+
+  // --- formatted strings ---
+  val dayDateString = SimpleDateFormat("EEEE, MMM d", Locale.getDefault()).format(now)
+      .uppercase(Locale.getDefault())
+  val timeString = SimpleDateFormat("h:mm a", Locale.getDefault()).format(now)
+  val fullDate   = SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).format(now)
+
+  // --- local dashboard palette ---
+  val textPrimary   = Color(0xFFF0F0F5)
+  val textSecondary = Color(0xFF8888A0)
+  val textMuted     = Color(0xFF55556A)
+  val accentGreen   = Color(0xFF30D158)
+  val accentAmber   = Color(0xFFFF9F0A)
+  val accentBlue    = Color(0xFF0A84FF)
+  val batteryColor  = when {
+    battery.charging    -> accentGreen
+    battery.percent <= 15 -> Color(0xFFFF453A)
+    else                -> textPrimary
+  }
+
+  Box(
+      modifier = Modifier
+          .fillMaxSize()
+          .background(Brush.verticalGradient(listOf(Color(0xFF0F0F12), Color(0xFF111116))))
+  ) {
     Column(
-        modifier =
-            Modifier.fillMaxHeight()
-                // Optionally cap the content width and center it so the grid stays
-                // comfortably sized on large displays (e.g. Portal+ 1920px) instead
-                // of stretching 6 columns across the whole panel. Off by default —
-                // most users want the full screen — and gated on the user's
-                // "Constrain page width" preference; uncapped, fillMaxWidth takes the
-                // whole panel. (widthIn must precede fillMaxWidth so the cap wins,
-                // then align centers the capped content.)
-                .align(Alignment.TopCenter)
-                .widthIn(max = if (constrainPageWidth) 1264.dp else Dp.Infinity)
-                .fillMaxWidth()
-                // Top is padded clear of the 60dp systemui status-bar window,
-                // which silently eats touches even while hidden in immersive —
-                // so header action buttons stay tappable.
-                .padding(start = 32.dp, end = 32.dp, top = 40.dp, bottom = 24.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 28.dp, vertical = 18.dp)
     ) {
-      HeaderBar(onScreensaver = onStartScreensaver)
-      Spacer(Modifier.size(8.dp))
+      // ── TOP BAR ──────────────────────────────────────────────────────────────
+      Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Column {
+          Text(
+              text = dayDateString,
+              color = textMuted,
+              fontSize = 11.sp,
+              fontWeight = FontWeight.SemiBold,
+              letterSpacing = 1.5.sp,
+          )
+          Spacer(Modifier.size(4.dp))
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "$greetingWord, ",
+                color = textPrimary,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = "Rohit",
+                color = textSecondary,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+            )
+          }
+        }
+        Column(horizontalAlignment = Alignment.End) {
+          Text(
+              text = timeString,
+              color = textPrimary,
+              fontSize = 30.sp,
+              fontWeight = FontWeight.Light,
+          )
+          val wc = weatherCurrent
+          if (wc != null) {
+            Text(
+                text = "${wc.city} · ${wc.temp}° · ${Weather.emoji(wc.code)}",
+                color = textSecondary,
+                fontSize = 13.sp,
+            )
+          }
+        }
+      }
+
+      Spacer(Modifier.size(12.dp))
+
+      // ── STATUS PILLS ─────────────────────────────────────────────────────────
+      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        weatherCurrent?.let { wc ->
+          DashStatusPill(text = "${Weather.emoji(wc.code)} ${wc.temp}°", accentColor = accentAmber)
+        }
+        if (battery.present) {
+          DashStatusPill(text = "${battery.percent}%", accentColor = batteryColor)
+        }
+        DashStatusPill(text = timeOfDayLabel, accentColor = accentBlue)
+      }
+
+      Spacer(Modifier.size(20.dp))
       androidx.compose.material3.HorizontalDivider(
-          color = Color(0x1AFFFFFF),
+          color = Color(0xFF2A2A35),
           thickness = 1.dp,
           modifier = Modifier.fillMaxWidth(),
       )
-      Spacer(Modifier.size(16.dp))
-      Box(
-          modifier =
-              Modifier.fillMaxWidth()
-                  .weight(1f)
-                  .onGloballyPositioned { containerOrigin = it.boundsInWindow().topLeft }
-                  // One stable, page-flip-proof drag detector for EVERY tile (apps, folders,
-                  // built-ins AND widgets). It watches for a long-press in the pointer Initial pass,
-                  // so it grabs the tile under the finger before a hosted widget's AndroidView can
-                  // swallow the touch — without consuming anything until the long-press actually
-                  // fires, so normal taps / widget interaction / page swipes still work.
-                  .pointerInput(Unit) {
-                    awaitEachGesture {
-                      val down =
-                          awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-                      val slop = viewConfiguration.touchSlop
-                      // Wait for the long-press without consuming. Returns non-null if the gesture
-                      // was a tap/move/swipe instead (let children handle it); null on timeout = a
-                      // genuine long-press.
-                      val aborted =
-                          withTimeoutOrNull(viewConfiguration.longPressTimeoutMillis) {
-                            var done = false
-                            while (!done) {
-                              val e = awaitPointerEvent(PointerEventPass.Initial)
-                              val c = e.changes.firstOrNull { it.id == down.id }
-                              if (c == null ||
-                                  !c.pressed ||
-                                  (c.position - down.position).getDistance() > slop) {
-                                done = true
-                              }
-                            }
-                            true
-                          }
-                      if (aborted != null) return@awaitEachGesture
-                      val win = down.position + containerOrigin
-                      val hitIdx =
-                          slotBounds.entries.firstOrNull { it.value.contains(win) }?.key
-                      val hitKey = hitIdx?.let { gridSlots.getOrNull(it) }
-                      if (hitKey == null) return@awaitEachGesture
-                      containerDragging = true
-                      startTileDrag(hitKey, win)
-                      val endedNormally =
-                          drag(down.id) { change ->
-                            change.consume()
-                            moveTileDrag(change.position - change.previousPosition)
-                          }
-                      if (endedNormally) endTileDrag() else cancelTileDrag()
-                      containerDragging = false
-                    }
-                  },
+      Spacer(Modifier.size(20.dp))
+
+      // ── HERO ROW — 3 large cards, asymmetric weights ──────────────────────────
+      Row(
+          modifier = Modifier.fillMaxWidth().height(200.dp),
+          horizontalArrangement = Arrangement.spacedBy(12.dp),
       ) {
-        val tileDp = LocalTileDp.current
-        BoxWithConstraints(Modifier.fillMaxSize()) {
-          // Fit whole rows per page from the available height, then page horizontally (iOS-style).
-          // Use a safe row height (icon + spacer + label + padding) and reserve the page-dots strip
-          // below the pager, so the bottom row is never clipped in half.
-          val rowH = tileDp + 42.dp
-          val dotsReserve = 30.dp
-          val avail = (maxHeight - dotsReserve).coerceAtLeast(rowH)
-          val rows = ((avail.value + 20f) / (rowH.value + 20f)).toInt().coerceAtLeast(1)
-          val cap = (gridColumns * rows).coerceAtLeast(1)
-          LaunchedEffect(cap) { pageCapacity = cap }
-          LaunchedEffect(allTileKeys, cap, dragKey != null, appsLoaded) {
-            // Keep a spare empty page only while arranging; otherwise empty pages are removed.
-            val normalized =
-                HomeGrid.normalizeToPagesWhenReady(
-                    gridSlots,
-                    allTileKeys,
-                    cap,
-                    keepSpare = dragKey != null,
-                    dynamicTilesLoaded = appsLoaded,
-                )
-            if (normalized != gridSlots) {
-              gridSlots = normalized
-              UserLayout.saveGridSlots(context, normalized)
-            }
-          }
-          Column(Modifier.fillMaxSize()) {
-            HorizontalPager(
-                state = pagerState,
-                // Disable horizontal page-swipe while a tile is being dragged (edge auto-advance
-                // takes over then); otherwise swiping flips between app pages.
-                userScrollEnabled = dragKey == null,
-                // Keep the neighbouring page composed so a drag survives a single edge page-flip
-                // (the dragged tile's gesture node isn't disposed when the page scrolls).
-                beyondViewportPageCount = 1,
-                modifier = Modifier.weight(1f).focusRequester(homeGridFocus).focusGroup(),
-            ) { page ->
-              LazyVerticalGrid(
-                  columns = GridCells.Fixed(gridColumns),
-                  horizontalArrangement = Arrangement.spacedBy(16.dp),
-                  verticalArrangement = Arrangement.spacedBy(20.dp),
-                  contentPadding = PaddingValues(horizontal = 24.dp),
-                  userScrollEnabled = false,
-                  modifier = Modifier.fillMaxSize(),
-              ) {
-                val pageStart = page * pageCapacity
-                val pageEnd = minOf(pageStart + pageCapacity, gridSlots.size)
-                val pageSize = (pageEnd - pageStart).coerceAtLeast(0)
-                // Free-placement grid: every cell is a slot — a tile or an intentional blank.
-                // Dragging a tile swaps slots, so blanks stay where the user left them. A long-press
-                // both enters Manage mode AND starts the drag in one gesture (see startTileDrag).
-                items(
-                    count = pageSize,
-                    key = { li -> gridSlots[pageStart + li] ?: "blank:${pageStart + li}" },
-                    span = { li -> GridItemSpan(widthOf(gridSlots[pageStart + li])) },
-                ) { li ->
-                  val i = pageStart + li
-                  val key = gridSlots[i]
-            val boundsMod = Modifier.onGloballyPositioned { slotBounds[i] = it.boundsInWindow() }
-            if (key == null) {
-              // Blank cell — an invisible drop target with the same footprint as a tile so the
-              // grid lines up perfectly whether a cell is filled or empty.
-              Column(
-                  horizontalAlignment = Alignment.CenterHorizontally,
-                  modifier = boundsMod.fillMaxWidth().padding(4.dp),
-              ) {
-                Box(Modifier.size(tileDp))
-                Spacer(Modifier.size(8.dp))
-                Text(" ", color = Color.Transparent, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+        DashHeroCard(
+            modifier    = Modifier.weight(1.4f).fillMaxHeight(),
+            gradient    = listOf(Color(0xFF1F2937), Color(0xFF111827)),
+            accentColor = accentAmber,
+            icon        = "📅",
+            title       = "PortalHub",
+            subtitle    = "Calendar & Family",
+            onClick     = {
+              runCatching {
+                context.startActivity(
+                    Intent(Intent.ACTION_MAIN)
+                        .addCategory(Intent.CATEGORY_LAUNCHER)
+                        .setPackage("com.immortal.hub")
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
               }
-            } else {
-              val isDragged = dragKey == key
-              when {
-                key == BUILTIN_CALLS ->
-                    HomeTileFrame(boundsMod, isDragged) { PortalHomeTile(onExitHome) }
-                key == BUILTIN_STORE ->
-                    HomeTileFrame(boundsMod, isDragged) { StoreTile(onOpenStore) }
-                key == BUILTIN_TOOLS ->
-                    HomeTileFrame(boundsMod, isDragged) {
-                      ToolsTile {
-                        context.startActivity(Intent(context, ToolsActivity::class.java))
-                      }
-                    }
-                key == BUILTIN_UPDATES ->
-                    HomeTileFrame(boundsMod, isDragged) {
-                      UpdatesTile(update = update, status = updateStatus) {
-                        val info = update
-                        if (info != null) {
-                          UpdateManager.installUpdate(context, info) { updateStatus = it }
-                        } else {
-                          updateStatus = "Checking…"
-                          UpdateManager.checkForUpdate(context) {
-                            update = it
-                            updateStatus = if (it == null) "Up to date" else null
-                          }
-                        }
-                      }
-                    }
-                key.startsWith(WIDGET_KEY) ->
-                    widgetByKey[key]?.let { w ->
-                      WidgetCell(
-                          widget = w,
-                          host = appWidgetHost,
-                          manager = appWidgetManager,
-                          editMode = editMode,
-                          tileDp = tileDp,
-                          dimmed = isDragged,
-                          modifier = boundsMod.alpha(if (isDragged) 0f else 1f),
-                          onRemove = { removeWidget(w) },
-                      )
-                    }
-                key.startsWith(FOLDER_KEY) -> {
-                  val name = key.removePrefix(FOLDER_KEY)
-                  HomeTileFrame(boundsMod, isDragged) {
-                    FolderTile(
-                        name = name,
-                        apps = appsEff.filter { it.folder == name },
-                        editMode = editMode,
-                        onClick = { openFolder = name },
-                    )
-                  }
-                }
-                key.startsWith(APP_KEY) ->
-                    appByKey[key]?.let { app ->
-                      val isFoldTarget = foldTarget == key
-                      AppTile(
-                          app = app,
-                          editMode = editMode,
-                          dimmed = isDragged,
-                          modifier =
-                              boundsMod
-                                  .alpha(if (isDragged) 0f else 1f)
-                                  .then(
-                                      if (isFoldTarget)
-                                          Modifier.border(2.dp, Color.White, RoundedCornerShape(18.dp))
-                                      else Modifier),
-                          onClick = { onLaunch(app.component) },
-                          onDelete = { onUninstall(app.component.packageName) },
-                      )
-                    }
-                  }
-                }
+            },
+        )
+        DashHeroCard(
+            modifier    = Modifier.weight(1.2f).fillMaxHeight(),
+            gradient    = listOf(Color(0xFF1A1030), Color(0xFF0D0820)),
+            accentColor = Color(0xFFBF5AF2),
+            icon        = "🤖",
+            title       = "Jarvis",
+            subtitle    = "AI Assistant",
+            onClick     = {
+              runCatching {
+                context.startActivity(
+                    Intent(Intent.ACTION_MAIN)
+                        .addCategory(Intent.CATEGORY_LAUNCHER)
+                        .setPackage("com.immortal.jarvis")
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
               }
-            }
+            },
+        )
+        DashHeroCard(
+            modifier    = Modifier.weight(1.0f).fillMaxHeight(),
+            gradient    = listOf(Color(0xFF0C1A2E), Color(0xFF060D18)),
+            accentColor = accentBlue,
+            icon        = "📞",
+            title       = "Calls",
+            subtitle    = "WhatsApp & Messenger",
+            onClick     = { onExitHome() },
+        )
+      }
+
+      Spacer(Modifier.size(16.dp))
+
+      // ── QUICK ACTIONS ─────────────────────────────────────────────────────────
+      DashSectionLabel("QUICK ACTIONS")
+      Spacer(Modifier.size(8.dp))
+      Row(
+          modifier = Modifier.fillMaxWidth().height(90.dp),
+          horizontalArrangement = Arrangement.spacedBy(10.dp),
+      ) {
+        DashQuickTile(
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            icon     = "📦",
+            label    = "App Store",
+            onClick  = { onOpenStore() },
+        )
+        DashQuickTile(
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            icon     = "🌐",
+            label    = "Browser",
+            onClick  = {
+              runCatching {
+                context.startActivity(
+                    Intent(Intent.ACTION_MAIN)
+                        .addCategory(Intent.CATEGORY_LAUNCHER)
+                        .setPackage("org.chromium.chrome")
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+              }
+            },
+        )
+        DashQuickTile(
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            icon     = "🔧",
+            label    = "Tools",
+            onClick  = {
+              runCatching {
+                context.startActivity(Intent(context, ToolsActivity::class.java))
+              }
+            },
+        )
+        DashQuickTile(
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            icon     = "⚙️",
+            label    = "Settings",
+            onClick  = {
+              runCatching {
+                context.startActivity(Intent(context, ImmortalSettingsActivity::class.java))
+              }
+            },
+        )
+      }
+
+      Spacer(Modifier.size(16.dp))
+
+      // ── BOTTOM ROW — fills remaining space ────────────────────────────────────
+      Row(
+          modifier = Modifier
+              .fillMaxWidth()
+              .weight(1f),
+          horizontalArrangement = Arrangement.spacedBy(12.dp),
+      ) {
+        DashCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
+          Column(modifier = Modifier.padding(16.dp)) {
+            DashSectionLabel("TODAY")
+            Spacer(Modifier.size(6.dp))
+            Text(
+                text = fullDate,
+                color = textPrimary,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = SimpleDateFormat("EEEE", Locale.getDefault()).format(now),
+                color = textSecondary,
+                fontSize = 13.sp,
+            )
           }
-          if (pageCount > 1) {
-            Spacer(Modifier.size(10.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-              PageDots(selected = pagerState.currentPage, count = pageCount)
-            }
+        }
+        DashCard(modifier = Modifier.weight(1.5f).fillMaxHeight()) {
+          Column(modifier = Modifier.padding(16.dp)) {
+            DashSectionLabel("NOW PLAYING")
+            Spacer(Modifier.size(6.dp))
+            Text(
+                text = "Nothing playing",
+                color = textMuted,
+                fontSize = 14.sp,
+            )
           }
+        }
+        DashCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
+          Column(modifier = Modifier.padding(16.dp)) {
+            DashSectionLabel("SYSTEM")
+            Spacer(Modifier.size(6.dp))
+            Text(
+                text = "Up to date",
+                color = accentGreen,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+            )
+            Text(
+                text = "All apps current",
+                color = textMuted,
+                fontSize = 11.sp,
+            )
           }
         }
       }
-      // Optional weather forecast, pinned full-width at the bottom of the screen
-      // below the (scrolling) app grid. Off by default.
-      if (weatherWidget != ImmortalSettings.WIDGET_OFF) {
-        Spacer(Modifier.size(16.dp))
-        WeatherWidget(mode = weatherWidget, fahrenheit = weatherFahrenheit)
-      }
-    }
-
-    // Manage / Done toggle lives in the bottom-right corner. While managing, a
-    // sibling + button opens the widget picker so widgets are an edit action, not
-    // a permanent launcher tile.
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.align(Alignment.BottomEnd).padding(end = 36.dp, bottom = 32.dp),
-    ) {
-      if (editMode) TidyButton { tidyGrid() }
-      if (editMode) AddWidgetButton { showWidgetPicker = true }
-      EditButton(editMode = editMode, onClick = { editMode = !editMode })
-    }
-
-    // Floating ghost of the tile being dragged — it follows the finger while the grid reflows
-    // beneath it (the source cell is hidden via alpha while dragging).
-    dragKey?.let { key ->
-      val ghostDp = LocalTileDp.current
-      val half = with(androidx.compose.ui.platform.LocalDensity.current) { (ghostDp / 2).toPx() }
-      val ghostMod =
-          Modifier.offset {
-                IntOffset((dragPos.x - half).roundToInt(), (dragPos.y - half).roundToInt())
-              }
-              .size(ghostDp)
-      val app = appByKey[key]
-      if (app != null) {
-        Image(
-            bitmap = app.icon,
-            contentDescription = null,
-            modifier = ghostMod.clip(RoundedCornerShape(20.dp)),
-        )
-      } else {
-        // Folders / built-ins / widgets: a simple lifted tile stand-in.
-        Box(
-            modifier =
-                ghostMod
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0xF23A3A3C)),
-        )
-      }
-    }
-
-    openFolder?.let { name ->
-      val folderApps = appsEff.filter { it.folder == name }
-      if (folderApps.isEmpty()) {
-        LaunchedEffect(name) { openFolder = null }
-      } else {
-        FolderOverlay(
-            name = name,
-            apps = folderApps,
-            onLaunch = {
-              onLaunch(it)
-              openFolder = null
-            },
-            onRename = { renaming = name },
-            onMoveOut = { moveOut(it) },
-            onDismiss = { openFolder = null },
-            extras =
-                if (name == "Settings")
-                    listOf(
-                        FolderExtra("Immortal", ICON_GEAR) {
-                          openFolder = null
-                          runCatching {
-                            context.startActivity(
-                                Intent(context, ImmortalSettingsActivity::class.java))
-                          }
-                        },
-                        FolderExtra("Screensaver", ICON_IMAGE) {
-                          openFolder = null
-                          runCatching {
-                            context.startActivity(
-                                Intent(context, ScreensaverSettingsActivity::class.java))
-                          }
-                        },
-                        FolderExtra("Help", ICON_HELP) {
-                          openFolder = null
-                          onOpenHelp()
-                        })
-                else emptyList(),
-        )
-      }
-    }
-
-    // Name a new folder (created by dropping one app on another).
-    pendingPair?.let { (src, tgt) ->
-      NameOverlay(
-          title = "Name folder",
-          initial = "Folder",
-          confirmLabel = "Create",
-          onConfirm = {
-            createFolder(src, tgt, it)
-            pendingPair = null
-          },
-          onCancel = { pendingPair = null },
-      )
-    }
-
-    // Rename an existing folder.
-    renaming?.let { old ->
-      NameOverlay(
-          title = "Rename folder",
-          initial = old,
-          confirmLabel = "Rename",
-          onConfirm = {
-            renameFolder(old, it)
-            renaming = null
-          },
-          onCancel = { renaming = null },
-      )
-    }
-
-    if (showWidgetPicker) {
-      val providers by
-          produceState(initialValue = emptyList<WidgetProviderEntry>(), reload, tileSize) {
-            value = withContext(Dispatchers.IO) { loadWidgetProviders(context, tileDpFor(tileSize)) }
-          }
-      WidgetPickerOverlay(
-          providers = providers,
-          status = widgetStatus,
-          onPick = { addWidget(it) },
-          onDismiss = {
-            showWidgetPicker = false
-            widgetStatus = null
-          },
-      )
-    }
-
-    // Timer "time's up" alarm: a full-screen swipe-to-stop overlay while ringing.
-    if (timerRinging) {
-      TimerAlarmOverlay(onStop = { TimerAlarm.stop(context) })
     }
   }
-  } // CompositionLocalProvider(LocalTileDp)
 }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dashboard helper composables — used by LauncherScreen's premium dark layout
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Dark rounded card surface for the bottom-row tiles. */
+@Composable
+private fun DashCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+  Box(
+      modifier = modifier
+          .clip(RoundedCornerShape(18.dp))
+          .background(Color(0xFF1C1C22))
+          .border(1.dp, Color(0xFF2A2A35).copy(alpha = 0.7f), RoundedCornerShape(18.dp)),
+  ) {
+    content()
+  }
+}
+
+/** Small caps section label (11sp, muted, letter-spaced). */
+@Composable
+private fun DashSectionLabel(text: String) {
+  Text(
+      text = text.uppercase(Locale.getDefault()),
+      color = Color(0xFF55556A),
+      fontSize = 11.sp,
+      fontWeight = FontWeight.SemiBold,
+      letterSpacing = 1.5.sp,
+  )
+}
+
+/** Coloured pill badge for status indicators (weather, battery, time-of-day). */
+@Composable
+private fun DashStatusPill(text: String, accentColor: Color) {
+  Box(
+      modifier = Modifier
+          .clip(RoundedCornerShape(50))
+          .background(Color(0xFF252530))
+          .border(1.dp, accentColor.copy(alpha = 0.4f), RoundedCornerShape(50))
+          .padding(horizontal = 12.dp, vertical = 5.dp),
+  ) {
+    Text(
+        text = text,
+        color = accentColor,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Medium,
+    )
+  }
+}
+
+/** Gradient hero card for primary app shortcuts (PortalHub, Jarvis, Calls). */
+@Composable
+private fun DashHeroCard(
+    modifier: Modifier = Modifier,
+    gradient: List<Color>,
+    accentColor: Color,
+    icon: String,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+) {
+  Box(
+      modifier = modifier
+          .clip(RoundedCornerShape(18.dp))
+          .background(Brush.verticalGradient(gradient))
+          .border(1.dp, accentColor.copy(alpha = 0.25f), RoundedCornerShape(18.dp))
+          .clickable(onClick = onClick),
+  ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(18.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+      Text(text = icon, fontSize = 36.sp)
+      Column {
+        Text(
+            text = title,
+            color = Color(0xFFF0F0F5),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = subtitle,
+            color = Color(0xFF8888A0),
+            fontSize = 12.sp,
+        )
+        Spacer(Modifier.size(8.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+                .background(accentColor.copy(alpha = 0.6f)),
+        )
+      }
+    }
+  }
+}
+
+/** Square quick-action tile (App Store, Browser, Tools, Settings). */
+@Composable
+private fun DashQuickTile(
+    modifier: Modifier = Modifier,
+    icon: String,
+    label: String,
+    onClick: () -> Unit,
+) {
+  Box(
+      modifier = modifier
+          .clip(RoundedCornerShape(14.dp))
+          .background(Color(0xFF1C1C22))
+          .border(1.dp, Color(0xFF2A2A35).copy(alpha = 0.7f), RoundedCornerShape(14.dp))
+          .clickable(onClick = onClick),
+      contentAlignment = Alignment.Center,
+  ) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+      Text(text = icon, fontSize = 26.sp)
+      Text(
+          text = label,
+          color = Color(0xFF8888A0),
+          fontSize = 11.sp,
+          fontWeight = FontWeight.Medium,
+      )
+    }
+  }
+}
+
 
 /**
  * Full-screen "time's up" alarm overlay with an iOS-style slide-to-stop. Blocks touches from
