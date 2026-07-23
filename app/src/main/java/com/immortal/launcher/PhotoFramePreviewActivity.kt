@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -75,6 +76,11 @@ class PhotoFramePreviewActivity : ComponentActivity() {
       finish()
       return
     }
+
+    // Render the frame *over* a secure keyguard so a presence/motion wake lands on the slideshow
+    // (or the night clock), the stock pre-Immortal behaviour, instead of the PIN pad (issue #158).
+    // Placed after the overnight-dark early-return above so it never fights the night blanking.
+    showOverKeyguard()
 
     frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false))
     // Only the screensaver-continuation launch (DreamPolicy's force-wake handoff) honours the
@@ -152,6 +158,25 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     setIntent(intent)
     launchDismissOnExit = intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock
     Log.i(TAG, "onNewIntent (reused instance): launchDismiss=$launchDismissOnExit")
+  }
+
+  /**
+   * Show the frame over a secure keyguard and turn the panel on for it, so a presence/motion wake
+   * surfaces the slideshow rather than the lock screen (issue #158). Mirrors [WakeLightActivity]'s
+   * show-over-lock flags but deliberately OMITS FLAG_DISMISS_KEYGUARD: the keyguard stays armed
+   * underneath, so a Portal in a public space still requires the PIN to actually *use* the device —
+   * finishing this frame on a tap falls back to the keyguard-protected launcher, which prompts the
+   * PIN on interaction. No-op on devices without a secure lock set.
+   */
+  private fun showOverKeyguard() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+      setShowWhenLocked(true)
+      setTurnScreenOn(true)
+    } else {
+      window.addFlags(
+          WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+              WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+    }
   }
 
   private fun applyKeepScreenOn() {
