@@ -15,8 +15,14 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import androidx.compose.ui.graphics.toArgb
 import com.immortal.launcher.ClockFaceView
 import com.immortal.launcher.ClockSpec
+import com.immortal.launcher.ui.theme.CardDeep
+import com.immortal.launcher.ui.theme.CardDivider
+import com.immortal.launcher.ui.theme.CardMid
+import com.immortal.launcher.ui.theme.ClockPrimary
+import com.immortal.launcher.ui.theme.ClockSecondary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -31,6 +37,8 @@ class SplitFlapClockFaceView(
     private val spec: ClockSpec,
 ) : ClockFaceView {
 
+    override val fullBleed: Boolean = true
+
     private val timeFmt = SimpleDateFormat("HHmm", Locale.getDefault())
     private var displayedDigits = charArrayOf('0', '0', '0', '0')
     private var pendingDigits   = charArrayOf('0', '0', '0', '0')
@@ -39,23 +47,23 @@ class SplitFlapClockFaceView(
     private val animators       = arrayOfNulls<ValueAnimator>(4)
 
     private val cardPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF1A1A2E.toInt()
+        color = CardDeep.toArgb()
     }
     private val topCardPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF22223A.toInt()
+        color = CardMid.toArgb()
     }
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFFEEEEFF.toInt()
+        color = ClockPrimary.toArgb()
         typeface = Typeface.DEFAULT_BOLD
         textAlign = Paint.Align.CENTER
     }
     private val colonPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF8888AA.toInt()
+        color = ClockSecondary.toArgb()
         typeface = Typeface.DEFAULT_BOLD
         textAlign = Paint.Align.CENTER
     }
     private val dividerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF000000.toInt()
+        color = CardDivider.toArgb()
         strokeWidth = 3f
     }
 

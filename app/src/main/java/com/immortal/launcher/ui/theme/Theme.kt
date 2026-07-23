@@ -34,7 +34,8 @@ private val PrimeDarkColorScheme = darkColorScheme(
     surfaceVariant       = SurfaceVariant,
     onSurfaceVariant     = ContentSecondary,
     surfaceContainer     = SurfaceContainer,
-    outline              = GlassBorder,
+    outline              = ContentTertiary,
+    outlineVariant       = GlassBorder,
     error                = Error,
     onError              = ContentOnAccent,
 )

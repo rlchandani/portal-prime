@@ -40,6 +40,12 @@ val ClockPrimary      = Color(0xFFEEEEFF)   // near-white with blue tint
 val ClockSecondary    = Color(0xFF8888AA)   // subdued for seconds / colon
 val AccentGlow        = Color(0xFF6699FF)   // neon halo color for glow shadow
 
+// Split-flap card backgrounds
+val CardDeep          = Color(0xFF1A1A2E)   // deep card background
+val CardMid           = Color(0xFF22223A)   // card top half background
+val CardDivider       = Color(0xFF000000)   // card centre divider
+val ArcTrack          = Color(0x33FFFFFF)   // seconds arc track (translucent)
+
 // Semantic
 val Success           = Color(0xFF4CAF50)
 val Warning           = Color(0xFFFF9800)

@@ -84,7 +84,7 @@ internal fun Card(content: @Composable () -> Unit) {
 /** A hairline divider between rows in a [Card]. */
 @Composable
 internal fun Divider() {
-  Spacer(Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outline))
+  Spacer(Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
 }
 
 /**
