@@ -71,8 +71,8 @@ class SplitFlapClockFaceView(
             val gap    = cardW * 0.06f
             val colonW = cardW * 0.3f
 
-            // Total width: 4 cards + 1 colon + gaps
-            val totalW = 4 * cardW + colonW + 5 * gap
+            // Total width: 4 cards + 1 colon + gaps (4 gaps: after each digit, plus after colon)
+            val totalW = 4 * cardW + colonW + 4 * gap
             val startX = (w - totalW) / 2f
             val startY = (h - cardH) / 2f
 
@@ -111,8 +111,7 @@ class SplitFlapClockFaceView(
                 // Draw flip card if animating
                 val progress = flipProgress[i]
                 if (progress > 0f) {
-                    val flipRect = RectF(x, startY + cardH / 2f - (cardH / 2f) * (1f - progress),
-                                        x + cardW, startY + cardH / 2f)
+                    val flipRect = RectF(x, startY, x + cardW, startY + cardH / 2f)
                     canvas.save()
                     canvas.scale(1f, progress, x + cardW / 2f, startY + cardH / 2f)
                     canvas.drawRoundRect(flipRect, radius, radius, topCardPaint)
