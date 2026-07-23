@@ -13,6 +13,7 @@ import android.graphics.Outline
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
+import com.immortal.launcher.ui.clock.PrimeDigitalClockFaceView
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.FrameLayout
@@ -40,12 +41,13 @@ interface ClockFaceView {
   fun dispose() {}
 }
 
-/** Pick the renderer for a clock spec. ANALOG / WORD fall back to digital until built. */
+/** Pick the renderer for a clock spec. ANALOG / WORD fall back to the premium digital face. */
 fun makeClockFace(context: Context, spec: ClockSpec, assets: AssetResolver): ClockFaceView =
     when (spec.mode) {
       ClockMode.NONE -> NoClockFaceView(context)
       ClockMode.FLIP -> FlipWebClockFaceView(context, spec)
-      else -> DigitalClockFaceView(context, spec, assets)
+      ClockMode.DIGITAL -> PrimeDigitalClockFaceView(context, spec, assets)
+      else -> PrimeDigitalClockFaceView(context, spec, assets)
     }
 
 /** A clock that draws nothing — used when the user turns clock faces off (photos only). */
