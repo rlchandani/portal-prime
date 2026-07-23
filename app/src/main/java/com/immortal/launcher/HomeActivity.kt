@@ -26,7 +26,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import android.content.pm.PackageInstaller
-import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.StartOffset
 import androidx.compose.animation.core.animateFloat
@@ -138,6 +138,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.immortal.launcher.ui.components.GlassTile
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.net.HttpURLConnection
 import java.net.URL
@@ -2087,16 +2088,12 @@ private fun BuiltInTile(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.fillMaxWidth().padding(4.dp).tvFocusable(RoundedCornerShape(22.dp)) { onClick() },
   ) {
-    Surface(
-        color = background,
-        shape = RoundedCornerShape(20.dp),
+    GlassTile(
         modifier = Modifier.size(tileDp),
     ) {
-      Box(contentAlignment = Alignment.Center) {
-        Canvas(Modifier.size(46.dp * (tileDp / 88.dp))) {
-          val s = size.minDimension / 24f
-          scale(s, s, pivot = Offset.Zero) { drawPath(path, Color.White) }
-        }
+      Canvas(Modifier.size(46.dp * (tileDp / 88.dp))) {
+        val s = size.minDimension / 24f
+        scale(s, s, pivot = Offset.Zero) { drawPath(path, Color.White) }
       }
     }
     Spacer(Modifier.size(8.dp))
@@ -2118,9 +2115,7 @@ private fun FolderTile(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = modifier.fillMaxWidth().padding(4.dp).tvFocusable(RoundedCornerShape(22.dp)) { onClick() },
   ) {
-    Surface(
-        color = Color(0xFF3A3A3A),
-        shape = RoundedCornerShape(20.dp),
+    GlassTile(
         modifier = Modifier.size(tileDp).jiggle(editMode, name.hashCode()),
     ) {
       Column(
@@ -3125,7 +3120,7 @@ private fun Modifier.jiggle(enabled: Boolean, seed: Int): Modifier {
           targetValue = 2.0f,
           animationSpec =
               infiniteRepeatable(
-                  animation = tween(durationMillis = 170, easing = LinearEasing),
+                  animation = tween(durationMillis = 180, easing = FastOutSlowInEasing),
                   repeatMode = RepeatMode.Reverse,
                   initialStartOffset = StartOffset(phase),
               ),
@@ -3137,7 +3132,7 @@ private fun Modifier.jiggle(enabled: Boolean, seed: Int): Modifier {
           targetValue = 1.4f,
           animationSpec =
               infiniteRepeatable(
-                  animation = tween(durationMillis = 230, easing = LinearEasing),
+                  animation = tween(durationMillis = 180, easing = FastOutSlowInEasing),
                   repeatMode = RepeatMode.Reverse,
                   initialStartOffset = StartOffset(phase + 60),
               ),
