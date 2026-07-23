@@ -28,10 +28,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.content.pm.PackageInstaller
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.StartOffset
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -70,6 +73,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.text.BasicTextField
@@ -139,6 +143,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.immortal.launcher.ui.components.GlassTile
+import com.immortal.launcher.ui.theme.ContentPrimary
+import com.immortal.launcher.ui.theme.ContentSecondary
+import com.immortal.launcher.ui.theme.PrimeBlue
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.net.HttpURLConnection
 import java.net.URL
@@ -879,7 +886,13 @@ private fun LauncherScreen(
                 .padding(start = 32.dp, end = 32.dp, top = 40.dp, bottom = 24.dp)
     ) {
       HeaderBar(onScreensaver = onStartScreensaver)
-      Spacer(Modifier.size(20.dp))
+      Spacer(Modifier.size(8.dp))
+      androidx.compose.material3.HorizontalDivider(
+          color = Color(0x1AFFFFFF),
+          thickness = 1.dp,
+          modifier = Modifier.fillMaxWidth(),
+      )
+      Spacer(Modifier.size(16.dp))
       Box(
           modifier =
               Modifier.fillMaxWidth()
@@ -971,6 +984,7 @@ private fun LauncherScreen(
                   columns = GridCells.Fixed(gridColumns),
                   horizontalArrangement = Arrangement.spacedBy(16.dp),
                   verticalArrangement = Arrangement.spacedBy(20.dp),
+                  contentPadding = PaddingValues(horizontal = 24.dp),
                   userScrollEnabled = false,
                   modifier = Modifier.fillMaxSize(),
               ) {
@@ -997,7 +1011,7 @@ private fun LauncherScreen(
               ) {
                 Box(Modifier.size(tileDp))
                 Spacer(Modifier.size(8.dp))
-                Text(" ", color = Color.Transparent, fontSize = 15.sp, maxLines = 1)
+                Text(" ", color = Color.Transparent, style = MaterialTheme.typography.labelMedium, maxLines = 1)
               }
             } else {
               val isDragged = dragKey == key
@@ -1426,15 +1440,18 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
   // Layout: the big clock anchors the left; the weather and date stack on the
   // right, right-aligned, so the header reads as a balanced pair of blocks. The
   // clock and the right-hand stack are centred against each other.
-  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+  Row(
+      modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
     // Clock anchors the top-left corner; the action buttons sit just to its right
     // (now that there's a group of them, leading with the buttons looked off).
     Text(
         SimpleDateFormat(if (use24Hour) "H:mm" else "h:mm", Locale.getDefault()).format(now),
         color = Color.White,
-        fontSize = 56.sp,
+        fontSize = 72.sp,
         fontWeight = FontWeight.Light,
-        lineHeight = 56.sp,
+        lineHeight = 72.sp,
     )
     Spacer(Modifier.size(28.dp))
     // Screensaver entry — the stock launcher's stacked-photo icon so the affordance
@@ -1506,14 +1523,16 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
           BatteryIndicator(percent = battery.percent, charging = battery.charging)
         }
         if (weather.isNotBlank()) {
-          Text(weather, color = Color.White, fontSize = 30.sp)
+          Text(weather, color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Light)
         }
       }
       Text(
           DateFormatter.format(now, "EEEEMMMMd"),
-          color = Color(0xFFDADADA),
-          fontSize = 18.sp,
-          modifier = Modifier.padding(top = 4.dp),
+          color = Color(0xFFAAAAAA),
+          fontSize = 20.sp,
+          fontWeight = FontWeight.Normal,
+          letterSpacing = 0.5.sp,
+          modifier = Modifier.padding(top = 6.dp),
       )
     }
   }
@@ -1744,11 +1763,12 @@ private fun WeatherWidget(mode: String, fahrenheit: Boolean) {
 private fun PageDots(selected: Int, count: Int) {
   Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
     repeat(count) { i ->
+      val isActive = i == selected
       Box(
           modifier =
-              Modifier.size(7.dp)
+              Modifier.size(if (isActive) 6.dp else 4.dp)
                   .clip(androidx.compose.foundation.shape.CircleShape)
-                  .background(if (i == selected) Color.White else Color(0x55FFFFFF)))
+                  .background(if (isActive) PrimeBlue else Color(0x55FFFFFF)))
     }
   }
 }
@@ -2097,7 +2117,13 @@ private fun BuiltInTile(
       }
     }
     Spacer(Modifier.size(8.dp))
-    Text(label, color = Color.White, fontSize = 15.sp, maxLines = 1, textAlign = TextAlign.Center)
+    Text(
+        label,
+        color = ContentSecondary,
+        style = MaterialTheme.typography.labelMedium,
+        maxLines = 1,
+        textAlign = TextAlign.Center,
+    )
   }
 }
 
@@ -2138,8 +2164,8 @@ private fun FolderTile(
     Spacer(Modifier.size(8.dp))
     Text(
         name,
-        color = Color.White,
-        fontSize = 15.sp,
+        color = ContentSecondary,
+        style = MaterialTheme.typography.labelMedium,
         maxLines = 1,
         textAlign = TextAlign.Center,
     )
@@ -3271,8 +3297,8 @@ private fun AppTile(
     Spacer(Modifier.size(8.dp))
     Text(
         app.label,
-        color = Color.White,
-        fontSize = 15.sp,
+        color = ContentSecondary,
+        style = MaterialTheme.typography.labelMedium,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.Center,
