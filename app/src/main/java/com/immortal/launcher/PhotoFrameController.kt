@@ -25,6 +25,7 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -82,6 +83,13 @@ class PhotoFrameController(
   private val ui = Handler(Looper.getMainLooper())
 
   private lateinit var photo: ImageView
+  // Second photo layer for crossfade transitions. Sits behind [photo] in the z-order;
+  // during a transition the incoming bitmap is loaded here, Ken Burns starts on it, and
+  // the two layers swap visibility. After the crossfade completes the roles flip so the
+  // next transition always writes the new image into whichever layer is currently behind.
+  private lateinit var photoBack: ImageView
+  // True when [photoBack] is currently the front (visible) layer and [photo] is the back.
+  private var photoBackIsFront = false
   private lateinit var videoView: VideoView
 
   // tvOS-style slow zoom/pan ("Ken Burns") on the photo layer. Runs over the dwell time and is
@@ -89,6 +97,7 @@ class PhotoFrameController(
   // image", which zooming would crop into). [kenBurnsStyle] cycles the motion so consecutive
   // photos don't all move the same way.
   private var kenBurns: AnimatorSet? = null
+  private var kenBurnsBack: AnimatorSet? = null
   private var kenBurnsStyle = 0
 
   // The "place · date" caption is now a FaceRenderer grid element (so it stacks with the
@@ -489,6 +498,12 @@ class PhotoFrameController(
     val root = FrameLayout(context)
     root.setBackgroundColor(Color.BLACK)
 
+    // Back photo layer — sits below [photo]; receives the incoming bitmap during a crossfade.
+    photoBack = ImageView(context)
+    photoBack.scaleType = ImageView.ScaleType.CENTER_CROP
+    photoBack.alpha = 0f
+    root.addView(photoBack, FrameLayout.LayoutParams(MATCH, MATCH))
+
     photo = ImageView(context)
     photo.scaleType = ImageView.ScaleType.CENTER_CROP
     root.addView(photo, FrameLayout.LayoutParams(MATCH, MATCH))
@@ -692,9 +707,11 @@ class PhotoFrameController(
 
   private fun applyFit() {
     // Video gets the same choice via [applyVideoFit], sized per-clip once its dimensions are known.
-    photo.scaleType =
+    val scaleType =
         if (settings.fit == ScreensaverConfig.FIT_FIT) ImageView.ScaleType.FIT_CENTER
         else ImageView.ScaleType.CENTER_CROP
+    photo.scaleType = scaleType
+    if (this::photoBack.isInitialized) photoBack.scaleType = scaleType
   }
 
   /**
@@ -1169,6 +1186,8 @@ class PhotoFrameController(
     faceRenderer.setCaption(null, null)
     photo.setImageDrawable(null)
     photo.visibility = View.GONE
+    photoBack.setImageDrawable(null)
+    photoBack.visibility = View.GONE
     videoView.visibility = View.VISIBLE
     runCatching {
           videoView.setOnPreparedListener { mp ->
@@ -1199,6 +1218,14 @@ class PhotoFrameController(
     if (this::videoView.isInitialized && videoView.visibility != View.GONE) {
       runCatching { videoView.stopPlayback() }
       videoView.visibility = View.GONE
+      // After video the photo layers are both hidden; reset the crossfade state to a
+      // clean baseline so the next show() call starts a normal front=photo, back=photoBack
+      // transition rather than an inverted one.
+      if (this::photo.isInitialized && this::photoBack.isInitialized) {
+        photo.alpha = 1f
+        photoBack.alpha = 0f
+        photoBackIsFront = false
+      }
     }
   }
 
@@ -1319,6 +1346,8 @@ class PhotoFrameController(
     faceRenderer.setCaption(null, null)
     photo.setImageDrawable(null)
     photo.visibility = View.GONE
+    photoBack.setImageDrawable(null)
+    photoBack.visibility = View.GONE
     videoView.visibility = View.VISIBLE
     runCatching {
           videoView.setOnPreparedListener { mp ->
@@ -1485,72 +1514,125 @@ class PhotoFrameController(
     // The caption belongs to whichever photo is incoming; hide it now and let the per-source
     // metadata load re-show it (web/CDN photos never re-show it — they carry no EXIF).
     faceRenderer.setCaption(null, null)
-    photo
-        .animate()
-        .alpha(0.15f)
-        .setDuration(220)
+
+    // Determine which layer is currently front (outgoing) and which is back (incoming).
+    // [photoBackIsFront] tracks whether photoBack is the currently visible layer:
+    //   false → photo is front, photoBack is back (initial state)
+    //   true  → photoBack is front, photo is back
+    val frontView = if (photoBackIsFront) photoBack else photo
+    val backView  = if (photoBackIsFront) photo     else photoBack
+    // [storeFront] controls which AnimatorSet field receives the Ken Burns result:
+    // it must match the incoming layer — photo ↔ kenBurns, photoBack ↔ kenBurnsBack.
+    // When photoBackIsFront=false, backView=photoBack so storeFront=false (kenBurnsBack).
+    // When photoBackIsFront=true,  backView=photo    so storeFront=true  (kenBurns).
+    val storeFront = photoBackIsFront
+
+    // Load the new bitmap into the back (incoming) layer and ensure it starts invisible.
+    backView.setImageBitmap(bmp)
+    backView.alpha = 0f
+    backView.visibility = View.VISIBLE
+
+    // Start Ken Burns on the incoming layer immediately so the motion is already underway
+    // as the image fades in — matching the tvOS feel where zoom begins with the reveal.
+    // startKenBurns cancels any previous animator for this slot internally.
+    startKenBurns(backView, storeFront)
+
+    // Crossfade: fade the incoming layer in while the outgoing layer fades out over 1 500 ms.
+    val crossfadeDuration = 1_500L
+    backView.animate()
+        .alpha(1f)
+        .setDuration(crossfadeDuration)
+        .setInterpolator(AccelerateDecelerateInterpolator())
+        .start()
+    frontView.animate()
+        .alpha(0f)
+        .setDuration(crossfadeDuration)
+        .setInterpolator(AccelerateDecelerateInterpolator())
         .withEndAction {
-          photo.setImageBitmap(bmp)
-          startKenBurns()
-          photo.animate().alpha(1f).setDuration(420).start()
+          // After the crossfade the old front is transparent — clear its bitmap to free
+          // memory; it will receive the next incoming image on the next show() call.
+          frontView.setImageDrawable(null)
+          // Flip the role flag so the next call to show() uses the correct layers.
+          photoBackIsFront = !photoBackIsFront
         }
         .start()
   }
 
   /**
-   * Apply a slow tvOS-style zoom/pan to the current photo over the dwell time. Cancelled and
-   * restarted on each advance. Only in fill mode: in fit/letterbox mode the user asked to see the
-   * whole frame, so cropping into it with a zoom would defeat that. A little overscan (scale
-   * [BIG]) gives pan styles room to move without ever exposing the black background.
+   * Apply a slow tvOS-style zoom/pan to [target] over the dwell time. Called on the *incoming*
+   * photo layer at the start of each crossfade so the motion is already in progress as the image
+   * fades in (matching the tvOS Ken Burns feel). [storeFront] controls which AnimatorSet field
+   * receives the result: true → [kenBurns] (the "photo" layer), false → [kenBurnsBack].
+   *
+   * Only active in fill mode: in fit/letterbox mode the user wants to see the whole frame, and
+   * zooming would crop into it. A little overscan (scale [BIG]) gives pan styles room to travel
+   * without ever exposing the black background. Uses LinearInterpolator for constant-speed motion;
+   * the AccelerateDecelerateInterpolator is reserved for the crossfade alpha animation.
    */
-  private fun startKenBurns() {
-    kenBurns?.cancel()
-    // Reset to identity first so a cancelled mid-animation transform never lingers on the new shot.
-    photo.scaleX = 1f
-    photo.scaleY = 1f
-    photo.translationX = 0f
-    photo.translationY = 0f
+  private fun startKenBurns(target: ImageView = photo, storeFront: Boolean = true) {
+    // Cancel the currently-running animator for this slot.
+    if (storeFront) { kenBurns?.cancel(); kenBurns = null }
+    else            { kenBurnsBack?.cancel(); kenBurnsBack = null }
+
+    // Reset to identity so a cancelled mid-animation transform never lingers.
+    target.scaleX = 1f
+    target.scaleY = 1f
+    target.translationX = 0f
+    target.translationY = 0f
     if (settings.fit != ScreensaverConfig.FIT_FILL) return
-    val w = (if (photo.width > 0) photo.width else context.resources.displayMetrics.widthPixels)
-    val h = (if (photo.height > 0) photo.height else context.resources.displayMetrics.heightPixels)
-    photo.pivotX = w / 2f
-    photo.pivotY = h / 2f
+
+    val w = (if (target.width > 0) target.width else context.resources.displayMetrics.widthPixels)
+    val h = (if (target.height > 0) target.height else context.resources.displayMetrics.heightPixels)
+    target.pivotX = w / 2f
+    target.pivotY = h / 2f
+
     val pan = (BIG - 1f) / 2f // max translation fraction that stays within the overscan at scale BIG
     val set = AnimatorSet()
     when ((kenBurnsStyle++ % 4 + 4) % 4) {
-      0 -> // slow zoom in
+      0 -> // slow zoom in from centre
       set.playTogether(
-          ObjectAnimator.ofFloat(photo, View.SCALE_X, 1f, BIG),
-          ObjectAnimator.ofFloat(photo, View.SCALE_Y, 1f, BIG))
-      1 -> // slow zoom out
+          ObjectAnimator.ofFloat(target, View.SCALE_X, 1f, BIG),
+          ObjectAnimator.ofFloat(target, View.SCALE_Y, 1f, BIG))
+      1 -> // slow zoom out from centre
       set.playTogether(
-          ObjectAnimator.ofFloat(photo, View.SCALE_X, BIG, 1f),
-          ObjectAnimator.ofFloat(photo, View.SCALE_Y, BIG, 1f))
-      2 -> { // pan down (hold the zoom so the edges stay covered)
-        photo.scaleX = BIG
-        photo.scaleY = BIG
-        set.playTogether(ObjectAnimator.ofFloat(photo, View.TRANSLATION_Y, pan * h, -pan * h))
+          ObjectAnimator.ofFloat(target, View.SCALE_X, BIG, 1f),
+          ObjectAnimator.ofFloat(target, View.SCALE_Y, BIG, 1f))
+      2 -> { // slow pan down (hold zoom so edges stay covered)
+        target.scaleX = BIG
+        target.scaleY = BIG
+        set.playTogether(ObjectAnimator.ofFloat(target, View.TRANSLATION_Y, pan * h, -pan * h))
       }
-      else -> { // pan up
-        photo.scaleX = BIG
-        photo.scaleY = BIG
-        set.playTogether(ObjectAnimator.ofFloat(photo, View.TRANSLATION_Y, -pan * h, pan * h))
+      else -> { // slow pan up
+        target.scaleX = BIG
+        target.scaleY = BIG
+        set.playTogether(ObjectAnimator.ofFloat(target, View.TRANSLATION_Y, -pan * h, pan * h))
       }
     }
-    set.duration = intervalMs() + 1200L // outlast the dwell so the motion never visibly stalls
-    set.interpolator = AccelerateDecelerateInterpolator()
+    // Outlast the dwell so the motion never visibly stalls at the end; LinearInterpolator
+    // gives constant-speed motion (the crossfade's AccelerateDecelerateInterpolator provides
+    // the ease-in/ease-out feel during the reveal, so the Ken Burns itself should be linear).
+    set.duration = intervalMs() + 1200L
+    set.interpolator = LinearInterpolator()
     set.start()
-    kenBurns = set
+    if (storeFront) kenBurns = set else kenBurnsBack = set
   }
 
   private fun cancelKenBurns() {
     kenBurns?.cancel()
     kenBurns = null
+    kenBurnsBack?.cancel()
+    kenBurnsBack = null
     if (this::photo.isInitialized) {
       photo.scaleX = 1f
       photo.scaleY = 1f
       photo.translationX = 0f
       photo.translationY = 0f
+    }
+    if (this::photoBack.isInitialized) {
+      photoBack.scaleX = 1f
+      photoBack.scaleY = 1f
+      photoBack.translationX = 0f
+      photoBack.translationY = 0f
     }
   }
 
