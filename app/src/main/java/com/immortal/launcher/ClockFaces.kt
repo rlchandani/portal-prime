@@ -14,6 +14,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import com.immortal.launcher.ui.clock.PrimeDigitalClockFaceView
+import com.immortal.launcher.ui.clock.SplitFlapClockFaceView
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.FrameLayout
@@ -45,7 +46,7 @@ interface ClockFaceView {
 fun makeClockFace(context: Context, spec: ClockSpec, assets: AssetResolver): ClockFaceView =
     when (spec.mode) {
       ClockMode.NONE -> NoClockFaceView(context)
-      ClockMode.FLIP -> FlipWebClockFaceView(context, spec)
+      ClockMode.FLIP -> SplitFlapClockFaceView(context, spec)
       ClockMode.DIGITAL -> PrimeDigitalClockFaceView(context, spec, assets)
       else -> PrimeDigitalClockFaceView(context, spec, assets)
     }
@@ -143,6 +144,5 @@ class DigitalClockFaceView(
 }
 
 // ─── Flip ────────────────────────────────────────────────────────────────────
-// The flip clock is rendered by [FlipWebClockFaceView] (a transparent WebView running
-// assets/faces/flip.html — a CSS/3D port of Fliqlo). An earlier native-View split-flap lived
-// here; CSS handles the 3D fold and the Fliqlo glyphs far better, so it was removed.
+// The flip clock is rendered by [SplitFlapClockFaceView] — a native Canvas split-flap that
+// replaces the previous Fliqlo WebView. Each digit animates via a ValueAnimator card-flip.
