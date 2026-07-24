@@ -730,32 +730,7 @@ private fun LauncherScreen(
                 .fillMaxHeight()
                 .weight(0.62f),
         ) {
-          // Done button in edit mode
-          if (editMode) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                contentAlignment = Alignment.TopEnd,
-            ) {
-              Surface(
-                  color = Color(0x40FFFFFF),
-                  shape = RoundedCornerShape(16.dp),
-                  modifier = Modifier
-                      .clickable { editMode = false }
-                      .padding(horizontal = 16.dp, vertical = 8.dp),
-              ) {
-                Text(
-                    text = "Done",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                )
-              }
-            }
-          }
-
+          // (No "Done" button — tap any empty space to exit edit mode.)
           LazyVerticalGrid(
               columns = GridCells.Fixed(5),
               modifier = Modifier.fillMaxSize(),
@@ -3331,31 +3306,21 @@ private fun ResizeBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
           ) { onClick() },
   ) {
     Canvas(Modifier.fillMaxSize()) {
-      val cx = this.size.width / 2f
-      val cy = this.size.height / 2f
-      val stroke = this.size.minDimension * 0.08f
-      val outerSize = this.size.minDimension * 0.56f
-      val innerSize = this.size.minDimension * 0.32f
-      val cornerRadius = this.size.minDimension * 0.06f
-
-      // Draw outer square (stroke only)
-      drawRoundRect(
-          color = Color.White,
-          topLeft = Offset(cx - outerSize / 2f, cy - outerSize / 2f),
-          size = Size(outerSize, outerSize),
-          cornerRadius = CornerRadius(cornerRadius, cornerRadius),
-          style = Stroke(width = stroke)
-      )
-
-      // Draw inner square (stroke only, positioned in lower-right)
-      val innerOffset = outerSize * 0.15f
-      drawRoundRect(
-          color = Color.White,
-          topLeft = Offset(cx - innerSize / 2f + innerOffset, cy - innerSize / 2f + innerOffset),
-          size = Size(innerSize, innerSize),
-          cornerRadius = CornerRadius(cornerRadius * 0.7f, cornerRadius * 0.7f),
-          style = Stroke(width = stroke)
-      )
+      // Double-headed diagonal resize arrow (↖ ↘): a diagonal shaft with an arrowhead at each end.
+      val d = this.size.minDimension
+      val stroke = d * 0.09f
+      val m = d * 0.30f                 // arrow tip inset from edges
+      val tl = Offset(m, m)             // top-left tip
+      val br = Offset(d - m, d - m)     // bottom-right tip
+      val head = d * 0.14f              // arrowhead leg length
+      // shaft
+      drawLine(Color.White, tl, br, strokeWidth = stroke, cap = StrokeCap.Round)
+      // top-left arrowhead (two legs)
+      drawLine(Color.White, tl, Offset(tl.x + head, tl.y), strokeWidth = stroke, cap = StrokeCap.Round)
+      drawLine(Color.White, tl, Offset(tl.x, tl.y + head), strokeWidth = stroke, cap = StrokeCap.Round)
+      // bottom-right arrowhead (two legs)
+      drawLine(Color.White, br, Offset(br.x - head, br.y), strokeWidth = stroke, cap = StrokeCap.Round)
+      drawLine(Color.White, br, Offset(br.x, br.y - head), strokeWidth = stroke, cap = StrokeCap.Round)
     }
   }
 }
