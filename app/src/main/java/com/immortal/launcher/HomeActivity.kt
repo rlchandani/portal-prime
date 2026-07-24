@@ -651,6 +651,8 @@ private fun weatherConditionText(code: Int): String = when (code) {
 // WiFi signal indicator
 // ─────────────────────────────────────────────────────────────────────────────
 
+private const val RSSI_UNAVAILABLE = -127
+
 @Composable
 private fun wifiLevel(): Int {
   val context = androidx.compose.ui.platform.LocalContext.current
@@ -658,8 +660,8 @@ private fun wifiLevel(): Int {
     while (true) {
       val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
       value = if (wifiManager != null) {
-        val rssi = wifiManager.connectionInfo?.rssi ?: -127
-        if (rssi == -127) {
+        val rssi = wifiManager.connectionInfo?.rssi ?: RSSI_UNAVAILABLE
+        if (rssi == RSSI_UNAVAILABLE) {
           -1
         } else {
           @Suppress("DEPRECATION")
@@ -696,19 +698,25 @@ private fun WifiBars(level: Int) {
 private fun FadingDivider() {
   Box(
       modifier = Modifier
-          .width(1.dp)
           .fillMaxHeight()
-          .padding(horizontal = 8.dp)
-          .background(
-              Brush.verticalGradient(
-                  listOf(
-                      Color.Transparent,
-                      Color.White.copy(alpha = 0.30f),
-                      Color.Transparent
-                  )
-              )
-          )
-  )
+          .padding(horizontal = 10.dp),
+      contentAlignment = Alignment.Center
+  ) {
+    Box(
+        modifier = Modifier
+            .width(1.5.dp)
+            .fillMaxHeight()
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color.Transparent,
+                        Color.White.copy(alpha = 0.30f),
+                        Color.Transparent
+                    )
+                )
+            )
+    )
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
