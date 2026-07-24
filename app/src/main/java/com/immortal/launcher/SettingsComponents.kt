@@ -320,65 +320,69 @@ internal fun <T> PickerRow(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val current = options.firstOrNull { it.value == selected }
-    Box {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = Sizes.rowMinHeight)
-                .tvFocusableRow { expanded = true }
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (iconSymbol.isNotEmpty()) {
-                IconBadge(color = iconColor, symbol = iconSymbol)
-                Spacer(Modifier.size(12.dp))
-            }
-            Text(
-                text = title,
-                color = IosLabel,
-                fontSize = Sizes.rowTitle,
-                letterSpacing = (-0.2).sp,
-                modifier = Modifier.weight(1f),
-            )
-            Text(
-                text = current?.label ?: "",
-                color = IosSecondary,
-                fontSize = Sizes.rowValue,
-                modifier = Modifier.padding(end = 6.dp),
-            )
-            // Up/down chevron hints "opens a menu" (vs the > that hints "navigates away").
-            Text(
-                text = "⌄",
-                color = IosChevron,
-                fontSize = Sizes.chevron,
-                fontWeight = FontWeight.Medium,
-            )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = Sizes.rowMinHeight)
+            .tvFocusableRow { expanded = true }
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (iconSymbol.isNotEmpty()) {
+            IconBadge(color = iconColor, symbol = iconSymbol)
+            Spacer(Modifier.size(12.dp))
         }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.background(IosCard),
-        ) {
-            options.forEach { opt ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            opt.label,
-                            color = IosLabel,
-                            fontSize = Sizes.rowTitle,
-                            fontWeight = if (opt.value == selected) FontWeight.SemiBold else FontWeight.Normal,
-                        )
-                    },
-                    trailingIcon = {
-                        if (opt.value == selected) {
-                            Text("v", color = IosBlue, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
-                        }
-                    },
-                    onClick = {
-                        expanded = false
-                        onSelect(opt.value)
-                    },
+        Text(
+            text = title,
+            color = IosLabel,
+            fontSize = Sizes.rowTitle,
+            letterSpacing = (-0.2).sp,
+            modifier = Modifier.weight(1f),
+        )
+        // Anchor the menu to the value + caret so it drops under them (right side), not the row start.
+        Box {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = current?.label ?: "",
+                    color = IosSecondary,
+                    fontSize = Sizes.rowValue,
+                    modifier = Modifier.padding(end = 6.dp),
                 )
+                // Filled down-triangle reads unambiguously as "dropdown" (⌄ has poor font
+                // coverage on the Portal's Android 10 and rendered as a stray "v").
+                Text(
+                    text = "▾",
+                    color = IosChevron,
+                    fontSize = Sizes.chevron,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(IosCard),
+            ) {
+                options.forEach { opt ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                opt.label,
+                                color = IosLabel,
+                                fontSize = Sizes.rowTitle,
+                                fontWeight = if (opt.value == selected) FontWeight.SemiBold else FontWeight.Normal,
+                            )
+                        },
+                        trailingIcon = {
+                            if (opt.value == selected) {
+                                Text("✓", color = IosBlue, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
+                            }
+                        },
+                        onClick = {
+                            expanded = false
+                            onSelect(opt.value)
+                        },
+                    )
+                }
             }
         }
     }

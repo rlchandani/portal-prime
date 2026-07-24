@@ -191,7 +191,7 @@ private fun ImmortalSettingsScreen() {
     // ---------------------------------------------------------------
     Column(
         modifier = Modifier
-            .width(300.dp)
+            .width(320.dp)
             .fillMaxHeight()
             .background(Color(0xFFE8E8EE))
             .focusRequester(firstFocus)
@@ -245,17 +245,17 @@ private fun ImmortalSettingsScreen() {
         ) {
           Box(
               modifier = Modifier
-                  .size(34.dp)
-                  .clip(RoundedCornerShape(8.dp))
+                  .size(44.dp)
+                  .clip(RoundedCornerShape(10.dp))
                   .background(if (isSelected) Color.White.copy(alpha = 0.25f) else sec.iconColor),
               contentAlignment = Alignment.Center,
           ) {
-            Text(sec.symbol, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(sec.symbol, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
           }
           Text(
               sec.name,
               color = if (isSelected) Color.White else IosLabel,
-              fontSize = 19.sp,
+              fontSize = 25.sp,
               fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
           )
         }
