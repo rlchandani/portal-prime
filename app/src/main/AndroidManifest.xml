@@ -572,6 +572,73 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="System-wide back-swipe gesture overlay" />
         </service>
+        <!-- Apple TV-style dashboard mock — PREVIEW ONLY.
+             Launch via explicit intent or adb to view the proposed home-screen design.
+             Does not replace any existing launcher behaviour. -->
+        <activity
+            android:name=".TvDashboardMockActivity"
+            android:exported="true"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- iOS 26 widget showcase mock — PREVIEW ONLY.
+             Displays all widget designs (weather, clock, system, quick actions) with
+             Liquid Glass styling on the deep-blue radial gradient background.
+             Launch: adb shell am start -n com.immortal.launcher.debug/com.immortal.launcher.mock.IosWidgetsMockActivity -->
+        <activity
+            android:name=".mock.IosWidgetsMockActivity"
+            android:exported="true"
+            android:label="iOS 26 Widgets"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- iOS 26 Liquid Glass home-screen mock — PREVIEW ONLY.
+             Launch via:
+               adb shell am start -n com.immortal.launcher.debug/.mock.IosHomeMockActivity
+             Does not replace any existing launcher behaviour. -->
+        <activity
+            android:name=".mock.IosHomeMockActivity"
+            android:exported="true"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- iOS 26 App Store mock — PREVIEW ONLY. -->
+        <activity
+            android:name=".mock.IosStoreMockActivity"
+            android:exported="true"
+            android:label="iOS Store Mock"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- iOS 26 Settings mock — PREVIEW ONLY. -->
+        <activity
+            android:name=".mock.IosSettingsMockActivity"
+            android:exported="true"
+            android:label="iOS Settings Mock"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
