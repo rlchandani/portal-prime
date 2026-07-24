@@ -58,8 +58,8 @@ internal fun ImmortalCalendarWidget(modifier: androidx.compose.ui.Modifier = and
     value = if (url.isNullOrBlank()) emptyList()
         else kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { CalendarFeed.fetch(url) }
   }
-  val now = System.currentTimeMillis()
-  val groups = androidx.compose.runtime.remember(events) { groupEventsByDay(events, now, maxDays = 3) }
+  val now = androidx.compose.runtime.remember { System.currentTimeMillis() }
+  val groups = androidx.compose.runtime.remember(events, now) { groupEventsByDay(events, now, maxDays = 3) }
 
   androidx.compose.foundation.layout.Box(
       modifier =
@@ -84,7 +84,8 @@ internal fun ImmortalCalendarWidget(modifier: androidx.compose.ui.Modifier = and
               "No calendar connected. Add a calendar link in Settings → Screensaver.",
               color = androidx.compose.ui.graphics.Color(0xE6FFFFFF),
               fontSize = 15.sp,
-              maxLines = 2)
+              maxLines = 2,
+              overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
         groups.isEmpty() -> {
           androidx.compose.material3.Text(
@@ -96,14 +97,13 @@ internal fun ImmortalCalendarWidget(modifier: androidx.compose.ui.Modifier = and
           androidx.compose.foundation.lazy.LazyColumn(
               verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
             groups.forEach { group ->
-              item {
+              item(key = "group_${group.label}") {
                 androidx.compose.material3.Text(
                     group.label.uppercase(Locale.getDefault()),
                     color = androidx.compose.ui.graphics.Color(0x8CFFFFFF),
-                    fontSize = 12.sp,
-                    modifier = androidx.compose.ui.Modifier.padding(bottom = 4.dp))
+                    fontSize = 12.sp)
               }
-              items(group.events.size) { idx ->
+              items(group.events.size, key = { idx -> "event_${group.label}_${group.events[idx].startMillis}_${idx}" }) { idx ->
                 androidx.compose.material3.Text(
                     calendarEventLine(group.events[idx], now, is24h),
                     color = androidx.compose.ui.graphics.Color(0xE6FFFFFF),
