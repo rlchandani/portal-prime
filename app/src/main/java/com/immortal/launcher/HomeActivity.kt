@@ -60,6 +60,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyGridState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -87,6 +89,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.border
@@ -739,79 +742,60 @@ private fun LauncherScreen(
                 .weight(0.62f),
         ) {
           // (No "Done" button — tap any empty space to exit edit mode.)
+          val gridState = rememberLazyGridState()
+          val reorderableState = rememberReorderableLazyGridState(gridState) { from, to ->
+            // Called continuously as items cross during drag — reorder the list + persist
+            val currentOrder = orderState.value.ifEmpty { orderedApps.map { it.component.packageName } }
+            val newOrder = currentOrder.toMutableList().apply {
+              add(to.index, removeAt(from.index))
+            }
+            UserLayout.saveOrder(context, newOrder)
+            orderState.value = newOrder
+          }
           LazyVerticalGrid(
               columns = GridCells.Fixed(5),
+              state = gridState,
               modifier = Modifier.fillMaxSize(),
               contentPadding = PaddingValues(4.dp),
               horizontalArrangement = Arrangement.spacedBy(16.dp),
               verticalArrangement = Arrangement.spacedBy(20.dp),
           ) {
             items(orderedApps, key = { it.component.packageName }) { app ->
-              LiquidGlassAppIcon(
-                  app = app,
-                  editMode = editMode,
-                  onClick = {
-                    if (!editMode) {
-                      onLaunch(app.component)
+              ReorderableItem(reorderableState, key = app.component.packageName) { isDragging ->
+                LiquidGlassAppIconContent(
+                    app = app,
+                    editMode = editMode,
+                    isDragging = isDragging,
+                    dragHandleModifier = if (editMode) {
+                      Modifier.longPressDraggableHandle(
+                          onDragStarted = { },
+                          onDragStopped = { },
+                      )
                     } else {
-                      // Add to dock in edit mode
-                      val pkg = app.component.packageName
-                      if (pkg !in dockPkgs.value) {
-                        val updated = DockStore.addToDock(dockPkgs.value, pkg, DockStore.MAX)
-                        if (updated != dockPkgs.value) {
-                          DockStore.save(context, updated)
-                          dockPkgs.value = updated
-                          Toast.makeText(context, "Added to dock", Toast.LENGTH_SHORT).show()
-                        } else {
-                          Toast.makeText(context, "Dock is full", Toast.LENGTH_SHORT).show()
+                      Modifier
+                    },
+                    onClick = {
+                      if (!editMode) {
+                        onLaunch(app.component)
+                      } else {
+                        // Add to dock in edit mode
+                        val pkg = app.component.packageName
+                        if (pkg !in dockPkgs.value) {
+                          val updated = DockStore.addToDock(dockPkgs.value, pkg, DockStore.MAX)
+                          if (updated != dockPkgs.value) {
+                            DockStore.save(context, updated)
+                            dockPkgs.value = updated
+                            Toast.makeText(context, "Added to dock", Toast.LENGTH_SHORT).show()
+                          } else {
+                            Toast.makeText(context, "Dock is full", Toast.LENGTH_SHORT).show()
+                          }
                         }
                       }
-                    }
-                  },
-                  onLongPress = { if (!editMode) editMode = true },
-                  onRemove = { onUninstall(app.component.packageName) },
-                  onReorder = { deltaX, deltaY ->
-                    val cellWidthPx = 126f  // Approx 110dp icon + 16dp spacing
-                    val cellHeightPx = 154f  // Approx 110dp icon + 22sp label + 20dp spacing
-                    val cols = 5
-                    val deltaCols = (deltaX / cellWidthPx).roundToInt()
-                    val deltaRows = (deltaY / cellHeightPx).roundToInt()
-                    val deltaCells = deltaCols + deltaRows * cols
-                    val baseOrder = orderState.value.ifEmpty { orderedApps.map { it.component.packageName } }
-                    val currentOrder = baseOrder
-                    val sourceIndex = currentOrder.indexOf(app.component.packageName)
-                    if (sourceIndex >= 0) {
-                      val targetIndex = (sourceIndex + deltaCells).coerceIn(0, currentOrder.size - 1)
-                      if (targetIndex != sourceIndex) {
-                        val targetPkg = currentOrder[targetIndex]
-                        val newOrder = UserLayout.moveOrder(currentOrder, app.component.packageName, targetPkg)
-                        UserLayout.saveOrder(context, newOrder)
-                        orderState.value = newOrder
-                      }
-                    }
-                  },
-                  onDragStart = { pkg -> draggedPkg = pkg },
-                  onDragUpdate = { deltaY -> dragScreenY = deltaY },
-                  onDragEnd = { pkg, deltaY ->
-                    // Heuristic: if drag ended significantly downward (>120dp ~ dock height), treat as drop-to-dock
-                    val dockThresholdPx = 120f * context.resources.displayMetrics.density
-                    if (deltaY > dockThresholdPx) {
-                      // Drop to dock
-                      if (pkg !in dockPkgs.value) {
-                        val updated = DockStore.addToDock(dockPkgs.value, pkg, DockStore.MAX)
-                        if (updated != dockPkgs.value) {
-                          DockStore.save(context, updated)
-                          dockPkgs.value = updated
-                          Toast.makeText(context, "Added to dock", Toast.LENGTH_SHORT).show()
-                        } else {
-                          Toast.makeText(context, "Dock is full", Toast.LENGTH_SHORT).show()
-                        }
-                      }
-                    }
-                    draggedPkg = null
-                    dragScreenY = 0f
-                  },
-              )
+                    },
+                    onLongPress = { if (!editMode) editMode = true },
+                    onRemove = { onUninstall(app.component.packageName) },
+                )
+              }
             }
           }
         }
@@ -954,24 +938,18 @@ private fun LiquidGlassWidget(
   LiquidGlass(modifier = modifier, cornerRadius = 22.dp, content = content)
 }
 
-/** App icon in the grid with scale animation on tap. */
+/** App icon in the grid with scale animation on tap and reorderable drag handle. */
 @Composable
-private fun LiquidGlassAppIcon(
+private fun LiquidGlassAppIconContent(
     app: AppEntry,
     editMode: Boolean,
+    isDragging: Boolean,
+    dragHandleModifier: Modifier,
     onClick: () -> Unit,
     onLongPress: () -> Unit,
     onRemove: () -> Unit,
-    onReorder: (deltaX: Float, deltaY: Float) -> Unit,
-    onDragStart: ((pkg: String) -> Unit)? = null,
-    onDragUpdate: ((y: Float) -> Unit)? = null,
-    onDragEnd: ((pkg: String, deltaY: Float) -> Unit)? = null,
 ) {
   val scale = remember { Animatable(1f) }
-  var dragDeltaX by remember { mutableStateOf(0f) }
-  var dragDeltaY by remember { mutableStateOf(0f) }
-  var dragOffset by remember { mutableStateOf(Offset.Zero) }
-  var isDragging by remember { mutableStateOf(false) }
 
   Box(
       modifier = Modifier
@@ -984,69 +962,19 @@ private fun LiquidGlassAppIcon(
         modifier = Modifier
             .zIndex(if (isDragging) 1f else 0f)
             .graphicsLayer {
-              scaleX = if (isDragging) 1.1f else scale.value
-              scaleY = if (isDragging) 1.1f else scale.value
-              translationX = dragOffset.x
-              translationY = dragOffset.y
+              scaleX = if (isDragging) 1.05f else scale.value
+              scaleY = if (isDragging) 1.05f else scale.value
               shadowElevation = if (isDragging) 16.dp.toPx() else 0f
               shape = RoundedCornerShape(26.dp)
               clip = false
+              // Disable Offscreen compositing while dragging for perf
+              compositingStrategy = if (isDragging) CompositingStrategy.Auto else CompositingStrategy.Offscreen
             }
+            .then(dragHandleModifier)
             .then(
-                if (editMode) {
-                  // Edit mode: custom gesture that disambiguates tap-vs-drag on touch-down
-                  Modifier.pointerInput(editMode, app.component.packageName) {
-                    awaitEachGesture {
-                      val down = awaitFirstDown(requireUnconsumed = false)
-                      val downTime = System.currentTimeMillis()
-                      val slop = viewConfiguration.touchSlop
-                      var hasMoved = false
-                      var accumulated = Offset.Zero
-
-                      // Track movement until release
-                      do {
-                        val event = awaitPointerEvent()
-                        val change = event.changes.firstOrNull { it.id == down.id }
-                        if (change != null && change.pressed) {
-                          val d = change.positionChange()
-                          accumulated += d
-                          val dist = accumulated.getDistance()
-                          if (dist > slop) {
-                            if (!hasMoved) {
-                              hasMoved = true
-                              onDragStart?.invoke(app.component.packageName)
-                            }
-                            change.consume()
-                            // Update live drag feedback — now smooth 1:1
-                            dragOffset = accumulated
-                            isDragging = true
-                            onDragUpdate?.invoke(accumulated.y)
-                          }
-                        }
-                      } while (event.changes.any { it.pressed && it.id == down.id })
-
-                      // Released — reset visual state before committing reorder
-                      val finalDelta = accumulated
-                      dragOffset = Offset.Zero
-                      isDragging = false
-
-                      if (hasMoved) {
-                        // Drag — commit reorder with accumulated deltas
-                        dragDeltaX = finalDelta.x
-                        dragDeltaY = finalDelta.y
-                        onDragEnd?.invoke(app.component.packageName, finalDelta.y)
-                        onReorder(dragDeltaX, dragDeltaY)
-                        dragDeltaX = 0f
-                        dragDeltaY = 0f
-                      } else {
-                        // No movement → tap (add-to-dock)
-                        onClick()
-                      }
-                    }
-                  }
-                } else {
+                if (!editMode) {
                   // Non-edit mode: standard tap gestures with press-scale
-                  Modifier.pointerInput(editMode) {
+                  Modifier.pointerInput(Unit) {
                     detectTapGestures(
                         onPress = {
                           scale.animateTo(0.96f, tween(90))
@@ -1055,6 +983,13 @@ private fun LiquidGlassAppIcon(
                         },
                         onTap = { onClick() },
                         onLongPress = { onLongPress() },
+                    )
+                  }
+                } else {
+                  // In edit mode, tap to add to dock
+                  Modifier.pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = { onClick() }
                     )
                   }
                 }
