@@ -26,11 +26,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInstaller
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.StartOffset
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
@@ -53,6 +55,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
@@ -167,6 +170,7 @@ private data class AppEntry(
     val component: ComponentName,
     val icon: ImageBitmap,
     val folder: String? = null,
+    val uninstallable: Boolean = false,
 )
 
 private data class WidgetProviderEntry(
@@ -395,6 +399,16 @@ private fun LauncherScreen(
   // Battery
   val battery = batteryState()
 
+  // Edit mode state
+  var editMode by remember { mutableStateOf(false) }
+  BackHandler(enabled = editMode) { editMode = false }
+
+  // User order for app icons
+  val orderState = remember { mutableStateOf(UserLayout.loadOrder(context)) }
+  val orderedApps = remember(installedApps, orderState.value) {
+    UserLayout.applyOrder(installedApps, orderState.value) { it.component.packageName }
+  }
+
   // Derived strings
   val hour = SimpleDateFormat("H", Locale.getDefault()).format(now).toIntOrNull() ?: 12
   val greetingWord = when {
@@ -479,7 +493,14 @@ private fun LauncherScreen(
               .weight(1f)
               .fillMaxWidth()
               .padding(horizontal = 28.dp)
-              .padding(top = 12.dp, bottom = 8.dp),
+              .padding(top = 12.dp, bottom = 8.dp)
+              .then(
+                  if (editMode) {
+                    Modifier.pointerInput(Unit) { detectTapGestures { editMode = false } }
+                  } else {
+                    Modifier
+                  }
+              ),
           horizontalArrangement = Arrangement.spacedBy(20.dp),
       ) {
 
@@ -607,6 +628,32 @@ private fun LauncherScreen(
                 .fillMaxHeight()
                 .weight(0.62f),
         ) {
+          // Done button in edit mode
+          if (editMode) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                contentAlignment = Alignment.TopEnd,
+            ) {
+              Surface(
+                  color = Color(0x40FFFFFF),
+                  shape = RoundedCornerShape(16.dp),
+                  modifier = Modifier
+                      .clickable { editMode = false }
+                      .padding(horizontal = 16.dp, vertical = 8.dp),
+              ) {
+                Text(
+                    text = "Done",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                )
+              }
+            }
+          }
+
           LazyVerticalGrid(
               columns = GridCells.Fixed(5),
               modifier = Modifier.fillMaxSize(),
@@ -614,10 +661,31 @@ private fun LauncherScreen(
               horizontalArrangement = Arrangement.spacedBy(16.dp),
               verticalArrangement = Arrangement.spacedBy(20.dp),
           ) {
-            items(installedApps) { app ->
+            items(orderedApps, key = { it.component.packageName }) { app ->
               LiquidGlassAppIcon(
                   app = app,
-                  onClick = { onLaunch(app.component) },
+                  editMode = editMode,
+                  onClick = { if (!editMode) onLaunch(app.component) },
+                  onLongPress = { if (!editMode) editMode = true },
+                  onRemove = { onUninstall(app.component.packageName) },
+                  onReorder = { deltaX, deltaY ->
+                    val cellWidthPx = 126f  // Approx 110dp icon + 16dp spacing
+                    val cellHeightPx = 154f  // Approx 110dp icon + 22sp label + 20dp spacing
+                    val cols = 5
+                    val deltaCols = (deltaX / cellWidthPx).roundToInt()
+                    val deltaRows = (deltaY / cellHeightPx).roundToInt()
+                    val deltaCells = deltaCols + deltaRows * cols
+                    val currentOrder = orderState.value
+                    val sourceIndex = currentOrder.indexOf(app.component.packageName)
+                        .takeIf { it >= 0 } ?: currentOrder.size
+                    val targetIndex = (sourceIndex + deltaCells).coerceIn(0, orderedApps.size - 1)
+                    if (targetIndex != sourceIndex && targetIndex < orderedApps.size) {
+                      val targetPkg = orderedApps[targetIndex].component.packageName
+                      val newOrder = UserLayout.moveOrder(currentOrder, app.component.packageName, targetPkg)
+                      UserLayout.saveOrder(context, newOrder)
+                      orderState.value = newOrder
+                    }
+                  },
               )
             }
           }
@@ -762,66 +830,89 @@ private fun LiquidGlassWidget(
 @Composable
 private fun LiquidGlassAppIcon(
     app: AppEntry,
+    editMode: Boolean,
     onClick: () -> Unit,
+    onLongPress: () -> Unit,
+    onRemove: () -> Unit,
+    onReorder: (deltaX: Float, deltaY: Float) -> Unit,
 ) {
-  var pressed by remember { mutableStateOf(false) }
-  val scale by animateFloatAsState(
-      targetValue = if (pressed) 1.08f else 1f,
-      animationSpec = spring(
-          dampingRatio = Spring.DampingRatioMediumBouncy,
-          stiffness = Spring.StiffnessMedium,
-      ),
-      label = "iconScale",
-  )
+  val scale = remember { Animatable(1f) }
+  var dragDeltaX by remember { mutableStateOf(0f) }
+  var dragDeltaY by remember { mutableStateOf(0f) }
 
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier
-          .graphicsLayer { scaleX = scale; scaleY = scale }
-          .clickable(
-              interactionSource = remember { MutableInteractionSource() },
-              indication = null,
-          ) { onClick() }
-          .pointerInput(Unit) {
-            awaitEachGesture {
-              awaitFirstDown(); pressed = true
-              try { drag(awaitFirstDown().id) { it.consume() } } finally { pressed = false }
-            }
-          },
-  ) {
-    Box(
+  Box(modifier = Modifier.jiggle(editMode, app.component.packageName.hashCode())) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .size(110.dp)
-            .clip(RoundedCornerShape(26.dp))
-            .background(Color(0x1EFFFFFF))
-            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(26.dp)),
-        contentAlignment = Alignment.Center,
-    ) {
-      // Specular
-      Box(
-          modifier = Modifier.matchParentSize().background(
-              Brush.radialGradient(
-                  colors = listOf(Color(0x28FFFFFF), Color.Transparent),
-                  radius = 180f,
+            .graphicsLayer { scaleX = scale.value; scaleY = scale.value }
+            .pointerInput(editMode) {
+              detectTapGestures(
+                  onPress = {
+                    scale.animateTo(0.96f, tween(90))
+                    tryAwaitRelease()
+                    scale.animateTo(1f, spring())
+                  },
+                  onTap = { if (!editMode) onClick() },
+                  onLongPress = { if (!editMode) onLongPress() },
               )
-          )
-      )
-      Image(
-          bitmap = app.icon,
-          contentDescription = app.label,
-          modifier = Modifier.size(100.dp),
+            }
+            .then(
+                if (editMode) {
+                  Modifier.pointerInput(app.component.packageName) {
+                    detectDragGesturesAfterLongPress(
+                        onDragEnd = {
+                          onReorder(dragDeltaX, dragDeltaY)
+                          dragDeltaX = 0f
+                          dragDeltaY = 0f
+                        }
+                    ) { change, drag ->
+                      change.consume()
+                      dragDeltaX += drag.x
+                      dragDeltaY += drag.y
+                    }
+                  }
+                } else {
+                  Modifier
+                }
+            ),
+    ) {
+      Box(
+          modifier = Modifier
+              .size(110.dp)
+              .clip(RoundedCornerShape(26.dp))
+              .background(Color(0x1EFFFFFF))
+              .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(26.dp)),
+          contentAlignment = Alignment.Center,
+      ) {
+        // Specular
+        Box(
+            modifier = Modifier.matchParentSize().background(
+                Brush.radialGradient(
+                    colors = listOf(Color(0x28FFFFFF), Color.Transparent),
+                    radius = 180f,
+                )
+            )
+        )
+        Image(
+            bitmap = app.icon,
+            contentDescription = app.label,
+            modifier = Modifier.size(100.dp),
+        )
+      }
+      Spacer(Modifier.height(6.dp))
+      Text(
+          text = app.label,
+          color = Color.White.copy(alpha = 0.82f),
+          fontSize = 22.sp,
+          fontWeight = FontWeight.Medium,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          textAlign = TextAlign.Center,
       )
     }
-    Spacer(Modifier.height(6.dp))
-    Text(
-        text = app.label,
-        color = Color.White.copy(alpha = 0.82f),
-        fontSize = 22.sp,
-        fontWeight = FontWeight.Medium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        textAlign = TextAlign.Center,
-    )
+    if (editMode && app.uninstallable) {
+      MinusBadge(modifier = Modifier.align(Alignment.TopStart)) { onRemove() }
+    }
   }
 }
 
@@ -3012,6 +3103,32 @@ private fun RemoveBadge(size: Dp, modifier: Modifier = Modifier, onClick: () -> 
 }
 
 /**
+ * Gray minus badge for iOS-style edit mode on app icons.
+ */
+@Composable
+private fun MinusBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
+  Surface(
+      color = Color(0xE6C7C7CC),
+      shape = CircleShape,
+      modifier = modifier.size(28.dp).clickable { onClick() },
+  ) {
+    Canvas(Modifier.fillMaxSize()) {
+      val cx = this.size.width / 2f
+      val cy = this.size.height / 2f
+      val armWidth = this.size.minDimension * 0.30f
+      val stroke = this.size.minDimension * 0.12f
+      drawLine(
+          Color.White,
+          Offset(cx - armWidth, cy),
+          Offset(cx + armWidth, cy),
+          strokeWidth = stroke,
+          cap = StrokeCap.Round,
+      )
+    }
+  }
+}
+
+/**
  * Wraps a tile whose own content does NOT swallow touches (built-ins, folders, apps) with a
  * dragged-dim. The drag itself is handled by the stable container detector that wraps the pager, so
  * the gesture survives a page flip (letting a tile be dragged onto another page). Hosted widgets
@@ -3132,11 +3249,16 @@ private fun loadApps(context: Context): List<AppEntry> {
                   ?: ri.loadIcon(pm)
               // Render with IconRenderer (adaptive composite + squircle mask)
               val bmp: Bitmap = IconRenderer.renderAppIcon(context, drawable, 144)
+              // Uninstallable: not a system app OR is an updated system app
+              val appInfo = ai.applicationInfo
+              val isUninstallable = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0 ||
+                                    (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
               AppEntry(
                   label = Curation.displayLabel(ai.packageName, rawLabel),
                   component = ComponentName(ai.packageName, ai.name),
                   icon = bmp.asImageBitmap(),
                   folder = Curation.folderFor(ai.packageName),
+                  uninstallable = isUninstallable,
               ) to rawLabel
             }
             .getOrNull()
