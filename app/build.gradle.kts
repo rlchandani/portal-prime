@@ -108,6 +108,8 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.exifinterface)
   implementation(libs.androidx.lifecycle.runtime.ktx)
+  // Smooth drag-to-reorder + animated reflow for the home-screen app grid (Apache-2.0).
+  implementation(libs.reorderable)
   debugImplementation(libs.androidx.compose.ui.tooling)
 
   // SMB/CIFS client for the "network share" screensaver source (smbj — SMB 2/3, incl. 3.1.1).
