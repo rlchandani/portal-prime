@@ -6,6 +6,16 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -36,4 +46,75 @@ internal fun groupEventsByDay(
   return events.sortedBy { it.startMillis }.groupBy { dayIdx(it.startMillis) }.toSortedMap()
       .entries.filter { it.key in 0 until maxDays }
       .map { (idx, evs) -> CalendarDayGroup(label(idx, evs.first().startMillis), evs) }
+}
+
+@androidx.compose.runtime.Composable
+internal fun ImmortalCalendarWidget(modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  val is24h = androidx.compose.runtime.remember { android.text.format.DateFormat.is24HourFormat(context) }
+  val url = androidx.compose.runtime.remember { ScreensaverConfig.load(context).calendarUrl }
+  val events by androidx.compose.runtime.produceState(
+      initialValue = emptyList<CalendarFeed.Event>(), url) {
+    value = if (url.isNullOrBlank()) emptyList()
+        else kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { CalendarFeed.fetch(url) }
+  }
+  val now = System.currentTimeMillis()
+  val groups = androidx.compose.runtime.remember(events) { groupEventsByDay(events, now, maxDays = 3) }
+
+  androidx.compose.foundation.layout.Box(
+      modifier =
+          modifier
+              .clip(androidx.compose.foundation.shape.RoundedCornerShape(24.dp))
+              .background(androidx.compose.ui.graphics.Color(0x1EFFFFFF))
+              .border(
+                  1.dp,
+                  androidx.compose.ui.graphics.Color(0x38FFFFFF),
+                  androidx.compose.foundation.shape.RoundedCornerShape(24.dp))
+              .padding(18.dp)) {
+    androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.fillMaxSize()) {
+      androidx.compose.material3.Text(
+          "Calendar",
+          color = androidx.compose.ui.graphics.Color.White,
+          fontSize = 20.sp,
+          fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
+      androidx.compose.foundation.layout.Spacer(androidx.compose.ui.Modifier.height(12.dp))
+      when {
+        url.isNullOrBlank() -> {
+          androidx.compose.material3.Text(
+              "No calendar connected. Add a calendar link in Settings → Screensaver.",
+              color = androidx.compose.ui.graphics.Color(0xE6FFFFFF),
+              fontSize = 15.sp,
+              maxLines = 2)
+        }
+        groups.isEmpty() -> {
+          androidx.compose.material3.Text(
+              "No upcoming events.",
+              color = androidx.compose.ui.graphics.Color(0xE6FFFFFF),
+              fontSize = 15.sp)
+        }
+        else -> {
+          androidx.compose.foundation.lazy.LazyColumn(
+              verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
+            groups.forEach { group ->
+              item {
+                androidx.compose.material3.Text(
+                    group.label.uppercase(Locale.getDefault()),
+                    color = androidx.compose.ui.graphics.Color(0x8CFFFFFF),
+                    fontSize = 12.sp,
+                    modifier = androidx.compose.ui.Modifier.padding(bottom = 4.dp))
+              }
+              items(group.events.size) { idx ->
+                androidx.compose.material3.Text(
+                    calendarEventLine(group.events[idx], now, is24h),
+                    color = androidx.compose.ui.graphics.Color(0xE6FFFFFF),
+                    fontSize = 15.sp,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
