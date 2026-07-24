@@ -42,10 +42,18 @@ object HomeWidgetStore {
   const val KIND_WEATHER = "weather"
   const val KIND_WORLD_CLOCK = "world_clock"
   const val KIND_TIMERS = "timers"
+  const val KIND_CALENDAR = "calendar"
 
   const val DEFAULT_SPAN_X = 2
   const val DEFAULT_SPAN_Y = 2
   const val MAX_SPAN = 4
+
+  /** iOS-style size cycle for a left-column widget: Small 1x1 -> Medium 2x1 -> Large 2x2 -> Small. */
+  fun nextWidgetSpan(current: Pair<Int, Int>): Pair<Int, Int> = when (current) {
+    1 to 1 -> 2 to 1
+    2 to 1 -> 2 to 2
+    else -> 1 to 1
+  }
 
   fun load(context: Context): List<HomeWidget> {
     val raw =
