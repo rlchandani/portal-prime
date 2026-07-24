@@ -133,6 +133,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -612,8 +613,9 @@ private fun LauncherScreen(
 
   // User order for app icons
   val orderState = remember { mutableStateOf(UserLayout.loadOrder(context)) }
-  val orderedApps = remember(installedApps, orderState.value) {
-    UserLayout.applyOrder(installedApps, orderState.value) { it.component.packageName }
+  val orderedApps = remember(installedApps, orderState.value, dockPkgs.value) {
+    val inDock = dockPkgs.value.toSet()
+    UserLayout.applyOrder(installedApps.filterNot { it.component.packageName in inDock }, orderState.value) { it.component.packageName }
   }
 
   // Derived strings
@@ -997,36 +999,34 @@ private fun LiquidGlassAppIcon(
                     awaitEachGesture {
                       val down = awaitFirstDown(requireUnconsumed = false)
                       val downTime = System.currentTimeMillis()
-                      val downPos = down.position
                       val slop = viewConfiguration.touchSlop
                       var hasMoved = false
-                      var currentPos = downPos
+                      var accumulated = Offset.Zero
 
                       // Track movement until release
                       do {
                         val event = awaitPointerEvent()
-                        event.changes.forEach { change ->
-                          if (change.id == down.id) {
-                            currentPos = change.position
-                            val delta = currentPos - downPos
-                            val distance = kotlin.math.sqrt((delta.x * delta.x + delta.y * delta.y).toDouble())
-                            if (distance > slop) {
-                              if (!hasMoved) {
-                                hasMoved = true
-                                onDragStart?.invoke(app.component.packageName)
-                              }
-                              change.consume()
-                              // Update live drag feedback
-                              dragOffset = delta
-                              isDragging = true
-                              onDragUpdate?.invoke(delta.y)
+                        val change = event.changes.firstOrNull { it.id == down.id }
+                        if (change != null && change.pressed) {
+                          val d = change.positionChange()
+                          accumulated += d
+                          val dist = accumulated.getDistance()
+                          if (dist > slop) {
+                            if (!hasMoved) {
+                              hasMoved = true
+                              onDragStart?.invoke(app.component.packageName)
                             }
+                            change.consume()
+                            // Update live drag feedback — now smooth 1:1
+                            dragOffset = accumulated
+                            isDragging = true
+                            onDragUpdate?.invoke(accumulated.y)
                           }
                         }
                       } while (event.changes.any { it.pressed && it.id == down.id })
 
                       // Released — reset visual state before committing reorder
-                      val finalDelta = currentPos - downPos
+                      val finalDelta = accumulated
                       dragOffset = Offset.Zero
                       isDragging = false
 
