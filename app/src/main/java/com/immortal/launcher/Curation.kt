@@ -85,4 +85,13 @@ object Curation {
 
   fun displayLabel(packageName: String, label: String): String =
       labelOverrides[packageName] ?: label
+
+  /** Per-package icon override map (drawable resource). Empty initially. */
+  private val ICON_OVERRIDES: Map<String, Int> = emptyMap()
+
+  /**
+   * Returns a drawable resource ID to use as an icon override for the given package,
+   * or null to use the app's own icon. Allows bundling hero icons for key apps.
+   */
+  fun iconOverride(pkg: String): Int? = ICON_OVERRIDES[pkg]
 }

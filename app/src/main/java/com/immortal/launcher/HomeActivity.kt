@@ -734,7 +734,7 @@ private fun LiquidGlassAppIcon(
       Image(
           bitmap = app.icon,
           contentDescription = app.label,
-          modifier = Modifier.size(100.dp).clip(RoundedCornerShape(22.dp)),
+          modifier = Modifier.size(100.dp),
       )
     }
     Spacer(Modifier.height(6.dp))
@@ -864,7 +864,7 @@ private fun DockIcon(app: AppEntry, onClick: () -> Unit) {
       Image(
           bitmap = app.icon,
           contentDescription = app.label,
-          modifier = Modifier.size(72.dp).clip(RoundedCornerShape(18.dp)),
+          modifier = Modifier.size(72.dp),
       )
     }
     Spacer(Modifier.height(4.dp))
@@ -3014,7 +3014,6 @@ private fun AppTile(
           contentDescription = app.label,
           modifier =
               Modifier.size(LocalTileDp.current)
-                  .clip(RoundedCornerShape(20.dp))
                   .alpha(if (dimmed) 0.3f else 1f),
       )
       if (editMode) {
@@ -3052,7 +3051,12 @@ private fun loadApps(context: Context): List<AppEntry> {
         runCatching {
               val ai = ri.activityInfo
               val rawLabel = ri.loadLabel(pm).toString()
-              val bmp: Bitmap = ri.loadIcon(pm).toBitmap(144, 144)
+              // Check for icon override first, then use app's own icon
+              val drawable = Curation.iconOverride(ai.packageName)
+                  ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
+                  ?: ri.loadIcon(pm)
+              // Render with IconRenderer (adaptive composite + squircle mask)
+              val bmp: Bitmap = IconRenderer.renderAppIcon(context, drawable, 144)
               AppEntry(
                   label = Curation.displayLabel(ai.packageName, rawLabel),
                   component = ComponentName(ai.packageName, ai.name),
