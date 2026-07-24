@@ -134,6 +134,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -962,17 +963,28 @@ private fun LiquidGlassAppIcon(
   val scale = remember { Animatable(1f) }
   var dragDeltaX by remember { mutableStateOf(0f) }
   var dragDeltaY by remember { mutableStateOf(0f) }
+  var dragOffset by remember { mutableStateOf(Offset.Zero) }
+  var isDragging by remember { mutableStateOf(false) }
 
   Box(
       modifier = Modifier
           .fillMaxWidth()
-          .jiggle(editMode, app.component.packageName.hashCode()),
+          .jiggle(editMode && !isDragging, app.component.packageName.hashCode()),
       contentAlignment = Alignment.Center
   ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .graphicsLayer { scaleX = scale.value; scaleY = scale.value }
+            .zIndex(if (isDragging) 1f else 0f)
+            .graphicsLayer {
+              scaleX = if (isDragging) 1.1f else scale.value
+              scaleY = if (isDragging) 1.1f else scale.value
+              translationX = dragOffset.x
+              translationY = dragOffset.y
+              shadowElevation = if (isDragging) 16.dp.toPx() else 0f
+              shape = RoundedCornerShape(26.dp)
+              clip = false
+            }
             .then(
                 if (editMode) {
                   // Edit mode: custom gesture that disambiguates tap-vs-drag on touch-down
@@ -996,16 +1008,23 @@ private fun LiquidGlassAppIcon(
                             if (distance > slop) {
                               hasMoved = true
                               change.consume()
+                              // Update live drag feedback
+                              dragOffset = delta
+                              isDragging = true
                             }
                           }
                         }
                       } while (event.changes.any { it.pressed && it.id == down.id })
 
-                      // Released
+                      // Released — reset visual state before committing reorder
+                      val finalDelta = currentPos - downPos
+                      dragOffset = Offset.Zero
+                      isDragging = false
+
                       if (hasMoved) {
                         // Drag — commit reorder with accumulated deltas
-                        dragDeltaX = currentPos.x - downPos.x
-                        dragDeltaY = currentPos.y - downPos.y
+                        dragDeltaX = finalDelta.x
+                        dragDeltaY = finalDelta.y
                         onReorder(dragDeltaX, dragDeltaY)
                         dragDeltaX = 0f
                         dragDeltaY = 0f
@@ -3314,16 +3333,29 @@ private fun ResizeBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Canvas(Modifier.fillMaxSize()) {
       val cx = this.size.width / 2f
       val cy = this.size.height / 2f
-      val inset = this.size.minDimension * 0.18f
       val stroke = this.size.minDimension * 0.08f
-      // Draw two chevrons pointing outward (resize glyph)
-      val chev = this.size.minDimension * 0.12f
-      // Top-left chevron
-      drawLine(Color.White, Offset(cx - inset, cy - inset + chev), Offset(cx - inset - chev, cy - inset), strokeWidth = stroke, cap = StrokeCap.Round)
-      drawLine(Color.White, Offset(cx - inset + chev, cy - inset), Offset(cx - inset, cy - inset - chev), strokeWidth = stroke, cap = StrokeCap.Round)
-      // Bottom-right chevron
-      drawLine(Color.White, Offset(cx + inset, cy + inset - chev), Offset(cx + inset + chev, cy + inset), strokeWidth = stroke, cap = StrokeCap.Round)
-      drawLine(Color.White, Offset(cx + inset - chev, cy + inset), Offset(cx + inset, cy + inset + chev), strokeWidth = stroke, cap = StrokeCap.Round)
+      val outerSize = this.size.minDimension * 0.56f
+      val innerSize = this.size.minDimension * 0.32f
+      val cornerRadius = this.size.minDimension * 0.06f
+
+      // Draw outer square (stroke only)
+      drawRoundRect(
+          color = Color.White,
+          topLeft = Offset(cx - outerSize / 2f, cy - outerSize / 2f),
+          size = Size(outerSize, outerSize),
+          cornerRadius = CornerRadius(cornerRadius, cornerRadius),
+          style = Stroke(width = stroke)
+      )
+
+      // Draw inner square (stroke only, positioned in lower-right)
+      val innerOffset = outerSize * 0.15f
+      drawRoundRect(
+          color = Color.White,
+          topLeft = Offset(cx - innerSize / 2f + innerOffset, cy - innerSize / 2f + innerOffset),
+          size = Size(innerSize, innerSize),
+          cornerRadius = CornerRadius(cornerRadius * 0.7f, cornerRadius * 0.7f),
+          style = Stroke(width = stroke)
+      )
     }
   }
 }
