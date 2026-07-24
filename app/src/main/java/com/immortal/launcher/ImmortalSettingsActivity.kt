@@ -20,11 +20,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -82,152 +84,439 @@ import org.json.JSONObject
  * Immortal's own settings (weather unit, home-screen tile size), reached from the
  * "Immortal" tile in the launcher's Settings folder. The launcher re-reads these
  * on resume, so changes apply the moment the user returns home.
+ *
+ * Rendered with an iOS Settings aesthetic: light grey background (#f2f2f7), white grouped
+ * cards (12dp radius), blue toggles, uppercase section headers.
  */
 class ImmortalSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { ImmortalSettingsScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { ImmortalSettingsScreen() } }
   }
 }
 
+// ---------------------------------------------------------------------------
+// Top-level iOS Settings screen
+// ---------------------------------------------------------------------------
+
 @Composable
 private fun ImmortalSettingsScreen() {
-  // The sub-screens (multi-room, MQTT, device health, boot apps, world clock) are now their own
-  // Activities, reached by launching them from the nav rows below — one nav model.
   val context = LocalContext.current
-  var settings by remember { mutableStateOf(ImmortalSettings.load(context)) }
+  var ss by remember { mutableStateOf(ScreensaverConfig.load(context)) }
+  var immortal by remember { mutableStateOf(ImmortalSettings.load(context)) }
+  var clock by remember { mutableStateOf(DigitalClockConfig.load(context)) }
 
-  // Re-read on resume so values changed in a sub-screen Activity reflect when we come back.
+  // Re-read all configs on resume so values changed in a sub-screen Activity reflect here.
   val resumeOwner = LocalLifecycleOwner.current
   DisposableEffect(resumeOwner) {
     val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) settings = ImmortalSettings.load(context)
+      if (e == Lifecycle.Event.ON_RESUME) {
+        ss = ScreensaverConfig.load(context)
+        immortal = ImmortalSettings.load(context)
+        clock = DigitalClockConfig.load(context)
+      }
     }
     resumeOwner.lifecycle.addObserver(obs)
     onDispose { resumeOwner.lifecycle.removeObserver(obs) }
   }
 
-  // Remote support: focus the first control on open; Back exits the screen.
   val activity = context as? Activity
   val firstFocus = remember { FocusRequester() }
   LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
 
-  // Every change routes through the registry's apply (so the domain's onApplied side effects —
-  // status-bar re-apply, multi-room resync — fire on the on-device path too), then we re-read.
-  fun apply(key: String, value: Any) {
+  fun applyScreensaver(key: String, value: Any) {
+    SettingsDomains.screensaver.apply(context, JSONObject().put(key, value))
+    ss = ScreensaverConfig.load(context)
+  }
+  fun applyImmortal(key: String, value: Any) {
     SettingsDomains.immortal.apply(context, JSONObject().put(key, value))
-    settings = ImmortalSettings.load(context)
+    immortal = ImmortalSettings.load(context)
   }
 
   Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) activity?.finish()
-                  true
-                } else false
-              }
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
+      modifier = Modifier
+          .fillMaxSize()
+          .onPreviewKeyEvent { e ->
+            if (e.key == Key.Back) {
+              if (e.type == KeyEventType.KeyUp) activity?.finish()
+              true
+            } else false
+          }
+          .background(IosBackground)
+          .verticalScroll(rememberScrollState()),
   ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp).focusRequester(firstFocus).focusGroup()) {
-      Text("Immortal", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "Tune how the launcher looks and what it shows.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(26.dp))
+    Column(
+        modifier = Modifier
+            .widthIn(max = 1100.dp)
+            .focusRequester(firstFocus)
+            .focusGroup(),
+    ) {
+      IosNavBar(title = "Settings")
 
-      // Top-level controls render from the `immortal` domain (the same registry that drives the
-      // remote). The multi-room fields are excluded here — they live behind the Multi-room sub-screen.
-      SettingsList(
-          SettingsDomains.immortal,
-          settings,
-          exclude = setOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword"),
-      ) { k, v ->
-        apply(k, v)
-      }
-
-      WallpaperSection()
-
-      Spacer(Modifier.size(26.dp))
-      SectionLabel("World clock")
+      // ---------------------------------------------------------------
+      // SCREENSAVER section
+      // ---------------------------------------------------------------
+      SectionLabel("Screensaver")
       Card {
-        Row(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .tvFocusableRow { context.startActivity(Intent(context, WorldClockActivity::class.java)) }
-                    .padding(18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Column(modifier = Modifier.weight(1f)) {
-            Text("World clock locations", color = Color.White, fontSize = 17.sp)
-            Text(
-                "Pick which cities the World Clock widget shows (first four are displayed).",
-                color = Color(0xFF9A9A9A),
-                fontSize = 13.sp,
-                modifier = Modifier.padding(top = 2.dp),
-            )
-          }
-          Text("›", color = Color(0xFF7C7C7C), fontSize = 26.sp)
-        }
+        NavRow(
+            title = "Photo Source",
+            value = screensaverSourceLabel(ss),
+            iconColor = Color(0xFFFF6B35),
+            iconSymbol = "P",
+            onClick = { context.startActivity(Intent(context, ScreensaverSourcesActivity::class.java)) },
+        )
+        Divider()
+        Stepper(
+            label = "Photo Interval",
+            valueText = "${ss.intervalSec}s",
+            iconColor = Color(0xFF5E5CE6),
+            iconSymbol = "t",
+            onMinus = {
+              val next = (ss.intervalSec - 5).coerceAtLeast(5)
+              applyScreensaver("intervalSec", next)
+            },
+            onPlus = {
+              val next = (ss.intervalSec + 5).coerceAtMost(600)
+              applyScreensaver("intervalSec", next)
+            },
+        )
+        Divider()
+        ToggleRow(
+            title = "Shuffle",
+            checked = ss.shuffle,
+            iconColor = Color(0xFFFF9F0A),
+            iconSymbol = "~",
+            onChange = { applyScreensaver("shuffle", it) },
+        )
+        Divider()
+        ToggleRow(
+            title = "Include Video",
+            checked = ss.includeVideo,
+            iconColor = Color(0xFF30D158),
+            iconSymbol = "v",
+            onChange = { applyScreensaver("includeVideo", it) },
+        )
+        Divider()
+        NavRow(
+            title = "Fit Mode",
+            value = if (ss.fit == ScreensaverConfig.FIT_FIT) "Fit" else "Fill",
+            iconColor = Color(0xFF636366),
+            iconSymbol = "F",
+            onClick = { applyScreensaver("fit", if (ss.fit == ScreensaverConfig.FIT_FILL) ScreensaverConfig.FIT_FIT else ScreensaverConfig.FIT_FILL) },
+        )
+        Divider()
+        NavRow(
+            title = "Presence Mode",
+            value = if (ss.presenceMode == FrameMode.PRESENCE) "Follow Presence" else "Always On",
+            iconColor = Color(0xFF0A84FF),
+            iconSymbol = "o",
+            onClick = {
+              val next = if (ss.presenceMode == FrameMode.ALWAYS_ON) FrameMode.PRESENCE else FrameMode.ALWAYS_ON
+              applyScreensaver("presenceMode", next.name)
+            },
+        )
+        Divider()
+        ToggleRow(
+            title = "Show Gradient",
+            checked = ss.showGradient,
+            iconColor = Color(0xFF5E5CE6),
+            iconSymbol = "G",
+            onChange = { applyScreensaver("showGradient", it) },
+        )
+        Divider()
+        ToggleRow(
+            title = "Anti Burn-In",
+            checked = ss.antiBurnIn,
+            iconColor = Color(0xFFFF453A),
+            iconSymbol = "B",
+            onChange = { applyScreensaver("antiBurnIn", it) },
+        )
       }
 
-      MultiRoomNavRow(onOpen = { context.startActivity(Intent(context, MultiRoomActivity::class.java)) })
+      // ---------------------------------------------------------------
+      // CLOCK section
+      // ---------------------------------------------------------------
+      SectionLabel("Clock Face")
+      Card {
+        NavRow(
+            title = "Clock Face",
+            value = FaceCatalog.entryFor(ss.faceId).name,
+            iconColor = Color(0xFF0A84FF),
+            iconSymbol = "c",
+            onClick = { context.startActivity(Intent(context, FacePickerActivity::class.java)) },
+        )
+        Divider()
+        NavRow(
+            title = "Clock Format",
+            value = when (immortal.clockFormat) {
+              ImmortalSettings.CLOCK_12 -> "12h"
+              ImmortalSettings.CLOCK_24 -> "24h"
+              else -> "Auto"
+            },
+            iconColor = Color(0xFFFF9F0A),
+            iconSymbol = "h",
+            onClick = {
+              val next = when (immortal.clockFormat) {
+                ImmortalSettings.CLOCK_AUTO -> ImmortalSettings.CLOCK_12
+                ImmortalSettings.CLOCK_12 -> ImmortalSettings.CLOCK_24
+                else -> ImmortalSettings.CLOCK_AUTO
+              }
+              applyImmortal("clockFormat", next)
+            },
+        )
+        Divider()
+        ToggleRow(
+            title = "Show Date",
+            checked = clock.showDate,
+            iconColor = Color(0xFF30D158),
+            iconSymbol = "d",
+            onChange = {
+              DigitalClockConfig.setShowDate(context, it)
+              clock = DigitalClockConfig.load(context)
+            },
+        )
+        Divider()
+        ToggleRow(
+            title = "Show Now Playing",
+            checked = ss.showNowPlaying,
+            iconColor = Color(0xFF64D2FF),
+            iconSymbol = "n",
+            onChange = { applyScreensaver("showNowPlaying", it) },
+        )
+        Divider()
+        ToggleRow(
+            title = "Show Seconds",
+            checked = clock.showSeconds,
+            iconColor = Color(0xFF30D158),
+            iconSymbol = "s",
+            onChange = {
+              DigitalClockConfig.setShowSeconds(context, it)
+              clock = DigitalClockConfig.load(context)
+            },
+        )
+      }
 
-      MqttNavRow(onOpen = { context.startActivity(Intent(context, MqttActivity::class.java)) })
+      // ---------------------------------------------------------------
+      // APPEARANCE section
+      // ---------------------------------------------------------------
+      SectionLabel("Appearance")
+      Card {
+        NavRow(
+            title = "Tile Size",
+            value = when (immortal.tileSize) {
+              ImmortalSettings.SIZE_LARGE -> "Large"
+              ImmortalSettings.SIZE_XL -> "XL"
+              else -> "Standard"
+            },
+            iconColor = Color(0xFF5E5CE6),
+            iconSymbol = "T",
+            onClick = {
+              val next = when (immortal.tileSize) {
+                ImmortalSettings.SIZE_STANDARD -> ImmortalSettings.SIZE_LARGE
+                ImmortalSettings.SIZE_LARGE -> ImmortalSettings.SIZE_XL
+                else -> ImmortalSettings.SIZE_STANDARD
+              }
+              applyImmortal("tileSize", next)
+            },
+        )
+        Divider()
+        NavRow(
+            title = "Weather Widget",
+            value = when (immortal.weatherWidget) {
+              ImmortalSettings.WIDGET_HOURLY -> "Hourly"
+              ImmortalSettings.WIDGET_DAILY -> "Daily"
+              else -> "Off"
+            },
+            iconColor = Color(0xFF64D2FF),
+            iconSymbol = "W",
+            onClick = {
+              val next = when (immortal.weatherWidget) {
+                ImmortalSettings.WIDGET_OFF -> ImmortalSettings.WIDGET_HOURLY
+                ImmortalSettings.WIDGET_HOURLY -> ImmortalSettings.WIDGET_DAILY
+                else -> ImmortalSettings.WIDGET_OFF
+              }
+              applyImmortal("weatherWidget", next)
+            },
+        )
+        Divider()
+        ToggleRow(
+            title = "Show Mini Player",
+            checked = immortal.showMiniPlayer,
+            iconColor = Color(0xFFFF375F),
+            iconSymbol = "m",
+            onChange = { applyImmortal("showMiniPlayer", it) },
+        )
+        Divider()
+        ToggleRow(
+            title = "Hide Status Bar",
+            checked = immortal.hideStatusBar,
+            iconColor = Color(0xFF636366),
+            iconSymbol = "S",
+            onChange = { applyImmortal("hideStatusBar", it) },
+        )
+      }
 
-      RemoteNavRow()
+      // ---------------------------------------------------------------
+      // WEATHER section
+      // ---------------------------------------------------------------
+      SectionLabel("Weather")
+      Card {
+        NavRow(
+            title = "Temperature Unit",
+            value = when (immortal.weatherUnit) {
+              ImmortalSettings.UNIT_F -> "Fahrenheit"
+              ImmortalSettings.UNIT_C -> "Celsius"
+              else -> "Auto (deg.F)"
+            },
+            iconColor = Color(0xFF0A84FF),
+            iconSymbol = "u",
+            onClick = {
+              val next = when (immortal.weatherUnit) {
+                ImmortalSettings.UNIT_AUTO -> ImmortalSettings.UNIT_F
+                ImmortalSettings.UNIT_F -> ImmortalSettings.UNIT_C
+                else -> ImmortalSettings.UNIT_AUTO
+              }
+              applyImmortal("weatherUnit", next)
+            },
+        )
+      }
 
-      FeatureSettingsNavRow(
-          "Sounds", "Chimes & spoken time",
-          "Hourly chime, spoken time, golden-hour tone, quiet hours") {
-            context.startActivity(Intent(context, ChimeSettingsActivity::class.java))
-          }
-      FeatureSettingsNavRow(
-          "Welcome overlay", "Welcome-back greeting",
-          "A time-of-day greeting when the screensaver starts") {
-            context.startActivity(Intent(context, WelcomeSettingsActivity::class.java))
-          }
-      FeatureSettingsNavRow(
-          "Digital clock", "Clock screensaver",
-          "Show a large digital clock as the screensaver") {
-            context.startActivity(Intent(context, ClockSettingsActivity::class.java))
-          }
-      FeatureSettingsNavRow(
-          "Sleep & idle", "Screen-off timers",
-          "Idle timeout and the overnight sleep window") {
-            context.startActivity(Intent(context, SleepSettingsActivity::class.java))
-          }
-      FeatureSettingsNavRow(
-          "Wake-up light", "Sunrise alarm",
-          "Brighten the screen gradually at a set time") {
-            context.startActivity(Intent(context, SunriseSettingsActivity::class.java))
-          }
+      // ---------------------------------------------------------------
+      // AUDIO section
+      // ---------------------------------------------------------------
+      SectionLabel("Audio")
+      Card {
+        NavRow(
+            title = "Chime",
+            value = "Off",
+            iconColor = Color(0xFFFF9F0A),
+            iconSymbol = "C",
+            onClick = { context.startActivity(Intent(context, ChimeSettingsActivity::class.java)) },
+        )
+        Divider()
+        NavRow(
+            title = "Sunrise Wake Light",
+            value = "Off",
+            iconColor = Color(0xFFFFD60A),
+            iconSymbol = "R",
+            onClick = { context.startActivity(Intent(context, SunriseSettingsActivity::class.java)) },
+        )
+        Divider()
+        NavRow(
+            title = "Soundscape",
+            value = ScreensaverConfig.soundscapeLabel(ss.soundscape),
+            iconColor = Color(0xFF30D158),
+            iconSymbol = "A",
+            onClick = {
+              val next = ScreensaverConfig.SOUNDSCAPES
+                  .let { list ->
+                    val idx = list.indexOf(ss.soundscape)
+                    list[(idx + 1) % list.size]
+                  }
+              applyScreensaver("soundscape", next)
+            },
+        )
+      }
 
-      QuickButtonsSection()
+      // ---------------------------------------------------------------
+      // SYSTEM section
+      // ---------------------------------------------------------------
+      SectionLabel("System")
+      Card {
+        NavRow(
+            title = "About",
+            value = "Portal+",
+            subLabel = "Android 10",
+            iconColor = Color(0xFF636366),
+            iconSymbol = "i",
+            onClick = { context.startActivity(Intent(context, DeviceHealthActivity::class.java)) },
+        )
+        Divider()
+        NavRow(
+            title = "Screensaver Source",
+            subLabel = screensaverSourcePath(ss),
+            iconColor = Color(0xFF3A3A3C),
+            iconSymbol = "/",
+            onClick = { context.startActivity(Intent(context, ScreensaverSourcesActivity::class.java)) },
+        )
+        Divider()
+        IosDebugRow(context = context)
+      }
 
-      Spacer(Modifier.size(26.dp))
-      BootAppsNavRow(
-          count = BootLaunch.packages(context).size,
-          onOpen = { context.startActivity(Intent(context, BootAppsActivity::class.java)) })
-
-      DeviceHealthNavRow(onOpen = { context.startActivity(Intent(context, DeviceHealthActivity::class.java)) })
-
-      MoreFeaturesSection()
-
-      Text(
-          "Changes apply as soon as you go back to the home screen.",
-          color = Color(0xFF7C7C7C),
-          fontSize = 13.sp,
-          modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
-      )
+      FooterNote("Changes apply as soon as you return to the home screen.")
+      Spacer(Modifier.size(32.dp))
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// iOS nav bar
+// ---------------------------------------------------------------------------
+
+@Composable
+private fun IosNavBar(title: String) {
+  Row(
+      modifier = Modifier
+          .fillMaxWidth()
+          .background(Color(0xF2F2F2F7))
+          .padding(horizontal = 16.dp, vertical = 12.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Center,
+  ) {
+    Text(
+        text = title,
+        color = IosLabel,
+        fontSize = 17.sp,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = (-0.3).sp,
+    )
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Debug toggle row (uses a local pref; only relevant in debug builds)
+// ---------------------------------------------------------------------------
+
+private const val PREFS_DEBUG = "immortal_debug"
+
+@Composable
+private fun IosDebugRow(context: android.content.Context) {
+  val prefs = remember { context.getSharedPreferences(PREFS_DEBUG, android.content.Context.MODE_PRIVATE) }
+  var debug by remember { mutableStateOf(prefs.getBoolean("debug_mode", false)) }
+  ToggleRow(
+      title = "Debug Mode",
+      checked = debug,
+      iconColor = Color(0xFFFF453A),
+      iconSymbol = "D",
+      onChange = {
+        debug = it
+        prefs.edit().putBoolean("debug_mode", it).apply()
+      },
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Screensaver helpers
+// ---------------------------------------------------------------------------
+
+private fun screensaverSourceLabel(s: ScreensaverConfig.Settings): String = when (s.source) {
+  ScreensaverConfig.SOURCE_FOLDER -> "Local folder"
+  ScreensaverConfig.SOURCE_URL -> "Album URL"
+  ScreensaverConfig.SOURCE_IMMICH -> "Immich"
+  ScreensaverConfig.SOURCE_SMB -> "NAS / SMB"
+  ScreensaverConfig.SOURCE_DAV -> "WebDAV"
+  ScreensaverConfig.SOURCE_WEBURL -> "Web page"
+  else -> ScreensaverConfig.feedLabel(s.feed)
+}
+
+private fun screensaverSourcePath(s: ScreensaverConfig.Settings): String = when (s.source) {
+  ScreensaverConfig.SOURCE_FOLDER -> s.folderPath ?: ""
+  ScreensaverConfig.SOURCE_URL -> s.albumUrl ?: ""
+  ScreensaverConfig.SOURCE_IMMICH -> s.immichUrl ?: ""
+  ScreensaverConfig.SOURCE_SMB -> s.smbHost?.let { "$it/${s.smbShare ?: ""}" } ?: ""
+  ScreensaverConfig.SOURCE_DAV -> s.davUrl ?: ""
+  ScreensaverConfig.SOURCE_WEBURL -> s.webUrl ?: ""
+  else -> ""
 }
 
 /**
