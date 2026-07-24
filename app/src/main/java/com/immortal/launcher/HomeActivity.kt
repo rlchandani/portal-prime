@@ -103,6 +103,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.CornerRadius
@@ -771,30 +772,47 @@ private fun LiquidGlassDock(
       installedApps.filterNot { app -> preferredPkgs.contains(app.component.packageName) })
       .take(5)
 
-  Box(
+  val context = androidx.compose.ui.platform.LocalContext.current
+  // Ribbon dock: flat left/right edges, only top+bottom borders, generous vertical padding
+  Column(
       modifier = Modifier
           .fillMaxWidth()
-          .height(112.dp)
-          .background(
-              Brush.horizontalGradient(
-                  listOf(Color(0x6B000000), Color(0x6B000000))
-              )
-          )
-          .border(
-              width = 1.dp,
-              color = Color(0x1FFFFFFF),
-              shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-          ),
-      contentAlignment = Alignment.Center,
+          .background(Color(0x88000000))
+          .drawWithContent {
+            drawContent()
+            // Top border only
+            drawLine(
+                color = Color(0x40FFFFFF),
+                start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                end = androidx.compose.ui.geometry.Offset(size.width, 0f),
+                strokeWidth = 1.dp.toPx(),
+            )
+            // Bottom border only
+            drawLine(
+                color = Color(0x20FFFFFF),
+                start = androidx.compose.ui.geometry.Offset(0f, size.height),
+                end = androidx.compose.ui.geometry.Offset(size.width, size.height),
+                strokeWidth = 1.dp.toPx(),
+            )
+          }
+          .padding(top = 16.dp, bottom = 16.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     Row(
-        modifier = Modifier.padding(horizontal = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
       dockApps.forEach { app ->
         DockIcon(app = app, onClick = { onLaunch(app.component) })
       }
+      // Always show Immortal Settings as the last dock item
+      DockSettingsIcon(onClick = {
+        context.startActivity(
+            Intent(context, ImmortalSettingsActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+      })
     }
   }
 }
@@ -862,6 +880,51 @@ private fun DockIcon(app: AppEntry, onClick: () -> Unit) {
   }
 }
 
+
+/** Settings gear icon for the dock — launches ImmortalSettingsActivity. */
+@Composable
+private fun DockSettingsIcon(onClick: () -> Unit) {
+  var pressed by remember { mutableStateOf(false) }
+  val scale by animateFloatAsState(
+      targetValue = if (pressed) 1.1f else 1f,
+      animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+      label = "settingsScale",
+  )
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier
+          .graphicsLayer { scaleX = scale; scaleY = scale }
+          .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onClick() }
+          .pointerInput(Unit) {
+            awaitEachGesture {
+              awaitFirstDown(); pressed = true
+              try { drag(awaitFirstDown().id) { it.consume() } } finally { pressed = false }
+            }
+          },
+  ) {
+    Box(
+        modifier = Modifier
+            .size(80.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .background(Color(0x1EFFFFFF))
+            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(22.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+      Box(modifier = Modifier.matchParentSize().background(
+          Brush.radialGradient(listOf(Color(0x28FFFFFF), Color.Transparent), radius = 120f)))
+      Text("⚙️", fontSize = 40.sp)
+    }
+    Spacer(Modifier.height(4.dp))
+    Text(
+        text = "Settings",
+        color = Color.White.copy(alpha = 0.8f),
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Medium,
+        maxLines = 1,
+        textAlign = TextAlign.Center,
+    )
+  }
+}
 
 /**
  * Full-screen "time's up" alarm overlay with an iOS-style slide-to-stop. Blocks touches from
