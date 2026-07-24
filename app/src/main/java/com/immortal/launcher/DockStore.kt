@@ -19,7 +19,7 @@ import org.json.JSONArray
  */
 object DockStore {
 
-  const val MAX = 5
+  const val MAX = 6
   private const val PREFS = "immortal_dock"
   private const val KEY = "dock_apps"
 

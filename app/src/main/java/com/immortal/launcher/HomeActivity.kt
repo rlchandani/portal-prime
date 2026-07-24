@@ -120,6 +120,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -593,6 +595,10 @@ private fun LauncherScreen(
   // Dock packages state
   val dockPkgs = remember { mutableStateOf(DockStore.load(context)) }
 
+  // Drag-to-dock state: track dragged package and screen position
+  var draggedPkg by remember { mutableStateOf<String?>(null) }
+  var dragScreenY by remember { mutableStateOf(0f) }
+
   // Home widgets state
   var homeWidgets by remember { mutableStateOf(HomeWidgetStore.load(context)) }
   LaunchedEffect(Unit) {
@@ -782,6 +788,27 @@ private fun LauncherScreen(
                       }
                     }
                   },
+                  onDragStart = { pkg -> draggedPkg = pkg },
+                  onDragUpdate = { deltaY -> dragScreenY = deltaY },
+                  onDragEnd = { pkg, deltaY ->
+                    // Heuristic: if drag ended significantly downward (>120dp ~ dock height), treat as drop-to-dock
+                    val dockThresholdPx = 120f * context.resources.displayMetrics.density
+                    if (deltaY > dockThresholdPx) {
+                      // Drop to dock
+                      if (pkg !in dockPkgs.value) {
+                        val updated = DockStore.addToDock(dockPkgs.value, pkg, DockStore.MAX)
+                        if (updated != dockPkgs.value) {
+                          DockStore.save(context, updated)
+                          dockPkgs.value = updated
+                          Toast.makeText(context, "Added to dock", Toast.LENGTH_SHORT).show()
+                        } else {
+                          Toast.makeText(context, "Dock is full", Toast.LENGTH_SHORT).show()
+                        }
+                      }
+                    }
+                    draggedPkg = null
+                    dragScreenY = 0f
+                  },
               )
             }
           }
@@ -934,6 +961,9 @@ private fun LiquidGlassAppIcon(
     onLongPress: () -> Unit,
     onRemove: () -> Unit,
     onReorder: (deltaX: Float, deltaY: Float) -> Unit,
+    onDragStart: ((pkg: String) -> Unit)? = null,
+    onDragUpdate: ((y: Float) -> Unit)? = null,
+    onDragEnd: ((pkg: String, deltaY: Float) -> Unit)? = null,
 ) {
   val scale = remember { Animatable(1f) }
   var dragDeltaX by remember { mutableStateOf(0f) }
@@ -981,11 +1011,15 @@ private fun LiquidGlassAppIcon(
                             val delta = currentPos - downPos
                             val distance = kotlin.math.sqrt((delta.x * delta.x + delta.y * delta.y).toDouble())
                             if (distance > slop) {
-                              hasMoved = true
+                              if (!hasMoved) {
+                                hasMoved = true
+                                onDragStart?.invoke(app.component.packageName)
+                              }
                               change.consume()
                               // Update live drag feedback
                               dragOffset = delta
                               isDragging = true
+                              onDragUpdate?.invoke(delta.y)
                             }
                           }
                         }
@@ -1000,6 +1034,7 @@ private fun LiquidGlassAppIcon(
                         // Drag — commit reorder with accumulated deltas
                         dragDeltaX = finalDelta.x
                         dragDeltaY = finalDelta.y
+                        onDragEnd?.invoke(app.component.packageName, finalDelta.y)
                         onReorder(dragDeltaX, dragDeltaY)
                         dragDeltaX = 0f
                         dragDeltaY = 0f
@@ -1047,6 +1082,7 @@ private fun LiquidGlassAppIcon(
               bitmap = app.icon,
               contentDescription = app.label,
               modifier = Modifier.size(100.dp),
+              filterQuality = FilterQuality.High,
           )
         }
         if (editMode && app.uninstallable) {
@@ -1125,6 +1161,16 @@ private fun LiquidGlassDock(
               DockStore.save(context, updated)
               dockPkgs.value = updated
             },
+            onDragOut = { pkg, deltaY ->
+              // Heuristic: if drag moved significantly upward (< -60dp), remove from dock
+              val removeThresholdPx = -60f * context.resources.displayMetrics.density
+              if (deltaY < removeThresholdPx) {
+                val updated = DockStore.removeFromDock(dockPkgs.value, pkg)
+                DockStore.save(context, updated)
+                dockPkgs.value = updated
+                Toast.makeText(context, "Removed from dock", Toast.LENGTH_SHORT).show()
+              }
+            },
         )
       }
       // Always show Immortal Settings as the last dock item
@@ -1146,24 +1192,76 @@ private fun DockIcon(
     onClick: () -> Unit,
     onLongPress: () -> Unit,
     onRemove: () -> Unit,
+    onDragOut: ((pkg: String, deltaY: Float) -> Unit)? = null,
 ) {
   val scale = remember { Animatable(1f) }
+  var dragOffset by remember { mutableStateOf(Offset.Zero) }
+  var isDragging by remember { mutableStateOf(false) }
 
-  Box(modifier = Modifier.jiggle(editMode, app.component.packageName.hashCode())) {
+  Box(modifier = Modifier.jiggle(editMode && !isDragging, app.component.packageName.hashCode())) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .graphicsLayer { scaleX = scale.value; scaleY = scale.value }
+            .zIndex(if (isDragging) 1f else 0f)
+            .graphicsLayer {
+              scaleX = if (isDragging) 1.1f else scale.value
+              scaleY = if (isDragging) 1.1f else scale.value
+              translationX = dragOffset.x
+              translationY = dragOffset.y
+              shadowElevation = if (isDragging) 16.dp.toPx() else 0f
+            }
             .pointerInput(editMode) {
-              detectTapGestures(
-                  onPress = {
-                    scale.animateTo(0.96f, tween(90))
-                    tryAwaitRelease()
-                    scale.animateTo(1f, spring())
-                  },
-                  onTap = { if (!editMode) onClick() },
-                  onLongPress = { if (!editMode) onLongPress() },
-              )
+              if (editMode && onDragOut != null) {
+                awaitEachGesture {
+                  val down = awaitFirstDown(requireUnconsumed = false)
+                  val downPos = down.position
+                  val slop = viewConfiguration.touchSlop
+                  var hasMoved = false
+                  var currentPos = downPos
+
+                  // Track movement until release
+                  do {
+                    val event = awaitPointerEvent()
+                    event.changes.forEach { change ->
+                      if (change.id == down.id) {
+                        currentPos = change.position
+                        val delta = currentPos - downPos
+                        val distance = kotlin.math.sqrt((delta.x * delta.x + delta.y * delta.y).toDouble())
+                        if (distance > slop) {
+                          hasMoved = true
+                          change.consume()
+                          // Update live drag feedback
+                          dragOffset = delta
+                          isDragging = true
+                        }
+                      }
+                    }
+                  } while (event.changes.any { it.pressed && it.id == down.id })
+
+                  // Released — reset visual state
+                  val finalDelta = currentPos - downPos
+                  dragOffset = Offset.Zero
+                  isDragging = false
+
+                  if (hasMoved) {
+                    // Notify parent about drag-out
+                    onDragOut(app.component.packageName, finalDelta.y)
+                  } else {
+                    // Tap — launch (non-edit only)
+                    if (!editMode) onClick()
+                  }
+                }
+              } else {
+                detectTapGestures(
+                    onPress = {
+                      scale.animateTo(0.96f, tween(90))
+                      tryAwaitRelease()
+                      scale.animateTo(1f, spring())
+                    },
+                    onTap = { if (!editMode) onClick() },
+                    onLongPress = { if (!editMode) onLongPress() },
+                )
+              }
             },
     ) {
     Box(
@@ -1186,6 +1284,7 @@ private fun DockIcon(
           bitmap = app.icon,
           contentDescription = app.label,
           modifier = Modifier.size(72.dp),
+          filterQuality = FilterQuality.High,
       )
     }
       Spacer(Modifier.height(4.dp))
@@ -3224,6 +3323,7 @@ private fun Modifier.jiggle(enabled: Boolean, seed: Int): Modifier {
   return this.graphicsLayer {
     rotationZ = angle
     translationY = bob
+    compositingStrategy = CompositingStrategy.Offscreen
   }
 }
 

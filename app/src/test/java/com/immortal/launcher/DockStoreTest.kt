@@ -11,8 +11,8 @@ import org.junit.Test
 
 class DockStoreTest {
   @Test fun add_appendsWhenRoomAndAbsent() {
-    assertEquals(listOf("a", "b"), DockStore.addToDock(listOf("a"), "b", max = 5))
-    assertEquals(listOf("a"), DockStore.addToDock(listOf("a"), "a", max = 5)) // dup ignored
+    assertEquals(listOf("a", "b"), DockStore.addToDock(listOf("a"), "b", max = 6))
+    assertEquals(listOf("a"), DockStore.addToDock(listOf("a"), "a", max = 6)) // dup ignored
   }
   @Test fun add_respectsMax() {
     assertEquals(listOf("a", "b"), DockStore.addToDock(listOf("a", "b"), "c", max = 2)) // full
