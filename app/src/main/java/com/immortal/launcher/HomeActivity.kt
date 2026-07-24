@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -98,6 +99,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -403,6 +405,9 @@ private fun LauncherScreen(
   var editMode by remember { mutableStateOf(false) }
   BackHandler(enabled = editMode) { editMode = false }
 
+  // Dock packages state
+  val dockPkgs = remember { mutableStateOf(DockStore.load(context)) }
+
   // User order for app icons
   val orderState = remember { mutableStateOf(UserLayout.loadOrder(context)) }
   val orderedApps = remember(installedApps, orderState.value) {
@@ -665,7 +670,24 @@ private fun LauncherScreen(
               LiquidGlassAppIcon(
                   app = app,
                   editMode = editMode,
-                  onClick = { if (!editMode) onLaunch(app.component) },
+                  onClick = {
+                    if (!editMode) {
+                      onLaunch(app.component)
+                    } else {
+                      // Add to dock in edit mode
+                      val pkg = app.component.packageName
+                      if (pkg !in dockPkgs.value) {
+                        val updated = DockStore.addToDock(dockPkgs.value, pkg, DockStore.MAX)
+                        if (updated != dockPkgs.value) {
+                          DockStore.save(context, updated)
+                          dockPkgs.value = updated
+                          Toast.makeText(context, "Added to dock", Toast.LENGTH_SHORT).show()
+                        } else {
+                          Toast.makeText(context, "Dock is full", Toast.LENGTH_SHORT).show()
+                        }
+                      }
+                    }
+                  },
                   onLongPress = { if (!editMode) editMode = true },
                   onRemove = { onUninstall(app.component.packageName) },
                   onReorder = { deltaX, deltaY ->
@@ -695,6 +717,9 @@ private fun LauncherScreen(
       // ── DOCK ─────────────────────────────────────────────────────────────
       LiquidGlassDock(
           installedApps = installedApps,
+          dockPkgs = dockPkgs,
+          editMode = editMode,
+          onEnterEdit = { editMode = true },
           onLaunch = onLaunch,
           onExitHome = onExitHome,
           onOpenStore = onOpenStore,
@@ -852,7 +877,7 @@ private fun LiquidGlassAppIcon(
                     tryAwaitRelease()
                     scale.animateTo(1f, spring())
                   },
-                  onTap = { if (!editMode) onClick() },
+                  onTap = { onClick() },
                   onLongPress = { if (!editMode) onLongPress() },
               )
             }
@@ -920,25 +945,18 @@ private fun LiquidGlassAppIcon(
 @Composable
 private fun LiquidGlassDock(
     installedApps: List<AppEntry>,
+    dockPkgs: MutableState<List<String>>,
+    editMode: Boolean,
+    onEnterEdit: () -> Unit,
     onLaunch: (ComponentName) -> Unit,
     onExitHome: () -> Unit,
     onOpenStore: () -> Unit,
 ) {
-  // Dock: prefer key apps, fill with whatever is installed up to 5
-  val preferredPkgs = listOf(
-      "com.portal.calendar",       // PortalHub
-      "com.portal.assistant",      // Jarvis
-      "org.chromium.chrome",       // Browser
-      "com.facebook.alohaapps.launcher", // Meta home
-      "com.immortal.launcher.debug",    // This app / App Store
-  )
-  val appsByPkg = installedApps.associateBy { it.component.packageName }
-  // Build dock list: preferred first, then fill from installed apps
-  val dockApps = (preferredPkgs.mapNotNull { appsByPkg[it] } +
-      installedApps.filterNot { app -> preferredPkgs.contains(app.component.packageName) })
-      .take(5)
-
   val context = androidx.compose.ui.platform.LocalContext.current
+
+  // Resolve packages to AppEntry instances (skip uninstalled)
+  val appsByPkg = installedApps.associateBy { it.component.packageName }
+  val dockApps = dockPkgs.value.mapNotNull { appsByPkg[it] }
   // Ribbon dock: flat left/right edges, only top+bottom borders, generous vertical padding
   Column(
       modifier = Modifier
@@ -970,7 +988,17 @@ private fun LiquidGlassDock(
         verticalAlignment = Alignment.CenterVertically,
     ) {
       dockApps.forEach { app ->
-        DockIcon(app = app, onClick = { onLaunch(app.component) })
+        DockIcon(
+            app = app,
+            editMode = editMode,
+            onClick = { onLaunch(app.component) },
+            onLongPress = onEnterEdit,
+            onRemove = {
+              val updated = DockStore.removeFromDock(dockPkgs.value, app.component.packageName)
+              DockStore.save(context, updated)
+              dockPkgs.value = updated
+            },
+        )
       }
       // Always show Immortal Settings as the last dock item
       DockSettingsIcon(onClick = {
@@ -985,32 +1013,32 @@ private fun LiquidGlassDock(
 
 /** Single dock icon tile. */
 @Composable
-private fun DockIcon(app: AppEntry, onClick: () -> Unit) {
-  var pressed by remember { mutableStateOf(false) }
-  val scale by animateFloatAsState(
-      targetValue = if (pressed) 1.1f else 1f,
-      animationSpec = spring(
-          dampingRatio = Spring.DampingRatioMediumBouncy,
-          stiffness = Spring.StiffnessMedium,
-      ),
-      label = "dockScale",
-  )
+private fun DockIcon(
+    app: AppEntry,
+    editMode: Boolean,
+    onClick: () -> Unit,
+    onLongPress: () -> Unit,
+    onRemove: () -> Unit,
+) {
+  val scale = remember { Animatable(1f) }
 
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier
-          .graphicsLayer { scaleX = scale; scaleY = scale; translationY = if (pressed) -6f else 0f }
-          .clickable(
-              interactionSource = remember { MutableInteractionSource() },
-              indication = null,
-          ) { onClick() }
-          .pointerInput(Unit) {
-            awaitEachGesture {
-              awaitFirstDown(); pressed = true
-              try { drag(awaitFirstDown().id) { it.consume() } } finally { pressed = false }
-            }
-          },
-  ) {
+  Box(modifier = Modifier.jiggle(editMode, app.component.packageName.hashCode())) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .graphicsLayer { scaleX = scale.value; scaleY = scale.value }
+            .pointerInput(editMode) {
+              detectTapGestures(
+                  onPress = {
+                    scale.animateTo(0.96f, tween(90))
+                    tryAwaitRelease()
+                    scale.animateTo(1f, spring())
+                  },
+                  onTap = { if (!editMode) onClick() },
+                  onLongPress = { if (!editMode) onLongPress() },
+              )
+            },
+    ) {
     Box(
         modifier = Modifier
             .size(80.dp)
@@ -1033,16 +1061,20 @@ private fun DockIcon(app: AppEntry, onClick: () -> Unit) {
           modifier = Modifier.size(72.dp),
       )
     }
-    Spacer(Modifier.height(4.dp))
-    Text(
-        text = app.label,
-        color = Color.White.copy(alpha = 0.8f),
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Medium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        textAlign = TextAlign.Center,
-    )
+      Spacer(Modifier.height(4.dp))
+      Text(
+          text = app.label,
+          color = Color.White.copy(alpha = 0.8f),
+          fontSize = 20.sp,
+          fontWeight = FontWeight.Medium,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          textAlign = TextAlign.Center,
+      )
+    }
+    if (editMode) {
+      MinusBadge(modifier = Modifier.align(Alignment.TopStart)) { onRemove() }
+    }
   }
 }
 
