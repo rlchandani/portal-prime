@@ -715,10 +715,10 @@ private fun LiquidGlassAppIcon(
   ) {
     Box(
         modifier = Modifier
-            .size(88.dp)
-            .clip(RoundedCornerShape(22.dp))
+            .size(110.dp)
+            .clip(RoundedCornerShape(26.dp))
             .background(Color(0x1EFFFFFF))
-            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(22.dp)),
+            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(26.dp)),
         contentAlignment = Alignment.Center,
     ) {
       // Specular
@@ -726,22 +726,22 @@ private fun LiquidGlassAppIcon(
           modifier = Modifier.matchParentSize().background(
               Brush.radialGradient(
                   colors = listOf(Color(0x28FFFFFF), Color.Transparent),
-                  radius = 150f,
+                  radius = 180f,
               )
           )
       )
       Image(
           bitmap = app.icon,
           contentDescription = app.label,
-          modifier = Modifier.size(52.dp).clip(RoundedCornerShape(14.dp)),
+          modifier = Modifier.size(100.dp).clip(RoundedCornerShape(22.dp)),
       )
     }
     Spacer(Modifier.height(6.dp))
     Text(
         text = app.label,
         color = Color.White.copy(alpha = 0.82f),
-        fontSize = 11.sp,
-        fontWeight = FontWeight.Normal,
+        fontSize = 22.sp,
+        fontWeight = FontWeight.Medium,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.Center,
@@ -757,20 +757,24 @@ private fun LiquidGlassDock(
     onExitHome: () -> Unit,
     onOpenStore: () -> Unit,
 ) {
-  // Dock entries: by package preference, fallback to first available
-  val dockPackages = listOf(
-      "com.immortal.launcher",
-      "com.immortal.hub",
-      "com.immortal.jarvis",
-      "org.chromium.chrome",
-      "com.android.settings",
+  // Dock: prefer key apps, fill with whatever is installed up to 5
+  val preferredPkgs = listOf(
+      "com.portal.calendar",       // PortalHub
+      "com.portal.assistant",      // Jarvis
+      "org.chromium.chrome",       // Browser
+      "com.facebook.alohaapps.launcher", // Meta home
+      "com.immortal.launcher.debug",    // This app / App Store
   )
   val appsByPkg = installedApps.associateBy { it.component.packageName }
+  // Build dock list: preferred first, then fill from installed apps
+  val dockApps = (preferredPkgs.mapNotNull { appsByPkg[it] } +
+      installedApps.filterNot { app -> preferredPkgs.contains(app.component.packageName) })
+      .take(5)
 
   Box(
       modifier = Modifier
           .fillMaxWidth()
-          .height(88.dp)
+          .height(112.dp)
           .background(
               Brush.horizontalGradient(
                   listOf(Color(0x6B000000), Color(0x6B000000))
@@ -788,11 +792,8 @@ private fun LiquidGlassDock(
         horizontalArrangement = Arrangement.spacedBy(20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-      dockPackages.forEach { pkg ->
-        val app = appsByPkg[pkg]
-        if (app != null) {
-          DockIcon(app = app, onClick = { onLaunch(app.component) })
-        }
+      dockApps.forEach { app ->
+        DockIcon(app = app, onClick = { onLaunch(app.component) })
       }
     }
   }
@@ -828,31 +829,32 @@ private fun DockIcon(app: AppEntry, onClick: () -> Unit) {
   ) {
     Box(
         modifier = Modifier
-            .size(64.dp)
-            .clip(RoundedCornerShape(18.dp))
+            .size(80.dp)
+            .clip(RoundedCornerShape(22.dp))
             .background(Color(0x1EFFFFFF))
-            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(18.dp)),
+            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(22.dp)),
         contentAlignment = Alignment.Center,
     ) {
       Box(
           modifier = Modifier.matchParentSize().background(
               Brush.radialGradient(
                   colors = listOf(Color(0x28FFFFFF), Color.Transparent),
-                  radius = 100f,
+                  radius = 120f,
               )
           )
       )
       Image(
           bitmap = app.icon,
           contentDescription = app.label,
-          modifier = Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)),
+          modifier = Modifier.size(72.dp).clip(RoundedCornerShape(18.dp)),
       )
     }
     Spacer(Modifier.height(4.dp))
     Text(
         text = app.label,
-        color = Color.White.copy(alpha = 0.7f),
-        fontSize = 10.sp,
+        color = Color.White.copy(alpha = 0.8f),
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Medium,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.Center,

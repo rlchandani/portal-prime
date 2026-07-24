@@ -29,7 +29,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -133,7 +136,20 @@ private fun ImmortalSettingsScreen() {
     immortal = ImmortalSettings.load(context)
   }
 
-  Column(
+  var selectedSection by remember { mutableStateOf("Screensaver") }
+
+  // Sidebar section definitions: name, SF-symbol-like letter, icon background color
+  data class SectionDef(val name: String, val symbol: String, val iconColor: Color)
+  val sections = listOf(
+      SectionDef("Screensaver", "P", Color(0xFFFF6B35)),
+      SectionDef("Clock Face",  "c", Color(0xFF0A84FF)),
+      SectionDef("Appearance",  "T", Color(0xFF5E5CE6)),
+      SectionDef("Weather",     "u", Color(0xFF0A84FF)),
+      SectionDef("Audio",       "A", Color(0xFF30D158)),
+      SectionDef("System",      "i", Color(0xFF636366)),
+  )
+
+  Row(
       modifier = Modifier
           .fillMaxSize()
           .onPreviewKeyEvent { e ->
@@ -142,20 +158,71 @@ private fun ImmortalSettingsScreen() {
               true
             } else false
           }
-          .background(IosBackground)
-          .verticalScroll(rememberScrollState()),
+          .background(IosBackground),
   ) {
+    // ---------------------------------------------------------------
+    // LEFT SIDEBAR (260 dp)
+    // ---------------------------------------------------------------
     Column(
         modifier = Modifier
-            .widthIn(max = 1100.dp)
+            .width(260.dp)
+            .fillMaxHeight()
+            .background(Color(0xFFE8E8EE))
             .focusRequester(firstFocus)
-            .focusGroup(),
+            .focusGroup()
+            .verticalScroll(rememberScrollState()),
     ) {
       IosNavBar(title = "Settings")
+      Spacer(Modifier.height(8.dp))
+      sections.forEach { sec ->
+        val isSelected = selectedSection == sec.name
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 3.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (isSelected) Color(0xFF007AFF) else Color.Transparent)
+                .clickable { selectedSection = sec.name }
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+          Box(
+              modifier = Modifier
+                  .size(30.dp)
+                  .clip(RoundedCornerShape(7.dp))
+                  .background(if (isSelected) Color.White.copy(alpha = 0.25f) else sec.iconColor),
+              contentAlignment = Alignment.Center,
+          ) {
+            Text(sec.symbol, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+          }
+          Text(
+              sec.name,
+              color = if (isSelected) Color.White else IosLabel,
+              fontSize = 15.sp,
+              fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+          )
+        }
+      }
+      Spacer(Modifier.height(16.dp))
+    }
+
+    // ---------------------------------------------------------------
+    // RIGHT DETAIL PANEL
+    // ---------------------------------------------------------------
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .widthIn(max = 840.dp)
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState()),
+    ) {
+      Spacer(Modifier.height(16.dp))
 
       // ---------------------------------------------------------------
       // SCREENSAVER section
       // ---------------------------------------------------------------
+      if (selectedSection == "Screensaver") {
       SectionLabel("Screensaver")
       Card {
         NavRow(
@@ -232,10 +299,12 @@ private fun ImmortalSettingsScreen() {
             onChange = { applyScreensaver("antiBurnIn", it) },
         )
       }
+      } // end Screensaver
 
       // ---------------------------------------------------------------
       // CLOCK section
       // ---------------------------------------------------------------
+      if (selectedSection == "Clock Face") {
       SectionLabel("Clock Face")
       Card {
         NavRow(
@@ -295,10 +364,12 @@ private fun ImmortalSettingsScreen() {
             },
         )
       }
+      } // end Clock Face
 
       // ---------------------------------------------------------------
       // APPEARANCE section
       // ---------------------------------------------------------------
+      if (selectedSection == "Appearance") {
       SectionLabel("Appearance")
       Card {
         NavRow(
@@ -355,10 +426,12 @@ private fun ImmortalSettingsScreen() {
             onChange = { applyImmortal("hideStatusBar", it) },
         )
       }
+      } // end Appearance
 
       // ---------------------------------------------------------------
       // WEATHER section
       // ---------------------------------------------------------------
+      if (selectedSection == "Weather") {
       SectionLabel("Weather")
       Card {
         NavRow(
@@ -380,10 +453,12 @@ private fun ImmortalSettingsScreen() {
             },
         )
       }
+      } // end Weather
 
       // ---------------------------------------------------------------
       // AUDIO section
       // ---------------------------------------------------------------
+      if (selectedSection == "Audio") {
       SectionLabel("Audio")
       Card {
         NavRow(
@@ -417,10 +492,12 @@ private fun ImmortalSettingsScreen() {
             },
         )
       }
+      } // end Audio
 
       // ---------------------------------------------------------------
       // SYSTEM section
       // ---------------------------------------------------------------
+      if (selectedSection == "System") {
       SectionLabel("System")
       Card {
         NavRow(
@@ -445,8 +522,9 @@ private fun ImmortalSettingsScreen() {
 
       FooterNote("Changes apply as soon as you return to the home screen.")
       Spacer(Modifier.size(32.dp))
-    }
-  }
+      } // end System
+    } // end right panel Column
+  } // end Row
 }
 
 // ---------------------------------------------------------------------------
