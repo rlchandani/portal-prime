@@ -971,34 +971,61 @@ private fun LiquidGlassAppIcon(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .graphicsLayer { scaleX = scale.value; scaleY = scale.value }
-            .pointerInput(editMode) {
-              detectTapGestures(
-                  onPress = {
-                    scale.animateTo(0.96f, tween(90))
-                    tryAwaitRelease()
-                    scale.animateTo(1f, spring())
-                  },
-                  onTap = { onClick() },
-                  onLongPress = { if (!editMode) onLongPress() },
-              )
-            }
             .then(
                 if (editMode) {
-                  Modifier.pointerInput(app.component.packageName) {
-                    detectDragGesturesAfterLongPress(
-                        onDragEnd = {
-                          onReorder(dragDeltaX, dragDeltaY)
-                          dragDeltaX = 0f
-                          dragDeltaY = 0f
+                  // Edit mode: custom gesture that disambiguates tap-vs-drag on touch-down
+                  Modifier.pointerInput(editMode, app.component.packageName) {
+                    awaitEachGesture {
+                      val down = awaitFirstDown(requireUnconsumed = false)
+                      val downTime = System.currentTimeMillis()
+                      val downPos = down.position
+                      val slop = viewConfiguration.touchSlop
+                      var hasMoved = false
+                      var currentPos = downPos
+
+                      // Track movement until release
+                      do {
+                        val event = awaitPointerEvent()
+                        event.changes.forEach { change ->
+                          if (change.id == down.id) {
+                            currentPos = change.position
+                            val delta = currentPos - downPos
+                            val distance = kotlin.math.sqrt((delta.x * delta.x + delta.y * delta.y).toDouble())
+                            if (distance > slop) {
+                              hasMoved = true
+                              change.consume()
+                            }
+                          }
                         }
-                    ) { change, drag ->
-                      change.consume()
-                      dragDeltaX += drag.x
-                      dragDeltaY += drag.y
+                      } while (event.changes.any { it.pressed && it.id == down.id })
+
+                      // Released
+                      if (hasMoved) {
+                        // Drag — commit reorder with accumulated deltas
+                        dragDeltaX = currentPos.x - downPos.x
+                        dragDeltaY = currentPos.y - downPos.y
+                        onReorder(dragDeltaX, dragDeltaY)
+                        dragDeltaX = 0f
+                        dragDeltaY = 0f
+                      } else {
+                        // No movement → tap (add-to-dock)
+                        onClick()
+                      }
                     }
                   }
                 } else {
-                  Modifier
+                  // Non-edit mode: standard tap gestures with press-scale
+                  Modifier.pointerInput(editMode) {
+                    detectTapGestures(
+                        onPress = {
+                          scale.animateTo(0.96f, tween(90))
+                          tryAwaitRelease()
+                          scale.animateTo(1f, spring())
+                        },
+                        onTap = { onClick() },
+                        onLongPress = { onLongPress() },
+                    )
+                  }
                 }
             ),
     ) {
@@ -1039,6 +1066,7 @@ private fun LiquidGlassAppIcon(
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
           textAlign = TextAlign.Center,
+          modifier = Modifier.widthIn(max = 110.dp),
       )
     }
   }
