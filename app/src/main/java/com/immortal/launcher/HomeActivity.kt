@@ -57,6 +57,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -371,31 +372,28 @@ private fun LauncherScreen(
 ) {
   val context = androidx.compose.ui.platform.LocalContext.current
 
-  // --- live time/date (1-second tick) ---
+  // Live clock tick
   val now by produceState(initialValue = Date()) {
-    while (true) {
-      delay(1000)
-      value = Date()
-    }
+    while (true) { delay(1000); value = Date() }
   }
 
-  // --- live weather (30-min refresh, 1-min retry on failure) ---
+  // Installed apps
+  val installedApps by produceState<List<AppEntry>>(initialValue = emptyList()) {
+    value = withContext(Dispatchers.IO) { loadApps(context) }
+  }
+
+  // Weather (30-min refresh)
   val weatherCurrent by produceState<Weather.Current?>(initialValue = null) {
     while (true) {
       val w = withContext(Dispatchers.IO) { Weather.fetchCurrent(context) }
-      if (w != null) {
-        value = w
-        delay(30L * 60 * 1000)
-      } else {
-        delay(60L * 1000)
-      }
+      if (w != null) { value = w; delay(30L * 60 * 1000) } else { delay(60L * 1000) }
     }
   }
 
-  // --- battery (live via sticky broadcast) ---
+  // Battery
   val battery = batteryState()
 
-  // --- time-of-day derived from ticking now ---
+  // Derived strings
   val hour = SimpleDateFormat("H", Locale.getDefault()).format(now).toIntOrNull() ?: 12
   val greetingWord = when {
     hour in 5..11  -> "Good morning"
@@ -403,397 +401,462 @@ private fun LauncherScreen(
     hour in 17..21 -> "Good evening"
     else           -> "Good night"
   }
-  val timeOfDayLabel = when {
-    hour in 5..11  -> "Morning"
-    hour in 12..16 -> "Afternoon"
-    hour in 17..21 -> "Evening"
-    else           -> "Night"
-  }
-
-  // --- formatted strings ---
-  val dayDateString = SimpleDateFormat("EEEE, MMM d", Locale.getDefault()).format(now)
-      .uppercase(Locale.getDefault())
   val timeString = SimpleDateFormat("h:mm a", Locale.getDefault()).format(now)
-  val fullDate   = SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).format(now)
+  val dateString = SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(now)
 
-  // --- local dashboard palette ---
-  val textPrimary   = Color(0xFFF0F0F5)
-  val textSecondary = Color(0xFF8888A0)
-  val textMuted     = Color(0xFF55556A)
-  val accentGreen   = Color(0xFF30D158)
-  val accentAmber   = Color(0xFFFF9F0A)
-  val accentBlue    = Color(0xFF0A84FF)
-  val batteryColor  = when {
-    battery.charging    -> accentGreen
-    battery.percent <= 15 -> Color(0xFFFF453A)
-    else                -> textPrimary
-  }
+  // ── iOS 26 Liquid Glass Layout ────────────────────────────────────────────
 
-  Box(
-      modifier = Modifier
-          .fillMaxSize()
-          .background(Brush.verticalGradient(listOf(Color(0xFF0F0F12), Color(0xFF111116))))
-  ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 28.dp, vertical = 18.dp)
-    ) {
-      // ── TOP BAR ──────────────────────────────────────────────────────────────
-      Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Column {
-          Text(
-              text = dayDateString,
-              color = textMuted,
-              fontSize = 11.sp,
-              fontWeight = FontWeight.SemiBold,
-              letterSpacing = 1.5.sp,
-          )
-          Spacer(Modifier.size(4.dp))
-          Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "$greetingWord, ",
-                color = textPrimary,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
+  BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+    val w = constraints.maxWidth
+    val h = constraints.maxHeight
+
+    // Background: deep-space radial gradient
+    Box(
+        modifier = Modifier.fillMaxSize().background(
+            Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF1A3A6B),
+                    Color(0xFF0D1F42),
+                    Color(0xFF080F20),
+                    Color(0xFF020408),
+                ),
+                center = Offset(w * 0.4f, h * 0.5f),
+                radius = w * 0.9f,
             )
-            Text(
-                text = "Rohit",
-                color = textSecondary,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-            )
-          }
-        }
-        Column(horizontalAlignment = Alignment.End) {
-          Text(
-              text = timeString,
-              color = textPrimary,
-              fontSize = 30.sp,
-              fontWeight = FontWeight.Light,
-          )
-          val wc = weatherCurrent
-          if (wc != null) {
-            Text(
-                text = "${wc.city} · ${wc.temp}° · ${Weather.emoji(wc.code)}",
-                color = textSecondary,
-                fontSize = 13.sp,
-            )
-          }
-        }
-      }
-
-      Spacer(Modifier.size(12.dp))
-
-      // ── STATUS PILLS ─────────────────────────────────────────────────────────
-      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        weatherCurrent?.let { wc ->
-          DashStatusPill(text = "${Weather.emoji(wc.code)} ${wc.temp}°", accentColor = accentAmber)
-        }
-        if (battery.present) {
-          DashStatusPill(text = "${battery.percent}%", accentColor = batteryColor)
-        }
-        DashStatusPill(text = timeOfDayLabel, accentColor = accentBlue)
-      }
-
-      Spacer(Modifier.size(20.dp))
-      androidx.compose.material3.HorizontalDivider(
-          color = Color(0xFF2A2A35),
-          thickness = 1.dp,
-          modifier = Modifier.fillMaxWidth(),
-      )
-      Spacer(Modifier.size(20.dp))
-
-      // ── HERO ROW — 3 large cards, asymmetric weights ──────────────────────────
-      Row(
-          modifier = Modifier.fillMaxWidth().height(200.dp),
-          horizontalArrangement = Arrangement.spacedBy(12.dp),
-      ) {
-        DashHeroCard(
-            modifier    = Modifier.weight(1.4f).fillMaxHeight(),
-            gradient    = listOf(Color(0xFF1F2937), Color(0xFF111827)),
-            accentColor = accentAmber,
-            icon        = "📅",
-            title       = "PortalHub",
-            subtitle    = "Calendar & Family",
-            onClick     = {
-              runCatching {
-                context.startActivity(
-                    Intent(Intent.ACTION_MAIN)
-                        .addCategory(Intent.CATEGORY_LAUNCHER)
-                        .setPackage("com.immortal.hub")
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-              }
-            },
         )
-        DashHeroCard(
-            modifier    = Modifier.weight(1.2f).fillMaxHeight(),
-            gradient    = listOf(Color(0xFF1A1030), Color(0xFF0D0820)),
-            accentColor = Color(0xFFBF5AF2),
-            icon        = "🤖",
-            title       = "Jarvis",
-            subtitle    = "AI Assistant",
-            onClick     = {
-              runCatching {
-                context.startActivity(
-                    Intent(Intent.ACTION_MAIN)
-                        .addCategory(Intent.CATEGORY_LAUNCHER)
-                        .setPackage("com.immortal.jarvis")
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-              }
-            },
-        )
-        DashHeroCard(
-            modifier    = Modifier.weight(1.0f).fillMaxHeight(),
-            gradient    = listOf(Color(0xFF0C1A2E), Color(0xFF060D18)),
-            accentColor = accentBlue,
-            icon        = "📞",
-            title       = "Calls",
-            subtitle    = "WhatsApp & Messenger",
-            onClick     = { onExitHome() },
-        )
-      }
+    )
 
-      Spacer(Modifier.size(16.dp))
+    Column(modifier = Modifier.fillMaxSize()) {
 
-      // ── QUICK ACTIONS ─────────────────────────────────────────────────────────
-      DashSectionLabel("QUICK ACTIONS")
-      Spacer(Modifier.size(8.dp))
-      Row(
-          modifier = Modifier.fillMaxWidth().height(90.dp),
-          horizontalArrangement = Arrangement.spacedBy(10.dp),
-      ) {
-        DashQuickTile(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
-            icon     = "📦",
-            label    = "App Store",
-            onClick  = { onOpenStore() },
-        )
-        DashQuickTile(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
-            icon     = "🌐",
-            label    = "Browser",
-            onClick  = {
-              runCatching {
-                context.startActivity(
-                    Intent(Intent.ACTION_MAIN)
-                        .addCategory(Intent.CATEGORY_LAUNCHER)
-                        .setPackage("org.chromium.chrome")
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-              }
-            },
-        )
-        DashQuickTile(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
-            icon     = "🔧",
-            label    = "Tools",
-            onClick  = {
-              runCatching {
-                context.startActivity(Intent(context, ToolsActivity::class.java))
-              }
-            },
-        )
-        DashQuickTile(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
-            icon     = "⚙️",
-            label    = "Settings",
-            onClick  = {
-              runCatching {
-                context.startActivity(Intent(context, ImmortalSettingsActivity::class.java))
-              }
-            },
-        )
-      }
-
-      Spacer(Modifier.size(16.dp))
-
-      // ── BOTTOM ROW — fills remaining space ────────────────────────────────────
+      // ── STATUS BAR ──────────────────────────────────────────────────────
       Row(
           modifier = Modifier
               .fillMaxWidth()
-              .weight(1f),
-          horizontalArrangement = Arrangement.spacedBy(12.dp),
+              .height(48.dp)
+              .background(
+                  Brush.verticalGradient(
+                      listOf(Color(0x40000000), Color.Transparent)
+                  )
+              )
+              .padding(horizontal = 28.dp),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.SpaceBetween,
       ) {
-        DashCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
-          Column(modifier = Modifier.padding(16.dp)) {
-            DashSectionLabel("TODAY")
-            Spacer(Modifier.size(6.dp))
+        Text(
+            text = timeString,
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Light,
+        )
+        Text(
+            text = dateString,
+            color = Color.White.copy(alpha = 0.7f),
+            fontSize = 16.sp,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+          weatherCurrent?.let {
             Text(
-                text = fullDate,
-                color = textPrimary,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = SimpleDateFormat("EEEE", Locale.getDefault()).format(now),
-                color = textSecondary,
-                fontSize = 13.sp,
-            )
-          }
-        }
-        DashCard(modifier = Modifier.weight(1.5f).fillMaxHeight()) {
-          Column(modifier = Modifier.padding(16.dp)) {
-            DashSectionLabel("NOW PLAYING")
-            Spacer(Modifier.size(6.dp))
-            Text(
-                text = "Nothing playing",
-                color = textMuted,
+                "${Weather.emoji(it.code)} ${it.temp}°",
+                color = Color.White,
                 fontSize = 14.sp,
             )
           }
-        }
-        DashCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
-          Column(modifier = Modifier.padding(16.dp)) {
-            DashSectionLabel("SYSTEM")
-            Spacer(Modifier.size(6.dp))
-            Text(
-                text = "Up to date",
-                color = accentGreen,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-            )
-            Text(
-                text = "All apps current",
-                color = textMuted,
-                fontSize = 11.sp,
-            )
+          Text("WiFi", color = Color.White, fontSize = 14.sp)
+          if (battery.present) {
+            Text("${battery.percent}%", color = Color.White, fontSize = 14.sp)
           }
         }
       }
+
+      // ── MAIN CONTENT ────────────────────────────────────────────────────
+      Row(
+          modifier = Modifier
+              .weight(1f)
+              .fillMaxWidth()
+              .padding(horizontal = 28.dp)
+              .padding(top = 12.dp, bottom = 8.dp),
+          horizontalArrangement = Arrangement.spacedBy(20.dp),
+      ) {
+
+        // LEFT COLUMN (38%)
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.38f),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+          // Widget 1: Weather
+          LiquidGlassWidget(
+              modifier = Modifier.fillMaxWidth().height(180.dp),
+          ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+              val wc = weatherCurrent
+              Text(
+                  text = (wc?.city?.uppercase(Locale.getDefault()) ?: "LOADING..."),
+                  color = Color.White.copy(alpha = 0.55f),
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Medium,
+                  letterSpacing = 1.5.sp,
+              )
+              if (wc != null) {
+                Text(
+                    text = "${wc.temp}°",
+                    color = Color.White,
+                    fontSize = 52.sp,
+                    fontWeight = FontWeight.Thin,
+                    letterSpacing = (-3).sp,
+                )
+                Text(
+                    text = "${Weather.emoji(wc.code)} ${weatherConditionText(wc.code)}",
+                    color = Color(0xFF6EB8FF),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Light,
+                )
+              }
+            }
+          }
+
+          // Widget 2: Greeting
+          LiquidGlassWidget(
+              modifier = Modifier.fillMaxWidth().height(110.dp),
+          ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+            ) {
+              Text(
+                  text = "$greetingWord,",
+                  color = Color.White.copy(alpha = 0.7f),
+                  fontSize = 16.sp,
+                  fontWeight = FontWeight.Light,
+              )
+              Text(
+                  text = "Rohit",
+                  color = Color.White,
+                  fontSize = 28.sp,
+                  fontWeight = FontWeight.Bold,
+                  letterSpacing = (-1).sp,
+              )
+              Text(
+                  text = dateString,
+                  color = Color.White.copy(alpha = 0.5f),
+                  fontSize = 13.sp,
+                  fontWeight = FontWeight.Light,
+              )
+            }
+          }
+
+          // Widget 3: Now Playing stub
+          LiquidGlassWidget(
+              modifier = Modifier.fillMaxWidth().height(80.dp),
+          ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+              // Album art placeholder
+              LiquidGlass(
+                  modifier = Modifier.size(40.dp),
+                  cornerRadius = 8.dp,
+              ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                  Text("♫", color = Color.White, fontSize = 18.sp)
+                }
+              }
+              Column {
+                Text(
+                    "Now Playing",
+                    color = Color.White.copy(alpha = 0.55f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                )
+                Text(
+                    "Tap to play",
+                    color = Color.White.copy(alpha = 0.28f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Light,
+                )
+              }
+            }
+          }
+        }
+
+        // RIGHT COLUMN (62%) — 5-column app icon grid
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(0.62f),
+        ) {
+          LazyVerticalGrid(
+              columns = GridCells.Fixed(5),
+              modifier = Modifier.fillMaxSize(),
+              contentPadding = PaddingValues(4.dp),
+              horizontalArrangement = Arrangement.spacedBy(16.dp),
+              verticalArrangement = Arrangement.spacedBy(20.dp),
+          ) {
+            items(installedApps) { app ->
+              LiquidGlassAppIcon(
+                  app = app,
+                  onClick = { onLaunch(app.component) },
+              )
+            }
+          }
+        }
+      }
+
+      // ── DOCK ─────────────────────────────────────────────────────────────
+      LiquidGlassDock(
+          installedApps = installedApps,
+          onLaunch = onLaunch,
+          onExitHome = onExitHome,
+          onOpenStore = onOpenStore,
+      )
     }
   }
 }
 
+// Minimal weather condition text without network deps
+private fun weatherConditionText(code: Int): String = when (code) {
+  0 -> "Clear Sky"
+  in 1..3 -> "Partly Cloudy"
+  in 45..48 -> "Foggy"
+  in 51..67 -> "Rainy"
+  in 71..77 -> "Snowy"
+  in 80..82 -> "Showers"
+  in 95..99 -> "Thunderstorm"
+  else -> "Cloudy"
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Dashboard helper composables — used by LauncherScreen's premium dark layout
+// Liquid Glass composables
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Dark rounded card surface for the bottom-row tiles. */
+/** Bare Liquid Glass surface — frosted fill + specular highlight + border. */
 @Composable
-private fun DashCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+private fun LiquidGlass(
+    modifier: Modifier = Modifier,
+    cornerRadius: Dp = 22.dp,
+    content: @Composable BoxScope.() -> Unit = {},
+) {
   Box(
       modifier = modifier
-          .clip(RoundedCornerShape(18.dp))
-          .background(Color(0xFF1C1C22))
-          .border(1.dp, Color(0xFF2A2A35).copy(alpha = 0.7f), RoundedCornerShape(18.dp)),
+          .clip(RoundedCornerShape(cornerRadius))
+          .background(Color(0x1EFFFFFF))
+          .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(cornerRadius)),
   ) {
+    // Specular top-left highlight
+    Box(
+        modifier = Modifier.matchParentSize().background(
+            Brush.radialGradient(
+                colors = listOf(Color(0x28FFFFFF), Color.Transparent),
+                radius = 300f,
+            )
+        )
+    )
     content()
   }
 }
 
-/** Small caps section label (11sp, muted, letter-spaced). */
+/** Liquid Glass widget tile (rounded 22dp). */
 @Composable
-private fun DashSectionLabel(text: String) {
-  Text(
-      text = text.uppercase(Locale.getDefault()),
-      color = Color(0xFF55556A),
-      fontSize = 11.sp,
-      fontWeight = FontWeight.SemiBold,
-      letterSpacing = 1.5.sp,
-  )
+private fun LiquidGlassWidget(
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit,
+) {
+  LiquidGlass(modifier = modifier, cornerRadius = 22.dp, content = content)
 }
 
-/** Coloured pill badge for status indicators (weather, battery, time-of-day). */
+/** App icon in the grid with scale animation on tap. */
 @Composable
-private fun DashStatusPill(text: String, accentColor: Color) {
-  Box(
+private fun LiquidGlassAppIcon(
+    app: AppEntry,
+    onClick: () -> Unit,
+) {
+  var pressed by remember { mutableStateOf(false) }
+  val scale by animateFloatAsState(
+      targetValue = if (pressed) 1.08f else 1f,
+      animationSpec = spring(
+          dampingRatio = Spring.DampingRatioMediumBouncy,
+          stiffness = Spring.StiffnessMedium,
+      ),
+      label = "iconScale",
+  )
+
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier
-          .clip(RoundedCornerShape(50))
-          .background(Color(0xFF252530))
-          .border(1.dp, accentColor.copy(alpha = 0.4f), RoundedCornerShape(50))
-          .padding(horizontal = 12.dp, vertical = 5.dp),
+          .graphicsLayer { scaleX = scale; scaleY = scale }
+          .clickable(
+              interactionSource = remember { MutableInteractionSource() },
+              indication = null,
+          ) { onClick() }
+          .pointerInput(Unit) {
+            awaitEachGesture {
+              awaitFirstDown(); pressed = true
+              try { drag(awaitFirstDown().id) { it.consume() } } finally { pressed = false }
+            }
+          },
   ) {
+    Box(
+        modifier = Modifier
+            .size(88.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .background(Color(0x1EFFFFFF))
+            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(22.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+      // Specular
+      Box(
+          modifier = Modifier.matchParentSize().background(
+              Brush.radialGradient(
+                  colors = listOf(Color(0x28FFFFFF), Color.Transparent),
+                  radius = 150f,
+              )
+          )
+      )
+      Image(
+          bitmap = app.icon,
+          contentDescription = app.label,
+          modifier = Modifier.size(52.dp).clip(RoundedCornerShape(14.dp)),
+      )
+    }
+    Spacer(Modifier.height(6.dp))
     Text(
-        text = text,
-        color = accentColor,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Medium,
+        text = app.label,
+        color = Color.White.copy(alpha = 0.82f),
+        fontSize = 11.sp,
+        fontWeight = FontWeight.Normal,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center,
     )
   }
 }
 
-/** Gradient hero card for primary app shortcuts (PortalHub, Jarvis, Calls). */
+/** Bottom dock — frosted glass bar with 5 pinned app slots. */
 @Composable
-private fun DashHeroCard(
-    modifier: Modifier = Modifier,
-    gradient: List<Color>,
-    accentColor: Color,
-    icon: String,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
+private fun LiquidGlassDock(
+    installedApps: List<AppEntry>,
+    onLaunch: (ComponentName) -> Unit,
+    onExitHome: () -> Unit,
+    onOpenStore: () -> Unit,
 ) {
+  // Dock entries: by package preference, fallback to first available
+  val dockPackages = listOf(
+      "com.immortal.launcher",
+      "com.immortal.hub",
+      "com.immortal.jarvis",
+      "org.chromium.chrome",
+      "com.android.settings",
+  )
+  val appsByPkg = installedApps.associateBy { it.component.packageName }
+
   Box(
-      modifier = modifier
-          .clip(RoundedCornerShape(18.dp))
-          .background(Brush.verticalGradient(gradient))
-          .border(1.dp, accentColor.copy(alpha = 0.25f), RoundedCornerShape(18.dp))
-          .clickable(onClick = onClick),
+      modifier = Modifier
+          .fillMaxWidth()
+          .height(88.dp)
+          .background(
+              Brush.horizontalGradient(
+                  listOf(Color(0x6B000000), Color(0x6B000000))
+              )
+          )
+          .border(
+              width = 1.dp,
+              color = Color(0x1FFFFFFF),
+              shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+          ),
+      contentAlignment = Alignment.Center,
   ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(18.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
+    Row(
+        modifier = Modifier.padding(horizontal = 24.dp),
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-      Text(text = icon, fontSize = 36.sp)
-      Column {
-        Text(
-            text = title,
-            color = Color(0xFFF0F0F5),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-        )
-        Text(
-            text = subtitle,
-            color = Color(0xFF8888A0),
-            fontSize = 12.sp,
-        )
-        Spacer(Modifier.size(8.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(accentColor.copy(alpha = 0.6f)),
-        )
+      dockPackages.forEach { pkg ->
+        val app = appsByPkg[pkg]
+        if (app != null) {
+          DockIcon(app = app, onClick = { onLaunch(app.component) })
+        }
       }
     }
   }
 }
 
-/** Square quick-action tile (App Store, Browser, Tools, Settings). */
+/** Single dock icon tile. */
 @Composable
-private fun DashQuickTile(
-    modifier: Modifier = Modifier,
-    icon: String,
-    label: String,
-    onClick: () -> Unit,
-) {
-  Box(
-      modifier = modifier
-          .clip(RoundedCornerShape(14.dp))
-          .background(Color(0xFF1C1C22))
-          .border(1.dp, Color(0xFF2A2A35).copy(alpha = 0.7f), RoundedCornerShape(14.dp))
-          .clickable(onClick = onClick),
-      contentAlignment = Alignment.Center,
+private fun DockIcon(app: AppEntry, onClick: () -> Unit) {
+  var pressed by remember { mutableStateOf(false) }
+  val scale by animateFloatAsState(
+      targetValue = if (pressed) 1.1f else 1f,
+      animationSpec = spring(
+          dampingRatio = Spring.DampingRatioMediumBouncy,
+          stiffness = Spring.StiffnessMedium,
+      ),
+      label = "dockScale",
+  )
+
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier
+          .graphicsLayer { scaleX = scale; scaleY = scale; translationY = if (pressed) -6f else 0f }
+          .clickable(
+              interactionSource = remember { MutableInteractionSource() },
+              indication = null,
+          ) { onClick() }
+          .pointerInput(Unit) {
+            awaitEachGesture {
+              awaitFirstDown(); pressed = true
+              try { drag(awaitFirstDown().id) { it.consume() } } finally { pressed = false }
+            }
+          },
   ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+    Box(
+        modifier = Modifier
+            .size(64.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color(0x1EFFFFFF))
+            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(18.dp)),
+        contentAlignment = Alignment.Center,
     ) {
-      Text(text = icon, fontSize = 26.sp)
-      Text(
-          text = label,
-          color = Color(0xFF8888A0),
-          fontSize = 11.sp,
-          fontWeight = FontWeight.Medium,
+      Box(
+          modifier = Modifier.matchParentSize().background(
+              Brush.radialGradient(
+                  colors = listOf(Color(0x28FFFFFF), Color.Transparent),
+                  radius = 100f,
+              )
+          )
+      )
+      Image(
+          bitmap = app.icon,
+          contentDescription = app.label,
+          modifier = Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)),
       )
     }
+    Spacer(Modifier.height(4.dp))
+    Text(
+        text = app.label,
+        color = Color.White.copy(alpha = 0.7f),
+        fontSize = 10.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center,
+    )
   }
 }
 
