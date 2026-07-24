@@ -65,4 +65,20 @@ class UserLayoutTest {
     assertEquals(listOf("a", "c", "b"), UserLayout.moveOrder(listOf("a", "b", "c"), "c", "b"))
     assertEquals(listOf("b", "a", "c"), UserLayout.moveOrder(listOf("a", "b", "c"), "a", "b"))
   }
+
+  @Test
+  fun moveOrder_movesSourceToTargetPosition() {
+    assertEquals(listOf("b", "c", "a", "d"), UserLayout.moveOrder(listOf("a", "b", "c", "d"), "a", "c"))
+  }
+
+  @Test
+  fun moveOrder_noopWhenSameOrMissing() {
+    assertEquals(listOf("a", "b"), UserLayout.moveOrder(listOf("a", "b"), "a", "a"))
+    assertEquals(listOf("a", "b"), UserLayout.moveOrder(listOf("a", "b"), "x", "b"))
+  }
+
+  @Test
+  fun applyOrder_knownThenRest() {
+    assertEquals(listOf("c", "a", "b"), UserLayout.applyOrder(listOf("a", "b", "c"), listOf("c", "a")) { it })
+  }
 }
