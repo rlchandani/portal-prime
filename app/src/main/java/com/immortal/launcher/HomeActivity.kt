@@ -381,6 +381,7 @@ private fun LeftWidgetColumn(
     homeWidgets: List<HomeWidgetStore.HomeWidget>,
     weatherCurrent: Weather.Current?,
     onWidgetsChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
+    onEnterEdit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
   var showAddMenu by remember { mutableStateOf(false) }
@@ -460,7 +461,17 @@ private fun LeftWidgetColumn(
           else -> Modifier.fillMaxWidth().height(widgetHeight)
         }
 
-        Box(modifier = widgetModifier.jiggle(editMode, widget.key.hashCode())) {
+        Box(
+            modifier = widgetModifier
+                .jiggle(editMode, widget.key.hashCode())
+                .pointerInput(editMode) {
+                  detectTapGestures(
+                      onLongPress = {
+                        if (!editMode) onEnterEdit()
+                      }
+                  )
+                }
+        ) {
           LiquidGlassWidget(modifier = Modifier.fillMaxSize()) {
             ImmortalWidgetContent(widget = widget, modifier = Modifier.fillMaxSize())
           }
@@ -704,6 +715,7 @@ private fun LauncherScreen(
               homeWidgets = newWidgets
               HomeWidgetStore.save(context, newWidgets)
             },
+            onEnterEdit = { editMode = true },
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(0.38f),
@@ -949,7 +961,12 @@ private fun LiquidGlassAppIcon(
   var dragDeltaX by remember { mutableStateOf(0f) }
   var dragDeltaY by remember { mutableStateOf(0f) }
 
-  Box(modifier = Modifier.jiggle(editMode, app.component.packageName.hashCode())) {
+  Box(
+      modifier = Modifier
+          .fillMaxWidth()
+          .jiggle(editMode, app.component.packageName.hashCode()),
+      contentAlignment = Alignment.Center
+  ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -985,28 +1002,33 @@ private fun LiquidGlassAppIcon(
                 }
             ),
     ) {
-      Box(
-          modifier = Modifier
-              .size(110.dp)
-              .clip(RoundedCornerShape(26.dp))
-              .background(Color(0x1EFFFFFF))
-              .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(26.dp)),
-          contentAlignment = Alignment.Center,
-      ) {
-        // Specular
+      Box {
         Box(
-            modifier = Modifier.matchParentSize().background(
-                Brush.radialGradient(
-                    colors = listOf(Color(0x28FFFFFF), Color.Transparent),
-                    radius = 180f,
-                )
-            )
-        )
-        Image(
-            bitmap = app.icon,
-            contentDescription = app.label,
-            modifier = Modifier.size(100.dp),
-        )
+            modifier = Modifier
+                .size(110.dp)
+                .clip(RoundedCornerShape(26.dp))
+                .background(Color(0x1EFFFFFF))
+                .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(26.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+          // Specular
+          Box(
+              modifier = Modifier.matchParentSize().background(
+                  Brush.radialGradient(
+                      colors = listOf(Color(0x28FFFFFF), Color.Transparent),
+                      radius = 180f,
+                  )
+              )
+          )
+          Image(
+              bitmap = app.icon,
+              contentDescription = app.label,
+              modifier = Modifier.size(100.dp),
+          )
+        }
+        if (editMode && app.uninstallable) {
+          MinusBadge(modifier = Modifier.align(Alignment.TopStart)) { onRemove() }
+        }
       }
       Spacer(Modifier.height(6.dp))
       Text(
@@ -1018,9 +1040,6 @@ private fun LiquidGlassAppIcon(
           overflow = TextOverflow.Ellipsis,
           textAlign = TextAlign.Center,
       )
-    }
-    if (editMode && app.uninstallable) {
-      MinusBadge(modifier = Modifier.align(Alignment.TopStart)) { onRemove() }
     }
   }
 }
@@ -3154,28 +3173,27 @@ private fun WidgetGlyph() {
 private fun Modifier.jiggle(enabled: Boolean, seed: Int): Modifier {
   if (!enabled) return this
   val transition = rememberInfiniteTransition(label = "jiggle")
-  val phase = (abs(seed) % 6) * 28
   val angle by
       transition.animateFloat(
-          initialValue = -2.0f,
-          targetValue = 2.0f,
+          initialValue = -1.0f,
+          targetValue = 1.0f,
           animationSpec =
               infiniteRepeatable(
-                  animation = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+                  animation = tween(durationMillis = 260, easing = FastOutSlowInEasing),
                   repeatMode = RepeatMode.Reverse,
-                  initialStartOffset = StartOffset(phase),
+                  initialStartOffset = StartOffset(0),
               ),
           label = "jiggle-angle",
       )
   val bob by
       transition.animateFloat(
-          initialValue = -1.4f,
-          targetValue = 1.4f,
+          initialValue = -0.8f,
+          targetValue = 0.8f,
           animationSpec =
               infiniteRepeatable(
-                  animation = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+                  animation = tween(durationMillis = 260, easing = FastOutSlowInEasing),
                   repeatMode = RepeatMode.Reverse,
-                  initialStartOffset = StartOffset(phase + 60),
+                  initialStartOffset = StartOffset(0),
               ),
           label = "jiggle-bob",
       )
@@ -3227,7 +3245,12 @@ private fun MinusBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
   Surface(
       color = Color(0xE6C7C7CC),
       shape = CircleShape,
-      modifier = modifier.size(28.dp).clickable { onClick() },
+      modifier = modifier
+          .size(32.dp)
+          .clickable(
+              interactionSource = remember { MutableInteractionSource() },
+              indication = null
+          ) { onClick() },
   ) {
     Canvas(Modifier.fillMaxSize()) {
       val cx = this.size.width / 2f
@@ -3251,7 +3274,12 @@ private fun ResizeBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
   Surface(
       color = Color(0xE6C7C7CC),
       shape = CircleShape,
-      modifier = modifier.size(28.dp).clickable { onClick() },
+      modifier = modifier
+          .size(32.dp)
+          .clickable(
+              interactionSource = remember { MutableInteractionSource() },
+              indication = null
+          ) { onClick() },
   ) {
     Canvas(Modifier.fillMaxSize()) {
       val cx = this.size.width / 2f
