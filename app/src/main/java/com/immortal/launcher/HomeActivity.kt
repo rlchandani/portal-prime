@@ -80,6 +80,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.text.BasicTextField
@@ -369,6 +371,177 @@ class HomeActivity : ComponentActivity() {
   }
 }
 
+/** Left column with greeting/now-playing chrome + resizable multi-widget area. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun LeftWidgetColumn(
+    editMode: Boolean,
+    greetingWord: String,
+    dateString: String,
+    homeWidgets: List<HomeWidgetStore.HomeWidget>,
+    weatherCurrent: Weather.Current?,
+    onWidgetsChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+  var showAddMenu by remember { mutableStateOf(false) }
+
+  Column(
+      modifier = modifier,
+      verticalArrangement = Arrangement.spacedBy(12.dp),
+  ) {
+    // Greeting card (always present)
+    LiquidGlassWidget(modifier = Modifier.fillMaxWidth().height(110.dp)) {
+      Column(
+          modifier = Modifier.fillMaxSize().padding(16.dp),
+          verticalArrangement = Arrangement.Center,
+      ) {
+        Text(
+            text = "$greetingWord,",
+            color = Color.White.copy(alpha = 0.7f),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Light,
+        )
+        Text(
+            text = "Rohit",
+            color = Color.White,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-1).sp,
+        )
+        Text(
+            text = dateString,
+            color = Color.White.copy(alpha = 0.5f),
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Light,
+        )
+      }
+    }
+
+    // Now Playing card (always present)
+    LiquidGlassWidget(modifier = Modifier.fillMaxWidth().height(80.dp)) {
+      Row(
+          modifier = Modifier.fillMaxSize().padding(12.dp),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(12.dp),
+      ) {
+        LiquidGlass(modifier = Modifier.size(40.dp), cornerRadius = 8.dp) {
+          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("♫", color = Color.White, fontSize = 18.sp)
+          }
+        }
+        Column {
+          Text(
+              "Now Playing",
+              color = Color.White.copy(alpha = 0.55f),
+              fontSize = 14.sp,
+              fontWeight = FontWeight.Medium,
+          )
+          Text(
+              "Tap to play",
+              color = Color.White.copy(alpha = 0.28f),
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Light,
+          )
+        }
+      }
+    }
+
+    // Store-driven resizable widgets
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+      homeWidgets.forEach { widget ->
+        val baseHeight = 100.dp
+        val widgetHeight = baseHeight * widget.spanY.toFloat()
+        val widgetModifier = when (widget.spanX) {
+          1 -> Modifier.weight(0.48f).height(widgetHeight)
+          else -> Modifier.fillMaxWidth().height(widgetHeight)
+        }
+
+        Box(modifier = widgetModifier.jiggle(editMode, widget.key.hashCode())) {
+          LiquidGlassWidget(modifier = Modifier.fillMaxSize()) {
+            ImmortalWidgetContent(widget = widget, modifier = Modifier.fillMaxSize())
+          }
+
+          if (editMode) {
+            MinusBadge(modifier = Modifier.align(Alignment.TopStart).padding(4.dp)) {
+              onWidgetsChanged(HomeWidgetStore.without(homeWidgets, widget.key))
+            }
+            ResizeBadge(modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp)) {
+              val (newX, newY) = HomeWidgetStore.nextWidgetSpan(widget.spanX to widget.spanY)
+              val updated = widget.copy(spanX = newX, spanY = newY)
+              onWidgetsChanged(homeWidgets.map { if (it.key == widget.key) updated else it })
+            }
+          }
+        }
+      }
+
+      // Add widget tile (edit mode only)
+      if (editMode) {
+        LiquidGlassWidget(
+            modifier = Modifier.fillMaxWidth().height(100.dp).clickable { showAddMenu = true },
+        ) {
+          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+              Canvas(Modifier.size(32.dp)) {
+                val cx = size.width / 2f
+                val cy = size.height / 2f
+                val armLength = size.minDimension * 0.3f
+                val stroke = size.minDimension * 0.08f
+                drawLine(Color.White.copy(alpha = 0.5f), Offset(cx - armLength, cy), Offset(cx + armLength, cy), strokeWidth = stroke, cap = StrokeCap.Round)
+                drawLine(Color.White.copy(alpha = 0.5f), Offset(cx, cy - armLength), Offset(cx, cy + armLength), strokeWidth = stroke, cap = StrokeCap.Round)
+              }
+              Text(
+                  "Add Widget",
+                  color = Color.White.copy(alpha = 0.5f),
+                  fontSize = 13.sp,
+                  fontWeight = FontWeight.Light,
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Add widget menu
+  if (showAddMenu) {
+    Box(
+        modifier = Modifier.fillMaxSize().clickable { showAddMenu = false },
+        contentAlignment = Alignment.Center,
+    ) {
+      Surface(
+          color = Color(0xE6000000),
+          shape = RoundedCornerShape(16.dp),
+          modifier = Modifier.padding(32.dp),
+      ) {
+        Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+          Text("Add Widget", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+          listOf(
+              HomeWidgetStore.KIND_CALENDAR to "Calendar",
+              HomeWidgetStore.KIND_WEATHER to "Weather",
+              HomeWidgetStore.KIND_WORLD_CLOCK to "World Clock",
+              HomeWidgetStore.KIND_TIMERS to "Timers",
+          ).forEach { (kind, label) ->
+            Text(
+                label,
+                color = Color(0xFF8AB4F8),
+                fontSize = 16.sp,
+                modifier = Modifier.fillMaxWidth().clickable {
+                  val newWidget = HomeWidgetStore.custom(kind)
+                  onWidgetsChanged(HomeWidgetStore.withAdded(homeWidgets, newWidget))
+                  showAddMenu = false
+                }.padding(12.dp),
+            )
+          }
+        }
+      }
+    }
+  }
+}
+
 @Composable
 private fun LauncherScreen(
     onLaunch: (ComponentName) -> Unit,
@@ -407,6 +580,17 @@ private fun LauncherScreen(
 
   // Dock packages state
   val dockPkgs = remember { mutableStateOf(DockStore.load(context)) }
+
+  // Home widgets state
+  var homeWidgets by remember { mutableStateOf(HomeWidgetStore.load(context)) }
+  LaunchedEffect(Unit) {
+    if (homeWidgets.isEmpty()) {
+      // Seed default: one Large weather widget
+      val defaultWidget = HomeWidgetStore.custom(HomeWidgetStore.KIND_WEATHER, spanX = 2, spanY = 2)
+      homeWidgets = listOf(defaultWidget)
+      HomeWidgetStore.save(context, homeWidgets)
+    }
+  }
 
   // User order for app icons
   val orderState = remember { mutableStateOf(UserLayout.loadOrder(context)) }
@@ -509,121 +693,21 @@ private fun LauncherScreen(
           horizontalArrangement = Arrangement.spacedBy(20.dp),
       ) {
 
-        // LEFT COLUMN (38%)
-        Column(
+        // LEFT COLUMN (38%) — Widget area with greeting/now-playing chrome + resizable widgets
+        LeftWidgetColumn(
+            editMode = editMode,
+            greetingWord = greetingWord,
+            dateString = dateString,
+            homeWidgets = homeWidgets,
+            weatherCurrent = weatherCurrent,
+            onWidgetsChanged = { newWidgets ->
+              homeWidgets = newWidgets
+              HomeWidgetStore.save(context, newWidgets)
+            },
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(0.38f),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-          // Widget 1: Weather
-          LiquidGlassWidget(
-              modifier = Modifier.fillMaxWidth().height(180.dp),
-          ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-              val wc = weatherCurrent
-              Text(
-                  text = (wc?.city?.uppercase(Locale.getDefault()) ?: "LOADING..."),
-                  color = Color.White.copy(alpha = 0.55f),
-                  fontSize = 11.sp,
-                  fontWeight = FontWeight.Medium,
-                  letterSpacing = 1.5.sp,
-              )
-              if (wc != null) {
-                Text(
-                    text = "${wc.temp}°",
-                    color = Color.White,
-                    fontSize = 52.sp,
-                    fontWeight = FontWeight.Thin,
-                    letterSpacing = (-3).sp,
-                )
-                Text(
-                    text = "${Weather.emoji(wc.code)} ${weatherConditionText(wc.code)}",
-                    color = Color(0xFF6EB8FF),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Light,
-                )
-              }
-            }
-          }
-
-          // Widget 2: Greeting
-          LiquidGlassWidget(
-              modifier = Modifier.fillMaxWidth().height(110.dp),
-          ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-            ) {
-              Text(
-                  text = "$greetingWord,",
-                  color = Color.White.copy(alpha = 0.7f),
-                  fontSize = 16.sp,
-                  fontWeight = FontWeight.Light,
-              )
-              Text(
-                  text = "Rohit",
-                  color = Color.White,
-                  fontSize = 28.sp,
-                  fontWeight = FontWeight.Bold,
-                  letterSpacing = (-1).sp,
-              )
-              Text(
-                  text = dateString,
-                  color = Color.White.copy(alpha = 0.5f),
-                  fontSize = 13.sp,
-                  fontWeight = FontWeight.Light,
-              )
-            }
-          }
-
-          // Widget 3: Now Playing stub
-          LiquidGlassWidget(
-              modifier = Modifier.fillMaxWidth().height(80.dp),
-          ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-              // Album art placeholder
-              LiquidGlass(
-                  modifier = Modifier.size(40.dp),
-                  cornerRadius = 8.dp,
-              ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                  Text("♫", color = Color.White, fontSize = 18.sp)
-                }
-              }
-              Column {
-                Text(
-                    "Now Playing",
-                    color = Color.White.copy(alpha = 0.55f),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                )
-                Text(
-                    "Tap to play",
-                    color = Color.White.copy(alpha = 0.28f),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Light,
-                )
-              }
-            }
-          }
-        }
+        )
 
         FadingDivider()
 
@@ -2505,6 +2589,7 @@ private fun ImmortalWidgetContent(widget: HomeWidgetStore.HomeWidget, modifier: 
     HomeWidgetStore.KIND_WEATHER -> ImmortalWeatherWidget(modifier)
     HomeWidgetStore.KIND_WORLD_CLOCK -> ImmortalWorldClockWidget(modifier)
     HomeWidgetStore.KIND_TIMERS -> ImmortalTimersWidget(modifier)
+    HomeWidgetStore.KIND_CALENDAR -> ImmortalCalendarWidget(modifier)
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
@@ -3156,6 +3241,31 @@ private fun MinusBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
           strokeWidth = stroke,
           cap = StrokeCap.Round,
       )
+    }
+  }
+}
+
+/** Resize control for widgets: cycles Small (1x1) -> Medium (2x1) -> Large (2x2). */
+@Composable
+private fun ResizeBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
+  Surface(
+      color = Color(0xE6C7C7CC),
+      shape = CircleShape,
+      modifier = modifier.size(28.dp).clickable { onClick() },
+  ) {
+    Canvas(Modifier.fillMaxSize()) {
+      val cx = this.size.width / 2f
+      val cy = this.size.height / 2f
+      val inset = this.size.minDimension * 0.18f
+      val stroke = this.size.minDimension * 0.08f
+      // Draw two chevrons pointing outward (resize glyph)
+      val chev = this.size.minDimension * 0.12f
+      // Top-left chevron
+      drawLine(Color.White, Offset(cx - inset, cy - inset + chev), Offset(cx - inset - chev, cy - inset), strokeWidth = stroke, cap = StrokeCap.Round)
+      drawLine(Color.White, Offset(cx - inset + chev, cy - inset), Offset(cx - inset, cy - inset - chev), strokeWidth = stroke, cap = StrokeCap.Round)
+      // Bottom-right chevron
+      drawLine(Color.White, Offset(cx + inset, cy + inset - chev), Offset(cx + inset + chev, cy + inset), strokeWidth = stroke, cap = StrokeCap.Round)
+      drawLine(Color.White, Offset(cx + inset - chev, cy + inset), Offset(cx + inset, cy + inset + chev), strokeWidth = stroke, cap = StrokeCap.Round)
     }
   }
 }
