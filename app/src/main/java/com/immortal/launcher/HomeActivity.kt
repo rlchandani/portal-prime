@@ -793,15 +793,17 @@ private fun LauncherScreen(
                     val deltaCols = (deltaX / cellWidthPx).roundToInt()
                     val deltaRows = (deltaY / cellHeightPx).roundToInt()
                     val deltaCells = deltaCols + deltaRows * cols
-                    val currentOrder = orderState.value
+                    val baseOrder = orderState.value.ifEmpty { orderedApps.map { it.component.packageName } }
+                    val currentOrder = baseOrder
                     val sourceIndex = currentOrder.indexOf(app.component.packageName)
-                        .takeIf { it >= 0 } ?: currentOrder.size
-                    val targetIndex = (sourceIndex + deltaCells).coerceIn(0, orderedApps.size - 1)
-                    if (targetIndex != sourceIndex && targetIndex < orderedApps.size) {
-                      val targetPkg = orderedApps[targetIndex].component.packageName
-                      val newOrder = UserLayout.moveOrder(currentOrder, app.component.packageName, targetPkg)
-                      UserLayout.saveOrder(context, newOrder)
-                      orderState.value = newOrder
+                    if (sourceIndex >= 0) {
+                      val targetIndex = (sourceIndex + deltaCells).coerceIn(0, currentOrder.size - 1)
+                      if (targetIndex != sourceIndex) {
+                        val targetPkg = currentOrder[targetIndex]
+                        val newOrder = UserLayout.moveOrder(currentOrder, app.component.packageName, targetPkg)
+                        UserLayout.saveOrder(context, newOrder)
+                        orderState.value = newOrder
+                      }
                     }
                   },
               )
