@@ -11,17 +11,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,7 +43,7 @@ class WebUrlEntryActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      PortalPrimeTheme(darkTheme = true) {
+      PortalPrimeTheme(darkTheme = false) {
         WebUrlEntryScreen(
             onSave = { url ->
               ScreensaverConfig.setWebUrl(this, url)
@@ -72,30 +67,18 @@ private fun WebUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) {
 
   BackHandler { onCancel() }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
+  SettingsScaffold(
+      title = "Web Page",
+      subtitle = "Show any web page as your screensaver — Immortal displays it fullscreen and the " +
+          "page provides its own clock and layout. Great for Immich Kiosk or a Home Assistant " +
+          "dashboard. Tap the screen to exit.",
+      onBack = onCancel,
   ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp)) {
-      Text("Web page", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "Show any web page as your screensaver — Immortal displays it fullscreen and the page " +
-              "provides its own clock and layout. Great for Immich Kiosk or a Home Assistant " +
-              "dashboard. Tap the screen to exit.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-
-      Spacer(Modifier.heightIn(min = 22.dp))
-
+    Column {
       OutlinedTextField(
           value = url,
           onValueChange = { url = it },
-          placeholder = { Text("http://192.168.1.50:3000", color = Color(0xFF777777)) },
+          placeholder = { Text("http://192.168.1.50:3000") },
           singleLine = true,
           modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
           shape = RoundedCornerShape(14.dp),
@@ -106,14 +89,14 @@ private fun WebUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) {
             valid -> "Looks good."
             else -> "Start the address with http:// or https://."
           },
-          color = if (valid || trimmed.isEmpty()) Color(0xFF9A9A9A) else Color(0xFFE89090),
-          fontSize = 13.sp,
+          color = if (valid || trimmed.isEmpty()) IosSecondary else Color(0xFFFF3B30),
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp),
       )
 
       Spacer(Modifier.heightIn(min = 26.dp))
       Surface(
-          color = if (valid) Color(0xFF2E6BE6) else Color(0xFF2A2A2C),
+          color = if (valid) IosBlue else IosDivider,
           shape = RoundedCornerShape(16.dp),
           modifier =
               Modifier.fillMaxWidth().then(initialFocus).tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -122,7 +105,7 @@ private fun WebUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) {
       ) {
         Text(
             "Use this page",
-            color = if (valid) Color.White else Color(0xFF777777),
+            color = if (valid) Color.White else IosSecondary,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
@@ -131,7 +114,7 @@ private fun WebUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) {
       }
       Spacer(Modifier.heightIn(min = 12.dp))
       Surface(
-          color = Color(0xFF1C1C1E),
+          color = IosCard,
           shape = RoundedCornerShape(16.dp),
           modifier =
               Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -140,8 +123,8 @@ private fun WebUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) {
       ) {
         Text(
             "Cancel",
-            color = Color(0xFFDDDDDD),
-            fontSize = 16.sp,
+            color = IosBlue,
+            fontSize = Sizes.rowTitle,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
         )

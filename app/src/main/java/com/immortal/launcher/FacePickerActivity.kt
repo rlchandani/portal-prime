@@ -19,14 +19,11 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,13 +38,11 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
@@ -59,7 +54,7 @@ import com.immortal.launcher.ui.theme.PortalPrimeTheme
 class FacePickerActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { FacePickerScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { FacePickerScreen() } }
   }
 }
 
@@ -71,87 +66,68 @@ private fun FacePickerScreen() {
   var sizeIndex by remember { mutableStateOf(ScreensaverConfig.load(context).faceSizeIndex) }
   val activity = context as? Activity
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) activity?.finish()
-                  true
-                } else false
-              }
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
+  SettingsScaffold(
+      title = "Clock Face",
+      subtitle = "Choose how the time looks on your screensaver.",
+      onBack = { activity?.finish() },
   ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp)) {
-      Text("Clock face", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "Choose how the time looks on your screensaver.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(26.dp))
+    // Master switch — off shows photos only (no clock). On by default.
+    Card { ToggleRow("Show a clock face", facesOn) { v ->
+      ScreensaverConfig.setFacesEnabled(context, v)
+      facesOn = v
+    } }
 
-      // Master switch — off shows photos only (no clock). On by default.
-      Card { ToggleRow("Show a clock face", facesOn) { v ->
-        ScreensaverConfig.setFacesEnabled(context, v)
-        facesOn = v
-      } }
-
-      if (facesOn) {
-        Spacer(Modifier.size(22.dp))
-        Card {
-          FaceCatalog.entries.forEachIndexed { i, entry ->
-            if (i > 0) Divider()
-            SelectableRow(
-                title = entry.name,
-                subtitle = entry.tagline,
-                selected = faceId == entry.id,
-                onClick = {
-                  ScreensaverConfig.setFaceId(context, entry.id)
-                  faceId = entry.id
-                },
-            )
-          }
-        }
-
-        // Size control — only for faces that offer variants (flip / big / bold).
-        val selected = FaceCatalog.entryFor(faceId)
-        if (selected.sizes.isNotEmpty()) {
-          Spacer(Modifier.size(18.dp))
-          Card {
-            SizeStepper(sizeIndex.coerceIn(0, selected.sizes.lastIndex)) { v ->
-              ScreensaverConfig.setFaceSizeIndex(context, v)
-              sizeIndex = v
-            }
-          }
-        }
-      } else {
-        Text(
-            "Photos only — no clock or widgets on the screensaver. The now-playing card still " +
-                "follows its own switch in screensaver settings.",
-            color = Color(0xFF9A9A9A),
-            fontSize = 14.sp,
-            modifier = Modifier.padding(top = 14.dp, start = 4.dp, end = 4.dp),
-        )
-      }
-
+    if (facesOn) {
       Spacer(Modifier.size(22.dp))
-      PreviewButton {
-        runCatching {
-          context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
+      Card {
+        FaceCatalog.entries.forEachIndexed { i, entry ->
+          if (i > 0) Divider()
+          SelectableRow(
+              title = entry.name,
+              subtitle = entry.tagline,
+              selected = faceId == entry.id,
+              onClick = {
+                ScreensaverConfig.setFaceId(context, entry.id)
+                faceId = entry.id
+              },
+          )
         }
       }
+
+      // Size control — only for faces that offer variants (flip / big / bold).
+      val selected = FaceCatalog.entryFor(faceId)
+      if (selected.sizes.isNotEmpty()) {
+        Spacer(Modifier.size(18.dp))
+        Card {
+          SizeStepper(sizeIndex.coerceIn(0, selected.sizes.lastIndex)) { v ->
+            ScreensaverConfig.setFaceSizeIndex(context, v)
+            sizeIndex = v
+          }
+        }
+      }
+    } else {
       Text(
-          "More faces — and premium layouts — are coming. Your photos keep showing behind the " +
-              "clock; the flip clock takes over the whole screen on its own.",
-          color = Color(0xFF7C7C7C),
-          fontSize = 13.sp,
+          "Photos only — no clock or widgets on the screensaver. The now-playing card still " +
+              "follows its own switch in screensaver settings.",
+          color = IosSecondary,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 14.dp, start = 4.dp, end = 4.dp),
       )
     }
+
+    Spacer(Modifier.size(22.dp))
+    PreviewButton {
+      runCatching {
+        context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
+      }
+    }
+    Text(
+        "More faces — and premium layouts — are coming. Your photos keep showing behind the " +
+            "clock; the flip clock takes over the whole screen on its own.",
+        color = IosTertiary,
+        fontSize = Sizes.rowSub,
+        modifier = Modifier.padding(top = 14.dp, start = 4.dp, end = 4.dp),
+    )
   }
 }
 
@@ -180,16 +156,16 @@ private fun SizeStepper(index: Int, onChange: (Int) -> Unit) {
                 else false
               }
               .focusable(interactionSource = src)
-              .background(if (focused) Color(0x402E6BE6) else Color.Transparent)
+              .background(if (focused) Color(0xFFE5F0FF) else Color.Transparent)
               .padding(start = 18.dp, end = 6.dp, top = 10.dp, bottom = 10.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text("Size", color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text("Size", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     ArrowButton("◀", focused) { if (index > 0) onChange(index - 1) }
     Text(
         FaceCatalog.SIZE_LABELS[index.coerceIn(0, last)],
-        color = if (focused) Color.White else Color(0xFFDDDDDD),
-        fontSize = 17.sp,
+        color = if (focused) IosBlue else IosLabel,
+        fontSize = Sizes.rowValue,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
         modifier = Modifier.widthIn(min = 110.dp),
@@ -200,11 +176,11 @@ private fun SizeStepper(index: Int, onChange: (Int) -> Unit) {
 
 @Composable
 private fun PreviewButton(onClick: () -> Unit) {
-  Surface(color = Color(0xFF2E6BE6), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
+  Surface(color = IosBlue, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
     Text(
         "Preview",
         color = Color.White,
-        fontSize = 17.sp,
+        fontSize = Sizes.rowTitle,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
         modifier = Modifier.fillMaxWidth().tvFocusableRow { onClick() }.padding(vertical = 16.dp),

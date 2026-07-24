@@ -11,22 +11,17 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -51,7 +46,7 @@ import java.util.Calendar
 class CountdownSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { CountdownSettingsScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { CountdownSettingsScreen() } }
   }
 }
 
@@ -73,31 +68,15 @@ private fun CountdownSettingsScreen() {
   var repeatsYearly by remember { mutableStateOf(true) }
   var year by remember { mutableIntStateOf(cal.get(Calendar.YEAR)) }
 
-  Box(modifier = Modifier.fillMaxSize()) {
-    Column(
-        modifier =
-            Modifier.fillMaxSize()
-                .background(Color(0xFF111111))
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 28.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-      Text("Countdowns", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-      Text(
-          "Pin a chip on the home screen counting down to a birthday, trip, or holiday.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 15.sp,
-          textAlign = TextAlign.Center,
-      )
-
+  SettingsScaffold(
+      title = "Countdowns",
+      subtitle = "Pin a chip on the home screen counting down to a birthday, trip, or holiday.",
+      onBack = { activity?.finish() },
+  ) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       // Existing events.
       if (events.isNotEmpty()) {
-        Surface(
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-            shape = RoundedCornerShape(22.dp),
-            modifier = Modifier.fillMaxWidth(),
-        ) {
+        Card {
           Column(modifier = Modifier.padding(vertical = 6.dp)) {
             events.forEach { e ->
               Row(
@@ -106,12 +85,12 @@ private fun CountdownSettingsScreen() {
               ) {
                 Text("${e.emoji}  ", fontSize = 20.sp)
                 Column(modifier = Modifier.weight(1f)) {
-                  Text(e.label, color = Color.White, fontSize = 17.sp)
+                  Text(e.label, color = IosLabel, fontSize = Sizes.rowTitle)
                   Text(
                       "${String.format("%02d.%02d", e.day, e.month)}" +
                           (if (e.year > 0) ".${e.year}" else " · yearly") + " — ${e.phrase()}",
-                      color = Color(0xFF9A9A9A),
-                      fontSize = 13.sp,
+                      color = IosSecondary,
+                      fontSize = Sizes.rowSub,
                   )
                 }
                 Box(
@@ -123,7 +102,7 @@ private fun CountdownSettingsScreen() {
                             },
                     contentAlignment = Alignment.Center,
                 ) {
-                  Text("✕", color = MaterialTheme.colorScheme.error, fontSize = 20.sp)
+                  Text("✕", color = Color(0xFFFF3B30), fontSize = 20.sp)
                 }
               }
             }
@@ -132,13 +111,9 @@ private fun CountdownSettingsScreen() {
       }
 
       // Add form.
-      Surface(
-          color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-          shape = RoundedCornerShape(22.dp),
-          modifier = Modifier.fillMaxWidth(),
-      ) {
+      Card {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-          Text("New countdown", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+          Text("New countdown", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
           OutlinedTextField(
               value = label,
               onValueChange = { label = it },
@@ -162,7 +137,7 @@ private fun CountdownSettingsScreen() {
               modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
               verticalAlignment = Alignment.CenterVertically,
           ) {
-            Text("Repeats every year", color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+            Text("Repeats every year", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
             Switch(checked = repeatsYearly, onCheckedChange = { repeatsYearly = it })
           }
           if (!repeatsYearly) {
@@ -170,7 +145,7 @@ private fun CountdownSettingsScreen() {
           }
 
           Surface(
-              color = MaterialTheme.colorScheme.primary,
+              color = IosBlue,
               shape = RoundedCornerShape(14.dp),
               modifier =
                   Modifier.fillMaxWidth()
@@ -195,13 +170,12 @@ private fun CountdownSettingsScreen() {
       Spacer(Modifier.size(8.dp))
     }
   }
-  FolderBackButton(onClick = { activity?.finish() })
 }
 
 @Composable
 private fun EmojiChip(emoji: String, selected: Boolean, onClick: () -> Unit) {
   Surface(
-      color = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else Color(0x22FFFFFF),
+      color = if (selected) Color(0xFFE5F0FF) else IosDivider,
       shape = RoundedCornerShape(10.dp),
       modifier = Modifier.size(44.dp).clickable { onClick() },
   ) {
@@ -212,20 +186,20 @@ private fun EmojiChip(emoji: String, selected: Boolean, onClick: () -> Unit) {
 @Composable
 private fun Stepper(label: String, value: Int, onChange: (Int) -> Unit) {
   Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-    Text(label, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     Box(modifier = Modifier.size(48.dp).clickable { onChange(value - 1) }, contentAlignment = Alignment.Center) {
-      Text("◀", color = Color(0xFFDDDDDD), fontSize = 20.sp)
+      Text("◀", color = IosBlue, fontSize = 20.sp)
     }
     Text(
         "$value",
-        color = Color.White,
-        fontSize = 17.sp,
+        color = IosLabel,
+        fontSize = Sizes.rowValue,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
         modifier = Modifier.widthIn(min = 56.dp),
     )
     Box(modifier = Modifier.size(48.dp).clickable { onChange(value + 1) }, contentAlignment = Alignment.Center) {
-      Text("▶", color = Color(0xFFDDDDDD), fontSize = 20.sp)
+      Text("▶", color = IosBlue, fontSize = 20.sp)
     }
   }
 }

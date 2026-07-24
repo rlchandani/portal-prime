@@ -1,20 +1,22 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 package com.immortal.launcher
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,7 +39,7 @@ class AlbumUrlEntryActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      PortalPrimeTheme(darkTheme = true) {
+      PortalPrimeTheme(darkTheme = false) {
         AlbumUrlEntryScreen(
             onSave = { url ->
               ScreensaverConfig.setAlbumUrl(this, url)
@@ -63,35 +65,18 @@ private fun AlbumUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) 
 
   BackHandler { onCancel() }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
+  SettingsScaffold(
+      title = "Shared Album Link",
+      subtitle = "Paste a public link from iCloud Shared Albums or Google Photos. " +
+          "Make sure it's shared as \"anyone with the link\" — Immortal can't sign in.",
+      onBack = onCancel,
   ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp)) {
-      Text(
-          "Shared album link",
-          color = Color.White,
-          fontSize = 34.sp,
-          fontWeight = FontWeight.SemiBold,
-      )
-      Text(
-          "Paste a public link from iCloud Shared Albums or Google Photos. " +
-              "Make sure it's shared as \"anyone with the link\" — Immortal can't sign in.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-
-      Spacer(Modifier.heightIn(min = 22.dp))
-
+    Column {
       OutlinedTextField(
           value = url,
           onValueChange = { url = it },
           placeholder = {
-            Text("https://photos.icloud.com/shared/album/…", color = Color(0xFF777777))
+            Text("https://photos.icloud.com/shared/album/…")
           },
           singleLine = true,
           modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
@@ -104,15 +89,15 @@ private fun AlbumUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) 
             supported -> "Looks like a $provider link."
             else -> "That doesn't look like a supported share link yet."
           },
-          color = if (supported || trimmed.isEmpty()) Color(0xFF9A9A9A) else Color(0xFFE89090),
-          fontSize = 13.sp,
+          color = if (supported || trimmed.isEmpty()) IosSecondary else Color(0xFFFF3B30),
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp),
       )
 
       Spacer(Modifier.heightIn(min = 26.dp))
 
       Surface(
-          color = if (supported) Color(0xFF2E6BE6) else Color(0xFF2A2A2C),
+          color = if (supported) IosBlue else IosDivider,
           shape = RoundedCornerShape(16.dp),
           modifier =
               Modifier.fillMaxWidth().then(initialFocus).tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -121,7 +106,7 @@ private fun AlbumUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) 
       ) {
         Text(
             "Use this album",
-            color = if (supported) Color.White else Color(0xFF777777),
+            color = if (supported) Color.White else IosSecondary,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
@@ -132,7 +117,7 @@ private fun AlbumUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) 
       Spacer(Modifier.heightIn(min = 12.dp))
 
       Surface(
-          color = Color(0xFF1C1C1E),
+          color = IosCard,
           shape = RoundedCornerShape(16.dp),
           modifier =
               Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -141,8 +126,8 @@ private fun AlbumUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) 
       ) {
         Text(
             "Cancel",
-            color = Color(0xFFDDDDDD),
-            fontSize = 16.sp,
+            color = IosBlue,
+            fontSize = Sizes.rowTitle,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
         )
@@ -152,8 +137,8 @@ private fun AlbumUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) 
 
       Text(
           "How to get a link:",
-          color = Color(0xFFBBBBBB),
-          fontSize = 14.sp,
+          color = IosLabel,
+          fontSize = Sizes.rowSub,
           fontWeight = FontWeight.SemiBold,
           modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
       )
@@ -162,8 +147,8 @@ private fun AlbumUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) 
               "Share Link → Copy Link (works with the current " +
               "photos.icloud.com/shared/album/… links).\n" +
               "• Google Photos → album → Share → \"Get link\" (anyone with the link can view).",
-          color = Color(0xFF8A8A8A),
-          fontSize = 13.sp,
+          color = IosTertiary,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(start = 4.dp),
       )
     }

@@ -17,19 +17,24 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -70,6 +75,31 @@ internal val IosGreen = Color(0xFF34C759)
 internal val IosChevron = Color(0xFFC7C7CC)
 
 // ---------------------------------------------------------------------------
+// Sizing scale (single source of truth)
+// ---------------------------------------------------------------------------
+
+/**
+ * The "Large" sizing scale, tuned for the Portal's 2160x1440 touch panel viewed at room
+ * distance. Every settings surface — the two-panel main screen and every full-screen
+ * sub-page — reads its type sizes and metrics from here so they can't drift.
+ */
+internal object Sizes {
+    val titleSidebar = 32.sp   // big left-aligned "Settings" in the sidebar
+    val titlePage = 34.sp      // sub-page H1
+    val pageSubtitle = 19.sp   // sub-page subtitle
+    val sectionLabel = 16.sp   // uppercase grey group headers
+    val rowTitle = 22.sp       // row body text
+    val rowSub = 16.sp         // row secondary/subtitle
+    val rowValue = 19.sp       // right-side value text
+    val chevron = 22.sp        // "›"
+    val iconBadge = 40.dp      // content-row icon badge
+    val iconGlyph = 20.sp
+    val iconRadius = 9.dp
+    val rowMinHeight = 68.dp
+    val cardRadius = 14.dp
+}
+
+// ---------------------------------------------------------------------------
 // Section label
 // ---------------------------------------------------------------------------
 
@@ -82,10 +112,10 @@ internal fun SectionLabel(text: String) {
     Text(
         text = text.uppercase(),
         color = IosTertiary,
-        fontSize = 13.sp,
+        fontSize = Sizes.sectionLabel,
         fontWeight = FontWeight.Normal,
         letterSpacing = 0.4.sp,
-        modifier = Modifier.padding(start = 20.dp, end = 16.dp, top = 16.dp, bottom = 6.dp),
+        modifier = Modifier.padding(start = 20.dp, end = 16.dp, top = 20.dp, bottom = 6.dp),
     )
 }
 
@@ -101,7 +131,7 @@ internal fun SectionLabel(text: String) {
 internal fun Card(content: @Composable () -> Unit) {
     Surface(
         color = IosCard,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(Sizes.cardRadius),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column { content() }
@@ -119,7 +149,7 @@ internal fun Divider() {
         Spacer(
             Modifier
                 .fillMaxWidth()
-                .padding(start = 58.dp)
+                .padding(start = 68.dp)
                 .height(1.dp)
                 .background(IosDivider),
         )
@@ -139,16 +169,16 @@ internal fun Divider() {
 internal fun IconBadge(color: Color, symbol: String) {
     Box(
         modifier = Modifier
-            .size(30.dp)
-            .clip(RoundedCornerShape(7.dp))
+            .size(Sizes.iconBadge)
+            .clip(RoundedCornerShape(Sizes.iconRadius))
             .background(color),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = symbol,
             color = Color.White,
-            fontSize = 17.sp,
-            lineHeight = 17.sp,
+            fontSize = Sizes.iconGlyph,
+            lineHeight = Sizes.iconGlyph,
         )
     }
 }
@@ -173,6 +203,7 @@ internal fun ToggleRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .defaultMinSize(minHeight = Sizes.rowMinHeight)
             .tvFocusableRow { onChange(!checked) }
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -184,7 +215,7 @@ internal fun ToggleRow(
         Text(
             text = title,
             color = IosLabel,
-            fontSize = 16.sp,
+            fontSize = Sizes.rowTitle,
             letterSpacing = (-0.2).sp,
             modifier = Modifier.weight(1f),
         )
@@ -223,6 +254,7 @@ internal fun NavRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .defaultMinSize(minHeight = Sizes.rowMinHeight)
             .tvFocusableRow { onClick() }
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -235,14 +267,14 @@ internal fun NavRow(
             Text(
                 text = title,
                 color = IosLabel,
-                fontSize = 16.sp,
+                fontSize = Sizes.rowTitle,
                 letterSpacing = (-0.2).sp,
             )
             if (subLabel.isNotEmpty()) {
                 Text(
                     text = subLabel,
                     color = IosSecondary,
-                    fontSize = 11.sp,
+                    fontSize = Sizes.rowSub,
                     modifier = Modifier.padding(top = 2.dp),
                 )
             }
@@ -251,16 +283,104 @@ internal fun NavRow(
             Text(
                 text = value,
                 color = IosSecondary,
-                fontSize = 15.sp,
+                fontSize = Sizes.rowValue,
                 modifier = Modifier.padding(end = 6.dp),
             )
         }
         Text(
             text = ">",
             color = IosChevron,
-            fontSize = 15.sp,
+            fontSize = Sizes.chevron,
             fontWeight = FontWeight.Medium,
         )
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Picker row (dropdown / popup button)
+// ---------------------------------------------------------------------------
+
+/** One choice in a [PickerRow]: the persisted [value] and the [label] shown to the user. */
+internal data class PickerOption<T>(val value: T, val label: String)
+
+/**
+ * A macOS/iPad-style "popup button" row: title on the left, the current value + a ⌄ affordance
+ * on the right. Tapping the row opens a [DropdownMenu] of all [options] with a check on the
+ * current one — rather than blind-cycling to the next value on each tap. [onSelect] is called
+ * with the chosen option's value. The whole row is the click target so the TV remote works.
+ */
+@Composable
+internal fun <T> PickerRow(
+    title: String,
+    selected: T,
+    options: List<PickerOption<T>>,
+    iconColor: Color = Color(0xFF636366),
+    iconSymbol: String = "",
+    onSelect: (T) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val current = options.firstOrNull { it.value == selected }
+    Box {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = Sizes.rowMinHeight)
+                .tvFocusableRow { expanded = true }
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (iconSymbol.isNotEmpty()) {
+                IconBadge(color = iconColor, symbol = iconSymbol)
+                Spacer(Modifier.size(12.dp))
+            }
+            Text(
+                text = title,
+                color = IosLabel,
+                fontSize = Sizes.rowTitle,
+                letterSpacing = (-0.2).sp,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = current?.label ?: "",
+                color = IosSecondary,
+                fontSize = Sizes.rowValue,
+                modifier = Modifier.padding(end = 6.dp),
+            )
+            // Up/down chevron hints "opens a menu" (vs the > that hints "navigates away").
+            Text(
+                text = "⌄",
+                color = IosChevron,
+                fontSize = Sizes.chevron,
+                fontWeight = FontWeight.Medium,
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(IosCard),
+        ) {
+            options.forEach { opt ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            opt.label,
+                            color = IosLabel,
+                            fontSize = Sizes.rowTitle,
+                            fontWeight = if (opt.value == selected) FontWeight.SemiBold else FontWeight.Normal,
+                        )
+                    },
+                    trailingIcon = {
+                        if (opt.value == selected) {
+                            Text("v", color = IosBlue, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
+                        }
+                    },
+                    onClick = {
+                        expanded = false
+                        onSelect(opt.value)
+                    },
+                )
+            }
+        }
     }
 }
 
@@ -279,18 +399,18 @@ internal fun SelectableRow(title: String, subtitle: String, selected: Boolean, o
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, color = IosLabel, fontSize = 16.sp)
+            Text(text = title, color = IosLabel, fontSize = Sizes.rowTitle)
             if (subtitle.isNotEmpty()) {
                 Text(
                     text = subtitle,
                     color = IosSecondary,
-                    fontSize = 13.sp,
+                    fontSize = Sizes.rowSub,
                     modifier = Modifier.padding(top = 2.dp),
                 )
             }
         }
         if (selected) {
-            Text(text = "v", color = IosBlue, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(text = "v", color = IosBlue, fontSize = Sizes.rowTitle, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -373,7 +493,7 @@ internal fun Stepper(
         Text(
             text = label,
             color = IosLabel,
-            fontSize = 16.sp,
+            fontSize = Sizes.rowTitle,
             letterSpacing = (-0.2).sp,
             modifier = Modifier.weight(1f),
         )
@@ -381,7 +501,7 @@ internal fun Stepper(
         Text(
             text = valueText,
             color = IosLabel,
-            fontSize = 14.sp,
+            fontSize = Sizes.rowValue,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(min = widthMin),
@@ -394,8 +514,8 @@ internal fun Stepper(
 private fun StepperButton(glyph: String, rowFocused: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .size(width = 32.dp, height = 30.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .size(width = 40.dp, height = 38.dp)
+            .clip(RoundedCornerShape(9.dp))
             .background(if (rowFocused) Color(0xFFE5F0FF) else Color(0xFFF2F2F7))
             .focusProperties { canFocus = false }
             .clickable(onClick = onClick),
@@ -404,7 +524,7 @@ private fun StepperButton(glyph: String, rowFocused: Boolean, onClick: () -> Uni
         Text(
             text = glyph,
             color = IosBlue,
-            fontSize = 18.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Medium,
         )
     }
@@ -447,16 +567,42 @@ internal fun FooterNote(text: String) {
     Text(
         text = text,
         color = IosTertiary,
-        fontSize = 13.sp,
-        lineHeight = 19.5.sp,
-        modifier = Modifier.padding(start = 20.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+        fontSize = Sizes.rowSub,
+        lineHeight = 24.sp,
+        modifier = Modifier.padding(start = 20.dp, end = 16.dp, top = 10.dp, bottom = 4.dp),
     )
 }
 
 // ---------------------------------------------------------------------------
-// Back button (no-op kept for older call sites)
+// Back button
 // ---------------------------------------------------------------------------
 
-/** Back is handled by the system/gesture path; keep this no-op for older call sites. */
+/**
+ * A visible iOS-style "‹ Back" pill for a full-screen settings sub-page: white card, blue
+ * label, focusable for the TV remote. Sub-pages also handle the hardware/gesture Back key,
+ * so this is the on-screen affordance to leave the page.
+ */
 @Composable
-fun FolderBackButton(onClick: () -> Unit, modifier: Modifier = Modifier) {}
+internal fun SettingsBackButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(
+        color = IosCard,
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.tvFocusable(RoundedCornerShape(12.dp)) { onClick() },
+    ) {
+        Text(
+            text = "‹  Back",
+            color = IosBlue,
+            fontSize = Sizes.pageSubtitle,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 11.dp),
+        )
+    }
+}
+
+/**
+ * Older call sites used a no-op `FolderBackButton`; it now draws the real [SettingsBackButton]
+ * so every legacy sub-page gets a visible, consistent back control for free.
+ */
+@Composable
+fun FolderBackButton(onClick: () -> Unit, modifier: Modifier = Modifier) =
+    SettingsBackButton(onClick, modifier)

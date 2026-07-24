@@ -12,18 +12,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,11 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -65,7 +55,7 @@ import org.json.JSONObject
 class ScreensaverSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { ScreensaverSettingsScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { ScreensaverSettingsScreen() } }
   }
 }
 
@@ -95,29 +85,12 @@ private fun ScreensaverSettingsScreen() {
     settings = ScreensaverConfig.load(context)
   }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) activity?.finish()
-                  true
-                } else false
-              }
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
+  SettingsScaffold(
+      title = "Screensaver",
+      subtitle = "Choose what shows on the photo frame when your Portal is idle.",
+      onBack = { activity?.finish() },
   ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp).focusRequester(firstFocus).focusGroup()) {
-      Text("Screensaver", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "Choose what shows on the photo frame when your Portal is idle.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(26.dp))
-
+    Column(modifier = Modifier.focusRequester(firstFocus).focusGroup()) {
       // Master toggle gates everything below (kept here rather than in the list so the rest only
       // renders when the frame is on, matching the original screen).
       Card {
@@ -125,12 +98,9 @@ private fun ScreensaverSettingsScreen() {
           apply(SettingsDomains.screensaver, "enabled", it)
         }
       }
-      Text(
+      FooterNote(
           "Turn this off to let your Portal's screen sleep on its own timer (or run your own " +
               "screensaver). Immortal won't switch it back on.",
-          color = Color(0xFF7C7C7C),
-          fontSize = 13.sp,
-          modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
 
       if (settings.enabled) {
@@ -144,7 +114,7 @@ private fun ScreensaverSettingsScreen() {
         }
         Spacer(Modifier.size(6.dp))
         Surface(
-            color = Color(0xFF2E6BE6),
+            color = IosBlue,
             shape = RoundedCornerShape(16.dp),
             modifier =
                 Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {

@@ -7,24 +7,18 @@
 
 package com.immortal.launcher
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -52,7 +46,7 @@ import java.util.Calendar
 class SunriseSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { SunriseScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { SunriseScreen() } }
   }
 }
 
@@ -88,45 +82,55 @@ private fun SunriseScreen() {
             .put("chime", chime))
   }
 
-  Box(modifier = Modifier.fillMaxSize().background(Color(0xFF1A1A1A)), contentAlignment = Alignment.TopCenter) {
-    Column(
-        modifier = Modifier.widthIn(max = 620.dp).padding(28.dp).verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
-    ) {
-      Text("🌅 Sunrise alarm", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-      Text("The screen brightens gradually to wake you, with an optional gentle chime.",
-          color = Color(0xFFB8B8B8), fontSize = 15.sp)
-
-      Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Text("Enabled", color = Color.White, fontSize = 18.sp, modifier = Modifier.weight(1f))
-        Switch(checked = enabled, onCheckedChange = { enabled = it; persist() })
+  val activity = context as? Activity
+  SettingsScaffold(
+      title = "Sunrise Alarm",
+      subtitle = "The screen brightens gradually to wake you, with an optional gentle chime.",
+      onBack = { activity?.finish() },
+  ) {
+    Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+      Card {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+        ) {
+          Text("Enabled", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
+          Switch(checked = enabled, onCheckedChange = { enabled = it; persist() })
+        }
       }
 
       // Time pickers (stepper rows).
-      Stepper("Hour", hour, 0, 23) { hour = it; persist() }
-      Stepper("Minute", minute, 0, 59, step = 5) { minute = it; persist() }
+      Card {
+        Stepper("Hour", hour, 0, 23) { hour = it; persist() }
+        Stepper("Minute", minute, 0, 59, step = 5) { minute = it; persist() }
+      }
 
-      Text("Wake on", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      SectionLabel("Wake on")
       Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         DAY_LABELS.forEach { (d, label) ->
           val on = d in days
-          Surface(color = if (on) MaterialTheme.colorScheme.primary else Color(0x22FFFFFF), shape = CircleShape,
+          Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
               modifier = Modifier.tvFocusable(CircleShape, focusScale = 1.08f) {
                 days = if (on) days - d else days + d; persist()
               }) {
-            Text(label, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+            Text(label, color = if (on) Color.White else IosLabel, fontSize = 16.sp, fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center, modifier = Modifier.padding(14.dp))
           }
         }
       }
 
-      Text("Ramp: $ramp min", color = Color.White, fontSize = 16.sp)
+      Text("Ramp: $ramp min", color = IosLabel, fontSize = Sizes.rowTitle)
       Slider(value = ramp.toFloat(), onValueChange = { ramp = it.toInt() },
           valueRange = 1f..45f, onValueChangeFinished = { persist() })
 
-      Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Text("Chime at the end", color = Color.White, fontSize = 18.sp, modifier = Modifier.weight(1f))
-        Switch(checked = chime, onCheckedChange = { chime = it; persist() })
+      Card {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+        ) {
+          Text("Chime at the end", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
+          Switch(checked = chime, onCheckedChange = { chime = it; persist() })
+        }
       }
 
       val next = remember(enabled, hour, minute, days) {
@@ -137,7 +141,7 @@ private fun SunriseScreen() {
               "Next: " + java.text.SimpleDateFormat("EEE d MMM, HH:mm", java.util.Locale.getDefault())
                   .format(java.util.Date(next))
           else "Alarm is off.",
-          color = Color(0xFF8AB4F8), fontSize = 15.sp)
+          color = IosBlue, fontSize = Sizes.rowValue)
 
       Surface(color = Color(0xFFEF6C00), shape = RoundedCornerShape(14.dp),
           modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp)) {
@@ -155,10 +159,13 @@ private fun SunriseScreen() {
 
 @Composable
 private fun Stepper(label: String, value: Int, min: Int, max: Int, step: Int = 1, onChange: (Int) -> Unit) {
-  Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-    Text(label, color = Color.White, fontSize = 18.sp, modifier = Modifier.weight(1f))
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+  ) {
+    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     StepBtn("–") { onChange(((value - step).coerceAtLeast(min))) }
-    Text("%02d".format(value), color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold,
+    Text("%02d".format(value), color = IosLabel, fontSize = 22.sp, fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 16.dp))
     StepBtn("+") { onChange(((value + step).coerceAtMost(max))) }
   }
@@ -166,9 +173,9 @@ private fun Stepper(label: String, value: Int, min: Int, max: Int, step: Int = 1
 
 @Composable
 private fun StepBtn(label: String, onClick: () -> Unit) {
-  Surface(color = Color(0x33FFFFFF), shape = CircleShape,
+  Surface(color = IosDivider, shape = CircleShape,
       modifier = Modifier.tvFocusable(CircleShape, focusScale = 1.1f) { onClick() }) {
-    Text(label, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold,
+    Text(label, color = IosBlue, fontSize = 24.sp, fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 18.dp, vertical = 6.dp))
   }
 }

@@ -11,20 +11,15 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.SettingsDomains
@@ -48,7 +42,7 @@ import org.json.JSONObject
 class ChimeSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { ChimeSettingsScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { ChimeSettingsScreen() } }
   }
 }
 
@@ -58,24 +52,12 @@ private fun ChimeSettingsScreen() {
   var settings by remember { mutableStateOf(ChimeConfig.load(context)) }
   val activity = context as? Activity
 
-  Box(modifier = Modifier.fillMaxSize()) {
-    Column(
-        modifier =
-            Modifier.fillMaxSize()
-                .background(Color(0xFF111111))
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 28.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-      Text("Sounds", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-      Text(
-          "Gentle ambient cues. All off by default; nothing plays during quiet hours.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 15.sp,
-          textAlign = TextAlign.Center,
-      )
-
+  SettingsScaffold(
+      title = "Sounds",
+      subtitle = "Gentle ambient cues. All off by default; nothing plays during quiet hours.",
+      onBack = { activity?.finish() },
+  ) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       // Scalar controls (toggles, volumes, quiet times, sunrise sound) render from the `chime`
       // registry domain - the same specs the phone remote uses. Apply routes through the domain so
       // its onApplied (ChimeScheduler.reschedule) fires here too, not just from the remote.
@@ -106,14 +88,13 @@ private fun ChimeSettingsScreen() {
         }
       }
     }
-    FolderBackButton(onClick = { activity?.finish() })
   }
 }
 
 @Composable
 private fun TestButton(label: String, onClick: () -> Unit) {
   Surface(
-      color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+      color = Color(0xFFE5F0FF),
       shape = RoundedCornerShape(12.dp),
       modifier =
           Modifier.padding(horizontal = 18.dp, vertical = 2.dp)
@@ -121,7 +102,7 @@ private fun TestButton(label: String, onClick: () -> Unit) {
   ) {
     Text(
         "▶  $label",
-        color = MaterialTheme.colorScheme.primary,
+        color = IosBlue,
         fontSize = 15.sp,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -165,9 +146,9 @@ private fun VoicePicker(current: String, onPick: (String) -> Unit) {
                 .padding(start = 18.dp, end = 18.dp, top = 2.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-      Text("Voice", color = Color(0xFFDDDDDD), fontSize = 15.sp, modifier = Modifier.weight(1f))
-      Text(label, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-      Text("  ▾", color = Color(0xFFDDDDDD), fontSize = 15.sp)
+      Text("Voice", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
+      Text(label, color = IosSecondary, fontSize = Sizes.rowValue, fontWeight = FontWeight.SemiBold)
+      Text("  ▾", color = IosSecondary, fontSize = Sizes.rowValue)
     }
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
       voices.forEach { (name, friendly) ->

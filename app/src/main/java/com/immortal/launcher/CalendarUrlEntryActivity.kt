@@ -11,17 +11,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -44,7 +39,7 @@ class CalendarUrlEntryActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      PortalPrimeTheme(darkTheme = true) {
+      PortalPrimeTheme(darkTheme = false) {
         CalendarUrlEntryScreen(
             onSave = { url ->
               ScreensaverConfig.setCalendarUrl(this, url)
@@ -78,35 +73,18 @@ private fun CalendarUrlEntryScreen(
 
   BackHandler { onCancel() }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
+  SettingsScaffold(
+      title = "Calendar Link",
+      subtitle = "Paste a private iCalendar (.ics) link from Google Calendar or Apple iCloud. " +
+          "Immortal reads it directly — it can't sign in to your account.",
+      onBack = onCancel,
   ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp)) {
-      Text(
-          "Calendar link",
-          color = Color.White,
-          fontSize = 34.sp,
-          fontWeight = FontWeight.SemiBold,
-      )
-      Text(
-          "Paste a private iCalendar (.ics) link from Google Calendar or Apple iCloud. " +
-              "Immortal reads it directly — it can't sign in to your account.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-
-      Spacer(Modifier.heightIn(min = 22.dp))
-
+    Column {
       OutlinedTextField(
           value = url,
           onValueChange = { url = it },
           placeholder = {
-            Text("https://calendar.google.com/calendar/ical/…/basic.ics", color = Color(0xFF777777))
+            Text("https://calendar.google.com/calendar/ical/…/basic.ics")
           },
           singleLine = true,
           modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
@@ -119,15 +97,15 @@ private fun CalendarUrlEntryScreen(
             supported -> "Looks like a $provider link."
             else -> "That doesn't look like a calendar (.ics) link yet."
           },
-          color = if (supported || trimmed.isEmpty()) Color(0xFF9A9A9A) else Color(0xFFE89090),
-          fontSize = 13.sp,
+          color = if (supported || trimmed.isEmpty()) IosSecondary else Color(0xFFFF3B30),
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp),
       )
 
       Spacer(Modifier.heightIn(min = 26.dp))
 
       Surface(
-          color = if (supported) Color(0xFF2E6BE6) else Color(0xFF2A2A2C),
+          color = if (supported) IosBlue else IosDivider,
           shape = RoundedCornerShape(16.dp),
           modifier =
               Modifier.fillMaxWidth().then(initialFocus).tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -136,7 +114,7 @@ private fun CalendarUrlEntryScreen(
       ) {
         Text(
             "Use this calendar",
-            color = if (supported) Color.White else Color(0xFF777777),
+            color = if (supported) Color.White else IosSecondary,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
@@ -148,7 +126,7 @@ private fun CalendarUrlEntryScreen(
 
       if (existing.isNotBlank()) {
         Surface(
-            color = Color(0xFF1C1C1E),
+            color = IosCard,
             shape = RoundedCornerShape(16.dp),
             modifier =
                 Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -157,8 +135,8 @@ private fun CalendarUrlEntryScreen(
         ) {
           Text(
               "Remove calendar",
-              color = Color(0xFFE89090),
-              fontSize = 16.sp,
+              color = Color(0xFFFF3B30),
+              fontSize = Sizes.rowTitle,
               textAlign = TextAlign.Center,
               modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
           )
@@ -167,7 +145,7 @@ private fun CalendarUrlEntryScreen(
       }
 
       Surface(
-          color = Color(0xFF1C1C1E),
+          color = IosCard,
           shape = RoundedCornerShape(16.dp),
           modifier =
               Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -176,8 +154,8 @@ private fun CalendarUrlEntryScreen(
       ) {
         Text(
             "Cancel",
-            color = Color(0xFFDDDDDD),
-            fontSize = 16.sp,
+            color = IosBlue,
+            fontSize = Sizes.rowTitle,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
         )
@@ -187,8 +165,8 @@ private fun CalendarUrlEntryScreen(
 
       Text(
           "How to get a link:",
-          color = Color(0xFFBBBBBB),
-          fontSize = 14.sp,
+          color = IosLabel,
+          fontSize = Sizes.rowSub,
           fontWeight = FontWeight.SemiBold,
           modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
       )
@@ -198,8 +176,8 @@ private fun CalendarUrlEntryScreen(
               "Keep it private — anyone with it can read the calendar.\n" +
               "• Apple iCloud → Calendar app → tap a calendar → turn on \"Public Calendar\" " +
               "→ Copy Link (a webcal:// link works too).",
-          color = Color(0xFF8A8A8A),
-          fontSize = 13.sp,
+          color = IosTertiary,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(start = 4.dp),
       )
     }

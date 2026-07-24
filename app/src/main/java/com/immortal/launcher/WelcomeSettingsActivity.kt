@@ -19,9 +19,7 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,7 +48,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
 class WelcomeSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { WelcomeSettingsScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { WelcomeSettingsScreen() } }
   }
 }
 
@@ -112,30 +110,12 @@ private fun WelcomeSettingsScreen() {
         android.speech.tts.TextToSpeech.QUEUE_FLUSH, params, "welcome_test")
   }
 
-  Box(modifier = Modifier.fillMaxSize()) {
-    Column(
-        modifier =
-            Modifier.fillMaxSize()
-                .onPreviewKeyEvent { e ->
-                  if (e.key == Key.Back) {
-                    if (e.type == KeyEventType.KeyUp) activity?.finish()
-                    true
-                  } else false
-                }
-                .background(Color(0xFF101012))
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 28.dp, vertical = 32.dp),
-    ) {
-      Column(modifier = Modifier.widthIn(max = 1100.dp).focusRequester(firstFocus).focusGroup()) {
-        Text("Welcome Overlay", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-        Text(
-            "Customize the greeting shown when the screensaver wakes up.",
-            color = Color(0xFF9A9A9A),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 6.dp),
-        )
-        Spacer(Modifier.size(26.dp))
-
+  SettingsScaffold(
+      title = "Welcome Overlay",
+      subtitle = "Customize the greeting shown when the screensaver wakes up.",
+      onBack = { activity?.finish() },
+  ) {
+      Column(modifier = Modifier.focusRequester(firstFocus).focusGroup()) {
         Card {
           ToggleRow("Show greeting message", settings.showGreeting) {
             SettingsDomains.welcome.apply(context, JSONObject().put("showGreeting", it))
@@ -175,12 +155,9 @@ private fun WelcomeSettingsScreen() {
             )
           }
         }
-        Text(
+        FooterNote(
             "Voice for the spoken greeting, from the voices installed on this device. " +
                 "Tap Test to hear it. (Enable \"Speak greeting\" above for it to play on wake.)",
-            color = Color(0xFF7C7C7C),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
         )
 
         Spacer(Modifier.size(26.dp))
@@ -223,11 +200,8 @@ private fun WelcomeSettingsScreen() {
             settings = WelcomeConfig.load(context)
           }
         }
-        Text(
+        FooterNote(
             "How long the welcome overlay displays before auto-dismissing.",
-            color = Color(0xFF7C7C7C),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
         )
 
         Spacer(Modifier.size(26.dp))
@@ -263,16 +237,13 @@ private fun WelcomeSettingsScreen() {
             settings = settings.copy(backgroundOpacity = clamped)
           }
         }
-        Text(
+        FooterNote(
             "Background darkness behind the welcome text (0% = transparent, 100% = opaque).",
-            color = Color(0xFF7C7C7C),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
         )
 
         Spacer(Modifier.size(28.dp))
         Surface(
-            color = MaterialTheme.colorScheme.primary,
+            color = IosBlue,
             shape = RoundedCornerShape(16.dp),
             modifier =
                 Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -293,16 +264,11 @@ private fun WelcomeSettingsScreen() {
 
         Spacer(Modifier.size(16.dp))
 
-        Text(
+        FooterNote(
             "Tip: The welcome overlay appears when the screensaver starts from sleep. " +
                 "Tap anywhere on the overlay to dismiss it early, or wait for it to auto-fade.",
-            color = Color(0xFF7C7C7C),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(start = 4.dp, end = 4.dp),
         )
       }
-    }
-    FolderBackButton(onClick = { activity?.finish() })
   }
 }
 
@@ -349,9 +315,9 @@ private fun AndroidVoiceRow(
       verticalAlignment = Alignment.CenterVertically,
   ) {
     RadioButton(selected = selected, onClick = null)
-    Text(label, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
+    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f).padding(start = 12.dp))
     Surface(
-        color = MaterialTheme.colorScheme.primary,
+        color = IosBlue,
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp), focusScale = 1f) { onTest() },
     ) {
@@ -414,32 +380,26 @@ private fun EditableTextRow(label: String, value: String, onChange: (String) -> 
               .padding(horizontal = 18.dp, vertical = 14.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(label, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     if (editing) {
       OutlinedTextField(
           value = tempValue,
           onValueChange = { tempValue = it },
           singleLine = true,
           modifier = Modifier.width(200.dp),
-          colors = TextFieldDefaults.colors(
-              focusedTextColor = Color.White,
-              unfocusedTextColor = Color.White,
-              focusedContainerColor = Color(0xFF2A2A2C),
-              unfocusedContainerColor = Color(0xFF2A2A2C),
-          ),
       )
       Spacer(Modifier.width(8.dp))
       TextButton(onClick = {
         onChange(tempValue)
         editing = false
       }) {
-        Text("Save", color = Color(0xFF8AB4F8))
+        Text("Save", color = IosBlue)
       }
     } else {
       Text(
           value,
-          color = Color(0xFFDDDDDD),
-          fontSize = 15.sp,
+          color = IosSecondary,
+          fontSize = Sizes.rowValue,
           modifier = Modifier.padding(start = 8.dp),
       )
     }
@@ -463,15 +423,15 @@ private fun DurationStepper(seconds: Int, onChange: (Int) -> Unit) {
                 } else false
               }
               .focusable(interactionSource = src)
-              .background(if (focused) Color(0x402E6BE6) else Color.Transparent)
+              .background(if (focused) Color(0xFFE5F0FF) else Color.Transparent)
               .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text("Display duration", color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text("Display duration", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     ArrowButton("◀", focused) { onChange(seconds - 1) }
     Text(
         "${seconds}s",
-        color = if (focused) Color.White else Color(0xFFDDDDDD),
+        color = if (focused) IosLabel else IosSecondary,
         fontSize = 17.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
@@ -498,15 +458,15 @@ private fun SizeStepper(label: String, size: Float, onChange: (Float) -> Unit) {
                 } else false
               }
               .focusable(interactionSource = src)
-              .background(if (focused) Color(0x402E6BE6) else Color.Transparent)
+              .background(if (focused) Color(0xFFE5F0FF) else Color.Transparent)
               .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(label, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     ArrowButton("◀", focused) { onChange(size - 2) }
     Text(
         "${size.toInt()}sp",
-        color = if (focused) Color.White else Color(0xFFDDDDDD),
+        color = if (focused) IosLabel else IosSecondary,
         fontSize = 17.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
@@ -534,15 +494,15 @@ private fun OpacityStepper(opacity: Float, onChange: (Float) -> Unit) {
                 } else false
               }
               .focusable(interactionSource = src)
-              .background(if (focused) Color(0x402E6BE6) else Color.Transparent)
+              .background(if (focused) Color(0xFFE5F0FF) else Color.Transparent)
               .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text("Opacity", color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text("Opacity", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     ArrowButton("◀", focused) { onChange(opacity - 0.05f) }
     Text(
         "$percent%",
-        color = if (focused) Color.White else Color(0xFFDDDDDD),
+        color = if (focused) IosLabel else IosSecondary,
         fontSize = 17.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,

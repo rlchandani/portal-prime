@@ -11,16 +11,8 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -28,17 +20,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
@@ -54,7 +38,7 @@ import com.immortal.launcher.ui.theme.PortalPrimeTheme
 class RemotePairActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { RemotePairScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { RemotePairScreen() } }
   }
 }
 
@@ -79,32 +63,15 @@ private fun RemotePairScreen() {
     onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) activity?.finish()
-                  true
-                } else false
-              }
-              .padding(horizontal = 28.dp, vertical = 40.dp),
+  SettingsScaffold(
+      title = "Control From Your Phone",
+      subtitle = "Use a phone or tablet on the same Wi-Fi as a remote for this Portal — nav " +
+          "buttons and an app launcher, no extra app to install.",
+      onBack = { activity?.finish() },
   ) {
-    Column(modifier = Modifier.widthIn(max = 900.dp)) {
-      Text("Control from your phone", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "Use a phone or tablet on the same Wi-Fi as a remote for this Portal — nav buttons and " +
-              "an app launcher, no extra app to install.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(28.dp))
+    RemotePairCard(url, pin)
 
-      RemotePairCard(url, pin)
-
-      Spacer(Modifier.size(28.dp))
-      PairDoneButton { activity?.finish() }
-    }
+    Spacer(Modifier.size(28.dp))
+    PairDoneButton { activity?.finish() }
   }
 }

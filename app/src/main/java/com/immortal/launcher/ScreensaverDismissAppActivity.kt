@@ -18,23 +18,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,13 +40,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.util.Locale
@@ -195,7 +187,7 @@ private data class PickEntry(
 class ScreensaverDismissAppActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { DismissAppScreen { finish() } } }
+    setContent { PortalPrimeTheme(darkTheme = false) { DismissAppScreen { finish() } } }
   }
 }
 
@@ -223,120 +215,89 @@ private fun DismissAppScreen(onDone: () -> Unit) {
 
   BackHandler { onDone() }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 24.dp),
+  SettingsScaffold(
+      title = "Open When Dismissed",
+      subtitle = "Choose what opens when you tap the screensaver to wake the Portal.",
+      onBack = onDone,
   ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp)) {
-      // Header with a back affordance, matching the glyph idiom of our other sub-pages.
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier =
-                Modifier.size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f) { onDone() },
-            contentAlignment = Alignment.Center,
-        ) {
-          Text("←", color = Color.White, fontSize = 26.sp)
-        }
-        Spacer(Modifier.size(14.dp))
-        Text(
-            "Open when dismissed",
-            color = Color.White,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.SemiBold,
-        )
-      }
-      Text(
-          "Choose what opens when you tap the screensaver to wake the Portal.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp, start = 58.dp),
-      )
-      Spacer(Modifier.size(26.dp))
-
-      // --- Home Assistant (only when the companion app is installed) -----------------
-      if (haPkg != null) {
-        SectionLabel("Home Assistant")
-        Card {
-          DismissRow(
-              icon = haIcon,
-              title = "Home Assistant",
-              subtitle = "Open your Home Assistant dashboard on tap.",
-              selected = haMode,
-          ) {
-            haMode = true
-            selectedComponent = null
-            ScreensaverConfig.setDismissHaDashboard(context, haPath)
-          }
-          if (haMode) {
-            Divider()
-            Column(modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 16.dp)) {
-              Text("Dashboard", color = Color.White, fontSize = 15.sp)
-              OutlinedTextField(
-                  value = haPath,
-                  onValueChange = {
-                    // Single-line: strip any newline the IME might inject.
-                    val v = it.replace("\n", "")
-                    haPath = v
-                    ScreensaverConfig.setDismissHaDashboard(context, v)
-                  },
-                  placeholder = { Text("today-home/security", color = Color(0xFF6E6E6E)) },
-                  singleLine = true,
-                  shape = RoundedCornerShape(12.dp),
-                  modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).padding(top = 8.dp),
-              )
-              Text(
-                  "The path after your Home Assistant address (e.g. lovelace/0). " +
-                      "Leave blank to open your default dashboard.",
-                  color = Color(0xFF8A8A8A),
-                  fontSize = 13.sp,
-                  modifier = Modifier.padding(top = 8.dp),
-              )
-            }
-          }
-        }
-        Spacer(Modifier.size(26.dp))
-      }
-
-      // --- Launcher + installed apps -------------------------------------------------
-      SectionLabel(if (haPkg != null) "Or an app" else "Open")
+    // --- Home Assistant (only when the companion app is installed) -----------------
+    if (haPkg != null) {
+      SectionLabel("Home Assistant")
       Card {
         DismissRow(
-            icon = null,
-            title = "Immortal launcher",
-            subtitle = "Return to your home screen (default).",
-            selected = !haMode && selectedComponent == null,
+            icon = haIcon,
+            title = "Home Assistant",
+            subtitle = "Open your Home Assistant dashboard on tap.",
+            selected = haMode,
         ) {
-          ScreensaverConfig.setDismissLauncher(context)
-          onDone()
+          haMode = true
+          selectedComponent = null
+          ScreensaverConfig.setDismissHaDashboard(context, haPath)
         }
-
-        val list = apps
-        if (list == null) {
+        if (haMode) {
           Divider()
-          Text(
-              "Finding your apps…",
-              color = Color(0xFF9A9A9A),
-              fontSize = 15.sp,
-              modifier = Modifier.padding(18.dp),
-          )
-        } else {
-          list.forEach { app ->
-            Divider()
-            val flat = app.component.flattenToString()
-            DismissRow(
-                icon = app.icon,
-                title = app.label,
-                subtitle = null,
-                selected = !haMode && selectedComponent == flat,
-            ) {
-              ScreensaverConfig.setDismissApp(context, flat)
-              onDone()
-            }
+          Column(modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 16.dp)) {
+            Text("Dashboard", color = IosLabel, fontSize = Sizes.rowSub)
+            OutlinedTextField(
+                value = haPath,
+                onValueChange = {
+                  // Single-line: strip any newline the IME might inject.
+                  val v = it.replace("\n", "")
+                  haPath = v
+                  ScreensaverConfig.setDismissHaDashboard(context, v)
+                },
+                placeholder = { Text("today-home/security", color = IosSecondary) },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).padding(top = 8.dp),
+            )
+            Text(
+                "The path after your Home Assistant address (e.g. lovelace/0). " +
+                    "Leave blank to open your default dashboard.",
+                color = IosTertiary,
+                fontSize = Sizes.rowSub,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+          }
+        }
+      }
+      Spacer(Modifier.size(26.dp))
+    }
+
+    // --- Launcher + installed apps -------------------------------------------------
+    SectionLabel(if (haPkg != null) "Or an app" else "Open")
+    Card {
+      DismissRow(
+          icon = null,
+          title = "Immortal launcher",
+          subtitle = "Return to your home screen (default).",
+          selected = !haMode && selectedComponent == null,
+      ) {
+        ScreensaverConfig.setDismissLauncher(context)
+        onDone()
+      }
+
+      val list = apps
+      if (list == null) {
+        Divider()
+        Text(
+            "Finding your apps…",
+            color = IosSecondary,
+            fontSize = Sizes.rowSub,
+            modifier = Modifier.padding(18.dp),
+        )
+      } else {
+        list.forEach { app ->
+          Divider()
+          val flat = app.component.flattenToString()
+          DismissRow(
+              icon = app.icon,
+              title = app.label,
+              subtitle = null,
+              selected = !haMode && selectedComponent == flat,
+          ) {
+            ScreensaverConfig.setDismissApp(context, flat)
+            onDone()
           }
         }
       }
@@ -369,18 +330,25 @@ private fun DismissRow(
       Spacer(Modifier.size(40.dp))
     }
     Column(modifier = Modifier.weight(1f)) {
-      Text(title, color = Color.White, fontSize = 17.sp)
+      Text(title, color = IosLabel, fontSize = Sizes.rowTitle)
       if (subtitle != null) {
         Text(
             subtitle,
-            color = Color(0xFF9A9A9A),
-            fontSize = 13.sp,
+            color = IosSecondary,
+            fontSize = Sizes.rowSub,
             modifier = Modifier.padding(top = 2.dp),
         )
       }
     }
     // Visual only — the whole row is the focus/click target.
-    RadioButton(selected = selected, onClick = null)
+    RadioButton(
+        selected = selected,
+        onClick = null,
+        colors = RadioButtonDefaults.colors(
+            selectedColor = IosBlue,
+            unselectedColor = IosChevron,
+        ),
+    )
   }
 }
 

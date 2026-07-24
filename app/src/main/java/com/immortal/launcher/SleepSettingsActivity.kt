@@ -12,25 +12,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -68,7 +61,7 @@ import org.json.JSONObject
 class SleepSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { SleepSettingsScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { SleepSettingsScreen() } }
   }
 }
 
@@ -129,40 +122,25 @@ private fun SleepSettingsScreen() {
     running = false
   }
 
-  Box(modifier = Modifier.fillMaxSize()) {
-    Column(
-        modifier =
-            Modifier.fillMaxSize()
-                .background(Color(0xFF111111))
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 28.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-      Text("Sleep Timer", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-      Text(
+  SettingsScaffold(
+      title = "Sleep Timer",
+      subtitle =
           if (settings.sleepTimerEnabled) "Set the timer, then start the countdown."
           else "Enable Sleep Timer below before starting.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 15.sp,
-          textAlign = TextAlign.Center,
-      )
-
-      Surface(
-          color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-          shape = RoundedCornerShape(22.dp),
-          modifier = Modifier.fillMaxWidth(),
-      ) {
+      onBack = { activity?.finish() },
+  ) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+      Card {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
           Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically,
           ) {
-            Text("Countdown", color = Color.White, fontSize = 18.sp)
+            Text("Countdown", color = IosLabel, fontSize = Sizes.rowTitle)
             Text(
                 if (remainingMs > 0) timerText else "00:00",
-                color = MaterialTheme.colorScheme.primary,
+                color = IosBlue,
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
             )
@@ -173,7 +151,7 @@ private fun SleepSettingsScreen() {
               horizontalArrangement = Arrangement.spacedBy(12.dp),
           ) {
             Surface(
-                color = MaterialTheme.colorScheme.primary,
+                color = IosBlue,
                 shape = RoundedCornerShape(14.dp),
                 modifier =
                     Modifier.weight(1f)
@@ -192,7 +170,7 @@ private fun SleepSettingsScreen() {
               )
             }
             Surface(
-                color = if (running) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary,
+                color = if (running) Color(0xFFFF3B30) else IosDivider,
                 shape = RoundedCornerShape(14.dp),
                 modifier =
                     Modifier.weight(1f)
@@ -202,7 +180,7 @@ private fun SleepSettingsScreen() {
             ) {
               Text(
                   "Stop",
-                  color = Color.White,
+                  color = if (running) Color.White else IosLabel,
                   fontSize = 18.sp,
                   fontWeight = FontWeight.SemiBold,
                   textAlign = TextAlign.Center,
@@ -244,15 +222,11 @@ private fun SleepSettingsScreen() {
       }
 
       Spacer(Modifier.size(8.dp))
-      Text(
+      FooterNote(
           "When the timer reaches zero, Immortal pauses audio, closes itself, disables the screensaver, and locks the screen.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 13.sp,
-          textAlign = TextAlign.Center,
       )
     }
   }
-  FolderBackButton(onClick = { activity?.finish() })
 }
 
 @Composable
@@ -263,7 +237,7 @@ private fun SleepToggleRow(title: String, checked: Boolean, onChange: (Boolean) 
               .padding(horizontal = 18.dp, vertical = 14.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(title, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text(title, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     Switch(checked = checked, onCheckedChange = null)
   }
 }
@@ -285,15 +259,15 @@ private fun SleepMinuteStepper(minutes: Int, onChange: (Int) -> Unit) {
                 } else false
               }
               .focusable(interactionSource = src)
-              .background(if (focused) Color(0x402E6BE6) else Color.Transparent)
+              .background(if (focused) Color(0xFFE5F0FF) else Color.Transparent)
               .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text("Turn off after", color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text("Turn off after", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     ArrowButton("◀", focused) { onChange(max(1, minutes - 5)) }
     Text(
         "${minutes}m",
-        color = if (focused) Color.White else Color(0xFFDDDDDD),
+        color = if (focused) IosLabel else IosSecondary,
         fontSize = 17.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,

@@ -13,17 +13,12 @@ import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,7 +47,7 @@ import kotlin.concurrent.thread
 class DavConnectActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { DavConnectScreen(onDone = { finish() }) } }
+    setContent { PortalPrimeTheme(darkTheme = false) { DavConnectScreen(onDone = { finish() }) } }
   }
 }
 
@@ -95,23 +90,15 @@ private fun DavConnectScreen(onDone: () -> Unit) {
     }
   }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
-  ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp)) {
-      Text("WebDAV folder", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-
+  SettingsScaffold(title = "WebDAV Folder", onBack = onDone) {
+    Column {
       val count = connectedCount
       if (count != null) {
         Text(
             "Connected — found $count photo${if (count == 1) "" else "s"}. Showing them on the " +
                 "screensaver now.",
-            color = Color(0xFF9A9A9A),
-            fontSize = 16.sp,
+            color = IosSecondary,
+            fontSize = Sizes.rowSub,
             modifier = Modifier.padding(top = 6.dp),
         )
         Spacer(Modifier.heightIn(min = 26.dp))
@@ -122,8 +109,8 @@ private fun DavConnectScreen(onDone: () -> Unit) {
       Text(
           "Show photos from a WebDAV folder — a NAS WebDAV share or Nextcloud. Paste the full " +
               "folder URL, and a username and password if the server needs them.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
+          color = IosSecondary,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 6.dp),
       )
       Spacer(Modifier.heightIn(min = 22.dp))
@@ -137,8 +124,8 @@ private fun DavConnectScreen(onDone: () -> Unit) {
       status?.let {
         Text(
             it,
-            color = Color(0xFFE89090),
-            fontSize = 13.sp,
+            color = Color(0xFFFF3B30),
+            fontSize = Sizes.rowSub,
             modifier = Modifier.padding(top = 10.dp, start = 4.dp),
         )
       }
@@ -149,7 +136,7 @@ private fun DavConnectScreen(onDone: () -> Unit) {
       }
       Spacer(Modifier.heightIn(min = 12.dp))
       Surface(
-          color = Color(0xFF1C1C1E),
+          color = IosCard,
           shape = RoundedCornerShape(16.dp),
           modifier =
               Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -158,8 +145,8 @@ private fun DavConnectScreen(onDone: () -> Unit) {
       ) {
         Text(
             "Cancel",
-            color = Color(0xFFDDDDDD),
-            fontSize = 16.sp,
+            color = IosBlue,
+            fontSize = Sizes.rowTitle,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
         )
@@ -179,7 +166,7 @@ private fun Field(
   OutlinedTextField(
       value = value,
       onValueChange = onChange,
-      placeholder = { Text(placeholder, color = Color(0xFF777777)) },
+      placeholder = { Text(placeholder) },
       singleLine = true,
       visualTransformation = if (password) PasswordVisualTransformation() else VisualTransformation.None,
       modifier = modifier.fillMaxWidth().heightIn(min = 56.dp),
@@ -190,7 +177,7 @@ private fun Field(
 @Composable
 private fun PrimaryButton(label: String, enabled: Boolean = true, onClick: () -> Unit) {
   Surface(
-      color = if (enabled) Color(0xFF2E6BE6) else Color(0xFF2A2A2C),
+      color = if (enabled) IosBlue else IosDivider,
       shape = RoundedCornerShape(16.dp),
       modifier =
           Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {

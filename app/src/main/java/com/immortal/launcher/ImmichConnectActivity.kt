@@ -13,18 +13,13 @@ import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -52,7 +47,7 @@ import kotlin.concurrent.thread
 class ImmichConnectActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { ImmichConnectScreen(onDone = { finish() }) } }
+    setContent { PortalPrimeTheme(darkTheme = false) { ImmichConnectScreen(onDone = { finish() }) } }
   }
 }
 
@@ -102,24 +97,16 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
     onDone()
   }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
-  ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp)) {
-      Text("Immich server", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-
+  SettingsScaffold(title = "Immich Server", onBack = onDone) {
+    Column {
       val loaded = albums
       if (loaded == null) {
         // --- Step 1: connection details ---
         Text(
             "Pull photos straight from your self-hosted Immich server. Enter its address and an " +
                 "API key (Immich → Account Settings → API Keys).",
-            color = Color(0xFF9A9A9A),
-            fontSize = 16.sp,
+            color = IosSecondary,
+            fontSize = Sizes.rowSub,
             modifier = Modifier.padding(top = 6.dp),
         )
         Spacer(Modifier.heightIn(min = 22.dp))
@@ -127,7 +114,7 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
         OutlinedTextField(
             value = url,
             onValueChange = { url = it },
-            placeholder = { Text("http://192.168.1.50:2283", color = Color(0xFF777777)) },
+            placeholder = { Text("http://192.168.1.50:2283") },
             singleLine = true,
             modifier = initialFocus.fillMaxWidth().heightIn(min = 56.dp),
             shape = RoundedCornerShape(14.dp),
@@ -136,7 +123,7 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
         OutlinedTextField(
             value = key,
             onValueChange = { key = it },
-            placeholder = { Text("API key", color = Color(0xFF777777)) },
+            placeholder = { Text("API key") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
             shape = RoundedCornerShape(14.dp),
@@ -145,15 +132,15 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
         status?.let {
           Text(
               it,
-              color = Color(0xFFE89090),
-              fontSize = 13.sp,
+              color = Color(0xFFFF3B30),
+              fontSize = Sizes.rowSub,
               modifier = Modifier.padding(top = 10.dp, start = 4.dp),
           )
         }
 
         Spacer(Modifier.heightIn(min = 26.dp))
         Surface(
-            color = if (testing) Color(0xFF2A2A2C) else Color(0xFF2E6BE6),
+            color = if (testing) IosDivider else IosBlue,
             shape = RoundedCornerShape(16.dp),
             modifier =
                 Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -175,13 +162,13 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
         // --- Step 2: pick an album (or the whole library) ---
         Text(
             "Connected. Choose what to show:",
-            color = Color(0xFF9A9A9A),
-            fontSize = 16.sp,
+            color = IosSecondary,
+            fontSize = Sizes.rowSub,
             modifier = Modifier.padding(top = 6.dp),
         )
         Spacer(Modifier.heightIn(min = 22.dp))
 
-        Surface(color = Color(0xFF1C1C1E), shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) {
+        Surface(color = IosCard, shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) {
           Column {
             AlbumRow("Whole library", "All your photos", selectedAlbumId == null) {
               selectedAlbumId = null
@@ -212,8 +199,8 @@ private fun AlbumRow(title: String, subtitle: String, selected: Boolean, onClick
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
-      Text(title, color = Color.White, fontSize = 17.sp)
-      Text(subtitle, color = Color(0xFF9A9A9A), fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
+      Text(title, color = IosLabel, fontSize = Sizes.rowTitle)
+      Text(subtitle, color = IosSecondary, fontSize = Sizes.rowSub, modifier = Modifier.padding(top = 2.dp))
     }
     RadioButton(selected = selected, onClick = null)
   }
@@ -222,15 +209,15 @@ private fun AlbumRow(title: String, subtitle: String, selected: Boolean, onClick
 @Composable
 private fun CancelRow(onDone: () -> Unit) {
   Surface(
-      color = Color(0xFF1C1C1E),
+      color = IosCard,
       shape = RoundedCornerShape(16.dp),
       modifier =
           Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) { onDone() },
   ) {
     Text(
         "Done",
-        color = Color(0xFFDDDDDD),
-        fontSize = 16.sp,
+        color = IosBlue,
+        fontSize = Sizes.rowTitle,
         textAlign = TextAlign.Center,
         modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
     )

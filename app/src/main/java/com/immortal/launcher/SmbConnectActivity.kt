@@ -13,17 +13,12 @@ import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,7 +46,7 @@ import kotlin.concurrent.thread
 class SmbConnectActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { SmbConnectScreen(onDone = { finish() }) } }
+    setContent { PortalPrimeTheme(darkTheme = false) { SmbConnectScreen(onDone = { finish() }) } }
   }
 }
 
@@ -98,23 +93,15 @@ private fun SmbConnectScreen(onDone: () -> Unit) {
     }
   }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
-  ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp)) {
-      Text("Network share", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-
+  SettingsScaffold(title = "Network Share (NAS)", onBack = onDone) {
+    Column {
       val count = connectedCount
       if (count != null) {
         Text(
             "Connected — found $count photo${if (count == 1) "" else "s"}. Showing them on the " +
                 "screensaver now.",
-            color = Color(0xFF9A9A9A),
-            fontSize = 16.sp,
+            color = IosSecondary,
+            fontSize = Sizes.rowSub,
             modifier = Modifier.padding(top = 6.dp),
         )
         Spacer(Modifier.heightIn(min = 26.dp))
@@ -125,8 +112,8 @@ private fun SmbConnectScreen(onDone: () -> Unit) {
       Text(
           "Show photos from a folder on your NAS over your local network (SMB). Enter the server, " +
               "the share, an optional folder inside it, and your username and password.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
+          color = IosSecondary,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 6.dp),
       )
       Spacer(Modifier.heightIn(min = 22.dp))
@@ -144,8 +131,8 @@ private fun SmbConnectScreen(onDone: () -> Unit) {
       status?.let {
         Text(
             it,
-            color = Color(0xFFE89090),
-            fontSize = 13.sp,
+            color = Color(0xFFFF3B30),
+            fontSize = Sizes.rowSub,
             modifier = Modifier.padding(top = 10.dp, start = 4.dp),
         )
       }
@@ -156,7 +143,7 @@ private fun SmbConnectScreen(onDone: () -> Unit) {
       }
       Spacer(Modifier.heightIn(min = 12.dp))
       Surface(
-          color = Color(0xFF1C1C1E),
+          color = IosCard,
           shape = RoundedCornerShape(16.dp),
           modifier =
               Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
@@ -165,8 +152,8 @@ private fun SmbConnectScreen(onDone: () -> Unit) {
       ) {
         Text(
             "Cancel",
-            color = Color(0xFFDDDDDD),
-            fontSize = 16.sp,
+            color = IosBlue,
+            fontSize = Sizes.rowTitle,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
         )
@@ -186,7 +173,7 @@ private fun Field(
   OutlinedTextField(
       value = value,
       onValueChange = onChange,
-      placeholder = { Text(placeholder, color = Color(0xFF777777)) },
+      placeholder = { Text(placeholder) },
       singleLine = true,
       visualTransformation =
           if (password) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
@@ -198,7 +185,7 @@ private fun Field(
 @Composable
 private fun PrimaryButton(label: String, enabled: Boolean = true, onClick: () -> Unit) {
   Surface(
-      color = if (enabled) Color(0xFF2E6BE6) else Color(0xFF2A2A2C),
+      color = if (enabled) IosBlue else IosDivider,
       shape = RoundedCornerShape(16.dp),
       modifier =
           Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {

@@ -10,27 +10,18 @@ package com.immortal.launcher
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -44,14 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -72,7 +57,7 @@ import org.json.JSONObject
 class ClockSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { ClockSettingsScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { ClockSettingsScreen() } }
   }
 }
 
@@ -99,30 +84,12 @@ private fun ClockSettingsScreen() {
   val firstFocus = remember { FocusRequester() }
   LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
 
-  Box(modifier = Modifier.fillMaxSize()) {
-    Column(
-        modifier =
-            Modifier.fillMaxSize()
-                .onPreviewKeyEvent { e ->
-                  if (e.key == Key.Back) {
-                    if (e.type == KeyEventType.KeyUp) activity?.finish()
-                    true
-                  } else false
-                }
-                .background(Color(0xFF101012))
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 28.dp, vertical = 32.dp),
-    ) {
-      Column(modifier = Modifier.widthIn(max = 1100.dp).focusRequester(firstFocus).focusGroup()) {
-        Text("Clock", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-        Text(
-            "Choose the digital clock and how it looks on the screensaver.",
-            color = Color(0xFF9A9A9A),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 6.dp),
-        )
-        Spacer(Modifier.size(26.dp))
-
+  SettingsScaffold(
+      title = "Clock",
+      subtitle = "Choose the digital clock and how it looks on the screensaver.",
+      onBack = { activity?.finish() },
+  ) {
+      Column(modifier = Modifier.focusRequester(firstFocus).focusGroup()) {
         // Clock preferences render from the `digitalclock` registry domain. Apply routes through
         // the domain so its onApplied (reaffirm the dream when `enabled` toggles) fires here too.
         SettingsList(SettingsDomains.digitalclock, clockConfig) { k, v ->
@@ -142,16 +109,16 @@ private fun ClockSettingsScreen() {
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Column(modifier = Modifier.weight(1f)) {
-              Text("Preview", color = Color.White, fontSize = 17.sp)
+              Text("Preview", color = IosLabel, fontSize = Sizes.rowTitle)
               Text(
                   "See the clock full-screen with your current settings.",
-                  color = Color(0xFF9A9A9A),
-                  fontSize = 13.sp,
+                  color = IosSecondary,
+                  fontSize = Sizes.rowSub,
                   modifier = Modifier.padding(top = 2.dp),
               )
             }
             Surface(
-                color = MaterialTheme.colorScheme.primary,
+                color = IosBlue,
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp)) {
                   context.startActivity(
@@ -169,14 +136,9 @@ private fun ClockSettingsScreen() {
           }
         }
 
-        Text(
+        FooterNote(
             "Changes apply immediately. Tap the clock icon on the home screen to start the screensaver.",
-            color = Color(0xFF7C7C7C),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
         )
       }
-    }
-    FolderBackButton(onClick = { activity?.finish() })
   }
 }

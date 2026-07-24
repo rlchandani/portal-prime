@@ -65,6 +65,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.platform.LocalFocusManager
@@ -125,7 +126,9 @@ private fun ImmortalSettingsScreen() {
 
   val activity = context as? Activity
   val firstFocus = remember { FocusRequester() }
-  LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
+  // Deliberately NOT auto-requesting focus on open: the sidebar's first focusable is now the
+  // search field, and grabbing focus there pops the on-screen keyboard every time Settings
+  // opens. Touch selects directly; the TV remote focuses the sidebar on its first D-pad press.
 
   fun applyScreensaver(key: String, value: Any) {
     SettingsDomains.screensaver.apply(context, JSONObject().put(key, value))
@@ -137,6 +140,7 @@ private fun ImmortalSettingsScreen() {
   }
 
   var selectedSection by remember { mutableStateOf("Screensaver") }
+  var query by remember { mutableStateOf("") }
 
   // Sidebar section definitions: name, SF-symbol-like letter, icon background color
   data class SectionDef(val name: String, val symbol: String, val iconColor: Color)
@@ -148,6 +152,28 @@ private fun ImmortalSettingsScreen() {
       SectionDef("Audio",       "A", Color(0xFF30D158)),
       SectionDef("System",      "i", Color(0xFF636366)),
   )
+
+  // Flat search index: every individual setting mapped to the section that hosts it, so the
+  // sidebar search can jump straight to (e.g.) "Anti Burn-In" and land on Screensaver. Kept
+  // next to the on-device rows it mirrors so the two stay in step.
+  val searchIndex = remember {
+    listOf(
+        "Photo Source" to "Screensaver", "Photo Interval" to "Screensaver",
+        "Shuffle" to "Screensaver", "Include Video" to "Screensaver",
+        "Fit Mode" to "Screensaver", "Presence Mode" to "Screensaver",
+        "Show Gradient" to "Screensaver", "Anti Burn-In" to "Screensaver",
+        "Clock Face" to "Clock Face", "Clock Format" to "Clock Face",
+        "Show Date" to "Clock Face", "Show Now Playing" to "Clock Face",
+        "Show Seconds" to "Clock Face",
+        "Tile Size" to "Appearance", "Weather Widget" to "Appearance",
+        "Show Mini Player" to "Appearance", "Hide Status Bar" to "Appearance",
+        "Temperature Unit" to "Weather",
+        "Chime" to "Audio", "Sunrise Wake Light" to "Audio", "Soundscape" to "Audio",
+        "About" to "System", "Screensaver Source" to "System", "Debug Mode" to "System",
+    )
+  }
+  val results = if (query.isBlank()) emptyList()
+      else searchIndex.filter { it.first.contains(query, ignoreCase = true) }
 
   Row(
       modifier = Modifier
@@ -165,7 +191,7 @@ private fun ImmortalSettingsScreen() {
     // ---------------------------------------------------------------
     Column(
         modifier = Modifier
-            .width(260.dp)
+            .width(300.dp)
             .fillMaxHeight()
             .background(Color(0xFFE8E8EE))
             .focusRequester(firstFocus)
@@ -173,7 +199,37 @@ private fun ImmortalSettingsScreen() {
             .verticalScroll(rememberScrollState()),
     ) {
       IosNavBar(title = "Settings")
+      SidebarSearch(query = query, onQueryChange = { query = it })
       Spacer(Modifier.height(8.dp))
+      // While searching, the sidebar becomes a results list that jumps to the setting's section.
+      if (query.isNotBlank()) {
+        if (results.isEmpty()) {
+          Text(
+              "No results for “$query”",
+              color = IosSecondary,
+              fontSize = 16.sp,
+              modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp),
+          )
+        } else {
+          results.forEach { (setting, section) ->
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 3.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable {
+                      selectedSection = section
+                      query = ""
+                    }
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+            ) {
+              Text(setting, color = IosLabel, fontSize = 18.sp)
+              Text(section, color = IosSecondary, fontSize = 14.sp, modifier = Modifier.padding(top = 1.dp))
+            }
+          }
+        }
+        Spacer(Modifier.height(16.dp))
+      } else
       sections.forEach { sec ->
         val isSelected = selectedSection == sec.name
         Row(
@@ -189,17 +245,17 @@ private fun ImmortalSettingsScreen() {
         ) {
           Box(
               modifier = Modifier
-                  .size(30.dp)
-                  .clip(RoundedCornerShape(7.dp))
+                  .size(34.dp)
+                  .clip(RoundedCornerShape(8.dp))
                   .background(if (isSelected) Color.White.copy(alpha = 0.25f) else sec.iconColor),
               contentAlignment = Alignment.Center,
           ) {
-            Text(sec.symbol, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(sec.symbol, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
           }
           Text(
               sec.name,
               color = if (isSelected) Color.White else IosLabel,
-              fontSize = 15.sp,
+              fontSize = 19.sp,
               fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
           )
         }
@@ -208,22 +264,28 @@ private fun ImmortalSettingsScreen() {
     }
 
     // ---------------------------------------------------------------
-    // RIGHT DETAIL PANEL
+    // RIGHT DETAIL PANEL — fixed top bar (section title) + scrolling content
     // ---------------------------------------------------------------
     Column(
         modifier = Modifier
             .weight(1f)
-            .widthIn(max = 840.dp)
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState()),
+            .fillMaxHeight(),
     ) {
+      DetailTopBar(title = selectedSection)
+      Column(
+          modifier = Modifier
+              .fillMaxWidth()
+              .weight(1f)
+              .verticalScroll(rememberScrollState())
+              // Symmetric breathing room so cards don't run flush to the right edge.
+              .padding(horizontal = 32.dp),
+      ) {
       Spacer(Modifier.height(16.dp))
 
       // ---------------------------------------------------------------
       // SCREENSAVER section
       // ---------------------------------------------------------------
       if (selectedSection == "Screensaver") {
-      SectionLabel("Screensaver")
       Card {
         NavRow(
             title = "Photo Source",
@@ -264,23 +326,28 @@ private fun ImmortalSettingsScreen() {
             onChange = { applyScreensaver("includeVideo", it) },
         )
         Divider()
-        NavRow(
+        PickerRow(
             title = "Fit Mode",
-            value = if (ss.fit == ScreensaverConfig.FIT_FIT) "Fit" else "Fill",
+            selected = ss.fit,
+            options = listOf(
+                PickerOption(ScreensaverConfig.FIT_FILL, "Fill"),
+                PickerOption(ScreensaverConfig.FIT_FIT, "Fit"),
+            ),
             iconColor = Color(0xFF636366),
             iconSymbol = "F",
-            onClick = { applyScreensaver("fit", if (ss.fit == ScreensaverConfig.FIT_FILL) ScreensaverConfig.FIT_FIT else ScreensaverConfig.FIT_FILL) },
+            onSelect = { applyScreensaver("fit", it) },
         )
         Divider()
-        NavRow(
+        PickerRow(
             title = "Presence Mode",
-            value = if (ss.presenceMode == FrameMode.PRESENCE) "Follow Presence" else "Always On",
+            selected = ss.presenceMode,
+            options = listOf(
+                PickerOption(FrameMode.ALWAYS_ON, "Always On"),
+                PickerOption(FrameMode.PRESENCE, "Follow Presence"),
+            ),
             iconColor = Color(0xFF0A84FF),
             iconSymbol = "o",
-            onClick = {
-              val next = if (ss.presenceMode == FrameMode.ALWAYS_ON) FrameMode.PRESENCE else FrameMode.ALWAYS_ON
-              applyScreensaver("presenceMode", next.name)
-            },
+            onSelect = { applyScreensaver("presenceMode", it.name) },
         )
         Divider()
         ToggleRow(
@@ -305,7 +372,6 @@ private fun ImmortalSettingsScreen() {
       // CLOCK section
       // ---------------------------------------------------------------
       if (selectedSection == "Clock Face") {
-      SectionLabel("Clock Face")
       Card {
         NavRow(
             title = "Clock Face",
@@ -315,23 +381,17 @@ private fun ImmortalSettingsScreen() {
             onClick = { context.startActivity(Intent(context, FacePickerActivity::class.java)) },
         )
         Divider()
-        NavRow(
+        PickerRow(
             title = "Clock Format",
-            value = when (immortal.clockFormat) {
-              ImmortalSettings.CLOCK_12 -> "12h"
-              ImmortalSettings.CLOCK_24 -> "24h"
-              else -> "Auto"
-            },
+            selected = immortal.clockFormat,
+            options = listOf(
+                PickerOption(ImmortalSettings.CLOCK_AUTO, "Auto"),
+                PickerOption(ImmortalSettings.CLOCK_12, "12h"),
+                PickerOption(ImmortalSettings.CLOCK_24, "24h"),
+            ),
             iconColor = Color(0xFFFF9F0A),
             iconSymbol = "h",
-            onClick = {
-              val next = when (immortal.clockFormat) {
-                ImmortalSettings.CLOCK_AUTO -> ImmortalSettings.CLOCK_12
-                ImmortalSettings.CLOCK_12 -> ImmortalSettings.CLOCK_24
-                else -> ImmortalSettings.CLOCK_AUTO
-              }
-              applyImmortal("clockFormat", next)
-            },
+            onSelect = { applyImmortal("clockFormat", it) },
         )
         Divider()
         ToggleRow(
@@ -370,44 +430,31 @@ private fun ImmortalSettingsScreen() {
       // APPEARANCE section
       // ---------------------------------------------------------------
       if (selectedSection == "Appearance") {
-      SectionLabel("Appearance")
       Card {
-        NavRow(
+        PickerRow(
             title = "Tile Size",
-            value = when (immortal.tileSize) {
-              ImmortalSettings.SIZE_LARGE -> "Large"
-              ImmortalSettings.SIZE_XL -> "XL"
-              else -> "Standard"
-            },
+            selected = immortal.tileSize,
+            options = listOf(
+                PickerOption(ImmortalSettings.SIZE_STANDARD, "Standard"),
+                PickerOption(ImmortalSettings.SIZE_LARGE, "Large"),
+                PickerOption(ImmortalSettings.SIZE_XL, "XL"),
+            ),
             iconColor = Color(0xFF5E5CE6),
             iconSymbol = "T",
-            onClick = {
-              val next = when (immortal.tileSize) {
-                ImmortalSettings.SIZE_STANDARD -> ImmortalSettings.SIZE_LARGE
-                ImmortalSettings.SIZE_LARGE -> ImmortalSettings.SIZE_XL
-                else -> ImmortalSettings.SIZE_STANDARD
-              }
-              applyImmortal("tileSize", next)
-            },
+            onSelect = { applyImmortal("tileSize", it) },
         )
         Divider()
-        NavRow(
+        PickerRow(
             title = "Weather Widget",
-            value = when (immortal.weatherWidget) {
-              ImmortalSettings.WIDGET_HOURLY -> "Hourly"
-              ImmortalSettings.WIDGET_DAILY -> "Daily"
-              else -> "Off"
-            },
+            selected = immortal.weatherWidget,
+            options = listOf(
+                PickerOption(ImmortalSettings.WIDGET_OFF, "Off"),
+                PickerOption(ImmortalSettings.WIDGET_HOURLY, "Hourly"),
+                PickerOption(ImmortalSettings.WIDGET_DAILY, "Daily"),
+            ),
             iconColor = Color(0xFF64D2FF),
             iconSymbol = "W",
-            onClick = {
-              val next = when (immortal.weatherWidget) {
-                ImmortalSettings.WIDGET_OFF -> ImmortalSettings.WIDGET_HOURLY
-                ImmortalSettings.WIDGET_HOURLY -> ImmortalSettings.WIDGET_DAILY
-                else -> ImmortalSettings.WIDGET_OFF
-              }
-              applyImmortal("weatherWidget", next)
-            },
+            onSelect = { applyImmortal("weatherWidget", it) },
         )
         Divider()
         ToggleRow(
@@ -432,25 +479,18 @@ private fun ImmortalSettingsScreen() {
       // WEATHER section
       // ---------------------------------------------------------------
       if (selectedSection == "Weather") {
-      SectionLabel("Weather")
       Card {
-        NavRow(
+        PickerRow(
             title = "Temperature Unit",
-            value = when (immortal.weatherUnit) {
-              ImmortalSettings.UNIT_F -> "Fahrenheit"
-              ImmortalSettings.UNIT_C -> "Celsius"
-              else -> "Auto (deg.F)"
-            },
+            selected = immortal.weatherUnit,
+            options = listOf(
+                PickerOption(ImmortalSettings.UNIT_AUTO, "Auto (°F)"),
+                PickerOption(ImmortalSettings.UNIT_F, "Fahrenheit"),
+                PickerOption(ImmortalSettings.UNIT_C, "Celsius"),
+            ),
             iconColor = Color(0xFF0A84FF),
             iconSymbol = "u",
-            onClick = {
-              val next = when (immortal.weatherUnit) {
-                ImmortalSettings.UNIT_AUTO -> ImmortalSettings.UNIT_F
-                ImmortalSettings.UNIT_F -> ImmortalSettings.UNIT_C
-                else -> ImmortalSettings.UNIT_AUTO
-              }
-              applyImmortal("weatherUnit", next)
-            },
+            onSelect = { applyImmortal("weatherUnit", it) },
         )
       }
       } // end Weather
@@ -459,7 +499,6 @@ private fun ImmortalSettingsScreen() {
       // AUDIO section
       // ---------------------------------------------------------------
       if (selectedSection == "Audio") {
-      SectionLabel("Audio")
       Card {
         NavRow(
             title = "Chime",
@@ -477,19 +516,15 @@ private fun ImmortalSettingsScreen() {
             onClick = { context.startActivity(Intent(context, SunriseSettingsActivity::class.java)) },
         )
         Divider()
-        NavRow(
+        PickerRow(
             title = "Soundscape",
-            value = ScreensaverConfig.soundscapeLabel(ss.soundscape),
+            selected = ss.soundscape,
+            options = ScreensaverConfig.SOUNDSCAPES.map {
+              PickerOption(it, ScreensaverConfig.soundscapeLabel(it))
+            },
             iconColor = Color(0xFF30D158),
             iconSymbol = "A",
-            onClick = {
-              val next = ScreensaverConfig.SOUNDSCAPES
-                  .let { list ->
-                    val idx = list.indexOf(ss.soundscape)
-                    list[(idx + 1) % list.size]
-                  }
-              applyScreensaver("soundscape", next)
-            },
+            onSelect = { applyScreensaver("soundscape", it) },
         )
       }
       } // end Audio
@@ -498,7 +533,6 @@ private fun ImmortalSettingsScreen() {
       // SYSTEM section
       // ---------------------------------------------------------------
       if (selectedSection == "System") {
-      SectionLabel("System")
       Card {
         NavRow(
             title = "About",
@@ -523,6 +557,7 @@ private fun ImmortalSettingsScreen() {
       FooterNote("Changes apply as soon as you return to the home screen.")
       Spacer(Modifier.size(32.dp))
       } // end System
+      } // end scrolling content Column
     } // end right panel Column
   } // end Row
 }
@@ -537,17 +572,73 @@ private fun IosNavBar(title: String) {
       modifier = Modifier
           .fillMaxWidth()
           .background(Color(0xF2F2F2F7))
-          .padding(horizontal = 16.dp, vertical = 12.dp),
+          .padding(start = 22.dp, end = 16.dp, top = 6.dp, bottom = 12.dp),
       verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.Center,
+      horizontalArrangement = Arrangement.Start,
   ) {
     Text(
         text = title,
         color = IosLabel,
-        fontSize = 17.sp,
-        fontWeight = FontWeight.SemiBold,
-        letterSpacing = (-0.3).sp,
+        fontSize = Sizes.titleSidebar,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = (-0.5).sp,
     )
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar search field (macOS System Settings style)
+// ---------------------------------------------------------------------------
+
+/** The rounded grey search field under "Settings". Filters the sidebar into a results list. */
+@Composable
+private fun SidebarSearch(query: String, onQueryChange: (String) -> Unit) {
+  Row(
+      modifier = Modifier
+          .fillMaxWidth()
+          .padding(start = 16.dp, end = 16.dp, bottom = 14.dp)
+          .clip(RoundedCornerShape(10.dp))
+          .background(Color(0xFFDFDFE6))
+          .padding(horizontal = 12.dp, vertical = 4.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(6.dp),
+  ) {
+    Text("⌕", color = IosSecondary, fontSize = 20.sp)
+    BasicTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        singleLine = true,
+        textStyle = androidx.compose.ui.text.TextStyle(color = IosLabel, fontSize = 17.sp),
+        cursorBrush = androidx.compose.ui.graphics.SolidColor(IosBlue),
+        modifier = Modifier.weight(1f).padding(vertical = 8.dp),
+        decorationBox = { inner ->
+          if (query.isEmpty()) {
+            Text("Search", color = IosSecondary, fontSize = 17.sp)
+          }
+          inner()
+        },
+    )
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Detail-panel top bar (macOS toolbar: section title above the scroll region)
+// ---------------------------------------------------------------------------
+
+/** Fixed top bar over the right detail panel; content scrolls beneath it, so it never starts
+ * flush at the very top. Shows the current section's title (title-only, no back/forward). */
+@Composable
+private fun DetailTopBar(title: String) {
+  Column(modifier = Modifier.fillMaxWidth().background(Color(0xF2F2F2F7))) {
+    Text(
+        text = title,
+        color = IosLabel,
+        fontSize = 26.sp,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = (-0.4).sp,
+        modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 20.dp, bottom = 16.dp),
+    )
+    Box(Modifier.fillMaxWidth().height(1.dp).background(IosDivider))
   }
 }
 

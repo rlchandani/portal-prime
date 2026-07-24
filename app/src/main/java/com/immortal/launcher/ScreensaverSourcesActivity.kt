@@ -66,7 +66,7 @@ import kotlin.concurrent.thread
 class ScreensaverSourcesActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { ScreensaverSourcesScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { ScreensaverSourcesScreen() } }
   }
 }
 
@@ -118,54 +118,25 @@ private fun ScreensaverSourcesScreen() {
           settings.usesDav ||
           settings.usesWebUrl)
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) activity?.finish()
-                  true
-                } else false
-              }
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
+  SettingsScaffold(
+      title = "Photo Source",
+      subtitle = "Choose where your screensaver photos come from.",
+      onBack = { activity?.finish() },
   ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp).focusRequester(firstFocus).focusGroup()) {
-      Text("Photo source", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "Choose where your screensaver photos come from.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(26.dp))
-
+    Column(modifier = Modifier.fillMaxWidth().focusRequester(firstFocus).focusGroup()) {
       // ── Set up from another device (LAN) ──────────────────────────────────
       // Easier than typing an Immich API key / NAS path / long URL on the Portal: the phone remote
       // now hosts source + calendar setup, so pair it and enter the details from another device.
       Card {
-        Row(
-            modifier =
-                Modifier.fillMaxWidth().tvFocusableRow { open(RemotePairActivity::class.java) }
-                    .padding(start = 18.dp, end = 18.dp, top = 16.dp, bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Column(modifier = Modifier.weight(1f)) {
-            Text("Set up from your phone", color = Color.White, fontSize = 17.sp)
-            Text(
-                "Pair the phone remote, then enter Immich keys, NAS details, a link, or the " +
-                    "calendar from another device on your Wi-Fi.",
-                color = Color(0xFF9A9A9A),
-                fontSize = 13.sp,
-                modifier = Modifier.padding(top = 2.dp),
-            )
-          }
-          Text("  ›", color = Color(0xFF7C7C7C), fontSize = 20.sp)
-        }
+        NavRow(
+            title = "Set up from your phone",
+            subLabel = "Pair the phone remote, then enter Immich keys, NAS details, a link, or " +
+                "the calendar from another device on your Wi-Fi.",
+            onClick = { open(RemotePairActivity::class.java) },
+        )
       }
 
-      Spacer(Modifier.size(26.dp))
+      Spacer(Modifier.size(20.dp))
 
       // ── Standard ──────────────────────────────────────────────────────────
       SectionLabel("Standard")
@@ -213,12 +184,9 @@ private fun ScreensaverSourcesScreen() {
 
       // ── Advanced (self-hosted) ────────────────────────────────────────────
       SectionLabel("Advanced")
-      Text(
+      FooterNote(
           "Self-hosted sources — pull from your own server or NAS, or point the screensaver at a " +
               "web frame like Immich Kiosk. These are on your local network.",
-          color = Color(0xFF7C7C7C),
-          fontSize = 13.sp,
-          modifier = Modifier.padding(top = 0.dp, bottom = 8.dp, start = 4.dp, end = 4.dp),
       )
       Card {
         SourceConnectRow(
@@ -257,12 +225,9 @@ private fun ScreensaverSourcesScreen() {
           open(WebUrlEntryActivity::class.java)
         }
       }
-      Text(
+      FooterNote(
           "If a source can't be read (server offline, drive unplugged), Immortal falls back to " +
               "its built-in photos so the frame is never blank.",
-          color = Color(0xFF7C7C7C),
-          fontSize = 13.sp,
-          modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
   }
@@ -335,8 +300,8 @@ private fun shortUrl(url: String): String {
 private fun TextButtonRow(label: String, onClick: () -> Unit) {
   Text(
       label,
-      color = Color(0xFF8AB4F8),
-      fontSize = 16.sp,
+      color = IosBlue,
+      fontSize = Sizes.rowTitle,
       modifier = Modifier.fillMaxWidth().tvFocusableRow { onClick() }.padding(18.dp),
   )
 }
@@ -365,16 +330,16 @@ private fun AlbumRefreshStepper(minutes: Int, onChange: (Int) -> Unit) {
                 } else false
               }
               .focusable(interactionSource = src)
-              .background(if (focused) Color(0x402E6BE6) else Color.Transparent)
+              .background(if (focused) Color(0xFFE5F0FF) else Color.Transparent)
               .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text("Refresh album", color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+    Text("Refresh album", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     ArrowButton("◀", focused) { onChange(prevAlbumRefreshStep(minutes)) }
     Text(
         formatRefreshMinutes(minutes),
-        color = if (focused) Color.White else Color(0xFFDDDDDD),
-        fontSize = 17.sp,
+        color = IosLabel,
+        fontSize = Sizes.rowValue,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
         modifier = Modifier.widthIn(min = 64.dp),
