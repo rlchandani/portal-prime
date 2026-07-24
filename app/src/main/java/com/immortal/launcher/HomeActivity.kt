@@ -16,6 +16,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.Bundle
 import android.util.TypedValue
@@ -465,7 +466,7 @@ private fun LauncherScreen(
                 fontSize = 14.sp,
             )
           }
-          Text("WiFi", color = Color.White, fontSize = 14.sp)
+          WifiBars(wifiLevel())
           if (battery.present) {
             Text("${battery.percent}%", color = Color.White, fontSize = 14.sp)
           }
@@ -598,6 +599,8 @@ private fun LauncherScreen(
           }
         }
 
+        FadingDivider()
+
         // RIGHT COLUMN (62%) — 5-column app icon grid
         Column(
             modifier = Modifier
@@ -642,6 +645,70 @@ private fun weatherConditionText(code: Int): String = when (code) {
   in 80..82 -> "Showers"
   in 95..99 -> "Thunderstorm"
   else -> "Cloudy"
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WiFi signal indicator
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun wifiLevel(): Int {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  return produceState(initialValue = -1) {
+    while (true) {
+      val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+      value = if (wifiManager != null) {
+        val rssi = wifiManager.connectionInfo?.rssi ?: -127
+        if (rssi == -127) {
+          -1
+        } else {
+          @Suppress("DEPRECATION")
+          WifiManager.calculateSignalLevel(rssi, 5)
+        }
+      } else {
+        -1
+      }
+      delay(10_000L)
+    }
+  }.value
+}
+
+@Composable
+private fun WifiBars(level: Int) {
+  Row(
+      horizontalArrangement = Arrangement.spacedBy(2.dp),
+      verticalAlignment = Alignment.Bottom,
+  ) {
+    for (i in 0..3) {
+      val height = (4 + i * 3).dp
+      val color = if (level != -1 && i < level) Color.White else Color.White.copy(alpha = 0.25f)
+      Box(
+          modifier = Modifier
+              .width(3.dp)
+              .height(height)
+              .background(color, RoundedCornerShape(1.dp))
+      )
+    }
+  }
+}
+
+@Composable
+private fun FadingDivider() {
+  Box(
+      modifier = Modifier
+          .width(1.dp)
+          .fillMaxHeight()
+          .padding(horizontal = 8.dp)
+          .background(
+              Brush.verticalGradient(
+                  listOf(
+                      Color.Transparent,
+                      Color.White.copy(alpha = 0.30f),
+                      Color.Transparent
+                  )
+              )
+          )
+  )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
