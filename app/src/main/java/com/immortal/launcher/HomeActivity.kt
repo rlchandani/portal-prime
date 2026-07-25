@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -57,9 +56,8 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.drag
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyGridState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -82,8 +80,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items as lazyRowItems
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.text.BasicTextField
@@ -135,7 +131,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.zIndex
@@ -558,120 +553,6 @@ private fun LeftWidgetColumn(
   }
 }
 
-/**
- * Self-authored, cross-container drag gesture for a single home icon (grid OR dock).
- *
- * The reorderable library scopes a drag to one scrollable and can't cross into the dock, so we own
- * the gesture end-to-end. Because we're already in edit mode, the drag starts on press+touchSlop
- * (no long-press). The finger is tracked in WINDOW coordinates by accumulating frame-independent
- * [positionChange] deltas onto the finger's position at the initial down — this avoids the jitter
- * that node-local `position` reads caused before.
- *
- * On each move we [hitTest] the finger against the live grid/dock bounds and slot rects, then mutate
- * the unified [HomeLayoutStore.HomeLayout] live (via moveToGrid / moveToDock) so the OTHER icons
- * reflow through `animateItem()`. The dragged icon itself is drawn as a ghost in a top-level overlay.
- *
- * All live state is read through lambda accessors so the gesture always sees current values.
- */
-private fun Modifier.homeDragGesture(
-    pkg: String,
-    editMode: Boolean,
-    startBounds: () -> Rect?,
-    gridBounds: () -> Rect,
-    dockBounds: () -> Rect,
-    gridSlots: () -> List<Rect>,
-    dockSlots: () -> List<Rect>,
-    currentLayout: () -> HomeLayoutStore.HomeLayout,
-    onDragStart: (Offset) -> Unit,
-    onDragMove: (Offset) -> Unit,
-    onLayoutChange: (HomeLayoutStore.HomeLayout) -> Unit,
-    onDrop: (dockFull: Boolean) -> Unit,
-): Modifier {
-  if (!editMode) return this
-  return this.pointerInput(pkg, editMode) {
-    awaitEachGesture {
-      val down = awaitFirstDown(requireUnconsumed = false)
-      val start = startBounds() ?: return@awaitEachGesture
-      val slop = viewConfiguration.touchSlop
-      val fingerAtDown = start.topLeft + down.position
-      var accumulated = Offset.Zero
-      var started = false
-      var lastKey = ""
-      var lastTarget = DropTarget(DropContainer.NONE, -1)
-      // Hysteresis to kill insertion-point flicker: after committing a reorder, require the
-      // finger to travel a minimum distance before the NEXT swap. Reordering moves the slot
-      // bounds we hit-test against, which otherwise causes the finger to appear over the
-      // previous slot again → swap-back → oscillation. A movement gate breaks that loop.
-      val swapGate = slop * 2.5f
-      var fingerAtLastSwap = Offset.Zero
-
-      // The container this icon lived in when the drag began. We only reorder LIVE
-      // within this same container so the icon's composable stays mounted (moving it
-      // to the other container would dispose its node and kill this very gesture,
-      // stranding the ghost). Cross-container moves are committed once, on drop.
-      val homeContainer =
-          if (pkg in currentLayout().dock) DropContainer.DOCK else DropContainer.GRID
-
-      android.util.Log.d("HomeDrag", "DOWN pkg=$pkg home=$homeContainer")
-      while (true) {
-        val event = awaitPointerEvent()
-        val change = event.changes.firstOrNull { it.id == down.id }
-        if (change == null) { android.util.Log.d("HomeDrag", "BREAK no-change pkg=$pkg started=$started"); break }
-        if (!change.pressed) { android.util.Log.d("HomeDrag", "BREAK not-pressed pkg=$pkg started=$started"); break }
-        accumulated += change.positionChange()
-        if (!started && accumulated.getDistance() > slop) {
-          started = true
-          android.util.Log.d("HomeDrag", "START pkg=$pkg dist=${accumulated.getDistance()}")
-          onDragStart(fingerAtDown + accumulated)
-        }
-        if (started) {
-          change.consume()
-          val finger = fingerAtDown + accumulated
-          onDragMove(finger)
-          val target = hitTest(finger, gridBounds(), dockBounds(), gridSlots(), dockSlots())
-          val key = "${target.container}:${target.index}"
-          if (target.container != DropContainer.NONE) {
-            lastTarget = target
-            // Live reorder only within the origin container (keeps this node mounted).
-            // Gate on both a changed target AND minimum finger travel since the last swap,
-            // so a reorder-induced bounds shift can't immediately trigger the reverse swap.
-            val movedEnough = (finger - fingerAtLastSwap).getDistance() >= swapGate
-            if (target.container == homeContainer && key != lastKey && (lastKey.isEmpty() || movedEnough)) {
-              lastKey = key
-              fingerAtLastSwap = finger
-              val now = currentLayout()
-              val next =
-                  if (homeContainer == DropContainer.GRID)
-                      HomeLayoutStore.moveToGrid(now, pkg, target.index)
-                  else HomeLayoutStore.moveToDock(now, pkg, target.index, DockStore.MAX)
-              if (next != now) onLayoutChange(next)
-            }
-          }
-        }
-      }
-
-      if (started) {
-        // Commit the final drop. Cross-container moves happen here (safe: the gesture
-        // is already ending, so disposing this node has no ill effect).
-        var dockFull = false
-        val now = currentLayout()
-        val committed =
-            when (lastTarget.container) {
-              DropContainer.GRID -> HomeLayoutStore.moveToGrid(now, pkg, lastTarget.index)
-              DropContainer.DOCK -> {
-                val next = HomeLayoutStore.moveToDock(now, pkg, lastTarget.index, DockStore.MAX)
-                dockFull = pkg !in now.dock && next == now
-                next
-              }
-              DropContainer.NONE -> now
-            }
-        if (committed != now) onLayoutChange(committed)
-        onDrop(dockFull)
-      }
-    }
-  }
-}
-
 @Composable
 private fun LauncherScreen(
     onLaunch: (ComponentName) -> Unit,
@@ -708,54 +589,15 @@ private fun LauncherScreen(
   var editMode by remember { mutableStateOf(false) }
   BackHandler(enabled = editMode) { editMode = false }
 
-  // ── Unified home layout (single source of truth for grid + dock) ───────────
-  // A package lives in exactly one container. HomeLayoutStore enforces this by
-  // construction; we mutate it live during a drag so both containers reflow.
-  var layout by remember { mutableStateOf(HomeLayoutStore.load(context)) }
-
-  // Bounds registry (window coords): every icon reports its slot, and the two
-  // container regions report themselves, so the drag can hit-test across both.
-  val slotBounds = remember { mutableStateMapOf<String, Rect>() }
-  var gridBounds by remember { mutableStateOf(Rect.Zero) }
-  var dockBounds by remember { mutableStateOf(Rect.Zero) }
-
-  // Active drag: the lifted package, the live finger point (window coords), and
-  // whether the ghost should render at dock size (captured at drag start).
-  var draggingPkg by remember { mutableStateOf<String?>(null) }
-  var ghostPoint by remember { mutableStateOf(Offset.Zero) }
-  var ghostIsDock by remember { mutableStateOf(false) }
-
-  // Normalize + one-time migration once installed apps are known. On first run
-  // (empty layout) we seed grid from the existing UserLayout order and dock from
-  // DockStore so the user's current dock survives the switch to HomeLayoutStore.
-  LaunchedEffect(installedApps) {
-    if (installedApps.isEmpty()) return@LaunchedEffect
-    val allPkgs = installedApps.map { it.component.packageName }
-    val current = layout
-    val seeded =
-        if (current.grid.isEmpty() && current.dock.isEmpty()) {
-          val existingDock = DockStore.load(context).filter { it in allPkgs }
-          val dockSet = existingDock.toSet()
-          val gridOrder =
-              UserLayout.applyOrder(
-                      installedApps.filterNot { it.component.packageName in dockSet },
-                      UserLayout.loadOrder(context)) { it.component.packageName }
-                  .map { it.component.packageName }
-          HomeLayoutStore.HomeLayout(gridOrder, existingDock)
-        } else {
-          current
-        }
-    val normalized = HomeLayoutStore.normalize(seeded, allPkgs)
-    if (normalized != layout) {
-      layout = normalized
-    }
-    HomeLayoutStore.save(context, normalized)
+  // ── Single reorderable app grid (no dock) ──────────────────────────────────
+  // The user's saved icon order. All installed apps live in one grid; the
+  // sh.calvin.reorderable library owns the drag-reorder (smooth, flicker-free).
+  // NOTE: HomeLayoutStore.kt / DragHitTest.kt (+ their tests) remain in the tree
+  // but are intentionally unused by the UI now that the dock is gone.
+  val orderState = remember { mutableStateOf(UserLayout.loadOrder(context)) }
+  val orderedApps = remember(installedApps, orderState.value) {
+    UserLayout.applyOrder(installedApps, orderState.value) { it.component.packageName }
   }
-
-  // Resolve packages → AppEntry, in layout order (skip anything uninstalled).
-  val byPkg = remember(installedApps) { installedApps.associateBy { it.component.packageName } }
-  val gridApps = remember(layout, byPkg) { layout.grid.mapNotNull { byPkg[it] } }
-  val dockApps = remember(layout, byPkg) { layout.dock.mapNotNull { byPkg[it] } }
 
   // Home widgets state
   var homeWidgets by remember { mutableStateOf(HomeWidgetStore.load(context)) }
@@ -792,7 +634,7 @@ private fun LauncherScreen(
     Box(
         modifier = Modifier.fillMaxSize()
             .then(
-                if (editMode && draggingPkg == null) {
+                if (editMode) {
                   Modifier.pointerInput(Unit) { detectTapGestures { editMode = false } }
                 } else Modifier
             )
@@ -855,11 +697,6 @@ private fun LauncherScreen(
         }
       }
 
-      // Shared drag plumbing. Slot rects are read live in layout order; commits
-      // set `layout` for live reflow and persist on drop.
-      val gridSlotsOf = { layout.grid.mapNotNull { slotBounds[it] } }
-      val dockSlotsOf = { layout.dock.mapNotNull { slotBounds[it] } }
-
       // ── MAIN CONTENT ────────────────────────────────────────────────────
       Row(
           modifier = Modifier
@@ -897,159 +734,61 @@ private fun LauncherScreen(
         ) {
           // (No "Done" button — tap any empty space to exit edit mode.)
           val gridState = rememberLazyGridState()
+          val reorderableState = rememberReorderableLazyGridState(gridState) { from, to ->
+            // Called continuously as items cross during drag. Reorder the displayed list
+            // (indexed identically to what the grid renders) so from/to line up 1:1 and the
+            // other items animate into their new slots. Persist the full order.
+            val displayed = orderedApps.map { it.component.packageName }.toMutableList()
+            if (from.index in displayed.indices && to.index in displayed.indices) {
+              displayed.add(to.index, displayed.removeAt(from.index))
+              UserLayout.saveOrder(context, displayed)
+              orderState.value = displayed
+            }
+          }
           LazyVerticalGrid(
               columns = GridCells.Fixed(5),
               state = gridState,
-              // In edit mode the grid's own vertical scroll competes with (and cancels) our
-              // icon-drag gesture — the "blips and can't hold" bug. Disable user scroll while
-              // editing so the drag owns the pointer; re-enable it in normal mode.
+              // In edit mode the grid's own vertical scroll competes with the drag; disable
+              // user scroll while editing so the reorder owns the pointer.
               userScrollEnabled = !editMode,
-              modifier = Modifier
-                  .fillMaxSize()
-                  .onGloballyPositioned { gridBounds = it.boundsInWindow() },
+              modifier = Modifier.fillMaxSize(),
               contentPadding = PaddingValues(4.dp),
               horizontalArrangement = Arrangement.spacedBy(16.dp),
               verticalArrangement = Arrangement.spacedBy(20.dp),
           ) {
-            items(gridApps, key = { it.component.packageName }) { app ->
+            items(orderedApps, key = { it.component.packageName }) { app ->
               val pkg = app.component.packageName
-              val isDragging = draggingPkg == pkg
-              // animateItem() glides the non-dragged icons into their new slots as `layout`
-              // mutates live during a hover — the real-time "make space" reflow. The dragged
-              // icon is the ghost, so it's excluded (and dimmed in place).
-              Box(
-                  modifier = (if (isDragging) Modifier else Modifier.animateItem())
-                      .onGloballyPositioned { slotBounds[pkg] = it.boundsInWindow() },
-              ) {
-                LiquidGlassAppIconContent(
-                    app = app,
-                    editMode = editMode,
-                    isDragging = isDragging,
-                    dragHandleModifier = Modifier.homeDragGesture(
-                        pkg = pkg,
-                        editMode = editMode,
-                        startBounds = { slotBounds[pkg] },
-                        gridBounds = { gridBounds },
-                        dockBounds = { dockBounds },
-                        gridSlots = gridSlotsOf,
-                        dockSlots = dockSlotsOf,
-                        currentLayout = { layout },
-                        onDragStart = { p ->
-                          draggingPkg = pkg
-                          ghostIsDock = false
-                          ghostPoint = p
-                        },
-                        onDragMove = { p -> ghostPoint = p },
-                        onLayoutChange = { layout = it },
-                        onDrop = { dockFull ->
-                          draggingPkg = null
-                          HomeLayoutStore.save(context, layout)
-                          if (dockFull) {
-                            Toast.makeText(context, "Dock is full", Toast.LENGTH_SHORT).show()
-                          }
-                        },
-                    ),
-                    onClick = { if (!editMode) onLaunch(app.component) },
-                    onLongPress = { if (!editMode) editMode = true },
-                    onRemove = { onUninstall(pkg) },
-                )
+              ReorderableItem(reorderableState, key = pkg) { isDragging ->
+                // animateItem() glides the OTHER icons into their new slots while one is
+                // dragged. The dragged item is driven by the reorderable library, so exclude
+                // it from placement animation while dragging.
+                Box(modifier = if (isDragging) Modifier else Modifier.animateItem()) {
+                  LiquidGlassAppIconContent(
+                      app = app,
+                      editMode = editMode,
+                      isDragging = isDragging,
+                      // Already in edit mode → start dragging on press+move (no extra
+                      // long-press wait). Press detector removes the redundant hold.
+                      dragHandleModifier = if (editMode) {
+                        Modifier.draggableHandle(
+                            dragGestureDetector = sh.calvin.reorderable.DragGestureDetector.Press,
+                            onDragStarted = {},
+                            onDragStopped = {},
+                        )
+                      } else {
+                        Modifier
+                      },
+                      onClick = { if (!editMode) onLaunch(app.component) },
+                      onLongPress = { if (!editMode) editMode = true },
+                      onRemove = { onUninstall(pkg) },
+                  )
+                }
               }
             }
           }
         }
       }
-
-      // ── DOCK ─────────────────────────────────────────────────────────────
-      LiquidGlassDock(
-          dockApps = dockApps,
-          editMode = editMode,
-          draggingPkg = draggingPkg,
-          onEnterEdit = { editMode = true },
-          onLaunch = onLaunch,
-          onUninstall = onUninstall,
-          onDockBounds = { dockBounds = it },
-          onSlotBounds = { p, r -> slotBounds[p] = r },
-          dragModifierFor = { pkg ->
-            Modifier.homeDragGesture(
-                pkg = pkg,
-                editMode = editMode,
-                startBounds = { slotBounds[pkg] },
-                gridBounds = { gridBounds },
-                dockBounds = { dockBounds },
-                gridSlots = gridSlotsOf,
-                dockSlots = dockSlotsOf,
-                currentLayout = { layout },
-                onDragStart = { p ->
-                  draggingPkg = pkg
-                  ghostIsDock = true
-                  ghostPoint = p
-                },
-                onDragMove = { p -> ghostPoint = p },
-                onLayoutChange = { layout = it },
-                onDrop = { dockFull ->
-                  draggingPkg = null
-                  HomeLayoutStore.save(context, layout)
-                  if (dockFull) {
-                    Toast.makeText(context, "Dock is full", Toast.LENGTH_SHORT).show()
-                  }
-                },
-            )
-          },
-      )
     }
-
-    // ── DRAG GHOST OVERLAY ──────────────────────────────────────────────────
-    // Drawn last (above everything) so the lifted icon follows the finger 1:1.
-    // Positioned so its center sits under the finger, in window coordinates. This
-    // Box is a child of the outer BoxWithConstraints, whose top-left is the window
-    // origin (immersive, no insets), so window coords map directly to offsets.
-    draggingPkg?.let { pkg ->
-      byPkg[pkg]?.let { app ->
-        DragGhost(app = app, isDock = ghostIsDock, point = ghostPoint)
-      }
-    }
-  }
-}
-
-/** The lifted icon that follows the finger during a drag (top-level overlay). */
-@Composable
-private fun DragGhost(app: AppEntry, isDock: Boolean, point: Offset) {
-  val tileSize = if (isDock) 80.dp else 110.dp
-  val iconSize = if (isDock) 72.dp else 100.dp
-  val corner = if (isDock) 22.dp else 26.dp
-  val density = androidx.compose.ui.platform.LocalDensity.current
-  val halfPx = with(density) { tileSize.toPx() / 2f }
-  Box(
-      modifier = Modifier
-          .zIndex(100f)
-          .offset {
-            IntOffset(
-                (point.x - halfPx).roundToInt(),
-                (point.y - halfPx).roundToInt(),
-            )
-          }
-          .size(tileSize)
-          .graphicsLayer {
-            scaleX = 1.1f
-            scaleY = 1.1f
-            shadowElevation = 20.dp.toPx()
-            shape = RoundedCornerShape(corner)
-            clip = false
-          }
-          .clip(RoundedCornerShape(corner))
-          .background(Color(0x1EFFFFFF))
-          .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(corner)),
-      contentAlignment = Alignment.Center,
-  ) {
-    Box(
-        modifier = Modifier.matchParentSize().background(
-            Brush.radialGradient(colors = listOf(Color(0x28FFFFFF), Color.Transparent), radius = 180f)))
-    Image(
-        bitmap = app.icon,
-        contentDescription = app.label,
-        modifier = Modifier.size(iconSize),
-        filterQuality = FilterQuality.High,
-    )
   }
 }
 
@@ -1208,8 +947,6 @@ private fun LiquidGlassAppIconContent(
               // Disable Offscreen compositing while dragging for perf
               compositingStrategy = if (isDragging) CompositingStrategy.Auto else CompositingStrategy.Offscreen
             }
-            // Dim the source slot while its ghost is being dragged.
-            .alpha(if (isDragging) 0.35f else 1f)
             .then(dragHandleModifier)
             .then(
                 if (!editMode) {
@@ -1272,220 +1009,6 @@ private fun LiquidGlassAppIconContent(
           modifier = Modifier.widthIn(max = 110.dp),
       )
     }
-  }
-}
-
-/**
- * Bottom dock — frosted glass bar. Renders the unified layout's dock apps via a LazyRow (so
- * `animateItem()` reflows the non-dragged icons during a hover) plus the pinned Settings gear,
- * which is NOT part of layout.dock and never draggable. The whole dock reports its window bounds
- * for cross-container hit-testing; each icon reports its own slot bounds.
- */
-@Composable
-private fun LiquidGlassDock(
-    dockApps: List<AppEntry>,
-    editMode: Boolean,
-    draggingPkg: String?,
-    onEnterEdit: () -> Unit,
-    onLaunch: (ComponentName) -> Unit,
-    onUninstall: (String) -> Unit,
-    onDockBounds: (Rect) -> Unit,
-    onSlotBounds: (String, Rect) -> Unit,
-    dragModifierFor: (String) -> Modifier,
-) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-
-  // Ribbon dock: flat left/right edges, only top+bottom borders, generous vertical padding
-  Column(
-      modifier = Modifier
-          .fillMaxWidth()
-          .background(Color(0x88000000))
-          .drawWithContent {
-            drawContent()
-            // Top border only
-            drawLine(
-                color = Color(0x40FFFFFF),
-                start = androidx.compose.ui.geometry.Offset(0f, 0f),
-                end = androidx.compose.ui.geometry.Offset(size.width, 0f),
-                strokeWidth = 1.dp.toPx(),
-            )
-            // Bottom border only
-            drawLine(
-                color = Color(0x20FFFFFF),
-                start = androidx.compose.ui.geometry.Offset(0f, size.height),
-                end = androidx.compose.ui.geometry.Offset(size.width, size.height),
-                strokeWidth = 1.dp.toPx(),
-            )
-          }
-          // Report the whole dock region so the drag can detect the dock even in the
-          // gaps between icons.
-          .onGloballyPositioned { onDockBounds(it.boundsInWindow()) }
-          .padding(top = 16.dp, bottom = 16.dp),
-      horizontalAlignment = Alignment.CenterHorizontally,
-  ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
-    ) {
-      LazyRow(
-          modifier = Modifier.weight(1f, fill = false),
-          horizontalArrangement = Arrangement.spacedBy(24.dp),
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-        lazyRowItems(dockApps, key = { it.component.packageName }) { app ->
-          val pkg = app.component.packageName
-          val isDragging = draggingPkg == pkg
-          Box(
-              modifier = (if (isDragging) Modifier else Modifier.animateItem())
-                  .onGloballyPositioned { onSlotBounds(pkg, it.boundsInWindow()) },
-          ) {
-            DockIcon(
-                app = app,
-                editMode = editMode,
-                isDragging = isDragging,
-                dragHandleModifier = dragModifierFor(pkg),
-                onClick = { onLaunch(app.component) },
-                onLongPress = onEnterEdit,
-                onRemove = { onUninstall(pkg) },
-            )
-          }
-        }
-      }
-      // Always show Immortal Settings as the last dock item — pinned, not part of the layout.
-      DockSettingsIcon(onClick = {
-        context.startActivity(
-            Intent(context, ImmortalSettingsActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        )
-      })
-    }
-  }
-}
-
-/** Single dock icon tile. Drag is owned by the unified [homeDragGesture] passed in. */
-@Composable
-private fun DockIcon(
-    app: AppEntry,
-    editMode: Boolean,
-    isDragging: Boolean,
-    dragHandleModifier: Modifier,
-    onClick: () -> Unit,
-    onLongPress: () -> Unit,
-    onRemove: () -> Unit,
-) {
-  val scale = remember { Animatable(1f) }
-
-  Box(modifier = Modifier.jiggle(editMode && !isDragging, app.component.packageName.hashCode())) {
-    if (editMode && app.uninstallable) {
-      MinusBadge(modifier = Modifier.align(Alignment.TopStart).zIndex(2f)) { onRemove() }
-    }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .zIndex(if (isDragging) 1f else 0f)
-            .graphicsLayer { scaleX = scale.value; scaleY = scale.value }
-            .alpha(if (isDragging) 0.35f else 1f)
-            .then(dragHandleModifier)
-            .then(
-                if (!editMode) {
-                  Modifier.pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                          scale.animateTo(0.96f, tween(90))
-                          tryAwaitRelease()
-                          scale.animateTo(1f, spring())
-                        },
-                        onTap = { onClick() },
-                        onLongPress = { onLongPress() },
-                    )
-                  }
-                } else {
-                  // Edit mode: drag handle owns the gesture; a plain tap does nothing.
-                  Modifier
-                }
-            ),
-    ) {
-    Box(
-        modifier = Modifier
-            .size(80.dp)
-            .clip(RoundedCornerShape(22.dp))
-            .background(Color(0x1EFFFFFF))
-            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(22.dp)),
-        contentAlignment = Alignment.Center,
-    ) {
-      Box(
-          modifier = Modifier.matchParentSize().background(
-              Brush.radialGradient(
-                  colors = listOf(Color(0x28FFFFFF), Color.Transparent),
-                  radius = 120f,
-              )
-          )
-      )
-      Image(
-          bitmap = app.icon,
-          contentDescription = app.label,
-          modifier = Modifier.size(72.dp),
-          filterQuality = FilterQuality.High,
-      )
-    }
-      Spacer(Modifier.height(4.dp))
-      Text(
-          text = app.label,
-          color = Color.White.copy(alpha = 0.8f),
-          fontSize = 20.sp,
-          fontWeight = FontWeight.Medium,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-          textAlign = TextAlign.Center,
-      )
-    }
-  }
-}
-
-
-/** Settings gear icon for the dock — launches ImmortalSettingsActivity. */
-@Composable
-private fun DockSettingsIcon(onClick: () -> Unit) {
-  var pressed by remember { mutableStateOf(false) }
-  val scale by animateFloatAsState(
-      targetValue = if (pressed) 1.1f else 1f,
-      animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
-      label = "settingsScale",
-  )
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier
-          .graphicsLayer { scaleX = scale; scaleY = scale }
-          .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onClick() }
-          .pointerInput(Unit) {
-            awaitEachGesture {
-              awaitFirstDown(); pressed = true
-              try { drag(awaitFirstDown().id) { it.consume() } } finally { pressed = false }
-            }
-          },
-  ) {
-    Box(
-        modifier = Modifier
-            .size(80.dp)
-            .clip(RoundedCornerShape(22.dp))
-            .background(Color(0x1EFFFFFF))
-            .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(22.dp)),
-        contentAlignment = Alignment.Center,
-    ) {
-      Box(modifier = Modifier.matchParentSize().background(
-          Brush.radialGradient(listOf(Color(0x28FFFFFF), Color.Transparent), radius = 120f)))
-      Text("⚙️", fontSize = 40.sp)
-    }
-    Spacer(Modifier.height(4.dp))
-    Text(
-        text = "Settings",
-        color = Color.White.copy(alpha = 0.8f),
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Medium,
-        maxLines = 1,
-        textAlign = TextAlign.Center,
-    )
   }
 }
 
