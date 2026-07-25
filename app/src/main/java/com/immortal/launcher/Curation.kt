@@ -66,6 +66,7 @@ object Curation {
   val labelOverrides =
       mapOf(
           "com.android.settings" to "System Settings",
+          "me.zhanghai.android.files" to "Material Files",
           "com.facebook.alohaapps.settings" to "Portal Settings",
           "com.facebook.portal.aiservice" to "AI Service",
           "com.android.quicksearchbox" to "Google Search",
@@ -86,8 +87,30 @@ object Curation {
   fun displayLabel(packageName: String, label: String): String =
       labelOverrides[packageName] ?: label
 
-  /** Per-package icon override map (drawable resource). Empty initially. */
-  private val ICON_OVERRIDES: Map<String, Int> = emptyMap()
+  /**
+   * Per-package icon override map (drawable resource). Bundled premium tiles use
+   * real brand marks from Simple Icons (CC0, no attribution required) and Google
+   * Material Symbols (Apache-2.0, no attribution required). Each drawable is a
+   * full-bleed square in the brand color with a centered white glyph; the uniform
+   * squircle mask is applied downstream by IconRenderer.
+   */
+  private val ICON_OVERRIDES: Map<String, Int> =
+      mapOf(
+          "org.chromium.chrome" to R.drawable.icon_chrome,
+          "org.videolan.vlc" to R.drawable.icon_vlc,
+          "de.danoeh.antennapod" to R.drawable.icon_antennapod,
+          "org.schabi.newpipe" to R.drawable.icon_newpipe,
+          "me.zhanghai.android.files" to R.drawable.icon_folder,
+          "com.facebook.aloha.app.whatsapp" to R.drawable.icon_whatsapp,
+          "com.android.settings" to R.drawable.icon_settings,
+          "com.immortal.launcher.debug" to R.drawable.icon_apps,
+          // Not installed on current device, but ready if they land later:
+          "org.mozilla.firefox" to R.drawable.icon_firefox,
+          "com.spotify.music" to R.drawable.icon_spotify,
+          "com.google.android.gm" to R.drawable.icon_gmail,
+          "com.google.android.googlequicksearchbox" to R.drawable.icon_google,
+          "io.homeassistant.companion.android" to R.drawable.icon_homeassistant,
+      )
 
   /**
    * Returns a drawable resource ID to use as an icon override for the given package,
