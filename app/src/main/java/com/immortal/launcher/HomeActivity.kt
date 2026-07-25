@@ -767,8 +767,11 @@ private fun LauncherScreen(
                       app = app,
                       editMode = editMode,
                       isDragging = isDragging,
-                      // Already in edit mode → start dragging on press+move (no extra
-                      // long-press wait). Press detector removes the redundant hold.
+                      // Drag handle is ALWAYS active:
+                      // - In edit mode: press+move starts a drag immediately (no hold).
+                      // - Not in edit mode: a long-press BOTH enters edit mode AND begins the
+                      //   drag in one continuous gesture (onDragStarted flips editMode), so the
+                      //   user never has to release and grab again.
                       dragHandleModifier = if (editMode) {
                         Modifier.draggableHandle(
                             dragGestureDetector = sh.calvin.reorderable.DragGestureDetector.Press,
@@ -776,10 +779,13 @@ private fun LauncherScreen(
                             onDragStopped = {},
                         )
                       } else {
-                        Modifier
+                        Modifier.longPressDraggableHandle(
+                            onDragStarted = { editMode = true },
+                            onDragStopped = {},
+                        )
                       },
                       onClick = { if (!editMode) onLaunch(app.component) },
-                      onLongPress = { if (!editMode) editMode = true },
+                      onLongPress = {},
                       onRemove = { onUninstall(pkg) },
                   )
                 }
@@ -994,7 +1000,10 @@ private fun LiquidGlassAppIconContent(
           )
         }
         if (editMode && app.uninstallable) {
-          MinusBadge(modifier = Modifier.align(Alignment.TopStart)) { onRemove() }
+          // Sit the minus on the icon's top-left EDGE (half outside), iPhone-style.
+          MinusBadge(
+              modifier = Modifier.align(Alignment.TopStart).offset(x = (-8).dp, y = (-8).dp),
+          ) { onRemove() }
         }
       }
       Spacer(Modifier.height(6.dp))
