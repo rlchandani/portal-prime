@@ -598,6 +598,12 @@ private fun Modifier.homeDragGesture(
       var started = false
       var lastKey = ""
       var lastTarget = DropTarget(DropContainer.NONE, -1)
+      // Hysteresis to kill insertion-point flicker: after committing a reorder, require the
+      // finger to travel a minimum distance before the NEXT swap. Reordering moves the slot
+      // bounds we hit-test against, which otherwise causes the finger to appear over the
+      // previous slot again → swap-back → oscillation. A movement gate breaks that loop.
+      val swapGate = slop * 2.5f
+      var fingerAtLastSwap = Offset.Zero
 
       // The container this icon lived in when the drag began. We only reorder LIVE
       // within this same container so the icon's composable stays mounted (moving it
@@ -606,13 +612,16 @@ private fun Modifier.homeDragGesture(
       val homeContainer =
           if (pkg in currentLayout().dock) DropContainer.DOCK else DropContainer.GRID
 
+      android.util.Log.d("HomeDrag", "DOWN pkg=$pkg home=$homeContainer")
       while (true) {
         val event = awaitPointerEvent()
-        val change = event.changes.firstOrNull { it.id == down.id } ?: break
-        if (!change.pressed) break
+        val change = event.changes.firstOrNull { it.id == down.id }
+        if (change == null) { android.util.Log.d("HomeDrag", "BREAK no-change pkg=$pkg started=$started"); break }
+        if (!change.pressed) { android.util.Log.d("HomeDrag", "BREAK not-pressed pkg=$pkg started=$started"); break }
         accumulated += change.positionChange()
         if (!started && accumulated.getDistance() > slop) {
           started = true
+          android.util.Log.d("HomeDrag", "START pkg=$pkg dist=${accumulated.getDistance()}")
           onDragStart(fingerAtDown + accumulated)
         }
         if (started) {
@@ -624,8 +633,12 @@ private fun Modifier.homeDragGesture(
           if (target.container != DropContainer.NONE) {
             lastTarget = target
             // Live reorder only within the origin container (keeps this node mounted).
-            if (target.container == homeContainer && key != lastKey) {
+            // Gate on both a changed target AND minimum finger travel since the last swap,
+            // so a reorder-induced bounds shift can't immediately trigger the reverse swap.
+            val movedEnough = (finger - fingerAtLastSwap).getDistance() >= swapGate
+            if (target.container == homeContainer && key != lastKey && (lastKey.isEmpty() || movedEnough)) {
               lastKey = key
+              fingerAtLastSwap = finger
               val now = currentLayout()
               val next =
                   if (homeContainer == DropContainer.GRID)
@@ -772,9 +785,18 @@ private fun LauncherScreen(
     val w = constraints.maxWidth
     val h = constraints.maxHeight
 
-    // Background: deep-space radial gradient
+    // Background: deep-space radial gradient. Also hosts the tap-to-exit-edit handler HERE
+    // (behind all content) so it only catches taps that land on empty space — icon drag
+    // gestures on top receive the touch first. (Previously this was on the content Row, which
+    // consumed every pointer-down and starved the grid icons' drag gesture.)
     Box(
-        modifier = Modifier.fillMaxSize().background(
+        modifier = Modifier.fillMaxSize()
+            .then(
+                if (editMode && draggingPkg == null) {
+                  Modifier.pointerInput(Unit) { detectTapGestures { editMode = false } }
+                } else Modifier
+            )
+            .background(
             Brush.radialGradient(
                 colors = listOf(
                     Color(0xFF1A3A6B),
@@ -844,15 +866,7 @@ private fun LauncherScreen(
               .weight(1f)
               .fillMaxWidth()
               .padding(horizontal = 28.dp)
-              .padding(top = 12.dp, bottom = 8.dp)
-              // Tap empty space exits edit mode (but not while a drag is active).
-              .then(
-                  if (editMode && draggingPkg == null) {
-                    Modifier.pointerInput(Unit) { detectTapGestures { editMode = false } }
-                  } else {
-                    Modifier
-                  }
-              ),
+              .padding(top = 12.dp, bottom = 8.dp),
           horizontalArrangement = Arrangement.spacedBy(20.dp),
       ) {
 
