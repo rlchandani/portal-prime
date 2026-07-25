@@ -599,9 +599,10 @@ private fun LauncherScreen(
   // Dock packages state
   val dockPkgs = remember { mutableStateOf(DockStore.load(context)) }
 
-  // Drag-to-dock state: track dragged package and screen position
-  var draggedPkg by remember { mutableStateOf<String?>(null) }
-  var dragScreenY by remember { mutableStateOf(0f) }
+  // Drag-to-dock state: track dragged package from grid and pointer position
+  var gridDraggedPkg by remember { mutableStateOf<String?>(null) }
+  var lastPointerY by remember { mutableStateOf(0f) }
+  var screenHeight by remember { mutableStateOf(0f) }
 
   // Home widgets state
   var homeWidgets by remember { mutableStateOf(HomeWidgetStore.load(context)) }
@@ -637,6 +638,11 @@ private fun LauncherScreen(
   BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
     val w = constraints.maxWidth
     val h = constraints.maxHeight
+
+    // Capture screen height for dock drop detection
+    LaunchedEffect(h) {
+      screenHeight = h.toFloat()
+    }
 
     // Background: deep-space radial gradient
     Box(
@@ -712,7 +718,23 @@ private fun LauncherScreen(
                   } else {
                     Modifier
                   }
-              ),
+              )
+              // Track pointer position during grid drags for drop-into-dock detection
+              .pointerInput(gridDraggedPkg) {
+                awaitEachGesture {
+                  val down = awaitFirstDown(requireUnconsumed = false)
+                  var currentEvent = down
+                  do {
+                    val event = awaitPointerEvent(PointerEventPass.Main)
+                    event.changes.forEach { change ->
+                      if (change.id == down.id) {
+                        currentEvent = change
+                        lastPointerY = change.position.y
+                      }
+                    }
+                  } while (event.changes.any { it.pressed && it.id == down.id })
+                }
+              },
           horizontalArrangement = Arrangement.spacedBy(20.dp),
       ) {
 
@@ -768,8 +790,30 @@ private fun LauncherScreen(
                     isDragging = isDragging,
                     dragHandleModifier = if (editMode) {
                       Modifier.longPressDraggableHandle(
-                          onDragStarted = { },
-                          onDragStopped = { },
+                          onDragStarted = {
+                            gridDraggedPkg = app.component.packageName
+                          },
+                          onDragStopped = {
+                            val pkg = gridDraggedPkg
+                            gridDraggedPkg = null
+                            // Check if drop was in dock zone (bottom ~120dp)
+                            if (pkg != null && screenHeight > 0f) {
+                              val dockThresholdY = screenHeight - 120f * context.resources.displayMetrics.density
+                              if (lastPointerY > dockThresholdY) {
+                                // Dropped in dock zone — add to dock
+                                if (pkg !in dockPkgs.value) {
+                                  val updated = DockStore.addToDock(dockPkgs.value, pkg, DockStore.MAX)
+                                  if (updated != dockPkgs.value) {
+                                    DockStore.save(context, updated)
+                                    dockPkgs.value = updated
+                                    Toast.makeText(context, "Added to dock", Toast.LENGTH_SHORT).show()
+                                  } else {
+                                    Toast.makeText(context, "Dock is full", Toast.LENGTH_SHORT).show()
+                                  }
+                                }
+                              }
+                            }
+                          },
                       )
                     } else {
                       Modifier
