@@ -974,7 +974,9 @@ private fun LiquidGlassAppIconContent(
                 }
             ),
     ) {
-      Box {
+      // Pad the wrapper so the minus badge sits at the tile's top-left corner and is FULLY
+      // visible (not clipped by the grid cell). The tile is inset by the overhang amount.
+      Box(modifier = Modifier.padding(top = 11.dp, start = 11.dp)) {
         Box(
             modifier = Modifier
                 .size(110.dp)
@@ -1000,9 +1002,10 @@ private fun LiquidGlassAppIconContent(
           )
         }
         if (editMode && app.uninstallable) {
-          // Sit the minus on the icon's top-left EDGE (half outside), iPhone-style.
+          // Badge sits at the tile's top-left corner, fully inside the padded wrapper (so it
+          // isn't clipped) — straddling the edge visually. Offset into the padding room.
           MinusBadge(
-              modifier = Modifier.align(Alignment.TopStart).offset(x = (-8).dp, y = (-8).dp),
+              modifier = Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = (-6).dp),
           ) { onRemove() }
         }
       }
