@@ -886,6 +886,10 @@ private fun LauncherScreen(
           LazyVerticalGrid(
               columns = GridCells.Fixed(5),
               state = gridState,
+              // In edit mode the grid's own vertical scroll competes with (and cancels) our
+              // icon-drag gesture — the "blips and can't hold" bug. Disable user scroll while
+              // editing so the drag owns the pointer; re-enable it in normal mode.
+              userScrollEnabled = !editMode,
               modifier = Modifier
                   .fillMaxSize()
                   .onGloballyPositioned { gridBounds = it.boundsInWindow() },
