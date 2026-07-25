@@ -766,13 +766,15 @@ private fun LauncherScreen(
           // (No "Done" button — tap any empty space to exit edit mode.)
           val gridState = rememberLazyGridState()
           val reorderableState = rememberReorderableLazyGridState(gridState) { from, to ->
-            // Called continuously as items cross during drag — reorder the list + persist
-            val currentOrder = orderState.value.ifEmpty { orderedApps.map { it.component.packageName } }
-            val newOrder = currentOrder.toMutableList().apply {
-              add(to.index, removeAt(from.index))
+            // Reorder the CURRENTLY-DISPLAYED list (orderedApps: dock apps already filtered out),
+            // indexed identically to what the grid renders, so from/to indices line up 1:1 and the
+            // other items animate into their new slots. Persist the full displayed order.
+            val displayed = orderedApps.map { it.component.packageName }.toMutableList()
+            if (from.index in displayed.indices && to.index in displayed.indices) {
+              displayed.add(to.index, displayed.removeAt(from.index))
+              UserLayout.saveOrder(context, displayed)
+              orderState.value = displayed
             }
-            UserLayout.saveOrder(context, newOrder)
-            orderState.value = newOrder
           }
           LazyVerticalGrid(
               columns = GridCells.Fixed(5),
@@ -784,6 +786,12 @@ private fun LauncherScreen(
           ) {
             items(orderedApps, key = { it.component.packageName }) { app ->
               ReorderableItem(reorderableState, key = app.component.packageName) { isDragging ->
+                // animateItem() makes the OTHER icons glide into their new slots while one is
+                // dragged (the real-time "make space" reflow). The dragged item is driven by the
+                // reorderable library, so exclude it from placement animation while dragging.
+                Box(
+                    modifier = if (isDragging) Modifier else Modifier.animateItem(),
+                ) {
                 LiquidGlassAppIconContent(
                     app = app,
                     editMode = editMode,
@@ -839,6 +847,7 @@ private fun LauncherScreen(
                     onLongPress = { if (!editMode) editMode = true },
                     onRemove = { onUninstall(app.component.packageName) },
                 )
+                }
               }
             }
           }
