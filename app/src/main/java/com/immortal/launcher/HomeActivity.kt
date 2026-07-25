@@ -464,13 +464,16 @@ private fun LeftWidgetColumn(
         Box(
             modifier = widgetModifier
                 .jiggle(editMode, widget.key.hashCode())
-                .pointerInput(editMode) {
-                  detectTapGestures(
-                      onLongPress = {
-                        if (!editMode) onEnterEdit()
+                // Long-press to ENTER edit mode only applies when NOT already editing. In edit
+                // mode we attach no parent gesture, so the corner badges (minus/resize) receive
+                // their own taps instead of being intercepted by this detector.
+                .then(
+                    if (!editMode) {
+                      Modifier.pointerInput(Unit) {
+                        detectTapGestures(onLongPress = { onEnterEdit() })
                       }
-                  )
-                }
+                    } else Modifier
+                )
                 // Inset the widget by the badge overhang so the corner badges sit ON the edge
                 // and render FULLY (not clipped) — same treatment as the app-icon minus badge.
                 .padding(11.dp)
