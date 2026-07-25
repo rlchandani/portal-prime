@@ -109,6 +109,8 @@ object Curation {
           "com.spotify.music" to R.drawable.icon_spotify,
           "com.google.android.gm" to R.drawable.icon_gmail,
           "com.google.android.googlequicksearchbox" to R.drawable.icon_google,
+          // The Portal's search app is AOSP QuickSearchBox, not Google's GSA package.
+          "com.android.quicksearchbox" to R.drawable.icon_google,
           "io.homeassistant.companion.android" to R.drawable.icon_homeassistant,
       )
 
