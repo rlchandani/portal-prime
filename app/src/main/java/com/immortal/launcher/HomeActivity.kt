@@ -797,7 +797,10 @@ private fun LauncherScreen(
                     editMode = editMode,
                     isDragging = isDragging,
                     dragHandleModifier = if (editMode) {
-                      Modifier.longPressDraggableHandle(
+                      // Already in edit mode, so start dragging on press+move (no extra long-press
+                      // wait). draggableHandle with the Press detector removes the redundant hold.
+                      Modifier.draggableHandle(
+                          dragGestureDetector = sh.calvin.reorderable.DragGestureDetector.Press,
                           onDragStarted = {
                             gridDraggedPkg = app.component.packageName
                           },
