@@ -78,8 +78,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.text.BasicTextField
@@ -371,8 +369,7 @@ class HomeActivity : ComponentActivity() {
   }
 }
 
-/** Left column with greeting/now-playing chrome + resizable multi-widget area. */
-@OptIn(ExperimentalLayoutApi::class)
+/** Left column with greeting/now-playing chrome + resizable, reorderable multi-widget area. */
 @Composable
 private fun LeftWidgetColumn(
     editMode: Boolean,
@@ -447,81 +444,120 @@ private fun LeftWidgetColumn(
       }
     }
 
-    // Store-driven resizable widgets
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
+    // Store-driven resizable + reorderable widgets.
+    // Mirrors the app-icon grid EXACTLY: a LazyVerticalGrid(2) whose reorderable state edits the
+    // same list the grid renders (1:1 index mapping) and persists the new order. A Small widget
+    // (spanX==1) fills one column; Medium/Large (spanX>=2) span both columns. The greeting and
+    // now-playing chrome stay fixed above; the "+ Add Widget" tile is a non-draggable full-span
+    // item at the end. The grid is weight(1f) inside this fillMaxHeight column so it is bounded
+    // (no scrolling parent → no infinite-height measure crash).
+    val widgetGridState = rememberLazyGridState()
+    val widgetReorderState = rememberReorderableLazyGridState(widgetGridState) { from, to ->
+      // Called continuously as items cross during drag. Reorder the displayed list (indexed
+      // identically to what the grid renders) so from/to line up 1:1, then persist the order.
+      val list = homeWidgets.toMutableList()
+      if (from.index in list.indices && to.index in list.indices) {
+        list.add(to.index, list.removeAt(from.index))
+        onWidgetsChanged(list)
+      }
+    }
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        state = widgetGridState,
+        // In edit mode the grid's own vertical scroll competes with the drag; disable user
+        // scroll while editing so the reorder owns the pointer (same as the icon grid).
+        userScrollEnabled = !editMode,
+        modifier = Modifier.fillMaxWidth().weight(1f),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-      homeWidgets.forEach { widget ->
-        val baseHeight = 100.dp
-        val widgetHeight = baseHeight * widget.spanY.toFloat()
-        val widgetModifier = when (widget.spanX) {
-          1 -> Modifier.weight(0.48f).height(widgetHeight)
-          else -> Modifier.fillMaxWidth().height(widgetHeight)
-        }
-
-        Box(
-            modifier = widgetModifier
-                .jiggle(editMode, widget.key.hashCode())
-                // Long-press to ENTER edit mode only applies when NOT already editing. In edit
-                // mode we attach no parent gesture, so the corner badges (minus/resize) receive
-                // their own taps instead of being intercepted by this detector.
-                .then(
-                    if (!editMode) {
-                      Modifier.pointerInput(Unit) {
-                        detectTapGestures(onLongPress = { onEnterEdit() })
-                      }
-                    } else Modifier
-                )
-                // Inset the widget by the badge overhang so the corner badges sit ON the edge
-                // and render FULLY (not clipped) — same treatment as the app-icon minus badge.
-                .padding(11.dp)
-        ) {
-          LiquidGlassWidget(modifier = Modifier.fillMaxSize()) {
-            ImmortalWidgetContent(widget = widget, modifier = Modifier.fillMaxSize())
-          }
-
-          if (editMode) {
-            // Minus at top-left edge, resize at bottom-right edge; offset out into the padding
-            // room so each badge straddles the widget corner and stays fully visible.
-            MinusBadge(
-                modifier = Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = (-6).dp),
+      items(
+          homeWidgets,
+          key = { it.key },
+          span = { GridItemSpan(if (it.spanX >= 2) 2 else 1) },
+      ) { widget ->
+        ReorderableItem(widgetReorderState, key = widget.key) { isDragging ->
+          val widgetHeight = 100.dp * widget.spanY.toFloat()
+          // animateItem() glides the OTHER widgets into their new slots while one is dragged.
+          // The dragged item is driven by the reorderable library, so exclude it while dragging.
+          Box(modifier = if (isDragging) Modifier else Modifier.animateItem()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(widgetHeight)
+                    .jiggle(editMode && !isDragging, widget.key.hashCode())
+                    // Drag handle mirrors the icon grid:
+                    // - In edit mode: press+move starts a drag immediately (no hold).
+                    // - Not in edit mode: a long-press BOTH enters edit mode AND begins the drag
+                    //   in one continuous gesture (onDragStarted calls onEnterEdit).
+                    // The handle is on the widget BODY, not the badges, so the corner badges
+                    // still receive their own taps.
+                    .then(
+                        if (editMode) {
+                          Modifier.draggableHandle(
+                              dragGestureDetector = sh.calvin.reorderable.DragGestureDetector.Press,
+                              onDragStarted = {},
+                              onDragStopped = {},
+                          )
+                        } else {
+                          Modifier.longPressDraggableHandle(
+                              onDragStarted = { onEnterEdit() },
+                              onDragStopped = {},
+                          )
+                        }
+                    )
+                    // Inset by the badge overhang so the corner badges sit ON the edge and render
+                    // FULLY (not clipped) — same treatment as the app-icon minus badge.
+                    .padding(11.dp)
             ) {
-              onWidgetsChanged(HomeWidgetStore.without(homeWidgets, widget.key))
-            }
-            ResizeBadge(
-                modifier = Modifier.align(Alignment.BottomEnd).offset(x = 6.dp, y = 6.dp),
-            ) {
-              val (newX, newY) = HomeWidgetStore.nextWidgetSpan(widget.spanX to widget.spanY)
-              val updated = widget.copy(spanX = newX, spanY = newY)
-              onWidgetsChanged(homeWidgets.map { if (it.key == widget.key) updated else it })
+              LiquidGlassWidget(modifier = Modifier.fillMaxSize()) {
+                ImmortalWidgetContent(widget = widget, modifier = Modifier.fillMaxSize())
+              }
+
+              if (editMode) {
+                // Minus at top-left edge, resize at bottom-right edge; offset out into the
+                // padding room so each badge straddles the corner and stays fully visible.
+                MinusBadge(
+                    modifier = Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = (-6).dp),
+                ) {
+                  onWidgetsChanged(HomeWidgetStore.without(homeWidgets, widget.key))
+                }
+                ResizeBadge(
+                    modifier = Modifier.align(Alignment.BottomEnd).offset(x = 6.dp, y = 6.dp),
+                ) {
+                  val (newX, newY) = HomeWidgetStore.nextWidgetSpan(widget.spanX to widget.spanY)
+                  val updated = widget.copy(spanX = newX, spanY = newY)
+                  onWidgetsChanged(homeWidgets.map { if (it.key == widget.key) updated else it })
+                }
+              }
             }
           }
         }
       }
 
-      // Add widget tile (edit mode only)
+      // Add widget tile (edit mode only) — full-span, non-draggable item at the end.
       if (editMode) {
-        LiquidGlassWidget(
-            modifier = Modifier.fillMaxWidth().height(100.dp).clickable { showAddMenu = true },
-        ) {
-          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-              Canvas(Modifier.size(32.dp)) {
-                val cx = size.width / 2f
-                val cy = size.height / 2f
-                val armLength = size.minDimension * 0.3f
-                val stroke = size.minDimension * 0.08f
-                drawLine(Color.White.copy(alpha = 0.5f), Offset(cx - armLength, cy), Offset(cx + armLength, cy), strokeWidth = stroke, cap = StrokeCap.Round)
-                drawLine(Color.White.copy(alpha = 0.5f), Offset(cx, cy - armLength), Offset(cx, cy + armLength), strokeWidth = stroke, cap = StrokeCap.Round)
+        item(key = "add-widget", span = { GridItemSpan(2) }) {
+          LiquidGlassWidget(
+              modifier = Modifier.fillMaxWidth().height(100.dp).clickable { showAddMenu = true },
+          ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+              Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Canvas(Modifier.size(32.dp)) {
+                  val cx = size.width / 2f
+                  val cy = size.height / 2f
+                  val armLength = size.minDimension * 0.3f
+                  val stroke = size.minDimension * 0.08f
+                  drawLine(Color.White.copy(alpha = 0.5f), Offset(cx - armLength, cy), Offset(cx + armLength, cy), strokeWidth = stroke, cap = StrokeCap.Round)
+                  drawLine(Color.White.copy(alpha = 0.5f), Offset(cx, cy - armLength), Offset(cx, cy + armLength), strokeWidth = stroke, cap = StrokeCap.Round)
+                }
+                Text(
+                    "Add Widget",
+                    color = Color.White.copy(alpha = 0.5f),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Light,
+                )
               }
-              Text(
-                  "Add Widget",
-                  color = Color.White.copy(alpha = 0.5f),
-                  fontSize = 13.sp,
-                  fontWeight = FontWeight.Light,
-              )
             }
           }
         }
