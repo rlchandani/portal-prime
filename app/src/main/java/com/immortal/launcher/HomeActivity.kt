@@ -471,16 +471,25 @@ private fun LeftWidgetColumn(
                       }
                   )
                 }
+                // Inset the widget by the badge overhang so the corner badges sit ON the edge
+                // and render FULLY (not clipped) — same treatment as the app-icon minus badge.
+                .padding(11.dp)
         ) {
           LiquidGlassWidget(modifier = Modifier.fillMaxSize()) {
             ImmortalWidgetContent(widget = widget, modifier = Modifier.fillMaxSize())
           }
 
           if (editMode) {
-            MinusBadge(modifier = Modifier.align(Alignment.TopStart).padding(4.dp)) {
+            // Minus at top-left edge, resize at bottom-right edge; offset out into the padding
+            // room so each badge straddles the widget corner and stays fully visible.
+            MinusBadge(
+                modifier = Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = (-6).dp),
+            ) {
               onWidgetsChanged(HomeWidgetStore.without(homeWidgets, widget.key))
             }
-            ResizeBadge(modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp)) {
+            ResizeBadge(
+                modifier = Modifier.align(Alignment.BottomEnd).offset(x = 6.dp, y = 6.dp),
+            ) {
               val (newX, newY) = HomeWidgetStore.nextWidgetSpan(widget.spanX to widget.spanY)
               val updated = widget.copy(spanX = newX, spanY = newY)
               onWidgetsChanged(homeWidgets.map { if (it.key == widget.key) updated else it })
