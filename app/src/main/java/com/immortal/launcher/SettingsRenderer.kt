@@ -11,7 +11,9 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -82,13 +84,23 @@ private fun <S> SettingControl(spec: SettingSpec<S>, snapshot: S, onApply: (Stri
     is EnumSpec<*> -> {
       val s = spec as EnumSpec<S>
       Column {
+        // Match the shared ToggleRow/NavRow metrics exactly (row min-height, 16/10 padding,
+        // Sizes.rowTitle, IosLabel) so enum rows like Power / Fit / Ambient sound line up with
+        // the toggles and nav rows in the same card instead of sitting smaller and off-height.
         Row(
-            modifier = Modifier.fillMaxWidth().padding(18.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = Sizes.rowMinHeight)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-          // IosLabel (black), not white — the settings screen is a light theme; a white
-          // title was invisible on the white card (see the Fill/Fit "fit" enum row).
-          Text(s.title, color = IosLabel, fontSize = 17.sp, modifier = Modifier.weight(1f))
+          Text(
+              s.title,
+              color = IosLabel,
+              fontSize = Sizes.rowTitle,
+              letterSpacing = (-0.2).sp,
+              modifier = Modifier.weight(1f),
+          )
           // EnumSpec.options is value→label; Segmented wants label→value.
           Segmented(s.options.map { (v, l) -> l to v }, s.get(snapshot)) { onApply(s.key, it) }
         }
@@ -136,14 +148,22 @@ private fun <S> SettingControl(spec: SettingSpec<S>, snapshot: S, onApply: (Stri
   }
 }
 
-/** The grey description shown beneath a control (the spec's `help`), matching the screens' style. */
+/**
+ * The grey description shown beneath a control (the spec's `help`). Pulled up close under the
+ * row's title with a small negative top offset — the row already reserves a tall min-height and
+ * centers its title, so without this the help text floated far below, leaving a big gap. Tight
+ * top, modest bottom → compact, iOS-like, better vertical-space use.
+ */
 @Composable
 private fun HelpText(help: String?) {
   if (help.isNullOrBlank()) return
   Text(
       help,
-      color = Color(0xFF9A9A9A),
-      fontSize = 13.sp,
-      modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 14.dp),
+      color = IosSecondary,
+      fontSize = Sizes.rowSub,
+      lineHeight = 18.sp,
+      modifier = Modifier
+          .offset(y = (-8).dp)
+          .padding(start = 16.dp, end = 16.dp, bottom = 6.dp),
   )
 }
