@@ -1081,26 +1081,14 @@ private fun LiquidGlassAppIconContent(
       // visible (not clipped by the grid cell). The tile is inset by the overhang amount.
       Box(modifier = Modifier.padding(top = 11.dp, start = 11.dp)) {
         Box(
-            modifier = Modifier
-                .size(110.dp)
-                .clip(RoundedCornerShape(26.dp))
-                .background(Color(0x1EFFFFFF))
-                .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(26.dp)),
+            modifier = Modifier.size(110.dp),
             contentAlignment = Alignment.Center,
         ) {
-          // Specular
-          Box(
-              modifier = Modifier.matchParentSize().background(
-                  Brush.radialGradient(
-                      colors = listOf(Color(0x28FFFFFF), Color.Transparent),
-                      radius = 180f,
-                  )
-              )
-          )
+          // No frame/background/specular — the icon art (its own squircle tile) fills cleanly.
           Image(
               bitmap = app.icon,
               contentDescription = app.label,
-              modifier = Modifier.size(100.dp),
+              modifier = Modifier.size(110.dp),
               filterQuality = FilterQuality.High,
           )
         }
