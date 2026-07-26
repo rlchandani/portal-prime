@@ -31,12 +31,10 @@ object ChimeConfig {
       val quietHoursOn: Boolean = true,
       val quietStartMin: Int = 22 * 60, // 22:00
       val quietEndMin: Int = 8 * 60, // 08:00
-      // Playback volume per cue (0..100). Default below full so cues are gentle.
-      val chimeVolume: Int = 60,
-      val spokenVolume: Int = 70,
-      val goldenVolume: Int = 60,
-      // "Ping the other room" ring volume (0..100). Louder by default — it's a doorbell.
-      val pingVolume: Int = 85,
+      // One shared playback volume (0..100) for every cue — hourly chime, spoken time, golden-hour
+      // tone, and the "ping the other room" ring. Consolidated from four per-cue volumes (was
+      // chime/spoken/golden/ping); existing installs migrate to the average in [load].
+      val volume: Int = 70,
       // TTS voice name for spoken time (TextToSpeech.Voice.getName()); "" = engine default.
       val spokenVoice: String = "",
       // Which sunrise sound to play: 0 = "Morning", 1 = "Rooster".
@@ -57,10 +55,7 @@ object ChimeConfig {
         quietHoursOn = p.getBoolean("quiet_hours_on", true),
         quietStartMin = p.getInt("quiet_start_min", 22 * 60),
         quietEndMin = p.getInt("quiet_end_min", 8 * 60),
-        chimeVolume = p.getInt("chime_volume", 60).coerceIn(0, 100),
-        spokenVolume = p.getInt("spoken_volume", 70).coerceIn(0, 100),
-        goldenVolume = p.getInt("golden_volume", 60).coerceIn(0, 100),
-        pingVolume = p.getInt("ping_volume", 85).coerceIn(0, 100),
+        volume = loadVolume(p),
         spokenVoice = p.getString("spoken_voice", "") ?: "",
         sunriseVariant = p.getInt("sunrise_variant", 0).coerceIn(0, 1),
     )
@@ -72,17 +67,22 @@ object ChimeConfig {
   fun setSunriseVariant(c: Context, variant: Int) =
       prefs(c).edit().putInt("sunrise_variant", variant.coerceIn(0, 1)).apply()
 
-  fun setChimeVolume(c: Context, v: Int) =
-      prefs(c).edit().putInt("chime_volume", v.coerceIn(0, 100)).apply()
+  fun setVolume(c: Context, v: Int) =
+      prefs(c).edit().putInt("volume", v.coerceIn(0, 100)).apply()
 
-  fun setSpokenVolume(c: Context, v: Int) =
-      prefs(c).edit().putInt("spoken_volume", v.coerceIn(0, 100)).apply()
-
-  fun setGoldenVolume(c: Context, v: Int) =
-      prefs(c).edit().putInt("golden_volume", v.coerceIn(0, 100)).apply()
-
-  fun setPingVolume(c: Context, v: Int) =
-      prefs(c).edit().putInt("ping_volume", v.coerceIn(0, 100)).apply()
+  /**
+   * The one shared cue volume. Reads the new "volume" key if present; otherwise migrates from the
+   * four legacy per-cue keys (chime/spoken/golden/ping) by averaging whichever were set, so an
+   * existing install keeps a sensible level instead of snapping to the default. Falls back to the
+   * default when nothing was ever set.
+   */
+  private fun loadVolume(p: android.content.SharedPreferences): Int {
+    if (p.contains("volume")) return p.getInt("volume", 70).coerceIn(0, 100)
+    val legacy = listOf("chime_volume", "spoken_volume", "golden_volume", "ping_volume")
+        .filter { p.contains(it) }
+        .map { p.getInt(it, 70).coerceIn(0, 100) }
+    return if (legacy.isEmpty()) 70 else (legacy.sum() / legacy.size).coerceIn(0, 100)
+  }
 
   fun setHourlyChime(c: Context, on: Boolean) =
       prefs(c).edit().putBoolean("hourly_chime_on", on).apply()

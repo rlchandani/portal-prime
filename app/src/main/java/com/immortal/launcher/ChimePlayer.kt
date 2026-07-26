@@ -36,7 +36,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
   /** Play the soft hourly chime (res/raw/chime.mp3), releasing on completion. */
   fun playChime(context: Context) {
     runCatching {
-      val vol = ChimeConfig.load(context).chimeVolume / 100f
+      val vol = ChimeConfig.load(context).volume / 100f
       if (vol <= 0f) return
       val mp = MediaPlayer()
       mp.setAudioAttributes(ambientAttrs)
@@ -73,7 +73,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
   /** Ring for an incoming "ping the other room" (res/raw/ping.mp3), a few times at the
    *  ping volume from Sounds settings. Separate sound + volume from the kitchen timer. */
   fun playPing(context: Context, repeats: Int = 2) {
-    val vol = (ChimeConfig.load(context).pingVolume / 100f).coerceIn(0f, 1f)
+    val vol = (ChimeConfig.load(context).volume / 100f).coerceIn(0f, 1f)
     if (vol <= 0f) return
     val h = Handler(Looper.getMainLooper())
     for (i in 0 until repeats) {
@@ -152,7 +152,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
   /** Play a bundled raw audio resource through the alarm stream at the golden volume. */
   private fun playRaw(context: Context, resId: Int) {
     runCatching {
-      val vol = (ChimeConfig.load(context).goldenVolume / 100f).coerceIn(0f, 1f)
+      val vol = (ChimeConfig.load(context).volume / 100f).coerceIn(0f, 1f)
       if (vol <= 0f) return
       val mp = MediaPlayer()
       mp.setAudioAttributes(
@@ -178,7 +178,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
   ) {
     runCatching {
       val cfg = ChimeConfig.load(context)
-      val vol = (volumeOverride ?: (cfg.spokenVolume / 100f)).coerceIn(0f, 1f)
+      val vol = (volumeOverride ?: (cfg.volume / 100f)).coerceIn(0f, 1f)
       if (vol <= 0f) return
       var tts: TextToSpeech? = null
       tts = TextToSpeech(context.applicationContext) { status ->
