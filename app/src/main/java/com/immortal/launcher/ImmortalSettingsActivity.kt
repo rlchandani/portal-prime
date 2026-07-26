@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -63,6 +64,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.key.Key
@@ -77,6 +79,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -116,16 +119,11 @@ internal data class SectionDef(val name: String, val symbol: String, val iconCol
  * Sections that hand off to Android's own Settings rather than rendering a detail panel. Mapped to
  * the `Settings.ACTION_*` string to fire (guarded with `runCatching`). Shown with a "↗" affordance.
  */
-private val OS_LINK_OUT_SECTIONS: Map<String, String> =
-    mapOf(
-        "Wi-Fi" to Settings.ACTION_WIFI_SETTINGS,
-        "Bluetooth" to Settings.ACTION_BLUETOOTH_SETTINGS,
-        "Sound & Volume" to Settings.ACTION_SOUND_SETTINGS,
-        "Display & Brightness" to Settings.ACTION_DISPLAY_SETTINGS,
-        "Date & Time" to Settings.ACTION_DATE_SETTINGS,
-        "Language & Region" to Settings.ACTION_LOCALE_SETTINGS,
-        "Accessibility & Back Gesture" to Settings.ACTION_ACCESSIBILITY_SETTINGS,
-    )
+// OS-owned screens (Wi-Fi, Bluetooth, Display, Sound, Date/Time, Language, Accessibility) are
+// reached through the stock "Portal Settings" / "System Settings" tiles on the home grid, not
+// duplicated here — so this map is empty. The link-out mechanism below is retained (harmless
+// when empty) in case a future OS screen is worth surfacing as a row again.
+private val OS_LINK_OUT_SECTIONS: Map<String, String> = emptyMap()
 
 /**
  * The grouped sidebar (approved iPhone grouping). Each group is a header + its ordered rows. Rows
@@ -135,11 +133,6 @@ private val OS_LINK_OUT_SECTIONS: Map<String, String> =
  */
 private val SECTION_GROUPS: List<Pair<String, List<SectionDef>>> =
     listOf(
-        "Connectivity" to
-            listOf(
-                SectionDef("Wi-Fi", "W", Color(0xFF0A84FF)),
-                SectionDef("Bluetooth", "B", Color(0xFF0A84FF)),
-            ),
         "Sound & Wake" to
             listOf(
                 SectionDef("Chime", "C", Color(0xFFFF9F0A)),
@@ -147,26 +140,20 @@ private val SECTION_GROUPS: List<Pair<String, List<SectionDef>>> =
                 SectionDef("Multi-room Audio", "M", Color(0xFF30D158)),
                 SectionDef("Welcome Greeting", "H", Color(0xFFFF375F)),
                 SectionDef("Touch Sounds", "s", Color(0xFF30D158)),
-                SectionDef("Sound & Volume", "V", Color(0xFFFF375F)),
             ),
         "General" to
             listOf(
-                SectionDef("Display & Brightness", "L", Color(0xFF5E5CE6)),
                 SectionDef("Screensaver", "P", Color(0xFFFF6B35)),
                 SectionDef("Wallpaper", "w", Color(0xFF5E5CE6)),
                 SectionDef("Clock Face", "c", Color(0xFF0A84FF)),
                 SectionDef("Appearance", "T", Color(0xFF5E5CE6)),
                 SectionDef("Weather", "u", Color(0xFF0A84FF)),
                 SectionDef("Sleep Timer", "z", Color(0xFF636366)),
-                SectionDef("Date & Time", "t", Color(0xFF636366)),
-                SectionDef("Language & Region", "g", Color(0xFF636366)),
-                SectionDef("Accessibility & Back Gesture", "a", Color(0xFF0A84FF)),
             ),
         "Widgets & Content" to
             listOf(
                 SectionDef("Calendar", "d", Color(0xFFFF453A)),
                 SectionDef("World Clock", "o", Color(0xFF0A84FF)),
-                SectionDef("Almanac", "k", Color(0xFF30D158)),
                 SectionDef("Countdown", "n", Color(0xFFFF9F0A)),
                 SectionDef("Quick Buttons", "q", Color(0xFF5E5CE6)),
             ),
@@ -258,7 +245,7 @@ private fun ImmortalSettingsScreen() {
         "Music Assistant" to "Multi-room Audio", "Snapcast" to "Multi-room Audio",
         "Touch sounds" to "Touch Sounds",
         "Calendar feed" to "Calendar", "World clock cities" to "World Clock",
-        "Almanac packs" to "Almanac", "Countdown events" to "Countdown",
+        "Countdown events" to "Countdown",
         "App-switcher button" to "Quick Buttons",
         "Home Assistant" to "Home Assistant", "MQTT" to "Home Assistant",
         "Phone remote" to "Phone Remote", "Start on boot" to "Start on Boot",
@@ -651,27 +638,6 @@ private fun ImmortalSettingsScreen() {
         ) { context.startActivity(Intent(context, WorldClockActivity::class.java)) }
       }
 
-      if (selectedSection == "Almanac") {
-        // Reused from MoreFeaturesSection: per-pack toggles feeding the home header + ambient dashboard.
-        Card {
-          CalendarPacks.AVAILABLE.forEachIndexed { i, pack ->
-            if (i > 0) Divider()
-            var on by remember(pack.id) { mutableStateOf(CalendarPacks.isEnabled(context, pack.id)) }
-            ToggleRow(
-                title = pack.title,
-                checked = on,
-                iconColor = Color(0xFF30D158),
-                iconSymbol = "k",
-                onChange = { checked ->
-                  on = checked
-                  CalendarPacks.setEnabled(context, pack.id, checked)
-                },
-            )
-          }
-        }
-        FooterNote("Enabled packs add their days to the home header and the ambient screensaver dashboard.")
-      }
-
       if (selectedSection == "Countdown") {
         SubScreenNavCard(
             title = "Countdown events",
@@ -892,20 +858,49 @@ private fun DeviceNameSection() {
   var name by remember { mutableStateOf(FleetConfig.name(context)) }
   Card {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = Sizes.rowMinHeight)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
       IconBadge(color = Color(0xFF636366), symbol = "i")
       Spacer(Modifier.size(12.dp))
-      OutlinedTextField(
+      Text(
+          "Device name",
+          color = IosLabel,
+          fontSize = Sizes.rowTitle,
+          letterSpacing = (-0.2).sp,
+      )
+      Spacer(Modifier.weight(1f))
+      // iOS-style inline field: right-aligned, no box, black text on the white card
+      // (Material3 OutlinedTextField rendered white-on-white here and looked foreign).
+      BasicTextField(
           value = name,
           onValueChange = { new ->
             name = new
             if (new.trim().length in 1..48) FleetConfig.setName(context, new.trim())
           },
           singleLine = true,
-          label = { Text("Device name") },
-          modifier = Modifier.weight(1f),
+          textStyle = androidx.compose.ui.text.TextStyle(
+              color = IosLabel,
+              fontSize = Sizes.rowValue,
+              textAlign = TextAlign.End,
+          ),
+          cursorBrush = SolidColor(IosBlue),
+          decorationBox = { inner ->
+            if (name.isEmpty()) {
+              Text(
+                  "Living Room",
+                  color = IosSecondary,
+                  fontSize = Sizes.rowValue,
+                  textAlign = TextAlign.End,
+                  modifier = Modifier.fillMaxWidth(),
+              )
+            }
+            inner()
+          },
+          modifier = Modifier.widthIn(min = 120.dp),
       )
     }
   }

@@ -681,8 +681,33 @@ private fun LauncherScreen(
     while (true) { delay(1000); value = Date() }
   }
 
-  // Installed apps
-  val installedApps by produceState<List<AppEntry>>(initialValue = emptyList()) {
+  // Installed apps. Reloaded whenever a package is added/removed/changed (so an uninstalled
+  // app's tile disappears immediately instead of lingering until the Activity is recreated)
+  // and whenever the launcher returns to the foreground (catches changes made elsewhere).
+  var appsRefreshKey by remember { mutableStateOf(0) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val onResume = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_RESUME) appsRefreshKey++
+    }
+    lifecycleOwner.lifecycle.addObserver(onResume)
+    val pkgReceiver = object : android.content.BroadcastReceiver() {
+      override fun onReceive(c: Context, intent: Intent) { appsRefreshKey++ }
+    }
+    val filter = android.content.IntentFilter().apply {
+      addAction(Intent.ACTION_PACKAGE_ADDED)
+      addAction(Intent.ACTION_PACKAGE_REMOVED)
+      addAction(Intent.ACTION_PACKAGE_CHANGED)
+      addAction(Intent.ACTION_PACKAGE_REPLACED)
+      addDataScheme("package")
+    }
+    runCatching { context.registerReceiver(pkgReceiver, filter) }
+    onDispose {
+      lifecycleOwner.lifecycle.removeObserver(onResume)
+      runCatching { context.unregisterReceiver(pkgReceiver) }
+    }
+  }
+  val installedApps by produceState<List<AppEntry>>(initialValue = emptyList(), appsRefreshKey) {
     value = withContext(Dispatchers.IO) { loadApps(context) }
   }
 

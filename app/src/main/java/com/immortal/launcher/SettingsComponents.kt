@@ -73,6 +73,10 @@ internal val IosDivider = Color(0xFFE5E5EA)
 internal val IosBlue = Color(0xFF007AFF)
 internal val IosGreen = Color(0xFF34C759)
 internal val IosChevron = Color(0xFFC7C7CC)
+internal val IosRed = Color(0xFFFF3B30)          // destructive / stop actions
+internal val IosFocusTint = Color(0xFFE5F0FF)    // D-pad focus highlight + action-pill fill
+internal val IosSegmentTrack = Color(0xFFE5E5EA) // segmented-control track (== IosDivider tone)
+internal val IosSegmentInactive = Color(0xFF3A3A3C) // unselected segment label
 
 // ---------------------------------------------------------------------------
 // Sizing scale (single source of truth)
@@ -90,7 +94,9 @@ internal object Sizes {
     val sectionLabel = 16.sp   // uppercase grey group headers
     val rowTitle = 22.sp       // row body text
     val rowSub = 16.sp         // row secondary/subtitle
-    val rowValue = 19.sp       // right-side value text
+    val rowValue = 19.sp       // right-side value text (steppers, pickers)
+    val actionButton = 17.sp   // blue action-button labels (Test / Preview / Save / Add)
+    val segmentLabel = 15.sp   // segmented-control segment label
     val chevron = 22.sp        // "›"
     val iconBadge = 40.dp      // content-row icon badge
     val iconGlyph = 20.sp
@@ -432,21 +438,21 @@ internal fun Segmented(
 ) {
     Row(
         modifier = Modifier
-            .background(Color(0xFFE5E5EA), RoundedCornerShape(8.dp))
+            .background(IosSegmentTrack, RoundedCornerShape(8.dp))
             .padding(2.dp),
         horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         options.forEach { (label, value) ->
             val on = value == selected
             Surface(
-                color = if (on) Color.White else Color.Transparent,
+                color = if (on) IosCard else Color.Transparent,
                 shape = RoundedCornerShape(6.dp),
                 modifier = Modifier.tvFocusable(RoundedCornerShape(6.dp)) { onSelect(value) },
             ) {
                 Text(
                     text = label,
-                    color = if (on) Color(0xFF000000) else Color(0xFF3A3A3C),
-                    fontSize = 13.sp,
+                    color = if (on) IosLabel else IosSegmentInactive,
+                    fontSize = Sizes.segmentLabel,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                 )
@@ -486,7 +492,7 @@ internal fun Stepper(
                 } else false
             }
             .focusable(interactionSource = src)
-            .background(if (focused) Color(0xFFE5F0FF) else Color.Transparent)
+            .background(if (focused) IosFocusTint else Color.Transparent)
             .padding(start = 16.dp, end = 6.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -520,7 +526,7 @@ private fun StepperButton(glyph: String, rowFocused: Boolean, onClick: () -> Uni
         modifier = Modifier
             .size(width = 40.dp, height = 38.dp)
             .clip(RoundedCornerShape(9.dp))
-            .background(if (rowFocused) Color(0xFFE5F0FF) else Color(0xFFF2F2F7))
+            .background(if (rowFocused) IosFocusTint else IosBackground)
             .focusProperties { canFocus = false }
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
@@ -528,7 +534,7 @@ private fun StepperButton(glyph: String, rowFocused: Boolean, onClick: () -> Uni
         Text(
             text = glyph,
             color = IosBlue,
-            fontSize = 22.sp,
+            fontSize = Sizes.chevron,
             fontWeight = FontWeight.Medium,
         )
     }
