@@ -89,10 +89,13 @@ object Curation {
 
   /**
    * Per-package icon override map (drawable resource). Bundled premium tiles use
-   * real brand marks from Simple Icons (CC0, no attribution required) and Google
-   * Material Symbols (Apache-2.0, no attribution required). Each drawable is a
-   * full-bleed square in the brand color with a centered white glyph; the uniform
-   * squircle mask is applied downstream by IconRenderer.
+   * real brand marks. The full-color marks (Google, Chrome, Gmail, Spotify,
+   * WhatsApp) are the official multicolor logos from github.com/gilbarbara/logos
+   * ("logos" set, permissive — no attribution required), drawn centered on a
+   * white squircle tile. The remaining single-glyph brand tiles (VLC, NewPipe,
+   * AntennaPod, Firefox, Home Assistant) are a full-bleed square in the brand
+   * color with a centered white glyph, which matches those apps' own icon look.
+   * The uniform squircle mask is applied downstream by IconRenderer.
    */
   private val ICON_OVERRIDES: Map<String, Int> =
       mapOf(
