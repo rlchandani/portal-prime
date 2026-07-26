@@ -2282,7 +2282,10 @@ private fun WallpaperSwatch(
     }
     Text(
         label,
-        color = if (selected) Color.White else Color(0xFFBBBBBB),
+        // Light-theme colors: selected is the accent blue + bold; unselected is the standard grey.
+        // (Was Color.White for selected — invisible on the light settings background.)
+        color = if (selected) IosBlue else IosSecondary,
+        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
         fontSize = 12.sp,
         maxLines = 1,
         modifier = Modifier.padding(top = 6.dp),
