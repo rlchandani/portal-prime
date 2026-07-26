@@ -31,6 +31,11 @@ object Curation {
           "com.facebook.alohasdk.ctsintentabsorber", // Android CTS test app, not user-facing
           "com.facebook.aloha.system.ripleyhome", // Portal TV stock home — Calls tile bridges to it
           "com.facebook.aloha.system.rcbootflow", // Portal TV boot/setup flow, not user-facing
+          // Aloha Smart-Camera AI backend. It's a privileged background service, but its
+          // LAUNCHER activity is an internal codec/AI-pipeline DEBUG console (Disable AI pipeline,
+          // H264/H265 codec mode, pose-tracker fps…) — never meant for users. Hiding the tile
+          // does not disable the service; it just removes a confusing/harmful entry point.
+          "com.facebook.portal.aiservice",
       )
 
   /** Hidden by visible label (catches gated apps that share a package). */
@@ -54,7 +59,6 @@ object Curation {
           "com.facebook.alohaapps.settings" to "Settings",
           "com.facebook.aloha.chargecontrol" to "Settings",
           "com.android.inputmethod.latin" to "Settings",
-          "com.facebook.portal.aiservice" to "Settings",
           "com.android.quicksearchbox" to "Settings",
           "com.android.tv.quicksettings" to "Settings", // Portal TV "Picture Mode" — useful, fold in
           // falcon's Amazon-link app: needed once to register, then useless. Provisioning auto-opens
@@ -68,7 +72,6 @@ object Curation {
           "com.android.settings" to "System Settings",
           "me.zhanghai.android.files" to "Material Files",
           "com.facebook.alohaapps.settings" to "Portal Settings",
-          "com.facebook.portal.aiservice" to "AI Service",
           "com.android.quicksearchbox" to "Google Search",
           "com.amazon.alexa.multimodal.falcon" to "Alexa setup", // it's the account-link app, not the assistant
       )
