@@ -1038,7 +1038,7 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
       Spacer(Modifier.size(22.dp))
       Card {
         Column(modifier = Modifier.padding(18.dp)) {
-          Text("Setting it up", color = Color.White, fontSize = 17.sp)
+          Text("Setting it up", color = IosLabel, fontSize = 17.sp)
           Text(
               "Group your Portals into one perfectly in-sync speaker system:",
               color = Color(0xFF9A9A9A),
@@ -1064,7 +1064,7 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
           Column(modifier = Modifier.weight(1f)) {
-            Text("Show what the group is playing", color = Color.White, fontSize = 17.sp)
+            Text("Show what the group is playing", color = IosLabel, fontSize = 17.sp)
             Text(
                 "Surfaces the Snapcast group's track on the now-playing card — even when the " +
                     "Music Assistant app isn't open on this Portal.",
@@ -1471,7 +1471,7 @@ internal fun MqttScreen(onBack: () -> Unit) {
       Spacer(Modifier.size(22.dp))
       Card {
         Column(modifier = Modifier.padding(18.dp)) {
-          Text("Setting it up", color = Color.White, fontSize = 17.sp)
+          Text("Setting it up", color = IosLabel, fontSize = 17.sp)
           MultiRoomStep(
               "1",
               "In Home Assistant, add the Mosquitto broker add-on (Settings → Add-ons) and the " +
@@ -1491,7 +1491,7 @@ internal fun MqttScreen(onBack: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
           Column(modifier = Modifier.weight(1f)) {
-            Text("Publish to Home Assistant", color = Color.White, fontSize = 17.sp)
+            Text("Publish to Home Assistant", color = IosLabel, fontSize = 17.sp)
             Text(
                 "Exposes this Portal's state and controls as Home Assistant entities over MQTT.",
                 color = Color(0xFF9A9A9A),
@@ -1597,7 +1597,7 @@ internal fun MqttScreen(onBack: () -> Unit) {
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Column(modifier = Modifier.weight(1f)) {
-              Text("Use TLS / SSL", color = Color.White, fontSize = 15.sp)
+              Text("Use TLS / SSL", color = IosLabel, fontSize = 15.sp)
               Text(
                   "Encrypt the connection (e.g. a broker behind a reverse proxy on port 8883).",
                   color = Color(0xFF9A9A9A),
@@ -1626,7 +1626,7 @@ internal fun MqttScreen(onBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
               Column(modifier = Modifier.weight(1f)) {
-                Text("Validate certificate", color = Color.White, fontSize = 15.sp)
+                Text("Validate certificate", color = IosLabel, fontSize = 15.sp)
                 Text(
                     "Verify the broker's certificate and hostname. Turn off only for a " +
                         "self-signed broker on a trusted network.",
@@ -1745,7 +1745,7 @@ internal fun WorldClockScreen(onBack: () -> Unit) {
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Column(modifier = Modifier.weight(1f)) {
-              Text(label, color = Color.White, fontSize = 16.sp)
+              Text(label, color = IosLabel, fontSize = 16.sp)
               Text(
                   zone.replace('_', ' '),
                   color = Color(0xFF9A9A9A),
@@ -1976,7 +1976,7 @@ private fun HealthRow(c: DevicePermissions.Check) {
         modifier = Modifier.padding(end = 14.dp, top = 1.dp),
     )
     Column(modifier = Modifier.weight(1f)) {
-      Text(c.title, color = Color.White, fontSize = 17.sp)
+      Text(c.title, color = IosLabel, fontSize = 17.sp)
       Text(
           c.enables,
           color = Color(0xFF9A9A9A),
@@ -2126,7 +2126,7 @@ internal fun BootAppsScreen(
               Image(bitmap = app.icon, contentDescription = null, modifier = Modifier.size(34.dp))
               Text(
                   app.label,
-                  color = Color.White,
+                  color = IosLabel,
                   fontSize = 16.sp,
                   modifier = Modifier.weight(1f).padding(start = 14.dp),
               )
@@ -2157,7 +2157,7 @@ private fun WallpaperSection() {
   SectionLabel("Wallpaper")
   Card {
     Column(modifier = Modifier.padding(18.dp)) {
-      Text("Background", color = Color.White, fontSize = 17.sp)
+      Text("Background", color = IosLabel, fontSize = 17.sp)
       Text(
           "A gradient, a photo, or sync with your screensaver (shown blurred). Tap to choose.",
           color = Color(0xFF9A9A9A),
@@ -2235,7 +2235,7 @@ private fun WallpaperSection() {
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Column(modifier = Modifier.weight(1f)) {
-          Text("Film grain", color = Color.White, fontSize = 17.sp)
+          Text("Film grain", color = IosLabel, fontSize = 17.sp)
           Text(
               "Adds a subtle grain texture over the wallpaper.",
               color = Color(0xFF9A9A9A),
