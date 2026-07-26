@@ -108,6 +108,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -1080,16 +1081,31 @@ private fun LiquidGlassAppIconContent(
       // Pad the wrapper so the minus badge sits at the tile's top-left corner and is FULLY
       // visible (not clipped by the grid cell). The tile is inset by the overhang amount.
       Box(modifier = Modifier.padding(top = 11.dp, start = 11.dp)) {
+        // iOS-style icon: rounded-squircle corners, soft drop shadow (3D depth), and a glossy
+        // top highlight sheen — applied uniformly so even square drawables read as premium
+        // rounded tiles.
+        val iconShape = RoundedCornerShape(26.dp)
         Box(
-            modifier = Modifier.size(110.dp),
+            modifier = Modifier
+                .size(110.dp)
+                .shadow(elevation = 8.dp, shape = iconShape, clip = false)
+                .clip(iconShape),
             contentAlignment = Alignment.Center,
         ) {
-          // No frame/background/specular — the icon art (its own squircle tile) fills cleanly.
           Image(
               bitmap = app.icon,
               contentDescription = app.label,
               modifier = Modifier.size(110.dp),
               filterQuality = FilterQuality.High,
+          )
+          // Glossy top-down sheen for the "candy"/3D finish.
+          Box(
+              modifier = Modifier.matchParentSize().background(
+                  Brush.verticalGradient(
+                      colors = listOf(Color(0x33FFFFFF), Color(0x0FFFFFFF), Color.Transparent),
+                      endY = 130f,
+                  )
+              )
           )
         }
         if (editMode && app.uninstallable) {
