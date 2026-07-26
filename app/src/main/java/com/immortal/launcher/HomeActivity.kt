@@ -1043,35 +1043,25 @@ private fun FadingDivider() {
 // Liquid Glass composables
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Bare Liquid Glass surface — a light, transparent frosted-glass card (the original look): a thin
- * translucent white wash so the wallpaper shows softly through, a bright hairline border, a diagonal
- * specular highlight in the top-left, and a soft drop shadow for lift. See-through and airy. No live
- * backdrop blur (the Portal's GPU can't afford it) — all static layers, no per-frame cost.
- */
+/** Bare Liquid Glass surface — frosted fill + specular highlight + border. */
 @Composable
 private fun LiquidGlass(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 22.dp,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
-  val shape = RoundedCornerShape(cornerRadius)
   Box(
       modifier = modifier
-          // Soft drop shadow lifts the card off the wallpaper (clip=false so it spreads).
-          .shadow(elevation = 14.dp, shape = shape, clip = false)
-          .clip(shape)
-          // Thin translucent white wash — transparent glass; the wallpaper shows softly through.
-          .background(Color(0x24FFFFFF))
-          .border(1.dp, Color(0x59FFFFFF), shape),
+          .clip(RoundedCornerShape(cornerRadius))
+          .background(Color(0x1EFFFFFF))
+          .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(cornerRadius)),
   ) {
-    // Diagonal specular highlight in the top-left corner.
+    // Specular top-left highlight
     Box(
         modifier = Modifier.matchParentSize().background(
             Brush.radialGradient(
-                colors = listOf(Color(0x38FFFFFF), Color.Transparent),
-                center = Offset(0f, 0f),
-                radius = 420f,
+                colors = listOf(Color(0x28FFFFFF), Color.Transparent),
+                radius = 300f,
             )
         )
     )
