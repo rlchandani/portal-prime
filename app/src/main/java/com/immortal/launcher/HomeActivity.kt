@@ -1063,16 +1063,17 @@ private fun LiquidGlass(
   Box(
       modifier = modifier
           .clip(shape)
-          // Transparent glass wash flowing left→right (only lightens the wallpaper, never darkens).
+          // Lighter glass wash flowing left→right — less frosting, more of the wallpaper shows
+          // through (~11%→5% white), while the border still defines a crisp glass edge.
           .background(
-              Brush.horizontalGradient(colors = listOf(Color(0x2EFFFFFF), Color(0x14FFFFFF))))
+              Brush.horizontalGradient(colors = listOf(Color(0x1CFFFFFF), Color(0x0DFFFFFF))))
           .border(1.dp, Color(0x40FFFFFF), shape),
   ) {
-    // Specular top-left highlight
+    // Subtle specular top-left highlight (softened to match the reduced frosting).
     Box(
         modifier = Modifier.matchParentSize().background(
             Brush.radialGradient(
-                colors = listOf(Color(0x28FFFFFF), Color.Transparent),
+                colors = listOf(Color(0x1AFFFFFF), Color.Transparent),
                 radius = 300f,
             )
         )
