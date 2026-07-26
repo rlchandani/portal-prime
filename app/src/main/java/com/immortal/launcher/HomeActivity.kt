@@ -1045,9 +1045,9 @@ private fun FadingDivider() {
 
 /**
  * Bare Liquid Glass surface — transparent glass, FLAT (no gradient): a single even translucent
- * white fill so the wallpaper shows through uniformly, plus a thin light border for the glass edge.
- * No drop shadow (it renders a dark rect that bleeds through the translucent fill and darkens the
- * centre) and no gradient. Just a clean, even, see-through card with a crisp rim.
+ * DARK tint so the card reads a touch darker than the wallpaper (gives it body and makes the white
+ * text pop), while still letting the wallpaper show through. A thin light border defines the glass
+ * edge. No drop shadow (it bleeds through the translucent fill and muddies the centre), no gradient.
  */
 @Composable
 private fun LiquidGlass(
@@ -1059,11 +1059,11 @@ private fun LiquidGlass(
   Box(
       modifier = modifier
           .clip(shape)
-          // Flat, even translucent fill — no gradient. ~5% white so the wallpaper shows through
-          // strongly; the border does most of the work defining the card.
-          .background(Color(0x0DFFFFFF))
+          // Flat, even translucent DARK tint (~22% black) — darkens the wallpaper inside the card
+          // for definition and text contrast, but stays see-through.
+          .background(Color(0x38000000))
           // Thin light rim for the glass edge.
-          .border(1.dp, Color(0x59FFFFFF), shape),
+          .border(1.dp, Color(0x4DFFFFFF), shape),
   ) {
     content()
   }
