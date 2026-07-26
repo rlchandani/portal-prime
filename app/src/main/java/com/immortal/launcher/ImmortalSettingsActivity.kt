@@ -1143,15 +1143,14 @@ internal fun MultiRoomContent() {
                 modifier = Modifier.padding(top = 2.dp),
             )
           }
-          Segmented(
-              options = listOf("Off" to "off", "On" to "on"),
-              selected = if (enabled) "on" else "off",
-              onSelect = {
-                val on = it == "on"
+          Switch(
+              checked = enabled,
+              onCheckedChange = { on ->
                 enabled = on
                 ImmortalSettings.setMultiRoomEnabled(context, on)
                 MultiRoomService.sync(context)
               },
+              colors = iosSwitchColors(),
           )
         }
         if (enabled) {
@@ -1410,15 +1409,14 @@ internal fun MqttContent() {
                 modifier = Modifier.padding(top = 2.dp),
             )
           }
-          Segmented(
-              options = listOf("Off" to "off", "On" to "on"),
-              selected = if (enabled) "on" else "off",
-              onSelect = {
-                val on = it == "on"
+          Switch(
+              checked = enabled,
+              onCheckedChange = { on ->
                 enabled = on
                 MqttConfig.setEnabled(context, on)
                 if (on) apply() else MqttService.sync(context)
               },
+              colors = iosSwitchColors(),
           )
         }
         if (enabled) {
@@ -1516,11 +1514,9 @@ internal fun MqttContent() {
                   modifier = Modifier.padding(top = 2.dp),
               )
             }
-            Segmented(
-                options = listOf("Off" to "off", "On" to "on"),
-                selected = if (useTls) "on" else "off",
-                onSelect = {
-                  val on = it == "on"
+            Switch(
+                checked = useTls,
+                onCheckedChange = { on ->
                   useTls = on
                   // Hop to the matching default port if the field is still on the other default.
                   if (on && port == MqttConfig.DEFAULT_PORT.toString())
@@ -1529,6 +1525,7 @@ internal fun MqttContent() {
                       port = MqttConfig.DEFAULT_PORT.toString()
                   apply()
                 },
+                colors = iosSwitchColors(),
             )
           }
           // Certificate validation is auto-managed (on by default, settings-reimagining Phase 5):
@@ -1627,7 +1624,7 @@ internal fun WorldClockContent() {
             } else if (on) {
               Text("hidden", color = IosSecondary, fontSize = 13.sp, modifier = Modifier.padding(end = 14.dp))
             }
-            Switch(checked = on, onCheckedChange = null)
+            Switch(checked = on, onCheckedChange = null, colors = iosSwitchColors())
           }
         }
       }
@@ -1876,7 +1873,7 @@ internal fun BootAppsContent() {
                   modifier = Modifier.weight(1f).padding(start = 14.dp),
               )
               // Visual only — the row toggles it (so the remote's center button works).
-              Switch(checked = app.pkg in selected, onCheckedChange = null)
+              Switch(checked = app.pkg in selected, onCheckedChange = null, colors = iosSwitchColors())
             }
           }
         }
@@ -1987,14 +1984,13 @@ private fun WallpaperSection() {
               modifier = Modifier.padding(top = 2.dp),
           )
         }
-        Segmented(
-            options = listOf("Off" to "off", "On" to "on"),
-            selected = if (grain) "on" else "off",
-            onSelect = {
-              val on = it == "on"
-              grain = on
-              WallpaperConfig.setGrain(context, on)
+        Switch(
+            checked = grain,
+            onCheckedChange = {
+              grain = it
+              WallpaperConfig.setGrain(context, it)
             },
+            colors = iosSwitchColors(),
         )
       }
     }

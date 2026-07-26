@@ -245,7 +245,7 @@ private fun SleepToggleRow(title: String, checked: Boolean, onChange: (Boolean) 
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Text(title, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-    Switch(checked = checked, onCheckedChange = null)
+    Switch(checked = checked, onCheckedChange = null, colors = iosSwitchColors())
   }
 }
 

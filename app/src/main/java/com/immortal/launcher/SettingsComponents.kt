@@ -208,6 +208,22 @@ internal fun IconBadge(color: Color, symbol: String, iconRes: Int? = null) {
 // ---------------------------------------------------------------------------
 
 /**
+ * The one iOS-style Switch color set: green track when on, light-grey track when off, white thumb.
+ * Every Switch in the settings surface MUST use this — a bare `Switch()` otherwise inherits the
+ * theme's blue primary + dark off-track (PortalPrimeTheme resolves to a dark scheme regardless of
+ * its `darkTheme` arg), which is the "blue on / weird black off" inconsistency this centralizes away.
+ */
+@Composable
+internal fun iosSwitchColors() =
+    SwitchDefaults.colors(
+        checkedThumbColor = Color.White,
+        checkedTrackColor = IosGreen,
+        uncheckedThumbColor = Color.White,
+        uncheckedTrackColor = IosDivider,
+        uncheckedBorderColor = IosDivider,
+    )
+
+/**
  * An iOS-style toggle row: optional 30dp icon badge on the left, 17sp label, and a green
  * iOS-style Switch on the right. The whole row is the click target so the TV remote's centre
  * button works. Min height 54dp, padding 10dp vertical / 16dp horizontal.
@@ -240,17 +256,7 @@ internal fun ToggleRow(
             modifier = Modifier.weight(1f),
         )
         // Visual only — the row toggles it (so the remote's centre button works).
-        Switch(
-            checked = checked,
-            onCheckedChange = null,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = IosGreen,
-                uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = IosDivider,
-                uncheckedBorderColor = IosDivider,
-            ),
-        )
+        Switch(checked = checked, onCheckedChange = null, colors = iosSwitchColors())
     }
 }
 

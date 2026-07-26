@@ -101,7 +101,7 @@ internal fun SunriseContent() {
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
         ) {
           Text("Enabled", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-          Switch(checked = enabled, onCheckedChange = { enabled = it; persist() })
+          Switch(checked = enabled, onCheckedChange = { enabled = it; persist() }, colors = iosSwitchColors())
         }
       }
 
@@ -135,7 +135,7 @@ internal fun SunriseContent() {
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
         ) {
           Text("Chime at the end", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-          Switch(checked = chime, onCheckedChange = { chime = it; persist() })
+          Switch(checked = chime, onCheckedChange = { chime = it; persist() }, colors = iosSwitchColors())
         }
       }
 

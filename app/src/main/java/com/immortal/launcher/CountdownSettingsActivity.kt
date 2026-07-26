@@ -144,7 +144,7 @@ internal fun CountdownSettingsContent() {
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Text("Repeats every year", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-            Switch(checked = repeatsYearly, onCheckedChange = { repeatsYearly = it })
+            Switch(checked = repeatsYearly, onCheckedChange = { repeatsYearly = it }, colors = iosSwitchColors())
           }
           if (!repeatsYearly) {
             Stepper("Year", year) { year = it.coerceIn(2000, 2100) }
