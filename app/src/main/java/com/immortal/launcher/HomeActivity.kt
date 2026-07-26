@@ -1043,18 +1043,28 @@ private fun FadingDivider() {
 // Liquid Glass composables
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Bare Liquid Glass surface — frosted fill + specular highlight + border. */
+/**
+ * Bare Liquid Glass surface — transparent frosted glass with a left→right sheen and a soft drop
+ * shadow for lift (matching the weather card's depth). Still see-through: a thin translucent white
+ * wash that flows brighter on the left to fainter on the right, a hairline border, and a top-left
+ * specular highlight. No live blur (Portal GPU) — all static.
+ */
 @Composable
 private fun LiquidGlass(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 22.dp,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
+  val shape = RoundedCornerShape(cornerRadius)
   Box(
       modifier = modifier
-          .clip(RoundedCornerShape(cornerRadius))
-          .background(Color(0x1EFFFFFF))
-          .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(cornerRadius)),
+          // Soft drop shadow for lift, like the weather card's depth (clip=false so it spreads).
+          .shadow(elevation = 12.dp, shape = shape, clip = false)
+          .clip(shape)
+          // Transparent glass wash flowing left→right: a touch brighter on the left, fainter right.
+          .background(
+              Brush.horizontalGradient(colors = listOf(Color(0x2EFFFFFF), Color(0x14FFFFFF))))
+          .border(1.dp, Color(0x38FFFFFF), shape),
   ) {
     // Specular top-left highlight
     Box(
