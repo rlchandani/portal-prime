@@ -708,7 +708,10 @@ private fun LauncherScreen(
   // but are intentionally unused by the UI now that the dock is gone.
   val orderState = remember { mutableStateOf(UserLayout.loadOrder(context)) }
   val orderedApps = remember(installedApps, orderState.value) {
-    UserLayout.applyOrder(installedApps, orderState.value) { it.component.packageName }
+    // Identity is the flattened component ("pkg/class"), not the package name: our two
+    // synthetic tiles (Settings, App Store) both live under this launcher's package, so a
+    // package-name key would collide and crash the LazyGrid ("key already used").
+    UserLayout.applyOrder(installedApps, orderState.value) { it.component.flattenToString() }
   }
 
   // Home widgets state
@@ -857,7 +860,7 @@ private fun LauncherScreen(
             // Called continuously as items cross during drag. Reorder the displayed list
             // (indexed identically to what the grid renders) so from/to line up 1:1 and the
             // other items animate into their new slots. Persist the full order.
-            val displayed = orderedApps.map { it.component.packageName }.toMutableList()
+            val displayed = orderedApps.map { it.component.flattenToString() }.toMutableList()
             if (from.index in displayed.indices && to.index in displayed.indices) {
               displayed.add(to.index, displayed.removeAt(from.index))
               UserLayout.saveOrder(context, displayed)
@@ -875,9 +878,10 @@ private fun LauncherScreen(
               horizontalArrangement = Arrangement.spacedBy(16.dp),
               verticalArrangement = Arrangement.spacedBy(20.dp),
           ) {
-            items(orderedApps, key = { it.component.packageName }) { app ->
+            items(orderedApps, key = { it.component.flattenToString() }) { app ->
               val pkg = app.component.packageName
-              ReorderableItem(reorderableState, key = pkg) { isDragging ->
+              val itemKey = app.component.flattenToString()
+              ReorderableItem(reorderableState, key = itemKey) { isDragging ->
                 // animateItem() glides the OTHER icons into their new slots while one is
                 // dragged. The dragged item is driven by the reorderable library, so exclude
                 // it from placement animation while dragging.
