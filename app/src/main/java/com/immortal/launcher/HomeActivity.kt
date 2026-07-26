@@ -674,34 +674,28 @@ private fun LauncherScreen(
 
   // ── iOS 26 Liquid Glass Layout ────────────────────────────────────────────
 
-  BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+  BoxWithConstraints(
+      modifier = Modifier.fillMaxSize().then(
+          if (editMode) {
+            // Exit edit mode on an empty-space tap. Attached to the OUTERMOST box so it always
+            // receives the gesture; the Final pass + unconsumed check means it fires only when
+            // no child (icon/widget/badge/drag-handle) claimed the tap — i.e. empty space.
+            Modifier.pointerInput(Unit) {
+              awaitEachGesture {
+                val down = awaitFirstDown(pass = androidx.compose.ui.input.pointer.PointerEventPass.Final)
+                val up = waitForUpOrCancellation(pass = androidx.compose.ui.input.pointer.PointerEventPass.Final)
+                if (up != null && !up.isConsumed) editMode = false
+              }
+            }
+          } else Modifier
+      )
+  ) {
     val w = constraints.maxWidth
     val h = constraints.maxHeight
 
-    // Background: deep-space radial gradient. Also hosts the tap-to-exit-edit handler HERE
-    // (behind all content) so it only catches taps that land on empty space — icon drag
-    // gestures on top receive the touch first. (Previously this was on the content Row, which
-    // consumed every pointer-down and starved the grid icons' drag gesture.)
+    // Background: deep-space radial gradient.
     Box(
         modifier = Modifier.fillMaxSize()
-            .then(
-                if (editMode) {
-                  // Exit edit mode on a tap that lands on EMPTY space. We watch the FINAL pass:
-                  // icons/widgets and their drag handles consume their own down events in the
-                  // main pass, so if a tap reaches us unconsumed here, it was on empty space.
-                  // (A full-screen background tap-catcher alone doesn't work now that the grid
-                  // fills the screen and intercepts touches over its area.)
-                  Modifier.pointerInput(Unit) {
-                    awaitEachGesture {
-                      val down = awaitFirstDown(pass = androidx.compose.ui.input.pointer.PointerEventPass.Final)
-                      val up = waitForUpOrCancellation(pass = androidx.compose.ui.input.pointer.PointerEventPass.Final)
-                      if (up != null && !down.isConsumed && !up.isConsumed) {
-                        editMode = false
-                      }
-                    }
-                  }
-                } else Modifier
-            )
             .background(
             Brush.radialGradient(
                 colors = listOf(
