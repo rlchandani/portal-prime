@@ -1044,13 +1044,10 @@ private fun FadingDivider() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Bare Liquid Glass surface — the premium frosted-card material used across the dashboard.
- * The Portal's older GPU can't do a live backdrop blur cheaply, so instead of a thin translucent
- * wash (which let the wallpaper show through the middle and read as a muddy "blue center, glass
- * edges"), this is a near-opaque frosted-dark material with its OWN subtle top-to-bottom gradient —
- * so it reads as a solid, self-contained card on any wallpaper, exactly like the weather hero. On
- * top: a bright top-edge sheen, a diagonal specular highlight, a hairline border, and a soft drop
- * shadow for lift. All static → no per-frame cost.
+ * Bare Liquid Glass surface — a light, transparent frosted-glass card (the original look): a thin
+ * translucent white wash so the wallpaper shows softly through, a bright hairline border, a diagonal
+ * specular highlight in the top-left, and a soft drop shadow for lift. See-through and airy. No live
+ * backdrop blur (the Portal's GPU can't afford it) — all static layers, no per-frame cost.
  */
 @Composable
 private fun LiquidGlass(
@@ -1062,27 +1059,17 @@ private fun LiquidGlass(
   Box(
       modifier = modifier
           // Soft drop shadow lifts the card off the wallpaper (clip=false so it spreads).
-          .shadow(elevation = 16.dp, shape = shape, clip = false)
+          .shadow(elevation = 14.dp, shape = shape, clip = false)
           .clip(shape)
-          // Frosted-dark material: a near-opaque cool gradient that fills the whole card (top a touch
-          // lighter than the bottom). ~90% alpha keeps a faint sense of glass without the wallpaper
-          // bleeding through the centre.
-          .background(
-              Brush.verticalGradient(
-                  colors = listOf(Color(0xE63A4056), Color(0xE6262B3D)),
-              ))
-          // Bright top-edge sheen fading down, like light catching a glass rim.
-          .background(
-              Brush.verticalGradient(
-                  colors = listOf(Color(0x26FFFFFF), Color.Transparent, Color(0x0DFFFFFF)),
-              ))
-          .border(1.dp, Color(0x33FFFFFF), shape),
+          // Thin translucent white wash — transparent glass; the wallpaper shows softly through.
+          .background(Color(0x24FFFFFF))
+          .border(1.dp, Color(0x59FFFFFF), shape),
   ) {
     // Diagonal specular highlight in the top-left corner.
     Box(
         modifier = Modifier.matchParentSize().background(
             Brush.radialGradient(
-                colors = listOf(Color(0x1FFFFFFF), Color.Transparent),
+                colors = listOf(Color(0x38FFFFFF), Color.Transparent),
                 center = Offset(0f, 0f),
                 radius = 420f,
             )
