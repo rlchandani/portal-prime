@@ -468,6 +468,12 @@ private fun LeftWidgetColumn(
       }
     }
 
+    // Premium dashboard cards (self-hiding when their data/target isn't available):
+    // smart-home quick controls, family quick-call, and a photo memory.
+    QuickControlsWidget(modifier = Modifier.fillMaxWidth())
+    FamilyCallRow(modifier = Modifier.fillMaxWidth())
+    PhotoMemoryStrip(modifier = Modifier.fillMaxWidth())
+
     // Store-driven resizable + reorderable widgets.
     // Mirrors the app-icon grid EXACTLY: a LazyVerticalGrid(2) whose reorderable state edits the
     // same list the grid renders (1:1 index mapping) and persists the new order. A Small widget
@@ -2300,6 +2306,164 @@ private fun ImmortalWidgetShell(
 }
 
 /**
+ * "On this day" photo-memory strip: a glass row with a small thumbnail from the user's screensaver
+ * photo folder and a caption; tapping opens the full photo-frame. Only shown when a local photo
+ * folder is configured and readable — otherwise it stays hidden (no empty chrome).
+ */
+@Composable
+private fun PhotoMemoryStrip(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  val onOpen: () -> Unit = {
+    runCatching {
+      context.startActivity(
+          Intent(context, PhotoFramePreviewActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  val photo by
+      produceState<ImageBitmap?>(initialValue = null) {
+        value = withContext(Dispatchers.IO) {
+          runCatching {
+            val cfg = ScreensaverConfig.load(context)
+            val folder = cfg.folderPath
+            if (cfg.usesFolder && folder != null && LocalMedia.isAccessible(folder)) {
+              LocalMedia.enumerate(folder, includeVideo = false, max = 60)
+                  .filterNot { it.isVideo }
+                  .randomOrNull()
+                  ?.let { android.graphics.BitmapFactory.decodeFile(it.path)?.asImageBitmap() }
+            } else null
+          }.getOrNull()
+        }
+      }
+  val bmp = photo ?: return // no readable local photos → hide the strip entirely
+
+  LiquidGlassWidget(modifier = modifier.wrapContentHeight()) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable { onOpen() }.padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+      Image(
+          bitmap = bmp,
+          contentDescription = null,
+          contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+          modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)),
+      )
+      Column(Modifier.weight(1f)) {
+        Text("On this day", color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        Text("A memory from your photos", color = Color.White.copy(alpha = 0.9f), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      }
+      Text("›", color = Color.White.copy(alpha = 0.5f), fontSize = 24.sp)
+    }
+  }
+}
+
+/**
+ * Home quick-controls: a glass grid of tap targets for the smart-home stuff a Portal owner reaches
+ * for — a Hey Portal voice tile (launches the on-device assistant), and Home Assistant shortcuts
+ * that open the HA app (the one-way MQTT bridge can't toggle devices, so we hand off to HA itself).
+ * Tiles whose target isn't installed are hidden, so the grid only shows what actually works here.
+ */
+@Composable
+private fun QuickControlsWidget(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  val pm = context.packageManager
+  val haInstalled = remember {
+    runCatching { pm.getLaunchIntentForPackage("io.homeassistant.companion.android") != null }.getOrDefault(false)
+  }
+  val assistantInstalled = remember {
+    runCatching { pm.getLaunchIntentForPackage("com.portal.assistant") != null }.getOrDefault(false)
+  }
+  fun launch(pkg: String) {
+    runCatching { pm.getLaunchIntentForPackage(pkg)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.let { context.startActivity(it) } }
+  }
+
+  data class QC(val glyph: String, val label: String, val tint: Color, val onTap: () -> Unit)
+  val tiles = buildList {
+    if (assistantInstalled) add(QC("🎙", "Hey Portal", Color(0xFF5E5CE6)) { launch("com.portal.assistant") })
+    if (haInstalled) {
+      add(QC("💡", "Lights", Color(0xFFFF9F0A)) { launch("io.homeassistant.companion.android") })
+      add(QC("🎬", "Scenes", Color(0xFF0A84FF)) { launch("io.homeassistant.companion.android") })
+      add(QC("🌡", "Climate", Color(0xFF30D158)) { launch("io.homeassistant.companion.android") })
+      add(QC("🏠", "Home", Color(0xFF41BDF5)) { launch("io.homeassistant.companion.android") })
+    }
+  }
+  if (tiles.isEmpty()) return // nothing installed to control → don't show an empty card
+
+  LiquidGlassWidget(modifier = modifier.wrapContentHeight()) {
+    Column(modifier = Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+      Text("Quick controls", color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, fontWeight = FontWeight.Medium)
+      // Up to 4 tiles per row. When a row is full it stretches evenly (weight); a partial last row
+      // uses fixed-width tiles so a lone tile (e.g. only Hey Portal) doesn't stretch across the card.
+      tiles.chunked(4).forEach { row ->
+        val full = row.size == 4
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+          row.forEach { qc ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = (if (full) Modifier.weight(1f) else Modifier.width(88.dp))
+                    .clip(RoundedCornerShape(16.dp)).clickable { qc.onTap() }
+                    .background(qc.tint.copy(alpha = 0.22f)).padding(vertical = 12.dp),
+            ) {
+              Text(qc.glyph, fontSize = 24.sp)
+              Text(qc.label, color = Color.White.copy(alpha = 0.9f), fontSize = 12.sp, maxLines = 1, modifier = Modifier.padding(top = 4.dp))
+            }
+          }
+          if (full) Unit else Spacer(Modifier.weight(1f))
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Family quick-call row: circular avatars that hand off to the stock Portal calling surface (the
+ * only trusted caller for Contacts/calling). Names are placeholders until the user configures them;
+ * the whole row routes through the same Portal-home bridge the Calls tile uses.
+ */
+@Composable
+private fun FamilyCallRow(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  // Route to the stock Portal Home calling surface via its VIEW deep link — the same trusted-caller
+  // bridge the Calls tile uses (Contacts rejects an untrusted direct launch). Marks the dream bridge
+  // so the screensaver doesn't claw the frame back mid-handoff.
+  val onCall: () -> Unit = {
+    runCatching {
+      DreamPolicy.markBridge(context)
+      context.startActivity(
+          Intent(Intent.ACTION_VIEW, Uri.parse("portal://launcher/home"))
+              .setPackage("com.facebook.alohaapps.launcher")
+              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  data class Person(val initial: String, val tint: List<Color>)
+  // Placeholder contacts — until the user wires real ones, tapping any opens the Portal call surface.
+  val people = listOf(
+      Person("M", listOf(Color(0xFFFF9A9E), Color(0xFFFECFEF))),
+      Person("D", listOf(Color(0xFFA18CD1), Color(0xFFFBC2EB))),
+      Person("S", listOf(Color(0xFF84FAB0), Color(0xFF8FD3F4))),
+  )
+  Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+    people.forEach { p ->
+      Box(
+          modifier = Modifier.size(56.dp).clip(RoundedCornerShape(50))
+              .background(Brush.linearGradient(p.tint)).clickable { onCall() },
+          contentAlignment = Alignment.Center,
+      ) {
+        Text(p.initial, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+      }
+    }
+    // Add / open full contacts.
+    Box(
+        modifier = Modifier.size(56.dp).clip(RoundedCornerShape(50))
+            .border(2.dp, Color.White.copy(alpha = 0.4f), RoundedCornerShape(50)).clickable { onCall() },
+        contentAlignment = Alignment.Center,
+    ) {
+      Text("＋", color = Color.White.copy(alpha = 0.8f), fontSize = 26.sp, fontWeight = FontWeight.Light)
+    }
+  }
+}
+
+/**
  * The glanceable "Today" strip for the left column: a frosted-glass card with three quick rows —
  * next calendar event, weather feels-like + hi/lo, and the moon phase with today's sunrise/sunset.
  * All data is already fetched elsewhere (weather + sun times keyless from Open-Meteo; moon phase is
@@ -2427,12 +2591,14 @@ private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
   // Forecast mode from Settings > Appearance > Weather widget: Off / Hourly / Daily. Re-read on
   // resume so a change applies when the user returns home.
   var forecastMode by remember { mutableStateOf(ImmortalSettings.load(context).weatherWidget) }
+  var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
   DisposableEffect(lifecycleOwner) {
     val obs = LifecycleEventObserver { _, e ->
       if (e == Lifecycle.Event.ON_RESUME) {
         fahrenheit = ImmortalSettings.useFahrenheit(context)
         forecastMode = ImmortalSettings.load(context).weatherWidget
+        use24 = ImmortalSettings.use24HourClock(context)
       }
     }
     lifecycleOwner.lifecycle.addObserver(obs)
@@ -2448,6 +2614,10 @@ private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
   val forecast by
       produceState<Weather.Forecast?>(initialValue = null, fahrenheit) {
         value = withContext(Dispatchers.IO) { Weather.fetchForecast(context) }
+      }
+  val sunTimes by
+      produceState<Weather.SunTimes?>(initialValue = null) {
+        value = withContext(Dispatchers.IO) { Weather.fetchSunTimes(context) }
       }
   val code = current?.code ?: 0
   val isDay = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY) in 6..18
@@ -2477,6 +2647,23 @@ private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
               color = Color.White,
               fontSize = 46.sp,
               fontWeight = FontWeight.Light,
+          )
+          // Always-present hero subline: condition · today's H/L · sunset — so the card reads as a
+          // premium weather hero even when the forecast strip mode is Off.
+          val today = forecast?.days?.firstOrNull()
+          val condition = weatherConditionText(code)
+          val sunsetLabel = sunTimes?.formatted(use24)?.second
+          Text(
+              buildString {
+                append(condition)
+                today?.let { append("  ·  H:${it.hi}° L:${it.lo}°") }
+                sunsetLabel?.let { append("  ·  ↓$it") }
+              },
+              color = Color(0xE6FFFFFF),
+              fontSize = 14.sp,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+              modifier = Modifier.padding(top = 2.dp),
           )
         }
         Text(Weather.emoji(code), fontSize = 34.sp)
