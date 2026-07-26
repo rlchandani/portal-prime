@@ -302,14 +302,8 @@ object SettingsDomains {
                       "Reduce screen burn-in",
                       get = { it.antiBurnIn },
                       set = ScreensaverConfig::setAntiBurnIn),
-                  BoolSpec(
-                      "showGradient",
-                      "Legibility gradient",
-                      get = { it.showGradient },
-                      set = ScreensaverConfig::setShowGradient,
-                      help =
-                          "Darken the bottom of the frame so the clock and widgets stay readable " +
-                              "over bright photos. Turn off to show photos clean edge-to-edge."),
+                  // NOTE: `showGradient` removed — the frame always draws a legibility scrim
+                  // (FaceRenderer), so the toggle never did anything. See settings-reimagining-audit.
                   EnumSpec(
                       "presenceMode",
                       "Power",
@@ -369,16 +363,8 @@ object SettingsDomains {
                       get = { it.overnightNightClock },
                       set = ScreensaverConfig::setOvernightNightClock,
                       visible = { _, s -> s.overnightEnabled }),
-                  // ---- Fork-specific screensaver controls ----
-                  EnumSpec(
-                      "feed",
-                      "Photo feed",
-                      get = { it.feed },
-                      set = ScreensaverConfig::setFeed,
-                      options = ScreensaverConfig.FEEDS.map { it to ScreensaverConfig.feedLabel(it) },
-                      coerce = { v -> v.takeIf { it in ScreensaverConfig.FEEDS } },
-                      visible = { _, s -> s.source == ScreensaverConfig.SOURCE_DEFAULT },
-                      help = "Which online photo feed to use with the built-in source."),
+                  // NOTE: `feed` (Photo feed picker) removed — PhotoFrameController hardcodes the
+                  // built-in source chain and never read the setting. See settings-reimagining-audit.
                   BoolSpec(
                       "sleepTimerEnabled",
                       "Sleep timer",
@@ -450,8 +436,6 @@ object SettingsDomains {
                   "includeVideo" to "Display",
                   "showNowPlaying" to "Display",
                   "antiBurnIn" to "Display",
-                  "showGradient" to "Display",
-                  "feed" to "Display",
                   "ambientDashboard" to "Display",
                   "gestureWave" to "Display",
                   "welcomeEnabled" to "Display",
@@ -551,13 +535,7 @@ object SettingsDomains {
                       set = ImmortalSettings::setHideStatusBar,
                       help =
                           "Hidden by default for a cleaner full-screen look. Swipe down from the top to reveal it briefly."),
-                  BoolSpec(
-                      "constrainPageWidth",
-                      "Constrain page width",
-                      get = { it.constrainPageWidth },
-                      set = ImmortalSettings::setConstrainPageWidth,
-                      help =
-                          "Cap the home screen width on large landscape displays instead of filling the whole panel. Off by default."),
+                  // NOTE: `constrainPageWidth` removed — no consumer ever read it. See audit.
                   BoolSpec(
                       "multiRoomEnabled",
                       "Multi-room audio",
@@ -600,7 +578,6 @@ object SettingsDomains {
                   "tileSize" to "Home screen",
                   "showMiniPlayer" to "Home screen",
                   "hideStatusBar" to "Home screen",
-                  "constrainPageWidth" to "Home screen",
                   "clockFormat" to "Clock",
                   "multiRoomEnabled" to "Audio",
                   "snapcastHost" to "Audio",

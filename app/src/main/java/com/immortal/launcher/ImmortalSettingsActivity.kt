@@ -584,14 +584,6 @@ private fun ImmortalSettingsScreen() {
             iconSymbol = "S",
             onChange = { applyImmortal("hideStatusBar", it) },
         )
-        Divider()
-        ToggleRow(
-            title = "Constrain Page Width",
-            checked = immortal.constrainPageWidth,
-            iconColor = Color(0xFF5E5CE6),
-            iconSymbol = "|",
-            onChange = { applyImmortal("constrainPageWidth", it) },
-        )
       }
       } // end Appearance
 

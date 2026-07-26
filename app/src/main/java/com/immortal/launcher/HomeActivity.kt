@@ -739,6 +739,13 @@ private fun LauncherScreen(
     UserLayout.applyOrder(installedApps, orderState.value) { it.component.flattenToString() }
   }
 
+  // App tile size (Settings > Appearance): drives the grid column count and the tile size that
+  // every AppTile reads via LocalTileDp. Re-read on the same resume/package trigger as the app
+  // list, so changing it in Settings applies the moment the user returns home.
+  val tileSize = remember(appsRefreshKey) { ImmortalSettings.load(context).tileSize }
+  val gridColumns = gridColumnsFor(tileSize)
+  val tileDp = tileDpFor(tileSize)
+
   // Home widgets state
   var homeWidgets by remember { mutableStateOf(HomeWidgetStore.load(context)) }
   LaunchedEffect(Unit) {
@@ -862,7 +869,9 @@ private fun LauncherScreen(
 
         FadingDivider()
 
-        // RIGHT COLUMN (62%) — 5-column app icon grid
+        // RIGHT COLUMN (62%) — app icon grid. Tile size + column count come from the
+        // "App tile size" setting (Standard 6×88dp / Large 5×110dp / XL 4×140dp) via LocalTileDp.
+        CompositionLocalProvider(LocalTileDp provides tileDp) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -882,7 +891,7 @@ private fun LauncherScreen(
             }
           }
           LazyVerticalGrid(
-              columns = GridCells.Fixed(5),
+              columns = GridCells.Fixed(gridColumns),
               state = gridState,
               // In edit mode the grid's own vertical scroll competes with the drag; disable
               // user scroll while editing so the reorder owns the pointer.
@@ -930,6 +939,7 @@ private fun LauncherScreen(
             }
           }
         }
+        } // end CompositionLocalProvider(LocalTileDp)
       }
     }
   }
@@ -2273,10 +2283,16 @@ private fun ImmortalWidgetShell(
 private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var fahrenheit by remember { mutableStateOf(ImmortalSettings.useFahrenheit(context)) }
+  // Forecast mode from Settings > Appearance > Weather widget: Off / Hourly / Daily. Re-read on
+  // resume so a change applies when the user returns home.
+  var forecastMode by remember { mutableStateOf(ImmortalSettings.load(context).weatherWidget) }
   val lifecycleOwner = LocalLifecycleOwner.current
   DisposableEffect(lifecycleOwner) {
     val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) fahrenheit = ImmortalSettings.useFahrenheit(context)
+      if (e == Lifecycle.Event.ON_RESUME) {
+        fahrenheit = ImmortalSettings.useFahrenheit(context)
+        forecastMode = ImmortalSettings.load(context).weatherWidget
+      }
     }
     lifecycleOwner.lifecycle.addObserver(obs)
     onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
@@ -2325,20 +2341,45 @@ private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
         Text(Weather.emoji(code), fontSize = 34.sp)
       }
       Spacer(Modifier.weight(1f))
-      val hours = forecast?.hours?.take(5).orEmpty()
-      if (hours.isNotEmpty()) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          hours.forEach { h ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.weight(1f),
-            ) {
-              Text(h.label, color = Color(0xCCFFFFFF), fontSize = 11.sp, maxLines = 1)
-              Text(Weather.emoji(h.code), fontSize = 18.sp, modifier = Modifier.padding(vertical = 3.dp))
-              Text("${h.temp}°", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+      // Forecast strip honors the Weather-widget mode: Off shows just the current conditions,
+      // Hourly shows the next 5 hours, Daily shows the next 5 days with high/low.
+      when (forecastMode) {
+        ImmortalSettings.WIDGET_HOURLY -> {
+          val hours = forecast?.hours?.take(5).orEmpty()
+          if (hours.isNotEmpty()) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              hours.forEach { h ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f),
+                ) {
+                  Text(h.label, color = Color(0xCCFFFFFF), fontSize = 11.sp, maxLines = 1)
+                  Text(Weather.emoji(h.code), fontSize = 18.sp, modifier = Modifier.padding(vertical = 3.dp))
+                  Text("${h.temp}°", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                }
+              }
             }
           }
         }
+        ImmortalSettings.WIDGET_DAILY -> {
+          val days = forecast?.days?.take(5).orEmpty()
+          if (days.isNotEmpty()) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              days.forEach { d ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f),
+                ) {
+                  Text(d.label, color = Color(0xCCFFFFFF), fontSize = 11.sp, maxLines = 1)
+                  Text(Weather.emoji(d.code), fontSize = 18.sp, modifier = Modifier.padding(vertical = 3.dp))
+                  Text("${d.hi}°", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                  Text("${d.lo}°", color = Color(0x99FFFFFF), fontSize = 11.sp)
+                }
+              }
+            }
+          }
+        }
+        else -> {} // WIDGET_OFF: current conditions only, no forecast strip.
       }
     }
   }
