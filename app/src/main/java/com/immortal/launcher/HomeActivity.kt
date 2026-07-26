@@ -1044,14 +1044,10 @@ private fun FadingDivider() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Bare Liquid Glass surface — TRULY transparent frosted glass: a thin translucent white wash
- * (brighter on the left, fainter right), a hairline light border, and a top-left specular highlight.
- * The wallpaper shows cleanly through — the card only ever LIGHTENS what's behind it, never darkens.
- *
- * Deliberately NO drop shadow: a shadow renders a dark rounded-rect that shows THROUGH the ~10%-
- * opaque fill and darkens the card's centre (the "glassy edges, dark middle" artifact the user hit).
- * A transparent card and a drop shadow are mutually exclusive; the border + specular define the
- * glass edge instead. No live blur (Portal GPU) — all static.
+ * Bare Liquid Glass surface — the SOLID card look (from the approved card-final mock): an opaque
+ * deep-blue gradient flowing left→right, a soft drop shadow for lift, and a thin light border for a
+ * glass edge. Because the fill is opaque, the shadow reads cleanly as depth (no bleed-through), and
+ * the card is self-contained and consistent on any wallpaper. No live blur (Portal GPU).
  */
 @Composable
 private fun LiquidGlass(
@@ -1062,25 +1058,21 @@ private fun LiquidGlass(
   val shape = RoundedCornerShape(cornerRadius)
   Box(
       modifier = modifier
+          // Soft drop shadow for lift — safe here because the fill below is opaque.
+          .shadow(elevation = 14.dp, shape = shape, clip = false)
           .clip(shape)
-          // Near-flat glass wash — barely any left→right variation now (was a strong gradient).
+          // Opaque deep-blue gradient, left→right (the mock's #243867 → #3a5aa0).
           .background(
-              Brush.horizontalGradient(colors = listOf(Color(0x17FFFFFF), Color(0x12FFFFFF))))
-          // Very subtle top-edge gloss — just a hint of light on the rim, much softer than before.
-          .background(
-              Brush.verticalGradient(
-                  colors = listOf(Color(0x1FFFFFFF), Color.Transparent),
-                  endY = 90f,
-              ))
-          // Crisp bright rim.
-          .border(1.dp, Color(0x59FFFFFF), shape),
+              Brush.linearGradient(colors = listOf(Color(0xFF243867), Color(0xFF3A5AA0))))
+          // Thin light rim for the glass edge.
+          .border(1.dp, Color(0x38FFFFFF), shape),
   ) {
-    // Soft specular top-left highlight.
+    // Soft top-left highlight for a hint of sheen.
     Box(
         modifier = Modifier.matchParentSize().background(
             Brush.radialGradient(
-                colors = listOf(Color(0x1AFFFFFF), Color.Transparent),
-                radius = 300f,
+                colors = listOf(Color(0x24FFFFFF), Color.Transparent),
+                radius = 320f,
             )
         )
     )
