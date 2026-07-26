@@ -228,10 +228,10 @@ object SettingsDomains {
                       step = 15,
                       format = { "$it min" },
                       help = "How often to re-fetch the photo list from a network album source.",
-                      // Only meaningful for a network album (Immich/URL/SMB/WebDAV/web feed); the
-                      // built-in feed and a local folder don't poll a remote listing, so on-device
-                      // this row only appears for those sources (it was remote-only before).
-                      visible = { _, s -> !s.usesFolder && s.source != ScreensaverConfig.SOURCE_DEFAULT }),
+                      // Auto-managed: hidden on-device (settings-reimagining Phase 5). The default
+                      // refresh cadence is fine for every album source; the phone remote can still
+                      // set it. (Was network-album-only: !s.usesFolder && source != DEFAULT.)
+                      visible = { _, _ -> false }),
                   EnumSpec(
                       "fit",
                       "Fit",
@@ -281,7 +281,10 @@ object SettingsDomains {
                       help =
                           "The most storage the saved copies may use. When it fills up, the items " +
                               "shown longest ago are removed first. Also limited by free space.",
-                      visible = { _, s -> (s.usesImmich || s.usesDav) && s.cacheEnabled }),
+                      // Auto-managed: hidden on-device (settings-reimagining Phase 5). The cache
+                      // self-evicts oldest-first within the default budget (and free space); the
+                      // phone remote can still tune it. (Was: (usesImmich||usesDav) && cacheEnabled.)
+                      visible = { _, _ -> false }),
                   BoolSpec(
                       "batterySaver",
                       "Sleep on battery when nobody's around",
@@ -297,11 +300,15 @@ object SettingsDomains {
                       get = { it.showNowPlaying },
                       set = ScreensaverConfig::setShowNowPlaying,
                       help = "Overlay the current track and cover art on the photo frame while music is playing."),
+                  // On-by-default and auto-managed: hidden on-device (settings-reimagining Phase 5).
+                  // Burn-in reduction should always be on for an always-on frame; the phone remote
+                  // can still toggle it if ever needed.
                   BoolSpec(
                       "antiBurnIn",
                       "Reduce screen burn-in",
                       get = { it.antiBurnIn },
-                      set = ScreensaverConfig::setAntiBurnIn),
+                      set = ScreensaverConfig::setAntiBurnIn,
+                      visible = { _, _ -> false }),
                   // NOTE: `showGradient` removed — the frame always draws a legibility scrim
                   // (FaceRenderer), so the toggle never did anything. See settings-reimagining-audit.
                   EnumSpec(
@@ -648,12 +655,15 @@ object SettingsDomains {
                       get = { MqttConfig.useTls(it) },
                       set = MqttConfig::setUseTls,
                       visible = { c, _ -> MqttConfig.isEnabled(c) }),
+                  // On-by-default and auto-managed: hidden on-device (settings-reimagining Phase 5).
+                  // Certificate validation should stay on; the phone remote can still turn it off
+                  // for a self-signed broker. (Was: isEnabled && useTls.)
                   BoolSpec(
                       "validateCert",
                       "Validate certificate",
                       get = { MqttConfig.validateCert(it) },
                       set = MqttConfig::setValidateCert,
-                      visible = { c, _ -> MqttConfig.isEnabled(c) && MqttConfig.useTls(c) }),
+                      visible = { _, _ -> false }),
               ),
           sections =
               mapOf(

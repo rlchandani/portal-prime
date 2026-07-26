@@ -1531,31 +1531,9 @@ internal fun MqttContent() {
                 },
             )
           }
-          if (useTls) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-              Column(modifier = Modifier.weight(1f)) {
-                Text("Validate certificate", color = IosLabel, fontSize = 15.sp)
-                Text(
-                    "Verify the broker's certificate and hostname. Turn off only for a " +
-                        "self-signed broker on a trusted network.",
-                    color = IosSecondary,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(top = 2.dp),
-                )
-              }
-              Segmented(
-                  options = listOf("Off" to "off", "On" to "on"),
-                  selected = if (validateCert) "on" else "off",
-                  onSelect = {
-                    validateCert = it == "on"
-                    apply()
-                  },
-              )
-            }
-          }
+          // Certificate validation is auto-managed (on by default, settings-reimagining Phase 5):
+          // no on-device row. It stays applied and the phone remote can still turn it off for a
+          // self-signed broker on a trusted network.
           // Live connection status — gives Apply visible feedback (Connecting… → Connected).
           Text(
               status.ifBlank { "Starting…" },
