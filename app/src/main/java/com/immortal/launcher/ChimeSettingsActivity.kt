@@ -48,15 +48,21 @@ class ChimeSettingsActivity : ComponentActivity() {
 
 @Composable
 private fun ChimeSettingsScreen() {
-  val context = LocalContext.current
-  var settings by remember { mutableStateOf(ChimeConfig.load(context)) }
-  val activity = context as? Activity
-
+  val activity = LocalContext.current as? Activity
   SettingsScaffold(
       title = "Sounds",
       subtitle = "Gentle ambient cues. All off by default; nothing plays during quiet hours.",
       onBack = { activity?.finish() },
-  ) {
+  ) { ChimeSettingsContent() }
+}
+
+/** Inlinable body of the Chime settings screen — rendered both by [ChimeSettingsScreen] (standalone
+ *  Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun ChimeSettingsContent() {
+  val context = LocalContext.current
+  var settings by remember { mutableStateOf(ChimeConfig.load(context)) }
+
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       // Scalar controls (toggles, volumes, quiet times, sunrise sound) render from the `chime`
       // registry domain - the same specs the phone remote uses. Apply routes through the domain so
@@ -88,7 +94,6 @@ private fun ChimeSettingsScreen() {
         }
       }
     }
-  }
 }
 
 @Composable

@@ -43,6 +43,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Dp
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -53,6 +54,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.runtime.remember
@@ -112,8 +114,16 @@ class ImmortalSettingsActivity : ComponentActivity() {
 // Sidebar model — iPhone-style grouped sections
 // ---------------------------------------------------------------------------
 
-/** One sidebar row: [name] gates the detail panel, [symbol] + [iconColor] draw its badge. */
-internal data class SectionDef(val name: String, val symbol: String, val iconColor: Color)
+/**
+ * One sidebar row: [name] gates the detail panel, [iconColor] tints its badge. The badge shows
+ * [iconRes] (a white-tinted vector drawable) when set, else falls back to the single-glyph [symbol].
+ */
+internal data class SectionDef(
+    val name: String,
+    val symbol: String,
+    val iconColor: Color,
+    val iconRes: Int? = null,
+)
 
 /**
  * Sections that hand off to Android's own Settings rather than rendering a detail panel. Mapped to
@@ -128,42 +138,44 @@ private val OS_LINK_OUT_SECTIONS: Map<String, String> = emptyMap()
 /**
  * The grouped sidebar (approved iPhone grouping). Each group is a header + its ordered rows. Rows
  * that link out to Android's own Settings appear in [OS_LINK_OUT_SECTIONS]; the rest open a detail
- * panel in [ImmortalSettingsScreen]. Badge glyphs are single ASCII letters (the Portal's Android 10
- * has patchy emoji coverage), matching the file's existing IconBadge convention.
+ * panel in [ImmortalSettingsScreen]. Each row shows a white Material vector badge (crisp on the
+ * Portal's Android 10, where emoji coverage is patchy); the single-ASCII-letter [symbol] is the
+ * fallback for any row without a dedicated icon.
  */
 private val SECTION_GROUPS: List<Pair<String, List<SectionDef>>> =
     listOf(
         "Sound & Wake" to
             listOf(
-                SectionDef("Chime", "C", Color(0xFFFF9F0A)),
-                SectionDef("Sunrise & Wake", "R", Color(0xFFFFD60A)),
-                SectionDef("Multi-room Audio", "M", Color(0xFF30D158)),
-                SectionDef("Welcome Greeting", "H", Color(0xFFFF375F)),
-                SectionDef("Touch Sounds", "s", Color(0xFF30D158)),
+                SectionDef("Chime", "C", Color(0xFFFF9F0A), R.drawable.ic_settings_chime),
+                SectionDef("Sunrise & Wake", "R", Color(0xFFFFD60A), R.drawable.ic_settings_sunrise),
+                SectionDef("Multi-room Audio", "M", Color(0xFF30D158), R.drawable.ic_settings_multiroom),
+                SectionDef("Welcome Greeting", "H", Color(0xFFFF375F), R.drawable.ic_settings_welcome),
+                SectionDef("Touch Sounds", "s", Color(0xFF30D158), R.drawable.ic_settings_touch),
             ),
         "General" to
             listOf(
-                SectionDef("Screensaver", "P", Color(0xFFFF6B35)),
-                SectionDef("Wallpaper", "w", Color(0xFF5E5CE6)),
-                SectionDef("Clock Face", "c", Color(0xFF0A84FF)),
-                SectionDef("Appearance", "T", Color(0xFF5E5CE6)),
-                SectionDef("Weather", "u", Color(0xFF0A84FF)),
-                SectionDef("Sleep Timer", "z", Color(0xFF636366)),
+                SectionDef("Display", "L", Color(0xFFFF9F0A), R.drawable.ic_settings_display),
+                SectionDef("Screensaver", "P", Color(0xFFFF6B35), R.drawable.ic_settings_screensaver),
+                SectionDef("Wallpaper", "w", Color(0xFF5E5CE6), R.drawable.ic_settings_wallpaper),
+                SectionDef("Clock Face", "c", Color(0xFF0A84FF), R.drawable.ic_settings_clock),
+                SectionDef("Appearance", "T", Color(0xFF5E5CE6), R.drawable.ic_settings_appearance),
+                SectionDef("Weather", "u", Color(0xFF0A84FF), R.drawable.ic_settings_weather),
+                SectionDef("Sleep Timer", "z", Color(0xFF636366), R.drawable.ic_settings_sleep),
             ),
         "Widgets & Content" to
             listOf(
-                SectionDef("Calendar", "d", Color(0xFFFF453A)),
-                SectionDef("World Clock", "o", Color(0xFF0A84FF)),
-                SectionDef("Countdown", "n", Color(0xFFFF9F0A)),
-                SectionDef("Quick Buttons", "q", Color(0xFF5E5CE6)),
+                SectionDef("Calendar", "d", Color(0xFFFF453A), R.drawable.ic_settings_calendar),
+                SectionDef("World Clock", "o", Color(0xFF0A84FF), R.drawable.ic_settings_worldclock),
+                SectionDef("Countdown", "n", Color(0xFFFF9F0A), R.drawable.ic_settings_countdown),
+                SectionDef("Quick Buttons", "q", Color(0xFF5E5CE6), R.drawable.ic_settings_quickbuttons),
             ),
         "Connections & Device" to
             listOf(
-                SectionDef("Home Assistant", "h", Color(0xFF41BDF5)),
-                SectionDef("Phone Remote", "r", Color(0xFF0A84FF)),
-                SectionDef("Start on Boot", "b", Color(0xFF636366)),
-                SectionDef("Device Name", "i", Color(0xFF636366)),
-                SectionDef("About & Device Health", "?", Color(0xFF636366)),
+                SectionDef("Home Assistant", "h", Color(0xFF41BDF5), R.drawable.ic_settings_homeassistant),
+                SectionDef("Phone Remote", "r", Color(0xFF0A84FF), R.drawable.ic_settings_remote),
+                SectionDef("Start on Boot", "b", Color(0xFF636366), R.drawable.ic_settings_boot),
+                SectionDef("Device Name", "i", Color(0xFF636366), R.drawable.ic_settings_devicename),
+                SectionDef("About & Device Health", "?", Color(0xFF636366), R.drawable.ic_settings_health),
             ),
     )
 
@@ -225,6 +237,7 @@ private fun ImmortalSettingsScreen() {
     // Every section is reachable by its own name.
     val bySection = SECTION_GROUPS.flatMap { it.second }.map { it.name to it.name }
     bySection + listOf(
+        "Brightness" to "Display", "Auto-brightness" to "Display", "Night Shift" to "Display",
         "Photo Source" to "Screensaver", "Photo Interval" to "Screensaver",
         "Shuffle" to "Screensaver", "Include Video" to "Screensaver",
         "Fit Mode" to "Screensaver", "Presence Mode" to "Screensaver",
@@ -365,7 +378,17 @@ private fun ImmortalSettingsScreen() {
                     .background(if (isSelected) Color.White.copy(alpha = 0.25f) else sec.iconColor),
                 contentAlignment = Alignment.Center,
             ) {
-              Text(sec.symbol, color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+              val iconRes = sec.iconRes
+              if (iconRes != null) {
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(23.dp),
+                )
+              } else {
+                Text(sec.symbol, color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+              }
             }
             Text(
                 sec.name,
@@ -395,7 +418,7 @@ private fun ImmortalSettingsScreen() {
             .weight(1f)
             .fillMaxHeight(),
     ) {
-      DetailTopBar(title = selectedSection)
+      DetailTopBar(title = selectedSection, subtitle = SECTION_SUBTITLES[selectedSection] ?: "")
       Column(
           modifier = Modifier
               .fillMaxWidth()
@@ -410,39 +433,19 @@ private fun ImmortalSettingsScreen() {
       // SOUND & WAKE — sub-screen launchers (own Activities) + reused blocks
       // ---------------------------------------------------------------
       if (selectedSection == "Chime") {
-        SubScreenNavCard(
-            title = "Chime, spoken time & quiet hours",
-            subtitle = "Hourly chime, spoken time, golden-hour tone, ping volume and a nightly quiet window.",
-            iconColor = Color(0xFFFF9F0A),
-            iconSymbol = "C",
-        ) { context.startActivity(Intent(context, ChimeSettingsActivity::class.java)) }
+        ChimeSettingsContent()
       }
 
       if (selectedSection == "Sunrise & Wake") {
-        SubScreenNavCard(
-            title = "Sunrise wake light",
-            subtitle = "Wake to a gradual screen-brightening ramp on the days you choose, optionally finishing with a chime.",
-            iconColor = Color(0xFFFFD60A),
-            iconSymbol = "R",
-        ) { context.startActivity(Intent(context, SunriseSettingsActivity::class.java)) }
+        SunriseContent()
       }
 
       if (selectedSection == "Multi-room Audio") {
-        SubScreenNavCard(
-            title = "Multi-room audio",
-            subtitle = "Join this Portal to a Snapcast group and control it through Music Assistant.",
-            iconColor = Color(0xFF30D158),
-            iconSymbol = "M",
-        ) { context.startActivity(Intent(context, MultiRoomActivity::class.java)) }
+        MultiRoomContent()
       }
 
       if (selectedSection == "Welcome Greeting") {
-        SubScreenNavCard(
-            title = "Welcome greeting",
-            subtitle = "The greeting overlay shown when the screensaver starts — text, clock, date and spoken greeting.",
-            iconColor = Color(0xFFFF375F),
-            iconSymbol = "H",
-        ) { context.startActivity(Intent(context, WelcomeSettingsActivity::class.java)) }
+        WelcomeSettingsContent()
       }
 
       if (selectedSection == "Touch Sounds") {
@@ -470,9 +473,14 @@ private fun ImmortalSettingsScreen() {
       }
 
       // ---------------------------------------------------------------
-      // GENERAL — Screensaver (full domain), Wallpaper, Clock Face, Appearance,
-      //           Weather, Sleep Timer
+      // GENERAL — Display, Screensaver (full domain), Wallpaper, Clock Face,
+      //           Appearance, Weather, Sleep Timer
       // ---------------------------------------------------------------
+      if (selectedSection == "Display") {
+        DisplaySection()
+        Spacer(Modifier.size(32.dp))
+      }
+
       if (selectedSection == "Screensaver") {
         // Master toggle gates the rest, mirroring ScreensaverSettingsActivity; the full
         // `screensaver` domain then renders generically (adds cache, overnight, feed, idle,
@@ -605,12 +613,7 @@ private fun ImmortalSettingsScreen() {
       } // end Weather
 
       if (selectedSection == "Sleep Timer") {
-        SubScreenNavCard(
-            title = "Sleep timer",
-            subtitle = "Turn the screensaver off after a set time, with a live countdown; optionally pause audio and close apps.",
-            iconColor = Color(0xFF636366),
-            iconSymbol = "z",
-        ) { context.startActivity(Intent(context, SleepSettingsActivity::class.java)) }
+        SleepSettingsContent()
       }
 
       // ---------------------------------------------------------------
@@ -622,21 +625,11 @@ private fun ImmortalSettingsScreen() {
       }
 
       if (selectedSection == "World Clock") {
-        SubScreenNavCard(
-            title = "World clock cities",
-            subtitle = "Choose the cities shown by the World Clock widget (the first four in pick order).",
-            iconColor = Color(0xFF0A84FF),
-            iconSymbol = "o",
-        ) { context.startActivity(Intent(context, WorldClockActivity::class.java)) }
+        WorldClockContent()
       }
 
       if (selectedSection == "Countdown") {
-        SubScreenNavCard(
-            title = "Countdown events",
-            subtitle = "Add days-until countdowns (birthdays, trips) shown on the home screen.",
-            iconColor = Color(0xFFFF9F0A),
-            iconSymbol = "n",
-        ) { context.startActivity(Intent(context, CountdownSettingsActivity::class.java)) }
+        CountdownSettingsContent()
       }
 
       if (selectedSection == "Quick Buttons") {
@@ -649,12 +642,7 @@ private fun ImmortalSettingsScreen() {
       //                        Device Name, About & Device Health
       // ---------------------------------------------------------------
       if (selectedSection == "Home Assistant") {
-        SubScreenNavCard(
-            title = "Home Assistant (MQTT)",
-            subtitle = "Publish this Portal to Home Assistant as auto-discovered entities over your MQTT broker.",
-            iconColor = Color(0xFF41BDF5),
-            iconSymbol = "h",
-        ) { context.startActivity(Intent(context, MqttActivity::class.java)) }
+        MqttContent()
       }
 
       if (selectedSection == "Phone Remote") {
@@ -667,12 +655,7 @@ private fun ImmortalSettingsScreen() {
       }
 
       if (selectedSection == "Start on Boot") {
-        SubScreenNavCard(
-            title = "Apps that start on boot",
-            subtitle = "Pick which installed apps Immortal relaunches after a reboot.",
-            iconColor = Color(0xFF636366),
-            iconSymbol = "b",
-        ) { context.startActivity(Intent(context, BootAppsActivity::class.java)) }
+        BootAppsContent()
       }
 
       if (selectedSection == "Device Name") {
@@ -680,16 +663,12 @@ private fun ImmortalSettingsScreen() {
       }
 
       if (selectedSection == "About & Device Health") {
+      // Device-health permissions/diagnostics render inline; the auxiliary rows (screensaver
+      // source, debug) follow in their own card.
+      DeviceHealthContent()
+      Spacer(Modifier.size(26.dp))
+      SectionLabel("Advanced")
       Card {
-        NavRow(
-            title = "Device health",
-            value = "Portal+",
-            subLabel = "Permissions & diagnostics",
-            iconColor = Color(0xFF636366),
-            iconSymbol = "?",
-            onClick = { context.startActivity(Intent(context, DeviceHealthActivity::class.java)) },
-        )
-        Divider()
         NavRow(
             title = "Screensaver Source",
             subLabel = screensaverSourcePath(ss),
@@ -774,7 +753,7 @@ private fun SidebarSearch(query: String, onQueryChange: (String) -> Unit) {
 /** Fixed top bar over the right detail panel; content scrolls beneath it, so it never starts
  * flush at the very top. Shows the current section's title (title-only, no back/forward). */
 @Composable
-private fun DetailTopBar(title: String) {
+private fun DetailTopBar(title: String, subtitle: String = "") {
   Column(modifier = Modifier.fillMaxWidth().background(Color(0xF2F2F2F7))) {
     Text(
         text = title,
@@ -782,11 +761,52 @@ private fun DetailTopBar(title: String) {
         fontSize = 26.sp,
         fontWeight = FontWeight.SemiBold,
         letterSpacing = (-0.4).sp,
-        modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 20.dp, bottom = 16.dp),
+        modifier =
+            Modifier.padding(
+                start = 32.dp,
+                end = 32.dp,
+                top = 20.dp,
+                bottom = if (subtitle.isEmpty()) 16.dp else 2.dp),
     )
+    // Sub-screens used to show a descriptive subtitle in their SettingsScaffold; now that they're
+    // inlined, that context lives here on the panel's top bar instead.
+    if (subtitle.isNotEmpty()) {
+      Text(
+          text = subtitle,
+          color = IosSecondary,
+          fontSize = Sizes.rowSub,
+          modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp),
+      )
+    }
     Box(Modifier.fillMaxWidth().height(1.dp).background(IosDivider))
   }
 }
+
+/**
+ * The descriptive subtitle each inlined sub-screen used to show under its title in
+ * [SettingsScaffold]. Keyed by sidebar section name; surfaced by [DetailTopBar] so inlining
+ * doesn't drop the context. Sections without an entry simply show no subtitle.
+ */
+private val SECTION_SUBTITLES: Map<String, String> =
+    mapOf(
+        "Chime" to
+            "Gentle ambient cues. All off by default; nothing plays during quiet hours.",
+        "Sunrise & Wake" to
+            "Wake to a gradual screen-brightening ramp on the days you choose, optionally finishing with a chime.",
+        "Multi-room Audio" to
+            "Show the Snapcast group's track on the now-playing card, with play/pause/skip.",
+        "Welcome Greeting" to
+            "The greeting overlay shown when the screensaver starts — text, clock, date and spoken greeting.",
+        "Sleep Timer" to
+            "Turn the screensaver off after a set time, with a live countdown; optionally pause audio and close apps.",
+        "Countdown" to
+            "Add days-until countdowns (birthdays, trips) shown on the home screen.",
+        "World Clock" to
+            "Choose the cities shown by the World Clock widget (the first four in pick order).",
+        "Home Assistant" to
+            "Publish this Portal to Home Assistant as auto-discovered entities over your MQTT broker.",
+        "Start on Boot" to "Pick which installed apps Immortal relaunches after a reboot.",
+    )
 
 // ---------------------------------------------------------------------------
 // Debug toggle row (uses a local pref; only relevant in debug builds)
@@ -836,6 +856,120 @@ private fun SubScreenNavCard(
         onClick = onOpen,
     )
   }
+}
+
+/**
+ * The "Display" detail: screen brightness + auto-brightness (real system settings via
+ * [DisplayControl], needing the WRITE_SETTINGS grant), and Night Shift — a launcher-drawn warm tint
+ * over a nightly window. Brightness rows gate on the write permission; if it's not held we show a
+ * "grant" nav row that opens the system screen.
+ */
+@Composable
+private fun DisplaySection() {
+  val context = LocalContext.current
+  var canWrite by remember { mutableStateOf(DisplayControl.canWrite(context)) }
+  var brightness by remember { mutableStateOf(DisplayControl.brightnessPercent(context)) }
+  var auto by remember { mutableStateOf(DisplayControl.autoBrightness(context)) }
+  var ns by remember { mutableStateOf(DisplayControl.nightShift(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val obs = LifecycleEventObserver { _, e ->
+      if (e == Lifecycle.Event.ON_RESUME) {
+        canWrite = DisplayControl.canWrite(context)
+        brightness = DisplayControl.brightnessPercent(context)
+        auto = DisplayControl.autoBrightness(context)
+        ns = DisplayControl.nightShift(context)
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+
+  SectionLabel("Brightness")
+  Card {
+    if (!canWrite) {
+      NavRow(
+          title = "Allow brightness control",
+          value = "Grant",
+          iconColor = Color(0xFFFF9F0A),
+          iconSymbol = "L",
+      ) { DisplayControl.requestWriteAccess(context) }
+    } else {
+      // Brightness slider row.
+      Row(
+          modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 68.dp)
+              .padding(horizontal = 16.dp, vertical = 10.dp),
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Text("Brightness", color = IosLabel, fontSize = 22.sp, modifier = Modifier.width(140.dp))
+        androidx.compose.material3.Slider(
+            value = brightness.toFloat(),
+            onValueChange = {
+              brightness = it.toInt()
+              DisplayControl.setBrightnessPercent(context, brightness)
+              auto = false // manual write turns adaptive off
+            },
+            valueRange = 1f..100f,
+            modifier = Modifier.weight(1f),
+        )
+        Text("$brightness%", color = IosSecondary, fontSize = 19.sp,
+            modifier = Modifier.width(56.dp), textAlign = TextAlign.End)
+      }
+      Divider()
+      ToggleRow(
+          title = "Auto-brightness",
+          checked = auto,
+          iconColor = Color(0xFFFFD60A),
+          iconSymbol = "a",
+          onChange = { on -> auto = on; DisplayControl.setAutoBrightness(context, on) },
+      )
+    }
+  }
+  FooterNote("Adjust the screen brightness, or let it adapt to the room automatically.")
+
+  SectionLabel("Night Shift")
+  Card {
+    ToggleRow(
+        title = "Night Shift",
+        checked = ns.enabled,
+        iconColor = Color(0xFFFF6B35),
+        iconSymbol = "N",
+        onChange = { on -> DisplayControl.setNightShiftEnabled(context, on); ns = ns.copy(enabled = on) },
+    )
+    if (ns.enabled) {
+      Divider()
+      Stepper(
+          label = "From",
+          valueText = minuteLabel(ns.startMin),
+          onMinus = { DisplayControl.setNightShiftStart(context, ns.startMin - 30); ns = ns.copy(startMin = (ns.startMin - 30 + 1440) % 1440) },
+          onPlus = { DisplayControl.setNightShiftStart(context, ns.startMin + 30); ns = ns.copy(startMin = (ns.startMin + 30) % 1440) },
+      )
+      Divider()
+      Stepper(
+          label = "Until",
+          valueText = minuteLabel(ns.endMin),
+          onMinus = { DisplayControl.setNightShiftEnd(context, ns.endMin - 30); ns = ns.copy(endMin = (ns.endMin - 30 + 1440) % 1440) },
+          onPlus = { DisplayControl.setNightShiftEnd(context, ns.endMin + 30); ns = ns.copy(endMin = (ns.endMin + 30) % 1440) },
+      )
+      Divider()
+      Stepper(
+          label = "Warmth",
+          valueText = "${ns.strength}%",
+          onMinus = { DisplayControl.setNightShiftStrength(context, ns.strength - 10); ns = ns.copy(strength = (ns.strength - 10).coerceIn(0, 100)) },
+          onPlus = { DisplayControl.setNightShiftStrength(context, ns.strength + 10); ns = ns.copy(strength = (ns.strength + 10).coerceIn(0, 100)) },
+      )
+    }
+  }
+  FooterNote("Warms the screen with an amber tint during the night window, easier on the eyes after dark.")
+}
+
+/** "h:mm a" / "HH:mm"-ish label for a minute-of-day (uses 12-hour with AM/PM for readability). */
+private fun minuteLabel(min: Int): String {
+  val h = (min / 60) % 24
+  val m = min % 60
+  val ampm = if (h < 12) "AM" else "PM"
+  val h12 = when { h == 0 -> 12; h > 12 -> h - 12; else -> h }
+  return "%d:%02d %s".format(h12, m, ampm)
 }
 
 /**
@@ -924,40 +1058,7 @@ private fun screensaverSourcePath(s: ScreensaverConfig.Settings): String = when 
 }
 
 /**
- * Nav row on the main settings page that opens the Multi-room audio subpage. Install-
- * context-aware: shown only when the Snapcast player ([MultiRoomService.SNAPCAST_PACKAGE])
- * is installed — i.e. when this Portal is set up as a synced speaker.
- */
-@Composable
-private fun MultiRoomNavRow(onOpen: () -> Unit) {
-  val context = LocalContext.current
-  val installed = remember { StoreCatalog.isInstalled(context, MultiRoomService.SNAPCAST_PACKAGE) }
-  if (!installed) return
-
-  Spacer(Modifier.size(26.dp))
-  SectionLabel("Multi-room audio")
-  Card {
-    Row(
-        modifier = Modifier.fillMaxWidth().tvFocusableRow { onOpen() }.padding(18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Column(modifier = Modifier.weight(1f)) {
-        Text("Multi-room audio", color = Color.White, fontSize = 17.sp)
-        Text(
-            if (ImmortalSettings.multiRoomEnabled(context)) MultiRoomStatus.text.ifBlank { "On" }
-            else "Off",
-            color = Color(0xFF9A9A9A),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-      }
-      Text("›", color = Color(0xFF7C7C7C), fontSize = 26.sp)
-    }
-  }
-}
-
-/**
- * The Multi-room audio subpage (reached from [MultiRoomNavRow]): surface the Snapcast
+ * The Multi-room audio subpage: surface the Snapcast
  * group's track on the now-playing card and device media controls, with play/pause/skip
  * forwarded to Music Assistant. The in-launcher relay reads the snapserver for metadata;
  * the MA login is needed only to send transport. Back returns to the main settings page.
@@ -968,17 +1069,28 @@ private fun MultiRoomStep(n: String, text: String) {
   Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
     Text(
         "$n.",
-        color = Color(0xFF8AB4F8),
+        color = IosBlue,
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(end = 10.dp),
     )
-    Text(text, color = Color(0xFFB8B8B8), fontSize = 14.sp, lineHeight = 20.sp)
+    Text(text, color = IosSecondary, fontSize = 14.sp, lineHeight = 20.sp)
   }
 }
 
 @Composable
 internal fun MultiRoomScreen(onBack: () -> Unit) {
+  SettingsScaffold(
+      title = "Multi-room audio",
+      subtitle = "Show the Snapcast group's track on the now-playing card, with play/pause/skip.",
+      onBack = onBack,
+  ) { MultiRoomContent() }
+}
+
+/** Inlinable body of the Multi-room audio screen — rendered by [MultiRoomScreen] (standalone
+ *  Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun MultiRoomContent() {
   val context = LocalContext.current
   var enabled by remember { mutableStateOf(ImmortalSettings.multiRoomEnabled(context)) }
   var host by remember { mutableStateOf(ImmortalSettings.snapcastHost(context)) }
@@ -986,8 +1098,6 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
   var maUser by remember { mutableStateOf(ImmortalSettings.maUser(context)) }
   var maPass by remember { mutableStateOf(ImmortalSettings.maPass(context)) }
 
-  val firstFocus = remember { FocusRequester() }
-  LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
   // Chain the text fields so the keyboard's "Next" jumps to the following field instead of
   // closing — the IP field focuses the username, which focuses the password.
   val focusManager = LocalFocusManager.current
@@ -995,53 +1105,13 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
   val userFocus = remember { FocusRequester() }
   val passFocus = remember { FocusRequester() }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) onBack()
-                  true
-                } else false
-              }
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
-  ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp).focusGroup()) {
-      Surface(
-          color = Color(0xFF1C1C1E),
-          shape = RoundedCornerShape(12.dp),
-          modifier =
-              Modifier.focusRequester(firstFocus).tvFocusable(RoundedCornerShape(12.dp)) { onBack() },
-      ) {
-        Text(
-            "‹  Back",
-            color = Color.White,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
-        )
-      }
-      Spacer(Modifier.size(18.dp))
-
-      Text(
-          "Multi-room audio",
-          color = Color.White,
-          fontSize = 34.sp,
-          fontWeight = FontWeight.SemiBold)
-      Text(
-          "Show the Snapcast group's track on the now-playing card, with play/pause/skip.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(22.dp))
+  Column {
       Card {
         Column(modifier = Modifier.padding(18.dp)) {
           Text("Setting it up", color = IosLabel, fontSize = 17.sp)
           Text(
               "Group your Portals into one perfectly in-sync speaker system:",
-              color = Color(0xFF9A9A9A),
+              color = IosSecondary,
               fontSize = 13.sp,
               modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
           )
@@ -1068,7 +1138,7 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
             Text(
                 "Surfaces the Snapcast group's track on the now-playing card — even when the " +
                     "Music Assistant app isn't open on this Portal.",
-                color = Color(0xFF9A9A9A),
+                color = IosSecondary,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 2.dp),
             )
@@ -1103,7 +1173,7 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
                 modifier = Modifier.weight(1f),
             )
             Surface(
-                color = Color(0xFF2E6BE6),
+                color = IosBlue,
                 shape = RoundedCornerShape(10.dp),
                 modifier =
                     Modifier.padding(start = 12.dp).tvFocusable(RoundedCornerShape(10.dp)) {
@@ -1178,7 +1248,7 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Surface(
-                color = Color(0xFF2E6BE6),
+                color = IosBlue,
                 shape = RoundedCornerShape(10.dp),
                 modifier =
                     Modifier.tvFocusable(RoundedCornerShape(10.dp)) { MaControl.testLogin(context) },
@@ -1194,7 +1264,7 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
             if (auth.isNotBlank()) {
               Text(
                   auth,
-                  color = if (auth.endsWith("✓")) Color(0xFF66BB6A) else Color(0xFFE57373),
+                  color = if (auth.endsWith("✓")) IosGreen else IosRed,
                   fontSize = 13.sp,
                   modifier = Modifier.padding(start = 14.dp),
               )
@@ -1204,7 +1274,7 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
               "Sends play/pause/skip to Music Assistant, and shows now-playing for AirPlay " +
                   "sources (which don't carry it over Snapcast). Library/radio now-playing works " +
                   "without it.",
-              color = Color(0xFF7C7C7C),
+              color = IosSecondary,
               fontSize = 12.sp,
               modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 8.dp),
           )
@@ -1212,7 +1282,7 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
           // Live relay status — gives Apply visible feedback (Connecting… → Connected).
           Text(
               MultiRoomStatus.text.ifBlank { "Starting…" },
-              color = Color(0xFF8AB4F8),
+              color = IosBlue,
               fontSize = 13.sp,
               modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 16.dp),
           )
@@ -1221,12 +1291,11 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
       Text(
           "Join this Portal to the same Snapcast group as your other rooms, then point it " +
               "at your Music Assistant server. The synced audio is played by the Snapcast app.",
-          color = Color(0xFF7C7C7C),
+          color = IosSecondary,
           fontSize = 13.sp,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
-  }
 }
 
 /**
@@ -1258,144 +1327,25 @@ private fun QuickButtonsSection() {
 }
 
 /**
- * Almanac calendar packs, system touch sounds, and the back-gesture accessibility service —
- * feature-integration steps 5-6. The packs feed the home header and the ambient screensaver
- * dashboard once on; touch sounds needs the WRITE_SETTINGS grant; the back gesture can only be
- * enabled from Android's Accessibility settings, so that row deep-links there and shows status.
- */
-@Composable
-private fun MoreFeaturesSection() {
-  val context = LocalContext.current
-  Spacer(Modifier.size(26.dp))
-  SectionLabel("Almanac")
-  Card {
-    CalendarPacks.AVAILABLE.forEach { pack ->
-      var on by remember { mutableStateOf(CalendarPacks.isEnabled(context, pack.id)) }
-      ToggleRow(pack.title, on) { checked ->
-        on = checked
-        CalendarPacks.setEnabled(context, pack.id, checked)
-      }
-    }
-  }
-  Spacer(Modifier.size(26.dp))
-  SectionLabel("Sound & input")
-  Card {
-    var sounds by remember { mutableStateOf(SystemSounds.touchSoundsEnabled(context)) }
-    ToggleRow("Touch sounds", sounds) { checked ->
-      if (SystemSounds.canWrite(context)) {
-        SystemSounds.setTouchSounds(context, checked)
-        sounds = SystemSounds.touchSoundsEnabled(context)
-      } else {
-        SystemSounds.requestWriteAccess(context)
-      }
-    }
-    NavRow("Back gesture", if (BackHelper.isBackServiceEnabled(context)) "On" else "Off") {
-      runCatching { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
-    }
-  }
-}
-
-/**
- * A settings-menu row that opens a fork feature's own settings Activity (chime, welcome, digital
- * clock, sleep, sunrise). Mirrors [MqttNavRow]'s section-label + card + chevron styling. These
- * screens are already registered SettingsDomains (so they also render on the phone remote); this
- * is the on-device link into each one — see docs/design/feature-integration.md, step 2.
- */
-@Composable
-private fun FeatureSettingsNavRow(
-    section: String,
-    title: String,
-    subtitle: String,
-    onOpen: () -> Unit,
-) {
-  Spacer(Modifier.size(26.dp))
-  SectionLabel(section)
-  Card {
-    Row(
-        modifier = Modifier.fillMaxWidth().tvFocusableRow { onOpen() }.padding(18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Column(modifier = Modifier.weight(1f)) {
-        Text(title, color = Color.White, fontSize = 17.sp)
-        Text(
-            subtitle,
-            color = Color(0xFF9A9A9A),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-      }
-      Text("›", color = Color(0xFF7C7C7C), fontSize = 26.sp)
-    }
-  }
-}
-
-/**
- * Nav row into the Home Assistant (MQTT) subpage. Always shown — no companion app needed;
- * the subtitle reflects whether publishing is on and the live connection status.
- */
-@Composable
-private fun MqttNavRow(onOpen: () -> Unit) {
-  val context = LocalContext.current
-  Spacer(Modifier.size(26.dp))
-  SectionLabel("Home Assistant")
-  Card {
-    Row(
-        modifier = Modifier.fillMaxWidth().tvFocusableRow { onOpen() }.padding(18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Column(modifier = Modifier.weight(1f)) {
-        Text("Home Assistant (MQTT)", color = Color.White, fontSize = 17.sp)
-        Text(
-            if (MqttConfig.isEnabled(context)) MqttStatus.text.ifBlank { "On" } else "Off",
-            color = Color(0xFF9A9A9A),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-      }
-      Text("›", color = Color(0xFF7C7C7C), fontSize = 26.sp)
-    }
-  }
-}
-
-/** Opens the phone-remote pairing screen ([RemotePairActivity]); shows on/off at a glance. */
-@Composable
-private fun RemoteNavRow() {
-  val context = LocalContext.current
-  Spacer(Modifier.size(26.dp))
-  SectionLabel("Remote")
-  Card {
-    Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .tvFocusableRow {
-                  runCatching {
-                    context.startActivity(Intent(context, RemotePairActivity::class.java))
-                  }
-                }
-                .padding(18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Column(modifier = Modifier.weight(1f)) {
-        Text("Control from your phone", color = Color.White, fontSize = 17.sp)
-        Text(
-            if (RemotePairing.isEnabled(context)) "On — pair a phone as a remote" else "Off",
-            color = Color(0xFF9A9A9A),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-      }
-      Text("›", color = Color(0xFF7C7C7C), fontSize = 26.sp)
-    }
-  }
-}
-
-/**
  * The Home Assistant (MQTT) subpage: publish this Portal to Home Assistant as auto-
  * discovered entities (presence, screen, battery, now-playing, controls) over a local
  * MQTT broker. Off by default; Back returns to the main settings page.
  */
 @Composable
 internal fun MqttScreen(onBack: () -> Unit) {
+  SettingsScaffold(
+      title = "Home Assistant",
+      subtitle =
+          "Publish this Portal to Home Assistant as auto-discovered entities — presence, " +
+              "screen, battery, now-playing, and controls — over your MQTT broker.",
+      onBack = onBack,
+  ) { MqttContent() }
+}
+
+/** Inlinable body of the Home Assistant (MQTT) screen — rendered by [MqttScreen] (standalone
+ *  Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun MqttContent() {
   val context = LocalContext.current
   var enabled by remember { mutableStateOf(MqttConfig.isEnabled(context)) }
   var host by remember { mutableStateOf(MqttConfig.host(context)) }
@@ -1414,8 +1364,6 @@ internal fun MqttScreen(onBack: () -> Unit) {
     }
   }
 
-  val firstFocus = remember { FocusRequester() }
-  LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
   val focusManager = LocalFocusManager.current
   val portFocus = remember { FocusRequester() }
   val userFocus = remember { FocusRequester() }
@@ -1431,44 +1379,7 @@ internal fun MqttScreen(onBack: () -> Unit) {
     MqttService.sync(context)
   }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) onBack()
-                  true
-                } else false
-              }
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
-  ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp).focusGroup()) {
-      Surface(
-          color = Color(0xFF1C1C1E),
-          shape = RoundedCornerShape(12.dp),
-          modifier =
-              Modifier.focusRequester(firstFocus).tvFocusable(RoundedCornerShape(12.dp)) { onBack() },
-      ) {
-        Text(
-            "‹  Back",
-            color = Color.White,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
-        )
-      }
-      Spacer(Modifier.size(18.dp))
-
-      Text("Home Assistant", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "Publish this Portal to Home Assistant as auto-discovered entities — presence, " +
-              "screen, battery, now-playing, and controls — over your MQTT broker.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(22.dp))
+  Column {
       Card {
         Column(modifier = Modifier.padding(18.dp)) {
           Text("Setting it up", color = IosLabel, fontSize = 17.sp)
@@ -1494,7 +1405,7 @@ internal fun MqttScreen(onBack: () -> Unit) {
             Text("Publish to Home Assistant", color = IosLabel, fontSize = 17.sp)
             Text(
                 "Exposes this Portal's state and controls as Home Assistant entities over MQTT.",
-                color = Color(0xFF9A9A9A),
+                color = IosSecondary,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 2.dp),
             )
@@ -1529,14 +1440,14 @@ internal fun MqttScreen(onBack: () -> Unit) {
                 modifier = Modifier.weight(1f),
             )
             Surface(
-                color = Color(0xFF2E6BE6),
+                color = IosBlue,
                 shape = RoundedCornerShape(10.dp),
                 modifier =
                     Modifier.padding(start = 12.dp).tvFocusable(RoundedCornerShape(10.dp)) { apply() },
             ) {
               Text(
                   "Apply",
-                  color = Color.White,
+                  color = Color.White, // white label on the blue button
                   fontSize = 15.sp,
                   modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
               )
@@ -1600,7 +1511,7 @@ internal fun MqttScreen(onBack: () -> Unit) {
               Text("Use TLS / SSL", color = IosLabel, fontSize = 15.sp)
               Text(
                   "Encrypt the connection (e.g. a broker behind a reverse proxy on port 8883).",
-                  color = Color(0xFF9A9A9A),
+                  color = IosSecondary,
                   fontSize = 13.sp,
                   modifier = Modifier.padding(top = 2.dp),
               )
@@ -1630,7 +1541,7 @@ internal fun MqttScreen(onBack: () -> Unit) {
                 Text(
                     "Verify the broker's certificate and hostname. Turn off only for a " +
                         "self-signed broker on a trusted network.",
-                    color = Color(0xFF9A9A9A),
+                    color = IosSecondary,
                     fontSize = 13.sp,
                     modifier = Modifier.padding(top = 2.dp),
                 )
@@ -1648,7 +1559,7 @@ internal fun MqttScreen(onBack: () -> Unit) {
           // Live connection status — gives Apply visible feedback (Connecting… → Connected).
           Text(
               status.ifBlank { "Starting…" },
-              color = Color(0xFF8AB4F8),
+              color = IosBlue,
               fontSize = 13.sp,
               modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 12.dp, bottom = 16.dp),
           )
@@ -1658,12 +1569,11 @@ internal fun MqttScreen(onBack: () -> Unit) {
           "Connects to a broker on your LAN over plain MQTT or TLS. Your Portal shows up in " +
               "Home Assistant automatically as a device with presence, screen, battery, " +
               "now-playing and a few controls — no configuration.yaml editing.",
-          color = Color(0xFF7C7C7C),
+          color = IosSecondary,
           fontSize = 13.sp,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
-  }
 }
 
 /** A curated set of cities for the world-clock picker (label → IANA tz id). */
@@ -1688,47 +1598,22 @@ private val WORLD_CLOCK_CITIES =
  * selection order. Back returns to the main settings page. */
 @Composable
 internal fun WorldClockScreen(onBack: () -> Unit) {
+  SettingsScaffold(
+      title = "World clock",
+      subtitle =
+          "Choose locations for the World Clock widget. The first four (in the order you pick them) are shown.",
+      onBack = onBack,
+  ) { WorldClockContent() }
+}
+
+/** Inlinable body of the World clock screen — rendered by [WorldClockScreen] (standalone Activity
+ *  host) and by the two-panel settings detail panel. */
+@Composable
+internal fun WorldClockContent() {
   val context = LocalContext.current
   var selected by remember { mutableStateOf(ImmortalSettings.worldClockZones(context)) }
-  val firstFocus = remember { FocusRequester() }
-  LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) onBack()
-                  true
-                } else false
-              }
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
-  ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp).focusGroup()) {
-      Surface(
-          color = Color(0xFF1C1C1E),
-          shape = RoundedCornerShape(12.dp),
-          modifier =
-              Modifier.focusRequester(firstFocus).tvFocusable(RoundedCornerShape(12.dp)) { onBack() },
-      ) {
-        Text(
-            "‹  Back",
-            color = Color.White,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
-        )
-      }
-      Spacer(Modifier.size(18.dp))
-      Text("World clock", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "Choose locations for the World Clock widget. The first four (in the order you pick them) are shown.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(26.dp))
+  Column {
       Card {
         WORLD_CLOCK_CITIES.forEachIndexed { i, (label, zone) ->
           if (i > 0) Divider()
@@ -1748,7 +1633,7 @@ internal fun WorldClockScreen(onBack: () -> Unit) {
               Text(label, color = IosLabel, fontSize = 16.sp)
               Text(
                   zone.replace('_', ' '),
-                  color = Color(0xFF9A9A9A),
+                  color = IosSecondary,
                   fontSize = 13.sp,
                   modifier = Modifier.padding(top = 2.dp),
               )
@@ -1756,13 +1641,13 @@ internal fun WorldClockScreen(onBack: () -> Unit) {
             if (on && rank in 0..3) {
               Text(
                   "#${rank + 1}",
-                  color = Color(0xFF8AB4F8),
+                  color = IosBlue,
                   fontSize = 14.sp,
                   fontWeight = FontWeight.SemiBold,
                   modifier = Modifier.padding(end = 14.dp),
               )
             } else if (on) {
-              Text("hidden", color = Color(0xFF7C7C7C), fontSize = 13.sp, modifier = Modifier.padding(end = 14.dp))
+              Text("hidden", color = IosSecondary, fontSize = 13.sp, modifier = Modifier.padding(end = 14.dp))
             }
             Switch(checked = on, onCheckedChange = null)
           }
@@ -1770,12 +1655,11 @@ internal fun WorldClockScreen(onBack: () -> Unit) {
       }
       Text(
           "Tip: the widget shows up to four clocks. Re-pick a city to move it to the end of the order.",
-          color = Color(0xFF7C7C7C),
+          color = IosSecondary,
           fontSize = 13.sp,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
-  }
 }
 
 private data class BootAppOption(val pkg: String, val label: String, val icon: ImageBitmap)
@@ -1799,36 +1683,6 @@ private fun loadLaunchableApps(context: Context): List<BootAppOption> {
 }
 
 /**
- * Row on the main settings page into the "Device health" subpage. Subtitle reflects how
- * many provisioned permissions are missing, so a problem is visible without drilling in.
- */
-@Composable
-private fun DeviceHealthNavRow(onOpen: () -> Unit) {
-  val context = LocalContext.current
-  val issues = remember { DevicePermissions.issueCount(context) }
-  Spacer(Modifier.size(26.dp))
-  SectionLabel("Device")
-  Card {
-    Row(
-        modifier = Modifier.fillMaxWidth().tvFocusableRow { onOpen() }.padding(18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Column(modifier = Modifier.weight(1f)) {
-        Text("Device health", color = Color.White, fontSize = 17.sp)
-        Text(
-            if (issues == 0) "All set up"
-            else "$issues setting${if (issues == 1) " needs" else "s need"} attention",
-            color = if (issues == 0) Color(0xFF9A9A9A) else Color(0xFFE0A030),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-      }
-      Text("›", color = Color(0xFF7C7C7C), fontSize = 26.sp)
-    }
-  }
-}
-
-/**
  * The "Device health" subpage: a live status of every special permission provisioning
  * grants (screen-off device admin, notification access, install, overlay, secure settings),
  * with — for anything that's missing — what's degraded and how to fix it. A diagnostic to
@@ -1837,52 +1691,28 @@ private fun DeviceHealthNavRow(onOpen: () -> Unit) {
  */
 @Composable
 internal fun DeviceHealthScreen(onBack: () -> Unit) {
+  SettingsScaffold(
+      title = "Device health",
+      subtitle = "The permissions your Portal was set up with, and what each one powers.",
+      onBack = onBack,
+  ) { DeviceHealthContent() }
+}
+
+/** Inlinable body of the Device health screen — rendered by [DeviceHealthScreen] (standalone
+ *  Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun DeviceHealthContent() {
   val context = LocalContext.current
   val checks = remember { DevicePermissions.all(context) }
   val issues = checks.count { !it.granted }
   var adminActive by remember { mutableStateOf(ScreenControl.isAdminActive(context)) }
   var confirmingDisable by remember { mutableStateOf(false) }
 
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) onBack()
-                  true
-                } else false
-              }
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
-  ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp).focusGroup()) {
-      Surface(
-          color = Color(0xFF1C1C1E),
-          shape = RoundedCornerShape(12.dp),
-          modifier = Modifier.tvFocusable(RoundedCornerShape(12.dp)) { onBack() },
-      ) {
-        Text(
-            "‹  Back",
-            color = Color.White,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
-        )
-      }
-      Spacer(Modifier.size(18.dp))
-
-      Text("Device health", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "The permissions your Portal was set up with, and what each one powers.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(22.dp))
-
+  Column {
       // Summary banner — green when healthy, amber when something needs attention.
+      // Light semantic tints (dark green/amber would clash with the light background).
       Surface(
-          color = if (issues == 0) Color(0xFF18301C) else Color(0xFF332813),
+          color = if (issues == 0) Color(0xFFE6F7EA) else Color(0xFFFDF1DD),
           shape = RoundedCornerShape(14.dp),
           modifier = Modifier.fillMaxWidth(),
       ) {
@@ -1890,7 +1720,7 @@ internal fun DeviceHealthScreen(onBack: () -> Unit) {
             if (issues == 0) "✓  Everything's set up correctly."
             else "!  $issues setting${if (issues == 1) " needs" else "s need"} attention — your Portal " +
                 "still works, but some features are limited.",
-            color = if (issues == 0) Color(0xFF7FD18B) else Color(0xFFE0A030),
+            color = if (issues == 0) Color(0xFF1E7B34) else Color(0xFFB26A00),
             fontSize = 15.sp,
             modifier = Modifier.padding(16.dp),
         )
@@ -1910,7 +1740,7 @@ internal fun DeviceHealthScreen(onBack: () -> Unit) {
         Text(
             "Reconnect your Portal to a computer and re-run Immortal setup — it re-grants all of " +
                 "these. (Advanced: re-run provision.sh / provision.ps1 from the provisioning kit.)",
-            color = Color(0xFFB8B8B8),
+            color = IosSecondary,
             fontSize = 14.sp,
             lineHeight = 20.sp,
             modifier = Modifier.padding(start = 4.dp, end = 4.dp),
@@ -1924,7 +1754,7 @@ internal fun DeviceHealthScreen(onBack: () -> Unit) {
         Spacer(Modifier.size(28.dp))
         Text(
             "Allow uninstall",
-            color = Color(0xFF8A8A8A),
+            color = IosSecondary,
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
@@ -1933,14 +1763,14 @@ internal fun DeviceHealthScreen(onBack: () -> Unit) {
             "Disabling the screen-off device admin lets Immortal be uninstalled, but it also stops " +
                 "automatic screen-off (screensaver sleep and the Home Assistant control) until you " +
                 "re-run setup. Only do this if you know what you're doing.",
-            color = Color(0xFF7C7C7C),
+            color = IosSecondary,
             fontSize = 13.sp,
             modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 10.dp),
         )
         Text(
             if (confirmingDisable) "Tap again to confirm — this stops automatic screen-off"
             else "Disable screen-off admin",
-            color = Color(0xFFE0908A),
+            color = IosRed,
             fontSize = 15.sp,
             fontWeight = if (confirmingDisable) FontWeight.SemiBold else FontWeight.Normal,
             modifier =
@@ -1959,7 +1789,6 @@ internal fun DeviceHealthScreen(onBack: () -> Unit) {
         )
       }
     }
-  }
 }
 
 @Composable
@@ -1970,7 +1799,7 @@ private fun HealthRow(c: DevicePermissions.Check) {
   ) {
     Text(
         if (c.granted) "✓" else "!",
-        color = if (c.granted) Color(0xFF7FD18B) else Color(0xFFE0A030),
+        color = if (c.granted) IosGreen else Color(0xFFB26A00),
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(end = 14.dp, top = 1.dp),
@@ -1979,7 +1808,7 @@ private fun HealthRow(c: DevicePermissions.Check) {
       Text(c.title, color = IosLabel, fontSize = 17.sp)
       Text(
           c.enables,
-          color = Color(0xFF9A9A9A),
+          color = IosSecondary,
           fontSize = 13.sp,
           lineHeight = 18.sp,
           modifier = Modifier.padding(top = 2.dp),
@@ -1987,14 +1816,14 @@ private fun HealthRow(c: DevicePermissions.Check) {
       if (!c.granted) {
         Text(
             "Without it: ${c.degraded}",
-            color = Color(0xFFE0A030),
+            color = Color(0xFFB26A00),
             fontSize = 13.sp,
             lineHeight = 18.sp,
             modifier = Modifier.padding(top = 6.dp),
         )
         Text(
             c.fix,
-            color = Color(0xFF8AB4F8),
+            color = IosBlue,
             fontSize = 13.sp,
             lineHeight = 18.sp,
             modifier = Modifier.padding(top = 4.dp),
@@ -2005,40 +1834,6 @@ private fun HealthRow(c: DevicePermissions.Check) {
 }
 
 /**
- * Row on the main settings page that opens the "Start on boot" subpage. The full app
- * list lives on its own page so it doesn't flood the main settings screen; here we just
- * summarise how many apps are set to relaunch after a reboot.
- */
-@Composable
-private fun BootAppsNavRow(count: Int, onOpen: () -> Unit) {
-  SectionLabel("Start on boot")
-  Card {
-    Row(
-        modifier = Modifier.fillMaxWidth().tvFocusableRow { onOpen() }.padding(18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Column(modifier = Modifier.weight(1f)) {
-        Text("Apps that start on boot", color = Color.White, fontSize = 17.sp)
-        Text(
-            if (count == 0) "None — pick apps that relaunch after a reboot"
-            else "$count app${if (count == 1) "" else "s"} relaunch after a reboot",
-            color = Color(0xFF9A9A9A),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-      }
-      Text("›", color = Color(0xFF7C7C7C), fontSize = 26.sp)
-    }
-  }
-  Text(
-      "Handy for players like Music Assistant that don't restart themselves after a reboot.",
-      color = Color(0xFF7C7C7C),
-      fontSize = 13.sp,
-      modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
-  )
-}
-
-/**
  * The "Start on boot" subpage: pick which installed apps Immortal relaunches after a
  * reboot — the same per-device list provisioning seeds (so e.g. the Music Assistant /
  * Sendspin player, which has no boot receiver, comes back on its own). Toggling a row
@@ -2046,70 +1841,42 @@ private fun BootAppsNavRow(count: Int, onOpen: () -> Unit) {
  * main settings page (handled by the parent via [onBack]).
  */
 @Composable
-internal fun BootAppsScreen(
-    selected: Set<String>,
-    onToggle: (String) -> Unit,
-    onBack: () -> Unit,
-) {
+internal fun BootAppsScreen(onBack: () -> Unit) {
+  SettingsScaffold(
+      title = "Start on boot",
+      subtitle = "Pick which installed apps Immortal relaunches after a reboot.",
+      onBack = onBack,
+  ) { BootAppsContent() }
+}
+
+/** Inlinable body of the Start-on-boot screen — rendered by [BootAppsScreen] (standalone Activity
+ *  host) and by the two-panel settings detail panel. Owns the boot-launch selection set (the
+ *  Activity used to hold it) so it's self-contained wherever it's rendered. */
+@Composable
+internal fun BootAppsContent() {
   val context = LocalContext.current
   var apps by remember { mutableStateOf<List<BootAppOption>?>(null) }
+  var selected by remember { mutableStateOf(BootLaunch.packages(context).toSet()) }
+  val onToggle: (String) -> Unit = { pkg ->
+    selected = if (pkg in selected) selected - pkg else selected + pkg
+    BootLaunch.setPackages(context, selected.toList())
+  }
   LaunchedEffect(Unit) { apps = withContext(Dispatchers.IO) { loadLaunchableApps(context) } }
 
-  // Open with the Back control focused so the remote can leave the subpage immediately.
-  val firstFocus = remember { FocusRequester() }
-  LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
-
-  Column(
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back) {
-                  if (e.type == KeyEventType.KeyUp) onBack()
-                  true
-                } else false
-              }
-              .background(Color(0xFF101012))
-              .verticalScroll(rememberScrollState())
-              .padding(horizontal = 28.dp, vertical = 32.dp),
-  ) {
-    Column(modifier = Modifier.widthIn(max = 1100.dp).focusGroup()) {
-      Surface(
-          color = Color(0xFF1C1C1E),
-          shape = RoundedCornerShape(12.dp),
-          modifier =
-              Modifier.focusRequester(firstFocus).tvFocusable(RoundedCornerShape(12.dp)) { onBack() },
-      ) {
-        Text(
-            "‹  Back",
-            color = Color.White,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
-        )
-      }
-      Spacer(Modifier.size(18.dp))
-
-      Text("Start on boot", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.SemiBold)
-      Text(
-          "Pick which installed apps Immortal relaunches after a reboot.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 16.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(26.dp))
-
+  Column {
       Card {
         val list = apps
         if (list == null) {
           Text(
               "Loading apps…",
-              color = Color(0xFF9A9A9A),
+              color = IosSecondary,
               fontSize = 14.sp,
               modifier = Modifier.padding(18.dp),
           )
         } else if (list.isEmpty()) {
           Text(
               "No other apps installed yet.",
-              color = Color(0xFF9A9A9A),
+              color = IosSecondary,
               fontSize = 14.sp,
               modifier = Modifier.padding(18.dp),
           )
@@ -2139,12 +1906,11 @@ internal fun BootAppsScreen(
       Text(
           "These apps relaunch automatically after a reboot — handy for players like Music " +
               "Assistant that don't restart themselves.",
-          color = Color(0xFF7C7C7C),
+          color = IosSecondary,
           fontSize = 13.sp,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
-  }
 }
 
 @Composable

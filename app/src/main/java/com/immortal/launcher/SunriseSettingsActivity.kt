@@ -58,6 +58,18 @@ private val DAY_LABELS =
 
 @Composable
 private fun SunriseScreen() {
+  val activity = LocalContext.current as? Activity
+  SettingsScaffold(
+      title = "Sunrise Alarm",
+      subtitle = "The screen brightens gradually to wake you, with an optional gentle chime.",
+      onBack = { activity?.finish() },
+  ) { SunriseContent() }
+}
+
+/** Inlinable body of the Sunrise settings screen — rendered both by [SunriseScreen] (standalone
+ *  Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun SunriseContent() {
   val context = LocalContext.current
   val initial = remember { SunriseConfig.load(context) }
   var enabled by remember { mutableStateOf(initial.enabled) }
@@ -82,12 +94,6 @@ private fun SunriseScreen() {
             .put("chime", chime))
   }
 
-  val activity = context as? Activity
-  SettingsScaffold(
-      title = "Sunrise Alarm",
-      subtitle = "The screen brightens gradually to wake you, with an optional gentle chime.",
-      onBack = { activity?.finish() },
-  ) {
     Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
       Card {
         Row(
@@ -154,7 +160,6 @@ private fun SunriseScreen() {
             textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth())
       }
     }
-  }
 }
 
 @Composable

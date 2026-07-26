@@ -55,8 +55,19 @@ private val EMOJI_PALETTE =
 
 @Composable
 private fun CountdownSettingsScreen() {
+  val activity = LocalContext.current as? Activity
+  SettingsScaffold(
+      title = "Countdowns",
+      subtitle = "Pin a chip on the home screen counting down to a birthday, trip, or holiday.",
+      onBack = { activity?.finish() },
+  ) { CountdownSettingsContent() }
+}
+
+/** Inlinable body of the Countdown settings screen — rendered both by [CountdownSettingsScreen]
+ *  (standalone Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun CountdownSettingsContent() {
   val context = LocalContext.current
-  val activity = context as? Activity
   var events by remember { mutableStateOf(CountdownConfig.loadSorted(context)) }
 
   // New-event form state.
@@ -68,11 +79,6 @@ private fun CountdownSettingsScreen() {
   var repeatsYearly by remember { mutableStateOf(true) }
   var year by remember { mutableIntStateOf(cal.get(Calendar.YEAR)) }
 
-  SettingsScaffold(
-      title = "Countdowns",
-      subtitle = "Pin a chip on the home screen counting down to a birthday, trip, or holiday.",
-      onBack = { activity?.finish() },
-  ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       // Existing events.
       if (events.isNotEmpty()) {
@@ -169,7 +175,6 @@ private fun CountdownSettingsScreen() {
       }
       Spacer(Modifier.size(8.dp))
     }
-  }
 }
 
 @Composable

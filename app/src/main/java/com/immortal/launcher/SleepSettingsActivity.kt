@@ -68,6 +68,22 @@ class SleepSettingsActivity : ComponentActivity() {
 @Composable
 private fun SleepSettingsScreen() {
   val context = LocalContext.current
+  val activity = context as? Activity
+  SettingsScaffold(
+      title = "Sleep Timer",
+      subtitle =
+          if (ScreensaverConfig.load(context).sleepTimerEnabled)
+              "Set the timer, then start the countdown."
+          else "Enable Sleep Timer below before starting.",
+      onBack = { activity?.finish() },
+  ) { SleepSettingsContent() }
+}
+
+/** Inlinable body of the Sleep settings screen — rendered both by [SleepSettingsScreen] (standalone
+ *  Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun SleepSettingsContent() {
+  val context = LocalContext.current
   var settings by remember { mutableStateOf(ScreensaverConfig.load(context)) }
   var remainingMs by remember { mutableLongStateOf(0L) }
   var running by remember { mutableStateOf(false) }
@@ -102,7 +118,6 @@ private fun SleepSettingsScreen() {
     if (h > 0) String.format("%d:%02d:%02d", h, m, s) else String.format("%d:%02d", m, s)
   }
 
-  val activity = context as? Activity
   val firstFocus = remember { FocusRequester() }
   LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
 
@@ -122,13 +137,6 @@ private fun SleepSettingsScreen() {
     running = false
   }
 
-  SettingsScaffold(
-      title = "Sleep Timer",
-      subtitle =
-          if (settings.sleepTimerEnabled) "Set the timer, then start the countdown."
-          else "Enable Sleep Timer below before starting.",
-      onBack = { activity?.finish() },
-  ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       Card {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -226,7 +234,6 @@ private fun SleepSettingsScreen() {
           "When the timer reaches zero, Immortal pauses audio, closes itself, disables the screensaver, and locks the screen.",
       )
     }
-  }
 }
 
 @Composable

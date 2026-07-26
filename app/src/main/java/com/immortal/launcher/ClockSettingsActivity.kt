@@ -63,6 +63,18 @@ class ClockSettingsActivity : ComponentActivity() {
 
 @Composable
 private fun ClockSettingsScreen() {
+  val activity = LocalContext.current as? Activity
+  SettingsScaffold(
+      title = "Clock",
+      subtitle = "Choose the digital clock and how it looks on the screensaver.",
+      onBack = { activity?.finish() },
+  ) { ClockSettingsContent() }
+}
+
+/** Inlinable body of the Clock settings screen — rendered both by [ClockSettingsScreen] (standalone
+ *  Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun ClockSettingsContent() {
   val context = LocalContext.current
   var clockConfig by remember { mutableStateOf(DigitalClockConfig.load(context)) }
   var settings by remember { mutableStateOf(ImmortalSettings.load(context)) }
@@ -80,15 +92,9 @@ private fun ClockSettingsScreen() {
     onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
 
-  val activity = context as? Activity
   val firstFocus = remember { FocusRequester() }
   LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
 
-  SettingsScaffold(
-      title = "Clock",
-      subtitle = "Choose the digital clock and how it looks on the screensaver.",
-      onBack = { activity?.finish() },
-  ) {
       Column(modifier = Modifier.focusRequester(firstFocus).focusGroup()) {
         // Clock preferences render from the `digitalclock` registry domain. Apply routes through
         // the domain so its onApplied (reaffirm the dream when `enabled` toggles) fires here too.
@@ -140,5 +146,4 @@ private fun ClockSettingsScreen() {
             "Changes apply immediately. Tap the clock icon on the home screen to start the screensaver.",
         )
       }
-  }
 }

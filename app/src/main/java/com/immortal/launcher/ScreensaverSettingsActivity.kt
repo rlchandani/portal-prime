@@ -61,6 +61,18 @@ class ScreensaverSettingsActivity : ComponentActivity() {
 
 @Composable
 private fun ScreensaverSettingsScreen() {
+  val activity = LocalContext.current as? Activity
+  SettingsScaffold(
+      title = "Screensaver",
+      subtitle = "Choose what shows on the photo frame when your Portal is idle.",
+      onBack = { activity?.finish() },
+  ) { ScreensaverSettingsContent() }
+}
+
+/** Inlinable body of the Screensaver settings screen — rendered both by [ScreensaverSettingsScreen]
+ *  (standalone Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun ScreensaverSettingsContent() {
   val context = LocalContext.current
   var settings by remember { mutableStateOf(ScreensaverConfig.load(context)) }
 
@@ -74,7 +86,6 @@ private fun ScreensaverSettingsScreen() {
     onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
 
-  val activity = context as? Activity
   val firstFocus = remember { FocusRequester() }
   LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
 
@@ -85,11 +96,6 @@ private fun ScreensaverSettingsScreen() {
     settings = ScreensaverConfig.load(context)
   }
 
-  SettingsScaffold(
-      title = "Screensaver",
-      subtitle = "Choose what shows on the photo frame when your Portal is idle.",
-      onBack = { activity?.finish() },
-  ) {
     Column(modifier = Modifier.focusRequester(firstFocus).focusGroup()) {
       // Master toggle gates everything below (kept here rather than in the list so the rest only
       // renders when the frame is on, matching the original screen).
@@ -132,5 +138,4 @@ private fun ScreensaverSettingsScreen() {
         }
       }
     }
-  }
 }

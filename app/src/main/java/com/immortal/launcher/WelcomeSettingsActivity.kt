@@ -54,10 +54,21 @@ class WelcomeSettingsActivity : ComponentActivity() {
 
 @Composable
 private fun WelcomeSettingsScreen() {
+  val activity = LocalContext.current as? Activity
+  SettingsScaffold(
+      title = "Welcome Overlay",
+      subtitle = "Customize the greeting shown when the screensaver wakes up.",
+      onBack = { activity?.finish() },
+  ) { WelcomeSettingsContent() }
+}
+
+/** Inlinable body of the Welcome settings screen — rendered both by [WelcomeSettingsScreen]
+ *  (standalone Activity host) and by the two-panel settings detail panel. */
+@Composable
+internal fun WelcomeSettingsContent() {
   val context = LocalContext.current
   var settings by remember { mutableStateOf(WelcomeConfig.load(context)) }
 
-  val activity = context as? Activity
   val firstFocus = remember { FocusRequester() }
   LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
 
@@ -110,11 +121,6 @@ private fun WelcomeSettingsScreen() {
         android.speech.tts.TextToSpeech.QUEUE_FLUSH, params, "welcome_test")
   }
 
-  SettingsScaffold(
-      title = "Welcome Overlay",
-      subtitle = "Customize the greeting shown when the screensaver wakes up.",
-      onBack = { activity?.finish() },
-  ) {
       Column(modifier = Modifier.focusRequester(firstFocus).focusGroup()) {
         Card {
           ToggleRow("Show greeting message", settings.showGreeting) {
@@ -269,7 +275,6 @@ private fun WelcomeSettingsScreen() {
                 "Tap anywhere on the overlay to dismiss it early, or wait for it to auto-fade.",
         )
       }
-  }
 }
 
 private fun ttsVoiceSort(): Comparator<android.speech.tts.Voice> =
