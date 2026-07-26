@@ -1044,10 +1044,14 @@ private fun FadingDivider() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Bare Liquid Glass surface — transparent frosted glass with a left→right sheen and a soft drop
- * shadow for lift (matching the weather card's depth). Still see-through: a thin translucent white
- * wash that flows brighter on the left to fainter on the right, a hairline border, and a top-left
- * specular highlight. No live blur (Portal GPU) — all static.
+ * Bare Liquid Glass surface — TRULY transparent frosted glass: a thin translucent white wash
+ * (brighter on the left, fainter right), a hairline light border, and a top-left specular highlight.
+ * The wallpaper shows cleanly through — the card only ever LIGHTENS what's behind it, never darkens.
+ *
+ * Deliberately NO drop shadow: a shadow renders a dark rounded-rect that shows THROUGH the ~10%-
+ * opaque fill and darkens the card's centre (the "glassy edges, dark middle" artifact the user hit).
+ * A transparent card and a drop shadow are mutually exclusive; the border + specular define the
+ * glass edge instead. No live blur (Portal GPU) — all static.
  */
 @Composable
 private fun LiquidGlass(
@@ -1058,13 +1062,11 @@ private fun LiquidGlass(
   val shape = RoundedCornerShape(cornerRadius)
   Box(
       modifier = modifier
-          // Soft drop shadow for lift, like the weather card's depth (clip=false so it spreads).
-          .shadow(elevation = 12.dp, shape = shape, clip = false)
           .clip(shape)
-          // Transparent glass wash flowing left→right: a touch brighter on the left, fainter right.
+          // Transparent glass wash flowing left→right (only lightens the wallpaper, never darkens).
           .background(
               Brush.horizontalGradient(colors = listOf(Color(0x2EFFFFFF), Color(0x14FFFFFF))))
-          .border(1.dp, Color(0x38FFFFFF), shape),
+          .border(1.dp, Color(0x40FFFFFF), shape),
   ) {
     // Specular top-left highlight
     Box(
