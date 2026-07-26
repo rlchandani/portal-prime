@@ -33,9 +33,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.Dp
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -277,16 +283,21 @@ private fun ImmortalSettingsScreen() {
           .background(IosBackground),
   ) {
     // ---------------------------------------------------------------
-    // LEFT SIDEBAR (260 dp)
+    // LEFT SIDEBAR
+    // Width matches the approved mock's proportion (~25% of the frame): wide enough that no
+    // nav label wraps to a second line. A thin scroll indicator (like the mock) rides the
+    // right edge. See settings-full-mockup.html.
     // ---------------------------------------------------------------
+    val sidebarScroll = rememberScrollState()
     Column(
         modifier = Modifier
-            .width(320.dp)
+            .width(440.dp)
             .fillMaxHeight()
             .background(Color(0xFFE8E8EE))
             .focusRequester(firstFocus)
             .focusGroup()
-            .verticalScroll(rememberScrollState()),
+            .verticalScrollbar(sidebarScroll)
+            .verticalScroll(sidebarScroll),
     ) {
       IosNavBar(title = "Settings")
       SidebarSearch(query = query, onQueryChange = { query = it })
@@ -362,18 +373,21 @@ private fun ImmortalSettingsScreen() {
           ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(9.dp))
                     .background(if (isSelected) Color.White.copy(alpha = 0.25f) else sec.iconColor),
                 contentAlignment = Alignment.Center,
             ) {
-              Text(sec.symbol, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+              Text(sec.symbol, color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
             }
             Text(
                 sec.name,
                 color = if (isSelected) Color.White else IosLabel,
-                fontSize = 25.sp,
+                fontSize = 21.sp,
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                // Never wrap — the mock keeps every nav label on one line.
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
             // Link-out rows carry the "↗" hand-off affordance.
@@ -2287,5 +2301,33 @@ private fun WallpaperSwatch(
         modifier = Modifier.padding(top = 6.dp),
     )
   }
+}
+
+/**
+ * A thin translucent scroll indicator on the container's right edge, matching the vertical
+ * scrollbar shown in the approved settings mock. Only drawn when the content overflows; the
+ * thumb height and position track [state] proportionally. Purely decorative — no drag.
+ */
+private fun Modifier.verticalScrollbar(
+    state: ScrollState,
+    width: Dp = 4.dp,
+    color: Color = Color(0x33000000),
+): Modifier = drawWithContent {
+  drawContent()
+  val max = state.maxValue
+  if (max <= 0) return@drawWithContent // no overflow → no bar
+  val viewport = size.height
+  // Thumb proportional to visible/total; total content = viewport + maxValue.
+  val total = viewport + max
+  val thumbH = (viewport / total * viewport).coerceAtLeast(24.dp.toPx())
+  val track = viewport - thumbH
+  val thumbY = if (max > 0) (state.value.toFloat() / max) * track else 0f
+  val w = width.toPx()
+  drawRoundRect(
+      color = color,
+      topLeft = Offset(size.width - w - 2.dp.toPx(), thumbY),
+      size = Size(w, thumbH),
+      cornerRadius = CornerRadius(w / 2, w / 2),
+  )
 }
 

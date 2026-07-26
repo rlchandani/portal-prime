@@ -86,7 +86,9 @@ private fun <S> SettingControl(spec: SettingSpec<S>, snapshot: S, onApply: (Stri
             modifier = Modifier.fillMaxWidth().padding(18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-          Text(s.title, color = Color.White, fontSize = 17.sp, modifier = Modifier.weight(1f))
+          // IosLabel (black), not white — the settings screen is a light theme; a white
+          // title was invisible on the white card (see the Fill/Fit "fit" enum row).
+          Text(s.title, color = IosLabel, fontSize = 17.sp, modifier = Modifier.weight(1f))
           // EnumSpec.options is value→label; Segmented wants label→value.
           Segmented(s.options.map { (v, l) -> l to v }, s.get(snapshot)) { onApply(s.key, it) }
         }
