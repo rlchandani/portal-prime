@@ -34,5 +34,28 @@ not parallel (same file).
   weight(1f) reorderable LazyVerticalGrid(2) below the fixed chrome.
 - Verify after each: ./gradlew :app:assembleDebug -q ; adb install -r ; screenshot.
 
-## Handoff note (fill on completion)
-- What's live vs. needs-your-data.
+## Handoff note — COMPLETE (all 6 pieces built, committed, verified on device)
+
+Commits: 8c71f73 (Today strip), fdbe703 (glass + sky), 522a2b6 (weather hero + HA + family + memory).
+Build + 300 unit tests green; no crash; HomeActivity resumes clean.
+
+### What's LIVE right now (no setup needed)
+- **Premium glass cards** — every dashboard card: shadow lift, sheen, specular, hairline border.
+- **Ambient Sky wallpaper (default)** — gradient drifts by real sunrise/sunset; sun (day)/moon (night)
+  glow arcs across the sky; 3 drifting clouds. Vivid in daylight, subtle at night (correct).
+- **Today strip** — next event · feels-like + H/L · moon phase + sunrise/sunset. (Event row needs a
+  calendar URL — see below.)
+- **Weather hero** — city, big temp, condition · H/L · sunset. Fully live.
+- **Quick controls** — "Hey Portal" voice tile works now (launches com.portal.assistant).
+- **Family quick-call row** — M/D/S avatars + add; all tap → stock Portal calling surface.
+
+### Needs YOUR data to fully light up (built + wired, just add the source)
+- **Calendar event** in Today strip → Settings > Calendar > paste a public .ics URL.
+- **Home Assistant tiles** (Lights/Scenes/Climate/Home) → appear automatically once the Home
+  Assistant app is installed (Aurora Store). They open the HA app.
+- **Photo 'On this day' strip** → hidden until Settings > Screensaver > Photo source = a local folder.
+- **Family names/photos** → currently placeholders (M/D/S); all route to the Portal call screen.
+
+### Known cosmetic follow-ups (not blocking)
+- Weather widget sits in the reorderable grid (below the family row) — can be pinned higher if wanted.
+- Cloud drift is a slow horizontal loop; could add weather-reactive particles (rain/snow) later.
