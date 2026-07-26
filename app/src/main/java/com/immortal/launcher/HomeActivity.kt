@@ -1044,10 +1044,10 @@ private fun FadingDivider() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Bare Liquid Glass surface — the SOLID card look (from the approved card-final mock): an opaque
- * deep-blue gradient flowing left→right, a soft drop shadow for lift, and a thin light border for a
- * glass edge. Because the fill is opaque, the shadow reads cleanly as depth (no bleed-through), and
- * the card is self-contained and consistent on any wallpaper. No live blur (Portal GPU).
+ * Bare Liquid Glass surface — transparent glass, FLAT (no gradient): a single even translucent
+ * white fill so the wallpaper shows through uniformly, plus a thin light border for the glass edge.
+ * No drop shadow (it renders a dark rect that bleeds through the translucent fill and darkens the
+ * centre) and no gradient. Just a clean, even, see-through card with a crisp rim.
  */
 @Composable
 private fun LiquidGlass(
@@ -1058,24 +1058,12 @@ private fun LiquidGlass(
   val shape = RoundedCornerShape(cornerRadius)
   Box(
       modifier = modifier
-          // Soft drop shadow for lift — safe here because the fill below is opaque.
-          .shadow(elevation = 14.dp, shape = shape, clip = false)
           .clip(shape)
-          // Opaque deep-blue gradient, left→right (the mock's #243867 → #3a5aa0).
-          .background(
-              Brush.linearGradient(colors = listOf(Color(0xFF243867), Color(0xFF3A5AA0))))
+          // Flat, even translucent fill — no gradient. Wallpaper shows through uniformly.
+          .background(Color(0x1FFFFFFF))
           // Thin light rim for the glass edge.
-          .border(1.dp, Color(0x38FFFFFF), shape),
+          .border(1.dp, Color(0x59FFFFFF), shape),
   ) {
-    // Soft top-left highlight for a hint of sheen.
-    Box(
-        modifier = Modifier.matchParentSize().background(
-            Brush.radialGradient(
-                colors = listOf(Color(0x24FFFFFF), Color.Transparent),
-                radius = 320f,
-            )
-        )
-    )
     content()
   }
 }
