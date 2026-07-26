@@ -54,12 +54,15 @@ object WallpaperConfig {
   // and the real night sky projected for the device's location. Formerly ForkHome-only.
   const val SKY = "sky"
   const val STARFIELD = "starfield"
+  // The launcher's signature look; also the default so existing installs keep their appearance.
+  const val SPACE = "g_space"
 
-  data class Config(val mode: String = DARK, val grain: Boolean = false)
+  data class Config(val mode: String = SPACE, val grain: Boolean = false)
 
   /** Gradient presets: id → top-to-bottom colour stops (ARGB longs). */
   val GRADIENTS: List<Pair<String, List<Long>>> =
       listOf(
+          "g_space" to listOf(0xFF1A3A6B, 0xFF0D1F42, 0xFF080F20, 0xFF020408),
           "g_midnight" to listOf(0xFF0F2027, 0xFF203A43, 0xFF2C5364),
           "g_dusk" to listOf(0xFF41295A, 0xFF2F0743),
           "g_ocean" to listOf(0xFF1A2980, 0xFF26D0CE),
@@ -81,7 +84,7 @@ object WallpaperConfig {
 
   fun load(context: Context): Config {
     val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-    return Config(mode = p.getString(KEY_MODE, DARK) ?: DARK, grain = p.getBoolean(KEY_GRAIN, false))
+    return Config(mode = p.getString(KEY_MODE, SPACE) ?: SPACE, grain = p.getBoolean(KEY_GRAIN, false))
   }
 
   fun setMode(context: Context, mode: String) =

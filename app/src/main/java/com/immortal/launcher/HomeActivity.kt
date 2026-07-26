@@ -782,22 +782,11 @@ private fun LauncherScreen(
     val w = constraints.maxWidth
     val h = constraints.maxHeight
 
-    // Background: deep-space radial gradient.
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(
-            Brush.radialGradient(
-                colors = listOf(
-                    Color(0xFF1A3A6B),
-                    Color(0xFF0D1F42),
-                    Color(0xFF080F20),
-                    Color(0xFF020408),
-                ),
-                center = Offset(w * 0.4f, h * 0.5f),
-                radius = w * 0.9f,
-            )
-        )
-    )
+    // Background: the user's chosen wallpaper (WallpaperConfig via HomeBackground) — dark fill,
+    // a gradient preset, a photo, sky/starfield, or "sync with screensaver". Re-reads on resume,
+    // so a change in Settings > Wallpaper takes effect the moment the user returns home.
+    // (Previously this was a hardcoded radial gradient, which made the Wallpaper setting a no-op.)
+    HomeBackground(modifier = Modifier.fillMaxSize())
 
     Column(modifier = Modifier.fillMaxSize()) {
 
