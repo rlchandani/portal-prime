@@ -90,8 +90,10 @@ internal val IosSegmentInactive = Color(0xFF3A3A3C) // unselected segment label
 internal object Sizes {
     val titleSidebar = 32.sp   // big left-aligned "Settings" in the sidebar
     val titlePage = 34.sp      // sub-page H1
+    val titleBar = 28.sp       // two-panel detail top-bar header
     val pageSubtitle = 19.sp   // sub-page subtitle
     val sectionLabel = 16.sp   // uppercase grey group headers
+    val navLabel = 21.sp       // sidebar nav-row label
     val rowTitle = 22.sp       // row body text
     val rowSub = 16.sp         // row secondary/subtitle
     val rowValue = 19.sp       // right-side value text (steppers, pickers)

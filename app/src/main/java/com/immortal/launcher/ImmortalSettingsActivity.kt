@@ -308,7 +308,7 @@ private fun ImmortalSettingsScreen() {
           Text(
               "No results for “$query”",
               color = IosSecondary,
-              fontSize = 16.sp,
+              fontSize = Sizes.rowSub,
               modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp),
           )
         } else {
@@ -332,8 +332,8 @@ private fun ImmortalSettingsScreen() {
                     }
                     .padding(horizontal = 14.dp, vertical = 8.dp),
             ) {
-              Text(setting, color = IosLabel, fontSize = 18.sp)
-              Text(section, color = IosSecondary, fontSize = 14.sp, modifier = Modifier.padding(top = 1.dp))
+              Text(setting, color = IosLabel, fontSize = Sizes.rowTitle)
+              Text(section, color = IosSecondary, fontSize = Sizes.rowSub, modifier = Modifier.padding(top = 1.dp))
             }
           }
         }
@@ -343,7 +343,7 @@ private fun ImmortalSettingsScreen() {
         Text(
             groupName.uppercase(),
             color = IosTertiary,
-            fontSize = 14.sp,
+            fontSize = Sizes.sectionLabel,
             fontWeight = FontWeight.SemiBold,
             letterSpacing = 0.6.sp,
             modifier = Modifier.padding(start = 22.dp, end = 16.dp, top = 18.dp, bottom = 4.dp),
@@ -356,7 +356,7 @@ private fun ImmortalSettingsScreen() {
                   .fillMaxWidth()
                   .padding(horizontal = 10.dp, vertical = 3.dp)
                   .clip(RoundedCornerShape(10.dp))
-                  .background(if (isSelected) Color(0xFF007AFF) else Color.Transparent)
+                  .background(if (isSelected) IosBlue else Color.Transparent)
                   .clickable {
                     if (linkOut != null) {
                       runCatching {
@@ -387,13 +387,13 @@ private fun ImmortalSettingsScreen() {
                     modifier = Modifier.size(23.dp),
                 )
               } else {
-                Text(sec.symbol, color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+                Text(sec.symbol, color = Color.White, fontSize = Sizes.iconGlyph, fontWeight = FontWeight.Bold)
               }
             }
             Text(
                 sec.name,
                 color = if (isSelected) Color.White else IosLabel,
-                fontSize = 21.sp,
+                fontSize = Sizes.navLabel,
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                 // Never wrap — the mock keeps every nav label on one line.
                 maxLines = 1,
@@ -696,7 +696,7 @@ private fun IosNavBar(title: String) {
   Row(
       modifier = Modifier
           .fillMaxWidth()
-          .background(Color(0xF2F2F2F7))
+          .background(IosBackground)
           .padding(start = 22.dp, end = 16.dp, top = 6.dp, bottom = 12.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Start,
@@ -754,11 +754,11 @@ private fun SidebarSearch(query: String, onQueryChange: (String) -> Unit) {
  * flush at the very top. Shows the current section's title (title-only, no back/forward). */
 @Composable
 private fun DetailTopBar(title: String, subtitle: String = "") {
-  Column(modifier = Modifier.fillMaxWidth().background(Color(0xF2F2F2F7))) {
+  Column(modifier = Modifier.fillMaxWidth().background(IosBackground)) {
     Text(
         text = title,
         color = IosLabel,
-        fontSize = 26.sp,
+        fontSize = Sizes.titleBar,
         fontWeight = FontWeight.SemiBold,
         letterSpacing = (-0.4).sp,
         modifier =
