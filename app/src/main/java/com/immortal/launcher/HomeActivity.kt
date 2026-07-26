@@ -1037,25 +1037,41 @@ private fun FadingDivider() {
 // Liquid Glass composables
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Bare Liquid Glass surface — frosted fill + specular highlight + border. */
+/**
+ * Bare Liquid Glass surface — the premium frosted-card material used across the dashboard.
+ * The Portal's older GPU can't do a live backdrop blur cheaply, so the "glass" look is faked
+ * convincingly with layers: a soft drop shadow for lift, a translucent white fill, a top-to-bottom
+ * sheen (brighter at the top edge like light catching glass), a diagonal specular highlight, and a
+ * hairline inner border. All static → no per-frame cost.
+ */
 @Composable
 private fun LiquidGlass(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 22.dp,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
+  val shape = RoundedCornerShape(cornerRadius)
   Box(
       modifier = modifier
-          .clip(RoundedCornerShape(cornerRadius))
-          .background(Color(0x1EFFFFFF))
-          .border(1.dp, Color(0x38FFFFFF), RoundedCornerShape(cornerRadius)),
+          // Soft drop shadow lifts the card off the wallpaper (clip=false so it spreads).
+          .shadow(elevation = 16.dp, shape = shape, clip = false)
+          .clip(shape)
+          // Base translucent fill — a touch brighter than before so it reads as glass on any wallpaper.
+          .background(Color(0x24FFFFFF))
+          // Vertical sheen: bright hairline at the top fading down, like light on a glass edge.
+          .background(
+              Brush.verticalGradient(
+                  colors = listOf(Color(0x33FFFFFF), Color(0x0FFFFFFF), Color(0x1AFFFFFF)),
+              ))
+          .border(1.dp, Color(0x40FFFFFF), shape),
   ) {
-    // Specular top-left highlight
+    // Diagonal specular highlight in the top-left corner.
     Box(
         modifier = Modifier.matchParentSize().background(
             Brush.radialGradient(
-                colors = listOf(Color(0x28FFFFFF), Color.Transparent),
-                radius = 300f,
+                colors = listOf(Color(0x33FFFFFF), Color.Transparent),
+                center = Offset(0f, 0f),
+                radius = 420f,
             )
         )
     )

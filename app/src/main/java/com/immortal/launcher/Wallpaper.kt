@@ -57,7 +57,9 @@ object WallpaperConfig {
   // The launcher's signature look; also the default so existing installs keep their appearance.
   const val SPACE = "g_space"
 
-  data class Config(val mode: String = SPACE, val grain: Boolean = false)
+  // Default = the live ambient Sky (drifts through the day with a sun/moon + clouds), the
+  // signature premium-dashboard backdrop. Users can switch to a static gradient/photo in Settings.
+  data class Config(val mode: String = SKY, val grain: Boolean = false)
 
   /** Gradient presets: id → top-to-bottom colour stops (ARGB longs). */
   val GRADIENTS: List<Pair<String, List<Long>>> =
@@ -84,7 +86,7 @@ object WallpaperConfig {
 
   fun load(context: Context): Config {
     val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-    return Config(mode = p.getString(KEY_MODE, SPACE) ?: SPACE, grain = p.getBoolean(KEY_GRAIN, false))
+    return Config(mode = p.getString(KEY_MODE, SKY) ?: SKY, grain = p.getBoolean(KEY_GRAIN, false))
   }
 
   fun setMode(context: Context, mode: String) =

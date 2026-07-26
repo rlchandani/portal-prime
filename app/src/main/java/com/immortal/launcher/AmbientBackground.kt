@@ -7,6 +7,12 @@
 
 package com.immortal.launcher
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -41,7 +47,12 @@ import java.util.Calendar
  * [StarField]; this is only rendering.
  */
 
-/** A full-screen sky gradient driven by the real sunrise/sunset for the device's location. */
+/**
+ * A full-screen ambient sky driven by the real sunrise/sunset for the device's location: a
+ * time-of-day gradient with a soft sun/moon glow that arcs across the sky as the day progresses,
+ * plus a few slowly-drifting cloud blobs. All cheap (gradients + blurred circles), no bitmaps —
+ * safe for the Portal's GPU. Selected via the "Sky" wallpaper mode; also the default.
+ */
 @Composable
 internal fun SkyBackground() {
   val context = LocalContext.current
@@ -56,13 +67,64 @@ internal fun SkyBackground() {
       delay(5L * 60 * 1000)
     }
   }
+  // Slow cloud drift: a phase 0..1 that advances over ~3 minutes, mapped to horizontal offset.
+  val drift = rememberInfiniteTransition(label = "cloudDrift")
+  val driftX by drift.animateFloat(
+      initialValue = 0f, targetValue = 1f,
+      animationSpec = infiniteRepeatable(tween(180_000, easing = LinearEasing), RepeatMode.Restart),
+      label = "driftX",
+  )
   val sr = sun?.let { ambientMinuteOfDay(it.sunriseMillis) } ?: 6 * 60
   val ss = sun?.let { ambientMinuteOfDay(it.sunsetMillis) } ?: 20 * 60
   val (top, bottom) = SkyColors.gradientFor(nowMin, sr, ss)
-  Box(
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Brush.verticalGradient(listOf(top, bottom))))
+  val isDay = nowMin in sr..ss
+
+  Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(top, bottom)))) {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+      val w = size.width
+      val h = size.height
+      // Celestial body: sun by day, moon by night. Arcs left→right, dawn/dusk near the horizon,
+      // midday high. Position = fraction of the daylight (or night) span.
+      val (frac, isSun) =
+          if (isDay) ((nowMin - sr).toFloat() / (ss - sr).coerceAtLeast(1)) to true
+          else {
+            // night: from sunset (0) through midnight to sunrise (1), wrapping
+            val nightLen = (24 * 60 - (ss - sr)).coerceAtLeast(1)
+            val since = if (nowMin > ss) nowMin - ss else nowMin + (24 * 60 - ss)
+            (since.toFloat() / nightLen) to false
+          }
+      val cx = (0.12f + 0.76f * frac.coerceIn(0f, 1f)) * w
+      // parabola: high at midday (frac .5), low at the horizons
+      val arc = 1f - 4f * (frac - 0.5f) * (frac - 0.5f)
+      val cy = h * (0.62f - 0.42f * arc.coerceIn(0f, 1f))
+      val glowColor = if (isSun) Color(0xFFFFE9B0) else Color(0xFFE8ECF5)
+      val coreR = if (isSun) 70f else 46f
+      val glowR = if (isSun) 260f else 150f
+      // outer glow
+      drawCircle(
+          brush = Brush.radialGradient(
+              colors = listOf(glowColor.copy(alpha = 0.35f), Color.Transparent),
+              center = Offset(cx, cy), radius = glowR),
+          radius = glowR, center = Offset(cx, cy))
+      // core
+      drawCircle(color = glowColor.copy(alpha = 0.9f), radius = coreR, center = Offset(cx, cy))
+
+      // Drifting cloud blobs — three soft translucent ellipses at different depths/speeds.
+      val cloudTint = if (isDay) Color.White else Color(0xFFB9C2D8)
+      fun cloud(baseX: Float, y: Float, rw: Float, alpha: Float, speed: Float) {
+        val x = ((baseX + driftX * speed) % 1.3f - 0.15f) * w
+        drawOval(
+            brush = Brush.radialGradient(
+                colors = listOf(cloudTint.copy(alpha = alpha), Color.Transparent),
+                center = Offset(x, y), radius = rw),
+            topLeft = Offset(x - rw, y - rw * 0.4f),
+            size = androidx.compose.ui.geometry.Size(rw * 2, rw * 0.8f))
+      }
+      cloud(0.05f, h * 0.16f, w * 0.22f, 0.10f, 1.0f)
+      cloud(0.45f, h * 0.10f, w * 0.16f, 0.08f, 0.7f)
+      cloud(0.70f, h * 0.24f, w * 0.26f, 0.07f, 1.3f)
+    }
+  }
 }
 
 /**
