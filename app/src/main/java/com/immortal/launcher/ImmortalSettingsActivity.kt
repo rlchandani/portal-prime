@@ -100,6 +100,81 @@ class ImmortalSettingsActivity : ComponentActivity() {
 }
 
 // ---------------------------------------------------------------------------
+// Sidebar model — iPhone-style grouped sections
+// ---------------------------------------------------------------------------
+
+/** One sidebar row: [name] gates the detail panel, [symbol] + [iconColor] draw its badge. */
+internal data class SectionDef(val name: String, val symbol: String, val iconColor: Color)
+
+/**
+ * Sections that hand off to Android's own Settings rather than rendering a detail panel. Mapped to
+ * the `Settings.ACTION_*` string to fire (guarded with `runCatching`). Shown with a "↗" affordance.
+ */
+private val OS_LINK_OUT_SECTIONS: Map<String, String> =
+    mapOf(
+        "Wi-Fi" to Settings.ACTION_WIFI_SETTINGS,
+        "Bluetooth" to Settings.ACTION_BLUETOOTH_SETTINGS,
+        "Sound & Volume" to Settings.ACTION_SOUND_SETTINGS,
+        "Display & Brightness" to Settings.ACTION_DISPLAY_SETTINGS,
+        "Date & Time" to Settings.ACTION_DATE_SETTINGS,
+        "Language & Region" to Settings.ACTION_LOCALE_SETTINGS,
+        "Accessibility & Back Gesture" to Settings.ACTION_ACCESSIBILITY_SETTINGS,
+    )
+
+/**
+ * The grouped sidebar (approved iPhone grouping). Each group is a header + its ordered rows. Rows
+ * that link out to Android's own Settings appear in [OS_LINK_OUT_SECTIONS]; the rest open a detail
+ * panel in [ImmortalSettingsScreen]. Badge glyphs are single ASCII letters (the Portal's Android 10
+ * has patchy emoji coverage), matching the file's existing IconBadge convention.
+ */
+private val SECTION_GROUPS: List<Pair<String, List<SectionDef>>> =
+    listOf(
+        "Connectivity" to
+            listOf(
+                SectionDef("Wi-Fi", "W", Color(0xFF0A84FF)),
+                SectionDef("Bluetooth", "B", Color(0xFF0A84FF)),
+            ),
+        "Sound & Wake" to
+            listOf(
+                SectionDef("Chime", "C", Color(0xFFFF9F0A)),
+                SectionDef("Sunrise & Wake", "R", Color(0xFFFFD60A)),
+                SectionDef("Multi-room Audio", "M", Color(0xFF30D158)),
+                SectionDef("Welcome Greeting", "H", Color(0xFFFF375F)),
+                SectionDef("Touch Sounds", "s", Color(0xFF30D158)),
+                SectionDef("Sound & Volume", "V", Color(0xFFFF375F)),
+            ),
+        "General" to
+            listOf(
+                SectionDef("Display & Brightness", "L", Color(0xFF5E5CE6)),
+                SectionDef("Screensaver", "P", Color(0xFFFF6B35)),
+                SectionDef("Wallpaper", "w", Color(0xFF5E5CE6)),
+                SectionDef("Clock Face", "c", Color(0xFF0A84FF)),
+                SectionDef("Appearance", "T", Color(0xFF5E5CE6)),
+                SectionDef("Weather", "u", Color(0xFF0A84FF)),
+                SectionDef("Sleep Timer", "z", Color(0xFF636366)),
+                SectionDef("Date & Time", "t", Color(0xFF636366)),
+                SectionDef("Language & Region", "g", Color(0xFF636366)),
+                SectionDef("Accessibility & Back Gesture", "a", Color(0xFF0A84FF)),
+            ),
+        "Widgets & Content" to
+            listOf(
+                SectionDef("Calendar", "d", Color(0xFFFF453A)),
+                SectionDef("World Clock", "o", Color(0xFF0A84FF)),
+                SectionDef("Almanac", "k", Color(0xFF30D158)),
+                SectionDef("Countdown", "n", Color(0xFFFF9F0A)),
+                SectionDef("Quick Buttons", "q", Color(0xFF5E5CE6)),
+            ),
+        "Connections & Device" to
+            listOf(
+                SectionDef("Home Assistant", "h", Color(0xFF41BDF5)),
+                SectionDef("Phone Remote", "r", Color(0xFF0A84FF)),
+                SectionDef("Start on Boot", "b", Color(0xFF636366)),
+                SectionDef("Device Name", "i", Color(0xFF636366)),
+                SectionDef("About & Device Health", "?", Color(0xFF636366)),
+            ),
+    )
+
+// ---------------------------------------------------------------------------
 // Top-level iOS Settings screen
 // ---------------------------------------------------------------------------
 
@@ -138,38 +213,53 @@ private fun ImmortalSettingsScreen() {
     SettingsDomains.immortal.apply(context, JSONObject().put(key, value))
     immortal = ImmortalSettings.load(context)
   }
+  fun applyCalendar(key: String, value: Any) {
+    SettingsDomains.calendar.apply(context, JSONObject().put(key, value))
+    ss = ScreensaverConfig.load(context)
+  }
 
   var selectedSection by remember { mutableStateOf("Screensaver") }
   var query by remember { mutableStateOf("") }
 
-  // Sidebar section definitions: name, SF-symbol-like letter, icon background color
-  data class SectionDef(val name: String, val symbol: String, val iconColor: Color)
-  val sections = listOf(
-      SectionDef("Screensaver", "P", Color(0xFFFF6B35)),
-      SectionDef("Clock Face",  "c", Color(0xFF0A84FF)),
-      SectionDef("Appearance",  "T", Color(0xFF5E5CE6)),
-      SectionDef("Weather",     "u", Color(0xFF0A84FF)),
-      SectionDef("Audio",       "A", Color(0xFF30D158)),
-      SectionDef("System",      "i", Color(0xFF636366)),
-  )
+  // The sidebar is grouped iPhone-style (Connectivity, Sound & Wake, …); [SECTION_GROUPS] carries
+  // the order and the group headers, [OS_LINK_OUT_SECTIONS] marks the rows that hand off to Android's
+  // own Settings ("↗"). The detail panel is gated by `selectedSection` below.
 
-  // Flat search index: every individual setting mapped to the section that hosts it, so the
-  // sidebar search can jump straight to (e.g.) "Anti Burn-In" and land on Screensaver. Kept
-  // next to the on-device rows it mirrors so the two stay in step.
+  // Flat search index: every individual setting mapped to the section that hosts it, so the sidebar
+  // search can jump straight to (e.g.) "Anti Burn-In" and land on Screensaver. Extended to cover the
+  // full domain-rendered sections so search still reaches the newly-surfaced settings.
   val searchIndex = remember {
-    listOf(
+    // Every section is reachable by its own name.
+    val bySection = SECTION_GROUPS.flatMap { it.second }.map { it.name to it.name }
+    bySection + listOf(
         "Photo Source" to "Screensaver", "Photo Interval" to "Screensaver",
         "Shuffle" to "Screensaver", "Include Video" to "Screensaver",
         "Fit Mode" to "Screensaver", "Presence Mode" to "Screensaver",
         "Show Gradient" to "Screensaver", "Anti Burn-In" to "Screensaver",
+        "Overnight screen-off" to "Screensaver", "Idle screen-off" to "Screensaver",
+        "Store media on this device" to "Screensaver", "Photo feed" to "Screensaver",
+        "Ambient dashboard" to "Screensaver", "Gesture wave to wake" to "Screensaver",
         "Clock Face" to "Clock Face", "Clock Format" to "Clock Face",
+        "Clock style" to "Clock Face", "Font" to "Clock Face", "Glow" to "Clock Face",
         "Show Date" to "Clock Face", "Show Now Playing" to "Clock Face",
         "Show Seconds" to "Clock Face",
         "Tile Size" to "Appearance", "Weather Widget" to "Appearance",
         "Show Mini Player" to "Appearance", "Hide Status Bar" to "Appearance",
+        "Constrain page width" to "Appearance",
         "Temperature Unit" to "Weather",
-        "Chime" to "Audio", "Sunrise Wake Light" to "Audio", "Soundscape" to "Audio",
-        "About" to "System", "Screensaver Source" to "System", "Debug Mode" to "System",
+        "Ambient sound" to "Chime", "Hourly chime" to "Chime", "Quiet hours" to "Chime",
+        "Sunrise alarm" to "Sunrise & Wake",
+        "Music Assistant" to "Multi-room Audio", "Snapcast" to "Multi-room Audio",
+        "Touch sounds" to "Touch Sounds",
+        "Calendar feed" to "Calendar", "World clock cities" to "World Clock",
+        "Almanac packs" to "Almanac", "Countdown events" to "Countdown",
+        "App-switcher button" to "Quick Buttons",
+        "Home Assistant" to "Home Assistant", "MQTT" to "Home Assistant",
+        "Phone remote" to "Phone Remote", "Start on boot" to "Start on Boot",
+        "Device name" to "Device Name", "About" to "About & Device Health",
+        "Device health" to "About & Device Health", "Debug Mode" to "About & Device Health",
+        "Wallpaper" to "Wallpaper", "Film grain" to "Wallpaper",
+        "Sleep timer" to "Sleep Timer",
     )
   }
   val results = if (query.isBlank()) emptyList()
@@ -218,7 +308,15 @@ private fun ImmortalSettingsScreen() {
                     .padding(horizontal = 10.dp, vertical = 3.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .clickable {
-                      selectedSection = section
+                      val linkOut = OS_LINK_OUT_SECTIONS[section]
+                      if (linkOut != null) {
+                        runCatching {
+                          context.startActivity(
+                              Intent(linkOut).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                        }
+                      } else {
+                        selectedSection = section
+                      }
                       query = ""
                     }
                     .padding(horizontal = 14.dp, vertical = 8.dp),
@@ -230,34 +328,59 @@ private fun ImmortalSettingsScreen() {
         }
         Spacer(Modifier.height(16.dp))
       } else
-      sections.forEach { sec ->
-        val isSelected = selectedSection == sec.name
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 3.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(if (isSelected) Color(0xFF007AFF) else Color.Transparent)
-                .clickable { selectedSection = sec.name }
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-          Box(
+      SECTION_GROUPS.forEach { (groupName, groupSections) ->
+        Text(
+            groupName.uppercase(),
+            color = IosTertiary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.6.sp,
+            modifier = Modifier.padding(start = 22.dp, end = 16.dp, top = 18.dp, bottom = 4.dp),
+        )
+        groupSections.forEach { sec ->
+          val linkOut = OS_LINK_OUT_SECTIONS[sec.name]
+          val isSelected = linkOut == null && selectedSection == sec.name
+          Row(
               modifier = Modifier
-                  .size(44.dp)
+                  .fillMaxWidth()
+                  .padding(horizontal = 10.dp, vertical = 3.dp)
                   .clip(RoundedCornerShape(10.dp))
-                  .background(if (isSelected) Color.White.copy(alpha = 0.25f) else sec.iconColor),
-              contentAlignment = Alignment.Center,
+                  .background(if (isSelected) Color(0xFF007AFF) else Color.Transparent)
+                  .clickable {
+                    if (linkOut != null) {
+                      runCatching {
+                        context.startActivity(
+                            Intent(linkOut).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                      }
+                    } else {
+                      selectedSection = sec.name
+                    }
+                  }
+                  .padding(horizontal = 12.dp, vertical = 10.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(12.dp),
           ) {
-            Text(sec.symbol, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(if (isSelected) Color.White.copy(alpha = 0.25f) else sec.iconColor),
+                contentAlignment = Alignment.Center,
+            ) {
+              Text(sec.symbol, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            }
+            Text(
+                sec.name,
+                color = if (isSelected) Color.White else IosLabel,
+                fontSize = 25.sp,
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                modifier = Modifier.weight(1f),
+            )
+            // Link-out rows carry the "↗" hand-off affordance.
+            if (linkOut != null) {
+              Text("↗", color = IosSecondary, fontSize = 20.sp)
+            }
           }
-          Text(
-              sec.name,
-              color = if (isSelected) Color.White else IosLabel,
-              fontSize = 25.sp,
-              fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-          )
         }
       }
       Spacer(Modifier.height(16.dp))
@@ -283,152 +406,140 @@ private fun ImmortalSettingsScreen() {
       Spacer(Modifier.height(16.dp))
 
       // ---------------------------------------------------------------
-      // SCREENSAVER section
+      // SOUND & WAKE — sub-screen launchers (own Activities) + reused blocks
+      // ---------------------------------------------------------------
+      if (selectedSection == "Chime") {
+        SubScreenNavCard(
+            title = "Chime, spoken time & quiet hours",
+            subtitle = "Hourly chime, spoken time, golden-hour tone, ping volume and a nightly quiet window.",
+            iconColor = Color(0xFFFF9F0A),
+            iconSymbol = "C",
+        ) { context.startActivity(Intent(context, ChimeSettingsActivity::class.java)) }
+      }
+
+      if (selectedSection == "Sunrise & Wake") {
+        SubScreenNavCard(
+            title = "Sunrise wake light",
+            subtitle = "Wake to a gradual screen-brightening ramp on the days you choose, optionally finishing with a chime.",
+            iconColor = Color(0xFFFFD60A),
+            iconSymbol = "R",
+        ) { context.startActivity(Intent(context, SunriseSettingsActivity::class.java)) }
+      }
+
+      if (selectedSection == "Multi-room Audio") {
+        SubScreenNavCard(
+            title = "Multi-room audio",
+            subtitle = "Join this Portal to a Snapcast group and control it through Music Assistant.",
+            iconColor = Color(0xFF30D158),
+            iconSymbol = "M",
+        ) { context.startActivity(Intent(context, MultiRoomActivity::class.java)) }
+      }
+
+      if (selectedSection == "Welcome Greeting") {
+        SubScreenNavCard(
+            title = "Welcome greeting",
+            subtitle = "The greeting overlay shown when the screensaver starts — text, clock, date and spoken greeting.",
+            iconColor = Color(0xFFFF375F),
+            iconSymbol = "H",
+        ) { context.startActivity(Intent(context, WelcomeSettingsActivity::class.java)) }
+      }
+
+      if (selectedSection == "Touch Sounds") {
+        // Reused from MoreFeaturesSection: the WRITE_SETTINGS-gated system touch-sounds toggle.
+        var sounds by remember { mutableStateOf(SystemSounds.touchSoundsEnabled(context)) }
+        Card {
+          ToggleRow(
+              title = "Touch sounds",
+              checked = sounds,
+              iconColor = Color(0xFF30D158),
+              iconSymbol = "s",
+              onChange = { checked ->
+                if (SystemSounds.canWrite(context)) {
+                  SystemSounds.setTouchSounds(context, checked)
+                  sounds = SystemSounds.touchSoundsEnabled(context)
+                } else {
+                  SystemSounds.requestWriteAccess(context)
+                }
+              },
+          )
+        }
+        FooterNote(
+            "Plays the system tap sound on touch. Needs the \"modify system settings\" permission — " +
+                "the first tap opens Android to grant it.")
+      }
+
+      // ---------------------------------------------------------------
+      // GENERAL — Screensaver (full domain), Wallpaper, Clock Face, Appearance,
+      //           Weather, Sleep Timer
       // ---------------------------------------------------------------
       if (selectedSection == "Screensaver") {
-      Card {
-        NavRow(
-            title = "Photo Source",
-            value = screensaverSourceLabel(ss),
-            iconColor = Color(0xFFFF6B35),
-            iconSymbol = "P",
-            onClick = { context.startActivity(Intent(context, ScreensaverSourcesActivity::class.java)) },
-        )
-        Divider()
-        Stepper(
-            label = "Photo Interval",
-            valueText = "${ss.intervalSec}s",
-            iconColor = Color(0xFF5E5CE6),
-            iconSymbol = "t",
-            onMinus = {
-              val next = (ss.intervalSec - 5).coerceAtLeast(5)
-              applyScreensaver("intervalSec", next)
-            },
-            onPlus = {
-              val next = (ss.intervalSec + 5).coerceAtMost(600)
-              applyScreensaver("intervalSec", next)
-            },
-        )
-        Divider()
-        ToggleRow(
-            title = "Shuffle",
-            checked = ss.shuffle,
-            iconColor = Color(0xFFFF9F0A),
-            iconSymbol = "~",
-            onChange = { applyScreensaver("shuffle", it) },
-        )
-        Divider()
-        ToggleRow(
-            title = "Include Video",
-            checked = ss.includeVideo,
-            iconColor = Color(0xFF30D158),
-            iconSymbol = "v",
-            onChange = { applyScreensaver("includeVideo", it) },
-        )
-        Divider()
-        PickerRow(
-            title = "Fit Mode",
-            selected = ss.fit,
-            options = listOf(
-                PickerOption(ScreensaverConfig.FIT_FILL, "Fill"),
-                PickerOption(ScreensaverConfig.FIT_FIT, "Fit"),
-            ),
-            iconColor = Color(0xFF636366),
-            iconSymbol = "F",
-            onSelect = { applyScreensaver("fit", it) },
-        )
-        Divider()
-        PickerRow(
-            title = "Presence Mode",
-            selected = ss.presenceMode,
-            options = listOf(
-                PickerOption(FrameMode.ALWAYS_ON, "Always On"),
-                PickerOption(FrameMode.PRESENCE, "Follow Presence"),
-            ),
-            iconColor = Color(0xFF0A84FF),
-            iconSymbol = "o",
-            onSelect = { applyScreensaver("presenceMode", it.name) },
-        )
-        Divider()
-        ToggleRow(
-            title = "Show Gradient",
-            checked = ss.showGradient,
-            iconColor = Color(0xFF5E5CE6),
-            iconSymbol = "G",
-            onChange = { applyScreensaver("showGradient", it) },
-        )
-        Divider()
-        ToggleRow(
-            title = "Anti Burn-In",
-            checked = ss.antiBurnIn,
-            iconColor = Color(0xFFFF453A),
-            iconSymbol = "B",
-            onChange = { applyScreensaver("antiBurnIn", it) },
-        )
+        // Master toggle gates the rest, mirroring ScreensaverSettingsActivity; the full
+        // `screensaver` domain then renders generically (adds cache, overnight, feed, idle,
+        // dismiss-target, ambient, gesture, welcome toggle — ~21 previously-missing settings).
+        Card {
+          ToggleRow(
+              title = "Show the photo-frame screensaver",
+              checked = ss.enabled,
+              iconColor = Color(0xFFFF6B35),
+              iconSymbol = "P",
+              onChange = { applyScreensaver("enabled", it) },
+          )
+        }
+        if (ss.enabled) {
+          Spacer(Modifier.size(20.dp))
+          SettingsList(SettingsDomains.screensaver, ss, exclude = setOf("enabled")) { k, v ->
+            applyScreensaver(k, v)
+          }
+        }
+        FooterNote("Changes apply as soon as you return to the home screen.")
+        Spacer(Modifier.size(32.dp))
       }
-      } // end Screensaver
 
-      // ---------------------------------------------------------------
-      // CLOCK section
-      // ---------------------------------------------------------------
+      if (selectedSection == "Wallpaper") {
+        WallpaperSection()
+        Spacer(Modifier.size(32.dp))
+      }
+
       if (selectedSection == "Clock Face") {
-      Card {
-        NavRow(
-            title = "Clock Face",
-            value = FaceCatalog.entryFor(ss.faceId).name,
-            iconColor = Color(0xFF0A84FF),
-            iconSymbol = "c",
-            onClick = { context.startActivity(Intent(context, FacePickerActivity::class.java)) },
-        )
-        Divider()
-        PickerRow(
-            title = "Clock Format",
-            selected = immortal.clockFormat,
-            options = listOf(
-                PickerOption(ImmortalSettings.CLOCK_AUTO, "Auto"),
-                PickerOption(ImmortalSettings.CLOCK_12, "12h"),
-                PickerOption(ImmortalSettings.CLOCK_24, "24h"),
-            ),
-            iconColor = Color(0xFFFF9F0A),
-            iconSymbol = "h",
-            onSelect = { applyImmortal("clockFormat", it) },
-        )
-        Divider()
-        ToggleRow(
-            title = "Show Date",
-            checked = clock.showDate,
-            iconColor = Color(0xFF30D158),
-            iconSymbol = "d",
-            onChange = {
-              DigitalClockConfig.setShowDate(context, it)
-              clock = DigitalClockConfig.load(context)
-            },
-        )
-        Divider()
-        ToggleRow(
-            title = "Show Now Playing",
-            checked = ss.showNowPlaying,
-            iconColor = Color(0xFF64D2FF),
-            iconSymbol = "n",
-            onChange = { applyScreensaver("showNowPlaying", it) },
-        )
-        Divider()
-        ToggleRow(
-            title = "Show Seconds",
-            checked = clock.showSeconds,
-            iconColor = Color(0xFF30D158),
-            iconSymbol = "s",
-            onChange = {
-              DigitalClockConfig.setShowSeconds(context, it)
-              clock = DigitalClockConfig.load(context)
-            },
-        )
+        // The digital-clock face picker + clock format, then the full `digitalclock` domain
+        // (style, color, font, size, layout, background, glow, show date/seconds).
+        Card {
+          NavRow(
+              title = "Clock Face",
+              value = FaceCatalog.entryFor(ss.faceId).name,
+              iconColor = Color(0xFF0A84FF),
+              iconSymbol = "c",
+              onClick = { context.startActivity(Intent(context, FacePickerActivity::class.java)) },
+          )
+          Divider()
+          PickerRow(
+              title = "Clock Format",
+              selected = immortal.clockFormat,
+              options = listOf(
+                  PickerOption(ImmortalSettings.CLOCK_AUTO, "Auto"),
+                  PickerOption(ImmortalSettings.CLOCK_12, "12h"),
+                  PickerOption(ImmortalSettings.CLOCK_24, "24h"),
+              ),
+              iconColor = Color(0xFFFF9F0A),
+              iconSymbol = "h",
+              onSelect = { applyImmortal("clockFormat", it) },
+          )
+          Divider()
+          ToggleRow(
+              title = "Show Now Playing",
+              checked = ss.showNowPlaying,
+              iconColor = Color(0xFF64D2FF),
+              iconSymbol = "n",
+              onChange = { applyScreensaver("showNowPlaying", it) },
+          )
+        }
+        Spacer(Modifier.size(20.dp))
+        SettingsList(SettingsDomains.digitalclock, clock) { k, v ->
+          SettingsDomains.digitalclock.apply(context, JSONObject().put(k, v))
+          clock = DigitalClockConfig.load(context)
+        }
       }
-      } // end Clock Face
 
-      // ---------------------------------------------------------------
-      // APPEARANCE section
-      // ---------------------------------------------------------------
       if (selectedSection == "Appearance") {
       Card {
         PickerRow(
@@ -472,12 +583,17 @@ private fun ImmortalSettingsScreen() {
             iconSymbol = "S",
             onChange = { applyImmortal("hideStatusBar", it) },
         )
+        Divider()
+        ToggleRow(
+            title = "Constrain Page Width",
+            checked = immortal.constrainPageWidth,
+            iconColor = Color(0xFF5E5CE6),
+            iconSymbol = "|",
+            onChange = { applyImmortal("constrainPageWidth", it) },
+        )
       }
       } // end Appearance
 
-      // ---------------------------------------------------------------
-      // WEATHER section
-      // ---------------------------------------------------------------
       if (selectedSection == "Weather") {
       Card {
         PickerRow(
@@ -495,51 +611,110 @@ private fun ImmortalSettingsScreen() {
       }
       } // end Weather
 
-      // ---------------------------------------------------------------
-      // AUDIO section
-      // ---------------------------------------------------------------
-      if (selectedSection == "Audio") {
-      Card {
-        NavRow(
-            title = "Chime",
-            value = "Off",
-            iconColor = Color(0xFFFF9F0A),
-            iconSymbol = "C",
-            onClick = { context.startActivity(Intent(context, ChimeSettingsActivity::class.java)) },
-        )
-        Divider()
-        NavRow(
-            title = "Sunrise Wake Light",
-            value = "Off",
-            iconColor = Color(0xFFFFD60A),
-            iconSymbol = "R",
-            onClick = { context.startActivity(Intent(context, SunriseSettingsActivity::class.java)) },
-        )
-        Divider()
-        PickerRow(
-            title = "Soundscape",
-            selected = ss.soundscape,
-            options = ScreensaverConfig.SOUNDSCAPES.map {
-              PickerOption(it, ScreensaverConfig.soundscapeLabel(it))
-            },
-            iconColor = Color(0xFF30D158),
-            iconSymbol = "A",
-            onSelect = { applyScreensaver("soundscape", it) },
-        )
+      if (selectedSection == "Sleep Timer") {
+        SubScreenNavCard(
+            title = "Sleep timer",
+            subtitle = "Turn the screensaver off after a set time, with a live countdown; optionally pause audio and close apps.",
+            iconColor = Color(0xFF636366),
+            iconSymbol = "z",
+        ) { context.startActivity(Intent(context, SleepSettingsActivity::class.java)) }
       }
-      } // end Audio
 
       // ---------------------------------------------------------------
-      // SYSTEM section
+      // WIDGETS & CONTENT — Calendar, World Clock, Almanac, Countdown, Quick Buttons
       // ---------------------------------------------------------------
-      if (selectedSection == "System") {
+      if (selectedSection == "Calendar") {
+        SettingsList(SettingsDomains.calendar, ss) { k, v -> applyCalendar(k, v) }
+        FooterNote("Add a public iCalendar (.ics) link to show upcoming events on the photo frame.")
+      }
+
+      if (selectedSection == "World Clock") {
+        SubScreenNavCard(
+            title = "World clock cities",
+            subtitle = "Choose the cities shown by the World Clock widget (the first four in pick order).",
+            iconColor = Color(0xFF0A84FF),
+            iconSymbol = "o",
+        ) { context.startActivity(Intent(context, WorldClockActivity::class.java)) }
+      }
+
+      if (selectedSection == "Almanac") {
+        // Reused from MoreFeaturesSection: per-pack toggles feeding the home header + ambient dashboard.
+        Card {
+          CalendarPacks.AVAILABLE.forEachIndexed { i, pack ->
+            if (i > 0) Divider()
+            var on by remember(pack.id) { mutableStateOf(CalendarPacks.isEnabled(context, pack.id)) }
+            ToggleRow(
+                title = pack.title,
+                checked = on,
+                iconColor = Color(0xFF30D158),
+                iconSymbol = "k",
+                onChange = { checked ->
+                  on = checked
+                  CalendarPacks.setEnabled(context, pack.id, checked)
+                },
+            )
+          }
+        }
+        FooterNote("Enabled packs add their days to the home header and the ambient screensaver dashboard.")
+      }
+
+      if (selectedSection == "Countdown") {
+        SubScreenNavCard(
+            title = "Countdown events",
+            subtitle = "Add days-until countdowns (birthdays, trips) shown on the home screen.",
+            iconColor = Color(0xFFFF9F0A),
+            iconSymbol = "n",
+        ) { context.startActivity(Intent(context, CountdownSettingsActivity::class.java)) }
+      }
+
+      if (selectedSection == "Quick Buttons") {
+        QuickButtonsSection()
+        Spacer(Modifier.size(32.dp))
+      }
+
+      // ---------------------------------------------------------------
+      // CONNECTIONS & DEVICE — Home Assistant, Phone Remote, Start on Boot,
+      //                        Device Name, About & Device Health
+      // ---------------------------------------------------------------
+      if (selectedSection == "Home Assistant") {
+        SubScreenNavCard(
+            title = "Home Assistant (MQTT)",
+            subtitle = "Publish this Portal to Home Assistant as auto-discovered entities over your MQTT broker.",
+            iconColor = Color(0xFF41BDF5),
+            iconSymbol = "h",
+        ) { context.startActivity(Intent(context, MqttActivity::class.java)) }
+      }
+
+      if (selectedSection == "Phone Remote") {
+        SubScreenNavCard(
+            title = "Control from your phone",
+            subtitle = "Pair a phone as a remote control for this Portal.",
+            iconColor = Color(0xFF0A84FF),
+            iconSymbol = "r",
+        ) { context.startActivity(Intent(context, RemotePairActivity::class.java)) }
+      }
+
+      if (selectedSection == "Start on Boot") {
+        SubScreenNavCard(
+            title = "Apps that start on boot",
+            subtitle = "Pick which installed apps Immortal relaunches after a reboot.",
+            iconColor = Color(0xFF636366),
+            iconSymbol = "b",
+        ) { context.startActivity(Intent(context, BootAppsActivity::class.java)) }
+      }
+
+      if (selectedSection == "Device Name") {
+        DeviceNameSection()
+      }
+
+      if (selectedSection == "About & Device Health") {
       Card {
         NavRow(
-            title = "About",
+            title = "Device health",
             value = "Portal+",
-            subLabel = "Android 10",
+            subLabel = "Permissions & diagnostics",
             iconColor = Color(0xFF636366),
-            iconSymbol = "i",
+            iconSymbol = "?",
             onClick = { context.startActivity(Intent(context, DeviceHealthActivity::class.java)) },
         )
         Divider()
@@ -553,10 +728,9 @@ private fun ImmortalSettingsScreen() {
         Divider()
         IosDebugRow(context = context)
       }
-
       FooterNote("Changes apply as soon as you return to the home screen.")
       Spacer(Modifier.size(32.dp))
-      } // end System
+      } // end About & Device Health
       } // end scrolling content Column
     } // end right panel Column
   } // end Row
@@ -662,6 +836,66 @@ private fun IosDebugRow(context: android.content.Context) {
         prefs.edit().putBoolean("debug_mode", it).apply()
       },
   )
+}
+
+// ---------------------------------------------------------------------------
+// Detail-panel building blocks used by the grouped sections
+// ---------------------------------------------------------------------------
+
+/**
+ * A single iOS-style nav card that launches a sub-screen Activity (Chime, Sunrise, Multi-room,
+ * Welcome, Countdown, MQTT, Remote, Boot apps, Sleep timer, World clock). Kept light-themed to
+ * match the two-panel detail area; the launched Activity draws its own full-screen page.
+ */
+@Composable
+private fun SubScreenNavCard(
+    title: String,
+    subtitle: String,
+    iconColor: Color,
+    iconSymbol: String,
+    onOpen: () -> Unit,
+) {
+  Card {
+    NavRow(
+        title = title,
+        subLabel = subtitle,
+        iconColor = iconColor,
+        iconSymbol = iconSymbol,
+        onClick = onOpen,
+    )
+  }
+}
+
+/**
+ * The "Device Name" detail: a single validated free-text field bound to [FleetConfig] (the same
+ * name Home Assistant and the phone remote show). Rendered inline rather than via [SettingsList]
+ * because the `fleet` domain's name spec is an `Entry.Inline` string, which the generic renderer
+ * shows as a blank row. Writes trim + gate to 1..48 chars, matching the registry's `applyWhen`.
+ */
+@Composable
+private fun DeviceNameSection() {
+  val context = LocalContext.current
+  var name by remember { mutableStateOf(FleetConfig.name(context)) }
+  Card {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      IconBadge(color = Color(0xFF636366), symbol = "i")
+      Spacer(Modifier.size(12.dp))
+      OutlinedTextField(
+          value = name,
+          onValueChange = { new ->
+            name = new
+            if (new.trim().length in 1..48) FleetConfig.setName(context, new.trim())
+          },
+          singleLine = true,
+          label = { Text("Device name") },
+          modifier = Modifier.weight(1f),
+      )
+    }
+  }
+  FooterNote("Shown in the phone remote and in Home Assistant. 1–48 characters.")
 }
 
 // ---------------------------------------------------------------------------
