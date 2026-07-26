@@ -167,12 +167,15 @@ internal fun Divider() {
 // ---------------------------------------------------------------------------
 
 /**
- * A 30x30dp rounded square icon badge used on the left side of each setting row. The
- * background [color] follows the mock spec per-row; the [symbol] is a single glyph/emoji
- * rendered at 17sp. Radius is 7dp per iOS spec.
+ * A rounded square icon badge used on the left side of each setting row. The background [color]
+ * follows the mock spec per-row. When [iconRes] is supplied it draws that (white-tinted) vector
+ * drawable; otherwise it falls back to the single-glyph [symbol]. Radius is per iOS spec.
+ *
+ * Vector drawables are preferred (crisp at any density, reliable on the Portal's Android 10 where
+ * emoji coverage is patchy); [symbol] remains for rows without a dedicated icon yet.
  */
 @Composable
-internal fun IconBadge(color: Color, symbol: String) {
+internal fun IconBadge(color: Color, symbol: String, iconRes: Int? = null) {
     Box(
         modifier = Modifier
             .size(Sizes.iconBadge)
@@ -180,12 +183,21 @@ internal fun IconBadge(color: Color, symbol: String) {
             .background(color),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = symbol,
-            color = Color.White,
-            fontSize = Sizes.iconGlyph,
-            lineHeight = Sizes.iconGlyph,
-        )
+        if (iconRes != null) {
+            androidx.compose.material3.Icon(
+                painter = androidx.compose.ui.res.painterResource(iconRes),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(Sizes.iconBadge * 0.62f),
+            )
+        } else {
+            Text(
+                text = symbol,
+                color = Color.White,
+                fontSize = Sizes.iconGlyph,
+                lineHeight = Sizes.iconGlyph,
+            )
+        }
     }
 }
 
