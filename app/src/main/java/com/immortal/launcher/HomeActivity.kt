@@ -1059,8 +1059,9 @@ private fun LiquidGlass(
   Box(
       modifier = modifier
           .clip(shape)
-          // Flat, even translucent fill — no gradient. Wallpaper shows through uniformly.
-          .background(Color(0x1FFFFFFF))
+          // Flat, even translucent fill — no gradient. ~5% white so the wallpaper shows through
+          // strongly; the border does most of the work defining the card.
+          .background(Color(0x0DFFFFFF))
           // Thin light rim for the glass edge.
           .border(1.dp, Color(0x59FFFFFF), shape),
   ) {
