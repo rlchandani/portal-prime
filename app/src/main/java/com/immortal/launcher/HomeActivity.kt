@@ -102,6 +102,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -481,6 +482,18 @@ private fun LeftWidgetColumn(
       ) { widget ->
         ReorderableItem(widgetReorderState, key = widget.key) { isDragging ->
           val widgetHeight = 100.dp * widget.spanY.toFloat()
+          // --- Hold-and-drag resize state (per widget) ---------------------------------------
+          // One grid row-unit is 100.dp; convert to px so a vertical drag maps to spanY steps.
+          val rowUnitPx = with(androidx.compose.ui.platform.LocalDensity.current) { 100.dp.toPx() }
+          // Gap between grid columns (matches horizontalArrangement.spacedBy(8.dp)).
+          val colGapPx = with(androidx.compose.ui.platform.LocalDensity.current) { 8.dp.toPx() }
+          // The laid-out width of this widget cell (spans widget.spanX columns). Captured below.
+          var widgetWidthPx by remember(widget.key) { mutableStateOf(0) }
+          // Accumulated drag delta since the current resize gesture began.
+          var resizeAccum by remember(widget.key) { mutableStateOf(Offset.Zero) }
+          // Span at the moment the resize gesture started (the anchor for target-span math).
+          var startSpanX by remember(widget.key) { mutableStateOf(widget.spanX) }
+          var startSpanY by remember(widget.key) { mutableStateOf(widget.spanY) }
           // animateItem() glides the OTHER widgets into their new slots while one is dragged.
           // The dragged item is driven by the reorderable library, so exclude it while dragging.
           Box(modifier = if (isDragging) Modifier else Modifier.animateItem()) {
@@ -488,6 +501,7 @@ private fun LeftWidgetColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(widgetHeight)
+                    .onGloballyPositioned { widgetWidthPx = it.size.width }
                     .jiggle(editMode && !isDragging, widget.key.hashCode())
                     // Drag handle mirrors the icon grid:
                     // - In edit mode: press+move starts a drag immediately (no hold).
@@ -527,11 +541,33 @@ private fun LeftWidgetColumn(
                 }
                 ResizeBadge(
                     modifier = Modifier.align(Alignment.BottomEnd).offset(x = 6.dp, y = 6.dp),
-                ) {
-                  val (newX, newY) = HomeWidgetStore.nextWidgetSpan(widget.spanX to widget.spanY)
-                  val updated = widget.copy(spanX = newX, spanY = newY)
-                  onWidgetsChanged(homeWidgets.map { if (it.key == widget.key) updated else it })
-                }
+                    onResizeStart = {
+                      // Anchor: capture the span at gesture start and zero the accumulator.
+                      startSpanX = widget.spanX
+                      startSpanY = widget.spanY
+                      resizeAccum = Offset.Zero
+                    },
+                    onResizeDrag = { delta ->
+                      resizeAccum += delta
+                      // One column ≈ (cell width - gap) / startSpanX. Fall back to half the cell for
+                      // a single-column widget so the very first drag still has a sane column size.
+                      val colWidthPx =
+                          if (widgetWidthPx > 0 && startSpanX > 0)
+                              ((widgetWidthPx - colGapPx) / startSpanX).coerceAtLeast(1f)
+                          else rowUnitPx
+                      val targetX =
+                          (startSpanX + (resizeAccum.x / colWidthPx).roundToInt()).coerceIn(1, 2)
+                      val targetY =
+                          (startSpanY + (resizeAccum.y / rowUnitPx).roundToInt()).coerceIn(1, 4)
+                      // Debounce: only persist when the snapped span actually changes.
+                      if (targetX != widget.spanX || targetY != widget.spanY) {
+                        val updated = widget.copy(spanX = targetX, spanY = targetY)
+                        onWidgetsChanged(
+                            homeWidgets.map { if (it.key == widget.key) updated else it })
+                      }
+                    },
+                    onResizeEnd = { resizeAccum = Offset.Zero },
+                )
               }
             }
           }
@@ -3124,18 +3160,40 @@ private fun MinusBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
   }
 }
 
-/** Resize control for widgets: cycles Small (1x1) -> Medium (2x1) -> Large (2x2). */
+/**
+ * Resize control for widgets: PRESS-AND-DRAG the bottom-right handle to resize (iOS/Android style).
+ * Reports the accumulated drag delta continuously via [onResizeDrag]; the caller snaps to grid
+ * sizes. [onResizeStart]/[onResizeEnd] bracket the gesture so the caller can capture the start span
+ * and reset its accumulator. The drag consumes its pointer events so it never triggers the widget
+ * body's reorder handle.
+ */
 @Composable
-private fun ResizeBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun ResizeBadge(
+    modifier: Modifier = Modifier,
+    onResizeStart: () -> Unit,
+    onResizeDrag: (dragDelta: Offset) -> Unit,
+    onResizeEnd: () -> Unit,
+) {
+  // Keep latest callbacks so the long-lived pointerInput lambda always calls the current versions.
+  val startState = rememberUpdatedState(onResizeStart)
+  val dragState = rememberUpdatedState(onResizeDrag)
+  val endState = rememberUpdatedState(onResizeEnd)
   Surface(
       color = Color(0xE6C7C7CC),
       shape = CircleShape,
       modifier = modifier
           .size(32.dp)
-          .clickable(
-              interactionSource = remember { MutableInteractionSource() },
-              indication = null
-          ) { onClick() },
+          .pointerInput(Unit) {
+            detectDragGestures(
+                onDragStart = { startState.value() },
+                onDragEnd = { endState.value() },
+                onDragCancel = { endState.value() },
+            ) { change, dragAmount ->
+              // Consume so the reorderable grid's drag handle does not also react to this pointer.
+              change.consume()
+              dragState.value(dragAmount)
+            }
+          },
   ) {
     Canvas(Modifier.fillMaxSize()) {
       // Double-headed diagonal resize arrow (↖ ↘): a diagonal shaft with an arrowhead at each end.
