@@ -2501,6 +2501,23 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
         }
       }
 
+  // Nearest upcoming countdown (birthday/trip) from Settings > Countdown. Re-read on resume so a
+  // newly-added event shows. Null when the user has none.
+  var countdown by remember { mutableStateOf<Pair<String, String>?>(null) }
+  DisposableEffect(lifecycleOwner) {
+    fun refresh() {
+      countdown = runCatching {
+        CountdownConfig.loadSorted(context)
+            .firstOrNull { it.daysUntil() >= 0 }
+            ?.let { "${it.emoji} ${it.label}" to it.phrase() }
+      }.getOrNull()
+    }
+    refresh()
+    val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) refresh() }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+
   val today = forecast?.days?.firstOrNull()
   val (moonGlyph, moonName) = remember { moonPhase(System.currentTimeMillis()) }
   val sunPair = sun?.formatted(use24)
@@ -2521,6 +2538,8 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
           moonName,
           sunPair?.let { "↑${it.first}  ↓${it.second}" },
       )
+      // Countdown row only appears when the user has an upcoming event configured.
+      countdown?.let { (label, phrase) -> TodayRow("⏳", label, phrase) }
     }
   }
 }

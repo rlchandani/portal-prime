@@ -199,6 +199,28 @@ fun HomeBackground(modifier: Modifier = Modifier) {
       else -> androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(Color(0xFF1A1A1A)))
     }
     if (cfg.grain) GrainOverlay()
+    NightShiftOverlay()
+  }
+}
+
+/**
+ * Night Shift warm overlay (from [DisplayControl]): a translucent amber layer over the launcher
+ * during the user's nightly window, so the home screen reads warmer at night. Re-checks every
+ * minute; alpha 0 (nothing drawn) when disabled or outside the window.
+ */
+@Composable
+private fun NightShiftOverlay() {
+  val context = LocalContext.current
+  var alpha by remember { mutableStateOf(DisplayControl.currentWarmAlpha(context)) }
+  androidx.compose.runtime.LaunchedEffect(Unit) {
+    while (true) {
+      alpha = DisplayControl.currentWarmAlpha(context)
+      kotlinx.coroutines.delay(60_000L)
+    }
+  }
+  if (alpha > 0f) {
+    androidx.compose.foundation.layout.Box(
+        Modifier.fillMaxSize().background(Color(0xFFFF8A2A).copy(alpha = alpha)))
   }
 }
 
