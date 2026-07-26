@@ -494,6 +494,8 @@ private fun LeftWidgetColumn(
           // Span at the moment the resize gesture started (the anchor for target-span math).
           var startSpanX by remember(widget.key) { mutableStateOf(widget.spanX) }
           var startSpanY by remember(widget.key) { mutableStateOf(widget.spanY) }
+          // Column width frozen at drag start (stable divisor — avoids the resize feedback loop).
+          var startColWidthPx by remember(widget.key) { mutableStateOf(0f) }
           // animateItem() glides the OTHER widgets into their new slots while one is dragged.
           // The dragged item is driven by the reorderable library, so exclude it while dragging.
           Box(modifier = if (isDragging) Modifier else Modifier.animateItem()) {
@@ -542,24 +544,31 @@ private fun LeftWidgetColumn(
                 ResizeBadge(
                     modifier = Modifier.align(Alignment.BottomEnd).offset(x = 6.dp, y = 6.dp),
                     onResizeStart = {
-                      // Anchor: capture the span at gesture start and zero the accumulator.
+                      // Anchor: capture the span AND the cell pixel size ONCE at gesture start.
+                      // Using a frozen column width (not the live widget width, which changes as
+                      // the widget resizes) prevents the divisor from shifting mid-drag — the
+                      // feedback loop that made the size flip back and forth.
                       startSpanX = widget.spanX
                       startSpanY = widget.spanY
                       resizeAccum = Offset.Zero
+                      startColWidthPx =
+                          if (widgetWidthPx > 0 && widget.spanX > 0)
+                              ((widgetWidthPx - colGapPx) / widget.spanX).coerceAtLeast(1f)
+                          else rowUnitPx
                     },
                     onResizeDrag = { delta ->
                       resizeAccum += delta
-                      // One column ≈ (cell width - gap) / startSpanX. Fall back to half the cell for
-                      // a single-column widget so the very first drag still has a sane column size.
-                      val colWidthPx =
-                          if (widgetWidthPx > 0 && startSpanX > 0)
-                              ((widgetWidthPx - colGapPx) / startSpanX).coerceAtLeast(1f)
-                          else rowUnitPx
-                      val targetX =
-                          (startSpanX + (resizeAccum.x / colWidthPx).roundToInt()).coerceIn(1, 2)
-                      val targetY =
-                          (startSpanY + (resizeAccum.y / rowUnitPx).roundToInt()).coerceIn(1, 4)
-                      // Debounce: only persist when the snapped span actually changes.
+                      // Hysteresis: only flip to the next span once the drag passes 65% of a cell
+                      // beyond the start (not the 50% midpoint), so jitter near a boundary can't
+                      // oscillate. stepsX/Y = how many whole cells past the 0.65 threshold.
+                      fun steps(accum: Float, unit: Float): Int {
+                        val cells = accum / unit
+                        // round toward zero until 0.65 into the next cell.
+                        return (kotlin.math.sign(cells) *
+                            kotlin.math.floor(kotlin.math.abs(cells) + 0.35f)).toInt()
+                      }
+                      val targetX = (startSpanX + steps(resizeAccum.x, startColWidthPx)).coerceIn(1, 2)
+                      val targetY = (startSpanY + steps(resizeAccum.y, rowUnitPx)).coerceIn(1, 4)
                       if (targetX != widget.spanX || targetY != widget.spanY) {
                         val updated = widget.copy(spanX = targetX, spanY = targetY)
                         onWidgetsChanged(
