@@ -1063,15 +1063,14 @@ private fun LiquidGlass(
   Box(
       modifier = modifier
           .clip(shape)
-          // Light glass wash flowing left→right (kept low so the wallpaper shows through).
+          // Near-flat glass wash — barely any left→right variation now (was a strong gradient).
           .background(
-              Brush.horizontalGradient(colors = listOf(Color(0x1CFFFFFF), Color(0x0DFFFFFF))))
-          // Glassy top gloss: a bright band that catches light along the top edge and fades out by
-          // ~40% down — the main cue that reads as real glass. Bottom stays clear.
+              Brush.horizontalGradient(colors = listOf(Color(0x17FFFFFF), Color(0x12FFFFFF))))
+          // Very subtle top-edge gloss — just a hint of light on the rim, much softer than before.
           .background(
               Brush.verticalGradient(
-                  colors = listOf(Color(0x3DFFFFFF), Color.Transparent),
-                  endY = 120f,
+                  colors = listOf(Color(0x1FFFFFFF), Color.Transparent),
+                  endY = 90f,
               ))
           // Crisp bright rim.
           .border(1.dp, Color(0x59FFFFFF), shape),
