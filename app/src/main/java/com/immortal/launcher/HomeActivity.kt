@@ -128,6 +128,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.PathParser
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -683,7 +686,20 @@ private fun LauncherScreen(
         modifier = Modifier.fillMaxSize()
             .then(
                 if (editMode) {
-                  Modifier.pointerInput(Unit) { detectTapGestures { editMode = false } }
+                  // Exit edit mode on a tap that lands on EMPTY space. We watch the FINAL pass:
+                  // icons/widgets and their drag handles consume their own down events in the
+                  // main pass, so if a tap reaches us unconsumed here, it was on empty space.
+                  // (A full-screen background tap-catcher alone doesn't work now that the grid
+                  // fills the screen and intercepts touches over its area.)
+                  Modifier.pointerInput(Unit) {
+                    awaitEachGesture {
+                      val down = awaitFirstDown(pass = androidx.compose.ui.input.pointer.PointerEventPass.Final)
+                      val up = waitForUpOrCancellation(pass = androidx.compose.ui.input.pointer.PointerEventPass.Final)
+                      if (up != null && !down.isConsumed && !up.isConsumed) {
+                        editMode = false
+                      }
+                    }
+                  }
                 } else Modifier
             )
             .background(
