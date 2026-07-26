@@ -77,6 +77,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -407,11 +408,11 @@ private fun LeftWidgetColumn(
       modifier = modifier,
       verticalArrangement = Arrangement.spacedBy(12.dp),
   ) {
-    // Greeting card (always present)
-    LiquidGlassWidget(modifier = Modifier.fillMaxWidth().height(110.dp)) {
+    // Greeting card (always present). Wraps its content so the date line isn't clipped.
+    LiquidGlassWidget(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
       Column(
-          modifier = Modifier.fillMaxSize().padding(16.dp),
-          verticalArrangement = Arrangement.Center,
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 18.dp),
+          verticalArrangement = Arrangement.spacedBy(2.dp),
       ) {
         Text(
             text = "$greetingWord,",
@@ -434,6 +435,9 @@ private fun LeftWidgetColumn(
         )
       }
     }
+
+    // Today strip (always present): next event · feels-like + hi/lo · moon phase + sun times.
+    TodayStripWidget(modifier = Modifier.fillMaxWidth())
 
     // Now Playing card (always present)
     LiquidGlassWidget(modifier = Modifier.fillMaxWidth().height(80.dp)) {
@@ -2276,6 +2280,127 @@ private fun ImmortalWidgetShell(
     )
     Spacer(Modifier.size(8.dp))
     content()
+  }
+}
+
+/**
+ * The glanceable "Today" strip for the left column: a frosted-glass card with three quick rows —
+ * next calendar event, weather feels-like + hi/lo, and the moon phase with today's sunrise/sunset.
+ * All data is already fetched elsewhere (weather + sun times keyless from Open-Meteo; moon phase is
+ * pure date math). Re-reads the clock format on resume so times match the user's 12/24h setting.
+ */
+@Composable
+private fun TodayStripWidget(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
+  var fahrenheit by remember { mutableStateOf(ImmortalSettings.useFahrenheit(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val obs = LifecycleEventObserver { _, e ->
+      if (e == Lifecycle.Event.ON_RESUME) {
+        use24 = ImmortalSettings.use24HourClock(context)
+        fahrenheit = ImmortalSettings.useFahrenheit(context)
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+  val current by
+      produceState<Weather.Current?>(initialValue = null, fahrenheit) {
+        while (true) {
+          value = withContext(Dispatchers.IO) { Weather.fetchCurrent(context) }
+          delay(if (value == null) 60_000L else 30L * 60 * 1000)
+        }
+      }
+  val forecast by
+      produceState<Weather.Forecast?>(initialValue = null, fahrenheit) {
+        value = withContext(Dispatchers.IO) { Weather.fetchForecast(context) }
+      }
+  val sun by
+      produceState<Weather.SunTimes?>(initialValue = null) {
+        value = withContext(Dispatchers.IO) { Weather.fetchSunTimes(context) }
+      }
+  val nextEvent by
+      produceState<String?>(initialValue = null, use24) {
+        val url = ScreensaverConfig.load(context).calendarUrl
+        value = if (url.isNullOrBlank()) null
+        else withContext(Dispatchers.IO) {
+          runCatching {
+            val now = System.currentTimeMillis()
+            CalendarFeed.fetch(url)
+                .filter { it.startMillis >= now - 60L * 60 * 1000 } // include one just-started
+                .minByOrNull { it.startMillis }
+                ?.let { calendarEventLine(it, now, use24) }
+          }.getOrNull()
+        }
+      }
+
+  val today = forecast?.days?.firstOrNull()
+  val (moonGlyph, moonName) = remember { moonPhase(System.currentTimeMillis()) }
+  val sunPair = sun?.formatted(use24)
+
+  LiquidGlassWidget(modifier = modifier.wrapContentHeight()) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+      TodayRow("▸", nextEvent ?: "No upcoming events", null)
+      TodayRow(
+          Weather.emoji(current?.code ?: 0),
+          current?.let { "Feels like ${it.temp}°" } ?: "Weather unavailable",
+          today?.let { "H:${it.hi}° L:${it.lo}°" },
+      )
+      TodayRow(
+          moonGlyph,
+          moonName,
+          sunPair?.let { "↑${it.first}  ↓${it.second}" },
+      )
+    }
+  }
+}
+
+@Composable
+private fun TodayRow(glyph: String, text: String, trailing: String?) {
+  Row(
+      modifier = Modifier.fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(12.dp),
+  ) {
+    Text(glyph, color = Color.White.copy(alpha = 0.92f), fontSize = 16.sp, modifier = Modifier.width(24.dp), textAlign = TextAlign.Center)
+    Text(
+        text,
+        color = Color.White.copy(alpha = 0.9f),
+        fontSize = 15.sp,
+        fontWeight = FontWeight.Medium,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.weight(1f),
+    )
+    if (trailing != null) {
+      Text(trailing, color = Color.White.copy(alpha = 0.6f), fontSize = 13.sp, maxLines = 1)
+    }
+  }
+}
+
+/**
+ * Moon phase (glyph + name) from the epoch, via the standard synodic-month approximation
+ * (29.53059 days from a known new moon). Pure date math — no network, good to ~1 day.
+ */
+private fun moonPhase(nowMillis: Long): Pair<String, String> {
+  val synodic = 29.530588853
+  val knownNew = 947182440000L // 2000-01-06 18:14 UTC, a reference new moon
+  val days = (nowMillis - knownNew).toDouble() / 86_400_000.0
+  val age = ((days % synodic) + synodic) % synodic
+  return when {
+    age < 1.84 -> "🌑" to "New moon"
+    age < 5.53 -> "🌒" to "Waxing crescent"
+    age < 9.22 -> "🌓" to "First quarter"
+    age < 12.91 -> "🌔" to "Waxing gibbous"
+    age < 16.61 -> "🌕" to "Full moon"
+    age < 20.30 -> "🌖" to "Waning gibbous"
+    age < 23.99 -> "🌗" to "Last quarter"
+    age < 27.68 -> "🌘" to "Waning crescent"
+    else -> "🌑" to "New moon"
   }
 }
 
