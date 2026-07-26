@@ -224,11 +224,20 @@ class HomeActivity : ComponentActivity() {
         LauncherScreen(
             onLaunch = { cn ->
               runCatching {
-                startActivity(
-                    Intent(Intent.ACTION_MAIN)
-                        .addCategory(Intent.CATEGORY_LAUNCHER)
-                        .setComponent(cn)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                if (cn.packageName == packageName &&
+                    cn.className == ImmortalSettingsActivity::class.java.name) {
+                  // Our own iOS-style settings (exported=false, no LAUNCHER filter) — launch it
+                  // directly with an explicit intent rather than the generic MAIN/LAUNCHER one.
+                  startActivity(
+                      Intent(this@HomeActivity, ImmortalSettingsActivity::class.java)
+                          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } else {
+                  startActivity(
+                      Intent(Intent.ACTION_MAIN)
+                          .addCategory(Intent.CATEGORY_LAUNCHER)
+                          .setComponent(cn)
+                          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                }
               }
             },
             onOpenStore = {
@@ -3370,6 +3379,22 @@ private fun loadApps(context: Context): List<AppEntry> {
       // debug/launcher activity that would otherwise show as a duplicate.
       .distinctBy { it.component.packageName }
       .sortedBy { it.label.lowercase(Locale.getDefault()) }
+      .let { apps ->
+        // Inject our own iOS-style settings as a grid tile. Our app is excluded from the
+        // normal query (pkg == this launcher), and ImmortalSettingsActivity is exported=false
+        // with no LAUNCHER filter, so it's launched via the special-case in onLaunch below.
+        val settingsIcon = Curation.iconOverride("com.android.settings")
+            ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
+            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+        if (settingsIcon != null) {
+          apps + AppEntry(
+              label = "Settings",
+              component = ComponentName(context.packageName, ImmortalSettingsActivity::class.java.name),
+              icon = settingsIcon,
+              uninstallable = false,
+          )
+        } else apps
+      }
 }
 
 private fun loadWidgetProviders(context: Context, tileDp: Dp): List<WidgetProviderEntry> {

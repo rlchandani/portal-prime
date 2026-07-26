@@ -3,16 +3,29 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Official multicolor Gmail envelope (gilbarbara/logos: google-gmail.svg) on a white squircle tile. -->
     <path
-        android:fillColor="#FFEA4335"
+        android:fillColor="#FFFFFFFF"
         android:pathData="M0,0h108v108h-108z" />
     <group
-        android:scaleX="2.7"
-        android:scaleY="2.7"
-        android:translateX="21.6"
-        android:translateY="21.6">
+        android:scaleX="0.235"
+        android:scaleY="0.235"
+        android:translateX="24"
+        android:translateY="31.5">
         <path
-            android:fillColor="#FFFFFFFF"
-            android:pathData="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" />
+            android:fillColor="#FF4285F4"
+            android:pathData="M58.1818182,192.049515 L58.1818182,93.1404244 L27.5066233,65.0770089 L0,49.5040608 L0,174.59497 C0,184.253152 7.82545455,192.049515 17.4545455,192.049515 L58.1818182,192.049515 Z" />
+        <path
+            android:fillColor="#FF34A853"
+            android:pathData="M197.818182,192.049515 L238.545455,192.049515 C248.203636,192.049515 256,184.224061 256,174.59497 L256,49.5040608 L224.844415,67.3422767 L197.818182,93.1404244 L197.818182,192.049515 Z" />
+        <path
+            android:fillColor="#FFEA4335"
+            android:pathData="M58.1818182,93.1404244 L54.0077618,54.4932827 L58.1818182,17.5040608 L128,69.8676972 L197.818182,17.5040608 L202.487488,52.4960089 L197.818182,93.1404244 L128,145.504061 Z" />
+        <path
+            android:fillColor="#FFFBBC04"
+            android:pathData="M197.818182,17.5040608 L197.818182,93.1404244 L256,49.5040608 L256,26.2313335 C256,4.64587897 231.36,-7.65957557 214.109091,5.28587897 L197.818182,17.5040608 Z" />
+        <path
+            android:fillColor="#FFC5221F"
+            android:pathData="M0,49.5040608 L26.7588051,69.5731646 L58.1818182,93.1404244 L58.1818182,17.5040608 L41.8909091,5.28587897 C24.6109091,-7.65957557 0,4.64587897 0,26.2313335 L0,49.5040608 Z" />
     </group>
 </vector>
