@@ -231,6 +231,12 @@ class HomeActivity : ComponentActivity() {
                   startActivity(
                       Intent(this@HomeActivity, ImmortalSettingsActivity::class.java)
                           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } else if (cn.packageName == packageName &&
+                    cn.className == StoreActivity::class.java.name) {
+                  // Our own App Store — explicit launch (same reasoning as settings).
+                  startActivity(
+                      Intent(this@HomeActivity, StoreActivity::class.java)
+                          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 } else {
                   startActivity(
                       Intent(Intent.ACTION_MAIN)
@@ -3386,14 +3392,27 @@ private fun loadApps(context: Context): List<AppEntry> {
         val settingsIcon = Curation.iconOverride("com.android.settings")
             ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
             ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+        // Inject the Immortal App Store too (StoreActivity — also our own, excluded from the query).
+        val storeIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_apps)
+            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+        var out = apps
         if (settingsIcon != null) {
-          apps + AppEntry(
+          out = out + AppEntry(
               label = "Settings",
               component = ComponentName(context.packageName, ImmortalSettingsActivity::class.java.name),
               icon = settingsIcon,
               uninstallable = false,
           )
-        } else apps
+        }
+        if (storeIcon != null) {
+          out = out + AppEntry(
+              label = "App Store",
+              component = ComponentName(context.packageName, StoreActivity::class.java.name),
+              icon = storeIcon,
+              uninstallable = false,
+          )
+        }
+        out
       }
 }
 
