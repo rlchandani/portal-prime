@@ -209,6 +209,10 @@ class SettingsDomainTest {
             "facesEnabled", "faceId", "faceSizeIndex",
             "dismissAppComponent", "dismissHaDashboard",
             "calendarUrl", "calendarEnabled", "calendarRange", "calendarSize", "calendarSide",
+            // Deliberately spec-less: their controls were removed as DEAD (nothing read them).
+            // The storage fields are retained to avoid churn; see settings-reimagining-audit.
+            "showGradient", // frame always drew the scrim regardless
+            "feed", // PhotoFrameController hardcodes the built-in source chain
         )
     val uncovered = fields - specKeys - managedElsewhere
     assertTrue(
@@ -228,7 +232,9 @@ class SettingsDomainTest {
             .map { it.name }
             .toSet()
     val specKeys = SettingsDomains.immortal.specs.map { it.key }.toSet()
-    val managedElsewhere = emptySet<String>()
+    // "constrainPageWidth" was removed as a DEAD control (no consumer ever read it); the storage
+    // field is retained to avoid churn. See settings-reimagining-audit.
+    val managedElsewhere = setOf("constrainPageWidth")
     val uncovered = fields - specKeys - managedElsewhere
     assertTrue(
         "ImmortalSettings.Settings has persisted fields neither in the registry nor accounted for: $uncovered",

@@ -68,6 +68,10 @@ object HeadlessInstaller {
         app.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
     else @Suppress("UnspecifiedRegisterReceiverFlag") app.registerReceiver(receiver, filter)
 
+    // Arm the auto-confirm accessibility service for the life of THIS headless install only, so
+    // it taps "Install" on the system dialog. Disarmed in `finally` so it can never dismiss an
+    // interactive install the user later triggers themselves.
+    InstallAutoConfirm.arm()
     return try {
       val pi = app.packageManager.packageInstaller
       val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
@@ -92,6 +96,7 @@ object HeadlessInstaller {
       Log.w(TAG, "headless install of $pkg failed", t)
       false
     } finally {
+      InstallAutoConfirm.disarm()
       runCatching { app.unregisterReceiver(receiver) }
     }
   }

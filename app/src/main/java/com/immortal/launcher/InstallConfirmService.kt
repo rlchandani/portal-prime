@@ -27,6 +27,11 @@ import android.view.accessibility.AccessibilityNodeInfo
 class InstallConfirmService : AccessibilityService() {
 
   override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+    // Only act during a headless/fleet install (armed by HeadlessInstaller). Otherwise this
+    // service must stay dormant, or it dismisses the interactive install dialog the user is
+    // looking at (Aurora Store / App Store) before they can tap it — the "flash and vanish"
+    // STATUS 3 abort. Interactive installs never arm the window.
+    if (!InstallAutoConfirm.isArmed()) return
     val pkg = event?.packageName?.toString() ?: return
     if (pkg !in INSTALLER_PKGS) return
     val root = rootInActiveWindow ?: return
@@ -67,8 +72,10 @@ class InstallConfirmService : AccessibilityService() {
     private const val TAG = "ImmortalFleet"
     val INSTALLER_PKGS =
         setOf("com.android.packageinstaller", "com.google.android.packageinstaller")
-    // AFFIRMATIVE only, most-specific first. Never "Cancel". Substring + case-insensitive,
-    // so "Install" also matches "Install anyway" / "Update".
-    val CONFIRM_LABELS = listOf("Install", "Update", "Continue", "Got it", "Done", "OK")
+    // AFFIRMATIVE install-confirm buttons only, most-specific first. Never "Cancel". Substring +
+    // case-insensitive, so "Install" also matches "Install anyway" / "Update". Deliberately does
+    // NOT include "OK"/"Done"/"Got it" — those appear on the FINAL/success screen and on unrelated
+    // dialogs, so matching them caused premature dismissal.
+    val CONFIRM_LABELS = listOf("Install", "Update", "Continue")
   }
 }

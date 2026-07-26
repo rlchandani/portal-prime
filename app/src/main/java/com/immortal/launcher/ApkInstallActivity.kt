@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -98,13 +99,13 @@ class ApkInstallActivity : ComponentActivity() {
             label = label,
             icon = icon,
             onCancel = { finish() },
-            onInstall = { setStatus -> doInstall(apk, pkg, src, setStatus) },
+            onInstall = { setStatus -> doInstall(apk, pkg, setStatus) },
         )
       }
     }
   }
 
-  private fun doInstall(apk: File, pkg: String, originalUri: Uri, setStatus: (String) -> Unit) {
+  private fun doInstall(apk: File, pkg: String, setStatus: (String) -> Unit) {
     when {
       InstallDaemon.installPaused(this) ->
           setStatus("Paused — connect to your computer and run the Immortal installer again")
@@ -116,21 +117,58 @@ class ApkInstallActivity : ComponentActivity() {
         }
       }
       else -> {
-        // Newer models — and Gen-1 once the overlay fix has made the stock dialog
-        // visible — hand off to the working system installer.
-        val ok =
-            runCatching {
-                  startActivity(
-                      Intent(Intent.ACTION_VIEW)
-                          .setDataAndType(originalUri, "application/vnd.android.package-archive")
-                          .setPackage("com.android.packageinstaller")
-                          .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
-                  finish()
-                }
-                .isSuccess
-        if (!ok) setStatus("Couldn't install on this device")
+        // Newer models (and Gen-1 with the overlay fix): install the APK we already copied to
+        // our cache via a PackageInstaller session — the same robust path the App Store uses.
+        // The system shows its own confirm dialog (STATUS_PENDING_USER_ACTION) which the user
+        // taps; the terminal result comes back on APK_INSTALL_ACTION. This replaces the old
+        // re-delegation to com.android.packageinstaller via ACTION_VIEW, which failed whenever
+        // the source URI wasn't one that installer could read ("Couldn't install on this device").
+        setStatus("Installing…")
+        commitSessionInstall(apk, setStatus)
       }
     }
+  }
+
+  private fun commitSessionInstall(apk: File, setStatus: (String) -> Unit) {
+    val app = applicationContext
+    val receiver =
+        object : android.content.BroadcastReceiver() {
+          override fun onReceive(c: android.content.Context, intent: Intent) {
+            when (intent.getIntExtra(
+                android.content.pm.PackageInstaller.EXTRA_STATUS, Int.MIN_VALUE)) {
+              android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION -> {
+                val confirm =
+                    if (android.os.Build.VERSION.SDK_INT >= 33)
+                        intent.getParcelableExtra(Intent.EXTRA_INTENT, Intent::class.java)
+                    else @Suppress("DEPRECATION") intent.getParcelableExtra(Intent.EXTRA_INTENT)
+                confirm?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                runCatching { startActivity(confirm) }
+                    .onFailure { setStatus("Couldn't open the installer") }
+              }
+              android.content.pm.PackageInstaller.STATUS_SUCCESS -> {
+                runCatching { app.unregisterReceiver(this) }
+                runOnUiThread { setStatus("Installed ✓"); finish() }
+              }
+              else -> {
+                runCatching { app.unregisterReceiver(this) }
+                runOnUiThread { setStatus("Install failed") }
+              }
+            }
+          }
+        }
+    val filter = IntentFilter(APK_INSTALL_ACTION)
+    if (android.os.Build.VERSION.SDK_INT >= 33)
+        registerReceiver(receiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED)
+    else @Suppress("UnspecifiedRegisterReceiverFlag") registerReceiver(receiver, filter)
+    runCatching { PackageInstallSessions.commit(this, apk, APK_INSTALL_ACTION) }
+        .onFailure {
+          runCatching { app.unregisterReceiver(receiver) }
+          setStatus("Couldn't install on this device")
+        }
+  }
+
+  private companion object {
+    const val APK_INSTALL_ACTION = "com.immortal.launcher.APK_INSTALL_STATUS"
   }
 }
 
