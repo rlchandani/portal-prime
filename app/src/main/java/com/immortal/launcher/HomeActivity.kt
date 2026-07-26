@@ -551,9 +551,11 @@ private fun LeftWidgetColumn(
                           )
                         }
                     )
-                    // Inset by the badge overhang so the corner badges sit ON the edge and render
-                    // FULLY (not clipped) — same treatment as the app-icon minus badge.
-                    .padding(11.dp)
+                    // Inset by the badge overhang ONLY in edit mode, so the corner drag/resize
+                    // badges (which sit half-outside the edge) render fully without being clipped.
+                    // In normal view there are no badges, so the widget fills flush — matching the
+                    // full-width top cards' left/right margins exactly (no extra inset).
+                    .padding(if (editMode) 11.dp else 0.dp)
             ) {
               LiquidGlassWidget(modifier = Modifier.fillMaxSize()) {
                 ImmortalWidgetContent(widget = widget, modifier = Modifier.fillMaxSize())
