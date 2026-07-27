@@ -241,9 +241,10 @@ private fun ImmortalSettingsScreen() {
         "Photo Source" to "Screensaver", "Photo Interval" to "Screensaver",
         "Shuffle" to "Screensaver", "Include Video" to "Screensaver",
         "Fit Mode" to "Screensaver", "Presence Mode" to "Screensaver",
-        "Show Gradient" to "Screensaver", "Anti Burn-In" to "Screensaver",
+        // NOTE: no "Show Gradient" / "Anti Burn-In" / "Photo feed" here — those controls were
+        // removed or auto-managed (hidden), so a search alias would jump to a row that isn't shown.
         "Overnight screen-off" to "Screensaver", "Idle screen-off" to "Screensaver",
-        "Store media on this device" to "Screensaver", "Photo feed" to "Screensaver",
+        "Store media on this device" to "Screensaver",
         "Ambient dashboard" to "Screensaver", "Gesture wave to wake" to "Screensaver",
         "Clock Face" to "Clock Face", "Clock Format" to "Clock Face",
         "Clock style" to "Clock Face", "Font" to "Clock Face", "Glow" to "Clock Face",
@@ -251,7 +252,6 @@ private fun ImmortalSettingsScreen() {
         "Show Seconds" to "Clock Face",
         "Tile Size" to "Appearance", "Weather Widget" to "Appearance",
         "Show Mini Player" to "Appearance", "Hide Status Bar" to "Appearance",
-        "Constrain page width" to "Appearance",
         "Temperature Unit" to "Weather",
         "Ambient sound" to "Chime", "Hourly chime" to "Chime", "Quiet hours" to "Chime",
         "Sunrise alarm" to "Sunrise & Wake",
@@ -1036,16 +1036,6 @@ private fun DeviceNameSection() {
 // ---------------------------------------------------------------------------
 // Screensaver helpers
 // ---------------------------------------------------------------------------
-
-private fun screensaverSourceLabel(s: ScreensaverConfig.Settings): String = when (s.source) {
-  ScreensaverConfig.SOURCE_FOLDER -> "Local folder"
-  ScreensaverConfig.SOURCE_URL -> "Album URL"
-  ScreensaverConfig.SOURCE_IMMICH -> "Immich"
-  ScreensaverConfig.SOURCE_SMB -> "NAS / SMB"
-  ScreensaverConfig.SOURCE_DAV -> "WebDAV"
-  ScreensaverConfig.SOURCE_WEBURL -> "Web page"
-  else -> ScreensaverConfig.feedLabel(s.feed)
-}
 
 private fun screensaverSourcePath(s: ScreensaverConfig.Settings): String = when (s.source) {
   ScreensaverConfig.SOURCE_FOLDER -> s.folderPath ?: ""
