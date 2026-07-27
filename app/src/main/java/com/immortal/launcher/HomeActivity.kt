@@ -469,9 +469,9 @@ private fun LeftWidgetColumn(
     }
 
     // Premium dashboard cards (self-hiding when their data/target isn't available):
-    // smart-home quick controls, family quick-call, and a photo memory.
+    // smart-home quick controls, a call button, and a photo memory.
     QuickControlsWidget(modifier = Modifier.fillMaxWidth())
-    FamilyCallRow(modifier = Modifier.fillMaxWidth())
+    CallButton(modifier = Modifier.fillMaxWidth())
     PhotoMemoryStrip(modifier = Modifier.fillMaxWidth())
 
     // Store-driven resizable + reorderable widgets.
@@ -2402,16 +2402,14 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
 }
 
 /**
- * Family quick-call row: circular avatars that hand off to the stock Portal calling surface (the
- * only trusted caller for Contacts/calling). Names are placeholders until the user configures them;
- * the whole row routes through the same Portal-home bridge the Calls tile uses.
+ * "Call" button: a single glass card that hands off to the stock Portal Home calling surface via its
+ * trusted-caller VIEW deep link (Contacts rejects an untrusted direct launch — the same bridge the
+ * Calls tile uses). Marks the dream bridge so the screensaver doesn't claw the frame back mid-handoff.
+ * Replaces the old placeholder family-avatar row (which had hardcoded fake contacts).
  */
 @Composable
-private fun FamilyCallRow(modifier: Modifier = Modifier) {
+private fun CallButton(modifier: Modifier = Modifier) {
   val context = androidx.compose.ui.platform.LocalContext.current
-  // Route to the stock Portal Home calling surface via its VIEW deep link — the same trusted-caller
-  // bridge the Calls tile uses (Contacts rejects an untrusted direct launch). Marks the dream bridge
-  // so the screensaver doesn't claw the frame back mid-handoff.
   val onCall: () -> Unit = {
     runCatching {
       DreamPolicy.markBridge(context)
@@ -2421,30 +2419,33 @@ private fun FamilyCallRow(modifier: Modifier = Modifier) {
               .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
   }
-  data class Person(val initial: String, val tint: List<Color>)
-  // Placeholder contacts — until the user wires real ones, tapping any opens the Portal call surface.
-  val people = listOf(
-      Person("M", listOf(Color(0xFFFF9A9E), Color(0xFFFECFEF))),
-      Person("D", listOf(Color(0xFFA18CD1), Color(0xFFFBC2EB))),
-      Person("S", listOf(Color(0xFF84FAB0), Color(0xFF8FD3F4))),
-  )
-  Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-    people.forEach { p ->
+  LiquidGlassWidget(modifier = modifier.wrapContentHeight()) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { onCall() }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
       Box(
-          modifier = Modifier.size(56.dp).clip(RoundedCornerShape(50))
-              .background(Brush.linearGradient(p.tint)).clickable { onCall() },
+          modifier = Modifier.size(44.dp).clip(RoundedCornerShape(50)).background(Color(0xFF30D158)),
           contentAlignment = Alignment.Center,
       ) {
-        Text(p.initial, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+        androidx.compose.material3.Icon(
+            painter = androidx.compose.ui.res.painterResource(R.drawable.ic_call),
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(24.dp),
+        )
       }
-    }
-    // Add / open full contacts.
-    Box(
-        modifier = Modifier.size(56.dp).clip(RoundedCornerShape(50))
-            .border(2.dp, Color.White.copy(alpha = 0.4f), RoundedCornerShape(50)).clickable { onCall() },
-        contentAlignment = Alignment.Center,
-    ) {
-      Text("＋", color = Color.White.copy(alpha = 0.8f), fontSize = 26.sp, fontWeight = FontWeight.Light)
+      Column(modifier = Modifier.weight(1f)) {
+        Text("Call", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+        Text(
+            "Open Portal calls",
+            color = Color.White.copy(alpha = 0.6f),
+            fontSize = 13.sp,
+            modifier = Modifier.padding(top = 1.dp),
+        )
+      }
     }
   }
 }
