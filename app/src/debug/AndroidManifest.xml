@@ -13,5 +13,57 @@
             android:name=".PhotoFramePreviewActivity"
             android:exported="true"
             tools:replace="android:exported" />
+
+        <!-- PREVIEW-ONLY design mocks. Debug-only (not merged into release). Launch over adb, e.g.
+             adb shell am start -n com.immortal.launcher.debug/com.immortal.launcher.mock.IosWidgetsMockActivity -->
+        <activity
+            android:name=".TvDashboardMockActivity"
+            android:exported="true"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".mock.IosWidgetsMockActivity"
+            android:exported="true"
+            android:label="iOS 26 Widgets"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".mock.IosHomeMockActivity"
+            android:exported="true"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".mock.IosStoreMockActivity"
+            android:exported="true"
+            android:label="iOS Store Mock"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".mock.IosSettingsMockActivity"
+            android:exported="true"
+            android:label="iOS Settings Mock"
+            android:theme="@style/Theme.SampleApp">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
