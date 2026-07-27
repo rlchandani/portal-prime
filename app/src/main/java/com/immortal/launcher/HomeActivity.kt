@@ -203,6 +203,10 @@ private const val STOCK_HOME_BACK_PRESSES = 5
 private const val STOCK_HOME_BACK_INTERVAL_MS = 300L
 private const val HOME_APP_WIDGET_HOST_ID = 0x4611
 
+// Sentinel component for the injected "Calls" grid tile — no real Activity backs it; onLaunch
+// recognizes this and bridges to the stock Portal calling surface via launchStockHome().
+private val CALLS_COMPONENT = ComponentName("com.immortal.launcher", "__immortal_calls_bridge__")
+
 /**
  * The custom Portal home launcher. Replaces the stock Aloha home (selected via
  * `cmd package set-home-activity`). Shows a clock/date/weather header, an App
@@ -225,7 +229,10 @@ class HomeActivity : ComponentActivity() {
         LauncherScreen(
             onLaunch = { cn ->
               runCatching {
-                if (cn.packageName == packageName &&
+                if (cn == CALLS_COMPONENT) {
+                  // The "Calls" tile: bridge to the stock Portal calling surface (trusted caller).
+                  launchStockHome()
+                } else if (cn.packageName == packageName &&
                     cn.className == ImmortalSettingsActivity::class.java.name) {
                   // Our own iOS-style settings (exported=false, no LAUNCHER filter) — launch it
                   // directly with an explicit intent rather than the generic MAIN/LAUNCHER one.
@@ -469,9 +476,9 @@ private fun LeftWidgetColumn(
     }
 
     // Premium dashboard cards (self-hiding when their data/target isn't available):
-    // smart-home quick controls, a call button, and a photo memory.
+    // smart-home quick controls and a photo memory. (Calling lives on the app grid as
+    // the "Calls" tile, not here.)
     QuickControlsWidget(modifier = Modifier.fillMaxWidth())
-    CallButton(modifier = Modifier.fillMaxWidth())
     PhotoMemoryStrip(modifier = Modifier.fillMaxWidth())
 
     // Store-driven resizable + reorderable widgets.
@@ -2402,55 +2409,6 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
 }
 
 /**
- * "Call" button: a single glass card that hands off to the stock Portal Home calling surface via its
- * trusted-caller VIEW deep link (Contacts rejects an untrusted direct launch — the same bridge the
- * Calls tile uses). Marks the dream bridge so the screensaver doesn't claw the frame back mid-handoff.
- * Replaces the old placeholder family-avatar row (which had hardcoded fake contacts).
- */
-@Composable
-private fun CallButton(modifier: Modifier = Modifier) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  val onCall: () -> Unit = {
-    runCatching {
-      DreamPolicy.markBridge(context)
-      context.startActivity(
-          Intent(Intent.ACTION_VIEW, Uri.parse("portal://launcher/home"))
-              .setPackage("com.facebook.alohaapps.launcher")
-              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-  }
-  LiquidGlassWidget(modifier = modifier.wrapContentHeight()) {
-    Row(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { onCall() }
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-      Box(
-          modifier = Modifier.size(44.dp).clip(RoundedCornerShape(50)).background(Color(0xFF30D158)),
-          contentAlignment = Alignment.Center,
-      ) {
-        androidx.compose.material3.Icon(
-            painter = androidx.compose.ui.res.painterResource(R.drawable.ic_call),
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(24.dp),
-        )
-      }
-      Column(modifier = Modifier.weight(1f)) {
-        Text("Call", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-        Text(
-            "Open Portal calls",
-            color = Color.White.copy(alpha = 0.6f),
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 1.dp),
-        )
-      }
-    }
-  }
-}
-
-/**
  * The glanceable "Today" strip for the left column: a frosted-glass card with three quick rows —
  * next calendar event, weather feels-like + hi/lo, and the moon phase with today's sunrise/sunset.
  * All data is already fetched elsewhere (weather + sun times keyless from Open-Meteo; moon phase is
@@ -3482,7 +3440,19 @@ private fun loadApps(context: Context): List<AppEntry> {
         // Inject the Immortal App Store too (StoreActivity — also our own, excluded from the query).
         val storeIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_apps)
             ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+        // Inject a "Calls" tile that bridges to the stock Portal calling surface (the only trusted
+        // caller). It has no real Activity — launch is special-cased in onLaunch via CALLS_COMPONENT.
+        val callIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_call_tile)
+            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
         var out = apps
+        if (callIcon != null) {
+          out = out + AppEntry(
+              label = "Calls",
+              component = CALLS_COMPONENT,
+              icon = callIcon,
+              uninstallable = false,
+          )
+        }
         if (settingsIcon != null) {
           out = out + AppEntry(
               label = "Settings",
