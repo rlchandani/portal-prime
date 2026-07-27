@@ -245,6 +245,12 @@ class HomeActivity : ComponentActivity() {
                   startActivity(
                       Intent(this@HomeActivity, StoreActivity::class.java)
                           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } else if (cn.packageName == packageName &&
+                    cn.className == ToolsActivity::class.java.name) {
+                  // Our own Tools hub (exported=false) — explicit launch.
+                  startActivity(
+                      Intent(this@HomeActivity, ToolsActivity::class.java)
+                          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 } else {
                   startActivity(
                       Intent(Intent.ACTION_MAIN)
@@ -402,6 +408,7 @@ class HomeActivity : ComponentActivity() {
 private fun LeftWidgetColumn(
     editMode: Boolean,
     greetingWord: String,
+    userName: String,
     dateString: String,
     homeWidgets: List<HomeWidgetStore.HomeWidget>,
     weatherCurrent: Weather.Current?,
@@ -427,13 +434,17 @@ private fun LeftWidgetColumn(
             fontSize = 16.sp,
             fontWeight = FontWeight.Light,
         )
-        Text(
-            text = "Rohit",
-            color = Color.White,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-1).sp,
-        )
+        // Only render the name line when the user has set one (blank by default — avoids a
+        // placeholder name; the greeting word alone reads fine).
+        if (userName.isNotBlank()) {
+          Text(
+              text = userName,
+              color = Color.White,
+              fontSize = 28.sp,
+              fontWeight = FontWeight.Bold,
+              letterSpacing = (-1).sp,
+          )
+        }
         Text(
             text = dateString,
             color = Color.White.copy(alpha = 0.5f),
@@ -446,34 +457,9 @@ private fun LeftWidgetColumn(
     // Today strip (always present): next event · feels-like + hi/lo · moon phase + sun times.
     TodayStripWidget(modifier = Modifier.fillMaxWidth())
 
-    // Now Playing card (always present)
-    LiquidGlassWidget(modifier = Modifier.fillMaxWidth().height(80.dp)) {
-      Row(
-          modifier = Modifier.fillMaxSize().padding(12.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(12.dp),
-      ) {
-        LiquidGlass(modifier = Modifier.size(40.dp), cornerRadius = 8.dp) {
-          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("♫", color = Color.White, fontSize = 18.sp)
-          }
-        }
-        Column {
-          Text(
-              "Now Playing",
-              color = Color.White.copy(alpha = 0.55f),
-              fontSize = 14.sp,
-              fontWeight = FontWeight.Medium,
-          )
-          Text(
-              "Tap to play",
-              color = Color.White.copy(alpha = 0.28f),
-              fontSize = 11.sp,
-              fontWeight = FontWeight.Light,
-          )
-        }
-      }
-    }
+    // Now Playing card — driven by NowPlayingHub; self-hides when nothing is playing (like the
+    // other dashboard cards) rather than showing a dead "Tap to play" stub. Tapping toggles play/pause.
+    NowPlayingCard(modifier = Modifier.fillMaxWidth())
 
     // Premium dashboard cards (self-hiding when their data/target isn't available):
     // smart-home quick controls and a photo memory. (Calling lives on the app grid as
@@ -695,9 +681,15 @@ private fun LauncherScreen(
 ) {
   val context = androidx.compose.ui.platform.LocalContext.current
 
-  // Live clock tick
+  // Live clock tick. The header/greeting show only h:mm + date (no seconds), so tick on the MINUTE
+  // boundary, not every second — identical output, ~60x fewer recompositions of this whole screen on
+  // an always-on device. (The world-clock widget with a seconds hand owns its own 1s tick.)
   val now by produceState(initialValue = Date()) {
-    while (true) { delay(1000); value = Date() }
+    while (true) {
+      val ms = System.currentTimeMillis()
+      delay(60_000L - (ms % 60_000L)) // sleep to the next minute boundary
+      value = Date()
+    }
   }
 
   // Installed apps. Reloaded whenever a package is added/removed/changed (so an uninstalled
@@ -776,16 +768,23 @@ private fun LauncherScreen(
     }
   }
 
-  // Derived strings
-  val hour = SimpleDateFormat("H", Locale.getDefault()).format(now).toIntOrNull() ?: 12
+  // Derived strings. Greeting words + the user's name come from WelcomeConfig (the same source the
+  // screensaver greeting uses), re-read on resume via appsRefreshKey so edits in Settings show here.
+  val welcome = remember(appsRefreshKey) { WelcomeConfig.load(context) }
+  // Formatters are remembered — reallocating SimpleDateFormat (locale + pattern parse) on every tick
+  // was needless churn on an always-on screen.
+  val hourFmt = remember { SimpleDateFormat("H", Locale.getDefault()) }
+  val timeFmt = remember { SimpleDateFormat("h:mm a", Locale.getDefault()) }
+  val dateFmt = remember { SimpleDateFormat("EEE, MMM d", Locale.getDefault()) }
+  val hour = hourFmt.format(now).toIntOrNull() ?: 12
   val greetingWord = when {
-    hour in 5..11  -> "Good morning"
-    hour in 12..16 -> "Good afternoon"
-    hour in 17..21 -> "Good evening"
-    else           -> "Good night"
+    hour in 5..11  -> welcome.greetingMorning
+    hour in 12..16 -> welcome.greetingAfternoon
+    hour in 17..21 -> welcome.greetingEvening
+    else           -> welcome.greetingNight
   }
-  val timeString = SimpleDateFormat("h:mm a", Locale.getDefault()).format(now)
-  val dateString = SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(now)
+  val timeString = timeFmt.format(now)
+  val dateString = dateFmt.format(now)
 
   // ── iOS 26 Liquid Glass Layout ────────────────────────────────────────────
 
@@ -873,6 +872,7 @@ private fun LauncherScreen(
         LeftWidgetColumn(
             editMode = editMode,
             greetingWord = greetingWord,
+            userName = welcome.userName,
             dateString = dateString,
             homeWidgets = homeWidgets,
             weatherCurrent = weatherCurrent,
@@ -1500,6 +1500,81 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
  * a subtle left PrimeBlue border indicating active playback, and refined typography.
  * The art area is the play/pause touch target. Driven by [NowPlayingHub].
  */
+/**
+ * Left-column "Now Playing" card. Subscribes to [NowPlayingHub] and renders the current track with
+ * a tap-to-play/pause art target; self-hides (renders nothing) when nothing is playing, matching the
+ * other self-hiding dashboard cards. Replaces the old always-present "Tap to play" stub.
+ */
+@Composable
+private fun NowPlayingCard(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  val mainHandler = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
+  var state by remember { mutableStateOf(NowPlayingHub.current) }
+  DisposableEffect(Unit) {
+    val l = NowPlayingHub.Listener { s -> mainHandler.post { state = s } }
+    NowPlayingHub.addListener(l) // replays current immediately
+    onDispose { NowPlayingHub.removeListener(l) }
+  }
+  val np = state ?: return // nothing playing → card hides entirely
+
+  var urlArt by remember(np.artUrl, np.artBitmap) { mutableStateOf<android.graphics.Bitmap?>(null) }
+  LaunchedEffect(np.artUrl, np.artBitmap) {
+    urlArt =
+        if (np.artBitmap == null && np.artUrl.isNotBlank())
+            withContext(Dispatchers.IO) { MediaArt.resolveUri(context, np.artUrl) }
+        else null
+  }
+  val cover = np.artBitmap ?: urlArt
+
+  LiquidGlassWidget(modifier = modifier.height(80.dp)) {
+    Row(
+        modifier = Modifier.fillMaxSize().padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+      LiquidGlass(
+          modifier = Modifier.size(48.dp).tvFocusable(RoundedCornerShape(8.dp)) {
+            NowPlayingHub.playPause()
+          },
+          cornerRadius = 8.dp,
+      ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+          if (cover != null) {
+            Image(
+                bitmap = cover.asImageBitmap(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+          } else {
+            Text("♫", color = Color.White, fontSize = 18.sp)
+          }
+        }
+      }
+      Column(modifier = Modifier.weight(1f)) {
+        Text(
+            np.title.ifBlank { "Now Playing" },
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        if (np.artist.isNotBlank()) {
+          Text(
+              np.artist,
+              color = Color.White.copy(alpha = 0.55f),
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Light,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+          )
+        }
+      }
+    }
+  }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MiniPlayer(state: NowPlayingState, modifier: Modifier = Modifier) {
@@ -3444,12 +3519,24 @@ private fun loadApps(context: Context): List<AppEntry> {
         // caller). It has no real Activity — launch is special-cased in onLaunch via CALLS_COMPONENT.
         val callIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_call_tile)
             ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+        // Inject "Tools" (ToolsActivity — our own, exported=false, launched via the onLaunch
+        // special-case). It's the entry point to timers, notes, converter, cameras, countdown editor.
+        val toolsIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_tools_tile)
+            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
         var out = apps
         if (callIcon != null) {
           out = out + AppEntry(
               label = "Calls",
               component = CALLS_COMPONENT,
               icon = callIcon,
+              uninstallable = false,
+          )
+        }
+        if (toolsIcon != null) {
+          out = out + AppEntry(
+              label = "Tools",
+              component = ComponentName(context.packageName, ToolsActivity::class.java.name),
+              icon = toolsIcon,
               uninstallable = false,
           )
         }
