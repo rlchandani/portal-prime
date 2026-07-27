@@ -31,9 +31,13 @@ object RemotePairing {
   private const val KEY_ENABLED = "enabled"
   private const val KEY_SESSIONS = "sessions" // newline-separated session tokens
   internal const val PIN_TTL_MS = 5 * 60_000L
+  /** Wrong guesses that burn the PIN. A 6-digit PIN is 10^6, but with no lockout the whole
+   *  5-min window is brute-forceable on a fast LAN; a hard cap makes online guessing infeasible. */
+  internal const val MAX_PIN_ATTEMPTS = 5
 
   @Volatile private var pin: String? = null
   @Volatile private var pinExpiresAt = 0L
+  @Volatile private var pinAttempts = 0
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -52,6 +56,7 @@ object RemotePairing {
     val fresh = randomDigits(6)
     pin = fresh
     pinExpiresAt = now + PIN_TTL_MS
+    pinAttempts = 0 // fresh PIN → reset the lockout counter
     return fresh
   }
 
@@ -64,9 +69,22 @@ object RemotePairing {
    * mint + persist a session token, and return it. Otherwise return null.
    */
   fun redeem(c: Context, candidate: String, now: Long = System.currentTimeMillis()): String? {
-    if (!pinMatches(pin, pinExpiresAt, candidate, now)) return null
+    if (!pinMatches(pin, pinExpiresAt, candidate, now)) {
+      // Count wrong guesses only while a live PIN exists (an expired/absent PIN already can't be
+      // redeemed). After too many, burn the PIN so the rest of the window is dead — the user must
+      // request a fresh one, defeating online brute force.
+      if (pin != null && now < pinExpiresAt) {
+        pinAttempts++
+        if (pinAttempts >= MAX_PIN_ATTEMPTS) {
+          pin = null
+          pinExpiresAt = 0L
+        }
+      }
+      return null
+    }
     pin = null
     pinExpiresAt = 0L
+    pinAttempts = 0
     val token = randomToken()
     val sessions = loadSessions(c).toMutableSet().apply { add(token) }
     prefs(c).edit().putString(KEY_SESSIONS, sessions.joinToString("\n")).apply()
