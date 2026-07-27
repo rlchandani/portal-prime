@@ -912,7 +912,7 @@ private fun DisplaySection() {
             valueRange = 1f..100f,
             modifier = Modifier.weight(1f),
         )
-        Text("$brightness%", color = IosSecondary, fontSize = 19.sp,
+        Text("$brightness%", color = IosSecondary, fontSize = Sizes.rowValue,
             modifier = Modifier.width(56.dp), textAlign = TextAlign.End)
       }
       Divider()
@@ -1070,11 +1070,11 @@ private fun MultiRoomStep(n: String, text: String) {
     Text(
         "$n.",
         color = IosBlue,
-        fontSize = 14.sp,
+        fontSize = Sizes.rowSub,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(end = 10.dp),
     )
-    Text(text, color = IosSecondary, fontSize = 14.sp, lineHeight = 20.sp)
+    Text(text, color = IosSecondary, fontSize = Sizes.rowSub, lineHeight = 20.sp)
   }
 }
 
@@ -1108,11 +1108,11 @@ internal fun MultiRoomContent() {
   Column {
       Card {
         Column(modifier = Modifier.padding(18.dp)) {
-          Text("Setting it up", color = IosLabel, fontSize = 17.sp)
+          Text("Setting it up", color = IosLabel, fontSize = Sizes.rowTitle)
           Text(
               "Group your Portals into one perfectly in-sync speaker system:",
               color = IosSecondary,
-              fontSize = 13.sp,
+              fontSize = Sizes.rowSub,
               modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
           )
           MultiRoomStep(
@@ -1134,12 +1134,12 @@ internal fun MultiRoomContent() {
             verticalAlignment = Alignment.CenterVertically,
         ) {
           Column(modifier = Modifier.weight(1f)) {
-            Text("Show what the group is playing", color = IosLabel, fontSize = 17.sp)
+            Text("Show what the group is playing", color = IosLabel, fontSize = Sizes.rowTitle)
             Text(
                 "Surfaces the Snapcast group's track on the now-playing card — even when the " +
                     "Music Assistant app isn't open on this Portal.",
                 color = IosSecondary,
-                fontSize = 13.sp,
+                fontSize = Sizes.rowSub,
                 modifier = Modifier.padding(top = 2.dp),
             )
           }
@@ -1183,7 +1183,7 @@ internal fun MultiRoomContent() {
               Text(
                   "Apply",
                   color = Color.White,
-                  fontSize = 15.sp,
+                  fontSize = Sizes.actionButton,
                   modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
               )
             }
@@ -1255,7 +1255,7 @@ internal fun MultiRoomContent() {
               Text(
                   "Sign in",
                   color = Color.White,
-                  fontSize = 15.sp,
+                  fontSize = Sizes.actionButton,
                   modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
               )
             }
@@ -1264,7 +1264,7 @@ internal fun MultiRoomContent() {
               Text(
                   auth,
                   color = if (auth.endsWith("✓")) IosGreen else IosRed,
-                  fontSize = 13.sp,
+                  fontSize = Sizes.rowSub,
                   modifier = Modifier.padding(start = 14.dp),
               )
             }
@@ -1274,7 +1274,7 @@ internal fun MultiRoomContent() {
                   "sources (which don't carry it over Snapcast). Library/radio now-playing works " +
                   "without it.",
               color = IosSecondary,
-              fontSize = 12.sp,
+              fontSize = Sizes.rowSub,
               modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 8.dp),
           )
 
@@ -1282,7 +1282,7 @@ internal fun MultiRoomContent() {
           Text(
               MultiRoomStatus.text.ifBlank { "Starting…" },
               color = IosBlue,
-              fontSize = 13.sp,
+              fontSize = Sizes.rowSub,
               modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 16.dp),
           )
         }
@@ -1291,7 +1291,7 @@ internal fun MultiRoomContent() {
           "Join this Portal to the same Snapcast group as your other rooms, then point it " +
               "at your Music Assistant server. The synced audio is played by the Snapcast app.",
           color = IosSecondary,
-          fontSize = 13.sp,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
@@ -1319,8 +1319,8 @@ private fun QuickButtonsSection() {
   Text(
       "Needs the accessibility-based top-bar watch enabled during setup. The switcher shows your " +
           "recently used apps; tap one to switch.",
-      color = Color(0xFF7C7C7C),
-      fontSize = 13.sp,
+      color = IosSecondary,
+      fontSize = Sizes.rowSub,
       modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
   )
 }
@@ -1381,7 +1381,7 @@ internal fun MqttContent() {
   Column {
       Card {
         Column(modifier = Modifier.padding(18.dp)) {
-          Text("Setting it up", color = IosLabel, fontSize = 17.sp)
+          Text("Setting it up", color = IosLabel, fontSize = Sizes.rowTitle)
           MultiRoomStep(
               "1",
               "In Home Assistant, add the Mosquitto broker add-on (Settings → Add-ons) and the " +
@@ -1401,11 +1401,11 @@ internal fun MqttContent() {
             verticalAlignment = Alignment.CenterVertically,
         ) {
           Column(modifier = Modifier.weight(1f)) {
-            Text("Publish to Home Assistant", color = IosLabel, fontSize = 17.sp)
+            Text("Publish to Home Assistant", color = IosLabel, fontSize = Sizes.rowTitle)
             Text(
                 "Exposes this Portal's state and controls as Home Assistant entities over MQTT.",
                 color = IosSecondary,
-                fontSize = 13.sp,
+                fontSize = Sizes.rowSub,
                 modifier = Modifier.padding(top = 2.dp),
             )
           }
@@ -1446,7 +1446,7 @@ internal fun MqttContent() {
               Text(
                   "Apply",
                   color = Color.White, // white label on the blue button
-                  fontSize = 15.sp,
+                  fontSize = Sizes.actionButton,
                   modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
               )
             }
@@ -1506,11 +1506,11 @@ internal fun MqttContent() {
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Column(modifier = Modifier.weight(1f)) {
-              Text("Use TLS / SSL", color = IosLabel, fontSize = 15.sp)
+              Text("Use TLS / SSL", color = IosLabel, fontSize = Sizes.rowTitle)
               Text(
                   "Encrypt the connection (e.g. a broker behind a reverse proxy on port 8883).",
                   color = IosSecondary,
-                  fontSize = 13.sp,
+                  fontSize = Sizes.rowSub,
                   modifier = Modifier.padding(top = 2.dp),
               )
             }
@@ -1535,7 +1535,7 @@ internal fun MqttContent() {
           Text(
               status.ifBlank { "Starting…" },
               color = IosBlue,
-              fontSize = 13.sp,
+              fontSize = Sizes.rowSub,
               modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 12.dp, bottom = 16.dp),
           )
         }
@@ -1545,7 +1545,7 @@ internal fun MqttContent() {
               "Home Assistant automatically as a device with presence, screen, battery, " +
               "now-playing and a few controls — no configuration.yaml editing.",
           color = IosSecondary,
-          fontSize = 13.sp,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
@@ -1605,11 +1605,11 @@ internal fun WorldClockContent() {
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Column(modifier = Modifier.weight(1f)) {
-              Text(label, color = IosLabel, fontSize = 16.sp)
+              Text(label, color = IosLabel, fontSize = Sizes.rowTitle)
               Text(
                   zone.replace('_', ' '),
                   color = IosSecondary,
-                  fontSize = 13.sp,
+                  fontSize = Sizes.rowSub,
                   modifier = Modifier.padding(top = 2.dp),
               )
             }
@@ -1617,12 +1617,12 @@ internal fun WorldClockContent() {
               Text(
                   "#${rank + 1}",
                   color = IosBlue,
-                  fontSize = 14.sp,
+                  fontSize = Sizes.rowSub,
                   fontWeight = FontWeight.SemiBold,
                   modifier = Modifier.padding(end = 14.dp),
               )
             } else if (on) {
-              Text("hidden", color = IosSecondary, fontSize = 13.sp, modifier = Modifier.padding(end = 14.dp))
+              Text("hidden", color = IosSecondary, fontSize = Sizes.rowSub, modifier = Modifier.padding(end = 14.dp))
             }
             Switch(checked = on, onCheckedChange = null, colors = iosSwitchColors())
           }
@@ -1631,7 +1631,7 @@ internal fun WorldClockContent() {
       Text(
           "Tip: the widget shows up to four clocks. Re-pick a city to move it to the end of the order.",
           color = IosSecondary,
-          fontSize = 13.sp,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
@@ -1696,7 +1696,7 @@ internal fun DeviceHealthContent() {
             else "!  $issues setting${if (issues == 1) " needs" else "s need"} attention — your Portal " +
                 "still works, but some features are limited.",
             color = if (issues == 0) Color(0xFF1E7B34) else Color(0xFFB26A00),
-            fontSize = 15.sp,
+            fontSize = Sizes.rowTitle,
             modifier = Modifier.padding(16.dp),
         )
       }
@@ -1716,7 +1716,7 @@ internal fun DeviceHealthContent() {
             "Reconnect your Portal to a computer and re-run Immortal setup — it re-grants all of " +
                 "these. (Advanced: re-run provision.sh / provision.ps1 from the provisioning kit.)",
             color = IosSecondary,
-            fontSize = 14.sp,
+            fontSize = Sizes.rowSub,
             lineHeight = 20.sp,
             modifier = Modifier.padding(start = 4.dp, end = 4.dp),
         )
@@ -1730,7 +1730,7 @@ internal fun DeviceHealthContent() {
         Text(
             "Allow uninstall",
             color = IosSecondary,
-            fontSize = 13.sp,
+            fontSize = Sizes.rowSub,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
         )
@@ -1739,14 +1739,14 @@ internal fun DeviceHealthContent() {
                 "automatic screen-off (screensaver sleep and the Home Assistant control) until you " +
                 "re-run setup. Only do this if you know what you're doing.",
             color = IosSecondary,
-            fontSize = 13.sp,
+            fontSize = Sizes.rowSub,
             modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 10.dp),
         )
         Text(
             if (confirmingDisable) "Tap again to confirm — this stops automatic screen-off"
             else "Disable screen-off admin",
             color = IosRed,
-            fontSize = 15.sp,
+            fontSize = Sizes.actionButton,
             fontWeight = if (confirmingDisable) FontWeight.SemiBold else FontWeight.Normal,
             modifier =
                 Modifier.tvFocusable(RoundedCornerShape(8.dp)) {
@@ -1775,16 +1775,16 @@ private fun HealthRow(c: DevicePermissions.Check) {
     Text(
         if (c.granted) "✓" else "!",
         color = if (c.granted) IosGreen else Color(0xFFB26A00),
-        fontSize = 18.sp,
+        fontSize = Sizes.rowTitle,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(end = 14.dp, top = 1.dp),
     )
     Column(modifier = Modifier.weight(1f)) {
-      Text(c.title, color = IosLabel, fontSize = 17.sp)
+      Text(c.title, color = IosLabel, fontSize = Sizes.rowTitle)
       Text(
           c.enables,
           color = IosSecondary,
-          fontSize = 13.sp,
+          fontSize = Sizes.rowSub,
           lineHeight = 18.sp,
           modifier = Modifier.padding(top = 2.dp),
       )
@@ -1792,14 +1792,14 @@ private fun HealthRow(c: DevicePermissions.Check) {
         Text(
             "Without it: ${c.degraded}",
             color = Color(0xFFB26A00),
-            fontSize = 13.sp,
+            fontSize = Sizes.rowSub,
             lineHeight = 18.sp,
             modifier = Modifier.padding(top = 6.dp),
         )
         Text(
             c.fix,
             color = IosBlue,
-            fontSize = 13.sp,
+            fontSize = Sizes.rowSub,
             lineHeight = 18.sp,
             modifier = Modifier.padding(top = 4.dp),
         )
@@ -1845,14 +1845,14 @@ internal fun BootAppsContent() {
           Text(
               "Loading apps…",
               color = IosSecondary,
-              fontSize = 14.sp,
+              fontSize = Sizes.rowSub,
               modifier = Modifier.padding(18.dp),
           )
         } else if (list.isEmpty()) {
           Text(
               "No other apps installed yet.",
               color = IosSecondary,
-              fontSize = 14.sp,
+              fontSize = Sizes.rowSub,
               modifier = Modifier.padding(18.dp),
           )
         } else {
@@ -1869,7 +1869,7 @@ internal fun BootAppsContent() {
               Text(
                   app.label,
                   color = IosLabel,
-                  fontSize = 16.sp,
+                  fontSize = Sizes.rowTitle,
                   modifier = Modifier.weight(1f).padding(start = 14.dp),
               )
               // Visual only — the row toggles it (so the remote's center button works).
@@ -1882,7 +1882,7 @@ internal fun BootAppsContent() {
           "These apps relaunch automatically after a reboot — handy for players like Music " +
               "Assistant that don't restart themselves.",
           color = IosSecondary,
-          fontSize = 13.sp,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
       )
     }
@@ -1898,11 +1898,11 @@ private fun WallpaperSection() {
   SectionLabel("Wallpaper")
   Card {
     Column(modifier = Modifier.padding(18.dp)) {
-      Text("Background", color = IosLabel, fontSize = 17.sp)
+      Text("Background", color = IosLabel, fontSize = Sizes.rowTitle)
       Text(
           "A gradient, a photo, or sync with your screensaver (shown blurred). Tap to choose.",
-          color = Color(0xFF9A9A9A),
-          fontSize = 13.sp,
+          color = IosSecondary,
+          fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 2.dp),
       )
       Spacer(Modifier.size(14.dp))
@@ -1976,11 +1976,11 @@ private fun WallpaperSection() {
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Column(modifier = Modifier.weight(1f)) {
-          Text("Film grain", color = IosLabel, fontSize = 17.sp)
+          Text("Film grain", color = IosLabel, fontSize = Sizes.rowTitle)
           Text(
               "Adds a subtle grain texture over the wallpaper.",
-              color = Color(0xFF9A9A9A),
-              fontSize = 13.sp,
+              color = IosSecondary,
+              fontSize = Sizes.rowSub,
               modifier = Modifier.padding(top = 2.dp),
           )
         }
@@ -2026,7 +2026,7 @@ private fun WallpaperSwatch(
         // (Was Color.White for selected — invisible on the light settings background.)
         color = if (selected) IosBlue else IosSecondary,
         fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-        fontSize = 12.sp,
+        fontSize = Sizes.rowSub,
         maxLines = 1,
         modifier = Modifier.padding(top = 6.dp),
     )
