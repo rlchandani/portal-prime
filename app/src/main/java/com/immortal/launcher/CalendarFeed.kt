@@ -7,6 +7,7 @@
 
 package com.immortal.launcher
 
+import android.util.Log
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
@@ -37,6 +38,8 @@ import java.util.TimeZone
  * shows nothing.
  */
 object CalendarFeed {
+  private const val TAG = "ImmortalCalendar"
+
 
   /** A single calendar occurrence, already resolved to absolute wall-clock millis. */
   data class Event(
@@ -125,6 +128,7 @@ object CalendarFeed {
             val ics = httpGet(normalizeUrl(url)) ?: return emptyList()
             parse(ics, nowMillis, horizonDays)
           }
+          .onFailure { Log.w(TAG, "calendar fetch/parse failed for ${url.take(60)}", it) }
           .getOrDefault(emptyList())
 
   // --- parsing (pure; unit-tested) --------------------------------------------

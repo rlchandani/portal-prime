@@ -1,5 +1,6 @@
 package com.immortal.launcher
 
+import android.util.Log
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -21,6 +22,8 @@ import org.json.JSONObject
  *    Services (no account — the resolve step mints a short-lived anonymous token).
  */
 object RemoteAlbum {
+  private const val TAG = "ImmortalRemoteAlbum"
+
 
   data class Album(val title: String?, val photoUrls: List<String>)
 
@@ -62,6 +65,7 @@ object RemoteAlbum {
             else -> null
           }
         }
+        .onFailure { Log.w(TAG, "album fetch failed for ${url.take(60)}", it) }
         .getOrNull()
   }
 

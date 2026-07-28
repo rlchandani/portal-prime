@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.util.Base64
+import android.util.Log
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -24,6 +25,8 @@ import java.net.URL
  * Best-effort: any failure returns null/empty and the caller falls back to the default feed.
  */
 object DavSource {
+  private const val TAG = "ImmortalDav"
+
 
   /** HTTP Basic auth header(s) — empty when the server needs no credentials. */
   fun authHeaders(user: String?, pass: String?): Map<String, String> =
@@ -107,6 +110,7 @@ object DavSource {
             }
             out
           }
+          .onFailure { Log.w(TAG, "WebDAV listing failed for ${baseUrl.take(60)}", it) }
           .getOrNull()
 
   /** `scheme://host[:port]` for a URL. */
