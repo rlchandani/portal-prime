@@ -238,6 +238,7 @@ private fun ImmortalSettingsScreen() {
     val bySection = SECTION_GROUPS.flatMap { it.second }.map { it.name to it.name }
     bySection + listOf(
         "Brightness" to "Display", "Auto-brightness" to "Display", "Night Shift" to "Display",
+        "Volume" to "Display", "Media volume" to "Display",
         "Photo Source" to "Screensaver", "Photo Interval" to "Screensaver",
         "Shuffle" to "Screensaver", "Include Video" to "Screensaver",
         "Fit Mode" to "Screensaver", "Presence Mode" to "Screensaver",
@@ -870,6 +871,7 @@ private fun DisplaySection() {
   var canWrite by remember { mutableStateOf(DisplayControl.canWrite(context)) }
   var brightness by remember { mutableStateOf(DisplayControl.brightnessPercent(context)) }
   var auto by remember { mutableStateOf(DisplayControl.autoBrightness(context)) }
+  var volume by remember { mutableStateOf(DisplayControl.mediaVolumePercent(context)) }
   var ns by remember { mutableStateOf(DisplayControl.nightShift(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
   DisposableEffect(lifecycleOwner) {
@@ -878,6 +880,7 @@ private fun DisplaySection() {
         canWrite = DisplayControl.canWrite(context)
         brightness = DisplayControl.brightnessPercent(context)
         auto = DisplayControl.autoBrightness(context)
+        volume = DisplayControl.mediaVolumePercent(context)
         ns = DisplayControl.nightShift(context)
       }
     }
@@ -926,6 +929,29 @@ private fun DisplaySection() {
     }
   }
   FooterNote("Adjust the screen brightness, or let it adapt to the room automatically.")
+
+  SectionLabel("Volume")
+  Card {
+    Row(
+        modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 68.dp)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text("Media", color = IosLabel, fontSize = 22.sp, modifier = Modifier.width(140.dp))
+      androidx.compose.material3.Slider(
+          value = volume.toFloat(),
+          onValueChange = {
+            volume = it.toInt()
+            DisplayControl.setMediaVolumePercent(context, volume)
+          },
+          valueRange = 0f..100f,
+          modifier = Modifier.weight(1f),
+      )
+      Text("$volume%", color = IosSecondary, fontSize = Sizes.rowValue,
+          modifier = Modifier.width(56.dp), textAlign = TextAlign.End)
+    }
+  }
+  FooterNote("Sets the media playback volume (music, videos, chimes).")
 
   SectionLabel("Night Shift")
   Card {

@@ -93,6 +93,30 @@ object DisplayControl {
     return autoBrightness(context) == on
   }
 
+  // ---- Media volume (STREAM_MUSIC) — no special permission needed ----
+
+  private fun audio(context: Context) =
+      context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+
+  /** Media-stream volume as 0..100. */
+  fun mediaVolumePercent(context: Context): Int =
+      runCatching {
+            val am = audio(context)
+            val max = am.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
+            if (max <= 0) 0 else (am.getStreamVolume(android.media.AudioManager.STREAM_MUSIC) * 100 / max)
+          }
+          .getOrDefault(0)
+
+  /** Set the media-stream volume from a 0..100 percent (mapped to the device's step range). */
+  fun setMediaVolumePercent(context: Context, percent: Int) {
+    runCatching {
+      val am = audio(context)
+      val max = am.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
+      val steps = (percent.coerceIn(0, 100) * max + 50) / 100 // round to nearest step
+      am.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, steps, 0)
+    }
+  }
+
   // ---- Night Shift (launcher warm overlay) — no WRITE_SETTINGS needed ----
   data class NightShift(
       val enabled: Boolean = false,
