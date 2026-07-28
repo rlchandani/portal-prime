@@ -212,25 +212,21 @@ internal fun WelcomeSettingsContent() {
 
         Spacer(Modifier.size(26.dp))
 
-        SectionLabel("TEXT SIZES")
+        SectionLabel("TEXT SIZE")
         Card {
-          SizeStepper("Greeting", settings.greetingSize) { size ->
-            val clamped = WelcomeConfig.clampTextSize(size)
-            WelcomeConfig.setGreetingSize(context, clamped)
-            settings = settings.copy(greetingSize = clamped)
-          }
-          Divider()
-          SizeStepper("Clock", settings.clockSize) { size ->
-            val clamped = WelcomeConfig.clampTextSize(size)
-            WelcomeConfig.setClockSize(context, clamped)
-            settings = settings.copy(clockSize = clamped)
-          }
-          Divider()
-          SizeStepper("Date", settings.dateSize) { size ->
-            val clamped = WelcomeConfig.clampTextSize(size)
-            WelcomeConfig.setDateSize(context, clamped)
-            settings = settings.copy(dateSize = clamped)
-          }
+          PickerRow(
+              title = "Text size",
+              selected = settings.textScale,
+              options = listOf(
+                  PickerOption(WelcomeConfig.SCALE_SMALL, "Small"),
+                  PickerOption(WelcomeConfig.SCALE_MEDIUM, "Medium"),
+                  PickerOption(WelcomeConfig.SCALE_LARGE, "Large"),
+              ),
+              onSelect = { scale ->
+                WelcomeConfig.setTextScale(context, scale)
+                settings = settings.copy(textScale = scale)
+              },
+          )
         }
 
         Spacer(Modifier.size(26.dp))
@@ -446,40 +442,6 @@ private fun DurationStepper(seconds: Int, onChange: (Int) -> Unit) {
   }
 }
 
-@Composable
-private fun SizeStepper(label: String, size: Float, onChange: (Float) -> Unit) {
-  val src = remember { MutableInteractionSource() }
-  val focused by src.collectIsFocusedAsState()
-  Row(
-      modifier =
-          Modifier.fillMaxWidth()
-              .onKeyEvent { e ->
-                if (e.type == KeyEventType.KeyDown) {
-                  when (e.key) {
-                    Key.DirectionLeft -> { onChange(size - 2); true }
-                    Key.DirectionRight -> { onChange(size + 2); true }
-                    else -> false
-                  }
-                } else false
-              }
-              .focusable(interactionSource = src)
-              .background(if (focused) Color(0xFFE5F0FF) else Color.Transparent)
-              .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-    ArrowButton("◀", focused) { onChange(size - 2) }
-    Text(
-        "${size.toInt()}sp",
-        color = if (focused) IosLabel else IosSecondary,
-        fontSize = 17.sp,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.widthIn(min = 64.dp),
-    )
-    ArrowButton("▶", focused) { onChange(size + 2) }
-  }
-}
 
 @Composable
 private fun OpacityStepper(opacity: Float, onChange: (Float) -> Unit) {

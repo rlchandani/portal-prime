@@ -38,10 +38,10 @@ object WelcomeConfig {
       // Background scrim opacity (0.0 = transparent, 1.0 = opaque)
       val backgroundOpacity: Float = 0.7f,
 
-      // Text sizes (SP)
-      val greetingSize: Float = 26f,
-      val clockSize: Float = 88f,
-      val dateSize: Float = 22f,
+      // Overall text size as one preset (Small / Medium / Large) — consolidated from the three
+      // free-float per-element sizes. The per-element SP values below are derived from it, so the
+      // renderer keeps reading greetingSize/clockSize/dateSize unchanged.
+      val textScale: String = SCALE_MEDIUM,
 
       // Show/hide individual elements
       val showGreeting: Boolean = true,
@@ -58,11 +58,38 @@ object WelcomeConfig {
       // The greeting speaks through Android TTS — Piper neural TTS was removed because its
       // model download is unreliable on the Portal's connection. See project notes.
       val ttsVoice: String = "",
-  )
+  ) {
+    // Per-element SP sizes derived from [textScale]. Kept as properties so the renderer
+    // (PhotoFrameController) reads greetingSize/clockSize/dateSize exactly as before.
+    val greetingSize: Float get() = 26f * scaleFactor(textScale)
+    val clockSize: Float get() = 88f * scaleFactor(textScale)
+    val dateSize: Float get() = 22f * scaleFactor(textScale)
+  }
+
+  const val SCALE_SMALL = "small"
+  const val SCALE_MEDIUM = "medium"
+  const val SCALE_LARGE = "large"
+
+  /** Multiplier applied to the base per-element sizes for each preset. */
+  private fun scaleFactor(scale: String): Float = when (scale) {
+    SCALE_SMALL -> 0.8f
+    SCALE_LARGE -> 1.25f
+    else -> 1f // medium / unknown
+  }
 
   fun clampDuration(ms: Int): Int = ms.coerceIn(1000, 10000)
   fun clampOpacity(opacity: Float): Float = opacity.coerceIn(0f, 1f)
-  fun clampTextSize(size: Float): Float = size.coerceIn(10f, 120f)
+
+  /** Bucket a legacy free-float greeting size (base 26sp) into the nearest S/M/L preset, so an
+   *  existing install keeps a comparable size instead of snapping to Medium. */
+  private fun scaleFromLegacy(greetingSize: Float): String {
+    // Thresholds at the midpoints between the presets' greeting sizes (20.8 / 26 / 32.5).
+    return when {
+      greetingSize < 23.4f -> SCALE_SMALL
+      greetingSize > 29.25f -> SCALE_LARGE
+      else -> SCALE_MEDIUM
+    }
+  }
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -79,9 +106,7 @@ object WelcomeConfig {
         clockColor = p.getInt("clock_color", 0xFFFFFFFF.toInt()),
         dateColor = p.getInt("date_color", 0xFFDADADA.toInt()),
         backgroundOpacity = clampOpacity(p.getFloat("background_opacity", 0.7f)),
-        greetingSize = clampTextSize(p.getFloat("greeting_size", 26f)),
-        clockSize = clampTextSize(p.getFloat("clock_size", 88f)),
-        dateSize = clampTextSize(p.getFloat("date_size", 22f)),
+        textScale = loadTextScale(p),
         showGreeting = p.getBoolean("show_greeting", true),
         showClock = p.getBoolean("show_clock", true),
         showDate = p.getBoolean("show_date", true),
@@ -127,16 +152,16 @@ object WelcomeConfig {
     prefs(context).edit().putFloat("background_opacity", clampOpacity(opacity)).apply()
   }
 
-  fun setGreetingSize(context: Context, size: Float) {
-    prefs(context).edit().putFloat("greeting_size", clampTextSize(size)).apply()
+  /** The one text-size preset. Reads the new `text_scale` key; else migrates from the legacy
+   *  free-float `greeting_size` by bucketing to the nearest preset; else Medium. */
+  private fun loadTextScale(p: android.content.SharedPreferences): String {
+    p.getString("text_scale", null)?.let { return it }
+    if (p.contains("greeting_size")) return scaleFromLegacy(p.getFloat("greeting_size", 26f))
+    return SCALE_MEDIUM
   }
 
-  fun setClockSize(context: Context, size: Float) {
-    prefs(context).edit().putFloat("clock_size", clampTextSize(size)).apply()
-  }
-
-  fun setDateSize(context: Context, size: Float) {
-    prefs(context).edit().putFloat("date_size", clampTextSize(size)).apply()
+  fun setTextScale(context: Context, scale: String) {
+    prefs(context).edit().putString("text_scale", scale).apply()
   }
 
   fun setShowGreeting(context: Context, show: Boolean) {

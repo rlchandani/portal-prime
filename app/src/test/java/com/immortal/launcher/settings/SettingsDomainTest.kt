@@ -303,10 +303,11 @@ class SettingsDomainTest {
 
   @Test
   fun welcomeRegistry_coversEveryPersistedField_orExplicitlyAccountsForIt() {
-    // The registry has no FloatSpec, so the Float fields (opacity, text sizes, letter spacing) stay
-    // in the bespoke WelcomeSettingsActivity. The ARGB color ints use bespoke color pickers, the
-    // greeting texts are free-text editors, and the TTS voice is an on-device voice picker — all
-    // managed by the Activity. The 5 registry-ready fields (duration + 4 toggles) are spec'd.
+    // The registry has no FloatSpec, so opacity + letter spacing stay in the bespoke
+    // WelcomeSettingsActivity, as does the S/M/L textScale (a bespoke PickerRow). The ARGB color
+    // ints use bespoke color pickers, the greeting texts are free-text editors, and the TTS voice is
+    // an on-device voice picker — all managed by the Activity. Duration + 4 toggles are spec'd.
+    // (greetingSize/clockSize/dateSize are now computed from textScale, not persisted fields.)
     val fields =
         com.immortal.launcher.WelcomeConfig.Settings::class.java.declaredFields
             .filter { !java.lang.reflect.Modifier.isStatic(it.modifiers) }
@@ -317,7 +318,7 @@ class SettingsDomainTest {
         setOf(
             "greetingNight", "greetingMorning", "greetingAfternoon", "greetingEvening",
             "userName", "greetingColor", "clockColor", "dateColor",
-            "backgroundOpacity", "greetingSize", "clockSize", "dateSize",
+            "backgroundOpacity", "textScale", // text sizes consolidated into one S/M/L preset
             "greetingLetterSpacing", "ttsVoice")
     val uncovered = fields - specKeys - managedElsewhere
     assertTrue(
