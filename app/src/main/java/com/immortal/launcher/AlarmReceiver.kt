@@ -26,7 +26,12 @@ class AlarmReceiver : BroadcastReceiver() {
       AlarmSound.start(context)
       showAlert(context, cfg)
     }
-    // Arm the next day (or next matching weekday).
+    if (cfg.days.isEmpty()) {
+      // One-shot alarm (no repeat days): turn it off after firing so it doesn't re-arm for the
+      // same time tomorrow. Disabling makes nextTrigger return null, so no new alarm is scheduled.
+      AlarmConfig.setEnabled(context, false)
+    }
+    // Re-arm the next matching weekday (a no-op for a now-disabled one-shot).
     AlarmScheduler.reschedule(context)
   }
 
