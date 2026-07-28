@@ -328,14 +328,17 @@ class SettingsDomainTest {
 
   @Test
   fun digitalClockRegistry_coversEveryPersistedField() {
-    // The on-device Clock screen renders its controls from this domain. Every field is a scalar
-    // bound by a spec — no managedElsewhere exceptions.
+    // The on-device Clock screen renders its controls from this domain. Every persisted field is a
+    // scalar bound by a spec. "face" is an ADDITIONAL synthetic spec (a curated preset that reads
+    // via faceOf and writes style+font+color+glow via setFace) — it's not a persisted field, so it's
+    // excluded from the field/spec equality check.
     val fields =
         com.immortal.launcher.DigitalClockConfig.Settings::class.java.declaredFields
             .filter { !java.lang.reflect.Modifier.isStatic(it.modifiers) }
             .map { it.name }
             .toSet()
-    val specKeys = SettingsDomains.digitalclock.specs.map { it.key }.toSet()
+    val syntheticSpecs = setOf("face")
+    val specKeys = SettingsDomains.digitalclock.specs.map { it.key }.toSet() - syntheticSpecs
     assertEquals(fields, specKeys)
   }
 

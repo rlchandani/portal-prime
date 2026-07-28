@@ -86,6 +86,45 @@ object DigitalClockConfig {
       val style: String = STYLE_CLASSIC,
   )
 
+  /**
+   * A curated clock "face": a named preset that fixes the look (style + font + color + glow) as a
+   * coherent combo, so the user picks one thing instead of juggling five raw enums. Size, position,
+   * background and show-date/seconds stay independent. Selecting a face writes its underlying enums
+   * ([setFace]); the current face is derived from the stored [style] ([faceOf]).
+   */
+  data class Face(
+      val id: String,
+      val label: String,
+      val style: String,
+      val font: String,
+      val color: String,
+      val glow: String,
+  )
+
+  val FACES: List<Face> =
+      listOf(
+          Face("classic", "Classic", STYLE_CLASSIC, FONT_LIGHT, COLOR_WHITE, GLOW_SOFT),
+          Face("bold", "Bold", STYLE_BOLD, FONT_BOLD, COLOR_WHITE, GLOW_NONE),
+          Face("neon", "Neon", STYLE_NEON, FONT_NORMAL, COLOR_CYAN, GLOW_STRONG),
+          Face("led", "Retro LED", STYLE_SEGMENT, FONT_SEGMENT_LED, COLOR_GREEN, GLOW_SOFT),
+          Face("flip", "Flip", STYLE_FLIP, FONT_NORMAL, COLOR_WHITE, GLOW_NONE),
+          Face("analog", "Analog", STYLE_ANALOG, FONT_LIGHT, COLOR_WHITE, GLOW_SOFT),
+      )
+
+  /** The face matching [s]'s current style (style is the dominant look driver); Classic if unknown. */
+  fun faceOf(s: Settings): String = FACES.firstOrNull { it.style == s.style }?.id ?: "classic"
+
+  /** Apply a face preset: write its style + font + color + glow together in one edit. */
+  fun setFace(c: Context, faceId: String) {
+    val f = FACES.firstOrNull { it.id == faceId } ?: FACES.first()
+    prefs(c).edit()
+        .putString("style", f.style)
+        .putString("font", f.font)
+        .putString("color", f.color)
+        .putString("glow", f.glow)
+        .apply()
+  }
+
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
   fun load(context: Context): Settings {

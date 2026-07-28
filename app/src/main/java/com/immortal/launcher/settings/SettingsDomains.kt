@@ -962,6 +962,19 @@ object SettingsDomains {
                           DigitalClockConfig.STYLE_CLASSIC, DigitalClockConfig.STYLE_FLIP,
                           DigitalClockConfig.STYLE_BOLD, DigitalClockConfig.STYLE_NEON,
                           DigitalClockConfig.STYLE_SEGMENT, DigitalClockConfig.STYLE_ANALOG),
+                      visible = { _, _ -> false }), // superseded by the face preset on-device
+                  // One curated "face" preset replaces the raw style/font/color/glow enums on-device
+                  // (settings-reimagining Phase 8b). Selecting a face writes all four together via
+                  // setFace; the value is derived from the stored style via faceOf. The raw enums stay
+                  // as hidden specs below (visible=false) so the phone remote can still set them and
+                  // existing values keep working.
+                  EnumSpec(
+                      "face",
+                      "Clock face",
+                      get = { DigitalClockConfig.faceOf(it) },
+                      set = DigitalClockConfig::setFace,
+                      options = DigitalClockConfig.FACES.map { it.id to it.label },
+                      coerce = oneOf(*DigitalClockConfig.FACES.map { it.id }.toTypedArray()),
                       visible = { _, s -> s.enabled }),
                   EnumSpec(
                       "color",
@@ -983,7 +996,7 @@ object SettingsDomains {
                           DigitalClockConfig.COLOR_GREEN, DigitalClockConfig.COLOR_BLUE,
                           DigitalClockConfig.COLOR_YELLOW, DigitalClockConfig.COLOR_CYAN,
                           DigitalClockConfig.COLOR_PINK, DigitalClockConfig.COLOR_ORANGE),
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, _ -> false }), // folded into the face preset on-device
                   EnumSpec(
                       "font",
                       "Font",
@@ -1004,7 +1017,7 @@ object SettingsDomains {
                           DigitalClockConfig.FONT_BOLD, DigitalClockConfig.FONT_MONO,
                           DigitalClockConfig.FONT_SERIF, DigitalClockConfig.FONT_SEGMENT_LED,
                           DigitalClockConfig.FONT_DIGITAL_7, DigitalClockConfig.FONT_TECHNOLOGY),
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, _ -> false }), // folded into the face preset on-device
                   EnumSpec(
                       "size",
                       "Size",
@@ -1062,7 +1075,7 @@ object SettingsDomains {
                       coerce = oneOf(
                           DigitalClockConfig.GLOW_NONE, DigitalClockConfig.GLOW_SOFT,
                           DigitalClockConfig.GLOW_STRONG),
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, _ -> false }), // folded into the face preset on-device
                   BoolSpec(
                       "showDate",
                       "Show date",
@@ -1078,6 +1091,7 @@ object SettingsDomains {
               ),
           sections =
               mapOf(
+                  "face" to "Clock face",
                   "style" to "Clock style",
                   "color" to "Appearance",
                   "font" to "Appearance",
