@@ -30,6 +30,9 @@ import org.json.JSONObject
 object Weather {
 
   private const val PREFS = "immortal_weather"
+  // Re-resolve the IP geolocation after this long, so a bad first fix (IP geo can land on the ISP's
+  // datacenter city) or a relocated Portal self-corrects instead of being wrong forever.
+  private const val LOCATION_TTL_MS = 7L * 24 * 60 * 60 * 1000 // 7 days
 
   /** Returns e.g. "☀️ 72°", or "" if it can't be fetched (caller can retry). */
   fun fetch(context: Context): String =
@@ -55,8 +58,14 @@ object Weather {
   /** Cached lat/lon, or a fresh geolocation (cached on success). Also caches the city name. */
   private fun location(context: Context): Pair<Double, Double>? {
     val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-    prefs.getString("lat", null)?.toDoubleOrNull()?.let { la ->
-      prefs.getString("lon", null)?.toDoubleOrNull()?.let { lo -> return la to lo }
+    // Use the cached fix only while it's fresh (within the TTL); a stale one falls through to a
+    // re-resolve, but the fresh cache still short-circuits the common every-call case.
+    val resolvedAt = prefs.getLong("resolved_at", 0L)
+    val fresh = System.currentTimeMillis() - resolvedAt < LOCATION_TTL_MS
+    if (fresh) {
+      prefs.getString("lat", null)?.toDoubleOrNull()?.let { la ->
+        prefs.getString("lon", null)?.toDoubleOrNull()?.let { lo -> return la to lo }
+      }
     }
     for (url in listOf("https://ipwho.is/", "https://ipapi.co/json/")) {
       val coords =
@@ -75,11 +84,23 @@ object Weather {
             .putString("lat", coords.first.toString())
             .putString("lon", coords.second.toString())
             .putString("city", coords.third)
+            .putLong("resolved_at", System.currentTimeMillis())
             .apply()
         return coords.first to coords.second
       }
     }
+    // Re-resolve failed (offline?). Fall back to a stale cached fix if we have one — a slightly
+    // wrong/old location beats no weather at all until the network returns.
+    prefs.getString("lat", null)?.toDoubleOrNull()?.let { la ->
+      prefs.getString("lon", null)?.toDoubleOrNull()?.let { lo -> return la to lo }
+    }
     return null
+  }
+
+  /** Clear the cached geolocation so the next call re-resolves (for a "re-detect location" action). */
+  fun clearLocationCache(context: Context) {
+    context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        .edit().remove("lat").remove("lon").remove("city").remove("resolved_at").apply()
   }
 
   /** Today's sunrise/sunset as epoch millis (location-local, which on a fixed Portal
