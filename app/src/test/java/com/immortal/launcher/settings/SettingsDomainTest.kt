@@ -432,6 +432,7 @@ class SettingsDomainTest {
             "TimerConfig" to "collection: kitchen timer instances (home chips)",
             "CountdownConfig" to "collection: countdown events (CountdownSettingsActivity)",
             "NotesConfig" to "user content: sticky / voice note (AudioNote)",
+            "AlarmConfig" to "bespoke scalar editor: wake-up alarm (AlarmSettingsActivity, Tools tile)",
         )
 
     val classified = registeredAsDomain + exemptCollectionsOrContent.keys

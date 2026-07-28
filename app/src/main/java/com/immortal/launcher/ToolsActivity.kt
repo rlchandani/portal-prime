@@ -118,6 +118,9 @@ private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
       )
       Spacer(Modifier.size(26.dp))
       Card {
+        ToolRow("Alarm", "A wake-up alarm at a set time") {
+          context.startActivity(Intent(context, AlarmSettingsActivity::class.java))
+        }
         ToolRow("Cameras", "View a saved RTSP camera feed") {
           context.startActivity(Intent(context, CameraViewerActivity::class.java))
         }

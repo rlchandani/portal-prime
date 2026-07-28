@@ -228,6 +228,23 @@
             android:turnScreenOn="true"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- "Alarm": wake-up alarm editor (time + days + label), opened from Tools. -->
+        <activity
+            android:name=".AlarmSettingsActivity"
+            android:exported="false"
+            android:label="Alarm"
+            android:theme="@style/Theme.SampleApp" />
+
+        <!-- Full-screen ringing-alarm screen, launched by AlarmReceiver at the alarm time;
+             shows over the lock screen and turns the screen on. -->
+        <activity
+            android:name=".AlarmRingActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- "Clock": digital clock screensaver style / color / layout settings. -->
         <activity
             android:name=".ClockSettingsActivity"
@@ -419,6 +436,11 @@
         <!-- Internal alarm for the sunrise wake light (launches WakeLightActivity). -->
         <receiver
             android:name=".SunriseReceiver"
+            android:exported="false" />
+
+        <!-- Internal alarm for the wake-up alarm clock (launches AlarmRingActivity). -->
+        <receiver
+            android:name=".AlarmReceiver"
             android:exported="false" />
 
         <!-- Device admin (force-lock only): lets Immortal turn the screen off for the
