@@ -652,6 +652,7 @@ private fun LeftWidgetColumn(
               HomeWidgetStore.KIND_WEATHER to "Weather",
               HomeWidgetStore.KIND_WORLD_CLOCK to "World Clock",
               HomeWidgetStore.KIND_TIMERS to "Timers",
+              HomeWidgetStore.KIND_ALARM to "Alarm",
           ).forEach { (kind, label) ->
             Text(
                 label,
@@ -1307,6 +1308,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_WEATHER -> "Weather"
       HomeWidgetStore.KIND_WORLD_CLOCK -> "World Clock"
       HomeWidgetStore.KIND_TIMERS -> "Timers"
+      HomeWidgetStore.KIND_ALARM -> "Alarm"
       else -> "Widget"
     }
 
@@ -2344,6 +2346,7 @@ private fun ImmortalWidgetContent(widget: HomeWidgetStore.HomeWidget, modifier: 
     HomeWidgetStore.KIND_WORLD_CLOCK -> ImmortalWorldClockWidget(modifier)
     HomeWidgetStore.KIND_TIMERS -> ImmortalTimersWidget(modifier)
     HomeWidgetStore.KIND_CALENDAR -> ImmortalCalendarWidget(modifier)
+    HomeWidgetStore.KIND_ALARM -> ImmortalAlarmWidget(modifier)
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
@@ -2944,6 +2947,59 @@ private fun ImmortalTimersWidget(modifier: Modifier = Modifier) {
         },
         onDismiss = { showCustom = false },
     )
+  }
+}
+
+/**
+ * Home widget for the wake-up alarm ([AlarmConfig]). Shows the next fire time + label when armed,
+ * or "No alarm" when off; a chip toggles it on/off, and tapping the body opens the alarm editor.
+ * Re-reads config on resume so edits in the editor reflect here.
+ */
+@Composable
+private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  val lifecycleOwner = LocalLifecycleOwner.current
+  var cfg by remember { mutableStateOf(AlarmConfig.load(context)) }
+  DisposableEffect(lifecycleOwner) {
+    val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) cfg = AlarmConfig.load(context) }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+  val next = remember(cfg) { AlarmConfig.nextTrigger(cfg) }
+  val timeFmt = remember { SimpleDateFormat("h:mm a", Locale.getDefault()) }
+  val open: () -> Unit = {
+    runCatching {
+      context.startActivity(
+          Intent(context, AlarmSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  ImmortalWidgetShell(title = "Alarm", accent = Color(0xFFFF453A), modifier = modifier.tvFocusableRow { open() }) {
+    Text(
+        if (cfg.enabled && next != null) "%02d:%02d".format(cfg.hour, cfg.minute) else "Off",
+        color = if (cfg.enabled) Color.White else Color(0xFF8A8A8A),
+        fontSize = 34.sp,
+        fontWeight = FontWeight.SemiBold,
+    )
+    Text(
+        when {
+          cfg.enabled && next != null ->
+            "${cfg.label} · ${java.text.SimpleDateFormat("EEE", Locale.getDefault()).format(java.util.Date(next))} ${timeFmt.format(java.util.Date(next))}"
+          else -> "No alarm set"
+        },
+        color = Color(0xFF9A9A9A),
+        fontSize = 13.sp,
+        maxLines = 1,
+        modifier = Modifier.padding(top = 2.dp),
+    )
+    Spacer(Modifier.size(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      TimerChip(if (cfg.enabled) "Turn off" else "Turn on") {
+        AlarmConfig.setEnabled(context, !cfg.enabled)
+        AlarmScheduler.reschedule(context)
+        cfg = AlarmConfig.load(context)
+      }
+      TimerChip("Edit") { open() }
+    }
   }
 }
 
