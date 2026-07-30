@@ -1861,6 +1861,35 @@ private fun fireHey(context: android.content.Context, pkg: String) {
   context.sendBroadcast(Intent(HEY_TRIGGER_ACTION).setPackage(pkg))
 }
 
+// Jarvis (com.portal.assistant) exposes an exported WakeHandoffReceiver that starts its listening
+// service on this broadcast — the same hand-off portal-wake uses on gen1. These literal strings are
+// Jarvis's stable "wake contract" (WakeContract), so we mirror them rather than depend on it.
+private const val JARVIS_PKG = "com.portal.assistant"
+private const val JARVIS_WAKE_ACTION = "com.portal.wake.action.WAKE"
+private const val JARVIS_WAKE_EXTRA_ID = "com.portal.wake.extra.ID"
+
+/**
+ * Trigger Jarvis to start LISTENING (not merely open it): broadcast its WAKE hand-off so the
+ * AssistantService takes the mic. Falls back to launching the app if the broadcast can't be delivered
+ * (older Jarvis without the receiver). Immortal is foreground when the tile is tapped, so this is the
+ * allowed foreground-mic path.
+ */
+private fun triggerJarvis(context: android.content.Context) {
+  val ok = runCatching {
+    context.sendBroadcast(
+        Intent(JARVIS_WAKE_ACTION)
+            .setPackage(JARVIS_PKG)
+            .putExtra(JARVIS_WAKE_EXTRA_ID, "immortal-quickcontrol"))
+    true
+  }.getOrDefault(false)
+  if (!ok) {
+    runCatching {
+      context.packageManager.getLaunchIntentForPackage(JARVIS_PKG)
+          ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.let { context.startActivity(it) }
+    }
+  }
+}
+
 /** Millennium's assistant picker (premium: choose which assistant to talk to). */
 private const val HEY_PICKER_ACTIVITY = "com.millennium.ui.HeyPickerActivity"
 
@@ -2450,7 +2479,7 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
 
   data class QC(val glyph: String, val label: String, val tint: Color, val onTap: () -> Unit)
   val tiles = buildList {
-    if (assistantInstalled) add(QC("🎙", "Hey Portal", Color(0xFF5E5CE6)) { launch("com.portal.assistant") })
+    if (assistantInstalled) add(QC("🎙", "Hey Jarvis", Color(0xFF5E5CE6)) { triggerJarvis(context) })
     if (haInstalled) {
       add(QC("💡", "Lights", Color(0xFFFF9F0A)) { launch("io.homeassistant.companion.android") })
       add(QC("🎬", "Scenes", Color(0xFF0A84FF)) { launch("io.homeassistant.companion.android") })
@@ -2793,28 +2822,49 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
       delay(1000)
     }
   }
-  ImmortalWidgetShell(title = "World Clock", accent = Color(0xFFFFC857), modifier = modifier) {
+  // No header, tight chrome. The row fills the widget's height; each clock face takes the space that
+  // remains above its two label lines (weight(1f)), so faces shrink to fit rather than overflow and
+  // clip the labels. Center vertically so a short widget still looks balanced.
+  Box(
+      modifier = modifier
+          .background(Color(0xFF161618), RoundedCornerShape(24.dp))
+          .padding(14.dp),
+      contentAlignment = Alignment.Center,
+  ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
       zones.take(4).forEach { zone ->
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-          AnalogClock(zone, now, Modifier.fillMaxWidth().aspectRatio(1f))
+          // Face fills the leftover height above the two label lines and stays round by deriving its
+          // width from that height (aspectRatio on a height-bounded box) — so it never overflows and
+          // clips the labels, regardless of how short the widget is.
+          Box(modifier = Modifier.weight(1f).aspectRatio(1f, matchHeightConstraintsFirst = true)) {
+            AnalogClock(zone, now, Modifier.fillMaxSize())
+          }
           Spacer(Modifier.size(6.dp))
+          // Timezone abbreviation (EDT/BST/JST…) as the primary label, city underneath.
           Text(
-              worldClockLabel(zone),
+              worldClockAbbrev(zone, now),
               color = Color.White,
-              fontSize = 12.sp,
-              fontWeight = FontWeight.Medium,
+              fontSize = 13.sp,
+              fontWeight = FontWeight.SemiBold,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
           )
-          Text(worldClockOffset(zone, now), color = Color(0xFF9A9A9A), fontSize = 10.sp, maxLines = 1)
+          Text(
+              worldClockCity(zone),
+              color = Color(0xFF9A9A9A),
+              fontSize = 10.sp,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+          )
         }
       }
     }
@@ -2822,19 +2872,20 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
 }
 
 /** Short city label from a tz id, e.g. "America/New_York" → "New York". */
-private fun worldClockLabel(zoneId: String): String =
+private fun worldClockCity(zoneId: String): String =
     zoneId.substringAfterLast('/').replace('_', ' ')
 
-/** Offset of [zoneId] vs the device's zone, e.g. "+5h" / "-3h" / "same". */
-private fun worldClockOffset(zoneId: String, now: Date): String {
-  val local = TimeZone.getDefault().getOffset(now.time)
-  val there = TimeZone.getTimeZone(zoneId).getOffset(now.time)
-  val diffH = (there - local) / 3_600_000
-  return when {
-    diffH == 0 -> "same"
-    diffH > 0 -> "+${diffH}h"
-    else -> "${diffH}h"
-  }
+/**
+ * The zone's short abbreviation for [now], honoring DST, e.g. "EDT" / "BST" / "JST" / "IST". Falls
+ * back to a GMT±offset (e.g. "GMT+5:30") for zones the platform can't abbreviate.
+ */
+private fun worldClockAbbrev(zoneId: String, now: Date): String {
+  val tz = TimeZone.getTimeZone(zoneId)
+  val dst = tz.inDaylightTime(now)
+  val abbr = tz.getDisplayName(dst, TimeZone.SHORT, Locale.US)
+  // Android returns "GMT+05:30" for zones without a named abbreviation — tidy that to "GMT+5:30".
+  return if (abbr.startsWith("GMT")) abbr.replace("+0", "+").replace("-0", "-").removeSuffix(":00")
+  else abbr
 }
 
 /** A small analog clock face for [zoneId], white by day / dark by night, with an orange seconds hand. */
