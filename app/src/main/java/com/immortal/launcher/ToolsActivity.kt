@@ -112,7 +112,7 @@ private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
   ) {
     // 4-per-row grid of icon tiles. Non-scrolling here (the scaffold body scrolls); use fixed rows.
     val perRow = 4
-    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(28.dp)) {
       tools.chunked(perRow).forEach { row ->
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
           row.forEach { t -> ToolTile(t, modifier = Modifier.weight(1f)) }
@@ -132,23 +132,23 @@ private fun ToolTile(item: ToolItem, modifier: Modifier = Modifier) {
           .padding(vertical = 12.dp),
   ) {
     Box(
-        modifier = Modifier.size(64.dp).clip(RoundedCornerShape(16.dp)).background(item.tint),
+        modifier = Modifier.size(104.dp).clip(RoundedCornerShape(24.dp)).background(item.tint),
         contentAlignment = Alignment.Center,
     ) {
       Icon(
           painter = painterResource(item.iconRes),
           contentDescription = null,
           tint = Color.White,
-          modifier = Modifier.size(34.dp),
+          modifier = Modifier.size(56.dp),
       )
     }
     Text(
         item.label,
         color = IosLabel,
-        fontSize = 15.sp,
+        fontSize = 18.sp,
         textAlign = TextAlign.Center,
         maxLines = 2,
-        modifier = Modifier.padding(top = 8.dp),
+        modifier = Modifier.padding(top = 10.dp),
     )
   }
 }
