@@ -3,32 +3,29 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Deep teal → blue radial gradient background. -->
+    <!-- Warm orange → amber radial gradient background. -->
     <path android:pathData="M0,0h108v108h-108z">
         <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
             <gradient
                 android:type="radial"
                 android:centerX="54"
-                android:centerY="46"
-                android:gradientRadius="78"
-                android:startColor="#FF1FB6C9"
-                android:centerColor="#FF1E7FE0"
-                android:endColor="#FF122A6B" />
+                android:centerY="44"
+                android:gradientRadius="80"
+                android:startColor="#FFFFB020"
+                android:centerColor="#FFFF8A00"
+                android:endColor="#FFE0590A" />
         </aapt:attr>
     </path>
-    <!-- Concentric "assistant orb": outer soft ring, mid ring, bright core. -->
-    <!-- Outer ring (faint). -->
-    <path
-        android:strokeColor="#59FFFFFF"
-        android:strokeWidth="2.5"
-        android:pathData="M54,26 a28,28 0 1,0 0.01,0 z" />
-    <!-- Mid ring (brighter). -->
-    <path
-        android:strokeColor="#B3FFFFFF"
-        android:strokeWidth="3"
-        android:pathData="M54,36 a18,18 0 1,0 0.01,0 z" />
-    <!-- Bright core. -->
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M54,45 a9,9 0 1,0 0.01,0 z" />
+    <!-- Voice waveform: five white bars of varying height, symmetric about the centre (x=54). Bars are
+         9 wide, centred at x = 24, 38, 54, 70, 84; drawn as rounded-cap strokes so the ends look pill-shaped. -->
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="9" android:strokeLineCap="round"
+        android:pathData="M24,46 L24,62" />
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="9" android:strokeLineCap="round"
+        android:pathData="M39,36 L39,72" />
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="9" android:strokeLineCap="round"
+        android:pathData="M54,28 L54,80" />
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="9" android:strokeLineCap="round"
+        android:pathData="M69,36 L69,72" />
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="9" android:strokeLineCap="round"
+        android:pathData="M84,46 L84,62" />
 </vector>

@@ -1869,24 +1869,34 @@ private const val JARVIS_WAKE_ACTION = "com.portal.wake.action.WAKE"
 private const val JARVIS_WAKE_EXTRA_ID = "com.portal.wake.extra.ID"
 
 /**
- * Trigger Jarvis to start LISTENING (not merely open it): broadcast its WAKE hand-off so the
- * AssistantService takes the mic. Falls back to launching the app if the broadcast can't be delivered
- * (older Jarvis without the receiver). Immortal is foreground when the tile is tapped, so this is the
- * allowed foreground-mic path.
+ * Trigger Jarvis. On this Portal (gen2 / Android 10) the OS silences a background sideloaded mic, so a
+ * background WAKE broadcast just shows Jarvis's orange bar without actually hearing anything. Jarvis
+ * only captures while its OWN UI is foreground — its MainActivity.onResume arms "hey jarvis" detection.
+ * So we LAUNCH Jarvis to the foreground (mic works → say "hey jarvis" or tap its mic) rather than fire
+ * the deaf background hand-off. Also send the WAKE broadcast as a hint for gen1 units where background
+ * capture is allowed. Falls back to the generic launch intent if the explicit component is unavailable.
  */
 private fun triggerJarvis(context: android.content.Context) {
-  val ok = runCatching {
-    context.sendBroadcast(
-        Intent(JARVIS_WAKE_ACTION)
-            .setPackage(JARVIS_PKG)
-            .putExtra(JARVIS_WAKE_EXTRA_ID, "immortal-quickcontrol"))
+  DreamPolicy.markBridge(context) // don't let the screensaver claw back over the Jarvis hand-off
+  val launched = runCatching {
+    context.startActivity(
+        Intent(Intent.ACTION_MAIN)
+            .addCategory(Intent.CATEGORY_LAUNCHER)
+            .setClassName(JARVIS_PKG, "$JARVIS_PKG.MainActivity")
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     true
   }.getOrDefault(false)
-  if (!ok) {
+  if (!launched) {
     runCatching {
       context.packageManager.getLaunchIntentForPackage(JARVIS_PKG)
           ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.let { context.startActivity(it) }
     }
+  }
+  // Gen1 also gets the wake hint (harmless no-op on gen2 where the OS ignores the background mic).
+  runCatching {
+    context.sendBroadcast(
+        Intent(JARVIS_WAKE_ACTION).setPackage(JARVIS_PKG)
+            .putExtra(JARVIS_WAKE_EXTRA_ID, "immortal-quickcontrol"))
   }
 }
 
@@ -2842,10 +2852,16 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-          // Face fills the leftover height above the two label lines and stays round by deriving its
-          // width from that height (aspectRatio on a height-bounded box) — so it never overflows and
-          // clips the labels, regardless of how short the widget is.
-          Box(modifier = Modifier.weight(1f).aspectRatio(1f, matchHeightConstraintsFirst = true)) {
+          // Face: square, capped so neighbouring clocks never touch. It's bounded by BOTH its column
+          // width (weight-shared, so ≤ column width with the 10dp gaps preserved) and the leftover
+          // height above the labels — widthIn(max) keeps a comfortable gap on wide columns, and the
+          // height weight shrinks it on short widgets. aspectRatio keeps it round within those bounds.
+          Box(
+              modifier = Modifier.weight(1f, fill = false)
+                  .fillMaxWidth()
+                  .widthIn(max = 96.dp)
+                  .aspectRatio(1f),
+          ) {
             AnalogClock(zone, now, Modifier.fillMaxSize())
           }
           Spacer(Modifier.size(6.dp))
