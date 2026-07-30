@@ -1,0 +1,34 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Deep teal → blue radial gradient background. -->
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="54"
+                android:centerY="46"
+                android:gradientRadius="78"
+                android:startColor="#FF1FB6C9"
+                android:centerColor="#FF1E7FE0"
+                android:endColor="#FF122A6B" />
+        </aapt:attr>
+    </path>
+    <!-- Concentric "assistant orb": outer soft ring, mid ring, bright core. -->
+    <!-- Outer ring (faint). -->
+    <path
+        android:strokeColor="#59FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M54,26 a28,28 0 1,0 0.01,0 z" />
+    <!-- Mid ring (brighter). -->
+    <path
+        android:strokeColor="#B3FFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M54,36 a18,18 0 1,0 0.01,0 z" />
+    <!-- Bright core. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,45 a9,9 0 1,0 0.01,0 z" />
+</vector>

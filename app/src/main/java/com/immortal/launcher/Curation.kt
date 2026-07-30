@@ -118,6 +118,8 @@ object Curation {
           // The Portal's search app is AOSP QuickSearchBox, not Google's GSA package.
           "com.android.quicksearchbox" to R.drawable.icon_google,
           "io.homeassistant.companion.android" to R.drawable.icon_homeassistant,
+          // Jarvis (the on-device AI assistant) — override its stock icon with an assistant-orb.
+          "com.portal.assistant" to R.drawable.icon_jarvis,
       )
 
   /**
