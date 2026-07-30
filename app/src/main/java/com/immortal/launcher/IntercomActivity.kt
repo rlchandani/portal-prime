@@ -53,7 +53,7 @@ import com.immortal.launcher.ui.theme.PortalPrimeTheme
 class IntercomActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { IntercomScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { IntercomScreen() } }
   }
 }
 
@@ -92,27 +92,22 @@ private fun IntercomScreen() {
     else permLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
   }
 
-  Box(modifier = Modifier.fillMaxSize()) {
-    Column(
-        modifier = Modifier.fillMaxSize().background(Color(0xFF111111))
-            .verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 28.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-      Text("Intercom", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-      Text("One-way audio between two Portals on the same Wi-Fi. No internet, no servers.",
-          color = Color(0xFF9A9A9A), fontSize = 15.sp, textAlign = TextAlign.Center)
-
+  SettingsScaffold(
+      title = "Intercom",
+      subtitle = "One-way audio between two Portals on the same Wi-Fi. No internet, no servers.",
+      onBack = { lan.stop(); activity?.finish() },
+  ) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       if (myIp.isNotBlank()) {
-        Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-            shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
-          Text("This Portal's address: $myIp", color = Color.White, fontSize = 15.sp,
+        Card {
+          Text("This Portal's address: $myIp", color = IosLabel, fontSize = Sizes.rowSub,
               modifier = Modifier.padding(16.dp))
         }
       }
 
       if (status.isNotBlank()) {
-        Text(status, color = MaterialTheme.colorScheme.primary, fontSize = 15.sp, textAlign = TextAlign.Center)
+        Text(status, color = IosBlue, fontSize = Sizes.rowSub, textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth())
       }
 
       // Broadcast (baby monitor in the nursery): this device's mic → the network.
@@ -124,8 +119,7 @@ private fun IntercomScreen() {
       }
 
       // Listen (kitchen Portal): connect to the broadcasting Portal's address.
-      Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-          shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) {
+      Card {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
           OutlinedTextField(value = host, onValueChange = { host = it }, singleLine = true,
               label = { Text("Other Portal's address (e.g. 192.168.1.42)") },
@@ -145,20 +139,18 @@ private fun IntercomScreen() {
           }
         }
       }
-      Spacer(Modifier.size(8.dp))
     }
   }
-  FolderBackButton(onClick = { lan.stop(); activity?.finish() })
 }
 
 @Composable
 private fun ActionButton(label: String, primary: Boolean, onClick: () -> Unit) {
   Surface(
-      color = if (primary) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+      color = if (primary) IosBlue else IosRed,
       shape = RoundedCornerShape(14.dp),
       modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { onClick() },
   ) {
-    Text(label, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
+    Text(label, color = Color.White, fontSize = Sizes.actionButton, fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth())
   }
 }

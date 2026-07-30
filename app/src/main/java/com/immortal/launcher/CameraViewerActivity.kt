@@ -56,7 +56,7 @@ import com.immortal.launcher.ui.theme.PortalPrimeTheme
 class CameraViewerActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = true) { CameraViewerScreen() } }
+    setContent { PortalPrimeTheme(darkTheme = false) { CameraViewerScreen() } }
   }
 }
 
@@ -90,64 +90,57 @@ private fun CameraViewerScreen() {
     return
   }
 
-  Box(modifier = Modifier.fillMaxSize()) {
-    Column(
-        modifier = Modifier.fillMaxSize().background(Color(0xFF111111))
-            .verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 28.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-      Text("Cameras", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-      Text("Live view of an RTSP camera (e.g. rtsp://user:pass@192.168.1.50:554/stream).",
-          color = Color(0xFF9A9A9A), fontSize = 15.sp, textAlign = TextAlign.Center)
-
-      cameras.forEach { cam ->
-        Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-            shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) {
-          Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)
-                .tvFocusableRow { playing = cam }) {
-              Text(cam.name, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-              Text(cam.url, color = Color(0xFF9A9A9A), fontSize = 12.sp, maxLines = 1)
-            }
-            Box(modifier = Modifier.size(40.dp).clickable {
-              CameraConfig.remove(context, cam.id); cameras = CameraConfig.load(context)
-            }, contentAlignment = Alignment.Center) {
-              Text("✕", color = MaterialTheme.colorScheme.error, fontSize = 20.sp)
+  SettingsScaffold(
+      title = "Cameras",
+      subtitle = "Live view of an RTSP camera (e.g. rtsp://user:pass@192.168.1.50:554/stream).",
+      onBack = { activity?.finish() },
+  ) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+      if (cameras.isNotEmpty()) {
+        Card {
+          cameras.forEachIndexed { i, cam ->
+            if (i > 0) Divider()
+            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+              Column(modifier = Modifier.weight(1f).tvFocusableRow { playing = cam }) {
+                Text(cam.name, color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
+                Text(cam.url, color = IosSecondary, fontSize = Sizes.rowSub, maxLines = 1)
+              }
+              Box(modifier = Modifier.size(40.dp).clickable {
+                CameraConfig.remove(context, cam.id); cameras = CameraConfig.load(context)
+              }, contentAlignment = Alignment.Center) {
+                Text("✕", color = IosRed, fontSize = 20.sp)
+              }
             }
           }
         }
       }
 
       if (adding) {
-        Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-            shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) {
+        Card {
           Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedTextField(value = name, onValueChange = { name = it }, singleLine = true,
                 label = { Text("Name (e.g. Driveway)") }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(value = url, onValueChange = { url = it }, singleLine = true,
                 label = { Text("rtsp:// URL") }, modifier = Modifier.fillMaxWidth())
-            Surface(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(14.dp),
+            Surface(color = IosBlue, shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
                   if (url.startsWith("rtsp://") && url.length > 8) {
                     CameraConfig.add(context, name, url)
                     cameras = CameraConfig.load(context); name = ""; url = "rtsp://"; adding = false
                   }
                 }) {
-              Text("Add camera", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
+              Text("Add camera", color = Color.White, fontSize = Sizes.actionButton, fontWeight = FontWeight.SemiBold,
                   textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth())
             }
           }
         }
       } else {
-        Surface(color = Color(0x22FFFFFF), shape = RoundedCornerShape(14.dp),
-            modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { adding = true }) {
-          Text("+ Add a camera", color = Color.White, fontSize = 16.sp, textAlign = TextAlign.Center,
-              modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth())
+        Card {
+          Text("+ Add a camera", color = IosBlue, fontSize = Sizes.rowTitle, textAlign = TextAlign.Center,
+              modifier = Modifier.fillMaxWidth().tvFocusableRow { adding = true }.padding(vertical = 14.dp))
         }
       }
-      Spacer(Modifier.size(8.dp))
     }
   }
-  FolderBackButton(onClick = { activity?.finish() })
 }

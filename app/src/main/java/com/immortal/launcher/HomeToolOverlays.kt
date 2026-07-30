@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,15 +73,15 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard {
-      Text("🛰️ Space station overhead", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+      Text("🛰️ Space station overhead", color = IosLabel, fontSize = 22.sp, fontWeight = FontWeight.Bold)
       val p = passes
       when {
-        p == null -> Text("Finding passes…", color = Color(0xFFB0B0B0), fontSize = 16.sp)
+        p == null -> Text("Finding passes…", color = IosSecondary, fontSize = 16.sp)
         p.isEmpty() ->
             Text(
                 "No passes found. Check the device is online so it can fetch the latest orbit, " +
                     "and that your location is set (it follows the weather tile).",
-                color = Color(0xFFB0B0B0),
+                color = IosSecondary,
                 fontSize = 15.sp,
             )
         else -> {
@@ -93,7 +92,7 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
                 append(IssPasses.timeLabel(first.startMillis))
                 append(if (first.visible) " ✨" else "")
               },
-              color = if (first.visible) Color(0xFFFFD54F) else Color.White,
+              color = if (first.visible) Color(0xFFFF9F0A) else IosLabel,
               fontSize = 17.sp,
               fontWeight = FontWeight.SemiBold,
           )
@@ -102,19 +101,19 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
               verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
             p.forEach { pass ->
-              Surface(color = Color(0x18FFFFFF), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+              Surface(color = IosBackground, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
                   Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(IssPasses.timeLabel(pass.startMillis), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Text(IssPasses.timeLabel(pass.startMillis), color = IosLabel, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                     if (pass.visible) {
-                      Surface(color = Color(0x33FFD54F), shape = RoundedCornerShape(8.dp)) {
-                        Text("✨ visible", color = Color(0xFFFFD54F), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                      Surface(color = Color(0x1AFF9F0A), shape = RoundedCornerShape(8.dp)) {
+                        Text("✨ visible", color = Color(0xFFFF9F0A), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
                       }
                     }
                   }
                   Text(
                       "Rises ${pass.startDir} · peak ${pass.maxElevationDeg}° to the ${pass.peakDir} · sets ${pass.endDir}",
-                      color = Color(0xFFB8B8B8),
+                      color = IosSecondary,
                       fontSize = 14.sp,
                   )
                 }
@@ -123,7 +122,7 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
           }
           Text(
               "Times are local. ✨ means it should be bright enough to see — go outside and look up to the listed direction.",
-              color = Color(0xFF8A8A8A),
+              color = IosSecondary,
               fontSize = 12.sp,
           )
         }
@@ -148,27 +147,27 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard {
-      Text("🌌 Aurora outlook", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+      Text("🌌 Aurora outlook", color = IosLabel, fontSize = 22.sp, fontWeight = FontWeight.Bold)
       val st = status
       when {
-        !loaded -> Text("Checking the K-index…", color = Color(0xFFB0B0B0), fontSize = 16.sp)
+        !loaded -> Text("Checking the K-index…", color = IosSecondary, fontSize = 16.sp)
         st == null ->
             Text(
                 "Couldn't fetch the K-index. Check the device is online and that your location is " +
                     "set (it follows the weather tile).",
-                color = Color(0xFFB0B0B0),
+                color = IosSecondary,
                 fontSize = 15.sp,
             )
         else -> {
           val accent =
               when (st.chance) {
-                Aurora.Chance.LIKELY -> Color(0xFF69F0AE)
-                Aurora.Chance.POSSIBLE -> Color(0xFFB9F6CA)
-                Aurora.Chance.SLIM -> Color(0xFFB0BEC5)
-                Aurora.Chance.NONE -> Color(0xFF90A4AE)
+                Aurora.Chance.LIKELY -> IosGreen
+                Aurora.Chance.POSSIBLE -> Color(0xFFFF9F0A)
+                Aurora.Chance.SLIM -> IosSecondary
+                Aurora.Chance.NONE -> IosSecondary
               }
           Text(st.headline, color = accent, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-          Text(st.detail, color = Color(0xFFCFCFCF), fontSize = 15.sp, lineHeight = 21.sp)
+          Text(st.detail, color = IosSecondary, fontSize = 15.sp, lineHeight = 21.sp)
           Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
             AuroraStat("Kp now", Aurora.fmtKp(st.kpNow), Modifier.weight(1f))
             AuroraStat("Next 24 h peak", Aurora.fmtKp(st.kpForecast), Modifier.weight(1f))
@@ -177,7 +176,7 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
           Text(
               "Source: NOAA SWPC planetary K-index. Best after dark, away from city lights, with a " +
                   "clear ${if (st.lookToward == "N") "northern" else "southern"} horizon.",
-              color = Color(0xFF8A8A8A),
+              color = IosSecondary,
               fontSize = 12.sp,
           )
         }
@@ -189,10 +188,10 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
 
 @Composable
 private fun AuroraStat(label: String, value: String, modifier: Modifier = Modifier) {
-  Surface(color = Color(0x18FFFFFF), shape = RoundedCornerShape(12.dp), modifier = modifier) {
+  Surface(color = IosBackground, shape = RoundedCornerShape(12.dp), modifier = modifier) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth()) {
-      Text(value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-      Text(label, color = Color(0xFF9A9A9A), fontSize = 12.sp, textAlign = TextAlign.Center)
+      Text(value, color = IosLabel, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+      Text(label, color = IosSecondary, fontSize = 12.sp, textAlign = TextAlign.Center)
     }
   }
 }
@@ -214,25 +213,25 @@ internal fun SpeedTestOverlay(onDismiss: () -> Unit) {
 
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
-    Surface(shape = RoundedCornerShape(28.dp), color = Color(0xFF1C1C1E)) {
+    Surface(shape = RoundedCornerShape(28.dp), color = IosCard) {
       Column(modifier = Modifier.width(380.dp).padding(24.dp)) {
-        Text("Speed test", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text("Speed test", color = IosLabel, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         Text(
             if (r.server.isNotEmpty()) r.server
             else if (phase == SpeedTest.Phase.DONE) "Cloudflare" else "Finding server…",
-            color = Color(0xFF9A9A9A),
+            color = IosSecondary,
             fontSize = 13.sp,
             modifier = Modifier.padding(top = 2.dp),
         )
         Spacer(Modifier.size(22.dp))
         Row(Modifier.fillMaxWidth()) {
-          SpeedMetric("Ping", r.pingMs, "ms", 0, active = phase == SpeedTest.Phase.PING, accent = Color(0xFFFFCA28), modifier = Modifier.weight(1f))
-          SpeedMetric("Jitter", r.jitterMs, "ms", 1, active = phase == SpeedTest.Phase.PING, accent = Color(0xFFFFCA28), modifier = Modifier.weight(1f))
+          SpeedMetric("Ping", r.pingMs, "ms", 0, active = phase == SpeedTest.Phase.PING, accent = Color(0xFFFF9F0A), modifier = Modifier.weight(1f))
+          SpeedMetric("Jitter", r.jitterMs, "ms", 1, active = phase == SpeedTest.Phase.PING, accent = Color(0xFFFF9F0A), modifier = Modifier.weight(1f))
         }
         Spacer(Modifier.size(20.dp))
-        SpeedMetric("↓  Download", r.downMbps, "Mbps", 1, active = phase == SpeedTest.Phase.DOWNLOAD, accent = Color(0xFF42A5F5), big = true)
+        SpeedMetric("↓  Download", r.downMbps, "Mbps", 1, active = phase == SpeedTest.Phase.DOWNLOAD, accent = IosBlue, big = true)
         Spacer(Modifier.size(16.dp))
-        SpeedMetric("↑  Upload", r.upMbps, "Mbps", 1, active = phase == SpeedTest.Phase.UPLOAD, accent = Color(0xFF66BB6A), big = true)
+        SpeedMetric("↑  Upload", r.upMbps, "Mbps", 1, active = phase == SpeedTest.Phase.UPLOAD, accent = IosGreen, big = true)
         Spacer(Modifier.size(26.dp))
         val busy = phase != SpeedTest.Phase.DONE
         val label =
@@ -243,11 +242,11 @@ internal fun SpeedTestOverlay(onDismiss: () -> Unit) {
               SpeedTest.Phase.DONE -> "Run again"
             }
         Surface(
-            color = if (busy) Color(0x22FFFFFF) else MaterialTheme.colorScheme.primary,
+            color = if (busy) IosBackground else IosBlue,
             shape = RoundedCornerShape(14.dp),
             modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { if (!busy) runId++ },
         ) {
-          Text(label, color = Color.White, fontSize = 16.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 13.dp))
+          Text(label, color = if (busy) IosSecondary else Color.White, fontSize = 16.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 13.dp))
         }
         Spacer(Modifier.size(10.dp))
         CloseButton("Close", onDismiss)
@@ -270,18 +269,18 @@ private fun SpeedMetric(
   val shown = if (value > 0.0) String.format("%.${decimals}f", value) else "—"
   if (big) {
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-      Text(label, color = Color(0xFFDADADA), fontSize = 17.sp, modifier = Modifier.weight(1f))
-      Text(shown, color = if (active) accent else Color.White, fontSize = 30.sp, fontWeight = FontWeight.Medium, lineHeight = 30.sp)
+      Text(label, color = IosSecondary, fontSize = 17.sp, modifier = Modifier.weight(1f))
+      Text(shown, color = if (active) accent else IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Medium, lineHeight = 30.sp)
       Spacer(Modifier.size(6.dp))
-      Text(unit, color = Color(0xFF9A9A9A), fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
+      Text(unit, color = IosSecondary, fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
     }
   } else {
     Column(modifier) {
-      Text(label.uppercase(), color = Color(0xFF8A8A8A), fontSize = 12.sp, letterSpacing = 0.5.sp)
+      Text(label.uppercase(), color = IosSecondary, fontSize = 12.sp, letterSpacing = 0.5.sp)
       Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 4.dp)) {
-        Text(shown, color = if (active) accent else Color.White, fontSize = 24.sp, fontWeight = FontWeight.Medium, lineHeight = 24.sp)
+        Text(shown, color = if (active) accent else IosLabel, fontSize = 24.sp, fontWeight = FontWeight.Medium, lineHeight = 24.sp)
         Spacer(Modifier.size(4.dp))
-        Text(unit, color = Color(0xFF9A9A9A), fontSize = 12.sp, modifier = Modifier.padding(bottom = 3.dp))
+        Text(unit, color = IosSecondary, fontSize = 12.sp, modifier = Modifier.padding(bottom = 3.dp))
       }
     }
   }
@@ -319,7 +318,7 @@ internal fun ConverterOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard {
-      Text("🔢 Converter", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+      Text("🔢 Converter", color = IosLabel, fontSize = 22.sp, fontWeight = FontWeight.Bold)
       ChipRow(categories, category) { category = it }
       TextField(
           value = input,
@@ -328,13 +327,13 @@ internal fun ConverterOverlay(onDismiss: () -> Unit) {
           singleLine = true,
           modifier = Modifier.fillMaxWidth(),
       )
-      Text("From", color = Color(0xFF8A8A8A), fontSize = 12.sp)
+      Text("From", color = IosSecondary, fontSize = 12.sp)
       ChipRow(units, from) { from = it }
-      Text("To", color = Color(0xFF8A8A8A), fontSize = 12.sp)
+      Text("To", color = IosSecondary, fontSize = 12.sp)
       ChipRow(units, to) { to = it }
       Text(
           if (result.isBlank()) "—" else "$result $to",
-          color = Color(0xFF69F0AE),
+          color = IosGreen,
           fontSize = 26.sp,
           fontWeight = FontWeight.Bold,
       )
@@ -363,8 +362,8 @@ internal fun TimersOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard {
-      Text("⏲️ Timers", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-      Text("Start a timer", color = Color(0xFF8A8A8A), fontSize = 12.sp)
+      Text("⏲️ Timers", color = IosLabel, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+      Text("Start a timer", color = IosSecondary, fontSize = 12.sp)
       val presets = listOf(1, 3, 5, 10, 15, 30)
       Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
         presets.take(3).forEach { m ->
@@ -377,22 +376,22 @@ internal fun TimersOverlay(onDismiss: () -> Unit) {
         }
       }
       val active = timers.filter { it.endAtMillis > now }.sortedBy { it.endAtMillis }
-      if (active.isEmpty()) Text("No timers running.", color = Color(0xFFB0B0B0), fontSize = 15.sp)
+      if (active.isEmpty()) Text("No timers running.", color = IosSecondary, fontSize = 15.sp)
       active.forEach { t ->
-        Surface(color = Color(0x18FFFFFF), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+        Surface(color = IosBackground, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
           Row(
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
           ) {
-            Text(t.label, color = Color.White, fontSize = 16.sp, modifier = Modifier.weight(1f))
-            Text(fmtClock(t.endAtMillis - now), color = Color(0xFFFFCA28), fontSize = 20.sp, fontWeight = FontWeight.Medium)
+            Text(t.label, color = IosLabel, fontSize = 16.sp, modifier = Modifier.weight(1f))
+            Text(fmtClock(t.endAtMillis - now), color = Color(0xFFFF9F0A), fontSize = 20.sp, fontWeight = FontWeight.Medium)
             Spacer(Modifier.size(12.dp))
             Surface(
-                color = Color(0x33FF5252),
+                color = Color(0x1AFF3B30),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp), focusScale = 1f) { TimerConfig.remove(context, t.id); reload() },
             ) {
-              Text("Cancel", color = Color(0xFFFF8A80), fontSize = 13.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+              Text("Cancel", color = IosRed, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
             }
           }
         }
@@ -431,7 +430,7 @@ internal fun NotesOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard {
-      Text("📝 Leave a note", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+      Text("📝 Leave a note", color = IosLabel, fontSize = 22.sp, fontWeight = FontWeight.Bold)
       TextField(
           value = text,
           onValueChange = { text = it; saved = false },
@@ -442,7 +441,7 @@ internal fun NotesOverlay(onDismiss: () -> Unit) {
           { NotesConfig.saveText(context, text); saved = true },
           Modifier.fillMaxWidth(),
       )
-      Text("Voice memo", color = Color(0xFF8A8A8A), fontSize = 12.sp)
+      Text("Voice memo", color = IosSecondary, fontSize = 12.sp)
       if (recording) {
         PillButton(
             "■ Stop recording",
@@ -475,11 +474,11 @@ private fun ChipRow(options: List<String>, selected: String, onSelect: (String) 
     options.forEach { opt ->
       val on = opt == selected
       Surface(
-          color = if (on) MaterialTheme.colorScheme.primary else Color(0x22FFFFFF),
+          color = if (on) IosBlue else IosBackground,
           shape = RoundedCornerShape(10.dp),
           modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp), focusScale = 1f) { onSelect(opt) },
       ) {
-        Text(opt, color = Color.White, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
+        Text(opt, color = if (on) Color.White else IosLabel, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
       }
     }
   }
@@ -489,13 +488,13 @@ private fun ChipRow(options: List<String>, selected: String, onSelect: (String) 
 @Composable
 private fun PillButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
   Surface(
-      color = Color(0x22FFFFFF),
+      color = IosBackground,
       shape = RoundedCornerShape(12.dp),
       modifier = modifier.tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f) { onClick() },
   ) {
     Text(
         label,
-        color = Color.White,
+        color = IosBlue,
         fontSize = 15.sp,
         textAlign = TextAlign.Center,
         modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp).fillMaxWidth(),
@@ -535,7 +534,7 @@ internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
 @Composable
 internal fun ToolCard(maxWidth: Int = 560, content: @Composable () -> Unit) {
   Surface(
-      color = MaterialTheme.colorScheme.surface,
+      color = IosCard,
       shape = RoundedCornerShape(24.dp),
       modifier = Modifier.widthIn(max = maxWidth.dp).heightIn(max = 760.dp).padding(24.dp),
   ) {
@@ -551,10 +550,10 @@ internal fun ToolCard(maxWidth: Int = 560, content: @Composable () -> Unit) {
 @Composable
 internal fun CloseButton(label: String, onClick: () -> Unit) {
   Surface(
-      color = Color(0x22FFFFFF),
+      color = IosBackground,
       shape = RoundedCornerShape(14.dp),
       modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { onClick() },
   ) {
-    Text(label, color = Color.White, fontSize = 16.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth())
+    Text(label, color = IosBlue, fontSize = 16.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth())
   }
 }
