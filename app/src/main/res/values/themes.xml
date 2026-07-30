@@ -11,4 +11,15 @@
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
+
+    <!-- Translucent variant for "folder"-style overlay activities (e.g. Tools): the window has a
+         transparent background so the activity's own Compose scrim + floating card show over the
+         home screen behind it, like opening an iOS folder. -->
+    <style name="Theme.SampleApp.Translucent" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>

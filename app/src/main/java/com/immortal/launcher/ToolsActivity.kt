@@ -13,28 +13,38 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -105,19 +115,35 @@ private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
       ToolItem("Speed test", R.drawable.ic_tool_speed, Color(0xFF5E5CE6)) { onOpen(ToolPage.SPEEDTEST) },
   )
 
-  SettingsScaffold(
-      title = "Tools",
-      subtitle = "Extra utilities for your Portal.",
-      onBack = { onExit() },
+  // iOS-style folder: a dark scrim over the (translucent-window) home, with a centered floating
+  // white card holding the tool grid. Tapping the scrim (outside the card) closes it; Back closes too.
+  Box(
+      modifier = Modifier.fillMaxSize()
+          .onPreviewKeyEvent { e ->
+            if (e.key == Key.Back) { if (e.type == KeyEventType.KeyUp) onExit(); true } else false
+          }
+          .background(Color(0x99000000))
+          .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { onExit() },
+      contentAlignment = Alignment.Center,
   ) {
-    // 4-per-row grid of icon tiles. Non-scrolling here (the scaffold body scrolls); use fixed rows.
-    val perRow = 4
-    Column(verticalArrangement = Arrangement.spacedBy(28.dp)) {
-      tools.chunked(perRow).forEach { row ->
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-          row.forEach { t -> ToolTile(t, modifier = Modifier.weight(1f)) }
-          // Pad a short last row so tiles keep their column width instead of stretching.
-          repeat(perRow - row.size) { Spacer(Modifier.weight(1f)) }
+    // The folder card itself — swallow taps so a tap on the card doesn't dismiss.
+    Surface(
+        color = IosBackground,
+        shape = RoundedCornerShape(28.dp),
+        modifier = Modifier.widthIn(max = 720.dp).padding(24.dp)
+            .tvFocusable(RoundedCornerShape(28.dp), focusScale = 1f) { /* consume */ },
+    ) {
+      Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 22.dp)) {
+        Text("Tools", color = IosLabel, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.size(18.dp))
+        val perRow = 4
+        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+          tools.chunked(perRow).forEach { row ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+              row.forEach { t -> ToolTile(t, modifier = Modifier.weight(1f)) }
+              repeat(perRow - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+          }
         }
       }
     }
@@ -132,23 +158,23 @@ private fun ToolTile(item: ToolItem, modifier: Modifier = Modifier) {
           .padding(vertical = 12.dp),
   ) {
     Box(
-        modifier = Modifier.size(104.dp).clip(RoundedCornerShape(24.dp)).background(item.tint),
+        modifier = Modifier.size(76.dp).clip(RoundedCornerShape(18.dp)).background(item.tint),
         contentAlignment = Alignment.Center,
     ) {
       Icon(
           painter = painterResource(item.iconRes),
           contentDescription = null,
           tint = Color.White,
-          modifier = Modifier.size(56.dp),
+          modifier = Modifier.size(42.dp),
       )
     }
     Text(
         item.label,
         color = IosLabel,
-        fontSize = 18.sp,
+        fontSize = 14.sp,
         textAlign = TextAlign.Center,
         maxLines = 2,
-        modifier = Modifier.padding(top = 10.dp),
+        modifier = Modifier.padding(top = 8.dp),
     )
   }
 }

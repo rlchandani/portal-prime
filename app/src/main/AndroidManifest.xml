@@ -265,7 +265,7 @@
             android:name=".ToolsActivity"
             android:exported="false"
             android:label="Tools"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Translucent" />
 
         <!-- "Cameras": RTSP/network camera viewer (VideoView, native RTSP). -->
         <activity
