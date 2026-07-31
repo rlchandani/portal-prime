@@ -2596,9 +2596,12 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
         }
       }
 
-  // Nearest upcoming countdown (birthday/trip) from Settings > Countdown. Re-read on resume so a
-  // newly-added event shows. Null when the user has none.
+  // Nearest upcoming countdown (birthday/trip) from Settings > Countdown, plus the next alarm and
+  // open to-do count. Re-read on resume so newly-added items show. Each is null/absent when empty,
+  // so the dashboard rows self-hide rather than showing dead chrome.
   var countdown by remember { mutableStateOf<Pair<String, String>?>(null) }
+  var alarmLine by remember { mutableStateOf<Pair<String, String>?>(null) }
+  var todoOpen by remember { mutableStateOf(0) }
   DisposableEffect(lifecycleOwner) {
     fun refresh() {
       countdown = runCatching {
@@ -2606,6 +2609,15 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
             .firstOrNull { it.daysUntil() >= 0 }
             ?.let { "${it.emoji} ${it.label}" to it.phrase() }
       }.getOrNull()
+      alarmLine = runCatching {
+        val cfg = AlarmConfig.load(context)
+        val next = if (cfg.enabled) AlarmConfig.nextTrigger(cfg) else null
+        next?.let {
+          val fmt = SimpleDateFormat(if (use24) "EEE HH:mm" else "EEE h:mm a", Locale.getDefault())
+          cfg.label.ifBlank { "Alarm" } to fmt.format(java.util.Date(it))
+        }
+      }.getOrNull()
+      todoOpen = runCatching { TodoStore.load(context).count { !it.done } }.getOrDefault(0)
     }
     refresh()
     val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) refresh() }
@@ -2633,6 +2645,12 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
           moonName,
           sunPair?.let { "↑${it.first}  ↓${it.second}" },
       )
+      // Next alarm row only when one is armed.
+      alarmLine?.let { (label, whenStr) -> TodayRow("⏰", label, whenStr) }
+      // Open to-do count only when there's something left to do.
+      if (todoOpen > 0) {
+        TodayRow("✓", if (todoOpen == 1) "1 to-do" else "$todoOpen to-dos", "open")
+      }
       // Countdown row only appears when the user has an upcoming event configured.
       countdown?.let { (label, phrase) -> TodayRow("⏳", label, phrase) }
     }
