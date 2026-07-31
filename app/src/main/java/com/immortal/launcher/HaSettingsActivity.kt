@@ -75,6 +75,9 @@ internal fun HaSettingsContent() {
   var discovered by remember { mutableStateOf<List<HaClient.EntityState>>(emptyList()) }
   var pinned by remember { mutableStateOf(HaConfig.entities(context)) }
   var query by remember { mutableStateOf("") }
+  // Domains the user has expanded (collapsed by default while browsing). Searching overrides this
+  // and expands every group so matches are always visible.
+  var expandedGroups by remember { mutableStateOf<Set<String>>(emptySet()) }
 
   fun refreshPinned() {
     pinned = HaConfig.entities(context)
@@ -201,22 +204,42 @@ internal fun HaSettingsContent() {
           )
         }
       } else {
-        // When not searching, cap each group so 190 switches don't render as 190 rows; searching
-        // shows every match (a search result set is small). This keeps the picker responsive.
-        val perGroupCap = if (q.isBlank()) 12 else Int.MAX_VALUE
+        // Searching expands every group (matches must be visible); otherwise a group shows only
+        // when the user has tapped its header open. Collapsed groups render just their header row,
+        // so 15 domains stay scannable. Expanded groups still cap rows (search to narrow further).
+        val searching = q.isNotBlank()
         orderedGroups.forEach { (domain, entities) ->
-          val shown = entities.take(perGroupCap)
-          val hidden = entities.size - shown.size
+          val expanded = searching || domain in expandedGroups
+          val perGroupCap = if (searching) Int.MAX_VALUE else 12
+          val shown = if (expanded) entities.take(perGroupCap) else emptyList()
+          val hidden = if (expanded) entities.size - shown.size else 0
           Card {
             Column(modifier = Modifier.padding(vertical = 6.dp)) {
-              Text(
-                  "${haGroupLabel(domain)} · ${entities.size}",
-                  color = IosSecondary,
-                  fontSize = Sizes.rowSub,
-                  fontWeight = FontWeight.SemiBold,
-                  modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
-              )
+              // Tappable header toggles the group (disabled while searching — all are forced open).
+              Row(
+                  modifier = Modifier.fillMaxWidth()
+                      .clickable(enabled = !searching) {
+                        expandedGroups = if (domain in expandedGroups) expandedGroups - domain else expandedGroups + domain
+                      }
+                      .padding(horizontal = 18.dp, vertical = 12.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Text(
+                    if (expanded) "▾" else "▸",
+                    color = IosSecondary,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(end = 10.dp),
+                )
+                Text(
+                    "${haGroupLabel(domain)} · ${entities.size}",
+                    color = IosLabel,
+                    fontSize = Sizes.rowTitle,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f),
+                )
+              }
               shown.forEach { e ->
+                Divider()
                 val already = pinned.any { it.entityId == e.entityId }
                 Row(
                     modifier = Modifier.fillMaxWidth()
