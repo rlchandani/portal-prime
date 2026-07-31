@@ -518,14 +518,19 @@ private fun fmtClock(ms: Long): String {
 
 /* ------------------------------------------------------------------ shared scaffolding */
 
-/** Full-screen scrim over the home page; tapping outside the card dismisses. */
+/**
+ * Full-screen scrim over the home page; tapping outside the card dismisses. Uses the SAME dim as the
+ * Tools folder grid (0x99 / 60% black) so opening a tool from the folder keeps the identical
+ * background darkness — the grid already establishes the dim, and swapping to a tool must not deepen
+ * it (which read as "another overlay on top"). Keep this alpha in sync with ToolsScreen's scrim.
+ */
 @Composable
 internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
   Box(
       contentAlignment = Alignment.Center,
       modifier =
           Modifier.fillMaxSize()
-              .background(Color(0xCC000000))
+              .background(Color(0x99000000))
               .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { onDismiss() },
   ) {
     content()
