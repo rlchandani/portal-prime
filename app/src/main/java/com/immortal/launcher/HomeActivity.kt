@@ -656,6 +656,8 @@ private fun LeftWidgetColumn(
               HomeWidgetStore.KIND_CRYPTO to "Crypto",
               HomeWidgetStore.KIND_TODO to "To-Do",
               HomeWidgetStore.KIND_NEWS to "News",
+              HomeWidgetStore.KIND_STOCKS to "Stocks",
+              HomeWidgetStore.KIND_OPTIONS to "Options",
           ).forEach { (kind, label) ->
             Text(
                 label,
@@ -1315,6 +1317,8 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_CRYPTO -> "Crypto"
       HomeWidgetStore.KIND_TODO -> "To-Do"
       HomeWidgetStore.KIND_NEWS -> "News"
+      HomeWidgetStore.KIND_STOCKS -> "Stocks"
+      HomeWidgetStore.KIND_OPTIONS -> "Options"
       else -> "Widget"
     }
 
@@ -2395,6 +2399,8 @@ private fun ImmortalWidgetContent(widget: HomeWidgetStore.HomeWidget, modifier: 
     HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier)
     HomeWidgetStore.KIND_TODO -> ImmortalTodoWidget(modifier)
     HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier)
+    HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier)
+    HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier)
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
@@ -3291,6 +3297,150 @@ private fun interleave(lists: List<List<NewsFeed.Headline>>): List<NewsFeed.Head
   return out
 }
 
+/**
+ * Stocks quote widget ([StocksConfig] + [AlpacaConfig]). Lists tracked tickers with last price and
+ * daily change (green/red) on the 30-min/1-min cadence. Requires Alpaca credentials — shows a
+ * "connect" prompt until configured. Tapping opens the editor. Data is IEX real-time (free tier).
+ */
+@Composable
+private fun ImmortalStocksWidget(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  var tickers by remember { mutableStateOf(StocksConfig.load(context)) }
+  var configured by remember { mutableStateOf(AlpacaConfig.isConfigured(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val obs = LifecycleEventObserver { _, e ->
+      if (e == Lifecycle.Event.ON_RESUME) {
+        tickers = StocksConfig.load(context)
+        configured = AlpacaConfig.isConfigured(context)
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+  val quotes by
+      produceState<List<AlpacaClient.StockQuote>?>(initialValue = null, tickers, configured) {
+        while (true) {
+          value = withContext(Dispatchers.IO) { AlpacaClient.fetchStockQuotes(context, tickers) }
+          delay(if (value.isNullOrEmpty()) 60_000L else 30L * 60 * 1000)
+        }
+      }
+  val open: () -> Unit = {
+    runCatching {
+      context.startActivity(
+          Intent(context, StocksSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  ImmortalWidgetShell(title = "Stocks", accent = Color(0xFF5E5CE6), modifier = modifier.tvFocusableRow { open() }) {
+    val rows = quotes
+    when {
+      !configured -> Text("Tap to connect Alpaca", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      tickers.isEmpty() -> Text("Add tickers to track", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      rows == null -> Text("Loading…", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      rows.isEmpty() -> Text("No quotes", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      else ->
+          Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            rows.take(5).forEach { q -> StockRow(q) }
+          }
+    }
+  }
+}
+
+/** One ticker line: symbol, last price, and colored daily change percent. */
+@Composable
+private fun StockRow(q: AlpacaClient.StockQuote) {
+  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Text(q.symbol, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+    Text("$%,.2f".format(q.last), color = Color.White, fontSize = 15.sp)
+    Text(
+        "%s%.2f%%".format(if (q.changePct >= 0) "+" else "", q.changePct),
+        color = if (q.changePct >= 0) Color(0xFF30D158) else Color(0xFFFF453A),
+        fontSize = 13.sp,
+        modifier = Modifier.padding(start = 8.dp),
+    )
+  }
+}
+
+/**
+ * Options scanner widget ([OptionsScanConfig] + [AlpacaConfig]). Lists option contracts across the
+ * configured underlyings whose Alpaca-computed delta falls in the user's band (default 0.20–0.30) —
+ * a premium-selling shortlist. Refreshes on a slower 60-min/2-min cadence (option chains are heavier
+ * and free data is 15-min delayed anyway). Requires Alpaca credentials; tap opens the editor.
+ */
+@Composable
+private fun ImmortalOptionsWidget(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  var tickers by remember { mutableStateOf(OptionsScanConfig.tickers(context)) }
+  var configured by remember { mutableStateOf(AlpacaConfig.isConfigured(context)) }
+  var type by remember { mutableStateOf(OptionsScanConfig.type(context)) }
+  var deltaMin by remember { mutableStateOf(OptionsScanConfig.deltaMin(context)) }
+  var deltaMax by remember { mutableStateOf(OptionsScanConfig.deltaMax(context)) }
+  var expiryDays by remember { mutableStateOf(OptionsScanConfig.expiryDays(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val obs = LifecycleEventObserver { _, e ->
+      if (e == Lifecycle.Event.ON_RESUME) {
+        tickers = OptionsScanConfig.tickers(context)
+        configured = AlpacaConfig.isConfigured(context)
+        type = OptionsScanConfig.type(context)
+        deltaMin = OptionsScanConfig.deltaMin(context)
+        deltaMax = OptionsScanConfig.deltaMax(context)
+        expiryDays = OptionsScanConfig.expiryDays(context)
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+  val hits by
+      produceState<List<OptionsScanner.Hit>?>(initialValue = null, tickers, configured, type, deltaMin, deltaMax, expiryDays) {
+        while (true) {
+          value =
+              withContext(Dispatchers.IO) {
+                OptionsScanner.scan(context, tickers, type, deltaMin, deltaMax, expiryDays)
+              }
+          delay(if (value.isNullOrEmpty()) 120_000L else 60L * 60 * 1000)
+        }
+      }
+  val open: () -> Unit = {
+    runCatching {
+      context.startActivity(
+          Intent(context, OptionsSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  ImmortalWidgetShell(title = "Options · ${"%.2f–%.2fΔ".format(deltaMin, deltaMax)}", accent = Color(0xFF64D2FF), modifier = modifier.tvFocusableRow { open() }) {
+    val rows = hits
+    when {
+      !configured -> Text("Tap to connect Alpaca", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      tickers.isEmpty() -> Text("Add tickers to scan", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      rows == null -> Text("Scanning…", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      rows.isEmpty() -> Text("No contracts in band", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      else ->
+          Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            rows.take(5).forEach { h -> OptionRow(h) }
+          }
+    }
+  }
+}
+
+/** One scanner row: "AAPL 300C 12/20" · delta · mid price. */
+@Composable
+private fun OptionRow(h: OptionsScanner.Hit) {
+  val label = "${h.underlying} ${strikeLabel(h.strike)}${if (h.call) "C" else "P"} ${expiryShort(h.expiry)}"
+  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Text(label, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+    Text("Δ%.2f".format(kotlin.math.abs(h.delta)), color = Color(0xFF64D2FF), fontSize = 13.sp)
+    h.mid?.let { Text("$%.2f".format(it), color = Color(0xFFCCCCCC), fontSize = 13.sp, modifier = Modifier.padding(start = 8.dp)) }
+  }
+}
+
+/** Whole-dollar strike when integral (300), else two decimals (302.50). */
+private fun strikeLabel(strike: Double): String =
+    if (strike == strike.toLong().toDouble()) "${strike.toLong()}" else "%.2f".format(strike)
+
+/** "2024-12-20" -> "12/20". */
+private fun expiryShort(iso: String): String =
+    iso.split("-").let { if (it.size == 3) "${it[1]}/${it[2]}" else iso }
+
 /** A keyboard-free duration picker (±steppers, remote/touch friendly) for a custom timer. */
 @Composable
 private fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
@@ -3535,6 +3685,8 @@ private fun CustomWidgetGlyph(kind: String) {
         HomeWidgetStore.KIND_CRYPTO -> "₿"
         HomeWidgetStore.KIND_TODO -> "✓"
         HomeWidgetStore.KIND_NEWS -> "📰"
+        HomeWidgetStore.KIND_STOCKS -> "📈"
+        HomeWidgetStore.KIND_OPTIONS -> "Δ"
         else -> "+"
       }
   Text(emoji, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)

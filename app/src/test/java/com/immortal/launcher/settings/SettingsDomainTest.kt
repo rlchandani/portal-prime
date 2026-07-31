@@ -438,6 +438,9 @@ class SettingsDomainTest {
             "AlarmConfig" to "bespoke scalar editor: wake-up alarm (AlarmSettingsActivity, Tools tile)",
             "CryptoConfig" to "collection: tracked coins for the crypto widget (CryptoSettingsActivity)",
             "NewsConfig" to "collection: RSS/Atom feed subscriptions for the news widget (NewsSettingsActivity)",
+            "StocksConfig" to "collection: tracked tickers for the stocks widget (StocksSettingsActivity)",
+            "AlpacaConfig" to "external-service credentials (Alpaca key/secret), like MqttConfig; edited in Stocks/Options",
+            "OptionsScanConfig" to "collection+params: options-scanner config (OptionsSettingsActivity)",
         )
 
     val classified = registeredAsDomain + exemptCollectionsOrContent.keys

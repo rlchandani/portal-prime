@@ -225,6 +225,20 @@
             android:label="News"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- "Stocks": Alpaca credentials + ticker editor for the stocks home widget. -->
+        <activity
+            android:name=".StocksSettingsActivity"
+            android:exported="false"
+            android:label="Stocks"
+            android:theme="@style/Theme.SampleApp" />
+
+        <!-- "Options": Alpaca credentials + scanner config for the options home widget. -->
+        <activity
+            android:name=".OptionsSettingsActivity"
+            android:exported="false"
+            android:label="Options"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- "Sounds": hourly chime / spoken time / golden-hour tone / ping volume + quiet hours. -->
         <activity
             android:name=".ChimeSettingsActivity"
