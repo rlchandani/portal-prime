@@ -441,6 +441,7 @@ class SettingsDomainTest {
             "StocksConfig" to "collection: tracked tickers for the stocks widget (StocksSettingsActivity)",
             "AlpacaConfig" to "external-service credentials (Alpaca key/secret), like MqttConfig; edited in Stocks/Options",
             "OptionsScanConfig" to "collection+params: options-scanner config (OptionsSettingsActivity)",
+            "HaConfig" to "external-service connection (HA URL/token) + pinned entities (HaSettingsActivity)",
         )
 
     val classified = registeredAsDomain + exemptCollectionsOrContent.keys

@@ -239,6 +239,13 @@
             android:label="Options"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- "Home Assistant": connection + entity picker for the HA control home widget. -->
+        <activity
+            android:name=".HaSettingsActivity"
+            android:exported="false"
+            android:label="Home Assistant"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- "Sounds": hourly chime / spoken time / golden-hour tone / ping volume + quiet hours. -->
         <activity
             android:name=".ChimeSettingsActivity"

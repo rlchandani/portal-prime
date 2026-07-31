@@ -169,6 +169,7 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
@@ -658,6 +659,7 @@ private fun LeftWidgetColumn(
               HomeWidgetStore.KIND_NEWS to "News",
               HomeWidgetStore.KIND_STOCKS to "Stocks",
               HomeWidgetStore.KIND_OPTIONS to "Options",
+              HomeWidgetStore.KIND_HA to "Home Assistant",
           ).forEach { (kind, label) ->
             Text(
                 label,
@@ -1319,6 +1321,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_NEWS -> "News"
       HomeWidgetStore.KIND_STOCKS -> "Stocks"
       HomeWidgetStore.KIND_OPTIONS -> "Options"
+      HomeWidgetStore.KIND_HA -> "Home Assistant"
       else -> "Widget"
     }
 
@@ -2401,6 +2404,7 @@ private fun ImmortalWidgetContent(widget: HomeWidgetStore.HomeWidget, modifier: 
     HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier)
     HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier)
     HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier)
+    HomeWidgetStore.KIND_HA -> ImmortalHaWidget(modifier)
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
@@ -3441,6 +3445,101 @@ private fun strikeLabel(strike: Double): String =
 private fun expiryShort(iso: String): String =
     iso.split("-").let { if (it.size == 3) "${it[1]}/${it[2]}" else iso }
 
+/**
+ * Home Assistant control widget ([HaConfig] + [HaClient]). Renders a tile per pinned entity showing
+ * its on/off state; tapping toggles it via HA's REST service call with optimistic UI (flip locally,
+ * then reconcile with the fetched truth). Polls state every 30s. Requires a base URL + long-lived
+ * token — shows a "connect" prompt until configured. This is the read/control path, distinct from
+ * the publish-only MQTT integration.
+ */
+@Composable
+private fun ImmortalHaWidget(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  val scope = androidx.compose.runtime.rememberCoroutineScope()
+  var entities by remember { mutableStateOf(HaConfig.entities(context)) }
+  var configured by remember { mutableStateOf(HaConfig.isConfigured(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val obs = LifecycleEventObserver { _, e ->
+      if (e == Lifecycle.Event.ON_RESUME) {
+        entities = HaConfig.entities(context)
+        configured = HaConfig.isConfigured(context)
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+  // A local override map lets a tap flip the tile instantly (optimistic) before the poll confirms.
+  var optimistic by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
+  val ids = remember(entities) { entities.map { it.entityId } }
+  val states by
+      produceState<List<HaClient.EntityState>?>(initialValue = null, ids, configured) {
+        while (true) {
+          value = withContext(Dispatchers.IO) { HaClient.fetchStates(context, ids) }
+          optimistic = emptyMap() // truth arrived; drop optimistic overrides
+          delay(30_000L)
+        }
+      }
+  val open: () -> Unit = {
+    runCatching {
+      context.startActivity(
+          Intent(context, HaSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  ImmortalWidgetShell(title = "Home", accent = Color(0xFF0A84FF), modifier = modifier.tvFocusableRow { open() }) {
+    when {
+      !configured -> Text("Tap to connect Home Assistant", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      entities.isEmpty() -> Text("Add entities to control", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      else -> {
+        val byId = (states ?: emptyList()).associateBy { it.entityId }
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          // Two tiles per row.
+          entities.chunked(2).take(3).forEach { pair ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              pair.forEach { ent ->
+                val fetched = byId[ent.entityId]
+                val on = optimistic[ent.entityId] ?: fetched?.on ?: false
+                val known = optimistic.containsKey(ent.entityId) || fetched != null
+                HaTile(
+                    name = ent.name.ifBlank { fetched?.friendlyName ?: ent.entityId },
+                    on = on,
+                    known = known,
+                    modifier = Modifier.weight(1f),
+                ) {
+                  optimistic = optimistic + (ent.entityId to !on)
+                  scope.launch { withContext(Dispatchers.IO) { HaClient.toggle(context, ent.entityId) } }
+                }
+              }
+              if (pair.size == 1) Spacer(Modifier.weight(1f))
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/** One HA control tile: name + on/off pill. Dimmed when the state is still unknown. */
+@Composable
+private fun HaTile(name: String, on: Boolean, known: Boolean, modifier: Modifier = Modifier, onToggle: () -> Unit) {
+  val bg = when {
+    !known -> Color(0xFF2A2A2C)
+    on -> Color(0xFF0A84FF)
+    else -> Color(0xFF3A3A3C)
+  }
+  Column(
+      modifier = modifier.clip(RoundedCornerShape(14.dp)).background(bg).tvFocusableRow { onToggle() }
+          .padding(horizontal = 12.dp, vertical = 10.dp),
+  ) {
+    Text(name, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Text(
+        when { !known -> "—"; on -> "On"; else -> "Off" },
+        color = Color(0xCCFFFFFF),
+        fontSize = 12.sp,
+    )
+  }
+}
+
 /** A keyboard-free duration picker (±steppers, remote/touch friendly) for a custom timer. */
 @Composable
 private fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
@@ -3687,6 +3786,7 @@ private fun CustomWidgetGlyph(kind: String) {
         HomeWidgetStore.KIND_NEWS -> "📰"
         HomeWidgetStore.KIND_STOCKS -> "📈"
         HomeWidgetStore.KIND_OPTIONS -> "Δ"
+        HomeWidgetStore.KIND_HA -> "🏠"
         else -> "+"
       }
   Text(emoji, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
