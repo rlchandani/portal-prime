@@ -204,6 +204,13 @@
             android:label="Countdowns"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- "Crypto": tracked-coin editor for the crypto price home widget. -->
+        <activity
+            android:name=".CryptoSettingsActivity"
+            android:exported="false"
+            android:label="Crypto"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- "Sounds": hourly chime / spoken time / golden-hour tone / ping volume + quiet hours. -->
         <activity
             android:name=".ChimeSettingsActivity"

@@ -653,6 +653,7 @@ private fun LeftWidgetColumn(
               HomeWidgetStore.KIND_WORLD_CLOCK to "World Clock",
               HomeWidgetStore.KIND_TIMERS to "Timers",
               HomeWidgetStore.KIND_ALARM to "Alarm",
+              HomeWidgetStore.KIND_CRYPTO to "Crypto",
           ).forEach { (kind, label) ->
             Text(
                 label,
@@ -1309,6 +1310,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_WORLD_CLOCK -> "World Clock"
       HomeWidgetStore.KIND_TIMERS -> "Timers"
       HomeWidgetStore.KIND_ALARM -> "Alarm"
+      HomeWidgetStore.KIND_CRYPTO -> "Crypto"
       else -> "Widget"
     }
 
@@ -2386,6 +2388,7 @@ private fun ImmortalWidgetContent(widget: HomeWidgetStore.HomeWidget, modifier: 
     HomeWidgetStore.KIND_TIMERS -> ImmortalTimersWidget(modifier)
     HomeWidgetStore.KIND_CALENDAR -> ImmortalCalendarWidget(modifier)
     HomeWidgetStore.KIND_ALARM -> ImmortalAlarmWidget(modifier)
+    HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier)
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
@@ -3070,6 +3073,76 @@ private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
   }
 }
 
+/**
+ * Crypto price widget: a compact list of the user's tracked coins (symbol · price · 24h change),
+ * refreshed from CoinGecko on the standard 30-min success / 1-min retry cadence. Tapping opens the
+ * coin editor. Change is green/red like the stock convention. Re-reads the coin list on resume so
+ * an edit applies on return home.
+ */
+@Composable
+private fun ImmortalCryptoWidget(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  var coins by remember { mutableStateOf(CryptoConfig.load(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val obs = LifecycleEventObserver { _, e ->
+      if (e == Lifecycle.Event.ON_RESUME) coins = CryptoConfig.load(context)
+    }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+  val quotes by
+      produceState<List<CryptoFeed.Quote>?>(initialValue = null, coins) {
+        while (true) {
+          value = withContext(Dispatchers.IO) { CryptoFeed.fetch(context, coins) }
+          delay(if (value.isNullOrEmpty()) 60_000L else 30L * 60 * 1000)
+        }
+      }
+  val open: () -> Unit = {
+    runCatching {
+      context.startActivity(
+          Intent(context, CryptoSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  ImmortalWidgetShell(title = "Crypto", accent = Color(0xFFF7931A), modifier = modifier.tvFocusableRow { open() }) {
+    val rows = quotes
+    when {
+      rows == null -> Text("Loading…", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      rows.isEmpty() -> Text("Add coins to track", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      else ->
+          Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            rows.take(5).forEach { q -> CryptoRow(q) }
+          }
+    }
+  }
+}
+
+/** One coin line: symbol on the left, price + colored 24h change on the right. */
+@Composable
+private fun CryptoRow(q: CryptoFeed.Quote) {
+  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Text(q.symbol, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+    Text(formatUsd(q.usd), color = Color.White, fontSize = 15.sp)
+    val change = q.change24h
+    if (change != null) {
+      Text(
+          "%s%.2f%%".format(if (change >= 0) "+" else "", change),
+          color = if (change >= 0) Color(0xFF30D158) else Color(0xFFFF453A),
+          fontSize = 13.sp,
+          modifier = Modifier.padding(start = 8.dp),
+      )
+    }
+  }
+}
+
+/** Compact USD formatting: whole dollars for big prices, cents for sub-$100 (e.g. altcoins). */
+private fun formatUsd(v: Double): String =
+    when {
+      v >= 1000 -> "$%,.0f".format(v)
+      v >= 1 -> "$%,.2f".format(v)
+      else -> "$%.4f".format(v)
+    }
+
 /** A keyboard-free duration picker (±steppers, remote/touch friendly) for a custom timer. */
 @Composable
 private fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
@@ -3311,6 +3384,7 @@ private fun CustomWidgetGlyph(kind: String) {
         HomeWidgetStore.KIND_WEATHER -> "☁"
         HomeWidgetStore.KIND_WORLD_CLOCK -> "◷"
         HomeWidgetStore.KIND_TIMERS -> "⏱"
+        HomeWidgetStore.KIND_CRYPTO -> "₿"
         else -> "+"
       }
   Text(emoji, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)

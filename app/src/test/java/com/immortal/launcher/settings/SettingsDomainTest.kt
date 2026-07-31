@@ -436,6 +436,7 @@ class SettingsDomainTest {
             "CountdownConfig" to "collection: countdown events (CountdownSettingsActivity)",
             "NotesConfig" to "user content: sticky / voice note (AudioNote)",
             "AlarmConfig" to "bespoke scalar editor: wake-up alarm (AlarmSettingsActivity, Tools tile)",
+            "CryptoConfig" to "collection: tracked coins for the crypto widget (CryptoSettingsActivity)",
         )
 
     val classified = registeredAsDomain + exemptCollectionsOrContent.keys
