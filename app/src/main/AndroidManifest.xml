@@ -218,6 +218,13 @@
             android:label="To-Do"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- "News": RSS/Atom feed editor for the news headlines home widget. -->
+        <activity
+            android:name=".NewsSettingsActivity"
+            android:exported="false"
+            android:label="News"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- "Sounds": hourly chime / spoken time / golden-hour tone / ping volume + quiet hours. -->
         <activity
             android:name=".ChimeSettingsActivity"

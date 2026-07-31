@@ -437,6 +437,7 @@ class SettingsDomainTest {
             "NotesConfig" to "user content: sticky / voice note (AudioNote)",
             "AlarmConfig" to "bespoke scalar editor: wake-up alarm (AlarmSettingsActivity, Tools tile)",
             "CryptoConfig" to "collection: tracked coins for the crypto widget (CryptoSettingsActivity)",
+            "NewsConfig" to "collection: RSS/Atom feed subscriptions for the news widget (NewsSettingsActivity)",
         )
 
     val classified = registeredAsDomain + exemptCollectionsOrContent.keys

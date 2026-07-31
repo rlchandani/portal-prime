@@ -655,6 +655,7 @@ private fun LeftWidgetColumn(
               HomeWidgetStore.KIND_ALARM to "Alarm",
               HomeWidgetStore.KIND_CRYPTO to "Crypto",
               HomeWidgetStore.KIND_TODO to "To-Do",
+              HomeWidgetStore.KIND_NEWS to "News",
           ).forEach { (kind, label) ->
             Text(
                 label,
@@ -1313,6 +1314,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_ALARM -> "Alarm"
       HomeWidgetStore.KIND_CRYPTO -> "Crypto"
       HomeWidgetStore.KIND_TODO -> "To-Do"
+      HomeWidgetStore.KIND_NEWS -> "News"
       else -> "Widget"
     }
 
@@ -2392,6 +2394,7 @@ private fun ImmortalWidgetContent(widget: HomeWidgetStore.HomeWidget, modifier: 
     HomeWidgetStore.KIND_ALARM -> ImmortalAlarmWidget(modifier)
     HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier)
     HomeWidgetStore.KIND_TODO -> ImmortalTodoWidget(modifier)
+    HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier)
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
@@ -3216,6 +3219,78 @@ private fun TodoRow(item: TodoStore.TodoItem, onToggle: () -> Unit) {
   }
 }
 
+/**
+ * News headlines widget: aggregates the latest titles across the user's configured RSS/Atom feeds
+ * ([NewsConfig]) on the standard 30-min / 1-min cadence. Tapping a headline opens its article link
+ * in the browser; tapping the chrome (or when empty) opens the feed editor. Re-reads feeds on resume.
+ */
+@Composable
+private fun ImmortalNewsWidget(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  var feeds by remember { mutableStateOf(NewsConfig.load(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) feeds = NewsConfig.load(context) }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+  val headlines by
+      produceState<List<NewsFeed.Headline>?>(initialValue = null, feeds) {
+        while (true) {
+          value =
+              withContext(Dispatchers.IO) {
+                // Interleave feeds so no single source dominates the (short) list.
+                feeds.map { NewsFeed.fetch(context, it.url) }.let(::interleave)
+              }
+          delay(if (value.isNullOrEmpty()) 60_000L else 30L * 60 * 1000)
+        }
+      }
+  val openEditor: () -> Unit = {
+    runCatching {
+      context.startActivity(
+          Intent(context, NewsSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  val openArticle: (String?) -> Unit = { link ->
+    if (link.isNullOrBlank()) openEditor()
+    else runCatching {
+      context.startActivity(
+          Intent(Intent.ACTION_VIEW, android.net.Uri.parse(link)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  ImmortalWidgetShell(title = "News", accent = Color(0xFFFF9F0A), modifier = modifier.tvFocusableRow { openEditor() }) {
+    val rows = headlines
+    when {
+      feeds.isEmpty() -> Text("Add a feed to see headlines", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      rows == null -> Text("Loading…", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      rows.isEmpty() -> Text("No headlines", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      else ->
+          Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            rows.take(5).forEach { h ->
+              Text(
+                  h.title,
+                  color = Color(0xFFEDEDED),
+                  fontSize = 14.sp,
+                  maxLines = 2,
+                  overflow = TextOverflow.Ellipsis,
+                  modifier = Modifier.fillMaxWidth().tvFocusableRow { openArticle(h.link) },
+              )
+            }
+          }
+    }
+  }
+}
+
+/** Round-robin merge of per-feed headline lists so each source is represented near the top. */
+private fun interleave(lists: List<List<NewsFeed.Headline>>): List<NewsFeed.Headline> {
+  val out = ArrayList<NewsFeed.Headline>()
+  val max = lists.maxOfOrNull { it.size } ?: 0
+  for (i in 0 until max) {
+    for (l in lists) l.getOrNull(i)?.let { out.add(it) }
+  }
+  return out
+}
+
 /** A keyboard-free duration picker (±steppers, remote/touch friendly) for a custom timer. */
 @Composable
 private fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
@@ -3459,6 +3534,7 @@ private fun CustomWidgetGlyph(kind: String) {
         HomeWidgetStore.KIND_TIMERS -> "⏱"
         HomeWidgetStore.KIND_CRYPTO -> "₿"
         HomeWidgetStore.KIND_TODO -> "✓"
+        HomeWidgetStore.KIND_NEWS -> "📰"
         else -> "+"
       }
   Text(emoji, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
