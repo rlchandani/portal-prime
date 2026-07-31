@@ -384,6 +384,7 @@ private fun EditableTextRow(label: String, value: String, onChange: (String) -> 
     Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
     if (editing) {
       OutlinedTextField(
+          colors = iosTextFieldColors(),
           value = tempValue,
           onValueChange = { tempValue = it },
           singleLine = true,

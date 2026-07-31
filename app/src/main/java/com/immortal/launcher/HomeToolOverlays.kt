@@ -325,6 +325,7 @@ internal fun ConverterOverlay(onDismiss: () -> Unit) {
           onValueChange = { v -> input = v.filter { it.isDigit() || it == '.' || it == '-' } },
           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
           singleLine = true,
+          colors = iosFilledTextFieldColors(),
           modifier = Modifier.fillMaxWidth(),
       )
       Text("From", color = IosSecondary, fontSize = 12.sp)
@@ -434,6 +435,7 @@ internal fun NotesOverlay(onDismiss: () -> Unit) {
       TextField(
           value = text,
           onValueChange = { text = it; saved = false },
+          colors = iosFilledTextFieldColors(),
           modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
       )
       PillButton(

@@ -154,6 +154,7 @@ internal fun CryptoSettingsContent() {
       Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Add by CoinGecko id", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = manualId,
             onValueChange = { manualId = it },
             label = { Text("CoinGecko id (e.g. bitcoin)") },
@@ -161,6 +162,7 @@ internal fun CryptoSettingsContent() {
             modifier = Modifier.fillMaxWidth(),
         )
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = manualSymbol,
             onValueChange = { manualSymbol = it },
             label = { Text("Display symbol (e.g. BTC)") },

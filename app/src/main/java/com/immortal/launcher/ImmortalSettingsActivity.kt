@@ -1176,6 +1176,7 @@ internal fun MultiRoomContent() {
               verticalAlignment = Alignment.CenterVertically,
           ) {
             OutlinedTextField(
+                colors = iosTextFieldColors(),
                 value = host,
                 onValueChange = {
                   host = it
@@ -1206,6 +1207,7 @@ internal fun MultiRoomContent() {
           }
           // Music Assistant API port — 8095 by default; only change it if MA's web server moved.
           OutlinedTextField(
+              colors = iosTextFieldColors(),
               value = maPort,
               onValueChange = {
                 maPort = it.filter(Char::isDigit).take(5)
@@ -1224,6 +1226,7 @@ internal fun MultiRoomContent() {
           // Music Assistant login — only used to forward play/pause/skip to MA, and only when MA's
           // optional authentication is enabled. Leave blank for a stock server.
           OutlinedTextField(
+              colors = iosTextFieldColors(),
               value = maUser,
               onValueChange = {
                 maUser = it
@@ -1242,6 +1245,7 @@ internal fun MultiRoomContent() {
                       .focusRequester(userFocus),
           )
           OutlinedTextField(
+              colors = iosTextFieldColors(),
               value = maPass,
               onValueChange = {
                 maPass = it
@@ -1442,6 +1446,7 @@ internal fun MqttContent() {
               verticalAlignment = Alignment.CenterVertically,
           ) {
             OutlinedTextField(
+                colors = iosTextFieldColors(),
                 value = host,
                 onValueChange = {
                   host = it
@@ -1468,6 +1473,7 @@ internal fun MqttContent() {
             }
           }
           OutlinedTextField(
+              colors = iosTextFieldColors(),
               value = port,
               onValueChange = {
                 port = it.filter { ch -> ch.isDigit() }
@@ -1484,6 +1490,7 @@ internal fun MqttContent() {
                       .focusRequester(portFocus),
           )
           OutlinedTextField(
+              colors = iosTextFieldColors(),
               value = user,
               onValueChange = {
                 user = it
@@ -1501,6 +1508,7 @@ internal fun MqttContent() {
                       .focusRequester(userFocus),
           )
           OutlinedTextField(
+              colors = iosTextFieldColors(),
               value = pass,
               onValueChange = {
                 pass = it

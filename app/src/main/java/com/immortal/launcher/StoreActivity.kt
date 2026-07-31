@@ -293,16 +293,7 @@ private fun BrowseScreen(
             modifier =
                 Modifier.fillMaxWidth().heightIn(min = 54.dp).focusRequester(searchFocus),
             shape = RoundedCornerShape(14.dp),
-            colors =
-                OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = IosLabel,
-                    unfocusedTextColor = IosLabel,
-                    focusedContainerColor = IosCard,
-                    unfocusedContainerColor = IosCard,
-                    focusedBorderColor = IosBlue,
-                    unfocusedBorderColor = IosDivider,
-                    cursorColor = IosBlue,
-                ),
+            colors = iosTextFieldColors(),
         )
         Text(
             "📁  Have an APK file? Install it →",

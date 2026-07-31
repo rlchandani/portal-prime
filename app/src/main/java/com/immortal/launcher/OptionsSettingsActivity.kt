@@ -141,6 +141,7 @@ internal fun OptionsSettingsContent() {
       Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Add ticker to scan", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = manual,
             onValueChange = { manual = it },
             label = { Text("Symbol (e.g. AAPL)") },

@@ -113,7 +113,7 @@ private fun IntercomScreen() {
       // Listen (kitchen Portal): connect to the broadcasting Portal's address.
       Card {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-          OutlinedTextField(value = host, onValueChange = { host = it }, singleLine = true,
+          OutlinedTextField(colors = iosTextFieldColors(), value = host, onValueChange = { host = it }, singleLine = true,
               label = { Text("Other Portal's address (e.g. 192.168.1.42)") },
               modifier = Modifier.fillMaxWidth())
           ActionButton(

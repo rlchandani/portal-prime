@@ -73,6 +73,7 @@ private fun AlbumUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) 
   ) {
     Column {
       OutlinedTextField(
+          colors = iosTextFieldColors(),
           value = url,
           onValueChange = { url = it },
           placeholder = {

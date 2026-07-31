@@ -81,6 +81,7 @@ private fun CalendarUrlEntryScreen(
   ) {
     Column {
       OutlinedTextField(
+          colors = iosTextFieldColors(),
           value = url,
           onValueChange = { url = it },
           placeholder = {

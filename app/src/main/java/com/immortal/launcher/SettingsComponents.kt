@@ -26,7 +26,9 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -221,6 +223,56 @@ internal fun iosSwitchColors() =
         uncheckedThumbColor = Color.White,
         uncheckedTrackColor = IosDivider,
         uncheckedBorderColor = IosDivider,
+    )
+
+/**
+ * The one iOS-style text-field color set for the light settings/editor surface. Every
+ * [androidx.compose.material3.OutlinedTextField] / TextField on a light background MUST use this.
+ *
+ * Why it's mandatory: PortalPrimeTheme always resolves to a DARK color scheme regardless of its
+ * `darkTheme` arg (see Theme.kt), so a bare text field inherits white body text + white cursor +
+ * near-white label from `MaterialTheme.colorScheme`, rendering invisible on the white [IosCard].
+ * This pins every relevant slot to the dark-on-light Ios tokens so typed text is always readable.
+ */
+@Composable
+internal fun iosTextFieldColors() =
+    OutlinedTextFieldDefaults.colors(
+        focusedTextColor = IosLabel,
+        unfocusedTextColor = IosLabel,
+        disabledTextColor = IosSecondary,
+        cursorColor = IosBlue,
+        focusedBorderColor = IosBlue,
+        unfocusedBorderColor = IosDivider,
+        focusedLabelColor = IosBlue,
+        unfocusedLabelColor = IosSecondary,
+        focusedPlaceholderColor = IosSecondary,
+        unfocusedPlaceholderColor = IosSecondary,
+        focusedContainerColor = Color.White,
+        unfocusedContainerColor = Color.White,
+    )
+
+/**
+ * The filled-[androidx.compose.material3.TextField] equivalent of [iosTextFieldColors]. Filled
+ * fields have a tinted container + a bottom indicator instead of a full border, so they need the
+ * `TextFieldDefaults.colors(...)` slots rather than the outlined ones. Same reason: the dark theme
+ * would otherwise paint white text on the light card.
+ */
+@Composable
+internal fun iosFilledTextFieldColors() =
+    TextFieldDefaults.colors(
+        focusedTextColor = IosLabel,
+        unfocusedTextColor = IosLabel,
+        disabledTextColor = IosSecondary,
+        cursorColor = IosBlue,
+        focusedContainerColor = Color.White,
+        unfocusedContainerColor = Color.White,
+        disabledContainerColor = Color.White,
+        focusedIndicatorColor = IosBlue,
+        unfocusedIndicatorColor = IosDivider,
+        focusedLabelColor = IosBlue,
+        unfocusedLabelColor = IosSecondary,
+        focusedPlaceholderColor = IosSecondary,
+        unfocusedPlaceholderColor = IosSecondary,
     )
 
 /**

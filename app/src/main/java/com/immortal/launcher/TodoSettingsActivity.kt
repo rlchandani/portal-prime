@@ -124,6 +124,7 @@ internal fun TodoSettingsContent() {
       Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Add item", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = draft,
             onValueChange = { draft = it },
             label = { Text("What needs doing?") },

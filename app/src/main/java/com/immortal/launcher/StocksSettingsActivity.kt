@@ -138,6 +138,7 @@ internal fun StocksSettingsContent() {
       Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Add ticker", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = manual,
             onValueChange = { manual = it },
             label = { Text("Symbol (e.g. AAPL)") },
@@ -180,6 +181,7 @@ internal fun AlpacaCredentialsCard() {
           fontSize = Sizes.rowSub,
       )
       OutlinedTextField(
+          colors = iosTextFieldColors(),
           value = keyId,
           onValueChange = { keyId = it },
           label = { Text("API Key ID") },
@@ -187,6 +189,7 @@ internal fun AlpacaCredentialsCard() {
           modifier = Modifier.fillMaxWidth(),
       )
       OutlinedTextField(
+          colors = iosTextFieldColors(),
           value = secret,
           onValueChange = { secret = it },
           label = { Text("API Secret Key") },

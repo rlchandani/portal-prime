@@ -239,6 +239,7 @@ private fun DismissAppScreen(onDone: () -> Unit) {
           Column(modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 16.dp)) {
             Text("Dashboard", color = IosLabel, fontSize = Sizes.rowSub)
             OutlinedTextField(
+                colors = iosTextFieldColors(),
                 value = haPath,
                 onValueChange = {
                   // Single-line: strip any newline the IME might inject.

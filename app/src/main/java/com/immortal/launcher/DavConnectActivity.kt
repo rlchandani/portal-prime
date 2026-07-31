@@ -164,6 +164,7 @@ private fun Field(
     modifier: Modifier = Modifier,
 ) {
   OutlinedTextField(
+      colors = iosTextFieldColors(),
       value = value,
       onValueChange = onChange,
       placeholder = { Text(placeholder) },

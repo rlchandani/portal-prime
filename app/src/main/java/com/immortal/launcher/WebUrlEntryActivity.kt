@@ -76,6 +76,7 @@ private fun WebUrlEntryScreen(onSave: (String) -> Unit, onCancel: () -> Unit) {
   ) {
     Column {
       OutlinedTextField(
+          colors = iosTextFieldColors(),
           value = url,
           onValueChange = { url = it },
           placeholder = { Text("http://192.168.1.50:3000") },

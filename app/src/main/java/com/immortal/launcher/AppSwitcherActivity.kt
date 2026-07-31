@@ -113,6 +113,7 @@ private fun AppSwitcherScreen(onDone: () -> Unit) {
               .padding(horizontal = 28.dp, vertical = 24.dp),
   ) {
     OutlinedTextField(
+        colors = iosTextFieldColors(),
         value = query,
         onValueChange = { query = it },
         singleLine = true,

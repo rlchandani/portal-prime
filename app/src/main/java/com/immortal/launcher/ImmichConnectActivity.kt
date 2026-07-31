@@ -112,6 +112,7 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
         Spacer(Modifier.heightIn(min = 22.dp))
 
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = url,
             onValueChange = { url = it },
             placeholder = { Text("http://192.168.1.50:2283") },
@@ -121,6 +122,7 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
         )
         Spacer(Modifier.heightIn(min = 12.dp))
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = key,
             onValueChange = { key = it },
             placeholder = { Text("API key") },

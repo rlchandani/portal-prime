@@ -121,6 +121,7 @@ internal fun CountdownSettingsContent() {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
           Text("New countdown", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
           OutlinedTextField(
+              colors = iosTextFieldColors(),
               value = label,
               onValueChange = { label = it },
               label = { Text("Name") },

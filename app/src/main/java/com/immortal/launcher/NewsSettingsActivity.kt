@@ -155,6 +155,7 @@ internal fun NewsSettingsContent() {
       Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Add a feed URL", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = name,
             onValueChange = { name = it },
             label = { Text("Name (optional)") },
@@ -162,6 +163,7 @@ internal fun NewsSettingsContent() {
             modifier = Modifier.fillMaxWidth(),
         )
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = url,
             onValueChange = { url = it },
             label = { Text("RSS / Atom URL") },

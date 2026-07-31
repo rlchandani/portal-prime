@@ -91,6 +91,7 @@ internal fun HaSettingsContent() {
             fontSize = Sizes.rowSub,
         )
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = url,
             onValueChange = { url = it },
             label = { Text("Base URL") },
@@ -98,6 +99,7 @@ internal fun HaSettingsContent() {
             modifier = Modifier.fillMaxWidth(),
         )
         OutlinedTextField(
+            colors = iosTextFieldColors(),
             value = token,
             onValueChange = { token = it },
             label = { Text("Long-lived token") },
@@ -168,6 +170,7 @@ internal fun HaSettingsContent() {
       Card {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
           OutlinedTextField(
+              colors = iosTextFieldColors(),
               value = query,
               onValueChange = { query = it },
               label = { Text("Search ${discovered.size} entities") },

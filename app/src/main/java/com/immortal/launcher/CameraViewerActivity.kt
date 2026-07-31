@@ -115,9 +115,9 @@ private fun CameraViewerScreen() {
       if (adding) {
         Card {
           Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedTextField(value = name, onValueChange = { name = it }, singleLine = true,
+            OutlinedTextField(colors = iosTextFieldColors(), value = name, onValueChange = { name = it }, singleLine = true,
                 label = { Text("Name (e.g. Driveway)") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = url, onValueChange = { url = it }, singleLine = true,
+            OutlinedTextField(colors = iosTextFieldColors(), value = url, onValueChange = { url = it }, singleLine = true,
                 label = { Text("rtsp:// URL") }, modifier = Modifier.fillMaxWidth())
             Surface(color = IosBlue, shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
