@@ -51,8 +51,24 @@ class IntercomActivity : ComponentActivity() {
 
 @Composable
 private fun IntercomScreen() {
+  val activity = LocalContext.current as? Activity
+  PopupScaffold(
+      title = "Intercom",
+      subtitle = "One-way audio between two Portals on the same Wi-Fi. No internet, no servers.",
+      onBack = { activity?.finish() },
+  ) {
+    IntercomContent()
+  }
+}
+
+/**
+ * The intercom body, shared by the standalone [IntercomScreen] popup and the in-page Tools overlay.
+ * Owns the [LanAudio] session and stops it on dispose, so leaving the screen (or the whole Tools
+ * folder) always releases the mic/socket.
+ */
+@Composable
+internal fun IntercomContent() {
   val context = LocalContext.current
-  val activity = context as? Activity
   val lan = remember { LanAudio() }
   DisposableEffect(Unit) { onDispose { lan.stop() } }
 
@@ -61,8 +77,6 @@ private fun IntercomScreen() {
   var status by remember { mutableStateOf("") }
   val myIp = remember { localIp(context) }
 
-  // Kick off the broadcast and reflect whether the port actually bound, so the UI
-  // never claims it's broadcasting when the socket couldn't open.
   fun beginBroadcast() {
     status = "Starting…"
     lan.startBroadcast { ok ->
@@ -84,11 +98,6 @@ private fun IntercomScreen() {
     else permLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
   }
 
-  PopupScaffold(
-      title = "Intercom",
-      subtitle = "One-way audio between two Portals on the same Wi-Fi. No internet, no servers.",
-      onBack = { lan.stop(); activity?.finish() },
-  ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       if (myIp.isNotBlank()) {
         Card {
@@ -132,7 +141,6 @@ private fun IntercomScreen() {
         }
       }
     }
-  }
 }
 
 @Composable

@@ -60,13 +60,40 @@ class BedtimeStoryActivity : ComponentActivity() {
   }
 }
 
+/** Standalone activity host: a dark floating card over a scrim. Tap the scrim / Back to exit. */
 @Composable
 private fun BedtimeScreen() {
+  val activity = LocalContext.current as? android.app.Activity
+  val cfg = androidx.compose.ui.platform.LocalConfiguration.current
+  val cardWidth = (cfg.screenWidthDp * 0.66f).dp.coerceAtMost(760.dp)
+  val cardMaxHeight = (cfg.screenHeightDp * 0.82f).dp
+  Box(
+      modifier = Modifier.fillMaxSize().background(Color(0xCC000000))
+          .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { activity?.finish() },
+      contentAlignment = Alignment.Center,
+  ) {
+    Surface(
+        color = Color(0xFF0E0E1A),
+        shape = RoundedCornerShape(28.dp),
+        modifier = Modifier.width(cardWidth).heightIn(max = cardMaxHeight)
+            .tvFocusable(RoundedCornerShape(28.dp), focusScale = 1f) { /* consume card taps */ },
+    ) {
+      BedtimeContent(onExit = { activity?.finish() })
+    }
+  }
+}
+
+/**
+ * The bedtime picker + reader, shared by the standalone [BedtimeScreen] and the in-page Tools
+ * overlay. Owns the TTS engine (stopped + shut down on dispose). Fills its parent (the caller
+ * supplies the dark card frame). [onExit] is called by Back when at the picker (top) level.
+ */
+@Composable
+internal fun BedtimeContent(onExit: () -> Unit) {
   val context = LocalContext.current
   var selected by remember { mutableStateOf<Stories.Story?>(null) }
   var speaking by remember { mutableStateOf(false) }
 
-  // One TTS instance for the screen's lifetime; stop + shut it down on exit.
   val tts = remember {
     var engine: TextToSpeech? = null
     engine = TextToSpeech(context.applicationContext) { status ->
@@ -84,79 +111,47 @@ private fun BedtimeScreen() {
     runCatching {
       tts?.stop()
       val text = story.title + ". " + story.paragraphs.joinToString(" ")
-      // Slow, gentle pace for bedtime.
       tts?.setSpeechRate(0.85f)
       tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "story")
       speaking = true
     }
   }
 
-  val activity = context as? android.app.Activity
-  val cfg = androidx.compose.ui.platform.LocalConfiguration.current
-  val cardWidth = (cfg.screenWidthDp * 0.66f).dp.coerceAtMost(760.dp)
-  val cardMaxHeight = (cfg.screenHeightDp * 0.82f).dp
-  // Floating pop-up over a scrim (Translucent activity) rather than a full-screen takeover: tap the
-  // scrim or press Back at the picker to dismiss; keeps the calming dark aesthetic inside the card.
-  Box(
-      modifier = Modifier.fillMaxSize().background(Color(0xCC000000))
-          .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) {
-            runCatching { tts?.stop() }; activity?.finish()
-          },
-      contentAlignment = Alignment.Center,
-  ) {
-    if (selected == null) {
-      BackHandler { runCatching { tts?.stop() }; activity?.finish() }
-    }
-    Surface(
-        color = Color(0xFF0E0E1A),
-        shape = RoundedCornerShape(28.dp),
-        modifier = Modifier.width(cardWidth).heightIn(max = cardMaxHeight)
-            .tvFocusable(RoundedCornerShape(28.dp), focusScale = 1f) { /* consume card taps */ },
+  val story = selected
+  if (story == null) {
+    // At the picker, Back exits the whole screen.
+    BackHandler { runCatching { tts?.stop() }; onExit() }
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(28.dp).verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-    val story = selected
-    if (story == null) {
-      // Story picker.
-      Column(
-          modifier = Modifier.fillMaxWidth().padding(28.dp)
-              .verticalScroll(rememberScrollState()),
-          verticalArrangement = Arrangement.spacedBy(14.dp),
-      ) {
-        Text("🌙 Bedtime stories", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-        Stories.ALL.forEach { s ->
-          Surface(color = Color(0x18FFFFFF), shape = RoundedCornerShape(16.dp),
-              modifier = Modifier.fillMaxWidth()
-                  .tvFocusableRow { selected = s; readAloud(s) }) {
-            Row(modifier = Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
-              Text(s.emoji, fontSize = 30.sp, modifier = Modifier.padding(end = 14.dp))
-              Text(s.title, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-            }
-          }
-        }
-      }
-    } else {
-      BackHandler {
-        runCatching { tts?.stop() }
-        speaking = false
-        selected = null
-      }
-      // Reader.
-      Column(
-          modifier = Modifier.fillMaxWidth().padding(32.dp)
-              .verticalScroll(rememberScrollState()),
-          verticalArrangement = Arrangement.spacedBy(20.dp),
-      ) {
-        Text("${story.emoji}  ${story.title}", color = Color.White, fontSize = 30.sp,
-            fontWeight = FontWeight.Bold)
-        story.paragraphs.forEach { p ->
-          Text(p, color = Color(0xFFEDEDED), fontSize = 23.sp, lineHeight = 34.sp)
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-          StoryButton(if (speaking) "Stop" else "Read aloud", Color(0xFF512DA8), Modifier.fillMaxWidth()) {
-            if (speaking) { runCatching { tts?.stop() }; speaking = false } else readAloud(story)
+      Text("🌙 Bedtime stories", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+      Stories.ALL.forEach { s ->
+        Surface(color = Color(0x18FFFFFF), shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth().tvFocusableRow { selected = s; readAloud(s) }) {
+          Row(modifier = Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(s.emoji, fontSize = 30.sp, modifier = Modifier.padding(end = 14.dp))
+            Text(s.title, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
           }
         }
       }
     }
+  } else {
+    // In the reader, Back returns to the picker (not out of the screen).
+    BackHandler { runCatching { tts?.stop() }; speaking = false; selected = null }
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(32.dp).verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+      Text("${story.emoji}  ${story.title}", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+      story.paragraphs.forEach { p ->
+        Text(p, color = Color(0xFFEDEDED), fontSize = 23.sp, lineHeight = 34.sp)
+      }
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+        StoryButton(if (speaking) "Stop" else "Read aloud", Color(0xFF512DA8), Modifier.fillMaxWidth()) {
+          if (speaking) { runCatching { tts?.stop() }; speaking = false } else readAloud(story)
+        }
+      }
     }
   }
 }

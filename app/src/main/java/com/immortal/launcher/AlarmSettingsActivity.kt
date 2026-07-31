@@ -53,16 +53,26 @@ private val ALARM_DAY_LABELS =
 
 @Composable
 private fun AlarmScreen() {
+  val activity = LocalContext.current as? Activity
+  PopupScaffold(
+      title = "Alarm",
+      subtitle = "Wake to a gentle chime at a set time. Pick the days it should repeat.",
+      onBack = { activity?.finish() },
+  ) {
+    AlarmContent()
+  }
+}
+
+/** The alarm editor body, shared by the standalone [AlarmScreen] popup and the in-page Tools overlay. */
+@Composable
+internal fun AlarmContent() {
   val context = LocalContext.current
-  val activity = context as? Activity
   val initial = remember { AlarmConfig.load(context) }
   var enabled by remember { mutableStateOf(initial.enabled) }
   var hour by remember { mutableIntStateOf(initial.hour) }
   var minute by remember { mutableIntStateOf(initial.minute) }
   var days by remember { mutableStateOf(initial.days) }
 
-  // Persist the full config, then (re)arm the alarm — every change re-schedules from the
-  // latest saved state, matching how the sunrise editor drives SunriseScheduler.
   fun persist() {
     AlarmConfig.save(
         context, AlarmConfig.Config(enabled = enabled, hour = hour, minute = minute,
@@ -70,12 +80,7 @@ private fun AlarmScreen() {
     AlarmScheduler.reschedule(context)
   }
 
-  PopupScaffold(
-      title = "Alarm",
-      subtitle = "Wake to a gentle chime at a set time. Pick the days it should repeat.",
-      onBack = { activity?.finish() },
-  ) {
-    Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+  Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
       Card {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -127,5 +132,4 @@ private fun AlarmScreen() {
           else "Alarm is off.",
           color = IosBlue, fontSize = Sizes.rowValue)
     }
-  }
 }

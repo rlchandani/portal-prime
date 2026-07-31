@@ -11,8 +11,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,8 +21,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -74,19 +76,60 @@ private enum class ToolPage {
   TIMERS,
   NOTES,
   CONVERTER,
+  ALARM,
+  COUNTDOWNS,
+  INTERCOM,
+  BEDTIME,
 }
 
 @Composable
 private fun ToolsRoot(onExit: () -> Unit) {
   var page by remember { mutableStateOf(ToolPage.LIST) }
+  val back = { page = ToolPage.LIST }
   when (page) {
     ToolPage.LIST -> ToolsScreen(onExit = onExit, onOpen = { page = it })
-    ToolPage.ISS -> IssOverlay { page = ToolPage.LIST }
-    ToolPage.AURORA -> AuroraOverlay { page = ToolPage.LIST }
-    ToolPage.SPEEDTEST -> SpeedTestOverlay { page = ToolPage.LIST }
-    ToolPage.TIMERS -> TimersOverlay { page = ToolPage.LIST }
-    ToolPage.NOTES -> NotesOverlay { page = ToolPage.LIST }
-    ToolPage.CONVERTER -> ConverterOverlay { page = ToolPage.LIST }
+    ToolPage.ISS -> IssOverlay(back)
+    ToolPage.AURORA -> AuroraOverlay(back)
+    ToolPage.SPEEDTEST -> SpeedTestOverlay(back)
+    ToolPage.TIMERS -> TimersOverlay(back)
+    ToolPage.NOTES -> NotesOverlay(back)
+    ToolPage.CONVERTER -> ConverterOverlay(back)
+    // Formerly separate activities — now in-page pages so they share the one Tools overlay:
+    // tapping a tile swaps the grid for the tool, and dismissing returns to the grid (not home).
+    ToolPage.ALARM -> ToolPageOverlay(back) { AlarmContent() }
+    ToolPage.COUNTDOWNS -> ToolPageOverlay(back) { CountdownSettingsContent() }
+    ToolPage.INTERCOM -> ToolPageOverlay(back) { IntercomContent() }
+    ToolPage.BEDTIME -> BedtimeOverlay(back)
+  }
+}
+
+/**
+ * A light in-page tool page: a scrim (tap outside to return to the grid) around a [ToolCard]
+ * holding [content]. Used for the tools converted from standalone activities (Alarm, Countdowns,
+ * Intercom) so they behave like the other in-page tools instead of stacking a second overlay.
+ */
+@Composable
+private fun ToolPageOverlay(onDismiss: () -> Unit, content: @Composable () -> Unit) {
+  BackHandler { onDismiss() }
+  Scrim(onDismiss) { ToolCard { content() } }
+}
+
+/** Bedtime keeps its dark aesthetic, so it gets a dark card instead of the light [ToolCard]. */
+@Composable
+private fun BedtimeOverlay(onDismiss: () -> Unit) {
+  BackHandler { onDismiss() }
+  val cfg = androidx.compose.ui.platform.LocalConfiguration.current
+  val cardWidth = (cfg.screenWidthDp * 0.72f).dp.coerceAtMost(860.dp)
+  val cardMaxHeight = (cfg.screenHeightDp * 0.82f).dp
+  Scrim(onDismiss) {
+    Surface(
+        color = Color(0xFF0E0E1A),
+        shape = RoundedCornerShape(28.dp),
+        modifier = Modifier.width(cardWidth).heightIn(max = cardMaxHeight)
+            .tvFocusable(RoundedCornerShape(28.dp), focusScale = 1f) { /* consume */ },
+    ) {
+      BedtimeContent(onExit = onDismiss)
+    }
   }
 }
 
@@ -101,12 +144,12 @@ private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
 
   // App-drawer grid of tools, in a light iOS surface. Icon tints echo the Settings section colors.
   val tools = listOf(
-      ToolItem("Alarm", R.drawable.ic_tool_alarm, Color(0xFFFF453A)) { launch(AlarmSettingsActivity::class.java) },
+      ToolItem("Alarm", R.drawable.ic_tool_alarm, Color(0xFFFF453A)) { onOpen(ToolPage.ALARM) },
       ToolItem("Cameras", R.drawable.ic_tool_camera, Color(0xFF5E5CE6)) { launch(CameraViewerActivity::class.java) },
-      ToolItem("Countdowns", R.drawable.ic_settings_countdown, Color(0xFFFF9F0A)) { launch(CountdownSettingsActivity::class.java) },
+      ToolItem("Countdowns", R.drawable.ic_settings_countdown, Color(0xFFFF9F0A)) { onOpen(ToolPage.COUNTDOWNS) },
       ToolItem("Lamp", R.drawable.ic_tool_lamp, Color(0xFFFFD60A)) { launch(LampActivity::class.java) },
-      ToolItem("Bedtime story", R.drawable.ic_tool_story, Color(0xFFAF52DE)) { launch(BedtimeStoryActivity::class.java) },
-      ToolItem("Intercom", R.drawable.ic_tool_intercom, Color(0xFF30D158)) { launch(IntercomActivity::class.java) },
+      ToolItem("Bedtime story", R.drawable.ic_tool_story, Color(0xFFAF52DE)) { onOpen(ToolPage.BEDTIME) },
+      ToolItem("Intercom", R.drawable.ic_tool_intercom, Color(0xFF30D158)) { onOpen(ToolPage.INTERCOM) },
       ToolItem("Timers", R.drawable.ic_tool_timer, Color(0xFFFF9F0A)) { onOpen(ToolPage.TIMERS) },
       ToolItem("Leave a note", R.drawable.ic_tool_note, Color(0xFFFFD60A)) { onOpen(ToolPage.NOTES) },
       ToolItem("Converter", R.drawable.ic_tool_converter, Color(0xFF64D2FF)) { onOpen(ToolPage.CONVERTER) },
