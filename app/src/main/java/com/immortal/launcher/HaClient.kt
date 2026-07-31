@@ -30,13 +30,23 @@ object HaClient {
       val on: Boolean,
       val toggleable: Boolean,
       val activatable: Boolean = false,
-  )
+      val readable: Boolean = false,
+      val rawState: String = "",
+      val unit: String = "",
+  ) {
+    /** A compact display value for a read-only tile, e.g. "21.5°C", "63%", "Home". */
+    val displayValue: String
+      get() = if (unit.isNotBlank()) "$rawState$unit" else rawState
+  }
 
   /** Domains we know how to toggle on/off from the widget (have a persistent on/off state). */
   private val TOGGLEABLE_DOMAINS = setOf("light", "switch", "fan", "input_boolean", "automation", "script")
 
   /** Momentary "run once" domains — no on/off state; a tap just fires `<domain>.turn_on`. */
   private val ACTIVATABLE_DOMAINS = setOf("scene")
+
+  /** Read-only domains shown as value tiles (no control): sensors, binary sensors, weather, etc. */
+  private val READABLE_DOMAINS = setOf("sensor", "binary_sensor", "weather", "device_tracker", "person", "sun")
 
   private fun domainOf(entityId: String): String = entityId.substringBefore('.', "")
 
@@ -66,7 +76,7 @@ object HaClient {
           val arr = JSONArray(body)
           (0 until arr.length())
               .mapNotNull { i -> arr.optJSONObject(i)?.let(::parseState) }
-              .filter { it.toggleable || it.activatable }
+              .filter { it.toggleable || it.activatable || it.readable }
               .sortedBy { it.friendlyName.lowercase() }
         }
         .getOrDefault(emptyList())
@@ -75,13 +85,19 @@ object HaClient {
   internal fun parseState(o: JSONObject): EntityState {
     val id = o.optString("entity_id", "")
     val state = o.optString("state", "")
-    val name = o.optJSONObject("attributes")?.optString("friendly_name", "").orEmpty().ifBlank { id }
+    val attrs = o.optJSONObject("attributes")
+    val name = attrs?.optString("friendly_name", "").orEmpty().ifBlank { id }
+    val unit = attrs?.optString("unit_of_measurement", "").orEmpty()
+    val domain = domainOf(id)
     return EntityState(
         entityId = id,
         friendlyName = name,
         on = state.equals("on", ignoreCase = true) || state.equals("playing", ignoreCase = true),
-        toggleable = domainOf(id) in TOGGLEABLE_DOMAINS,
-        activatable = domainOf(id) in ACTIVATABLE_DOMAINS,
+        toggleable = domain in TOGGLEABLE_DOMAINS,
+        activatable = domain in ACTIVATABLE_DOMAINS,
+        readable = domain in READABLE_DOMAINS,
+        rawState = state,
+        unit = unit,
     )
   }
 

@@ -67,4 +67,21 @@ class HaClientTest {
     assertTrue(s.toggleable)
     assertFalse(s.activatable)
   }
+
+  @Test
+  fun `sensor is readable with value and unit`() {
+    val s = HaClient.parseState(obj("""{"entity_id":"sensor.temp","state":"21.5","attributes":{"friendly_name":"Temp","unit_of_measurement":"°C"}}"""))
+    assertTrue(s.readable)
+    assertFalse(s.toggleable)
+    assertEquals("21.5", s.rawState)
+    assertEquals("°C", s.unit)
+    assertEquals("21.5°C", s.displayValue)
+  }
+
+  @Test
+  fun `readable value without a unit shows the bare state`() {
+    val s = HaClient.parseState(obj("""{"entity_id":"person.alex","state":"home","attributes":{"friendly_name":"Alex"}}"""))
+    assertTrue(s.readable)
+    assertEquals("home", s.displayValue)
+  }
 }

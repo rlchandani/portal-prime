@@ -3498,22 +3498,34 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
               pair.forEach { ent ->
                 val fetched = byId[ent.entityId]
-                // Scenes are momentary (no on/off) — a tap just runs them; everything else toggles.
-                val momentary = ent.entityId.substringBefore('.', "") == "scene"
+                val domain = ent.entityId.substringBefore('.', "")
+                // Scenes are momentary (no on/off) — a tap just runs them.
+                val momentary = domain == "scene"
+                // Read-only entities (sensors, weather, presence) show a value, no control.
+                val readonly = fetched?.readable == true
                 val on = optimistic[ent.entityId] ?: fetched?.on ?: false
                 val known = optimistic.containsKey(ent.entityId) || fetched != null
-                HaTile(
-                    name = ent.name.ifBlank { fetched?.friendlyName ?: ent.entityId },
-                    on = on,
-                    known = known || momentary,
-                    momentary = momentary,
-                    modifier = Modifier.weight(1f),
-                ) {
-                  if (momentary) {
-                    scope.launch { withContext(Dispatchers.IO) { HaClient.activate(context, ent.entityId) } }
-                  } else {
-                    optimistic = optimistic + (ent.entityId to !on)
-                    scope.launch { withContext(Dispatchers.IO) { HaClient.toggle(context, ent.entityId) } }
+                val displayName = ent.name.ifBlank { fetched?.friendlyName ?: ent.entityId }
+                if (readonly) {
+                  HaSensorTile(
+                      name = displayName,
+                      value = fetched?.displayValue?.ifBlank { "—" } ?: "—",
+                      modifier = Modifier.weight(1f),
+                  )
+                } else {
+                  HaTile(
+                      name = displayName,
+                      on = on,
+                      known = known || momentary,
+                      momentary = momentary,
+                      modifier = Modifier.weight(1f),
+                  ) {
+                    if (momentary) {
+                      scope.launch { withContext(Dispatchers.IO) { HaClient.activate(context, ent.entityId) } }
+                    } else {
+                      optimistic = optimistic + (ent.entityId to !on)
+                      scope.launch { withContext(Dispatchers.IO) { HaClient.toggle(context, ent.entityId) } }
+                    }
                   }
                 }
               }
@@ -3561,6 +3573,18 @@ private fun HaTile(
         color = Color(0xCCFFFFFF),
         fontSize = 12.sp,
     )
+  }
+}
+
+/** A read-only HA value tile: big value + name underneath (sensor / weather / presence). No control. */
+@Composable
+private fun HaSensorTile(name: String, value: String, modifier: Modifier = Modifier) {
+  Column(
+      modifier = modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFF2A2A2C))
+          .padding(horizontal = 12.dp, vertical = 10.dp),
+  ) {
+    Text(value, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Text(name, color = Color(0xFF9A9A9A), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
   }
 }
 
