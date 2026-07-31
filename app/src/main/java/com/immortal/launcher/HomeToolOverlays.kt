@@ -530,10 +530,14 @@ private fun fmtClock(ms: Long): String {
 /* ------------------------------------------------------------------ shared scaffolding */
 
 /**
- * Full-screen scrim over the home page; tapping outside the card dismisses. Uses the SAME dim as the
- * Tools folder grid (0x99 / 60% black) so opening a tool from the folder keeps the identical
- * background darkness — the grid already establishes the dim, and swapping to a tool must not deepen
- * it (which read as "another overlay on top"). Keep this alpha in sync with ToolsScreen's scrim.
+ * Full-screen scrim over the home page. Tapping outside the card does NOT dismiss (the tap is
+ * swallowed) — closing is only via the card's explicit Close button or Back, so an accidental
+ * outside-tap while using a tool can't lose your place. Uses the SAME dim as the Tools folder grid
+ * (0x99 / 60% black) so opening a tool from the folder keeps the identical background darkness.
+ * Keep this alpha in sync with ToolsScreen's scrim.
+ *
+ * [onDismiss] is still wired to Back (via each overlay's BackHandler); the scrim itself just
+ * consumes taps so nothing behind it (or a fall-through dismiss) fires.
  */
 @Composable
 internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
@@ -542,7 +546,7 @@ internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
       modifier =
           Modifier.fillMaxSize()
               .background(Color(0x99000000))
-              .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { onDismiss() },
+              .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { /* swallow — no tap-to-dismiss */ },
   ) {
     content()
   }

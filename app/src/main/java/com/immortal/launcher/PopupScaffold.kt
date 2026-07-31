@@ -71,9 +71,10 @@ internal fun PopupScaffold(
                   true
                 } else false
               }
-              // Tap the scrim (outside the card) to dismiss.
+              // Outside-tap does NOT dismiss (swallowed) — closing is via the ‹ Back pill or Back
+              // key only, so an accidental tap can't lose your place.
               .background(Color(0xCC000000))
-              .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { onBack() },
+              .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { /* swallow */ },
   ) {
     Surface(
         color = IosBackground,
