@@ -59,6 +59,34 @@ object PhotoCaption {
   fun formatDate(millis: Long?): String? =
       millis?.let { SimpleDateFormat("MMMM d, yyyy", Locale.getDefault()).format(Date(it)) }
 
+  // --- "On this day" memories ------------------------------------------------
+
+  /**
+   * How many years ago (>= 1) a photo was taken, IF it was taken on today's calendar day (same
+   * month + day-of-month) in a prior year — the "on this day" test. Returns null when the photo
+   * has no date, is from today's own year, or falls on a different day. Pure + deterministic:
+   * [now] and the calendar zone are passed in so tests don't depend on the wall clock.
+   */
+  fun memoryYears(dateMillis: Long?, now: Long = System.currentTimeMillis()): Int? {
+    val taken = dateMillis ?: return null
+    val cal = java.util.Calendar.getInstance()
+    cal.timeInMillis = taken
+    val tMonth = cal.get(java.util.Calendar.MONTH)
+    val tDay = cal.get(java.util.Calendar.DAY_OF_MONTH)
+    val tYear = cal.get(java.util.Calendar.YEAR)
+    cal.timeInMillis = now
+    val nMonth = cal.get(java.util.Calendar.MONTH)
+    val nDay = cal.get(java.util.Calendar.DAY_OF_MONTH)
+    val nYear = cal.get(java.util.Calendar.YEAR)
+    if (tMonth != nMonth || tDay != nDay) return null
+    val years = nYear - tYear
+    return if (years >= 1) years else null
+  }
+
+  /** A memory badge like "1 year ago today" / "5 years ago today" from [memoryYears]. */
+  fun memoryLabel(years: Int): String =
+      if (years == 1) "1 year ago today" else "$years years ago today"
+
   // --- reverse geocoding (keyless) -------------------------------------------
   // BigDataCloud's reverse-geocode-client endpoint needs no key — the same keyless-web-service
   // approach Immortal already uses for weather (Open-Meteo) and IP geolocation. Results are

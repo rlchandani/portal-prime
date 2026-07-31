@@ -74,6 +74,7 @@ internal fun HaSettingsContent() {
   var status by remember { mutableStateOf("") }
   var discovered by remember { mutableStateOf<List<HaClient.EntityState>>(emptyList()) }
   var pinned by remember { mutableStateOf(HaConfig.entities(context)) }
+  var query by remember { mutableStateOf("") }
 
   fun refreshPinned() {
     pinned = HaConfig.entities(context)
@@ -160,38 +161,89 @@ internal fun HaSettingsContent() {
       }
     }
 
-    // Discovered entities to add.
+    // Discovered entities to add — searchable + grouped by domain, since a real HA server has
+    // hundreds of entities and a flat list is unusable.
     if (discovered.isNotEmpty()) {
+      // Search box (its own card so it stays pinned above the results visually).
       Card {
-        Column(modifier = Modifier.padding(vertical = 6.dp)) {
+        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+          OutlinedTextField(
+              value = query,
+              onValueChange = { query = it },
+              label = { Text("Search ${discovered.size} entities") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+          )
+        }
+      }
+
+      val q = query.trim().lowercase()
+      val matches =
+          if (q.isBlank()) discovered
+          else discovered.filter {
+            it.friendlyName.lowercase().contains(q) || it.entityId.lowercase().contains(q)
+          }
+      // Group by domain (light/switch/scene/…), ordered so the most-controlled domains come first.
+      val grouped = matches.groupBy { it.entityId.substringBefore('.', "") }
+      val orderedGroups = grouped.entries.sortedWith(
+          compareBy({ HA_GROUP_ORDER.indexOf(it.key).let { i -> if (i < 0) HA_GROUP_ORDER.size else i } }, { it.key }))
+
+      if (matches.isEmpty()) {
+        Card {
           Text(
-              "Discovered — tap to pin",
+              "No entities match \"$query\".",
               color = IosSecondary,
               fontSize = Sizes.rowSub,
-              fontWeight = FontWeight.SemiBold,
-              modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
+              modifier = Modifier.padding(18.dp),
           )
-          discovered.forEach { e ->
-            val already = pinned.any { it.entityId == e.entityId }
-            Row(
-                modifier = Modifier.fillMaxWidth()
-                    .clickable(enabled = !already) {
-                      HaConfig.addEntity(context, e.entityId, e.friendlyName)
-                      refreshPinned()
-                    }
-                    .padding(horizontal = 18.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-              Column(modifier = Modifier.weight(1f)) {
-                Text(e.friendlyName, color = IosLabel, fontSize = Sizes.rowTitle)
-                Text(e.entityId, color = IosSecondary, fontSize = Sizes.rowSub)
-              }
+        }
+      } else {
+        // When not searching, cap each group so 190 switches don't render as 190 rows; searching
+        // shows every match (a search result set is small). This keeps the picker responsive.
+        val perGroupCap = if (q.isBlank()) 12 else Int.MAX_VALUE
+        orderedGroups.forEach { (domain, entities) ->
+          val shown = entities.take(perGroupCap)
+          val hidden = entities.size - shown.size
+          Card {
+            Column(modifier = Modifier.padding(vertical = 6.dp)) {
               Text(
-                  if (already) "Pinned ✓" else "+ Pin",
-                  color = if (already) IosSecondary else IosBlue,
-                  fontSize = 15.sp,
+                  "${haGroupLabel(domain)} · ${entities.size}",
+                  color = IosSecondary,
+                  fontSize = Sizes.rowSub,
                   fontWeight = FontWeight.SemiBold,
+                  modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
               )
+              shown.forEach { e ->
+                val already = pinned.any { it.entityId == e.entityId }
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .clickable(enabled = !already) {
+                          HaConfig.addEntity(context, e.entityId, e.friendlyName)
+                          refreshPinned()
+                        }
+                        .padding(horizontal = 18.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                  Column(modifier = Modifier.weight(1f)) {
+                    Text(e.friendlyName, color = IosLabel, fontSize = Sizes.rowTitle)
+                    Text(e.entityId, color = IosSecondary, fontSize = Sizes.rowSub)
+                  }
+                  Text(
+                      if (already) "Pinned ✓" else "+ Pin",
+                      color = if (already) IosSecondary else IosBlue,
+                      fontSize = 15.sp,
+                      fontWeight = FontWeight.SemiBold,
+                  )
+                }
+              }
+              if (hidden > 0) {
+                Text(
+                    "+$hidden more — search to narrow",
+                    color = IosSecondary,
+                    fontSize = Sizes.rowSub,
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
+                )
+              }
             }
           }
         }
@@ -200,3 +252,30 @@ internal fun HaSettingsContent() {
     Spacer(Modifier.size(8.dp))
   }
 }
+
+/** Domain display order for the discovered-entities grouping — controllable things first. */
+private val HA_GROUP_ORDER =
+    listOf("light", "switch", "fan", "scene", "script", "automation", "input_boolean",
+        "climate", "cover", "media_player", "binary_sensor", "sensor", "person", "device_tracker", "weather", "sun")
+
+/** Friendly, pluralized section heading for an HA domain. */
+private fun haGroupLabel(domain: String): String =
+    when (domain) {
+      "light" -> "Lights"
+      "switch" -> "Switches"
+      "fan" -> "Fans"
+      "scene" -> "Scenes"
+      "script" -> "Scripts"
+      "automation" -> "Automations"
+      "input_boolean" -> "Toggles"
+      "climate" -> "Climate"
+      "cover" -> "Covers"
+      "media_player" -> "Media players"
+      "binary_sensor" -> "Binary sensors"
+      "sensor" -> "Sensors"
+      "person" -> "People"
+      "device_tracker" -> "Device trackers"
+      "weather" -> "Weather"
+      "sun" -> "Sun"
+      else -> domain.replaceFirstChar { it.uppercase() }
+    }
