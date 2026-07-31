@@ -56,7 +56,7 @@ private val EMOJI_PALETTE =
 @Composable
 private fun CountdownSettingsScreen() {
   val activity = LocalContext.current as? Activity
-  SettingsScaffold(
+  PopupScaffold(
       title = "Countdowns",
       subtitle = "Pin a chip on the home screen counting down to a birthday, trip, or holiday.",
       onBack = { activity?.finish() },

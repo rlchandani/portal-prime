@@ -532,17 +532,25 @@ internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
   }
 }
 
-/** The standard tool card: a rounded surface with a vertically-scrolling padded column. */
+/**
+ * The standard tool card: a rounded surface with a vertically-scrolling padded column. Sized
+ * generously for the Portal's wide panel — it fills ~72% of the screen width (up to [maxWidth]) and
+ * ~78% of the height, so tools like the speed test / converter / space-station read as a substantial
+ * floating window rather than a cramped little box, while the scrim still frames it as a pop-up.
+ */
 @Composable
-internal fun ToolCard(maxWidth: Int = 560, content: @Composable () -> Unit) {
+internal fun ToolCard(maxWidth: Int = 860, content: @Composable () -> Unit) {
+  val cfg = androidx.compose.ui.platform.LocalConfiguration.current
+  val cardWidth = (cfg.screenWidthDp * 0.72f).dp.coerceAtMost(maxWidth.dp)
+  val cardMaxHeight = (cfg.screenHeightDp * 0.82f).dp
   Surface(
       color = IosCard,
-      shape = RoundedCornerShape(24.dp),
-      modifier = Modifier.widthIn(max = maxWidth.dp).heightIn(max = 760.dp).padding(24.dp),
+      shape = RoundedCornerShape(28.dp),
+      modifier = Modifier.width(cardWidth).heightIn(max = cardMaxHeight).padding(24.dp),
   ) {
     Column(
-        modifier = Modifier.padding(24.dp).verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        modifier = Modifier.padding(28.dp).verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
       content()
     }

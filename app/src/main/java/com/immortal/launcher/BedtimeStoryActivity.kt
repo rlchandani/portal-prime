@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -89,12 +91,33 @@ private fun BedtimeScreen() {
     }
   }
 
-  Box(modifier = Modifier.fillMaxSize().background(Color(0xFF0E0E1A)), contentAlignment = Alignment.Center) {
+  val activity = context as? android.app.Activity
+  val cfg = androidx.compose.ui.platform.LocalConfiguration.current
+  val cardWidth = (cfg.screenWidthDp * 0.66f).dp.coerceAtMost(760.dp)
+  val cardMaxHeight = (cfg.screenHeightDp * 0.82f).dp
+  // Floating pop-up over a scrim (Translucent activity) rather than a full-screen takeover: tap the
+  // scrim or press Back at the picker to dismiss; keeps the calming dark aesthetic inside the card.
+  Box(
+      modifier = Modifier.fillMaxSize().background(Color(0xCC000000))
+          .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) {
+            runCatching { tts?.stop() }; activity?.finish()
+          },
+      contentAlignment = Alignment.Center,
+  ) {
+    if (selected == null) {
+      BackHandler { runCatching { tts?.stop() }; activity?.finish() }
+    }
+    Surface(
+        color = Color(0xFF0E0E1A),
+        shape = RoundedCornerShape(28.dp),
+        modifier = Modifier.width(cardWidth).heightIn(max = cardMaxHeight)
+            .tvFocusable(RoundedCornerShape(28.dp), focusScale = 1f) { /* consume card taps */ },
+    ) {
     val story = selected
     if (story == null) {
       // Story picker.
       Column(
-          modifier = Modifier.widthIn(max = 620.dp).padding(28.dp)
+          modifier = Modifier.fillMaxWidth().padding(28.dp)
               .verticalScroll(rememberScrollState()),
           verticalArrangement = Arrangement.spacedBy(14.dp),
       ) {
@@ -118,7 +141,7 @@ private fun BedtimeScreen() {
       }
       // Reader.
       Column(
-          modifier = Modifier.widthIn(max = 720.dp).padding(32.dp)
+          modifier = Modifier.fillMaxWidth().padding(32.dp)
               .verticalScroll(rememberScrollState()),
           verticalArrangement = Arrangement.spacedBy(20.dp),
       ) {
@@ -133,6 +156,7 @@ private fun BedtimeScreen() {
           }
         }
       }
+    }
     }
   }
 }

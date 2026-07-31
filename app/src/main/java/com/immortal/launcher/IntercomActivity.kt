@@ -84,7 +84,7 @@ private fun IntercomScreen() {
     else permLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
   }
 
-  SettingsScaffold(
+  PopupScaffold(
       title = "Intercom",
       subtitle = "One-way audio between two Portals on the same Wi-Fi. No internet, no servers.",
       onBack = { lan.stop(); activity?.finish() },

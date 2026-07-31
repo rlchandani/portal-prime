@@ -202,7 +202,7 @@
             android:name=".CountdownSettingsActivity"
             android:exported="false"
             android:label="Countdowns"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Translucent" />
 
         <!-- "Crypto": tracked-coin editor for the crypto price home widget. -->
         <activity
@@ -275,7 +275,7 @@
             android:name=".AlarmSettingsActivity"
             android:exported="false"
             android:label="Alarm"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Translucent" />
 
         <!-- Full-screen ringing-alarm screen, launched by AlarmReceiver at the alarm time;
              shows over the lock screen and turns the screen on. -->
@@ -345,14 +345,14 @@
             android:exported="false"
             android:screenOrientation="landscape"
             android:label="Bedtime story"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Translucent" />
 
         <!-- "Intercom": LAN one-way intercom / baby monitor (LanAudio). -->
         <activity
             android:name=".IntercomActivity"
             android:exported="false"
             android:label="Intercom"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Translucent" />
 
         <!-- Connect a self-hosted Immich server as the screensaver source. -->
         <activity

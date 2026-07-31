@@ -70,7 +70,7 @@ private fun AlarmScreen() {
     AlarmScheduler.reschedule(context)
   }
 
-  SettingsScaffold(
+  PopupScaffold(
       title = "Alarm",
       subtitle = "Wake to a gentle chime at a set time. Pick the days it should repeat.",
       onBack = { activity?.finish() },
