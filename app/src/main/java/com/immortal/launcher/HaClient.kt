@@ -29,10 +29,14 @@ object HaClient {
       val friendlyName: String,
       val on: Boolean,
       val toggleable: Boolean,
+      val activatable: Boolean = false,
   )
 
-  /** Domains we know how to toggle on/off from the widget. */
+  /** Domains we know how to toggle on/off from the widget (have a persistent on/off state). */
   private val TOGGLEABLE_DOMAINS = setOf("light", "switch", "fan", "input_boolean", "automation", "script")
+
+  /** Momentary "run once" domains — no on/off state; a tap just fires `<domain>.turn_on`. */
+  private val ACTIVATABLE_DOMAINS = setOf("scene")
 
   private fun domainOf(entityId: String): String = entityId.substringBefore('.', "")
 
@@ -51,8 +55,8 @@ object HaClient {
       entityIds.mapNotNull { fetchState(context, it) }
 
   /**
-   * Discover all controllable entities on the server (for the picker). Returns entities in the
-   * toggleable domains, sorted by friendly name. Blocking; empty on failure.
+   * Discover all controllable entities on the server (for the picker). Returns entities that are
+   * either toggleable or activatable (scenes), sorted by friendly name. Blocking; empty on failure.
    */
   fun discover(context: Context): List<EntityState> {
     if (!HaConfig.isConfigured(context)) return emptyList()
@@ -62,7 +66,7 @@ object HaClient {
           val arr = JSONArray(body)
           (0 until arr.length())
               .mapNotNull { i -> arr.optJSONObject(i)?.let(::parseState) }
-              .filter { it.toggleable }
+              .filter { it.toggleable || it.activatable }
               .sortedBy { it.friendlyName.lowercase() }
         }
         .getOrDefault(emptyList())
@@ -77,6 +81,7 @@ object HaClient {
         friendlyName = name,
         on = state.equals("on", ignoreCase = true) || state.equals("playing", ignoreCase = true),
         toggleable = domainOf(id) in TOGGLEABLE_DOMAINS,
+        activatable = domainOf(id) in ACTIVATABLE_DOMAINS,
     )
   }
 
@@ -93,6 +98,20 @@ object HaClient {
     if (callService(context, domain, "toggle", entityId)) return true
     return callService(context, "homeassistant", "toggle", entityId)
   }
+
+  /**
+   * Activate a momentary entity (scene/script) via `POST /api/services/<domain>/turn_on`. Returns
+   * true on a 2xx. Blocking. Scenes have no on/off state — this just fires them.
+   */
+  fun activate(context: Context, entityId: String): Boolean {
+    if (!HaConfig.isConfigured(context)) return false
+    val domain = domainOf(entityId).ifBlank { "homeassistant" }
+    return callService(context, domain, "turn_on", entityId)
+  }
+
+  /** Fire the right service for [entity] based on its kind: toggle if toggleable, else activate. */
+  fun trigger(context: Context, entity: EntityState): Boolean =
+      if (entity.toggleable) toggle(context, entity.entityId) else activate(context, entity.entityId)
 
   /** Call an arbitrary service with `{"entity_id": …}`. Returns true on a 2xx. Blocking. */
   fun callService(context: Context, domain: String, service: String, entityId: String): Boolean {

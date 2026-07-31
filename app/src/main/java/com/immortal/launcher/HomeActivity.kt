@@ -3498,16 +3498,23 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
               pair.forEach { ent ->
                 val fetched = byId[ent.entityId]
+                // Scenes are momentary (no on/off) — a tap just runs them; everything else toggles.
+                val momentary = ent.entityId.substringBefore('.', "") == "scene"
                 val on = optimistic[ent.entityId] ?: fetched?.on ?: false
                 val known = optimistic.containsKey(ent.entityId) || fetched != null
                 HaTile(
                     name = ent.name.ifBlank { fetched?.friendlyName ?: ent.entityId },
                     on = on,
-                    known = known,
+                    known = known || momentary,
+                    momentary = momentary,
                     modifier = Modifier.weight(1f),
                 ) {
-                  optimistic = optimistic + (ent.entityId to !on)
-                  scope.launch { withContext(Dispatchers.IO) { HaClient.toggle(context, ent.entityId) } }
+                  if (momentary) {
+                    scope.launch { withContext(Dispatchers.IO) { HaClient.activate(context, ent.entityId) } }
+                  } else {
+                    optimistic = optimistic + (ent.entityId to !on)
+                    scope.launch { withContext(Dispatchers.IO) { HaClient.toggle(context, ent.entityId) } }
+                  }
                 }
               }
               if (pair.size == 1) Spacer(Modifier.weight(1f))
@@ -3519,10 +3526,22 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier) {
   }
 }
 
-/** One HA control tile: name + on/off pill. Dimmed when the state is still unknown. */
+/**
+ * One HA control tile: name + status line. Toggle entities show On/Off (dimmed while unknown);
+ * momentary entities (scenes) show a "Tap to run" affordance and a purple accent, since they have
+ * no persistent state.
+ */
 @Composable
-private fun HaTile(name: String, on: Boolean, known: Boolean, modifier: Modifier = Modifier, onToggle: () -> Unit) {
+private fun HaTile(
+    name: String,
+    on: Boolean,
+    known: Boolean,
+    momentary: Boolean = false,
+    modifier: Modifier = Modifier,
+    onToggle: () -> Unit,
+) {
   val bg = when {
+    momentary -> Color(0xFF5E5CE6) // scenes: always "ready", purple accent
     !known -> Color(0xFF2A2A2C)
     on -> Color(0xFF0A84FF)
     else -> Color(0xFF3A3A3C)
@@ -3533,7 +3552,12 @@ private fun HaTile(name: String, on: Boolean, known: Boolean, modifier: Modifier
   ) {
     Text(name, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     Text(
-        when { !known -> "—"; on -> "On"; else -> "Off" },
+        when {
+          momentary -> "Tap to run"
+          !known -> "—"
+          on -> "On"
+          else -> "Off"
+        },
         color = Color(0xCCFFFFFF),
         fontSize = 12.sp,
     )

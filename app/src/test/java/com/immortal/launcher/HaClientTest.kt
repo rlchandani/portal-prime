@@ -52,4 +52,19 @@ class HaClientTest {
     assertTrue(s.on)
     assertFalse(s.toggleable) // media_player isn't in the toggleable set
   }
+
+  @Test
+  fun `scene is activatable but not toggleable`() {
+    val s = HaClient.parseState(obj("""{"entity_id":"scene.movie_night","state":"","attributes":{"friendly_name":"Movie Night"}}"""))
+    assertTrue(s.activatable)
+    assertFalse(s.toggleable)
+    assertEquals("Movie Night", s.friendlyName)
+  }
+
+  @Test
+  fun `script is toggleable, not activatable`() {
+    val s = HaClient.parseState(obj("""{"entity_id":"script.bedtime","state":"off","attributes":{}}"""))
+    assertTrue(s.toggleable)
+    assertFalse(s.activatable)
+  }
 }
