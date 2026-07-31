@@ -654,6 +654,7 @@ private fun LeftWidgetColumn(
               HomeWidgetStore.KIND_TIMERS to "Timers",
               HomeWidgetStore.KIND_ALARM to "Alarm",
               HomeWidgetStore.KIND_CRYPTO to "Crypto",
+              HomeWidgetStore.KIND_TODO to "To-Do",
           ).forEach { (kind, label) ->
             Text(
                 label,
@@ -1311,6 +1312,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_TIMERS -> "Timers"
       HomeWidgetStore.KIND_ALARM -> "Alarm"
       HomeWidgetStore.KIND_CRYPTO -> "Crypto"
+      HomeWidgetStore.KIND_TODO -> "To-Do"
       else -> "Widget"
     }
 
@@ -2389,6 +2391,7 @@ private fun ImmortalWidgetContent(widget: HomeWidgetStore.HomeWidget, modifier: 
     HomeWidgetStore.KIND_CALENDAR -> ImmortalCalendarWidget(modifier)
     HomeWidgetStore.KIND_ALARM -> ImmortalAlarmWidget(modifier)
     HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier)
+    HomeWidgetStore.KIND_TODO -> ImmortalTodoWidget(modifier)
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
@@ -3143,6 +3146,76 @@ private fun formatUsd(v: Double): String =
       else -> "$%.4f".format(v)
     }
 
+/**
+ * Local checklist widget ([TodoStore]). Rows are tappable to toggle done (strikethrough + dimmed);
+ * a footer shows the open count and a "+" opens the editor for adding items / clearing completed.
+ * Purely local — no network. Re-reads on resume so edits made in the editor reflect here, and
+ * toggles persist immediately (optimistic local state).
+ */
+@Composable
+private fun ImmortalTodoWidget(modifier: Modifier = Modifier) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  var items by remember { mutableStateOf(TodoStore.load(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) items = TodoStore.load(context) }
+    lifecycleOwner.lifecycle.addObserver(obs)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  }
+  val open: () -> Unit = {
+    runCatching {
+      context.startActivity(
+          Intent(context, TodoSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+  }
+  val openCount = items.count { !it.done }
+  ImmortalWidgetShell(title = "To-Do", accent = Color(0xFF30D158), modifier = modifier.tvFocusableRow { open() }) {
+    if (items.isEmpty()) {
+      Text("No items — tap to add", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+    } else {
+      Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        // Open items first, then completed — the actionable list stays on top.
+        items.sortedBy { it.done }.take(5).forEach { item ->
+          TodoRow(item) {
+            TodoStore.toggle(context, item.id)
+            items = TodoStore.load(context)
+          }
+        }
+      }
+      Spacer(Modifier.size(8.dp))
+      Text(
+          if (openCount == 0) "All done 🎉" else "$openCount to do",
+          color = Color(0xFF9A9A9A),
+          fontSize = 12.sp,
+      )
+    }
+  }
+}
+
+/** One checklist line: a check glyph + text, struck through and dimmed when done. Tap toggles. */
+@Composable
+private fun TodoRow(item: TodoStore.TodoItem, onToggle: () -> Unit) {
+  Row(
+      modifier = Modifier.fillMaxWidth().tvFocusableRow { onToggle() },
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+        if (item.done) "☑" else "☐",
+        color = if (item.done) Color(0xFF30D158) else Color(0xFFBFBFBF),
+        fontSize = 16.sp,
+    )
+    Text(
+        item.text,
+        color = if (item.done) Color(0xFF7A7A7A) else Color.White,
+        fontSize = 15.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        textDecoration = if (item.done) androidx.compose.ui.text.style.TextDecoration.LineThrough else null,
+        modifier = Modifier.padding(start = 8.dp).weight(1f),
+    )
+  }
+}
+
 /** A keyboard-free duration picker (±steppers, remote/touch friendly) for a custom timer. */
 @Composable
 private fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
@@ -3385,6 +3458,7 @@ private fun CustomWidgetGlyph(kind: String) {
         HomeWidgetStore.KIND_WORLD_CLOCK -> "◷"
         HomeWidgetStore.KIND_TIMERS -> "⏱"
         HomeWidgetStore.KIND_CRYPTO -> "₿"
+        HomeWidgetStore.KIND_TODO -> "✓"
         else -> "+"
       }
   Text(emoji, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)

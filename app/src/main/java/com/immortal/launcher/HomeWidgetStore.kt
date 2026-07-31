@@ -45,6 +45,7 @@ object HomeWidgetStore {
   const val KIND_CALENDAR = "calendar"
   const val KIND_ALARM = "alarm"
   const val KIND_CRYPTO = "crypto"
+  const val KIND_TODO = "todo"
 
   const val DEFAULT_SPAN_X = 2
   const val DEFAULT_SPAN_Y = 2
