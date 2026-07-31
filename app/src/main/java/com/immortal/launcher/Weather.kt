@@ -8,8 +8,6 @@
 package com.immortal.launcher
 
 import android.content.Context
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -249,14 +247,8 @@ object Weather {
     return out
   }
 
-  private fun httpGet(spec: String): String {
-    val c = URL(spec).openConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 8000
-    c.instanceFollowRedirects = true
-    c.setRequestProperty("User-Agent", "Immortal/1.0")
-    return c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-  }
+  private fun httpGet(spec: String): String =
+      Http.getString(spec, readTimeoutMs = 8000) ?: error("GET failed: $spec")
 
   fun emoji(code: Int): String =
       when (code) {

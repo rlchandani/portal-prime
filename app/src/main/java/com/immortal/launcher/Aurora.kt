@@ -8,8 +8,6 @@
 package com.immortal.launcher
 
 import android.content.Context
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -239,11 +237,6 @@ object Aurora {
         else -> ""
       }
 
-  private fun httpGet(spec: String): String {
-    val c = URL(spec).openConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 10000
-    c.setRequestProperty("User-Agent", "Immortal/1.0")
-    return c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-  }
+  private fun httpGet(spec: String): String =
+      Http.getString(spec, readTimeoutMs = 10000) ?: error("GET failed: $spec")
 }
