@@ -2399,15 +2399,22 @@ private fun ImmortalWidgetContent(widget: HomeWidgetStore.HomeWidget, modifier: 
     HomeWidgetStore.KIND_TIMERS -> ImmortalTimersWidget(modifier)
     HomeWidgetStore.KIND_CALENDAR -> ImmortalCalendarWidget(modifier)
     HomeWidgetStore.KIND_ALARM -> ImmortalAlarmWidget(modifier)
-    HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier)
-    HomeWidgetStore.KIND_TODO -> ImmortalTodoWidget(modifier)
-    HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier)
-    HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier)
-    HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier)
-    HomeWidgetStore.KIND_HA -> ImmortalHaWidget(modifier)
+    HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier, maxRows = listRows(widget.spanY))
+    HomeWidgetStore.KIND_TODO -> ImmortalTodoWidget(modifier, maxRows = listRows(widget.spanY))
+    HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier, maxRows = listRows(widget.spanY))
+    HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier, maxRows = listRows(widget.spanY))
+    HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier, maxRows = listRows(widget.spanY))
+    HomeWidgetStore.KIND_HA -> ImmortalHaWidget(modifier, maxTileRows = widget.spanY.coerceIn(1, 4))
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
+
+/**
+ * How many list rows a scrolling widget should show at a given vertical span. One grid unit fits a
+ * title + ~2 rows; each extra unit adds ~3. Clamped so a 1-tall widget still shows a couple of rows
+ * and a 4-tall one doesn't run away.
+ */
+private fun listRows(spanY: Int): Int = (spanY * 3).coerceIn(2, 12)
 
 @Composable
 private fun ImmortalWidgetShell(
@@ -3114,7 +3121,7 @@ private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
  * an edit applies on return home.
  */
 @Composable
-private fun ImmortalCryptoWidget(modifier: Modifier = Modifier) {
+private fun ImmortalCryptoWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var coins by remember { mutableStateOf(CryptoConfig.load(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -3145,7 +3152,7 @@ private fun ImmortalCryptoWidget(modifier: Modifier = Modifier) {
       rows.isEmpty() -> Text("Add coins to track", color = Color(0xFF9A9A9A), fontSize = 14.sp)
       else ->
           Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            rows.take(5).forEach { q -> CryptoRow(q) }
+            rows.take(maxRows).forEach { q -> CryptoRow(q) }
           }
     }
   }
@@ -3184,7 +3191,7 @@ private fun formatUsd(v: Double): String =
  * toggles persist immediately (optimistic local state).
  */
 @Composable
-private fun ImmortalTodoWidget(modifier: Modifier = Modifier) {
+private fun ImmortalTodoWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var items by remember { mutableStateOf(TodoStore.load(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -3206,7 +3213,7 @@ private fun ImmortalTodoWidget(modifier: Modifier = Modifier) {
     } else {
       Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         // Open items first, then completed — the actionable list stays on top.
-        items.sortedBy { it.done }.take(5).forEach { item ->
+        items.sortedBy { it.done }.take(maxRows).forEach { item ->
           TodoRow(item) {
             TodoStore.toggle(context, item.id)
             items = TodoStore.load(context)
@@ -3253,7 +3260,7 @@ private fun TodoRow(item: TodoStore.TodoItem, onToggle: () -> Unit) {
  * in the browser; tapping the chrome (or when empty) opens the feed editor. Re-reads feeds on resume.
  */
 @Composable
-private fun ImmortalNewsWidget(modifier: Modifier = Modifier) {
+private fun ImmortalNewsWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var feeds by remember { mutableStateOf(NewsConfig.load(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -3294,7 +3301,7 @@ private fun ImmortalNewsWidget(modifier: Modifier = Modifier) {
       rows.isEmpty() -> Text("No headlines", color = Color(0xFF9A9A9A), fontSize = 14.sp)
       else ->
           Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            rows.take(5).forEach { h ->
+            rows.take(maxRows).forEach { h ->
               Text(
                   h.title,
                   color = Color(0xFFEDEDED),
@@ -3325,7 +3332,7 @@ private fun interleave(lists: List<List<NewsFeed.Headline>>): List<NewsFeed.Head
  * "connect" prompt until configured. Tapping opens the editor. Data is IEX real-time (free tier).
  */
 @Composable
-private fun ImmortalStocksWidget(modifier: Modifier = Modifier) {
+private fun ImmortalStocksWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var tickers by remember { mutableStateOf(StocksConfig.load(context)) }
   var configured by remember { mutableStateOf(AlpacaConfig.isConfigured(context)) }
@@ -3362,7 +3369,7 @@ private fun ImmortalStocksWidget(modifier: Modifier = Modifier) {
       rows.isEmpty() -> Text("No quotes", color = Color(0xFF9A9A9A), fontSize = 14.sp)
       else ->
           Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            rows.take(5).forEach { q -> StockRow(q) }
+            rows.take(maxRows).forEach { q -> StockRow(q) }
           }
     }
   }
@@ -3390,7 +3397,7 @@ private fun StockRow(q: AlpacaClient.StockQuote) {
  * and free data is 15-min delayed anyway). Requires Alpaca credentials; tap opens the editor.
  */
 @Composable
-private fun ImmortalOptionsWidget(modifier: Modifier = Modifier) {
+private fun ImmortalOptionsWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var tickers by remember { mutableStateOf(OptionsScanConfig.tickers(context)) }
   var configured by remember { mutableStateOf(AlpacaConfig.isConfigured(context)) }
@@ -3438,7 +3445,7 @@ private fun ImmortalOptionsWidget(modifier: Modifier = Modifier) {
       rows.isEmpty() -> Text("No contracts in band", color = Color(0xFF9A9A9A), fontSize = 14.sp)
       else ->
           Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            rows.take(5).forEach { h -> OptionRow(h) }
+            rows.take(maxRows).forEach { h -> OptionRow(h) }
           }
     }
   }
@@ -3471,7 +3478,7 @@ private fun expiryShort(iso: String): String =
  * the publish-only MQTT integration.
  */
 @Composable
-private fun ImmortalHaWidget(modifier: Modifier = Modifier) {
+private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3) {
   val context = androidx.compose.ui.platform.LocalContext.current
   val scope = androidx.compose.runtime.rememberCoroutineScope()
   var entities by remember { mutableStateOf(HaConfig.entities(context)) }
@@ -3511,8 +3518,8 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier) {
       else -> {
         val byId = (states ?: emptyList()).associateBy { it.entityId }
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          // Two tiles per row.
-          entities.chunked(2).take(3).forEach { pair ->
+          // Two tiles per row; row count scales with the widget's height.
+          entities.chunked(2).take(maxTileRows).forEach { pair ->
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
               pair.forEach { ent ->
                 val fetched = byId[ent.entityId]
