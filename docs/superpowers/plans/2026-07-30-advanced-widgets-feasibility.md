@@ -9,6 +9,17 @@ Research done via parallel codebase audits; this doc is for review BEFORE any co
 - **Alpaca feed: `iex`** (free Basic key, real-time, IEX-only thin tape). Widget notes the source honestly.
 - Alpaca key/secret + HA URL/token supplied by user.
 
+## ✅ SHIPPED 2026-07-30 — all delivered
+Cleanup + 6 widgets built, unit-tested, committed. Full suite: 351 tests, 0 failures; debug APK assembles.
+- **Http.kt / HttpCache.kt** — shared fetch (header map, defaultable UA/timeouts, 2xx + errorStream) + TTL cache.
+- **Crypto** — CryptoConfig/CryptoFeed/CryptoSettingsActivity, KIND_CRYPTO. CryptoFeedTest (5).
+- **To-Do** — TodoStore (kept separate from NotesConfig)/ImmortalTodoWidget/TodoSettingsActivity, KIND_TODO. TodoStoreTest (5).
+- **News** — NewsConfig/NewsFeed (hand-rolled RSS+Atom, no XmlPullParser)/NewsSettingsActivity, KIND_NEWS. NewsFeedTest (6).
+- **Stocks** — AlpacaConfig/AlpacaClient/StocksConfig/ImmortalStocksWidget/StocksSettingsActivity, KIND_STOCKS. AlpacaClientTest (6).
+- **Options scanner** — OptionsScanConfig/OptionsScanner (delta-magnitude filter + OCC decode)/OptionsSettingsActivity, KIND_OPTIONS. OptionsScannerTest (6).
+- **HA control** — HaConfig/HaClient (REST+token)/ImmortalHaWidget (optimistic toggle tiles)/HaSettingsActivity, KIND_HA. HaClientTest (5).
+- Widget->editor reachable via each widget's tap; new *Configs exempted in the settings tripwire.
+
 ## How a custom widget is added (shared cost, all of these)
 Non-AppWidget "Immortal widgets" wire in via ~5 touchpoints (HomeWidgetStore + HomeActivity):
 KIND_ const, picker entry, title case, picker glyph, `ImmortalWidgetContent` dispatch, + the
