@@ -16,6 +16,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.horizontalScroll
@@ -725,16 +726,20 @@ private fun SidebarSearch(query: String, onQueryChange: (String) -> Unit) {
   Row(
       modifier = Modifier
           .fillMaxWidth()
-          // Balanced vertical margin so the gap above the search (title's bottom padding) matches
-          // the gap below it (before the first section label, which brings its own top padding).
-          .padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 6.dp)
+          // Visually balance the gaps: the first section label ("SOUND & WAKE") already brings its
+          // own top=18dp below the search, so the search needs MORE top margin than bottom to keep
+          // the space above it (from the title) equal to the space below.
+          .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 2.dp)
           .clip(RoundedCornerShape(10.dp))
-          .background(Color(0xFFDFDFE6))
-          .padding(horizontal = 12.dp, vertical = 8.dp),
+          // A white field with a defined border reads clearly as an input against the grey sidebar
+          // background — the old grey-on-grey pill faded into the panel.
+          .background(Color.White)
+          .border(BorderStroke(1.dp, IosDivider), RoundedCornerShape(10.dp))
+          .padding(horizontal = 12.dp, vertical = 10.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(6.dp),
   ) {
-    Text("⌕", color = IosSecondary, fontSize = 20.sp)
+    Text("⌕", color = IosLabel.copy(alpha = 0.55f), fontSize = 20.sp)
     BasicTextField(
         value = query,
         onValueChange = onQueryChange,
