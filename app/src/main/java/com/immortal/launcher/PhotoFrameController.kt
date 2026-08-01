@@ -326,7 +326,14 @@ class PhotoFrameController(
               else emptyList()
           ui.post {
             if (list.isNotEmpty()) {
-              playlist = if (source.shuffle) list.shuffled() else list
+              val ordered = if (source.shuffle) list.shuffled() else list
+              // Engine mode: hand the images (as file:// URLs) to the WebView engine. Images only —
+              // the HTML engine can't play the local videos, so drop those for engine rendering.
+              if (ScreensaverConfig.usesEngine(settings.mode)) {
+                val urls = ordered.filterNot { it.isVideo }.map { "file://" + it.path }
+                if (urls.isNotEmpty()) { startEngine(urls); engineActive = true; return@post }
+              }
+              playlist = ordered
               localMode = true
               localIndex = -1
               advanceLocal(+1)
@@ -344,7 +351,11 @@ class PhotoFrameController(
           val urls = album?.photoUrls.orEmpty()
           ui.post {
             if (urls.isNotEmpty()) {
-              remoteUrls = if (source.shuffle) urls.shuffled() else urls
+              val ordered = if (source.shuffle) urls.shuffled() else urls
+              // Shared-album URLs are direct https with no auth header, so the WebView engine can
+              // load them straight into <img>. Hand off to the engine when a mode is selected.
+              if (ScreensaverConfig.usesEngine(settings.mode)) { startEngine(ordered); engineActive = true; return@post }
+              remoteUrls = ordered
               remoteHeaders = emptyMap()
               remoteMode = true
               remoteIndex = -1
@@ -435,7 +446,14 @@ class PhotoFrameController(
           }
         }
       }
-      PhotoFrameSource.DefaultFeed -> startWeb()
+      PhotoFrameSource.DefaultFeed -> {
+        // Engine mode + built-in feed: give the engine a batch of keyless Picsum URLs with varied
+        // aspect ratios (portraits/landscapes/squares/panos) so every mode has material to work with
+        // out of the box, before the user configures their own photo source. Otherwise, classic feed.
+        if (ScreensaverConfig.usesEngine(settings.mode)) {
+          startEngine(defaultFeedUrls()); engineActive = true
+        } else startWeb()
+      }
     }
   }
 
@@ -467,6 +485,68 @@ class PhotoFrameController(
     webView = wv
   }
 
+  /**
+   * Render the photos with the bundled HTML/JS screensaver engine (assets/screensaver) instead of
+   * the native crossfade — the premium multi-style modes. [photoUrls] are file:// paths (local
+   * folder) or http(s) URLs (Immich/DAV/album/feed). [headers] auth remote sources (unused by the
+   * WebView's own <img> loads today, so remote sources needing auth headers still fall back to the
+   * native renderer — see the caller). The engine reads the list + mode via the injected JS bridge.
+   *
+   * The engine draws the photos; the Face overlay (clock/weather) stays on top as usual, and
+   * tap-to-exit still works because we suppress the WebView's own touch handling.
+   */
+  @android.annotation.SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface")
+  private fun startEngine(photoUrls: List<String>, dims: Map<String, Pair<Int, Int>> = emptyMap()) {
+    val wv =
+        object : android.webkit.WebView(context) {
+          override fun onTouchEvent(event: MotionEvent): Boolean = false
+          override fun performClick(): Boolean = false
+        }
+    wv.setBackgroundColor(Color.BLACK)
+    wv.isVerticalScrollBarEnabled = false
+    wv.isHorizontalScrollBarEnabled = false
+    wv.overScrollMode = View.OVER_SCROLL_NEVER
+    wv.settings.apply {
+      javaScriptEnabled = true
+      domStorageEnabled = true
+      mediaPlaybackRequiresUserGesture = false
+      // Local engine + local photo files: allow file access (same as the flip-clock face WebView).
+      allowFileAccess = true
+      @Suppress("DEPRECATION")
+      allowFileAccessFromFileURLs = true
+    }
+    wv.webViewClient = android.webkit.WebViewClient()
+
+    // JS bridge: the engine calls Android.getPhotos()/getMode()/use24Hour() to pull its inputs.
+    val photosJson =
+        org.json.JSONArray().apply {
+          photoUrls.forEach { u ->
+            val o = JSONObject().put("url", u)
+            dims[u]?.let { (w, h) -> o.put("w", w).put("h", h) }
+            put(o)
+          }
+        }.toString()
+    val mode = settings.mode
+    val use24 = ImmortalSettings.use24HourClock(context)
+    wv.addJavascriptInterface(
+        object {
+          @android.webkit.JavascriptInterface fun getPhotos(): String = photosJson
+          @android.webkit.JavascriptInterface fun getMode(): String = mode
+          @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
+        },
+        "Android")
+
+    (view as FrameLayout).addView(wv, FrameLayout.LayoutParams(MATCH, MATCH))
+    wv.loadUrl("file:///android_asset/screensaver/index.html")
+    webView = wv
+    // The engine draws its own clock, but keep the Face overlay too? The engine's clock is part of
+    // its aesthetic, so hide the native Face overlay while the engine runs to avoid a double clock.
+    runCatching { faceRenderer.view.visibility = View.GONE }
+  }
+
+  /** True once the engine WebView has been created (so ticks/crossfade paths bail out). */
+  private var engineActive = false
+
   fun stop() {
     ui.removeCallbacks(dashboardCycle)
     ui.removeCallbacksAndMessages(null)
@@ -483,6 +563,7 @@ class PhotoFrameController(
     if (this::videoView.isInitialized) runCatching { videoView.stopPlayback() }
     webView?.let { runCatching { it.stopLoading(); it.destroy() } }
     webView = null
+    engineActive = false
     // Close the SMB connection off-thread (network I/O) before the io executor is killed.
     smbSource?.let { s -> Thread { runCatching { s.close() } }.start() }
     smbSource = null
@@ -1633,6 +1714,32 @@ class PhotoFrameController(
       photoBack.scaleY = 1f
       photoBack.translationX = 0f
       photoBack.translationY = 0f
+    }
+  }
+
+  /**
+   * A batch of keyless Picsum URLs with deliberately varied aspect ratios, for the WebView engine
+   * when the built-in feed is the source. Fixed seeds so orientation-aware modes (diptych, panorama,
+   * hero+sidebar) reliably have portraits, landscapes, squares, and panoramas to compose with. The
+   * engine measures true dimensions on load; the seeds just guarantee a good spread.
+   */
+  private fun defaultFeedUrls(): List<String> {
+    // seed to (w,h) — portraits, landscapes, squares, panoramas.
+    val specs = listOf(
+        "ridge" to (1600 to 1067), "harbor" to (1600 to 1067), "desert" to (1600 to 1067),
+        "forest7" to (1600 to 1067), "coast22" to (1600 to 1000), "city88" to (1600 to 1067),
+        "portraitA" to (1000 to 1500), "portraitB" to (1000 to 1500), "portraitC" to (1000 to 1400),
+        "portraitD" to (1000 to 1500), "waterfall" to (1000 to 1600), "tower55" to (1000 to 1500),
+        "square1" to (1200 to 1200), "square2" to (1200 to 1200), "square3" to (1200 to 1200),
+        "pano1" to (2400 to 900), "pano2" to (2400 to 800),
+    )
+    // Cap the long edge to the screen size so we don't pull needlessly huge images on the device.
+    val m = context.resources.displayMetrics
+    val cap = maxOf(m.widthPixels, m.heightPixels).coerceIn(1080, 2200)
+    return specs.map { (seed, wh) ->
+      val (w, h) = wh
+      val scale = cap.toDouble() / maxOf(w, h)
+      "https://picsum.photos/seed/$seed/${(w * scale).toInt()}/${(h * scale).toInt()}"
     }
   }
 

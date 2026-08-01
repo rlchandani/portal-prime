@@ -19,6 +19,7 @@ import com.immortal.launcher.WelcomeConfig
 import com.immortal.launcher.DreamPolicy
 import com.immortal.launcher.FaceCatalog
 import com.immortal.launcher.FacePickerActivity
+import com.immortal.launcher.ScreensaverModeActivity
 import com.immortal.launcher.FleetCalendar
 import com.immortal.launcher.FleetConfig
 import com.immortal.launcher.FleetScreensaver
@@ -188,6 +189,15 @@ object SettingsDomains {
                       help =
                           "Turn this off to let your Portal's screen sleep on its own timer (or run " +
                               "your own screensaver). Immortal won't switch it back on."),
+                  NavSpec(
+                      "screensaverStyle",
+                      "Style",
+                      value = { _, s -> ScreensaverConfig.modeLabel(s.mode) },
+                      activity = ScreensaverModeActivity::class.java,
+                      help =
+                          "How your photos animate - Shuffle mixes all the cinematic styles, or pick " +
+                              "one (Ken Burns, gallery wall, cinema, and more). Tap to preview now.",
+                      visible = { _, s -> s.enabled }),
                   NavSpec(
                       "clockFace",
                       "Clock face",

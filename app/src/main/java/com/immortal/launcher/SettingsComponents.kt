@@ -109,7 +109,8 @@ internal object Sizes {
     val iconGlyph = 20.sp
     val iconRadius = 9.dp
     val rowMinHeight = 68.dp
-    val cardRadius = 14.dp
+    val cardRadius = 14.dp  // THE canonical container corner radius — cards, search field, selection
+                            // pill, and result rows all use this so every rounded surface matches.
 }
 
 // ---------------------------------------------------------------------------

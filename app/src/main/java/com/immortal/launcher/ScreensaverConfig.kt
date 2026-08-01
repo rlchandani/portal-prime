@@ -48,6 +48,37 @@ object ScreensaverConfig {
   const val SOURCE_WEBURL = "weburl"
   const val FIT_FILL = "fill" // crop to fill the screen
   const val FIT_FIT = "fit" // letterbox to show the whole image
+
+  // Screensaver render "mode" — the animated engine (WebView) to use. "classic" keeps the legacy
+  // native crossfade + Ken Burns renderer; every other value runs the bundled HTML/JS engine
+  // (assets/screensaver) with that mode, and "shuffle" cycles the engine's modes intelligently.
+  const val MODE_CLASSIC = "classic"
+  const val MODE_SHUFFLE = "shuffle"
+  // Engine mode ids — MUST match the SS.MODES keys in assets/screensaver/modes.js.
+  val ENGINE_MODES = listOf(
+      "kenBurns", "diptych", "framed", "galleryWall", "push", "memories",
+      "panorama", "polaroid", "mosaic", "filmstrip", "cinema", "heroSidebar")
+  // Full ordered list for the settings picker: Classic, Shuffle, then each engine mode.
+  val MODES = listOf(MODE_CLASSIC, MODE_SHUFFLE) + ENGINE_MODES
+  fun modeLabel(m: String): String = when (m) {
+    MODE_CLASSIC -> "Classic (crossfade)"
+    MODE_SHUFFLE -> "Shuffle — all styles"
+    "kenBurns" -> "Cinematic Ken Burns"
+    "diptych" -> "Orientation Diptych"
+    "framed" -> "Framed Print"
+    "galleryWall" -> "Living Gallery Wall"
+    "push" -> "Cinematic Push"
+    "memories" -> "Memories"
+    "panorama" -> "Panorama Drift"
+    "polaroid" -> "Polaroid Scatter"
+    "mosaic" -> "Mosaic Wall"
+    "filmstrip" -> "Filmstrip Coverflow"
+    "cinema" -> "Cinema Letterbox"
+    "heroSidebar" -> "Hero + Sidebar"
+    else -> m
+  }
+  /** True when [mode] should run the WebView engine (anything other than the legacy classic path). */
+  fun usesEngine(mode: String): Boolean = mode != MODE_CLASSIC
   const val DEFAULT_INTERVAL = 30
   const val DEFAULT_ALBUM_REFRESH_MIN = 60
   // On-device media-cache storage limit, in GB (the "Storage limit" control's range). Capped at
@@ -126,6 +157,9 @@ object ScreensaverConfig {
       // etc. A power-user "bring your own frame" option — not the promoted default.
       val webUrl: String? = null,
       val fit: String = FIT_FILL,
+      // Render mode: the animated engine to use (see MODE_* / ENGINE_MODES). Defaults to Shuffle so
+      // the premium multi-style engine is the out-of-the-box experience; "classic" = legacy renderer.
+      val mode: String = MODE_SHUFFLE,
       val intervalSec: Int = DEFAULT_INTERVAL,
       val albumRefreshMin: Int = DEFAULT_ALBUM_REFRESH_MIN,
       val shuffle: Boolean = false,
@@ -273,6 +307,7 @@ object ScreensaverConfig {
         davPass = p.getString("dav_pass", null),
         webUrl = p.getString("web_url", null),
         fit = p.getString("fit", FIT_FILL) ?: FIT_FILL,
+        mode = p.getString("mode", MODE_SHUFFLE)?.takeIf { it in MODES } ?: MODE_SHUFFLE,
         intervalSec = clampInterval(p.getInt("interval_sec", DEFAULT_INTERVAL)),
         albumRefreshMin =
             clampAlbumRefresh(p.getInt("album_refresh_min", DEFAULT_ALBUM_REFRESH_MIN)),
@@ -396,6 +431,9 @@ object ScreensaverConfig {
       prefs(c).edit().putString("feed", feed).putString("source", SOURCE_DEFAULT).apply()
 
   fun setFit(c: Context, fit: String) = prefs(c).edit().putString("fit", fit).apply()
+
+  fun setMode(c: Context, mode: String) =
+      prefs(c).edit().putString("mode", if (mode in MODES) mode else MODE_SHUFFLE).apply()
 
   fun setInterval(c: Context, sec: Int) =
       prefs(c).edit().putInt("interval_sec", clampInterval(sec)).apply()

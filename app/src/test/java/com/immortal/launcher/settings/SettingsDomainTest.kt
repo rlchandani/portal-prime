@@ -207,6 +207,9 @@ class SettingsDomainTest {
             "smbHost", "smbShare", "smbPath", "smbUser", "smbPass",
             "davUrl", "davUser", "davPass", "webUrl",
             "facesEnabled", "faceId", "faceSizeIndex",
+            // Render style ("mode") is managed by ScreensaverModeActivity via the "screensaverStyle"
+            // NavSpec (same pattern as faceId/clockFace).
+            "mode",
             "dismissAppComponent", "dismissHaDashboard",
             "calendarUrl", "calendarEnabled", "calendarRange", "calendarSize", "calendarSide",
             // Deliberately spec-less: their controls were removed as DEAD (nothing read them).

@@ -183,6 +183,12 @@
             android:exported="false"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- Screensaver render-style picker subpage (Classic / Shuffle / the 12 engine modes). -->
+        <activity
+            android:name=".ScreensaverModeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- "Control from your phone": pairing screen for the phone web remote. -->
         <activity
             android:name=".RemotePairActivity"

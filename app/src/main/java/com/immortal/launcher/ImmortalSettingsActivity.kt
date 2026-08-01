@@ -318,7 +318,7 @@ private fun ImmortalSettingsScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp, vertical = 3.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(Sizes.cardRadius))
                     .clickable {
                       val linkOut = OS_LINK_OUT_SECTIONS[section]
                       if (linkOut != null) {
@@ -356,7 +356,7 @@ private fun ImmortalSettingsScreen() {
               modifier = Modifier
                   .fillMaxWidth()
                   .padding(horizontal = 10.dp, vertical = 3.dp)
-                  .clip(RoundedCornerShape(10.dp))
+                  .clip(RoundedCornerShape(Sizes.cardRadius))
                   .background(if (isSelected) IosBlue else Color.Transparent)
                   .clickable {
                     if (linkOut != null) {
@@ -730,11 +730,11 @@ private fun SidebarSearch(query: String, onQueryChange: (String) -> Unit) {
           // own top=18dp below the search, so the search needs MORE top margin than bottom to keep
           // the space above it (from the title) equal to the space below.
           .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 2.dp)
-          .clip(RoundedCornerShape(10.dp))
+          .clip(RoundedCornerShape(Sizes.cardRadius))
           // A white field with a defined border reads clearly as an input against the grey sidebar
           // background — the old grey-on-grey pill faded into the panel.
           .background(Color.White)
-          .border(BorderStroke(1.dp, IosDivider), RoundedCornerShape(10.dp))
+          .border(BorderStroke(1.dp, IosDivider), RoundedCornerShape(Sizes.cardRadius))
           .padding(horizontal = 12.dp, vertical = 10.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(6.dp),
