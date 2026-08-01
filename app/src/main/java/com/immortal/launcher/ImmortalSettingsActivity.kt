@@ -302,7 +302,6 @@ private fun ImmortalSettingsScreen() {
     ) {
       IosNavBar(title = "Settings")
       SidebarSearch(query = query, onQueryChange = { query = it })
-      Spacer(Modifier.height(8.dp))
       // While searching, the sidebar becomes a results list that jumps to the setting's section.
       if (query.isNotBlank()) {
         if (results.isEmpty()) {
@@ -726,9 +725,9 @@ private fun SidebarSearch(query: String, onQueryChange: (String) -> Unit) {
   Row(
       modifier = Modifier
           .fillMaxWidth()
-          // Balanced vertical margin so the search box doesn't touch the title above or the
-          // list below; comfortable inner padding so the field breathes inside the grey pill.
-          .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 14.dp)
+          // Balanced vertical margin so the gap above the search (title's bottom padding) matches
+          // the gap below it (before the first section label, which brings its own top padding).
+          .padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 6.dp)
           .clip(RoundedCornerShape(10.dp))
           .background(Color(0xFFDFDFE6))
           .padding(horizontal = 12.dp, vertical = 8.dp),
