@@ -36,6 +36,12 @@ object Curation {
           // H264/H265 codec mode, pose-tracker fps…) — never meant for users. Hiding the tile
           // does not disable the service; it just removes a confusing/harmful entry point.
           "com.facebook.portal.aiservice",
+          // Stock Android Settings — retired from the grid: our Immortal Settings now covers the
+          // native controls AND surfaces the OS-only screens (Wi-Fi, Bluetooth, date/time, language,
+          // accessibility, storage, all-settings) as link-out rows under its "System" group. So
+          // there's no functionality lost and no redundant tile. (Portal Settings stays for the
+          // Meta-specific device controls we don't replicate.)
+          "com.android.settings",
       )
 
   /** Hidden by visible label (catches gated apps that share a package). */
