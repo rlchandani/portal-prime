@@ -2423,28 +2423,20 @@ private fun ImmortalWidgetShell(
     accent: Color = Color(0xFF7AA7FF),
     content: @Composable ColumnScope.() -> Unit,
 ) {
-  // Translucent "liquid glass" surface (matches the dashboard cards) instead of an opaque black box:
-  // a ~22% black tint over the wallpaper + a thin light rim, so the widget reads as glass, not a
-  // solid slab. The tint + a slightly heavier scrim under text keep content legible over any
-  // wallpaper without eye strain.
-  val shape = RoundedCornerShape(24.dp)
-  Column(
-      modifier =
-          modifier
-              .clip(shape)
-              .background(Color(0x40000000))
-              .border(1.dp, Color(0x40FFFFFF), shape)
-              .padding(18.dp),
-  ) {
-    Text(
-        title.uppercase(Locale.getDefault()),
-        color = accent,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Bold,
-        maxLines = 1,
-    )
-    Spacer(Modifier.size(8.dp))
-    content()
+  // Use the EXACT same LiquidGlass surface as the Calendar/dashboard cards (one source of truth),
+  // so every widget is visually homogeneous — no more slightly-different hand-rolled backgrounds.
+  LiquidGlassWidget(modifier = modifier) {
+    Column(modifier = Modifier.fillMaxWidth().padding(18.dp)) {
+      Text(
+          title.uppercase(Locale.getDefault()),
+          color = accent,
+          fontSize = 12.sp,
+          fontWeight = FontWeight.Bold,
+          maxLines = 1,
+      )
+      Spacer(Modifier.size(8.dp))
+      content()
+    }
   }
 }
 
@@ -2886,17 +2878,10 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
   // No header, tight chrome. The row fills the widget's height; each clock face takes the space that
   // remains above its two label lines (weight(1f)), so faces shrink to fit rather than overflow and
   // clip the labels. Center vertically so a short widget still looks balanced.
-  val wcShape = RoundedCornerShape(24.dp)
-  Box(
-      modifier = modifier
-          .clip(wcShape)
-          .background(Color(0x40000000))
-          .border(1.dp, Color(0x40FFFFFF), wcShape)
-          .padding(14.dp),
-      contentAlignment = Alignment.Center,
-  ) {
+  // Same LiquidGlass surface as every other widget (homogeneous).
+  LiquidGlassWidget(modifier = modifier) {
     Row(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(14.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -2930,7 +2915,7 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
           )
           Text(
               worldClockCity(zone),
-              color = Color(0xFF9A9A9A),
+              color = Color(0xB3FFFFFF), // translucent white — readable on glass (was dim grey)
               fontSize = 10.sp,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
