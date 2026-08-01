@@ -15,7 +15,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.R
 
-private val InterFontFamily = FontFamily(
+// The app-wide typeface (Inter — a free, near-metric match to iOS's San Francisco). Exposed so the
+// theme can set it as the DEFAULT text style, ensuring the ~300 Text() calls that pass an inline
+// fontSize without a fontFamily still render in Inter rather than falling back to Android's Roboto.
+val InterFontFamily = FontFamily(
     Font(R.font.inter,        weight = FontWeight.Normal),
     Font(R.font.inter_medium, weight = FontWeight.Medium),
     Font(R.font.inter_bold,   weight = FontWeight.Bold),

@@ -13,7 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 
 private val PrimeDarkColorScheme = darkColorScheme(
@@ -57,6 +59,13 @@ fun PortalPrimeTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography  = Typography,
-        content     = content,
-    )
+    ) {
+        // Make Inter the DEFAULT text style app-wide: the ~300 Text() calls that override fontSize
+        // inline (without a fontFamily) inherit LocalTextStyle, so this flips them from Roboto to
+        // Inter without editing every call site. A Text that sets its own fontFamily still wins.
+        CompositionLocalProvider(
+            LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = InterFontFamily),
+            content = content,
+        )
+    }
 }
