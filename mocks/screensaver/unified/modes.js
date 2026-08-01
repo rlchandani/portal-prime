@@ -43,9 +43,9 @@
   // How long each mode holds the screen before the scheduler advances (ms). Collage/gallery modes
   // hold longer (they have internal micro-motion); single-photo modes advance per photo.
   const BEAT = {
-    kenBurns: 9000, diptych: 9000, framed: 14000, galleryWall: 26000, push: 8000,
-    memories: 9000, panorama: 13000, polaroid: 20000, mosaic: 30000, filmstrip: 22000,
-    cinema: 9000, heroSidebar: 24000,
+    kenBurns: 27000, diptych: 27000, framed: 28000, galleryWall: 30000, push: 24000,
+    memories: 27000, panorama: 26000, polaroid: 24000, mosaic: 32000, filmstrip: 24000,
+    cinema: 27000, heroSidebar: 26000,
   };
 
   const MODE_IDS = Object.keys(APPETITE);
