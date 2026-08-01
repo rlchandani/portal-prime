@@ -310,10 +310,15 @@ class PhotoFrameController(
     }
 
     // Feed the ambient dashboard's weather, and schedule its cycle (first card after ~45s).
+    // The ambient dashboard is a Classic-renderer feature: it pauses the photo and shows a big
+    // clock/date/weather card periodically. Under the engine that's just an interruption (the engine
+    // already shows a clock overlay, and the dashboard would render behind the opaque WebView), so
+    // it's disabled whenever an engine mode is active — the user never asked for that overlay.
+    val engineMode = ScreensaverConfig.usesEngine(settings.mode)
     refreshWeather.run()
-    if (settings.ambientDashboard) ui.postDelayed(dashboardCycle, 45_000L)
+    if (settings.ambientDashboard && !engineMode) ui.postDelayed(dashboardCycle, 45_000L)
 
-    if (showWelcome && settings.welcomeEnabled) showWelcomeOverlay()
+    if (showWelcome && settings.welcomeEnabled && !engineMode) showWelcomeOverlay()
     when (source) {
       is PhotoFrameSource.WebPage -> {
         // Web-page source takes over the whole frame — no photo feed, no Immortal overlay.

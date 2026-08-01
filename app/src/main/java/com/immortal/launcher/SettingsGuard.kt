@@ -66,14 +66,13 @@ object SettingsGuard {
         Settings.Secure.putInt(resolver, "screensaver_enabled", 0)
         return@runCatching
       }
-      // Use the digital-clock screensaver if enabled, otherwise the photo frame.
-      val dreamServiceClass =
-          if (DigitalClockConfig.load(context).enabled) {
-            DigitalClockDreamService::class.java
-          } else {
-            PhotoDreamService::class.java
-          }
-      val ours = ComponentName(context, dreamServiceClass).flattenToShortString()
+      // The photo-frame is ALWAYS the screensaver dream. It now hosts the multi-mode animation
+      // engine and draws its own clock overlay, so the standalone DigitalClockDreamService (a plain
+      // full-screen clock, no photos/engine) is no longer selected here — a stale
+      // DigitalClockConfig.enabled flag used to silently hijack the screensaver with just a clock.
+      // The full-screen flip clock is still available as a clock FACE inside the photo frame
+      // (faceId="flip"), so nothing is lost.
+      val ours = ComponentName(context, PhotoDreamService::class.java).flattenToShortString()
       if (Settings.Secure.getString(resolver, "screensaver_components") != ours) {
         Settings.Secure.putString(resolver, "screensaver_components", ours)
       }
