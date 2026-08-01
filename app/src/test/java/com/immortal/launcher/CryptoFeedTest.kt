@@ -12,7 +12,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** CoinGecko `simple/price` parsing (no device/network needed). */
+/** CoinGecko `coins/markets` parsing — price, 24h change, 7d sparkline (no device/network). */
 class CryptoFeedTest {
 
   private val coins =
@@ -24,15 +24,19 @@ class CryptoFeedTest {
 
   private val sample =
       """
-      {
-        "bitcoin":  {"usd": 43210.5, "usd_24h_change":  2.345},
-        "ethereum": {"usd":  2301.0, "usd_24h_change": -1.100},
-        "solana":   {"usd":   150.25}
-      }
+      [
+        {"id": "ethereum", "symbol": "eth", "current_price": 2301.0,
+         "price_change_percentage_24h": -1.100,
+         "sparkline_in_7d": {"price": [2290.0, 2295.5, 2310.2, 2301.0]}},
+        {"id": "bitcoin", "symbol": "btc", "current_price": 43210.5,
+         "price_change_percentage_24h": 2.345,
+         "sparkline_in_7d": {"price": [42800.0, 42910.5, 43100.0, 43210.5]}},
+        {"id": "solana", "symbol": "sol", "current_price": 150.25}
+      ]
       """.trimIndent()
 
   @Test
-  fun `parses quotes in the coin list order`() {
+  fun `parses quotes in the coin list order, not API order`() {
     val quotes = CryptoFeed.parse(sample, coins)
     assertEquals(listOf("BTC", "ETH", "SOL"), quotes.map { it.symbol })
     assertEquals(43210.5, quotes[0].usd, 0.001)
@@ -48,6 +52,16 @@ class CryptoFeedTest {
   }
 
   @Test
+  fun `sparkline points survive parsing, missing sparkline is empty`() {
+    val quotes = CryptoFeed.parse(sample, coins)
+    val btc = quotes.first { it.symbol == "BTC" }
+    assertTrue(btc.spark.isNotEmpty())
+    assertEquals(42800.0, btc.spark.first(), 0.001)
+    assertEquals(43210.5, btc.spark.last(), 0.001)
+    assertTrue(quotes.first { it.symbol == "SOL" }.spark.isEmpty())
+  }
+
+  @Test
   fun `coins absent from the response are dropped`() {
     val withUnknown = coins + CryptoConfig.Coin("not-a-coin", "XXX")
     val quotes = CryptoFeed.parse(sample, withUnknown)
@@ -56,14 +70,15 @@ class CryptoFeedTest {
   }
 
   @Test
-  fun `an entry without a usd price is dropped`() {
-    val body = """{"bitcoin": {"usd_24h_change": 1.0}}"""
-    assertTrue(CryptoFeed.parse(body, coins).isEmpty())
+  fun `configured symbol label wins over the API's`() {
+    val custom = listOf(CryptoConfig.Coin("bitcoin", "XBT"))
+    assertEquals("XBT", CryptoFeed.parse(sample, custom).single().symbol)
   }
 
   @Test
   fun `malformed json yields an empty list, never throws`() {
     assertTrue(CryptoFeed.parse("not json", coins).isEmpty())
     assertTrue(CryptoFeed.parse("", coins).isEmpty())
+    assertTrue(CryptoFeed.parse("{}", coins).isEmpty())
   }
 }

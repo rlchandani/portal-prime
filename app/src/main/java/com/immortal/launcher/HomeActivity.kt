@@ -444,9 +444,11 @@ private fun LeftWidgetColumn(
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         state = widgetGridState,
-        // In edit mode the grid's own vertical scroll competes with the drag; disable user
-        // scroll while editing so the reorder owns the pointer (same as the icon grid).
-        userScrollEnabled = !editMode,
+        // Scroll stays enabled in edit mode: widget-body presses become drags immediately (the
+        // Press detector consumes them), so scrolling only happens from the header cards and
+        // gaps — and the reorder library auto-scrolls near the edges during a drag. With the
+        // headers now inside the grid, disabling scroll would strand the Add tile off-screen.
+        userScrollEnabled = true,
         modifier = Modifier.fillMaxWidth().weight(1f),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -2921,10 +2923,14 @@ private fun SkyOrb(night: Boolean) {
 private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var zones by remember { mutableStateOf(ImmortalSettings.worldClockZones(context)) }
+  var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
   DisposableEffect(lifecycleOwner) {
     val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) zones = ImmortalSettings.worldClockZones(context)
+      if (e == Lifecycle.Event.ON_RESUME) {
+        zones = ImmortalSettings.worldClockZones(context)
+        use24 = ImmortalSettings.use24HourClock(context)
+      }
     }
     lifecycleOwner.lifecycle.addObserver(obs)
     onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
@@ -2965,19 +2971,20 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
             AnalogClock(zone, now, Modifier.fillMaxSize())
           }
           Spacer(Modifier.size(6.dp))
-          // Timezone abbreviation (EDT/BST/JST…) as the primary label, city underneath.
+          // Dusk Aurora labels: bold city as the primary line, that zone's local time underneath
+          // (what you actually want at a glance — "London · 12:42 AM", not "BST").
           Text(
-              worldClockAbbrev(zone, now),
+              worldClockCity(zone),
               color = Color.White,
-              fontSize = 13.sp,
+              fontSize = 12.5.sp,
               fontWeight = FontWeight.SemiBold,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
           )
           Text(
-              worldClockCity(zone),
-              color = Color(0xB3FFFFFF), // translucent white — readable on glass (was dim grey)
-              fontSize = 10.sp,
+              worldClockLocalTime(zone, now, use24),
+              color = Color(0xB3FFFFFF),
+              fontSize = 10.5.sp,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
           )
@@ -2991,18 +2998,13 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
 private fun worldClockCity(zoneId: String): String =
     zoneId.substringAfterLast('/').replace('_', ' ')
 
-/**
- * The zone's short abbreviation for [now], honoring DST, e.g. "EDT" / "BST" / "JST" / "IST". Falls
- * back to a GMT±offset (e.g. "GMT+5:30") for zones the platform can't abbreviate.
- */
-private fun worldClockAbbrev(zoneId: String, now: Date): String {
-  val tz = TimeZone.getTimeZone(zoneId)
-  val dst = tz.inDaylightTime(now)
-  val abbr = tz.getDisplayName(dst, TimeZone.SHORT, Locale.US)
-  // Android returns "GMT+05:30" for zones without a named abbreviation — tidy that to "GMT+5:30".
-  return if (abbr.startsWith("GMT")) abbr.replace("+0", "+").replace("-0", "-").removeSuffix(":00")
-  else abbr
+/** The zone's local wall time, e.g. "12:42 AM" / "00:42". */
+private fun worldClockLocalTime(zoneId: String, now: Date, use24: Boolean): String {
+  val fmt = SimpleDateFormat(if (use24) "HH:mm" else "h:mm a", Locale.getDefault())
+  fmt.timeZone = TimeZone.getTimeZone(zoneId)
+  return fmt.format(now)
 }
+
 
 /** A small analog clock face for [zoneId], white by day / dark by night, with an orange seconds hand. */
 @Composable
@@ -3214,21 +3216,63 @@ private fun ImmortalCryptoWidget(modifier: Modifier = Modifier, maxRows: Int = 5
   }
 }
 
-/** One coin line: symbol on the left, price + colored 24h change on the right. */
+/** One coin line: symbol · 7d sparkline · price · tinted change pill (Dusk Aurora). */
 @Composable
 private fun CryptoRow(q: CryptoFeed.Quote) {
   Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-    Text(q.symbol, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-    Text(formatUsd(q.usd), color = Color.White, fontSize = 15.sp)
-    val change = q.change24h
-    if (change != null) {
-      Text(
-          "%s%.2f%%".format(if (change >= 0) "+" else "", change),
-          color = if (change >= 0) Color(0xFF30D158) else Color(0xFFFF453A),
-          fontSize = 13.sp,
-          modifier = Modifier.padding(start = 8.dp),
-      )
+    Text(q.symbol, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+    Spacer(Modifier.weight(1f))
+    if (q.spark.size >= 2) {
+      Sparkline(q.spark, up = (q.change24h ?: 0.0) >= 0, modifier = Modifier.size(width = 46.dp, height = 16.dp))
+      Spacer(Modifier.size(8.dp))
     }
+    Text(formatUsd(q.usd), color = Color.White, fontSize = 15.sp)
+    q.change24h?.let { ChangePill(it, Modifier.padding(start = 8.dp)) }
+  }
+}
+
+/**
+ * A tinted percent-change pill: soft green/red fill with a saturated label (the mock's `.chg`).
+ * Fixed min-width keeps columns of pills aligned.
+ */
+@Composable
+private fun ChangePill(pct: Double, modifier: Modifier = Modifier) {
+  val up = pct >= 0
+  Text(
+      "%s%.1f%%".format(if (up) "+" else "−", kotlin.math.abs(pct)),
+      color = if (up) Color(0xFF4CD964) else Color(0xFFFF8A80),
+      fontSize = 12.sp,
+      fontWeight = FontWeight.Bold,
+      textAlign = androidx.compose.ui.text.style.TextAlign.End,
+      modifier =
+          modifier
+              .clip(RoundedCornerShape(7.dp))
+              .background(if (up) Color(0x2E30D158) else Color(0x29FF6961))
+              .padding(horizontal = 7.dp, vertical = 2.dp)
+              .widthIn(min = 46.dp),
+  )
+}
+
+/** A tiny price polyline, tinted by direction — the widget-row mini chart from the mock. */
+@Composable
+private fun Sparkline(points: List<Double>, up: Boolean, modifier: Modifier = Modifier) {
+  val color = if (up) Color(0xFF4CD964) else Color(0xFFFF8A80)
+  Canvas(modifier) {
+    val min = points.min()
+    val max = points.max()
+    val range = (max - min).takeIf { it > 0 } ?: 1.0
+    val stepX = size.width / (points.size - 1)
+    val path = androidx.compose.ui.graphics.Path()
+    points.forEachIndexed { i, p ->
+      val x = i * stepX
+      val y = (size.height * (1f - ((p - min) / range).toFloat())).coerceIn(0f, size.height)
+      if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+    }
+    drawPath(
+        path,
+        color,
+        style = androidx.compose.ui.graphics.drawscope.Stroke(
+            width = 1.6.dp.toPx(), cap = StrokeCap.Round, join = androidx.compose.ui.graphics.StrokeJoin.Round))
   }
 }
 
@@ -3431,18 +3475,13 @@ private fun ImmortalStocksWidget(modifier: Modifier = Modifier, maxRows: Int = 5
   }
 }
 
-/** One ticker line: symbol, last price, and colored daily change percent. */
+/** One ticker line: symbol · last price · tinted daily-change pill (Dusk Aurora). */
 @Composable
 private fun StockRow(q: AlpacaClient.StockQuote) {
   Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
     Text(q.symbol, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
     Text("$%,.2f".format(q.last), color = Color.White, fontSize = 15.sp)
-    Text(
-        "%s%.2f%%".format(if (q.changePct >= 0) "+" else "", q.changePct),
-        color = if (q.changePct >= 0) Color(0xFF30D158) else Color(0xFFFF453A),
-        fontSize = 13.sp,
-        modifier = Modifier.padding(start = 8.dp),
-    )
+    ChangePill(q.changePct, Modifier.padding(start = 8.dp))
   }
 }
 
