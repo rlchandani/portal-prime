@@ -212,10 +212,6 @@ class SettingsDomainTest {
             "mode",
             "dismissAppComponent", "dismissHaDashboard",
             "calendarUrl", "calendarEnabled", "calendarRange", "calendarSize", "calendarSide",
-            // Deliberately spec-less: their controls were removed as DEAD (nothing read them).
-            // The storage fields are retained to avoid churn; see settings-reimagining-audit.
-            "showGradient", // frame always drew the scrim regardless
-            "feed", // PhotoFrameController hardcodes the built-in source chain
         )
     val uncovered = fields - specKeys - managedElsewhere
     assertTrue(

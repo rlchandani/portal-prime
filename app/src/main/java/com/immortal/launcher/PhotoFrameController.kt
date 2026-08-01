@@ -578,12 +578,21 @@ class PhotoFrameController(
         },
         "Android")
 
-    (view as FrameLayout).addView(wv, FrameLayout.LayoutParams(MATCH, MATCH))
-    wv.loadUrl("file:///android_asset/screensaver/index.html")
+    // The engine is the opaque PHOTO layer. Add it on top of the photo ImageViews, then lift the
+    // native overlays (clock face, calendar, ambient dashboard, now-playing, welcome) ABOVE it by
+    // re-adding them last — so every overlay setting keeps working across engine modes, exactly like
+    // the classic renderer, while the WebView stays the opaque base (no home/photo bleed-through in
+    // the gaps a mode leaves). The engine's own HTML clock is suppressed (?nativeClock=1) to avoid a
+    // double clock — the Face overlay is the single clock everywhere.
+    val root = view as FrameLayout
+    root.addView(wv, FrameLayout.LayoutParams(MATCH, MATCH))
+    // Re-stack the overlays above the engine (bringToFront preserves their relative order).
+    runCatching { faceRenderer.view.bringToFront() }
+    runCatching { calendarPanel.bringToFront() }
+    dashboardPanel?.let { runCatching { it.bringToFront() } }
+    runCatching { welcomeOverlay.bringToFront() }
+    wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1")
     webView = wv
-    // The engine draws its own clock, but keep the Face overlay too? The engine's clock is part of
-    // its aesthetic, so hide the native Face overlay while the engine runs to avoid a double clock.
-    runCatching { faceRenderer.view.visibility = View.GONE }
   }
 
   /** True once the engine WebView has been created (so ticks/crossfade paths bail out). */

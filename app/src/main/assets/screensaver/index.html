@@ -43,19 +43,29 @@
     return false;
   }
 
-  // Custom clock honoring 24h; overrides engine.js startClock so the app setting is respected.
-  (function clock() {
-    const timeEl = document.getElementById("chrome-time"), dateEl = document.getElementById("chrome-date");
-    const h24 = use24();
-    function tick() {
-      const d = new Date();
-      let h = d.getHours(); const m = String(d.getMinutes()).padStart(2, "0");
-      if (h24) { timeEl.textContent = `${String(h).padStart(2,"0")}:${m}`; }
-      else { const hh = h % 12 || 12; timeEl.textContent = `${hh}:${m}`; }
-      dateEl.textContent = d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
-    }
-    tick(); setInterval(tick, 1000);
-  })();
+  // When the host renders its own native clock/overlays on top (?nativeClock=1), suppress the
+  // engine's built-in clock + scrim so we don't draw two clocks. The engine is then purely the
+  // photo layer; the app's Face overlay (clock face, calendar, now-playing) sits above it.
+  const nativeClock = new URLSearchParams(location.search).has("nativeClock");
+  if (nativeClock) {
+    ["chrome-clock", "chrome-scrim", "chrome-mode"].forEach((id) => {
+      const el = document.getElementById(id); if (el) el.style.display = "none";
+    });
+  } else {
+    // Standalone (browser/dev): the engine draws its own clock honoring 24h.
+    (function clock() {
+      const timeEl = document.getElementById("chrome-time"), dateEl = document.getElementById("chrome-date");
+      const h24 = use24();
+      function tick() {
+        const d = new Date();
+        let h = d.getHours(); const m = String(d.getMinutes()).padStart(2, "0");
+        if (h24) { timeEl.textContent = `${String(h).padStart(2,"0")}:${m}`; }
+        else { const hh = h % 12 || 12; timeEl.textContent = `${hh}:${m}`; }
+        dateEl.textContent = d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+      }
+      tick(); setInterval(tick, 1000);
+    })();
+  }
 
   // Pre-measure photo dimensions so the very first mode already has correct orientation info.
   // Cap the initial measure so a huge library doesn't stall the start; the rest measure lazily.

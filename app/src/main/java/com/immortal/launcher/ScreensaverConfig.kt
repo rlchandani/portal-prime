@@ -133,8 +133,6 @@ object ScreensaverConfig {
       // the user run their own screensaver (e.g. Home Assistant + Immich frame).
       val enabled: Boolean = true,
       val source: String = SOURCE_DEFAULT,
-      // Which online feed to use when source == SOURCE_DEFAULT.
-      val feed: String = FEED_PICSUM,
       val folderPath: String? = null,
       val albumUrl: String? = null,
       // Immich (self-hosted) connection. albumId/Name null = the whole library.
@@ -190,9 +188,6 @@ object ScreensaverConfig {
       // Anti-burn-in pixel-shift: slowly drift the overlay so static content (the clock) doesn't
       // brand the panel over days. On by default; can be turned off if the motion is distracting.
       val antiBurnIn: Boolean = true,
-      // The legibility gradient under the bottom widget cluster. On by default (the original
-      // frame look); off shows the photo clean edge-to-edge (issue #144).
-      val showGradient: Boolean = true,
       // Whether to draw a clock face at all. Off = photos only (the now-playing card still follows
       // its own [showNowPlaying] switch). On by default.
       val facesEnabled: Boolean = true,
@@ -290,7 +285,6 @@ object ScreensaverConfig {
     return Settings(
         enabled = p.getBoolean("enabled", true),
         source = p.getString("source", SOURCE_DEFAULT) ?: SOURCE_DEFAULT,
-        feed = p.getString("feed", FEED_PICSUM) ?: FEED_PICSUM,
         folderPath = p.getString("folder_path", null),
         albumUrl = p.getString("album_url", null),
         immichUrl = p.getString("immich_url", null),
@@ -325,7 +319,6 @@ object ScreensaverConfig {
         batterySaver = p.getBoolean("battery_saver", true),
         showNowPlaying = p.getBoolean("show_now_playing", true),
         antiBurnIn = p.getBoolean("anti_burn_in", true),
-        showGradient = p.getBoolean("show_gradient", true),
         facesEnabled = p.getBoolean("faces_enabled", true),
         faceId = p.getString("face_id", "immortal-classic") ?: "immortal-classic",
         faceSizeIndex = p.getInt("face_size_index", 1),
@@ -426,10 +419,6 @@ object ScreensaverConfig {
 
   fun useDefault(c: Context) = prefs(c).edit().putString("source", SOURCE_DEFAULT).apply()
 
-  /** Pick the online feed and switch the source back to the default (online) feed. */
-  fun setFeed(c: Context, feed: String) =
-      prefs(c).edit().putString("feed", feed).putString("source", SOURCE_DEFAULT).apply()
-
   fun setFit(c: Context, fit: String) = prefs(c).edit().putString("fit", fit).apply()
 
   fun setMode(c: Context, mode: String) =
@@ -487,10 +476,6 @@ object ScreensaverConfig {
 
   fun setAntiBurnIn(c: Context, on: Boolean) =
       prefs(c).edit().putBoolean("anti_burn_in", on).apply()
-
-  /** Show/hide the legibility gradient under the bottom widget cluster. */
-  fun setShowGradient(c: Context, on: Boolean) =
-      prefs(c).edit().putBoolean("show_gradient", on).apply()
 
   /** Turn the clock face on/off (off = photos only). */
   fun setFacesEnabled(c: Context, on: Boolean) =
