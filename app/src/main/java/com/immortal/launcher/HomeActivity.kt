@@ -2744,15 +2744,16 @@ private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
         value = withContext(Dispatchers.IO) { Weather.fetchSunTimes(context) }
       }
   val code = current?.code ?: 0
-  val isDay = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY) in 6..18
-  val (gTop, gBottom) = weatherGradient(code, isDay)
-  // Dynamic gradient card that matches the weather (iOS-style), city + big temp top-left,
-  // condition glyph top-right, and an hourly strip along the bottom.
+  val phase = skyPhase()
+  val sky = weatherSky(code, phase)
+  // The widget paints its own sky (Dusk Aurora design): a multi-stop vertical gradient that tracks
+  // condition + time of day — night sky fading into a warm horizon at dusk — with a glowing
+  // sun/moon orb when skies are clear. City + big temp top-left, hourly strip along the bottom.
   Box(
       modifier =
           modifier
               .clip(RoundedCornerShape(24.dp))
-              .background(Brush.linearGradient(listOf(gTop, gBottom)))
+              .background(Brush.verticalGradient(sky))
               .padding(18.dp),
   ) {
     Column(Modifier.fillMaxSize()) {
@@ -2790,7 +2791,9 @@ private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
               modifier = Modifier.padding(top = 2.dp),
           )
         }
-        Text(Weather.emoji(code), fontSize = 34.sp)
+        // Clear skies get a glowing sun/moon orb (the Dusk Aurora "paints its own sky" look);
+        // anything with real weather keeps the condition glyph.
+        if (code <= 1) SkyOrb(night = phase == SkyPhase.NIGHT) else Text(Weather.emoji(code), fontSize = 34.sp)
       }
       Spacer(Modifier.weight(1f))
       // Forecast strip honors the Weather-widget mode: Off shows just the current conditions,
@@ -2837,22 +2840,77 @@ private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
   }
 }
 
-/** A weather-matching two-stop gradient (top → bottom), varying with the condition and day/night. */
-private fun weatherGradient(code: Int, isDay: Boolean): Pair<Color, Color> {
-  if (!isDay) {
-    return when {
-      code in 51..99 -> Color(0xFF2A3340) to Color(0xFF49586B)
-      code == 3 || code in 45..48 -> Color(0xFF263041) to Color(0xFF3C4A5E)
-      else -> Color(0xFF18233F) to Color(0xFF36527E)
-    }
+/** Time-of-day bucket for the widget's painted sky. */
+private enum class SkyPhase { DAY, DUSK, NIGHT }
+
+private fun skyPhase(): SkyPhase {
+  val h = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+  return when (h) {
+    in 8..17 -> SkyPhase.DAY
+    in 5..7, in 18..20 -> SkyPhase.DUSK // dawn shares the dusk palette
+    else -> SkyPhase.NIGHT
   }
-  return when {
-    code in 71..77 -> Color(0xFF7E93A8) to Color(0xFFBFCEDC) // snow
-    code in 51..67 || code in 80..82 -> Color(0xFF45607A) to Color(0xFF7791A6) // rain
-    code in 95..99 -> Color(0xFF3A4A5C) to Color(0xFF5E7286) // thunder
-    code == 3 -> Color(0xFF5E7E98) to Color(0xFF93ABC0) // overcast
-    code in 45..48 -> Color(0xFF7E8E9C) to Color(0xFFAEBBC6) // fog
-    else -> Color(0xFF3E8BD0) to Color(0xFF77B8E8) // clear / partly (the blue from the mock)
+}
+
+/**
+ * The widget's sky: a multi-stop vertical gradient per condition + phase (Dusk Aurora design).
+ * Dusk is the signature — deep night blue melting into a warm ember horizon; weather conditions
+ * mute it toward grey. Colors match mocks/ipados (weatherw / .hero .sun).
+ */
+private fun weatherSky(code: Int, phase: SkyPhase): List<Color> {
+  val precip = code in 51..99
+  val grey = code == 3 || code in 45..48
+  return when (phase) {
+    SkyPhase.DUSK ->
+        when {
+          precip -> listOf(Color(0xFF232C3D), Color(0xFF3A4457), Color(0xFF5D5350))
+          grey -> listOf(Color(0xFF27303F), Color(0xFF434D5C), Color(0xFF6B6058))
+          else -> listOf(Color(0xFF16294F), Color(0xFF2C4470), Color(0xFF8A5F52), Color(0xFFC98A5E))
+        }
+    SkyPhase.NIGHT ->
+        when {
+          precip -> listOf(Color(0xFF1C2330), Color(0xFF333E4E))
+          grey -> listOf(Color(0xFF1D2634), Color(0xFF37424F))
+          else -> listOf(Color(0xFF0A1226), Color(0xFF16294F), Color(0xFF27436E))
+        }
+    SkyPhase.DAY ->
+        when {
+          code in 71..77 -> listOf(Color(0xFF7E93A8), Color(0xFFBFCEDC)) // snow
+          code in 51..67 || code in 80..82 -> listOf(Color(0xFF45607A), Color(0xFF7791A6)) // rain
+          code in 95..99 -> listOf(Color(0xFF3A4A5C), Color(0xFF5E7286)) // thunder
+          code == 3 -> listOf(Color(0xFF5E7E98), Color(0xFF93ABC0)) // overcast
+          code in 45..48 -> listOf(Color(0xFF7E8E9C), Color(0xFFAEBBC6)) // fog
+          else -> listOf(Color(0xFF2E6BB8), Color(0xFF4F97DC), Color(0xFF8FC3EE)) // clear
+        }
+  }
+}
+
+/** A glowing sun (or moon) orb for clear skies — radial core + soft halo, drawn not emoji. */
+@Composable
+private fun SkyOrb(night: Boolean) {
+  androidx.compose.foundation.Canvas(Modifier.size(44.dp)) {
+    val r = size.minDimension / 2f
+    val c = center
+    if (night) {
+      drawCircle(
+          Brush.radialGradient(
+              listOf(Color(0x66AFC6FF), Color(0x00AFC6FF)), center = c, radius = r),
+          radius = r, center = c)
+      drawCircle(
+          Brush.radialGradient(
+              listOf(Color(0xFFF4F6FB), Color(0xFFC9D4E8)), center = c.copy(x = c.x - r * 0.15f), radius = r * 0.62f),
+          radius = r * 0.55f, center = c)
+    } else {
+      drawCircle(
+          Brush.radialGradient(
+              listOf(Color(0x80FFC96B), Color(0x00FFC96B)), center = c, radius = r),
+          radius = r, center = c)
+      drawCircle(
+          Brush.radialGradient(
+              listOf(Color(0xFFFFF3D6), Color(0xFFFFCF7D), Color(0xFFFF9D4D)),
+              center = c.copy(x = c.x - r * 0.12f, y = c.y - r * 0.15f), radius = r * 0.62f),
+          radius = r * 0.55f, center = c)
+    }
   }
 }
 
@@ -3572,19 +3630,29 @@ private fun HaTile(
     modifier: Modifier = Modifier,
     onToggle: () -> Unit,
 ) {
-  // On glass, only the ACTIVE states use a solid accent (so "on"/scene pops); off/unknown are a
-  // translucent white "glass button" instead of a heavy black slab, matching the widget surface.
+  // Dusk Aurora glow tiles: an ON light glows warm amber (like a lit bulb — near-opaque amber fill,
+  // dark warm text) instead of app-blue; scenes are translucent violet with a violet rim; off and
+  // unknown stay quiet glass so the lit tiles carry the eye.
   val bg = when {
-    momentary -> Color(0xFF5E5CE6) // scenes: always "ready", purple accent
-    on -> Color(0xFF0A84FF)         // on: solid blue accent
-    !known -> Color(0x1FFFFFFF)     // unknown: faint glass
-    else -> Color(0x2EFFFFFF)       // off: translucent glass button
+    momentary -> Color(0x577C4DFF)  // scenes: translucent violet
+    on -> Color(0xF0FFD66E)          // on: warm amber "lit bulb"
+    !known -> Color(0x1FFFFFFF)      // unknown: faint glass
+    else -> Color(0x17FFFFFF)        // off: quiet glass
   }
+  val border = when {
+    momentary -> Color(0x4DA078FF)
+    on -> Color.Transparent
+    else -> Color(0x12FFFFFF)
+  }
+  val fg = if (on && !momentary) Color(0xFF3D2C00) else Color.White
+  val fgSub = if (on && !momentary) Color(0xA83D2C00) else Color(0xCCFFFFFF)
   Column(
-      modifier = modifier.clip(RoundedCornerShape(14.dp)).background(bg).tvFocusableRow { onToggle() }
+      modifier = modifier.clip(RoundedCornerShape(14.dp)).background(bg)
+          .border(0.5.dp, border, RoundedCornerShape(14.dp))
+          .tvFocusableRow { onToggle() }
           .padding(horizontal = 12.dp, vertical = 10.dp),
   ) {
-    Text(name, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Text(name, color = fg, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     Text(
         when {
           momentary -> "Tap to run"
@@ -3592,7 +3660,7 @@ private fun HaTile(
           on -> "On"
           else -> "Off"
         },
-        color = Color(0xCCFFFFFF),
+        color = fgSub,
         fontSize = 12.sp,
     )
   }
