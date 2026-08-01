@@ -130,18 +130,11 @@ internal data class SectionDef(
  * Sections that hand off to Android's own Settings rather than rendering a detail panel. Mapped to
  * the `Settings.ACTION_*` string to fire (guarded with `runCatching`). Shown with a "↗" affordance.
  */
-// OS-owned screens a launcher can't reimplement natively (Wi-Fi picker, Bluetooth, date/time,
-// language, accessibility, storage) are surfaced here as link-out rows that fire the stock Android
-// Settings intent — so everything lives under our Settings (iOS-style) and the redundant stock
-// "System Settings" grid tile can be retired. Names must match the "System" SectionDefs below.
+// OS-owned screens live in Android's own Settings; a single "All Android Settings" link-out under
+// System reaches them all (Wi-Fi, Bluetooth, date/time, language, accessibility, storage). The
+// per-screen rows were dropped as clutter — everything is one tap deeper via the stock grid.
 private val OS_LINK_OUT_SECTIONS: Map<String, String> =
     mapOf(
-        "Wi-Fi" to android.provider.Settings.ACTION_WIFI_SETTINGS,
-        "Bluetooth" to android.provider.Settings.ACTION_BLUETOOTH_SETTINGS,
-        "Date & Time" to android.provider.Settings.ACTION_DATE_SETTINGS,
-        "Language & Region" to android.provider.Settings.ACTION_LOCALE_SETTINGS,
-        "Accessibility" to android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS,
-        "Storage" to android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS,
         "All Android Settings" to android.provider.Settings.ACTION_SETTINGS,
     )
 
@@ -187,16 +180,10 @@ private val SECTION_GROUPS: List<Pair<String, List<SectionDef>>> =
                 SectionDef("Device Name", "i", Color(0xFF636366), R.drawable.ic_settings_devicename),
                 SectionDef("About & Device Health", "?", Color(0xFF636366), R.drawable.ic_settings_health),
             ),
-        // System group — link-outs to the stock Android screens a launcher can't reimplement, so the
-        // user reaches Wi-Fi/Bluetooth/etc from our Settings (each fires its Settings.ACTION_* intent).
+        // System group — one link-out to the stock Android Settings grid, which contains Wi-Fi,
+        // Bluetooth, date/time, language, accessibility and storage one tap deeper.
         "System" to
             listOf(
-                SectionDef("Wi-Fi", "W", Color(0xFF0A84FF)),
-                SectionDef("Bluetooth", "B", Color(0xFF0A84FF)),
-                SectionDef("Date & Time", "T", Color(0xFF636366)),
-                SectionDef("Language & Region", "G", Color(0xFF636366)),
-                SectionDef("Accessibility", "A", Color(0xFF30D158)),
-                SectionDef("Storage", "S", Color(0xFF636366)),
                 SectionDef("All Android Settings", "O", Color(0xFF636366)),
             ),
     )
