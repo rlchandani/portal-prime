@@ -242,6 +242,9 @@ object SettingsDomains {
                       // refresh cadence is fine for every album source; the phone remote can still
                       // set it. (Was network-album-only: !s.usesFolder && source != DEFAULT.)
                       visible = { _, _ -> false }),
+                  // Fit + Photo interval only affect the Classic renderer — the animation engine
+                  // controls its own per-mode layout and pacing. Hide them in engine modes (the
+                  // default) so they're not dead controls that silently do nothing.
                   EnumSpec(
                       "fit",
                       "Fit",
@@ -249,7 +252,8 @@ object SettingsDomains {
                       set = ScreensaverConfig::setFit,
                       options =
                           listOf(ScreensaverConfig.FIT_FILL to "Fill", ScreensaverConfig.FIT_FIT to "Fit"),
-                      coerce = { FleetScreensaver.coerceFit(it) }),
+                      coerce = { FleetScreensaver.coerceFit(it) },
+                      visible = { _, s -> s.enabled && !ScreensaverConfig.usesEngine(s.mode) }),
                   IntSpec(
                       "intervalSec",
                       "Photo interval",
@@ -258,7 +262,8 @@ object SettingsDomains {
                       min = 5,
                       max = 600,
                       step = 5,
-                      format = { "${it}s" }),
+                      format = { "${it}s" },
+                      visible = { _, s -> s.enabled && !ScreensaverConfig.usesEngine(s.mode) }),
                   BoolSpec("shuffle", "Shuffle", get = { it.shuffle }, set = ScreensaverConfig::setShuffle),
                   BoolSpec(
                       "includeVideo",
