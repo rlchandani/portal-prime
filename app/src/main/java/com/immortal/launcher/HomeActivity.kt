@@ -2423,10 +2423,17 @@ private fun ImmortalWidgetShell(
     accent: Color = Color(0xFF7AA7FF),
     content: @Composable ColumnScope.() -> Unit,
 ) {
+  // Translucent "liquid glass" surface (matches the dashboard cards) instead of an opaque black box:
+  // a ~22% black tint over the wallpaper + a thin light rim, so the widget reads as glass, not a
+  // solid slab. The tint + a slightly heavier scrim under text keep content legible over any
+  // wallpaper without eye strain.
+  val shape = RoundedCornerShape(24.dp)
   Column(
       modifier =
           modifier
-              .background(Color(0xFF161618), RoundedCornerShape(24.dp))
+              .clip(shape)
+              .background(Color(0x40000000))
+              .border(1.dp, Color(0x40FFFFFF), shape)
               .padding(18.dp),
   ) {
     Text(
@@ -2879,9 +2886,12 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
   // No header, tight chrome. The row fills the widget's height; each clock face takes the space that
   // remains above its two label lines (weight(1f)), so faces shrink to fit rather than overflow and
   // clip the labels. Center vertically so a short widget still looks balanced.
+  val wcShape = RoundedCornerShape(24.dp)
   Box(
       modifier = modifier
-          .background(Color(0xFF161618), RoundedCornerShape(24.dp))
+          .clip(wcShape)
+          .background(Color(0x40000000))
+          .border(1.dp, Color(0x40FFFFFF), wcShape)
           .padding(14.dp),
       contentAlignment = Alignment.Center,
   ) {
@@ -3577,11 +3587,13 @@ private fun HaTile(
     modifier: Modifier = Modifier,
     onToggle: () -> Unit,
 ) {
+  // On glass, only the ACTIVE states use a solid accent (so "on"/scene pops); off/unknown are a
+  // translucent white "glass button" instead of a heavy black slab, matching the widget surface.
   val bg = when {
     momentary -> Color(0xFF5E5CE6) // scenes: always "ready", purple accent
-    !known -> Color(0xFF2A2A2C)
-    on -> Color(0xFF0A84FF)
-    else -> Color(0xFF3A3A3C)
+    on -> Color(0xFF0A84FF)         // on: solid blue accent
+    !known -> Color(0x1FFFFFFF)     // unknown: faint glass
+    else -> Color(0x2EFFFFFF)       // off: translucent glass button
   }
   Column(
       modifier = modifier.clip(RoundedCornerShape(14.dp)).background(bg).tvFocusableRow { onToggle() }
@@ -3605,11 +3617,11 @@ private fun HaTile(
 @Composable
 private fun HaSensorTile(name: String, value: String, modifier: Modifier = Modifier) {
   Column(
-      modifier = modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xFF2A2A2C))
+      modifier = modifier.clip(RoundedCornerShape(14.dp)).background(Color(0x22FFFFFF))
           .padding(horizontal = 12.dp, vertical = 10.dp),
   ) {
     Text(value, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    Text(name, color = Color(0xFF9A9A9A), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Text(name, color = Color(0xCCFFFFFF), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
   }
 }
 
