@@ -252,6 +252,13 @@ class HomeActivity : ComponentActivity() {
                   startActivity(
                       Intent(this@HomeActivity, ToolsActivity::class.java)
                           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } else if (cn.packageName == packageName &&
+                    cn.className == WebAppActivity::class.java.name) {
+                  // The Music tile: YouTube Music's PWA in the kiosk WebView (no GMS client).
+                  startActivity(
+                      Intent(this@HomeActivity, WebAppActivity::class.java)
+                          .putExtra(WebAppActivity.EXTRA_URL, WebAppActivity.URL_YT_MUSIC)
+                          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 } else {
                   startActivity(
                       Intent(Intent.ACTION_MAIN)
@@ -4302,7 +4309,19 @@ private fun loadApps(context: Context): List<AppEntry> {
         // special-case). It's the entry point to timers, notes, converter, cameras, countdown editor.
         val toolsIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_tools_tile)
             ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+        // Inject "Music" (WebAppActivity → the YouTube Music PWA — there's no installable
+        // client without GMS, so the web app IS the client on a Portal).
+        val musicIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_music_tile)
+            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
         var out = apps
+        if (musicIcon != null) {
+          out = out + AppEntry(
+              label = "Music",
+              component = ComponentName(context.packageName, WebAppActivity::class.java.name),
+              icon = musicIcon,
+              uninstallable = false,
+          )
+        }
         if (callIcon != null) {
           out = out + AppEntry(
               label = "Calls",

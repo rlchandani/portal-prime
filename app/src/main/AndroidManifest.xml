@@ -153,6 +153,16 @@
             android:label="App Store"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- Fullscreen kiosk WebView for web apps with no installable Portal client
+             (Music tile → YouTube Music PWA). URL comes via Intent extra; landscape,
+             internal-only like the other tile activities. -->
+        <activity
+            android:name=".WebAppActivity"
+            android:exported="false"
+            android:label="Music"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- Full-screen photo frame: on-demand preview AND the permanent frame
              DreamPolicy relaunches when the system force-wakes the screensaver.
              Excluded from recents — it's ambient, not a task. -->
