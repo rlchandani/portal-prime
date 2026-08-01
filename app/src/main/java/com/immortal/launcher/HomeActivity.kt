@@ -3506,7 +3506,7 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
           Intent(context, HaSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
   }
-  ImmortalWidgetShell(title = "Home", accent = Color(0xFF0A84FF), modifier = modifier.tvFocusableRow { open() }) {
+  ImmortalWidgetShell(title = "Home", accent = Color(0xFF64D2FF), modifier = modifier.tvFocusableRow { open() }) {
     when {
       !configured -> Text("Tap to connect Home Assistant", color = Color(0xFF9A9A9A), fontSize = 14.sp)
       entities.isEmpty() -> Text("Add entities to control", color = Color(0xFF9A9A9A), fontSize = 14.sp)
