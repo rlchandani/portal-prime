@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Unified Screensaver — Shuffle + Selectable Modes</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* Mode picker chrome (bottom-right), for the demo. Hidden in the real build. */
+  #picker { position: fixed; bottom: 24px; right: 24px; z-index: 20; display: flex; flex-wrap: wrap; gap: 6px;
+    max-width: 520px; justify-content: flex-end; }
+  #picker button { font: 13px -apple-system, sans-serif; color: #ddd; background: rgba(20,20,24,0.72);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 6px 12px; cursor: pointer; backdrop-filter: blur(8px); }
+  #picker button.active { background: #3a6df0; color: #fff; border-color: #3a6df0; }
+  #hint { position: fixed; top: 42px; left: 56px; z-index: 20; color: rgba(255,255,255,0.5); font: 14px -apple-system, sans-serif; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="chrome-scrim"></div>
+  <div id="chrome-vignette"></div>
+  <div id="chrome-clock"><div id="chrome-time">--:--</div><div id="chrome-date"></div></div>
+  <div id="chrome-mode"></div>
+  <div id="hint">Unified engine — shuffle picks a mode per beat, matched to photo shapes</div>
+  <div id="picker"></div>
+
+<script src="../photos.js"></script>
+<script src="../engine.js"></script>
+<script src="modes.js"></script>
+<script src="mode-impls.js"></script>
+<script src="engine.js"></script>
+<script>
+const stage = document.getElementById("stage");
+let running = null;
+function startMode(mode) {
+  if (running) running.stop();
+  running = SS.startEngine({
+    stage, mode,
+    onMode: (label) => { document.getElementById("chrome-mode").textContent = (mode === "shuffle" ? "SHUFFLE · " : "") + label.toUpperCase(); },
+  });
+  [...document.querySelectorAll("#picker button")].forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
+}
+
+// Build the picker: Shuffle first, then each mode.
+const picker = document.getElementById("picker");
+function addBtn(mode, label) { const b = document.createElement("button"); b.textContent = label; b.dataset.mode = mode; b.onclick = () => startMode(mode); picker.appendChild(b); }
+addBtn("shuffle", "🎲 Shuffle");
+SS.MODE_IDS.forEach(id => addBtn(id, SS.MODES[id].name));
+
+// Global clock chrome (shared across all modes).
+startClock(document.getElementById("chrome-time"), document.getElementById("chrome-date"));
+
+// Start in Shuffle so you see the intelligent rotation immediately.
+startMode("shuffle");
+</script>
+</body>
+</html>

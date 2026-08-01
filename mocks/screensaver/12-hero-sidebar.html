@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>12 · Hero + Sidebar</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a0c; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #stage { position: fixed; inset: 20px; display: flex; gap: 16px; }
+  .col { display: flex; flex-direction: column; gap: 16px; }
+  .cell { position: relative; overflow: hidden; border-radius: 12px; box-shadow: 0 16px 40px -16px rgba(0,0,0,0.8); flex: 1; }
+  .cell .img { position: absolute; inset: 0; background-size: cover; background-position: center 38%; will-change: transform; transition: opacity 1.1s ease;
+    animation: kb var(--d,20s) ease-in-out infinite alternate; }
+  @keyframes kb { from { transform: scale(1.03); } to { transform: scale(1.1) translate(var(--dx,1%),var(--dy,1%)); } }
+  #hero { flex: 1.9; }
+  #side { flex: 1; }
+  #scrim { position: fixed; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 70%, rgba(0,0,0,0.5) 100%); }
+  #clock { position: fixed; bottom: 44px; left: 60px; color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.7); z-index: 3; }
+  #time { font-size: 72px; font-weight: 200; letter-spacing: -2px; line-height: 1; }
+  #date { font-size: 20px; font-weight: 300; opacity: .82; margin-top: 4px; }
+  .badge { position: fixed; top: 44px; right: 60px; color: rgba(255,255,255,0.5); font-size: 15px; letter-spacing: 1px; z-index: 3; }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <div class="col" id="heroCol" style="flex:1.9"><div class="cell" id="hero"></div></div>
+    <div class="col" id="side" style="flex:1"></div>
+  </div>
+  <div id="scrim"></div>
+  <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
+  <div class="badge">12 · HERO + SIDEBAR</div>
+<script src="photos.js"></script>
+<script src="engine.js"></script>
+<script>
+const heroCell = document.getElementById("hero");
+const side = document.getElementById("side");
+let di = 0;
+const landscapes = shuffled([...byKind("landscape"), ...byKind("pano")]);
+const portraits = shuffled([...byKind("portrait"), ...byKind("square")]);
+let li=0, pi=0;
+const nextL = () => landscapes[li++ % landscapes.length];
+const nextP = () => portraits[pi++ % portraits.length];
+
+function mkImg(p, longEdge){
+  const img=document.createElement("div"); img.className="img";
+  img.style.backgroundImage=`url("${photoUrl(p, longEdge||1400)}")`;
+  img.style.setProperty("--d",(16+Math.random()*8)+"s");
+  img.style.setProperty("--dx",((Math.random()*2-1)*1.5).toFixed(1)+"%");
+  img.style.setProperty("--dy",((Math.random()*2-1)*1.5).toFixed(1)+"%");
+  img.style.animationDelay=(-Math.random()*10)+"s";
+  return img;
+}
+function fillCell(cell, p, longEdge){
+  const img = mkImg(p, longEdge); cell.appendChild(img);
+  const old = cell._img;
+  requestAnimationFrame(()=>{ if(old) old.style.opacity="0"; });
+  setTimeout(()=>{ if(old) old.remove(); }, 1100);
+  cell._img = img;
+}
+
+// Build: big hero (landscape) on the left, two stacked portraits on the right.
+let sideCells = [];
+function buildSide(){
+  side.innerHTML=""; sideCells=[];
+  for (let i=0;i<2;i++){ const c=document.createElement("div"); c.className="cell"; side.appendChild(c); sideCells.push(c); fillCell(c, nextP(), 1100); }
+}
+fillCell(heroCell, nextL(), 1800);
+buildSide();
+startClock(document.getElementById("time"), document.getElementById("date"));
+
+// Rotate: alternate refreshing the hero and one side cell, staggered so it's never all at once.
+let turn=0;
+setInterval(()=>{
+  turn++;
+  if (turn % 3 === 0) fillCell(heroCell, nextL(), 1800);
+  else fillCell(sideCells[turn % sideCells.length], nextP(), 1100);
+}, 4500);
+addEventListener("resize", ()=>{}); // layout is flex, auto-reflows
+</script>
+</body>
+</html>

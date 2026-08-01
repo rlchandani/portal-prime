@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>06 · Memories</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #stage { position: fixed; inset: 0; }
+  /* Single-photo beat (Ken Burns) */
+  .single { position: absolute; inset: 0; opacity: 0; transition: opacity 2s cubic-bezier(0.4,0,0.2,1); }
+  .single.on { opacity: 1; }
+  .single .fill { position: absolute; inset: -8%; background-size: cover; background-position: center; filter: blur(46px) brightness(0.6) saturate(1.2); transform: scale(1.12); }
+  .single .hero { position: absolute; inset: 0; background-size: contain; background-repeat: no-repeat; background-position: center; will-change: transform; }
+  .single.on .hero { animation: kb 12s linear forwards; }
+  @keyframes kb { from { transform: scale(var(--s0,1.04)) translate(var(--x0,0),var(--y0,0)); } to { transform: scale(var(--s1,1.15)) translate(var(--x1,0),var(--y1,0)); } }
+  /* Collage beat (occasional): 3 photos scatter in, then dissolve */
+  .collage { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; }
+  .collage.on { opacity: 1; }
+  .collage .tile { position: absolute; overflow: hidden; border-radius: 10px; box-shadow: 0 20px 50px -18px rgba(0,0,0,0.8);
+    opacity: 0; transform: scale(0.9) translateY(20px); transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); }
+  .collage.on .tile { opacity: 1; transform: none; }
+  .collage .tile .img { position: absolute; inset: 0; background-size: cover; background-position: center 38%; animation: breathe 14s ease-in-out infinite alternate; }
+  @keyframes breathe { from { transform: scale(1.02); } to { transform: scale(1.09); } }
+  #title { position: fixed; top: 50%; left: 0; right: 0; text-align: center; transform: translateY(-50%); color: #fff; opacity: 0; transition: opacity 1s ease; pointer-events: none; }
+  #title.on { opacity: 1; }
+  #title .big { font-size: 64px; font-weight: 300; letter-spacing: -1px; text-shadow: 0 4px 30px rgba(0,0,0,.7); }
+  #title .sub { font-size: 22px; opacity: .8; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
+  #scrim { position: fixed; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 22%, transparent 74%, rgba(0,0,0,0.5) 100%); }
+  #clock { position: fixed; bottom: 40px; left: 54px; color: #fff; text-shadow: 0 2px 16px rgba(0,0,0,.6); }
+  #time { font-size: 72px; font-weight: 200; letter-spacing: -2px; line-height: 1; }
+  #date { font-size: 20px; font-weight: 300; opacity: .82; margin-top: 4px; }
+  .badge { position: fixed; top: 44px; right: 54px; color: rgba(255,255,255,0.5); font-size: 15px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="scrim"></div>
+  <div id="title"><div class="big"></div><div class="sub"></div></div>
+  <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
+  <div class="badge">06 · MEMORIES</div>
+<script src="photos.js"></script>
+<script src="engine.js"></script>
+<script>
+const stage = document.getElementById("stage");
+const single = mkSingle(); stage.appendChild(single.root);
+const collage = document.createElement("div"); collage.className = "collage"; stage.appendChild(collage);
+let idx = 0, beat = 0;
+const order = shuffled(PHOTOS);
+const MEMORY_TITLES = [["Over the Years","a look back"],["This Weekend","recently added"],["On Our Travels","places you've been"],["Golden Hours","favorites"]];
+
+function mkSingle(){ const root=document.createElement("div"); root.className="single"; const fill=document.createElement("div"); fill.className="fill"; const hero=document.createElement("div"); hero.className="hero"; root.appendChild(fill); root.appendChild(hero); return {root,fill,hero}; }
+const next = () => order[idx++ % order.length];
+
+async function showSingle(p){
+  collage.classList.remove("on");
+  const url = photoUrl(p, 2200); await preloadDecoded(url);
+  const kb = kenBurnsPair(p);
+  single.fill.style.backgroundImage = `url("${url}")`;
+  single.hero.style.backgroundImage = `url("${url}")`;
+  single.hero.style.setProperty("--s0",kb.s0); single.hero.style.setProperty("--s1",kb.s1);
+  single.hero.style.setProperty("--x0",kb.x0+"%"); single.hero.style.setProperty("--y0",kb.y0+"%");
+  single.hero.style.setProperty("--x1",kb.x1+"%"); single.hero.style.setProperty("--y1",kb.y1+"%");
+  single.hero.style.animation="none"; void single.hero.offsetWidth; single.hero.style.animation="";
+  single.root.classList.add("on");
+}
+
+async function showCollage(){
+  single.root.classList.remove("on");
+  const [t,s] = MEMORY_TITLES[Math.floor(Math.random()*MEMORY_TITLES.length)];
+  const title = document.getElementById("title");
+  title.querySelector(".big").textContent = t; title.querySelector(".sub").textContent = s;
+  // 3 photos in an asymmetric arrangement
+  const ps = [next(), next(), next()];
+  await Promise.all(ps.map(p=>preloadDecoded(photoUrl(p,1100))));
+  collage.innerHTML = "";
+  const W=innerWidth,H=innerHeight;
+  const slots = [
+    {left:W*0.08,top:H*0.16,w:W*0.42,h:H*0.5},
+    {left:W*0.53,top:H*0.1,w:W*0.36,h:H*0.42},
+    {left:W*0.5,top:H*0.56,w:W*0.4,h:H*0.3},
+  ];
+  ps.forEach((p,i)=>{ const s=slots[i]; const tile=document.createElement("div"); tile.className="tile";
+    tile.style.left=s.left+"px"; tile.style.top=s.top+"px"; tile.style.width=s.w+"px"; tile.style.height=s.h+"px";
+    tile.style.transitionDelay=(i*0.15)+"s";
+    const img=document.createElement("div"); img.className="img"; img.style.backgroundImage=`url("${photoUrl(p,1100)}")`;
+    img.style.animationDelay=(-Math.random()*8)+"s"; tile.appendChild(img); collage.appendChild(tile); });
+  requestAnimationFrame(()=>{ collage.classList.add("on"); title.classList.add("on"); });
+  setTimeout(()=>title.classList.remove("on"), 4500);
+}
+
+async function loop(){
+  beat++;
+  if (beat % 6 === 0) { await showCollage(); setTimeout(loop, 9000); }
+  else { await showSingle(next()); setTimeout(loop, 8500); }
+}
+startClock(document.getElementById("time"), document.getElementById("date"));
+loop();
+</script>
+</body>
+</html>

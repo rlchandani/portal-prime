@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>04 · Living Gallery Wall</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #08080a; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #wall { position: fixed; inset: 0; }
+  .cell { position: absolute; overflow: hidden; border-radius: 6px; box-shadow: 0 10px 30px -12px rgba(0,0,0,0.7);
+    transition: left .8s cubic-bezier(.22,1,.36,1), top .8s cubic-bezier(.22,1,.36,1), width .8s cubic-bezier(.22,1,.36,1), height .8s cubic-bezier(.22,1,.36,1); }
+  .cell .img { position: absolute; inset: 0; background-size: cover; background-position: center 38%;
+    will-change: transform; transition: opacity 1.1s ease; }
+  .cell .img.kb { animation: kb var(--d,18s) ease-in-out infinite alternate; }
+  @keyframes kb { from { transform: scale(1.02); } to { transform: scale(1.09) translate(var(--dx,1%), var(--dy,1%)); } }
+  #scrim { position: fixed; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 16%, transparent 80%, rgba(0,0,0,0.5) 100%); }
+  #clock { position: fixed; bottom: 40px; left: 54px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.6), 0 0 40px rgba(0,0,0,.4); }
+  #time { font-size: 76px; font-weight: 200; letter-spacing: -2px; line-height: 1; }
+  #date { font-size: 20px; font-weight: 300; opacity: .82; margin-top: 4px; }
+  .badge { position: fixed; top: 44px; right: 54px; color: rgba(255,255,255,0.5); font-size: 15px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div id="wall"></div>
+  <div id="scrim"></div>
+  <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
+  <div class="badge">04 · LIVING GALLERY WALL</div>
+<script src="photos.js"></script>
+<script src="engine.js"></script>
+<script>
+const wall = document.getElementById("wall");
+let deck = shuffled(PHOTOS);
+let di = 0;
+const nextPhoto = () => deck[(di++) % deck.length];
+const nextPhotoBucket = (bucket) => {
+  // Prefer same bucket so a cell swap keeps a sensible crop.
+  for (let k = 0; k < deck.length; k++) { const p = deck[(di + k) % deck.length]; if (bucketOf(p) === bucket) { di += k + 1; return p; } }
+  return nextPhoto();
+};
+
+let cells = []; // { el, img, photo }
+
+function buildImg(photo) {
+  const img = document.createElement("div");
+  img.className = "img kb";
+  img.style.backgroundImage = `url("${photoUrl(photo, 1200)}")`;
+  img.style.setProperty("--d", (14 + Math.random()*8) + "s");
+  img.style.setProperty("--dx", ((Math.random()*2-1)*2).toFixed(1) + "%");
+  img.style.setProperty("--dy", ((Math.random()*2-1)*2).toFixed(1) + "%");
+  return img;
+}
+
+function layout() {
+  const W = innerWidth, H = innerHeight;
+  const pad = 16, gutter = 12;
+  const targetH = H > 1000 ? 300 : 240;
+  const rowsWanted = Math.max(2, Math.round((H - pad*2 + gutter) / (targetH + gutter)));
+  // Take a de-duplicated set of photos for this screen (no repeats within one wall).
+  const pick = [];
+  const seen = new Set();
+  let guard = 0;
+  while (pick.length < 18 && guard < deck.length * 2) {
+    const p = deck[(di++) % deck.length]; guard++;
+    if (!seen.has(p.seed)) { seen.add(p.seed); pick.push(p); }
+  }
+  const res = justifiedLayout(pick, W - pad*2, { targetRowHeight: targetH, gutter, maxRows: rowsWanted });
+  // Scale rows vertically to fill the exact height (justified fills width; this removes the bottom gap).
+  const scaleY = (H - pad*2) / Math.max(res.height, 1);
+  return res.cells.map(c => ({ ...c, left: c.left + pad, top: c.top*scaleY + pad, height: c.height*scaleY }));
+}
+
+function render(target) {
+  // FLIP: remember old rects, then move existing cells + fade in/out.
+  const firsts = new Map(cells.map(c => [c, c.el.getBoundingClientRect()]));
+  // Reuse existing cell elements where possible (same index), else create.
+  const wanted = target.length;
+  while (cells.length < wanted) {
+    const el = document.createElement("div"); el.className = "cell";
+    wall.appendChild(el); cells.push({ el, img: null, photo: null });
+  }
+  while (cells.length > wanted) { const c = cells.pop(); c.el.remove(); }
+
+  target.forEach((slot, i) => {
+    const c = cells[i];
+    const first = firsts.get(c);
+    c.el.style.left = slot.left + "px"; c.el.style.top = slot.top + "px";
+    c.el.style.width = slot.width + "px"; c.el.style.height = slot.height + "px";
+    if (c.photo !== slot.photo) {
+      const img = buildImg(slot.photo);
+      c.el.appendChild(img);
+      const old = c.img;
+      requestAnimationFrame(() => { if (old) old.style.opacity = "0"; });
+      setTimeout(() => { if (old) old.remove(); }, 1200);
+      c.img = img; c.photo = slot.photo;
+    }
+    if (first) flip(c.el, first, 800, EASE.outQuint);
+  });
+}
+
+function rebuild() { render(layout()); }
+
+// Staggered single-cell swap — the ambient "alive" default (1 cell at a time).
+function swapOneCell() {
+  if (!cells.length) return;
+  const c = cells[Math.floor(Math.random()*cells.length)];
+  const onWall = new Set(cells.map(x => x.photo && x.photo.seed));
+  // Pick a fresh photo (prefer same bucket) that isn't already shown elsewhere on the wall.
+  let p = null;
+  for (let k = 0; k < deck.length; k++) {
+    const cand = deck[(di + k) % deck.length];
+    if (!onWall.has(cand.seed) && bucketOf(cand) === bucketOf(c.photo)) { p = cand; di += k + 1; break; }
+  }
+  if (!p) for (let k = 0; k < deck.length; k++) { const cand = deck[(di + k) % deck.length]; if (!onWall.has(cand.seed)) { p = cand; di += k + 1; break; } }
+  if (!p) p = nextPhoto();
+  const img = buildImg(p);
+  c.el.appendChild(img);
+  const old = c.img;
+  requestAnimationFrame(() => { if (old) old.style.opacity = "0"; });
+  setTimeout(() => { if (old) old.remove(); }, 1200);
+  c.img = img; c.photo = p;
+}
+
+rebuild();
+startClock(document.getElementById("time"), document.getElementById("date"));
+// Cadence: swap a cell every ~4s; full reshuffle every ~40s (shortened for a demo).
+setInterval(swapOneCell, 4000);
+setInterval(rebuild, 40000);
+addEventListener("resize", rebuild);
+</script>
+</body>
+</html>

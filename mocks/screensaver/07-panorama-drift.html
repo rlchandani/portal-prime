@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>07 · Panorama Drift</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #stage { position: fixed; inset: 0; }
+  .layer { position: absolute; inset: 0; opacity: 0; transition: opacity 2.2s cubic-bezier(0.4,0,0.2,1); overflow: hidden; }
+  .layer.on { opacity: 1; }
+  /* The image is taller/wider than the viewport and slowly translates across — a slow camera dolly. */
+  .pan { position: absolute; top: 0; height: 100%; background-size: cover; background-position: left center; will-change: transform; }
+  .layer.on .pan { animation: dolly var(--dur, 26s) linear forwards; }
+  @keyframes dolly { from { transform: translateX(0); } to { transform: translateX(var(--shift, -20%)); } }
+  #vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(130% 130% at 50% 45%, transparent 60%, rgba(0,0,0,0.45) 100%); }
+  #scrim { position: fixed; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 20%, transparent 76%, rgba(0,0,0,0.5) 100%); }
+  #clock { position: fixed; bottom: 42px; left: 54px; color: #fff; text-shadow: 0 2px 16px rgba(0,0,0,.6); }
+  #time { font-size: 78px; font-weight: 200; letter-spacing: -2px; line-height: 1; }
+  #date { font-size: 20px; font-weight: 300; opacity: .82; margin-top: 4px; }
+  .badge { position: fixed; top: 44px; right: 54px; color: rgba(255,255,255,0.5); font-size: 15px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="vignette"></div>
+  <div id="scrim"></div>
+  <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
+  <div class="badge">07 · PANORAMA DRIFT</div>
+<script src="photos.js"></script>
+<script src="engine.js"></script>
+<script>
+const stage = document.getElementById("stage");
+const layers = [mk(), mk()]; layers.forEach(l=>stage.appendChild(l.root));
+let cur = 0, idx = 0;
+// Favor wide photos here; a slow horizontal dolly across a wide image is the whole point.
+const order = shuffled([...byKind("pano"), ...byKind("landscape"), ...byKind("pano"), ...byKind("landscape")]);
+function mk(){ const root=document.createElement("div"); root.className="layer"; const pan=document.createElement("div"); pan.className="pan"; root.appendChild(pan); return {root,pan}; }
+
+async function loop(){
+  const p = order[idx++ % order.length];
+  const url = photoUrl(p, 2600);
+  await preloadDecoded(url);
+  const L = layers[1-cur];
+  // Make the image wider than viewport so there's room to travel; wider photos get more shift.
+  const overW = aspect(p) > 2.2 ? 165 : 128;
+  L.pan.style.width = overW + "%";
+  L.pan.style.backgroundImage = `url("${url}")`;
+  const shift = -(overW - 100);
+  L.pan.style.setProperty("--shift", shift + "%");
+  L.pan.style.setProperty("--dur", (aspect(p) > 2.2 ? 30 : 22) + "s");
+  L.pan.style.animation = "none"; void L.pan.offsetWidth; L.pan.style.animation = "";
+  layers[cur].root.classList.remove("on");
+  L.root.classList.add("on");
+  cur = 1-cur;
+  setTimeout(loop, 12000);
+}
+startClock(document.getElementById("time"), document.getElementById("date"));
+loop();
+</script>
+</body>
+</html>

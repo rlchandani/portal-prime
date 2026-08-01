@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Screensaver Mocks — Gallery</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0c0c0f; color: #e8e8ea; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; padding: 48px; }
+  h1 { font-weight: 300; font-size: 40px; letter-spacing: -1px; }
+  .sub { color: #8a8a92; margin-top: 8px; font-size: 17px; max-width: 780px; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top: 40px; }
+  a.card { display: block; text-decoration: none; color: inherit; background: #16161a; border: 1px solid #24242b;
+    border-radius: 16px; padding: 22px; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+  a.card:hover { transform: translateY(-3px); border-color: #3a6df0; background: #1b1b21; }
+  .num { color: #3a6df0; font-size: 14px; font-weight: 700; letter-spacing: 2px; }
+  .name { font-size: 22px; font-weight: 500; margin-top: 6px; }
+  .desc { color: #9a9aa2; font-size: 15px; margin-top: 10px; line-height: 1.5; }
+  .tag { display: inline-block; margin-top: 14px; margin-right: 6px; font-size: 12px; color: #b8b8c0;
+    background: #26262e; border-radius: 20px; padding: 4px 11px; }
+  .note { margin-top: 36px; color: #6a6a72; font-size: 14px; }
+</style>
+</head>
+<body>
+  <h1>Screensaver — design mocks</h1>
+  <div class="sub">Twelve premium screensaver modes, each auto-running its real animation with a mixed
+    library of portraits, landscapes, squares & panoramas so you can see how each handles orientation
+    on a wide screen. Click any to open it full-screen; press F11 for true fullscreen. Let it run ~30s
+    to see transitions, Ken Burns, and (where relevant) cell swaps / collage beats.</div>
+  <div class="grid" id="grid"></div>
+  <div class="note">Photos are placeholder samples (Picsum, fixed seeds) — the real build will use your library.
+    All motion, layout, timing & transitions are the actual proposed behavior.</div>
+<script>
+const MODES = [
+  ["01","Cinematic Ken Burns","Single photo, slow linear pan+zoom that keeps moving through the crossfade. Portraits/panoramas get a blurred-fill background (no black bars). Vignette + film grain + ambient clock.",["single","ken burns","blur-fill"]],
+  ["02","Orientation-Aware Diptych","Reads each photo's shape: panoramas span full width, landscapes go solo, and two portraits pair side-by-side to fill the wide screen — the Google/immich signature move.",["pairing","orientation","gallery"]],
+  ["03","Framed Print · Art Mode","Samsung-Frame style: each photo hung as a matted print on a lit gallery wall, thin frame + bevel shadow, long calm dwell. Turns the display into wall art.",["art mode","matte","calm"]],
+  ["04","Living Gallery Wall","Justified-row collage (Flickr algorithm) that's always alive: every cell drifts with Ken Burns, one cell swaps every few seconds, full reshuffle with FLIP morph periodically. The 'God mode' pick.",["collage","justified","FLIP","alive"]],
+  ["05","Cinematic Push","Zoom-through transition — the camera pushes past the old photo as the new one rushes in and settles. Blur-fill, vignette. Bold and filmic.",["single","push","filmic"]],
+  ["06","Memories","Mostly single Ken Burns, but every ~6th beat becomes a titled 'memory' — 3 photos scatter into an asymmetric collage with a headline ('Over the Years'), then dissolve back.",["single","collage beat","titles"]],
+  ["07","Panorama Drift","Slow horizontal camera dolly across wide & panoramic shots — the image is wider than the screen and glides across. Best for landscapes/panos.",["pano","dolly","wide"]],
+  ["08","Polaroid Scatter","Photos drop onto a wood table as tilted polaroid prints with handwritten captions, stacking up then gently clearing. Playful, warm, nostalgic.",["playful","scatter","polaroid"]],
+  ["09","Mosaic Wall","Dense gap-free photo wall via golden-ratio binary partition — a few hero cells + many small ones, orientation-matched. Cells swap & the whole wall reshuffles.",["mosaic","dense","BSP"]],
+  ["10","Filmstrip Coverflow","A horizontal strip of photos glides so each takes center stage, scaled up & bright while neighbors dim. The room glows with the centered photo's color.",["coverflow","ambient","motion"]],
+  ["11","Cinema · Letterbox","2.39:1 scope framing with black bars, film grain, and a slow Ken Burns — a deliberate 'movie' beat. Landscapes & panoramas shine here.",["cinematic","letterbox","grain"]],
+  ["12","Hero + Sidebar","Orientation-aware template: a big landscape hero on the left, two stacked portraits on the right. Cells refresh on a staggered clock. Magazine-like.",["template","hero","magazine"]],
+];
+const grid = document.getElementById("grid");
+MODES.forEach(([num,name,desc,tags])=>{
+  const a = document.createElement("a"); a.className="card"; a.href = `${num}-`+fileFor(num)+".html";
+  a.innerHTML = `<div class="num">MODE ${num}</div><div class="name">${name}</div><div class="desc">${desc}</div>`
+    + tags.map(t=>`<span class="tag">${t}</span>`).join("");
+  grid.appendChild(a);
+});
+function fileFor(num){
+  return {"01":"ken-burns","02":"diptych","03":"framed-print","04":"gallery-wall","05":"cinematic-push",
+    "06":"memories","07":"panorama-drift","08":"polaroid-scatter","09":"mosaic","10":"filmstrip",
+    "11":"cinema-letterbox","12":"hero-sidebar"}[num];
+}
+</script>
+</body>
+</html>

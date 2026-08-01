@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>09 · Mosaic Wall</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #wall { position: fixed; inset: 0; }
+  .cell { position: absolute; overflow: hidden; }
+  .cell .img { position: absolute; inset: 0; background-size: cover; background-position: center 40%; will-change: transform; transition: opacity 1.2s ease;
+    animation: kb var(--d,20s) ease-in-out infinite alternate; }
+  @keyframes kb { from { transform: scale(1.03); } to { transform: scale(1.08) translate(var(--dx,1%),var(--dy,1%)); } }
+  .cell::after { content:""; position:absolute; inset:0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35); pointer-events:none; } /* seam definition */
+  #scrim { position: fixed; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 14%, transparent 82%, rgba(0,0,0,0.5) 100%); }
+  #clock { position: fixed; bottom: 40px; left: 54px; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.7), 0 0 40px rgba(0,0,0,.5); }
+  #time { font-size: 76px; font-weight: 200; letter-spacing: -2px; line-height: 1; }
+  #date { font-size: 20px; font-weight: 300; opacity: .82; margin-top: 4px; }
+  .badge { position: fixed; top: 44px; right: 54px; color: rgba(255,255,255,0.5); font-size: 15px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div id="wall"></div>
+  <div id="scrim"></div>
+  <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
+  <div class="badge">09 · MOSAIC WALL</div>
+<script src="photos.js"></script>
+<script src="engine.js"></script>
+<script>
+const wall = document.getElementById("wall");
+let deck = shuffled(PHOTOS), di = 0;
+const next = () => deck[di++ % deck.length];
+const nextBucket = (b) => { for(let k=0;k<deck.length;k++){const p=deck[(di+k)%deck.length]; if(bucketOf(p)===b){di+=k+1;return p;}} return next(); };
+let cells = [];
+
+// Binary space partition (guillotine) with golden-ratio splits — dense gap-free mosaic with a
+// few hero cells and several small ones. Splits the longer axis; biases ratio toward 0.618.
+function bsp(rect, n){
+  if (n <= 1) return [rect];
+  const k = Math.max(1, Math.round(n * (0.42 + Math.random()*0.16)));
+  const horizontal = rect.w >= rect.h; // split the longer axis
+  const ratio = k / n;
+  if (horizontal){
+    const w1 = Math.round(rect.w * ratio);
+    return bsp({x:rect.x, y:rect.y, w:w1, h:rect.h}, k)
+      .concat(bsp({x:rect.x+w1, y:rect.y, w:rect.w-w1, h:rect.h}, n-k));
+  } else {
+    const h1 = Math.round(rect.h * ratio);
+    return bsp({x:rect.x, y:rect.y, w:rect.w, h:h1}, k)
+      .concat(bsp({x:rect.x, y:rect.y+h1, w:rect.w, h:rect.h-h1}, n-k));
+  }
+}
+
+function build(){
+  wall.innerHTML = ""; cells = [];
+  const rects = bsp({x:0,y:0,w:innerWidth,h:innerHeight}, 9);
+  rects.forEach(r=>{
+    const cell = document.createElement("div"); cell.className="cell";
+    cell.style.left=r.x+"px"; cell.style.top=r.y+"px"; cell.style.width=r.w+"px"; cell.style.height=r.h+"px";
+    // Route a photo whose orientation matches the cell (wide cell → wide photo).
+    const cellA = r.w/r.h;
+    const want = cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape";
+    const p = nextBucket(want);
+    const img = mkImg(p);
+    cell.appendChild(img);
+    wall.appendChild(cell);
+    cells.push({cell, img, photo:p});
+  });
+}
+function mkImg(p){
+  const img=document.createElement("div"); img.className="img";
+  img.style.backgroundImage=`url("${photoUrl(p,1200)}")`;
+  img.style.setProperty("--d",(16+Math.random()*8)+"s");
+  img.style.setProperty("--dx",((Math.random()*2-1)*1.5).toFixed(1)+"%");
+  img.style.setProperty("--dy",((Math.random()*2-1)*1.5).toFixed(1)+"%");
+  img.style.animationDelay=(-Math.random()*10)+"s";
+  return img;
+}
+function swap(){
+  if(!cells.length) return;
+  const c = cells[Math.floor(Math.random()*cells.length)];
+  const cellA = c.cell.offsetWidth/c.cell.offsetHeight;
+  const want = cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape";
+  const p = nextBucket(want);
+  const img = mkImg(p); c.cell.appendChild(img);
+  const old=c.img; requestAnimationFrame(()=>{ if(old) old.style.opacity="0"; });
+  setTimeout(()=>{ if(old) old.remove(); },1200);
+  c.img=img; c.photo=p;
+}
+build();
+startClock(document.getElementById("time"), document.getElementById("date"));
+setInterval(swap, 3500);
+setInterval(build, 45000);
+addEventListener("resize", build);
+</script>
+</body>
+</html>

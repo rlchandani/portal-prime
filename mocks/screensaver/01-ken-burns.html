@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>01 · Cinematic Ken Burns</title>
+<style>
+  :root { --dwell: 9s; --fade: 2.2s; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, "SF Pro Display", "Segoe UI", Roboto, sans-serif; }
+  #stage { position: fixed; inset: 0; }
+
+  /* Two stacked layers we crossfade between. Each holds a blurred fill + a contained hero. */
+  .layer { position: absolute; inset: 0; opacity: 0; transition: opacity var(--fade) cubic-bezier(0.4,0,0.2,1); }
+  .layer.on { opacity: 1; }
+
+  /* Blurred, over-scaled background so portrait/panorama photos never letterbox to black. */
+  .fill {
+    position: absolute; inset: -8%; background-size: cover; background-position: center;
+    filter: blur(46px) saturate(1.25) brightness(0.62); transform: scale(1.12);
+  }
+  /* The hero photo, contained so it's never cropped weirdly; Ken Burns pans/zooms it. */
+  .hero {
+    position: absolute; inset: 0; background-size: contain; background-repeat: no-repeat;
+    background-position: center; will-change: transform;
+  }
+  .layer.on .hero { animation: kb var(--kbdur, 13s) cubic-bezier(0.25,0.1,0.25,1) forwards; }
+
+  /* Ken Burns: gentle zoom + drift. Values injected per-photo via CSS vars for variety. */
+  @keyframes kb {
+    from { transform: scale(var(--s0)) translate(var(--x0), var(--y0)); }
+    to   { transform: scale(var(--s1)) translate(var(--x1), var(--y1)); }
+  }
+
+  /* Cinematic finishing: vignette + subtle film grain + top/bottom scrims for overlay legibility. */
+  #vignette { position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(130% 130% at 50% 45%, transparent 55%, rgba(0,0,0,0.55) 100%); }
+  #scrim { position: fixed; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 22%, transparent 72%, rgba(0,0,0,0.55) 100%); }
+  #grain { position: fixed; inset: 0; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  /* Ambient overlay: big clock top-left, caption bottom-left. */
+  #clock { position: fixed; top: 44px; left: 54px; color: #fff; text-shadow: 0 2px 24px rgba(0,0,0,0.6); }
+  #time { font-size: 96px; font-weight: 200; letter-spacing: -3px; line-height: 1; }
+  #date { font-size: 24px; font-weight: 300; opacity: 0.85; margin-top: 6px; }
+  #caption { position: fixed; bottom: 46px; left: 54px; color: #fff; text-shadow: 0 2px 20px rgba(0,0,0,0.7);
+    font-size: 22px; font-weight: 400; opacity: 0; transition: opacity 1.2s ease; }
+  #caption.on { opacity: 0.92; }
+  .badge { position: fixed; top: 44px; right: 54px; color: rgba(255,255,255,0.5); font-size: 15px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="vignette"></div>
+  <div id="scrim"></div>
+  <div id="grain"></div>
+  <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
+  <div id="caption"></div>
+  <div class="badge">01 · CINEMATIC KEN BURNS</div>
+
+<script src="photos.js"></script>
+<script>
+const stage = document.getElementById("stage");
+const layers = [makeLayer(), makeLayer()];
+layers.forEach(l => stage.appendChild(l.root));
+let cur = 0;
+const order = shuffled(PHOTOS);
+let idx = 0;
+
+function makeLayer() {
+  const root = document.createElement("div"); root.className = "layer";
+  const fill = document.createElement("div"); fill.className = "fill";
+  const hero = document.createElement("div"); hero.className = "hero";
+  root.appendChild(fill); root.appendChild(hero);
+  return { root, fill, hero };
+}
+
+// A tasteful random Ken Burns: zoom from ~1.04→1.16 (or reverse), drifting a few % so edges never
+// pull into view. Portrait/pano photos get a bigger allowable drift along their long axis.
+function kenBurns(p) {
+  const zoomIn = Math.random() > 0.5;
+  const s0 = zoomIn ? 1.04 : 1.16, s1 = zoomIn ? 1.16 : 1.04;
+  const wide = aspect(p) > 1.3;
+  const dxMax = wide ? 4.5 : 2.2, dyMax = wide ? 2.2 : 4.5;
+  const rx = () => (Math.random() * 2 - 1) * dxMax;
+  const ry = () => (Math.random() * 2 - 1) * dyMax;
+  return { s0, s1, x0: rx()+"%", y0: ry()+"%", x1: rx()+"%", y1: ry()+"%" };
+}
+
+function preload(url) { return new Promise(res => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = url; }); }
+
+async function show(p) {
+  const url = photoUrl(p, 2200);
+  await preload(url);
+  const next = 1 - cur;
+  const L = layers[next];
+  const kb = kenBurns(p);
+  L.fill.style.backgroundImage = `url("${url}")`;
+  L.hero.style.backgroundImage = `url("${url}")`;
+  L.hero.style.setProperty("--s0", kb.s0); L.hero.style.setProperty("--s1", kb.s1);
+  L.hero.style.setProperty("--x0", kb.x0); L.hero.style.setProperty("--y0", kb.y0);
+  L.hero.style.setProperty("--x1", kb.x1); L.hero.style.setProperty("--y1", kb.y1);
+  // Restart the KB animation cleanly.
+  L.hero.style.animation = "none"; void L.hero.offsetWidth;
+  L.hero.style.animation = "";
+  layers[cur].root.classList.remove("on");
+  L.root.classList.add("on");
+  cur = next;
+}
+
+async function loop() {
+  const p = order[idx % order.length]; idx++;
+  await show(p);
+  const cap = document.getElementById("caption");
+  cap.textContent = `${p.kind === "pano" ? "Panorama" : p.kind[0].toUpperCase()+p.kind.slice(1)} · ${p.seed}`;
+  cap.classList.add("on");
+  setTimeout(() => cap.classList.remove("on"), 5000);
+  setTimeout(loop, 9000);
+}
+
+function tick() {
+  const d = new Date();
+  let h = d.getHours(); const m = String(d.getMinutes()).padStart(2,"0");
+  const ampm = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
+  document.getElementById("time").textContent = `${h}:${m}`;
+  document.getElementById("date").textContent = d.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric" });
+}
+setInterval(tick, 1000); tick();
+loop();
+</script>
+</body>
+</html>

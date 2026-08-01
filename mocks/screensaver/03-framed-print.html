@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>03 · Framed Print (Art Mode)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0b0c; font-family: "Georgia", "Times New Roman", serif; }
+  /* Gallery-wall canvas: a soft dark room tone with a faint top light, like a lit gallery wall. */
+  #room { position: fixed; inset: 0; background:
+      radial-gradient(120% 80% at 50% -10%, #23231f 0%, #141414 45%, #0b0b0c 100%); }
+  #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+
+  .art { position: absolute; opacity: 0; transition: opacity 2.4s cubic-bezier(0.16,1,0.3,1);
+    display: flex; align-items: center; justify-content: center; }
+  .art.on { opacity: 1; }
+
+  /* The mat/passe-partout: wide off-white border with an inner bevel shadow — The Frame's signature. */
+  .mat { background: #f4f1ea; padding: 46px; border-radius: 2px;
+    box-shadow: 0 40px 90px -20px rgba(0,0,0,0.8), 0 8px 24px rgba(0,0,0,0.5); }
+  .bevel { position: relative; box-shadow: inset 0 2px 6px rgba(0,0,0,0.28), inset 0 -1px 2px rgba(255,255,255,0.4);
+    background: #ddd; }
+  .photo { display: block; background-size: cover; background-position: center;
+    will-change: transform; animation: breathe 22s linear infinite alternate; }
+  @keyframes breathe { from { transform: scale(1.0); } to { transform: scale(1.06); } }
+  /* Thin dark frame edge around the mat. */
+  .frameEdge { padding: 10px; background: linear-gradient(145deg, #2a2622, #4a3f34 40%, #1c1916);
+    border-radius: 3px; box-shadow: 0 50px 100px -24px rgba(0,0,0,0.85); }
+
+  #plate { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); text-align: center;
+    color: #cbb68a; font-size: 17px; letter-spacing: 3px; text-transform: uppercase; opacity: 0;
+    transition: opacity 1.4s ease; font-family: -apple-system, "Segoe UI", sans-serif; }
+  #plate.on { opacity: 0.8; }
+  #clock { position: fixed; top: 40px; left: 54px; color: rgba(255,255,255,0.62);
+    font-family: -apple-system, "Segoe UI", sans-serif; }
+  #time { font-size: 40px; font-weight: 200; letter-spacing: -1px; }
+  .badge { position: fixed; top: 44px; right: 54px; color: rgba(255,255,255,0.4); font-size: 15px; letter-spacing: 1px;
+    font-family: -apple-system, sans-serif; }
+</style>
+</head>
+<body>
+  <div id="room"></div>
+  <div id="stage"></div>
+  <div id="plate"></div>
+  <div id="clock"><div id="time">--:--</div></div>
+  <div class="badge">03 · FRAMED PRINT · ART MODE</div>
+<script src="photos.js"></script>
+<script>
+const stage = document.getElementById("stage");
+const arts = [makeArt(), makeArt()];
+arts.forEach(a => stage.appendChild(a.root));
+let cur = 0, idx = 0;
+const order = shuffled(PHOTOS);
+
+function makeArt(){
+  const root=document.createElement("div"); root.className="art";
+  const frameEdge=document.createElement("div"); frameEdge.className="frameEdge";
+  const mat=document.createElement("div"); mat.className="mat";
+  const bevel=document.createElement("div"); bevel.className="bevel";
+  const photo=document.createElement("div"); photo.className="photo";
+  bevel.appendChild(photo); mat.appendChild(bevel); frameEdge.appendChild(mat); root.appendChild(frameEdge);
+  return { root, photo, mat };
+}
+
+// Fit the print to leave a generous wall margin; portraits get a taller print, landscapes wider.
+function sizeFor(p){
+  const vw = innerWidth, vh = innerHeight;
+  const maxW = vw*0.62, maxH = vh*0.72;
+  const ar = aspect(p);
+  let w = maxW, h = w/ar;
+  if (h > maxH){ h = maxH; w = h*ar; }
+  return { w: Math.round(w), h: Math.round(h) };
+}
+
+function preload(url){ return new Promise(r=>{const i=new Image();i.onload=i.onerror=()=>r();i.src=url;}); }
+
+async function loop(){
+  const p = order[idx++ % order.length];
+  const url = photoUrl(p, 1800);
+  await preload(url);
+  const A = arts[1-cur];
+  const {w,h} = sizeFor(p);
+  A.photo.style.width = w+"px"; A.photo.style.height = h+"px";
+  A.photo.style.backgroundImage = `url("${url}")`;
+  A.photo.style.animationDelay = (-Math.random()*10)+"s";
+  arts[cur].root.classList.remove("on");
+  A.root.classList.add("on");
+  cur = 1-cur;
+  const plate = document.getElementById("plate");
+  plate.textContent = `“${p.seed}”  ·  from your library`;
+  plate.classList.add("on"); setTimeout(()=>plate.classList.remove("on"), 6000);
+  setTimeout(loop, 14000); // art-mode: long, calm dwell
+}
+function tick(){ const d=new Date(); let h=d.getHours(); const m=String(d.getMinutes()).padStart(2,"0"); h=h%12||12;
+  document.getElementById("time").textContent=`${h}:${m}`; }
+setInterval(tick,1000); tick(); loop();
+</script>
+</body>
+</html>

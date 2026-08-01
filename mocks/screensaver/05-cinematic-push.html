@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>05 · Cinematic Push</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #stage { position: fixed; inset: 0; }
+  .layer { position: absolute; inset: 0; opacity: 0; }
+  .fill { position: absolute; inset: -8%; background-size: cover; background-position: center; filter: blur(44px) brightness(0.6) saturate(1.2); transform: scale(1.12); }
+  .hero { position: absolute; inset: 0; background-size: contain; background-repeat: no-repeat; background-position: center; will-change: transform, opacity; }
+  /* Push: incoming rushes in from slightly larger and settles; outgoing pushes past the camera. */
+  .layer.enter { animation: pushIn 1.15s cubic-bezier(0.77,0,0.175,1) forwards; }
+  .layer.leave { animation: pushOut 1.15s cubic-bezier(0.77,0,0.175,1) forwards; }
+  @keyframes pushIn  { from { opacity: 0; transform: scale(1.14); } to { opacity: 1; transform: scale(1.0); } }
+  @keyframes pushOut { from { opacity: 1; transform: scale(1.0); } to { opacity: 0; transform: scale(0.82); } }
+  /* While resting, a slow drift keeps it alive. */
+  .layer.rest .hero { animation: drift 12s linear forwards; }
+  @keyframes drift { from { transform: scale(1.0); } to { transform: scale(1.06); } }
+  #vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(130% 130% at 50% 45%, transparent 58%, rgba(0,0,0,0.5) 100%); }
+  #scrim { position: fixed; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 22%, transparent 74%, rgba(0,0,0,0.5) 100%); }
+  #clock { position: fixed; top: 44px; left: 54px; color: #fff; text-shadow: 0 2px 20px rgba(0,0,0,.6); }
+  #time { font-size: 92px; font-weight: 200; letter-spacing: -3px; line-height: 1; }
+  #date { font-size: 23px; font-weight: 300; opacity: .85; margin-top: 6px; }
+  .badge { position: fixed; top: 44px; right: 54px; color: rgba(255,255,255,0.5); font-size: 15px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="vignette"></div>
+  <div id="scrim"></div>
+  <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
+  <div class="badge">05 · CINEMATIC PUSH</div>
+<script src="photos.js"></script>
+<script src="engine.js"></script>
+<script>
+const stage = document.getElementById("stage");
+const layers = [mk(), mk()];
+layers.forEach(l => stage.appendChild(l.root));
+let cur = 0, idx = 0;
+const order = shuffled(PHOTOS);
+function mk(){ const root=document.createElement("div"); root.className="layer"; const fill=document.createElement("div"); fill.className="fill"; const hero=document.createElement("div"); hero.className="hero"; root.appendChild(fill); root.appendChild(hero); return {root,fill,hero}; }
+
+async function loop(){
+  const p = order[idx++ % order.length];
+  const url = photoUrl(p, 2200);
+  await preloadDecoded(url);
+  const inL = layers[1-cur], outL = layers[cur];
+  inL.fill.style.backgroundImage = `url("${url}")`;
+  inL.hero.style.backgroundImage = `url("${url}")`;
+  inL.root.className = "layer enter";
+  if (idx > 1) outL.root.className = "layer leave";
+  setTimeout(() => { inL.root.className = "layer rest"; inL.root.style.opacity = "1"; }, 1150);
+  cur = 1-cur;
+  setTimeout(loop, 8000);
+}
+startClock(document.getElementById("time"), document.getElementById("date"));
+loop();
+</script>
+</body>
+</html>

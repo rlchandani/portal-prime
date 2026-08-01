@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>02 · Orientation-Aware Diptych</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #stage { position: fixed; inset: 0; }
+  .frame { position: absolute; inset: 0; display: flex; gap: 14px; padding: 0; opacity: 0;
+    transition: opacity 1.8s cubic-bezier(0.4,0,0.2,1); }
+  .frame.on { opacity: 1; }
+  .cell { position: relative; flex: 1; overflow: hidden; }
+  .cell .img { position: absolute; inset: 0; background-size: cover; background-position: center;
+    will-change: transform; animation: drift 16s ease-in-out infinite alternate; }
+  @keyframes drift { from { transform: scale(1.06) translate(-1%, -1%); } to { transform: scale(1.14) translate(1%, 1%); } }
+  /* Blurred fill behind a contained solo landscape/pano so it's framed, not stretched. */
+  .cell.contain .img { background-size: contain; background-repeat: no-repeat; animation: none; }
+  .cell.contain .fill { position: absolute; inset: -6%; background-size: cover; background-position: center;
+    filter: blur(40px) brightness(0.55) saturate(1.2); transform: scale(1.1); }
+  #scrim { position: fixed; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 20%, transparent 74%, rgba(0,0,0,0.5) 100%); }
+  #clock { position: fixed; top: 44px; left: 54px; color: #fff; text-shadow: 0 2px 24px rgba(0,0,0,0.7); }
+  #time { font-size: 88px; font-weight: 200; letter-spacing: -3px; line-height: 1; }
+  #date { font-size: 22px; font-weight: 300; opacity: 0.85; margin-top: 6px; }
+  .badge { position: fixed; top: 44px; right: 54px; color: rgba(255,255,255,0.5); font-size: 15px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="scrim"></div>
+  <div id="clock"><div id="time">--:--</div><div id="date"></div></div>
+  <div class="badge">02 · ORIENTATION-AWARE DIPTYCH</div>
+<script src="photos.js"></script>
+<script>
+const stage = document.getElementById("stage");
+let frames = [makeFrame(), makeFrame()];
+frames.forEach(f => stage.appendChild(f));
+let cur = 0;
+
+const portraits = shuffled(byKind("portrait"));
+const landscapes = shuffled([...byKind("landscape"), ...byKind("square")]);
+const panos = shuffled(byKind("pano"));
+let pi = 0, li = 0, pai = 0;
+
+function makeFrame(){ const f=document.createElement("div"); f.className="frame"; return f; }
+function cellCover(p){
+  const c=document.createElement("div"); c.className="cell";
+  const im=document.createElement("div"); im.className="img"; im.style.backgroundImage=`url("${photoUrl(p,1400)}")`;
+  im.style.animationDelay = (-Math.random()*8)+"s";
+  c.appendChild(im); return c;
+}
+function cellContain(p){
+  const c=document.createElement("div"); c.className="cell contain";
+  const fill=document.createElement("div"); fill.className="fill"; fill.style.backgroundImage=`url("${photoUrl(p,1400)}")`;
+  const im=document.createElement("div"); im.className="img"; im.style.backgroundImage=`url("${photoUrl(p,1800)}")`;
+  c.appendChild(fill); c.appendChild(im); return c;
+}
+
+// Decide the layout for this beat: pano => full-width solo; landscape/square => solo contained;
+// portraits => pair two side-by-side (a classic gallery diptych).
+function buildBeat(f){
+  f.innerHTML = "";
+  const roll = Math.random();
+  if (roll < 0.25 && panos.length){ f.appendChild(cellContain(panos[pai++ % panos.length])); f.dataset.k="Panorama"; }
+  else if (roll < 0.6){ f.appendChild(cellContain(landscapes[li++ % landscapes.length])); f.dataset.k="Landscape"; }
+  else { f.appendChild(cellCover(portraits[pi++ % portraits.length])); f.appendChild(cellCover(portraits[pi++ % portraits.length])); f.dataset.k="Portrait diptych"; }
+}
+
+function preload(urls){ return Promise.all(urls.map(u=>new Promise(r=>{const i=new Image();i.onload=i.onerror=()=>r();i.src=u;}))); }
+
+async function loop(){
+  const next = 1-cur; const f = frames[next];
+  buildBeat(f);
+  const urls = [...f.querySelectorAll(".img,.fill")].map(e=>e.style.backgroundImage.slice(5,-2));
+  await preload(urls);
+  frames[cur].classList.remove("on");
+  f.classList.add("on");
+  cur = next;
+  setTimeout(loop, 8500);
+}
+
+function tick(){ const d=new Date(); let h=d.getHours(); const m=String(d.getMinutes()).padStart(2,"0");
+  h=h%12||12; document.getElementById("time").textContent=`${h}:${m}`;
+  document.getElementById("date").textContent=d.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"}); }
+setInterval(tick,1000); tick(); loop();
+</script>
+</body>
+</html>
