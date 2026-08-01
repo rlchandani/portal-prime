@@ -10,6 +10,7 @@ package com.immortal.launcher
 import android.service.dreams.DreamService
 import android.util.Log
 import android.view.MotionEvent
+import android.view.WindowManager
 
 /**
  * Native photo-frame screensaver. Reproduces the stock Portal idle screen
@@ -31,6 +32,13 @@ class PhotoDreamService : DreamService() {
     isInteractive = true
     isFullscreen = true
     isScreenBright = true
+    // A DreamService window is NOT hardware-accelerated by default, and a WebView renders BLANK
+    // without HW acceleration — which is why the new WebView engine showed nothing here (only the
+    // software-rendered clock overlay) while the preview Activity worked. Force it on so the engine
+    // paints. (The classic ImageView renderer worked either way — ImageViews render in software.)
+    window?.setFlags(
+        WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+        WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
     frame = PhotoFrameController(this)
     frame.onExit = {
       Log.i(TAG, "onExit (tap) -> finish()")
