@@ -377,6 +377,13 @@ class PhotoFrameController(
           ui.post {
             if (media.isNotEmpty()) {
               val ordered = if (source.shuffle) media.shuffled() else media
+              // Engine mode: images only (WebView can't play the video URLs), auth via header inject.
+              if (ScreensaverConfig.usesEngine(settings.mode)) {
+                val urls = ordered.filterNot { it.isVideo }.map { it.url }
+                if (urls.isNotEmpty()) {
+                  startEngine(urls, authHeaders = ImmichSource.authHeaders(source.key)); engineActive = true; return@post
+                }
+              }
               remoteUrls = ordered.map { it.url }
               remoteVideos = media.filter { it.isVideo }.mapTo(HashSet()) { it.url }
               remoteHeaders = ImmichSource.authHeaders(source.key)
@@ -403,6 +410,12 @@ class PhotoFrameController(
           ui.post {
             if (media.isNotEmpty()) {
               val ordered = if (source.shuffle) media.shuffled() else media
+              if (ScreensaverConfig.usesEngine(settings.mode)) {
+                val urls = ordered.filterNot { it.isVideo }.map { it.url }
+                if (urls.isNotEmpty()) {
+                  startEngine(urls, authHeaders = DavSource.authHeaders(source.user, source.pass)); engineActive = true; return@post
+                }
+              }
               remoteUrls = ordered.map { it.url }
               remoteVideos = ordered.filter { it.isVideo }.mapTo(HashSet()) { it.url }
               remoteHeaders = DavSource.authHeaders(source.user, source.pass)
@@ -488,15 +501,20 @@ class PhotoFrameController(
   /**
    * Render the photos with the bundled HTML/JS screensaver engine (assets/screensaver) instead of
    * the native crossfade — the premium multi-style modes. [photoUrls] are file:// paths (local
-   * folder) or http(s) URLs (Immich/DAV/album/feed). [headers] auth remote sources (unused by the
-   * WebView's own <img> loads today, so remote sources needing auth headers still fall back to the
-   * native renderer — see the caller). The engine reads the list + mode via the injected JS bridge.
+   * folder) or http(s) URLs (Immich/DAV/album/feed). When a source needs auth headers (Immich
+   * x-api-key, WebDAV Basic) the WebView's plain <img> loads can't send them, so [authHeaders] are
+   * injected by intercepting each request and re-fetching with the headers (see the WebViewClient
+   * below). The engine reads the photo list + mode via the injected JS bridge.
    *
    * The engine draws the photos; the Face overlay (clock/weather) stays on top as usual, and
    * tap-to-exit still works because we suppress the WebView's own touch handling.
    */
   @android.annotation.SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface")
-  private fun startEngine(photoUrls: List<String>, dims: Map<String, Pair<Int, Int>> = emptyMap()) {
+  private fun startEngine(
+      photoUrls: List<String>,
+      dims: Map<String, Pair<Int, Int>> = emptyMap(),
+      authHeaders: Map<String, String> = emptyMap(),
+  ) {
     val wv =
         object : android.webkit.WebView(context) {
           override fun onTouchEvent(event: MotionEvent): Boolean = false
@@ -515,7 +533,31 @@ class PhotoFrameController(
       @Suppress("DEPRECATION")
       allowFileAccessFromFileURLs = true
     }
-    wv.webViewClient = android.webkit.WebViewClient()
+    // When the source needs auth headers, intercept the engine's image requests and re-issue them
+    // with the headers, streaming the bytes back. Only http(s) GETs to a non-local host are touched;
+    // the local engine assets (file://) pass straight through. Failures return null → normal load.
+    wv.webViewClient =
+        if (authHeaders.isEmpty()) android.webkit.WebViewClient()
+        else object : android.webkit.WebViewClient() {
+          override fun shouldInterceptRequest(
+              v: android.webkit.WebView,
+              req: android.webkit.WebResourceRequest,
+          ): android.webkit.WebResourceResponse? {
+            val u = req.url
+            val scheme = u.scheme?.lowercase()
+            if (scheme != "http" && scheme != "https") return null
+            if (!req.method.equals("GET", ignoreCase = true)) return null
+            val bytes = Http.getBytes(u.toString(), headers = authHeaders) ?: return null
+            val mime = when {
+              u.toString().endsWith(".png", true) -> "image/png"
+              u.toString().endsWith(".webp", true) -> "image/webp"
+              u.toString().endsWith(".gif", true) -> "image/gif"
+              else -> "image/jpeg"
+            }
+            return android.webkit.WebResourceResponse(
+                mime, "utf-8", java.io.ByteArrayInputStream(bytes))
+          }
+        }
 
     // JS bridge: the engine calls Android.getPhotos()/getMode()/use24Hour() to pull its inputs.
     val photosJson =
