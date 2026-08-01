@@ -693,7 +693,9 @@ class PhotoFrameController(
     // Resolve the place name on this background thread (network) before touching the UI.
     val place = if (meta.hasLocation) PhotoCaption.placeName(meta.lat!!, meta.lng!!) else null
     val date = PhotoCaption.formatDate(meta.dateMillis)
-    ui.post { if (g == gen) faceRenderer.setCaption(place, date) }
+    // "On this day": an amber badge when the photo was taken on today's month+day in a prior year.
+    val memory = PhotoCaption.memoryYears(meta.dateMillis)?.let { PhotoCaption.memoryLabel(it) }
+    ui.post { if (g == gen) faceRenderer.setCaption(place, date, memory) }
   }
 
   /** A clean upcoming-events panel top-right, over the photo. Its own translucent

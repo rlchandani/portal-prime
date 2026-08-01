@@ -114,8 +114,9 @@ class FaceRenderer(
   private var lastArtBitmap: Bitmap? = null
   private var npListener: NowPlayingHub.Listener? = null
 
-  // Photo caption (place / date). A grid element like the rest, fed per-photo via [setCaption].
+  // Photo caption (place / date + "on this day" badge). Grid element, fed via [setCaption].
   private var captionPanel: LinearLayout? = null
+  private var captionMemory: TextView? = null
   private var captionPlace: TextView? = null
   private var captionDate: TextView? = null
 
@@ -485,6 +486,14 @@ class FaceRenderer(
     col.orientation = LinearLayout.VERTICAL
     col.gravity = align
     col.visibility = View.GONE
+    // "On this day" memory badge — warm amber, above the place/date lines. Only shows for a
+    // photo taken on today's month+day in a prior year (PhotoCaption.memoryYears).
+    val memory = text(15f, 0xFFFFD66E.toInt(), false)
+    memory.typeface = Typeface.DEFAULT_BOLD
+    memory.letterSpacing = 0.04f
+    memory.maxLines = 1
+    memory.gravity = align
+    memory.visibility = View.GONE
     val place = text(19f, Color.WHITE, false)
     place.typeface = Typeface.DEFAULT_BOLD
     place.maxLines = 1
@@ -493,6 +502,7 @@ class FaceRenderer(
     val date = text(14f, 0xCCFFFFFF.toInt(), true)
     date.maxLines = 1
     date.gravity = align
+    col.addView(memory, LinearLayout.LayoutParams(WRAP, WRAP))
     col.addView(place, LinearLayout.LayoutParams(WRAP, WRAP))
     col.addView(date, LinearLayout.LayoutParams(WRAP, WRAP))
     // Top margin gives breathing room from whatever sits above in the same cell (the now-playing
@@ -500,22 +510,29 @@ class FaceRenderer(
     bucket(spec.position)
         .addView(col, LinearLayout.LayoutParams(WRAP, WRAP).apply { topMargin = dp(18) })
     captionPanel = col
+    captionMemory = memory
     captionPlace = place
     captionDate = date
   }
 
   /**
    * Push the latest photo caption (main thread). A blank/absent place AND date hides it; otherwise
-   * each line shows only when it has content. No-op when the caption isn't built (disabled, or a
-   * full-bleed face).
+   * each line shows only when it has content. [memory] is the "N years ago today" badge — shown
+   * above the place when non-null. No-op when the caption isn't built (disabled, or a full-bleed
+   * face).
    */
-  fun setCaption(place: String?, date: String?) {
+  fun setCaption(place: String?, date: String?, memory: String? = null) {
     val col = captionPanel ?: return
     val p = place?.takeIf { it.isNotBlank() }
     val d = date?.takeIf { it.isNotBlank() }
-    if (p == null && d == null) {
+    val m = memory?.takeIf { it.isNotBlank() }
+    if (p == null && d == null && m == null) {
       col.visibility = View.GONE
       return
+    }
+    captionMemory?.apply {
+      visibility = if (m == null) View.GONE else View.VISIBLE
+      text = m ?: ""
     }
     captionPlace?.apply {
       visibility = if (p == null) View.GONE else View.VISIBLE
