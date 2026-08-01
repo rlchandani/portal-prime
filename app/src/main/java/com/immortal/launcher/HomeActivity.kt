@@ -423,65 +423,21 @@ private fun LeftWidgetColumn(
       modifier = modifier,
       verticalArrangement = Arrangement.spacedBy(12.dp),
   ) {
-    // Greeting card (always present). Wraps its content so the date line isn't clipped.
-    LiquidGlassWidget(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
-      Column(
-          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 18.dp),
-          verticalArrangement = Arrangement.spacedBy(2.dp),
-      ) {
-        Text(
-            text = "$greetingWord,",
-            color = Color.White.copy(alpha = 0.7f),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Light,
-        )
-        // Only render the name line when the user has set one (blank by default — avoids a
-        // placeholder name; the greeting word alone reads fine).
-        if (userName.isNotBlank()) {
-          Text(
-              text = userName,
-              color = Color.White,
-              fontSize = 28.sp,
-              fontWeight = FontWeight.Bold,
-              letterSpacing = (-1).sp,
-          )
-        }
-        Text(
-            text = dateString,
-            color = Color.White.copy(alpha = 0.5f),
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Light,
-        )
-      }
-    }
-
-    // Today strip (always present): next event · feels-like + hi/lo · moon phase + sun times.
-    TodayStripWidget(modifier = Modifier.fillMaxWidth())
-
-    // Now Playing card — driven by NowPlayingHub; self-hides when nothing is playing (like the
-    // other dashboard cards) rather than showing a dead "Tap to play" stub. Tapping toggles play/pause.
-    NowPlayingCard(modifier = Modifier.fillMaxWidth())
-
-    // Premium dashboard cards (self-hiding when their data/target isn't available):
-    // smart-home quick controls and a photo memory. (Calling lives on the app grid as
-    // the "Calls" tile, not here.)
-    QuickControlsWidget(modifier = Modifier.fillMaxWidth())
-    PhotoMemoryStrip(modifier = Modifier.fillMaxWidth())
-
-    // Store-driven resizable + reorderable widgets.
-    // Mirrors the app-icon grid EXACTLY: a LazyVerticalGrid(2) whose reorderable state edits the
-    // same list the grid renders (1:1 index mapping) and persists the new order. A Small widget
-    // (spanX==1) fills one column; Medium/Large (spanX>=2) span both columns. The greeting and
-    // now-playing chrome stay fixed above; the "+ Add Widget" tile is a non-draggable full-span
-    // item at the end. The grid is weight(1f) inside this fillMaxHeight column so it is bounded
-    // (no scrolling parent → no infinite-height measure crash).
+    // The WHOLE left column scrolls as one surface: the dashboard chrome (greeting, today strip,
+    // now playing, quick controls, photo memory) rides inside the LazyVerticalGrid as full-span
+    // header items, so when there are more widgets than fit the viewport everything scrolls
+    // together instead of the fixed cards eating the visible area.
+    //
+    // Reordering maps drag positions to the widget list BY KEY (not index): the header items
+    // shift the grid indices, and some headers self-hide, so indices are not 1:1 with the list.
+    // Header keys never match a widget key, so a drag over a header is a no-op.
     val widgetGridState = rememberLazyGridState()
     val widgetReorderState = rememberReorderableLazyGridState(widgetGridState) { from, to ->
-      // Called continuously as items cross during drag. Reorder the displayed list (indexed
-      // identically to what the grid renders) so from/to line up 1:1, then persist the order.
       val list = homeWidgets.toMutableList()
-      if (from.index in list.indices && to.index in list.indices) {
-        list.add(to.index, list.removeAt(from.index))
+      val fromIdx = list.indexOfFirst { it.key == from.key }
+      val toIdx = list.indexOfFirst { it.key == to.key }
+      if (fromIdx >= 0 && toIdx >= 0) {
+        list.add(toIdx, list.removeAt(fromIdx))
         onWidgetsChanged(list)
       }
     }
@@ -495,6 +451,53 @@ private fun LeftWidgetColumn(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+      // ---- Fixed dashboard chrome (full-span headers; not reorderable, not resizable) ----
+      item(key = "hdr-greeting", span = { GridItemSpan(2) }) {
+        LiquidGlassWidget(modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(bottom = 4.dp)) {
+          Column(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 18.dp),
+              verticalArrangement = Arrangement.spacedBy(2.dp),
+          ) {
+            Text(
+                text = "$greetingWord,",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Light,
+            )
+            // Only render the name line when the user has set one (blank by default — avoids a
+            // placeholder name; the greeting word alone reads fine).
+            if (userName.isNotBlank()) {
+              Text(
+                  text = userName,
+                  color = Color.White,
+                  fontSize = 28.sp,
+                  fontWeight = FontWeight.Bold,
+                  letterSpacing = (-1).sp,
+              )
+            }
+            Text(
+                text = dateString,
+                color = Color.White.copy(alpha = 0.5f),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Light,
+            )
+          }
+        }
+      }
+      item(key = "hdr-today", span = { GridItemSpan(2) }) {
+        TodayStripWidget(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp))
+      }
+      item(key = "hdr-nowplaying", span = { GridItemSpan(2) }) {
+        NowPlayingCard(modifier = Modifier.fillMaxWidth())
+      }
+      item(key = "hdr-quick", span = { GridItemSpan(2) }) {
+        QuickControlsWidget(modifier = Modifier.fillMaxWidth())
+      }
+      item(key = "hdr-memory", span = { GridItemSpan(2) }) {
+        PhotoMemoryStrip(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp))
+      }
+
+      // ---- Store-driven resizable + reorderable widgets ----
       items(
           homeWidgets,
           key = { it.key },
