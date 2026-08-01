@@ -90,9 +90,12 @@ internal val IosSegmentInactive = Color(0xFF3A3A3C) // unselected segment label
  * sub-page — reads its type sizes and metrics from here so they can't drift.
  */
 internal object Sizes {
-    val titleSidebar = 32.sp   // big left-aligned "Settings" in the sidebar
     val titlePage = 34.sp      // sub-page H1
-    val titleBar = 28.sp       // two-panel detail top-bar header
+    // Shared two-panel header title — used for BOTH the sidebar "Settings" heading and the
+    // right-panel section title so they match in size/weight and sit on the same baseline.
+    val panelTitle = 30.sp     // two-panel header title (sidebar + detail top-bar)
+    val panelTitleTop = 20.dp  // top padding above the header title in both panels (aligns baselines)
+    val panelTitleBottom = 14.dp // bottom padding below the header title in both panels (equal heights)
     val pageSubtitle = 19.sp   // sub-page subtitle
     val sectionLabel = 16.sp   // uppercase grey group headers
     val navLabel = 21.sp       // sidebar nav-row label

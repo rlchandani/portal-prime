@@ -698,16 +698,20 @@ private fun IosNavBar(title: String) {
       modifier = Modifier
           .fillMaxWidth()
           .background(IosBackground)
-          .padding(start = 22.dp, end = 16.dp, top = 6.dp, bottom = 12.dp),
+          .padding(
+              start = 22.dp,
+              end = 16.dp,
+              top = Sizes.panelTitleTop,
+              bottom = Sizes.panelTitleBottom),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Start,
   ) {
     Text(
         text = title,
         color = IosLabel,
-        fontSize = Sizes.titleSidebar,
-        fontWeight = FontWeight.Bold,
-        letterSpacing = (-0.5).sp,
+        fontSize = Sizes.panelTitle,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = (-0.4).sp,
     )
   }
 }
@@ -722,10 +726,12 @@ private fun SidebarSearch(query: String, onQueryChange: (String) -> Unit) {
   Row(
       modifier = Modifier
           .fillMaxWidth()
-          .padding(start = 16.dp, end = 16.dp, bottom = 14.dp)
+          // Balanced vertical margin so the search box doesn't touch the title above or the
+          // list below; comfortable inner padding so the field breathes inside the grey pill.
+          .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 14.dp)
           .clip(RoundedCornerShape(10.dp))
           .background(Color(0xFFDFDFE6))
-          .padding(horizontal = 12.dp, vertical = 4.dp),
+          .padding(horizontal = 12.dp, vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(6.dp),
   ) {
@@ -759,15 +765,15 @@ private fun DetailTopBar(title: String, subtitle: String = "") {
     Text(
         text = title,
         color = IosLabel,
-        fontSize = Sizes.titleBar,
+        fontSize = Sizes.panelTitle,
         fontWeight = FontWeight.SemiBold,
         letterSpacing = (-0.4).sp,
         modifier =
             Modifier.padding(
                 start = 32.dp,
                 end = 32.dp,
-                top = 20.dp,
-                bottom = if (subtitle.isEmpty()) 16.dp else 2.dp),
+                top = Sizes.panelTitleTop,
+                bottom = if (subtitle.isEmpty()) Sizes.panelTitleBottom else 2.dp),
     )
     // Sub-screens used to show a descriptive subtitle in their SettingsScaffold; now that they're
     // inlined, that context lives here on the panel's top bar instead.
