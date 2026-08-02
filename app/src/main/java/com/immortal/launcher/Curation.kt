@@ -108,8 +108,21 @@ object Curation {
    */
   private val ICON_OVERRIDES: Map<String, Int> =
       mapOf(
-          "org.chromium.chrome" to R.drawable.icon_chrome,
-          "org.videolan.vlc" to R.drawable.icon_vlc,
+          // Dusk Aurora icon system (mock 06): a two-stop diagonal gradient squircle with a white
+          // line glyph, per app accent. Every stock app on the grid gets one so the whole grid
+          // reads as one designed set (the mock's approved look) instead of a mixed bag.
+          "org.chromium.chrome" to R.drawable.icon_browser_tile,
+          "org.videolan.vlc" to R.drawable.icon_vlc_tile,
+          "com.aurora.store" to R.drawable.icon_aurora,
+          "org.fdroid.fdroid" to R.drawable.icon_fdroid_tile,
+          "com.android.quicksearchbox" to R.drawable.icon_google_tile,
+          "com.google.android.googlequicksearchbox" to R.drawable.icon_google_tile,
+          "org.breezyweather" to R.drawable.icon_weather_tile,
+          "com.portal.assistant" to R.drawable.icon_jarvis_tile,
+          // com.portal.calendar is the app labelled "PortalHub" on this device (orange radio in
+          // the mock); the red calendar tile stays available for a real calendar app.
+          "com.portal.calendar" to R.drawable.icon_portalhub_tile,
+          "com.facebook.alohaapps.settings" to R.drawable.icon_portal_settings_tile,
           "de.danoeh.antennapod" to R.drawable.icon_antennapod,
           "org.schabi.newpipe" to R.drawable.icon_newpipe,
           "me.zhanghai.android.files" to R.drawable.icon_folder,
@@ -120,12 +133,8 @@ object Curation {
           "org.mozilla.firefox" to R.drawable.icon_firefox,
           "com.spotify.music" to R.drawable.icon_spotify,
           "com.google.android.gm" to R.drawable.icon_gmail,
-          "com.google.android.googlequicksearchbox" to R.drawable.icon_google,
-          // The Portal's search app is AOSP QuickSearchBox, not Google's GSA package.
-          "com.android.quicksearchbox" to R.drawable.icon_google,
           "io.homeassistant.companion.android" to R.drawable.icon_homeassistant,
-          // Jarvis (the on-device AI assistant) — override its stock icon with an assistant-orb.
-          "com.portal.assistant" to R.drawable.icon_jarvis,
+          "io.homeassistant.companion.android.minimal" to R.drawable.icon_homeassistant,
       )
 
   /**
