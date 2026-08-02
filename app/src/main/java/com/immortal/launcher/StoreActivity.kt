@@ -704,7 +704,8 @@ private fun CategoryJumpBar(
               .fillMaxWidth()
               .padding(16.dp)
               .clip(RoundedCornerShape(26.dp))
-              .background(Color(0xF2FFFFFF)),
+              // Frosted dark pill (was near-opaque white — a light-theme leftover).
+              .background(Color(0xF21E2230)),
   ) {
     Row(
         modifier =
