@@ -72,7 +72,7 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
 
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
-    ToolCard {
+    ToolCard(onClose = onDismiss) {
       Text("🛰️ Space station overhead", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
       val p = passes
       when {
@@ -130,7 +130,6 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
           )
         }
       }
-      CloseButton("Close", onDismiss)
     }
   }
 }
@@ -149,7 +148,7 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
 
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
-    ToolCard {
+    ToolCard(onClose = onDismiss) {
       Text("🌌 Aurora outlook", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
       val st = status
       when {
@@ -186,7 +185,6 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
           )
         }
       }
-      CloseButton("Close", onDismiss)
     }
   }
 }
@@ -220,7 +218,8 @@ internal fun SpeedTestOverlay(onDismiss: () -> Unit) {
   val cfg = androidx.compose.ui.platform.LocalConfiguration.current
   val cardWidth = (cfg.screenWidthDp * 0.6f).dp.coerceIn(520.dp, 720.dp)
   Scrim(onDismiss) {
-    Surface(shape = RoundedCornerShape(28.dp), color = IosCard) {
+    Surface(shape = RoundedCornerShape(28.dp), color = ToolWindow) {
+      Box {
       Column(modifier = Modifier.width(cardWidth).padding(32.dp)) {
         Text("Speed test", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
         Text(
@@ -256,7 +255,9 @@ internal fun SpeedTestOverlay(onDismiss: () -> Unit) {
           Text(label, color = if (busy) IosSecondary else Color.White, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp))
         }
         Spacer(Modifier.size(12.dp))
-        CloseButton("Close", onDismiss)
+        }
+      // Consistent close affordance: one ✕, top-right (matches every other tool window).
+      Box(modifier = Modifier.align(Alignment.TopEnd).padding(18.dp)) { CloseCircle(onDismiss) }
       }
     }
   }
@@ -324,7 +325,7 @@ internal fun ConverterOverlay(onDismiss: () -> Unit) {
 
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
-    ToolCard {
+    ToolCard(onClose = onDismiss) {
       Text("🔢 Converter", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
       ChipRow(categories, category) { category = it }
       TextField(
@@ -346,7 +347,6 @@ internal fun ConverterOverlay(onDismiss: () -> Unit) {
           fontSize = 40.sp,
           fontWeight = FontWeight.Bold,
       )
-      CloseButton("Close", onDismiss)
     }
   }
 }
@@ -370,7 +370,7 @@ internal fun TimersOverlay(onDismiss: () -> Unit) {
 
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
-    ToolCard {
+    ToolCard(onClose = onDismiss) {
       Text("⏲️ Timers", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
       Text("Start a timer", color = IosSecondary, fontSize = 16.sp)
       val presets = listOf(1, 3, 5, 10, 15, 30)
@@ -405,7 +405,6 @@ internal fun TimersOverlay(onDismiss: () -> Unit) {
           }
         }
       }
-      CloseButton("Close", onDismiss)
     }
   }
 }
@@ -438,7 +437,7 @@ internal fun NotesOverlay(onDismiss: () -> Unit) {
 
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
-    ToolCard {
+    ToolCard(onClose = onDismiss) {
       Text("📝 Leave a note", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
       TextField(
           value = text,
@@ -468,7 +467,6 @@ internal fun NotesOverlay(onDismiss: () -> Unit) {
           PillButton("Delete", { NotesConfig.clearAudio(context); hasAudio = false }, Modifier.weight(1f))
         }
       }
-      CloseButton("Close", onDismiss)
     }
   }
 }
@@ -533,7 +531,7 @@ private fun fmtClock(ms: Long): String {
  * Full-screen scrim over the home page. Tapping outside the card does NOT dismiss (the tap is
  * swallowed) — closing is only via the card's explicit Close button or Back, so an accidental
  * outside-tap while using a tool can't lose your place. Uses the SAME dim as the Tools folder grid
- * (0x99 / 60% black) so opening a tool from the folder keeps the identical background darkness.
+ * (0x4D / 30% black) so opening a tool from the folder keeps the identical background darkness.
  * Keep this alpha in sync with ToolsScreen's scrim.
  *
  * [onDismiss] is still wired to Back (via each overlay's BackHandler); the scrim itself just
@@ -545,7 +543,7 @@ internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
       contentAlignment = Alignment.Center,
       modifier =
           Modifier.fillMaxSize()
-              .background(Color(0x99000000))
+              .background(Color(0x4D000000))
               .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { /* swallow — no tap-to-dismiss */ },
   ) {
     content()
@@ -559,31 +557,32 @@ internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
  * floating window rather than a cramped little box, while the scrim still frames it as a pop-up.
  */
 @Composable
-internal fun ToolCard(maxWidth: Int = 860, content: @Composable () -> Unit) {
+internal fun ToolCard(maxWidth: Int = 860, onClose: (() -> Unit)? = null, content: @Composable () -> Unit) {
   val cfg = androidx.compose.ui.platform.LocalConfiguration.current
   val cardWidth = (cfg.screenWidthDp * 0.72f).dp.coerceAtMost(maxWidth.dp)
   val cardMaxHeight = (cfg.screenHeightDp * 0.82f).dp
   Surface(
-      color = IosCard,
+      // A step lighter than the settings card tone — tool windows sit over a dimmed home and
+      // read too heavy at IosCard; this keeps them clearly "windows", not voids.
+      color = ToolWindow,
       shape = RoundedCornerShape(28.dp),
       modifier = Modifier.width(cardWidth).heightIn(max = cardMaxHeight).padding(24.dp),
   ) {
-    Column(
-        modifier = Modifier.padding(32.dp).verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-    ) {
-      content()
+    Box {
+      Column(
+          modifier = Modifier.padding(32.dp).verticalScroll(rememberScrollState()),
+          verticalArrangement = Arrangement.spacedBy(20.dp),
+      ) {
+        content()
+      }
+      // THE close affordance: one ✕, always top-right (consistent across every tool window).
+      if (onClose != null) {
+        Box(modifier = Modifier.align(Alignment.TopEnd).padding(18.dp)) { CloseCircle(onClose) }
+      }
     }
   }
 }
 
-@Composable
-internal fun CloseButton(label: String, onClick: () -> Unit) {
-  Surface(
-      color = IosBackground,
-      shape = RoundedCornerShape(16.dp),
-      modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) { onClick() },
-  ) {
-    Text(label, color = IosBlue, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 16.dp).fillMaxWidth())
-  }
-}
+/** Tool-window surface tone — lighter than [IosCard] so floating tools don't read as voids. */
+internal val ToolWindow = Color(0xFF2A2F40)
+

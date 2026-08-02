@@ -14,6 +14,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -115,11 +117,8 @@ private fun ToolsRoot(onExit: () -> Unit) {
 private fun ToolPageOverlay(title: String, onDismiss: () -> Unit, content: @Composable () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
-    ToolCard {
-      Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Text(title, color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-        CloseCircle(onDismiss)
-      }
+    ToolCard(onClose = onDismiss) {
+      Text(title, color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
       content()
     }
   }
@@ -173,9 +172,9 @@ private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
       ToolItem("Speed test", R.drawable.ic_tool_speed, Color(0xFF5E5CE6)) { onOpen(ToolPage.SPEEDTEST) },
   )
 
-  // iOS-style folder: a dark scrim over the (translucent-window) home, with a centered floating
-  // card holding the tool grid. Closing is via the explicit ✕ button (top-right) or Back — NOT by
-  // tapping outside, so an accidental outside-tap while using a tool can't dismiss it.
+  // iOS-style folder: a light scrim over the (translucent-window) home, with a centered floating
+  // card holding the tool grid. Like an iPadOS folder it closes on tap-outside or Back — no ✕
+  // (tools OPENED from the folder keep an explicit top-right ✕; the folder itself is ephemeral).
   val cfg = androidx.compose.ui.platform.LocalConfiguration.current
   val cardWidth = (cfg.screenWidthDp * 0.82f).dp.coerceAtMost(1100.dp)
   Box(
@@ -183,18 +182,20 @@ private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
           .onPreviewKeyEvent { e ->
             if (e.key == Key.Back) { if (e.type == KeyEventType.KeyUp) onExit(); true } else false
           }
-          .background(Color(0x99000000)),
+          .background(Color(0x4D000000))
+          .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onExit() },
       contentAlignment = Alignment.Center,
   ) {
     Surface(
         color = IosBackground,
         shape = RoundedCornerShape(32.dp),
-        modifier = Modifier.width(cardWidth).padding(24.dp),
+        modifier = Modifier.width(cardWidth).padding(24.dp)
+            // Consume taps on the card so only true outside-taps dismiss.
+            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {},
     ) {
       Column(modifier = Modifier.padding(horizontal = 32.dp, vertical = 28.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
           Text("Tools", color = IosLabel, fontSize = 32.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-          CloseCircle(onExit)
         }
         Spacer(Modifier.size(24.dp))
         val perRow = 4
