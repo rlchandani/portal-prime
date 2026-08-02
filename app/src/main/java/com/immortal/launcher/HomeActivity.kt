@@ -2486,10 +2486,11 @@ private fun ImmortalWidgetShell(
     accent: Color = Color(0xFF7AA7FF),
     content: @Composable ColumnScope.() -> Unit,
 ) {
-  // Use the EXACT same LiquidGlass surface as the Calendar/dashboard cards (one source of truth),
-  // so every widget is visually homogeneous — no more slightly-different hand-rolled backgrounds.
-  LiquidGlassWidget(modifier = modifier) {
-    Column(modifier = Modifier.fillMaxWidth().padding(18.dp)) {
+  // BARE content — no surface here. The widget grid cell provides THE one LiquidGlass surface
+  // (single source of truth); a shell that painted its own glass double-glazed the card, which
+  // is why converted widgets looked darker than the rest.
+  Column(modifier = modifier.padding(18.dp)) {
+    Column(modifier = Modifier.fillMaxWidth()) {
       Text(
           title.uppercase(Locale.getDefault()),
           color = accent,
@@ -2534,7 +2535,8 @@ private fun PhotoMemoryStrip(modifier: Modifier = Modifier) {
       }
   val bmp = photo ?: return // no readable local photos → hide the strip entirely
 
-  LiquidGlassWidget(modifier = modifier.wrapContentHeight()) {
+  // Bare content — the widget grid cell provides the glass surface.
+  Box(modifier = modifier) {
     Row(
         modifier = Modifier.fillMaxWidth().clickable { onOpen() }.padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -2587,7 +2589,8 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
   }
   if (tiles.isEmpty()) return // nothing installed to control → don't show an empty card
 
-  LiquidGlassWidget(modifier = modifier.wrapContentHeight()) {
+  // Bare content — the widget grid cell provides the glass surface.
+  Box(modifier = modifier) {
     Column(modifier = Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
       Text("Quick controls", color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, fontWeight = FontWeight.Medium)
       // Up to 4 tiles per row. When a row is full it stretches evenly (weight); a partial last row
@@ -2698,7 +2701,8 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
   val (moonGlyph, moonName) = remember { moonPhase(System.currentTimeMillis()) }
   val sunPair = sun?.formatted(use24)
 
-  LiquidGlassWidget(modifier = modifier.wrapContentHeight()) {
+  // Bare content — the widget grid cell provides the glass surface.
+  Box(modifier = modifier) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -2815,7 +2819,9 @@ private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
   Box(
       modifier =
           modifier
-              .clip(RoundedCornerShape(24.dp))
+              // 22dp matches the grid cell's LiquidGlass exactly, so the painted sky fills the
+              // glass card edge-to-edge with no rim peeking through.
+              .clip(RoundedCornerShape(22.dp))
               .background(Brush.verticalGradient(sky))
               .padding(18.dp),
   ) {
@@ -3003,8 +3009,8 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
   // No header, tight chrome. The row fills the widget's height; each clock face takes the space that
   // remains above its two label lines (weight(1f)), so faces shrink to fit rather than overflow and
   // clip the labels. Center vertically so a short widget still looks balanced.
-  // Same LiquidGlass surface as every other widget (homogeneous).
-  LiquidGlassWidget(modifier = modifier) {
+  // Bare content — the widget grid cell provides the glass surface.
+  Box(modifier = modifier) {
     Row(
         modifier = Modifier.fillMaxSize().padding(14.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
