@@ -102,7 +102,7 @@ private fun DavConnectScreen(onDone: () -> Unit) {
             modifier = Modifier.padding(top = 6.dp),
         )
         Spacer(Modifier.heightIn(min = 26.dp))
-        PrimaryButton("Done") { onDone() }
+        PrimaryPillButton("Done") { onDone() }
         return@Column
       }
 
@@ -115,11 +115,11 @@ private fun DavConnectScreen(onDone: () -> Unit) {
       )
       Spacer(Modifier.heightIn(min = 22.dp))
 
-      Field(url, { url = it }, "http://nas:30035/share/photos/", modifier = initialFocus)
+      IosTextField(url, { url = it }, "http://nas:30035/share/photos/", modifier = initialFocus)
       Spacer(Modifier.heightIn(min = 12.dp))
-      Field(user, { user = it }, "Username (optional)")
+      IosTextField(user, { user = it }, "Username (optional)")
       Spacer(Modifier.heightIn(min = 12.dp))
-      Field(pass, { pass = it }, "Password (optional)", password = true)
+      IosTextField(pass, { pass = it }, "Password (optional)", password = true)
 
       status?.let {
         Text(
@@ -131,7 +131,7 @@ private fun DavConnectScreen(onDone: () -> Unit) {
       }
 
       Spacer(Modifier.heightIn(min = 26.dp))
-      PrimaryButton(if (testing) "Connecting…" else "Test & connect", enabled = !testing) {
+      PrimaryPillButton(if (testing) "Connecting…" else "Test & connect", enabled = !testing) {
         if (!testing) connect()
       }
       Spacer(Modifier.heightIn(min = 12.dp))
@@ -155,43 +155,4 @@ private fun DavConnectScreen(onDone: () -> Unit) {
   }
 }
 
-@Composable
-private fun Field(
-    value: String,
-    onChange: (String) -> Unit,
-    placeholder: String,
-    password: Boolean = false,
-    modifier: Modifier = Modifier,
-) {
-  OutlinedTextField(
-      colors = iosTextFieldColors(),
-      value = value,
-      onValueChange = onChange,
-      placeholder = { Text(placeholder) },
-      singleLine = true,
-      visualTransformation = if (password) PasswordVisualTransformation() else VisualTransformation.None,
-      modifier = modifier.fillMaxWidth().heightIn(min = 56.dp),
-      shape = RoundedCornerShape(14.dp),
-  )
-}
 
-@Composable
-private fun PrimaryButton(label: String, enabled: Boolean = true, onClick: () -> Unit) {
-  Surface(
-      color = if (enabled) IosBlue else IosDivider,
-      shape = RoundedCornerShape(16.dp),
-      modifier =
-          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
-            onClick()
-          },
-  ) {
-    Text(
-        label,
-        color = Color.White,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.padding(vertical = 16.dp).fillMaxWidth(),
-    )
-  }
-}

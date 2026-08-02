@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -692,3 +693,73 @@ internal fun SettingsBackButton(onClick: () -> Unit, modifier: Modifier = Modifi
 @Composable
 fun FolderBackButton(onClick: () -> Unit, modifier: Modifier = Modifier) =
     SettingsBackButton(onClick, modifier)
+
+// ---------------------------------------------------------------------------
+// Shared form controls (consolidated from the connect/entry screens)
+// ---------------------------------------------------------------------------
+
+/** THE iOS text field: white rounded 14dp, min-56dp tall, optional password masking. */
+@Composable
+internal fun IosTextField(
+    value: String,
+    onChange: (String) -> Unit,
+    placeholder: String,
+    password: Boolean = false,
+    modifier: Modifier = Modifier,
+) {
+    androidx.compose.material3.OutlinedTextField(
+        colors = iosTextFieldColors(),
+        value = value,
+        onValueChange = onChange,
+        placeholder = { Text(placeholder) },
+        singleLine = true,
+        visualTransformation =
+            if (password) androidx.compose.ui.text.input.PasswordVisualTransformation()
+            else androidx.compose.ui.text.input.VisualTransformation.None,
+        modifier = modifier.fillMaxWidth().heightIn(min = 56.dp),
+        shape = RoundedCornerShape(14.dp),
+    )
+}
+
+/** THE full-width primary pill (blue when enabled, grey-disabled): Test & connect / Use this X. */
+@Composable
+internal fun PrimaryPillButton(label: String, enabled: Boolean = true, onClick: () -> Unit) {
+    Surface(
+        color = if (enabled) IosBlue else IosDivider,
+        shape = RoundedCornerShape(16.dp),
+        modifier =
+            Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
+                if (enabled) onClick()
+            },
+    ) {
+        Text(
+            label,
+            color = if (enabled) Color.White else IosSecondary,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.padding(vertical = 16.dp).fillMaxWidth(),
+        )
+    }
+}
+
+/** THE full-width white card pill (Cancel / Done / Remove — pass IosRed for destructive). */
+@Composable
+internal fun CardPillButton(label: String, color: Color = IosBlue, onClick: () -> Unit) {
+    Surface(
+        color = IosCard,
+        shape = RoundedCornerShape(16.dp),
+        modifier =
+            Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
+                onClick()
+            },
+    ) {
+        Text(
+            label,
+            color = color,
+            fontSize = Sizes.rowTitle,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
+        )
+    }
+}

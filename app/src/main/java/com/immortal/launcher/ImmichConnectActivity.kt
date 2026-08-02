@@ -111,25 +111,9 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
         )
         Spacer(Modifier.heightIn(min = 22.dp))
 
-        OutlinedTextField(
-            colors = iosTextFieldColors(),
-            value = url,
-            onValueChange = { url = it },
-            placeholder = { Text("http://192.168.1.50:2283") },
-            singleLine = true,
-            modifier = initialFocus.fillMaxWidth().heightIn(min = 56.dp),
-            shape = RoundedCornerShape(14.dp),
-        )
+        IosTextField(url, { url = it }, "http://192.168.1.50:2283", modifier = initialFocus)
         Spacer(Modifier.heightIn(min = 12.dp))
-        OutlinedTextField(
-            colors = iosTextFieldColors(),
-            value = key,
-            onValueChange = { key = it },
-            placeholder = { Text("API key") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
-            shape = RoundedCornerShape(14.dp),
-        )
+        IosTextField(key, { key = it }, "API key")
 
         status?.let {
           Text(
@@ -141,25 +125,9 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
         }
 
         Spacer(Modifier.heightIn(min = 26.dp))
-        Surface(
-            color = if (testing) IosDivider else IosBlue,
-            shape = RoundedCornerShape(16.dp),
-            modifier =
-                Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
-                  if (!testing) connect()
-                },
-        ) {
-          Text(
-              if (testing) "Connecting…" else "Test & connect",
-              color = Color.White,
-              fontSize = 18.sp,
-              fontWeight = FontWeight.SemiBold,
-              textAlign = TextAlign.Center,
-              modifier = Modifier.padding(vertical = 16.dp).fillMaxWidth(),
-          )
-        }
+        PrimaryPillButton(if (testing) "Connecting…" else "Test & connect", enabled = !testing) { connect() }
         Spacer(Modifier.heightIn(min = 12.dp))
-        CancelRow(onDone)
+        CardPillButton("Cancel") { onDone() }
       } else {
         // --- Step 2: pick an album (or the whole library) ---
         Text(
@@ -186,7 +154,7 @@ private fun ImmichConnectScreen(onDone: () -> Unit) {
           }
         }
         Spacer(Modifier.heightIn(min = 16.dp))
-        CancelRow(onDone)
+        CardPillButton("Cancel") { onDone() }
       }
     }
   }
@@ -208,20 +176,3 @@ private fun AlbumRow(title: String, subtitle: String, selected: Boolean, onClick
   }
 }
 
-@Composable
-private fun CancelRow(onDone: () -> Unit) {
-  Surface(
-      color = IosCard,
-      shape = RoundedCornerShape(16.dp),
-      modifier =
-          Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) { onDone() },
-  ) {
-    Text(
-        "Done",
-        color = IosBlue,
-        fontSize = Sizes.rowTitle,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
-    )
-  }
-}
