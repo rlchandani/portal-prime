@@ -43,6 +43,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.activity.compose.BackHandler
@@ -479,6 +481,10 @@ private fun HeroClockCard(
   }
 }
 
+/** One Add-Widget gallery card's metadata: store kind + display name/blurb/glyph/accent. */
+private data class GalleryEntry(
+    val kind: String, val label: String, val desc: String, val glyph: String, val accent: Color)
+
 /** Left column with greeting/now-playing chrome + resizable, reorderable multi-widget area. */
 @Composable
 private fun LeftWidgetColumn(
@@ -694,38 +700,75 @@ private fun LeftWidgetColumn(
         contentAlignment = Alignment.Center,
     ) {
       Surface(
-          color = Color(0xE6000000),
-          shape = RoundedCornerShape(16.dp),
-          modifier = Modifier.padding(32.dp),
+          color = Glass.Scrim,
+          shape = RoundedCornerShape(20.dp),
+          modifier = Modifier.padding(32.dp).widthIn(max = 720.dp),
       ) {
-        Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-          Text("Add Widget", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-          listOf(
-              HomeWidgetStore.KIND_CALENDAR to "Calendar",
-              HomeWidgetStore.KIND_WEATHER to "Weather",
-              HomeWidgetStore.KIND_WORLD_CLOCK to "World Clock",
-              HomeWidgetStore.KIND_TIMERS to "Timers",
-              HomeWidgetStore.KIND_ALARM to "Alarm",
-              HomeWidgetStore.KIND_CRYPTO to "Crypto",
-              HomeWidgetStore.KIND_TODO to "To-Do",
-              HomeWidgetStore.KIND_NEWS to "News",
-              HomeWidgetStore.KIND_STOCKS to "Stocks",
-              HomeWidgetStore.KIND_OPTIONS to "Options",
-              HomeWidgetStore.KIND_HA to "Home Assistant",
-              HomeWidgetStore.KIND_TODAY to "Today",
-              HomeWidgetStore.KIND_QUICK_CONTROLS to "Quick Controls",
-              HomeWidgetStore.KIND_PHOTO_MEMORY to "Photo Memory",
-          ).forEach { (kind, label) ->
-            Text(
-                label,
-                color = Color(0xFF8AB4F8),
-                fontSize = 16.sp,
-                modifier = Modifier.fillMaxWidth().clickable {
-                  val newWidget = HomeWidgetStore.custom(kind)
-                  onWidgetsChanged(HomeWidgetStore.withAdded(homeWidgets, newWidget))
-                  showAddMenu = false
-                }.padding(12.dp),
-            )
+        // Widget GALLERY (mock 07): preview cards on glass, not a text list. Each card shows the
+        // kind's glyph in an accent-tinted chip + name + one-line description; tap to add.
+        Column(
+            modifier = Modifier.padding(24.dp).verticalScroll(rememberScrollState()),
+        ) {
+          Text("Add Widget", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+          Text(
+              "Tap to add · resize from the corner after",
+              color = Glass.TextMuted,
+              fontSize = 13.sp,
+              modifier = Modifier.padding(top = 2.dp, bottom = 16.dp))
+          val entries = listOf(
+              GalleryEntry(HomeWidgetStore.KIND_WEATHER, "Weather", "Paints its own sky", "☀", Color(0xFF64D2FF)),
+              GalleryEntry(HomeWidgetStore.KIND_CALENDAR, "Calendar", "Today + upcoming events", "▦", Color(0xFFFF6961)),
+              GalleryEntry(HomeWidgetStore.KIND_WORLD_CLOCK, "World Clock", "Up to 4 cities, day/night dials", "◷", Color(0xFF64D2FF)),
+              GalleryEntry(HomeWidgetStore.KIND_ALARM, "Alarm", "Next alarm + quick toggle", "⏰", Color(0xFFFF9F0A)),
+              GalleryEntry(HomeWidgetStore.KIND_TIMERS, "Timers", "Kitchen timer presets", "⏱", Color(0xFFFF9F0A)),
+              GalleryEntry(HomeWidgetStore.KIND_HA, "My Home", "Lights, scenes, sensors", "💡", Color(0xFF64D2FF)),
+              GalleryEntry(HomeWidgetStore.KIND_TODAY, "Today", "Events, weather, moon, to-dos", "▸", Color(0xFF30D158)),
+              GalleryEntry(HomeWidgetStore.KIND_TODO, "To-Do", "Tappable checklist", "✓", Color(0xFF30D158)),
+              GalleryEntry(HomeWidgetStore.KIND_CRYPTO, "Crypto", "Prices + 7-day sparklines", "₿", Color(0xFFF7931A)),
+              GalleryEntry(HomeWidgetStore.KIND_STOCKS, "Stocks", "Tickers + daily change", "▲", Color(0xFF5E5CE6)),
+              GalleryEntry(HomeWidgetStore.KIND_NEWS, "News", "Headlines from your feeds", "≡", Color(0xFFFF9F0A)),
+              GalleryEntry(HomeWidgetStore.KIND_OPTIONS, "Options", "Delta-band contract scan", "Δ", Color(0xFF64D2FF)),
+              GalleryEntry(HomeWidgetStore.KIND_QUICK_CONTROLS, "Quick Controls", "Assistant + smart-home taps", "◈", Color(0xFF41BDF5)),
+              GalleryEntry(HomeWidgetStore.KIND_PHOTO_MEMORY, "Photo Memory", "On this day, from your photos", "🖼", Color(0xFFFF375F)),
+          )
+          entries.chunked(2).forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+              row.forEach { e ->
+                GlassCard(
+                    modifier = Modifier.weight(1f).height(72.dp),
+                    cornerRadius = 16.dp,
+                ) {
+                  Row(
+                      modifier = Modifier
+                          .fillMaxSize()
+                          .clickable {
+                            onWidgetsChanged(
+                                HomeWidgetStore.withAdded(homeWidgets, HomeWidgetStore.custom(e.kind)))
+                            showAddMenu = false
+                          }
+                          .padding(horizontal = 14.dp),
+                      verticalAlignment = Alignment.CenterVertically,
+                      horizontalArrangement = Arrangement.spacedBy(12.dp),
+                  ) {
+                    Box(
+                        modifier = Modifier.size(40.dp).clip(RoundedCornerShape(11.dp))
+                            .background(e.accent.copy(alpha = 0.24f)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                      Text(e.glyph, color = e.accent, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Column {
+                      Text(e.label, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                      Text(e.desc, color = Glass.TextMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                  }
+                }
+              }
+              if (row.size == 1) Spacer(Modifier.weight(1f))
+            }
           }
         }
       }
@@ -3154,42 +3197,67 @@ private fun ImmortalTimersWidget(modifier: Modifier = Modifier) {
 @Composable
 private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
   val context = androidx.compose.ui.platform.LocalContext.current
-  val lifecycleOwner = LocalLifecycleOwner.current
   var cfg by remember { mutableStateOf(AlarmConfig.load(context)) }
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) cfg = AlarmConfig.load(context) }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
-  }
+  OnResume { cfg = AlarmConfig.load(context) }
   val next = remember(cfg) { AlarmConfig.nextTrigger(cfg) }
-  val timeFmt = remember { SimpleDateFormat("h:mm a", Locale.getDefault()) }
   val open: () -> Unit = { context.launchSafely(AlarmSettingsActivity::class.java) }
-  ImmortalWidgetShell(title = "Alarm", accent = Color(0xFFFF453A), modifier = modifier.tvFocusableRow { open() }) {
-    Text(
-        if (cfg.enabled && next != null) "%02d:%02d".format(cfg.hour, cfg.minute) else "Off",
-        color = if (cfg.enabled) Color.White else Color(0xFF8A8A8A),
-        fontSize = 34.sp,
-        fontWeight = FontWeight.SemiBold,
-    )
+  // Dusk Aurora anatomy: thin time + small AM/PM, "Label · in Nh Nm" line, iOS toggle bottom-left.
+  // Tap anywhere = edit; the switch flips enabled.
+  ImmortalWidgetShell(title = "Alarm", accent = Color(0xFFFF9F0A), modifier = modifier.tvFocusableRow { open() }) {
+    val is12 = remember { !ImmortalSettings.use24HourClock(context) }
+    val h12 = if (cfg.hour % 12 == 0) 12 else cfg.hour % 12
+    Row(verticalAlignment = Alignment.Bottom) {
+      Text(
+          if (is12) "%d:%02d".format(h12, cfg.minute) else "%02d:%02d".format(cfg.hour, cfg.minute),
+          color = if (cfg.enabled) Color.White else Color(0x66FFFFFF),
+          fontSize = 38.sp,
+          fontWeight = FontWeight.Light,
+          letterSpacing = (-1).sp,
+      )
+      if (is12) {
+        Text(
+            if (cfg.hour < 12) " AM" else " PM",
+            color = Glass.TextSecondary.copy(alpha = if (cfg.enabled) 0.8f else 0.35f),
+            fontSize = 17.sp,
+            fontWeight = FontWeight.Normal,
+            modifier = Modifier.padding(bottom = 5.dp),
+        )
+      }
+    }
     Text(
         when {
-          cfg.enabled && next != null ->
-            "${cfg.label} · ${java.text.SimpleDateFormat("EEE", Locale.getDefault()).format(java.util.Date(next))} ${timeFmt.format(java.util.Date(next))}"
+          cfg.enabled && next != null -> {
+            val mins = ((next - System.currentTimeMillis()) / 60_000L).coerceAtLeast(0)
+            val lead = cfg.label.ifBlank { "Weekdays" }
+            "$lead · in ${mins / 60} hr ${mins % 60} min"
+          }
           else -> "No alarm set"
         },
-        color = Color(0xFF9A9A9A),
+        color = Glass.TextMuted,
         fontSize = 13.sp,
         maxLines = 1,
         modifier = Modifier.padding(top = 2.dp),
     )
-    Spacer(Modifier.size(12.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-      TimerChip(if (cfg.enabled) "Turn off" else "Turn on") {
-        AlarmConfig.setEnabled(context, !cfg.enabled)
-        AlarmScheduler.reschedule(context)
-        cfg = AlarmConfig.load(context)
-      }
-      TimerChip("Edit") { open() }
+    Spacer(Modifier.weight(1f))
+    // iOS switch, bottom-left (the mock). Reuses the settings switch look inline.
+    Box(
+        modifier = Modifier
+            .size(width = 46.dp, height = 27.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .background(if (cfg.enabled) Color(0xFF30D158) else Color(0x2EFFFFFF))
+            .clickable {
+              AlarmConfig.setEnabled(context, !cfg.enabled)
+              AlarmScheduler.reschedule(context)
+              cfg = AlarmConfig.load(context)
+            },
+    ) {
+      Box(
+          Modifier
+              .align(if (cfg.enabled) Alignment.CenterEnd else Alignment.CenterStart)
+              .padding(horizontal = 2.5.dp)
+              .size(22.dp)
+              .clip(RoundedCornerShape(11.dp))
+              .background(Color.White))
     }
   }
 }
@@ -3570,7 +3638,7 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
         }
       }
   val open: () -> Unit = { context.launchSafely(HaSettingsActivity::class.java) }
-  ImmortalWidgetShell(title = "Home", accent = Color(0xFF64D2FF), modifier = modifier.tvFocusableRow { open() }) {
+  ImmortalWidgetShell(title = "My Home", accent = Color(0xFF64D2FF), modifier = modifier.tvFocusableRow { open() }) {
     when {
       !configured -> WidgetPlaceholder("Tap to connect Home Assistant")
       entities.isEmpty() -> WidgetPlaceholder("Add entities to control")
@@ -3652,23 +3720,29 @@ private fun HaTile(
   }
   val fg = if (on && !momentary) Color(0xFF3D2C00) else Color.White
   val fgSub = if (on && !momentary) Color(0xA83D2C00) else Color(0xCCFFFFFF)
+  // Mock anatomy: glyph on its own line up top, then name over the state line — the tile reads
+  // as an object (a lamp, a scene) rather than a labelled button.
   Column(
-      modifier = modifier.clip(RoundedCornerShape(14.dp)).background(bg)
-          .border(0.5.dp, border, RoundedCornerShape(14.dp))
+      modifier = modifier.clip(RoundedCornerShape(Glass.SubRadius)).background(bg)
+          .border(0.5.dp, border, RoundedCornerShape(Glass.SubRadius))
           .tvFocusableRow { onToggle() }
           .padding(horizontal = 12.dp, vertical = 10.dp),
+      verticalArrangement = Arrangement.spacedBy(10.dp),
   ) {
-    Text(name, color = fg, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    Text(
-        when {
-          momentary -> "Tap to run"
-          !known -> "—"
-          on -> "On"
-          else -> "Off"
-        },
-        color = fgSub,
-        fontSize = 12.sp,
-    )
+    Text(if (momentary) "🎬" else "💡", fontSize = 16.sp)
+    Column {
+      Text(name, color = fg, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Text(
+          when {
+            momentary -> "Scene"
+            !known -> "—"
+            on -> "On"
+            else -> "Off"
+          },
+          color = fgSub,
+          fontSize = 11.sp,
+      )
+    }
   }
 }
 
