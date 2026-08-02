@@ -156,7 +156,12 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.immortal.launcher.ui.components.GlassTile
+import com.immortal.launcher.ui.components.GlassCard
+import com.immortal.launcher.ui.components.Glass
+import com.immortal.launcher.ui.components.OnResume
+import com.immortal.launcher.ui.components.WidgetPlaceholder
+import com.immortal.launcher.ui.components.launchSafely
+import com.immortal.launcher.ui.components.pollingState
 import com.immortal.launcher.ui.theme.ContentPrimary
 import com.immortal.launcher.ui.theme.ContentSecondary
 import com.immortal.launcher.ui.theme.PrimeBlue
@@ -1124,21 +1129,13 @@ private fun FadingDivider() {
 @Composable
 private fun LiquidGlass(
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = 22.dp,
+    cornerRadius: Dp = Glass.Radius,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
-  val shape = RoundedCornerShape(cornerRadius)
-  Box(
-      modifier = modifier
-          .clip(shape)
-          // Dusk Aurora dark glass (the mock's --glass-bg rgba(22,26,38,.52)): a cool near-black
-          // tint that reads as frosted dark glass on the aurora wallpaper.
-          .background(Color(0x85161A26))
-          // Faint light rim (the mock's --glass-border rgba(255,255,255,.14)).
-          .border(1.dp, Color(0x24FFFFFF), shape),
-  ) {
-    content()
-  }
+  // Thin alias over the ONE shared glass surface (ui/components/Glass.kt) — colors/radius live
+  // there so every card in the app changes together.
+  GlassCard(
+      modifier = modifier, cornerRadius = cornerRadius, content = content)
 }
 
 /** Liquid Glass widget tile (rounded 22dp). */
@@ -1415,18 +1412,11 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
     NowPlayingHub.addListener(l) // replays current immediately
     onDispose { NowPlayingHub.removeListener(l) }
   }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
+  OnResume {
         weatherUnit = ImmortalSettings.load(context).weatherUnit
         use24Hour = ImmortalSettings.use24HourClock(context)
         heyPkg = heyPackage(context)
         showMiniPlayer = ImmortalSettings.load(context).showMiniPlayer
-      }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
   val weather by produceState(initialValue = "", weatherUnit) {
     // Retry soon on failure (e.g. a transient geolocation rate-limit), then
@@ -2254,12 +2244,15 @@ private fun BuiltInTile(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.fillMaxWidth().padding(4.dp).tvFocusable(RoundedCornerShape(22.dp)) { onClick() },
   ) {
-    GlassTile(
+    GlassCard(
         modifier = Modifier.size(tileDp),
+        cornerRadius = 20.dp,
     ) {
-      Canvas(Modifier.size(46.dp * (tileDp / 88.dp))) {
-        val s = size.minDimension / 24f
-        scale(s, s, pivot = Offset.Zero) { drawPath(path, Color.White) }
+      Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.size(46.dp * (tileDp / 88.dp))) {
+          val s = size.minDimension / 24f
+          scale(s, s, pivot = Offset.Zero) { drawPath(path, Color.White) }
+        }
       }
     }
     Spacer(Modifier.size(8.dp))
@@ -2512,12 +2505,7 @@ private fun ImmortalWidgetShell(
 @Composable
 private fun PhotoMemoryStrip(modifier: Modifier = Modifier) {
   val context = androidx.compose.ui.platform.LocalContext.current
-  val onOpen: () -> Unit = {
-    runCatching {
-      context.startActivity(
-          Intent(context, PhotoFramePreviewActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-  }
+  val onOpen: () -> Unit = { context.launchSafely(PhotoFramePreviewActivity::class.java) }
   val photo by
       produceState<ImageBitmap?>(initialValue = null) {
         value = withContext(Dispatchers.IO) {
@@ -2627,16 +2615,9 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
   var fahrenheit by remember { mutableStateOf(ImmortalSettings.useFahrenheit(context)) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
+  OnResume {
         use24 = ImmortalSettings.use24HourClock(context)
         fahrenheit = ImmortalSettings.useFahrenheit(context)
-      }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
   val current by
       produceState<Weather.Current?>(initialValue = null, fahrenheit) {
@@ -2674,28 +2655,24 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
   var countdown by remember { mutableStateOf<Pair<String, String>?>(null) }
   var alarmLine by remember { mutableStateOf<Pair<String, String>?>(null) }
   var todoOpen by remember { mutableStateOf(0) }
-  DisposableEffect(lifecycleOwner) {
-    fun refresh() {
-      countdown = runCatching {
-        CountdownConfig.loadSorted(context)
-            .firstOrNull { it.daysUntil() >= 0 }
-            ?.let { "${it.emoji} ${it.label}" to it.phrase() }
-      }.getOrNull()
-      alarmLine = runCatching {
-        val cfg = AlarmConfig.load(context)
-        val next = if (cfg.enabled) AlarmConfig.nextTrigger(cfg) else null
-        next?.let {
-          val fmt = SimpleDateFormat(if (use24) "EEE HH:mm" else "EEE h:mm a", Locale.getDefault())
-          cfg.label.ifBlank { "Alarm" } to fmt.format(java.util.Date(it))
-        }
-      }.getOrNull()
-      todoOpen = runCatching { TodoStore.load(context).count { !it.done } }.getOrDefault(0)
-    }
-    refresh()
-    val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) refresh() }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+  val refreshTodayLines = {
+    countdown = runCatching {
+      CountdownConfig.loadSorted(context)
+          .firstOrNull { it.daysUntil() >= 0 }
+          ?.let { "${it.emoji} ${it.label}" to it.phrase() }
+    }.getOrNull()
+    alarmLine = runCatching {
+      val cfg = AlarmConfig.load(context)
+      val next = if (cfg.enabled) AlarmConfig.nextTrigger(cfg) else null
+      next?.let {
+        val fmt = SimpleDateFormat(if (use24) "EEE HH:mm" else "EEE h:mm a", Locale.getDefault())
+        cfg.label.ifBlank { "Alarm" } to fmt.format(java.util.Date(it))
+      }
+    }.getOrNull()
+    todoOpen = runCatching { TodoStore.load(context).count { !it.done } }.getOrDefault(0)
   }
+  LaunchedEffect(Unit) { refreshTodayLines() }
+  OnResume { refreshTodayLines() }
 
   val today = forecast?.days?.firstOrNull()
   val (moonGlyph, moonName) = remember { moonPhase(System.currentTimeMillis()) }
@@ -2783,17 +2760,10 @@ private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
   // resume so a change applies when the user returns home.
   var forecastMode by remember { mutableStateOf(ImmortalSettings.load(context).weatherWidget) }
   var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
+  OnResume {
         fahrenheit = ImmortalSettings.useFahrenheit(context)
         forecastMode = ImmortalSettings.load(context).weatherWidget
         use24 = ImmortalSettings.use24HourClock(context)
-      }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
   val current by
       produceState<Weather.Current?>(initialValue = null, fahrenheit) {
@@ -2988,16 +2958,9 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var zones by remember { mutableStateOf(ImmortalSettings.worldClockZones(context)) }
   var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
+  OnResume {
         zones = ImmortalSettings.worldClockZones(context)
         use24 = ImmortalSettings.use24HourClock(context)
-      }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
   var now by remember { mutableStateOf(Date()) }
   LaunchedEffect(Unit) {
@@ -3200,12 +3163,7 @@ private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
   }
   val next = remember(cfg) { AlarmConfig.nextTrigger(cfg) }
   val timeFmt = remember { SimpleDateFormat("h:mm a", Locale.getDefault()) }
-  val open: () -> Unit = {
-    runCatching {
-      context.startActivity(
-          Intent(context, AlarmSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-  }
+  val open: () -> Unit = { context.launchSafely(AlarmSettingsActivity::class.java) }
   ImmortalWidgetShell(title = "Alarm", accent = Color(0xFFFF453A), modifier = modifier.tvFocusableRow { open() }) {
     Text(
         if (cfg.enabled && next != null) "%02d:%02d".format(cfg.hour, cfg.minute) else "Off",
@@ -3246,14 +3204,7 @@ private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
 private fun ImmortalCryptoWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var coins by remember { mutableStateOf(CryptoConfig.load(context)) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) coins = CryptoConfig.load(context)
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
-  }
+  OnResume { coins = CryptoConfig.load(context) }
   val quotes by
       produceState<List<CryptoFeed.Quote>?>(initialValue = null, coins) {
         while (true) {
@@ -3261,17 +3212,12 @@ private fun ImmortalCryptoWidget(modifier: Modifier = Modifier, maxRows: Int = 5
           delay(if (value.isNullOrEmpty()) 60_000L else 30L * 60 * 1000)
         }
       }
-  val open: () -> Unit = {
-    runCatching {
-      context.startActivity(
-          Intent(context, CryptoSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-  }
+  val open: () -> Unit = { context.launchSafely(CryptoSettingsActivity::class.java) }
   ImmortalWidgetShell(title = "Crypto", accent = Color(0xFFF7931A), modifier = modifier.tvFocusableRow { open() }) {
     val rows = quotes
     when {
-      rows == null -> Text("Loading…", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      rows.isEmpty() -> Text("Add coins to track", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      rows == null -> WidgetPlaceholder("Loading…")
+      rows.isEmpty() -> WidgetPlaceholder("Add coins to track")
       else ->
           Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             rows.take(maxRows).forEach { q -> CryptoRow(q) }
@@ -3364,16 +3310,11 @@ private fun ImmortalTodoWidget(modifier: Modifier = Modifier, maxRows: Int = 5) 
     lifecycleOwner.lifecycle.addObserver(obs)
     onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
-  val open: () -> Unit = {
-    runCatching {
-      context.startActivity(
-          Intent(context, TodoSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-  }
+  val open: () -> Unit = { context.launchSafely(TodoSettingsActivity::class.java) }
   val openCount = items.count { !it.done }
   ImmortalWidgetShell(title = "To-Do", accent = Color(0xFF30D158), modifier = modifier.tvFocusableRow { open() }) {
     if (items.isEmpty()) {
-      Text("No items — tap to add", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      WidgetPlaceholder("No items — tap to add")
     } else {
       Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         // Open items first, then completed — the actionable list stays on top.
@@ -3444,12 +3385,7 @@ private fun ImmortalNewsWidget(modifier: Modifier = Modifier, maxRows: Int = 5) 
           delay(if (value.isNullOrEmpty()) 60_000L else 30L * 60 * 1000)
         }
       }
-  val openEditor: () -> Unit = {
-    runCatching {
-      context.startActivity(
-          Intent(context, NewsSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-  }
+  val openEditor: () -> Unit = { context.launchSafely(NewsSettingsActivity::class.java) }
   val openArticle: (String?) -> Unit = { link ->
     if (link.isNullOrBlank()) openEditor()
     else runCatching {
@@ -3460,9 +3396,9 @@ private fun ImmortalNewsWidget(modifier: Modifier = Modifier, maxRows: Int = 5) 
   ImmortalWidgetShell(title = "News", accent = Color(0xFFFF9F0A), modifier = modifier.tvFocusableRow { openEditor() }) {
     val rows = headlines
     when {
-      feeds.isEmpty() -> Text("Add a feed to see headlines", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      rows == null -> Text("Loading…", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      rows.isEmpty() -> Text("No headlines", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      feeds.isEmpty() -> WidgetPlaceholder("Add a feed to see headlines")
+      rows == null -> WidgetPlaceholder("Loading…")
+      rows.isEmpty() -> WidgetPlaceholder("No headlines")
       else ->
           Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             rows.take(maxRows).forEach { h ->
@@ -3500,16 +3436,9 @@ private fun ImmortalStocksWidget(modifier: Modifier = Modifier, maxRows: Int = 5
   val context = androidx.compose.ui.platform.LocalContext.current
   var tickers by remember { mutableStateOf(StocksConfig.load(context)) }
   var configured by remember { mutableStateOf(AlpacaConfig.isConfigured(context)) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
+  OnResume {
         tickers = StocksConfig.load(context)
         configured = AlpacaConfig.isConfigured(context)
-      }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
   val quotes by
       produceState<List<AlpacaClient.StockQuote>?>(initialValue = null, tickers, configured) {
@@ -3518,19 +3447,14 @@ private fun ImmortalStocksWidget(modifier: Modifier = Modifier, maxRows: Int = 5
           delay(if (value.isNullOrEmpty()) 60_000L else 30L * 60 * 1000)
         }
       }
-  val open: () -> Unit = {
-    runCatching {
-      context.startActivity(
-          Intent(context, StocksSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-  }
+  val open: () -> Unit = { context.launchSafely(StocksSettingsActivity::class.java) }
   ImmortalWidgetShell(title = "Stocks", accent = Color(0xFF5E5CE6), modifier = modifier.tvFocusableRow { open() }) {
     val rows = quotes
     when {
-      !configured -> Text("Tap to connect Alpaca", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      tickers.isEmpty() -> Text("Add tickers to track", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      rows == null -> Text("Loading…", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      rows.isEmpty() -> Text("No quotes", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      !configured -> WidgetPlaceholder("Tap to connect Alpaca")
+      tickers.isEmpty() -> WidgetPlaceholder("Add tickers to track")
+      rows == null -> WidgetPlaceholder("Loading…")
+      rows.isEmpty() -> WidgetPlaceholder("No quotes")
       else ->
           Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             rows.take(maxRows).forEach { q -> StockRow(q) }
@@ -3564,20 +3488,13 @@ private fun ImmortalOptionsWidget(modifier: Modifier = Modifier, maxRows: Int = 
   var deltaMin by remember { mutableStateOf(OptionsScanConfig.deltaMin(context)) }
   var deltaMax by remember { mutableStateOf(OptionsScanConfig.deltaMax(context)) }
   var expiryDays by remember { mutableStateOf(OptionsScanConfig.expiryDays(context)) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
+  OnResume {
         tickers = OptionsScanConfig.tickers(context)
         configured = AlpacaConfig.isConfigured(context)
         type = OptionsScanConfig.type(context)
         deltaMin = OptionsScanConfig.deltaMin(context)
         deltaMax = OptionsScanConfig.deltaMax(context)
         expiryDays = OptionsScanConfig.expiryDays(context)
-      }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
   val hits by
       produceState<List<OptionsScanner.Hit>?>(initialValue = null, tickers, configured, type, deltaMin, deltaMax, expiryDays) {
@@ -3589,19 +3506,14 @@ private fun ImmortalOptionsWidget(modifier: Modifier = Modifier, maxRows: Int = 
           delay(if (value.isNullOrEmpty()) 120_000L else 60L * 60 * 1000)
         }
       }
-  val open: () -> Unit = {
-    runCatching {
-      context.startActivity(
-          Intent(context, OptionsSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-  }
+  val open: () -> Unit = { context.launchSafely(OptionsSettingsActivity::class.java) }
   ImmortalWidgetShell(title = "Options · ${"%.2f–%.2fΔ".format(deltaMin, deltaMax)}", accent = Color(0xFF64D2FF), modifier = modifier.tvFocusableRow { open() }) {
     val rows = hits
     when {
-      !configured -> Text("Tap to connect Alpaca", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      tickers.isEmpty() -> Text("Add tickers to scan", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      rows == null -> Text("Scanning…", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      rows.isEmpty() -> Text("No contracts in band", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      !configured -> WidgetPlaceholder("Tap to connect Alpaca")
+      tickers.isEmpty() -> WidgetPlaceholder("Add tickers to scan")
+      rows == null -> WidgetPlaceholder("Scanning…")
+      rows.isEmpty() -> WidgetPlaceholder("No contracts in band")
       else ->
           Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             rows.take(maxRows).forEach { h -> OptionRow(h) }
@@ -3642,16 +3554,9 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
   val scope = androidx.compose.runtime.rememberCoroutineScope()
   var entities by remember { mutableStateOf(HaConfig.entities(context)) }
   var configured by remember { mutableStateOf(HaConfig.isConfigured(context)) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
+  OnResume {
         entities = HaConfig.entities(context)
         configured = HaConfig.isConfigured(context)
-      }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
   // A local override map lets a tap flip the tile instantly (optimistic) before the poll confirms.
   var optimistic by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
@@ -3664,16 +3569,11 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
           delay(30_000L)
         }
       }
-  val open: () -> Unit = {
-    runCatching {
-      context.startActivity(
-          Intent(context, HaSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-  }
+  val open: () -> Unit = { context.launchSafely(HaSettingsActivity::class.java) }
   ImmortalWidgetShell(title = "Home", accent = Color(0xFF64D2FF), modifier = modifier.tvFocusableRow { open() }) {
     when {
-      !configured -> Text("Tap to connect Home Assistant", color = Color(0xFF9A9A9A), fontSize = 14.sp)
-      entities.isEmpty() -> Text("Add entities to control", color = Color(0xFF9A9A9A), fontSize = 14.sp)
+      !configured -> WidgetPlaceholder("Tap to connect Home Assistant")
+      entities.isEmpty() -> WidgetPlaceholder("Add entities to control")
       else -> {
         val byId = (states ?: emptyList()).associateBy { it.entityId }
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

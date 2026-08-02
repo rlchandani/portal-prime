@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.Lifecycle
+import com.immortal.launcher.ui.components.OnResume
 import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -173,14 +173,7 @@ object WallpaperConfig {
 fun HomeBackground(modifier: Modifier = Modifier) {
   val context = LocalContext.current
   var cfg by remember { mutableStateOf(WallpaperConfig.load(context)) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) cfg = WallpaperConfig.load(context)
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
-  }
+  OnResume { cfg = WallpaperConfig.load(context) }
 
   val mode = cfg.mode
   val gradient = WallpaperConfig.gradientColors(mode)
