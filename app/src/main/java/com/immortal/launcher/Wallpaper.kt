@@ -10,6 +10,12 @@ package com.immortal.launcher
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.compose.animation.core.EaseInOutSine
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,12 +60,13 @@ object WallpaperConfig {
   // and the real night sky projected for the device's location. Formerly ForkHome-only.
   const val SKY = "sky"
   const val STARFIELD = "starfield"
-  // The launcher's signature look; also the default so existing installs keep their appearance.
   const val SPACE = "g_space"
+  // The Dusk Aurora look (the approved mock): night sky melting into a warm ember horizon with
+  // drifting teal/violet aurora ribbons and stars. The new default.
+  const val DUSK_AURORA = "dusk_aurora"
 
-  // Default = the live ambient Sky (drifts through the day with a sun/moon + clouds), the
-  // signature premium-dashboard backdrop. Users can switch to a static gradient/photo in Settings.
-  data class Config(val mode: String = SKY, val grain: Boolean = false)
+  // Default = Dusk Aurora, the approved home design. Users can switch in Settings > Wallpaper.
+  data class Config(val mode: String = DUSK_AURORA, val grain: Boolean = false)
 
   /** Gradient presets: id → top-to-bottom colour stops (ARGB longs). */
   val GRADIENTS: List<Pair<String, List<Long>>> =
@@ -84,9 +91,21 @@ object WallpaperConfig {
 
   fun isPhoto(mode: String): Boolean = mode == SCREENSAVER || mode.startsWith(PHOTO_PREFIX)
 
+  // One-time: installs that were on the old Sky default move to Dusk Aurora (the approved
+  // redesign look). A mode the user picked deliberately (gradient/photo/dark) is left alone.
+  private const val KEY_AURORA_MIGRATED = "aurora_migrated"
+
   fun load(context: Context): Config {
     val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-    return Config(mode = p.getString(KEY_MODE, SKY) ?: SKY, grain = p.getBoolean(KEY_GRAIN, false))
+    var mode = p.getString(KEY_MODE, DUSK_AURORA) ?: DUSK_AURORA
+    if (!p.getBoolean(KEY_AURORA_MIGRATED, false)) {
+      if (mode == SKY) {
+        mode = DUSK_AURORA
+        p.edit().putString(KEY_MODE, mode).apply()
+      }
+      p.edit().putBoolean(KEY_AURORA_MIGRATED, true).apply()
+    }
+    return Config(mode = mode, grain = p.getBoolean(KEY_GRAIN, false))
   }
 
   fun setMode(context: Context, mode: String) =
@@ -167,6 +186,7 @@ fun HomeBackground(modifier: Modifier = Modifier) {
   val gradient = WallpaperConfig.gradientColors(mode)
   androidx.compose.foundation.layout.Box(modifier) {
     when {
+      mode == WallpaperConfig.DUSK_AURORA -> DuskAuroraBackground()
       mode == WallpaperConfig.SKY -> {
         SkyBackground()
         DayProgressBar()
@@ -383,4 +403,68 @@ private fun stackBlur(sent: Bitmap, radius: Int): Bitmap {
   }
   bitmap.setPixels(pix, 0, w, 0, 0, w, h)
   return bitmap
+}
+
+/**
+ * The Dusk Aurora wallpaper (the approved mock, ported 1:1): a dusk sky — near-black up top
+ * melting into a warm ember horizon — with three soft aurora ribbons (teal, violet-teal, and a
+ * warm glow) and a scattering of stars. Ribbons drift slowly; everything is drawn, no assets.
+ * Colors match mocks/ipados/aurora.css exactly.
+ */
+@Composable
+fun DuskAuroraBackground(modifier: Modifier = Modifier) {
+  // 26s ease-in-out drift, mirrored — the same animation the mock runs.
+  val t by rememberInfiniteTransition(label = "aurora")
+      .animateFloat(
+          initialValue = -1f,
+          targetValue = 1f,
+          animationSpec =
+              infiniteRepeatable(
+                  animation = tween(26_000, easing = EaseInOutSine),
+                  repeatMode = RepeatMode.Reverse),
+          label = "drift")
+  // Fixed star positions (fraction of w/h, radius px, alpha) — from the mock's #stars layer.
+  val stars = remember {
+    listOf(
+        Triple(0.12f, 0.18f, 0.9f), Triple(0.28f, 0.08f, 0.7f), Triple(0.44f, 0.24f, 0.8f),
+        Triple(0.58f, 0.12f, 0.6f), Triple(0.71f, 0.20f, 0.85f), Triple(0.83f, 0.07f, 0.7f),
+        Triple(0.92f, 0.27f, 0.75f), Triple(0.36f, 0.38f, 0.5f), Triple(0.66f, 0.42f, 0.55f),
+        Triple(0.08f, 0.46f, 0.45f))
+  }
+  Canvas(modifier.fillMaxSize()) {
+    val w = size.width
+    val h = size.height
+    // Sky: the mock's vertical gradient — deep night for the top two-thirds, the warm shift
+    // held tight to the bottom edge so the ember reads as a horizon, not a pink wash.
+    drawRect(
+        Brush.verticalGradient(
+            0.00f to Color(0xFF050810), 0.40f to Color(0xFF0A1226), 0.70f to Color(0xFF12234A),
+            0.88f to Color(0xFF27436E), 0.96f to Color(0xFF3E4E66), 1.00f to Color(0xFF5A5560)))
+    // Aurora ribbons: soft radial blobs stand in for the mock's blurred linear ribbons — the
+    // radial falloff IS the blur, so no expensive blur pass is needed on the Portal's GPU.
+    fun ribbon(cx: Float, cy: Float, r: Float, colors: List<Color>) {
+      drawCircle(
+          Brush.radialGradient(colors, center = androidx.compose.ui.geometry.Offset(cx, cy), radius = r),
+          radius = r,
+          center = androidx.compose.ui.geometry.Offset(cx, cy))
+    }
+    val drift = t * 0.02f * w
+    // a1 — teal band, upper left, drifting.
+    ribbon(w * 0.30f + drift, h * 0.13f, w * 0.42f,
+        listOf(Color(0x511DE9B6), Color(0x3326C6DA), Color(0x0026C6DA)))
+    // a2 — violet-teal, upper right, counter-phase.
+    ribbon(w * 0.78f - drift, h * 0.22f, w * 0.36f,
+        listOf(Color(0x2E7C4DFF), Color(0x211DE9B6), Color(0x001DE9B6)))
+    // a3 — warm ember glow hugging the bottom edge (static in the mock; kept small so the
+    // warmth stays at the horizon).
+    ribbon(w * 0.52f, h * 1.04f, w * 0.24f,
+        listOf(Color(0x52FF9D5C), Color(0x24FF783C), Color(0x00FF783C)))
+    // Stars — small white dots, upper half only.
+    stars.forEach { (fx, fy, a) ->
+      drawCircle(
+          Color.White.copy(alpha = a * 0.8f),
+          radius = 1.6f,
+          center = androidx.compose.ui.geometry.Offset(fx * w, fy * h))
+    }
+  }
 }

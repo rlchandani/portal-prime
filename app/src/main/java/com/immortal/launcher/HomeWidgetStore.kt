@@ -50,10 +50,34 @@ object HomeWidgetStore {
   const val KIND_STOCKS = "stocks"
   const val KIND_OPTIONS = "options"
   const val KIND_HA = "ha"
+  // The former fixed dashboard cards — now regular widgets (addable/removable). Only the
+  // greeting card stays permanent chrome.
+  const val KIND_TODAY = "today"
+  const val KIND_QUICK_CONTROLS = "quick_controls"
+  const val KIND_PHOTO_MEMORY = "photo_memory"
 
   const val DEFAULT_SPAN_X = 2
   const val DEFAULT_SPAN_Y = 2
   const val MAX_SPAN = 4
+
+  // One-time migration: layouts saved before KIND_TODAY/QUICK/MEMORY existed had those cards as
+  // permanent chrome — inject them (Today on top, Quick + Memory after) so nothing visibly
+  // disappears on update. New installs seed them too; users can now delete them.
+  private const val KEY_DASH_MIGRATED = "dashboard_cards_migrated"
+
+  fun migrateDashboardCards(context: Context) {
+    val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    if (prefs.getBoolean(KEY_DASH_MIGRATED, false)) return
+    val current = load(context)
+    val migrated =
+        listOf(custom(KIND_TODAY, spanX = 2, spanY = 1)) +
+            current +
+            listOf(
+                custom(KIND_QUICK_CONTROLS, spanX = 2, spanY = 1),
+                custom(KIND_PHOTO_MEMORY, spanX = 2, spanY = 1))
+    save(context, migrated)
+    prefs.edit().putBoolean(KEY_DASH_MIGRATED, true).apply()
+  }
 
   /** iOS-style size cycle for a left-column widget: Small 1x1 -> Medium 2x1 -> Large 2x2 -> Small. */
   fun nextWidgetSpan(current: Pair<Int, Int>): Pair<Int, Int> = when (current) {

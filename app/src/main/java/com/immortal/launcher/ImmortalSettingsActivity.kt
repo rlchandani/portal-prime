@@ -1952,6 +1952,18 @@ private fun WallpaperSection() {
           modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
           horizontalArrangement = Arrangement.spacedBy(12.dp),
       ) {
+        WallpaperSwatch("Dusk Aurora", selected = mode == WallpaperConfig.DUSK_AURORA, onClick = {
+          mode = WallpaperConfig.DUSK_AURORA
+          WallpaperConfig.setMode(context, mode)
+        }) {
+          Spacer(
+              Modifier.fillMaxSize()
+                  .background(
+                      Brush.verticalGradient(
+                          listOf(
+                              Color(0xFF050810), Color(0xFF12234A),
+                              Color(0xFF27436E), Color(0xFFC98A5E)))))
+        }
         WallpaperSwatch("Dark", selected = mode == WallpaperConfig.DARK, onClick = {
           mode = WallpaperConfig.DARK
           WallpaperConfig.setMode(context, mode)

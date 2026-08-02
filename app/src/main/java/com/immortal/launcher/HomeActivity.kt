@@ -411,6 +411,69 @@ class HomeActivity : ComponentActivity() {
   }
 }
 
+/**
+ * The mock's hero card: a 56sp thin clock over "Good evening, Name", with the current temp
+ * (26sp light) + condition bottom-right. Ticks by the minute; honors the 12/24h setting.
+ */
+@Composable
+private fun HeroClockCard(
+    greetingWord: String,
+    userName: String,
+    weather: Weather.Current?,
+    modifier: Modifier = Modifier,
+) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  val use24 = remember { ImmortalSettings.use24HourClock(context) }
+  val fmt = remember(use24) { SimpleDateFormat(if (use24) "H:mm" else "h:mm", Locale.getDefault()) }
+  var now by remember { mutableStateOf(Date()) }
+  LaunchedEffect(Unit) {
+    while (true) {
+      now = Date()
+      delay(15_000)
+    }
+  }
+  LiquidGlassWidget(modifier = modifier) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.Bottom,
+    ) {
+      Column(Modifier.weight(1f)) {
+        Text(
+            fmt.format(now),
+            color = Color.White,
+            fontSize = 56.sp,
+            fontWeight = FontWeight.ExtraLight,
+            letterSpacing = (-2.5).sp,
+            lineHeight = 56.sp,
+        )
+        Text(
+            if (userName.isNotBlank()) "$greetingWord, $userName" else greetingWord,
+            color = Color.White.copy(alpha = 0.66f),
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(top = 2.dp),
+        )
+      }
+      if (weather != null) {
+        Column(horizontalAlignment = Alignment.End) {
+          Text(
+              "${weather.temp}°",
+              color = Color.White,
+              fontSize = 26.sp,
+              fontWeight = FontWeight.Light,
+          )
+          Text(
+              weatherConditionText(weather.code),
+              color = Color.White.copy(alpha = 0.6f),
+              fontSize = 12.5.sp,
+              maxLines = 1,
+          )
+        }
+      }
+    }
+  }
+}
+
 /** Left column with greeting/now-playing chrome + resizable, reorderable multi-widget area. */
 @Composable
 private fun LeftWidgetColumn(
@@ -461,49 +524,21 @@ private fun LeftWidgetColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
       // ---- Fixed dashboard chrome (full-span headers; not reorderable, not resizable) ----
+      // The hero card from the mock: a big thin clock over "Good evening, Name", with the
+      // current temperature + condition bottom-right.
       item(key = "hdr-greeting", span = { GridItemSpan(2) }) {
-        LiquidGlassWidget(modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(bottom = 4.dp)) {
-          Column(
-              modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 18.dp),
-              verticalArrangement = Arrangement.spacedBy(2.dp),
-          ) {
-            Text(
-                text = "$greetingWord,",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Light,
-            )
-            // Only render the name line when the user has set one (blank by default — avoids a
-            // placeholder name; the greeting word alone reads fine).
-            if (userName.isNotBlank()) {
-              Text(
-                  text = userName,
-                  color = Color.White,
-                  fontSize = 28.sp,
-                  fontWeight = FontWeight.Bold,
-                  letterSpacing = (-1).sp,
-              )
-            }
-            Text(
-                text = dateString,
-                color = Color.White.copy(alpha = 0.5f),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Light,
-            )
-          }
-        }
+        HeroClockCard(
+            greetingWord = greetingWord,
+            userName = userName,
+            weather = weatherCurrent,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+        )
       }
-      item(key = "hdr-today", span = { GridItemSpan(2) }) {
-        TodayStripWidget(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp))
-      }
+      // Now-playing stays chrome: it self-hides when silent, so as a widget it would be a
+      // dead card most of the time. Today / Quick controls / Photo memory are regular
+      // widgets now (KIND_TODAY / KIND_QUICK_CONTROLS / KIND_PHOTO_MEMORY).
       item(key = "hdr-nowplaying", span = { GridItemSpan(2) }) {
         NowPlayingCard(modifier = Modifier.fillMaxWidth())
-      }
-      item(key = "hdr-quick", span = { GridItemSpan(2) }) {
-        QuickControlsWidget(modifier = Modifier.fillMaxWidth())
-      }
-      item(key = "hdr-memory", span = { GridItemSpan(2) }) {
-        PhotoMemoryStrip(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp))
       }
 
       // ---- Store-driven resizable + reorderable widgets ----
@@ -672,6 +707,9 @@ private fun LeftWidgetColumn(
               HomeWidgetStore.KIND_STOCKS to "Stocks",
               HomeWidgetStore.KIND_OPTIONS to "Options",
               HomeWidgetStore.KIND_HA to "Home Assistant",
+              HomeWidgetStore.KIND_TODAY to "Today",
+              HomeWidgetStore.KIND_QUICK_CONTROLS to "Quick Controls",
+              HomeWidgetStore.KIND_PHOTO_MEMORY to "Photo Memory",
           ).forEach { (kind, label) ->
             Text(
                 label,
@@ -777,8 +815,13 @@ private fun LauncherScreen(
   val gridColumns = gridColumnsFor(tileSize)
   val tileDp = tileDpFor(tileSize)
 
-  // Home widgets state
-  var homeWidgets by remember { mutableStateOf(HomeWidgetStore.load(context)) }
+  // Home widgets state. The dashboard-cards migration runs first (one-time): Today / Quick
+  // controls / Photo memory used to be permanent chrome — they become regular widgets so the
+  // user can delete or re-add them; only the greeting card stays fixed.
+  var homeWidgets by remember {
+    HomeWidgetStore.migrateDashboardCards(context)
+    mutableStateOf(HomeWidgetStore.load(context))
+  }
   LaunchedEffect(Unit) {
     if (homeWidgets.isEmpty()) {
       // Seed default: one Large weather widget
@@ -1088,11 +1131,11 @@ private fun LiquidGlass(
   Box(
       modifier = modifier
           .clip(shape)
-          // Flat, even translucent DARK tint (~22% black) — darkens the wallpaper inside the card
-          // for definition and text contrast, but stays see-through.
-          .background(Color(0x38000000))
-          // Thin light rim for the glass edge.
-          .border(1.dp, Color(0x4DFFFFFF), shape),
+          // Dusk Aurora dark glass (the mock's --glass-bg rgba(22,26,38,.52)): a cool near-black
+          // tint that reads as frosted dark glass on the aurora wallpaper.
+          .background(Color(0x85161A26))
+          // Faint light rim (the mock's --glass-border rgba(255,255,255,.14)).
+          .border(1.dp, Color(0x24FFFFFF), shape),
   ) {
     content()
   }
@@ -1334,6 +1377,9 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_STOCKS -> "Stocks"
       HomeWidgetStore.KIND_OPTIONS -> "Options"
       HomeWidgetStore.KIND_HA -> "Home Assistant"
+      HomeWidgetStore.KIND_TODAY -> "Today"
+      HomeWidgetStore.KIND_QUICK_CONTROLS -> "Quick Controls"
+      HomeWidgetStore.KIND_PHOTO_MEMORY -> "Photo Memory"
       else -> "Widget"
     }
 
@@ -2417,6 +2463,11 @@ private fun ImmortalWidgetContent(widget: HomeWidgetStore.HomeWidget, modifier: 
     HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_HA -> ImmortalHaWidget(modifier, maxTileRows = widget.spanY.coerceIn(1, 4))
+    // The former fixed dashboard cards, now regular widgets. They keep their self-sizing card
+    // look; the grid cell just gives them room.
+    HomeWidgetStore.KIND_TODAY -> TodayStripWidget(modifier)
+    HomeWidgetStore.KIND_QUICK_CONTROLS -> QuickControlsWidget(modifier)
+    HomeWidgetStore.KIND_PHOTO_MEMORY -> PhotoMemoryStrip(modifier)
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
