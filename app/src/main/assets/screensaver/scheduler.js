@@ -56,7 +56,19 @@
     }
 
     advance();
-    addEventListener("resize", () => { /* modes read ctx.W/H on next beat */ });
-    return { advance, stop: () => { clearTimeout(beatTimer); clearStage(); } };
+    // Re-render on a REAL viewport change. A DreamService WebView can deliver its first layout
+    // after the page boots, so the first mode renders against a tiny early viewport (content
+    // squeezed into a corner, rest black) — and single-mode styles loop internally, so without
+    // this they never recover. Debounced; ignores sub-5% jitter.
+    let lastW = innerWidth, lastH = innerHeight, resizeTimer = null;
+    addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const dw = Math.abs(innerWidth - lastW) / Math.max(1, lastW);
+        const dh = Math.abs(innerHeight - lastH) / Math.max(1, lastH);
+        if (dw > 0.05 || dh > 0.05) { lastW = innerWidth; lastH = innerHeight; advance(); }
+      }, 250);
+    });
+    return { advance, stop: () => { clearTimeout(beatTimer); clearTimeout(resizeTimer); clearStage(); } };
   };
 })();

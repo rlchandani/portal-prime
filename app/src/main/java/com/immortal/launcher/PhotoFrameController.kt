@@ -590,7 +590,19 @@ class PhotoFrameController(
     // the gaps a mode leaves). The engine's own HTML clock is suppressed (?nativeClock=1) to avoid a
     // double clock — the Face overlay is the single clock everywhere.
     val root = view as FrameLayout
-    root.addView(wv, FrameLayout.LayoutParams(MATCH, MATCH))
+    // Pin the WebView to the root's REAL pixel size, not MATCH. When the engine attaches before
+    // the host window's first layout (DreamService does this), a MATCH WebView can get measured
+    // at its 256px unmeasured default and keep rendering the page in a narrow left strip with
+    // the rest black. Explicit pixels now + a layout listener for any later size change.
+    fun engineParams(): FrameLayout.LayoutParams =
+        if (root.width > 0 && root.height > 0) FrameLayout.LayoutParams(root.width, root.height)
+        else FrameLayout.LayoutParams(MATCH, MATCH)
+    root.addView(wv, engineParams())
+    root.addOnLayoutChangeListener { _, l, t, r, b, ol, ot, or2, ob ->
+      if ((r - l) != (or2 - ol) || (b - t) != (ob - ot)) {
+        if (root.width > 0 && root.height > 0) wv.layoutParams = engineParams()
+      }
+    }
     // Re-stack the overlays above the engine (bringToFront preserves their relative order).
     runCatching { faceRenderer.view.bringToFront() }
     runCatching { calendarPanel.bringToFront() }
