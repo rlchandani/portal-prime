@@ -131,7 +131,7 @@ private fun SmbConnectScreen(onDone: () -> Unit) {
       status?.let {
         Text(
             it,
-            color = Color(0xFFFF3B30),
+            color = IosRed,
             fontSize = Sizes.rowSub,
             modifier = Modifier.padding(top = 10.dp, start = 4.dp),
         )

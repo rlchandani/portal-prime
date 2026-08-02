@@ -126,7 +126,7 @@ internal fun HaSettingsContent() {
           }
         }
         if (status.isNotBlank()) {
-          Text(status, color = if (status.contains("✓")) Color(0xFF34C759) else IosSecondary, fontSize = Sizes.rowSub)
+          Text(status, color = if (status.contains("✓")) IosGreen else IosSecondary, fontSize = Sizes.rowSub)
         }
       }
     }
@@ -158,7 +158,7 @@ internal fun HaSettingsContent() {
                   },
                   contentAlignment = Alignment.Center,
               ) {
-                Text("✕", color = Color(0xFFFF3B30), fontSize = 20.sp)
+                Text("✕", color = IosRed, fontSize = 20.sp)
               }
             }
           }

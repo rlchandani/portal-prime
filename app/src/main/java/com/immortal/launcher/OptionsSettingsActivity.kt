@@ -129,7 +129,7 @@ internal fun OptionsSettingsContent() {
                   },
                   contentAlignment = Alignment.Center,
               ) {
-                Text("✕", color = Color(0xFFFF3B30), fontSize = 20.sp)
+                Text("✕", color = IosRed, fontSize = 20.sp)
               }
             }
           }

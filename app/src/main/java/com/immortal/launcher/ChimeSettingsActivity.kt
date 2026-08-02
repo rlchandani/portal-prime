@@ -99,7 +99,7 @@ internal fun ChimeSettingsContent() {
 @Composable
 private fun TestButton(label: String, onClick: () -> Unit) {
   Surface(
-      color = Color(0xFFE5F0FF),
+      color = IosFocusTint,
       shape = RoundedCornerShape(12.dp),
       modifier =
           Modifier.padding(horizontal = 18.dp, vertical = 2.dp)

@@ -92,7 +92,7 @@ internal fun TodoSettingsContent() {
               ) {
                 Text(
                     if (item.done) "☑" else "☐",
-                    color = if (item.done) Color(0xFF34C759) else IosSecondary,
+                    color = if (item.done) IosGreen else IosSecondary,
                     fontSize = 22.sp,
                 )
               }
@@ -111,7 +111,7 @@ internal fun TodoSettingsContent() {
                       },
                   contentAlignment = Alignment.Center,
               ) {
-                Text("✕", color = Color(0xFFFF3B30), fontSize = 20.sp)
+                Text("✕", color = IosRed, fontSize = 20.sp)
               }
             }
           }
@@ -166,7 +166,7 @@ internal fun TodoSettingsContent() {
       ) {
         Text(
             "Clear completed",
-            color = Color(0xFFFF3B30),
+            color = IosRed,
             fontSize = 17.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,

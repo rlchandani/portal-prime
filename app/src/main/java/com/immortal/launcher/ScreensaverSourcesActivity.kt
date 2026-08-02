@@ -330,7 +330,7 @@ private fun AlbumRefreshStepper(minutes: Int, onChange: (Int) -> Unit) {
                 } else false
               }
               .focusable(interactionSource = src)
-              .background(if (focused) Color(0xFFE5F0FF) else Color.Transparent)
+              .background(if (focused) IosFocusTint else Color.Transparent)
               .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {

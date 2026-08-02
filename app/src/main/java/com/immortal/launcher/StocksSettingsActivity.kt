@@ -97,7 +97,7 @@ internal fun StocksSettingsContent() {
                   },
                   contentAlignment = Alignment.Center,
               ) {
-                Text("✕", color = Color(0xFFFF3B30), fontSize = 20.sp)
+                Text("✕", color = IosRed, fontSize = 20.sp)
               }
             }
           }
@@ -113,7 +113,7 @@ internal fun StocksSettingsContent() {
           TICKER_SUGGESTIONS.forEach { sym ->
             val added = tickers.contains(sym)
             Surface(
-                color = if (added) IosDivider else Color(0xFFE5F0FF),
+                color = if (added) IosDivider else IosFocusTint,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.clickable(enabled = !added) {
                   StocksConfig.add(context, sym)
@@ -173,7 +173,7 @@ internal fun AlpacaCredentialsCard() {
     Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Text("Alpaca account", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-        if (savedTick) Text("Connected ✓", color = Color(0xFF34C759), fontSize = Sizes.rowSub, fontWeight = FontWeight.SemiBold)
+        if (savedTick) Text("Connected ✓", color = IosGreen, fontSize = Sizes.rowSub, fontWeight = FontWeight.SemiBold)
       }
       Text(
           "Get free API keys at alpaca.markets → Paper/Live → API Keys. Market-data keys are read-only.",

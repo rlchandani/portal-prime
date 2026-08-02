@@ -113,7 +113,7 @@ internal fun NewsSettingsContent() {
                       },
                   contentAlignment = Alignment.Center,
               ) {
-                Text("✕", color = Color(0xFFFF3B30), fontSize = 20.sp)
+                Text("✕", color = IosRed, fontSize = 20.sp)
               }
             }
           }
@@ -129,7 +129,7 @@ internal fun NewsSettingsContent() {
           FEED_SUGGESTIONS.forEach { (label, feedUrl) ->
             val added = feeds.any { it.url == feedUrl }
             Surface(
-                color = if (added) IosDivider else Color(0xFFE5F0FF),
+                color = if (added) IosDivider else IosFocusTint,
                 shape = RoundedCornerShape(12.dp),
                 modifier =
                     Modifier.clickable(enabled = !added) {

@@ -112,7 +112,7 @@ internal fun CryptoSettingsContent() {
                       },
                   contentAlignment = Alignment.Center,
               ) {
-                Text("✕", color = Color(0xFFFF3B30), fontSize = 20.sp)
+                Text("✕", color = IosRed, fontSize = 20.sp)
               }
             }
           }
@@ -128,7 +128,7 @@ internal fun CryptoSettingsContent() {
           COIN_SUGGESTIONS.forEach { (id, sym) ->
             val added = coins.any { it.id == id }
             Surface(
-                color = if (added) IosDivider else Color(0xFFE5F0FF),
+                color = if (added) IosDivider else IosFocusTint,
                 shape = RoundedCornerShape(12.dp),
                 modifier =
                     Modifier.clickable(enabled = !added) {

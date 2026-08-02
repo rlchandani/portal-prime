@@ -108,7 +108,7 @@ internal fun CountdownSettingsContent() {
                             },
                     contentAlignment = Alignment.Center,
                 ) {
-                  Text("✕", color = Color(0xFFFF3B30), fontSize = 20.sp)
+                  Text("✕", color = IosRed, fontSize = 20.sp)
                 }
               }
             }
@@ -181,7 +181,7 @@ internal fun CountdownSettingsContent() {
 @Composable
 private fun EmojiChip(emoji: String, selected: Boolean, onClick: () -> Unit) {
   Surface(
-      color = if (selected) Color(0xFFE5F0FF) else IosDivider,
+      color = if (selected) IosFocusTint else IosDivider,
       shape = RoundedCornerShape(10.dp),
       modifier = Modifier.size(44.dp).clickable { onClick() },
   ) {
