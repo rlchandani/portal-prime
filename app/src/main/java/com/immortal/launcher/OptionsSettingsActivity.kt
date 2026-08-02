@@ -97,18 +97,15 @@ internal fun OptionsSettingsContent() {
           }
         }
 
-        OptionStepper("Delta min", "%.2f".format(deltaMinPct / 100.0)) {
-          deltaMinPct = (deltaMinPct + it).coerceIn(1, 99)
-          persistBand()
-        }
-        OptionStepper("Delta max", "%.2f".format(deltaMaxPct / 100.0)) {
-          deltaMaxPct = (deltaMaxPct + it).coerceIn(1, 99)
-          persistBand()
-        }
-        OptionStepper("Expiry within (days)", "$expiryDays") {
-          expiryDays = (expiryDays + it * 5).coerceIn(1, 365)
-          OptionsScanConfig.setExpiryDays(context, expiryDays)
-        }
+        Stepper("Delta min", "%.2f".format(deltaMinPct / 100.0),
+            onMinus = { deltaMinPct = (deltaMinPct - 1).coerceIn(1, 99); persistBand() },
+            onPlus = { deltaMinPct = (deltaMinPct + 1).coerceIn(1, 99); persistBand() })
+        Stepper("Delta max", "%.2f".format(deltaMaxPct / 100.0),
+            onMinus = { deltaMaxPct = (deltaMaxPct - 1).coerceIn(1, 99); persistBand() },
+            onPlus = { deltaMaxPct = (deltaMaxPct + 1).coerceIn(1, 99); persistBand() })
+        Stepper("Expiry within (days)", "$expiryDays",
+            onMinus = { expiryDays = (expiryDays - 5).coerceIn(1, 365); OptionsScanConfig.setExpiryDays(context, expiryDays) },
+            onPlus = { expiryDays = (expiryDays + 5).coerceIn(1, 365); OptionsScanConfig.setExpiryDays(context, expiryDays) })
       }
     }
 
@@ -178,23 +175,3 @@ private fun TypePill(label: String, selected: Boolean, onClick: () -> Unit) {
 }
 
 /** A ±stepper row for a scalar scan parameter (reads its display value pre-formatted). */
-@Composable
-private fun OptionStepper(label: String, value: String, onChange: (Int) -> Unit) {
-  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-    Box(modifier = Modifier.size(48.dp).clickable { onChange(-1) }, contentAlignment = Alignment.Center) {
-      Text("◀", color = IosBlue, fontSize = 20.sp)
-    }
-    Text(
-        value,
-        color = IosLabel,
-        fontSize = Sizes.rowValue,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.widthIn(min = 56.dp),
-    )
-    Box(modifier = Modifier.size(48.dp).clickable { onChange(1) }, contentAlignment = Alignment.Center) {
-      Text("▶", color = IosBlue, fontSize = 20.sp)
-    }
-  }
-}

@@ -137,8 +137,8 @@ internal fun CountdownSettingsContent() {
             EMOJI_PALETTE.drop(6).forEach { e -> EmojiChip(e, e == emoji) { emoji = e } }
           }
 
-          Stepper("Month", month) { month = ((it - 1 + 12) % 12) + 1 }
-          Stepper("Day", day) { day = ((it - 1 + 31) % 31) + 1 }
+          Stepper("Month", "$month", onMinus = { month = ((month - 2 + 12) % 12) + 1 }, onPlus = { month = (month % 12) + 1 })
+          Stepper("Day", "$day", onMinus = { day = ((day - 2 + 31) % 31) + 1 }, onPlus = { day = (day % 31) + 1 })
 
           Row(
               modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
@@ -148,7 +148,7 @@ internal fun CountdownSettingsContent() {
             Switch(checked = repeatsYearly, onCheckedChange = { repeatsYearly = it }, colors = iosSwitchColors())
           }
           if (!repeatsYearly) {
-            Stepper("Year", year) { year = it.coerceIn(2000, 2100) }
+            Stepper("Year", "$year", onMinus = { year = (year - 1).coerceIn(2000, 2100) }, onPlus = { year = (year + 1).coerceIn(2000, 2100) })
           }
 
           Surface(
@@ -189,23 +189,3 @@ private fun EmojiChip(emoji: String, selected: Boolean, onClick: () -> Unit) {
   }
 }
 
-@Composable
-private fun Stepper(label: String, value: Int, onChange: (Int) -> Unit) {
-  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-    Box(modifier = Modifier.size(48.dp).clickable { onChange(value - 1) }, contentAlignment = Alignment.Center) {
-      Text("◀", color = IosBlue, fontSize = 20.sp)
-    }
-    Text(
-        "$value",
-        color = IosLabel,
-        fontSize = Sizes.rowValue,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.widthIn(min = 56.dp),
-    )
-    Box(modifier = Modifier.size(48.dp).clickable { onChange(value + 1) }, contentAlignment = Alignment.Center) {
-      Text("▶", color = IosBlue, fontSize = 20.sp)
-    }
-  }
-}
