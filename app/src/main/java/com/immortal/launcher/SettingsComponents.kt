@@ -67,19 +67,23 @@ import androidx.compose.ui.unit.sp
 // iOS color palette
 // ---------------------------------------------------------------------------
 
-internal val IosBackground = Color(0xFFF2F2F7)
-internal val IosCard = Color(0xFFFFFFFF)
-internal val IosLabel = Color(0xFF000000)
-internal val IosSecondary = Color(0xFF8E8E93)
-internal val IosTertiary = Color(0xFF6E6E73)
-internal val IosDivider = Color(0xFFE5E5EA)
-internal val IosBlue = Color(0xFF007AFF)
-internal val IosGreen = Color(0xFF34C759)
-internal val IosChevron = Color(0xFFC7C7CC)
-internal val IosRed = Color(0xFFFF3B30)          // destructive / stop actions
-internal val IosFocusTint = Color(0xFFE5F0FF)    // D-pad focus highlight + action-pill fill
-internal val IosSegmentTrack = Color(0xFFE5E5EA) // segmented-control track (== IosDivider tone)
-internal val IosSegmentInactive = Color(0xFF3A3A3C) // unselected segment label
+// Dusk Aurora DARK palette (the approved settings mock, 02-settings-v3): a cool near-black
+// panel with dark glass cards, white type, and iOS-dark accents. Every settings surface reads
+// these tokens, so this block IS the theme — the light values it replaced live in git history.
+internal val IosBackground = Color(0xFF10131C)   // detail panel (mock rgba(22,26,38,.55) solidified)
+internal val IosCard = Color(0xFF1E2230)         // grouped card (mock rgba(255,255,255,.07) on dark)
+internal val IosLabel = Color(0xFFFFFFFF)
+internal val IosSecondary = Color(0xFFA1A1AA)    // ~66% white
+internal val IosTertiary = Color(0xFF74747E)     // ~45% white
+internal val IosDivider = Color(0xFF2A2E3C)      // hairline on dark (mock rgba(255,255,255,.09))
+internal val IosBlue = Color(0xFF0A84FF)         // iOS dark-mode blue
+internal val IosGreen = Color(0xFF30D158)        // iOS dark-mode green
+internal val IosChevron = Color(0xFF4A4E5C)
+internal val IosRed = Color(0xFFFF453A)          // destructive / stop actions (dark-mode red)
+internal val IosFocusTint = Color(0xFF1C3350)    // D-pad focus highlight + action-pill fill (blue-dark)
+internal val IosSegmentTrack = Color(0xFF2A2E3C) // segmented-control track (== IosDivider tone)
+internal val IosSegmentInactive = Color(0xFFA1A1AA) // unselected segment label
+internal val IosSidebar = Color(0xFF0C0F17)      // sidebar panel (mock rgba(14,17,26,.74) solidified)
 
 // ---------------------------------------------------------------------------
 // Sizing scale (single source of truth)
@@ -252,8 +256,8 @@ internal fun iosTextFieldColors() =
         unfocusedLabelColor = IosSecondary,
         focusedPlaceholderColor = IosSecondary,
         unfocusedPlaceholderColor = IosSecondary,
-        focusedContainerColor = Color.White,
-        unfocusedContainerColor = Color.White,
+        focusedContainerColor = IosCard,
+        unfocusedContainerColor = IosCard,
     )
 
 /**
@@ -269,9 +273,9 @@ internal fun iosFilledTextFieldColors() =
         unfocusedTextColor = IosLabel,
         disabledTextColor = IosSecondary,
         cursorColor = IosBlue,
-        focusedContainerColor = Color.White,
-        unfocusedContainerColor = Color.White,
-        disabledContainerColor = Color.White,
+        focusedContainerColor = IosCard,
+        unfocusedContainerColor = IosCard,
+        disabledContainerColor = IosCard,
         focusedIndicatorColor = IosBlue,
         unfocusedIndicatorColor = IosDivider,
         focusedLabelColor = IosBlue,
@@ -522,7 +526,9 @@ internal fun Segmented(
         options.forEach { (label, value) ->
             val on = value == selected
             Surface(
-                color = if (on) IosCard else Color.Transparent,
+                // Selected segment: lighter fill so it reads against the dark track (the mock's
+                // rgba(255,255,255,.22)); IosCard is too close to the track tone on dark.
+                color = if (on) Color(0xFF3A4152) else Color.Transparent,
                 shape = RoundedCornerShape(6.dp),
                 modifier = Modifier.tvFocusable(RoundedCornerShape(6.dp)) { onSelect(value) },
             ) {

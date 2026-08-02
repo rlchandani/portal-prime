@@ -303,7 +303,7 @@ private fun ImmortalSettingsScreen() {
         modifier = Modifier
             .width(440.dp)
             .fillMaxHeight()
-            .background(Color(0xFFE8E8EE))
+            .background(IosSidebar)
             .focusRequester(firstFocus)
             .focusGroup()
             .verticalScrollbar(sidebarScroll)
@@ -741,7 +741,7 @@ private fun SidebarSearch(query: String, onQueryChange: (String) -> Unit) {
           .clip(RoundedCornerShape(Sizes.cardRadius))
           // A white field with a defined border reads clearly as an input against the grey sidebar
           // background — the old grey-on-grey pill faded into the panel.
-          .background(Color.White)
+          .background(IosCard)
           .border(BorderStroke(1.dp, IosDivider), RoundedCornerShape(Sizes.cardRadius))
           .padding(horizontal = 12.dp, vertical = 10.dp),
       verticalAlignment = Alignment.CenterVertically,
