@@ -85,8 +85,8 @@ internal fun WelcomeSettingsContent() {
         val found = runCatching {
           engine?.voices
               ?.filter { !it.isNetworkConnectionRequired }
-              ?.sortedWith(ttsVoiceSort())
-              ?.map { it.name to androidVoiceLabel(it) }
+              ?.sortedWith(TtsVoiceLabels.sort)
+              ?.map { it.name to TtsVoiceLabels.label(it) }
               ?.distinctBy { it.first }
               ?: emptyList()
         }.getOrDefault(emptyList())
@@ -273,34 +273,6 @@ internal fun WelcomeSettingsContent() {
       }
 }
 
-private fun ttsVoiceSort(): Comparator<android.speech.tts.Voice> =
-    compareBy<android.speech.tts.Voice> { ttsVoiceGroup(it) }
-        .thenByDescending { it.quality }
-        .thenBy { it.locale.displayLanguage }
-        .thenBy { it.name }
-
-private fun ttsVoiceGroup(v: android.speech.tts.Voice): Int {
-  val n = v.name.lowercase()
-  return when {
-    n.startsWith("sherpa-kokoro-") -> 0
-    n.startsWith("sherpa-piper-ro_ro-") -> 1
-    n.startsWith("sherpa-piper-") -> 2
-    else -> 3
-  }
-}
-
-private fun ttsLocaleLabel(v: android.speech.tts.Voice): String {
-  val language = v.locale.getDisplayLanguage(java.util.Locale.US).ifBlank { v.locale.language }
-  val country = v.locale.country
-  return if (country.isBlank()) language else "$language (${country.uppercase()})"
-}
-
-private fun ttsQualityLabel(v: android.speech.tts.Voice): String? =
-    when {
-      v.quality >= android.speech.tts.Voice.QUALITY_VERY_HIGH -> "HQ+"
-      v.quality >= android.speech.tts.Voice.QUALITY_HIGH -> "HQ"
-      else -> null
-    }
 
 @Composable
 private fun AndroidVoiceRow(
@@ -333,37 +305,6 @@ private fun AndroidVoiceRow(
   }
 }
 
-/** Turn an Android engine voice name like "en-us-x-sfg#female_1-local" into a label. */
-private fun androidVoiceLabel(v: android.speech.tts.Voice): String {
-  val n = v.name.lowercase()
-  if (n.startsWith("sherpa-kokoro-")) {
-    val voice = v.name.removePrefix("sherpa-kokoro-")
-    return listOfNotNull("Kokoro $voice", ttsLocaleLabel(v), ttsQualityLabel(v)).joinToString(" - ")
-  }
-  if (n == "sherpa-piper-ro_ro-mihai-medium") {
-    return listOfNotNull("Romanian Mihai", ttsLocaleLabel(v), ttsQualityLabel(v)).joinToString(" - ")
-  }
-  if (n.startsWith("sherpa-piper-")) {
-    val voice = v.name.removePrefix("sherpa-piper-").replace('-', ' ')
-    return listOfNotNull("Piper $voice", ttsLocaleLabel(v), ttsQualityLabel(v)).joinToString(" - ")
-  }
-  val gender = when {
-    n.contains("female") -> "Female"
-    n.contains("male") -> "Male"
-    else -> null
-  }
-  val num = Regex("(\\d+)").find(n)?.value
-  val base = listOfNotNull(gender, num?.let { "voice $it" }).joinToString(" ").ifBlank { v.name }
-  val region = v.locale.country.ifBlank { v.locale.language }.uppercase()
-  // Quality tier hint so the user can pick the better-sounding voices.
-  val q = when {
-    v.quality >= android.speech.tts.Voice.QUALITY_VERY_HIGH -> "HQ+"
-    v.quality >= android.speech.tts.Voice.QUALITY_HIGH -> "HQ"
-    else -> null
-  }
-  return listOfNotNull(base.takeIf { it.isNotBlank() }, region.takeIf { it.isNotBlank() }, q)
-      .joinToString(" · ")
-}
 
 @Composable
 private fun EditableTextRow(label: String, value: String, onChange: (String) -> Unit) {

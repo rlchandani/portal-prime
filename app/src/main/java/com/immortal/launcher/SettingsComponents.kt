@@ -769,3 +769,60 @@ internal fun CardPillButton(label: String, color: Color = IosBlue, onClick: () -
         )
     }
 }
+
+/** THE small blue action pill (Apply / Sign in / Test) — 10dp radius, white 17sp label. */
+@Composable
+internal fun ActionPill(label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Surface(
+        color = IosBlue,
+        shape = RoundedCornerShape(10.dp),
+        modifier = modifier.tvFocusable(RoundedCornerShape(10.dp)) { onClick() },
+    ) {
+        Text(
+            label,
+            color = Color.White,
+            fontSize = Sizes.actionButton,
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
+        )
+    }
+}
+
+/** Numbered setup step ("1.  Do the thing") for the connection how-to cards. */
+@Composable
+internal fun SetupStep(n: String, text: String) {
+    Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+        Text(
+            "$n.",
+            color = IosBlue,
+            fontSize = Sizes.rowSub,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(end = 10.dp),
+        )
+        Text(text, color = IosSecondary, fontSize = Sizes.rowSub, lineHeight = 20.sp)
+    }
+}
+
+/** Card-header toggle: title + wrapping subtitle on the left, iOS switch right. */
+@Composable
+internal fun ToggleHeaderRow(
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(18.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, color = IosLabel, fontSize = Sizes.rowTitle)
+            Text(
+                subtitle,
+                color = IosSecondary,
+                fontSize = Sizes.rowSub,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+        Switch(checked = checked, onCheckedChange = onCheckedChange, colors = iosSwitchColors())
+    }
+}

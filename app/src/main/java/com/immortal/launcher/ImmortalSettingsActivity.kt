@@ -1099,20 +1099,6 @@ private fun screensaverSourcePath(s: ScreensaverConfig.Settings): String = when 
  */
 /** A numbered step in the multi-room setup guide. */
 @Composable
-private fun MultiRoomStep(n: String, text: String) {
-  Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-    Text(
-        "$n.",
-        color = IosBlue,
-        fontSize = Sizes.rowSub,
-        fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.padding(end = 10.dp),
-    )
-    Text(text, color = IosSecondary, fontSize = Sizes.rowSub, lineHeight = 20.sp)
-  }
-}
-
-@Composable
 internal fun MultiRoomScreen(onBack: () -> Unit) {
   SettingsScaffold(
       title = "Multi-room audio",
@@ -1149,15 +1135,15 @@ internal fun MultiRoomContent() {
               fontSize = Sizes.rowSub,
               modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
           )
-          MultiRoomStep(
+          SetupStep(
               "1",
               "Install and set up Music Assistant as a server on your home network. New to Music " +
                   "Assistant? Learn more at music-assistant.io")
-          MultiRoomStep(
+          SetupStep(
               "2",
               "Install Snapcast from the Immortal App Store, and point it at your Music Assistant " +
                   "server.")
-          MultiRoomStep(
+          SetupStep(
               "3", "Turn on the toggle below, then enter your Music Assistant server's address.")
         }
       }
@@ -1206,21 +1192,9 @@ internal fun MultiRoomContent() {
                 label = { Text("Music Assistant / Snapcast server IP") },
                 modifier = Modifier.weight(1f),
             )
-            Surface(
-                color = IosBlue,
-                shape = RoundedCornerShape(10.dp),
-                modifier =
-                    Modifier.padding(start = 12.dp).tvFocusable(RoundedCornerShape(10.dp)) {
+            ActionPill("Apply", modifier = Modifier.padding(start = 12.dp)) {
                       ImmortalSettings.setSnapcastHost(context, host)
                       MultiRoomService.sync(context)
-                    },
-            ) {
-              Text(
-                  "Apply",
-                  color = Color.White,
-                  fontSize = Sizes.actionButton,
-                  modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
-              )
             }
           }
           // Music Assistant API port — 8095 by default; only change it if MA's web server moved.
@@ -1284,19 +1258,7 @@ internal fun MultiRoomContent() {
               modifier = Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 10.dp),
               verticalAlignment = Alignment.CenterVertically,
           ) {
-            Surface(
-                color = IosBlue,
-                shape = RoundedCornerShape(10.dp),
-                modifier =
-                    Modifier.tvFocusable(RoundedCornerShape(10.dp)) { MaControl.testLogin(context) },
-            ) {
-              Text(
-                  "Sign in",
-                  color = Color.White,
-                  fontSize = Sizes.actionButton,
-                  modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
-              )
-            }
+            ActionPill("Sign in") { MaControl.testLogin(context) }
             val auth = MultiRoomStatus.maAuth
             if (auth.isNotBlank()) {
               Text(
@@ -1420,13 +1382,13 @@ internal fun MqttContent() {
       Card {
         Column(modifier = Modifier.padding(18.dp)) {
           Text("Setting it up", color = IosLabel, fontSize = Sizes.rowTitle)
-          MultiRoomStep(
+          SetupStep(
               "1",
               "In Home Assistant, add the Mosquitto broker add-on (Settings → Add-ons) and the " +
                   "MQTT integration. New to MQTT? See home-assistant.io/integrations/mqtt")
-          MultiRoomStep(
+          SetupStep(
               "2", "Turn on the toggle below and enter your broker's address (and login, if any).")
-          MultiRoomStep(
+          SetupStep(
               "3",
               "This Portal appears automatically under Settings → Devices as a new MQTT device — " +
                   "no YAML needed.")
@@ -1476,19 +1438,7 @@ internal fun MqttContent() {
                 label = { Text("MQTT broker IP / host") },
                 modifier = Modifier.weight(1f),
             )
-            Surface(
-                color = IosBlue,
-                shape = RoundedCornerShape(10.dp),
-                modifier =
-                    Modifier.padding(start = 12.dp).tvFocusable(RoundedCornerShape(10.dp)) { apply() },
-            ) {
-              Text(
-                  "Apply",
-                  color = Color.White, // white label on the blue button
-                  fontSize = Sizes.actionButton,
-                  modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
-              )
-            }
+            ActionPill("Apply", modifier = Modifier.padding(start = 12.dp)) { apply() }
           }
           OutlinedTextField(
               colors = iosTextFieldColors(),

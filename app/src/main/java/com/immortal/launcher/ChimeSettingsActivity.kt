@@ -131,8 +131,8 @@ private fun VoicePicker(current: String, onPick: (String) -> Unit) {
         val found = runCatching {
           tts?.voices
               ?.filter { !it.isNetworkConnectionRequired }
-              ?.sortedWith(chimeTtsVoiceSort())
-              ?.map { it.name to prettyVoice(it) }
+              ?.sortedWith(TtsVoiceLabels.sort)
+              ?.map { it.name to TtsVoiceLabels.label(it) }
               ?.distinctBy { it.first }
               ?: emptyList()
         }.getOrDefault(emptyList())
@@ -165,56 +165,5 @@ private fun VoicePicker(current: String, onPick: (String) -> Unit) {
   }
 }
 
-private fun chimeTtsVoiceSort(): Comparator<android.speech.tts.Voice> =
-    compareBy<android.speech.tts.Voice> { chimeTtsVoiceGroup(it) }
-        .thenByDescending { it.quality }
-        .thenBy { it.locale.displayLanguage }
-        .thenBy { it.name }
 
-private fun chimeTtsVoiceGroup(v: android.speech.tts.Voice): Int {
-  val n = v.name.lowercase()
-  return when {
-    n.startsWith("sherpa-kokoro-") -> 0
-    n.startsWith("sherpa-piper-ro_ro-") -> 1
-    n.startsWith("sherpa-piper-") -> 2
-    else -> 3
-  }
-}
 
-private fun chimeTtsLocaleLabel(v: android.speech.tts.Voice): String {
-  val language = v.locale.getDisplayLanguage(java.util.Locale.US).ifBlank { v.locale.language }
-  val country = v.locale.country
-  return if (country.isBlank()) language else "$language (${country.uppercase()})"
-}
-
-private fun chimeTtsQualityLabel(v: android.speech.tts.Voice): String? =
-    when {
-      v.quality >= android.speech.tts.Voice.QUALITY_VERY_HIGH -> "HQ+"
-      v.quality >= android.speech.tts.Voice.QUALITY_HIGH -> "HQ"
-      else -> null
-    }
-
-/** Turn an engine voice name like "en-us-x-sfg#female_1-local" into something readable. */
-private fun prettyVoice(v: android.speech.tts.Voice): String {
-  val n = v.name.lowercase()
-  if (n.startsWith("sherpa-kokoro-")) {
-    val voice = v.name.removePrefix("sherpa-kokoro-")
-    return listOfNotNull("Kokoro $voice", chimeTtsLocaleLabel(v), chimeTtsQualityLabel(v)).joinToString(" - ")
-  }
-  if (n == "sherpa-piper-ro_ro-mihai-medium") {
-    return listOfNotNull("Romanian Mihai", chimeTtsLocaleLabel(v), chimeTtsQualityLabel(v)).joinToString(" - ")
-  }
-  if (n.startsWith("sherpa-piper-")) {
-    val voice = v.name.removePrefix("sherpa-piper-").replace('-', ' ')
-    return listOfNotNull("Piper $voice", chimeTtsLocaleLabel(v), chimeTtsQualityLabel(v)).joinToString(" - ")
-  }
-  val gender = when {
-    n.contains("female") -> "Female"
-    n.contains("male") -> "Male"
-    else -> null
-  }
-  val num = Regex("(\\d+)").find(n)?.value
-  val base = listOfNotNull(gender, num?.let { "voice $it" }).joinToString(" ").ifBlank { v.name }
-  val region = v.locale.country.ifBlank { v.locale.language }.uppercase()
-  return if (region.isNotBlank()) "$base · $region" else base
-}
