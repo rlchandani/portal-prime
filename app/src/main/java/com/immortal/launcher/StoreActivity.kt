@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -79,6 +80,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+import java.util.Locale
 import kotlinx.coroutines.launch
 
 /**
@@ -264,6 +266,7 @@ private fun BrowseScreen(
         i++ // top header block (title + search + apk link)
         if (query.isBlank() && heroApp != null) i++ // hero
         if (query.isBlank() && originals.isNotEmpty()) i++ // featured carousel
+        if (query.isBlank() && apps.size >= 4) i++ // Top-on-Portal chart
         if (showUpdates) i += 2 // updates header + card
         if (query.isBlank()) for (cat in categories.keys) { map[cat] = i; i += 2 }
         map
@@ -277,7 +280,19 @@ private fun BrowseScreen(
     ) {
       item(key = "top") {
         Spacer(Modifier.height(56.dp))
-        Text("App Store", fontSize = 34.sp, fontWeight = FontWeight.Bold, color = IosLabel)
+        // "Today" editorial masthead (mock 04): date kicker over a big Today title.
+        Text(
+            remember {
+              java.text.SimpleDateFormat("EEEE, MMMM d", Locale.getDefault())
+                  .format(java.util.Date())
+                  .uppercase(Locale.getDefault())
+            },
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.4.sp,
+            color = IosTertiary,
+        )
+        Text("Today", fontSize = 38.sp, fontWeight = FontWeight.Bold, color = IosLabel)
         Text(
             "${apps.size} apps picked for Portal · community submissions welcome",
             fontSize = 15.sp,
@@ -318,6 +333,55 @@ private fun BrowseScreen(
         item(key = "featured") {
           Spacer(Modifier.height(14.dp))
           FeaturedCarousel(originals, onOpenDetail)
+        }
+      }
+
+      // "Top on Portal" — a ranked two-column chart (mock 04): installed apps rank first
+      // (they're what people actually use), then compatible not-yet-installed picks.
+      if (query.isBlank() && apps.size >= 4) {
+        item(key = "top-chart") {
+          Spacer(Modifier.height(14.dp))
+          SectionHeader("Top on Portal")
+          Spacer(Modifier.height(8.dp))
+          val ranked =
+              remember(apps) {
+                apps.sortedByDescending {
+                  var s = 0
+                  if (StoreCatalog.isInstalled(context, it.packageName)) s += 2
+                  if (StoreCatalog.isCompatible(it)) s += 1
+                  s
+                }.take(8)
+              }
+          Surface(color = IosCard, shape = RoundedCornerShape(Sizes.cardRadius), modifier = Modifier.fillMaxWidth()) {
+            Row {
+              listOf(ranked.take(4), ranked.drop(4)).forEach { colApps ->
+                Column(Modifier.weight(1f)) {
+                  colApps.forEachIndexed { i, app ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().tvFocusableRow { onOpenDetail(app) }
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                      Text(
+                          "${ranked.indexOf(app) + 1}",
+                          color = IosTertiary,
+                          fontSize = 17.sp,
+                          fontWeight = FontWeight.Bold,
+                          modifier = Modifier.widthIn(min = 24.dp),
+                      )
+                      AppIcon(app, 48.dp)
+                      Column(modifier = Modifier.weight(1f).padding(start = 12.dp, end = 10.dp)) {
+                        Text(app.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = IosLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(app.description, fontSize = 12.sp, color = IosSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                      }
+                      AppActionSlot(app, updates, onInstall)
+                    }
+                    if (i < colApps.size - 1) RowDivider()
+                  }
+                }
+              }
+            }
+          }
         }
       }
 
@@ -599,32 +663,35 @@ private fun HeroBanner(
     Box(modifier = Modifier.align(Alignment.TopEnd).padding(top = 22.dp, end = 20.dp)) {
       AppIcon(app, 84.dp)
     }
-    Column(modifier = Modifier.align(Alignment.BottomStart).padding(20.dp)) {
-      Box(
-          modifier =
-              Modifier.clip(RoundedCornerShape(6.dp))
-                  .background(Color(0x33FFFFFF))
-                  .padding(horizontal = 10.dp, vertical = 4.dp),
-      ) {
-        Text(
-            "PORTAL PICK",
-            color = Color.White,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.8.sp,
-        )
-      }
-      Spacer(Modifier.height(8.dp))
-      Text(app.name, color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+    // "App of the Day" story layout (mock 04): kicker, a big editorial headline (the app's
+    // description does the selling), then the app identity row with the action at its side.
+    Column(modifier = Modifier.align(Alignment.BottomStart).padding(22.dp)) {
+      Text(
+          "APP OF THE DAY",
+          color = Color(0xFF1DE9B6),
+          fontSize = 11.sp,
+          fontWeight = FontWeight.Bold,
+          letterSpacing = 1.6.sp,
+      )
+      Spacer(Modifier.height(6.dp))
       Text(
           app.description,
-          color = Color(0xCCFFFFFF),
-          fontSize = 15.sp,
+          color = Color.White,
+          fontSize = 26.sp,
+          fontWeight = FontWeight.Bold,
+          lineHeight = 32.sp,
           maxLines = 2,
           overflow = TextOverflow.Ellipsis,
       )
       Spacer(Modifier.height(14.dp))
-      AppActionSlot(app, updates, onInstall)
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        AppIcon(app, 44.dp)
+        Column(modifier = Modifier.weight(1f).padding(start = 12.dp, end = 12.dp)) {
+          Text(app.name, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+          Text(app.category, color = Color(0xB3FFFFFF), fontSize = 13.sp, maxLines = 1)
+        }
+        AppActionSlot(app, updates, onInstall)
+      }
     }
   }
 }
