@@ -65,3 +65,21 @@ fun GlassCard(
     content()
   }
 }
+
+/**
+ * THE dark dialog/panel surface — every floating dialog on the home surface (add-widget
+ * gallery, pair dialog, custom timer, widget picker) uses this one tone + radius, replacing
+ * four ad-hoc color/radius pairs.
+ */
+@Composable
+fun DarkDialogSurface(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+  androidx.compose.material3.Surface(
+      color = Color(0xFF1C202E),
+      shape = RoundedCornerShape(24.dp),
+      content = content,
+      modifier = modifier,
+  )
+}

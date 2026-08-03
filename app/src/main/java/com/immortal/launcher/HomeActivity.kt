@@ -699,9 +699,7 @@ private fun LeftWidgetColumn(
         modifier = Modifier.fillMaxSize().clickable { showAddMenu = false },
         contentAlignment = Alignment.Center,
     ) {
-      Surface(
-          color = Glass.Scrim,
-          shape = RoundedCornerShape(20.dp),
+      com.immortal.launcher.ui.components.DarkDialogSurface(
           modifier = Modifier.padding(32.dp).widthIn(max = 720.dp),
       ) {
         // Widget GALLERY (mock 07): preview cards on glass, not a text list. Each card shows the
@@ -1307,7 +1305,7 @@ private fun TimerAlarmOverlay(onStop: () -> Unit) {
       contentAlignment = Alignment.Center,
       modifier =
           Modifier.fillMaxSize()
-              .background(Color(0xE6000000))
+              .background(Glass.Scrim)
               // Swallow taps so nothing behind the alarm reacts.
               .clickable(interactionSource = noRipple, indication = null) {},
   ) {
@@ -1583,7 +1581,7 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
 
   if (showPair) {
     androidx.compose.ui.window.Dialog(onDismissRequest = { showPair = false }) {
-      Surface(color = Color(0xFF101012), shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)) {
+      com.immortal.launcher.ui.components.DarkDialogSurface {
         Column(modifier = Modifier.padding(20.dp)) {
           Text("Control from your phone", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
           Text(
@@ -3764,7 +3762,7 @@ private fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
   var minutes by remember { mutableStateOf(5) }
   var seconds by remember { mutableStateOf(0) }
   androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
-    Surface(color = Color(0xFF1C1C1E), shape = RoundedCornerShape(24.dp)) {
+    com.immortal.launcher.ui.components.DarkDialogSurface {
       Column(
           modifier = Modifier.padding(28.dp),
           horizontalAlignment = Alignment.CenterHorizontally,
@@ -3866,12 +3864,10 @@ private fun WidgetPickerOverlay(
                   true
                 } else false
               }
-              .background(Color(0xDD000000))
+              .background(Glass.Scrim)
               .clickable(interactionSource = noRipple, indication = null) { onDismiss() },
   ) {
-    Surface(
-        color = Color(0xFF1C1C1E),
-        shape = RoundedCornerShape(28.dp),
+    com.immortal.launcher.ui.components.DarkDialogSurface(
         modifier =
             Modifier.widthIn(max = 920.dp)
                 .fillMaxWidth(0.78f)
