@@ -33,6 +33,7 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.StartOffset
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
@@ -968,6 +969,15 @@ private fun LauncherScreen(
       }
 
       // ── MAIN CONTENT ────────────────────────────────────────────────────
+      // One orchestrated entrance (the mock's staggered rise): the widget column and app grid
+      // fade + rise ~14dp over 700ms on first composition, grid trailing slightly. Cheap — two
+      // animated floats, once per cold start, nothing animates after settle.
+      val entrance = remember { Animatable(0f) }
+      val entranceGrid = remember { Animatable(0f) }
+      LaunchedEffect(Unit) {
+        launch { entrance.animateTo(1f, tween(700, easing = EaseOutCubic)) }
+        launch { entranceGrid.animateTo(1f, tween(700, delayMillis = 120, easing = EaseOutCubic)) }
+      }
       Row(
           modifier = Modifier
               .weight(1f)
@@ -992,7 +1002,11 @@ private fun LauncherScreen(
             onEnterEdit = { editMode = true },
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(0.38f),
+                .weight(0.38f)
+                .graphicsLayer {
+                  alpha = entrance.value
+                  translationY = (1f - entrance.value) * 14.dp.toPx()
+                },
         )
 
         FadingDivider()
@@ -1003,7 +1017,11 @@ private fun LauncherScreen(
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(0.62f),
+                .weight(0.62f)
+                .graphicsLayer {
+                  alpha = entranceGrid.value
+                  translationY = (1f - entranceGrid.value) * 14.dp.toPx()
+                },
         ) {
           // (No "Done" button — tap any empty space to exit edit mode.)
           val gridState = rememberLazyGridState()

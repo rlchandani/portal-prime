@@ -123,18 +123,18 @@ object Curation {
           // the mock); the red calendar tile stays available for a real calendar app.
           "com.portal.calendar" to R.drawable.icon_portalhub_tile,
           "com.facebook.alohaapps.settings" to R.drawable.icon_portal_settings_tile,
-          "de.danoeh.antennapod" to R.drawable.icon_antennapod,
-          "org.schabi.newpipe" to R.drawable.icon_newpipe,
-          "me.zhanghai.android.files" to R.drawable.icon_folder,
-          "com.facebook.aloha.app.whatsapp" to R.drawable.icon_whatsapp,
+          "de.danoeh.antennapod" to R.drawable.icon_antennapod_tile,
+          "org.schabi.newpipe" to R.drawable.icon_newpipe_tile,
+          "me.zhanghai.android.files" to R.drawable.icon_files_tile,
+          "com.facebook.aloha.app.whatsapp" to R.drawable.icon_whatsapp_tile,
           "com.android.settings" to R.drawable.icon_settings,
           "com.immortal.launcher.debug" to R.drawable.icon_apps,
           // Not installed on current device, but ready if they land later:
-          "org.mozilla.firefox" to R.drawable.icon_firefox,
-          "com.spotify.music" to R.drawable.icon_spotify,
-          "com.google.android.gm" to R.drawable.icon_gmail,
-          "io.homeassistant.companion.android" to R.drawable.icon_homeassistant,
-          "io.homeassistant.companion.android.minimal" to R.drawable.icon_homeassistant,
+          "org.mozilla.firefox" to R.drawable.icon_firefox_tile,
+          "com.spotify.music" to R.drawable.icon_spotify_tile,
+          "com.google.android.gm" to R.drawable.icon_gmail_tile,
+          "io.homeassistant.companion.android" to R.drawable.icon_ha_tile,
+          "io.homeassistant.companion.android.minimal" to R.drawable.icon_ha_tile,
       )
 
   /**
