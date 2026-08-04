@@ -58,13 +58,10 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
   animation: panH var(--d,20s) ease-in-out infinite alternate; }
 @keyframes panH { from { transform: translateX(0); } to { transform: translateX(var(--travel,-50%)); } }
 .ss-mcell::after { content:""; position:absolute; inset:0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35); pointer-events:none; }
-/* mosaic choreography: roaming spotlight + tile trades */
-.ss-wall.spotlit .ss-mcell { transition: left .9s cubic-bezier(.22,1,.36,1), top .9s cubic-bezier(.22,1,.36,1),
-  width .9s cubic-bezier(.22,1,.36,1), height .9s cubic-bezier(.22,1,.36,1),
-  filter 1.2s ease, transform 1.2s ease; }
-.ss-wall.spotlit .ss-mcell { filter: brightness(0.82) saturate(0.92); }
+/* mosaic choreography: roaming spotlight (tiles themselves never move) */
+.ss-wall.spotlit .ss-mcell { transition: filter 1.2s ease, transform 1.2s ease;
+  filter: brightness(0.82) saturate(0.92); }
 .ss-wall.spotlit .ss-mcell.spot { filter: brightness(1.05) saturate(1.05); transform: scale(1.015); z-index: 2; }
-.ss-mcell.glide { z-index: 3; box-shadow: 0 24px 60px -18px rgba(0,0,0,0.9); }
 
 /* memories */
 .ss-single { position: absolute; inset: 0; opacity: 0; transition: opacity 2s cubic-bezier(0.4,0,0.2,1); }
