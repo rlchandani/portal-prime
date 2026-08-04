@@ -255,7 +255,10 @@
     // One tile gently lifts while the rest dim a touch; the focus wanders per beat.
     function spotlight() { const i = Math.floor(Math.random() * cells.length); cells.forEach((c, k) => c.c.classList.toggle("spot", k === i)); }
     build(); spotlight();
-    t.every(() => { spotlight(); swap(); }, 3500);
+    // The spotlight wanders every beat; photos change only every fourth beat (~20s) —
+    // anything faster reads as restless on a wall display.
+    let beat = 0;
+    t.every(() => { beat++; spotlight(); if (beat % 4 === 0) swap(); }, 5000);
     return () => t.clear();
   }};
 
