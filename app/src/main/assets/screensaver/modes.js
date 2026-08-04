@@ -99,4 +99,17 @@
     }
     return out;
   };
+
+  // Compositions scale to the pool: a mode that designs for N slots asks for
+  // min(N, distinct photos) so a small library never forces repeats on screen.
+  window.SS.slots = function (deck, want) {
+    return Math.min(want, new Set(deck.map((p) => p.seed)).size);
+  };
+
+  // Photos not currently on screen. Swap/drop beats call this first and skip
+  // the beat when it's empty — a static composition beats a duplicated one.
+  window.SS.unused = function (deck, exclude) {
+    const ex = new Set(exclude || []);
+    return deck.filter((p) => !ex.has(p.seed));
+  };
 })();
