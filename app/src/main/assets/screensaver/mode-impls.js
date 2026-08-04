@@ -106,7 +106,7 @@
         if (c.photo !== slot.photo) { const img = buildImg(slot.photo); c.el.appendChild(img); const old = c.img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = slot.photo; } });
     }
     function rebuild() { render(layout()); }
-    function swap() { if (!cells.length) return; const c = cells[Math.floor(Math.random() * cells.length)]; const onWall = new Set(cells.map(x => x.photo && x.photo.seed)); let p = null; for (let k = 0; k < deck.length; k++) { const cand = deck[(ctx.cursor.i + k) % deck.length]; if (!onWall.has(cand.seed) && SS.bucket(cand) === SS.bucket(c.photo)) { p = cand; ctx.cursor.i += k + 1; break; } } if (!p) p = deck[ctx.cursor.i++ % deck.length]; const img = buildImg(p); c.el.appendChild(img); const old = c.img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
+    function swap() { if (!cells.length) return; const c = cells[Math.floor(Math.random() * cells.length)]; const onWall = cells.map(x => x.photo && x.photo.seed).filter(Boolean); let p = null; const wallSet = new Set(onWall); for (let k = 0; k < deck.length; k++) { const cand = deck[(ctx.cursor.i + k) % deck.length]; if (!wallSet.has(cand.seed) && SS.bucket(cand) === SS.bucket(c.photo)) { p = cand; ctx.cursor.i += k + 1; break; } } if (!p) p = SS.take(deck, ctx.cursor, ["any"], onWall)[0]; const img = buildImg(p); c.el.appendChild(img); const old = c.img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
     rebuild(); t.every(swap, 4000);
     return () => t.clear();
   }};
@@ -162,16 +162,26 @@
 
   // ---- 08 Polaroid scatter ---------------------------------------------------
   MODES.polaroid = { name: "Polaroid Scatter", run(ctx, deck) {
-    const t = makeTimers(); const table = el("ss-table", ctx.root); let live = []; const MAX = 7;
+    const t = makeTimers(); const table = el("ss-table", ctx.root); let live = []; const MAX = 6;
     const CAPS = ["good times", "summer '24", "us", "♥", "don't forget", "golden hour", "home", "the trip"];
     function drop() {
-      if (live.length >= MAX) { const old = live.shift(); old.style.opacity = "0"; old.style.transform += " translateY(-30px)"; t.after(() => old.remove(), 1000); }
-      const p = SS.take(deck, ctx.cursor, ["any"])[0]; const pl = el("ss-polaroid"); const a = aspect(p); const pw = a >= 1 ? 300 : 240; const ph = Math.round(pw / a);
-      const inner = el("ss-ph", pl); inner.style.width = pw + "px"; inner.style.height = ph + "px"; bg(inner, ctx.url(p, 900));
+      if (live.length >= MAX) { const old = live.shift(); old.el.style.opacity = "0"; old.el.style.transform += " translateY(-30px)"; t.after(() => old.el.remove(), 1000); }
+      // Exclude prints still on the table so a photo never appears twice at once.
+      const p = SS.take(deck, ctx.cursor, ["any"], live.map(x => x.photo.seed))[0];
+      const pl = el("ss-polaroid"); const a = aspect(p);
+      // Big prints (2x the original 300/240) — the table is a 2160px wall display.
+      const pw = a >= 1 ? 600 : 480; const ph = Math.round(pw / a);
+      const inner = el("ss-ph", pl); inner.style.width = pw + "px"; inner.style.height = ph + "px"; bg(inner, ctx.url(p, 1400));
       const cap = el("ss-cap", pl); cap.textContent = CAPS[Math.floor(Math.random() * CAPS.length)]; table.appendChild(pl);
-      const W = ctx.W, H = ctx.H; const x = W * .12 + Math.random() * (W * .62), y = H * .12 + Math.random() * (H * .5), rot = (Math.random() * 2 - 1) * 11;
+      // Scatter across the WHOLE screen: uniform over the area the print can occupy (small 16px
+      // breathing margin; ~110px reserved under the photo for the polaroid chin + caption).
+      const W = ctx.W, H = ctx.H, M = 16;
+      const x = M + Math.random() * Math.max(1, W - pw - M * 2);
+      const y = M + Math.random() * Math.max(1, H - ph - 110 - M * 2);
+      const rot = (Math.random() * 2 - 1) * 11;
       pl.style.left = x + "px"; pl.style.top = y + "px"; pl.style.transform = `rotate(${rot}deg) scale(0.86)`;
-      requestAnimationFrame(() => { pl.classList.add("on"); pl.style.transform = `rotate(${rot}deg) scale(1)`; }); live.push(pl);
+      requestAnimationFrame(() => { pl.classList.add("on"); pl.style.transform = `rotate(${rot}deg) scale(1)`; });
+      live.push({ el: pl, photo: p });
     }
     for (let i = 0; i < 4; i++) t.after(drop, i * 450); t.every(drop, 3500);
     return () => t.clear();
@@ -183,8 +193,10 @@
     function bsp(rect, n) { if (n <= 1) return [rect]; const k = Math.max(1, Math.round(n * (0.42 + Math.random() * 0.16))); const horiz = rect.w >= rect.h; const ratio = k / n; if (horiz) { const w1 = Math.round(rect.w * ratio); return bsp({ x: rect.x, y: rect.y, w: w1, h: rect.h }, k).concat(bsp({ x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, n - k)); } const h1 = Math.round(rect.h * ratio); return bsp({ x: rect.x, y: rect.y, w: rect.w, h: h1 }, k).concat(bsp({ x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, n - k)); }
     function mkImg(p) { const img = el("ss-img kb"); bg(img, ctx.url(p, 1200)); img.style.setProperty("--d", (16 + Math.random() * 8) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 1.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 1.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
     function wantFor(cellA) { return cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape"; }
-    function build() { wall.innerHTML = ""; cells = []; bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, 9).forEach(r => { const c = el("ss-mcell", wall); c.style.left = r.x + "px"; c.style.top = r.y + "px"; c.style.width = r.w + "px"; c.style.height = r.h + "px"; const p = SS.take(deck, ctx.cursor, [wantFor(r.w / r.h)])[0]; const img = mkImg(p); c.appendChild(img); cells.push({ c, img, photo: p }); }); }
-    function swap() { if (!cells.length) return; const c = cells[Math.floor(Math.random() * cells.length)]; const p = SS.take(deck, ctx.cursor, [wantFor(c.c.offsetWidth / c.c.offsetHeight)])[0]; const img = mkImg(p); c.c.appendChild(img); const old = c.img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
+    // Every pick excludes what's already on the wall, so no tile duplicates another.
+    function onWall() { return cells.map(x => x.photo && x.photo.seed).filter(Boolean); }
+    function build() { wall.innerHTML = ""; cells = []; bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, 9).forEach(r => { const c = el("ss-mcell", wall); c.style.left = r.x + "px"; c.style.top = r.y + "px"; c.style.width = r.w + "px"; c.style.height = r.h + "px"; const p = SS.take(deck, ctx.cursor, [wantFor(r.w / r.h)], onWall())[0]; const img = mkImg(p); c.appendChild(img); cells.push({ c, img, photo: p }); }); }
+    function swap() { if (!cells.length) return; const c = cells[Math.floor(Math.random() * cells.length)]; const p = SS.take(deck, ctx.cursor, [wantFor(c.c.offsetWidth / c.c.offsetHeight)], onWall())[0]; const img = mkImg(p); c.c.appendChild(img); const old = c.img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
     build(); t.every(swap, 3500);
     return () => t.clear();
   }};
@@ -216,10 +228,12 @@
     const t = makeTimers(); const stage = el("ss-hs", ctx.root); const heroCol = el("ss-col", stage); heroCol.style.flex = "1.9"; const heroCell = el("ss-cell", heroCol); const side = el("ss-col", stage); side.style.flex = "1";
     function mkImg(p, le) { const img = el("ss-img kb"); bg(img, ctx.url(p, le || 1400)); img.style.setProperty("--d", (16 + Math.random() * 8) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 1.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 1.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
     function fill(cell, p, le) { const img = mkImg(p, le); cell.appendChild(img); const old = cell._img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1100); cell._img = img; }
-    let sideCells = [];
-    fill(heroCell, SS.take(deck, ctx.cursor, ["landscape"])[0], 1800);
-    for (let i = 0; i < 2; i++) { const c = el("ss-cell", side); sideCells.push(c); fill(c, SS.take(deck, ctx.cursor, ["portrait"])[0], 1100); }
-    let turn = 0; t.every(() => { turn++; if (turn % 3 === 0) fill(heroCell, SS.take(deck, ctx.cursor, ["landscape"])[0], 1800); else fill(sideCells[turn % sideCells.length], SS.take(deck, ctx.cursor, ["portrait"])[0], 1100); }, 4500);
+    // Track what's on screen (hero + both side cells) so no pane duplicates another.
+    let sideCells = []; const shown = { hero: null, sides: [null, null] };
+    function seeds() { return [shown.hero, ...shown.sides].filter(Boolean).map(p => p.seed); }
+    const h0 = SS.take(deck, ctx.cursor, ["landscape"], seeds())[0]; shown.hero = h0; fill(heroCell, h0, 1800);
+    for (let i = 0; i < 2; i++) { const c = el("ss-cell", side); sideCells.push(c); const p = SS.take(deck, ctx.cursor, ["portrait"], seeds())[0]; shown.sides[i] = p; fill(c, p, 1100); }
+    let turn = 0; t.every(() => { turn++; if (turn % 3 === 0) { const p = SS.take(deck, ctx.cursor, ["landscape"], seeds())[0]; shown.hero = p; fill(heroCell, p, 1800); } else { const i = turn % sideCells.length; const p = SS.take(deck, ctx.cursor, ["portrait"], seeds())[0]; shown.sides[i] = p; fill(sideCells[i], p, 1100); } }, 4500);
     return () => t.clear();
   }};
 

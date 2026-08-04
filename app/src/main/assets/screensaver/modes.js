@@ -72,17 +72,29 @@
   };
 
   // Helper: pull N photos of specific buckets from a rotating deck (for a mode's appetite).
-  // Returns nulls filtered out; falls back to any bucket if a preferred one is exhausted.
-  window.SS.take = function (deck, cursorRef, spec) {
-    // spec: array of bucket names (or "any"). Returns array of photos, advancing the cursor.
+  // DUPLICATE-SAFE: photos already picked in this call — plus anything in [exclude] (the seeds
+  // currently on screen) — are skipped, so a composition never shows the same photo twice. When
+  // a bucket runs dry it falls back to any UNUSED photo (previously it wrapped the deck and
+  // re-picked the same one — the source of duplicate tiles in mosaic/hero/gallery/polaroid).
+  // Only if the deck is genuinely smaller than the request does it allow a repeat.
+  window.SS.take = function (deck, cursorRef, spec, exclude) {
     const out = [];
+    const used = new Set(exclude || []);
     for (const want of spec) {
       let found = null;
       for (let k = 0; k < deck.length; k++) {
         const p = deck[(cursorRef.i + k) % deck.length];
+        if (used.has(p.seed)) continue;
         if (want === "any" || bucket(p) === want) { found = p; cursorRef.i += k + 1; break; }
       }
+      if (!found) {
+        for (let k = 0; k < deck.length; k++) {
+          const p = deck[(cursorRef.i + k) % deck.length];
+          if (!used.has(p.seed)) { found = p; cursorRef.i += k + 1; break; }
+        }
+      }
       if (!found) { found = deck[cursorRef.i % deck.length]; cursorRef.i++; }
+      used.add(found.seed);
       out.push(found);
     }
     return out;

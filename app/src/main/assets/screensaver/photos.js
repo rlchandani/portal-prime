@@ -40,6 +40,10 @@
   // Normalize into the engine's photo objects. w/h may be 0/absent → measured lazily on first use.
   const PHOTOS = raw.map((p, i) => ({
     id: i,
+    // The engine's duplicate-avoidance (SS.take exclude lists) keys photos by `seed`. The Chrome
+    // mock's Picsum photos carry one natively; bridge photos must get one too or every photo
+    // shares seed=undefined and the dedup collapses into a no-op.
+    seed: p.url || String(i),
     url: p.url,
     w: p.w || 0,
     h: p.h || 0,
