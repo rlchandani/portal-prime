@@ -113,6 +113,20 @@
     return deck.filter((p) => !ex.has(p.seed));
   };
 
+  // Where a pan-through should START, as a fraction of its total travel (0..1), so the
+  // first thing on screen is the face, not whatever the top of the photo happens to be.
+  // [focal] is the face's position along the pan axis (fx or fy, 0..1; undefined = no
+  // face → start at 0). [sizePct] is the element's size along that axis as a percentage
+  // of the cell (from fitPlan). The start centers the face in the visible window,
+  // clamped to the travel range; the alternating animation still tours the whole photo.
+  window.SS.panStart = function (focal, sizePct) {
+    if (!(focal >= 0)) return 0;
+    const visible = 100 / sizePct;          // window size as a fraction of the photo
+    if (visible >= 1) return 0;
+    const windowTop = focal - visible / 2;  // put the face mid-window
+    return Math.min(1, Math.max(0, windowTop / (1 - visible)));
+  };
+
   // How a photo should live in a cell. When the aspects roughly agree, a cover
   // crop loses little and the normal Ken Burns applies. Past MISMATCH the crop
   // discards most of the photo (a portrait in a wide cell keeps only a middle

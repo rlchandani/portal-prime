@@ -565,14 +565,23 @@ class PhotoFrameController(
         }
 
     // JS bridge: the engine calls Android.getPhotos()/getMode()/use24Hour() to pull its inputs.
+    // Cached face focal points ride along as fx/fy (0..1) so crops and pans keep faces in
+    // frame; photos not yet analyzed get no fx/fy (engine centers) and are warmed up in the
+    // background for the NEXT run — detection never delays tonight's screensaver.
+    val faceStore = FaceFocusStore(context)
     val photosJson =
         org.json.JSONArray().apply {
           photoUrls.forEach { u ->
             val o = JSONObject().put("url", u)
             dims[u]?.let { (w, h) -> o.put("w", w).put("h", h) }
+            faceStore.focusFor(u)?.let { f ->
+              o.put("fx", String.format(java.util.Locale.US, "%.3f", f.fx).toDouble())
+              o.put("fy", String.format(java.util.Locale.US, "%.3f", f.fy).toDouble())
+            }
             put(o)
           }
         }.toString()
+    io.execute { runCatching { faceStore.warmUp(photoUrls, authHeaders) } }
     val mode = settings.mode
     val use24 = ImmortalSettings.use24HourClock(context)
     wv.addJavascriptInterface(

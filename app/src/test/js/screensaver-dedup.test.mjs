@@ -59,6 +59,25 @@ test("near-matching aspects keep the normal cover + Ken Burns", () => {
   assert.equal(SS.fitPlan(1.5, 1.7).mode, "cover"); // mild mismatch: crop is fine
 });
 
+console.log("SS.panStart — pans open on the face, then tour the rest");
+test("face near the top starts the vertical pan at the top", () => {
+  // size 250% of cell; face at fy=0.1 sits inside the first window → start 0
+  assert.equal(SS.panStart(0.1, 250), 0);
+});
+test("face at the bottom starts the pan fully travelled", () => {
+  const s = SS.panStart(0.95, 250);
+  assert.ok(Math.abs(s - 1) < 0.01, `expected ~1, got ${s}`);
+});
+test("centered face starts mid-travel with the face centered in view", () => {
+  // visible window = 100/250 = 40% of the photo; centering fy=0.5 → window top at 0.3
+  // of the photo → travel fraction 0.3/(1-0.4) = 0.5
+  const s = SS.panStart(0.5, 250);
+  assert.ok(Math.abs(s - 0.5) < 0.01, `expected ~0.5, got ${s}`);
+});
+test("no face falls back to top-start", () => {
+  assert.equal(SS.panStart(undefined, 250), 0);
+});
+
 console.log("SS.take — never duplicates while unused photos remain");
 test("a full-deck request returns every photo exactly once", () => {
   const deck = deckOf(7);

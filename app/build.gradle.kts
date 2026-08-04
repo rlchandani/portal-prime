@@ -121,6 +121,11 @@ dependencies {
   // render the BitMatrix to a Bitmap ourselves, no Android-specific zxing module needed.
   implementation("com.google.zxing:core:3.5.3")
 
+  // ML Kit face detection (bundled model — no Play Services on a provisioned Portal).
+  // Feeds FaceFocusStore: one small decode per photo, cached focal points so screensaver
+  // crops/pans keep faces in frame ("fast" mode, boxes only — no landmarks/classification).
+  implementation("com.google.mlkit:face-detection:16.1.7")
+
   // Media3 Transformer: on-device, hardware-accelerated video downscale/transcode for the
   // screensaver media cache ([VideoTranscoder]) — turns near-original remote clips into
   // 1200x800 derivatives the Portal stores and replays locally. -effect provides Presentation

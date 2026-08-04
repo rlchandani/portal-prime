@@ -212,6 +212,8 @@
     function bsp(rect, n) { if (n <= 1) return [rect]; const k = Math.max(1, Math.round(n * (0.42 + Math.random() * 0.16))); const horiz = rect.w >= rect.h; const ratio = k / n; if (horiz) { const w1 = Math.round(rect.w * ratio); return bsp({ x: rect.x, y: rect.y, w: w1, h: rect.h }, k).concat(bsp({ x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, n - k)); } const h1 = Math.round(rect.h * ratio); return bsp({ x: rect.x, y: rect.y, w: rect.w, h: h1 }, k).concat(bsp({ x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, n - k)); }
     // A photo whose shape fights its cell (portrait in a wide frame) would lose most of
     // itself to the cover crop, so it pans through its full extent instead of Ken Burns.
+    // Face-aware: pans open with the face in frame (then tour the rest); cover crops
+    // anchor on the face instead of the photo's center.
     function mkImg(p, rect) {
       const plan = SS.fitPlan(aspect(p), rect.w / rect.h);
       if (plan.mode !== "cover") {
@@ -220,10 +222,16 @@
         if (plan.mode === "panV") { img.style.height = plan.size + "%"; img.style.setProperty("--travel", -(plan.size - 100) / plan.size * 100 + "%"); }
         else { img.style.width = plan.size + "%"; img.style.setProperty("--travel", -(plan.size - 100) / plan.size * 100 + "%"); }
         // Duration scales with how far there is to travel, so long pans don't rush.
-        img.style.setProperty("--d", Math.min(36, 10 + plan.size / 12) + "s");
+        const dur = Math.min(36, 10 + plan.size / 12);
+        img.style.setProperty("--d", dur + "s");
+        // Enter the alternating pan mid-cycle so the face is what's on screen first.
+        const start = SS.panStart(plan.mode === "panV" ? p.fy : p.fx, plan.size);
+        if (start > 0) img.style.animationDelay = (-start * dur) + "s";
         return img;
       }
-      const img = el("ss-img kb"); bg(img, ctx.url(p, 1200)); img.style.setProperty("--d", (12 + Math.random() * 6) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img;
+      const img = el("ss-img kb"); bg(img, ctx.url(p, 1200)); img.style.setProperty("--d", (12 + Math.random() * 6) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s";
+      if (typeof p.fx === "number") img.style.backgroundPosition = (p.fx * 100).toFixed(1) + "% " + (p.fy * 100).toFixed(1) + "%";
+      return img;
     }
     function wantFor(cellA) { return cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape"; }
     // Every pick excludes what's already on the wall, so no tile duplicates another.

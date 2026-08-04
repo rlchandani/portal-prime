@@ -48,6 +48,10 @@
     w: p.w || 0,
     h: p.h || 0,
     measured: !!(p.w && p.h),
+    // Face focal point (0..1 of width/height), when the host has analyzed this photo.
+    // Framing code reads these to keep faces in crops and open pans on them.
+    fx: typeof p.fx === "number" ? p.fx : undefined,
+    fy: typeof p.fy === "number" ? p.fy : undefined,
   }));
 
   // Measure a photo's real dimensions (once). Returns a promise resolving to the photo with w/h set.
