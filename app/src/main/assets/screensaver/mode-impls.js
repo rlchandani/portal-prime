@@ -201,17 +201,40 @@
     return () => t.clear();
   }};
 
-  // ---- 09 Mosaic wall (BSP) --------------------------------------------------
+  // ---- 09 Mosaic wall (BSP, choreographed) -----------------------------------
+  // Four motions on one beat clock: per-tile Ken Burns (continuous), a roaming
+  // spotlight (every beat), photo swaps, two tiles trading places, and a periodic
+  // whole-wall morph to a fresh BSP layout. All position moves ride the cell's CSS
+  // left/top/width/height transitions; spotlight is filter/transform only.
   MODES.mosaic = { name: "Mosaic Wall", run(ctx, deck) {
-    const t = makeTimers(); const wall = el("ss-wall", ctx.root); let cells = [];
+    const t = makeTimers(); const wall = el("ss-wall spotlit", ctx.root); let cells = [];
     function bsp(rect, n) { if (n <= 1) return [rect]; const k = Math.max(1, Math.round(n * (0.42 + Math.random() * 0.16))); const horiz = rect.w >= rect.h; const ratio = k / n; if (horiz) { const w1 = Math.round(rect.w * ratio); return bsp({ x: rect.x, y: rect.y, w: w1, h: rect.h }, k).concat(bsp({ x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, n - k)); } const h1 = Math.round(rect.h * ratio); return bsp({ x: rect.x, y: rect.y, w: rect.w, h: h1 }, k).concat(bsp({ x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, n - k)); }
-    function mkImg(p) { const img = el("ss-img kb"); bg(img, ctx.url(p, 1200)); img.style.setProperty("--d", (16 + Math.random() * 8) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 1.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 1.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
+    function mkImg(p) { const img = el("ss-img kb"); bg(img, ctx.url(p, 1200)); img.style.setProperty("--d", (12 + Math.random() * 6) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
     function wantFor(cellA) { return cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape"; }
     // Every pick excludes what's already on the wall, so no tile duplicates another.
     function onWall() { return cells.map(x => x.photo && x.photo.seed).filter(Boolean); }
-    function build() { wall.innerHTML = ""; cells = []; bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, SS.slots(deck, 9)).forEach(r => { const c = el("ss-mcell", wall); c.style.left = r.x + "px"; c.style.top = r.y + "px"; c.style.width = r.w + "px"; c.style.height = r.h + "px"; const p = SS.take(deck, ctx.cursor, [wantFor(r.w / r.h)], onWall())[0]; const img = mkImg(p); c.appendChild(img); cells.push({ c, img, photo: p }); }); }
-    function swap() { if (!cells.length || !SS.unused(deck, onWall()).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; const p = SS.take(deck, ctx.cursor, [wantFor(c.c.offsetWidth / c.c.offsetHeight)], onWall())[0]; const img = mkImg(p); c.c.appendChild(img); const old = c.img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
-    build(); t.every(swap, 3500);
+    function setRect(cell, r) { cell.rect = r; cell.c.style.left = r.x + "px"; cell.c.style.top = r.y + "px"; cell.c.style.width = r.w + "px"; cell.c.style.height = r.h + "px"; }
+    function build() { wall.innerHTML = ""; cells = []; bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, SS.slots(deck, 9)).forEach(r => { const c = el("ss-mcell", wall); const cell = { c, img: null, photo: null, rect: null }; setRect(cell, r); const p = SS.take(deck, ctx.cursor, [wantFor(r.w / r.h)], onWall())[0]; cell.img = mkImg(p); c.appendChild(cell.img); cell.photo = p; cells.push(cell); }); }
+    function swap() { if (!cells.length || !SS.unused(deck, onWall()).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; const p = SS.take(deck, ctx.cursor, [wantFor(c.rect.w / c.rect.h)], onWall())[0]; const img = mkImg(p); c.c.appendChild(img); const old = c.img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
+    // One tile gently lifts while the rest dim a touch; the focus wanders per beat.
+    function spotlight() { const i = Math.floor(Math.random() * cells.length); cells.forEach((c, k) => c.c.classList.toggle("spot", k === i)); }
+    // Two same-orientation tiles glide across the wall and trade rectangles, so the
+    // photos stay suited to their frames and no refill is needed mid-flight.
+    function trade() {
+      const groups = {};
+      cells.forEach(c => { const k = wantFor(c.rect.w / c.rect.h); (groups[k] = groups[k] || []).push(c); });
+      const eligible = Object.values(groups).filter(g => g.length >= 2);
+      if (!eligible.length) return swap();
+      const [a, b] = window.shuffled(eligible[Math.floor(Math.random() * eligible.length)]).slice(0, 2);
+      a.c.classList.add("glide"); b.c.classList.add("glide");
+      const ra = a.rect, rb = b.rect; setRect(a, rb); setRect(b, ra);
+      t.after(() => { a.c.classList.remove("glide"); b.c.classList.remove("glide"); }, 950);
+    }
+    // The whole wall reshapes: same tiles, fresh BSP — every cell glides to its new home.
+    function morph() { const rects = bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, cells.length); cells.forEach((c, i) => setRect(c, rects[i])); }
+    build(); spotlight();
+    let beat = 0;
+    t.every(() => { beat++; spotlight(); if (beat % 8 === 0) morph(); else if (beat % 3 === 0) trade(); else swap(); }, 3500);
     return () => t.clear();
   }};
 
