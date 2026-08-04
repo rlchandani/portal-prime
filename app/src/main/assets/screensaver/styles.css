@@ -49,6 +49,14 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-gcell .ss-img, .ss-mcell .ss-img { transition: opacity 1.1s ease; }
 .ss-img.kb { animation: kbCell var(--d,18s) ease-in-out infinite alternate; }
 @keyframes kbCell { from { transform: scale(1.02); } to { transform: scale(1.09) translate(var(--dx,1%),var(--dy,1%)); } }
+/* pan-through: photo shaped unlike its cell is sized to full extent and slowly toured.
+   width/height set inline; --travel is the translate that brings the far edge into view. */
+.ss-img.panv { inset: auto; top: 0; left: 0; width: 100%; background-size: cover;
+  animation: panV var(--d,20s) ease-in-out infinite alternate; }
+@keyframes panV { from { transform: translateY(0); } to { transform: translateY(var(--travel,-50%)); } }
+.ss-img.panh { inset: auto; top: 0; left: 0; height: 100%; background-size: cover;
+  animation: panH var(--d,20s) ease-in-out infinite alternate; }
+@keyframes panH { from { transform: translateX(0); } to { transform: translateX(var(--travel,-50%)); } }
 .ss-mcell::after { content:""; position:absolute; inset:0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35); pointer-events:none; }
 /* mosaic choreography: roaming spotlight + tile trades */
 .ss-wall.spotlit .ss-mcell { transition: left .9s cubic-bezier(.22,1,.36,1), top .9s cubic-bezier(.22,1,.36,1),

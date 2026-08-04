@@ -209,13 +209,32 @@
   MODES.mosaic = { name: "Mosaic Wall", run(ctx, deck) {
     const t = makeTimers(); const wall = el("ss-wall spotlit", ctx.root); let cells = [];
     function bsp(rect, n) { if (n <= 1) return [rect]; const k = Math.max(1, Math.round(n * (0.42 + Math.random() * 0.16))); const horiz = rect.w >= rect.h; const ratio = k / n; if (horiz) { const w1 = Math.round(rect.w * ratio); return bsp({ x: rect.x, y: rect.y, w: w1, h: rect.h }, k).concat(bsp({ x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, n - k)); } const h1 = Math.round(rect.h * ratio); return bsp({ x: rect.x, y: rect.y, w: rect.w, h: h1 }, k).concat(bsp({ x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, n - k)); }
-    function mkImg(p) { const img = el("ss-img kb"); bg(img, ctx.url(p, 1200)); img.style.setProperty("--d", (12 + Math.random() * 6) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
+    // A photo whose shape fights its cell (portrait in a wide frame) would lose most of
+    // itself to the cover crop, so it pans through its full extent instead of Ken Burns.
+    function mkImg(p, rect) {
+      const plan = SS.fitPlan(aspect(p), rect.w / rect.h);
+      if (plan.mode !== "cover") {
+        const img = el(plan.mode === "panV" ? "ss-img panv" : "ss-img panh");
+        bg(img, ctx.url(p, 1200));
+        if (plan.mode === "panV") { img.style.height = plan.size + "%"; img.style.setProperty("--travel", -(plan.size - 100) / plan.size * 100 + "%"); }
+        else { img.style.width = plan.size + "%"; img.style.setProperty("--travel", -(plan.size - 100) / plan.size * 100 + "%"); }
+        // Duration scales with how far there is to travel, so long pans don't rush.
+        img.style.setProperty("--d", Math.min(36, 10 + plan.size / 12) + "s");
+        return img;
+      }
+      const img = el("ss-img kb"); bg(img, ctx.url(p, 1200)); img.style.setProperty("--d", (12 + Math.random() * 6) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img;
+    }
     function wantFor(cellA) { return cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape"; }
     // Every pick excludes what's already on the wall, so no tile duplicates another.
     function onWall() { return cells.map(x => x.photo && x.photo.seed).filter(Boolean); }
     function setRect(cell, r) { cell.rect = r; cell.c.style.left = r.x + "px"; cell.c.style.top = r.y + "px"; cell.c.style.width = r.w + "px"; cell.c.style.height = r.h + "px"; }
-    function build() { wall.innerHTML = ""; cells = []; bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, SS.slots(deck, 9)).forEach(r => { const c = el("ss-mcell", wall); const cell = { c, img: null, photo: null, rect: null }; setRect(cell, r); const p = SS.take(deck, ctx.cursor, [wantFor(r.w / r.h)], onWall())[0]; cell.img = mkImg(p); c.appendChild(cell.img); cell.photo = p; cells.push(cell); }); }
-    function swap() { if (!cells.length || !SS.unused(deck, onWall()).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; const p = SS.take(deck, ctx.cursor, [wantFor(c.rect.w / c.rect.h)], onWall())[0]; const img = mkImg(p); c.c.appendChild(img); const old = c.img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
+    // Replace a cell's image (crossfade). Reused by swaps and by refit after moves.
+    function setImg(cell, p) { const img = mkImg(p, cell.rect); cell.c.appendChild(img); const old = cell.img; requestAnimationFrame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); cell.img = img; cell.photo = p; }
+    // A move can change a cell's shape enough that its pan plan is wrong (a pan-through
+    // portrait landing in a portrait frame, or vice versa); refit the same photo if so.
+    function refit(cell) { const want = SS.fitPlan(aspect(cell.photo), cell.rect.w / cell.rect.h).mode; const have = cell.img.classList.contains("panv") ? "panV" : cell.img.classList.contains("panh") ? "panH" : "cover"; if (want !== have) setImg(cell, cell.photo); }
+    function build() { wall.innerHTML = ""; cells = []; bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, SS.slots(deck, 9)).forEach(r => { const c = el("ss-mcell", wall); const cell = { c, img: null, photo: null, rect: null }; setRect(cell, r); const p = SS.take(deck, ctx.cursor, [wantFor(r.w / r.h)], onWall())[0]; cell.img = mkImg(p, r); c.appendChild(cell.img); cell.photo = p; cells.push(cell); }); }
+    function swap() { if (!cells.length || !SS.unused(deck, onWall()).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; const p = SS.take(deck, ctx.cursor, [wantFor(c.rect.w / c.rect.h)], onWall())[0]; setImg(c, p); }
     // One tile gently lifts while the rest dim a touch; the focus wanders per beat.
     function spotlight() { const i = Math.floor(Math.random() * cells.length); cells.forEach((c, k) => c.c.classList.toggle("spot", k === i)); }
     // Two same-orientation tiles glide across the wall and trade rectangles, so the
@@ -228,10 +247,10 @@
       const [a, b] = window.shuffled(eligible[Math.floor(Math.random() * eligible.length)]).slice(0, 2);
       a.c.classList.add("glide"); b.c.classList.add("glide");
       const ra = a.rect, rb = b.rect; setRect(a, rb); setRect(b, ra);
-      t.after(() => { a.c.classList.remove("glide"); b.c.classList.remove("glide"); }, 950);
+      t.after(() => { a.c.classList.remove("glide"); b.c.classList.remove("glide"); refit(a); refit(b); }, 950);
     }
     // The whole wall reshapes: same tiles, fresh BSP — every cell glides to its new home.
-    function morph() { const rects = bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, cells.length); cells.forEach((c, i) => setRect(c, rects[i])); }
+    function morph() { const rects = bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, cells.length); cells.forEach((c, i) => setRect(c, rects[i])); t.after(() => cells.forEach(refit), 950); }
     build(); spotlight();
     let beat = 0;
     t.every(() => { beat++; spotlight(); if (beat % 8 === 0) morph(); else if (beat % 3 === 0) trade(); else swap(); }, 3500);

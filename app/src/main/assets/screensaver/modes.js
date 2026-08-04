@@ -112,4 +112,20 @@
     const ex = new Set(exclude || []);
     return deck.filter((p) => !ex.has(p.seed));
   };
+
+  // How a photo should live in a cell. When the aspects roughly agree, a cover
+  // crop loses little and the normal Ken Burns applies. Past MISMATCH the crop
+  // discards most of the photo (a portrait in a wide cell keeps only a middle
+  // band), so instead the photo is sized to its full extent along the clipped
+  // axis and slowly pans through it — every part of the image gets shown.
+  // Returns { mode: "cover"|"panV"|"panH", size } where size is the element's
+  // height (panV) or width (panH) as a percentage of the cell.
+  window.SS.fitPlan = function (photoAspect, cellAspect) {
+    const MISMATCH = 1.35;
+    if (photoAspect * MISMATCH < cellAspect)
+      return { mode: "panV", size: (cellAspect / photoAspect) * 100 };
+    if (photoAspect > cellAspect * MISMATCH)
+      return { mode: "panH", size: (photoAspect / cellAspect) * 100 };
+    return { mode: "cover", size: 100 };
+  };
 })();
