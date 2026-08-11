@@ -197,6 +197,18 @@ object PresenceHub {
         DreamStopVerdict.SUPPRESSED -> Unit // a call handoff — presence is unknowable here
       }
 
+  /**
+   * A verdict from Meta's own presence CV ([MetaPresenceReader]). Camera-quality and immune
+   * to the pinned-frame blind spot, so it upgrades confidence: when the dream/sleep proxy is
+   * masked this becomes the presence source; when the proxy is live the fresher signal wins
+   * (they almost always agree — the proxy is derived from this same CV).
+   */
+  fun onMetaPresence(c: Context, present: Boolean) {
+    val presence = if (present) Presence.PRESENT else Presence.ABSENT
+    // Keep the screen state we already know; this signal says nothing about the display.
+    set(presence, current.screen, confident = true, context = c)
+  }
+
   /** Screen blanked outside the dream path (our own lockNow, power button). */
   private fun onScreenOff(c: Context) {
     // If we were confidently following the proxy, a screen-off means the room emptied or the
