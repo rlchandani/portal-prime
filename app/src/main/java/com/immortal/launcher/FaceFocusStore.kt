@@ -59,10 +59,17 @@ class FaceFocusStore(private val context: Context) {
     val v = cache[url] ?: return null
     if (v.isEmpty()) return null
     val parts = v.split(",")
-    if (parts.size != 2) return null
+    if (parts.size < 2) return null
     val fx = parts[0].toFloatOrNull() ?: return null
     val fy = parts[1].toFloatOrNull() ?: return null
     return FaceFocus.Focus(fx, fy)
+  }
+
+  /** The cached people-weight (0..1) for [url]; 0 if unanalyzed / no faces. */
+  fun weightFor(url: String): Float {
+    val v = cache[url] ?: return 0f
+    if (v.isEmpty()) return 0f
+    return v.split(",").getOrNull(2)?.toFloatOrNull() ?: 0f
   }
 
   /**
@@ -71,7 +78,13 @@ class FaceFocusStore(private val context: Context) {
    * quietly on repeated failures so an unreachable source can't spin the worker forever.
    */
   fun warmUp(urls: List<String>, authHeaders: Map<String, String> = emptyMap()) {
-    val pending = urls.filter { it !in cache }
+    // Unanalyzed photos, plus pre-weight cache entries ("fx,fy" without the third field)
+    // that need one re-pass to gain a people-weight. ""-entries (no faces) stay final.
+    val pending =
+        urls.filter { u ->
+          val v = cache[u]
+          v == null || (v.isNotEmpty() && v.split(",").size < 3)
+        }
     if (pending.isEmpty()) return
     val detector =
         FaceDetection.getClient(
@@ -82,14 +95,14 @@ class FaceFocusStore(private val context: Context) {
     var failStreak = 0
     try {
       for (url in pending) {
-        val focus = runCatching { detect(detector, url, authHeaders) }.getOrNull()
-        if (focus == null && ++failStreak >= MAX_FAIL_STREAK) {
+        val entry = runCatching { detect(detector, url, authHeaders) }.getOrNull()
+        if (entry == null && ++failStreak >= MAX_FAIL_STREAK) {
           Log.w(TAG, "face warm-up aborted after $failStreak consecutive failures")
           break
         }
-        if (focus != null) failStreak = 0
+        if (entry != null) failStreak = 0
         // null = decode/detect failed (retry next run); "" = analyzed, no faces (final).
-        if (focus != null) cache[url] = if (focus.fx.isNaN()) "" else "${focus.fx},${focus.fy}"
+        if (entry != null) cache[url] = entry
         persist()
       }
     } finally {
@@ -98,14 +111,14 @@ class FaceFocusStore(private val context: Context) {
   }
 
   /**
-   * Decode a small bitmap for [url] and run detection. Returns the focal point, a
-   * NaN-marker Focus when the photo analyzed clean but has no faces, or null on failure.
+   * Decode a small bitmap for [url] and run detection. Returns the cache entry
+   * ("fx,fy,weight"; "" when the photo analyzed clean but has no faces) or null on failure.
    */
   private fun detect(
       detector: com.google.mlkit.vision.face.FaceDetector,
       url: String,
       authHeaders: Map<String, String>,
-  ): FaceFocus.Focus? {
+  ): String? {
     val bmp = decodeSmall(url, authHeaders) ?: return null
     try {
       val faces =
@@ -113,8 +126,9 @@ class FaceFocusStore(private val context: Context) {
       val boxes = faces.map {
         FaceFocus.Box(it.boundingBox.left, it.boundingBox.top, it.boundingBox.right, it.boundingBox.bottom)
       }
-      return FaceFocus.focalPoint(boxes, bmp.width, bmp.height)
-          ?: FaceFocus.Focus(Float.NaN, Float.NaN)
+      val focus = FaceFocus.focalPoint(boxes, bmp.width, bmp.height) ?: return ""
+      val weight = FaceFocus.peopleWeight(boxes, bmp.width, bmp.height)
+      return "${focus.fx},${focus.fy},$weight"
     } finally {
       bmp.recycle()
     }

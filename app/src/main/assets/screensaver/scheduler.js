@@ -35,6 +35,15 @@
       stage.innerHTML = "";
     }
 
+    // Presence-aware people bias: while someone is in front of the frame (host bridge
+    // signal), the beat's deck leads with photos of people. Checked once per beat — the
+    // bridge call is cheap but there's no reason to ask more often than modes change.
+    function beatDeck() {
+      let watching = false;
+      try { watching = !!(window.Android && window.Android.isWatching && window.Android.isWatching()); } catch (_) {}
+      return SS.peopleDeck(deck, watching);
+    }
+
     function advance() {
       clearTimeout(beatTimer);
       const enabled = opts.enabledModes && opts.enabledModes.length ? opts.enabledModes : SS.MODE_IDS;
@@ -48,7 +57,7 @@
       if (!impl) { modeId = "kenBurns"; }
       const label = (SS.MODES[modeId] && SS.MODES[modeId].name) || modeId;
       if (opts.onMode) opts.onMode(label, modeId);
-      currentCleanup = SS.MODES[modeId].run(ctx(), deck) || null;
+      currentCleanup = SS.MODES[modeId].run(ctx(), beatDeck()) || null;
 
       // Single-mode (non-shuffle) modes loop themselves internally; in shuffle we time each beat.
       const beat = (opts.mode && opts.mode !== "shuffle") ? null : (SS.BEAT[modeId] || 9000);

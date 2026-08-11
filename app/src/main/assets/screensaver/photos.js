@@ -52,6 +52,9 @@
     // Framing code reads these to keep faces in crops and open pans on them.
     fx: typeof p.fx === "number" ? p.fx : undefined,
     fy: typeof p.fy === "number" ? p.fy : undefined,
+    // People-weight (0..1): how face-centric the photo is. Drives the presence-aware
+    // deck bias (SS.peopleDeck) — people photos lead while someone is watching.
+    pw: typeof p.pw === "number" ? p.pw : 0,
   }));
 
   // Measure a photo's real dimensions (once). Returns a promise resolving to the photo with w/h set.

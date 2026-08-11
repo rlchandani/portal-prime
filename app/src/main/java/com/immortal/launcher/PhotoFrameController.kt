@@ -578,6 +578,9 @@ class PhotoFrameController(
               o.put("fx", String.format(java.util.Locale.US, "%.3f", f.fx).toDouble())
               o.put("fy", String.format(java.util.Locale.US, "%.3f", f.fy).toDouble())
             }
+            faceStore.weightFor(u).takeIf { it > 0f }?.let { pw ->
+              o.put("pw", String.format(java.util.Locale.US, "%.2f", pw).toDouble())
+            }
             put(o)
           }
         }.toString()
@@ -589,6 +592,11 @@ class PhotoFrameController(
           @android.webkit.JavascriptInterface fun getPhotos(): String = photosJson
           @android.webkit.JavascriptInterface fun getMode(): String = mode
           @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
+          // Live presence for the engine's people-bias: the deck leans toward photos of
+          // people while someone is actually in front of the frame. Reads the hub fresh
+          // per call (the engine polls at mode-beat cadence, a few times a minute).
+          @android.webkit.JavascriptInterface
+          fun isWatching(): Boolean = PresenceHub.current.presence == Presence.PRESENT
         },
         "Android")
 

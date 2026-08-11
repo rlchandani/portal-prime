@@ -63,4 +63,31 @@ class FaceFocusTest {
   fun `degenerate image dims yield null`() {
     assertNull(FaceFocus.focalPoint(listOf(box(0, 0, 100, 100)), 0, 0))
   }
+
+  // ---- people weight ----------------------------------------------------------
+
+  @Test
+  fun `no faces weighs zero`() {
+    assertEquals(0f, FaceFocus.peopleWeight(emptyList(), 1000, 1000), 1e-4f)
+  }
+
+  @Test
+  fun `weight grows with face coverage and count`() {
+    val one = FaceFocus.peopleWeight(listOf(box(0, 0, 200, 200)), 1000, 1000)
+    val big = FaceFocus.peopleWeight(listOf(box(0, 0, 500, 500)), 1000, 1000)
+    val two = FaceFocus.peopleWeight(listOf(box(0, 0, 200, 200), box(600, 600, 800, 800)), 1000, 1000)
+    assert(big > one) { "bigger face should weigh more ($big vs $one)" }
+    assert(two > one) { "two faces should weigh more than one ($two vs $one)" }
+  }
+
+  @Test
+  fun `weight is capped at one`() {
+    val w = FaceFocus.peopleWeight(List(30) { box(0, 0, 900, 900) }, 1000, 1000)
+    assert(w <= 1f)
+  }
+
+  @Test
+  fun `noise faces do not weigh`() {
+    assertEquals(0f, FaceFocus.peopleWeight(listOf(box(0, 0, 8, 8)), 1000, 1000), 1e-4f)
+  }
 }

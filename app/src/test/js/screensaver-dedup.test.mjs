@@ -78,6 +78,29 @@ test("no face falls back to top-start", () => {
   assert.equal(SS.panStart(undefined, 250), 0);
 });
 
+console.log("SS.peopleDeck — lean toward faces when someone is watching");
+test("people photos move ahead of face-free ones, order stable within groups", () => {
+  const deck = [
+    { seed: "a", pw: 0 }, { seed: "b", pw: 0.8 }, { seed: "c", pw: 0 },
+    { seed: "d", pw: 0.3 }, { seed: "e", pw: 0.8 },
+  ];
+  const biased = SS.peopleDeck(deck, true);
+  assert.deepEqual(biased.map((p) => p.seed), ["b", "e", "d", "a", "c"]);
+});
+test("returns the deck untouched when nobody is watching", () => {
+  const deck = [{ seed: "a", pw: 0 }, { seed: "b", pw: 0.9 }];
+  assert.equal(SS.peopleDeck(deck, false), deck);
+});
+test("does not mutate the input deck", () => {
+  const deck = [{ seed: "a", pw: 0 }, { seed: "b", pw: 0.9 }];
+  SS.peopleDeck(deck, true);
+  assert.equal(deck[0].seed, "a");
+});
+test("photos without pw are treated as zero", () => {
+  const deck = [{ seed: "a" }, { seed: "b", pw: 0.5 }];
+  assert.deepEqual(SS.peopleDeck(deck, true).map((p) => p.seed), ["b", "a"]);
+});
+
 console.log("SS.take — never duplicates while unused photos remain");
 test("a full-deck request returns every photo exactly once", () => {
   const deck = deckOf(7);

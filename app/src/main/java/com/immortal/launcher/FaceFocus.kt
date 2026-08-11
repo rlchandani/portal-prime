@@ -40,6 +40,22 @@ object FaceFocus {
   private const val CENTROID_PULL = 0.5f
 
   /**
+   * How "people-centric" a photo is, 0..1: 0 = no (real) faces, rising with face count and
+   * the fraction of frame they cover, saturating at 1. Drives the People screensaver bias —
+   * when someone is watching, the deck leans toward photos of people.
+   */
+  fun peopleWeight(faces: List<Box>, w: Int, h: Int): Float {
+    if (w <= 0 || h <= 0) return 0f
+    val minSide = minOf(w, h) * MIN_FACE_FRACTION
+    val real = faces.filter { it.width >= minSide && it.height >= minSide }
+    if (real.isEmpty()) return 0f
+    val coverage = real.sumOf { it.area }.toFloat() / (w.toLong() * h.toLong())
+    // Count and coverage both matter: a group of small faces ≈ one large portrait.
+    val score = real.size * 0.25f + coverage * 4f
+    return score.coerceIn(0f, 1f)
+  }
+
+  /**
    * Reduce [faces] (in pixel coords of a [w]x[h] image) to one normalized focal point,
    * or null when there is nothing trustworthy to focus on (caller falls back to center).
    */

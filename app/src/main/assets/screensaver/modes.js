@@ -113,6 +113,16 @@
     return deck.filter((p) => !ex.has(p.seed));
   };
 
+  // People bias: when someone is watching (host presence signal), reorder the deck so
+  // photos with faces (higher pw = people-weight, set by the host's face analysis) come
+  // first — the wall leans toward people while preserving shuffle order within each tier.
+  // A stable sort keeps this deterministic; watching=false returns the deck untouched so
+  // the common path costs nothing.
+  window.SS.peopleDeck = function (deck, watching) {
+    if (!watching) return deck;
+    return deck.slice().sort((a, b) => (b.pw || 0) - (a.pw || 0));
+  };
+
   // Where a pan-through should START, as a fraction of its total travel (0..1), so the
   // first thing on screen is the face, not whatever the top of the photo happens to be.
   // [focal] is the face's position along the pan axis (fx or fy, 0..1; undefined = no
