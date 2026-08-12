@@ -46,6 +46,11 @@ object MetaPresence {
         // Gen-1 grammar: PresenceManager emits only while someone is present.
         line.contains("PresenceManager") && line.contains("presence detected", ignoreCase = true) ->
             Signal.BEAT
+        // Portal 10 gen-2 grammar (observed live): a ~30s "onNotifyPresence presence updated"
+        // heartbeat while a person is in view. The companion "onNotifyPresence, dreaming" line
+        // must NOT match (substring guard: "presence updated").
+        line.contains("onNotifyPresence") && line.contains("presence updated", ignoreCase = true) ->
+            Signal.BEAT
         line.contains("Availability idle", ignoreCase = true) -> Signal.IDLE
         else -> null
       }

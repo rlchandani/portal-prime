@@ -31,6 +31,21 @@ class MetaPresenceTest {
   }
 
   @Test
+  fun `onNotifyPresence heartbeat (observed on Portal 10 gen2) is a beat`() {
+    // Live wording on device FAMILY_PORTAL_SERIAL, ~30s cadence while a person is in view:
+    assertEquals(
+        MetaPresence.Signal.BEAT,
+        MetaPresence.classify(
+            "08-11 23:10:42.409 20785 21716 I PresenceManager: onNotifyPresence presence updated [APPLICATION]"))
+  }
+
+  @Test
+  fun `onNotifyPresence dreaming companion line is not a beat`() {
+    // Follows every heartbeat; classifying both would double-count evidence.
+    assertNull(MetaPresence.classify("I PresenceManager: onNotifyPresence, dreaming"))
+  }
+
+  @Test
   fun `idle availability is an idle hint`() {
     assertEquals(
         MetaPresence.Signal.IDLE,
