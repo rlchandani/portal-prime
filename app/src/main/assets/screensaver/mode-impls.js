@@ -128,11 +128,13 @@
 
   // ---- 06 Memories (single + occasional titled collage beat) ----------------
   MODES.memories = { name: "Memories", run(ctx, deck) {
-    const t = makeTimers(); const single = mk(); ctx.root.appendChild(single.root);
+    // Two alternating single layers (like kenBurns): reusing one layer swapped its
+    // background in place — an instant hard cut whenever the image was already cached.
+    const t = makeTimers(); const singles = [mk(), mk()]; singles.forEach(s => ctx.root.appendChild(s.root)); let sCur = 0;
     const collage = el("ss-collage", ctx.root); const title = el("ss-mtitle", ctx.root); const big = el("big", title); const sub = el("sub", title);
     let beat = 0; const TITLES = [["Over the Years", "a look back"], ["This Weekend", "recently added"], ["On Our Travels", "places you've been"], ["Golden Hours", "favorites"]];
     function mk() { const root = el("ss-single"); const fill = el("ss-fill", root); const hero = el("ss-hero", root); return { root, fill, hero }; }
-    async function showSingle() { collage.classList.remove("on"); const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 2200); await preload(u); bg(single.fill, u); bg(single.hero, u, "contain"); kbVars(single.hero, p); single.hero.style.animation = "none"; void single.hero.offsetWidth; single.hero.style.animation = ""; single.root.classList.add("on"); }
+    async function showSingle() { collage.classList.remove("on"); const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 2200); await preload(u); const S = singles[1 - sCur]; bg(S.fill, u); bg(S.hero, u, "contain"); kbVars(S.hero, p); S.hero.style.animation = "none"; void S.hero.offsetWidth; S.hero.style.animation = ""; singles[sCur].root.classList.remove("on"); S.root.classList.add("on"); sCur = 1 - sCur; }
     async function showCollage() {
       single.root.classList.remove("on"); const [tt, ss] = TITLES[Math.floor(Math.random() * TITLES.length)]; big.textContent = tt; sub.textContent = ss;
       const ps = SS.take(deck, ctx.cursor, ["any", "any", "any"]); await Promise.all(ps.map(p => preload(ctx.url(p, 1100)))); collage.innerHTML = "";

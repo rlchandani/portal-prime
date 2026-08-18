@@ -21,17 +21,39 @@
     // opts.mode: a specific mode id, or "shuffle" to let the scheduler choose each beat.
     let prev = null;
     let currentCleanup = null;
+    let currentLayer = null;
     let beatTimer = null;
+    let fadeTimer = null;
 
-    function ctx() {
+    // Modes render into a per-beat layer, not the bare stage, so beats can crossfade:
+    // the new layer fades in OVER the still-running old mode, then the old one is torn
+    // down — no flash-to-black between shuffle modes. XFADE matches the .ss-beat CSS.
+    const XFADE_MS = 1600;
+
+    function ctx(layer) {
       return {
-        root: stage, deck, cursor, W: innerWidth, H: innerHeight, url,
+        root: layer, deck, cursor, W: innerWidth, H: innerHeight, url,
         done: () => advance(),
       };
     }
 
+    // A fade in flight: the outgoing layer + its mode's cleanup, torn down when the fade
+    // ends — or flushed early if a new beat / stop() arrives first (never leaked: a mode's
+    // cleanup stops its timers, and an unstopped mode would keep mutating a dead layer).
+    let pendingFade = null;
+    function flushFade() {
+      clearTimeout(fadeTimer);
+      if (!pendingFade) return;
+      const { cleanup, layer } = pendingFade;
+      pendingFade = null;
+      if (cleanup) { try { cleanup(); } catch (_) {} }
+      layer.remove();
+    }
+
     function clearStage() {
+      flushFade();
       if (currentCleanup) { try { currentCleanup(); } catch (_) {} currentCleanup = null; }
+      currentLayer = null;
       stage.innerHTML = "";
     }
 
@@ -46,18 +68,34 @@
 
     function advance() {
       clearTimeout(beatTimer);
+      flushFade(); // a beat arriving mid-fade finishes the previous teardown first
       const enabled = opts.enabledModes && opts.enabledModes.length ? opts.enabledModes : SS.MODE_IDS;
       let modeId;
       if (opts.mode && opts.mode !== "shuffle") modeId = opts.mode;
       else modeId = SS.pickNextMode(enabled, deck, prev);
       prev = modeId;
 
-      clearStage();
       const impl = SS.MODES[modeId];
       if (!impl) { modeId = "kenBurns"; }
       const label = (SS.MODES[modeId] && SS.MODES[modeId].name) || modeId;
       if (opts.onMode) opts.onMode(label, modeId);
-      currentCleanup = SS.MODES[modeId].run(ctx(), beatDeck()) || null;
+
+      // Crossfade beats: the new mode renders into a fresh layer that fades in over the
+      // still-running old one; the old layer (and its mode's timers) is torn down only
+      // after the fade completes. First beat has nothing to fade over → shown immediately.
+      const oldLayer = currentLayer, oldCleanup = currentCleanup;
+      const layer = document.createElement("div");
+      layer.className = "ss-beat";
+      stage.appendChild(layer);
+      currentLayer = layer;
+      currentCleanup = SS.MODES[modeId].run(ctx(layer), beatDeck()) || null;
+      if (oldLayer) {
+        pendingFade = { cleanup: oldCleanup, layer: oldLayer };
+        requestAnimationFrame(() => layer.classList.add("on"));
+        fadeTimer = setTimeout(flushFade, XFADE_MS + 100);
+      } else {
+        layer.classList.add("on");
+      }
 
       // Single-mode (non-shuffle) modes loop themselves internally; in shuffle we time each beat.
       const beat = (opts.mode && opts.mode !== "shuffle") ? null : (SS.BEAT[modeId] || 9000);
