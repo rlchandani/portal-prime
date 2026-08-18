@@ -2536,6 +2536,7 @@ private fun ImmortalWidgetShell(
     title: String,
     modifier: Modifier = Modifier,
     accent: Color = Color(0xFF7AA7FF),
+    trailingAction: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
   // BARE content — no surface here. The widget grid cell provides THE one LiquidGlass surface
@@ -2543,13 +2544,29 @@ private fun ImmortalWidgetShell(
   // is why converted widgets looked darker than the rest.
   Column(modifier = modifier.padding(18.dp)) {
     Column(modifier = Modifier.fillMaxWidth()) {
-      Text(
-          title.uppercase(Locale.getDefault()),
-          color = accent,
-          fontSize = 12.sp,
-          fontWeight = FontWeight.Bold,
-          maxLines = 1,
-      )
+      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            title.uppercase(Locale.getDefault()),
+            color = accent,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            modifier = Modifier.weight(1f),
+        )
+        if (trailingAction != null) {
+          Text(
+              "OPEN →",
+              color = accent.copy(alpha = 0.7f),
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Bold,
+              letterSpacing = 0.5.sp,
+              modifier = Modifier
+                  .clip(androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
+                  .clickable { trailingAction() }
+                  .padding(horizontal = 8.dp, vertical = 3.dp),
+          )
+        }
+      }
       Spacer(Modifier.size(8.dp))
       content()
     }
@@ -3654,7 +3671,10 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
         }
       }
   val open: () -> Unit = { context.launchSafely(HaSettingsActivity::class.java) }
-  ImmortalWidgetShell(title = "My Home", accent = Color(0xFF64D2FF), modifier = modifier.tvFocusableRow { open() }) {
+  val openDashboard: () -> Unit = { context.launchSafely(HaDashboardActivity::class.java) }
+  ImmortalWidgetShell(title = "My Home", accent = Color(0xFF64D2FF),
+      modifier = modifier.tvFocusableRow { open() },
+      trailingAction = if (configured) openDashboard else null) {
     when {
       !configured -> WidgetPlaceholder("Tap to connect Home Assistant")
       entities.isEmpty() -> WidgetPlaceholder("Add entities to control")
