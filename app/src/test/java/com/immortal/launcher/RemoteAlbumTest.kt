@@ -15,6 +15,7 @@ class RemoteAlbumTest {
     assertTrue(RemoteAlbum.isSupported("https://photos.icloud.com/shared/album/037SP6pgkQQ_LNS48MIYBgiTQ"))
     assertTrue(RemoteAlbum.isSupported("https://photos.app.goo.gl/abcd1234"))
     assertTrue(RemoteAlbum.isSupported("https://photos.google.com/share/AF1Qa1b2c3d"))
+    assertTrue(RemoteAlbum.isSupported("https://nas.example:5001/mo/sharing/8S5GDsCVN"))
     assertFalse(RemoteAlbum.isSupported("https://example.com/album/123"))
     assertFalse(RemoteAlbum.isSupported(""))
   }
@@ -28,7 +29,46 @@ class RemoteAlbumTest {
         "iCloud Shared Album",
         RemoteAlbum.providerName("https://photos.icloud.com/shared/album/037SP6pgkQQ_LNS48MIYBgiTQ"))
     assertEquals("Google Photos", RemoteAlbum.providerName("https://photos.app.goo.gl/x"))
+    assertEquals(
+        "Synology Photos",
+        RemoteAlbum.providerName("https://nas.example:5001/mo/sharing/8S5GDsCVN"))
     assertEquals("Shared album", RemoteAlbum.providerName("https://example.com"))
+  }
+
+  @Test
+  fun synologyShare_extractsTokenAndPreservesPhotosBasePath() {
+    val share =
+        RemoteAlbum.synologyShare(
+            "https://nas.example:5001/photos/mo/sharing/8S5GDsCVN?ignored=true")
+    assertEquals("8S5GDsCVN", share?.passphrase)
+    assertEquals(
+        "https://nas.example:5001/photos/mo/sharing/webapi/entry.cgi",
+        share?.apiUrl)
+    assertNull(RemoteAlbum.synologyShare("https://nas.example:5001/photos/album/8S5GDsCVN"))
+  }
+
+  @Test
+  fun synologySharingCookie_keepsOnlySessionPair() {
+    assertEquals(
+        "sharing_sid=abc123",
+        RemoteAlbum.synologySharingCookie(
+            listOf("other=x; Path=/", "sharing_sid=abc123; Path=/; Secure")))
+    assertNull(RemoteAlbum.synologySharingCookie(listOf("other=x; Path=/")))
+  }
+
+  @Test
+  fun synologyThumbnailUrl_containsQuotedWebApiParameters() {
+    val url =
+        RemoteAlbum.synologyThumbnailUrl(
+            "https://nas.example/mo/sharing/webapi/entry.cgi",
+            "share key",
+            296,
+            "296_123",
+        )
+    assertTrue(url.contains("api=%22SYNO.Foto.Thumbnail%22"))
+    assertTrue(url.contains("passphrase=%22share+key%22"))
+    assertTrue(url.contains("cache_key=%22296_123%22"))
+    assertTrue(url.contains("size=%22xl%22"))
   }
 
   @Test
@@ -179,5 +219,21 @@ class RemoteAlbumTest {
             }
             """.trimIndent())
     assertEquals("big", RemoteAlbum.pickBestDerivative(derivs, 1920, 1080))
+  }
+
+  @Test
+  fun extractGoogleAlbumKey_parsesUrlAndHtml() {
+    val url = "https://photos.google.com/share/AF1Qa1b2c3d_Key456?key=SampleKey"
+    assertEquals("AF1Qa1b2c3d_Key456", RemoteAlbum.extractGoogleAlbumKey(url, ""))
+
+    val html = """var data = ["AF1Qa1b2c3d_KeyFromHtml"];"""
+    assertEquals("AF1Qa1b2c3d_KeyFromHtml", RemoteAlbum.extractGoogleAlbumKey("https://photos.app.goo.gl/short", html))
+  }
+
+  @Test
+  fun extractGoogleContinuationToken_findsLongToken() {
+    val sampleText = """AF_initDataCallback({key: 'ds:1', data: [["photo1"], "CAESa0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB"]});"""
+    val token = RemoteAlbum.extractGoogleContinuationToken(sampleText)
+    assertTrue(token != null && token.startsWith("CAESa"))
   }
 }

@@ -359,7 +359,13 @@ class PhotoFrameController(
               val ordered = if (source.shuffle) urls.shuffled() else urls
               // Shared-album URLs are direct https with no auth header, so the WebView engine can
               // load them straight into <img>. Hand off to the engine when a mode is selected.
-              if (ScreensaverConfig.usesEngine(settings.mode)) { startEngine(ordered); engineActive = true; return@post }
+              // The album keeps refreshing underneath (scheduleEngineAlbumRefresh): photos the
+              // user adds in Google Photos / iCloud appear without touching the Portal.
+              if (ScreensaverConfig.usesEngine(settings.mode)) {
+                startEngine(ordered); engineActive = true
+                scheduleEngineAlbumRefresh(source.url, ordered, source.shuffle)
+                return@post
+              }
               remoteUrls = ordered
               remoteHeaders = emptyMap()
               remoteMode = true
@@ -649,6 +655,8 @@ class PhotoFrameController(
     webView?.let { runCatching { it.stopLoading(); it.destroy() } }
     webView = null
     engineActive = false
+    engineAlbumRefresh?.let { ui.removeCallbacks(it) }
+    engineAlbumRefresh = null
     // Close the SMB connection off-thread (network I/O) before the io executor is killed.
     smbSource?.let { s -> Thread { runCatching { s.close() } }.start() }
     smbSource = null
@@ -1432,6 +1440,43 @@ class PhotoFrameController(
   private fun scheduleRemoteRefresh() {
     ui.removeCallbacks(remoteRefresh)
     ui.postDelayed(remoteRefresh, settings.albumRefreshMin * 60_000L)
+  }
+
+  // --- engine-mode album auto-refresh ------------------------------------------
+  // The engine snapshots its photo list at startEngine(); this re-fetches the share on the
+  // user's refresh interval and restarts the engine ONLY when the set actually changed —
+  // so albums stay live (new photos appear, removed ones drop) without ever interrupting
+  // the show for a no-op. The restart itself is cheap: the engine rebuilds from cache-warm
+  // URLs, and the shuffle-beat crossfade hides the swap.
+  private var engineAlbumRefresh: Runnable? = null
+
+  private fun scheduleEngineAlbumRefresh(shareUrl: String, current: List<String>, shuffle: Boolean) {
+    engineAlbumRefresh?.let { ui.removeCallbacks(it) }
+    val task = object : Runnable {
+      override fun run() {
+        if (!engineActive) return
+        val m = context.resources.displayMetrics
+        io.execute {
+          val fresh = RemoteAlbum.fetch(shareUrl, m.widthPixels, m.heightPixels)?.photoUrls.orEmpty()
+          ui.post {
+            if (!engineActive) return@post
+            if (fresh.isNotEmpty() && fresh.toSet() != current.toSet()) {
+              Log.i(TAG, "album changed (${current.size} -> ${fresh.size} photos); restarting engine")
+              val ordered = if (shuffle) fresh.shuffled() else fresh
+              webView?.let { runCatching { it.stopLoading(); it.destroy() } }
+              webView = null
+              startEngine(ordered)
+              scheduleEngineAlbumRefresh(shareUrl, ordered, shuffle)
+            } else {
+              // Unchanged or transient failure: keep showing what we have, try again later.
+              ui.postDelayed(this, settings.albumRefreshMin * 60_000L)
+            }
+          }
+        }
+      }
+    }
+    engineAlbumRefresh = task
+    ui.postDelayed(task, settings.albumRefreshMin * 60_000L)
   }
 
   private fun advanceRemote(dir: Int) {
