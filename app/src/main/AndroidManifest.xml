@@ -269,13 +269,6 @@
             android:label="Home"
             android:theme="@style/Theme.SampleApp" />
 
-        <!-- Debug-only launcher alias for the HA dashboard (for adb/screenshot testing). -->
-        <activity-alias
-            android:name=".HaDashboardAlias"
-            android:exported="true"
-            android:label="Home A..."
-            android:targetActivity=".HaDashboardActivity"
-            android:enabled="true" />
 
         <!-- "Sounds": hourly chime / spoken time / golden-hour tone / ping volume + quiet hours. -->
         <activity
