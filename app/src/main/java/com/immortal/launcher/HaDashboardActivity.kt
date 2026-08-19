@@ -383,9 +383,16 @@ private fun RoomGrid(
     // We use a LazyVerticalGrid equivalent built from Column/Rows so we can
     // mix span-1 and span-2 tiles without the LazyGrid's fixed-column constraint.
     val rows = buildRows(tiles)
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    // Fixed tile heights — never stretch to fill the screen regardless of tile count.
+    val narrowH = 150.dp
+    val wideH = 220.dp   // climate dial needs more vertical room
+    Column(
+        Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
         rows.forEach { row ->
-            Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            val rowH = if (row.any { it.kind == HaDashboardModel.Kind.CLIMATE }) wideH else narrowH
+            Row(Modifier.fillMaxWidth().height(rowH), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 row.forEach { tile ->
                     val span = if (tile.kind == HaDashboardModel.Kind.DIMMER ||
                         tile.kind == HaDashboardModel.Kind.MEDIA ||
@@ -405,12 +412,10 @@ private fun RoomGrid(
                         onMediaAction = onMediaAction,
                     )
                 }
-                // Pad odd rows with a spacer if there's only one narrow tile
-                if (row.size == 1 && tiles.count { narrowKind(it.kind) } == 1) {
-                    Spacer(Modifier.weight(1f))
-                }
+                if (row.size == 1 && narrowKind(row[0].kind)) Spacer(Modifier.weight(1f))
             }
         }
+        Spacer(Modifier.height(8.dp))
     }
 }
 

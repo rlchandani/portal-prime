@@ -44,11 +44,25 @@ object HaDashboardApi {
       val unit: String,             // sensor
   )
 
-  // Jinja template that serializes HA's area registry: id, name, and all entity ids in the
-  // area. HA evaluates this server-side; the response is the rendered JSON string.
-  private const val AREAS_TEMPLATE =
-      """[{% for a in areas() %}{"id":{{ a | tojson }},"name":{{ area_name(a) | tojson }},""" +
-          """"entities":{{ area_entities(a) | list | tojson }}}{{ "," if not loop.last }}{% endfor %}]"""
+  // Domains the dashboard renders — anything else is noise on a wall display (buttons, numbers,
+  // select, update, binary_sensor motion/window that flood large installs with 100+ entries).
+  // Sensors are kept but capped to the first 3 per room so sparklines don't bury the controls.
+  private val RENDERABLE_DOMAINS = setOf(
+      "light", "switch", "fan", "input_boolean", "lock", "cover",
+      "climate", "media_player", "sensor",
+  )
+  // Per-room cap: fetch at most this many entity details (one REST call each).
+  // Ordered by domain priority so lights/climate/media always make the cut.
+  private val DOMAIN_PRIORITY = listOf(
+      "climate", "media_player", "light", "switch", "fan", "cover", "lock", "input_boolean", "sensor"
+  )
+  internal const val MAX_ENTITIES_PER_ROOM = 12
+
+  // area_entities() returns plain entity_id strings — filter by matching the domain prefix,
+  // then reject noisy diagnostic suffixes (LED indicators, consumption sensors, motion, etc.).
+  // This keeps only the controllable/meaningful entities the dashboard can actually render,
+  // typically 5-15 per room vs the raw 50-190 a large HA install has.
+  private const val AREAS_TEMPLATE = """[{% for a in areas() %}{"id":{{ a | tojson }},"name":{{ area_name(a) | tojson }},"entities":{{ area_entities(a) | select("match","^(light|switch|climate|media_player|fan|cover|lock|input_boolean)\\.") | reject("match",".*_(led|motion_sensor|occupancy|tamper|battery|rssi|consumption|voltage|current|energy|power)$") | list | tojson }}}{{ "," if not loop.last }}{% endfor %}]"""
 
   // --- reads ------------------------------------------------------------------
 
