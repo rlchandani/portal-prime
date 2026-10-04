@@ -78,6 +78,7 @@ class FaceFocusStore(private val context: Context) {
    * quietly on repeated failures so an unreachable source can't spin the worker forever.
    */
   fun warmUp(urls: List<String>, authHeaders: Map<String, String> = emptyMap()) {
+    Log.i(TAG, "warmUp: entered with ${urls.size} urls")
     // Unanalyzed photos, plus pre-weight cache entries ("fx,fy" without the third field)
     // that need one re-pass to gain a people-weight. ""-entries (no faces) stay final.
     val pending =
@@ -86,12 +87,14 @@ class FaceFocusStore(private val context: Context) {
           v == null || (v.isNotEmpty() && v.split(",").size < 3)
         }
     if (pending.isEmpty()) return
+    Log.i(TAG, "warmUp: ${pending.size} photos pending; building detector")
     val detector =
         FaceDetection.getClient(
             FaceDetectorOptions.Builder()
                 .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
                 .setMinFaceSize(0.06f)
                 .build())
+    Log.i(TAG, "warmUp: detector ready; analyzing")
     var failStreak = 0
     try {
       for (url in pending) {
@@ -107,6 +110,7 @@ class FaceFocusStore(private val context: Context) {
       }
     } finally {
       runCatching { detector.close() }
+      Log.i(TAG, "warmUp: finished; cache now has ${cache.size} entries")
     }
   }
 

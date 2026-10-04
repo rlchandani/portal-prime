@@ -83,7 +83,18 @@
   window.premeasureAll = premeasureAll;
 
   // Engine helpers (mirror the mock's API so mode code is unchanged).
-  window.photoUrl = function (p) { return p.url; }; // app already sized/proxied the image
+  // Prefer the host's screen-sized copy of a local photo once it exists (decode-once cache, see
+  // EngineScaledCache.kt): a 12MP original is a ~46MB texture, the copy ~17MB. Remote/proxied
+  // photos are already sized by the app. A hit is memoized per photo; a miss is re-asked next time
+  // because the copy may land mid-session.
+  window.photoUrl = function (p) {
+    if (p._scaled) return p._scaled;
+    try {
+      const s = window.Android && window.Android.scaledUrl ? window.Android.scaledUrl(p.url) : "";
+      if (s) { p._scaled = s; return s; }
+    } catch (_) {}
+    return p.url;
+  };
   window.aspect = function (p) { return (p.w || 1600) / (p.h || 1067); };
   window.byKind = function (kind) { return PHOTOS.filter((p) => window.bucketOf(p) === kind); };
   window.shuffled = function (arr) {

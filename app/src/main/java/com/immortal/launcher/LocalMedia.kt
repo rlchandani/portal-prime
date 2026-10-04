@@ -47,6 +47,19 @@ object LocalMedia {
     OTHER,
   }
 
+  /**
+   * Directories we never descend into for a photo source. Hidden/dot dirs are OS/app caches
+   * (.thumbnails, .trashed); "Android" is the app-data/obb/media tree (app caches, not the user's
+   * pictures); "cache" is a generic cache dir; nested "Screenshots" folders are skipped so a broad
+   * scan doesn't surface screenshots. An explicitly-picked folder is always scanned regardless —
+   * only nested subdirs are filtered — so choosing a Screenshots folder on purpose still works.
+   */
+  fun isJunkDir(name: String): Boolean =
+      name.startsWith(".") ||
+          name.equals("Android", ignoreCase = true) ||
+          name.equals("cache", ignoreCase = true) ||
+          name.equals("Screenshots", ignoreCase = true)
+
   /** Classify a file by its extension (pure, for testing). */
   fun classify(name: String): Kind {
     val ext = name.substringAfterLast('.', "").lowercase()
@@ -82,7 +95,7 @@ object LocalMedia {
       children.sortedBy { it.name.lowercase() }.forEach { f ->
         if (out.size >= max) return@forEach
         when {
-          f.isDirectory -> stack.addLast(f)
+          f.isDirectory -> if (!isJunkDir(f.name)) stack.addLast(f)
           else ->
               when (classify(f.name)) {
                 Kind.IMAGE -> out.add(MediaItem(f.absolutePath, false))
@@ -120,7 +133,7 @@ object LocalMedia {
       val children = runCatching { dir.listFiles() }.getOrNull() ?: continue
       for (f in children) {
         if (f.isDirectory) {
-          if (!f.name.startsWith(".")) stack.addLast(f)
+          if (!isJunkDir(f.name)) stack.addLast(f)
           continue
         }
         when (classify(f.name)) {

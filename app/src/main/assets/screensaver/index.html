@@ -42,6 +42,12 @@
     try { if (window.Android && window.Android.use24Hour) return !!window.Android.use24Hour(); } catch (e) {}
     return false;
   }
+  // Per-photo dwell in seconds (host bridge). 0 → engine uses its own sensible default.
+  function intervalSec() {
+    try { if (window.Android && window.Android.getIntervalSec) return window.Android.getIntervalSec() || 0; } catch (e) {}
+    if (window.SS_CONFIG && window.SS_CONFIG.intervalSec) return window.SS_CONFIG.intervalSec;
+    return 0;
+  }
 
   // When the host renders its own native clock/overlays on top (?nativeClock=1), suppress the
   // engine's built-in clock + scrim so we don't draw two clocks. The engine is then purely the
@@ -69,7 +75,7 @@
 
   // Pre-measure photo dimensions so the very first mode already has correct orientation info.
   // Cap the initial measure so a huge library doesn't stall the start; the rest measure lazily.
-  if (window.premeasureAll) { try { await window.premeasureAll(24); } catch (e) {} }
+  if (window.premeasureAll) { try { await window.premeasureAll(6); } catch (e) {} }
 
   document.getElementById("loading").classList.add("hide");
 
@@ -82,6 +88,7 @@
   SS.startEngine({
     stage,
     mode: bridgeMode(),
+    intervalSec: intervalSec(),
     onMode: () => {},
   });
 })();

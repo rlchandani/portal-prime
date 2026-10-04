@@ -18,6 +18,16 @@
     const stage = opts.stage;
     const deck = window.shuffled(window.PHOTOS.slice());
     const cursor = { i: 0 };
+    // Per-photo dwell comes from the user's interval (host bridge, seconds). Single-photo modes
+    // hold each photo this long; collage modes derive a gentler micro-motion cadence from it.
+    // Falls back to 12s (research sweet spot) when no host interval is provided (dev/browser).
+    const intervalSec = (opts.intervalSec && opts.intervalSec > 0) ? opts.intervalSec : 12;
+    const intervalMs = Math.min(600, Math.max(5, intervalSec)) * 1000;
+    // microMs drives visible IMAGE SWAPS → tie it to the interval so a photo changes ~every
+    // interval (not 4x faster). ambientMs drives pure MOTION (e.g. the mosaic spotlight) that should
+    // stay gentle regardless of interval.
+    const microMs = intervalMs;
+    const ambientMs = Math.min(9000, Math.max(3500, Math.round(intervalMs / 4)));
     // opts.mode: a specific mode id, or "shuffle" to let the scheduler choose each beat.
     let prev = null;
     let currentCleanup = null;
@@ -33,6 +43,7 @@
     function ctx(layer) {
       return {
         root: layer, deck, cursor, W: innerWidth, H: innerHeight, url,
+        photoMs: intervalMs, microMs: microMs, ambientMs: ambientMs,
         done: () => advance(),
       };
     }
@@ -41,13 +52,18 @@
     // ends — or flushed early if a new beat / stop() arrives first (never leaked: a mode's
     // cleanup stops its timers, and an unstopped mode would keep mutating a dead layer).
     let pendingFade = null;
+    let queuedAdvance = false;
+    let stopped = false;
     function flushFade() {
       clearTimeout(fadeTimer);
-      if (!pendingFade) return;
-      const { cleanup, layer } = pendingFade;
-      pendingFade = null;
-      if (cleanup) { try { cleanup(); } catch (_) {} }
-      layer.remove();
+      if (pendingFade) {
+        const { cleanup, layer } = pendingFade;
+        pendingFade = null;
+        if (cleanup) { try { cleanup(); } catch (_) {} }
+        layer.remove();
+      }
+      // A beat that arrived mid-fade was deferred (not stacked); run it now the fade is done.
+      if (queuedAdvance && !stopped) { queuedAdvance = false; advance(); }
     }
 
     function clearStage() {
@@ -67,8 +83,11 @@
     }
 
     function advance() {
+      // Re-entrancy guard: never rip out a half-faded layer. If a crossfade is still in flight,
+      // defer this advance until it completes (coalesced) instead of stacking a second fade —
+      // stacked/flushed layers were the "two images coasting" ghost.
+      if (pendingFade) { queuedAdvance = true; return; }
       clearTimeout(beatTimer);
-      flushFade(); // a beat arriving mid-fade finishes the previous teardown first
       const enabled = opts.enabledModes && opts.enabledModes.length ? opts.enabledModes : SS.MODE_IDS;
       let modeId;
       if (opts.mode && opts.mode !== "shuffle") modeId = opts.mode;
@@ -79,6 +98,7 @@
       if (!impl) { modeId = "kenBurns"; }
       const label = (SS.MODES[modeId] && SS.MODES[modeId].name) || modeId;
       if (opts.onMode) opts.onMode(label, modeId);
+      try { console.log("[ss] beat " + modeId + " vp=" + innerWidth + "x" + innerHeight + " dpr=" + (window.devicePixelRatio || 1)); } catch (_) {}
 
       // Crossfade beats: the new mode renders into a fresh layer that fades in over the
       // still-running old one; the old layer (and its mode's timers) is torn down only
@@ -90,6 +110,7 @@
       currentLayer = layer;
       currentCleanup = SS.MODES[modeId].run(ctx(layer), beatDeck()) || null;
       if (oldLayer) {
+        oldLayer.classList.add("freeze"); // stop the outgoing mode animating during the crossfade
         pendingFade = { cleanup: oldCleanup, layer: oldLayer };
         requestAnimationFrame(() => layer.classList.add("on"));
         fadeTimer = setTimeout(flushFade, XFADE_MS + 100);
@@ -98,24 +119,33 @@
       }
 
       // Single-mode (non-shuffle) modes loop themselves internally; in shuffle we time each beat.
-      const beat = (opts.mode && opts.mode !== "shuffle") ? null : (SS.BEAT[modeId] || 9000);
+      // Honor the user's interval: a mode holds at least as long as one photo dwell, so a long
+      // interval slows scene changes (not clamped by the mode's base beat) while a short one still
+      // lets a mode compose 2-3 photos before rotating.
+      const beat =
+          (opts.mode && opts.mode !== "shuffle") ? null : Math.max(SS.BEAT[modeId] || 9000, intervalMs);
       if (beat) beatTimer = setTimeout(advance, beat);
     }
 
     advance();
-    // Re-render on a REAL viewport change. A DreamService WebView can deliver its first layout
-    // after the page boots, so the first mode renders against a tiny early viewport (content
-    // squeezed into a corner, rest black) — and single-mode styles loop internally, so without
-    // this they never recover. Debounced; ignores sub-5% jitter.
-    let lastW = innerWidth, lastH = innerHeight, resizeTimer = null;
+    // ONE-SHOT boot recovery only. A DreamService WebView can deliver its first layout at a
+    // degenerate (tiny) size, so the opening mode composes into a corner. Recover exactly once,
+    // and only when the viewport grows from that degenerate state to ~full-screen. We must NOT
+    // re-advance on ordinary viewport changes — that was tearing down live beats mid-photo and
+    // stacking half-faded crossfades (the "jumps to a new mode" + "two images coasting" bugs).
+    let recovered = false, resizeTimer = null;
+    const bootDegenerate = innerWidth < screen.width * 0.6 || innerHeight < screen.height * 0.6;
     addEventListener("resize", () => {
+      if (recovered || !bootDegenerate) return;
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        const dw = Math.abs(innerWidth - lastW) / Math.max(1, lastW);
-        const dh = Math.abs(innerHeight - lastH) / Math.max(1, lastH);
-        if (dw > 0.05 || dh > 0.05) { lastW = innerWidth; lastH = innerHeight; advance(); }
-      }, 250);
+        const full = innerWidth >= screen.width * 0.8 && innerHeight >= screen.height * 0.8;
+        if (full && !pendingFade) { recovered = true; advance(); }
+      }, 300);
     });
-    return { advance, stop: () => { clearTimeout(beatTimer); clearTimeout(resizeTimer); clearStage(); } };
+    return {
+      advance,
+      stop: () => { stopped = true; clearTimeout(beatTimer); clearTimeout(resizeTimer); clearStage(); },
+    };
   };
 })();

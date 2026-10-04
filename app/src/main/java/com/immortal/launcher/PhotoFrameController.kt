@@ -77,6 +77,8 @@ class PhotoFrameController(
     private val calendarRefreshMs: Long = 30 * 60_000L,
 ) {
   private val io = Executors.newSingleThreadExecutor()
+  // Decode-once screen-sized copies of local photos for the engine (see [EngineScaledCache]).
+  private val scaledCache = EngineScaledCache(java.io.File(context.cacheDir, "ss_scaled"))
   // A separate single-thread executor for caption work (EXIF read + the reverse-geocode
   // network call), so an 8s geocode lookup can never stall the image-decode pipeline on [io].
   private val metaIo = Executors.newSingleThreadExecutor()
@@ -329,15 +331,48 @@ class PhotoFrameController(
           val list =
               if (LocalMedia.isAccessible(source.path)) LocalMedia.enumerate(source.path, source.includeVideo)
               else emptyList()
+          val ordered = if (source.shuffle) list.shuffled() else list
+          // Engine mode: precompute each photo's ORIENTED w/h (header-only decode) so the
+          // orientation-aware mode scheduler in modes.js can match photos to modes, and drop
+          // sub-[MIN_PHOTO_EDGE] thumbnails/junk that cheapen the wall. Bounded to
+          // [ENGINE_MAX_PHOTOS] to keep this pass (and the deck) small. Images only — the HTML
+          // engine can't play local videos.
+          val useEngine = ScreensaverConfig.usesEngine(settings.mode)
+          val engineDims = HashMap<String, Pair<Int, Int>>()
+          val engineUrls =
+              if (useEngine) {
+                val urls = ArrayList<String>()
+                var measured = 0
+                for (item in ordered) {
+                  if (item.isVideo) continue
+                  if (urls.size >= ENGINE_MAX_PHOTOS) break
+                  val u = "file://" + item.path
+                  // Measure oriented w/h for a bounded SEED only (this pre-pass gates first paint).
+                  // Tiny junk is dropped among the measured (a sub-[MIN_PHOTO_EDGE] header is the
+                  // reliable junk signal); unmeasured photos still show, defaulting to a safe bucket.
+                  if (measured < DIMS_SEED) {
+                    measured++
+                    val d = orientedImageDims(item.path)
+                    if (d != null) {
+                      if (minOf(d.first, d.second) < MIN_PHOTO_EDGE) continue
+                      engineDims[u] = d
+                    }
+                  }
+                  urls.add(u)
+                }
+                urls
+              } else emptyList()
           ui.post {
-            if (list.isNotEmpty()) {
-              val ordered = if (source.shuffle) list.shuffled() else list
-              // Engine mode: hand the images (as file:// URLs) to the WebView engine. Images only —
-              // the HTML engine can't play the local videos, so drop those for engine rendering.
-              if (ScreensaverConfig.usesEngine(settings.mode)) {
-                val urls = ordered.filterNot { it.isVideo }.map { "file://" + it.path }
-                if (urls.isNotEmpty()) { startEngine(urls); engineActive = true; return@post }
-              }
+            if (useEngine && engineUrls.isNotEmpty()) {
+              startEngine(engineUrls, dims = engineDims)
+              engineActive = true
+              // Warm the scaled-copy cache in deck order, but only after Chromium's cold start has
+              // settled — competing for CPU during init would delay the first photo.
+              val localPaths = engineUrls.map { it.removePrefix("file://") }
+              ui.postDelayed({ if (engineActive) scaledCache.warm(localPaths) }, ENGINE_WARM_DELAY_MS)
+              return@post
+            }
+            if (ordered.isNotEmpty()) {
               playlist = ordered
               localMode = true
               localIndex = -1
@@ -544,9 +579,10 @@ class PhotoFrameController(
       @Suppress("DEPRECATION")
       allowFileAccessFromFileURLs = true
     }
-    // When the source needs auth headers, intercept the engine's image requests and re-issue them
-    // with the headers, streaming the bytes back. Only http(s) GETs to a non-local host are touched;
-    // the local engine assets (file://) pass straight through. Failures return null → normal load.
+    // LOCAL photos load natively (fast, no on-the-fly decode → no image "buffering"; the WebView's
+    // Chromium honors EXIF orientation itself, so portraits stay upright). Only REMOTE sources that
+    // need auth headers are intercepted and re-fetched with those headers; everything else (incl.
+    // local file:// and the engine's own assets) falls through to normal loading.
     wv.webViewClient =
         if (authHeaders.isEmpty()) android.webkit.WebViewClient()
         else object : android.webkit.WebViewClient() {
@@ -565,8 +601,16 @@ class PhotoFrameController(
               u.toString().endsWith(".gif", true) -> "image/gif"
               else -> "image/jpeg"
             }
-            return android.webkit.WebResourceResponse(
-                mime, "utf-8", java.io.ByteArrayInputStream(bytes))
+            return android.webkit.WebResourceResponse(mime, "utf-8", java.io.ByteArrayInputStream(bytes))
+          }
+        }
+    // Forward the engine's JS console to logcat (tag "ImmortalEngine") — the WebView was a black box
+    // before (no console reached a bug report), which made field diagnosis impossible.
+    wv.webChromeClient =
+        object : android.webkit.WebChromeClient() {
+          override fun onConsoleMessage(m: android.webkit.ConsoleMessage): Boolean {
+            Log.i("ImmortalEngine", "${m.message()} @${m.sourceId()}:${m.lineNumber()}")
+            return true
           }
         }
 
@@ -590,14 +634,30 @@ class PhotoFrameController(
             put(o)
           }
         }.toString()
-    io.execute { runCatching { faceStore.warmUp(photoUrls, authHeaders) } }
+    // Face warm-up on a dedicated thread (best-effort; no-ops on hardware where ML Kit face
+    // detection is unavailable). Kept for the sources/devices where it does populate focal points.
+    Thread {
+      runCatching { faceStore.warmUp(photoUrls, authHeaders) }
+          .onFailure { Log.w(TAG, "face warm-up failed (faces won't be kept in frame this run)", it) }
+    }.start()
     val mode = settings.mode
     val use24 = ImmortalSettings.use24HourClock(context)
     wv.addJavascriptInterface(
         object {
           @android.webkit.JavascriptInterface fun getPhotos(): String = photosJson
           @android.webkit.JavascriptInterface fun getMode(): String = mode
+          // Per-photo dwell (seconds). The engine holds each photo this long instead of its old
+          // hardcoded ~9s step, so the user's interval actually takes effect in engine modes.
+          @android.webkit.JavascriptInterface fun getIntervalSec(): Int = settings.intervalSec
           @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
+          // Screen-sized copy of a local photo if the cache has one ("" otherwise → use the original).
+          // Pure stat()s, never a decode, so a miss costs nothing on the load path.
+          @android.webkit.JavascriptInterface
+          fun scaledUrl(url: String): String {
+            if (!url.startsWith("file://")) return ""
+            val f = scaledCache.resolve(url.removePrefix("file://")) ?: return ""
+            return "file://" + f.absolutePath
+          }
           // Live presence for the engine's people-bias: the deck leans toward photos of
           // people while someone is actually in front of the frame. Reads the hub fresh
           // per call (the engine polls at mode-beat cadence, a few times a minute).
@@ -631,7 +691,15 @@ class PhotoFrameController(
     runCatching { calendarPanel.bringToFront() }
     dashboardPanel?.let { runCatching { it.bringToFront() } }
     runCatching { welcomeOverlay.bringToFront() }
-    wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1")
+    // Bust the WebView cache on app UPDATES by versioning the asset URL (VERSION_CODE bumps each
+    // release) rather than clearCache(true) on every start — clearing every start wiped the disk
+    // cache during the most latency-sensitive moment of cold start. Same URL within a version keeps
+    // normal in-session caching.
+    val assetVer =
+        runCatching {
+          @Suppress("DEPRECATION") context.packageManager.getPackageInfo(context.packageName, 0).versionCode
+        }.getOrDefault(0)
+    wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1&v=$assetVer")
     webView = wv
   }
 
@@ -639,16 +707,26 @@ class PhotoFrameController(
   private var engineActive = false
 
   fun stop() {
+    // Halt the WebView's JS timers + GPU compositing IMMEDIATELY so the heavy scene stops competing
+    // with the return-to-home transition — this is what made tap-to-exit feel slow. (destroy() must
+    // still run on the main thread just below; pausing first makes the hand-off snappy.)
+    webView?.let { runCatching { it.onPause(); it.pauseTimers() } }
+    scaledCache.cancel() // don't keep burning CPU on copies while Home redraws
     ui.removeCallbacks(dashboardCycle)
     ui.removeCallbacksAndMessages(null)
     runCatching { gestureCamera?.stop() }
     gestureCamera = null
-    runCatching { soundscape.stop() }
-    tts?.stop()
-    tts?.shutdown()
+    // TTS stop/shutdown is an IPC round-trip to the system TTS service, and soundscape.stop() can
+    // block briefly — move both off the main thread so neither delays the exit.
+    val ttsRef = tts
     tts = null
     ttsReady = false
     pendingSpeech = null
+    Thread {
+      runCatching { ttsRef?.stop() }
+      runCatching { ttsRef?.shutdown() }
+      runCatching { soundscape.stop() }
+    }.start()
     cancelKenBurns()
     faceRenderer.stop()
     if (this::videoView.isInitialized) runCatching { videoView.stopPlayback() }
@@ -1355,6 +1433,32 @@ class PhotoFrameController(
     val rotated = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, matrix, true)
     if (rotated != bmp) bmp.recycle()
     return rotated
+  }
+
+  /**
+   * Fast ORIENTED dimensions of a local image: a header-only bounds decode plus the EXIF
+   * orientation tag, swapping W/H for the quarter-turn orientations so a portrait shot saved as a
+   * landscape sensor buffer reports as portrait. Feeds the engine's orientation-aware mode
+   * scheduler (modes.js buckets by W/H) without decoding pixels. Null if the header is unreadable.
+   */
+  private fun orientedImageDims(path: String): Pair<Int, Int>? {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    runCatching { BitmapFactory.decodeFile(path, bounds) }
+    val w = bounds.outWidth
+    val h = bounds.outHeight
+    if (w <= 0 || h <= 0) return null
+    val orient =
+        runCatching {
+              ExifInterface(path)
+                  .getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            }
+            .getOrDefault(ExifInterface.ORIENTATION_NORMAL)
+    val swap =
+        orient == ExifInterface.ORIENTATION_ROTATE_90 ||
+            orient == ExifInterface.ORIENTATION_ROTATE_270 ||
+            orient == ExifInterface.ORIENTATION_TRANSPOSE ||
+            orient == ExifInterface.ORIENTATION_TRANSVERSE
+    return if (swap) h to w else w to h
   }
 
   private fun showVideo(path: String, g: Int) {
@@ -2152,6 +2256,20 @@ class PhotoFrameController(
     // Ken-Burns overscan headroom (2560²·4 ≈ 26MB) while staying far under the cap. See
     // [decodeBoundedFile]/[decodeBoundedStream].
     const val MAX_EDGE = 2560
+    // Local-folder curation: skip images whose short side is below this (thumbnails, icons,
+    // tiny web junk) — they read as clutter on a 2160px wall display. Real photos clear it easily.
+    const val MIN_PHOTO_EDGE = 512
+    // Cap the engine's local-photo pool: enough for rich variety with no visible repetition, while
+    // bounding the header-decode dimension pass at startup and the deck's memory. The pool is a
+    // random sample when shuffle is on.
+    const val ENGINE_MAX_PHOTOS = 300
+    // Delay before the engine's scaled-copy cache starts warming (lets Chromium cold-start first).
+    const val ENGINE_WARM_DELAY_MS = 20_000L
+    // Oriented-dimension SEED: measure only this many photos up front (header decode + EXIF is the
+    // single-threaded pre-pass that gates first paint AND the background face warm-up). The seed
+    // gives the scheduler real orientation variety; the rest default via the engine's own measure /
+    // NaN-safe bucket. Keeps cold start to a few seconds instead of ~15s for the whole pool.
+    const val DIMS_SEED = 80
     // Bundled fallback photos live under app/src/main/assets/<FALLBACK_DIR>/.
     const val FALLBACK_DIR = "photoframe_fallback"
     // How long to skip a web source after it fails, so a dead host (e.g. a Picsum

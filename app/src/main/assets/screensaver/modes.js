@@ -12,6 +12,7 @@
   // Orientation buckets (shared with photos): portrait <0.8, square <=1.3, landscape <=2.2, pano >2.2
   function bucket(p) {
     const a = p.w / p.h;
+    if (!(a > 0)) return "landscape"; // unmeasured (w/h 0 or NaN) → safe default, never 'pano'
     if (a < 0.8) return "portrait";
     if (a <= 1.3) return "square";
     if (a <= 2.2) return "landscape";
@@ -145,7 +146,7 @@
   // Returns { mode: "cover"|"panV"|"panH", size } where size is the element's
   // height (panV) or width (panH) as a percentage of the cell.
   window.SS.fitPlan = function (photoAspect, cellAspect) {
-    const MISMATCH = 1.35;
+    const MISMATCH = 1.15;
     if (photoAspect * MISMATCH < cellAspect)
       return { mode: "panV", size: (cellAspect / photoAspect) * 100 };
     if (photoAspect > cellAspect * MISMATCH)
