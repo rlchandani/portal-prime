@@ -41,13 +41,17 @@ Portal+ runs Android 10/API 29 at 2160 × 1440 pixels and density 180, equivalen
 - Home and Customize use one paged, four-column rectangle layout, so changing
   editing mode does not change card order, geometry, selected page or viewport.
   Packing fills holes beneath short cards independently of tall neighbors,
-  retaining the normal 24 dp gutter. The first photo remains the shared hero.
+  retaining the normal 24 dp gutter. The first photo is shared across pages,
+  but follows its saved relative position instead of being forced into the first cell.
   Per-widget explicit size choices no longer switch the sizing of other cards
   or pages. Legacy dimensions remain presentation hints; merely viewing or
   toggling Customize does not rewrite the saved widget data.
-- Dragging owns a transparent gesture layer above each widget body and below
-  its editing controls. Current ordered identities and placements refresh the
-  detector after each drop. Reorder and resize save only on release; cancellation
+- Short swipes scroll; a stationary long press starts dragging through a
+  transparent gesture layer above each widget body and below its editing controls.
+  A single drag owner prevents another detector from replacing its draft.
+  Held edge drags scroll the viewport, with scroll displacement included in the
+  ghost's content coordinates. Current ordered identities and placements refresh
+  the detector after each drop. Reorder and resize save only on release; cancellation
   discards their drafts. Hit testing and horizontal resizing account for RTL.
   Move supports numbered destinations across pages, and Settings uses the
   existing editors. Photo long-press still enters Customize.
@@ -106,7 +110,7 @@ and animated scaling remain available.
 
 ## Verification
 
-The complete debug build and test APK build passed. All **505 JVM tests** passed,
+The complete debug build and test APK build passed. All **516 JVM tests** passed,
 with zero failures or errors. The frame probe's 14 offline checks and the icon
 generator's 12 tests passed. Icon generation also matched all six frozen input
 hashes. Independent review drove corrections to catalog delivery, transport
@@ -171,9 +175,9 @@ and theme independence. Home/Apps/Tools stay dark; Settings appearance applies
 to its own panes and internal editors. The HA entity chooser is explicitly
 shown as a separate Activity simulation.
 
-All 93 isolated browser assertions passed with zero browser errors, including
+All 101 isolated browser assertions passed with zero browser errors, including
 26 Apps gesture/grid regressions and 28 widget geometry/action checks added
-after the original 39 checks. The final
+after the original 39 checks, plus eight photo-order regressions. The final
 Home layout was also visually inspected. This preview uses the approved
 renderer and sample fixtures read-only; the 67 frozen mock hashes remain
 unchanged. It is a browser demonstration, not an Android emulator, live Portal
@@ -200,12 +204,14 @@ verification.
 
 ## Widget layout and editing refinement
 
-The final widget debug build and test APK build passed, with all 505 JVM tests
-passing and zero failures or errors. Twenty added JVM cases cover deterministic
+The current widget debug build and test APK build passed, with all 516 JVM tests
+passing and zero failures or errors. Twenty earlier added JVM cases cover deterministic
 packing, first-fit/non-overlap properties, legacy dimensions, explicit size
 roundtrips, page-local sizing and photo-removal stability. Independent review
 found and drove fixes for consecutive equal-size drag identity, pointer coroutine
 cancellation, RTL hit testing and resizing, and unintended neighbor promotion.
+Eleven further cases cover photo-order projection and drag ownership,
+scroll displacement, cancellation, RTL destinations and bounded edge scrolling.
 
 On the final installed artifact, 36 recorded device assertions passed. Both
 pages retained identical card bounds through three Customize/Done cycles each,
@@ -223,28 +229,80 @@ navigation preserved the edited layout. The observer was stopped, and all nine
 original widget identities, order, dimensions and metadata were restored
 byte-for-byte after verification.
 
-Device gesture tests cover the connected device's left-to-right layout.
-RTL behavior and coroutine cancellation have source-review evidence; this run
-does not claim physical RTL or interrupted-gesture device coverage, arbitrary
-provider-widget certification, or final frame-time acceptance.
+The 36 checks were repeated on the current artifact with a stationary hold
+before movement and a test-only progress marker confirming the pointer was
+still down during persistence assertions. Nineteen additional assertions passed:
+repeated photo Move and held drag, exact normal/edit geometry after moving,
+ACTION_CANCEL for drag and resize, short scrolling through oversized cards,
+and a held edge drag reaching an initially offscreen destination. Oversized
+fixtures retained the existing two identities with explicit 4 × 4 dimensions;
+the original nine-widget configuration was restored byte-for-byte afterward.
+
+A first second-photo-Move test failed because its helper climbed out of an
+offscreen photo cell and tapped Home Assistant's Move button. Strict scoped
+targeting, scrolling the photo footer into view, and checking the photo-specific
+dialog corrected the test. Repeated saved-order and rendered-position checks
+then passed; no product change was made for that test-helper failure.
+
+Seven further review probes passed: two injected two-pointer handoffs (Weather
+and Photo) preserved order and reset the ghost, while a matching single-pointer
+control did reorder. The reviewer withdrew the handoff finding after these
+checks; a potential source risk was not a reproduced bug, and production pointer
+handling was not rewritten.
+
+These 62 device assertions cover the connected device's left-to-right layout
+and the named injected-pointer scenarios. Arbitrary multi-pointer arbitration,
+physical RTL, process interruption, provider-widget certification and final
+gesture frame timing remain unverified. Fresh debug/test builds and the 516-test
+JVM gate passed after adding the test-only handoff and private linkage diagnostics.
 
 ## Device performance evidence
 
 Current installed debug artifact:
-`409bd1f3ae61766e3afedbba466ee759a7fb40fb57ac3ed0214fa6d2531f5509`.
+`5f1de1a9f9d657ceca15099cda34f791c1ec2e6799fdaada6e1a49bc4689b87f`.
 Its APK hash was independently read from the device and matched the tested
-build. This artifact adds the shared Home/Customize packing and gesture fixes,
-the Apps long-press refinement, expanded local Settings
-routing, nested Back/Cancel, shared launcher return/search routes and internal window presentation after the
-measured Settings checkpoint. The table below records earlier artifacts, not a
-performance measurement of this final widget build.
+build. The current functional build adds held-drag ownership, edge scrolling
+and photo-order projection. Its rendering performance has not been measured.
+The preceding committed widget artifact `409bd1f3…` was measured separately.
+
+The display reports active mode 1 at **60.000004 Hz**, giving a 16.666666 ms
+screening budget. New Settings trials each retained 120 valid active frames:
+
+| Artifact / cohort | p50 ms | p95 ms | Largest ms | Proxy over budget |
+|---|---:|---:|---:|---:|
+| `409bd1f3…` debug, test instrumentation | 11.58 | 65.91 | 80.15 | 51/120 |
+| `484c3cc4…` release-style, test instrumentation | 11.10 | 43.89 | 56.91 | 43/120 |
+| `409bd1f3…` debug, shell taps without test observer | 11.75 | 61.90 | 84.52 | 54/120 |
+
+The release-style benchmark uses the debug package and signing key to preserve
+device data, with debuggability disabled and the existing release optimization
+options unchanged. It is a separate build, not the provisioned release.
+These are single trials and the shell-input cohort differs from instrumentation;
+they do not establish a matched comparative improvement. All three fail the
+active-frame proxy target. Deadline/presentation fields are unavailable here,
+so these counts are not actual presentation misses or Apple's hitch ratio.
+
+Instrumentation saves its frame capture before teardown. The seven-frame
+public capture obtained after teardown belongs to the restarted window and was
+rejected as insufficient. Main-thread method sampling was used diagnostically
+only: profiler overhead and recursive inclusive totals prevent interpreting it
+as final rendering performance. An opt-in R8 benchmark candidate is under
+investigation; production release options remain unchanged. The first optimized
+candidate `f7e12bcb…` installed and independently matched, but the probe returned
+`NoClassDefFoundError` and produced no accepted timing evidence. Its R8 mapping
+renamed the Kotlin runtime ABI used by the separately compiled test APK.
+The rebuilt screening candidate `bade4da2…` preserves that ABI and built
+successfully; its device measurement is pending after automatic approval review
+returned a temporary service rate limit. This benchmark accommodation is not an
+exact prospective shipping artifact. See the
+[R8 investigation](portal-plus-r8-investigation.md).
 
 Warmed navigation and scrolling measurements are recorded separately from
 functional tests. Zero-frame/static-page samples do not establish smoothness.
 Frame elapsed time is a rendering proxy, not input-to-photon latency. Android
 window creation and first-install/JIT effects are distinguished from settled
 scrolling; debug results do not constitute release performance certification.
-Performance acceptance is still open. The following debug measurements used
+Performance acceptance is still open. The following historical debug measurements used
 65 warmed navigation roundtrips, stopped the screenshot observer, and checked
 the initial native window identity before every tap. Each result below has
 120 retained frame samples. Instrumentation still adds an accessibility client.

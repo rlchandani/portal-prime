@@ -213,7 +213,10 @@
   function projectedHome(route) {
     if (!staging.querySelector('.modal-layer')) sampleHome(route);
     const { body, photo, remaining, templates, pageCount } = homeProjection;
-    const selected = [...(photo ? [photo] : []), ...remaining.slice(homePage * 4, homePage * 4 + 4)];
+    // Share the first photo across pages, then honor saved order within each
+    // visible subset. Sharing membership must not pin its rendered position.
+    const selected = [...(photo ? [photo] : []), ...remaining.slice(homePage * 4, homePage * 4 + 4)]
+      .sort((a, b) => a.index - b.index);
     // Frozen widgetSizes entries are explicit selections, including legacy-looking
     // 2 × 1 / 2 × 2 presets. A neighbor's size never changes this widget's default.
     const span = entry => entry.saved || (entry.kind === 'photo_memory' ? [2, 4] : [1, 2]);

@@ -75,4 +75,28 @@ class ApprovedWidgetPageGeometryTest {
     assertEquals(listOf(ApprovedWidgetPacking.Span(1, 2), ApprovedWidgetPacking.Span(1, 2)),
         HomePresentation.spans(neighbors))
   }
+
+  @Test fun movingSharedPhoto_changesItsRenderedSlotWithoutLosingAnyIdentity() {
+    val widgets = listOf(widget("photo", HomeWidgetStore.KIND_PHOTO_MEMORY, y = 1),
+        widget("today", HomeWidgetStore.KIND_TODAY, y = 1), widget("ha", HomeWidgetStore.KIND_HA),
+        widget("calendar", HomeWidgetStore.KIND_CALENDAR), widget("weather"))
+    val moved = HomePresentation.move(widgets, widgets.first().key, widgets.last().key)
+    val visible = HomePresentation.pageWidgets(moved, HomePresentation.page(moved, 0))
+    assertEquals(moved.map { it.key }, visible.map { it.key })
+    val placements = ApprovedWidgetPacking.pack(HomePresentation.spans(visible))
+    val photo = placements[visible.indexOfFirst { it.customId == "photo" }]
+    assertEquals(2, photo.row)
+    assertEquals(widgets.map { it.key }.toSet(), visible.map { it.key }.toSet())
+  }
+
+  @Test fun sharedPhoto_preservesSavedRelativeOrderOnEveryPage() {
+    val photo = widget("photo", HomeWidgetStore.KIND_PHOTO_MEMORY, y = 1)
+    val widgets = (0..7).map { widget("w$it") }.toMutableList().apply { add(3, photo) }
+    repeat(2) { index ->
+      val visible = HomePresentation.pageWidgets(widgets, HomePresentation.page(widgets, index))
+      val selectedKeys = visible.map { it.key }.toSet()
+      assertEquals(widgets.filter { it.key in selectedKeys }.map { it.key }, visible.map { it.key })
+      assertEquals(1, visible.count { it.key == photo.key })
+    }
+  }
 }

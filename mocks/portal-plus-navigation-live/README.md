@@ -25,13 +25,18 @@ appears in the existing Favorite apps row. Previous/More widgets remain availabl
 while editing. Greeting, favorites and the content viewport keep their positions.
 Size, Remove, Move and Settings controls overlay the real cards and invoke the
 frozen renderer's existing indexed actions and dialogs. Move uses its existing
-menu, committing only the selected destination.
+menu, committing only the selected destination. This browser simulation does
+not emulate native held dragging or edge auto scroll.
 
 Saved sizes are joined to current original indices through the frozen editor's
 Size controls and labels; private widget keys are neither inferred nor changed.
 Additional photo widgets remain distinct paged items with their own sizes and
-actions. The frozen Home omits those additional photos, so the projection uses its
-photo markup for each indexed instance and extends the visible page count. Its
+actions. Each page combines the shared first photo with four paged items, then
+sorts that visible subset by current saved index. Moving Photo therefore changes
+its actual position in both Home and Customize; a saved photo-first dashboard
+keeps its original layout. The frozen Home omits additional photos, so the
+projection uses its photo markup for each indexed instance and extends the
+visible page count. Its
 existing page action keeps the fixture page synchronized within the fixture's
 older count. No frozen API, fixture file, or native code is changed.
 
@@ -87,10 +92,14 @@ Run the isolated browser checks with a local Playwright installation:
 PLAYWRIGHT_MODULE=/path/to/playwright node mocks/portal-plus-navigation-live/verify.browser.cjs
 ```
 
-The gate retains all 65 navigation/Apps checks and adds isolated widget geometry,
-page-local sizing, packing/gutter, indexed action and duplicate-photo assertions.
-It also covers pointer, real touch, keyboard, cancellation, Apps projection and
-dock behavior. It prints the passed count and browser errors, including console
+The gate retains all 93 navigation/Apps/widget checks and adds eight photo-order
+regressions covering actual visual bounds, Home/Customize parity, shared-photo
+page membership and duplicate-photo reachability. Widget tests establish the
+approved photo-first default through the existing Move action because the frozen
+sample's raw order lists Photo last. Coverage includes widget geometry,
+page-local sizing, packing/gutter, indexed actions, pointer, real touch, keyboard,
+cancellation, Apps projection and dock behavior.
+It prints the passed count and browser errors, including console
 and failed-request errors.
 Scroll checks constrain the short sample Apps grid to exercise actual overflow.
 The checks do not write screenshots, reports, references, or approved files.

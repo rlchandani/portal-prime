@@ -32,6 +32,12 @@ internal object HomePresentation {
     return Page(hero, remaining.drop(index * 4).take(4), index, count)
   }
 
+  /** Sharing the photo across pages must not override its saved relative position. */
+  fun pageWidgets(widgets: List<HomeWidgetStore.HomeWidget>, page: Page): List<HomeWidgetStore.HomeWidget> {
+    val positions = widgets.mapIndexed { index, widget -> widget.key to index }.toMap()
+    return (listOfNotNull(page.hero) + page.widgets).sortedBy { positions[it.key] ?: Int.MAX_VALUE }
+  }
+
   fun usesCustomSizing(widgets: List<HomeWidgetStore.HomeWidget>): Boolean =
       widgets.any {
         val default = when (it.kind) {

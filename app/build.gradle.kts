@@ -77,6 +77,21 @@ android {
       // Lets a debug build install alongside a provisioned release for testing.
       applicationIdSuffix = ".debug"
     }
+    // Measure release rendering without replacing a provisioned release or losing the
+    // debug device's configuration. Keep release optimization options for a fair comparison;
+    // changing them belongs in a separately measured candidate.
+    create("benchmark") {
+      initWith(getByName("release"))
+      applicationIdSuffix = ".debug"
+      isDebuggable = false
+      signingConfig = signingConfigs.getByName("debug")
+      matchingFallbacks += "release"
+      // Opt-in candidate: compare with the faithful baseline before changing release.
+      if (providers.gradleProperty("portalBenchmarkOptimize").orNull == "true") {
+        isMinifyEnabled = true
+        proguardFiles("benchmark-rules.pro")
+      }
+    }
     // Release-faithful iteration build. Same applicationId + same signing key + minify off
     // (inherited from release via initWith), so it provisions identically — home role, device
     // admin, and self-update signature checks all behave exactly as on a release build. The ONLY

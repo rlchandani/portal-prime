@@ -6,8 +6,9 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,15 +23,18 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.isActive
 import kotlin.math.roundToInt
 
-/** Both viewing and editing measure the same placements; a drag commits only on release. */
+/** Short swipes scroll; held drags reorder, committing only on release. */
 @Composable
 internal fun ApprovedPackedWidgetGrid(
     widgets: List<HomeWidgetStore.HomeWidget>,
@@ -41,16 +45,25 @@ internal fun ApprovedPackedWidgetGrid(
     content: @Composable (HomeWidgetStore.HomeWidget, Modifier, ApprovedWidgetPacking.Span, Modifier) -> Unit,
 ) {
   val placements = remember(spans) { ApprovedWidgetPacking.pack(spans) }
-  val identities = remember(widgets) { widgets.map { it.key } }
   val latestMove = rememberUpdatedState(onMove)
   val scroll = rememberScrollState()
-  var draggedKey by remember { mutableStateOf<String?>(null) }
-  var targetKey by remember { mutableStateOf<String?>(null) }
-  var dragOffset by remember { mutableStateOf(Offset.Zero) }
+  val dragState = remember { ApprovedWidgetDragState() }
+  var preview by remember { mutableStateOf<ApprovedWidgetDragState.Snapshot?>(null) }
+  val draggedKey by remember { derivedStateOf { preview?.key } }
+  val targetKey by remember { derivedStateOf { preview?.targetKey } }
   var dragOwner by remember { mutableStateOf<Any?>(null) }
-  fun resetDrag() { draggedKey = null; targetKey = null; dragOffset = Offset.Zero; dragOwner = null }
-  LaunchedEffect(editMode, widgets) { resetDrag() }
-  BoxWithConstraints(modifier) {
+  val pageActive = LocalApprovedLauncherPageActive.current && LocalApprovedWidgetPageInput.current
+  var viewportCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+  fun resetDrag() { dragState.reset(); preview = null; dragOwner = null }
+  fun cancelDrag(owner: Any) {
+    if (dragState.isOwner(owner)) {
+      dragState.cancel(owner)
+      preview = null
+      dragOwner = null
+    }
+  }
+  // Capture the unscrolled container, not coordinates of a node with verticalScroll.
+  BoxWithConstraints(modifier.onGloballyPositioned { viewportCoordinates = it }) {
     val density = LocalDensity.current
     val gap = 24.dp
     val column = ((maxWidth - gap * 3) / 4).coerceAtLeast(1.dp)
@@ -59,10 +72,50 @@ internal fun ApprovedPackedWidgetGrid(
     val rowStep = with(density) { (row + gap).toPx() }
     val gapPx = with(density) { gap.toPx() }
     val widthPx = with(density) { maxWidth.toPx() }
+    val viewportHeightPx = with(density) { maxHeight.toPx() }
+    val edgeBandPx = with(density) { 64.dp.toPx() }
+    val maxScrollSpeedPx = with(density) { 480.dp.toPx() }
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    fun left(placement: ApprovedWidgetPacking.Placement): Float =
-        if (rtl) widthPx - (placement.column + placement.columns) * columnStep + gapPx
-        else placement.column * columnStep
+    val bounds = remember(widgets, placements, columnStep, rowStep, widthPx, gapPx, rtl) {
+      placements.map {
+        val width = (it.columns * columnStep - gapPx).roundToInt().coerceAtLeast(1)
+        val logicalLeft = (it.column * columnStep).roundToInt()
+        ApprovedWidgetDragState.Bounds(widgets[it.index].key,
+            (if (rtl) widthPx.roundToInt() - logicalLeft - width else logicalLeft).toFloat(),
+            (it.row * rowStep).roundToInt().toFloat(), width.toFloat(),
+            (it.rows * rowStep - gapPx).roundToInt().coerceAtLeast(1).toFloat())
+      }
+    }
+    fun publishPreview() { preview = dragState.snapshot(scroll.value.toFloat(), bounds) }
+    // Invalidation is synchronous with composition disposal, including retained inactive pages.
+    DisposableEffect(editMode, pageActive, widgets, bounds, viewportHeightPx) {
+      resetDrag()
+      onDispose { resetDrag() }
+    }
+    val activeOwner = dragOwner
+    LaunchedEffect(activeOwner, editMode, pageActive, widgets, bounds, viewportHeightPx) {
+      val owner = activeOwner ?: return@LaunchedEffect
+      try {
+        // One frame loop per active drag. UserInput also stops a pre-existing scroll fling.
+        scroll.scroll(MutatePriority.UserInput) {
+          var previousFrame = withFrameNanos { it }
+          while (isActive && dragState.isOwner(owner)) {
+            val frame = withFrameNanos { it }
+            if (!dragState.isOwner(owner)) break
+            val current = dragState.snapshot(scroll.value.toFloat(), bounds) ?: break
+            val delta = ApprovedWidgetDragState.edgeScrollDelta(current.pointerY,
+                viewportHeightPx, edgeBandPx, maxScrollSpeedPx,
+                ((frame - previousFrame) / 1_000_000_000.0).toFloat(),
+                scroll.value.toFloat(), scroll.maxValue.toFloat())
+            previousFrame = frame
+            if (delta != 0f) scrollBy(delta)
+            publishPreview()
+          }
+        }
+      } finally {
+        cancelDrag(owner)
+      }
+    }
     val rowCount = maxOf(4, placements.maxOfOrNull { it.row + it.rows } ?: 0)
     val height = row * rowCount + gap * (rowCount - 1)
     Box(Modifier.fillMaxSize().verticalScroll(scroll)) {
@@ -74,37 +127,51 @@ internal fun ApprovedPackedWidgetGrid(
                 val placement = placements[index]
                 val cellSpan = ApprovedWidgetPacking.Span(placement.columns, placement.rows)
                 val dragging = draggedKey == widget.key
-                val drag = if (!editMode) Modifier else Modifier.pointerInput(
-                    widget.key, editMode, identities, placement, placements, columnStep, rowStep, rtl) {
-                  val owner = Any()
-                  try { detectDragGestures(
-                      onDragStart = { dragOwner = owner; draggedKey = widget.key; targetKey = null; dragOffset = Offset.Zero },
-                      onDragCancel = { if (dragOwner === owner) resetDrag() },
-                      onDragEnd = {
-                        val destination = targetKey
-                        if (dragOwner === owner) {
-                          resetDrag()
-                          if (destination != null && destination != widget.key) latestMove.value(widget.key, destination)
+                var handleCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+                val drag = if (!editMode || !pageActive) Modifier else Modifier
+                    .onGloballyPositioned { handleCoordinates = it }.pointerInput(
+                    widget.key, editMode, pageActive, widgets, placement, bounds, viewportHeightPx) {
+                  var owner = Any()
+                  fun viewportPoint(local: Offset): ApprovedWidgetDragState.Point? {
+                    val viewport = viewportCoordinates?.takeIf { it.isAttached } ?: return null
+                    val handle = handleCoordinates?.takeIf { it.isAttached } ?: return null
+                    // The handle scrolls AND translates with the ghost. Its local position is
+                    // not a stable drag accumulator; convert the actual pointer to the viewport.
+                    val point = viewport.localPositionOf(handle, local)
+                    return ApprovedWidgetDragState.Point(point.x, point.y)
+                  }
+                  try { detectDragGesturesAfterLongPress(
+                      onDragStart = { local ->
+                        owner = Any() // A new token for each held gesture, not just each detector.
+                        viewportPoint(local)?.let { point ->
+                          if (dragState.start(owner, bounds[index], point, scroll.value.toFloat())) {
+                            dragOwner = owner
+                            publishPreview()
+                          }
                         }
                       },
-                  ) { change, amount ->
-                    change.consume()
-                    dragOffset += amount
-                    val center = Offset(
-                        left(placement) + (placement.columns * columnStep - gapPx) / 2,
-                        placement.row * rowStep + (placement.rows * rowStep - gapPx) / 2) + dragOffset
-                    targetKey = placements.firstOrNull {
-                      val x = left(it); val y = it.row * rowStep
-                      center.x >= x && center.x <= x + it.columns * columnStep - gapPx &&
-                          center.y >= y && center.y <= y + it.rows * rowStep - gapPx
-                    }?.let { widgets[it.index].key }
-                  } } finally { if (dragOwner === owner) resetDrag() }
+                      onDragCancel = { cancelDrag(owner) },
+                      onDragEnd = {
+                        if (dragState.isOwner(owner)) {
+                          val destination = dragState.finish(owner, scroll.value.toFloat(), bounds)
+                          resetDrag()
+                          if (destination != null) latestMove.value(widget.key, destination)
+                        }
+                      },
+                  ) { change, _ ->
+                    if (dragState.isOwner(owner)) {
+                      change.consume()
+                      val point = viewportPoint(change.position)
+                      if (point == null) cancelDrag(owner)
+                      else if (dragState.move(owner, point)) publishPreview()
+                    }
+                  } } finally { cancelDrag(owner) }
                 }
                 content(widget, Modifier.fillMaxSize().zIndex(if (dragging) 1f else 0f)
                     .graphicsLayer {
-                      translationX = if (draggedKey == widget.key) dragOffset.x else 0f
-                      translationY = if (draggedKey == widget.key) dragOffset.y else 0f
-                      alpha = if (draggedKey == widget.key) .88f else 1f
+                      translationX = preview?.takeIf { it.key == widget.key }?.translationX ?: 0f
+                      translationY = preview?.takeIf { it.key == widget.key }?.translationY ?: 0f
+                      alpha = if (preview?.key == widget.key) .88f else 1f
                     }.then(if (targetKey == widget.key && !dragging)
                         Modifier.border(2.dp, ApprovedHomePalette.Accent, RoundedCornerShape(20.dp)) else Modifier),
                     cellSpan, drag)

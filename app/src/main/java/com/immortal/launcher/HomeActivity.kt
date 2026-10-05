@@ -742,7 +742,7 @@ private fun ApprovedWidgetPage(
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
     editMode: Boolean = false,
 ) {
-  val pageWidgets = remember(displayed) { listOfNotNull(displayed.hero) + displayed.widgets }
+  val pageWidgets = remember(displayed, widgets) { HomePresentation.pageWidgets(widgets, displayed) }
   ApprovedWidgetGrid(pageWidgets, Modifier.fillMaxSize(), widgets, editMode, host, manager,
       onChanged, onEnterEdit, onRemove)
 }

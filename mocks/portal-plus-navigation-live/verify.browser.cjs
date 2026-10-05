@@ -443,6 +443,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     watchPage(widgetPage);
     await widgetPage.goto(`${origin}/portal-plus-navigation-live/`);
     await widgetPage.waitForFunction(() => !!window.__portalNavigationDemo);
+    // Establish the approved photo-first default via the existing indexed action;
+    // the frozen sample's raw order instead puts Photo last.
+    await widgetPage.evaluate(() => __portalMock.showAction('widget-move-to', { from: '8', to: '0' }));
+    await widgetPage.waitForFunction(() =>
+      !!document.querySelector('.live-widget-grid [data-live-widget-index="0"][data-live-widget-kind="photo_memory"]'));
     const widgetRoot = widgetPage.locator('#navigation-device');
     const widgetSettled = () => widgetPage.waitForFunction(() =>
       document.querySelector('#navigation-device').getAnimations({ subtree: true }).length === 0);
@@ -508,11 +513,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         !document.querySelector('.app-header .live-widget-toolbar')));
     check('default first-fit page preserves hero plus four original widget indices',
       JSON.stringify(await placements()) === JSON.stringify([
-        { index: 8, kind: 'photo_memory', column: '1 / span 2', row: '1 / span 4' },
-        { index: 0, kind: 'today', column: '3 / span 1', row: '1 / span 2' },
-        { index: 1, kind: 'ha', column: '4 / span 1', row: '1 / span 2' },
-        { index: 2, kind: 'calendar', column: '3 / span 1', row: '3 / span 2' },
-        { index: 3, kind: 'weather', column: '4 / span 1', row: '3 / span 2' },
+        { index: 0, kind: 'photo_memory', column: '1 / span 2', row: '1 / span 4' },
+        { index: 1, kind: 'today', column: '3 / span 1', row: '1 / span 2' },
+        { index: 2, kind: 'ha', column: '4 / span 1', row: '1 / span 2' },
+        { index: 3, kind: 'calendar', column: '3 / span 1', row: '3 / span 2' },
+        { index: 4, kind: 'weather', column: '4 / span 1', row: '3 / span 2' },
       ]));
     check('editing controls overlay the actual cards and retain original action indices',
       await widgetPage.evaluate(() => [...document.querySelectorAll('.live-widget-edit-controls')].length === 5 &&
@@ -529,9 +534,9 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await customize();
     check('Customize retains the selected second page and only its cards',
       JSON.stringify(await layout()) === JSON.stringify(secondPageDefault) &&
-      JSON.stringify((await placements()).map(item => item.index)) === JSON.stringify([8, 4, 5, 6, 7]));
+      JSON.stringify((await placements()).map(item => item.index)) === JSON.stringify([0, 5, 6, 7, 8]));
     await previousWidgets();
-    await size(0, '1 × 1');
+    await size(1, '1 × 1');
     const oneResized = await layout();
     check('one explicit resize leaves neighbor sizes and available positions unchanged',
       defaultHome.cards.filter(card => card.name !== 'Today').every(card => {
@@ -539,20 +544,20 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         return next.box[2] === card.box[2] && next.box[3] === card.box[3] &&
           (card.name === 'Calendar' || JSON.stringify(next.box) === JSON.stringify(card.box));
       }));
-    for (const [index, span] of [[0, '1 × 4'], [1, '1 × 1'], [2, '1 × 1'], [3, '1 × 2']]) await size(index, span);
+    for (const [index, span] of [[1, '1 × 4'], [2, '1 × 1'], [3, '1 × 1'], [4, '1 × 2']]) await size(index, span);
     check('mixed-size widgets use deterministic first-fit holes without overlap',
       JSON.stringify(await placements()) === JSON.stringify([
-        { index: 8, kind: 'photo_memory', column: '1 / span 2', row: '1 / span 4' },
-        { index: 0, kind: 'today', column: '3 / span 1', row: '1 / span 4' },
-        { index: 1, kind: 'ha', column: '4 / span 1', row: '1 / span 1' },
-        { index: 2, kind: 'calendar', column: '4 / span 1', row: '2 / span 1' },
-        { index: 3, kind: 'weather', column: '4 / span 1', row: '3 / span 2' },
+        { index: 0, kind: 'photo_memory', column: '1 / span 2', row: '1 / span 4' },
+        { index: 1, kind: 'today', column: '3 / span 1', row: '1 / span 4' },
+        { index: 2, kind: 'ha', column: '4 / span 1', row: '1 / span 1' },
+        { index: 3, kind: 'calendar', column: '4 / span 1', row: '2 / span 1' },
+        { index: 4, kind: 'weather', column: '4 / span 1', row: '3 / span 2' },
       ]) && await noOverlap());
     check('short equal-width neighbors have only the 24 px gutter below them',
       await widgetPage.evaluate(() => {
         const grid = document.querySelector('.live-widget-grid');
-        const first = grid.querySelector('[data-live-widget-index="1"]').getBoundingClientRect();
-        const next = grid.querySelector('[data-live-widget-index="2"]').getBoundingClientRect();
+        const first = grid.querySelector('[data-live-widget-index="2"]').getBoundingClientRect();
+        const next = grid.querySelector('[data-live-widget-index="3"]').getBoundingClientRect();
         const scale = grid.getBoundingClientRect().width / grid.clientWidth;
         return Math.abs(next.y - first.bottom - 24 * scale) < 0.1 &&
           Math.abs(first.width - next.width) < 0.1 && Math.abs(first.x - next.x) < 0.1;
@@ -575,21 +580,21 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       JSON.stringify(await layout()) === JSON.stringify(secondPageDefault));
     await customize();
     await previousWidgets();
-    await widgetClick('[data-live-widget-index="2"] [data-action="widget-move"]');
+    await widgetClick('[data-live-widget-index="3"] [data-action="widget-move"]');
     check('opening the existing Move menu does not commit any reorder',
       await widgetPage.evaluate(() => JSON.stringify(__portalMock.getState().widgets) ===
-        JSON.stringify(['today', 'ha', 'calendar', 'weather', 'alarm', 'world_clock', 'crypto', 'quick_controls', 'photo_memory'])));
-    await widgetClick('#live-overlays [data-action="widget-move-to"][data-to="6"]');
+        JSON.stringify(['photo_memory', 'today', 'ha', 'calendar', 'weather', 'alarm', 'world_clock', 'crypto', 'quick_controls'])));
+    await widgetClick('#live-overlays [data-action="widget-move-to"][data-to="7"]');
     check('Move commits the selected original index once through the frozen renderer',
       await widgetPage.evaluate(() => JSON.stringify(__portalMock.getState().widgets) ===
-        JSON.stringify(['today', 'ha', 'weather', 'alarm', 'world_clock', 'crypto', 'calendar', 'quick_controls', 'photo_memory'])) &&
+        JSON.stringify(['photo_memory', 'today', 'ha', 'weather', 'alarm', 'world_clock', 'crypto', 'calendar', 'quick_controls'])) &&
       await noOverlap());
     await nextWidgets();
-    await widgetClick('[data-live-widget-index="6"] [data-action="widget-size"]');
+    await widgetClick('[data-live-widget-index="7"] [data-action="widget-size"]');
     await widgetPage.keyboard.press('Escape');
     check('a moved widget retains its saved size on its new page',
-      (await placements()).some(item => item.index === 6 && item.kind === 'calendar' && item.column.endsWith('span 1') && item.row.endsWith('span 1')));
-    await widgetClick('[data-live-widget-index="6"] [data-action="widget-remove"]');
+      (await placements()).some(item => item.index === 7 && item.kind === 'calendar' && item.column.endsWith('span 1') && item.row.endsWith('span 1')));
+    await widgetClick('[data-live-widget-index="7"] [data-action="widget-remove"]');
     check('Remove uses the existing confirmation for the selected widget',
       /Remove Calendar/.test(await widgetRoot.locator('#live-overlays .modal').innerText()));
     await widgetClick('#live-overlays [data-action="widget-remove-confirm"]');
@@ -597,7 +602,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       await widgetPage.evaluate(() => !__portalMock.getState().widgets.includes('calendar') &&
         __portalMock.getState().widgets.length === 8) &&
       (await layout()).page === '2 of 2' && await noOverlap());
-    await widgetClick('[data-live-widget-index="4"] .live-widget-edit-controls [data-action="go"]');
+    await widgetClick('[data-live-widget-index="5"] .live-widget-edit-controls [data-action="go"]');
     check('overlay Settings opens the existing widget destination',
       await widgetPage.evaluate(() => __portalNavigationDemo.getState().route.screen === 'world'));
     await widgetPage.keyboard.press('Escape');
@@ -616,7 +621,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await nextWidgets();
     check('additional photo widgets are reachable on a third page with distinct original indices',
       (await layout()).page === '3 of 3' &&
-      JSON.stringify((await placements()).map(item => item.index)) === JSON.stringify([7, 9]));
+      JSON.stringify((await placements()).map(item => item.index)) === JSON.stringify([0, 9]));
     await size(9, '2 × 3');
     await widgetClick('[data-live-widget-index="9"] [data-action="widget-move"]');
     await widgetClick('#live-overlays [data-action="widget-move-to"][data-to="0"]');
@@ -655,6 +660,96 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       await widgetPage.evaluate(() => widgetChrome.header === document.querySelector('.live-launcher > .app-header') &&
         widgetChrome.dock === document.querySelector('.live-launcher > .dock')));
     await widgetContext.close();
+
+    const photoContext = await browser.newContext({ viewport: { width: 1440, height: 1020 } });
+    await photoContext.route('**/*', route =>
+      new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+    const photoPage = await photoContext.newPage();
+    watchPage(photoPage);
+    await photoPage.goto(`${origin}/portal-plus-navigation-live/`);
+    await photoPage.waitForFunction(() => !!window.__portalNavigationDemo);
+    // The frozen evidence lists Photo last. Establish the approved native default
+    // through the existing action, without rewriting fixtures or manufacturing keys.
+    await photoPage.evaluate(() => __portalMock.showAction('widget-move-to', { from: '8', to: '0' }));
+    await photoPage.waitForFunction(() =>
+      !!document.querySelector('.live-widget-grid [data-live-widget-index="0"][data-live-widget-kind="photo_memory"]'));
+    const photoRoot = photoPage.locator('#navigation-device');
+    const photoClick = async selector => {
+      await photoRoot.locator(selector).click();
+      await photoPage.waitForFunction(() =>
+        document.querySelector('#navigation-device').getAnimations({ subtree: true }).length === 0);
+    };
+    const photoLayout = () => photoPage.evaluate(() => ({
+      page: document.querySelector('.widget-page > span:not(.live-widget-toolbar)').textContent,
+      cards: [...document.querySelectorAll('.live-widget-grid > [data-live-widget-index]')].map(slot => {
+        const box = slot.querySelector('.home-card').getBoundingClientRect();
+        return { index: Number(slot.dataset.liveWidgetIndex), kind: slot.dataset.liveWidgetKind,
+          box: ['x', 'y', 'width', 'height'].map(key => Math.round(box[key] * 1000) / 1000) };
+      }),
+    }));
+    const photoMove = async (from, to) => {
+      await photoClick(`[data-live-widget-index="${from}"] [data-action="widget-move"]`);
+      await photoClick(`#live-overlays [data-action="widget-move-to"][data-to="${to}"]`);
+    };
+    const photoNext = () => photoClick('[data-action="page"][data-dir="1"]');
+    const approvedPhotoHome = await photoLayout();
+    check('saved photo-first default retains the approved dashboard order',
+      JSON.stringify(approvedPhotoHome.cards.map(card => card.kind)) ===
+      JSON.stringify(['photo_memory', 'today', 'ha', 'calendar', 'weather']) &&
+      approvedPhotoHome.cards[0].box[0] < approvedPhotoHome.cards[1].box[0] &&
+      approvedPhotoHome.cards[0].box[3] > approvedPhotoHome.cards[1].box[3]);
+    await photoClick('.live-launcher > .app-header [data-screen="edit"]');
+    await photoMove(0, 3);
+    const movedPhotoEdit = await photoLayout();
+    check('moving the first photo to a later slot changes rendered order to saved order',
+      JSON.stringify(movedPhotoEdit.cards.map(card => card.index)) === JSON.stringify([0, 1, 2, 3, 4]) &&
+      JSON.stringify(movedPhotoEdit.cards.map(card => card.kind)) ===
+        JSON.stringify(['today', 'ha', 'calendar', 'photo_memory', 'weather']) &&
+      await photoPage.evaluate(() => JSON.stringify(__portalMock.getState().widgets) === JSON.stringify(
+        ['today', 'ha', 'calendar', 'photo_memory', 'weather', 'alarm', 'world_clock', 'crypto', 'quick_controls'])));
+    const movedPhotoBox = movedPhotoEdit.cards.find(card => card.kind === 'photo_memory').box;
+    check('photo Move changes actual visual bounds instead of only the saved array',
+      movedPhotoBox[1] > approvedPhotoHome.cards[0].box[1] &&
+      movedPhotoBox[2] === approvedPhotoHome.cards[0].box[2] &&
+      movedPhotoBox[3] === approvedPhotoHome.cards[0].box[3]);
+    await photoClick('.live-launcher > .app-header [data-live-widget-done]');
+    check('Home after Done preserves the moved photo order and visual bounds',
+      JSON.stringify(await photoLayout()) === JSON.stringify(movedPhotoEdit));
+    await photoClick('.live-launcher > .app-header [data-screen="edit"]');
+    check('Customize preserves Home order and bounds after photo Move',
+      JSON.stringify(await photoLayout()) === JSON.stringify(movedPhotoEdit));
+    await photoNext();
+    const earlierSecondPage = await photoLayout();
+    check('shared first photo appears once in the second saved-order subset',
+      earlierSecondPage.page === '2 of 2' &&
+      JSON.stringify(earlierSecondPage.cards.map(card => card.index)) === JSON.stringify([3, 5, 6, 7, 8]) &&
+      earlierSecondPage.cards.filter(card => card.kind === 'photo_memory').length === 1);
+    await photoMove(3, 7);
+    const laterSecondPage = await photoLayout();
+    check('moving the shared photo across pages also changes its second-page order and bounds',
+      laterSecondPage.page === '2 of 2' &&
+      JSON.stringify(laterSecondPage.cards.map(card => card.index)) === JSON.stringify([4, 5, 6, 7, 8]) &&
+      JSON.stringify(laterSecondPage.cards.map(card => card.kind)) ===
+        JSON.stringify(['alarm', 'world_clock', 'crypto', 'photo_memory', 'quick_controls']) &&
+      laterSecondPage.cards.find(card => card.kind === 'photo_memory').box[1] >
+        earlierSecondPage.cards.find(card => card.kind === 'photo_memory').box[1]);
+    for (let count = 0; count < 2; count++) {
+      await photoClick('.live-widget-toolbar [data-screen="widgets"]');
+      await photoClick('[data-tab="home"] [data-action="widget-add"][data-kind="photo_memory"]');
+    }
+    const photoReached = new Set();
+    for (let count = 0; count < 3; count++) {
+      const snapshot = await photoLayout();
+      const ids = snapshot.cards.map(card => card.index);
+      assert.deepEqual(ids, [...ids].sort((a, b) => a - b), 'each page follows current saved indices');
+      assert.equal(new Set(ids).size, ids.length, 'every visible widget ID appears once');
+      assert.equal(ids.filter(index => index === 7).length, 1, 'shared first photo appears once per page');
+      snapshot.cards.forEach(card => photoReached.add(card.index));
+      await photoNext();
+    }
+    check('photo reordering preserves duplicate-photo reachability without duplicate visible IDs',
+      photoReached.size === 11 && photoReached.has(9) && photoReached.has(10));
+    await photoContext.close();
     assert.deepEqual(errors, [], 'browser errors');
   } finally {
     console.log(JSON.stringify({ passed: checks.length, checks, browserErrors: errors }, null, 2));

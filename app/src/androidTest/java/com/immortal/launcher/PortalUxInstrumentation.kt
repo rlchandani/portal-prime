@@ -99,6 +99,13 @@ class PortalUxInstrumentation : Instrumentation() {
             finish(0, result)
         } catch (error: Throwable) {
             result.putString("errorType", error.javaClass.simpleName)
+            // Private diagnostics distinguish test-runner linkage from app rendering.
+            runCatching {
+                val folder = File(targetContext.cacheDir, "portal-ux-e2e")
+                folder.mkdirs()
+                val writer = java.io.PrintWriter(File(folder, "probe-error.txt"))
+                try { error.printStackTrace(writer) } finally { writer.close() }
+            }
             finish(1, result)
         }
     }
@@ -316,6 +323,14 @@ class PortalUxInstrumentation : Instrumentation() {
             val name = command.optString("name", "latest").replace(Regex("[^a-zA-Z0-9_-]"), "_")
             try {
                 val active = root(automation)
+                if (command.optString("command") == "widgetGesture") {
+                    widgetGesture(automation, active, command) { phase ->
+                        File(folder, "$name-gesture.json").writeText(JSONObject()
+                            .put("phase", phase).put("pointerDown", phase != "finished").toString())
+                    }
+                    response.writeText(JSONObject().put("name", name).put("success", true).toString())
+                    continue
+                }
                 if (command.optString("command") == "setText") {
                     val fields = mutableListOf<AccessibilityNodeInfo>()
                     collectEditable(active, fields)
@@ -352,6 +367,84 @@ class PortalUxInstrumentation : Instrumentation() {
                     targetContext.stopService(Intent(targetContext, FleetAgentService::class.java))
                 }
             }
+        }
+    }
+
+    /** Functional QA only: real stationary hold, movement and release/cancel in Customize. */
+    private fun widgetGesture(automation: UiAutomation, active: AccessibilityNodeInfo, command: JSONObject,
+        progress: (String) -> Unit) {
+        check(active.packageName?.toString() == targetContext.packageName)
+        check(find(active, "Done") != null)
+        val owner = find(active, command.getString("source")) ?: error("Widget not found")
+        check(owner.isVisibleToUser)
+        val source = if (command.optBoolean("resize")) find(owner, "Resize widget") ?: error("Handle not found")
+            else owner
+        check(source.isVisibleToUser)
+        val bounds = Rect().also(source::getBoundsInScreen)
+        check(!bounds.isEmpty)
+        val x = bounds.exactCenterX()
+        val y = bounds.exactCenterY()
+        val targetLabel = command.optString("target")
+        val target = if (targetLabel.isNotEmpty()) {
+            val node = find(active, targetLabel) ?: error("Target not found")
+            check(node.isVisibleToUser)
+            Rect().also(node::getBoundsInScreen).also { check(!it.isEmpty) }
+        } else null
+        val endX = target?.exactCenterX() ?: (x + command.optInt("dx"))
+        val endY = target?.exactCenterY() ?: (y + command.optInt("dy"))
+        val hold = command.optLong("holdMs", 0).also { require(it in 0..2_000) }
+        val moving = command.optLong("moveMs", 700).also { require(it in 100..3_000) }
+        val edgeHold = command.optLong("edgeHoldMs", 0).also { require(it in 0..3_000) }
+        val down = SystemClock.uptimeMillis()
+        fun inject(action: Int, px: Float, py: Float) {
+            val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, px, py, 0)
+            event.source = InputDevice.SOURCE_TOUCHSCREEN
+            try { check(automation.injectInputEvent(event, true)) } finally { event.recycle() }
+        }
+        var pressed = false
+        try {
+            inject(MotionEvent.ACTION_DOWN, x, y)
+            pressed = true
+            progress("pressed")
+            SystemClock.sleep(hold)
+            val steps = (moving / 16).toInt().coerceAtLeast(1)
+            repeat(steps) { index ->
+                val fraction = (index + 1).toFloat() / steps
+                inject(MotionEvent.ACTION_MOVE, x + (endX - x) * fraction, y + (endY - y) * fraction)
+                if (index == steps * 3 / 4) progress("moving")
+                SystemClock.sleep(moving / steps)
+            }
+            SystemClock.sleep(edgeHold)
+            if (command.optBoolean("handoff")) {
+                fun multi(action: Int, ids: IntArray, points: List<Pair<Float, Float>>) {
+                    val properties = ids.map { id -> MotionEvent.PointerProperties().apply {
+                        this.id = id; toolType = MotionEvent.TOOL_TYPE_FINGER
+                    } }.toTypedArray()
+                    val coordinates = points.map { (px, py) -> MotionEvent.PointerCoords().apply {
+                        this.x = px; this.y = py; pressure = 1f; size = 1f
+                    } }.toTypedArray()
+                    val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action,
+                        ids.size, properties, coordinates, 0, 0, 1f, 1f, 0, 0,
+                        InputDevice.SOURCE_TOUCHSCREEN, 0)
+                    try { check(automation.injectInputEvent(event, true)) } finally { event.recycle() }
+                }
+                val first = endX to endY
+                val second = endX + 80f to endY + 20f
+                multi(MotionEvent.ACTION_POINTER_DOWN or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
+                    intArrayOf(0, 1), listOf(first, second))
+                SystemClock.sleep(100)
+                multi(MotionEvent.ACTION_POINTER_UP, intArrayOf(0, 1), listOf(first, second))
+                SystemClock.sleep(100)
+                multi(MotionEvent.ACTION_MOVE, intArrayOf(1), listOf(second.first + 10f to second.second))
+                SystemClock.sleep(100)
+                multi(MotionEvent.ACTION_UP, intArrayOf(1), listOf(second.first + 10f to second.second))
+            } else {
+                inject(if (command.optBoolean("cancel")) MotionEvent.ACTION_CANCEL else MotionEvent.ACTION_UP, endX, endY)
+            }
+            pressed = false
+        } finally {
+            if (pressed) runCatching { inject(MotionEvent.ACTION_CANCEL, endX, endY) }
+            progress("finished")
         }
     }
 
