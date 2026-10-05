@@ -13,6 +13,15 @@ reference regeneration, or changes to the complete/signoff previews.
 The visible launcher header and dock remain mounted through Home/Apps/Tools.
 The three tab containers remain mounted and use 160 ms horizontal transitions.
 Visited tab content is retained; local app/tool drill-ins use their tab's history.
+Apps projects installed app tiles without the separate Options controls or the
+duplicate builtin Tools tile; Tools remains in the footer dock. A regular tap
+launches an installed app's existing handoff simulation. Touch/pointer hold
+(550 ms within 10 browser CSS pixels), right-click, or focused Shift+F10/Menu key
+opens the frozen renderer's existing app action dialog. A recognized hold
+suppresses its release click. Movement, scrolling, release, pointer cancellation,
+another contact, navigation, window focus loss, or page visibility changes cancel a
+pending hold. Touch scrolling remains enabled. These refinements apply only to
+the projected Apps page; other categories and Options settings remain available.
 Alarm, countdowns, intercom, stories, timers, notes, converter, ISS, aurora and
 speed details render in the Tools content area. Cameras and Lamp mark their
 fullscreen handoffs. Photos, Music and other fullscreen destinations mark their
@@ -56,4 +65,8 @@ Run the isolated browser checks with a local Playwright installation:
 PLAYWRIGHT_MODULE=/path/to/playwright node mocks/portal-plus-navigation-live/verify.browser.cjs
 ```
 
+The gate retains the original 39 navigation checks and adds isolated pointer,
+real touch, keyboard, cancellation, Apps projection and dock assertions. It prints
+the passed count and browser errors, including console and failed-request errors.
+Scroll checks constrain the short sample Apps grid to exercise actual overflow.
 The checks do not write screenshots, reports, references, or approved files.

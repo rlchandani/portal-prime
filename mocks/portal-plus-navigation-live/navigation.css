@@ -46,6 +46,12 @@ body { background: #101c22; }
 .native-tab-panel > .detail-body {
   height: auto; min-height: 0; flex: 1; padding: 24px 56px 32px;
 }
+.live-launcher [data-tab="apps"] .app-tile[data-live-app-menu] {
+  touch-action: pan-y pinch-zoom;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 .live-settings .settings-layout { height: 1176px; }
 .live-settings .settings-sidebar { height: 1176px; }
 .live-detail-stage { position: relative; overflow: hidden; }

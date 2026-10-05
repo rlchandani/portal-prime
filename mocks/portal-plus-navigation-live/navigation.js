@@ -47,6 +47,10 @@
   let activityReturn = null;
   let exitingActivity = null;
   const activityHistory = [];
+  const appHoldDelay = 550;
+  const appHoldSlop = 10; // Browser CSS pixels, independent of the scaled Portal canvas.
+  let appHold = null;
+  let suppressedAppClick = null;
 
   const routeKey = route => `${route.category}/${route.screen}`;
   const routeTitle = route => route.screen === 'settings'
@@ -137,6 +141,19 @@
     const source = main.querySelector('.home-body,.screen-body,.detail-body');
     if (!source) throw new Error(`No approved fixture content for ${route.screen}`);
     const content = source.cloneNode(true);
+    if (route.screen === 'apps') {
+      // Refine only the projected Apps HTML. The approved fixture stays read-only.
+      content.querySelectorAll('.app-with-menu').forEach(wrapper => {
+        const tile = wrapper.querySelector('.app-tile[data-action="launch"]');
+        const menu = wrapper.querySelector('[data-action="app-menu"]');
+        if (!tile || menu?.dataset.pkg !== tile.dataset.pkg) return;
+        tile.dataset.liveAppMenu = '';
+        tile.setAttribute('aria-haspopup', 'dialog');
+        tile.setAttribute('aria-description', 'Touch and hold or right-click for app actions. Keyboard: Shift+F10 or Menu key.');
+        wrapper.replaceWith(tile);
+      });
+      content.querySelector('.app-grid .app-tile[data-screen="tools"]')?.remove();
+    }
     if (route.screen !== 'home') {
       const originalBack = content.querySelector(':scope > [data-screen="settings"]');
       originalBack?.remove();
@@ -157,6 +174,7 @@
     if (force || panel.signature !== signature) {
       const focus = captureFocus();
       if (routeKey(panel.route || route) === routeKey(route)) saveScroll(panel);
+      if (appHold && panel.node.contains(appHold.tile)) cancelAppHold();
       panel.node.replaceChildren(content);
       panel.signature = signature;
       panel.route = { ...route };
@@ -269,6 +287,7 @@
   function syncOverlays() {
     if (localSimulation) return;
     const sourceModal = staging.querySelector('.modal-layer');
+    if (sourceModal) cancelAppHold();
     const sourceToast = staging.querySelector('.toast');
     const hadModal = !!overlays.querySelector('.modal-layer');
     const focus = captureFocus();
@@ -417,6 +436,7 @@
   }
 
   function navigate(screen, category, options = {}) {
+    cancelAppHold();
     if (fullscreen.has(screen)) {
       return simulate(screen, 'Fullscreen handoff');
     }
@@ -452,6 +472,7 @@
   }
 
   function back() {
+    cancelAppHold();
     if (localSimulation) return closeSimulation();
     if (staging.querySelector('.modal-layer')) {
       renderer.showAction('close');
@@ -586,8 +607,55 @@
     }
   }
 
+  function appMenuTile(target) {
+    const tile = target?.closest?.('.app-tile[data-live-app-menu]');
+    return host === 'launcher' && activeTab === 'apps' && current.screen === 'apps' &&
+      tile && canvas.contains(tile) && !tile.disabled && !tile.closest('[hidden],[inert]') ? tile : null;
+  }
+
+  function cancelAppHold() {
+    if (appHold) clearTimeout(appHold.timer);
+    appHold = null;
+  }
+
+  function openAppMenu(tile) {
+    cancelAppHold();
+    // Use the frozen renderer's app-menu action and overlay/focus handling.
+    tile.focus({ preventScroll: true });
+    renderer.showAction('app-menu', { pkg: tile.dataset.pkg });
+    refreshFromSource();
+  }
+
+  function startAppHold(event) {
+    cancelAppHold(); // A second contact cancels the gesture.
+    if (!event.isPrimary || event.button !== 0) return;
+    suppressedAppClick = null; // A new gesture may activate a menu action or launch normally.
+    const tile = appMenuTile(event.target);
+    if (!tile) return;
+    const pending = { tile, pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+    appHold = pending;
+    pending.timer = setTimeout(() => {
+      if (appHold !== pending || !appMenuTile(tile)) return cancelAppHold();
+      suppressedAppClick = tile;
+      openAppMenu(tile);
+    }, appHoldDelay);
+    // No preventDefault or forced capture: native touch scrolling must remain available.
+  }
+
+  function moveAppHold(event) {
+    if (appHold?.pointerId === event.pointerId &&
+        Math.hypot(event.clientX - appHold.x, event.clientY - appHold.y) > appHoldSlop) cancelAppHold();
+  }
+
   function onClick(event) {
     const control = event.target.closest('button,[data-action]');
+    // A release can land on the newly opened overlay or on the tile after Escape.
+    // Keep suppression until the next pointerdown; keyboard menu actions still work.
+    if (suppressedAppClick && (event.detail > 0 || control === suppressedAppClick)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     if (!control || control.disabled) return;
     if (control.type === 'submit' && control.form && !control.dataset.action) return;
     if (control.dataset.liveAction) {
@@ -667,6 +735,23 @@
   const overlays = document.createElement('div');
   overlays.id = 'live-overlays';
   canvas.append(launcher, settings, overlays);
+  document.addEventListener('pointerdown', startAppHold, true);
+  canvas.addEventListener('contextmenu', event => {
+    const tile = appMenuTile(event.target);
+    if (!tile) return;
+    event.preventDefault();
+    suppressedAppClick = tile;
+    openAppMenu(tile);
+  });
+  document.addEventListener('pointermove', moveAppHold, true);
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    document.addEventListener(type, event => {
+      if (appHold?.pointerId === event.pointerId) cancelAppHold();
+    }, true);
+  }
+  document.addEventListener('scroll', cancelAppHold, true);
+  window.addEventListener('blur', cancelAppHold);
+  document.addEventListener('visibilitychange', cancelAppHold);
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('input', event => {
     if (event.target.type !== 'checkbox') forward(event.target, 'input');
@@ -682,6 +767,14 @@
     refreshFromSource();
   });
   document.addEventListener('keydown', event => {
+    const tile = appMenuTile(event.target);
+    if (tile && (event.key === 'Enter' || event.key === ' ')) suppressedAppClick = null;
+    if (tile && (event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10'))) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (!event.repeat) openAppMenu(tile);
+      return;
+    }
     if (event.key === 'Escape') {
       event.preventDefault();
       event.stopImmediatePropagation();

@@ -230,7 +230,7 @@ private fun ApprovedAppsContent(
           Spacer(Modifier.height(36.dp))
         }
       }
-      val builtins = if (!recent && folder == null && query.isBlank()) listOf("store" to "Immortal App Store", "tools" to "Tools", "music" to "Music", "calls" to "Calls", "settings" to "Settings") else emptyList()
+      val builtins = if (!recent && folder == null && query.isBlank()) listOf("store" to "Immortal App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") else emptyList()
       val otherFolders = if (!recent && folder == null && query.isBlank()) folderNames.filterNot { it == "Settings" } else emptyList()
       val tiles = shown.map { app -> AppsTileEntry(app.label, app = app) } + otherFolders.map { AppsTileEntry(it, folder = it) } + builtins.map { AppsTileEntry(it.second, builtin = it.first) }
       items(tiles.size, key = { index -> tiles[index].app?.component?.flattenToString() ?: "${tiles[index].builtin}:${tiles[index].folder}" }, contentType = { "app-tile" }) { index ->
@@ -314,25 +314,24 @@ private data class AppsTileEntry(val label: String, val app: AppItem? = null, va
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun InstalledAppTile(entry: AppsTileEntry, badge: Int, subtitle: String?, onOpen: () -> Unit, onOptions: () -> Unit) {
-  Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    Surface(color = IosCard, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, IosDivider)) {
-      Column(Modifier.widthIn(min = 150.dp).heightIn(min = 205.dp).combinedClickable(onClick = onOpen, onLongClick = { if (entry.app != null) onOptions() })
-          .padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-        BadgedBox(badge = { if (badge > 0) Badge { Text(if (badge > 9) "9+" else "$badge") } }) {
-          ApprovedAppsIcon(entry.app?.component?.packageName ?: "builtin:${entry.builtin ?: "folder"}", entry.label, 92.dp, entry.app?.icon)
-        }
-        Text(entry.label, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 14.dp))
-        if (subtitle != null) Text(subtitle, color = IosSecondary, fontSize = 20.sp, lineHeight = 28.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 7.dp))
+  Surface(color = IosCard, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, IosDivider)) {
+    Column(Modifier.widthIn(min = 150.dp).heightIn(min = 205.dp).combinedClickable(
+        onClick = onOpen, onLongClickLabel = "App actions",
+        onLongClick = if (entry.app != null) onOptions else null)
+        .padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+      BadgedBox(badge = { if (badge > 0) Badge { Text(if (badge > 9) "9+" else "$badge") } }) {
+        ApprovedAppsIcon(entry.app?.component?.packageName ?: "builtin:${entry.builtin ?: "folder"}", entry.label, 92.dp, entry.app?.icon)
       }
+      Text(entry.label, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 14.dp))
+      if (subtitle != null) Text(subtitle, color = IosSecondary, fontSize = 20.sp, lineHeight = 28.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 7.dp))
     }
-    if (entry.app != null) AppsMenuRow("Options", centered = true, onClick = onOptions)
   }
 }
 
 @Composable
-private fun AppsMenuRow(label: String, danger: Boolean = false, centered: Boolean = false, onClick: () -> Unit) {
+private fun AppsMenuRow(label: String, danger: Boolean = false, onClick: () -> Unit) {
   Text(label, color = if (danger) IosRed else IosBlue, fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium,
-      textAlign = if (centered) TextAlign.Center else TextAlign.Start,
+      textAlign = TextAlign.Start,
       modifier = Modifier.fillMaxWidth().heightIn(min = 68.dp).tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, onClick = onClick).padding(horizontal = 20.dp, vertical = 16.dp))
 }
 

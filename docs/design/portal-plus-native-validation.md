@@ -35,6 +35,9 @@ Portal+ runs Android 10/API 29 at 2160 × 1440 pixels and density 180, equivalen
 - Store/APK dock and search actions also return to the retained Home tabs.
   Repeated incoming search requests leave search open. Timer-dialog Back dismisses
   to Home; its explicit Tools action selects the retained Tools tab.
+- Apps no longer repeats an Options link beneath each installed app or a Tools
+  shortcut in its grid. A long press opens the existing app-action menu, with an
+  accessibility action label. The Tools dock entry and saved Home favorites remain.
 - Widgets remain draggable and resizable through the original saved layout.
   Device gestures changed Weather's order and row span, then restored all nine
   original widget identities, order and sizes. Photo long-press enters the editor.
@@ -115,7 +118,7 @@ Native device checks covered:
   stayed in the main Settings Activity. World clock, health, HA controls and
   Intercom panes also rendered there. No microphone session or HA discovery was
   started. Together with Store/APK/tab checks, 48 recorded functional assertions
-  passed on the final artifact.
+  passed on the expanded-routing artifact (`df4c6c28…`).
 - Store → Tools, Store → Apps, APK header search → Apps and repeated search requests
   returned to the original Home native window. Bedtime/Intercom tool navigation
   and Back also kept that window; Apps → Settings → Home selected actual Home.
@@ -153,19 +156,36 @@ and theme independence. Home/Apps/Tools stay dark; Settings appearance applies
 to its own panes and internal editors. The HA entity chooser is explicitly
 shown as a separate Activity simulation.
 
-All 39 isolated browser assertions passed with zero browser errors. The final
+All 65 isolated browser assertions passed with zero browser errors, including
+26 Apps gesture/grid regressions added after the original 39 checks. The final
 Home layout was also visually inspected. This preview uses the approved
 renderer and sample fixtures read-only; the 67 frozen mock hashes remain
 unchanged. It is a browser demonstration, not an Android emulator, live Portal
 connection, or proof of native frame timing and pixel parity.
 
+## Apps long-press refinement
+
+The debug build and test APK build passed after the Apps change; all 485 JVM
+tests passed with zero failures or errors. On the Portal+, 18 checks verified
+Options absence, one Tools entry in the dock across grid scrolling, retained
+Home window identity, long press opening the existing actions without launching
+VLC, dialog dismissal, movement without opening the menu, and dock navigation.
+Two additional checks verified a normal tap opening the existing Material Files
+app and Back returning to Apps. No favorite/folder edits, uninstall, or file
+operations were performed.
+
+The initial long-press test selected the search field because it shared the VLC
+label with the tile. Targeting the app tile and hiding the keyboard corrected
+the test; no product change was needed. The test-only observer was stopped after
+verification.
+
 ## Device performance evidence
 
 Current installed debug artifact:
-`df4c6c28de97f365e8dd89e3bf1d178c12dcc9314e80ba3ae89e9ae0206995ab`.
+`b06e44f6429ead9a77d26ae91ab92243eca5a77435013ee3deb175ff57df5f84`.
 Its APK hash was independently read from the device and matched the tested
-build. This artifact adds expanded local Settings routing, nested Back/Cancel,
-shared launcher return/search routes and internal window presentation after the
+build. This artifact adds the Apps long-press refinement, expanded local Settings
+routing, nested Back/Cancel, shared launcher return/search routes and internal window presentation after the
 measured Settings checkpoint. The table below records earlier artifacts, not a
 performance measurement of this final expanded-routing build.
 

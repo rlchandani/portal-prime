@@ -12,14 +12,19 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
   const browser = await chromium.launch({ headless: true, channel: 'chrome' });
   const checks = [];
   const errors = [];
+  const watchPage = page => {
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+    page.on('requestfailed', request => errors.push(`${request.failure()?.errorText} ${request.url()}`));
+    page.on('response', response => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
+  };
   try {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1020 } });
     const origin = process.env.DEMO_ORIGIN || 'http://127.0.0.1:8765';
     await context.route('**/*', route =>
       new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
     const page = await context.newPage();
-    page.on('pageerror', error => errors.push(error.message));
-    page.on('response', response => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
+    watchPage(page);
     await page.goto(`${origin}/portal-plus-navigation-live/`);
     await page.waitForFunction(() => !!window.__portalNavigationDemo);
     const root = page.locator('#navigation-device');
@@ -40,6 +45,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await click('.live-launcher > .dock [data-screen="apps"]');
     await page.evaluate(() => {
       const scroll = document.querySelector('[data-tab="apps"] .screen-body');
+      // The refined sample grid fits the Portal. Constrain it to exercise real overflow.
+      scroll.style.maxHeight = '620px';
       scroll.scrollTop = 260;
       window.appsScrollBefore = scroll.scrollTop;
       window.appsContentBefore = scroll;
@@ -261,9 +268,176 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await click('.live-launcher > .dock [data-screen="apps"]');
     check('reduced motion preserves navigation', (await state()).tab === 'apps');
     check('no document navigation or iframe route resets', await page.evaluate(() => auditNodes.document === document && document.querySelectorAll('iframe').length === 0));
+
+    // Fresh touch-capable context: the retained navigation checks above stay intact.
+    const touchContext = await browser.newContext({ viewport: { width: 1440, height: 1020 }, hasTouch: true });
+    await touchContext.route('**/*', route =>
+      new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+    const touchPage = await touchContext.newPage();
+    watchPage(touchPage);
+    await touchPage.goto(`${origin}/portal-plus-navigation-live/`);
+    await touchPage.waitForFunction(() => !!window.__portalNavigationDemo);
+    const touchRoot = touchPage.locator('#navigation-device');
+    const touchSettled = () => touchPage.waitForFunction(() =>
+      document.querySelector('#navigation-device').getAnimations({ subtree: true }).length === 0);
+    const touchClick = async selector => { await touchRoot.locator(selector).click(); await touchSettled(); };
+    await touchClick('.live-launcher > .dock [data-screen="apps"]');
+    await touchPage.evaluate(() => {
+      window.appLaunches = 0;
+      document.querySelector('[data-tab="apps"] .screen-body').style.maxHeight = '620px';
+      document.querySelector('#device').addEventListener('click', event => {
+        const data = event.target.closest('[data-action]')?.dataset;
+        if (data?.action === 'launch' || (data?.action === 'app-option' && data.name === 'Open')) appLaunches++;
+      }, true);
+    });
+    const appSelector = '[data-tab="apps"] .app-tile[data-action="launch"][data-pkg="org.chromium.chrome"]';
+    const tile = touchRoot.locator(appSelector);
+    const modal = touchRoot.locator('#live-overlays .modal');
+    const launchCount = () => touchPage.evaluate(() => appLaunches);
+    const menuOptions = () => modal.locator('[data-action="app-option"]').allTextContents();
+    const expectedOptions = ['Open', 'App info', 'Close (free up memory)', 'Uninstall'];
+    const waitForMenu = () => touchPage.waitForFunction(() =>
+      !!document.querySelector('#live-overlays [data-action="app-option"]'), null, { timeout: 2000 });
+    const dismiss = async () => { await touchPage.keyboard.press('Escape'); await touchSettled(); };
+    const center = async () => {
+      await tile.scrollIntoViewIfNeeded();
+      const box = await tile.boundingBox();
+      return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    };
+
+    const mousePoint = await center();
+    await touchPage.mouse.move(mousePoint.x, mousePoint.y);
+    await touchPage.mouse.down();
+    await waitForMenu();
+    check('pointer hold opens the existing app menu without launching',
+      await launchCount() === 0 && JSON.stringify(await menuOptions()) === JSON.stringify(expectedOptions));
+    // Dismiss while still pressed: release over the now-active tile must not launch it.
+    await dismiss();
+    await touchPage.mouse.up();
+    check('recognized hold suppresses release click even after menu dismissal',
+      await launchCount() === 0 && await modal.count() === 0);
+    await tile.click();
+    check('a fresh regular all-app click still launches once after a hold',
+      await launchCount() === 1 && await modal.locator('.external-note').count() === 1);
+    await dismiss();
+
+    check('Apps has no Options text or separate app-menu controls',
+      !/\bOptions\b/.test(await touchRoot.locator('[data-tab="apps"]').innerText()) &&
+      await touchRoot.locator('[data-tab="apps"] [data-action="app-menu"]').count() === 0);
+    check('Apps omits the duplicate Tools tile while retaining the footer Tools dock',
+      await touchRoot.locator('[data-tab="apps"] .app-grid [data-screen="tools"]').count() === 0 &&
+      await touchRoot.locator('.live-launcher > .dock [data-screen="tools"]').isVisible());
+
+    await tile.click({ button: 'right' });
+    check('desktop contextmenu opens the unchanged app actions without launch',
+      await launchCount() === 1 && JSON.stringify(await menuOptions()) === JSON.stringify(expectedOptions));
+    await dismiss();
+    check('menu dismissal restores focus to the installed app tile', await tile.evaluate(node => document.activeElement === node));
+    check('installed tiles expose accessible menu instructions',
+      await tile.getAttribute('aria-haspopup') === 'dialog' &&
+      /Shift\+F10/.test(await tile.getAttribute('aria-description')));
+    for (const key of ['Shift+F10', 'ContextMenu']) {
+      await tile.focus();
+      await touchPage.keyboard.press(key);
+      check(`${key} opens the existing app menu without launch`,
+        await launchCount() === 1 && JSON.stringify(await menuOptions()) === JSON.stringify(expectedOptions));
+      await dismiss();
+    }
+    await tile.focus();
+    await touchPage.keyboard.press('Enter');
+    check('keyboard Enter preserves regular app launch',
+      await launchCount() === 2 && await modal.locator('.external-note').count() === 1);
+    await dismiss();
+    await tile.focus();
+    await touchPage.keyboard.press('Shift+F10');
+    await touchClick('#live-overlays [data-action="app-option"][data-name="App info"]');
+    check('existing App info action retains its Android simulation',
+      /App info Browser/.test(await modal.innerText()) && await modal.locator('.external-note').count() === 1);
+    await dismiss();
+
+    // Real browser touch input includes compatibility click synthesis on touchEnd.
+    const cdp = await touchContext.newCDPSession(touchPage);
+    const touch = (type, points = []) => cdp.send('Input.dispatchTouchEvent', {
+      type, touchPoints: points.map((point, id) => ({ ...point, id, radiusX: 1, radiusY: 1, force: 1 })),
+    });
+    const touchPoint = await center();
+    await touch('touchStart', [touchPoint]);
+    await waitForMenu();
+    check('real touch hold opens the app action menu without launch',
+      await launchCount() === 2 && JSON.stringify(await menuOptions()) === JSON.stringify(expectedOptions));
+    await touch('touchEnd');
+    check('real touch release does not activate Open or launch the tile',
+      await launchCount() === 2 && JSON.stringify(await menuOptions()) === JSON.stringify(expectedOptions));
+    await dismiss();
+    await tile.tap();
+    check('a regular touch tap launches the installed app exactly once',
+      await launchCount() === 3 && await modal.locator('.external-note').count() === 1);
+    await dismiss();
+
+    // Each cancellation is followed by a full hold interval, catching stale timers.
+    const pointer = (type, extra = {}) => tile.dispatchEvent(type, {
+      pointerId: 71, pointerType: 'touch', isPrimary: true, button: 0,
+      clientX: touchPoint.x, clientY: touchPoint.y, bubbles: true, ...extra,
+    });
+    for (const reason of ['movement', 'scroll', 'pointercancel', 'release', 'navigation', 'blur', 'second pointer']) {
+      await pointer('pointerdown');
+      if (reason === 'movement') {
+        await pointer('pointermove', { clientX: touchPoint.x + 30 });
+        await pointer('pointermove'); // Returning to the origin must not restart the timer.
+      } else if (reason === 'scroll') {
+        await touchPage.evaluate(() => { document.querySelector('[data-tab="apps"] .screen-body').scrollTop += 80; });
+      } else if (reason === 'pointercancel') {
+        await pointer('pointercancel');
+      } else if (reason === 'release') {
+        await pointer('pointerup');
+      } else if (reason === 'navigation') {
+        await touchPage.evaluate(() => __portalNavigationDemo.navigate('tools', null, { switching: true }));
+      } else if (reason === 'blur') {
+        await touchPage.evaluate(() => window.dispatchEvent(new Event('blur')));
+      } else {
+        await pointer('pointerdown', { pointerId: 72, isPrimary: false });
+      }
+      await touchPage.waitForTimeout(750);
+      check(`${reason} cancels the pending app hold without a stale menu or launch`,
+        await modal.count() === 0 && await launchCount() === 3);
+      await pointer('pointerup');
+      if (reason === 'navigation') await touchClick('.live-launcher > .dock [data-screen="apps"]');
+    }
+
+    await touchPage.evaluate(() => {
+      window.touchCancellations = 0;
+      document.addEventListener('pointercancel', () => touchCancellations++, true);
+    });
+    const swipePoint = await center();
+    const beforeSwipe = await touchPage.evaluate(() => document.querySelector('[data-tab="apps"] .screen-body').scrollTop);
+    await touch('touchStart', [swipePoint]);
+    await touch('touchMove', [{ x: swipePoint.x, y: swipePoint.y - 100 }]);
+    await touch('touchMove', [{ x: swipePoint.x, y: swipePoint.y - 200 }]);
+    await touchPage.waitForTimeout(750);
+    await touch('touchEnd');
+    check('real touch scrolling stays enabled and cancels hold without launch',
+      await touchPage.evaluate(before => touchCancellations > 0 &&
+        document.querySelector('[data-tab="apps"] .screen-body').scrollTop > before, beforeSwipe) &&
+      await modal.count() === 0 && await launchCount() === 3);
+
+    await touchPage.evaluate(() => { __portalMock.configure({ advanced: true }); });
+    await touchSettled();
+    check('Apps removals survive fixture refresh',
+      await touchRoot.locator('[data-tab="apps"] [data-action="app-menu"],[data-tab="apps"] .app-grid [data-screen="tools"]').count() === 0);
+    await touchPage.evaluate(() => __portalNavigationDemo.navigate('options'));
+    await touchSettled();
+    check('Options scanner in Settings remains available outside Apps',
+      await touchRoot.locator('.settings-pane:not([hidden]) [data-value="options.symbol"]').isVisible());
+    await touchPage.evaluate(() => __portalNavigationDemo.navigate('apps'));
+    await touchSettled();
+    await touchClick('.live-launcher > .dock [data-screen="tools"]');
+    check('preserved footer Tools dock still opens the Tools category',
+      await touchPage.evaluate(() => __portalNavigationDemo.getState().route.screen === 'tools') &&
+      await touchRoot.locator('[data-tab="tools"] [data-screen="alarm"]').isVisible());
+    await touchContext.close();
     assert.deepEqual(errors, [], 'browser errors');
-    console.log(JSON.stringify({ passed: checks.length, checks, browserErrors: errors }, null, 2));
   } finally {
+    console.log(JSON.stringify({ passed: checks.length, checks, browserErrors: errors }, null, 2));
     await browser.close();
   }
 })().catch(error => { console.error(error.stack); process.exitCode = 1; });
