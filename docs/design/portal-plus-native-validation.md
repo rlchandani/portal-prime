@@ -144,6 +144,21 @@ The test-only observer includes the app's separate Compose popup windows.
 It is stopped for all performance measurements. Raw UI, images and app backups
 remain private local artifacts and are excluded from Git.
 
+## Additive browser navigation preview
+
+The local preview at
+<http://127.0.0.1:8765/portal-plus-navigation-live/> demonstrates retained
+launcher tabs, the Settings shell, nested Back/Cancel, separate internal handoffs
+and theme independence. Home/Apps/Tools stay dark; Settings appearance applies
+to its own panes and internal editors. The HA entity chooser is explicitly
+shown as a separate Activity simulation.
+
+All 39 isolated browser assertions passed with zero browser errors. The final
+Home layout was also visually inspected. This preview uses the approved
+renderer and sample fixtures read-only; the 67 frozen mock hashes remain
+unchanged. It is a browser demonstration, not an Android emulator, live Portal
+connection, or proof of native frame timing and pixel parity.
+
 ## Device performance evidence
 
 Current installed debug artifact:
