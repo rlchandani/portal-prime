@@ -116,7 +116,7 @@ internal fun ApprovedAppsDock(selected: String, onExit: () -> Unit, modifier: Mo
             .background(if (active) LocalApprovedPalette.current.selected else Color.Transparent)
             .tvFocusable(RoundedCornerShape(18.dp), focusScale = 1f) {
               if (!active) when (id) {
-                "home" -> { context.startActivity(Intent(context, HomeActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)); onExit() }
+                "home" -> { context.startActivity(Intent(context, HomeActivity::class.java).putExtra("approved_home_tab", "home").addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)); onExit() }
                 "apps" -> { context.startActivity(Intent(context, AppSwitcherActivity::class.java).putExtra("approved_all_apps", true)); onExit() }
                 "photos" -> context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
                 "tools" -> { context.startActivity(Intent(context, ToolsActivity::class.java)); onExit() }

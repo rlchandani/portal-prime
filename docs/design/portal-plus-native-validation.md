@@ -93,6 +93,9 @@ Native device checks covered:
 - Appearance → Display → Back, Appearance → Wallpaper and sidebar category
   changes kept the same Settings Activity and native window. These checks verify
   continuity; they do not establish frame-time acceptance.
+- Opening Settings from Apps and selecting its Home button returned to the
+  actual Home tab. The final installed build displayed native Display controls,
+  kept Advanced off, and preserved the original nine widget placements.
 - Cached scalar-pane revisits after more than four routes, Display's Night Shift
   parent gate and its dependent rows, retained Notes navigation, and the enlarged
   resize handle passed. Original Night Shift, Advanced and widget values were
@@ -121,7 +124,10 @@ remain private local artifacts and are excluded from Git.
 ## Device performance evidence
 
 Current installed debug artifact:
-`93a6c45d75cf514bf26737ca2b4e821bad73385302486edab9fd5445535fcb44`.
+`cb39edab904de901c3ba8e6f0ffe240a0d0bd08facd56e875b3ebbb1120c72a1`.
+Its APK hash was independently read from the device and matched the tested
+build. This artifact adds explicit Home-tab selection to the two Home return
+buttons after the measured Settings checkpoint.
 
 Warmed navigation and scrolling measurements are recorded separately from
 functional tests. Zero-frame/static-page samples do not establish smoothness.
@@ -137,7 +143,7 @@ the initial native window identity before every tap. Each result below has
 |---|---:|---:|---:|
 | `21a12d44…` Settings, rebuilding details | 9.63 | 76.77 | 128.41 |
 | `ec3d8af8…` Settings, retained panes + Display IO | 10.44 | 40.93 | 52.17 |
-| `93a6c45d…` Installed checkpoint, Settings | 10.65 | 34.14 | 46.12 |
+| `93a6c45d…` Measured checkpoint, Settings | 10.65 | 34.14 | 46.12 |
 | `7f9a9065…` Home widget paging | 44.76 | 58.75 | 66.43 |
 | `7f9a9065…` Home/Apps/Tools tabs | 14.90 | 62.14 | 77.39 |
 
@@ -145,7 +151,7 @@ The earlier tab candidate measured p95 45.46 ms, so removing inventory reloads
 has not established a frame-time improvement; the later run's tails were worse.
 These are individual trials, not a pooled percentile or a matched old/new
 launcher benchmark. All remain above the 16.67 ms screening budget at an assumed
-60 Hz. The installed checkpoint passed 65 same-window Settings roundtrips; its
+60 Hz. The measured `93a6c45d…` checkpoint passed 65 same-window Settings roundtrips; its
 APK hash was independently read from the device and matched the tested build.
 The inspected recent crash buffer contained no launcher process crash entry.
 

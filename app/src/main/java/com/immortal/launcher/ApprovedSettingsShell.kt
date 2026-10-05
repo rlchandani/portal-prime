@@ -179,6 +179,7 @@ internal fun ApprovedSettingsShell(
             ) {
                 ApprovedSettingsBackButton("Home") {
                     context.startActivity(Intent(context, HomeActivity::class.java)
+                        .putExtra("approved_home_tab", "home")
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
                     (context as? Activity)?.finish()
                 }
