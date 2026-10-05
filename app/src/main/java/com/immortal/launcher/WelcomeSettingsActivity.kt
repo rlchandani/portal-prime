@@ -271,7 +271,7 @@ internal fun WelcomeSettingsContent() {
         ) {
           Text(
               "Preview welcome overlay",
-              color = Color.White,
+              color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
               fontSize = 24.sp,
               fontWeight = FontWeight.SemiBold,
               textAlign = TextAlign.Center,

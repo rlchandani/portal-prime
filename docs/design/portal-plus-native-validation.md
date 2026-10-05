@@ -18,15 +18,23 @@ Portal+ runs Android 10/API 29 at 2160 × 1440 pixels and density 180, equivalen
 - Advanced settings and settings appearance are registry-bound preferences.
   Advanced defaults off; hiding technical controls does not disable configured
   features. Search retains parent/hardware prerequisites and explicit consent.
-- Scalar settings use local routes in one Settings Activity. The sidebar/header
-  remain fixed while the detail pane transitions in 160 ms. Rich editors keep
-  Activity navigation. System settings, installed applications,
+- Ordinary settings and 24 additional existing editor/control bodies use local
+  routes in one Settings Activity. Screensaver, its source/style/face selection,
+  clock, sounds, wake/sleep, widget collections and connection controls share the
+  fixed sidebar/header and 160 ms detail transition. Nested Back returns to its
+  parent and editor Cancel leaves the local pane. Source credential/URL/folder
+  forms retain their Activity wrappers, with a 160 ms internal handoff fade and
+  disabled black starting-window preview. System settings, installed applications,
   provider widgets and external dashboards remain real native handoffs.
 - Home uses the bounded card layout, compact favorites and a separate dock.
   Home, Apps and Tools now share HomeActivity, the Home palette and a 160 ms
   horizontal transition. Visited tabs retain UI state; inactive tabs lose input
   and drop to CREATED lifecycle state. Photos remains a full-screen handoff.
-  Every Apps entry point uses the same embedded Apps screen.
+  Home and shared dock/search entries use the same embedded Apps screen;
+  standalone Recents remains available from outside the launcher.
+- Store/APK dock and search actions also return to the retained Home tabs.
+  Repeated incoming search requests leave search open. Timer-dialog Back dismisses
+  to Home; its explicit Tools action selects the retained Tools tab.
 - Widgets remain draggable and resizable through the original saved layout.
   Device gestures changed Weather's order and row span, then restored all nine
   original widget identities, order and sizes. Photo long-press enters the editor.
@@ -64,7 +72,12 @@ request. Multi-feed/entity/option-page loaders check cancellation between reads.
 Settings compose individual visible specs as lazy items with stable identities.
 The main host retains at most four visited scalar panes. Each pane keeps its own
 route and scroll state; inactive panes lose semantics/input and their lifecycle
-drops to CREATED. Display reads permission, brightness, volume and Night Shift
+drops to CREATED. Formerly standalone rich bodies dispose immediately when
+navigation leaves them, releasing request, polling, TTS and audio ownership.
+Only route metadata is retained in a bounded 32-entry history; Activity recreation
+restores that history without storing credential drafts. Screensaver reuses its
+single lazy list, and its initial focus request runs after the row mounts.
+Display reads permission, brightness, volume and Night Shift
 as one snapshot on IO, with stale-read protection around newer user edits.
 The Apps tab refreshes inventory on host resume/package changes rather than every
 tab activation, while favorite assignments and badges refresh on activation.
@@ -75,7 +88,7 @@ and animated scaling remain available.
 
 ## Verification
 
-The complete debug build and test APK build passed. All **478 JVM tests** passed,
+The complete debug build and test APK build passed. All **485 JVM tests** passed,
 with zero failures or errors. The frame probe's 14 offline checks and the icon
 generator's 12 tests passed. Icon generation also matched all six frozen input
 hashes. Independent review drove corrections to catalog delivery, transport
@@ -96,6 +109,16 @@ Native device checks covered:
 - Opening Settings from Apps and selecting its Home button returned to the
   actual Home tab. The final installed build displayed native Display controls,
   kept Advanced off, and preserved the original nine widget placements.
+- The expanded continuity check passed for Sounds, Welcome, Sunrise, Alarm,
+  Sleep, Screensaver, Digital Clock, and nested Style/Clock face/Photo source
+  navigation with parent Back. Collection-editor and HA connection-form Cancel
+  stayed in the main Settings Activity. World clock, health, HA controls and
+  Intercom panes also rendered there. No microphone session or HA discovery was
+  started. Together with Store/APK/tab checks, 48 recorded functional assertions
+  passed on the final artifact.
+- Store → Tools, Store → Apps, APK header search → Apps and repeated search requests
+  returned to the original Home native window. Bedtime/Intercom tool navigation
+  and Back also kept that window; Apps → Settings → Home selected actual Home.
 - Cached scalar-pane revisits after more than four routes, Display's Night Shift
   parent gate and its dependent rows, retained Notes navigation, and the enlarged
   resize handle passed. Original Night Shift, Advanced and widget values were
@@ -124,10 +147,12 @@ remain private local artifacts and are excluded from Git.
 ## Device performance evidence
 
 Current installed debug artifact:
-`cb39edab904de901c3ba8e6f0ffe240a0d0bd08facd56e875b3ebbb1120c72a1`.
+`df4c6c28de97f365e8dd89e3bf1d178c12dcc9314e80ba3ae89e9ae0206995ab`.
 Its APK hash was independently read from the device and matched the tested
-build. This artifact adds explicit Home-tab selection to the two Home return
-buttons after the measured Settings checkpoint.
+build. This artifact adds expanded local Settings routing, nested Back/Cancel,
+shared launcher return/search routes and internal window presentation after the
+measured Settings checkpoint. The table below records earlier artifacts, not a
+performance measurement of this final expanded-routing build.
 
 Warmed navigation and scrolling measurements are recorded separately from
 functional tests. Zero-frame/static-page samples do not establish smoothness.

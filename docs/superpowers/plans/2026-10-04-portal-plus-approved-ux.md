@@ -17,32 +17,33 @@ on its 2160 × 1440 display at density 180 (1920 × 1280 dp).
   Apps or Tools select those tabs. Photos opens full-screen.
 - Widgets remain draggable and resizable, with layouts saved through the
   existing `HomeWidgetStore` and its persisted model.
-- Settings navigation from Appearance to Display stays in the same detail
+- Ordinary Settings navigation, including Screensaver, clock/style/source
+  selection, sounds, wake/sleep, widget editors and connection controls, stays in the same detail
   pane and window. Keep the shared sidebar and header fixed; animate only
   the detail content for 160 ms.
-- Rich editors, system screens and third-party handoffs remain Activities.
-  Rich settings editors continue to use registry `NavSpec` entries, following
-  the repository settings rule.
+- Existing bodies and registry `NavSpec` declarations are reused. Activity
+  wrappers remain available for direct entry; source credential forms, URL/folder
+  pickers, system screens and third-party handoffs retain Activity boundaries.
+  Remaining internal UI handoffs use a 160 ms fade without a black launch preview.
+- Store/APK dock and search returns select Home's retained Apps/Tools tabs.
+  Nested Settings Back returns to the actual parent; Cancel leaves the editor.
+- A separate browser navigation demonstration may be added alongside the
+  frozen approved mock, without changing its files or references.
 
 ## Constraints
 
-- Keep the frozen 67 mocks and 795 references intact; no browser edits.
+- Keep the frozen 67 mocks and 795 references intact.
 - Preserve widget identities, configured services, photo sources and credentials.
 - Keep validation and side effects in the existing settings domains.
 - Advanced is presentation only; disabling it must not disable configured features.
-- Keep rich editors as Activities and retain Android/third-party handoffs.
+- Preserve existing editor logic and Activity entry points; retain Android/third-party handoffs.
 - Use native Roboto, solid surfaces and native Compose controls.
 - Never publish private device data or signing material.
 
-This checkpoint is documentation only: edit this plan alone. Do not edit
-`docs/design/portal-plus-native-validation.md` or
-`docs/superpowers/plans/portal-plus-performance-audit.md`, change code or mocks,
-operate the device, or stage, commit or otherwise modify Git state.
+## Native architecture and progress
 
-## Native architecture and reported progress
-
-The following records the latest supplied implementation status; this
-documentation update does not independently run the app or repeat its test gate.
+Verification and artifact-specific limits are recorded in
+`docs/design/portal-plus-native-validation.md`.
 
 - `ApprovedLauncherTabs.kt` retains visited Home/Apps/Tools tabs. Hidden pages
   have lifecycle state `CREATED`, stopping refresh, recording and Back handling.
@@ -50,23 +51,24 @@ documentation update does not independently run the app or repeat its test gate.
   composition.
 - `AppSwitcherActivity` and `ToolsActivity` expose embedded screen APIs for
   the launcher host. All Home Apps/Tools entries now select local tabs.
-- `ImmortalSettingsActivity` owns simple settings routes through
+- `ImmortalSettingsActivity` owns local settings routes through
   `ApprovedSettingsRoute` and `LocalApprovedSettingsNavigate`. The shared shell
-  keeps the sidebar and header fixed; `AnimatedContent` wraps only the detail
-  pane with a 160 ms transition. Rich editors and external handoffs retain
-  their Activity boundaries.
+  keeps the sidebar and header fixed. Bounded retained panes animate their
+  graphics layers for 160 ms. Rich bodies dispose when navigation leaves them,
+  releasing TTS, polling and request ownership. A bounded route history preserves
+  nested Back behavior and survives Activity recreation without saving credentials.
 - The widget editor retains the existing persisted model and drag/resize
   behavior. Performance changes retain a bounded three-widget-page working
   set and cache data according to the Home-tab lifecycle and refresh deadlines.
-  Actual gesture and end-to-end verification remain ongoing.
-- The latest reported JVM gate passed **478 tests**. This does not establish
+  Actual drag/resize gestures preserved the original layout after restoration.
+- The latest JVM gate passed **485 tests**. This does not establish
   native interaction acceptance or performance completion.
 - **Performance is not complete.** The previous installed debug artifact
   measured Home-page p95 at **62.88 ms**. This is historical evidence for that
   artifact, not certification of the latest implementation; current frame
   evidence remains ongoing.
-- The frozen **67 mocks / 795 references** remain unchanged, with no browser
-  edits. Native acceptance must be established on the implemented screens.
+- The frozen **67 mocks / 795 references** remain unchanged. An additive navigation
+  demo demonstrates shell continuity; native acceptance remains a device check.
 
 ## Parallel work and interfaces
 

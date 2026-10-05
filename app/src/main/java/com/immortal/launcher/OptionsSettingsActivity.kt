@@ -6,7 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,8 +30,8 @@ class OptionsSettingsActivity : ComponentActivity() {
 
 @Composable
 private fun OptionsSettingsScreen() {
-    val activity = LocalContext.current as? Activity
-    SettingsScaffold(title = "Options scanner", onBack = { activity?.finish() }) { OptionsSettingsContent() }
+    val onBack = rememberApprovedSettingsBack()
+    SettingsScaffold(title = "Options scanner", onBack = onBack) { OptionsSettingsContent() }
 }
 
 @Composable
@@ -42,6 +41,7 @@ internal fun OptionsSettingsContent() {
         return
     }
     val context = LocalContext.current
+    val onBack = rememberApprovedSettingsBack()
     var tickers by remember { mutableStateOf(OptionsScanConfig.tickers(context)) }
     var manual by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(OptionsScanConfig.type(context)) }
@@ -78,7 +78,7 @@ internal fun OptionsSettingsContent() {
         }
         ApprovedEditorsForm(actions = {
             ApprovedEditorsActions(error = error, onCancel = {
-                restoreDraft(); (context as? Activity)?.finish()
+                restoreDraft(); onBack()
             }) {
                 if (manual.isBlank()) error = "Enter a symbol."
                 else if (saveScan()) {

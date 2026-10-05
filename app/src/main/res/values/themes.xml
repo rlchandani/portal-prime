@@ -12,6 +12,20 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
+    <!-- Internal handoffs keep the previous surface until Compose draws, then fade.
+         Home, ambient previews, alarms and external applications keep their own policy. -->
+    <style name="Theme.SampleApp.Navigation" parent="Theme.SampleApp">
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowAnimationStyle">@style/Animation.Immortal.Navigation</item>
+    </style>
+
+    <style name="Animation.Immortal.Navigation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/portal_navigation_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/portal_navigation_stay</item>
+        <item name="android:activityCloseEnterAnimation">@anim/portal_navigation_stay</item>
+        <item name="android:activityCloseExitAnimation">@anim/portal_navigation_exit</item>
+    </style>
+
     <!-- Translucent variant for "folder"-style overlay activities (e.g. Tools): the window has a
          transparent background so the activity's own Compose scrim + floating card show over the
          home screen behind it, like opening an iOS folder. -->

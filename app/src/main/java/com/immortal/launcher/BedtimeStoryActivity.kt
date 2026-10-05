@@ -40,10 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.util.Locale
 
@@ -85,12 +88,13 @@ private fun BedtimeScreen() {
 
 /**
  * The bedtime picker + reader, shared by the standalone [BedtimeScreen] and the in-page Tools
- * overlay. Owns the TTS engine (stopped + shut down on dispose). Fills its parent (the caller
- * supplies the dark card frame). [onExit] is called by Back when at the picker (top) level.
+ * overlay. Owns the TTS engine (stopped when hidden, shut down on dispose). The caller supplies
+ * the dark card frame. [onExit] is called by Back when at the picker (top) level.
  */
 @Composable
 internal fun BedtimeContent(onExit: () -> Unit) {
   val context = LocalContext.current
+  val owner = LocalLifecycleOwner.current
   var selected by remember { mutableStateOf<Stories.Story?>(null) }
   var speaking by remember { mutableStateOf(false) }
 
@@ -103,8 +107,21 @@ internal fun BedtimeContent(onExit: () -> Unit) {
     }
     engine
   }
-  DisposableEffect(Unit) {
+  DisposableEffect(tts) {
     onDispose { runCatching { tts?.stop(); tts?.shutdown() } }
+  }
+  DisposableEffect(owner, tts) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_STOP) {
+        runCatching { tts?.stop() }
+        speaking = false
+      }
+    }
+    owner.lifecycle.addObserver(observer)
+    onDispose {
+      owner.lifecycle.removeObserver(observer)
+      runCatching { tts?.stop() }
+    }
   }
 
   fun readAloud(story: Stories.Story) {

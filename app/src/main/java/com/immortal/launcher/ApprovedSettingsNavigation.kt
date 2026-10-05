@@ -31,6 +31,15 @@ internal data class ApprovedSettingsRoute(
 /** Only the main Settings host handles scalar routes in its existing detail pane. */
 internal val LocalApprovedSettingsNavigate =
     staticCompositionLocalOf<((ApprovedSettingsRoute) -> Unit)?> { null }
+internal val LocalApprovedSettingsBack = staticCompositionLocalOf<(() -> Unit)?> { null }
+
+/** Cancel leaves a local editor; standalone wrappers still finish their own Activity. */
+@Composable
+internal fun rememberApprovedSettingsBack(): () -> Unit {
+    val context = LocalContext.current
+    val local = LocalApprovedSettingsBack.current
+    return remember(context, local) { local ?: { (context as? Activity)?.finish(); Unit } }
+}
 
 internal fun approvedSettingsRoute(
     page: String,
@@ -95,23 +104,23 @@ internal data class ApprovedSettingsPage(
     val title: String,
     val category: String,
     val activity: Class<*>? = null,
+    val standaloneActivity: Class<*>? = activity,
 )
 
 /**
- * Only native destinations are listed. Rich editors keep their existing Activity, IDs,
- * validators, atomic credentials, asynchronous work and service behavior.
- * Scalar pages share the main Settings detail pane; rich editors retain Activity navigation.
+ * Existing Activity wrappers remain registered for direct/platform launches. A null activity
+ * renders the same existing body in Settings; standaloneActivity identifies registry NavSpecs.
  */
 internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("touch", "Touch sounds", "sound"),
     ApprovedSettingsPage("display", "Display", "appearance"),
     ApprovedSettingsPage("appearance", "App appearance", "appearance"),
     ApprovedSettingsPage("wallpaper", "Wallpaper", "appearance"),
-    ApprovedSettingsPage("screensaver", "Photos & screensaver", "photos", ScreensaverSettingsActivity::class.java),
-    ApprovedSettingsPage("sources", "Photo sources", "photos", ScreensaverSourcesActivity::class.java),
-    ApprovedSettingsPage("styles", "Screensaver style", "photos", ScreensaverModeActivity::class.java),
-    ApprovedSettingsPage("faces", "Photo clock faces", "photos", FacePickerActivity::class.java),
-    ApprovedSettingsPage("clock", "Digital clock", "photos", ClockSettingsActivity::class.java),
+    ApprovedSettingsPage("screensaver", "Photos & screensaver", "photos", standaloneActivity = ScreensaverSettingsActivity::class.java),
+    ApprovedSettingsPage("sources", "Photo sources", "photos", standaloneActivity = ScreensaverSourcesActivity::class.java),
+    ApprovedSettingsPage("styles", "Screensaver style", "photos", standaloneActivity = ScreensaverModeActivity::class.java),
+    ApprovedSettingsPage("faces", "Photo clock faces", "photos", standaloneActivity = FacePickerActivity::class.java),
+    ApprovedSettingsPage("clock", "Digital clock", "photos", standaloneActivity = ClockSettingsActivity::class.java),
     ApprovedSettingsPage("dismiss", "Open when you tap to exit", "photos", ScreensaverDismissAppActivity::class.java),
     ApprovedSettingsPage("folder", "Choose photo folder", "photos", FolderPickerActivity::class.java),
     ApprovedSettingsPage("album", "Shared album link", "photos", AlbumUrlEntryActivity::class.java),
@@ -126,32 +135,32 @@ internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("weather", "Weather", "home"),
     ApprovedSettingsPage("calendar", "Calendar", "home"),
     ApprovedSettingsPage("calendar-url", "Calendar feed", "home", CalendarUrlEntryActivity::class.java),
-    ApprovedSettingsPage("world", "World clock", "home", WorldClockActivity::class.java),
-    ApprovedSettingsPage("countdowns", "Countdowns", "home", CountdownSettingsActivity::class.java),
+    ApprovedSettingsPage("world", "World clock", "home", standaloneActivity = WorldClockActivity::class.java),
+    ApprovedSettingsPage("countdowns", "Countdowns", "home", standaloneActivity = CountdownSettingsActivity::class.java),
     ApprovedSettingsPage("quickbar", "Quick buttons", "home"),
-    ApprovedSettingsPage("alarm", "Alarm", "sound", AlarmSettingsActivity::class.java),
-    ApprovedSettingsPage("crypto", "Crypto", "home", CryptoSettingsActivity::class.java),
-    ApprovedSettingsPage("todo", "To-do", "home", TodoSettingsActivity::class.java),
-    ApprovedSettingsPage("news", "News", "home", NewsSettingsActivity::class.java),
-    ApprovedSettingsPage("stocks", "Stocks", "home", StocksSettingsActivity::class.java),
+    ApprovedSettingsPage("alarm", "Alarm", "sound", standaloneActivity = AlarmSettingsActivity::class.java),
+    ApprovedSettingsPage("crypto", "Crypto", "home", standaloneActivity = CryptoSettingsActivity::class.java),
+    ApprovedSettingsPage("todo", "To-do", "home", standaloneActivity = TodoSettingsActivity::class.java),
+    ApprovedSettingsPage("news", "News", "home", standaloneActivity = NewsSettingsActivity::class.java),
+    ApprovedSettingsPage("stocks", "Stocks", "home", standaloneActivity = StocksSettingsActivity::class.java),
     // Alpaca is an atomic form within the existing Stocks editor.
-    ApprovedSettingsPage("alpaca", "Alpaca account", "home", StocksSettingsActivity::class.java),
-    ApprovedSettingsPage("options", "Options scanner", "home", OptionsSettingsActivity::class.java),
-    ApprovedSettingsPage("chime", "Sounds", "sound", ChimeSettingsActivity::class.java),
-    ApprovedSettingsPage("welcome", "Welcome greeting", "sound", WelcomeSettingsActivity::class.java),
-    ApprovedSettingsPage("sunrise", "Sunrise & wake", "sound", SunriseSettingsActivity::class.java),
+    ApprovedSettingsPage("alpaca", "Alpaca account", "home", standaloneActivity = StocksSettingsActivity::class.java),
+    ApprovedSettingsPage("options", "Options scanner", "home", standaloneActivity = OptionsSettingsActivity::class.java),
+    ApprovedSettingsPage("chime", "Sounds", "sound", standaloneActivity = ChimeSettingsActivity::class.java),
+    ApprovedSettingsPage("welcome", "Welcome greeting", "sound", standaloneActivity = WelcomeSettingsActivity::class.java),
+    ApprovedSettingsPage("sunrise", "Sunrise & wake", "sound", standaloneActivity = SunriseSettingsActivity::class.java),
     ApprovedSettingsPage("lamp", "Lamp", "sound", LampActivity::class.java),
-    ApprovedSettingsPage("multiroom", "Multi-room audio", "connections", MultiRoomActivity::class.java),
-    ApprovedSettingsPage("mqtt", "MQTT publishing", "connections", MqttActivity::class.java),
-    ApprovedSettingsPage("ha", "Home Assistant controls", "connections", HaSettingsActivity::class.java),
+    ApprovedSettingsPage("multiroom", "Multi-room audio", "connections", standaloneActivity = MultiRoomActivity::class.java),
+    ApprovedSettingsPage("mqtt", "MQTT publishing", "connections", standaloneActivity = MqttActivity::class.java),
+    ApprovedSettingsPage("ha", "Home Assistant controls", "connections", standaloneActivity = HaSettingsActivity::class.java),
     ApprovedSettingsPage("ha-entities", "Choose Home Assistant entities", "connections", HaSettingsActivity::class.java),
     ApprovedSettingsPage("ha-dashboard", "Home Assistant", "connections", HaDashboardActivity::class.java),
     ApprovedSettingsPage("phone", "Phone remote", "connections", RemotePairActivity::class.java),
-    ApprovedSettingsPage("intercom", "Intercom", "connections", IntercomActivity::class.java),
-    ApprovedSettingsPage("boot", "Start on boot", "device", BootAppsActivity::class.java),
+    ApprovedSettingsPage("intercom", "Intercom", "connections", standaloneActivity = IntercomActivity::class.java),
+    ApprovedSettingsPage("boot", "Start on boot", "device", standaloneActivity = BootAppsActivity::class.java),
     ApprovedSettingsPage("device", "Device name", "device"),
-    ApprovedSettingsPage("sleep", "Sleep timer", "device", SleepSettingsActivity::class.java),
-    ApprovedSettingsPage("health", "About & device health", "device", DeviceHealthActivity::class.java),
+    ApprovedSettingsPage("sleep", "Sleep timer", "device", standaloneActivity = SleepSettingsActivity::class.java),
+    ApprovedSettingsPage("health", "About & device health", "device", standaloneActivity = DeviceHealthActivity::class.java),
     ApprovedSettingsPage("apk", "Install an APK", "device", ApkBrowserActivity::class.java),
     ApprovedSettingsPage("help", "Welcome to Immortal", "device", HelpActivity::class.java),
     ApprovedSettingsPage("speed", "Speed test", "connections"),
@@ -192,7 +201,7 @@ internal fun approvedCategoryIntent(context: Context, category: String) =
 internal fun approvedPageForHost(context: Context, title: String): String {
     (context as? Activity)?.intent?.getStringExtra(APPROVED_SETTINGS_PAGE)?.let { return it }
     val activity = context.javaClass
-    ApprovedSettingsPages.firstOrNull { it.activity == activity }?.let { return it.id }
+    ApprovedSettingsPages.firstOrNull { it.standaloneActivity == activity }?.let { return it.id }
     // The shared URL editor and Activity wrappers can have a context wrapper.
     return when (title.lowercase()) {
         "home assistant" -> "ha"

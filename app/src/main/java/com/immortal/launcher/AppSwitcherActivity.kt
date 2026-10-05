@@ -73,7 +73,8 @@ private data class AppItem(val label: String, val component: ComponentName, val 
 
 /**
  * Native installed-app page; an embedding Home host supplies its theme, header and dock.
- * Each changed positive [searchRequest] toggles search; [onSelectTab] routes embedded Tools to Home.
+ * [searchRequest] toggles search; [openSearchRequest] opens it for an incoming Home route.
+ * [onSelectTab] routes embedded Tools to Home.
  */
 @Composable
 internal fun ApprovedAppsScreen(
@@ -83,10 +84,11 @@ internal fun ApprovedAppsScreen(
     initiallyRecent: Boolean = false,
     initiallySearching: Boolean = false,
     searchRequest: Int = 0,
+    openSearchRequest: Int = 0,
     onSelectTab: ((String) -> Unit)? = null,
 ) {
   val content: @Composable () -> Unit = {
-    ApprovedAppsContent(onExit, modifier, embedded, initiallyRecent, initiallySearching, searchRequest, onSelectTab)
+    ApprovedAppsContent(onExit, modifier, embedded, initiallyRecent, initiallySearching, searchRequest, openSearchRequest, onSelectTab)
   }
   if (embedded) content() else PortalPrimeTheme(darkTheme = false) { content() }
 }
@@ -99,6 +101,7 @@ private fun ApprovedAppsContent(
     initiallyRecent: Boolean,
     initiallySearching: Boolean,
     searchRequest: Int,
+    openSearchRequest: Int,
     onSelectTab: ((String) -> Unit)?,
 ) {
   val context = LocalContext.current
@@ -150,6 +153,13 @@ private fun ApprovedAppsContent(
   }
   LaunchedEffect(searchRequest) {
     if (searchRequest > 0) searching = !searching
+  }
+  LaunchedEffect(openSearchRequest) {
+    if (openSearchRequest > 0) {
+      recent = false
+      folder = null
+      searching = true
+    }
   }
   LaunchedEffect(resume, refresh, pageActive, resumed) {
     if (!pageActive || !resumed) return@LaunchedEffect
@@ -371,13 +381,16 @@ private fun AppsDialog(title: String, onDismiss: () -> Unit, content: @Composabl
 }
 
 private fun launchApprovedIntent(context: Context, intent: Intent): Boolean = runCatching {
-  context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true
+  if (intent.component == ComponentName(context, StoreActivity::class.java))
+    context.startApprovedInternalActivity(intent)
+  else context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+  true
 }.getOrElse { Toast.makeText(context, "This app couldn’t be opened.", Toast.LENGTH_LONG).show(); false }
 
 private fun launchApprovedBuiltin(context: Context, id: String) {
   when (id) {
     "store" -> launchApprovedIntent(context, Intent(context, StoreActivity::class.java))
-    "tools" -> launchApprovedIntent(context, Intent(context, ToolsActivity::class.java))
+    "tools" -> context.openApprovedHomeTab(ApprovedLauncherTab.TOOLS)
     "settings" -> launchApprovedIntent(context, Intent(context, ImmortalSettingsActivity::class.java))
     "music" -> launchApprovedIntent(context, Intent(context, WebAppActivity::class.java).putExtra(WebAppActivity.EXTRA_URL, WebAppActivity.URL_YT_MUSIC))
     "calls" -> {

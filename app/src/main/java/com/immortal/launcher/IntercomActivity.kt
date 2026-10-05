@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,7 +31,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -200,7 +200,8 @@ private fun ActionButton(label: String, primary: Boolean, onClick: () -> Unit) {
       shape = RoundedCornerShape(14.dp),
       modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { onClick() },
   ) {
-    Text(label, color = Color.White, fontSize = Sizes.actionButton, fontWeight = FontWeight.SemiBold,
+    Text(label, color = if (primary) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onError,
+        fontSize = Sizes.actionButton, fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth())
   }
 }

@@ -64,7 +64,7 @@ private fun approvedPageForSpec(domain: String, spec: SettingSpec<*>): String? {
         else -> null
     }
     return if (activity != null) {
-        ApprovedSettingsPages.firstOrNull { it.activity == activity }?.id
+        ApprovedSettingsPages.firstOrNull { it.standaloneActivity == activity }?.id
     } else {
         approvedPageForControl(domain, spec.key)
     }

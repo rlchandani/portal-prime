@@ -6,7 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,9 +31,10 @@ class StocksSettingsActivity : ComponentActivity() {
         val account = intent.getStringExtra(APPROVED_SETTINGS_PAGE) == "alpaca"
         setContent {
             PortalPrimeTheme(darkTheme = false) {
-                SettingsScaffold(title = if (account) "Alpaca account" else "Stocks", onBack = { finish() }) {
+                val onBack = rememberApprovedSettingsBack()
+                SettingsScaffold(title = if (account) "Alpaca account" else "Stocks", onBack = onBack) {
                     if (account) {
-                        if (rememberApprovedAdvanced()) ApprovedEditorsAlpacaForm(onCancel = { finish() })
+                        if (rememberApprovedAdvanced()) ApprovedEditorsAlpacaForm(onCancel = onBack)
                         else ApprovedSettingsAdvancedGate(LocalApprovedEnableAdvanced.current)
                     } else StocksSettingsContent()
                 }
@@ -49,6 +49,7 @@ private val TICKER_SUGGESTIONS = listOf("AAPL", "MSFT", "NVDA", "GOOGL", "AMZN",
 @Composable
 internal fun StocksSettingsContent() {
     val context = LocalContext.current
+    val onBack = rememberApprovedSettingsBack()
     var tickers by remember { mutableStateOf(StocksConfig.load(context)) }
     var manual by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
@@ -61,7 +62,7 @@ internal fun StocksSettingsContent() {
         }
         ApprovedEditorsForm(actions = {
             ApprovedEditorsActions(error = error, onCancel = {
-                manual = ""; error = null; (context as? Activity)?.finish()
+                manual = ""; error = null; onBack()
             }) {
                 if (manual.isBlank()) error = "Enter a symbol."
                 else { StocksConfig.add(context, manual); manual = ""; error = null; refresh() }
@@ -93,14 +94,15 @@ internal fun StocksSettingsContent() {
     }
 }
 
-/** Credentials are a rich Activity destination; opening it never mutates the saved pair. */
+/** Opening the credentials editor uses the current Settings host and never mutates the saved pair. */
 @Composable
 internal fun AlpacaCredentialsCard() {
     val context = LocalContext.current
+    val navigate = rememberApprovedSettingsNavigator()
     if (rememberApprovedAdvanced()) {
         Card {
             NavRow("Alpaca account", value = if (AlpacaConfig.isConfigured(context)) "Credentials saved" else "Set up") {
-                context.startActivity(approvedSettingsIntent(context, "alpaca"))
+                navigate(approvedSettingsRoute("alpaca"))
             }
         }
     }

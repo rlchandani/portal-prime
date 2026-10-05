@@ -226,6 +226,12 @@ private fun <S> SettingControl(
     onApply: (String, Any) -> Unit,
 ) {
     val context = LocalContext.current
+    val navigate = rememberApprovedSettingsNavigator()
+    fun open(activity: Class<*>) {
+        val destination = ApprovedSettingsPages.firstOrNull { it.standaloneActivity == activity }
+        if (destination != null) navigate(approvedSettingsRoute(destination.id))
+        else context.startActivity(Intent(context, activity))
+    }
     val fullHelp = when (spec) {
         is BoolSpec<*> -> spec.help
         is EnumSpec<*> -> spec.help
@@ -260,7 +266,7 @@ private fun <S> SettingControl(
                 val entry = s.entry
                 if (entry is Entry.Nav) {
                     NavRow(s.title, s.get(snapshot).ifBlank { "Not set" }) {
-                        context.startActivity(Intent(context, entry.activity))
+                        open(entry.activity)
                     }
                 } else {
                     ApprovedStringSetting(s, s.get(snapshot), help) { onApply(s.key, it) }
@@ -269,7 +275,7 @@ private fun <S> SettingControl(
             is NavSpec<*> -> {
                 val s = spec as NavSpec<S>
                 NavRow(s.title, s.value(context, snapshot)) {
-                    context.startActivity(Intent(context, s.activity))
+                    open(s.activity)
                 }
             }
             is DerivedSpec<*> -> Unit

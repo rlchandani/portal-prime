@@ -6,7 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -39,14 +38,15 @@ private val FEED_SUGGESTIONS =
 
 @Composable
 private fun NewsSettingsScreen() {
-    val activity = LocalContext.current as? Activity
-    SettingsScaffold(title = "News", onBack = { activity?.finish() }) { NewsSettingsContent() }
+    val onBack = rememberApprovedSettingsBack()
+    SettingsScaffold(title = "News", onBack = onBack) { NewsSettingsContent() }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun NewsSettingsContent() {
     val context = LocalContext.current
+    val onBack = rememberApprovedSettingsBack()
     var feeds by remember { mutableStateOf(NewsConfig.load(context)) }
     var name by remember { mutableStateOf("") }
     var url by remember { mutableStateOf("") }
@@ -61,7 +61,7 @@ internal fun NewsSettingsContent() {
         }
         ApprovedEditorsForm(actions = {
             ApprovedEditorsActions(error = error, onCancel = {
-                name = ""; url = ""; error = null; (context as? Activity)?.finish()
+                name = ""; url = ""; error = null; onBack()
             }) {
                 if (!approvedEditorsHttpUrl(url)) error = "Enter a public http:// or https:// RSS / Atom URL."
                 else { NewsConfig.add(context, name, url); name = ""; url = ""; error = null; refresh() }

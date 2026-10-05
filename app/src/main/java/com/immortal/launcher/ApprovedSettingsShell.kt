@@ -103,6 +103,7 @@ private data class ApprovedSettingsDetail(
     val requested: String?,
     val lazy: ApprovedSettingsLazyDetail?,
     val content: @Composable () -> Unit,
+    val retainInactive: Boolean,
 )
 
 /** The same header/sidebar/detail pattern for the overview and native sub-settings. */
@@ -302,6 +303,7 @@ internal fun ApprovedSettingsShell(
                     gated = page != null && SettingsPresentation.isAdvancedPage(page) && !appliedAdvanced,
                     requested = LocalApprovedRequestedControl.current,
                     lazy = lazyDetail, content = content,
+                    retainInactive = page == null || approvedSettingsPage(page)?.standaloneActivity == null,
                 )
                 if (localNavigation) {
                     ApprovedSettingsDetailPanes(detail, Modifier.weight(1f).fillMaxHeight()) { consent = true }
@@ -360,7 +362,7 @@ private fun ApprovedSettingsDetailPanes(
         target.entering = true
         panes.filter { it !== target }.forEach { it.entering = false }
         // Moving a selected pane to the end makes this a bounded least-recently-used cache.
-        panes = (panes.filter { it !== target } + target).takeLast(4)
+        panes = (panes.filter { it !== target && it.detail.retainInactive } + target).takeLast(4)
         coroutineScope {
             panes.forEach { pane ->
                 launch { pane.opacity.animateTo(if (pane === target) 1f else 0f, tween(160)) }
@@ -369,23 +371,27 @@ private fun ApprovedSettingsDetailPanes(
     }
     Box(modifier.clipToBounds()) {
         panes.forEach { pane ->
-            key(pane.id) {
-                val active = pane.id == selected
-                Box(Modifier.fillMaxSize().zIndex(if (active) 1f else 0f)
-                    .graphicsLayer {
-                        val progress = pane.opacity.value
-                        alpha = progress
-                        translationX = (if (pane.entering) distance else -distance) * (1f - progress)
-                    }.focusProperties { canFocus = active }
-                    .then(if (active) Modifier else Modifier.clearAndSetSemantics { })
-                    .pointerInput(active) {
-                        if (!active) awaitPointerEventScope {
-                            while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
-                        }
-                    }) {
-                    CompositionLocalProvider(LocalApprovedLauncherPageActive provides active) {
-                        ApprovedLauncherPageLifecycle(active) {
-                            ApprovedSettingsDetailBody(pane.detail, Modifier.fillMaxSize(), onAdvanced)
+            val active = pane.id == selected
+            // Rich editors own TTS, HTTP requests, polling and drafts. Dispose them as soon
+            // as navigation leaves them rather than retaining those resources out of view.
+            if (active || pane.detail.retainInactive) {
+                key(pane.id) {
+                    Box(Modifier.fillMaxSize().zIndex(if (active) 1f else 0f)
+                        .graphicsLayer {
+                            val progress = pane.opacity.value
+                            alpha = progress
+                            translationX = (if (pane.entering) distance else -distance) * (1f - progress)
+                        }.focusProperties { canFocus = active }
+                        .then(if (active) Modifier else Modifier.clearAndSetSemantics { })
+                        .pointerInput(active) {
+                            if (!active) awaitPointerEventScope {
+                                while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
+                            }
+                        }) {
+                        CompositionLocalProvider(LocalApprovedLauncherPageActive provides active) {
+                            ApprovedLauncherPageLifecycle(active) {
+                                ApprovedSettingsDetailBody(pane.detail, Modifier.fillMaxSize(), onAdvanced)
+                            }
                         }
                     }
                 }

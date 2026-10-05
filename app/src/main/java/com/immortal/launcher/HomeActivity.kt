@@ -279,6 +279,7 @@ private val CALLS_COMPONENT = ComponentName("com.immortal.launcher", "__immortal
 class HomeActivity : ComponentActivity() {
   private var widgetLibraryRequest by mutableStateOf(0)
   private var launcherTab by mutableStateOf(ApprovedLauncherTab.HOME)
+  private var appsSearchOpenRequest by mutableStateOf(0)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -295,6 +296,7 @@ class HomeActivity : ComponentActivity() {
       PortalPrimeTheme(darkTheme = true) {
         LauncherScreen(
             widgetLibraryRequest = widgetLibraryRequest,
+            appsSearchOpenRequest = appsSearchOpenRequest,
             selectedTab = launcherTab,
             onSelectTab = { launcherTab = it },
             onLaunch = { cn ->
@@ -312,9 +314,7 @@ class HomeActivity : ComponentActivity() {
                 } else if (cn.packageName == packageName &&
                     cn.className == StoreActivity::class.java.name) {
                   // Our own App Store — explicit launch (same reasoning as settings).
-                  startActivity(
-                      Intent(this@HomeActivity, StoreActivity::class.java)
-                          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                  startActivity(Intent(this@HomeActivity, StoreActivity::class.java))
                 } else if (cn.packageName == packageName &&
                     cn.className == ToolsActivity::class.java.name) {
                   launcherTab = ApprovedLauncherTab.TOOLS
@@ -368,8 +368,13 @@ class HomeActivity : ComponentActivity() {
   }
 
   private fun consumeLauncherTabIntent(incoming: Intent) {
-    ApprovedLauncherTab.fromId(incoming.getStringExtra("approved_home_tab"))?.let { launcherTab = it }
-    incoming.removeExtra("approved_home_tab")
+    ApprovedLauncherTab.fromId(incoming.getStringExtra(APPROVED_HOME_TAB))?.let { launcherTab = it }
+    if (incoming.getBooleanExtra(APPROVED_HOME_SEARCH, false)) {
+      launcherTab = ApprovedLauncherTab.APPS
+      appsSearchOpenRequest++
+    }
+    incoming.removeExtra(APPROVED_HOME_TAB)
+    incoming.removeExtra(APPROVED_HOME_SEARCH)
   }
 
   /** Settings can open the same library without taking ownership of AppWidgetHost callbacks. */
@@ -1005,6 +1010,7 @@ private fun ApprovedHomeWidgetListening(host: AppWidgetHost) {
 @Composable
 private fun LauncherScreen(
     widgetLibraryRequest: Int,
+    appsSearchOpenRequest: Int,
     selectedTab: ApprovedLauncherTab,
     onSelectTab: (ApprovedLauncherTab) -> Unit,
     onLaunch: (ComponentName) -> Unit,
@@ -1221,6 +1227,7 @@ private fun LauncherScreen(
           ApprovedLauncherTab.APPS -> ApprovedAppsScreen(
               onExit = { onSelectTab(ApprovedLauncherTab.HOME) }, embedded = true,
               searchRequest = appsSearchRequest,
+              openSearchRequest = appsSearchOpenRequest,
               onSelectTab = { id -> ApprovedLauncherTab.fromId(id)?.let(onSelectTab) })
           ApprovedLauncherTab.TOOLS -> ApprovedToolsScreen(
               onExit = { onSelectTab(ApprovedLauncherTab.HOME) }, embedded = true)

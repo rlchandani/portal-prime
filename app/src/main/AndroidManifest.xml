@@ -152,7 +152,7 @@
             android:name=".StoreActivity"
             android:exported="false"
             android:label="App Store"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Fullscreen kiosk WebView for web apps with no installable Portal client
              (Music tile → YouTube Music PWA). URL comes via Intent extra; landscape,
@@ -180,38 +180,38 @@
             android:name=".ScreensaverSettingsActivity"
             android:exported="false"
             android:label="Screensaver"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Photo-source picker subpage (standard + advanced sources). -->
         <activity
             android:name=".ScreensaverSourcesActivity"
             android:exported="false"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Clock-face picker subpage (the FaceCatalog faces). -->
         <activity
             android:name=".FacePickerActivity"
             android:exported="false"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Screensaver render-style picker subpage (Classic / Shuffle / the 12 engine modes). -->
         <activity
             android:name=".ScreensaverModeActivity"
             android:exported="false"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "Control from your phone": pairing screen for the phone web remote. -->
         <activity
             android:name=".RemotePairActivity"
             android:exported="false"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Immortal-settings sub-screens (reached via a NavSpec from the registry-driven screen). -->
-        <activity android:name=".MultiRoomActivity" android:exported="false" android:theme="@style/Theme.SampleApp" />
-        <activity android:name=".MqttActivity" android:exported="false" android:theme="@style/Theme.SampleApp" />
-        <activity android:name=".DeviceHealthActivity" android:exported="false" android:theme="@style/Theme.SampleApp" />
-        <activity android:name=".WorldClockActivity" android:exported="false" android:theme="@style/Theme.SampleApp" />
-        <activity android:name=".BootAppsActivity" android:exported="false" android:theme="@style/Theme.SampleApp" />
+        <activity android:name=".MultiRoomActivity" android:exported="false" android:theme="@style/Theme.SampleApp.Navigation" />
+        <activity android:name=".MqttActivity" android:exported="false" android:theme="@style/Theme.SampleApp.Navigation" />
+        <activity android:name=".DeviceHealthActivity" android:exported="false" android:theme="@style/Theme.SampleApp.Navigation" />
+        <activity android:name=".WorldClockActivity" android:exported="false" android:theme="@style/Theme.SampleApp.Navigation" />
+        <activity android:name=".BootAppsActivity" android:exported="false" android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Countdown chips (birthdays, trips, holidays), opened from the Countdowns
              tile in the launcher's Settings folder. -->
@@ -219,49 +219,49 @@
             android:name=".CountdownSettingsActivity"
             android:exported="false"
             android:label="Countdowns"
-            android:theme="@style/Theme.SampleApp.Translucent" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "Crypto": tracked-coin editor for the crypto price home widget. -->
         <activity
             android:name=".CryptoSettingsActivity"
             android:exported="false"
             android:label="Crypto"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "To-Do": checklist editor for the local to-do home widget. -->
         <activity
             android:name=".TodoSettingsActivity"
             android:exported="false"
             android:label="To-Do"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "News": RSS/Atom feed editor for the news headlines home widget. -->
         <activity
             android:name=".NewsSettingsActivity"
             android:exported="false"
             android:label="News"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "Stocks": Alpaca credentials + ticker editor for the stocks home widget. -->
         <activity
             android:name=".StocksSettingsActivity"
             android:exported="false"
             android:label="Stocks"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "Options": Alpaca credentials + scanner config for the options home widget. -->
         <activity
             android:name=".OptionsSettingsActivity"
             android:exported="false"
             android:label="Options"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "Home Assistant": connection + entity picker for the HA control home widget. -->
         <activity
             android:name=".HaSettingsActivity"
             android:exported="false"
             android:label="Home Assistant"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Full-screen HA dashboard (mock 08 port). -->
         <activity
@@ -276,14 +276,14 @@
             android:name=".ChimeSettingsActivity"
             android:exported="false"
             android:label="Sounds"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "Sunrise alarm": gradual wake-light schedule + days. -->
         <activity
             android:name=".SunriseSettingsActivity"
             android:exported="false"
             android:label="Sunrise alarm"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Full-screen sunrise wake light, launched by SunriseReceiver at the alarm
              time; shows over the lock screen and turns the screen on. -->
@@ -300,7 +300,7 @@
             android:name=".AlarmSettingsActivity"
             android:exported="false"
             android:label="Alarm"
-            android:theme="@style/Theme.SampleApp.Translucent" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Full-screen ringing-alarm screen, launched by AlarmReceiver at the alarm time;
              shows over the lock screen and turns the screen on. -->
@@ -317,7 +317,7 @@
             android:name=".ClockSettingsActivity"
             android:exported="false"
             android:label="Clock"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Full-screen digital clock preview, opened from the Preview button in
              Clock settings. Excluded from recents. -->
@@ -346,14 +346,14 @@
             android:name=".WelcomeSettingsActivity"
             android:exported="false"
             android:label="Welcome"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "Sleep": screensaver sleep-timer + audio/app behaviour on sleep. -->
         <activity
             android:name=".SleepSettingsActivity"
             android:exported="false"
             android:label="Sleep"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Lamp mode: full-screen warm-white light panel. -->
         <activity
@@ -383,25 +383,25 @@
         <activity
             android:name=".ImmichConnectActivity"
             android:exported="false"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Connect an SMB / network share (NAS) as the screensaver source. -->
         <activity
             android:name=".SmbConnectActivity"
             android:exported="false"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Connect a WebDAV folder (NAS WebDAV / Nextcloud) as the screensaver source. -->
         <activity
             android:name=".DavConnectActivity"
             android:exported="false"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Render an arbitrary web page (Immich Kiosk, a dashboard) as the screensaver. -->
         <activity
             android:name=".WebUrlEntryActivity"
             android:exported="false"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Immortal's own settings (weather unit, home-screen forecast widget, tile
              size), opened from the Immortal tile in the launcher's Settings folder. -->
@@ -409,7 +409,7 @@
             android:name=".ImmortalSettingsActivity"
             android:exported="false"
             android:label="Immortal Settings"
-            android:theme="@style/Theme.SampleApp"
+            android:theme="@style/Theme.SampleApp.Navigation"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- Friendly, non-technical guided tour. Opened from the Help tile and once
@@ -418,7 +418,7 @@
             android:name=".HelpActivity"
             android:exported="false"
             android:label="Help"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- In-app folder browser for picking a screensaver source (the Portal has
              no system document picker), reachable from the screensaver settings. -->
@@ -426,7 +426,7 @@
             android:name=".FolderPickerActivity"
             android:exported="false"
             android:label="Choose a folder"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- App picker for "open this app when the screensaver is dismissed",
              reachable from the "When dismissed" row in screensaver settings. -->
@@ -434,7 +434,7 @@
             android:name=".ScreensaverDismissAppActivity"
             android:exported="false"
             android:label="Open when dismissed"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- One-field form for pasting a public iCloud / Google Photos shared-album
              link, reachable from the "Shared album link" row in screensaver settings. -->
@@ -443,7 +443,7 @@
             android:exported="false"
             android:label="Shared album link"
             android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- One-field form for pasting a public iCalendar (.ics) feed link from Google
              Calendar or Apple iCloud, reachable from the "Calendar" section in
@@ -453,14 +453,14 @@
             android:exported="false"
             android:label="Calendar link"
             android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "Install an APK" file browser, opened from the App Store. -->
         <activity
             android:name=".ApkBrowserActivity"
             android:exported="false"
             android:label="Install an APK"
-            android:theme="@style/Theme.SampleApp" />
+            android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- "Open with Immortal" for any .apk the user taps (Chrome download,
              file manager, etc.) — routes the install through the silent daemon,

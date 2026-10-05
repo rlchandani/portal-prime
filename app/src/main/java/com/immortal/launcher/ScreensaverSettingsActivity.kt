@@ -63,6 +63,18 @@ class ScreensaverSettingsActivity : ComponentActivity() {
 
 @Composable
 private fun ScreensaverSettingsScreen() {
+  val activity = LocalContext.current as? Activity
+  SettingsScaffold(
+      title = "Screensaver",
+      subtitle = "Choose what shows on the photo frame when your Portal is idle.",
+      onBack = { activity?.finish() },
+      lazyDetail = screensaverSettingsDetail(),
+  ) {}
+}
+
+/** One lazy list is reused by the main Settings pane and the direct Activity entry. */
+@Composable
+internal fun screensaverSettingsDetail(): ApprovedSettingsLazyDetail {
   val context = LocalContext.current
   val activity = context as? Activity
   val state = rememberScreensaverSettings()
@@ -86,9 +98,17 @@ private fun ScreensaverSettingsScreen() {
   )
   LaunchedEffect(requested, index) { if (index != null) scroll.scrollToItem(index) }
   val firstFocus = remember { FocusRequester() }
-  LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
-  val detail = ApprovedSettingsLazyDetail(scroll) {
+  var focusedOnce by remember { mutableStateOf(false) }
+  return ApprovedSettingsLazyDetail(scroll) {
     item(key = "screensaver.enabled", contentType = "master") {
+      // The host creates this list model before its incoming pane mounts. Request focus
+      // from the attached row, once per visit, rather than before the FocusRequester attaches.
+      LaunchedEffect(firstFocus) {
+        if (!focusedOnce) {
+          firstFocus.requestFocus()
+          focusedOnce = true
+        }
+      }
       ApprovedSettingsLazyRow(
           "screensaver.enabled", true, true, requested,
           modifier = Modifier.focusRequester(firstFocus).focusGroup(),
@@ -114,12 +134,6 @@ private fun ScreensaverSettingsScreen() {
       }
     }
   }
-  SettingsScaffold(
-      title = "Screensaver",
-      subtitle = "Choose what shows on the photo frame when your Portal is idle.",
-      onBack = { activity?.finish() },
-      lazyDetail = detail,
-  ) {}
 }
 
 @Composable

@@ -6,7 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -43,14 +42,15 @@ private val COIN_SUGGESTIONS =
 
 @Composable
 private fun CryptoSettingsScreen() {
-    val activity = LocalContext.current as? Activity
-    SettingsScaffold(title = "Crypto", onBack = { activity?.finish() }) { CryptoSettingsContent() }
+    val onBack = rememberApprovedSettingsBack()
+    SettingsScaffold(title = "Crypto", onBack = onBack) { CryptoSettingsContent() }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun CryptoSettingsContent() {
     val context = LocalContext.current
+    val onBack = rememberApprovedSettingsBack()
     var coins by remember { mutableStateOf(CryptoConfig.load(context)) }
     var coinId by remember { mutableStateOf("") }
     var symbol by remember { mutableStateOf("") }
@@ -64,7 +64,7 @@ internal fun CryptoSettingsContent() {
         }
         ApprovedEditorsForm(actions = {
             ApprovedEditorsActions(error = error, onCancel = {
-                coinId = ""; symbol = ""; error = null; (context as? Activity)?.finish()
+                coinId = ""; symbol = ""; error = null; onBack()
             }) {
                 if (coinId.isBlank()) error = "Enter a CoinGecko id."
                 else {

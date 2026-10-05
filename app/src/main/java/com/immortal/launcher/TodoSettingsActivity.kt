@@ -6,7 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,13 +27,14 @@ class TodoSettingsActivity : ComponentActivity() {
 
 @Composable
 private fun TodoSettingsScreen() {
-    val activity = LocalContext.current as? Activity
-    SettingsScaffold(title = "To-do", onBack = { activity?.finish() }) { TodoSettingsContent() }
+    val onBack = rememberApprovedSettingsBack()
+    SettingsScaffold(title = "To-do", onBack = onBack) { TodoSettingsContent() }
 }
 
 @Composable
 internal fun TodoSettingsContent() {
     val context = LocalContext.current
+    val onBack = rememberApprovedSettingsBack()
     var items by remember { mutableStateOf(TodoStore.load(context)) }
     var draft by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
@@ -53,7 +53,7 @@ internal fun TodoSettingsContent() {
         }
         ApprovedEditorsForm(actions = {
             ApprovedEditorsActions(error = error, onCancel = {
-                draft = ""; error = null; (context as? Activity)?.finish()
+                draft = ""; error = null; onBack()
             }) {
                 if (draft.isBlank()) error = "Enter what needs doing."
                 else { TodoStore.add(context, draft); draft = ""; error = null; refresh() }

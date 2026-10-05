@@ -55,6 +55,15 @@ class ScreensaverSourcesActivity : ComponentActivity() {
 private fun ScreensaverSourcesScreen() {
     val context = LocalContext.current
     val activity = context as? Activity
+    ApprovedSourcesPage("Photo sources", onBack = { activity?.finish() }) {
+        ScreensaverSourcesContent(onDone = { activity?.let { approvedSourcesReturn(it) } })
+    }
+}
+
+@Composable
+internal fun ScreensaverSourcesContent(onDone: () -> Unit) {
+    val context = LocalContext.current
+    val navigate = rememberApprovedSettingsNavigator()
     val owner = LocalLifecycleOwner.current
     var settings by remember { mutableStateOf(ScreensaverConfig.load(context)) }
     DisposableEffect(owner) {
@@ -73,66 +82,64 @@ private fun ScreensaverSourcesScreen() {
             ApprovedSourcesFolderStatus(accessible, if (accessible) approvedSourcesSummary(path) else null)
         }
     }
-    fun openSource(page: String) = context.startActivity(approvedSettingsIntent(context, page))
-    ApprovedSourcesPage("Photo sources", onBack = { activity?.finish() }) {
-        val showAdvanced = LocalAdvancedSettings.current
-        Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
-                SourceTile("Immortal photos", "A calming built-in photo feed. No setup needed.",
-                    settings.source == ScreensaverConfig.SOURCE_DEFAULT,
-                    "photo", Modifier.weight(1f)) {
-                    ScreensaverConfig.useDefault(context)
-                    activity?.let { approvedSourcesReturn(it) }
-                }
-                SourceTile("My photos & videos", "Choose a photo folder on your Portal.",
-                    settings.usesFolder, "folder", Modifier.weight(1f)) { openSource("folder") }
+    fun openSource(page: String) = navigate(approvedSettingsRoute(page))
+    val showAdvanced = LocalAdvancedSettings.current
+    Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
+            SourceTile("Immortal photos", "A calming built-in photo feed. No setup needed.",
+                settings.source == ScreensaverConfig.SOURCE_DEFAULT,
+                "photo", Modifier.weight(1f)) {
+                ScreensaverConfig.useDefault(context)
+                onDone()
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
-                SourceTile("Shared album link", "Use an iCloud, Google Photos or Synology share link.",
-                    settings.usesUrl, "link", Modifier.weight(1f)) { openSource("album") }
-                SourceTile("Connect your phone", "Set up photos from another device on your Wi-Fi.",
-                    false, "phone", Modifier.weight(1f)) { openSource("phone") }
-            }
+            SourceTile("My photos & videos", "Choose a photo folder on your Portal.",
+                settings.usesFolder, "folder", Modifier.weight(1f)) { openSource("folder") }
         }
-        if (settings.source != ScreensaverConfig.SOURCE_DEFAULT) {
-            SectionLabel("Current source")
-            Card {
-                ApprovedSourcesInfoRow("Selected", sourceStatus(settings, localStatus))
-                val page = sourcePage(settings)
-                if (showAdvanced || page in listOf("folder", "album")) {
-                    Divider()
-                    NavRow("Change source connection", "") { openSource(page) }
-                }
-            }
-            if (!showAdvanced && sourcePage(settings) in listOf("immich", "smb", "dav", "web")) {
-                FooterNote("Your current source remains selected. Its connection is available in Advanced settings.")
-            }
+        Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
+            SourceTile("Shared album link", "Use an iCloud, Google Photos or Synology share link.",
+                settings.usesUrl, "link", Modifier.weight(1f)) { openSource("album") }
+            SourceTile("Connect your phone", "Set up photos from another device on your Wi-Fi.",
+                false, "phone", Modifier.weight(1f)) { openSource("phone") }
         }
-        if (showAdvanced) {
-            SectionLabel("Advanced options")
-            Card {
-                NavRow("Immich") { openSource("immich") }
-                Divider()
-                NavRow("SMB / NAS") { openSource("smb") }
-                Divider()
-                NavRow("WebDAV") { openSource("dav") }
-                Divider()
-                NavRow("Web page") { openSource("web") }
-                if (settings.usesUrl) {
-                    Divider()
-                    PickerRow("Refresh album", settings.albumRefreshMin,
-                        listOf(15, 30, 45, 60, 120, 180, 240, 360, 720, 1440).map {
-                            PickerOption(it, if (it < 60) "$it min" else "${it / 60} hours")
-                        }) { minutes ->
-                        SettingsRegistry.apply(context, "screensaver",
-                            JSONObject().put("albumRefreshMin", minutes))
-                        settings = ScreensaverConfig.load(context)
-                    }
-                }
-            }
-        }
-        FooterNote("If a source can't be read, Immortal falls back to its built-in photos.")
     }
+    if (settings.source != ScreensaverConfig.SOURCE_DEFAULT) {
+        SectionLabel("Current source")
+        Card {
+            ApprovedSourcesInfoRow("Selected", sourceStatus(settings, localStatus))
+            val page = sourcePage(settings)
+            if (showAdvanced || page in listOf("folder", "album")) {
+                Divider()
+                NavRow("Change source connection", "") { openSource(page) }
+            }
+        }
+        if (!showAdvanced && sourcePage(settings) in listOf("immich", "smb", "dav", "web")) {
+            FooterNote("Your current source remains selected. Its connection is available in Advanced settings.")
+        }
+    }
+    if (showAdvanced) {
+        SectionLabel("Advanced options")
+        Card {
+            NavRow("Immich") { openSource("immich") }
+            Divider()
+            NavRow("SMB / NAS") { openSource("smb") }
+            Divider()
+            NavRow("WebDAV") { openSource("dav") }
+            Divider()
+            NavRow("Web page") { openSource("web") }
+            if (settings.usesUrl) {
+                Divider()
+                PickerRow("Refresh album", settings.albumRefreshMin,
+                    listOf(15, 30, 45, 60, 120, 180, 240, 360, 720, 1440).map {
+                        PickerOption(it, if (it < 60) "$it min" else "${it / 60} hours")
+                    }) { minutes ->
+                    SettingsRegistry.apply(context, "screensaver",
+                        JSONObject().put("albumRefreshMin", minutes))
+                    settings = ScreensaverConfig.load(context)
+                }
+            }
+        }
+    }
+    FooterNote("If a source can't be read, Immortal falls back to its built-in photos.")
 }
 
 @Composable

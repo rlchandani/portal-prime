@@ -51,8 +51,7 @@ internal fun ApprovedAppsShell(
   ApprovedAppsImmersive()
   Column(Modifier.fillMaxSize().background(IosBackground)) {
     ApprovedAppsHeader(onSearch ?: {
-      context.startActivity(Intent(context, AppSwitcherActivity::class.java)
-          .putExtra(AppSwitcherActivity.EXTRA_ALL_APPS, true).putExtra("approved_search", true))
+      if (context.openApprovedHomeTab(ApprovedLauncherTab.APPS, searchApps = true)) onExit()
     })
     Box(Modifier.weight(1f).fillMaxWidth(), content = content)
     Spacer(Modifier.height(24.dp))
@@ -115,11 +114,11 @@ internal fun ApprovedAppsDock(selected: String, onExit: () -> Unit, modifier: Mo
         Row(Modifier.widthIn(min = 176.dp).height(74.dp).clip(RoundedCornerShape(18.dp))
             .background(if (active) LocalApprovedPalette.current.selected else Color.Transparent)
             .tvFocusable(RoundedCornerShape(18.dp), focusScale = 1f) {
-              if (!active) when (id) {
-                "home" -> { context.startActivity(Intent(context, HomeActivity::class.java).putExtra("approved_home_tab", "home").addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)); onExit() }
-                "apps" -> { context.startActivity(Intent(context, AppSwitcherActivity::class.java).putExtra("approved_all_apps", true)); onExit() }
+              when (id) {
                 "photos" -> context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
-                "tools" -> { context.startActivity(Intent(context, ToolsActivity::class.java)); onExit() }
+                else -> ApprovedLauncherTab.fromId(id)?.let { tab ->
+                  if (context.openApprovedHomeTab(tab)) onExit()
+                }
               }
             }.padding(horizontal = 25.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
           val color = if (active) IosBlue else IosSecondary

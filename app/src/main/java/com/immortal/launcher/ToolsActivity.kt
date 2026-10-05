@@ -145,7 +145,10 @@ private fun BedtimeOverlay(onDismiss: () -> Unit) {
     Column(Modifier.fillMaxSize().padding(horizontal = 56.dp, vertical = 36.dp)) {
       ApprovedAppsButton("‹  Tools", onClick = onDismiss)
       Spacer(Modifier.height(26.dp))
-      BedtimeContent(onExit = onDismiss)
+      Surface(color = Color(0xFF0E0E1A), shape = RoundedCornerShape(28.dp),
+          modifier = Modifier.weight(1f).fillMaxWidth()) {
+        BedtimeContent(onExit = onDismiss)
+      }
     }
     return
   }

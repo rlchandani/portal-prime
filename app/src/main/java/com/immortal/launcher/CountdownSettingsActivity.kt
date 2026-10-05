@@ -6,7 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,13 +31,14 @@ private val EMOJI_PALETTE = listOf("📅", "🎂", "🎉", "✈️", "❤️", "
 
 @Composable
 private fun CountdownSettingsScreen() {
-    val activity = LocalContext.current as? Activity
-    SettingsScaffold(title = "Countdowns", onBack = { activity?.finish() }) { CountdownSettingsContent() }
+    val onBack = rememberApprovedSettingsBack()
+    SettingsScaffold(title = "Countdowns", onBack = onBack) { CountdownSettingsContent() }
 }
 
 @Composable
 internal fun CountdownSettingsContent() {
     val context = LocalContext.current
+    val onBack = rememberApprovedSettingsBack()
     var events by remember { mutableStateOf(CountdownConfig.loadSorted(context)) }
     var label by remember { mutableStateOf("") }
     var emoji by remember { mutableStateOf("🎂") }
@@ -64,7 +64,7 @@ internal fun CountdownSettingsContent() {
                 onRemove = { removal = event })
         }
         ApprovedEditorsForm(actions = {
-            ApprovedEditorsActions(error = error, onCancel = { reset(); (context as? Activity)?.finish() }) {
+            ApprovedEditorsActions(error = error, onCancel = { reset(); onBack() }) {
                 if (label.isBlank()) error = "Enter a name."
                 else {
                     CountdownConfig.add(context, label, emoji, month, day, if (yearly) 0 else year)

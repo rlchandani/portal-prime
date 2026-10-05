@@ -6,8 +6,11 @@
  */
 package com.immortal.launcher
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -19,22 +22,42 @@ import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.immortal.launcher.ui.components.launchSafely
 
-/** Preserve the native editor Activity while selecting its approved page/category explicitly. */
+internal const val APPROVED_HOME_TAB = "approved_home_tab"
+internal const val APPROVED_HOME_SEARCH = "approved_home_search"
+
+private tailrec fun Context.approvedNavigationActivity(): Activity? = when {
+  this is Activity -> this
+  this is ContextWrapper && baseContext !== this -> baseContext.approvedNavigationActivity()
+  else -> null
+}
+
+/** Internal navigation keeps the caller's task; services still need NEW_TASK. */
+internal fun Context.startApprovedInternalActivity(intent: Intent) {
+  if (approvedNavigationActivity() == null) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+  startActivity(intent)
+}
+
+/** Open an ordinary Settings main-pane page within the caller's task. */
 internal fun Context.openApprovedHomeSettings(page: String) {
   runCatching {
-    startActivity(approvedSettingsIntent(this, page).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    startApprovedInternalActivity(approvedSettingsIntent(this, page))
   }
 }
 
-/** External entry points select the retained Apps tab in the existing launcher task. */
+/** Return to Home's retained pages rather than creating another Apps or Tools host. */
+internal fun Context.openApprovedHomeTab(tab: ApprovedLauncherTab, searchApps: Boolean = false): Boolean =
+    runCatching {
+      startApprovedInternalActivity(Intent(this, HomeActivity::class.java)
+          .putExtra(APPROVED_HOME_TAB, tab.id)
+          .putExtra(APPROVED_HOME_SEARCH, searchApps)
+          .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+      true
+    }.getOrDefault(false)
+
+/** Keep the existing Apps entry point for callers outside the launcher. */
 internal fun Context.openApprovedHomeApps() {
-  runCatching {
-    startActivity(Intent(this, HomeActivity::class.java)
-        .putExtra("approved_home_tab", "apps")
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
-  }
+  openApprovedHomeTab(ApprovedLauncherTab.APPS)
 }
 
 /** Tools has no timer deep link. Host its existing page without changing timer logic or storage. */
@@ -59,8 +82,11 @@ internal fun ApprovedHomeTimersPage(onDismiss: () -> Unit) {
       ApprovedAppsShell("tools", onExit = onDismiss) {
         TimersOverlay {
           onDismiss()
-          context.launchSafely(ToolsActivity::class.java)
+          context.openApprovedHomeTab(ApprovedLauncherTab.TOOLS)
         }
+        // TimersOverlay shares its Tools button callback with Back. Register the Home
+        // dialog's Back callback last so only the explicit button selects Tools.
+        BackHandler(onBack = onDismiss)
       }
     }
   }

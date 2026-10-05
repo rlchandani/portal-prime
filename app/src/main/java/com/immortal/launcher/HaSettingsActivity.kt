@@ -51,6 +51,7 @@ internal fun HaSettingsContent() { ApprovedEditorsHaContent(entitiesOnly = false
 @Composable
 private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
     val context = LocalContext.current
+    val back = rememberApprovedSettingsBack()
     val scope = rememberCoroutineScope()
     val requests = remember { ApprovedEditorsRequestGate() }
     var connectionJob by remember { mutableStateOf<Job?>(null) }
@@ -153,7 +154,7 @@ private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
                 ApprovedEditorsActions("Save & connect", error, enabled = !busy,
                     onCancel = {
                         cancelConnection(); url = HaConfig.baseUrl(context); token = ""; error = null; status = ""
-                        (context as? Activity)?.finish()
+                        back()
                     }) { discover(saveDraft = true) }
                 if (status.isNotEmpty()) FooterNote(status)
             }) {

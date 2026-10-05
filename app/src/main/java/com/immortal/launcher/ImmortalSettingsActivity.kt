@@ -122,7 +122,8 @@ import org.json.JSONObject
  * cards (12dp radius), blue toggles, uppercase section headers.
  */
 class ImmortalSettingsActivity : ComponentActivity() {
-  private var route by mutableStateOf(ApprovedSettingsRoute())
+  private var history by mutableStateOf(ApprovedSettingsHistory.initial(ApprovedSettingsRoute()))
+  private val route: ApprovedSettingsRoute get() = history.current
 
   private fun readRoute(intent: Intent) = ApprovedSettingsRoute(
       intent.getStringExtra(APPROVED_SETTINGS_PAGE),
@@ -131,6 +132,17 @@ class ImmortalSettingsActivity : ComponentActivity() {
   )
 
   private fun navigateLocal(next: ApprovedSettingsRoute) {
+    history = history.navigate(next)
+    syncRouteIntent()
+  }
+
+  private fun backLocal() {
+    history = history.back()
+    syncRouteIntent()
+  }
+
+  private fun syncRouteIntent() {
+    val next = route
     // Keep intent fallbacks in shared rows in sync, including clearing an old search highlight.
     setIntent(Intent(intent).apply {
       removeExtra(APPROVED_SETTINGS_PAGE)
@@ -139,18 +151,24 @@ class ImmortalSettingsActivity : ComponentActivity() {
       next.page?.let { putExtra(APPROVED_SETTINGS_PAGE, it) }
       next.control?.let { putExtra(APPROVED_SETTINGS_CONTROL, it) }
     })
-    route = next
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    route = readRoute(intent)
+    val restored = savedInstanceState?.getParcelableArrayList<Bundle>("approved_settings_history")
+        ?.map { ApprovedSettingsRoute(it.getString("page"), it.getString("category") ?: "appearance",
+            it.getString("control")) }
+    history = if (restored.isNullOrEmpty()) ApprovedSettingsHistory.initial(readRoute(intent))
+        else ApprovedSettingsHistory(restored.takeLast(32))
+    syncRouteIntent()
     setContent {
       PortalPrimeTheme(darkTheme = false) {
         val navigate = remember { ::navigateLocal }
+        val back = remember { ::backLocal }
         CompositionLocalProvider(
             LocalApprovedRequestedControl provides route.control,
             LocalApprovedSettingsNavigate provides navigate,
+            LocalApprovedSettingsBack provides back,
         ) {
           ImmortalSettingsScreen(route)
         }
@@ -161,7 +179,16 @@ class ImmortalSettingsActivity : ComponentActivity() {
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
-    route = readRoute(intent)
+    history = ApprovedSettingsHistory.initial(readRoute(intent))
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    outState.putParcelableArrayList("approved_settings_history", ArrayList(history.entries.map { entry ->
+      Bundle().apply {
+        putString("page", entry.page); putString("category", entry.category); putString("control", entry.control)
+      }
+    }))
+    super.onSaveInstanceState(outState)
   }
 }
 
@@ -171,7 +198,7 @@ private fun ImmortalSettingsScreen(route: ApprovedSettingsRoute) {
   val navigate = rememberApprovedSettingsNavigator()
   val category = ApprovedSettingsCategories.firstOrNull { it.id == route.category }
       ?: ApprovedSettingsCategories.first()
-  val backToCategory: () -> Unit = { navigate(ApprovedSettingsRoute(category = category.id)) }
+  val backToCategory = rememberApprovedSettingsBack()
   BackHandler(enabled = route.page != null, onBack = backToCategory)
   var prerequisite by remember(route) { mutableStateOf<String?>(null) }
   LaunchedEffect(route) {
@@ -190,6 +217,7 @@ private fun ImmortalSettingsScreen(route: ApprovedSettingsRoute) {
       subtitle = if (route.page == null) category.subtitle else "",
       onBack = if (route.page != null) backToCategory else null,
       page = route.page,
+      lazyDetail = if (route.page == "screensaver") screensaverSettingsDetail() else null,
       content = routeContent,
   )
   prerequisite?.let { message ->
@@ -242,11 +270,12 @@ private fun ApprovedSettingsRouteContent(
   }
 }
 
-/** Native scalar pages; rich forms and pickers remain in their original Activities. */
+/** Shared bodies retain their original registry, validators and side effects. */
 @Composable
 private fun ApprovedNativeSettingsPage(page: String) {
   val context = LocalContext.current
   val navigate = rememberApprovedSettingsNavigator()
+  val back = rememberApprovedSettingsBack()
   var immortal by remember { mutableStateOf(ImmortalSettings.load(context)) }
   var ss by remember { mutableStateOf(ScreensaverConfig.load(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -266,6 +295,31 @@ private fun ApprovedNativeSettingsPage(page: String) {
   }
   when (page) {
     "display" -> DisplaySection()
+    // Screensaver uses the same single lazy list as its standalone wrapper via lazyDetail.
+    "screensaver" -> Unit
+    "sources" -> ScreensaverSourcesContent(onDone = back)
+    "styles" -> ScreensaverModeContent()
+    "faces" -> FacePickerContent()
+    "clock" -> ClockSettingsContent()
+    "chime" -> ChimeSettingsContent()
+    "welcome" -> WelcomeSettingsContent()
+    "sunrise" -> SunriseContent()
+    "sleep" -> SleepSettingsContent()
+    "alarm" -> AlarmContent()
+    "world" -> WorldClockContent()
+    "countdowns" -> CountdownSettingsContent()
+    "crypto" -> CryptoSettingsContent()
+    "todo" -> TodoSettingsContent()
+    "news" -> NewsSettingsContent()
+    "stocks" -> StocksSettingsContent()
+    "options" -> OptionsSettingsContent()
+    "alpaca" -> ApprovedEditorsAlpacaForm(onCancel = back)
+    "multiroom" -> MultiRoomContent()
+    "mqtt" -> MqttContent()
+    "health" -> DeviceHealthContent()
+    "boot" -> BootAppsContent()
+    "ha" -> HaSettingsContent()
+    "intercom" -> IntercomContent()
     "appearance" -> SettingsList(SettingsDomains.immortal, immortal,
         exclude = SettingsDomains.immortal.specs.map { it.key }.toSet() -
             setOf("tileSize", "showMiniPlayer", "hideStatusBar", "clockFormat", "settingsTheme")) { k, v ->
@@ -339,7 +393,7 @@ private fun ApprovedNativeSettingsPage(page: String) {
     }
     "speed" -> Card {
       NavRow("Speed test", subLabel = "Open Tools to measure your connection.") {
-        context.startActivity(Intent(context, ToolsActivity::class.java))
+        context.openApprovedHomeTab(ApprovedLauncherTab.TOOLS)
       }
     }
   }
