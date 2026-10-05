@@ -12,12 +12,14 @@ import com.hierynomus.msfscc.FileAttributes
 import com.hierynomus.mssmb2.SMB2CreateDisposition
 import com.hierynomus.mssmb2.SMB2ShareAccess
 import com.hierynomus.smbj.SMBClient
+import com.hierynomus.smbj.SmbConfig
 import com.hierynomus.smbj.auth.AuthenticationContext
 import com.hierynomus.smbj.connection.Connection
 import com.hierynomus.smbj.session.Session
 import com.hierynomus.smbj.share.DiskShare
 import java.io.InputStream
 import java.util.EnumSet
+import java.util.concurrent.TimeUnit
 
 /**
  * A photo source backed by an SMB/CIFS network share (a NAS) — the second self-hosted source.
@@ -38,25 +40,32 @@ class SmbSource(
     private val password: String,
     private val domain: String? = null,
 ) {
-  private var client: SMBClient? = null
-  private var connection: Connection? = null
-  private var session: Session? = null
-  private var share: DiskShare? = null
+  @Volatile private var client: SMBClient? = null
+  @Volatile private var connection: Connection? = null
+  @Volatile private var session: Session? = null
+  @Volatile private var share: DiskShare? = null
 
   /** Open the share. Returns true on success. */
   fun connect(): Boolean =
       runCatching {
-            val c = SMBClient()
-            val conn = c.connect(host)
-            val sess = conn.authenticate(AuthenticationContext(user, password.toCharArray(), domain))
-            val sh = sess.connectShare(shareName) as DiskShare
+            val c = if (PhotoSourceWork.ownsCurrentRequest()) SMBClient(
+                SmbConfig.builder().withSocketFactory(PhotoSourceSocketFactory())
+                    .withTimeout(8, TimeUnit.SECONDS).withSoTimeout(8, TimeUnit.SECONDS).build())
+                else SMBClient()
             client = c
+            PhotoSourceWork.checkpoint()
+            val conn = c.connect(host)
             connection = conn
+            PhotoSourceWork.checkpoint()
+            val sess = conn.authenticate(AuthenticationContext(user, password.toCharArray(), domain))
             session = sess
+            PhotoSourceWork.checkpoint()
+            val sh = sess.connectShare(shareName) as DiskShare
             share = sh
+            PhotoSourceWork.checkpoint()
             true
           }
-          .getOrDefault(false)
+          .getOrElse { close(); false }
 
   /** Recursively list image file paths (share-relative, backslash-separated), capped at [cap]. */
   fun listImages(cap: Int = 1000): List<String> {
@@ -65,9 +74,11 @@ class SmbSource(
     val stack = ArrayDeque<String>()
     stack.addLast(normalize(basePath))
     while (stack.isNotEmpty() && out.size < cap) {
+      PhotoSourceWork.checkpoint()
       val dir = stack.removeLast()
       val entries = runCatching { sh.list(dir) }.getOrNull() ?: continue
       for (e in entries) {
+        PhotoSourceWork.checkpoint()
         if (out.size >= cap) break
         val name = e.fileName
         if (name == "." || name == "..") continue

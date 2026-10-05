@@ -7,6 +7,8 @@
 
 package com.immortal.launcher
 
+import com.immortal.launcher.ui.theme.LocalApprovedPalette
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -25,10 +27,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Switch
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Surface
@@ -49,73 +49,66 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/**
- * iOS Settings-style shared UI vocabulary. All components match the iOS Settings aesthetic:
- * light background (#f2f2f7), white cards with 12dp corner radius, blue accents (#007aff),
- * green toggles (#34c759), grey secondary text, uppercase section headers (13sp), and
- * standard 54dp row heights with icon badges.
- *
- * Built on the D-pad focus primitives in [TvFocus] so the TV remote still navigates correctly.
- */
+/** Shared native settings rows for the approved Portal+ UI, with D-pad support. */
 
 // ---------------------------------------------------------------------------
 // iOS color palette
 // ---------------------------------------------------------------------------
 
-// Dusk Aurora DARK palette (the approved settings mock, 02-settings-v3): a cool near-black
-// panel with dark glass cards, white type, and iOS-dark accents. Every settings surface reads
-// these tokens, so this block IS the theme — the light values it replaced live in git history.
-internal val IosBackground = Color(0xFF10131C)   // detail panel (mock rgba(22,26,38,.55) solidified)
-internal val IosCard = Color(0xFF1E2230)         // grouped card (mock rgba(255,255,255,.07) on dark)
-internal val IosLabel = Color(0xFFFFFFFF)
-internal val IosSecondary = Color(0xFFA1A1AA)    // ~66% white
-internal val IosTertiary = Color(0xFF74747E)     // ~45% white
-internal val IosDivider = Color(0xFF2A2E3C)      // hairline on dark (mock rgba(255,255,255,.09))
-internal val IosBlue = Color(0xFF0A84FF)         // iOS dark-mode blue
-internal val IosGreen = Color(0xFF30D158)        // iOS dark-mode green
-internal val IosChevron = Color(0xFF4A4E5C)
-internal val IosRed = Color(0xFFFF453A)          // destructive / stop actions (dark-mode red)
-internal val IosFocusTint = Color(0xFF1C3350)    // D-pad focus highlight + action-pill fill (blue-dark)
-internal val IosSegmentTrack = Color(0xFF2A2E3C) // segmented-control track (== IosDivider tone)
-internal val IosSegmentInactive = Color(0xFFA1A1AA) // unselected segment label
-internal val IosSidebar = Color(0xFF0C0F17)      // sidebar panel (mock rgba(14,17,26,.74) solidified)
+// Keep these names stable: existing editors share the approved palette supplied by the theme.
+internal val IosBackground: Color @Composable get() = LocalApprovedPalette.current.background
+internal val IosSidebar: Color @Composable get() = LocalApprovedPalette.current.sidebar
+internal val IosCard: Color @Composable get() = LocalApprovedPalette.current.surface
+internal val IosLabel: Color @Composable get() = LocalApprovedPalette.current.text
+internal val IosSecondary: Color @Composable get() = LocalApprovedPalette.current.secondary
+internal val IosTertiary: Color @Composable get() = LocalApprovedPalette.current.secondary
+internal val IosDivider: Color @Composable get() = LocalApprovedPalette.current.divider
+internal val IosBlue: Color @Composable get() = LocalApprovedPalette.current.accent
+internal val IosGreen: Color @Composable get() = LocalApprovedPalette.current.green
+internal val IosChevron: Color @Composable get() = LocalApprovedPalette.current.secondary
+internal val IosRed: Color @Composable get() = LocalApprovedPalette.current.error
+internal val IosFocusTint: Color @Composable get() = LocalApprovedPalette.current.selected
+internal val IosSegmentTrack: Color @Composable get() = LocalApprovedPalette.current.surface2
+internal val IosSegmentInactive: Color @Composable get() = LocalApprovedPalette.current.secondary
 
-// ---------------------------------------------------------------------------
-// Sizing scale (single source of truth)
-// ---------------------------------------------------------------------------
-
-/**
- * The "Large" sizing scale, tuned for the Portal's 2160x1440 touch panel viewed at room
- * distance. Every settings surface — the two-panel main screen and every full-screen
- * sub-page — reads its type sizes and metrics from here so they can't drift.
- */
+/** Revision 04 measurements in dp/sp, at the Portal+'s native 1920 × 1280 dp viewport. */
 internal object Sizes {
-    val titlePage = 34.sp      // sub-page H1
-    // Shared two-panel header title — used for BOTH the sidebar "Settings" heading and the
-    // right-panel section title so they match in size/weight and sit on the same baseline.
-    val panelTitle = 30.sp     // two-panel header title (sidebar + detail top-bar)
-    val panelTitleTop = 20.dp  // top padding above the header title in both panels (aligns baselines)
-    val panelTitleBottom = 14.dp // bottom padding below the header title in both panels (equal heights)
-    val pageSubtitle = 19.sp   // sub-page subtitle
-    val sectionLabel = 16.sp   // uppercase grey group headers
-    val navLabel = 21.sp       // sidebar nav-row label
-    val rowTitle = 22.sp       // row body text
-    val rowSub = 16.sp         // row secondary/subtitle
-    val rowValue = 19.sp       // right-side value text (steppers, pickers)
-    val actionButton = 17.sp   // blue action-button labels (Test / Preview / Save / Add)
-    val segmentLabel = 15.sp   // segmented-control segment label
-    val chevron = 22.sp        // "›"
-    val iconBadge = 40.dp      // content-row icon badge
-    val iconGlyph = 20.sp
-    val iconRadius = 9.dp
-    val rowMinHeight = 68.dp
-    val cardRadius = 14.dp  // THE canonical container corner radius — cards, search field, selection
-                            // pill, and result rows all use this so every rounded surface matches.
+    val titlePage = 40.sp
+    val panelTitle = 40.sp
+    val panelTitleTop = 12.dp
+    val panelTitleBottom = 34.dp
+    val pageSubtitle = 23.sp
+    val sectionLabel = 22.sp
+    val navLabel = 22.sp
+    val rowTitle = 26.sp
+    val rowSub = 20.sp
+    val rowValue = 23.sp
+    val actionButton = 24.sp
+    val segmentLabel = 23.sp
+    val chevron = 24.sp
+    val iconBadge = 42.dp
+    val iconGlyph = 26.sp
+    val iconRadius = 11.dp
+    val rowMinHeight = 100.dp
+    val cardRadius = 24.dp
+    val sidebarWidth = 368.dp
+    val headerHeight = 104.dp
+    val primaryTarget = 68.dp
 }
 
 // ---------------------------------------------------------------------------
@@ -129,12 +122,12 @@ internal object Sizes {
 @Composable
 internal fun SectionLabel(text: String) {
     Text(
-        text = text.uppercase(),
+        text = text,
         color = IosTertiary,
         fontSize = Sizes.sectionLabel,
         fontWeight = FontWeight.Normal,
-        letterSpacing = 0.4.sp,
-        modifier = Modifier.padding(start = 20.dp, end = 16.dp, top = 20.dp, bottom = 6.dp),
+        lineHeight = 30.sp,
+        modifier = Modifier.padding(start = 6.dp, end = 6.dp, top = 32.dp, bottom = 12.dp),
     )
 }
 
@@ -151,6 +144,7 @@ internal fun Card(content: @Composable () -> Unit) {
     Surface(
         color = IosCard,
         shape = RoundedCornerShape(Sizes.cardRadius),
+        border = BorderStroke(1.dp, IosDivider),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column { content() }
@@ -168,7 +162,7 @@ internal fun Divider() {
         Spacer(
             Modifier
                 .fillMaxWidth()
-                .padding(start = 68.dp)
+                .padding(start = 28.dp)
                 .height(1.dp)
                 .background(IosDivider),
         )
@@ -201,7 +195,7 @@ internal fun IconBadge(color: Color, symbol: String, iconRes: Int? = null) {
                 painter = androidx.compose.ui.res.painterResource(iconRes),
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(Sizes.iconBadge * 0.62f),
+                modifier = Modifier.size(26.dp),
             )
         } else {
             Text(
@@ -219,10 +213,8 @@ internal fun IconBadge(color: Color, symbol: String, iconRes: Int? = null) {
 // ---------------------------------------------------------------------------
 
 /**
- * The one iOS-style Switch color set: green track when on, light-grey track when off, white thumb.
- * Every Switch in the settings surface MUST use this — a bare `Switch()` otherwise inherits the
- * theme's blue primary + dark off-track (PortalPrimeTheme resolves to a dark scheme regardless of
- * its `darkTheme` arg), which is the "blue on / weird black off" inconsistency this centralizes away.
+ * Compatibility colors for existing callers. [ApprovedSettingsSwitch] uses the reactive approved
+ * palette by default; callers can also pass this existing Material3 color set.
  */
 @Composable
 internal fun iosSwitchColors() =
@@ -230,7 +222,7 @@ internal fun iosSwitchColors() =
         checkedThumbColor = Color.White,
         checkedTrackColor = IosGreen,
         uncheckedThumbColor = Color.White,
-        uncheckedTrackColor = IosDivider,
+        uncheckedTrackColor = IosSegmentTrack,
         uncheckedBorderColor = IosDivider,
     )
 
@@ -301,23 +293,18 @@ internal fun ToggleRow(
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = Sizes.rowMinHeight)
-            .tvFocusableRow { onChange(!checked) }
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .tvFocusableRow(focusFill = IosFocusTint) { onChange(!checked) }
+            .semantics { role = Role.Switch; toggleableState = ToggleableState(checked) }
+            .padding(horizontal = 28.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (iconSymbol.isNotEmpty()) {
             IconBadge(color = iconColor, symbol = iconSymbol)
             Spacer(Modifier.size(12.dp))
         }
-        Text(
-            text = title,
-            color = IosLabel,
-            fontSize = Sizes.rowTitle,
-            letterSpacing = (-0.2).sp,
-            modifier = Modifier.weight(1f),
-        )
+        ApprovedSettingsLabel(title, LocalApprovedSettingsHelp.current, Modifier.weight(1f))
         // Visual only — the row toggles it (so the remote's centre button works).
-        Switch(checked = checked, onCheckedChange = null, colors = iosSwitchColors())
+        ApprovedSettingsSwitch(checked)
     }
 }
 
@@ -342,8 +329,8 @@ internal fun NavRow(
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = Sizes.rowMinHeight)
-            .tvFocusableRow { onClick() }
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .tvFocusableRow(focusFill = IosFocusTint) { onClick() }
+            .padding(horizontal = 28.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (iconSymbol.isNotEmpty()) {
@@ -355,14 +342,16 @@ internal fun NavRow(
                 text = title,
                 color = IosLabel,
                 fontSize = Sizes.rowTitle,
-                letterSpacing = (-0.2).sp,
+                lineHeight = 34.sp,
             )
-            if (subLabel.isNotEmpty()) {
+            val help = subLabel.ifEmpty { LocalApprovedSettingsHelp.current.orEmpty() }
+            if (help.isNotEmpty()) {
                 Text(
-                    text = subLabel,
+                    text = help,
                     color = IosSecondary,
                     fontSize = Sizes.rowSub,
-                    modifier = Modifier.padding(top = 2.dp),
+                    lineHeight = 28.sp,
+                    modifier = Modifier.padding(top = 8.dp),
                 )
             }
         }
@@ -371,15 +360,12 @@ internal fun NavRow(
                 text = value,
                 color = IosSecondary,
                 fontSize = Sizes.rowValue,
-                modifier = Modifier.padding(end = 6.dp),
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.widthIn(max = 500.dp).padding(end = 20.dp),
             )
         }
-        Text(
-            text = ">",
-            color = IosChevron,
-            fontSize = Sizes.chevron,
-            fontWeight = FontWeight.Medium,
-        )
+        ApprovedSettingsChevron()
     }
 }
 
@@ -407,68 +393,20 @@ internal fun <T> PickerRow(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val current = options.firstOrNull { it.value == selected }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = Sizes.rowMinHeight)
-            .tvFocusableRow { expanded = true }
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (iconSymbol.isNotEmpty()) {
-            IconBadge(color = iconColor, symbol = iconSymbol)
-            Spacer(Modifier.size(12.dp))
-        }
-        Text(
-            text = title,
-            color = IosLabel,
-            fontSize = Sizes.rowTitle,
-            letterSpacing = (-0.2).sp,
-            modifier = Modifier.weight(1f),
-        )
-        // Anchor the menu to the value + caret so it drops under them (right side), not the row start.
-        Box {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = current?.label ?: "",
-                    color = IosSecondary,
-                    fontSize = Sizes.rowValue,
-                    modifier = Modifier.padding(end = 6.dp),
-                )
-                // Filled down-triangle reads unambiguously as "dropdown" (⌄ has poor font
-                // coverage on the Portal's Android 10 and rendered as a stray "v").
-                Text(
-                    text = "▾",
-                    color = IosChevron,
-                    fontSize = Sizes.chevron,
-                    fontWeight = FontWeight.Medium,
-                )
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.background(IosCard),
-            ) {
-                options.forEach { opt ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                opt.label,
-                                color = IosLabel,
-                                fontSize = Sizes.rowTitle,
-                                fontWeight = if (opt.value == selected) FontWeight.SemiBold else FontWeight.Normal,
-                            )
-                        },
-                        trailingIcon = {
-                            if (opt.value == selected) {
-                                Text("✓", color = IosBlue, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
-                            }
-                        },
-                        onClick = {
+    NavRow(title, current?.label ?: selected.toString(), iconColor = iconColor,
+        iconSymbol = iconSymbol, onClick = { expanded = true })
+    if (expanded) {
+        ApprovedSettingsDialog(title, onDismiss = { expanded = false }) {
+            Card {
+                LazyColumn(Modifier.heightIn(max = (LocalConfiguration.current.screenHeightDp - 400)
+                    .coerceAtLeast(300).dp)) {
+                    itemsIndexed(options, key = { _, option -> option.value.toString() }) { index, option ->
+                        if (index > 0) Divider()
+                        SelectableRow(option.label, "", option.value == selected) {
                             expanded = false
-                            onSelect(opt.value)
-                        },
-                    )
+                            onSelect(option.value)
+                        }
+                    }
                 }
             }
         }
@@ -485,8 +423,9 @@ internal fun SelectableRow(title: String, subtitle: String, selected: Boolean, o
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .tvFocusableRow { onClick() }
-            .padding(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp),
+            .defaultMinSize(minHeight = Sizes.rowMinHeight)
+            .tvFocusableRow(focusFill = IosFocusTint) { onClick() }
+            .padding(horizontal = 28.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -501,7 +440,7 @@ internal fun SelectableRow(title: String, subtitle: String, selected: Boolean, o
             }
         }
         if (selected) {
-            Text(text = "v", color = IosBlue, fontSize = Sizes.rowTitle, fontWeight = FontWeight.Medium)
+            Text(text = "✓", color = IosBlue, fontSize = Sizes.rowTitle, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -528,9 +467,9 @@ internal fun Segmented(
             Surface(
                 // Selected segment: lighter fill so it reads against the dark track (the mock's
                 // rgba(255,255,255,.22)); IosCard is too close to the track tone on dark.
-                color = if (on) Color(0xFF3A4152) else Color.Transparent,
+                color = if (on) IosCard else Color.Transparent,
                 shape = RoundedCornerShape(6.dp),
-                modifier = Modifier.tvFocusable(RoundedCornerShape(6.dp)) { onSelect(value) },
+                modifier = Modifier.tvFocusable(RoundedCornerShape(6.dp), focusScale = 1f, ringColor = IosBlue) { onSelect(value) },
             ) {
                 Text(
                     text = label,
@@ -567,6 +506,7 @@ internal fun Stepper(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .defaultMinSize(minHeight = Sizes.rowMinHeight)
             .onKeyEvent { e ->
                 if (e.type == KeyEventType.KeyDown) when (e.key) {
                     Key.DirectionLeft -> { onMinus(); true }
@@ -576,7 +516,7 @@ internal fun Stepper(
             }
             .focusable(interactionSource = src)
             .background(if (focused) IosFocusTint else Color.Transparent)
-            .padding(start = 16.dp, end = 6.dp, top = 10.dp, bottom = 10.dp),
+            .padding(horizontal = 28.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (iconSymbol.isNotEmpty()) {
@@ -587,7 +527,7 @@ internal fun Stepper(
             text = label,
             color = IosLabel,
             fontSize = Sizes.rowTitle,
-            letterSpacing = (-0.2).sp,
+            lineHeight = 34.sp,
             modifier = Modifier.weight(1f),
         )
         StepperButton("-", focused) { onMinus() }
@@ -607,7 +547,7 @@ internal fun Stepper(
 private fun StepperButton(glyph: String, rowFocused: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .size(width = 40.dp, height = 38.dp)
+            .size(width = 68.dp, height = 68.dp)
             .clip(RoundedCornerShape(9.dp))
             .background(if (rowFocused) IosFocusTint else IosBackground)
             .focusProperties { canFocus = false }
@@ -635,7 +575,7 @@ private fun StepperButton(glyph: String, rowFocused: Boolean, onClick: () -> Uni
 internal fun ArrowButton(glyph: String, rowFocused: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .size(48.dp)
+            .size(68.dp)
             .clip(RoundedCornerShape(12.dp))
             .focusProperties { canFocus = false }
             .clickable(onClick = onClick),
@@ -661,7 +601,7 @@ internal fun FooterNote(text: String) {
         text = text,
         color = IosTertiary,
         fontSize = Sizes.rowSub,
-        lineHeight = 24.sp,
+        lineHeight = 30.sp,
         modifier = Modifier.padding(start = 20.dp, end = 16.dp, top = 10.dp, bottom = 4.dp),
     )
 }
@@ -680,7 +620,7 @@ internal fun SettingsBackButton(onClick: () -> Unit, modifier: Modifier = Modifi
     Surface(
         color = IosCard,
         shape = RoundedCornerShape(12.dp),
-        modifier = modifier.tvFocusable(RoundedCornerShape(12.dp)) { onClick() },
+        modifier = modifier.heightIn(min = 68.dp).tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, ringColor = IosBlue) { onClick() },
     ) {
         Text(
             text = "‹  Back",
@@ -719,10 +659,11 @@ internal fun IosTextField(
         onValueChange = onChange,
         placeholder = { Text(placeholder) },
         singleLine = true,
+        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 26.sp, color = IosLabel),
         visualTransformation =
             if (password) androidx.compose.ui.text.input.PasswordVisualTransformation()
             else androidx.compose.ui.text.input.VisualTransformation.None,
-        modifier = modifier.fillMaxWidth().heightIn(min = 56.dp),
+        modifier = modifier.fillMaxWidth().heightIn(min = 68.dp),
         shape = RoundedCornerShape(14.dp),
     )
 }
@@ -734,15 +675,16 @@ internal fun PrimaryPillButton(label: String, enabled: Boolean = true, onClick: 
         color = if (enabled) IosBlue else IosDivider,
         shape = RoundedCornerShape(16.dp),
         modifier =
-            Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
+            Modifier.fillMaxWidth().heightIn(min = 68.dp).tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, ringColor = IosBlue, enabled = enabled) {
                 if (enabled) onClick()
             },
     ) {
         Text(
             label,
-            color = if (enabled) Color.White else IosSecondary,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
+            color = if (enabled) MaterialTheme.colorScheme.onPrimary else IosSecondary,
+            fontSize = Sizes.actionButton,
+            fontWeight = FontWeight.Medium,
+            lineHeight = 32.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.padding(vertical = 16.dp).fillMaxWidth(),
         )
@@ -756,33 +698,80 @@ internal fun CardPillButton(label: String, color: Color = IosBlue, onClick: () -
         color = IosCard,
         shape = RoundedCornerShape(16.dp),
         modifier =
-            Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
+            Modifier.fillMaxWidth().heightIn(min = 68.dp).tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, ringColor = IosBlue) {
                 onClick()
             },
     ) {
         Text(
             label,
             color = color,
-            fontSize = Sizes.rowTitle,
+            fontSize = Sizes.actionButton,
+            fontWeight = FontWeight.Medium,
+            lineHeight = 32.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
         )
     }
 }
 
-/** THE small blue action pill (Apply / Sign in / Test) — 10dp radius, white 17sp label. */
+/** Approved primary action: a 68 dp target, 16 dp radius and 24 sp medium label. */
 @Composable
 internal fun ActionPill(label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    SettingsActionSurface(label, modifier, onClick)
+}
+
+/** One accessible action for the full row, including its visible 68 dp action button. */
+@Composable
+internal fun ActionSettingRow(
+    title: String,
+    subtitle: String = "",
+    actionLabel: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight)
+            .then(if (enabled) Modifier.tvFocusableRow(focusFill = IosFocusTint, onClick = onClick)
+                else Modifier)
+            .semantics {
+                role = Role.Button
+                if (!enabled) disabled()
+            }
+            .padding(horizontal = 28.dp, vertical = 22.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(28.dp),
+    ) {
+        ApprovedSettingsLabel(title, subtitle.ifBlank { LocalApprovedSettingsHelp.current.orEmpty() },
+            Modifier.weight(1f))
+        // The full row owns touch, accessibility and D-pad; this button adds no second focus stop.
+        SettingsActionSurface(actionLabel, enabled = enabled)
+    }
+}
+
+@Composable
+private fun SettingsActionSurface(
+    label: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
+) {
+    val shape = RoundedCornerShape(16.dp)
     Surface(
-        color = IosBlue,
-        shape = RoundedCornerShape(10.dp),
-        modifier = modifier.tvFocusable(RoundedCornerShape(10.dp)) { onClick() },
+        color = if (enabled) IosBlue else IosDivider,
+        shape = shape,
+        modifier = modifier.heightIn(min = Sizes.primaryTarget)
+            .then(if (enabled && onClick != null)
+                Modifier.tvFocusable(shape, focusScale = 1f, ringColor = IosBlue, onClick = onClick)
+                else Modifier),
     ) {
         Text(
             label,
-            color = Color.White,
+            color = if (enabled) MaterialTheme.colorScheme.onPrimary else IosSecondary,
             fontSize = Sizes.actionButton,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
+            fontWeight = FontWeight.Medium,
+            lineHeight = 32.sp,
+            modifier = Modifier.padding(horizontal = 26.dp, vertical = 18.dp),
         )
     }
 }
@@ -798,7 +787,7 @@ internal fun SetupStep(n: String, text: String) {
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(end = 10.dp),
         )
-        Text(text, color = IosSecondary, fontSize = Sizes.rowSub, lineHeight = 20.sp)
+        Text(text, color = IosSecondary, fontSize = Sizes.rowSub, lineHeight = 28.sp)
     }
 }
 
@@ -823,6 +812,10 @@ internal fun ToggleHeaderRow(
                 modifier = Modifier.padding(top = 2.dp),
             )
         }
-        Switch(checked = checked, onCheckedChange = onCheckedChange, colors = iosSwitchColors())
+        ApprovedSettingsSwitch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier.semantics { contentDescription = title },
+        )
     }
 }

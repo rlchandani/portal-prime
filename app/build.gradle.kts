@@ -34,8 +34,7 @@ android {
     targetSdk = 36
     versionCode = 58
     versionName = "1.64"
-
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner = "com.immortal.launcher.PortalUxInstrumentation"
 
     // Portal hardware is ARM only (gen-1/gen-2 Snapdragon, Portal TV Amlogic).
     // Kept as a guard so any future native dependency can't drag x86/x86_64 .so

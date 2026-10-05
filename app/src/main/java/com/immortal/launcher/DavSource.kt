@@ -90,11 +90,13 @@ object DavSource {
             stack.addLast(dir(baseUrl))
             val seen = HashSet<String>()
             while (stack.isNotEmpty() && out.size < cap) {
+              PhotoSourceWork.checkpoint()
               val url = stack.removeLast()
               if (!seen.add(url)) continue
               val selfPath = URL(url).path
               val body = propfind(url, headers, "1") ?: continue
               for ((href, isCollection) in parseEntries(body)) {
+                PhotoSourceWork.checkpoint()
                 if (out.size >= cap) break
                 if (href.trimEnd('/') == selfPath.trimEnd('/')) continue // the folder itself
                 val full = origin + href
@@ -138,7 +140,7 @@ object DavSource {
 
   // --- HTTP PROPFIND ----------------------------------------------------------
   private fun propfind(url: String, headers: Map<String, String>, depth: String): String? {
-    val c = URL(url).openConnection() as HttpURLConnection
+    val c = URL(url).openPhotoSourceConnection()
     c.connectTimeout = 8000
     c.readTimeout = 12000
     setMethod(c, "PROPFIND")

@@ -26,15 +26,19 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
@@ -63,39 +67,79 @@ private fun IntercomScreen() {
 
 /**
  * The intercom body, shared by the standalone [IntercomScreen] popup and the in-page Tools overlay.
- * Owns the [LanAudio] session and stops it on dispose, so leaving the screen (or the whole Tools
- * folder) always releases the mic/socket.
+ * Owns the [LanAudio] session and stops it when hidden, stopped or disposed.
  */
 @Composable
 internal fun IntercomContent() {
   val context = LocalContext.current
+  val owner = LocalLifecycleOwner.current
+  val pageActive by rememberUpdatedState(LocalApprovedLauncherPageActive.current)
   val lan = remember { LanAudio() }
-  DisposableEffect(Unit) { onDispose { lan.stop() } }
 
   var mode by remember { mutableStateOf("idle") } // idle | broadcasting | listening
   var host by remember { mutableStateOf("") }
   var status by remember { mutableStateOf("") }
+  var live by remember { mutableStateOf(true) }
+  var session by remember { mutableStateOf(0) }
+  var permissionSession by remember { mutableStateOf<Int?>(null) }
+  val handler = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
   val myIp = remember { localIp(context) }
 
+  fun isActive() = live && pageActive && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+  fun stop() {
+    session++
+    permissionSession = null
+    lan.stop()
+    mode = "idle"
+    status = ""
+  }
+  DisposableEffect(owner, lan) {
+    live = true
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_STOP) stop()
+    }
+    owner.lifecycle.addObserver(observer)
+    if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) stop()
+    onDispose {
+      live = false
+      owner.lifecycle.removeObserver(observer)
+      stop()
+    }
+  }
+
   fun beginBroadcast() {
+    if (!isActive()) return
+    val request = ++session
     status = "Starting…"
     lan.startBroadcast { ok ->
-      if (ok) { mode = "broadcasting"; status = "Broadcasting this room's audio" }
-      else { mode = "idle"; status = "Couldn't start — the broadcast port is in use" }
+      handler.post {
+        if (isActive() && request == session) {
+          if (ok) { mode = "broadcasting"; status = "Broadcasting this room's audio" }
+          else { mode = "idle"; status = "Couldn't start — the broadcast port is in use" }
+        }
+      }
     }
   }
 
   val permLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
       androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { granted ->
-    if (granted) beginBroadcast()
-    else status = "Microphone permission is needed to broadcast"
+    val request = permissionSession
+    permissionSession = null
+    if (request != null && request == session && isActive()) {
+      if (granted) beginBroadcast()
+      else status = "Microphone permission is needed to broadcast"
+    }
   }
 
   fun startBroadcast() {
+    if (!isActive()) return
     val granted = android.content.pm.PackageManager.PERMISSION_GRANTED ==
         context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
     if (granted) beginBroadcast()
-    else permLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+    else {
+      permissionSession = ++session
+      permLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+    }
   }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -116,7 +160,7 @@ internal fun IntercomContent() {
           label = if (mode == "broadcasting") "■ Stop broadcasting" else "🔊 Broadcast this room",
           primary = mode != "broadcasting",
       ) {
-        if (mode == "broadcasting") { lan.stop(); mode = "idle"; status = "" } else startBroadcast()
+        if (mode == "broadcasting") stop() else startBroadcast()
       }
 
       // Listen (kitchen Portal): connect to the broadcasting Portal's address.
@@ -129,12 +173,18 @@ internal fun IntercomContent() {
               label = if (mode == "listening") "■ Stop listening" else "👂 Listen",
               primary = mode != "listening",
           ) {
-            if (mode == "listening") { lan.stop(); mode = "idle"; status = "" }
-            else if (host.isNotBlank()) {
+            if (mode == "listening") stop()
+            else if (host.isNotBlank() && isActive()) {
+              val request = ++session
+              val address = host.trim()
               status = "Connecting…"
-              lan.startListening(host.trim()) { ok ->
-                status = if (ok) "Listening to $host" else "Couldn't connect to $host"
-                mode = if (ok) "listening" else "idle"
+              lan.startListening(address) { ok ->
+                handler.post {
+                  if (isActive() && request == session) {
+                    status = if (ok) "Listening to $address" else "Couldn't connect to $address"
+                    mode = if (ok) "listening" else "idle"
+                  }
+                }
               }
             }
           }

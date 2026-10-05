@@ -12,27 +12,25 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
-/** Paste-a-link screen for the web-page screensaver source — a [UrlEntryScreen] configuration. */
+/** Native web-frame form, preserving the existing literal http/https validation. */
 class WebUrlEntryActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
       PortalPrimeTheme(darkTheme = false) {
         UrlEntryScreen(
-            title = "Web Page",
-            subtitle =
-                "Show any web page as your screensaver — Immortal displays it fullscreen and the " +
-                    "page provides its own clock and layout. Great for Immich Kiosk or a Home " +
-                    "Assistant dashboard. Tap the screen to exit.",
-            placeholder = "http://192.168.1.50:3000",
+            title = "Web page",
+            fieldLabel = "Web page address",
+            advancedOnly = true,
+            placeholder = "https://…",
             initial = ScreensaverConfig.load(this).webUrl.orEmpty(),
-            emptyHint = "Enter the full address, starting with http:// or https://.",
+            emptyHint = "Enter an address starting with http:// or https://.",
             invalidHint = "Start the address with http:// or https://.",
             primaryLabel = "Use this page",
             validate = { if (it.startsWith("http://") || it.startsWith("https://")) "" else null },
             onSave = { url ->
               ScreensaverConfig.setWebUrl(this, url)
-              finish()
+              approvedSourcesReturn(this)
             },
             onCancel = { finish() },
         )

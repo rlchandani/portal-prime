@@ -11,6 +11,9 @@ import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,6 +22,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +32,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Shared "control from your phone" pairing UI + enable step, used by both the full
@@ -58,41 +65,53 @@ fun enableRemoteAndMintPin(context: Context): Pair<String?, String?> {
  */
 @Composable
 fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
-  Surface(color = Color(0xFF1C1C1E), shape = RoundedCornerShape(18.dp), modifier = modifier.fillMaxWidth()) {
+  Surface(color = IosCard, shape = RoundedCornerShape(24.dp), modifier = modifier.fillMaxWidth()) {
     if (url == null) {
       Text(
           "Connect your Portal to Wi-Fi to use the remote.",
-          color = Color(0xFFE0A0A0),
-          fontSize = 17.sp,
-          modifier = Modifier.padding(20.dp),
+          color = IosSecondary,
+          fontSize = 24.sp,
+          modifier = Modifier.padding(35.dp),
       )
     } else {
       val pairUrl = remember(url, pin) { url + (pin?.let { "#pin=$it" } ?: "") }
-      val qr = remember(pairUrl) { lanSetupQr(pairUrl, 600) }
-      Column(
-          modifier = Modifier.fillMaxWidth().padding(24.dp),
-          horizontalAlignment = Alignment.CenterHorizontally,
+      val qr by produceState<android.graphics.Bitmap?>(null, pairUrl) {
+        value = withContext(Dispatchers.Default) { lanSetupQr(pairUrl, 400) }
+      }
+      Row(
+          modifier = Modifier.fillMaxWidth().padding(35.dp),
+          horizontalArrangement = Arrangement.spacedBy(50.dp),
+          verticalAlignment = Alignment.CenterVertically,
       ) {
-        Text("Scan with your phone camera", color = Color(0xFF9A9A9A), fontSize = 15.sp)
-        if (qr != null) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+          Text("Control from your phone", color = IosLabel, fontSize = 28.sp,
+              fontWeight = FontWeight.Medium)
+          Text("Scan with your phone camera, or open the address below on the same Wi-Fi.",
+              color = IosSecondary, fontSize = 24.sp, lineHeight = 36.sp)
+          Text(url, color = IosBlue, fontSize = 24.sp, lineHeight = 36.sp)
+          Text("Enter the pairing code. It expires in a few minutes.",
+              color = IosSecondary, fontSize = 22.sp, lineHeight = 32.sp)
+        }
+        Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+        qr?.let { image ->
           Surface(color = Color.White, shape = RoundedCornerShape(12.dp), modifier = Modifier.padding(top = 14.dp)) {
             Image(
-                bitmap = qr.asImageBitmap(),
+                bitmap = image.asImageBitmap(),
                 contentDescription = "Remote pairing QR code",
-                modifier = Modifier.padding(12.dp).size(240.dp),
+                modifier = Modifier.padding(12.dp).size(200.dp),
             )
           }
         }
-        Text("or open $url and enter the code", color = Color(0xFF9A9A9A), fontSize = 14.sp, modifier = Modifier.padding(top = 18.dp))
         Text(
             pin ?: "------",
-            color = Color.White,
-            fontSize = 44.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            modifier = Modifier.padding(top = 8.dp),
+            color = IosLabel,
+            fontSize = 90.sp,
+            lineHeight = 110.sp,
+            letterSpacing = 8.sp,
+            fontWeight = FontWeight.Normal,
+            modifier = Modifier.padding(top = 18.dp),
         )
-        Text("Code expires in a few minutes", color = Color(0xFF7C7C7C), fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
+        }
       }
     }
   }
@@ -106,16 +125,16 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
 fun PairDoneButton(modifier: Modifier = Modifier, onDone: () -> Unit) {
   Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
     Surface(
-        color = Color(0xFF2E6BE6),
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.tvFocusable(RoundedCornerShape(12.dp)) { onDone() },
+        color = IosBlue,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.heightIn(min = 68.dp).tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) { onDone() },
     ) {
       Text(
           "Done",
-          color = Color.White,
-          fontSize = 16.sp,
+          color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
+          fontSize = 24.sp,
           fontWeight = FontWeight.SemiBold,
-          modifier = Modifier.padding(horizontal = 44.dp, vertical = 12.dp),
+          modifier = Modifier.padding(horizontal = 44.dp, vertical = 18.dp),
       )
     }
   }

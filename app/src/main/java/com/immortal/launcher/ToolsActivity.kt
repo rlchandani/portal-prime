@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -67,8 +68,9 @@ import com.immortal.launcher.ui.theme.PortalPrimeTheme
  */
 class ToolsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
+    setTheme(R.style.Theme_SampleApp)
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = false) { ToolsRoot(::finish) } }
+    setContent { PortalPrimeTheme(darkTheme = false) { ApprovedToolsScreen(::finish) } }
   }
 }
 
@@ -87,24 +89,35 @@ private enum class ToolPage {
   BEDTIME,
 }
 
+/** Native tool pages; an embedding Home host supplies its theme, header and dock. */
 @Composable
-private fun ToolsRoot(onExit: () -> Unit) {
+internal fun ApprovedToolsScreen(
+    onExit: () -> Unit,
+    modifier: Modifier = Modifier,
+    embedded: Boolean = false,
+) {
   var page by remember { mutableStateOf(ToolPage.LIST) }
   val back = { page = ToolPage.LIST }
-  when (page) {
-    ToolPage.LIST -> ToolsScreen(onExit = onExit, onOpen = { page = it })
-    ToolPage.ISS -> IssOverlay(back)
-    ToolPage.AURORA -> AuroraOverlay(back)
-    ToolPage.SPEEDTEST -> SpeedTestOverlay(back)
-    ToolPage.TIMERS -> TimersOverlay(back)
-    ToolPage.NOTES -> NotesOverlay(back)
-    ToolPage.CONVERTER -> ConverterOverlay(back)
-    // Formerly separate activities — now in-page pages so they share the one Tools overlay:
-    // tapping a tile swaps the grid for the tool; closing returns to the grid (not home).
-    ToolPage.ALARM -> ToolPageOverlay("Alarm", back) { AlarmContent() }
-    ToolPage.COUNTDOWNS -> ToolPageOverlay("Countdowns", back) { CountdownSettingsContent() }
-    ToolPage.INTERCOM -> ToolPageOverlay("Intercom", back) { IntercomContent() }
-    ToolPage.BEDTIME -> BedtimeOverlay(back)
+  BackHandler { if (page == ToolPage.LIST) onExit() else back() }
+  androidx.compose.runtime.CompositionLocalProvider(LocalApprovedToolPage provides true) {
+    val content: @Composable () -> Unit = {
+      Box(modifier.fillMaxSize()) {
+        when (page) {
+          ToolPage.LIST -> ToolsScreen(onExit = onExit, onOpen = { page = it })
+          ToolPage.ISS -> IssOverlay(back)
+          ToolPage.AURORA -> AuroraOverlay(back)
+          ToolPage.SPEEDTEST -> SpeedTestOverlay(back)
+          ToolPage.TIMERS -> TimersOverlay(back)
+          ToolPage.NOTES -> NotesOverlay(back)
+          ToolPage.CONVERTER -> ConverterOverlay(back)
+          ToolPage.ALARM -> ToolPageOverlay("Alarm", back) { AlarmContent() }
+          ToolPage.COUNTDOWNS -> ToolPageOverlay("Countdowns", back) { CountdownSettingsContent() }
+          ToolPage.INTERCOM -> ToolPageOverlay("Intercom", back) { IntercomContent() }
+          ToolPage.BEDTIME -> BedtimeOverlay(back)
+        }
+      }
+    }
+    if (embedded) content() else ApprovedAppsShell("tools", onExit) { content() }
   }
 }
 
@@ -118,7 +131,7 @@ private fun ToolPageOverlay(title: String, onDismiss: () -> Unit, content: @Comp
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text(title, color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+      Text(title, color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
       content()
     }
   }
@@ -128,6 +141,14 @@ private fun ToolPageOverlay(title: String, onDismiss: () -> Unit, content: @Comp
 @Composable
 private fun BedtimeOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
+  if (LocalApprovedToolPage.current) {
+    Column(Modifier.fillMaxSize().padding(horizontal = 56.dp, vertical = 36.dp)) {
+      ApprovedAppsButton("‹  Tools", onClick = onDismiss)
+      Spacer(Modifier.height(26.dp))
+      BedtimeContent(onExit = onDismiss)
+    }
+    return
+  }
   val cfg = androidx.compose.ui.platform.LocalConfiguration.current
   val cardWidth = (cfg.screenWidthDp * 0.72f).dp.coerceAtMost(860.dp)
   val cardMaxHeight = (cfg.screenHeightDp * 0.82f).dp
@@ -148,115 +169,53 @@ private fun BedtimeOverlay(onDismiss: () -> Unit) {
 }
 
 /** One tool tile: icon + tint + label + tap action. */
-private data class ToolItem(val label: String, val iconRes: Int, val tint: Color, val onOpen: () -> Unit)
+private data class ToolItem(val label: String, val description: String, val onOpen: () -> Unit)
 
 @Composable
 private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
   val context = LocalContext.current
-  val activity = context as? Activity
+  val resume = rememberApprovedResume()
+  val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
   fun launch(cls: Class<*>) = context.startActivity(Intent(context, cls))
-
-  // App-drawer grid of tools, in a light iOS surface. Icon tints echo the Settings section colors.
   val tools = listOf(
-      ToolItem("Alarm", R.drawable.ic_tool_alarm, Color(0xFFFF453A)) { onOpen(ToolPage.ALARM) },
-      ToolItem("Cameras", R.drawable.ic_tool_camera, Color(0xFF5E5CE6)) { launch(CameraViewerActivity::class.java) },
-      ToolItem("Countdowns", R.drawable.ic_settings_countdown, Color(0xFFFF9F0A)) { onOpen(ToolPage.COUNTDOWNS) },
-      ToolItem("Lamp", R.drawable.ic_tool_lamp, Color(0xFFFFD60A)) { launch(LampActivity::class.java) },
-      ToolItem("Bedtime story", R.drawable.ic_tool_story, Color(0xFFAF52DE)) { onOpen(ToolPage.BEDTIME) },
-      ToolItem("Intercom", R.drawable.ic_tool_intercom, Color(0xFF30D158)) { onOpen(ToolPage.INTERCOM) },
-      ToolItem("Timers", R.drawable.ic_tool_timer, Color(0xFFFF9F0A)) { onOpen(ToolPage.TIMERS) },
-      ToolItem("Leave a note", R.drawable.ic_tool_note, Color(0xFFFFD60A)) { onOpen(ToolPage.NOTES) },
-      ToolItem("Converter", R.drawable.ic_tool_converter, Color(0xFF64D2FF)) { onOpen(ToolPage.CONVERTER) },
-      ToolItem("ISS passes", R.drawable.ic_tool_iss, Color(0xFF0A84FF)) { onOpen(ToolPage.ISS) },
-      ToolItem("Aurora outlook", R.drawable.ic_tool_aurora, Color(0xFF30D158)) { onOpen(ToolPage.AURORA) },
-      ToolItem("Speed test", R.drawable.ic_tool_speed, Color(0xFF5E5CE6)) { onOpen(ToolPage.SPEEDTEST) },
-  )
-
-  // iOS-style folder: a light scrim over the (translucent-window) home, with a centered floating
-  // card holding the tool grid. Like an iPadOS folder it closes on tap-outside or Back — no ✕
-  // (tools OPENED from the folder keep an explicit top-right ✕; the folder itself is ephemeral).
-  val cfg = androidx.compose.ui.platform.LocalConfiguration.current
-  val cardWidth = (cfg.screenWidthDp * 0.82f).dp.coerceAtMost(1100.dp)
-  Box(
-      modifier = Modifier.fillMaxSize()
-          .onPreviewKeyEvent { e ->
-            if (e.key == Key.Back) { if (e.type == KeyEventType.KeyUp) onExit(); true } else false
-          }
-          .background(Color(0x4D000000))
-          .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onExit() },
-      contentAlignment = Alignment.Center,
+      ToolItem("Alarm", "Choose your next wake-up time.") { onOpen(ToolPage.ALARM) },
+      ToolItem("Cameras", "Keep an eye on your home.") { launch(CameraViewerActivity::class.java) },
+      ToolItem("Countdowns", "Count down to a day that matters.") { onOpen(ToolPage.COUNTDOWNS) },
+      ToolItem("Lamp", "A soft glow for your room.") { launch(LampActivity::class.java) },
+      ToolItem("Bedtime story", "Something calm for the evening.") { onOpen(ToolPage.BEDTIME) },
+      ToolItem("Intercom", "Talk across the house.") { onOpen(ToolPage.INTERCOM) },
+      ToolItem("Timers", "A little time, set aside.") { onOpen(ToolPage.TIMERS) },
+      ToolItem("Leave a note", "A message for the next person here.") { onOpen(ToolPage.NOTES) },
+      ToolItem("Converter", "Quick everyday measurements.") { onOpen(ToolPage.CONVERTER) },
+      ToolItem("ISS passes", "Find the next pass above your home.") { onOpen(ToolPage.ISS) },
+      ToolItem("Aurora outlook", "Check the chance of northern lights.") { onOpen(ToolPage.AURORA) },
+  ) + if (advanced) listOf(ToolItem("Speed test", "Download test and latency.") { onOpen(ToolPage.SPEEDTEST) }) else emptyList()
+  androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+      columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(3),
+      horizontalArrangement = Arrangement.spacedBy(24.dp),
+      modifier = Modifier.fillMaxSize().padding(horizontal = 56.dp),
+      contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 36.dp, bottom = 24.dp),
+      verticalArrangement = Arrangement.spacedBy(24.dp),
   ) {
-    Surface(
-        color = IosBackground,
-        shape = RoundedCornerShape(32.dp),
-        modifier = Modifier.width(cardWidth).padding(24.dp)
-            // Consume taps on the card so only true outside-taps dismiss.
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {},
-    ) {
-      Column(modifier = Modifier.padding(horizontal = 32.dp, vertical = 28.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-          Text("Tools", color = IosLabel, fontSize = 32.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-        }
-        Spacer(Modifier.size(24.dp))
-        val perRow = 4
-        Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-          tools.chunked(perRow).forEach { row ->
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-              row.forEach { t -> ToolTile(t, modifier = Modifier.weight(1f)) }
-              repeat(perRow - row.size) { Spacer(Modifier.weight(1f)) }
-            }
-          }
-        }
-      }
-    }
+    item(key = "heading", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { ApprovedAppsHeading("Tools", "Everyday tools for your Portal.") }
+    items(tools.size, key = { tools[it].label }) { index -> ToolTile(tools[index], Modifier.fillMaxWidth()) }
   }
 }
 
-/**
- * One tool tile styled to match the home-grid app icons: a squircle-cornered tinted icon with a
- * soft drop shadow (3D depth) + a glossy top sheen, and a label in the same weight/size as the grid.
- */
 @Composable
 private fun ToolTile(item: ToolItem, modifier: Modifier = Modifier) {
-  val iconShape = RoundedCornerShape(24.dp)
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = modifier.clip(RoundedCornerShape(22.dp)).tvFocusable(RoundedCornerShape(22.dp)) { item.onOpen() }
-          .padding(vertical = 14.dp),
-  ) {
-    Box(
-        modifier = Modifier
-            .size(104.dp)
-            .shadow(elevation = 8.dp, shape = iconShape, clip = false)
-            .clip(iconShape)
-            .background(item.tint),
-        contentAlignment = Alignment.Center,
-    ) {
-      Icon(
-          painter = painterResource(item.iconRes),
-          contentDescription = null,
-          tint = Color.White,
-          modifier = Modifier.size(56.dp),
-      )
-      // Glossy top-down sheen for the "candy"/3D finish — same as the home-grid icons.
-      Box(
-          modifier = Modifier.matchParentSize().background(
-              Brush.verticalGradient(
-                  colors = listOf(Color(0x33FFFFFF), Color(0x0FFFFFFF), Color.Transparent),
-                  endY = 120f,
-              )
-          )
-      )
+  val glyph = when (item.label) {
+    "Alarm" -> "bell"; "Cameras" -> "film"; "Countdowns" -> "hourglass"; "Lamp" -> "bulb"
+    "Bedtime story", "Leave a note" -> "notes"; "Intercom" -> "megaphone"; "Timers" -> "timer"
+    "Converter" -> "calc"; "ISS passes" -> "globe"; "Aurora outlook" -> "weather"; else -> "wifi"
+  }
+  Surface(color = IosCard, shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider), modifier = modifier) {
+    Column(Modifier.height(210.dp).tvFocusable(RoundedCornerShape(24.dp), focusScale = 1f, onClick = item.onOpen).padding(32.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)) {
+      ApprovedAppsGlyph(glyph, IosBlue, 40.dp)
+      Text(item.label, color = IosLabel, fontSize = 28.sp, lineHeight = 38.sp, fontWeight = FontWeight.Medium)
+      Text(item.description, color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp)
     }
-    Text(
-        item.label,
-        color = IosLabel,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Medium,
-        textAlign = TextAlign.Center,
-        maxLines = 2,
-        modifier = Modifier.padding(top = 12.dp),
-    )
   }
 }
 
@@ -266,7 +225,7 @@ internal fun CloseCircle(onClick: () -> Unit) {
   Surface(
       color = IosDivider,
       shape = CircleShape,
-      modifier = Modifier.size(40.dp).tvFocusable(CircleShape, focusScale = 1.1f) { onClick() },
+      modifier = Modifier.size(68.dp).tvFocusable(CircleShape, focusScale = 1f) { onClick() },
   ) {
     Box(contentAlignment = Alignment.Center) {
       Text("✕", color = IosSecondary, fontSize = 18.sp, fontWeight = FontWeight.Bold)

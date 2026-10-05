@@ -56,24 +56,34 @@ object StoreCatalog {
       "https://raw.githubusercontent.com/starbrightlab/immortal/main/catalog.json"
 
   private val io = Executors.newSingleThreadExecutor()
+  // Catalog browsing cannot queue behind APK downloads or F-Droid update checks.
+  private val catalogIo = Executors.newSingleThreadExecutor()
+  private val catalogSnapshots = CatalogSnapshotDelivery<CatalogApp>()
+  private val updateIo = Executors.newSingleThreadExecutor()
+  private val updateRequests = CatalogRequestDelivery<List<CatalogApp>, Pair<String, Long>>()
   // Lazy so touching the pure helpers (parse/resolveApkUrl) in a unit test doesn't
   // eagerly construct a main-looper Handler (unavailable off-device).
   private val main by lazy { Handler(Looper.getMainLooper()) }
 
   private const val TAG = "ImmortalStore"
 
-  fun loadCatalog(context: Context, onResult: (List<CatalogApp>) -> Unit) {
-    io.execute {
+  fun loadCatalog(context: Context, onResult: (List<CatalogApp>) -> Unit): () -> Unit {
+    val interest = catalogSnapshots.subscribe(onResult)
+    interest.snapshot?.let { ready -> main.post { onResult(ready) } }
+    if (!interest.startLoad) return interest.cancel
+    val appContext = context.applicationContext
+    catalogIo.execute {
+      try {
       // Asset-first: the bundled catalog always renders instantly and offline,
       // so the store is never empty even if the network or remote file fails.
       val bundled =
           runCatching {
-                context.assets.open("catalog.json").use { it.readBytes().toString(Charsets.UTF_8) }
+                appContext.assets.open("catalog.json").use { it.readBytes().toString(Charsets.UTF_8) }
               }
               .mapCatching { parse(it) }
               .onFailure { android.util.Log.w(TAG, "bundled catalog failed", it) }
               .getOrDefault(emptyList())
-      if (bundled.isNotEmpty()) main.post { onResult(bundled) }
+      if (bundled.isNotEmpty() && interest.snapshot == null) publishCatalog(bundled)
 
       // Then refresh from the hosted catalog if reachable and newer-shaped.
       val remote =
@@ -83,9 +93,22 @@ object StoreCatalog {
               .onFailure { android.util.Log.w(TAG, "remote catalog parse failed", it) }
               .getOrDefault(emptyList())
       android.util.Log.i(TAG, "catalog loaded: bundled=${bundled.size} remote=${remote.size}")
-      if (remote.isNotEmpty()) main.post { onResult(remote) }
-      else if (bundled.isEmpty()) main.post { onResult(emptyList()) }
+      val finalCatalog = retainedCatalogSnapshot(remote, interest.snapshot, bundled)
+      catalogSnapshots.complete(finalCatalog).forEach { callback ->
+        main.post { callback(finalCatalog) }
+      }
+      } catch (error: Throwable) {
+        catalogSnapshots.complete(interest.snapshot.orEmpty()).forEach { callback ->
+          main.post { callback(interest.snapshot.orEmpty()) }
+        }
+        android.util.Log.w(TAG, "catalog refresh failed", error)
+      }
     }
+    return interest.cancel
+  }
+
+  private fun publishCatalog(apps: List<CatalogApp>) {
+    catalogSnapshots.publish(apps).forEach { callback -> main.post { callback(apps) } }
   }
 
   internal fun parse(json: String): List<CatalogApp> {
@@ -157,17 +180,30 @@ object StoreCatalog {
    * package — the launcher has its own self-updater. Calls [onResult] on the main
    * thread with packageName -> latest versionCode.
    */
-  fun findUpdates(context: Context, apps: List<CatalogApp>, onResult: (Map<String, Long>) -> Unit) {
-    io.execute {
-      val updates = mutableMapOf<String, Long>()
-      for (app in apps) {
-        if (app.packageName == context.packageName) continue
-        val installed = installedVersionCode(context, app.packageName) ?: continue
-        val latest = latestVersionCode(app) ?: continue
-        if (latest > installed) updates[app.packageName] = latest
+  fun findUpdates(context: Context, apps: List<CatalogApp>, onResult: (Map<String, Long>) -> Unit): () -> Unit {
+    val requestKey = apps.toList()
+    val interest = updateRequests.subscribe(requestKey) { onResult(it.toMap()) }
+    if (!interest.startLoad) return interest.cancel
+    val appContext = context.applicationContext
+    updateIo.execute {
+      val updates = mutableListOf<Pair<String, Long>>()
+      try {
+        for (app in requestKey) {
+          if (app.packageName == appContext.packageName) continue
+          val installed = installedVersionCode(appContext, app.packageName) ?: continue
+          val latest = latestVersionCode(app) ?: continue
+          if (latest > installed) updates += app.packageName to latest
+        }
+      } catch (error: Throwable) {
+        android.util.Log.w(TAG, "update scan failed", error)
+      } finally {
+        val ready = updates.toList()
+        updateRequests.complete(requestKey).forEach { callback ->
+          main.post { callback(ready) }
+        }
       }
-      main.post { onResult(updates) }
     }
+    return interest.cancel
   }
 
   /**

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,6 +27,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -61,12 +63,78 @@ class ScreensaverSettingsActivity : ComponentActivity() {
 
 @Composable
 private fun ScreensaverSettingsScreen() {
-  val activity = LocalContext.current as? Activity
+  val context = LocalContext.current
+  val activity = context as? Activity
+  val state = rememberScreensaverSettings()
+  val settings by state
+  fun apply(domain: SettingsDomain<ScreensaverConfig.Settings>, key: String, value: Any) {
+    domain.apply(context, JSONObject().put(key, value))
+    state.value = ScreensaverConfig.load(context)
+  }
+  val screensaver = if (settings.enabled) prepareSettingsList(
+      SettingsDomains.screensaver, settings, exclude = setOf("enabled"),
+  ) { key, value -> apply(SettingsDomains.screensaver, key, value) } else null
+  val calendar = if (settings.enabled) prepareSettingsList(
+      SettingsDomains.calendar, settings,
+  ) { key, value -> apply(SettingsDomains.calendar, key, value) } else null
+  val requested = LocalApprovedRequestedControl.current
+      ?: activity?.intent?.getStringExtra(APPROVED_SETTINGS_CONTROL)
+  val scroll = rememberLazyListState()
+  val index = approvedScreensaverControlIndex(
+      requested, settings.enabled, screensaver?.projection?.controlIndices.orEmpty(),
+      screensaver?.itemCount ?: 0, calendar?.projection?.controlIndices.orEmpty(),
+  )
+  LaunchedEffect(requested, index) { if (index != null) scroll.scrollToItem(index) }
+  val firstFocus = remember { FocusRequester() }
+  LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
+  val detail = ApprovedSettingsLazyDetail(scroll) {
+    item(key = "screensaver.enabled", contentType = "master") {
+      ApprovedSettingsLazyRow(
+          "screensaver.enabled", true, true, requested,
+          modifier = Modifier.focusRequester(firstFocus).focusGroup(),
+      ) {
+        ToggleRow("Show the photo-frame screensaver", settings.enabled) {
+          apply(SettingsDomains.screensaver, "enabled", it)
+        }
+      }
+    }
+    item(key = "screensaver:master-footer", contentType = "footer") {
+      FooterNote("Show photos when your Portal is idle.")
+    }
+    if (settings.enabled && screensaver != null && calendar != null) {
+      item(key = "screensaver:leading-gap", contentType = "gap") { Spacer(Modifier.size(20.dp)) }
+      settingsListItems(screensaver)
+      item(key = "calendar:page-heading", contentType = "section-heading") { SectionLabel("Calendar") }
+      settingsListItems(calendar)
+      item(key = "screensaver:preview-gap", contentType = "gap") { Spacer(Modifier.size(6.dp)) }
+      item(key = "screensaver:preview", contentType = "preview") {
+        PrimaryPillButton("Preview screensaver") {
+          context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
+        }
+      }
+    }
+  }
   SettingsScaffold(
       title = "Screensaver",
       subtitle = "Choose what shows on the photo frame when your Portal is idle.",
       onBack = { activity?.finish() },
-  ) { ScreensaverSettingsContent() }
+      lazyDetail = detail,
+  ) {}
+}
+
+@Composable
+private fun rememberScreensaverSettings(): MutableState<ScreensaverConfig.Settings> {
+  val context = LocalContext.current
+  val state = remember { mutableStateOf(ScreensaverConfig.load(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_RESUME) state.value = ScreensaverConfig.load(context)
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+  }
+  return state
 }
 
 /** Inlinable body of the Screensaver settings screen — rendered both by [ScreensaverSettingsScreen]
@@ -105,8 +173,7 @@ internal fun ScreensaverSettingsContent() {
         }
       }
       FooterNote(
-          "Turn this off to let your Portal's screen sleep on its own timer (or run your own " +
-              "screensaver). Immortal won't switch it back on.",
+          "Show photos when your Portal is idle.",
       )
 
       if (settings.enabled) {

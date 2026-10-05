@@ -47,7 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.util.Locale
-import kotlin.concurrent.thread
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Resolves and launches whatever the user picked to open when they tap the photo-frame
@@ -191,165 +196,138 @@ class ScreensaverDismissAppActivity : ComponentActivity() {
   }
 }
 
+private enum class ApprovedEditorsDismissPopup { TARGET, APPS, HA_PATH }
+
 @Composable
 private fun DismissAppScreen(onDone: () -> Unit) {
   val context = LocalContext.current
-  val haPkg = remember { ScreensaverDismiss.installedHaPackage(context) }
-  val initial = remember { ScreensaverConfig.load(context) }
-
-  // Three-way selection: HA mode, a specific app component, or neither (launcher).
-  var haMode by remember { mutableStateOf(initial.dismissHaDashboard != null) }
-  var haPath by remember { mutableStateOf(initial.dismissHaDashboard ?: "") }
-  var selectedComponent by remember { mutableStateOf(initial.dismissAppComponent) }
-
-  // null = still loading; emptyList would mean "no apps" (shouldn't happen on a Portal).
+  var settings by remember { mutableStateOf(ScreensaverConfig.load(context)) }
+  var haPkg by remember { mutableStateOf<String?>(null) }
   var apps by remember { mutableStateOf<List<PickEntry>?>(null) }
   var haIcon by remember { mutableStateOf<ImageBitmap?>(null) }
-  // Enumerating + decoding icons is slow; do it off the main thread.
-  LaunchedEffect(Unit) {
-    thread {
-      haPkg?.let { haIcon = ScreensaverDismiss.appIcon(context, it) }
-      apps = loadLaunchableApps(context)
+  var popup by remember { mutableStateOf<ApprovedEditorsDismissPopup?>(null) }
+  var path by remember { mutableStateOf("") }
+  var query by remember { mutableStateOf("") }
+  val advanced = rememberApprovedAdvanced()
+  // Lifecycle-owned IO replaces the old unowned thread that could update a closed picker.
+  LaunchedEffect(context) {
+    val result = withContext(Dispatchers.IO) {
+      val pkg = ScreensaverDismiss.installedHaPackage(context)
+      Triple(pkg, pkg?.let { ScreensaverDismiss.appIcon(context, it) }, loadLaunchableApps(context))
+    }
+    haPkg = result.first; haIcon = result.second; apps = result.third
+  }
+  val matches = remember(apps, query) {
+    val q = query.trim()
+    apps?.filter { q.isEmpty() || it.label.contains(q, ignoreCase = true) ||
+      it.component.packageName.contains(q, ignoreCase = true) }
+  }
+  fun refresh() { settings = ScreensaverConfig.load(context) }
+  fun chooseLauncher() { ScreensaverConfig.setDismissLauncher(context); refresh(); popup = null }
+  fun chooseHa() {
+    // Selecting HA without editing its advanced path retains a previously configured dashboard.
+    ScreensaverConfig.setDismissHaDashboard(context, settings.dismissHaDashboard.orEmpty())
+    refresh(); popup = null
+  }
+  BackHandler { onDone() }
+  SettingsScaffold(title = "Open when you tap to exit", onBack = onDone) {
+    SectionLabel("Options")
+    Card {
+      NavRow("Open when you tap to exit", value = when {
+        settings.dismissHaDashboard != null -> "Home Assistant dashboard"
+        settings.dismissAppComponent != null -> apps?.firstOrNull {
+          it.component.flattenToString() == settings.dismissAppComponent
+        }?.label ?: "Chosen app"
+        else -> "Immortal launcher"
+      }) { popup = ApprovedEditorsDismissPopup.TARGET }
+    }
+    if (settings.dismissHaDashboard != null && haPkg == null && apps != null) {
+      FooterNote("The Home Assistant companion app is unavailable. The screensaver returns to Immortal.")
+    }
+    if (settings.dismissHaDashboard != null && advanced && haPkg != null) {
+      SectionLabel("Advanced options")
+      Card {
+        NavRow("Home Assistant dashboard path", value = settings.dismissHaDashboard.orEmpty().ifBlank {
+          "Default dashboard"
+        }, subLabel = "Leave blank to open the default dashboard.") {
+          path = settings.dismissHaDashboard.orEmpty(); popup = ApprovedEditorsDismissPopup.HA_PATH
+        }
+      }
     }
   }
-
-  BackHandler { onDone() }
-
-  SettingsScaffold(
-      title = "Open When Dismissed",
-      subtitle = "Choose what opens when you tap the screensaver to wake the Portal.",
-      onBack = onDone,
-  ) {
-    // --- Home Assistant (only when the companion app is installed) -----------------
-    if (haPkg != null) {
-      SectionLabel("Home Assistant")
+  when (popup) {
+    ApprovedEditorsDismissPopup.TARGET -> ApprovedSettingsDialog("Open when you tap to exit",
+      onDismiss = { popup = null }) {
       Card {
-        DismissRow(
-            icon = haIcon,
-            title = "Home Assistant",
-            subtitle = "Open your Home Assistant dashboard on tap.",
-            selected = haMode,
-        ) {
-          haMode = true
-          selectedComponent = null
-          ScreensaverConfig.setDismissHaDashboard(context, haPath)
-        }
-        if (haMode) {
+        DismissRow(null, "Immortal launcher", "Return to your home screen (default).",
+          settings.dismissHaDashboard == null && settings.dismissAppComponent == null) { chooseLauncher() }
+        if (haPkg != null) {
           Divider()
-          Column(modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 16.dp)) {
-            Text("Dashboard", color = IosLabel, fontSize = Sizes.rowSub)
-            OutlinedTextField(
-                colors = iosTextFieldColors(),
-                value = haPath,
-                onValueChange = {
-                  // Single-line: strip any newline the IME might inject.
-                  val v = it.replace("\n", "")
-                  haPath = v
-                  ScreensaverConfig.setDismissHaDashboard(context, v)
-                },
-                placeholder = { Text("today-home/security", color = IosSecondary) },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).padding(top = 8.dp),
-            )
-            Text(
-                "The path after your Home Assistant address (e.g. lovelace/0). " +
-                    "Leave blank to open your default dashboard.",
-                color = IosTertiary,
-                fontSize = Sizes.rowSub,
-                modifier = Modifier.padding(top = 8.dp),
-            )
-          }
+          DismissRow(haIcon, "Home Assistant dashboard", "Open the installed Home Assistant app.",
+            settings.dismissHaDashboard != null) { chooseHa() }
         }
-      }
-      Spacer(Modifier.size(26.dp))
-    }
-
-    // --- Launcher + installed apps -------------------------------------------------
-    SectionLabel(if (haPkg != null) "Or an app" else "Open")
-    Card {
-      DismissRow(
-          icon = null,
-          title = "Immortal launcher",
-          subtitle = "Return to your home screen (default).",
-          selected = !haMode && selectedComponent == null,
-      ) {
-        ScreensaverConfig.setDismissLauncher(context)
-        onDone()
-      }
-
-      val list = apps
-      if (list == null) {
         Divider()
-        Text(
-            "Finding your apps…",
-            color = IosSecondary,
-            fontSize = Sizes.rowSub,
-            modifier = Modifier.padding(18.dp),
-        )
-      } else {
-        list.forEach { app ->
-          Divider()
-          val flat = app.component.flattenToString()
-          DismissRow(
-              icon = app.icon,
-              title = app.label,
-              subtitle = null,
-              selected = !haMode && selectedComponent == flat,
-          ) {
-            ScreensaverConfig.setDismissApp(context, flat)
-            onDone()
+        DismissRow(null, "Choose an installed app", "Uses the apps installed on your Portal.",
+          settings.dismissHaDashboard == null && settings.dismissAppComponent != null) {
+          query = ""; popup = ApprovedEditorsDismissPopup.APPS
+        }
+      }
+      Spacer(Modifier.size(24.dp))
+      ApprovedEditorsButton("Cancel") { popup = null }
+    }
+    ApprovedEditorsDismissPopup.APPS -> ApprovedSettingsDialog("Choose an installed app",
+      onDismiss = { popup = null }) {
+      ApprovedEditorsField("Search installed apps", query, { query = it }, placeholder = "Name or package")
+      Card {
+        val list = matches
+        if (list == null) ApprovedEditorsEmpty("Finding your apps…")
+        else if (list.isEmpty()) ApprovedEditorsEmpty(if (query.isBlank()) "No launchable apps found."
+          else "No apps match \"$query\".")
+        else LazyColumn(Modifier.fillMaxWidth().heightIn(max = 560.dp)) {
+          itemsIndexed(list, key = { _, app -> app.component.flattenToString() }) { index, app ->
+            if (index > 0) Divider()
+            val component = app.component.flattenToString()
+            DismissRow(app.icon, app.label, null,
+              settings.dismissHaDashboard == null && settings.dismissAppComponent == component) {
+              ScreensaverConfig.setDismissApp(context, component); refresh(); popup = null
+            }
           }
         }
       }
+      Spacer(Modifier.size(24.dp))
+      ApprovedEditorsButton("Cancel") { popup = null }
     }
+    ApprovedEditorsDismissPopup.HA_PATH -> ApprovedSettingsDialog("Home Assistant dashboard path",
+      onDismiss = { popup = null },
+      help = "Use a path such as lovelace/0, a Home Assistant deep link, or a full dashboard URL. " +
+        "Leave blank for the default dashboard.") {
+      ApprovedEditorsField("Dashboard path", path, { path = it }, placeholder = "lovelace/0")
+      ApprovedEditorsActions("Save", onCancel = { popup = null }) {
+        ScreensaverConfig.setDismissHaDashboard(context, path); refresh(); popup = null
+      }
+    }
+    null -> Unit
   }
 }
 
 @Composable
 private fun DismissRow(
-    icon: ImageBitmap?,
-    title: String,
-    subtitle: String?,
-    selected: Boolean,
-    onClick: () -> Unit,
+    icon: ImageBitmap?, title: String, subtitle: String?, selected: Boolean, onClick: () -> Unit,
 ) {
-  Row(
-      modifier =
-          Modifier.fillMaxWidth().tvFocusableRow { onClick() }
-              .padding(start = 18.dp, end = 12.dp, top = 14.dp, bottom = 14.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(14.dp),
-  ) {
-    if (icon != null) {
-      Image(
-          bitmap = icon,
-          contentDescription = null,
-          modifier = Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)),
-      )
-    } else {
-      Spacer(Modifier.size(40.dp))
+  Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = 116.dp)
+      .tvFocusableRow(focusFill = IosFocusTint, onClick = onClick)
+      .padding(horizontal = 24.dp, vertical = 23.dp),
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.spacedBy(22.dp)) {
+    if (icon != null) Image(icon, contentDescription = null,
+      modifier = Modifier.size(56.dp).clip(RoundedCornerShape(14.dp)))
+    Column(Modifier.weight(1f)) {
+      Text(title, color = IosLabel, fontSize = 26.sp, lineHeight = 35.sp)
+      if (subtitle != null) Text(subtitle, color = IosSecondary, fontSize = 22.sp,
+        lineHeight = 30.sp, modifier = Modifier.padding(top = 7.dp))
     }
-    Column(modifier = Modifier.weight(1f)) {
-      Text(title, color = IosLabel, fontSize = Sizes.rowTitle)
-      if (subtitle != null) {
-        Text(
-            subtitle,
-            color = IosSecondary,
-            fontSize = Sizes.rowSub,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-      }
-    }
-    // Visual only — the whole row is the focus/click target.
-    RadioButton(
-        selected = selected,
-        onClick = null,
-        colors = RadioButtonDefaults.colors(
-            selectedColor = IosBlue,
-            unselectedColor = IosChevron,
-        ),
-    )
+    RadioButton(selected, onClick = null,
+      colors = RadioButtonDefaults.colors(selectedColor = IosBlue, unselectedColor = IosChevron))
   }
 }
 

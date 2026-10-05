@@ -108,9 +108,9 @@ private fun TestButton(label: String, onClick: () -> Unit) {
     Text(
         "▶  $label",
         color = IosBlue,
-        fontSize = 15.sp,
+        fontSize = 24.sp,
         fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp),
     )
   }
 }
@@ -164,6 +164,5 @@ private fun VoicePicker(current: String, onPick: (String) -> Unit) {
     }
   }
 }
-
 
 

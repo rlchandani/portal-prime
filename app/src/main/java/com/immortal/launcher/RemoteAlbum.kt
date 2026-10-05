@@ -174,7 +174,7 @@ object RemoteAlbum {
   private fun resolveIcloudHost(token: String): Pair<String, String?>? {
     val firstGuess = "p${icloudPartition(token)}-sharedstreams.icloud.com"
     val c =
-        URL("https://$firstGuess/$token/sharedstreams/webstream").openConnection()
+        URL("https://$firstGuess/$token/sharedstreams/webstream").openPhotoSourceConnection()
             as HttpURLConnection
     c.connectTimeout = 8000
     c.readTimeout = 8000
@@ -452,7 +452,7 @@ object RemoteAlbum {
   }
 
   private fun postForm(spec: String, body: String): String? {
-    val c = URL(spec).openConnection() as HttpURLConnection
+    val c = URL(spec).openPhotoSourceConnection() as HttpURLConnection
     c.connectTimeout = 8000
     c.readTimeout = 10000
     c.requestMethod = "POST"
@@ -644,7 +644,7 @@ object RemoteAlbum {
   private fun followRedirects(spec: String, maxHops: Int = 5): String? {
     var current = spec
     repeat(maxHops) {
-      val c = URL(current).openConnection() as HttpURLConnection
+      val c = URL(current).openPhotoSourceConnection() as HttpURLConnection
       c.connectTimeout = 8000
       c.readTimeout = 8000
       c.instanceFollowRedirects = false
@@ -674,7 +674,7 @@ object RemoteAlbum {
       spec: String,
       headers: Map<String, String> = emptyMap(),
   ): HttpResponse? {
-    val c = URL(spec).openConnection() as HttpURLConnection
+    val c = URL(spec).openPhotoSourceConnection() as HttpURLConnection
     c.connectTimeout = 8000
     c.readTimeout = 10000
     c.instanceFollowRedirects = true
@@ -694,7 +694,7 @@ object RemoteAlbum {
   }
 
   private fun postJson(spec: String, body: String): String? {
-    val c = URL(spec).openConnection() as HttpURLConnection
+    val c = URL(spec).openPhotoSourceConnection() as HttpURLConnection
     c.connectTimeout = 8000
     c.readTimeout = 10000
     c.requestMethod = "POST"

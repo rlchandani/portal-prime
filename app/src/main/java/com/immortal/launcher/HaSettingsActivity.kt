@@ -4,285 +4,276 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 package com.immortal.launcher
 
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+
+
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * Editor for the Home Assistant control widget: connection (base URL + long-lived token), a "Test &
- * discover" action that pings the server and lists controllable entities to pin, and the pinned-entity
- * list. Light iOS layout matching the other widget editors.
- */
 class HaSettingsActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = false) { HaSettingsScreen() } }
-  }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val entities = intent.getStringExtra(APPROVED_SETTINGS_PAGE) == "ha-entities"
+        setContent {
+            PortalPrimeTheme(darkTheme = false) {
+                SettingsScaffold(title = if (entities) "Choose Home Assistant entities" else "Home Assistant controls",
+                    onBack = { finish() }) { ApprovedEditorsHaContent(entities) }
+            }
+        }
+    }
 }
 
 @Composable
-private fun HaSettingsScreen() {
-  val activity = LocalContext.current as? Activity
-  SettingsScaffold(
-      title = "Home Assistant",
-      subtitle = "Control lights, switches, and scenes. Needs your HA URL + a long-lived access token.",
-      onBack = { activity?.finish() },
-  ) { HaSettingsContent() }
-}
+internal fun HaSettingsContent() { ApprovedEditorsHaContent(entitiesOnly = false) }
 
 @Composable
-internal fun HaSettingsContent() {
-  val context = LocalContext.current
-  val scope = rememberCoroutineScope()
-  var url by remember { mutableStateOf(HaConfig.baseUrl(context)) }
-  var token by remember { mutableStateOf(HaConfig.token(context)) }
-  var status by remember { mutableStateOf("") }
-  var discovered by remember { mutableStateOf<List<HaClient.EntityState>>(emptyList()) }
-  var pinned by remember { mutableStateOf(HaConfig.entities(context)) }
-  var query by remember { mutableStateOf("") }
-  // Domains the user has expanded (collapsed by default while browsing). Searching overrides this
-  // and expands every group so matches are always visible.
-  var expandedGroups by remember { mutableStateOf<Set<String>>(emptySet()) }
+private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val requests = remember { ApprovedEditorsRequestGate() }
+    var connectionJob by remember { mutableStateOf<Job?>(null) }
+    var url by remember { mutableStateOf(HaConfig.baseUrl(context)) }
+    // Secrets never get copied into an editable field just to display the configured state.
+    var token by remember { mutableStateOf("") }
+    var status by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var discovered by remember { mutableStateOf<List<ApprovedEditorsEntity>>(emptyList()) }
+    var pinned by remember { mutableStateOf(HaConfig.entities(context)) }
+    var query by remember { mutableStateOf("") }
+    var expandedGroups by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var groups by remember { mutableStateOf<List<ApprovedEditorsHaGroup>>(emptyList()) }
+    var filtering by remember { mutableStateOf(false) }
+    var removal by remember { mutableStateOf<HaConfig.Entity?>(null) }
+    val pinnedIds = remember(pinned) { pinned.map { it.entityId }.toSet() }
 
-  fun refreshPinned() {
-    pinned = HaConfig.entities(context)
-  }
-
-  Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-    // Connection.
-    Card {
-      Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Connection", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
-        Text(
-            "In HA: profile → Long-lived access tokens → Create. Paste the URL (e.g. http://homeassistant.local:8123) and token.",
-            color = IosSecondary,
-            fontSize = Sizes.rowSub,
-        )
-        OutlinedTextField(
-            colors = iosTextFieldColors(),
-            value = url,
-            onValueChange = { url = it },
-            label = { Text("Base URL") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        OutlinedTextField(
-            colors = iosTextFieldColors(),
-            value = token,
-            onValueChange = { token = it },
-            label = { Text("Long-lived token") },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        PrimaryButton("Save & discover") {
-          HaConfig.setConnection(context, url, token)
-          status = "Connecting…"
-          scope.launch {
-            val ok = withContext(Dispatchers.IO) { HaClient.ping(context) }
-            if (!ok) {
-              status = "Couldn't reach Home Assistant — check URL and token"
-              discovered = emptyList()
-            } else {
-              val list = withContext(Dispatchers.IO) { HaClient.discover(context) }
-              discovered = list
-              status = "Connected ✓ — ${list.size} controllable entities found"
-            }
-          }
-        }
-        if (status.isNotBlank()) {
-          Text(status, color = if (status.contains("✓")) IosGreen else IosSecondary, fontSize = Sizes.rowSub)
-        }
-      }
+    fun cancelConnection() {
+        if (busy) status = ""
+        requests.cancel(); connectionJob?.cancel(); connectionJob = null; busy = false
     }
-
-    // Pinned entities.
-    if (pinned.isNotEmpty()) {
-      Card {
-        Column(modifier = Modifier.padding(vertical = 6.dp)) {
-          Text(
-              "Pinned to widget",
-              color = IosSecondary,
-              fontSize = Sizes.rowSub,
-              fontWeight = FontWeight.SemiBold,
-              modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
-          )
-          pinned.forEach { e ->
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-              Column(modifier = Modifier.weight(1f)) {
-                Text(e.name, color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
-                Text(e.entityId, color = IosSecondary, fontSize = Sizes.rowSub)
-              }
-              Box(
-                  modifier = Modifier.size(40.dp).clickable {
-                    HaConfig.removeEntity(context, e.entityId)
-                    refreshPinned()
-                  },
-                  contentAlignment = Alignment.Center,
-              ) {
-                Text("✕", color = IosRed, fontSize = 20.sp)
-              }
-            }
-          }
+    fun discover(saveDraft: Boolean) {
+        val candidateUrl = if (saveDraft) url.trim().trimEnd('/') else HaConfig.baseUrl(context)
+        val candidateToken = if (saveDraft) approvedEditorsCredential(token, HaConfig.token(context))
+            else HaConfig.token(context)
+        if (!approvedEditorsHttpUrl(candidateUrl) || candidateToken.isBlank()) {
+            error = "Enter your Home Assistant http:// or https:// address and a long-lived token."
+            return
         }
-      }
-    }
-
-    // Discovered entities to add — searchable + grouped by domain, since a real HA server has
-    // hundreds of entities and a flat list is unusable.
-    if (discovered.isNotEmpty()) {
-      // Search box (its own card so it stays pinned above the results visually).
-      Card {
-        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-          OutlinedTextField(
-              colors = iosTextFieldColors(),
-              value = query,
-              onValueChange = { query = it },
-              label = { Text("Search ${discovered.size} entities") },
-              singleLine = true,
-              modifier = Modifier.fillMaxWidth(),
-          )
-        }
-      }
-
-      val q = query.trim().lowercase()
-      val matches =
-          if (q.isBlank()) discovered
-          else discovered.filter {
-            it.friendlyName.lowercase().contains(q) || it.entityId.lowercase().contains(q)
-          }
-      // Group by domain (light/switch/scene/…), ordered so the most-controlled domains come first.
-      val grouped = matches.groupBy { it.entityId.substringBefore('.', "") }
-      val orderedGroups = grouped.entries.sortedWith(
-          compareBy({ HA_GROUP_ORDER.indexOf(it.key).let { i -> if (i < 0) HA_GROUP_ORDER.size else i } }, { it.key }))
-
-      if (matches.isEmpty()) {
-        Card {
-          Text(
-              "No entities match \"$query\".",
-              color = IosSecondary,
-              fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(18.dp),
-          )
-        }
-      } else {
-        // Searching expands every group (matches must be visible); otherwise a group shows only
-        // when the user has tapped its header open. Collapsed groups render just their header row,
-        // so 15 domains stay scannable. Expanded groups still cap rows (search to narrow further).
-        val searching = q.isNotBlank()
-        orderedGroups.forEach { (domain, entities) ->
-          val expanded = searching || domain in expandedGroups
-          val perGroupCap = if (searching) Int.MAX_VALUE else 12
-          val shown = if (expanded) entities.take(perGroupCap) else emptyList()
-          val hidden = if (expanded) entities.size - shown.size else 0
-          Card {
-            Column(modifier = Modifier.padding(vertical = 6.dp)) {
-              // Tappable header toggles the group (disabled while searching — all are forced open).
-              Row(
-                  modifier = Modifier.fillMaxWidth()
-                      .clickable(enabled = !searching) {
-                        expandedGroups = if (domain in expandedGroups) expandedGroups - domain else expandedGroups + domain
-                      }
-                      .padding(horizontal = 18.dp, vertical = 12.dp),
-                  verticalAlignment = Alignment.CenterVertically,
-              ) {
-                Text(
-                    if (expanded) "▾" else "▸",
-                    color = IosSecondary,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(end = 10.dp),
-                )
-                Text(
-                    "${haGroupLabel(domain)} · ${entities.size}",
-                    color = IosLabel,
-                    fontSize = Sizes.rowTitle,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f),
-                )
-              }
-              shown.forEach { e ->
-                Divider()
-                val already = pinned.any { it.entityId == e.entityId }
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                        .clickable(enabled = !already) {
-                          HaConfig.addEntity(context, e.entityId, e.friendlyName)
-                          refreshPinned()
-                        }
-                        .padding(horizontal = 18.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                  Column(modifier = Modifier.weight(1f)) {
-                    Text(e.friendlyName, color = IosLabel, fontSize = Sizes.rowTitle)
-                    Text(e.entityId, color = IosSecondary, fontSize = Sizes.rowSub)
-                  }
-                  Text(
-                      if (already) "Pinned ✓" else "+ Pin",
-                      color = if (already) IosSecondary else IosBlue,
-                      fontSize = 15.sp,
-                      fontWeight = FontWeight.SemiBold,
-                  )
+        cancelConnection()
+        val request = requests.begin()
+        busy = true; error = null; status = "Connecting…"
+        connectionJob = scope.launch {
+            try {
+                val result = approvedEditorsDiscoverHa(candidateUrl, candidateToken)
+                if (!requests.isCurrent(request)) return@launch
+                busy = false
+                if (result == null) {
+                    error = "Couldn't reach Home Assistant — check URL and token"
+                    status = ""; discovered = emptyList()
+                } else {
+                    if (saveDraft) {
+                        // No suspension between the cancellation check and this atomic Config write.
+                        HaConfig.setConnection(context, candidateUrl, candidateToken)
+                        url = HaConfig.baseUrl(context); token = ""
+                    }
+                    discovered = result
+                    status = "Connected ✓ — ${result.size} controllable entities found"
+                    if (saveDraft) {
+                        ApprovedEditorsHaTransfer.publish(candidateUrl, candidateToken, result)
+                        context.startActivity(approvedSettingsIntent(context, "ha-entities"))
+                    }
                 }
-              }
-              if (hidden > 0) {
-                Text(
-                    "+$hidden more — search to narrow",
-                    color = IosSecondary,
-                    fontSize = Sizes.rowSub,
-                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
-                )
-              }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                if (requests.isCurrent(request)) {
+                    busy = false; status = ""
+                    error = "Couldn't reach Home Assistant — check URL and token"
+                }
             }
-          }
         }
-      }
     }
-    Spacer(Modifier.size(8.dp))
-  }
+    val lifecycle = (context as? ComponentActivity)?.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) cancelConnection()
+            if (event == Lifecycle.Event.ON_RESUME) pinned = HaConfig.entities(context)
+        }
+        lifecycle?.addObserver(observer)
+        onDispose {
+            lifecycle?.removeObserver(observer)
+            requests.cancel(); connectionJob?.cancel()
+        }
+    }
+    LaunchedEffect(entitiesOnly) {
+        if (entitiesOnly && HaConfig.isConfigured(context)) {
+            val transferred = ApprovedEditorsHaTransfer.take(HaConfig.baseUrl(context), HaConfig.token(context))
+            if (transferred == null) discover(saveDraft = false)
+            else {
+                discovered = transferred
+                status = "Connected ✓ — ${transferred.size} controllable entities found"
+            }
+        }
+    }
+    // The immutable indexed names are built during IO discovery. Search/grouping is computed only
+    // when inputs change, off main, with cancelled recomputations unable to publish old matches.
+    LaunchedEffect(discovered, query, expandedGroups) {
+        filtering = true
+        groups = withContext(Dispatchers.Default) {
+            approvedEditorsHaGroups(discovered, query, expandedGroups)
+        }
+        filtering = false
+    }
+
+    Column {
+        if (!entitiesOnly) {
+            ApprovedEditorsForm(actions = {
+                ApprovedEditorsActions("Save & connect", error, enabled = !busy,
+                    onCancel = {
+                        cancelConnection(); url = HaConfig.baseUrl(context); token = ""; error = null; status = ""
+                        (context as? Activity)?.finish()
+                    }) { discover(saveDraft = true) }
+                if (status.isNotEmpty()) FooterNote(status)
+            }) {
+                ApprovedEditorsField("Base URL", url, { url = it; error = null; status = "" },
+                    placeholder = "http://homeassistant.local:8123", enabled = !busy)
+                Divider()
+                ApprovedEditorsField("Long-lived token", token, { token = it; error = null; status = "" },
+                    placeholder = if (HaConfig.token(context).isBlank()) "Enter a new value"
+                        else "Leave blank to keep your saved token", secret = true, enabled = !busy)
+            }
+            FooterNote("In Home Assistant: profile → Long-lived access tokens → Create. " +
+                "The connection is saved after the server responds successfully.")
+            SectionLabel("More options")
+            Card {
+                NavRow("Choose Home Assistant entities") {
+                    cancelConnection()
+                    context.startActivity(approvedSettingsIntent(context, "ha-entities"))
+                }
+                Divider()
+                NavRow("Home Assistant dashboard") {
+                    cancelConnection()
+                    context.startActivity(android.content.Intent(context, HaDashboardActivity::class.java))
+                }
+            }
+        } else {
+            if (!HaConfig.isConfigured(context)) {
+                Card { ApprovedEditorsEmpty("Set up your Home Assistant connection before searching for entities.") }
+                ApprovedSettingsTextButton("Set up Home Assistant") {
+                    context.startActivity(approvedSettingsIntent(context, "ha"))
+                }
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    ApprovedEditorsButton(if (busy) "Discovering…" else "Refresh entities", enabled = !busy) {
+                        discover(saveDraft = false)
+                    }
+                    if (busy) ApprovedEditorsButton("Cancel") { cancelConnection(); status = "" }
+                }
+                if (status.isNotEmpty()) FooterNote(status)
+                error?.let { FooterNote(it) }
+            }
+        }
+
+        if (entitiesOnly) {
+            ApprovedEditorsCollection("Pinned to widget", pinned, key = { it.entityId },
+                empty = "No entities selected.") { entity ->
+                ApprovedEditorsCollectionRow(entity.name, entity.entityId, onRemove = { removal = entity })
+            }
+        }
+        if (entitiesOnly && discovered.isNotEmpty()) {
+            Spacer(Modifier.height(24.dp))
+            Card {
+                ApprovedEditorsField("Search ${discovered.size} entities", query, { query = it },
+                    placeholder = "Search by name or entity id")
+            }
+            Spacer(Modifier.height(24.dp))
+            Card {
+                if (filtering) ApprovedEditorsEmpty("Searching…")
+                else if (groups.isEmpty()) ApprovedEditorsEmpty("No entities match \"$query\".")
+                else LazyColumn(Modifier.fillMaxWidth().heightIn(max = 640.dp)) {
+                    groups.forEach { group ->
+                        item(key = "group:${group.domain}", contentType = "group") {
+                            ApprovedEditorsHaGroupRow(group, searching = query.isNotBlank()) {
+                                expandedGroups = if (group.domain in expandedGroups)
+                                    expandedGroups - group.domain else expandedGroups + group.domain
+                            }
+                        }
+                        items(group.shown, key = { "entity:${it.id}" }, contentType = { "entity" }) { entity ->
+                            Divider()
+                            val already = entity.id in pinnedIds
+                            val pin = {
+                                HaConfig.addEntity(context, entity.id, entity.name)
+                                pinned = HaConfig.entities(context)
+                            }
+                            val interaction = if (already) Modifier else Modifier.tvFocusableRow(
+                                focusFill = IosFocusTint, onClick = pin)
+                            Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = 100.dp)
+                                .then(interaction)
+                                .padding(horizontal = 28.dp, vertical = 21.dp),
+                                verticalAlignment = Alignment.CenterVertically) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(entity.name, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp)
+                                    Text(entity.id, color = IosSecondary, fontSize = 21.sp, lineHeight = 29.sp)
+                                }
+                                Text(if (already) "Pinned ✓" else "+ Pin",
+                                    color = if (already) IosSecondary else IosBlue,
+                                    fontSize = 24.sp, lineHeight = 32.sp)
+                            }
+                        }
+                        if (group.hidden > 0) item(key = "more:${group.domain}", contentType = "hint") {
+                            ApprovedEditorsEmpty("+${group.hidden} more — search to narrow")
+                        }
+                        item(key = "end:${group.domain}", contentType = "divider") { Divider() }
+                    }
+                }
+            }
+        }
+    }
+    removal?.let { entity ->
+        ApprovedEditorsRemoveDialog(entity.name, onCancel = { removal = null }) {
+            HaConfig.removeEntity(context, entity.entityId); removal = null
+            pinned = HaConfig.entities(context)
+        }
+    }
 }
 
-/** Domain display order for the discovered-entities grouping — controllable things first. */
-private val HA_GROUP_ORDER =
-    listOf("light", "switch", "fan", "scene", "script", "automation", "input_boolean",
-        "climate", "cover", "media_player", "binary_sensor", "sensor", "person", "device_tracker", "weather", "sun")
+@Composable
+private fun ApprovedEditorsHaGroupRow(
+    group: ApprovedEditorsHaGroup, searching: Boolean, onClick: () -> Unit,
+) {
+    val interaction = if (searching) Modifier else Modifier.tvFocusableRow(
+        focusFill = IosFocusTint, onClick = onClick)
+    Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = 100.dp).then(interaction)
+        .padding(horizontal = 28.dp, vertical = 22.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Text("${haGroupLabel(group.domain)} · ${group.total}", color = IosLabel,
+            fontSize = 26.sp, lineHeight = 34.sp, modifier = Modifier.weight(1f))
+        Text(if (group.expanded) "Collapse" else "Expand", color = IosSecondary,
+            fontSize = 24.sp, lineHeight = 32.sp)
+    }
+}
 
 /** Friendly, pluralized section heading for an HA domain. */
 private fun haGroupLabel(domain: String): String =

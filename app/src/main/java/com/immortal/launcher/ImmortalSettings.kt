@@ -45,6 +45,8 @@ object ImmortalSettings {
   const val CLOCK_24 = "24" // force 24-hour (e.g. 13:05, 13)
 
   data class Settings(
+      val advancedSettings: Boolean = false,
+      val settingsTheme: String = "light",
       val weatherUnit: String = UNIT_AUTO,
       val tileSize: String = SIZE_STANDARD,
       val weatherWidget: String = WIDGET_OFF,
@@ -79,6 +81,8 @@ object ImmortalSettings {
   fun load(context: Context): Settings {
     val p = prefs(context)
     return Settings(
+        advancedSettings = p.getBoolean("advanced_settings", false),
+        settingsTheme = p.getString("settings_theme", "light") ?: "light",
         weatherUnit = p.getString("weather_unit", UNIT_AUTO) ?: UNIT_AUTO,
         tileSize = p.getString("tile_size", SIZE_STANDARD) ?: SIZE_STANDARD,
         weatherWidget = p.getString("weather_widget", WIDGET_OFF) ?: WIDGET_OFF,
@@ -92,6 +96,25 @@ object ImmortalSettings {
         maUsername = p.getString("ma_username", "") ?: "",
         maPassword = p.getString("ma_password", "") ?: "",
     )
+  }
+
+  fun setAdvancedSettings(c: Context, enabled: Boolean) =
+      prefs(c).edit().putBoolean("advanced_settings", enabled).apply()
+
+  fun setSettingsTheme(c: Context, theme: String) =
+      prefs(c).edit().putString("settings_theme", theme).apply()
+
+  fun settingsTheme(c: Context): String = prefs(c).getString("settings_theme", "light") ?: "light"
+  fun advancedSettings(c: Context): Boolean = prefs(c).getBoolean("advanced_settings", false)
+
+  /** Theme and presentation observers share the config's storage names; UI does not own them. */
+  fun observePresentation(c: Context, changed: () -> Unit): () -> Unit {
+    val p = prefs(c)
+    val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+      if (key == "settings_theme" || key == "advanced_settings") changed()
+    }
+    p.registerOnSharedPreferenceChangeListener(listener)
+    return { p.unregisterOnSharedPreferenceChangeListener(listener) }
   }
 
   fun multiRoomEnabled(c: Context): Boolean = prefs(c).getBoolean("multiroom_enabled", false)

@@ -11,12 +11,20 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.sp
+import com.immortal.launcher.ImmortalSettings
 
 private val PrimeDarkColorScheme = darkColorScheme(
     primary              = PrimeBlue,
@@ -44,27 +52,55 @@ private val PrimeDarkColorScheme = darkColorScheme(
 
 @Composable
 fun PortalPrimeTheme(
-    darkTheme: Boolean = true,  // Portal is always dark
+    darkTheme: Boolean = true,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
+    val context = LocalContext.current
+    var appearance by remember(context) { mutableStateOf(ImmortalSettings.settingsTheme(context)) }
+    var advanced by remember(context) { mutableStateOf(ImmortalSettings.advancedSettings(context)) }
+    DisposableEffect(context) {
+        val stopObserving = ImmortalSettings.observePresentation(context) {
+            appearance = ImmortalSettings.settingsTheme(context)
+            advanced = ImmortalSettings.advancedSettings(context)
+        }
+        onDispose { stopObserving() }
+    }
+    // Home/ambient surfaces stay dark. Settings and editors follow the persisted appearance.
+    val useDark = darkTheme || appearance == "dark"
+    val palette = if (useDark) ApprovedDarkPalette else ApprovedLightPalette
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context)
+            if (useDark) dynamicDarkColorScheme(context)
             else dynamicLightColorScheme(context)
         }
-        else -> PrimeDarkColorScheme
+        useDark -> darkColorScheme(
+            primary = palette.accent, onPrimary = palette.background,
+            primaryContainer = palette.selected, onPrimaryContainer = palette.text,
+            secondary = palette.secondary, background = palette.background,
+            onBackground = palette.text, surface = palette.surface, onSurface = palette.text,
+            surfaceVariant = palette.surface2, onSurfaceVariant = palette.secondary,
+            surfaceContainer = palette.surface, outline = palette.secondary,
+            outlineVariant = palette.divider, error = palette.error)
+        else -> lightColorScheme(
+            primary = palette.accent, onPrimary = palette.surface,
+            primaryContainer = palette.selected, onPrimaryContainer = palette.text,
+            secondary = palette.secondary, background = palette.background,
+            onBackground = palette.text, surface = palette.surface, onSurface = palette.text,
+            surfaceVariant = palette.surface2, onSurfaceVariant = palette.secondary,
+            surfaceContainer = palette.surface, outline = palette.secondary,
+            outlineVariant = palette.divider, error = palette.error)
     }
     MaterialTheme(
         colorScheme = colorScheme,
         typography  = Typography,
     ) {
-        // Make Inter the DEFAULT text style app-wide: the ~300 Text() calls that override fontSize
-        // inline (without a fontFamily) inherit LocalTextStyle, so this flips them from Roboto to
-        // Inter without editing every call site. A Text that sets its own fontFamily still wins.
         CompositionLocalProvider(
-            LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = InterFontFamily),
+            LocalApprovedPalette provides palette,
+            LocalAdvancedSettings provides advanced,
+            LocalTextStyle provides LocalTextStyle.current.copy(
+                fontFamily = InterFontFamily, letterSpacing = 0.sp),
             content = content,
         )
     }

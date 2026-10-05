@@ -12,33 +12,26 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
-/** Paste-a-link screen for the URL screensaver source — a [UrlEntryScreen] configuration. */
+/** Native shared-link form; provider recognition stays with [RemoteAlbum]. */
 class AlbumUrlEntryActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
       PortalPrimeTheme(darkTheme = false) {
         UrlEntryScreen(
-            title = "Shared Album Link",
-            subtitle =
-                "Paste a public link from iCloud Shared Albums or Google Photos. " +
-                    "Make sure it's shared as \"anyone with the link\" — Immortal can't sign in.",
-            placeholder = "https://photos.icloud.com/shared/album/…",
+            title = "Shared album link",
+            fieldLabel = "Shared album link",
+            placeholder = "https://…",
             initial = ScreensaverConfig.load(this).albumUrl.orEmpty(),
             emptyHint = "Examples: iCloud Shared Album, Google Photos shared album.",
-            invalidHint = "That doesn't look like a supported share link yet.",
+            invalidHint = "That doesn’t look like a supported share link yet.",
             primaryLabel = "Use this album",
             validate = { if (RemoteAlbum.isSupported(it)) RemoteAlbum.providerName(it) else null },
             onSave = { url ->
               ScreensaverConfig.setAlbumUrl(this, url)
-              finish()
+              approvedSourcesReturn(this)
             },
             onCancel = { finish() },
-            helpTitle = "How to get a link:",
-            helpBody =
-                "• iPhone Photos → a Shared Album you own → people/share button → " +
-                    "\"Anyone can view\" → copy the icloud.com link.\n" +
-                    "• Google Photos → album → Share → \"Get link\" (anyone with the link can view).",
         )
       }
     }

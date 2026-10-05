@@ -55,7 +55,7 @@ internal fun PopupScaffold(
     title: String,
     onBack: () -> Unit,
     subtitle: String = "",
-    maxWidthDp: Int = 720,
+    maxWidthDp: Int = 900,
     body: @Composable () -> Unit,
 ) {
   val cfg = LocalConfiguration.current
@@ -73,7 +73,7 @@ internal fun PopupScaffold(
               }
               // Outside-tap does NOT dismiss (swallowed) — closing is via the ‹ Back pill or Back
               // key only, so an accidental tap can't lose your place.
-              .background(Color(0xCC000000))
+              .background(Color(0xA6081822))
               .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { /* swallow */ },
   ) {
     Surface(
@@ -84,7 +84,7 @@ internal fun PopupScaffold(
             .tvFocusable(RoundedCornerShape(28.dp), focusScale = 1f) { /* consume */ },
     ) {
       Column(
-          modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(30.dp),
+          modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(38.dp),
       ) {
         Row {
           SettingsBackButton(onClick = onBack)

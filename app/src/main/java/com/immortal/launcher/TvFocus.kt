@@ -47,16 +47,17 @@ fun Modifier.tvFocusable(
     onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit,
 ): Modifier {
-  if (!enabled) return this
+  if (!enabled || !LocalApprovedLauncherPageActive.current) return this
   val source = remember { MutableInteractionSource() }
   val focused by source.collectIsFocusedAsState()
-  val scale by animateFloatAsState(if (focused) focusScale else 1f, label = "tvFocusScale")
-  val base =
-      this.scale(scale)
-          .border(
-              BorderStroke(if (focused) 3.dp else 0.dp, if (focused) ringColor else Color.Transparent),
-              shape,
-          )
+  // Touch cards use focusScale=1: avoid an identity graphics layer and animation
+  // state for each visible card. Retain the animated return for TV callers.
+  val scale = if (focusScale == 1f) 1f else {
+    val animated by animateFloatAsState(if (focused) focusScale else 1f, label = "tvFocusScale")
+    animated
+  }
+  val scaled = if (scale == 1f) this else this.scale(scale)
+  val base = if (focused) scaled.border(BorderStroke(3.dp, ringColor), shape) else scaled
   // Stable clickable when there's no long-press handler (unchanged for every other
   // caller); only the "hey" button opts into combinedClickable for its picker.
   return if (onLongClick != null) {
@@ -76,6 +77,7 @@ fun Modifier.tvFocusableRow(
     focusFill: Color = Color(0x402E6BE6),
     onClick: () -> Unit,
 ): Modifier {
+  if (!LocalApprovedLauncherPageActive.current) return this
   val source = remember { MutableInteractionSource() }
   val focused by source.collectIsFocusedAsState()
   return this.background(if (focused) focusFill else Color.Transparent)

@@ -7,152 +7,86 @@
 
 package com.immortal.launcher
 
+import android.app.Activity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import kotlin.concurrent.thread
 
-/**
- * Connect a WebDAV folder (a NAS WebDAV share or Nextcloud) as the screensaver source: the
- * full folder URL plus optional credentials. "Test & connect" lists the images before saving.
- * Modelled on [SmbConnectActivity].
- */
 class DavConnectActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = false) { DavConnectScreen(onDone = { finish() }) } }
-  }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent { PortalPrimeTheme(darkTheme = false) { DavConnectScreen { finish() } } }
+    }
 }
 
 @Composable
-private fun DavConnectScreen(onDone: () -> Unit) {
-  val context = LocalContext.current
-  val ui = remember { Handler(Looper.getMainLooper()) }
-  val existing = remember { ScreensaverConfig.load(context) }
+private fun DavConnectScreen(onCancel: () -> Unit) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val existing = remember { ScreensaverConfig.load(context) }
+    val work = rememberApprovedSourcesWork()
+    var url by remember { mutableStateOf(existing.davUrl.orEmpty()) }
+    var user by remember { mutableStateOf(existing.davUser.orEmpty()) }
+    var pass by remember { mutableStateOf(existing.davPass.orEmpty()) }
+    var status by remember { mutableStateOf<String?>(null) }
+    var connectedCount by remember { mutableStateOf<Int?>(null) }
+    val cancel = { work.close(); onCancel() }
+    BackHandler(onBack = cancel)
 
-  var url by remember { mutableStateOf(existing.davUrl ?: "") }
-  var user by remember { mutableStateOf(existing.davUser ?: "") }
-  var pass by remember { mutableStateOf(existing.davPass ?: "") }
-  var testing by remember { mutableStateOf(false) }
-  var status by remember { mutableStateOf<String?>(null) }
-  var connectedCount by remember { mutableStateOf<Int?>(null) }
-  val (_, initialFocus) = rememberInitialFocus()
-
-  BackHandler { onDone() }
-
-  fun connect() {
-    if (url.isBlank()) {
-      status = "Enter the WebDAV folder address."
-      return
-    }
-    testing = true
-    status = null
-    thread {
-      val images = DavSource.listImageUrls(url.trim(), user.trim(), pass).orEmpty()
-      ui.post {
-        testing = false
-        if (images.isNotEmpty()) {
-          ScreensaverConfig.setDav(context, url, user, pass)
-          connectedCount = images.size
-        } else {
-          status =
-              "Couldn't read images from that address. Check the URL and (if needed) the username " +
-                  "and password."
+    fun connect() {
+        if (work.busy) return
+        if (url.isBlank()) { status = "Enter the WebDAV folder address."; return }
+        val address = url.trim()
+        val username = user.trim()
+        val password = pass
+        status = null
+        work.start(work = {
+            DavSource.listImageUrls(address, username, password)?.size ?: 0
+        }) { result ->
+            val count = result.getOrNull() ?: 0
+            if (count > 0) {
+                ScreensaverConfig.setDav(context, address, username, password)
+                connectedCount = count
+            } else status = "Couldn't read images from that address. Check the URL and credentials."
         }
-      }
     }
-  }
 
-  SettingsScaffold(title = "WebDAV Folder", onBack = onDone) {
-    Column {
-      val count = connectedCount
-      if (count != null) {
-        Text(
-            "Connected — found $count photo${if (count == 1) "" else "s"}. Showing them on the " +
-                "screensaver now.",
-            color = IosSecondary,
-            fontSize = Sizes.rowSub,
-            modifier = Modifier.padding(top = 6.dp),
-        )
-        Spacer(Modifier.heightIn(min = 26.dp))
-        PrimaryPillButton("Done") { onDone() }
-        return@Column
-      }
-
-      Text(
-          "Show photos from a WebDAV folder — a NAS WebDAV share or Nextcloud. Paste the full " +
-              "folder URL, and a username and password if the server needs them.",
-          color = IosSecondary,
-          fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.heightIn(min = 22.dp))
-
-      IosTextField(url, { url = it }, "http://nas:30035/share/photos/", modifier = initialFocus)
-      Spacer(Modifier.heightIn(min = 12.dp))
-      IosTextField(user, { user = it }, "Username (optional)")
-      Spacer(Modifier.heightIn(min = 12.dp))
-      IosTextField(pass, { pass = it }, "Password (optional)", password = true)
-
-      status?.let {
-        Text(
-            it,
-            color = IosRed,
-            fontSize = Sizes.rowSub,
-            modifier = Modifier.padding(top = 10.dp, start = 4.dp),
-        )
-      }
-
-      Spacer(Modifier.heightIn(min = 26.dp))
-      PrimaryPillButton(if (testing) "Connecting…" else "Test & connect", enabled = !testing) {
-        if (!testing) connect()
-      }
-      Spacer(Modifier.heightIn(min = 12.dp))
-      Surface(
-          color = IosCard,
-          shape = RoundedCornerShape(16.dp),
-          modifier =
-              Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
-                onDone()
-              },
-      ) {
-        Text(
-            "Cancel",
-            color = IosBlue,
-            fontSize = Sizes.rowTitle,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
-        )
-      }
+    ApprovedSourcesPage("Connect WebDAV", onBack = cancel, advancedOnly = true) {
+        val count = connectedCount
+        if (count != null) {
+            ApprovedSettingsSectionLabel("Connected")
+            Card {
+                ApprovedSourcesInfoRow("Photos found", count.toString())
+                Divider()
+                ApprovedSourcesInfoRow("Selected source", "WebDAV folder")
+            }
+            Spacer(Modifier.height(30.dp))
+            ApprovedSourcesButton("Done") {
+                work.close()
+                activity?.let { approvedSourcesReturn(it) }
+            }
+        } else {
+            ApprovedSourcesForm("WebDAV folder", "Paste the full WebDAV folder URL from your NAS or Nextcloud. Enter credentials if required. Immortal checks for photos before selecting this source.") {
+                ApprovedSourcesField("WebDAV folder address", url, { url = it }, "http://nas:30035/share/photos/", enabled = !work.busy)
+                ApprovedSourcesField("Username (optional)", user, { user = it }, enabled = !work.busy)
+                ApprovedSourcesField("Password (optional)", pass, { pass = it }, secret = true, enabled = !work.busy)
+                ApprovedSourcesStatus(status)
+                ApprovedSourcesActions(if (work.busy) "Connecting…" else "Test & connect",
+                    enabled = !work.busy && url.isNotBlank(),
+                    onConfirm = ::connect, onCancel = cancel)
+            }
+        }
     }
-  }
 }
-
-

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2026 Starbright Lab.
+
+    This source code is licensed under the MIT license found in the
+    LICENSE file in the root directory of this source tree.
+
+    Generated from frozen revision 04 assets/icons.js: calc.
+    Regenerate with scripts/generate_approved_icons_rev04.py.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#00000000" android:fillAlpha="1" android:fillType="nonZero" android:strokeColor="#FFFFFFFF" android:strokeAlpha="1" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="miter" android:strokeMiterLimit="4" android:pathData="M7 2H17A2 2 0 0 1 19 4V20A2 2 0 0 1 17 22H7A2 2 0 0 1 5 20V4A2 2 0 0 1 7 2Z" />
+    <path android:fillColor="#00000000" android:fillAlpha="1" android:fillType="nonZero" android:strokeColor="#FFFFFFFF" android:strokeAlpha="1" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="miter" android:strokeMiterLimit="4" android:pathData="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01" />
+</vector>

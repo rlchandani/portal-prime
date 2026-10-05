@@ -17,11 +17,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +36,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.SettingsDomains
@@ -96,13 +99,7 @@ internal fun SunriseContent() {
 
     Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
       Card {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-        ) {
-          Text("Enabled", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-          Switch(checked = enabled, onCheckedChange = { enabled = it; persist() }, colors = iosSwitchColors())
-        }
+        ToggleRow("Enabled", enabled) { enabled = it; persist() }
       }
 
       // Time pickers (stepper rows).
@@ -112,14 +109,16 @@ internal fun SunriseContent() {
       }
 
       SectionLabel("Wake on")
-      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         DAY_LABELS.forEach { (d, label) ->
           val on = d in days
           Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
-              modifier = Modifier.tvFocusable(CircleShape, focusScale = 1.08f) {
+              modifier = Modifier.size(68.dp).semantics {
+                contentDescription = java.text.DateFormatSymbols().weekdays[d]
+              }.tvFocusable(CircleShape, focusScale = 1f) {
                 days = if (on) days - d else days + d; persist()
               }) {
-            Text(label, color = if (on) Color.White else IosLabel, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+            Text(label, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel, fontSize = 24.sp, fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center, modifier = Modifier.padding(14.dp))
           }
         }
@@ -130,13 +129,7 @@ internal fun SunriseContent() {
           valueRange = 1f..45f, onValueChangeFinished = { persist() })
 
       Card {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-        ) {
-          Text("Chime at the end", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-          Switch(checked = chime, onCheckedChange = { chime = it; persist() }, colors = iosSwitchColors())
-        }
+        ToggleRow("Chime at the end", chime) { chime = it; persist() }
       }
 
       val next = remember(enabled, hour, minute, days) {
@@ -149,14 +142,14 @@ internal fun SunriseContent() {
           else "Alarm is off.",
           color = IosBlue, fontSize = Sizes.rowValue)
 
-      Surface(color = Color(0xFFEF6C00), shape = RoundedCornerShape(14.dp),
-          modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp)) {
+      Surface(color = IosBlue, shape = RoundedCornerShape(16.dp),
+          modifier = Modifier.fillMaxWidth().heightIn(min = 68.dp).tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
             context.startActivity(
                 Intent(context, WakeLightActivity::class.java)
                     .putExtra(WakeLightActivity.EXTRA_RAMP_MIN, 1)
                     .putExtra(WakeLightActivity.EXTRA_CHIME, chime))
           }) {
-        Text("Preview (1-min ramp)", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
+        Text("Preview (1-min ramp)", color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary, fontSize = 24.sp, fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth())
       }
     }
@@ -164,23 +157,7 @@ internal fun SunriseContent() {
 
 @Composable
 private fun Stepper(label: String, value: Int, min: Int, max: Int, step: Int = 1, onChange: (Int) -> Unit) {
-  Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-  ) {
-    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-    StepBtn("–") { onChange(((value - step).coerceAtLeast(min))) }
-    Text("%02d".format(value), color = IosLabel, fontSize = 22.sp, fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 16.dp))
-    StepBtn("+") { onChange(((value + step).coerceAtMost(max))) }
-  }
-}
-
-@Composable
-private fun StepBtn(label: String, onClick: () -> Unit) {
-  Surface(color = IosDivider, shape = CircleShape,
-      modifier = Modifier.tvFocusable(CircleShape, focusScale = 1.1f) { onClick() }) {
-    Text(label, color = IosBlue, fontSize = 24.sp, fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 18.dp, vertical = 6.dp))
-  }
+  Stepper(label, "%02d".format(value),
+      onMinus = { onChange((value - step).coerceAtLeast(min)) },
+      onPlus = { onChange((value + step).coerceAtMost(max)) })
 }

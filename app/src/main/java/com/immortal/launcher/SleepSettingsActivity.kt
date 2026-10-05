@@ -20,12 +20,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import com.immortal.launcher.ApprovedSettingsSwitch as Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -84,6 +85,7 @@ private fun SleepSettingsScreen() {
 @Composable
 internal fun SleepSettingsContent() {
   val context = LocalContext.current
+  val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
   var settings by remember { mutableStateOf(ScreensaverConfig.load(context)) }
   var remainingMs by remember { mutableLongStateOf(0L) }
   var running by remember { mutableStateOf(false) }
@@ -149,7 +151,7 @@ internal fun SleepSettingsContent() {
             Text(
                 if (remainingMs > 0) timerText else "00:00",
                 color = IosBlue,
-                fontSize = 34.sp,
+                fontSize = 58.sp,
                 fontWeight = FontWeight.Bold,
             )
           }
@@ -162,7 +164,7 @@ internal fun SleepSettingsContent() {
                 color = IosBlue,
                 shape = RoundedCornerShape(14.dp),
                 modifier =
-                    Modifier.weight(1f)
+                    Modifier.weight(1f).heightIn(min = 68.dp)
                         .focusRequester(firstFocus)
                         .tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
                           startCountdown()
@@ -170,8 +172,8 @@ internal fun SleepSettingsContent() {
             ) {
               Text(
                   "Start countdown",
-                  color = Color.White,
-                  fontSize = 18.sp,
+                  color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
+                  fontSize = 24.sp,
                   fontWeight = FontWeight.SemiBold,
                   textAlign = TextAlign.Center,
                   modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(),
@@ -181,7 +183,7 @@ internal fun SleepSettingsContent() {
                 color = if (running) IosRed else IosDivider,
                 shape = RoundedCornerShape(14.dp),
                 modifier =
-                    Modifier.weight(1f)
+                    Modifier.weight(1f).heightIn(min = 68.dp)
                         .tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
                           stopCountdown()
                         },
@@ -189,7 +191,7 @@ internal fun SleepSettingsContent() {
               Text(
                   "Stop",
                   color = if (running) Color.White else IosLabel,
-                  fontSize = 18.sp,
+                  fontSize = 24.sp,
                   fontWeight = FontWeight.SemiBold,
                   textAlign = TextAlign.Center,
                   modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(),
@@ -224,14 +226,15 @@ internal fun SleepSettingsContent() {
         settings = ScreensaverConfig.load(context)
       }
 
-      SleepToggleRow("Close Immortal before sleeping", settings.closeAppOnSleep) {
+      if (advanced) SleepToggleRow("Close Immortal before sleeping", settings.closeAppOnSleep) {
         SettingsDomains.screensaver.apply(context, JSONObject().put("closeAppOnSleep", it))
         settings = ScreensaverConfig.load(context)
       }
 
       Spacer(Modifier.size(8.dp))
       FooterNote(
-          "When the timer reaches zero, Immortal pauses audio, closes itself, disables the screensaver, and locks the screen.",
+          if (advanced) "When the timer ends, the screen sleeps using your audio and app preferences."
+          else "Turn the screen off after a set time.",
       )
     }
 }
@@ -241,7 +244,7 @@ private fun SleepToggleRow(title: String, checked: Boolean, onChange: (Boolean) 
   Row(
       modifier =
           Modifier.fillMaxWidth().tvFocusableRow { onChange(!checked) }
-              .padding(horizontal = 18.dp, vertical = 14.dp),
+              .heightIn(min = 100.dp).padding(horizontal = 28.dp, vertical = 22.dp),
       verticalAlignment = Alignment.CenterVertically,
   ) {
     Text(title, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
@@ -275,7 +278,7 @@ private fun SleepMinuteStepper(minutes: Int, onChange: (Int) -> Unit) {
     Text(
         "${minutes}m",
         color = if (focused) IosLabel else IosSecondary,
-        fontSize = 17.sp,
+        fontSize = Sizes.rowValue,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
         modifier = Modifier.widthIn(min = 64.dp),

@@ -494,6 +494,19 @@ object SettingsDomains {
           load = ImmortalSettings::load,
           specs =
               listOf(
+                  BoolSpec(
+                      "advancedSettings",
+                      "Advanced settings",
+                      get = { it.advancedSettings },
+                      set = ImmortalSettings::setAdvancedSettings,
+                      help = "Show technical connections, automation and diagnostics."),
+                  EnumSpec(
+                      "settingsTheme",
+                      "Appearance",
+                      get = { it.settingsTheme },
+                      set = ImmortalSettings::setSettingsTheme,
+                      options = listOf("light" to "Light", "dark" to "Dark"),
+                      coerce = oneOf("light", "dark")),
                   EnumSpec(
                       "weatherUnit",
                       "Temperature unit",

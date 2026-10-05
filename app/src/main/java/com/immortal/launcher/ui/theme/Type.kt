@@ -9,20 +9,13 @@ package com.immortal.launcher.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.R
 
-// The app-wide typeface (Inter — a free, near-metric match to iOS's San Francisco). Exposed so the
-// theme can set it as the DEFAULT text style, ensuring the ~300 Text() calls that pass an inline
-// fontSize without a fontFamily still render in Inter rather than falling back to Android's Roboto.
-val InterFontFamily = FontFamily(
-    Font(R.font.inter,        weight = FontWeight.Normal),
-    Font(R.font.inter_medium, weight = FontWeight.Medium),
-    Font(R.font.inter_bold,   weight = FontWeight.Bold),
-)
+// Android's bundled Roboto works offline on Portal firmware without Google font services.
+// Keep this alias for existing consumers that explicitly reference the former family.
+val InterFontFamily = FontFamily.SansSerif
 
 val Typography = Typography(
     // ── Display — used for clock faces and ambient large numbers ──────────────
@@ -89,19 +82,19 @@ val Typography = Typography(
     // ── Body ──────────────────────────────────────────────────────────────────
     bodyLarge = TextStyle(
         fontFamily  = InterFontFamily,
-        fontWeight  = FontWeight.Medium,
+        fontWeight  = FontWeight.Normal,
         fontSize    = 18.sp,
         lineHeight  = 28.sp,
     ),
     bodyMedium = TextStyle(
         fontFamily  = InterFontFamily,
-        fontWeight  = FontWeight.Medium,
+        fontWeight  = FontWeight.Normal,
         fontSize    = 16.sp,
         lineHeight  = 24.sp,
     ),
     bodySmall = TextStyle(
         fontFamily  = InterFontFamily,
-        fontWeight  = FontWeight.Medium,
+        fontWeight  = FontWeight.Normal,
         fontSize    = 14.sp,
         lineHeight  = 20.sp,
     ),

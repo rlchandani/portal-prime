@@ -4,188 +4,108 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 package com.immortal.launcher
 
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+
 import java.util.Calendar
 
 class CountdownSettingsActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = false) { CountdownSettingsScreen() } }
-  }
-}
-
-private val EMOJI_PALETTE =
-    listOf("📅", "🎂", "🎉", "✈️", "❤️", "🎄", "🏖️", "🎓", "💍", "🍼", "⭐", "🏠")
-
-@Composable
-private fun CountdownSettingsScreen() {
-  val activity = LocalContext.current as? Activity
-  PopupScaffold(
-      title = "Countdowns",
-      subtitle = "Pin a chip on the home screen counting down to a birthday, trip, or holiday.",
-      onBack = { activity?.finish() },
-  ) { CountdownSettingsContent() }
-}
-
-/** Inlinable body of the Countdown settings screen — rendered both by [CountdownSettingsScreen]
- *  (standalone Activity host) and by the two-panel settings detail panel. */
-@Composable
-internal fun CountdownSettingsContent() {
-  val context = LocalContext.current
-  var events by remember { mutableStateOf(CountdownConfig.loadSorted(context)) }
-
-  // New-event form state.
-  var label by remember { mutableStateOf("") }
-  var emoji by remember { mutableStateOf("🎂") }
-  val cal = remember { Calendar.getInstance() }
-  var month by remember { mutableIntStateOf(cal.get(Calendar.MONTH) + 1) }
-  var day by remember { mutableIntStateOf(cal.get(Calendar.DAY_OF_MONTH)) }
-  var repeatsYearly by remember { mutableStateOf(true) }
-  var year by remember { mutableIntStateOf(cal.get(Calendar.YEAR)) }
-
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-      // Existing events.
-      if (events.isNotEmpty()) {
-        Card {
-          Column(modifier = Modifier.padding(vertical = 6.dp)) {
-            events.forEach { e ->
-              Row(
-                  modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp),
-                  verticalAlignment = Alignment.CenterVertically,
-              ) {
-                Text("${e.emoji}  ", fontSize = 20.sp)
-                Column(modifier = Modifier.weight(1f)) {
-                  Text(e.label, color = IosLabel, fontSize = Sizes.rowTitle)
-                  Text(
-                      "${String.format("%02d.%02d", e.day, e.month)}" +
-                          (if (e.year > 0) ".${e.year}" else " · yearly") + " — ${e.phrase()}",
-                      color = IosSecondary,
-                      fontSize = Sizes.rowSub,
-                  )
-                }
-                Box(
-                    modifier =
-                        Modifier.size(40.dp)
-                            .clickable {
-                              CountdownConfig.remove(context, e.id)
-                              events = CountdownConfig.loadSorted(context)
-                            },
-                    contentAlignment = Alignment.Center,
-                ) {
-                  Text("✕", color = IosRed, fontSize = 20.sp)
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // Add form.
-      Card {
-        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-          Text("New countdown", color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
-          OutlinedTextField(
-              colors = iosTextFieldColors(),
-              value = label,
-              onValueChange = { label = it },
-              label = { Text("Name") },
-              singleLine = true,
-              modifier = Modifier.fillMaxWidth(),
-          )
-
-          // Emoji palette.
-          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            EMOJI_PALETTE.take(6).forEach { e -> EmojiChip(e, e == emoji) { emoji = e } }
-          }
-          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            EMOJI_PALETTE.drop(6).forEach { e -> EmojiChip(e, e == emoji) { emoji = e } }
-          }
-
-          Stepper("Month", "$month", onMinus = { month = ((month - 2 + 12) % 12) + 1 }, onPlus = { month = (month % 12) + 1 })
-          Stepper("Day", "$day", onMinus = { day = ((day - 2 + 31) % 31) + 1 }, onPlus = { day = (day % 31) + 1 })
-
-          Row(
-              modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-              verticalAlignment = Alignment.CenterVertically,
-          ) {
-            Text("Repeats every year", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-            Switch(checked = repeatsYearly, onCheckedChange = { repeatsYearly = it }, colors = iosSwitchColors())
-          }
-          if (!repeatsYearly) {
-            Stepper("Year", "$year", onMinus = { year = (year - 1).coerceIn(2000, 2100) }, onPlus = { year = (year + 1).coerceIn(2000, 2100) })
-          }
-
-          Surface(
-              color = IosBlue,
-              shape = RoundedCornerShape(14.dp),
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
-                        CountdownConfig.add(context, label, emoji, month, day,
-                            if (repeatsYearly) 0 else year)
-                        label = ""
-                        events = CountdownConfig.loadSorted(context)
-                      },
-          ) {
-            Text(
-                "Add countdown",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(),
-            )
-          }
-        }
-      }
-      Spacer(Modifier.size(8.dp))
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent { PortalPrimeTheme(darkTheme = false) { CountdownSettingsScreen() } }
     }
 }
 
+private val EMOJI_PALETTE = listOf("📅", "🎂", "🎉", "✈️", "❤️", "🎄", "🏖️", "🎓", "💍", "🍼", "⭐", "🏠")
+
 @Composable
-private fun EmojiChip(emoji: String, selected: Boolean, onClick: () -> Unit) {
-  Surface(
-      color = if (selected) IosFocusTint else IosDivider,
-      shape = RoundedCornerShape(10.dp),
-      modifier = Modifier.size(44.dp).clickable { onClick() },
-  ) {
-    Box(contentAlignment = Alignment.Center) { Text(emoji, fontSize = 20.sp) }
-  }
+private fun CountdownSettingsScreen() {
+    val activity = LocalContext.current as? Activity
+    SettingsScaffold(title = "Countdowns", onBack = { activity?.finish() }) { CountdownSettingsContent() }
 }
 
+@Composable
+internal fun CountdownSettingsContent() {
+    val context = LocalContext.current
+    var events by remember { mutableStateOf(CountdownConfig.loadSorted(context)) }
+    var label by remember { mutableStateOf("") }
+    var emoji by remember { mutableStateOf("🎂") }
+    val initialDate = remember { Calendar.getInstance() }
+    var month by remember { mutableIntStateOf(initialDate.get(Calendar.MONTH) + 1) }
+    var day by remember { mutableIntStateOf(initialDate.get(Calendar.DAY_OF_MONTH)) }
+    var year by remember { mutableIntStateOf(initialDate.get(Calendar.YEAR)) }
+    var yearly by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var removal by remember { mutableStateOf<CountdownConfig.Event?>(null) }
+    var iconPicker by remember { mutableStateOf<String?>(null) }
+    fun reset() {
+        label = ""; emoji = "🎂"; yearly = true; error = null
+        month = initialDate.get(Calendar.MONTH) + 1
+        day = initialDate.get(Calendar.DAY_OF_MONTH)
+        year = initialDate.get(Calendar.YEAR)
+    }
+    Column {
+        ApprovedEditorsCollection("Your countdowns", events, key = { it.id }) { event ->
+            ApprovedEditorsCollectionRow("${event.emoji}  ${event.label}",
+                "%02d.%02d".format(event.day, event.month) +
+                    (if (event.year > 0) ".${event.year}" else " · yearly") + " · ${event.phrase()}",
+                onRemove = { removal = event })
+        }
+        ApprovedEditorsForm(actions = {
+            ApprovedEditorsActions(error = error, onCancel = { reset(); (context as? Activity)?.finish() }) {
+                if (label.isBlank()) error = "Enter a name."
+                else {
+                    CountdownConfig.add(context, label, emoji, month, day, if (yearly) 0 else year)
+                    label = ""; error = null; events = CountdownConfig.loadSorted(context)
+                }
+            }
+        }) {
+            ApprovedEditorsField("Name", label, { label = it; error = null })
+            Divider()
+            if (!yearly) {
+                ApprovedEditorsNumber("Year", year, 2000, 2100, { year = it })
+                Divider()
+            }
+            ApprovedEditorsNumber("Month", month, 1, 12, { month = it }, wrap = true)
+            Divider()
+            ApprovedEditorsNumber("Day", day, 1, 31, { day = it }, wrap = true)
+            Divider()
+            NavRow("Icon", value = emoji) { iconPicker = emoji }
+            Divider()
+            ToggleRow("Repeats every year", yearly, onChange = { yearly = it })
+        }
+    }
+    removal?.let { event ->
+        ApprovedEditorsRemoveDialog(event.label, onCancel = { removal = null }) {
+            CountdownConfig.remove(context, event.id); removal = null
+            events = CountdownConfig.loadSorted(context)
+        }
+    }
+    iconPicker?.let { selected ->
+        ApprovedSettingsDialog("Icon", onDismiss = { iconPicker = null }) {
+            EMOJI_PALETTE.chunked(6).forEach { icons ->
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    icons.forEach { icon ->
+                        ApprovedEditorsButton(if (icon == selected) "$icon ✓" else icon) {
+                            emoji = icon; iconPicker = null
+                        }
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+            ApprovedEditorsButton("Cancel") { iconPicker = null }
+        }
+    }
+}

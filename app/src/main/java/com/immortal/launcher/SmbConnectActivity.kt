@@ -7,159 +7,97 @@
 
 package com.immortal.launcher
 
+import android.app.Activity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import kotlin.concurrent.thread
 
-/**
- * Connect an SMB / network share (a NAS) as the screensaver source: server, share, an optional
- * folder within it, and credentials. "Test & connect" verifies the share and counts the images
- * before saving. Modelled on [ImmichConnectActivity].
- */
 class SmbConnectActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = false) { SmbConnectScreen(onDone = { finish() }) } }
-  }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent { PortalPrimeTheme(darkTheme = false) { SmbConnectScreen { finish() } } }
+    }
 }
 
 @Composable
-private fun SmbConnectScreen(onDone: () -> Unit) {
-  val context = LocalContext.current
-  val ui = remember { Handler(Looper.getMainLooper()) }
-  val existing = remember { ScreensaverConfig.load(context) }
+private fun SmbConnectScreen(onCancel: () -> Unit) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val existing = remember { ScreensaverConfig.load(context) }
+    val work = rememberApprovedSourcesWork()
+    var host by remember { mutableStateOf(existing.smbHost.orEmpty()) }
+    var share by remember { mutableStateOf(existing.smbShare.orEmpty()) }
+    var path by remember { mutableStateOf(existing.smbPath.orEmpty()) }
+    var user by remember { mutableStateOf(existing.smbUser.orEmpty()) }
+    var pass by remember { mutableStateOf(existing.smbPass.orEmpty()) }
+    var status by remember { mutableStateOf<String?>(null) }
+    var connectedCount by remember { mutableStateOf<Int?>(null) }
+    val cancel = { work.close(); onCancel() }
+    BackHandler(onBack = cancel)
 
-  var host by remember { mutableStateOf(existing.smbHost ?: "") }
-  var share by remember { mutableStateOf(existing.smbShare ?: "") }
-  var path by remember { mutableStateOf(existing.smbPath ?: "") }
-  var user by remember { mutableStateOf(existing.smbUser ?: "") }
-  var pass by remember { mutableStateOf(existing.smbPass ?: "") }
-  var testing by remember { mutableStateOf(false) }
-  var status by remember { mutableStateOf<String?>(null) }
-  var connectedCount by remember { mutableStateOf<Int?>(null) }
-  val (_, initialFocus) = rememberInitialFocus()
-
-  BackHandler { onDone() }
-
-  fun connect() {
-    if (host.isBlank() || share.isBlank()) {
-      status = "Enter at least the server and share name."
-      return
-    }
-    testing = true
-    status = null
-    thread {
-      val src = SmbSource(host.trim(), share.trim(), path.trim(), user.trim(), pass)
-      val images = if (src.connect()) src.listImages() else emptyList()
-      runCatching { src.close() }
-      ui.post {
-        testing = false
-        if (images.isNotEmpty()) {
-          ScreensaverConfig.setSmb(context, host, share, path, user, pass)
-          connectedCount = images.size
-        } else {
-          status =
-              "Couldn't read images from that share. Check the server, share name, folder and " +
-                  "credentials."
+    fun connect() {
+        if (work.busy) return
+        if (host.isBlank() || share.isBlank()) { status = "Enter at least the server and share name."; return }
+        val server = host.trim()
+        val shareName = share.trim()
+        val folder = path.trim()
+        val username = user.trim()
+        val password = pass
+        status = null
+        work.start(work = {
+            val source = SmbSource(server, shareName, folder, username, password)
+            try {
+                if (!source.connect()) error("connection")
+                if (Thread.currentThread().isInterrupted) throw InterruptedException()
+                source.listImages().size
+            } finally { source.close() }
+        }) { result ->
+            val count = result.getOrNull() ?: 0
+            if (count > 0) {
+                ScreensaverConfig.setSmb(context, server, shareName, folder, username, password)
+                connectedCount = count
+            } else status = "Couldn't read images from that share. Check the server, share name, folder and credentials."
         }
-      }
     }
-  }
 
-  SettingsScaffold(title = "Network Share (NAS)", onBack = onDone) {
-    Column {
-      val count = connectedCount
-      if (count != null) {
-        Text(
-            "Connected — found $count photo${if (count == 1) "" else "s"}. Showing them on the " +
-                "screensaver now.",
-            color = IosSecondary,
-            fontSize = Sizes.rowSub,
-            modifier = Modifier.padding(top = 6.dp),
-        )
-        Spacer(Modifier.heightIn(min = 26.dp))
-        PrimaryPillButton("Done") { onDone() }
-        return@Column
-      }
-
-      Text(
-          "Show photos from a folder on your NAS over your local network (SMB). Enter the server, " +
-              "the share, an optional folder inside it, and your username and password.",
-          color = IosSecondary,
-          fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.heightIn(min = 22.dp))
-
-      IosTextField(host, { host = it }, "Server (e.g. 192.168.1.50)", modifier = initialFocus)
-      Spacer(Modifier.heightIn(min = 12.dp))
-      IosTextField(share, { share = it }, "Share name (e.g. media)")
-      Spacer(Modifier.heightIn(min = 12.dp))
-      IosTextField(path, { path = it }, "Folder in the share (optional, e.g. photos)")
-      Spacer(Modifier.heightIn(min = 12.dp))
-      IosTextField(user, { user = it }, "Username")
-      Spacer(Modifier.heightIn(min = 12.dp))
-      IosTextField(pass, { pass = it }, "Password", password = true)
-
-      status?.let {
-        Text(
-            it,
-            color = IosRed,
-            fontSize = Sizes.rowSub,
-            modifier = Modifier.padding(top = 10.dp, start = 4.dp),
-        )
-      }
-
-      Spacer(Modifier.heightIn(min = 26.dp))
-      PrimaryPillButton(if (testing) "Connecting…" else "Test & connect", enabled = !testing) {
-        if (!testing) connect()
-      }
-      Spacer(Modifier.heightIn(min = 12.dp))
-      Surface(
-          color = IosCard,
-          shape = RoundedCornerShape(16.dp),
-          modifier =
-              Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
-                onDone()
-              },
-      ) {
-        Text(
-            "Cancel",
-            color = IosBlue,
-            fontSize = Sizes.rowTitle,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
-        )
-      }
+    ApprovedSourcesPage("Connect SMB / NAS", onBack = cancel, advancedOnly = true) {
+        val count = connectedCount
+        if (count != null) {
+            ApprovedSettingsSectionLabel("Connected")
+            Card {
+                ApprovedSourcesInfoRow("Photos found", count.toString())
+                Divider()
+                ApprovedSourcesInfoRow("Selected source", "Network share")
+            }
+            Spacer(Modifier.height(30.dp))
+            ApprovedSourcesButton("Done") {
+                work.close()
+                activity?.let { approvedSourcesReturn(it) }
+            }
+        } else {
+            ApprovedSourcesForm("Network share", "Enter your server, share name, an optional folder inside the share, and credentials. Immortal tests the connection and counts photos before selecting this source.") {
+                ApprovedSourcesField("Server", host, { host = it }, "192.168.1.50", enabled = !work.busy)
+                ApprovedSourcesField("Share name", share, { share = it }, "media", enabled = !work.busy)
+                ApprovedSourcesField("Folder in the share", path, { path = it }, "photos (optional)", enabled = !work.busy)
+                ApprovedSourcesField("Username", user, { user = it }, enabled = !work.busy)
+                ApprovedSourcesField("Password", pass, { pass = it }, secret = true, enabled = !work.busy)
+                ApprovedSourcesStatus(status)
+                ApprovedSourcesActions(if (work.busy) "Connecting…" else "Test & connect",
+                    enabled = !work.busy && host.isNotBlank() && share.isNotBlank(),
+                    onConfirm = ::connect, onCancel = cancel)
+            }
+        }
     }
-  }
 }
-
-

@@ -125,6 +125,7 @@ object ImmichSource {
     val out = ArrayList<Pair<String, Boolean>>()
     var page = 1
     while (out.size < cap) {
+      PhotoSourceWork.checkpoint()
       val req = JSONObject().put("size", 1000).put("page", page)
       if (!includeVideo) req.put("type", "IMAGE")
       if (albumId != null) req.put("albumIds", JSONArray().put(albumId))
@@ -160,7 +161,7 @@ object ImmichSource {
 
   // --- HTTP (mirrors the app's other best-effort fetchers) --------------------
   private fun httpGet(spec: String, headers: Map<String, String>): String? {
-    val c = URL(spec).openConnection() as HttpURLConnection
+    val c = URL(spec).openPhotoSourceConnection()
     c.connectTimeout = 8000
     c.readTimeout = 10000
     headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
@@ -169,7 +170,7 @@ object ImmichSource {
   }
 
   private fun httpPostJson(spec: String, headers: Map<String, String>, json: String): String? {
-    val c = URL(spec).openConnection() as HttpURLConnection
+    val c = URL(spec).openPhotoSourceConnection()
     c.connectTimeout = 8000
     c.readTimeout = 12000
     c.requestMethod = "POST"

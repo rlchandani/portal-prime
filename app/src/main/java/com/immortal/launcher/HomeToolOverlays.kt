@@ -42,15 +42,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -68,22 +72,24 @@ import kotlinx.coroutines.withContext
 internal fun IssOverlay(onDismiss: () -> Unit) {
   val context = LocalContext.current
   var passes by remember { mutableStateOf<List<IssPasses.Pass>?>(null) }
-  LaunchedEffect(Unit) { passes = withContext(Dispatchers.IO) { IssPasses.predict(context) } }
+  var retry by remember { mutableStateOf(0) }
+  LaunchedEffect(retry) { passes = withContext(Dispatchers.IO) { IssPasses.predict(context) } }
 
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("🛰️ Space station overhead", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+      Text("ISS passes", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      ApprovedAppsButton("Refresh passes") { passes = null; retry++ }
       val p = passes
       when {
-        p == null -> Text("Finding passes…", color = IosSecondary, fontSize = 20.sp)
+        p == null -> Text("Finding passes…", color = IosSecondary, fontSize = 24.sp)
         p.isEmpty() ->
             Text(
                 "No passes found. Check the device is online so it can fetch the latest orbit, " +
                     "and that your location is set (it follows the weather tile).",
                 color = IosSecondary,
-                fontSize = 19.sp,
-                lineHeight = 27.sp,
+                fontSize = 24.sp,
+                lineHeight = 34.sp,
             )
         else -> {
           val first = p.first()
@@ -105,17 +111,17 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
               Surface(color = IosBackground, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp)) {
                   Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(IssPasses.timeLabel(pass.startMillis), color = IosLabel, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Text(IssPasses.timeLabel(pass.startMillis), color = IosLabel, fontSize = 24.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                     if (pass.visible) {
                       Surface(color = Color(0x1AFF9F0A), shape = RoundedCornerShape(8.dp)) {
-                        Text("✨ visible", color = Color(0xFFFF9F0A), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
+                        Text("✨ visible", color = Color(0xFFFF9F0A), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
                       }
                     }
                   }
                   Text(
                       "Rises ${pass.startDir} · peak ${pass.maxElevationDeg}° to the ${pass.peakDir} · sets ${pass.endDir}",
                       color = IosSecondary,
-                      fontSize = 17.sp,
+                      fontSize = 22.sp,
                       modifier = Modifier.padding(top = 4.dp),
                   )
                 }
@@ -125,8 +131,8 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
           Text(
               "Times are local. ✨ means it should be bright enough to see — go outside and look up to the listed direction.",
               color = IosSecondary,
-              fontSize = 15.sp,
-              lineHeight = 21.sp,
+              fontSize = 21.sp,
+              lineHeight = 30.sp,
           )
         }
       }
@@ -141,7 +147,9 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
   val context = LocalContext.current
   var status by remember { mutableStateOf<Aurora.Status?>(null) }
   var loaded by remember { mutableStateOf(false) }
-  LaunchedEffect(Unit) {
+  var retry by remember { mutableStateOf(0) }
+  LaunchedEffect(retry) {
+    loaded = false
     status = withContext(Dispatchers.IO) { Aurora.status(context) }
     loaded = true
   }
@@ -149,17 +157,18 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("🌌 Aurora outlook", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+      Text("Aurora outlook", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      ApprovedAppsButton("Refresh outlook") { retry++ }
       val st = status
       when {
-        !loaded -> Text("Checking the K-index…", color = IosSecondary, fontSize = 20.sp)
+        !loaded -> Text("Checking the K-index…", color = IosSecondary, fontSize = 24.sp)
         st == null ->
             Text(
                 "Couldn't fetch the K-index. Check the device is online and that your location is " +
                     "set (it follows the weather tile).",
                 color = IosSecondary,
-                fontSize = 19.sp,
-                lineHeight = 27.sp,
+                fontSize = 24.sp,
+                lineHeight = 34.sp,
             )
         else -> {
           val accent =
@@ -170,7 +179,7 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
                 Aurora.Chance.NONE -> IosSecondary
               }
           Text(st.headline, color = accent, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
-          Text(st.detail, color = IosSecondary, fontSize = 19.sp, lineHeight = 27.sp)
+          Text(st.detail, color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp)
           Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
             AuroraStat("Kp now", Aurora.fmtKp(st.kpNow), Modifier.weight(1f))
             AuroraStat("Next 24 h peak", Aurora.fmtKp(st.kpForecast), Modifier.weight(1f))
@@ -180,8 +189,8 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
               "Source: NOAA SWPC planetary K-index. Best after dark, away from city lights, with a " +
                   "clear ${if (st.lookToward == "N") "northern" else "southern"} horizon.",
               color = IosSecondary,
-              fontSize = 15.sp,
-              lineHeight = 21.sp,
+              fontSize = 21.sp,
+              lineHeight = 30.sp,
           )
         }
       }
@@ -194,7 +203,7 @@ private fun AuroraStat(label: String, value: String, modifier: Modifier = Modifi
   Surface(color = IosBackground, shape = RoundedCornerShape(14.dp), modifier = modifier) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(vertical = 16.dp).fillMaxWidth()) {
       Text(value, color = IosLabel, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-      Text(label, color = IosSecondary, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 2.dp))
+      Text(label, color = IosSecondary, fontSize = 21.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 2.dp))
     }
   }
 }
@@ -203,93 +212,12 @@ private fun AuroraStat(label: String, value: String, modifier: Modifier = Modifi
 
 @Composable
 internal fun SpeedTestOverlay(onDismiss: () -> Unit) {
-  var phase by remember { mutableStateOf(SpeedTest.Phase.PING) }
-  val r = remember { SpeedTest.Result() }
-  var runId by remember { mutableStateOf(0) }
-
-  LaunchedEffect(runId) {
-    r.reset()
-    phase = SpeedTest.Phase.PING
-    SpeedTest.run(result = r, onPhase = { phase = it })
-    phase = SpeedTest.Phase.DONE
-  }
-
   BackHandler { onDismiss() }
-  val cfg = androidx.compose.ui.platform.LocalConfiguration.current
-  val cardWidth = (cfg.screenWidthDp * 0.6f).dp.coerceIn(520.dp, 720.dp)
-  Scrim(onDismiss) {
-    Surface(shape = RoundedCornerShape(28.dp), color = ToolWindow) {
-      Box {
-      Column(modifier = Modifier.width(cardWidth).padding(32.dp)) {
-        Text("Speed test", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-        Text(
-            if (r.server.isNotEmpty()) r.server
-            else if (phase == SpeedTest.Phase.DONE) "Cloudflare" else "Finding server…",
-            color = IosSecondary,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 4.dp),
-        )
-        Spacer(Modifier.size(28.dp))
-        Row(Modifier.fillMaxWidth()) {
-          SpeedMetric("Ping", r.pingMs, "ms", 0, active = phase == SpeedTest.Phase.PING, accent = Color(0xFFFF9F0A), modifier = Modifier.weight(1f))
-          SpeedMetric("Jitter", r.jitterMs, "ms", 1, active = phase == SpeedTest.Phase.PING, accent = Color(0xFFFF9F0A), modifier = Modifier.weight(1f))
-        }
-        Spacer(Modifier.size(26.dp))
-        SpeedMetric("↓  Download", r.downMbps, "Mbps", 1, active = phase == SpeedTest.Phase.DOWNLOAD, accent = IosBlue, big = true)
-        Spacer(Modifier.size(20.dp))
-        SpeedMetric("↑  Upload", r.upMbps, "Mbps", 1, active = phase == SpeedTest.Phase.UPLOAD, accent = IosGreen, big = true)
-        Spacer(Modifier.size(30.dp))
-        val busy = phase != SpeedTest.Phase.DONE
-        val label =
-            when (phase) {
-              SpeedTest.Phase.PING -> "Pinging…"
-              SpeedTest.Phase.DOWNLOAD -> "Testing download…"
-              SpeedTest.Phase.UPLOAD -> "Testing upload…"
-              SpeedTest.Phase.DONE -> "Run again"
-            }
-        Surface(
-            color = if (busy) IosBackground else IosBlue,
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) { if (!busy) runId++ },
-        ) {
-          Text(label, color = if (busy) IosSecondary else Color.White, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp))
-        }
-        Spacer(Modifier.size(12.dp))
-        }
-      // Consistent close affordance: one ✕, top-right (matches every other tool window).
-      Box(modifier = Modifier.align(Alignment.TopEnd).padding(18.dp)) { CloseCircle(onDismiss) }
-      }
-    }
-  }
-}
-
-@Composable
-private fun SpeedMetric(
-    label: String,
-    value: Double,
-    unit: String,
-    decimals: Int,
-    active: Boolean,
-    accent: Color,
-    modifier: Modifier = Modifier,
-    big: Boolean = false,
-) {
-  val shown = if (value > 0.0) String.format("%.${decimals}f", value) else "—"
-  if (big) {
-    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-      Text(label, color = IosSecondary, fontSize = 22.sp, modifier = Modifier.weight(1f))
-      Text(shown, color = if (active) accent else IosLabel, fontSize = 44.sp, fontWeight = FontWeight.Medium, lineHeight = 44.sp)
-      Spacer(Modifier.size(8.dp))
-      Text(unit, color = IosSecondary, fontSize = 18.sp, modifier = Modifier.padding(bottom = 6.dp))
-    }
-  } else {
-    Column(modifier) {
-      Text(label.uppercase(), color = IosSecondary, fontSize = 15.sp, letterSpacing = 0.5.sp)
-      Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 6.dp)) {
-        Text(shown, color = if (active) accent else IosLabel, fontSize = 34.sp, fontWeight = FontWeight.Medium, lineHeight = 34.sp)
-        Spacer(Modifier.size(6.dp))
-        Text(unit, color = IosSecondary, fontSize = 15.sp, modifier = Modifier.padding(bottom = 5.dp))
-      }
+  if (LocalApprovedToolPage.current) ApprovedToolsSpeedScreen(onDismiss)
+  else Scrim(onDismiss) {
+    Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider),
+        modifier = Modifier.widthIn(max = 1120.dp).heightIn(max = 1040.dp)) {
+      ApprovedToolsSpeedScreen(onDismiss)
     }
   }
 }
@@ -323,33 +251,36 @@ internal fun ConverterOverlay(onDismiss: () -> Unit) {
         }
   }
 
-  BackHandler { onDismiss() }
+  var picker by remember { mutableStateOf<String?>(null) }
+  BackHandler { if (picker != null) picker = null else onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("🔢 Converter", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-      ChipRow(categories, category) { category = it }
-      TextField(
-          value = input,
-          onValueChange = { v -> input = v.filter { it.isDigit() || it == '.' || it == '-' } },
-          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-          singleLine = true,
-          textStyle = androidx.compose.ui.text.TextStyle(fontSize = 28.sp, fontWeight = FontWeight.SemiBold),
-          colors = iosFilledTextFieldColors(),
-          modifier = Modifier.fillMaxWidth(),
-      )
-      Text("From", color = IosSecondary, fontSize = 16.sp)
-      ChipRow(units, from) { from = it }
-      Text("To", color = IosSecondary, fontSize = 16.sp)
-      ChipRow(units, to) { to = it }
-      Text(
-          if (result.isBlank()) "—" else "$result $to",
-          color = IosGreen,
-          fontSize = 40.sp,
-          fontWeight = FontWeight.Bold,
-      )
+      Text("Converter", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      ToolGroup("Convert") {
+        ToolValueRow("Category", category) { picker = "Category" }
+        ToolValueRow("From", from) { picker = "From" }
+        ToolValueRow("To", to) { picker = "To" }
+        Row(Modifier.fillMaxWidth().heightIn(min = 100.dp).padding(horizontal = 28.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+          Text("Value", color = IosLabel, fontSize = 26.sp, modifier = Modifier.weight(1f))
+          androidx.compose.material3.OutlinedTextField(value = input, onValueChange = { input = it }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true,
+              textStyle = androidx.compose.ui.text.TextStyle(fontSize = 26.sp, color = IosLabel), shape = RoundedCornerShape(16.dp), colors = iosTextFieldColors(), modifier = Modifier.width(320.dp))
+        }
+      }
+      ToolGroup("Result") {
+        Text(if (input.toDoubleOrNull() == null) "Enter a valid number." else if (result.isBlank()) "Calculating…" else "$result $to", color = IosLabel, fontSize = 40.sp, lineHeight = 54.sp, modifier = Modifier.padding(28.dp))
+      }
+    }
+  }
+  picker?.let { which ->
+    ToolDialog(which, { picker = null }) {
+      val options = if (which == "Category") categories else units
+      options.forEach { option -> ToolValueRow(option, if (option == when (which) { "Category" -> category; "From" -> from; else -> to }) "✓" else "") {
+        when (which) { "Category" -> category = option; "From" -> from = option; else -> to = option }; picker = null
+      } }
     }
   }
 }
+
 
 /* ------------------------------------------------------------------ Timers */
 
@@ -358,10 +289,16 @@ internal fun TimersOverlay(onDismiss: () -> Unit) {
   val context = LocalContext.current
   var timers by remember { mutableStateOf(TimerConfig.load(context)) }
   var now by remember { mutableStateOf(System.currentTimeMillis()) }
-  LaunchedEffect(Unit) {
-    while (true) {
-      now = System.currentTimeMillis()
+  var custom by remember { mutableStateOf(false) }
+  var hours by remember { mutableStateOf("0") }
+  var minutes by remember { mutableStateOf("5") }
+  var seconds by remember { mutableStateOf("0") }
+  var cancelTimer by remember { mutableStateOf<String?>(null) }
+  LaunchedEffect(timers) {
+    now = System.currentTimeMillis()
+    while (timers.any { it.endAtMillis > now }) {
       delay(1000)
+      now = System.currentTimeMillis()
     }
   }
   fun reload() {
@@ -371,8 +308,8 @@ internal fun TimersOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("⏲️ Timers", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-      Text("Start a timer", color = IosSecondary, fontSize = 16.sp)
+      Text("Timers", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      Text("Start a timer", color = IosSecondary, fontSize = 22.sp)
       val presets = listOf(1, 3, 5, 10, 15, 30)
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
         presets.take(3).forEach { m ->
@@ -384,51 +321,104 @@ internal fun TimersOverlay(onDismiss: () -> Unit) {
           PillButton("${m}m", { TimerConfig.add(context, "$m min", m * 60_000L); reload() }, Modifier.weight(1f))
         }
       }
+      ApprovedAppsButton("Custom timer") { custom = true }
       val active = timers.filter { it.endAtMillis > now }.sortedBy { it.endAtMillis }
-      if (active.isEmpty()) Text("No timers running.", color = IosSecondary, fontSize = 19.sp)
+      if (active.isEmpty()) Text("No timers running.", color = IosSecondary, fontSize = 24.sp)
       active.forEach { t ->
         Surface(color = IosBackground, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
           Row(
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
           ) {
-            Text(t.label, color = IosLabel, fontSize = 20.sp, modifier = Modifier.weight(1f))
+            Text(t.label, color = IosLabel, fontSize = 24.sp, modifier = Modifier.weight(1f))
             Text(fmtClock(t.endAtMillis - now), color = Color(0xFFFF9F0A), fontSize = 28.sp, fontWeight = FontWeight.Medium)
             Spacer(Modifier.size(16.dp))
             Surface(
                 color = Color(0x1AFF3B30),
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f) { TimerConfig.remove(context, t.id); reload() },
+                modifier = Modifier.tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f) { cancelTimer = t.id },
             ) {
-              Text("Cancel", color = IosRed, fontSize = 17.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp))
+              Text("Cancel", color = IosRed, fontSize = 22.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp))
             }
           }
         }
       }
     }
   }
+  if (custom) ToolDialog("Custom timer", { custom = false }) {
+    listOf(Triple("Hours", hours, 0), Triple("Minutes", minutes, 1), Triple("Seconds", seconds, 2)).forEach { (label, value, index) ->
+      Text(label, color = IosSecondary, fontSize = 22.sp)
+      androidx.compose.material3.OutlinedTextField(value, { next -> if (next.all(Char::isDigit)) when (index) { 0 -> hours = next; 1 -> minutes = next; else -> seconds = next } },
+          singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), textStyle = androidx.compose.ui.text.TextStyle(fontSize = 26.sp, color = IosLabel), colors = iosTextFieldColors(), modifier = Modifier.fillMaxWidth())
+    }
+    val h = hours.toLongOrNull() ?: 0L
+    val m = minutes.toLongOrNull() ?: 0L
+    val sec = seconds.toLongOrNull() ?: 0L
+    val valid = h in 0..23 && m in 0..59 && sec in 0..59 && (h + m + sec > 0)
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      ApprovedAppsButton("Cancel") { custom = false }
+      ApprovedAppsButton("Start timer", primary = true, enabled = valid) { TimerConfig.add(context, "Timer", (h * 3600 + m * 60 + sec) * 1000); reload(); custom = false }
+    }
+  }
+  cancelTimer?.let { id -> ToolDialog("Cancel this timer?", { cancelTimer = null }) {
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      ApprovedAppsButton("Keep timer") { cancelTimer = null }
+      ApprovedAppsButton("Cancel timer") { TimerConfig.remove(context, id); reload(); cancelTimer = null }
+    }
+  } }
 }
+
 
 /* ------------------------------------------------------------------ Leave a note */
 
 @Composable
 internal fun NotesOverlay(onDismiss: () -> Unit) {
   val context = LocalContext.current
+  val owner = LocalLifecycleOwner.current
+  val pageActive by rememberUpdatedState(LocalApprovedLauncherPageActive.current)
   var text by remember { mutableStateOf(NotesConfig.loadText(context)) }
   var saved by remember { mutableStateOf(false) }
   val audio = remember { AudioNote(context) }
   var recording by remember { mutableStateOf(false) }
   var hasAudio by remember { mutableStateOf(NotesConfig.hasAudioNote(context)) }
-  DisposableEffect(Unit) { onDispose { audio.release() } }
+  var live by remember { mutableStateOf(true) }
+  var playing by remember { mutableStateOf(false) }
+  var message by remember { mutableStateOf<String?>(null) }
+  var removeMemo by remember { mutableStateOf(false) }
+  var clearText by remember { mutableStateOf(false) }
+  fun stopAudio() {
+    if (audio.isRecording) hasAudio = audio.stopRecording()
+    audio.stopPlaying()
+    recording = false
+    playing = false
+  }
+  DisposableEffect(owner, audio) {
+    live = true
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_STOP) stopAudio()
+    }
+    owner.lifecycle.addObserver(observer)
+    if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) stopAudio()
+    onDispose {
+      live = false
+      owner.lifecycle.removeObserver(observer)
+      audio.release()
+    }
+  }
 
+  fun isActive() = live && pageActive && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
   fun beginRecord() {
-    if (audio.startRecording()) recording = true
+    if (!isActive()) return
+    if (audio.startRecording()) { recording = true; playing = false } else message = "The microphone couldn’t start recording. Check app permissions and try again."
   }
   val micPerm =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) beginRecord()
+        if (isActive()) {
+          if (granted) beginRecord() else message = "Microphone access is needed to record a voice memo."
+        }
       }
   fun record() {
+    if (!isActive()) return
     if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
         PackageManager.PERMISSION_GRANTED)
         beginRecord()
@@ -438,11 +428,12 @@ internal fun NotesOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("📝 Leave a note", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+      Text("Leave a note", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      message?.let { Text(it, color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp) }
       TextField(
           value = text,
           onValueChange = { text = it; saved = false },
-          textStyle = androidx.compose.ui.text.TextStyle(fontSize = 20.sp),
+          textStyle = androidx.compose.ui.text.TextStyle(fontSize = 24.sp),
           colors = iosFilledTextFieldColors(),
           modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
       )
@@ -451,11 +442,12 @@ internal fun NotesOverlay(onDismiss: () -> Unit) {
           { NotesConfig.saveText(context, text); saved = true },
           Modifier.fillMaxWidth(),
       )
-      Text("Voice memo", color = IosSecondary, fontSize = 16.sp)
+      ApprovedAppsButton("Clear note") { clearText = true }
+      Text("Voice memo", color = IosSecondary, fontSize = 22.sp)
       if (recording) {
         PillButton(
             "■ Stop recording",
-            { audio.stopRecording(); recording = false; hasAudio = NotesConfig.hasAudioNote(context) },
+            { hasAudio = audio.stopRecording(); recording = false; if (!hasAudio) message = "The recording was too short. Please try again." },
             Modifier.fillMaxWidth(),
         )
       } else {
@@ -463,10 +455,26 @@ internal fun NotesOverlay(onDismiss: () -> Unit) {
       }
       if (hasAudio && !recording) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-          PillButton("▶ Play", { audio.play() }, Modifier.weight(1f))
-          PillButton("Delete", { NotesConfig.clearAudio(context); hasAudio = false }, Modifier.weight(1f))
+          PillButton(if (playing) "Stop playback" else "Play memo", {
+            if (playing) { audio.stopPlaying(); playing = false }
+            else if (isActive()) { playing = true; audio.play { if (live) playing = false } }
+          }, Modifier.weight(1f))
+          PillButton("Delete memo", { removeMemo = true }, Modifier.weight(1f))
         }
       }
+    }
+  }
+      // Saving is explicit; clearing or deleting always asks before modifying the saved note.
+  if (removeMemo) ToolDialog("Delete voice memo?", { removeMemo = false }) {
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      ApprovedAppsButton("Cancel") { removeMemo = false }
+      ApprovedAppsButton("Delete memo") { audio.stopPlaying(); playing = false; NotesConfig.clearAudio(context); hasAudio = false; removeMemo = false }
+    }
+  }
+  if (clearText) ToolDialog("Clear this note?", { clearText = false }) {
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      ApprovedAppsButton("Cancel") { clearText = false }
+      ApprovedAppsButton("Clear note") { NotesConfig.saveText(context, ""); text = ""; saved = true; clearText = false }
     }
   }
 }
@@ -488,7 +496,7 @@ private fun ChipRow(options: List<String>, selected: String, onSelect: (String) 
           shape = RoundedCornerShape(14.dp),
           modifier = Modifier.tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { onSelect(opt) },
       ) {
-        Text(opt, color = if (on) Color.White else IosLabel, fontSize = 20.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp))
+        Text(opt, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel, fontSize = 24.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp))
       }
     }
   }
@@ -537,52 +545,65 @@ private fun fmtClock(ms: Long): String {
  * [onDismiss] is still wired to Back (via each overlay's BackHandler); the scrim itself just
  * consumes taps so nothing behind it (or a fall-through dismiss) fires.
  */
+/** Page hosts keep their header/dock; Home callers retain an explicit, bounded modal. */
+internal val LocalApprovedToolPage = androidx.compose.runtime.staticCompositionLocalOf { false }
+
 @Composable
 internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
-  Box(
-      contentAlignment = Alignment.Center,
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Color(0x4D000000))
-              .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { /* swallow — no tap-to-dismiss */ },
-  ) {
-    content()
-  }
+  val page = LocalApprovedToolPage.current
+  if (!page) KeepInteractiveScreenAwake()
+  Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
+      .background(if (page) IosBackground else Color(0x66000000))) { content() }
 }
 
-/**
- * The standard tool card: a rounded surface with a vertically-scrolling padded column. Sized
- * generously for the Portal's wide panel — it fills ~72% of the screen width (up to [maxWidth]) and
- * ~78% of the height, so tools like the speed test / converter / space-station read as a substantial
- * floating window rather than a cramped little box, while the scrim still frames it as a pop-up.
- */
 @Composable
 internal fun ToolCard(maxWidth: Int = 860, onClose: (() -> Unit)? = null, content: @Composable () -> Unit) {
+  val page = LocalApprovedToolPage.current
   val cfg = androidx.compose.ui.platform.LocalConfiguration.current
-  val cardWidth = (cfg.screenWidthDp * 0.72f).dp.coerceAtMost(maxWidth.dp)
-  val cardMaxHeight = (cfg.screenHeightDp * 0.82f).dp
-  Surface(
-      // A step lighter than the settings card tone — tool windows sit over a dimmed home and
-      // read too heavy at IosCard; this keeps them clearly "windows", not voids.
-      color = ToolWindow,
-      shape = RoundedCornerShape(28.dp),
-      modifier = Modifier.width(cardWidth).heightIn(max = cardMaxHeight).padding(24.dp),
-  ) {
-    Box {
-      Column(
-          modifier = Modifier.padding(32.dp).verticalScroll(rememberScrollState()),
-          verticalArrangement = Arrangement.spacedBy(20.dp),
-      ) {
+  if (page) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 56.dp, vertical = 36.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)) {
+      if (onClose != null) ApprovedAppsButton("‹  Tools", onClick = onClose)
+      content()
+    }
+  } else {
+    Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider),
+        modifier = Modifier.width((cfg.screenWidthDp * .72f).dp.coerceAtMost(maxWidth.dp)).heightIn(max = (cfg.screenHeightDp * .82f).dp)) {
+      Column(Modifier.verticalScroll(rememberScrollState()).padding(36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        if (onClose != null) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { CloseCircle(onClose) }
         content()
-      }
-      // THE close affordance: one ✕, always top-right (consistent across every tool window).
-      if (onClose != null) {
-        Box(modifier = Modifier.align(Alignment.TopEnd).padding(18.dp)) { CloseCircle(onClose) }
       }
     }
   }
 }
 
-/** Tool-window surface tone — lighter than [IosCard] so floating tools don't read as voids. */
-internal val ToolWindow = Color(0xFF2A2F40)
+internal val ToolWindow: Color @Composable get() = IosCard
 
+@Composable
+private fun ToolGroup(title: String, content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
+  Text(title, color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(start = 22.dp, bottom = 12.dp))
+  Surface(color = IosCard, shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider), modifier = Modifier.fillMaxWidth()) { Column(content = content) }
+}
+
+@Composable
+private fun ToolValueRow(label: String, value: String, onClick: () -> Unit) {
+  Row(Modifier.fillMaxWidth().heightIn(min = 100.dp).tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, onClick = onClick).padding(horizontal = 28.dp, vertical = 21.dp), verticalAlignment = Alignment.CenterVertically) {
+    Text(label, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp, modifier = Modifier.weight(1f))
+    Text(value, color = IosSecondary, fontSize = 24.sp, lineHeight = 32.sp)
+    Text("›", color = IosSecondary, fontSize = 28.sp, modifier = Modifier.padding(start = 22.dp))
+  }
+}
+
+@Composable
+private fun ToolDialog(title: String, onDismiss: () -> Unit, content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
+  if (!LocalApprovedLauncherPageActive.current) return
+  androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+    KeepInteractiveScreenAwake()
+    Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider), modifier = Modifier.width(760.dp).heightIn(max = 980.dp)) {
+      Column(Modifier.verticalScroll(rememberScrollState()).padding(36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        Text(title, color = IosLabel, fontSize = 34.sp, lineHeight = 46.sp, fontWeight = FontWeight.Medium)
+        content()
+      }
+    }
+  }
+}

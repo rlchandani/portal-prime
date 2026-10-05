@@ -106,39 +106,14 @@ internal fun ClockSettingsContent() {
         // Preview button — opens fullscreen preview (a bespoke action, not a setting).
         SectionLabel("Preview")
         Card {
-          Row(
-              modifier = Modifier.fillMaxWidth().padding(18.dp).clickable {
-                context.startActivity(
-                    Intent(context, DigitalClockPreviewActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-              },
-              verticalAlignment = Alignment.CenterVertically,
+          ActionSettingRow(
+              title = "Preview",
+              subtitle = "See the clock full-screen with your current settings.",
+              actionLabel = "Preview",
           ) {
-            Column(modifier = Modifier.weight(1f)) {
-              Text("Preview", color = IosLabel, fontSize = Sizes.rowTitle)
-              Text(
-                  "See the clock full-screen with your current settings.",
-                  color = IosSecondary,
-                  fontSize = Sizes.rowSub,
-                  modifier = Modifier.padding(top = 2.dp),
-              )
-            }
-            Surface(
-                color = IosBlue,
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp)) {
-                  context.startActivity(
-                      Intent(context, DigitalClockPreviewActivity::class.java)
-                          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                },
-            ) {
-              Text(
-                  "Preview",
-                  color = Color.White,
-                  fontSize = 15.sp,
-                  modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-              )
-            }
+            context.startActivity(
+                Intent(context, DigitalClockPreviewActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
           }
         }
 

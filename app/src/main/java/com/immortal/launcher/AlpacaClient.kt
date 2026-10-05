@@ -96,14 +96,20 @@ object AlpacaClient {
       expiryGte: String,
       expiryLte: String,
       maxPages: Int = 5,
+      checkCancelled: () -> Unit = {},
   ): List<OptionContract> {
+    checkCancelled()
     val sym = underlying.trim().uppercase()
-    if (sym.isBlank() || !AlpacaConfig.isConfigured(context)) return emptyList()
+    if (sym.isBlank() || !AlpacaConfig.isConfigured(context)) {
+      checkCancelled()
+      return emptyList()
+    }
     val headers = AlpacaConfig.authHeaders(context)
     val out = ArrayList<OptionContract>()
     var pageToken: String? = null
     var page = 0
     do {
+      checkCancelled()
       val url = buildString {
         append("${AlpacaConfig.DATA_HOST}/v1beta1/options/snapshots/$sym")
         append("?feed=${AlpacaConfig.OPTIONS_FEED}")
@@ -113,12 +119,15 @@ object AlpacaClient {
         append("&limit=1000")
         pageToken?.let { append("&page_token=$it") }
       }
-      val body = Http.getString(url, headers = headers) ?: break
+      val body = Http.getString(url, headers = headers)
+      checkCancelled()
+      if (body == null) break
       val (contracts, next) = parseOptionChain(body)
       out.addAll(contracts)
       pageToken = next
       page++
     } while (!pageToken.isNullOrBlank() && page < maxPages)
+    checkCancelled()
     return out
   }
 

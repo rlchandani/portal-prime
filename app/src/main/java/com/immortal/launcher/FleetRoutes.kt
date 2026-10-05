@@ -397,12 +397,16 @@ class FleetRoutes(private val context: Context) {
   private fun findUpdatesBlocking(apps: List<CatalogApp>, timeoutMs: Long = 30_000): Map<String, Long> {
     val latch = CountDownLatch(1)
     val ref = AtomicReference<Map<String, Long>>(emptyMap())
-    StoreCatalog.findUpdates(context, apps) {
+    val cancel = StoreCatalog.findUpdates(context, apps) {
       ref.set(it)
       latch.countDown()
     }
-    latch.await(timeoutMs, TimeUnit.MILLISECONDS)
-    return ref.get()
+    return try {
+      latch.await(timeoutMs, TimeUnit.MILLISECONDS)
+      ref.get()
+    } finally {
+      cancel()
+    }
   }
 
   private fun syntheticUrlApp(pkg: String, url: String) =

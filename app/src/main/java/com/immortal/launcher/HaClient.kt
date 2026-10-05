@@ -60,9 +60,22 @@ object HaClient {
     return runCatching { parseState(JSONObject(body)) }.getOrNull()
   }
 
-  /** Fetch the states of several entities, dropping any that fail. Blocking. */
-  fun fetchStates(context: Context, entityIds: List<String>): List<EntityState> =
-      entityIds.mapNotNull { fetchState(context, it) }
+  /** Fetch several states, dropping failures; cancellation checkpoints remain outside parsing. */
+  fun fetchStates(
+      context: Context,
+      entityIds: List<String>,
+      checkCancelled: () -> Unit = {},
+  ): List<EntityState> {
+    checkCancelled()
+    val states = entityIds.mapNotNull {
+      checkCancelled()
+      val state = fetchState(context, it)
+      checkCancelled()
+      state
+    }
+    checkCancelled()
+    return states
+  }
 
   /**
    * Discover all controllable entities on the server (for the picker). Returns entities that are

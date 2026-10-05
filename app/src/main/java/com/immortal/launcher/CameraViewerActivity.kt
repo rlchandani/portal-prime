@@ -4,139 +4,168 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 package com.immortal.launcher
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.MediaController
 import android.widget.VideoView
-import androidx.activity.compose.BackHandler
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * RTSP/ONVIF camera viewer: full-screen live view of a saved camera stream, played by
- * Android's built-in [VideoView] (native RTSP support — no extra library, no GMS).
- * A kitchen Portal showing the driveway or door cam.
- */
+private const val APPROVED_CAMERA_STREAM_ID = "approved_camera_stream_id"
+
+/** Existing native RTSP player and saved-camera editor, with separate Activity destinations. */
 class CameraViewerActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = false) { CameraViewerScreen() } }
-  }
+    private var video: VideoView? = null
+    private var streamStopped = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val streamId = if (intent.hasExtra(APPROVED_CAMERA_STREAM_ID))
+            intent.getLongExtra(APPROVED_CAMERA_STREAM_ID, -1L) else null
+        setContent {
+            PortalPrimeTheme(darkTheme = false) {
+                CameraViewerScreen(streamId,
+                    onVideoCreated = { video = it },
+                    onVideoReleased = { if (video === it) video = null })
+            }
+        }
+    }
+
+    override fun onStop() {
+        streamStopped = video != null
+        video?.stopPlayback()
+        super.onStop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (streamStopped) { video?.resume(); streamStopped = false }
+    }
 }
 
 @Composable
-private fun CameraViewerScreen() {
-  val context = LocalContext.current
-  val activity = context as? Activity
-  var cameras by remember { mutableStateOf(CameraConfig.load(context)) }
-  var playing by remember { mutableStateOf<CameraConfig.Camera?>(null) }
-  var adding by remember { mutableStateOf(cameras.isEmpty()) }
-  var name by remember { mutableStateOf("") }
-  var url by remember { mutableStateOf("rtsp://") }
-
-  val current = playing
-  if (current != null) {
-    BackHandler { playing = null }
-    // Full-screen live player.
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-      AndroidView(
-          factory = { ctx ->
-            VideoView(ctx).apply {
-              setMediaController(MediaController(ctx).also { it.setAnchorView(this) })
-              setVideoPath(current.url)
-              setOnPreparedListener { it.isLooping = true; start() }
-              setOnErrorListener { _, _, _ -> true }
-            }
-          },
-          modifier = Modifier.fillMaxSize(),
-      )
+private fun CameraViewerScreen(
+    streamId: Long?, onVideoCreated: (VideoView) -> Unit, onVideoReleased: (VideoView) -> Unit,
+) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+    var cameras by remember { mutableStateOf(CameraConfig.load(context)) }
+    var name by remember { mutableStateOf("") }
+    var url by remember { mutableStateOf("rtsp://") }
+    var error by remember { mutableStateOf<String?>(null) }
+    var removal by remember { mutableStateOf<CameraConfig.Camera?>(null) }
+    val current = remember(cameras, streamId) { cameras.firstOrNull { it.id == streamId } }
+    if (streamId != null && current != null) {
+        CameraLiveStream(current, onBack = { activity?.finish() },
+            onVideoCreated = onVideoCreated, onVideoReleased = onVideoReleased)
+        return
     }
-    return
-  }
 
-  SettingsScaffold(
-      title = "Cameras",
-      subtitle = "Live view of an RTSP camera (e.g. rtsp://user:pass@192.168.1.50:554/stream).",
-      onBack = { activity?.finish() },
-  ) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-      if (cameras.isNotEmpty()) {
-        Card {
-          cameras.forEachIndexed { i, cam ->
-            if (i > 0) Divider()
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-              Column(modifier = Modifier.weight(1f).tvFocusableRow { playing = cam }) {
-                Text(cam.name, color = IosLabel, fontSize = Sizes.rowTitle, fontWeight = FontWeight.SemiBold)
-                Text(cam.url, color = IosSecondary, fontSize = Sizes.rowSub, maxLines = 1)
-              }
-              Box(modifier = Modifier.size(40.dp).clickable {
-                CameraConfig.remove(context, cam.id); cameras = CameraConfig.load(context)
-              }, contentAlignment = Alignment.Center) {
-                Text("✕", color = IosRed, fontSize = 20.sp)
-              }
+    SettingsScaffold(title = "Cameras", onBack = { activity?.finish() }) {
+        Column {
+            ApprovedEditorsCollection("Your cameras", cameras, key = { it.id }) { camera ->
+                ApprovedEditorsCollectionRow(camera.name, camera.url,
+                    onRemove = { removal = camera }, action = "View", onAction = {
+                        context.startActivity(Intent(context, CameraViewerActivity::class.java)
+                            .putExtra(APPROVED_CAMERA_STREAM_ID, camera.id))
+                    })
             }
-          }
-        }
-      }
-
-      if (adding) {
-        Card {
-          Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedTextField(colors = iosTextFieldColors(), value = name, onValueChange = { name = it }, singleLine = true,
-                label = { Text("Name (e.g. Driveway)") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(colors = iosTextFieldColors(), value = url, onValueChange = { url = it }, singleLine = true,
-                label = { Text("rtsp:// URL") }, modifier = Modifier.fillMaxWidth())
-            Surface(color = IosBlue, shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
-                  if (url.startsWith("rtsp://") && url.length > 8) {
-                    CameraConfig.add(context, name, url)
-                    cameras = CameraConfig.load(context); name = ""; url = "rtsp://"; adding = false
-                  }
+            ApprovedEditorsForm(actions = {
+                ApprovedEditorsActions(error = error, onCancel = {
+                    name = ""; url = "rtsp://"; error = null; activity?.finish()
                 }) {
-              Text("Add camera", color = Color.White, fontSize = Sizes.actionButton, fontWeight = FontWeight.SemiBold,
-                  textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth())
+                    // Retain the original literal RTSP predicate; no stricter URL parser or
+                    // required name is introduced. CameraConfig supplies the Camera fallback.
+                    if (!url.startsWith("rtsp://") || url.length <= 8) {
+                        error = "Enter an rtsp:// stream address longer than eight characters."
+                    } else {
+                        CameraConfig.add(context, name, url)
+                        cameras = CameraConfig.load(context)
+                        name = ""; url = "rtsp://"; error = null
+                    }
+                }
+            }) {
+                ApprovedEditorsField("Name (optional)", name, { name = it; error = null })
+                Divider()
+                ApprovedEditorsField("RTSP URL", url, { url = it; error = null })
             }
-          }
         }
-      } else {
-        Card {
-          Text("+ Add a camera", color = IosBlue, fontSize = Sizes.rowTitle, textAlign = TextAlign.Center,
-              modifier = Modifier.fillMaxWidth().tvFocusableRow { adding = true }.padding(vertical = 14.dp))
-        }
-      }
     }
-  }
+    removal?.let { camera ->
+        ApprovedEditorsRemoveDialog(camera.name, onCancel = { removal = null }) {
+            CameraConfig.remove(context, camera.id)
+            cameras = CameraConfig.load(context); removal = null
+        }
+    }
+}
+
+@Composable
+private fun CameraLiveStream(
+    camera: CameraConfig.Camera, onBack: () -> Unit,
+    onVideoCreated: (VideoView) -> Unit, onVideoReleased: (VideoView) -> Unit,
+) {
+    var failed by remember(camera.id) { mutableStateOf(false) }
+    var attempt by remember(camera.id) { mutableIntStateOf(0) }
+    val released = remember(camera.id) { AtomicBoolean(false) }
+    BackHandler(onBack = onBack)
+    Box(Modifier.fillMaxSize().background(Color.Black)) {
+        AndroidView(
+            factory = { context ->
+                VideoView(context).apply {
+                    setMediaController(MediaController(context).also { it.setAnchorView(this) })
+                    setOnPreparedListener { player ->
+                        if (!released.get()) { player.isLooping = true; start() }
+                    }
+                    setOnErrorListener { _, _, _ ->
+                        if (!released.get()) failed = true
+                        true
+                    }
+                    onVideoCreated(this)
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+            onReset = null,
+            onRelease = { view ->
+                released.set(true)
+                view.setOnPreparedListener(null)
+                view.setOnErrorListener(null)
+                view.stopPlayback()
+                view.setMediaController(null)
+                onVideoReleased(view)
+            },
+            update = { view ->
+                if (view.tag != attempt) {
+                    view.tag = attempt
+                    view.setVideoPath(camera.url)
+                }
+            },
+        )
+        Box(Modifier.align(Alignment.TopStart).padding(start = 40.dp, top = 38.dp)) {
+            ApprovedEditorsButton("Back", onClick = onBack)
+        }
+        if (failed) {
+            ApprovedSettingsDialog(camera.name, onDismiss = onBack,
+                help = "Camera unavailable. Check the stream address.") {
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    ApprovedEditorsButton("Retry", primary = true) { failed = false; attempt++ }
+                    ApprovedEditorsButton("Done", onClick = onBack)
+                }
+            }
+        }
+    }
 }

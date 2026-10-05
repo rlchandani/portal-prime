@@ -268,12 +268,13 @@ object RemoteHtml {
         <button class=link onclick=closeSrcPanel()>&lsaquo; Back to settings</button>
         <div class=label>Photo source</div>
         <div class=editor>
-          <label class=pick><input type=radio name=src value=default onclick="showSrc('default')"> Default photo feed</label>
-          <label class=pick><input type=radio name=src value=immich onclick="showSrc('immich')"> Immich server</label>
-          <label class=pick><input type=radio name=src value=smb onclick="showSrc('smb')"> Network share (NAS)</label>
-          <label class=pick><input type=radio name=src value=dav onclick="showSrc('dav')"> WebDAV folder</label>
-          <label class=pick><input type=radio name=src value=web onclick="showSrc('web')"> Web page</label>
-          <label class=pick><input type=radio name=src value=album onclick="showSrc('album')"> Shared album link</label>
+          <label class=pick><input type=radio name=src value=default onclick="showSrc('default',true)"> Default photo feed</label>
+          <label class=pick><input type=radio name=src value=immich onclick="showSrc('immich',true)"> Immich server</label>
+          <label class=pick><input type=radio name=src value=smb onclick="showSrc('smb',true)"> Network share (NAS)</label>
+          <label class=pick><input type=radio name=src value=dav onclick="showSrc('dav',true)"> WebDAV folder</label>
+          <label class=pick><input type=radio name=src value=web onclick="showSrc('web',true)"> Web page</label>
+          <label class=pick><input type=radio name=src value=album onclick="showSrc('album',true)"> Shared album link</label>
+          <div id=srcGate class=sub></div>
           <div class=srcf id=f_immich><input id=immichUrl placeholder="Immich URL (http://192.168.x.x:2283)"><input id=immichKey placeholder="API key"><div class=row><select id=immichAlbum><option value="">Whole library</option></select><button onclick=loadImmichAlbums()>Load albums</button></div><div id=immichAlbumMsg class=sub style="margin:4px 0 0"></div></div>
           <div class=srcf id=f_smb><input id=smbHost placeholder="Host or IP"><input id=smbShare placeholder="Share name"><input id=smbPath placeholder="Folder path (optional)"><input id=smbUser placeholder="Username (optional)"><input id=smbPass type=password placeholder="Password (optional)"></div>
           <div class=srcf id=f_dav><input id=davUrl placeholder="WebDAV URL"><input id=davUser placeholder="Username (optional)"><input id=davPass type=password placeholder="Password (optional)"></div>
@@ -484,16 +485,19 @@ object RemoteHtml {
   function closeSrcPanel(){var p=document.getElementById('srcPanel');if(p)p.classList.add('hide');var l=document.getElementById('settingsList');if(l)l.classList.remove('hide');}
   function renderDomain(sec,dom){
     sec.innerHTML='';
+    var visible=(dom.controls||[]).filter(function(c){return c.tier!=='advanced'||remoteAdvanced();});
+    sec.style.display=visible.length?'':'none';
+    if(!visible.length)return;
     var h=document.createElement('div');h.className='setsec';
     var ti=document.createElement('span');ti.textContent=dom.title;h.appendChild(ti);
-    if((dom.controls||[]).some(function(c){return c['default']!==undefined;})){
+    if(visible.some(function(c){return c['default']!==undefined;})){
       var rl=document.createElement('button');rl.className='resetlink';rl.textContent='Reset';
       rl.onclick=function(){resetDomain(dom);};h.appendChild(rl);
     }
     sec.appendChild(h);
     // Group controls by their schema-declared section (first-appearance order); ungrouped first.
     var groups=[],idx={};
-    (dom.controls||[]).forEach(function(ctl){
+    visible.forEach(function(ctl){
       var k=ctl.section||'';
       if(!(k in idx)){idx[k]=groups.length;groups.push({name:ctl.section||null,items:[]});}
       groups[idx[k]].items.push(ctl);
@@ -506,11 +510,12 @@ object RemoteHtml {
   function renderControl(domId,ctl){
     var row=document.createElement('div');row.className='setrow';row.id='c_'+domId+'_'+ctl.key;
     var t=document.createElement('div');t.className='t';t.textContent=ctl.title;
+    var help=remoteAdvanced()?ctl.help:ctl.shortHelp;
     if(ctl.type==='string'||(ctl.type==='int'&&ctl.asText)){
       row.className='setrow col';row.appendChild(t);
       var inp=document.createElement('input');inp.value=(ctl.value!=null?ctl.value:'');
-      if(ctl.secret){inp.type='password';inp.placeholder=ctl.hasValue?'Set - leave blank to keep':(ctl.help||'');}
-      else if(ctl.help)inp.placeholder=ctl.help;
+      if(ctl.secret){inp.type='password';inp.placeholder=ctl.hasValue?'Set - leave blank to keep':(help||'');}
+      else if(help)inp.placeholder=help;
       if(ctl.type==='int')inp.inputMode='numeric';
       inp.onchange=function(){var v=ctl.type==='int'?parseInt(inp.value,10):inp.value;if(ctl.type==='int'&&isNaN(v))return;setPut(domId,ctl.key,v);};
       row.appendChild(inp);
@@ -548,6 +553,7 @@ object RemoteHtml {
     el.textContent=msg;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(function(){el.style.opacity='0';},2600);
   }
   function schemaDomain(domId){var ds=(lastSchema&&lastSchema.settings&&lastSchema.settings.domains)||[];for(var i=0;i<ds.length;i++)if(ds[i].id===domId)return ds[i];return null;}
+  function remoteAdvanced(){var dom=schemaDomain('immortal');return !!(dom&&(dom.controls||[]).some(function(c){return c.key==='advancedSettings'&&c.value===true;}));}
   function setSchemaDomain(domId,dom){var ds=(lastSchema&&lastSchema.settings&&lastSchema.settings.domains)||[];for(var i=0;i<ds.length;i++)if(ds[i].id===domId){ds[i]=dom;return;}}
   function ctlKeys(dom){return ((dom&&dom.controls)||[]).map(function(c){return c.key;}).join(',');}
   // Apply a fresh domain schema WITHOUT tearing down the whole section: replace only each control's
@@ -584,12 +590,12 @@ object RemoteHtml {
     // The device name is per-device — never broadcast it, or every Portal ends up identically named.
     if(setScope==='all'&&domId!=='fleet')broadcast(body);
     api('/remote/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:body})
-      .then(function(d){if(d&&d.domain)applyDomainUpdate(domId,d.domain);})
+      .then(function(d){if(d&&d.domain){applyDomainUpdate(domId,d.domain);if(domId==='immortal'&&key==='advancedSettings')loadSettings();}})
       .catch(function(){flash('Couldn’t apply — is the Portal reachable?',true);});
   }
   function resetDomain(dom){
     var vals={};
-    (dom.controls||[]).forEach(function(c){if(c['default']!==undefined)vals[c.key]=c['default'];});
+    (dom.controls||[]).forEach(function(c){if(c['default']!==undefined&&(c.tier!=='advanced'||remoteAdvanced()))vals[c.key]=c['default'];});
     var body=JSON.stringify({domain:dom.id,values:vals});
     if(setScope==='all'&&dom.id!=='fleet')broadcast(body);
     api('/remote/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:body})
@@ -787,7 +793,13 @@ object RemoteHtml {
   }
   function deletePreset(id){presetsData=presetsData.filter(function(p){return p.id!==id;});savePresets(function(){renderPresets();renderExisting();});}
   // --- screensaver / calendar source setup ---
-  function showSrc(src){['immich','smb','dav','web','album'].forEach(function(s){var e=document.getElementById('f_'+s);if(e)e.classList.toggle('on',s===src);});}
+  function showSrc(src,edited){
+    var advanced=remoteAdvanced(),technical=['immich','smb','dav','web'],hidden=technical.indexOf(src)>=0&&!advanced;
+    technical.forEach(function(s){var r=document.querySelector('input[name=src][value="'+s+'"]');if(r)r.parentElement.style.display=advanced?'':'none';});
+    ['immich','smb','dav','web','album'].forEach(function(s){var e=document.getElementById('f_'+s);if(e)e.classList.toggle('on',s===src&&!hidden);});
+    var gate=document.getElementById('srcGate');if(gate)gate.textContent=hidden?'Your configured source continues to play. Turn on Advanced settings to edit its connection.':src==='folder'&&!edited?'Your selected folder continues to play. Choose another folder on the Portal.':'';
+    var save=document.querySelector('#srcPanel button[onclick="saveSources()"]');if(save)save.disabled=hidden||(src==='folder'&&!edited);
+  }
   function setVal(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
   function gv(id){var e=document.getElementById(id);return e?e.value.trim():'';}
   function loadSources(){

@@ -6,39 +6,40 @@
  */
 package com.immortal.launcher
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.immortal.launcher.ui.theme.LocalApprovedPalette
 
 /**
- * THE paste-a-link screen. Calendar/.ics, shared-album, and web-page entry are the same screen
- * with different validators and strings — this is the single implementation all three use.
- *
- * @param validate returns a non-null provider/label when [trimmed] input is acceptable (the
- *   label feeds the "Looks like a X link." line; pass "" for a generic "Looks good.").
+ * Revision 04 URL body: full-width Options form, field card, hint and inline actions.
+ * Providers and validation stay with the caller; nothing is saved while typing or cancelling.
  */
 @Composable
 internal fun UrlEntryScreen(
     title: String,
-    subtitle: String,
+    fieldLabel: String,
     placeholder: String,
     initial: String,
     emptyHint: String,
@@ -49,112 +50,75 @@ internal fun UrlEntryScreen(
     onCancel: () -> Unit,
     removeLabel: String? = null,
     onRemove: (() -> Unit)? = null,
-    helpTitle: String? = null,
-    helpBody: String? = null,
+    fieldHelp: String? = null,
+    advancedOnly: Boolean = false,
 ) {
-  var url by remember { mutableStateOf(initial) }
-  val (_, initialFocus) = rememberInitialFocus()
+    val palette = LocalApprovedPalette.current
+    val activity = LocalContext.current as? Activity
+    var value by remember { mutableStateOf(initial) }
+    var remove by remember { mutableStateOf(false) }
+    var complete by remember { mutableStateOf(false) }
+    val cancel = { complete = true; onCancel() }
+    BackHandler(onBack = cancel)
 
-  val trimmed = url.trim()
-  val provider = if (trimmed.isEmpty()) null else validate(trimmed)
-  val valid = provider != null
-
-  BackHandler { onCancel() }
-
-  SettingsScaffold(title = title, subtitle = subtitle, onBack = onCancel) {
-    Column {
-      OutlinedTextField(
-          colors = iosTextFieldColors(),
-          value = url,
-          onValueChange = { url = it },
-          placeholder = { Text(placeholder) },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
-          shape = RoundedCornerShape(14.dp),
-      )
-
-      Text(
-          when {
-            trimmed.isEmpty() -> emptyHint
-            valid -> if (provider!!.isBlank()) "Looks good." else "Looks like a $provider link."
-            else -> invalidHint
-          },
-          color = if (valid || trimmed.isEmpty()) IosSecondary else IosRed,
-          fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(top = 10.dp, start = 4.dp),
-      )
-
-      Spacer(Modifier.heightIn(min = 26.dp))
-
-      Surface(
-          color = if (valid) IosBlue else IosDivider,
-          shape = RoundedCornerShape(16.dp),
-          modifier =
-              Modifier.fillMaxWidth().then(initialFocus).tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) {
-                if (valid) onSave(trimmed)
-              },
-      ) {
-        Text(
-            primaryLabel,
-            color = if (valid) Color.White else IosSecondary,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(vertical = 16.dp).fillMaxWidth(),
-        )
-      }
-
-      Spacer(Modifier.heightIn(min = 12.dp))
-
-      if (removeLabel != null && onRemove != null && initial.isNotBlank()) {
-        Surface(
-            color = IosCard,
-            shape = RoundedCornerShape(16.dp),
-            modifier =
-                Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) { onRemove() },
-        ) {
-          Text(
-              removeLabel,
-              color = IosRed,
-              fontSize = Sizes.rowTitle,
-              textAlign = TextAlign.Center,
-              modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
-          )
+    val trimmed = value.trim()
+    val provider = if (trimmed.isEmpty()) null else validate(trimmed)
+    ApprovedSourcesPage(title, onBack = cancel, advancedOnly = advancedOnly) {
+        ApprovedEditorsForm(actions = {
+            // The frozen form reserves its empty error paragraph above the URL hint.
+            Spacer(Modifier.height(70.dp))
+            Text(
+                when {
+                    trimmed.isEmpty() -> emptyHint
+                    provider == null -> invalidHint
+                    provider.isEmpty() -> "Looks good."
+                    else -> "Looks like a $provider link."
+                },
+                color = if (trimmed.isNotEmpty() && provider == null) palette.error else palette.text,
+                fontSize = 24.sp, lineHeight = 37.7.sp,
+                modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
+            )
+            Row(Modifier.padding(top = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                ApprovedEditorsButton(primaryLabel, primary = true, enabled = provider != null && !complete) {
+                    val draft = value.trim()
+                    if (draft.isNotEmpty() && validate(draft) != null && !complete &&
+                        activity?.isFinishing != true && activity?.isDestroyed != true) {
+                        complete = true
+                        onSave(draft)
+                    }
+                }
+                ApprovedEditorsButton("Cancel", onClick = cancel)
+                if (initial.isNotBlank() && removeLabel != null && onRemove != null) {
+                    ApprovedSettingsTextButton(removeLabel) { if (!complete) remove = true }
+                }
+            }
+        }) {
+            ApprovedEditorsField(fieldLabel, value, { if (!complete) value = it }, placeholder)
+            if (!fieldHelp.isNullOrBlank()) {
+                Text(fieldHelp, color = palette.secondary, fontSize = 20.sp, lineHeight = 27.sp,
+                    modifier = Modifier.padding(start = 28.dp, end = 28.dp, top = 14.dp))
+            }
+            // Preserve the field's bottom rule and 26 dp trailing margin inside the field card.
+            Spacer(Modifier.height(26.dp))
+            Box(Modifier.fillMaxWidth().height(1.dp).background(palette.divider))
+            Spacer(Modifier.height(26.dp))
         }
-        Spacer(Modifier.heightIn(min = 12.dp))
-      }
-
-      Surface(
-          color = IosCard,
-          shape = RoundedCornerShape(16.dp),
-          modifier =
-              Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f) { onCancel() },
-      ) {
-        Text(
-            "Cancel",
-            color = IosBlue,
-            fontSize = Sizes.rowTitle,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(),
-        )
-      }
-
-      if (helpTitle != null && helpBody != null) {
-        Spacer(Modifier.heightIn(min = 26.dp))
-        Text(
-            helpTitle,
-            color = IosLabel,
-            fontSize = Sizes.rowSub,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
-        )
-        Text(
-            helpBody,
-            color = IosTertiary,
-            fontSize = Sizes.rowSub,
-            modifier = Modifier.padding(start = 4.dp),
-        )
-      }
     }
-  }
+    if (remove && onRemove != null) {
+        ApprovedSettingsDialog("Remove connection?", onDismiss = { remove = false },
+            help = "The existing source remains available until you confirm.") {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                ApprovedEditorsButton("Cancel") { remove = false }
+                ApprovedEditorsButton("Remove", primary = true) {
+                    remove = false
+                    if (!complete && activity?.isFinishing != true && activity?.isDestroyed != true) {
+                        complete = true
+                        onRemove()
+                    }
+                }
+            }
+        }
+    }
 }

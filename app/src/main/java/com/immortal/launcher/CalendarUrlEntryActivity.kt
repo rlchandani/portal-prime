@@ -11,41 +11,36 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+import com.immortal.launcher.settings.SettingsRegistry
+import org.json.JSONObject
 
-/** Paste-a-link screen for the calendar widget's ICS feed — a [UrlEntryScreen] configuration. */
+/** Native calendar form, preserving [CalendarFeed] providers and webcal links. */
 class CalendarUrlEntryActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
       PortalPrimeTheme(darkTheme = false) {
         UrlEntryScreen(
-            title = "Calendar Link",
-            subtitle =
-                "Paste a private iCalendar (.ics) link from Google Calendar or Apple iCloud. " +
-                    "Immortal reads it directly — it can't sign in to your account.",
-            placeholder = "https://calendar.google.com/calendar/ical/…/basic.ics",
+            title = "Calendar feed",
+            fieldLabel = "Calendar feed",
+            placeholder = "https://…",
             initial = ScreensaverConfig.load(this).calendarUrl.orEmpty(),
-            emptyHint = "Examples: Google \"secret address in iCal format\", Apple iCloud public calendar.",
-            invalidHint = "That doesn't look like a calendar (.ics) link yet.",
+            emptyHint = "Google secret address in iCal format or Apple iCloud public calendar.",
+            invalidHint = "That doesn’t look like a calendar (.ics) link yet.",
             primaryLabel = "Use this calendar",
             validate = { if (CalendarFeed.isSupported(it)) CalendarFeed.providerName(it) else null },
             onSave = { url ->
-              ScreensaverConfig.setCalendarUrl(this, url)
-              finish()
+              SettingsRegistry.apply(this, "calendar", JSONObject().put("url", url))
+              approvedSourcesReturn(this, "calendar")
             },
             onCancel = { finish() },
             removeLabel = "Remove calendar",
             onRemove = {
-              ScreensaverConfig.clearCalendarUrl(this)
-              finish()
+              SettingsRegistry.apply(this, "calendar", JSONObject().put("url", ""))
+              approvedSourcesReturn(this, "calendar")
             },
-            helpTitle = "How to get a link:",
-            helpBody =
-                "• Google Calendar (on a computer) → Settings → your calendar → " +
-                    "\"Integrate calendar\" → copy the \"Secret address in iCal format\". " +
-                    "Keep it private — anyone with it can read the calendar.\n" +
-                    "• Apple iCloud → Calendar app → tap a calendar → turn on \"Public Calendar\" " +
-                    "→ Copy Link (a webcal:// link works too).",
+            fieldHelp = "A public iCalendar (.ics) link - a Google \"secret iCal\" address or an Apple " +
+                "iCloud public-calendar link. Shows your upcoming events on the frame.",
         )
       }
     }

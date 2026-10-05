@@ -9,7 +9,6 @@ package com.immortal.launcher
 
 import android.media.AudioAttributes
 import android.media.AudioFormat
-import android.media.AudioManager
 import android.media.AudioRecord
 import android.media.AudioTrack
 import android.media.MediaRecorder
@@ -37,79 +36,134 @@ class LanAudio {
   val PORT = 8724
   private val SAMPLE_RATE = 16000
 
-  @Volatile private var running = false
-  private var serverThread: Thread? = null
-  private var clientThread: Thread? = null
-  private var serverSocket: ServerSocket? = null
-  private var clientSocket: Socket? = null
+  private val sessions = LanAudioSessions()
 
-  val isActive: Boolean get() = running
+  val isActive: Boolean get() = sessions.isActive
 
   /** Capture the mic and stream it to every device that connects to this port.
    * [onState] reports whether the listening socket bound, so the UI doesn't claim
    * it's broadcasting when the port couldn't be opened (e.g. already in use). */
   fun startBroadcast(onState: (Boolean) -> Unit = {}) {
-    stop()
-    running = true
-    serverThread = Thread {
-      val server = runCatching { ServerSocket(PORT) }
-          .onFailure { Log.w(TAG, "broadcast bind failed on :$PORT", it) }
-          .getOrNull()
-      if (server == null) {
-        running = false
-        onState(false)
-        return@Thread
-      }
-      serverSocket = server
-      onState(true)
-      runCatching {
-        server.soTimeout = 0
-        while (running) {
-          val socket = runCatching { server.accept() }.getOrNull() ?: continue
-          // Serve each listener on its own short-lived thread.
-          Thread { runCatching { pumpMicTo(socket.getOutputStream()) }.also { socket.close() } }
-              .apply { isDaemon = true; start() }
+    val session = sessions.start()
+    Thread {
+      try {
+        if (!session.isActive) return@Thread
+        val server = runCatching { ServerSocket() }
+            .onFailure {
+              if (session.isActive) Log.w(TAG, "broadcast bind failed on :$PORT", it)
+            }.getOrNull()
+        if (server == null) {
+          if (session.isActive) {
+            sessions.finish(session)
+            onState(false)
+          }
+          return@Thread
         }
-      }.onFailure { Log.w(TAG, "broadcast failed", it) }
-    }.also { it.isDaemon = true; it.start() }
+        // Own the unbound socket first: a retired worker must never claim the new session's port.
+        val ownedServer = session.own { server.close() } ?: return@Thread
+        try {
+          val bound = runCatching {
+            ownedServer.start { server.bind(InetSocketAddress(PORT)) }
+          }.onFailure {
+            if (session.isActive) Log.w(TAG, "broadcast bind failed on :$PORT", it)
+          }.getOrDefault(false)
+          if (!bound) {
+            if (session.isActive) {
+              sessions.finish(session)
+              onState(false)
+            }
+            return@Thread
+          }
+          if (!session.isActive) return@Thread
+          onState(true)
+          server.soTimeout = 0
+          while (session.isActive) {
+            val socket = server.accept()
+            val ownedSocket = session.own { socket.close() } ?: break
+            // Each listener and microphone belongs to this exact broadcast session.
+            Thread {
+              try {
+                if (session.isActive) pumpMicTo(session, socket.getOutputStream())
+              } catch (error: Throwable) {
+                if (session.isActive) Log.w(TAG, "mic pump ended", error)
+              } finally {
+                ownedSocket.close()
+              }
+            }.apply { isDaemon = true; start() }
+          }
+        } finally {
+          ownedServer.close()
+        }
+      } catch (error: Throwable) {
+        if (session.isActive) Log.w(TAG, "broadcast failed", error)
+      } finally {
+        sessions.finish(session)
+      }
+    }.apply { isDaemon = true; start() }
   }
 
-  private fun pumpMicTo(out: OutputStream) {
+  private fun pumpMicTo(session: LanAudioSessions.Session, out: OutputStream) {
+    if (!session.isActive) return
     val minBuf = AudioRecord.getMinBufferSize(
         SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
     val rec = AudioRecord(
         MediaRecorder.AudioSource.MIC, SAMPLE_RATE,
         AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, maxOf(minBuf, 4096))
-    runCatching {
-      rec.startRecording()
+    val ownedMic = session.own {
+      runCatching { rec.stop() }
+      runCatching { rec.release() }
+    } ?: return
+    try {
+      if (!ownedMic.start { rec.startRecording() }) return
       val buf = ByteArray(2048)
-      while (running) {
+      while (session.isActive) {
         val n = rec.read(buf, 0, buf.size)
-        if (n > 0) out.write(buf, 0, n) else break
+        if (n > 0 && session.isActive) out.write(buf, 0, n) else break
       }
-    }.onFailure { Log.w(TAG, "mic pump ended", it) }
-    runCatching { rec.stop() }; runCatching { rec.release() }
+    } finally {
+      ownedMic.close()
+    }
   }
 
   /** Connect to [host] and play whatever audio it streams. [onState] reports connect
    * success/failure so the UI can show status. */
   fun startListening(host: String, onState: (Boolean) -> Unit) {
-    stop()
-    running = true
-    clientThread = Thread {
-      val ok = runCatching {
-        val socket = Socket()
-        socket.connect(InetSocketAddress(host, PORT), 5000)
-        clientSocket = socket
-        true
-      }.getOrDefault(false)
-      onState(ok)
-      if (ok) runCatching { playFrom(clientSocket!!.getInputStream()) }
-          .onFailure { Log.w(TAG, "listen ended", it) }
-    }.also { it.isDaemon = true; it.start() }
+    val session = sessions.start()
+    Thread {
+      try {
+        if (!session.isActive) return@Thread
+        val socket = runCatching { Socket() }.getOrNull()
+        if (socket == null) {
+          if (session.isActive) {
+            sessions.finish(session)
+            onState(false)
+          }
+          return@Thread
+        }
+        // Own the pending socket before connect, so stop can interrupt its blocking IO.
+        val ownedSocket = session.own { socket.close() } ?: return@Thread
+        try {
+          val ok = runCatching {
+            if (!session.isActive) return@Thread
+            socket.connect(InetSocketAddress(host, PORT), 5000)
+            true
+          }.getOrDefault(false)
+          if (!session.isActive) return@Thread
+          if (!ok) sessions.finish(session)
+          onState(ok)
+          if (ok && session.isActive) runCatching { playFrom(session, socket.getInputStream()) }
+              .onFailure { if (session.isActive) Log.w(TAG, "listen ended", it) }
+        } finally {
+          ownedSocket.close()
+        }
+      } finally {
+        sessions.finish(session)
+      }
+    }.apply { isDaemon = true; start() }
   }
 
-  private fun playFrom(input: InputStream) {
+  private fun playFrom(session: LanAudioSessions.Session, input: InputStream) {
+    if (!session.isActive) return
     val minBuf = AudioTrack.getMinBufferSize(
         SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
     val track = AudioTrack.Builder()
@@ -124,23 +178,24 @@ class LanAudio {
                 .setChannelMask(AudioFormat.CHANNEL_OUT_MONO).build())
         .setBufferSizeInBytes(maxOf(minBuf, 4096))
         .setTransferMode(AudioTrack.MODE_STREAM).build()
-    runCatching {
-      track.play()
+    val ownedPlayback = session.own {
+      runCatching { track.stop() }
+      runCatching { track.release() }
+    } ?: return
+    try {
+      if (!ownedPlayback.start { track.play() }) return
       val buf = ByteArray(2048)
-      while (running) {
+      while (session.isActive) {
         val n = input.read(buf)
-        if (n > 0) track.write(buf, 0, n) else break
+        if (n > 0 && session.isActive) track.write(buf, 0, n) else break
       }
+    } finally {
+      ownedPlayback.close()
     }
-    runCatching { track.stop() }; runCatching { track.release() }
   }
 
-  /** Stop broadcasting/listening and release sockets. Idempotent. */
+  /** Stop broadcasting/listening and release sockets (including streams) and audio. Idempotent. */
   fun stop() {
-    running = false
-    runCatching { serverSocket?.close() }; serverSocket = null
-    runCatching { clientSocket?.close() }; clientSocket = null
-    serverThread = null
-    clientThread = null
+    sessions.stop()
   }
 }

@@ -35,8 +35,15 @@ object SettingsGuard {
    */
   fun setSystemScreensaverEnabled(context: Context, on: Boolean) {
     runCatching {
-      Settings.Secure.putInt(context.contentResolver, "screensaver_enabled", if (on) 1 else 0)
+      setDreamEnabledIfChanged(context.contentResolver, on)
     }
+  }
+
+  /** Avoid notifying the system Dream service again on every return to an unchanged Home. */
+  private fun setDreamEnabledIfChanged(resolver: android.content.ContentResolver, on: Boolean) {
+    val desired = if (on) 1 else 0
+    if (Settings.Secure.getInt(resolver, "screensaver_enabled", -1) != desired)
+      Settings.Secure.putInt(resolver, "screensaver_enabled", desired)
   }
 
   /**
@@ -47,10 +54,9 @@ object SettingsGuard {
    */
   fun applyStatusBar(context: Context) {
     runCatching {
-      Settings.Global.putString(
-          context.contentResolver,
-          "policy_control",
-          if (ImmortalSettings.hideStatusBar(context)) "immersive.status=*" else null)
+      val desired = if (ImmortalSettings.hideStatusBar(context)) "immersive.status=*" else null
+      if (Settings.Global.getString(context.contentResolver, "policy_control") != desired)
+        Settings.Global.putString(context.contentResolver, "policy_control", desired)
     }
   }
 
@@ -63,7 +69,7 @@ object SettingsGuard {
       // behaviour as a "force off" so a stray re-enable can't bring it back — which
       // is exactly the "I disable it and it comes back" complaint.
       if (!ScreensaverConfig.load(context).enabled || SleepScheduler.isOvernightNow(context)) {
-        Settings.Secure.putInt(resolver, "screensaver_enabled", 0)
+        setDreamEnabledIfChanged(resolver, false)
         return@runCatching
       }
       // The photo-frame is ALWAYS the screensaver dream. It now hosts the multi-mode animation
@@ -79,7 +85,7 @@ object SettingsGuard {
       if (Settings.Secure.getString(resolver, "screensaver_default_component") != ours) {
         Settings.Secure.putString(resolver, "screensaver_default_component", ours)
       }
-      Settings.Secure.putInt(resolver, "screensaver_enabled", 1)
+      setDreamEnabledIfChanged(resolver, true)
     }
   }
 

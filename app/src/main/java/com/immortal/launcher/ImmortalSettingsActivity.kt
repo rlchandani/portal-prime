@@ -13,12 +13,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,9 +56,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.DisposableEffect
@@ -58,10 +67,18 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.key
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -105,727 +122,280 @@ import org.json.JSONObject
  * cards (12dp radius), blue toggles, uppercase section headers.
  */
 class ImmortalSettingsActivity : ComponentActivity() {
+  private var route by mutableStateOf(ApprovedSettingsRoute())
+
+  private fun readRoute(intent: Intent) = ApprovedSettingsRoute(
+      intent.getStringExtra(APPROVED_SETTINGS_PAGE),
+      intent.getStringExtra(APPROVED_SETTINGS_CATEGORY) ?: "appearance",
+      intent.getStringExtra(APPROVED_SETTINGS_CONTROL),
+  )
+
+  private fun navigateLocal(next: ApprovedSettingsRoute) {
+    // Keep intent fallbacks in shared rows in sync, including clearing an old search highlight.
+    setIntent(Intent(intent).apply {
+      removeExtra(APPROVED_SETTINGS_PAGE)
+      removeExtra(APPROVED_SETTINGS_CONTROL)
+      putExtra(APPROVED_SETTINGS_CATEGORY, next.category)
+      next.page?.let { putExtra(APPROVED_SETTINGS_PAGE, it) }
+      next.control?.let { putExtra(APPROVED_SETTINGS_CONTROL, it) }
+    })
+    route = next
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = false) { ImmortalSettingsScreen() } }
+    route = readRoute(intent)
+    setContent {
+      PortalPrimeTheme(darkTheme = false) {
+        val navigate = remember { ::navigateLocal }
+        CompositionLocalProvider(
+            LocalApprovedRequestedControl provides route.control,
+            LocalApprovedSettingsNavigate provides navigate,
+        ) {
+          ImmortalSettingsScreen(route)
+        }
+      }
+    }
+  }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    route = readRoute(intent)
   }
 }
 
-// ---------------------------------------------------------------------------
-// Sidebar model — iPhone-style grouped sections
-// ---------------------------------------------------------------------------
-
-/**
- * One sidebar row: [name] gates the detail panel, [iconColor] tints its badge. The badge shows
- * [iconRes] (a white-tinted vector drawable) when set, else falls back to the single-glyph [symbol].
- */
-internal data class SectionDef(
-    val name: String,
-    val symbol: String,
-    val iconColor: Color,
-    val iconRes: Int? = null,
-)
-
-/**
- * Sections that hand off to Android's own Settings rather than rendering a detail panel. Mapped to
- * the `Settings.ACTION_*` string to fire (guarded with `runCatching`). Shown with a "↗" affordance.
- */
-// OS-owned screens live in Android's own Settings; a single "All Android Settings" link-out under
-// System reaches them all (Wi-Fi, Bluetooth, date/time, language, accessibility, storage). The
-// per-screen rows were dropped as clutter — everything is one tap deeper via the stock grid.
-private val OS_LINK_OUT_SECTIONS: Map<String, String> =
-    mapOf(
-        "All Android Settings" to android.provider.Settings.ACTION_SETTINGS,
-    )
-
-/**
- * The grouped sidebar (approved iPhone grouping). Each group is a header + its ordered rows. Rows
- * that link out to Android's own Settings appear in [OS_LINK_OUT_SECTIONS]; the rest open a detail
- * panel in [ImmortalSettingsScreen]. Each row shows a white Material vector badge (crisp on the
- * Portal's Android 10, where emoji coverage is patchy); the single-ASCII-letter [symbol] is the
- * fallback for any row without a dedicated icon.
- */
-private val SECTION_GROUPS: List<Pair<String, List<SectionDef>>> =
-    listOf(
-        "Sound & Wake" to
-            listOf(
-                SectionDef("Chime", "C", Color(0xFFFF9F0A), R.drawable.ic_settings_chime),
-                SectionDef("Sunrise & Wake", "R", Color(0xFFFFD60A), R.drawable.ic_settings_sunrise),
-                SectionDef("Multi-room Audio", "M", Color(0xFF30D158), R.drawable.ic_settings_multiroom),
-                SectionDef("Welcome Greeting", "H", Color(0xFFFF375F), R.drawable.ic_settings_welcome),
-                SectionDef("Touch Sounds", "s", Color(0xFF30D158), R.drawable.ic_settings_touch),
-            ),
-        "General" to
-            listOf(
-                SectionDef("Display", "L", Color(0xFFFF9F0A), R.drawable.ic_settings_display),
-                SectionDef("Screensaver", "P", Color(0xFFFF6B35), R.drawable.ic_settings_screensaver),
-                SectionDef("Wallpaper", "w", Color(0xFF5E5CE6), R.drawable.ic_settings_wallpaper),
-                SectionDef("Clock Face", "c", Color(0xFF0A84FF), R.drawable.ic_settings_clock),
-                SectionDef("Appearance", "T", Color(0xFF5E5CE6), R.drawable.ic_settings_appearance),
-                SectionDef("Weather", "u", Color(0xFF0A84FF), R.drawable.ic_settings_weather),
-                SectionDef("Sleep Timer", "z", Color(0xFF636366), R.drawable.ic_settings_sleep),
-            ),
-        "Widgets & Content" to
-            listOf(
-                SectionDef("Calendar", "d", Color(0xFFFF453A), R.drawable.ic_settings_calendar),
-                SectionDef("World Clock", "o", Color(0xFF0A84FF), R.drawable.ic_settings_worldclock),
-                SectionDef("Countdown", "n", Color(0xFFFF9F0A), R.drawable.ic_settings_countdown),
-                SectionDef("Quick Buttons", "q", Color(0xFF5E5CE6), R.drawable.ic_settings_quickbuttons),
-            ),
-        "Connections & Device" to
-            listOf(
-                SectionDef("Home Assistant", "h", Color(0xFF41BDF5), R.drawable.ic_settings_homeassistant),
-                SectionDef("Phone Remote", "r", Color(0xFF0A84FF), R.drawable.ic_settings_remote),
-                SectionDef("Start on Boot", "b", Color(0xFF636366), R.drawable.ic_settings_boot),
-                SectionDef("Device Name", "i", Color(0xFF636366), R.drawable.ic_settings_devicename),
-                SectionDef("About & Device Health", "?", Color(0xFF636366), R.drawable.ic_settings_health),
-            ),
-        // System group — one link-out to the stock Android Settings grid, which contains Wi-Fi,
-        // Bluetooth, date/time, language, accessibility and storage one tap deeper.
-        "System" to
-            listOf(
-                SectionDef("All Android Settings", "O", Color(0xFF636366)),
-            ),
-    )
-
-// ---------------------------------------------------------------------------
-// Top-level iOS Settings screen
-// ---------------------------------------------------------------------------
+@Composable
+private fun ImmortalSettingsScreen(route: ApprovedSettingsRoute) {
+  val context = LocalContext.current
+  val navigate = rememberApprovedSettingsNavigator()
+  val category = ApprovedSettingsCategories.firstOrNull { it.id == route.category }
+      ?: ApprovedSettingsCategories.first()
+  val backToCategory: () -> Unit = { navigate(ApprovedSettingsRoute(category = category.id)) }
+  BackHandler(enabled = route.page != null, onBack = backToCategory)
+  var prerequisite by remember(route) { mutableStateOf<String?>(null) }
+  LaunchedEffect(route) {
+    route.control?.takeIf { it.isNotBlank() }?.let { control ->
+      prerequisite = withContext(Dispatchers.IO) { approvedSettingsPrerequisite(context, control) }
+    }
+  }
+  // A retained detail must keep its own route, including its search highlight. Creating the
+  // composable lambda inside remember prevents a newer route from updating the old lambda.
+  val routeContent: @Composable () -> Unit = remember(route, navigate) {
+    { ApprovedSettingsRouteContent(route, navigate) }
+  }
+  ApprovedSettingsShell(
+      category = category.id,
+      title = route.page?.let { approvedSettingsPage(it)?.title } ?: category.title,
+      subtitle = if (route.page == null) category.subtitle else "",
+      onBack = if (route.page != null) backToCategory else null,
+      page = route.page,
+      content = routeContent,
+  )
+  prerequisite?.let { message ->
+    ApprovedSettingsDialog("Setting prerequisite", onDismiss = { prerequisite = null }, help = message) {
+      ApprovedSettingsTextButton("Review parent settings") { prerequisite = null }
+    }
+  }
+}
 
 @Composable
-private fun ImmortalSettingsScreen() {
-  val context = LocalContext.current
-  var ss by remember { mutableStateOf(ScreensaverConfig.load(context)) }
-  var immortal by remember { mutableStateOf(ImmortalSettings.load(context)) }
-  var clock by remember { mutableStateOf(DigitalClockConfig.load(context)) }
-
-  // Re-read all configs on resume so values changed in a sub-screen Activity reflect here.
-  val resumeOwner = LocalLifecycleOwner.current
-  DisposableEffect(resumeOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
-        ss = ScreensaverConfig.load(context)
-        immortal = ImmortalSettings.load(context)
-        clock = DigitalClockConfig.load(context)
+private fun ApprovedSettingsRouteContent(
+    route: ApprovedSettingsRoute,
+    navigate: (ApprovedSettingsRoute) -> Unit,
+) {
+  val category = ApprovedSettingsCategories.firstOrNull { it.id == route.category }
+      ?: ApprovedSettingsCategories.first()
+  key(route.detailKey, route.control) {
+    if (route.page != null) {
+      ApprovedNativeSettingsPage(route.page)
+    } else {
+      val advanced = rememberApprovedAdvanced()
+      if (category.id == "advanced") {
+        if (!advanced) {
+          ApprovedSettingsAdvancedGate(LocalApprovedEnableAdvanced.current)
+        } else {
+          category.pages.mapNotNull(::approvedSettingsPage).groupBy { it.category }.forEach { (group, pages) ->
+            SectionLabel(ApprovedSettingsCategories.firstOrNull { it.id == group }?.title ?: "Device")
+            Card {
+              pages.forEachIndexed { index, destination ->
+                if (index > 0) Divider()
+                NavRow(destination.title) {
+                  navigate(approvedSettingsRoute(destination.id, category = category.id))
+                }
+              }
+            }
+          }
+        }
+      } else {
+        ApprovedSettingsSectionLabel("Settings")
+        Card {
+          category.pages.forEachIndexed { index, id ->
+            if (index > 0) Divider()
+            NavRow(approvedSettingsPage(id)?.title ?: id) {
+              navigate(approvedSettingsRoute(id, category = category.id))
+            }
+          }
+        }
       }
     }
-    resumeOwner.lifecycle.addObserver(obs)
-    onDispose { resumeOwner.lifecycle.removeObserver(obs) }
   }
+}
 
-  val activity = context as? Activity
-  val firstFocus = remember { FocusRequester() }
-  // Deliberately NOT auto-requesting focus on open: the sidebar's first focusable is now the
-  // search field, and grabbing focus there pops the on-screen keyboard every time Settings
-  // opens. Touch selects directly; the TV remote focuses the sidebar on its first D-pad press.
-
-  fun applyScreensaver(key: String, value: Any) {
-    SettingsDomains.screensaver.apply(context, JSONObject().put(key, value))
-    ss = ScreensaverConfig.load(context)
+/** Native scalar pages; rich forms and pickers remain in their original Activities. */
+@Composable
+private fun ApprovedNativeSettingsPage(page: String) {
+  val context = LocalContext.current
+  val navigate = rememberApprovedSettingsNavigator()
+  var immortal by remember { mutableStateOf(ImmortalSettings.load(context)) }
+  var ss by remember { mutableStateOf(ScreensaverConfig.load(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_RESUME) {
+        immortal = ImmortalSettings.load(context)
+        ss = ScreensaverConfig.load(context)
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
   }
   fun applyImmortal(key: String, value: Any) {
     SettingsDomains.immortal.apply(context, JSONObject().put(key, value))
     immortal = ImmortalSettings.load(context)
   }
-  fun applyCalendar(key: String, value: Any) {
-    SettingsDomains.calendar.apply(context, JSONObject().put(key, value))
-    ss = ScreensaverConfig.load(context)
-  }
-
-  var selectedSection by remember { mutableStateOf("Screensaver") }
-  var query by remember { mutableStateOf("") }
-
-  // The sidebar is grouped iPhone-style (Connectivity, Sound & Wake, …); [SECTION_GROUPS] carries
-  // the order and the group headers, [OS_LINK_OUT_SECTIONS] marks the rows that hand off to Android's
-  // own Settings ("↗"). The detail panel is gated by `selectedSection` below.
-
-  // Flat search index: every individual setting mapped to the section that hosts it, so the sidebar
-  // search can jump straight to (e.g.) "Anti Burn-In" and land on Screensaver. Extended to cover the
-  // full domain-rendered sections so search still reaches the newly-surfaced settings.
-  val searchIndex = remember {
-    // Every section is reachable by its own name.
-    val bySection = SECTION_GROUPS.flatMap { it.second }.map { it.name to it.name }
-    bySection + listOf(
-        "Brightness" to "Display", "Auto-brightness" to "Display", "Night Shift" to "Display",
-        "Volume" to "Display", "Media volume" to "Display",
-        "Photo Source" to "Screensaver", "Photo Interval" to "Screensaver",
-        "Shuffle" to "Screensaver", "Include Video" to "Screensaver",
-        "Fit Mode" to "Screensaver", "Presence Mode" to "Screensaver",
-        // NOTE: no "Show Gradient" / "Anti Burn-In" / "Photo feed" here — those controls were
-        // removed or auto-managed (hidden), so a search alias would jump to a row that isn't shown.
-        "Overnight screen-off" to "Screensaver", "Idle screen-off" to "Screensaver",
-        "Store media on this device" to "Screensaver",
-        "Ambient dashboard" to "Screensaver", "Gesture wave to wake" to "Screensaver",
-        "Clock Face" to "Clock Face", "Clock Format" to "Clock Face",
-        "Clock style" to "Clock Face", "Font" to "Clock Face", "Glow" to "Clock Face",
-        "Show Date" to "Clock Face", "Show Now Playing" to "Clock Face",
-        "Show Seconds" to "Clock Face",
-        "Tile Size" to "Appearance", "Weather Widget" to "Appearance",
-        "Show Mini Player" to "Appearance", "Hide Status Bar" to "Appearance",
-        "Temperature Unit" to "Weather",
-        "Ambient sound" to "Chime", "Hourly chime" to "Chime", "Quiet hours" to "Chime",
-        "Sunrise alarm" to "Sunrise & Wake",
-        "Music Assistant" to "Multi-room Audio", "Snapcast" to "Multi-room Audio",
-        "Touch sounds" to "Touch Sounds",
-        "Calendar feed" to "Calendar", "World clock cities" to "World Clock",
-        "Countdown events" to "Countdown",
-        "App-switcher button" to "Quick Buttons",
-        "Home Assistant" to "Home Assistant", "MQTT" to "Home Assistant",
-        "Phone remote" to "Phone Remote", "Start on boot" to "Start on Boot",
-        "Device name" to "Device Name", "About" to "About & Device Health",
-        "Device health" to "About & Device Health", "Debug Mode" to "About & Device Health",
-        "Wallpaper" to "Wallpaper", "Film grain" to "Wallpaper",
-        "Sleep timer" to "Sleep Timer",
-    )
-  }
-  val results = if (query.isBlank()) emptyList()
-      else searchIndex.filter { it.first.contains(query, ignoreCase = true) }
-
-  Row(
-      modifier = Modifier
-          .fillMaxSize()
-          .onPreviewKeyEvent { e ->
-            if (e.key == Key.Back) {
-              if (e.type == KeyEventType.KeyUp) activity?.finish()
-              true
-            } else false
-          }
-          .background(IosBackground),
-  ) {
-    // ---------------------------------------------------------------
-    // LEFT SIDEBAR
-    // Width matches the approved mock's proportion (~25% of the frame): wide enough that no
-    // nav label wraps to a second line. A thin scroll indicator (like the mock) rides the
-    // right edge. See settings-full-mockup.html.
-    // ---------------------------------------------------------------
-    val sidebarScroll = rememberScrollState()
-    Column(
-        modifier = Modifier
-            .width(440.dp)
-            .fillMaxHeight()
-            .background(IosSidebar)
-            .focusRequester(firstFocus)
-            .focusGroup()
-            .verticalScrollbar(sidebarScroll)
-            .verticalScroll(sidebarScroll),
-    ) {
-      IosNavBar(title = "Settings")
-      SidebarSearch(query = query, onQueryChange = { query = it })
-      // While searching, the sidebar becomes a results list that jumps to the setting's section.
-      if (query.isNotBlank()) {
-        if (results.isEmpty()) {
-          Text(
-              "No results for “$query”",
-              color = IosSecondary,
-              fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp),
-          )
-        } else {
-          results.forEach { (setting, section) ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 3.dp)
-                    .clip(RoundedCornerShape(Sizes.cardRadius))
-                    .clickable {
-                      val linkOut = OS_LINK_OUT_SECTIONS[section]
-                      if (linkOut != null) {
-                        runCatching {
-                          context.startActivity(
-                              Intent(linkOut).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                        }
-                      } else {
-                        selectedSection = section
-                      }
-                      query = ""
-                    }
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
-            ) {
-              Text(setting, color = IosLabel, fontSize = Sizes.rowTitle)
-              Text(section, color = IosSecondary, fontSize = Sizes.rowSub, modifier = Modifier.padding(top = 1.dp))
-            }
-          }
+  when (page) {
+    "display" -> DisplaySection()
+    "appearance" -> SettingsList(SettingsDomains.immortal, immortal,
+        exclude = SettingsDomains.immortal.specs.map { it.key }.toSet() -
+            setOf("tileSize", "showMiniPlayer", "hideStatusBar", "clockFormat", "settingsTheme")) { k, v ->
+      applyImmortal(k, v)
+    }
+    "weather" -> SettingsList(SettingsDomains.immortal, immortal,
+        exclude = SettingsDomains.immortal.specs.map { it.key }.toSet() -
+            setOf("weatherUnit", "weatherWidget")) { k, v -> applyImmortal(k, v) }
+    "wallpaper" -> WallpaperSection()
+    "calendar" -> SettingsList(SettingsDomains.calendar, ss) { k, v ->
+      SettingsDomains.calendar.apply(context, JSONObject().put(k, v))
+      ss = ScreensaverConfig.load(context)
+    }
+    "quickbar" -> QuickButtonsSection()
+    "touch" -> ApprovedTouchSounds()
+    "device" -> DeviceNameSection()
+    "widgets" -> {
+      SectionLabel("Home & widgets")
+      Card {
+        NavRow("Customize home", subLabel = "Touch and hold a widget on Home to move, resize or remove it.") {
+          context.startActivity(Intent(context, HomeActivity::class.java))
         }
-        Spacer(Modifier.height(16.dp))
-      } else
-      SECTION_GROUPS.forEach { (groupName, groupSections) ->
-        Text(
-            groupName.uppercase(),
-            color = IosTertiary,
-            fontSize = Sizes.sectionLabel,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.6.sp,
-            modifier = Modifier.padding(start = 22.dp, end = 16.dp, top = 18.dp, bottom = 4.dp),
-        )
-        groupSections.forEach { sec ->
-          val linkOut = OS_LINK_OUT_SECTIONS[sec.name]
-          val isSelected = linkOut == null && selectedSection == sec.name
-          Row(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(horizontal = 10.dp, vertical = 3.dp)
-                  .clip(RoundedCornerShape(Sizes.cardRadius))
-                  .background(if (isSelected) IosBlue else Color.Transparent)
-                  .clickable {
-                    if (linkOut != null) {
-                      runCatching {
-                        context.startActivity(
-                            Intent(linkOut).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                      }
-                    } else {
-                      selectedSection = sec.name
-                    }
-                  }
-                  .padding(horizontal = 12.dp, vertical = 10.dp),
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(12.dp),
-          ) {
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .clip(RoundedCornerShape(9.dp))
-                    .background(if (isSelected) Color.White.copy(alpha = 0.25f) else sec.iconColor),
-                contentAlignment = Alignment.Center,
-            ) {
-              val iconRes = sec.iconRes
-              if (iconRes != null) {
-                Icon(
-                    painter = painterResource(iconRes),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(23.dp),
-                )
-              } else {
-                Text(sec.symbol, color = Color.White, fontSize = Sizes.iconGlyph, fontWeight = FontWeight.Bold)
+      }
+      SectionLabel("Widget settings")
+      Card {
+        listOf("weather", "ha", "calendar", "alarm", "world", "crypto", "countdowns", "todo", "news", "stocks", "sources")
+            .forEachIndexed { index, id ->
+              if (index > 0) Divider()
+              NavRow(approvedSettingsPage(id)?.title ?: id) {
+                navigate(approvedSettingsRoute(id))
               }
             }
-            Text(
-                sec.name,
-                color = if (isSelected) Color.White else IosLabel,
-                fontSize = Sizes.navLabel,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                // Never wrap — the mock keeps every nav label on one line.
-                maxLines = 1,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
-            )
-            // Link-out rows carry the "↗" hand-off affordance.
-            if (linkOut != null) {
-              Text("↗", color = IosSecondary, fontSize = 20.sp)
-            }
-          }
-        }
       }
-      Spacer(Modifier.height(16.dp))
+      if (rememberApprovedAdvanced()) {
+        SectionLabel("Advanced options")
+        Card { NavRow("Options scanner") { navigate(approvedSettingsRoute("options")) } }
+      }
     }
-
-    // ---------------------------------------------------------------
-    // RIGHT DETAIL PANEL — fixed top bar (section title) + scrolling content
-    // ---------------------------------------------------------------
-    Column(
-        modifier = Modifier
-            .weight(1f)
-            .fillMaxHeight(),
-    ) {
-      DetailTopBar(title = selectedSection, subtitle = SECTION_SUBTITLES[selectedSection] ?: "")
-      Column(
-          modifier = Modifier
-              .fillMaxWidth()
-              .weight(1f)
-              .verticalScroll(rememberScrollState())
-              // Symmetric breathing room so cards don't run flush to the right edge.
-              .padding(horizontal = 32.dp),
-      ) {
-      Spacer(Modifier.height(16.dp))
-
-      // ---------------------------------------------------------------
-      // SOUND & WAKE — sub-screen launchers (own Activities) + reused blocks
-      // ---------------------------------------------------------------
-      if (selectedSection == "Chime") {
-        ChimeSettingsContent()
-      }
-
-      if (selectedSection == "Sunrise & Wake") {
-        SunriseContent()
-      }
-
-      if (selectedSection == "Multi-room Audio") {
-        MultiRoomContent()
-      }
-
-      if (selectedSection == "Welcome Greeting") {
-        WelcomeSettingsContent()
-      }
-
-      if (selectedSection == "Touch Sounds") {
-        // Reused from MoreFeaturesSection: the WRITE_SETTINGS-gated system touch-sounds toggle.
-        var sounds by remember { mutableStateOf(SystemSounds.touchSoundsEnabled(context)) }
-        Card {
-          ToggleRow(
-              title = "Touch sounds",
-              checked = sounds,
-              iconColor = Color(0xFF30D158),
-              iconSymbol = "s",
-              onChange = { checked ->
-                if (SystemSounds.canWrite(context)) {
-                  SystemSounds.setTouchSounds(context, checked)
-                  sounds = SystemSounds.touchSoundsEnabled(context)
-                } else {
-                  SystemSounds.requestWriteAccess(context)
-                }
-              },
-          )
-        }
-        FooterNote(
-            "Plays the system tap sound on touch. Needs the \"modify system settings\" permission — " +
-                "the first tap opens Android to grant it.")
-      }
-
-      // ---------------------------------------------------------------
-      // GENERAL — Display, Screensaver (full domain), Wallpaper, Clock Face,
-      //           Appearance, Weather, Sleep Timer
-      // ---------------------------------------------------------------
-      if (selectedSection == "Display") {
-        DisplaySection()
-        Spacer(Modifier.size(32.dp))
-      }
-
-      if (selectedSection == "Screensaver") {
-        // Master toggle gates the rest, mirroring ScreensaverSettingsActivity; the full
-        // `screensaver` domain then renders generically (adds cache, overnight, feed, idle,
-        // dismiss-target, ambient, gesture, welcome toggle — ~21 previously-missing settings).
-        Card {
-          ToggleRow(
-              title = "Show the photo-frame screensaver",
-              checked = ss.enabled,
-              iconColor = Color(0xFFFF6B35),
-              iconSymbol = "P",
-              onChange = { applyScreensaver("enabled", it) },
-          )
-        }
-        if (ss.enabled) {
-          Spacer(Modifier.size(20.dp))
-          SettingsList(SettingsDomains.screensaver, ss, exclude = setOf("enabled")) { k, v ->
-            applyScreensaver(k, v)
+    "system" -> {
+      SectionLabel("Android settings")
+      Card {
+        listOf(
+            "Wi-Fi" to Settings.ACTION_WIFI_SETTINGS,
+            "Bluetooth" to Settings.ACTION_BLUETOOTH_SETTINGS,
+            "Date & time" to Settings.ACTION_DATE_SETTINGS,
+            "Language & region" to Settings.ACTION_LOCALE_SETTINGS,
+            "Accessibility" to Settings.ACTION_ACCESSIBILITY_SETTINGS,
+            "Storage" to Settings.ACTION_INTERNAL_STORAGE_SETTINGS,
+            "App permissions" to Settings.ACTION_APPLICATION_SETTINGS,
+            "All Android Settings" to Settings.ACTION_SETTINGS,
+        ).forEachIndexed { index, (title, action) ->
+          if (index > 0) Divider()
+          NavRow(title, subLabel = "Opens the existing system screen") {
+            runCatching { context.startActivity(Intent(action)) }
+                .onFailure { context.startActivity(Intent(Settings.ACTION_SETTINGS)) }
           }
         }
-        FooterNote("Changes apply as soon as you return to the home screen.")
-        Spacer(Modifier.size(32.dp))
-      }
-
-      if (selectedSection == "Wallpaper") {
-        WallpaperSection()
-        Spacer(Modifier.size(32.dp))
-      }
-
-      if (selectedSection == "Clock Face") {
-        // The digital-clock face picker + clock format, then the full `digitalclock` domain
-        // (style, color, font, size, layout, background, glow, show date/seconds).
-        Card {
-          NavRow(
-              title = "Clock Face",
-              value = FaceCatalog.entryFor(ss.faceId).name,
-              iconColor = Color(0xFF0A84FF),
-              iconSymbol = "c",
-              onClick = { context.startActivity(Intent(context, FacePickerActivity::class.java)) },
-          )
-          Divider()
-          PickerRow(
-              title = "Clock Format",
-              selected = immortal.clockFormat,
-              options = listOf(
-                  PickerOption(ImmortalSettings.CLOCK_AUTO, "Auto"),
-                  PickerOption(ImmortalSettings.CLOCK_12, "12h"),
-                  PickerOption(ImmortalSettings.CLOCK_24, "24h"),
-              ),
-              iconColor = Color(0xFFFF9F0A),
-              iconSymbol = "h",
-              onSelect = { applyImmortal("clockFormat", it) },
-          )
-          Divider()
-          ToggleRow(
-              title = "Show Now Playing",
-              checked = ss.showNowPlaying,
-              iconColor = Color(0xFF64D2FF),
-              iconSymbol = "n",
-              onChange = { applyScreensaver("showNowPlaying", it) },
-          )
-        }
-        Spacer(Modifier.size(20.dp))
-        SettingsList(SettingsDomains.digitalclock, clock) { k, v ->
-          SettingsDomains.digitalclock.apply(context, JSONObject().put(k, v))
-          clock = DigitalClockConfig.load(context)
+        Divider()
+        NavRow("Portal Settings", subLabel = "Opens the existing Portal settings") {
+          val intent = context.packageManager.getLaunchIntentForPackage("com.facebook.alohaapps.settings")
+          if (intent != null) context.startActivity(intent)
+          else context.startActivity(Intent(Settings.ACTION_SETTINGS))
         }
       }
-
-      if (selectedSection == "Appearance") {
-      Card {
-        PickerRow(
-            title = "Tile Size",
-            selected = immortal.tileSize,
-            options = listOf(
-                PickerOption(ImmortalSettings.SIZE_STANDARD, "Standard"),
-                PickerOption(ImmortalSettings.SIZE_LARGE, "Large"),
-                PickerOption(ImmortalSettings.SIZE_XL, "XL"),
-            ),
-            iconColor = Color(0xFF5E5CE6),
-            iconSymbol = "T",
-            onSelect = { applyImmortal("tileSize", it) },
-        )
-        Divider()
-        PickerRow(
-            title = "Weather Widget",
-            selected = immortal.weatherWidget,
-            options = listOf(
-                PickerOption(ImmortalSettings.WIDGET_OFF, "Off"),
-                PickerOption(ImmortalSettings.WIDGET_HOURLY, "Hourly"),
-                PickerOption(ImmortalSettings.WIDGET_DAILY, "Daily"),
-            ),
-            iconColor = Color(0xFF64D2FF),
-            iconSymbol = "W",
-            onSelect = { applyImmortal("weatherWidget", it) },
-        )
-        Divider()
-        ToggleRow(
-            title = "Show Mini Player",
-            checked = immortal.showMiniPlayer,
-            iconColor = Color(0xFFFF375F),
-            iconSymbol = "m",
-            onChange = { applyImmortal("showMiniPlayer", it) },
-        )
-        Divider()
-        ToggleRow(
-            title = "Hide Status Bar",
-            checked = immortal.hideStatusBar,
-            iconColor = Color(0xFF636366),
-            iconSymbol = "S",
-            onChange = { applyImmortal("hideStatusBar", it) },
-        )
-      }
-      } // end Appearance
-
-      if (selectedSection == "Weather") {
-      Card {
-        PickerRow(
-            title = "Temperature Unit",
-            selected = immortal.weatherUnit,
-            options = listOf(
-                PickerOption(ImmortalSettings.UNIT_AUTO, "Auto (°F)"),
-                PickerOption(ImmortalSettings.UNIT_F, "Fahrenheit"),
-                PickerOption(ImmortalSettings.UNIT_C, "Celsius"),
-            ),
-            iconColor = Color(0xFF0A84FF),
-            iconSymbol = "u",
-            onSelect = { applyImmortal("weatherUnit", it) },
-        )
-      }
-      } // end Weather
-
-      if (selectedSection == "Sleep Timer") {
-        SleepSettingsContent()
-      }
-
-      // ---------------------------------------------------------------
-      // WIDGETS & CONTENT — Calendar, World Clock, Almanac, Countdown, Quick Buttons
-      // ---------------------------------------------------------------
-      if (selectedSection == "Calendar") {
-        SettingsList(SettingsDomains.calendar, ss) { k, v -> applyCalendar(k, v) }
-        FooterNote("Add a public iCalendar (.ics) link to show upcoming events on the photo frame.")
-      }
-
-      if (selectedSection == "World Clock") {
-        WorldClockContent()
-      }
-
-      if (selectedSection == "Countdown") {
-        CountdownSettingsContent()
-      }
-
-      if (selectedSection == "Quick Buttons") {
-        QuickButtonsSection()
-        Spacer(Modifier.size(32.dp))
-      }
-
-      // ---------------------------------------------------------------
-      // CONNECTIONS & DEVICE — Home Assistant, Phone Remote, Start on Boot,
-      //                        Device Name, About & Device Health
-      // ---------------------------------------------------------------
-      if (selectedSection == "Home Assistant") {
-        MqttContent()
-      }
-
-      if (selectedSection == "Phone Remote") {
-        SubScreenNavCard(
-            title = "Control from your phone",
-            subtitle = "Pair a phone as a remote control for this Portal.",
-            iconColor = Color(0xFF0A84FF),
-            iconSymbol = "r",
-        ) { context.startActivity(Intent(context, RemotePairActivity::class.java)) }
-      }
-
-      if (selectedSection == "Start on Boot") {
-        BootAppsContent()
-      }
-
-      if (selectedSection == "Device Name") {
-        DeviceNameSection()
-      }
-
-      if (selectedSection == "About & Device Health") {
-      // Device-health permissions/diagnostics render inline; the auxiliary rows (screensaver
-      // source, debug) follow in their own card.
-      DeviceHealthContent()
-      Spacer(Modifier.size(26.dp))
-      SectionLabel("Advanced")
-      Card {
-        NavRow(
-            title = "Screensaver Source",
-            subLabel = screensaverSourcePath(ss),
-            iconColor = Color(0xFF3A3A3C),
-            iconSymbol = "/",
-            onClick = { context.startActivity(Intent(context, ScreensaverSourcesActivity::class.java)) },
-        )
-        Divider()
-        IosDebugRow(context = context)
-      }
-      FooterNote("Changes apply as soon as you return to the home screen.")
-      Spacer(Modifier.size(32.dp))
-      } // end About & Device Health
-      } // end scrolling content Column
-    } // end right panel Column
-  } // end Row
-}
-
-// ---------------------------------------------------------------------------
-// iOS nav bar
-// ---------------------------------------------------------------------------
-
-@Composable
-private fun IosNavBar(title: String) {
-  Row(
-      modifier = Modifier
-          .fillMaxWidth()
-          .background(IosBackground)
-          .padding(
-              start = 22.dp,
-              end = 16.dp,
-              top = Sizes.panelTitleTop,
-              bottom = Sizes.panelTitleBottom),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.Start,
-  ) {
-    Text(
-        text = title,
-        color = IosLabel,
-        fontSize = Sizes.panelTitle,
-        fontWeight = FontWeight.SemiBold,
-        letterSpacing = (-0.4).sp,
-    )
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Sidebar search field (macOS System Settings style)
-// ---------------------------------------------------------------------------
-
-/** The rounded grey search field under "Settings". Filters the sidebar into a results list. */
-@Composable
-private fun SidebarSearch(query: String, onQueryChange: (String) -> Unit) {
-  Row(
-      modifier = Modifier
-          .fillMaxWidth()
-          // Visually balance the gaps: the first section label ("SOUND & WAKE") already brings its
-          // own top=18dp below the search, so the search needs MORE top margin than bottom to keep
-          // the space above it (from the title) equal to the space below.
-          .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 2.dp)
-          .clip(RoundedCornerShape(Sizes.cardRadius))
-          // A white field with a defined border reads clearly as an input against the grey sidebar
-          // background — the old grey-on-grey pill faded into the panel.
-          .background(IosCard)
-          .border(BorderStroke(1.dp, IosDivider), RoundedCornerShape(Sizes.cardRadius))
-          .padding(horizontal = 12.dp, vertical = 10.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(6.dp),
-  ) {
-    Text("⌕", color = IosLabel.copy(alpha = 0.55f), fontSize = 20.sp)
-    BasicTextField(
-        value = query,
-        onValueChange = onQueryChange,
-        singleLine = true,
-        textStyle = androidx.compose.ui.text.TextStyle(color = IosLabel, fontSize = 17.sp),
-        cursorBrush = androidx.compose.ui.graphics.SolidColor(IosBlue),
-        modifier = Modifier.weight(1f).padding(vertical = 8.dp),
-        decorationBox = { inner ->
-          if (query.isEmpty()) {
-            Text("Search", color = IosSecondary, fontSize = 17.sp)
-          }
-          inner()
-        },
-    )
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Detail-panel top bar (macOS toolbar: section title above the scroll region)
-// ---------------------------------------------------------------------------
-
-/** Fixed top bar over the right detail panel; content scrolls beneath it, so it never starts
- * flush at the very top. Shows the current section's title (title-only, no back/forward). */
-@Composable
-private fun DetailTopBar(title: String, subtitle: String = "") {
-  Column(modifier = Modifier.fillMaxWidth().background(IosBackground)) {
-    Text(
-        text = title,
-        color = IosLabel,
-        fontSize = Sizes.panelTitle,
-        fontWeight = FontWeight.SemiBold,
-        letterSpacing = (-0.4).sp,
-        modifier =
-            Modifier.padding(
-                start = 32.dp,
-                end = 32.dp,
-                top = Sizes.panelTitleTop,
-                bottom = if (subtitle.isEmpty()) Sizes.panelTitleBottom else 2.dp),
-    )
-    // Sub-screens used to show a descriptive subtitle in their SettingsScaffold; now that they're
-    // inlined, that context lives here on the panel's top bar instead.
-    if (subtitle.isNotEmpty()) {
-      Text(
-          text = subtitle,
-          color = IosSecondary,
-          fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp),
-      )
     }
-    Box(Modifier.fillMaxWidth().height(1.dp).background(IosDivider))
+    "managed" -> ApprovedManagedSettingsPage()
+    "debug" -> {
+      SectionLabel("Diagnostics")
+      Card { IosDebugRow(context) }
+      Card { NavRow("About & device health") { navigate(approvedSettingsRoute("health")) } }
+    }
+    "speed" -> Card {
+      NavRow("Speed test", subLabel = "Open Tools to measure your connection.") {
+        context.startActivity(Intent(context, ToolsActivity::class.java))
+      }
+    }
   }
 }
 
-/**
- * The descriptive subtitle each inlined sub-screen used to show under its title in
- * [SettingsScaffold]. Keyed by sidebar section name; surfaced by [DetailTopBar] so inlining
- * doesn't drop the context. Sections without an entry simply show no subtitle.
- */
-private val SECTION_SUBTITLES: Map<String, String> =
-    mapOf(
-        "Chime" to
-            "Gentle ambient cues. All off by default; nothing plays during quiet hours.",
-        "Sunrise & Wake" to
-            "Wake to a gradual screen-brightening ramp on the days you choose, optionally finishing with a chime.",
-        "Multi-room Audio" to
-            "Show the Snapcast group's track on the now-playing card, with play/pause/skip.",
-        "Welcome Greeting" to
-            "The greeting overlay shown when the screensaver starts — text, clock, date and spoken greeting.",
-        "Sleep Timer" to
-            "Turn the screensaver off after a set time, with a live countdown; optionally pause audio and close apps.",
-        "Countdown" to
-            "Add days-until countdowns (birthdays, trips) shown on the home screen.",
-        "World Clock" to
-            "Choose the cities shown by the World Clock widget (the first four in pick order).",
-        "Home Assistant" to
-            "Publish this Portal to Home Assistant as auto-discovered entities over your MQTT broker.",
-        "Start on Boot" to "Pick which installed apps Immortal relaunches after a reboot.",
-    )
+@Composable
+private fun ApprovedTouchSounds() {
+  val context = LocalContext.current
+  var sounds by remember { mutableStateOf(SystemSounds.touchSoundsEnabled(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_RESUME) sounds = SystemSounds.touchSoundsEnabled(context)
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+  }
+  SectionLabel("Options")
+  Card {
+    ToggleRow("Touch sounds", sounds) { checked ->
+      if (SystemSounds.canWrite(context)) {
+        SystemSounds.setTouchSounds(context, checked)
+        sounds = SystemSounds.touchSoundsEnabled(context)
+      } else SystemSounds.requestWriteAccess(context)
+    }
+  }
+  FooterNote("Plays the system tap sound on touch. Android may ask you to allow modifying system settings.")
+}
+
+@Composable
+private fun ApprovedManagedSettingsPage() {
+  val context = LocalContext.current
+  com.immortal.launcher.settings.SettingsRegistry.domains.forEach { raw ->
+    @Suppress("UNCHECKED_CAST")
+    val domain = raw as com.immortal.launcher.settings.SettingsDomain<Any>
+    val snapshot = domain.load(context)
+    val controls = domain.specs.filter { "${domain.id}.${it.key}" in ApprovedManagedControls }
+    if (controls.isNotEmpty()) {
+      SectionLabel(domain.title)
+      Card {
+        controls.forEachIndexed { index, spec ->
+          if (index > 0) Divider()
+          val meta = spec.metaJson(context, snapshot)
+          Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight)
+              .padding(horizontal = 28.dp, vertical = 22.dp), verticalAlignment = Alignment.CenterVertically) {
+            ApprovedSettingsLabel(meta?.optString("title") ?: spec.key,
+                "Managed by the existing app · preserved without a new switch", Modifier.weight(1f))
+            Text(meta?.optString("display")?.takeIf { it.isNotBlank() }
+                ?: meta?.opt("value")?.toString().orEmpty(), color = IosSecondary, fontSize = Sizes.rowValue)
+          }
+        }
+      }
+    }
+  }
+  FooterNote("Legacy appearance values remain stored and unchanged.")
+}
 
 // ---------------------------------------------------------------------------
 // Debug toggle row (uses a local pref; only relevant in debug builds)
@@ -877,6 +447,14 @@ private fun SubScreenNavCard(
   }
 }
 
+private data class DisplaySnapshot(
+    val canWrite: Boolean,
+    val brightness: Int,
+    val autoBrightness: Boolean,
+    val volume: Int,
+    val nightShift: DisplayControl.NightShift,
+)
+
 /**
  * The "Display" detail: screen brightness + auto-brightness (real system settings via
  * [DisplayControl], needing the WRITE_SETTINGS grant), and Night Shift — a launcher-drawn warm tint
@@ -886,63 +464,92 @@ private fun SubScreenNavCard(
 @Composable
 private fun DisplaySection() {
   val context = LocalContext.current
-  var canWrite by remember { mutableStateOf(DisplayControl.canWrite(context)) }
-  var brightness by remember { mutableStateOf(DisplayControl.brightnessPercent(context)) }
-  var auto by remember { mutableStateOf(DisplayControl.autoBrightness(context)) }
-  var volume by remember { mutableStateOf(DisplayControl.mediaVolumePercent(context)) }
-  var ns by remember { mutableStateOf(DisplayControl.nightShift(context)) }
+  var snapshot by remember(context) { mutableStateOf<DisplaySnapshot?>(null) }
+  var loadFailed by remember(context) { mutableStateOf(false) }
+  var editRevision by remember(context) { mutableStateOf(0) }
   val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) {
-        canWrite = DisplayControl.canWrite(context)
-        brightness = DisplayControl.brightnessPercent(context)
-        auto = DisplayControl.autoBrightness(context)
-        volume = DisplayControl.mediaVolumePercent(context)
-        ns = DisplayControl.nightShift(context)
+  val pageActive = LocalApprovedLauncherPageActive.current
+  LaunchedEffect(context, lifecycleOwner, pageActive) {
+    if (!pageActive) return@LaunchedEffect
+    // The retained pane owner follows both the parent lifecycle and pane activation. There is
+    // one initial/resume load, and leaving RESUMED cancels publication of an unfinished read.
+    lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+      loadFailed = false
+      val revision = editRevision
+      val loaded = withContext(Dispatchers.IO) {
+        runCatching {
+          DisplaySnapshot(
+              canWrite = DisplayControl.canWrite(context),
+              brightness = DisplayControl.brightnessPercent(context),
+              autoBrightness = DisplayControl.autoBrightness(context),
+              volume = DisplayControl.mediaVolumePercent(context),
+              nightShift = DisplayControl.nightShift(context),
+          )
+        }.getOrNull()
       }
+      loadFailed = loaded == null
+      // Keep real cached values during a refresh, but never replace a newer slider/toggle edit
+      // with a system read that started before that edit.
+      if (loaded != null && revision == editRevision) snapshot = loaded
     }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
+  val display = snapshot
+  if (display == null) {
+    // Until the first snapshot arrives there are no writable rows or invented control values.
+    FooterNote(if (loadFailed) "Display settings could not be loaded. Reopen this page to try again."
+        else "Loading display settings…")
+    return
+  }
+  fun updateDisplay(update: (DisplaySnapshot) -> DisplaySnapshot) {
+    snapshot = snapshot?.let(update)
+    editRevision++
+  }
+  fun updateNightShift(update: (DisplayControl.NightShift) -> DisplayControl.NightShift) {
+    updateDisplay { it.copy(nightShift = update(it.nightShift)) }
+  }
+  val brightness = display.brightness
+  val volume = display.volume
+  val ns = display.nightShift
 
-  SectionLabel("Brightness")
+  ApprovedSettingsSectionLabel("Brightness")
   Card {
-    if (!canWrite) {
+    if (!display.canWrite) {
       NavRow(
           title = "Allow brightness control",
           value = "Grant",
-          iconColor = Color(0xFFFF9F0A),
-          iconSymbol = "L",
       ) { DisplayControl.requestWriteAccess(context) }
     } else {
       // Brightness slider row.
       Row(
-          modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 68.dp)
+          modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight)
               .padding(horizontal = 16.dp, vertical = 10.dp),
           verticalAlignment = Alignment.CenterVertically,
       ) {
-        Text("Brightness", color = IosLabel, fontSize = 22.sp, modifier = Modifier.width(140.dp))
+        Text("Brightness", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.width(240.dp))
         androidx.compose.material3.Slider(
             value = brightness.toFloat(),
             onValueChange = {
-              brightness = it.toInt()
-              DisplayControl.setBrightnessPercent(context, brightness)
-              auto = false // manual write turns adaptive off
+              val percent = it.toInt()
+              // A manual brightness write also turns adaptive brightness off.
+              updateDisplay { current -> current.copy(brightness = percent, autoBrightness = false) }
+              DisplayControl.setBrightnessPercent(context, percent)
             },
             valueRange = 1f..100f,
+            colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = IosBlue,
+                activeTrackColor = IosBlue, inactiveTrackColor = IosDivider),
             modifier = Modifier.weight(1f),
         )
         Text("$brightness%", color = IosSecondary, fontSize = Sizes.rowValue,
-            modifier = Modifier.width(56.dp), textAlign = TextAlign.End)
+            modifier = Modifier.width(90.dp), textAlign = TextAlign.End)
       }
       Divider()
       ToggleRow(
           title = "Auto-brightness",
-          checked = auto,
-          iconColor = Color(0xFFFFD60A),
-          iconSymbol = "a",
-          onChange = { on -> auto = on; DisplayControl.setAutoBrightness(context, on) },
+          checked = display.autoBrightness,
+          onChange = { on ->
+            updateDisplay { it.copy(autoBrightness = on) }
+            DisplayControl.setAutoBrightness(context, on)
+          },
       )
     }
   }
@@ -951,22 +558,25 @@ private fun DisplaySection() {
   SectionLabel("Volume")
   Card {
     Row(
-        modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 68.dp)
+        modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-      Text("Media", color = IosLabel, fontSize = 22.sp, modifier = Modifier.width(140.dp))
+      Text("Media", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.width(240.dp))
       androidx.compose.material3.Slider(
           value = volume.toFloat(),
           onValueChange = {
-            volume = it.toInt()
-            DisplayControl.setMediaVolumePercent(context, volume)
+            val percent = it.toInt()
+            updateDisplay { current -> current.copy(volume = percent) }
+            DisplayControl.setMediaVolumePercent(context, percent)
           },
           valueRange = 0f..100f,
+          colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = IosBlue,
+              activeTrackColor = IosBlue, inactiveTrackColor = IosDivider),
           modifier = Modifier.weight(1f),
       )
       Text("$volume%", color = IosSecondary, fontSize = Sizes.rowValue,
-          modifier = Modifier.width(56.dp), textAlign = TextAlign.End)
+          modifier = Modifier.width(90.dp), textAlign = TextAlign.End)
     }
   }
   FooterNote("Sets the media playback volume (music, videos, chimes).")
@@ -976,31 +586,50 @@ private fun DisplaySection() {
     ToggleRow(
         title = "Night Shift",
         checked = ns.enabled,
-        iconColor = Color(0xFFFF6B35),
-        iconSymbol = "N",
-        onChange = { on -> DisplayControl.setNightShiftEnabled(context, on); ns = ns.copy(enabled = on) },
+        onChange = { on ->
+          DisplayControl.setNightShiftEnabled(context, on)
+          updateNightShift { it.copy(enabled = on) }
+        },
     )
     if (ns.enabled) {
       Divider()
       Stepper(
           label = "From",
           valueText = minuteLabel(ns.startMin),
-          onMinus = { DisplayControl.setNightShiftStart(context, ns.startMin - 30); ns = ns.copy(startMin = (ns.startMin - 30 + 1440) % 1440) },
-          onPlus = { DisplayControl.setNightShiftStart(context, ns.startMin + 30); ns = ns.copy(startMin = (ns.startMin + 30) % 1440) },
+          onMinus = {
+            DisplayControl.setNightShiftStart(context, ns.startMin - 30)
+            updateNightShift { it.copy(startMin = (ns.startMin - 30 + 1440) % 1440) }
+          },
+          onPlus = {
+            DisplayControl.setNightShiftStart(context, ns.startMin + 30)
+            updateNightShift { it.copy(startMin = (ns.startMin + 30) % 1440) }
+          },
       )
       Divider()
       Stepper(
           label = "Until",
           valueText = minuteLabel(ns.endMin),
-          onMinus = { DisplayControl.setNightShiftEnd(context, ns.endMin - 30); ns = ns.copy(endMin = (ns.endMin - 30 + 1440) % 1440) },
-          onPlus = { DisplayControl.setNightShiftEnd(context, ns.endMin + 30); ns = ns.copy(endMin = (ns.endMin + 30) % 1440) },
+          onMinus = {
+            DisplayControl.setNightShiftEnd(context, ns.endMin - 30)
+            updateNightShift { it.copy(endMin = (ns.endMin - 30 + 1440) % 1440) }
+          },
+          onPlus = {
+            DisplayControl.setNightShiftEnd(context, ns.endMin + 30)
+            updateNightShift { it.copy(endMin = (ns.endMin + 30) % 1440) }
+          },
       )
       Divider()
       Stepper(
           label = "Warmth",
           valueText = "${ns.strength}%",
-          onMinus = { DisplayControl.setNightShiftStrength(context, ns.strength - 10); ns = ns.copy(strength = (ns.strength - 10).coerceIn(0, 100)) },
-          onPlus = { DisplayControl.setNightShiftStrength(context, ns.strength + 10); ns = ns.copy(strength = (ns.strength + 10).coerceIn(0, 100)) },
+          onMinus = {
+            DisplayControl.setNightShiftStrength(context, ns.strength - 10)
+            updateNightShift { it.copy(strength = (ns.strength - 10).coerceIn(0, 100)) }
+          },
+          onPlus = {
+            DisplayControl.setNightShiftStrength(context, ns.strength + 10)
+            updateNightShift { it.copy(strength = (ns.strength + 10).coerceIn(0, 100)) }
+          },
       )
     }
   }
@@ -1025,56 +654,12 @@ private fun minuteLabel(min: Int): String {
 @Composable
 private fun DeviceNameSection() {
   val context = LocalContext.current
-  var name by remember { mutableStateOf(FleetConfig.name(context)) }
-  Card {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = Sizes.rowMinHeight)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      IconBadge(color = Color(0xFF636366), symbol = "i")
-      Spacer(Modifier.size(12.dp))
-      Text(
-          "Device name",
-          color = IosLabel,
-          fontSize = Sizes.rowTitle,
-          letterSpacing = (-0.2).sp,
-      )
-      Spacer(Modifier.weight(1f))
-      // iOS-style inline field: right-aligned, no box, black text on the white card
-      // (Material3 OutlinedTextField rendered white-on-white here and looked foreign).
-      BasicTextField(
-          value = name,
-          onValueChange = { new ->
-            name = new
-            if (new.trim().length in 1..48) FleetConfig.setName(context, new.trim())
-          },
-          singleLine = true,
-          textStyle = androidx.compose.ui.text.TextStyle(
-              color = IosLabel,
-              fontSize = Sizes.rowValue,
-              textAlign = TextAlign.End,
-          ),
-          cursorBrush = SolidColor(IosBlue),
-          decorationBox = { inner ->
-            if (name.isEmpty()) {
-              Text(
-                  "Living Room",
-                  color = IosSecondary,
-                  fontSize = Sizes.rowValue,
-                  textAlign = TextAlign.End,
-                  modifier = Modifier.fillMaxWidth(),
-              )
-            }
-            inner()
-          },
-          modifier = Modifier.widthIn(min = 120.dp),
-      )
+  var revision by remember { mutableStateOf(0) }
+  androidx.compose.runtime.key(revision) {
+    SettingsList(SettingsDomains.fleet, context) { key, value ->
+      if (key in SettingsDomains.fleet.apply(context, JSONObject().put(key, value))) revision++
     }
   }
-  FooterNote("Shown in the phone remote and in Home Assistant. 1–48 characters.")
 }
 
 // ---------------------------------------------------------------------------
@@ -1117,6 +702,25 @@ internal fun MultiRoomContent() {
   var maPort by remember { mutableStateOf(ImmortalSettings.maPort(context).toString()) }
   var maUser by remember { mutableStateOf(ImmortalSettings.maUser(context)) }
   var maPass by remember { mutableStateOf(ImmortalSettings.maPass(context)) }
+  var error by remember { mutableStateOf<String?>(null) }
+  fun applyConnection(): Boolean {
+    val port = maPort.toIntOrNull()
+    val portSpec = SettingsDomains.immortal.specs.first { it.key == "maPort" }
+        as com.immortal.launcher.settings.IntSpec<*>
+    if (port == null || port !in portSpec.min..portSpec.max) {
+      error = "Enter a port from ${portSpec.min} to ${portSpec.max}."
+      return false
+    }
+    SettingsDomains.immortal.apply(context, JSONObject().put("snapcastHost", host)
+        .put("maPort", port).put("maUsername", maUser).put("maPassword", maPass))
+    val stored = ImmortalSettings.load(context)
+    host = stored.snapcastHost
+    maPort = stored.maPort.toString()
+    maUser = stored.maUsername
+    maPass = stored.maPassword
+    error = null
+    return true
+  }
 
   // Chain the text fields so the keyboard's "Next" jumps to the following field instead of
   // closing — the IP field focuses the username, which focuses the password.
@@ -1163,14 +767,13 @@ internal fun MultiRoomContent() {
                 modifier = Modifier.padding(top = 2.dp),
             )
           }
-          Switch(
+          ApprovedSettingsSwitch(
               checked = enabled,
               onCheckedChange = { on ->
-                enabled = on
-                ImmortalSettings.setMultiRoomEnabled(context, on)
-                MultiRoomService.sync(context)
+                SettingsDomains.immortal.apply(context, JSONObject().put("multiRoomEnabled", on))
+                enabled = ImmortalSettings.load(context).multiRoomEnabled
               },
-              colors = iosSwitchColors(),
+              modifier = Modifier.semantics { contentDescription = "Show what the group is playing" },
           )
         }
         if (enabled) {
@@ -1184,7 +787,6 @@ internal fun MultiRoomContent() {
                 value = host,
                 onValueChange = {
                   host = it
-                  ImmortalSettings.setSnapcastHost(context, it)
                 },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -1193,8 +795,7 @@ internal fun MultiRoomContent() {
                 modifier = Modifier.weight(1f),
             )
             ActionPill("Apply", modifier = Modifier.padding(start = 12.dp)) {
-                      ImmortalSettings.setSnapcastHost(context, host)
-                      MultiRoomService.sync(context)
+                      applyConnection()
             }
           }
           // Music Assistant API port — 8095 by default; only change it if MA's web server moved.
@@ -1203,7 +804,6 @@ internal fun MultiRoomContent() {
               value = maPort,
               onValueChange = {
                 maPort = it.filter(Char::isDigit).take(5)
-                maPort.toIntOrNull()?.let { p -> ImmortalSettings.setMaPort(context, p) }
               },
               singleLine = true,
               keyboardOptions =
@@ -1222,7 +822,6 @@ internal fun MultiRoomContent() {
               value = maUser,
               onValueChange = {
                 maUser = it
-                ImmortalSettings.setMaUsername(context, it)
               },
               singleLine = true,
               // No auto-capitalize: a lowercase MA username must stay lowercase.
@@ -1241,7 +840,6 @@ internal fun MultiRoomContent() {
               value = maPass,
               onValueChange = {
                 maPass = it
-                ImmortalSettings.setMaPassword(context, it)
               },
               singleLine = true,
               visualTransformation = PasswordVisualTransformation(),
@@ -1258,7 +856,7 @@ internal fun MultiRoomContent() {
               modifier = Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 10.dp),
               verticalAlignment = Alignment.CenterVertically,
           ) {
-            ActionPill("Sign in") { MaControl.testLogin(context) }
+            ActionPill("Sign in") { if (applyConnection()) MaControl.testLogin(context) }
             val auth = MultiRoomStatus.maAuth
             if (auth.isNotBlank()) {
               Text(
@@ -1279,6 +877,7 @@ internal fun MultiRoomContent() {
           )
 
           // Live relay status — gives Apply visible feedback (Connecting… → Connected).
+          error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp)) }
           Text(
               MultiRoomStatus.text.ifBlank { "Starting…" },
               color = IosBlue,
@@ -1307,8 +906,7 @@ private fun QuickButtonsSection() {
   val context = LocalContext.current
   var settings by remember { mutableStateOf(QuickBarConfig.load(context)) }
 
-  Spacer(Modifier.size(26.dp))
-  SectionLabel("Quick buttons")
+  ApprovedSettingsSectionLabel("Quick buttons")
   // Rendered from the `quickbar` registry domain (the same specs the phone remote uses), so the
   // toggle and its gated "Always show" can't drift from the remote's version. Apply routes through
   // the domain so its onApplied (reconcile + overlay refresh) fires here too.
@@ -1333,7 +931,7 @@ private fun QuickButtonsSection() {
 @Composable
 internal fun MqttScreen(onBack: () -> Unit) {
   SettingsScaffold(
-      title = "Home Assistant",
+      title = "MQTT publishing",
       subtitle =
           "Publish this Portal to Home Assistant as auto-discovered entities — presence, " +
               "screen, battery, now-playing, and controls — over your MQTT broker.",
@@ -1352,12 +950,12 @@ internal fun MqttContent() {
   var user by remember { mutableStateOf(MqttConfig.username(context)) }
   var pass by remember { mutableStateOf(MqttConfig.password(context)) }
   var useTls by remember { mutableStateOf(MqttConfig.useTls(context)) }
-  var validateCert by remember { mutableStateOf(MqttConfig.validateCert(context)) }
+  var error by remember { mutableStateOf<String?>(null) }
   // MqttStatus is a plain holder updated off the main thread, so poll it for live
   // "Connecting… → Connected" feedback (Compose won't recompose on its writes).
   var status by remember { mutableStateOf(MqttStatus.text) }
-  LaunchedEffect(Unit) {
-    while (true) {
+  LaunchedEffect(enabled) {
+    while (enabled) {
       status = MqttStatus.text
       kotlinx.coroutines.delay(800)
     }
@@ -1368,14 +966,24 @@ internal fun MqttContent() {
   val userFocus = remember { FocusRequester() }
   val passFocus = remember { FocusRequester() }
 
-  fun apply() {
-    MqttConfig.setHost(context, host)
-    MqttConfig.setPort(context, port.toIntOrNull() ?: MqttConfig.DEFAULT_PORT)
-    MqttConfig.setUsername(context, user)
-    MqttConfig.setPassword(context, pass)
-    MqttConfig.setUseTls(context, useTls)
-    MqttConfig.setValidateCert(context, validateCert)
-    MqttService.sync(context)
+  fun apply(): Boolean {
+    val chosenPort = port.toIntOrNull()
+    val portSpec = SettingsDomains.mqtt.specs.first { it.key == "port" }
+        as com.immortal.launcher.settings.IntSpec<*>
+    if (chosenPort == null || chosenPort !in portSpec.min..portSpec.max) {
+      error = "Enter a port from ${portSpec.min} to ${portSpec.max}."
+      return false
+    }
+    // One registry apply keeps side effects once per batch and retains a masked blank secret.
+    SettingsDomains.mqtt.apply(context, JSONObject().put("host", host).put("port", chosenPort)
+        .put("username", user).put("password", pass).put("useTls", useTls))
+    host = MqttConfig.host(context)
+    port = MqttConfig.port(context).toString()
+    user = MqttConfig.username(context)
+    pass = MqttConfig.password(context)
+    useTls = MqttConfig.useTls(context)
+    error = null
+    return true
   }
 
   Column {
@@ -1409,14 +1017,13 @@ internal fun MqttContent() {
                 modifier = Modifier.padding(top = 2.dp),
             )
           }
-          Switch(
+          ApprovedSettingsSwitch(
               checked = enabled,
               onCheckedChange = { on ->
-                enabled = on
-                MqttConfig.setEnabled(context, on)
-                if (on) apply() else MqttService.sync(context)
+                SettingsDomains.mqtt.apply(context, JSONObject().put("enabled", on))
+                enabled = MqttConfig.isEnabled(context)
               },
-              colors = iosSwitchColors(),
+              modifier = Modifier.semantics { contentDescription = "Publish to Home Assistant" },
           )
         }
         if (enabled) {
@@ -1430,7 +1037,6 @@ internal fun MqttContent() {
                 value = host,
                 onValueChange = {
                   host = it
-                  MqttConfig.setHost(context, it)
                 },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -1445,7 +1051,6 @@ internal fun MqttContent() {
               value = port,
               onValueChange = {
                 port = it.filter { ch -> ch.isDigit() }
-                MqttConfig.setPort(context, port.toIntOrNull() ?: MqttConfig.DEFAULT_PORT)
               },
               singleLine = true,
               keyboardOptions =
@@ -1462,7 +1067,6 @@ internal fun MqttContent() {
               value = user,
               onValueChange = {
                 user = it
-                MqttConfig.setUsername(context, it)
               },
               singleLine = true,
               keyboardOptions =
@@ -1480,7 +1084,6 @@ internal fun MqttContent() {
               value = pass,
               onValueChange = {
                 pass = it
-                MqttConfig.setPassword(context, it)
               },
               singleLine = true,
               visualTransformation = PasswordVisualTransformation(),
@@ -1506,7 +1109,7 @@ internal fun MqttContent() {
                   modifier = Modifier.padding(top = 2.dp),
               )
             }
-            Switch(
+            ApprovedSettingsSwitch(
                 checked = useTls,
                 onCheckedChange = { on ->
                   useTls = on
@@ -1517,13 +1120,14 @@ internal fun MqttContent() {
                       port = MqttConfig.DEFAULT_PORT.toString()
                   apply()
                 },
-                colors = iosSwitchColors(),
+                modifier = Modifier.semantics { contentDescription = "Use TLS / SSL" },
             )
           }
           // Certificate validation is auto-managed (on by default, settings-reimagining Phase 5):
           // no on-device row. It stays applied and the phone remote can still turn it off for a
           // self-signed broker on a trusted network.
           // Live connection status — gives Apply visible feedback (Connecting… → Connected).
+          error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp)) }
           Text(
               status.ifBlank { "Starting…" },
               color = IosBlue,
@@ -1582,18 +1186,24 @@ internal fun WorldClockContent() {
 
   Column {
       Card {
-        WORLD_CLOCK_CITIES.forEachIndexed { i, (label, zone) ->
+        LazyColumn(Modifier.heightIn(max = (LocalConfiguration.current.screenHeightDp - 400).coerceAtLeast(400).dp)) {
+        itemsIndexed(WORLD_CLOCK_CITIES, key = { _, city -> city.second }) { i, (label, zone) ->
           if (i > 0) Divider()
           val on = zone in selected
           val rank = selected.indexOf(zone)
           Row(
               modifier =
                   Modifier.fillMaxWidth()
-                      .tvFocusableRow {
+                      .defaultMinSize(minHeight = Sizes.rowMinHeight)
+                      .tvFocusableRow(focusFill = IosFocusTint) {
                         selected = if (on) selected - zone else selected + zone
                         ImmortalSettings.setWorldClockZones(context, selected)
                       }
-                      .padding(horizontal = 18.dp, vertical = 14.dp),
+                      .semantics {
+                        role = Role.Switch
+                        toggleableState = ToggleableState(on)
+                      }
+                      .padding(horizontal = 28.dp, vertical = 22.dp),
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -1616,9 +1226,10 @@ internal fun WorldClockContent() {
             } else if (on) {
               Text("hidden", color = IosSecondary, fontSize = Sizes.rowSub, modifier = Modifier.padding(end = 14.dp))
             }
-            Switch(checked = on, onCheckedChange = null, colors = iosSwitchColors())
+            ApprovedSettingsSwitch(on)
           }
         }
+      }
       }
       Text(
           "Tip: the widget shows up to four clocks. Re-pick a city to move it to the end of the order.",
@@ -1777,7 +1388,7 @@ private fun HealthRow(c: DevicePermissions.Check) {
           c.enables,
           color = IosSecondary,
           fontSize = Sizes.rowSub,
-          lineHeight = 18.sp,
+          lineHeight = 28.sp,
           modifier = Modifier.padding(top = 2.dp),
       )
       if (!c.granted) {
@@ -1785,14 +1396,14 @@ private fun HealthRow(c: DevicePermissions.Check) {
             "Without it: ${c.degraded}",
             color = Color(0xFFB26A00),
             fontSize = Sizes.rowSub,
-            lineHeight = 18.sp,
+            lineHeight = 28.sp,
             modifier = Modifier.padding(top = 6.dp),
         )
         Text(
             c.fix,
             color = IosBlue,
             fontSize = Sizes.rowSub,
-            lineHeight = 18.sp,
+            lineHeight = 28.sp,
             modifier = Modifier.padding(top = 4.dp),
         )
       }
@@ -1823,12 +1434,26 @@ internal fun BootAppsScreen(onBack: () -> Unit) {
 internal fun BootAppsContent() {
   val context = LocalContext.current
   var apps by remember { mutableStateOf<List<BootAppOption>?>(null) }
-  var selected by remember { mutableStateOf(BootLaunch.packages(context).toSet()) }
+  var selected by remember { mutableStateOf<Set<String>>(emptySet()) }
+  val scope = rememberCoroutineScope()
+  val writeLock = remember { Mutex() }
   val onToggle: (String) -> Unit = { pkg ->
-    selected = if (pkg in selected) selected - pkg else selected + pkg
-    BootLaunch.setPackages(context, selected.toList())
+    scope.launch {
+      writeLock.withLock {
+        selected = withContext(Dispatchers.IO) {
+          val saved = BootLaunch.packages(context).toSet()
+          val chosen = if (pkg in saved) saved - pkg else saved + pkg
+          BootLaunch.setPackages(context, chosen.toList())
+          BootLaunch.packages(context).toSet()
+        }
+      }
+    }
   }
-  LaunchedEffect(Unit) { apps = withContext(Dispatchers.IO) { loadLaunchableApps(context) } }
+  LaunchedEffect(context) {
+    val loaded = withContext(Dispatchers.IO) { loadLaunchableApps(context) to BootLaunch.packages(context).toSet() }
+    apps = loaded.first
+    selected = loaded.second
+  }
 
   Column {
       Card {
@@ -1848,16 +1473,22 @@ internal fun BootAppsContent() {
               modifier = Modifier.padding(18.dp),
           )
         } else {
-          list.forEachIndexed { i, app ->
+          LazyColumn(Modifier.heightIn(max = (LocalConfiguration.current.screenHeightDp - 400).coerceAtLeast(400).dp)) {
+          itemsIndexed(list, key = { _, app -> app.pkg }) { i, app ->
             if (i > 0) Divider()
             Row(
                 modifier =
                     Modifier.fillMaxWidth()
-                        .tvFocusableRow { onToggle(app.pkg) }
-                        .padding(horizontal = 18.dp, vertical = 12.dp),
+                        .defaultMinSize(minHeight = Sizes.rowMinHeight)
+                        .tvFocusableRow(focusFill = IosFocusTint) { onToggle(app.pkg) }
+                        .semantics {
+                          role = Role.Switch
+                          toggleableState = ToggleableState(app.pkg in selected)
+                        }
+                        .padding(horizontal = 28.dp, vertical = 22.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-              Image(bitmap = app.icon, contentDescription = null, modifier = Modifier.size(34.dp))
+              Image(bitmap = app.icon, contentDescription = null, modifier = Modifier.size(42.dp))
               Text(
                   app.label,
                   color = IosLabel,
@@ -1865,10 +1496,11 @@ internal fun BootAppsContent() {
                   modifier = Modifier.weight(1f).padding(start = 14.dp),
               )
               // Visual only — the row toggles it (so the remote's center button works).
-              Switch(checked = app.pkg in selected, onCheckedChange = null, colors = iosSwitchColors())
+              ApprovedSettingsSwitch(app.pkg in selected)
             }
           }
         }
+      }
       }
       Text(
           "These apps relaunch automatically after a reboot — handy for players like Music " +
@@ -1886,8 +1518,7 @@ private fun WallpaperSection() {
   var mode by remember { mutableStateOf(WallpaperConfig.load(context).mode) }
   var grain by remember { mutableStateOf(WallpaperConfig.load(context).grain) }
 
-  Spacer(Modifier.size(26.dp))
-  SectionLabel("Wallpaper")
+  ApprovedSettingsSectionLabel("Wallpaper")
   Card {
     Column(modifier = Modifier.padding(18.dp)) {
       Text("Background", color = IosLabel, fontSize = Sizes.rowTitle)
@@ -1929,22 +1560,26 @@ private fun WallpaperSection() {
           }
         }
         WallpaperConfig.PHOTOS.forEach { (id, label) ->
-          val thumb =
-              remember(id) {
-                runCatching {
-                      context.assets.open("photoframe_fallback/${id.removePrefix(WallpaperConfig.PHOTO_PREFIX)}")
-                          .use { android.graphics.BitmapFactory.decodeStream(it) }
-                          ?.let { android.graphics.Bitmap.createScaledBitmap(it, 96, 96, true).asImageBitmap() }
+          val thumb by androidx.compose.runtime.produceState<ImageBitmap?>(null, id) {
+            value = withContext(Dispatchers.IO) {
+              runCatching {
+                context.assets.open("photoframe_fallback/${id.removePrefix(WallpaperConfig.PHOTO_PREFIX)}")
+                    .use { android.graphics.BitmapFactory.decodeStream(it) }
+                    ?.let { bitmap ->
+                      val scaled = android.graphics.Bitmap.createScaledBitmap(bitmap, 240, 145, true)
+                      if (scaled !== bitmap) bitmap.recycle()
+                      scaled.asImageBitmap()
                     }
-                    .getOrNull()
-              }
+              }.getOrNull()
+            }
+          }
           WallpaperSwatch(label, selected = mode == id, onClick = {
             mode = id
             WallpaperConfig.setMode(context, id)
           }) {
-            if (thumb != null) {
-              Image(bitmap = thumb, contentDescription = null, modifier = Modifier.fillMaxSize())
-            } else {
+            thumb?.let { bitmap ->
+              Image(bitmap = bitmap, contentDescription = null, modifier = Modifier.fillMaxSize())
+            } ?: run {
               Spacer(Modifier.fillMaxSize().background(Color(0xFF333740)))
             }
           }
@@ -1988,13 +1623,13 @@ private fun WallpaperSection() {
               modifier = Modifier.padding(top = 2.dp),
           )
         }
-        Switch(
+        ApprovedSettingsSwitch(
             checked = grain,
             onCheckedChange = {
               grain = it
               WallpaperConfig.setGrain(context, it)
             },
-            colors = iosSwitchColors(),
+            modifier = Modifier.semantics { contentDescription = "Film grain" },
         )
       }
     }
@@ -2014,11 +1649,11 @@ private fun WallpaperSwatch(
   ) {
     androidx.compose.foundation.layout.Box(
         modifier =
-            Modifier.size(74.dp)
+            Modifier.size(width = 240.dp, height = 145.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .border(
                     width = if (selected) 3.dp else 1.dp,
-                    color = if (selected) Color(0xFF2E6BE6) else Color(0x33FFFFFF),
+                    color = if (selected) IosBlue else IosDivider,
                     shape = RoundedCornerShape(16.dp),
                 ),
     ) {
@@ -2064,4 +1699,3 @@ private fun Modifier.verticalScrollbar(
       cornerRadius = CornerRadius(w / 2, w / 2),
   )
 }
-

@@ -67,6 +67,7 @@ private fun WelcomeSettingsScreen() {
 @Composable
 internal fun WelcomeSettingsContent() {
   val context = LocalContext.current
+  val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
   var settings by remember { mutableStateOf(WelcomeConfig.load(context)) }
 
   val firstFocus = remember { FocusRequester() }
@@ -78,10 +79,11 @@ internal fun WelcomeSettingsContent() {
   // voices: name -> friendly label; first entry is the engine default.
   var androidVoices by remember { mutableStateOf<List<Pair<String, String>>>(listOf("" to "Default voice")) }
   val ttsEngine = remember { mutableStateOf<android.speech.tts.TextToSpeech?>(null) }
-  DisposableEffect(Unit) {
+  if (advanced && settings.enableTts) DisposableEffect(Unit) {
+    var active = true
     var engine: android.speech.tts.TextToSpeech? = null
     engine = android.speech.tts.TextToSpeech(context.applicationContext) { status ->
-      if (status == android.speech.tts.TextToSpeech.SUCCESS) {
+      if (active && status == android.speech.tts.TextToSpeech.SUCCESS) {
         val found = runCatching {
           engine?.voices
               ?.filter { !it.isNetworkConnectionRequired }
@@ -94,7 +96,12 @@ internal fun WelcomeSettingsContent() {
       }
     }
     ttsEngine.value = engine
-    onDispose { runCatching { engine?.stop() }; runCatching { engine?.shutdown() } }
+    onDispose {
+      active = false
+      ttsEngine.value = null
+      runCatching { engine?.stop() }
+      runCatching { engine?.shutdown() }
+    }
   }
   fun testVoice(voiceName: String) {
     val t = ttsEngine.value ?: return
@@ -146,7 +153,8 @@ internal fun WelcomeSettingsContent() {
 
         Spacer(Modifier.size(26.dp))
 
-        SectionLabel("VOICE")
+        if (advanced && settings.enableTts) {
+        SectionLabel("Voice")
         Card {
           androidVoices.forEachIndexed { i, (name, label) ->
             if (i > 0) Divider()
@@ -167,13 +175,15 @@ internal fun WelcomeSettingsContent() {
         )
 
         Spacer(Modifier.size(26.dp))
+        }
 
-        SectionLabel("GREETINGS")
+        SectionLabel("Greeting")
         Card {
           EditableTextRow("Your name", settings.userName) { text ->
             WelcomeConfig.setUserName(context, text)
             settings = settings.copy(userName = text)
           }
+          if (advanced) {
           Divider()
           EditableTextRow("Night (22:00-04:59)", settings.greetingNight) { text ->
             WelcomeConfig.setGreetingNight(context, text)
@@ -194,11 +204,13 @@ internal fun WelcomeSettingsContent() {
             WelcomeConfig.setGreetingEvening(context, text)
             settings = settings.copy(greetingEvening = text)
           }
+          }
         }
 
         Spacer(Modifier.size(26.dp))
 
-        SectionLabel("TIMING")
+        if (advanced) {
+        SectionLabel("Timing")
         Card {
           DurationStepper(settings.durationMs / 1000) { sec ->
             val ms = WelcomeConfig.clampDuration(sec * 1000)
@@ -211,6 +223,7 @@ internal fun WelcomeSettingsContent() {
         )
 
         Spacer(Modifier.size(26.dp))
+        }
 
         SectionLabel("TEXT SIZE")
         Card {
@@ -231,7 +244,8 @@ internal fun WelcomeSettingsContent() {
 
         Spacer(Modifier.size(26.dp))
 
-        SectionLabel("BACKGROUND")
+        if (advanced) {
+        SectionLabel("Background")
         Card {
           OpacityStepper(settings.backgroundOpacity) { opacity ->
             val clamped = WelcomeConfig.clampOpacity(opacity)
@@ -242,6 +256,7 @@ internal fun WelcomeSettingsContent() {
         FooterNote(
             "Background darkness behind the welcome text (0% = transparent, 100% = opaque).",
         )
+        }
 
         Spacer(Modifier.size(28.dp))
         Surface(
@@ -257,7 +272,7 @@ internal fun WelcomeSettingsContent() {
           Text(
               "Preview welcome overlay",
               color = Color.White,
-              fontSize = 18.sp,
+              fontSize = 24.sp,
               fontWeight = FontWeight.SemiBold,
               textAlign = TextAlign.Center,
               modifier = Modifier.padding(vertical = 16.dp).fillMaxWidth(),

@@ -16,8 +16,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Switch
+import com.immortal.launcher.ApprovedSettingsSwitch as Switch
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +33,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
@@ -54,7 +57,7 @@ private val ALARM_DAY_LABELS =
 @Composable
 private fun AlarmScreen() {
   val activity = LocalContext.current as? Activity
-  PopupScaffold(
+  SettingsScaffold(
       title = "Alarm",
       subtitle = "Wake to a gentle chime at a set time. Pick the days it should repeat.",
       onBack = { activity?.finish() },
@@ -108,14 +111,16 @@ internal fun AlarmContent() {
       }
 
       SectionLabel("Repeat on")
-      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         ALARM_DAY_LABELS.forEach { (d, label) ->
           val on = d in days
           Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
-              modifier = Modifier.tvFocusable(CircleShape, focusScale = 1.08f) {
+              modifier = Modifier.size(68.dp).semantics {
+                contentDescription = java.text.DateFormatSymbols().weekdays[d]
+              }.tvFocusable(CircleShape, focusScale = 1f) {
                 days = if (on) days - d else days + d; persist()
               }) {
-            Text(label, color = if (on) Color.White else IosLabel, fontSize = 16.sp,
+            Text(label, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel, fontSize = 24.sp,
                 fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.padding(14.dp))
           }
         }

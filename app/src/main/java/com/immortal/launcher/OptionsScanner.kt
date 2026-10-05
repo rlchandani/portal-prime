@@ -39,6 +39,7 @@ object OptionsScanner {
    * Scan all [tickers] and return contracts in the [deltaMin]..[deltaMax] band, sorted so contracts
    * closest to the band's center appear first, capped at [max]. Blocking — call off the main thread.
    * Delta is compared by magnitude, so a puts scan (negative deltas) matches a positive band too.
+   * [checkCancelled] runs outside best-effort fetching/parsing before and after each ticker.
    */
   fun scan(
       context: Context,
@@ -49,17 +50,28 @@ object OptionsScanner {
       expiryDays: Int,
       max: Int = 8,
       now: Long = System.currentTimeMillis(),
+      checkCancelled: () -> Unit = {},
   ): List<Hit> {
-    if (tickers.isEmpty() || !AlpacaConfig.isConfigured(context)) return emptyList()
+    checkCancelled()
+    if (tickers.isEmpty() || !AlpacaConfig.isConfigured(context)) {
+      checkCancelled()
+      return emptyList()
+    }
     val (gte, lte) = expiryWindow(now, expiryDays)
     val isCall = type != OptionsScanConfig.TYPE_PUT
     val hits = ArrayList<Hit>()
     for (ticker in tickers) {
-      val chain = AlpacaClient.fetchOptionChain(context, ticker, type, gte, lte)
+      checkCancelled()
+      val chain = AlpacaClient.fetchOptionChain(context, ticker, type, gte, lte,
+          checkCancelled = checkCancelled)
+      checkCancelled()
       hits.addAll(filterChain(ticker, chain, isCall, deltaMin, deltaMax))
     }
+    checkCancelled()
     val center = (deltaMin + deltaMax) / 2.0
-    return hits.sortedBy { abs(abs(it.delta) - center) }.take(max)
+    val result = hits.sortedBy { abs(abs(it.delta) - center) }.take(max)
+    checkCancelled()
+    return result
   }
 
   /** Today and today+[days] as ISO yyyy-MM-dd strings (UTC), for the expiry_date_gte/lte params. */

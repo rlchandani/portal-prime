@@ -90,9 +90,11 @@ object LocalMedia {
     val stack = ArrayDeque<File>()
     stack.addLast(root)
     while (stack.isNotEmpty() && out.size < max) {
+      PhotoSourceWork.checkpoint()
       val dir = stack.removeLast()
       val children = runCatching { dir.listFiles() }.getOrNull() ?: continue
       children.sortedBy { it.name.lowercase() }.forEach { f ->
+        PhotoSourceWork.checkpoint()
         if (out.size >= max) return@forEach
         when {
           f.isDirectory -> if (!isJunkDir(f.name)) stack.addLast(f)

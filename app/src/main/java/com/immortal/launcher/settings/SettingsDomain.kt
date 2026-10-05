@@ -53,6 +53,8 @@ class SettingsDomain<S>(
     specs.forEach { spec ->
       if (spec.visibleWhen(c, s))
           spec.metaJson(c, s)?.let { meta ->
+            meta.put("tier", if (SettingsPresentation.isAdvanced(id, spec.key)) "advanced" else "everyday")
+            meta.put("shortHelp", SettingsPresentation.conciseHelp(id, spec.key, meta.optString("help")))
             sections[spec.key]?.let { meta.put("section", it) }
             if (defJson != null && defJson.has(spec.key)) meta.put("default", defJson.get(spec.key))
             controls.put(meta)

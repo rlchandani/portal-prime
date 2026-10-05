@@ -52,6 +52,8 @@ object WallpaperConfig {
   private const val PREFS = "immortal_wallpaper"
   private const val KEY_MODE = "mode"
   private const val KEY_GRAIN = "grain"
+  private const val KEY_MODE_EXPLICIT_SELECTION = "mode_explicitly_selected"
+  private const val KEY_LEGACY_AURORA_MIGRATED = "aurora_migrated"
 
   const val DARK = "dark"
   const val SCREENSAVER = "screensaver"
@@ -91,25 +93,23 @@ object WallpaperConfig {
 
   fun isPhoto(mode: String): Boolean = mode == SCREENSAVER || mode.startsWith(PHOTO_PREFIX)
 
-  // One-time: installs that were on the old Sky default move to Dusk Aurora (the approved
-  // redesign look). A mode the user picked deliberately (gradient/photo/dark) is left alone.
-  private const val KEY_AURORA_MIGRATED = "aurora_migrated"
-
+  // Resolve the historical Sky default on read, retaining its original stored value.
+  // Both selection markers protect deliberate Sky choices, including ones made after
+  // the previous migration but before explicit-selection metadata was introduced.
   fun load(context: Context): Config {
     val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-    var mode = p.getString(KEY_MODE, DUSK_AURORA) ?: DUSK_AURORA
-    if (!p.getBoolean(KEY_AURORA_MIGRATED, false)) {
-      if (mode == SKY) {
-        mode = DUSK_AURORA
-        p.edit().putString(KEY_MODE, mode).apply()
-      }
-      p.edit().putBoolean(KEY_AURORA_MIGRATED, true).apply()
-    }
+    val stored = p.getString(KEY_MODE, DUSK_AURORA) ?: DUSK_AURORA
+    val explicit = p.getBoolean(KEY_MODE_EXPLICIT_SELECTION, false) ||
+        p.getBoolean(KEY_LEGACY_AURORA_MIGRATED, false)
+    val mode = if (stored == SKY && !explicit) DUSK_AURORA else stored
     return Config(mode = mode, grain = p.getBoolean(KEY_GRAIN, false))
   }
 
   fun setMode(context: Context, mode: String) =
-      context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY_MODE, mode).apply()
+      context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+          .putString(KEY_MODE, mode)
+          .putBoolean(KEY_MODE_EXPLICIT_SELECTION, true)
+          .apply()
 
   fun setGrain(context: Context, on: Boolean) =
       context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_GRAIN, on).apply()
