@@ -435,6 +435,226 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       await touchPage.evaluate(() => __portalNavigationDemo.getState().route.screen === 'tools') &&
       await touchRoot.locator('[data-tab="tools"] [data-screen="alarm"]').isVisible());
     await touchContext.close();
+
+    const widgetContext = await browser.newContext({ viewport: { width: 1440, height: 1020 } });
+    await widgetContext.route('**/*', route =>
+      new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+    const widgetPage = await widgetContext.newPage();
+    watchPage(widgetPage);
+    await widgetPage.goto(`${origin}/portal-plus-navigation-live/`);
+    await widgetPage.waitForFunction(() => !!window.__portalNavigationDemo);
+    const widgetRoot = widgetPage.locator('#navigation-device');
+    const widgetSettled = () => widgetPage.waitForFunction(() =>
+      document.querySelector('#navigation-device').getAnimations({ subtree: true }).length === 0);
+    const widgetClick = async selector => { await widgetRoot.locator(selector).click(); await widgetSettled(); };
+    const layout = () => widgetPage.evaluate(() => {
+      const grid = document.querySelector('[data-tab="home"] .home-grid');
+      if (!grid) return null;
+      const rect = node => {
+        const box = node.getBoundingClientRect();
+        return ['x', 'y', 'width', 'height'].map(key => Math.round(box[key] * 1000) / 1000);
+      };
+      return {
+        page: document.querySelector('[data-tab="home"] .widget-page > span:not(.live-widget-toolbar)')?.textContent,
+        grid: rect(grid),
+        viewport: rect(grid.closest('.home-body')),
+        greeting: rect(grid.closest('.home-body').querySelector('.greeting')),
+        favorites: rect(grid.closest('.home-body').querySelector('.favorite-section')),
+        cards: [...grid.querySelectorAll('.home-card')].map(card => ({
+          name: card.classList.contains('photo-card') ? 'Photo memory' : card.querySelector('.card-heading > span')?.textContent,
+          box: rect(card),
+        })),
+      };
+    });
+    const placements = () => widgetPage.evaluate(() =>
+      [...document.querySelectorAll('[data-tab="home"] .home-grid > [data-live-widget-index]')].map(slot => ({
+        index: Number(slot.dataset.liveWidgetIndex), kind: slot.dataset.liveWidgetKind,
+        column: slot.style.gridColumn, row: slot.style.gridRow,
+      })));
+    const noOverlap = async () => widgetPage.evaluate(() => {
+      const boxes = [...document.querySelectorAll('[data-tab="home"] .home-grid > [data-live-widget-index]')]
+        .map(node => node.getBoundingClientRect());
+      return boxes.every((box, index) => boxes.slice(index + 1).every(other =>
+        Math.min(box.right, other.right) - Math.max(box.left, other.left) < 0.1 ||
+        Math.min(box.bottom, other.bottom) - Math.max(box.top, other.top) < 0.1));
+    });
+    const customize = () => widgetClick('.live-launcher > .app-header [data-screen="edit"]');
+    const done = async () => {
+      await widgetClick('.live-launcher > .app-header [data-live-widget-done]');
+      assert.equal(await widgetPage.evaluate(() => __portalNavigationDemo.getState().route.screen), 'home',
+        'Done must leave editing, including after visiting the widget library');
+    };
+    const nextWidgets = () => widgetClick('[data-tab="home"] [data-action="page"][data-dir="1"]');
+    const previousWidgets = () => widgetClick('[data-tab="home"] [data-action="page"][data-dir="-1"]');
+    const size = async (index, span) => {
+      await widgetClick(`[data-live-widget-index="${index}"] [data-action="widget-size"]`);
+      await widgetClick(`#live-overlays [data-action="widget-size-set"][data-name="${span}"]`);
+    };
+    await widgetPage.evaluate(() => {
+      window.widgetChrome = {
+        header: document.querySelector('.live-launcher > .app-header'),
+        dock: document.querySelector('.live-launcher > .dock'),
+        customize: document.querySelector('.live-launcher > .app-header [data-screen="edit"]'),
+      };
+    });
+    const defaultHome = await layout();
+    await customize();
+    check('Customize projects exactly the same Home cards and geometry',
+      JSON.stringify(await layout()) === JSON.stringify(defaultHome));
+    check('mounted Customize becomes Done while Add widget stays in the Favorite apps row',
+      await widgetPage.evaluate(() => widgetChrome.customize === document.querySelector('[data-live-widget-done]') &&
+        widgetChrome.customize.textContent === 'Done' &&
+        !!document.querySelector('.favorite-section .live-widget-toolbar [data-screen="widgets"]') &&
+        !document.querySelector('.app-header .live-widget-toolbar')));
+    check('default first-fit page preserves hero plus four original widget indices',
+      JSON.stringify(await placements()) === JSON.stringify([
+        { index: 8, kind: 'photo_memory', column: '1 / span 2', row: '1 / span 4' },
+        { index: 0, kind: 'today', column: '3 / span 1', row: '1 / span 2' },
+        { index: 1, kind: 'ha', column: '4 / span 1', row: '1 / span 2' },
+        { index: 2, kind: 'calendar', column: '3 / span 1', row: '3 / span 2' },
+        { index: 3, kind: 'weather', column: '4 / span 1', row: '3 / span 2' },
+      ]));
+    check('editing controls overlay the actual cards and retain original action indices',
+      await widgetPage.evaluate(() => [...document.querySelectorAll('.live-widget-edit-controls')].length === 5 &&
+        [...document.querySelectorAll('.live-widget-edit-controls')].every(controls => {
+          const index = controls.parentElement.dataset.liveWidgetIndex;
+          return ['widget-size', 'widget-remove', 'widget-move'].every(action =>
+            controls.querySelector(`[data-action="${action}"]`)?.dataset.index === index) &&
+            !!controls.querySelector('[data-action="go"]');
+        })));
+    await done();
+    check('Done restores identical default Home positions', JSON.stringify(await layout()) === JSON.stringify(defaultHome));
+    await nextWidgets();
+    const secondPageDefault = await layout();
+    await customize();
+    check('Customize retains the selected second page and only its cards',
+      JSON.stringify(await layout()) === JSON.stringify(secondPageDefault) &&
+      JSON.stringify((await placements()).map(item => item.index)) === JSON.stringify([8, 4, 5, 6, 7]));
+    await previousWidgets();
+    await size(0, '1 × 1');
+    const oneResized = await layout();
+    check('one explicit resize leaves neighbor sizes and available positions unchanged',
+      defaultHome.cards.filter(card => card.name !== 'Today').every(card => {
+        const next = oneResized.cards.find(item => item.name === card.name);
+        return next.box[2] === card.box[2] && next.box[3] === card.box[3] &&
+          (card.name === 'Calendar' || JSON.stringify(next.box) === JSON.stringify(card.box));
+      }));
+    for (const [index, span] of [[0, '1 × 4'], [1, '1 × 1'], [2, '1 × 1'], [3, '1 × 2']]) await size(index, span);
+    check('mixed-size widgets use deterministic first-fit holes without overlap',
+      JSON.stringify(await placements()) === JSON.stringify([
+        { index: 8, kind: 'photo_memory', column: '1 / span 2', row: '1 / span 4' },
+        { index: 0, kind: 'today', column: '3 / span 1', row: '1 / span 4' },
+        { index: 1, kind: 'ha', column: '4 / span 1', row: '1 / span 1' },
+        { index: 2, kind: 'calendar', column: '4 / span 1', row: '2 / span 1' },
+        { index: 3, kind: 'weather', column: '4 / span 1', row: '3 / span 2' },
+      ]) && await noOverlap());
+    check('short equal-width neighbors have only the 24 px gutter below them',
+      await widgetPage.evaluate(() => {
+        const grid = document.querySelector('.live-widget-grid');
+        const first = grid.querySelector('[data-live-widget-index="1"]').getBoundingClientRect();
+        const next = grid.querySelector('[data-live-widget-index="2"]').getBoundingClientRect();
+        const scale = grid.getBoundingClientRect().width / grid.clientWidth;
+        return Math.abs(next.y - first.bottom - 24 * scale) < 0.1 &&
+          Math.abs(first.width - next.width) < 0.1 && Math.abs(first.x - next.x) < 0.1;
+      }));
+    check('editing overlays remain inside card bounds without increasing card heights',
+      await widgetPage.evaluate(() => [...document.querySelectorAll('.live-widget-slot')].every(slot => {
+        const box = slot.getBoundingClientRect();
+        const card = slot.querySelector('.home-card').getBoundingClientRect();
+        const controls = slot.querySelector('.live-widget-edit-controls').getBoundingClientRect();
+        return Math.abs(box.height - card.height) < 0.1 && Math.abs(box.width - card.width) < 0.1 &&
+          controls.left >= box.left && controls.right <= box.right &&
+          controls.top >= box.top && controls.bottom <= box.bottom;
+      })));
+    const sizedEdit = await layout();
+    await done();
+    assert.deepEqual(await layout(), sizedEdit, 'resized Home and editor card geometry');
+    check('resized Home and editor have identical card positions', true);
+    await nextWidgets();
+    check('custom sizes on page one do not reshape the untouched second page',
+      JSON.stringify(await layout()) === JSON.stringify(secondPageDefault));
+    await customize();
+    await previousWidgets();
+    await widgetClick('[data-live-widget-index="2"] [data-action="widget-move"]');
+    check('opening the existing Move menu does not commit any reorder',
+      await widgetPage.evaluate(() => JSON.stringify(__portalMock.getState().widgets) ===
+        JSON.stringify(['today', 'ha', 'calendar', 'weather', 'alarm', 'world_clock', 'crypto', 'quick_controls', 'photo_memory'])));
+    await widgetClick('#live-overlays [data-action="widget-move-to"][data-to="6"]');
+    check('Move commits the selected original index once through the frozen renderer',
+      await widgetPage.evaluate(() => JSON.stringify(__portalMock.getState().widgets) ===
+        JSON.stringify(['today', 'ha', 'weather', 'alarm', 'world_clock', 'crypto', 'calendar', 'quick_controls', 'photo_memory'])) &&
+      await noOverlap());
+    await nextWidgets();
+    await widgetClick('[data-live-widget-index="6"] [data-action="widget-size"]');
+    await widgetPage.keyboard.press('Escape');
+    check('a moved widget retains its saved size on its new page',
+      (await placements()).some(item => item.index === 6 && item.kind === 'calendar' && item.column.endsWith('span 1') && item.row.endsWith('span 1')));
+    await widgetClick('[data-live-widget-index="6"] [data-action="widget-remove"]');
+    check('Remove uses the existing confirmation for the selected widget',
+      /Remove Calendar/.test(await widgetRoot.locator('#live-overlays .modal').innerText()));
+    await widgetClick('#live-overlays [data-action="widget-remove-confirm"]');
+    check('confirmed removal updates the selected page and removes only the intended widget',
+      await widgetPage.evaluate(() => !__portalMock.getState().widgets.includes('calendar') &&
+        __portalMock.getState().widgets.length === 8) &&
+      (await layout()).page === '2 of 2' && await noOverlap());
+    await widgetClick('[data-live-widget-index="4"] .live-widget-edit-controls [data-action="go"]');
+    check('overlay Settings opens the existing widget destination',
+      await widgetPage.evaluate(() => __portalNavigationDemo.getState().route.screen === 'world'));
+    await widgetPage.keyboard.press('Escape');
+    await widgetSettled();
+    await widgetPage.keyboard.press('Escape');
+    await widgetSettled();
+    check('Settings Back through its category returns to the selected editing page',
+      await widgetPage.evaluate(() => __portalNavigationDemo.getState().route.screen === 'edit') &&
+      await widgetRoot.locator('.live-widget-toolbar').isVisible() && (await layout()).page === '2 of 2');
+
+    // Extra photos are separate indexed items even though the frozen Home omits them.
+    for (let count = 0; count < 2; count++) {
+      await widgetClick('.live-widget-toolbar [data-screen="widgets"]');
+      await widgetClick('[data-tab="home"] [data-action="widget-add"][data-kind="photo_memory"]');
+    }
+    await nextWidgets();
+    check('additional photo widgets are reachable on a third page with distinct original indices',
+      (await layout()).page === '3 of 3' &&
+      JSON.stringify((await placements()).map(item => item.index)) === JSON.stringify([7, 9]));
+    await size(9, '2 × 3');
+    await widgetClick('[data-live-widget-index="9"] [data-action="widget-move"]');
+    await widgetClick('#live-overlays [data-action="widget-move-to"][data-to="0"]');
+    check('duplicate-photo Move keeps the resized identity instead of losing its size',
+      (await placements()).some(item => item.index === 0 && item.kind === 'photo_memory' && item.row === '1 / span 3') &&
+      await noOverlap());
+    const reached = new Set();
+    for (let count = 0; count < 3; count++) {
+      (await placements()).forEach(item => reached.add(item.index));
+      assert.ok((await placements()).length <= 5, 'editor remains bounded to one page');
+      await nextWidgets();
+    }
+    check('editor paging reaches every widget including duplicate photos', reached.size === 10);
+    await size(9, '2 × 1');
+    check('an explicit photo 2 by 1 preset remains one row instead of becoming a hero default',
+      (await placements()).some(item => item.index === 9 && item.row.endsWith('span 1') && item.column.endsWith('span 2')));
+    await nextWidgets();
+    await size(4, '2 × 2');
+    check('an explicit regular 2 by 2 preset remains two columns instead of becoming a legacy default',
+      (await placements()).some(item => item.index === 4 && item.row.endsWith('span 2') && item.column.endsWith('span 2')) &&
+      await noOverlap());
+    const finalEdit = await layout();
+    await done();
+    check('Done preserves the selected page and final edited geometry',
+      JSON.stringify(await layout()) === JSON.stringify(finalEdit));
+    await widgetPage.evaluate(() => { document.querySelector('.live-widget-grid').scrollTop = 100; });
+    const scrolledHome = await layout();
+    await customize();
+    check('Customize preserves the selected overflow page scroll and geometry',
+      await widgetPage.evaluate(() => document.querySelector('.live-widget-grid').scrollTop > 0) &&
+      JSON.stringify(await layout()) === JSON.stringify(scrolledHome));
+    await done();
+    check('Done also preserves the actual overflowing grid scroll and geometry',
+      JSON.stringify(await layout()) === JSON.stringify(scrolledHome));
+    check('Customize, paging and editing preserve the mounted parent header and dock',
+      await widgetPage.evaluate(() => widgetChrome.header === document.querySelector('.live-launcher > .app-header') &&
+        widgetChrome.dock === document.querySelector('.live-launcher > .dock')));
+    await widgetContext.close();
     assert.deepEqual(errors, [], 'browser errors');
   } finally {
     console.log(JSON.stringify({ passed: checks.length, checks, browserErrors: errors }, null, 2));

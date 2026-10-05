@@ -40,8 +40,26 @@ internal object HomePresentation {
           HomeWidgetStore.KIND_PHOTO_MEMORY -> 2 to 1
           else -> 2 to 2
         }
-        it.isAppWidget || (it.spanX to it.spanY) != default
+        it.isAppWidget || it.explicitSize || (it.spanX to it.spanY) != default
       }
+
+  /** Resolve legacy dashboard dimensions once, identically for Home and Customize. */
+  fun spans(widgets: List<HomeWidgetStore.HomeWidget>): List<ApprovedWidgetPacking.Span> {
+    return widgets.map { widget ->
+      val default = when (widget.kind) {
+        HomeWidgetStore.KIND_TODAY, HomeWidgetStore.KIND_QUICK_CONTROLS,
+        HomeWidgetStore.KIND_PHOTO_MEMORY -> 2 to 1
+        else -> 2 to 2
+      }
+      when {
+        widget.explicitSize || widget.isAppWidget || (widget.spanX to widget.spanY) != default ->
+          ApprovedWidgetPacking.Span(widget.spanX, widget.spanY)
+        widget.kind == HomeWidgetStore.KIND_PHOTO_MEMORY ->
+          ApprovedWidgetPacking.Span(2, 4)
+        else -> ApprovedWidgetPacking.Span(1, 2)
+      }
+    }
+  }
 
   /** Stable identity moves also work across pages; headers never enter the saved order. */
   fun move(

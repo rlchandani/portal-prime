@@ -27,6 +27,8 @@ object HomeWidgetStore {
       val spanY: Int = DEFAULT_SPAN_Y,
       val kind: String = KIND_APP_WIDGET,
       val customId: String = "",
+      // Old dashboard spans were presentation hints. New user size choices are exact.
+      val explicitSize: Boolean = false,
   ) {
     val provider: ComponentName
       get() = ComponentName(providerPackage, providerClass)
@@ -70,11 +72,11 @@ object HomeWidgetStore {
     if (prefs.getBoolean(KEY_DASH_MIGRATED, false)) return
     val current = load(context)
     val migrated =
-        listOf(custom(KIND_TODAY, spanX = 2, spanY = 1)) +
+        listOf(custom(KIND_TODAY, spanX = 2, spanY = 1, explicitSize = false)) +
             current +
             listOf(
-                custom(KIND_QUICK_CONTROLS, spanX = 2, spanY = 1),
-                custom(KIND_PHOTO_MEMORY, spanX = 2, spanY = 1))
+                custom(KIND_QUICK_CONTROLS, spanX = 2, spanY = 1, explicitSize = false),
+                custom(KIND_PHOTO_MEMORY, spanX = 2, spanY = 1, explicitSize = false))
     save(context, migrated)
     prefs.edit().putBoolean(KEY_DASH_MIGRATED, true).apply()
   }
@@ -101,12 +103,14 @@ object HomeWidgetStore {
         .apply()
   }
 
-  fun custom(kind: String, spanX: Int = DEFAULT_SPAN_X, spanY: Int = DEFAULT_SPAN_Y): HomeWidget =
+  fun custom(kind: String, spanX: Int = DEFAULT_SPAN_X, spanY: Int = DEFAULT_SPAN_Y,
+      explicitSize: Boolean = false): HomeWidget =
       HomeWidget(
           kind = kind,
           customId = "$kind:${UUID.randomUUID()}",
           spanX = normalizeSpan(spanX),
           spanY = normalizeSpan(spanY),
+          explicitSize = explicitSize,
       )
 
   fun withAdded(widgets: List<HomeWidget>, widget: HomeWidget): List<HomeWidget> =
@@ -120,15 +124,16 @@ object HomeWidgetStore {
   internal fun serialize(widgets: List<HomeWidget>): String {
     val arr = JSONArray()
     widgets.forEach { w ->
-      arr.put(
-          JSONObject()
+      val entry = JSONObject()
               .put("id", w.appWidgetId)
               .put("package", w.providerPackage)
               .put("class", w.providerClass)
               .put("spanX", normalizeSpan(w.spanX))
               .put("spanY", normalizeSpan(w.spanY))
               .put("kind", w.kind)
-              .put("customId", w.customId))
+              .put("customId", w.customId)
+      if (w.explicitSize) entry.put("explicitSize", true)
+      arr.put(entry)
     }
     return arr.toString()
   }
@@ -157,6 +162,7 @@ object HomeWidgetStore {
                             spanY = normalizeSpan(obj.optInt("spanY", DEFAULT_SPAN_Y)),
                             kind = kind,
                             customId = customId,
+                            explicitSize = obj.optBoolean("explicitSize", false),
                         ))
                   }
                 }

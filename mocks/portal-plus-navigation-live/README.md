@@ -13,6 +13,28 @@ reference regeneration, or changes to the complete/signoff previews.
 The visible launcher header and dock remain mounted through Home/Apps/Tools.
 The three tab containers remain mounted and use 160 ms horizontal transitions.
 Visited tab content is retained; local app/tool drill-ins use their tab's history.
+Home and Customize project the same frozen Home cards into one deterministic
+four-column first-fit layout. The base area has four rows and a 24 px gutter;
+short cards leave reusable space beneath them independently of taller neighbors.
+Every unsized photo uses 2 × 4 and every other unsized card uses 1 × 2.
+Each saved size is an explicit preset, including 2 × 1 and 2 × 2; resizing one
+card never switches the defaults of its neighbors or another page. Entering
+Customize and pressing Done preserve card geometry, the selected page and its
+scroll offset. The mounted header Customize button becomes Done; Add widget
+appears in the existing Favorite apps row. Previous/More widgets remain available
+while editing. Greeting, favorites and the content viewport keep their positions.
+Size, Remove, Move and Settings controls overlay the real cards and invoke the
+frozen renderer's existing indexed actions and dialogs. Move uses its existing
+menu, committing only the selected destination.
+
+Saved sizes are joined to current original indices through the frozen editor's
+Size controls and labels; private widget keys are neither inferred nor changed.
+Additional photo widgets remain distinct paged items with their own sizes and
+actions. The frozen Home omits those additional photos, so the projection uses its
+photo markup for each indexed instance and extends the visible page count. Its
+existing page action keeps the fixture page synchronized within the fixture's
+older count. No frozen API, fixture file, or native code is changed.
+
 Apps projects installed app tiles without the separate Options controls or the
 duplicate builtin Tools tile; Tools remains in the footer dock. A regular tap
 launches an installed app's existing handoff simulation. Touch/pointer hold
@@ -65,8 +87,10 @@ Run the isolated browser checks with a local Playwright installation:
 PLAYWRIGHT_MODULE=/path/to/playwright node mocks/portal-plus-navigation-live/verify.browser.cjs
 ```
 
-The gate retains the original 39 navigation checks and adds isolated pointer,
-real touch, keyboard, cancellation, Apps projection and dock assertions. It prints
-the passed count and browser errors, including console and failed-request errors.
+The gate retains all 65 navigation/Apps checks and adds isolated widget geometry,
+page-local sizing, packing/gutter, indexed action and duplicate-photo assertions.
+It also covers pointer, real touch, keyboard, cancellation, Apps projection and
+dock behavior. It prints the passed count and browser errors, including console
+and failed-request errors.
 Scroll checks constrain the short sample Apps grid to exercise actual overflow.
 The checks do not write screenshots, reports, references, or approved files.

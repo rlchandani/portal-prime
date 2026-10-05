@@ -51,6 +51,8 @@
   const appHoldSlop = 10; // Browser CSS pixels, independent of the scaled Portal canvas.
   let appHold = null;
   let suppressedAppClick = null;
+  let homePage = 0;
+  let homeProjection = null;
 
   const routeKey = route => `${route.category}/${route.screen}`;
   const routeTitle = route => route.screen === 'settings'
@@ -124,11 +126,15 @@
     if (!panel?.route || !panel.node.getClientRects().length) return;
     const positions = [...panel.node.querySelectorAll('.screen-body,.detail-body,.home-grid')]
       .map(element => ({ top: element.scrollTop, left: element.scrollLeft }));
-    scrollPositions.set(routeKey(panel.route), positions);
+    const homeGrid = panel.node.querySelector('.live-widget-grid');
+    const key = homeGrid ? `home/widgets/${homeGrid.dataset.livePage}` : routeKey(panel.route);
+    scrollPositions.set(key, positions);
   }
 
   function restoreScroll(panel) {
-    const positions = scrollPositions.get(routeKey(panel.route));
+    const homeGrid = panel.node.querySelector('.live-widget-grid');
+    const key = homeGrid ? `home/widgets/${homeGrid.dataset.livePage}` : routeKey(panel.route);
+    const positions = scrollPositions.get(key);
     if (!positions) return;
     panel.node.querySelectorAll('.screen-body,.detail-body,.home-grid').forEach((element, index) => {
       element.scrollTop = positions[index]?.top || 0;
@@ -136,7 +142,122 @@
     });
   }
 
+  function indexedWidgets() {
+    const widgets = renderer.getState().widgets;
+    const entries = [...sourceMain().querySelectorAll('.widget-edit')].map(editor => {
+      const index = Number(editor.querySelector('[data-action="widget-size"]').dataset.index);
+      const size = editor.querySelector('.small').textContent.match(/^([1-4]) × ([1-4])$/);
+      return { index, kind: widgets[index], saved: size ? [Number(size[1]), Number(size[2])] : null,
+        controls: editor.querySelector('.button-group').cloneNode(true) };
+    });
+    if (entries.length !== widgets.length || entries.some((entry, index) => entry.index !== index || !entry.kind)) {
+      throw new Error('Frozen editor did not expose every widget by its original action index.');
+    }
+    return entries;
+  }
+
+  function sampleHome(route) {
+    // Read indexed size labels, never guess private widgetKeys from array positions.
+    // Borrow only dialog-free staging renders; visible chrome and panels stay mounted.
+    renderer.navigate('edit', route.category);
+    const entries = indexedWidgets();
+    const toolbar = sourceMain().querySelector('.editing-toolbar .button-group').cloneNode(true);
+    renderer.navigate('home', route.category);
+    const sourcePage = () => sourceMain().querySelector('.widget-page > span').textContent.match(/(\d+) of (\d+)/).slice(1).map(Number);
+    const [originalPage, count] = sourcePage();
+    const body = sourceMain().querySelector('.home-body').cloneNode(true);
+    const paint = { background: sourceMain().style.background, grain: sourceMain().classList.contains('grain-background') };
+    const photo = entries.find(entry => entry.kind === 'photo_memory');
+    const nonPhotos = entries.filter(entry => entry.kind !== 'photo_memory');
+    const templates = new Map();
+    for (let page = 0; page < count; page++) {
+      const visible = [...(photo ? [photo] : []), ...nonPhotos.slice((sourcePage()[0] - 1) * 4, sourcePage()[0] * 4)];
+      const cards = [...sourceMain().querySelector('.home-grid').children];
+      if (cards.length !== visible.length) throw new Error('Frozen Home card inventory cannot be joined to editor indices.');
+      visible.forEach((entry, index) => templates.set(entry.index, cards[index].cloneNode(true)));
+      renderer.showAction('page', { dir: '1' });
+    }
+    // Extra photos use the fixture's photo card but keep their own indexed actions/sizes.
+    entries.filter(entry => entry.kind === 'photo_memory').forEach(entry =>
+      templates.set(entry.index, templates.get(photo.index).cloneNode(true)));
+    const remaining = entries.filter(entry => entry !== photo);
+    const pageCount = Math.max(1, Math.ceil(remaining.length / 4));
+    homePage = Math.min(homePage, pageCount - 1);
+    // The old fixture omits extra photos from its count. Synchronize every page it can
+    // represent; projected paging also exposes the additional configured identities.
+    const targetPage = Math.min(homePage, count - 1);
+    if (targetPage !== originalPage - 1) renderer.showAction('page', { dir: String(targetPage - originalPage + 1) });
+    if (route.screen === 'edit') renderer.navigate('edit', route.category);
+    homeProjection = { entries, toolbar, body, templates, paint, photo, remaining, pageCount };
+  }
+
+  function packWidgets(entries, span) {
+    const occupied = [];
+    return entries.map(entry => {
+      const [width, height] = span(entry);
+      let row = 0;
+      let column = 0;
+      const fits = (x, y) => Array.from({ length: height }, (_, dy) =>
+        Array.from({ length: width }, (_, dx) => !occupied[y + dy]?.[x + dx]).every(Boolean)).every(Boolean);
+      search: for (;; row++) {
+        for (column = 0; column <= 4 - width; column++) if (fits(column, row)) break search;
+      }
+      for (let dy = 0; dy < height; dy++) {
+        occupied[row + dy] ||= [];
+        for (let dx = 0; dx < width; dx++) occupied[row + dy][column + dx] = true;
+      }
+      return { entry, column, row, width, height };
+    });
+  }
+
+  function projectedHome(route) {
+    if (!staging.querySelector('.modal-layer')) sampleHome(route);
+    const { body, photo, remaining, templates, pageCount } = homeProjection;
+    const selected = [...(photo ? [photo] : []), ...remaining.slice(homePage * 4, homePage * 4 + 4)];
+    // Frozen widgetSizes entries are explicit selections, including legacy-looking
+    // 2 × 1 / 2 × 2 presets. A neighbor's size never changes this widget's default.
+    const span = entry => entry.saved || (entry.kind === 'photo_memory' ? [2, 4] : [1, 2]);
+    const content = body.cloneNode(true);
+    const grid = content.querySelector('.home-grid');
+    grid.className = 'home-grid live-widget-grid';
+    grid.dataset.livePage = homePage;
+    grid.replaceChildren();
+    packWidgets(selected, span).forEach(({ entry, column, row, width, height }) => {
+      const slot = document.createElement('div');
+      slot.className = 'live-widget-slot';
+      slot.dataset.liveWidgetIndex = entry.index;
+      slot.dataset.liveWidgetKind = entry.kind;
+      slot.style.gridColumn = `${column + 1} / span ${width}`;
+      slot.style.gridRow = `${row + 1} / span ${height}`;
+      const card = templates.get(entry.index).cloneNode(true);
+      card.classList.add('live-widget-preview');
+      card.style.removeProperty('grid-column');
+      card.style.removeProperty('grid-row');
+      card.style.minHeight = '0';
+      slot.append(card);
+      if (route.screen === 'edit') {
+        card.inert = true;
+        const controls = entry.controls.cloneNode(true);
+        controls.className = 'live-widget-edit-controls';
+        controls.querySelectorAll('button').forEach(control => { control.type = 'button'; });
+        slot.append(controls);
+      }
+      grid.append(slot);
+    });
+    if (route.screen === 'edit') {
+      const toolbar = document.createElement('span');
+      toolbar.className = 'live-widget-toolbar';
+      const add = homeProjection.toolbar.querySelector('[data-screen="widgets"]').cloneNode(true);
+      add.className = 'text-button';
+      toolbar.append(add);
+      content.querySelector('.widget-page').prepend(toolbar);
+    }
+    content.querySelector('.widget-page > span:not(.live-widget-toolbar)').textContent = `${homePage + 1} of ${pageCount}`;
+    return content;
+  }
+
   function cloneContent(route) {
+    if (route.screen === 'home' || route.screen === 'edit') return projectedHome(route);
     const main = sourceMain();
     const source = main.querySelector('.home-body,.screen-body,.detail-body');
     if (!source) throw new Error(`No approved fixture content for ${route.screen}`);
@@ -183,10 +304,11 @@
     }
     panel.route = { ...route };
     panel.revision = nextRevision;
-    panel.node.classList.toggle('home-screen', route.screen === 'home');
-    if (route.screen === 'home') {
-      panel.node.style.background = sourceMain().style.background;
-      panel.node.classList.toggle('grain-background', sourceMain().classList.contains('grain-background'));
+    const isHome = route.screen === 'home' || route.screen === 'edit';
+    panel.node.classList.toggle('home-screen', isHome);
+    if (isHome) {
+      panel.node.style.background = homeProjection.paint.background;
+      panel.node.classList.toggle('grain-background', homeProjection.paint.grain);
     } else {
       panel.node.style.background = '';
       panel.node.classList.remove('grain-background');
@@ -248,7 +370,11 @@
     applyPalette(launcher, 'dark');
     applyPalette(overlays, host === 'launcher' ? 'dark' : state.theme);
     document.getElementById('demo-theme').value = state.theme;
-    launcherHeader.querySelector('[data-screen="edit"]').hidden = activeTab !== 'home';
+    const editing = host === 'launcher' && activeTab === 'home' && current.screen === 'edit';
+    customizeControl.hidden = activeTab !== 'home';
+    customizeControl.textContent = editing ? 'Done' : 'Customize';
+    customizeControl.dataset.screen = editing ? 'home' : 'edit';
+    customizeControl.toggleAttribute('data-live-widget-done', editing);
     launcherDock.querySelectorAll('[data-screen]').forEach(node =>
       node.classList.toggle('selected', node.dataset.screen === activeTab));
     const room = launcherHeader.querySelector('.room-name');
@@ -577,6 +703,10 @@
 
   function forward(element, type) {
     mirrorInputs();
+    if (type === 'click' && element.dataset.action === 'page' && activeTab === 'home' &&
+        ['home', 'edit'].includes(current.screen)) {
+      homePage = (homePage + Number(element.dataset.dir) + homeProjection.pageCount) % homeProjection.pageCount;
+    }
     const target = sourceTarget(element);
     if (type === 'click') {
       if (target) {
@@ -669,6 +799,12 @@
     }
     if (data.action === 'go') {
       event.preventDefault();
+      if (control === customizeControl && control.hasAttribute('data-live-widget-done')) {
+        const history = tabs.get('home').history;
+        // Done leaves the editor flow, including any nested Add-widget library visits.
+        while (homePages.has(history.at(-1)?.screen)) history.pop();
+        return navigate('home', history.at(-1)?.category, { push: false });
+      }
       if (settingsHeader.contains(control) && data.screen === 'home') {
         saveScroll(activePanel());
         host = 'launcher';
@@ -723,6 +859,7 @@
   launcher.className = 'app-screen live-launcher';
   const launcherHeader = sourceMain().querySelector('.app-header').cloneNode(true);
   const launcherDock = sourceMain().querySelector('.dock').cloneNode(true);
+  const customizeControl = launcherHeader.querySelector('[data-screen="edit"]');
   const tabStage = document.createElement('div');
   tabStage.className = 'live-tab-stage';
   launcher.append(launcherHeader, tabStage, launcherDock);
@@ -830,6 +967,7 @@
       retainedTabs: tabs.size, retainedSettings: settingsPanes.size,
       settingsKeys: [...settingsPanes.keys()],
       internalActivity: !!activity,
+      homePage, homePageCount: homeProjection?.pageCount || 1,
       simulation: localSimulation || !!overlays.querySelector('.external-note'),
       fixtureRevisionChanged: revision() !== fixtureRevision,
     }),

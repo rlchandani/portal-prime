@@ -38,9 +38,19 @@ Portal+ runs Android 10/API 29 at 2160 × 1440 pixels and density 180, equivalen
 - Apps no longer repeats an Options link beneath each installed app or a Tools
   shortcut in its grid. A long press opens the existing app-action menu, with an
   accessibility action label. The Tools dock entry and saved Home favorites remain.
-- Widgets remain draggable and resizable through the original saved layout.
-  Device gestures changed Weather's order and row span, then restored all nine
-  original widget identities, order and sizes. Photo long-press enters the editor.
+- Home and Customize use one paged, four-column rectangle layout, so changing
+  editing mode does not change card order, geometry, selected page or viewport.
+  Packing fills holes beneath short cards independently of tall neighbors,
+  retaining the normal 24 dp gutter. The first photo remains the shared hero.
+  Per-widget explicit size choices no longer switch the sizing of other cards
+  or pages. Legacy dimensions remain presentation hints; merely viewing or
+  toggling Customize does not rewrite the saved widget data.
+- Dragging owns a transparent gesture layer above each widget body and below
+  its editing controls. Current ordered identities and placements refresh the
+  detector after each drop. Reorder and resize save only on release; cancellation
+  discards their drafts. Hit testing and horizontal resizing account for RTL.
+  Move supports numbered destinations across pages, and Settings uses the
+  existing editors. Photo long-press still enters Customize.
 - The settings shell, rows, dialogs, source forms, collection editors, Store,
   Tools, Help and Lamp use the approved palette and geometry. All 45 vector icons
   reproduce the 51 original SVG paths from a small immutable, versioned input.
@@ -71,6 +81,11 @@ refresh deadlines owned by the Home tab. Paging changes visible layers and input
 eligibility; it does not restart each widget's network producer. Re-entry waits
 for any cancelled blocking producer to release its mutex before issuing another
 request. Multi-feed/entity/option-page loaders check cancellation between reads.
+The shared widget layout remembers packing by spans. During a move, only the
+dragged visual layer and target highlight change; during resize, a local outline
+previews the requested dimensions. Neither gesture writes preferences or repacks
+the grid on each pointer event. This is an implementation property, not a
+measurement of final-device frame timing.
 
 Settings compose individual visible specs as lazy items with stable identities.
 The main host retains at most four visited scalar panes. Each pane keeps its own
@@ -91,7 +106,7 @@ and animated scaling remain available.
 
 ## Verification
 
-The complete debug build and test APK build passed. All **485 JVM tests** passed,
+The complete debug build and test APK build passed. All **505 JVM tests** passed,
 with zero failures or errors. The frame probe's 14 offline checks and the icon
 generator's 12 tests passed. Icon generation also matched all six frozen input
 hashes. Independent review drove corrections to catalog delivery, transport
@@ -156,12 +171,16 @@ and theme independence. Home/Apps/Tools stay dark; Settings appearance applies
 to its own panes and internal editors. The HA entity chooser is explicitly
 shown as a separate Activity simulation.
 
-All 65 isolated browser assertions passed with zero browser errors, including
-26 Apps gesture/grid regressions added after the original 39 checks. The final
+All 93 isolated browser assertions passed with zero browser errors, including
+26 Apps gesture/grid regressions and 28 widget geometry/action checks added
+after the original 39 checks. The final
 Home layout was also visually inspected. This preview uses the approved
 renderer and sample fixtures read-only; the 67 frozen mock hashes remain
 unchanged. It is a browser demonstration, not an Android emulator, live Portal
 connection, or proof of native frame timing and pixel parity.
+Home and Customize use the same packing and page-local size resolution.
+The browser demo's Size/Move controls use the frozen renderer's menus; native
+freehand drag/resize gestures are verified on the Portal separately.
 
 ## Apps long-press refinement
 
@@ -179,15 +198,46 @@ label with the tile. Targeting the app tile and hiding the keyboard corrected
 the test; no product change was needed. The test-only observer was stopped after
 verification.
 
+## Widget layout and editing refinement
+
+The final widget debug build and test APK build passed, with all 505 JVM tests
+passing and zero failures or errors. Twenty added JVM cases cover deterministic
+packing, first-fit/non-overlap properties, legacy dimensions, explicit size
+roundtrips, page-local sizing and photo-removal stability. Independent review
+found and drove fixes for consecutive equal-size drag identity, pointer coroutine
+cancellation, RTL hit testing and resizing, and unintended neighbor promotion.
+
+On the final installed artifact, 36 recorded device assertions passed. Both
+pages retained identical card bounds through three Customize/Done cycles each,
+without rewriting preferences. Resizing Today committed its exact dimensions
+only on release, preserved every neighbor and placed Calendar directly below it
+with a 27 physical-pixel gutter (24 dp at density 180). Preview and editing
+bounds matched after resizing and after two successive equal-size card moves.
+Neither resizing nor dragging changed saved data while the finger remained down.
+
+Numbered Move destinations worked across pages, with the moved card reachable
+on its destination page. Move and Remove cancellation preserved the layout.
+Widget Settings opened the existing shell; Back followed its page-to-category
+path and then returned to the original Home window. Settings and widget-library
+navigation preserved the edited layout. The observer was stopped, and all nine
+original widget identities, order, dimensions and metadata were restored
+byte-for-byte after verification.
+
+Device gesture tests cover the connected device's left-to-right layout.
+RTL behavior and coroutine cancellation have source-review evidence; this run
+does not claim physical RTL or interrupted-gesture device coverage, arbitrary
+provider-widget certification, or final frame-time acceptance.
+
 ## Device performance evidence
 
 Current installed debug artifact:
-`b06e44f6429ead9a77d26ae91ab92243eca5a77435013ee3deb175ff57df5f84`.
+`409bd1f3ae61766e3afedbba466ee759a7fb40fb57ac3ed0214fa6d2531f5509`.
 Its APK hash was independently read from the device and matched the tested
-build. This artifact adds the Apps long-press refinement, expanded local Settings
+build. This artifact adds the shared Home/Customize packing and gesture fixes,
+the Apps long-press refinement, expanded local Settings
 routing, nested Back/Cancel, shared launcher return/search routes and internal window presentation after the
 measured Settings checkpoint. The table below records earlier artifacts, not a
-performance measurement of this final expanded-routing build.
+performance measurement of this final widget build.
 
 Warmed navigation and scrolling measurements are recorded separately from
 functional tests. Zero-frame/static-page samples do not establish smoothness.

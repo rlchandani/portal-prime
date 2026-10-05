@@ -19,9 +19,11 @@ import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -59,8 +61,6 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyGridState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -87,7 +87,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.border
@@ -151,6 +150,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.zIndex
@@ -586,20 +586,31 @@ private fun ApprovedWidgetCell(
     onChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
     onEnterEdit: () -> Unit,
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
+    displaySpan: Pair<Int, Int> = widget.spanX to widget.spanY,
+    onMove: () -> Unit = {},
+    dragHandle: Modifier = Modifier,
 ) {
     key(widget.key) {
+      val context = LocalContext.current
+      var showTimers by remember { mutableStateOf(false) }
       var widthPx by remember { mutableStateOf(0) }
+      var heightPx by remember { mutableStateOf(0) }
       var resizeAccum by remember { mutableStateOf(Offset.Zero) }
       var startSpan by remember { mutableStateOf(widget.spanX to widget.spanY) }
+      var resizeDraft by remember { mutableStateOf<Pair<Int, Int>?>(null) }
       var columnUnit by remember { mutableStateOf(1f) }
+      var rowUnit by remember { mutableStateOf(1f) }
       val density = androidx.compose.ui.platform.LocalDensity.current
       val gapPx = with(density) { 24.dp.toPx() }
-      val rowUnit = with(density) { 152.dp.toPx() }
-      Box(cell.then(if (editMode) Modifier.onSizeChanged { widthPx = it.width }
-          .semantics { contentDescription = "Move ${if (widget.isAppWidget) "widget" else customWidgetLabel(widget.kind)}" }
-          else Modifier)) {
+      val resizeRtl = androidx.compose.ui.platform.LocalLayoutDirection.current ==
+          androidx.compose.ui.unit.LayoutDirection.Rtl
+      LaunchedEffect(editMode) { resizeDraft = null; resizeAccum = Offset.Zero }
+      Box(cell.zIndex(if (resizeDraft != null) 2f else 0f)
+          .onSizeChanged { widthPx = it.width; heightPx = it.height }
+          .semantics { contentDescription = "${if (widget.isAppWidget) "App" else customWidgetLabel(widget.kind)} widget" }) {
         ApprovedHomeSurface(Modifier.fillMaxSize().combinedClickable(
-            onClick = {}, onLongClick = onEnterEdit)) {
+            enabled = !editMode, onClick = {}, onLongClick = onEnterEdit)
+            .then(if (editMode) Modifier.clearAndSetSemantics { } else Modifier)) {
           if (widget.isAppWidget) {
             ApprovedHostedWidget(widget, host, manager, editMode)
           } else {
@@ -607,35 +618,87 @@ private fun ApprovedWidgetCell(
           }
         }
         if (editMode) {
+          // Own the editing gesture above widget content, whose click/scroll handlers
+          // otherwise compete with moving the card.
+          Box(Modifier.matchParentSize().then(dragHandle))
           Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth()
-              .background(ApprovedHomePalette.Card).padding(6.dp),
+              .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+              .background(ApprovedHomePalette.Card).padding(start = 6.dp, top = 6.dp, bottom = 6.dp, end = 58.dp),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
-            ApprovedHomeTextButton("Size", Modifier.weight(1f)) {
-              val next = HomeWidgetStore.nextWidgetSpan(widget.spanX to widget.spanY)
-              onChanged(widgets.map { if (it.key == widget.key) it.copy(spanX = next.first, spanY = next.second) else it })
+            ApprovedWidgetAction("Move", Modifier.weight(1f), onClick = onMove)
+            ApprovedWidgetAction("Size", Modifier.weight(1f)) {
+              val next = HomeWidgetStore.nextWidgetSpan(displaySpan)
+              onChanged(widgets.map { if (it.key == widget.key) it.copy(
+                  spanX = next.first, spanY = next.second, explicitSize = true) else it })
             }
-            ApprovedHomeTextButton("Remove", Modifier.weight(1f)) { onRemove(widget) }
+            ApprovedWidgetAction("Settings", Modifier.weight(1f)) {
+              when {
+                widget.kind == HomeWidgetStore.KIND_TIMERS -> showTimers = true
+                widget.isAppWidget -> {
+                  val config = manager.getAppWidgetInfo(widget.appWidgetId)?.configure
+                  val intent = if (config != null) Intent().setComponent(config)
+                      .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widget.appWidgetId)
+                      else Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                          Uri.parse("package:${widget.providerPackage}"))
+                  runCatching { context.startApprovedInternalActivity(intent) }.onFailure {
+                    Toast.makeText(context, "Widget settings couldn’t be opened.", Toast.LENGTH_SHORT).show()
+                  }
+                }
+                else -> context.openApprovedHomeSettings(when (widget.kind) {
+                  HomeWidgetStore.KIND_WORLD_CLOCK -> "world"
+                  HomeWidgetStore.KIND_TODAY -> "calendar"
+                  HomeWidgetStore.KIND_PHOTO_MEMORY -> "screensaver"
+                  HomeWidgetStore.KIND_QUICK_CONTROLS -> "quickbar"
+                  else -> widget.kind
+                })
+              }
+            }
+            ApprovedWidgetAction("Remove", Modifier.weight(1f)) { onRemove(widget) }
+          }
+          resizeDraft?.let { span ->
+            Canvas(Modifier.matchParentSize()) {
+              drawRoundRect(ApprovedHomeTabPalette.accent,
+                  size = Size(span.first * columnUnit - gapPx, span.second * rowUnit - gapPx),
+                  cornerRadius = androidx.compose.ui.geometry.CornerRadius(20.dp.toPx()),
+                  style = Stroke(3.dp.toPx()))
+            }
           }
           ResizeBadge(Modifier.align(Alignment.BottomEnd), onResizeStart = {
-            startSpan = widget.spanX to widget.spanY
+            startSpan = displaySpan
             resizeAccum = Offset.Zero
-            columnUnit = ((widthPx - gapPx * (widget.spanX - 1)) / widget.spanX).coerceAtLeast(1f) + gapPx
+            resizeDraft = displaySpan
+            columnUnit = ((widthPx - gapPx * (displaySpan.first - 1)) / displaySpan.first).coerceAtLeast(1f) + gapPx
+            rowUnit = ((heightPx - gapPx * (displaySpan.second - 1)) / displaySpan.second).coerceAtLeast(1f) + gapPx
           }, onResizeDrag = { delta ->
-            resizeAccum += delta
+            resizeAccum += Offset(if (resizeRtl) -delta.x else delta.x, delta.y)
             fun steps(value: Float, unit: Float): Int = (kotlin.math.sign(value) *
                 kotlin.math.floor(kotlin.math.abs(value / unit) + .35f)).toInt()
             val x = (startSpan.first + steps(resizeAccum.x, columnUnit)).coerceIn(1, 4)
             val y = (startSpan.second + steps(resizeAccum.y, rowUnit)).coerceIn(1, 4)
-            if (x != widget.spanX || y != widget.spanY)
-              onChanged(widgets.map { if (it.key == widget.key) it.copy(spanX = x, spanY = y) else it })
-          }, onResizeEnd = { resizeAccum = Offset.Zero })
+            resizeDraft = x to y
+          }, onResizeEnd = {
+            resizeDraft?.takeIf { it != startSpan }?.let { span ->
+              onChanged(widgets.map { if (it.key == widget.key) it.copy(
+                  spanX = span.first, spanY = span.second, explicitSize = true) else it })
+            }
+            resizeDraft = null; resizeAccum = Offset.Zero
+          }, onResizeCancel = { resizeDraft = null; resizeAccum = Offset.Zero })
         }
       }
+      if (showTimers) ApprovedHomeTimersPage { showTimers = false }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ApprovedWidgetAction(label: String, modifier: Modifier, onClick: () -> Unit) {
+  Box(modifier.heightIn(min = 52.dp)
+      .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, onClick = onClick)
+      .padding(horizontal = 6.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
+    Text(label, color = ApprovedHomePalette.Accent, fontSize = 18.sp, lineHeight = 26.sp, maxLines = 1)
+  }
+}
+
 @Composable
 private fun ApprovedWidgetGrid(
     visible: List<HomeWidgetStore.HomeWidget>,
@@ -648,54 +711,26 @@ private fun ApprovedWidgetGrid(
     onEnterEdit: () -> Unit,
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
 ) {
-    val grid = rememberLazyGridState()
-    val reorder = if (editMode) rememberReorderableLazyGridState(grid) { from, to ->
-      onChanged(HomePresentation.move(widgets, from.key.toString(), to.key.toString()))
-    } else null
-    LazyVerticalGrid(columns = GridCells.Fixed(4), state = grid, modifier = gridModifier,
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)) {
-      items(visible, key = { it.key }, span = { GridItemSpan(it.spanX.coerceIn(1, 4)) }) { widget ->
-        val rows = if (widget.kind == HomeWidgetStore.KIND_PHOTO_MEMORY && widget.spanX == 2 && widget.spanY == 1) 4 else widget.spanY
-        val cell = Modifier.fillMaxWidth().height(128.dp * rows + 24.dp * (rows - 1))
-        if (reorder == null) {
-          ApprovedWidgetCell(widget, cell, widgets, editMode, host, manager, onChanged, onEnterEdit, onRemove)
-        } else ReorderableItem(reorder, key = widget.key) { dragging ->
-          ApprovedWidgetCell(widget, cell.then(if (dragging) Modifier else Modifier.animateItem())
-              .draggableHandle(dragGestureDetector = sh.calvin.reorderable.DragGestureDetector.Press), widgets, editMode, host, manager, onChanged, onEnterEdit, onRemove)
-        }
-      }
-    }
-}
-
-@Composable
-private fun ApprovedSmallWidgetGrid(
-    displayed: HomePresentation.Page,
-    widgets: List<HomeWidgetStore.HomeWidget>,
-    host: AppWidgetHost,
-    manager: AppWidgetManager,
-    onChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
-    onEnterEdit: () -> Unit,
-    onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
-) {
-  val small = if (displayed.hero == null) displayed.widgets.drop(1) else displayed.widgets
-  Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-    repeat(2) { column ->
-      Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        repeat(2) { row ->
-          Box(Modifier.weight(1f).fillMaxWidth()) {
-            small.getOrNull(row * 2 + column)?.let {
-              ApprovedWidgetCell(it, Modifier.fillMaxSize(), widgets, false, host, manager,
-                  onChanged, onEnterEdit, onRemove)
-            }
-          }
+  val spans = remember(visible) { HomePresentation.spans(visible) }
+  var move by remember { mutableStateOf<HomeWidgetStore.HomeWidget?>(null) }
+  ApprovedPackedWidgetGrid(visible, spans, editMode, gridModifier,
+      onMove = { source, target -> onChanged(HomePresentation.move(widgets, source, target)) }) { widget, cell, span, drag ->
+    ApprovedWidgetCell(widget, cell, widgets, editMode, host, manager, onChanged, onEnterEdit,
+        onRemove, span.columns to span.rows, onMove = { move = widget }, dragHandle = drag)
+  }
+  move?.let { selected ->
+    ApprovedHomeDialog("Move ${customWidgetLabel(selected.kind)}", onDismiss = { move = null }) {
+      Text("Choose a position, including on another page.", color = ApprovedHomePalette.Secondary, fontSize = 23.sp)
+      widgets.forEachIndexed { index, target ->
+        if (target.key != selected.key) ApprovedHomeTextButton("${index + 1}. ${customWidgetLabel(target.kind)}") {
+          onChanged(HomePresentation.move(widgets, selected.key, target.key)); move = null
         }
       }
     }
   }
 }
 
-/** A retained page's content has stable inputs independent of the currently selected page. */
+/** Home and Customize keep the same page, identities, measurements and placement rules. */
 @Composable
 private fun ApprovedWidgetPage(
     displayed: HomePresentation.Page,
@@ -705,35 +740,14 @@ private fun ApprovedWidgetPage(
     onChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
     onEnterEdit: () -> Unit,
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
+    editMode: Boolean = false,
 ) {
   val pageWidgets = remember(displayed) { listOfNotNull(displayed.hero) + displayed.widgets }
-  if (HomePresentation.usesCustomSizing(pageWidgets)) {
-    ApprovedWidgetGrid(pageWidgets, Modifier.fillMaxSize(), widgets, false, host, manager,
-        onChanged, onEnterEdit, onRemove)
-  } else {
-    BoxWithConstraints(Modifier.fillMaxSize()) {
-      val heroWidth = (maxWidth - 48.dp) / 2
-      Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-        Box(Modifier.width(heroWidth).fillMaxHeight()) {
-          val hero = displayed.hero ?: displayed.widgets.firstOrNull()
-          if (hero != null) ApprovedWidgetCell(hero, Modifier.fillMaxSize(), widgets, false,
-              host, manager, onChanged, onEnterEdit, onRemove)
-          else ApprovedHomeSurface(Modifier.fillMaxSize()) {
-            Column(Modifier.align(Alignment.Center).padding(30.dp)) {
-              Text("Make this Home yours", color = ApprovedHomePalette.Text, fontSize = 36.sp)
-              ApprovedHomeTextButton("Add widgets", onClick = onEnterEdit)
-            }
-          }
-        }
-        Box(Modifier.weight(1f).fillMaxHeight()) {
-          ApprovedSmallWidgetGrid(displayed, widgets, host, manager, onChanged, onEnterEdit, onRemove)
-        }
-      }
-    }
-  }
+  ApprovedWidgetGrid(pageWidgets, Modifier.fillMaxSize(), widgets, editMode, host, manager,
+      onChanged, onEnterEdit, onRemove)
 }
 
-/** Approved normal grid and bounded user-size/editor grid share the original widget model. */
+/** Bounded pages share the same grid in Home and Customize. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ApprovedWidgetArea(
@@ -750,52 +764,41 @@ private fun ApprovedWidgetArea(
 ) {
   var remove by remember { mutableStateOf<HomeWidgetStore.HomeWidget?>(null) }
   val onRemove: (HomeWidgetStore.HomeWidget) -> Unit = remember { { remove = it } }
-  val render: @Composable (HomeWidgetStore.HomeWidget, Modifier) -> Unit = { widget, cell ->
-    ApprovedWidgetCell(widget, cell, widgets, editMode, host, manager, onChanged, onEnterEdit, onRemove)
-  }
-  val renderGrid: @Composable (List<HomeWidgetStore.HomeWidget>, Modifier) -> Unit = { visible, gridModifier ->
-    ApprovedWidgetGrid(visible, gridModifier, widgets, editMode, host, manager, onChanged, onEnterEdit, onRemove)
-  }
-  if (editMode) {
-    renderGrid(widgets, modifier)
-  } else {
-    val renderSmall: @Composable (HomePresentation.Page) -> Unit = { displayed ->
-      ApprovedSmallWidgetGrid(displayed, widgets, host, manager, onChanged, onEnterEdit, onRemove)
+  val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+  val isTv = configuration.uiMode and android.content.res.Configuration.UI_MODE_TYPE_MASK ==
+      android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+  if (!isTv) {
+    val prepared = remember(widgets) {
+      List(HomePresentation.page(widgets, 0).count) { HomePresentation.page(widgets, it) }
     }
-    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
-    val isTv = configuration.uiMode and android.content.res.Configuration.UI_MODE_TYPE_MASK ==
-        android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
-    if (!isTv) {
-      val prepared = remember(widgets) {
-        List(HomePresentation.page(widgets, 0).count) { HomePresentation.page(widgets, it) }
-      }
-      val homeActive = LocalApprovedLauncherPageActive.current
-      val focus = androidx.compose.ui.platform.LocalFocusManager.current
-      LaunchedEffect(page.index) { focus.clearFocus(force = true) }
-      BoxWithConstraints(modifier.clipToBounds()) {
-        val widthPx = with(androidx.compose.ui.platform.LocalDensity.current) { maxWidth.toPx() }
-        val first = (page.index - 1).coerceAtLeast(0)
-        val last = (page.index + 1).coerceAtMost(prepared.lastIndex)
-        for (index in first..last) key(index) {
-          val displayed = prepared[index]
-          val selected = index == page.index
-          val active = homeActive && selected
-          Box(Modifier.fillMaxSize().graphicsLayer {
-            translationX = when {
-              selected -> 0f
-              index < page.index -> -widthPx
-              else -> widthPx
-            }
-            alpha = if (selected) 1f else 0f
-          }.then(if (active) Modifier else Modifier.clearAndSetSemantics { })
-              .focusProperties { canFocus = active }) {
-            CompositionLocalProvider(LocalApprovedWidgetPageInput provides active) {
-                ApprovedWidgetPage(displayed, widgets, host, manager, onChanged, onEnterEdit, onRemove)
-            }
+    val homeActive = LocalApprovedLauncherPageActive.current
+    val focus = androidx.compose.ui.platform.LocalFocusManager.current
+    LaunchedEffect(page.index) { focus.clearFocus(force = true) }
+    BoxWithConstraints(modifier.clipToBounds()) {
+      val widthPx = with(androidx.compose.ui.platform.LocalDensity.current) { maxWidth.toPx() }
+      val first = (page.index - 1).coerceAtLeast(0)
+      val last = (page.index + 1).coerceAtMost(prepared.lastIndex)
+      for (index in first..last) key(index) {
+        val displayed = prepared[index]
+        val selected = index == page.index
+        val active = homeActive && selected
+        Box(Modifier.fillMaxSize().graphicsLayer {
+          translationX = when {
+            selected -> 0f
+            index < page.index -> -widthPx
+            else -> widthPx
+          }
+          alpha = if (selected) 1f else 0f
+        }.then(if (active) Modifier else Modifier.clearAndSetSemantics { })
+            .focusProperties { canFocus = active }) {
+          CompositionLocalProvider(LocalApprovedWidgetPageInput provides active) {
+            ApprovedWidgetPage(displayed, widgets, host, manager, onChanged,
+                onEnterEdit, onRemove, editMode && selected)
           }
         }
       }
-    } else {
+    }
+  } else {
     val pager = rememberPagerState(initialPage = page.index) { page.count }
     SideEffect { navigation.reflectParent(page.index) }
     LaunchedEffect(page.index) {
@@ -809,61 +812,13 @@ private fun ApprovedWidgetArea(
           navigation.observe(index)?.let { pageChanged.value(it) }
       }
     }
-    if (HomePresentation.usesCustomSizing(widgets)) {
-      // Mixed-size collections retain whole pages, including each page's sized grid.
-      // Photo views share the bounded process bitmap cache; saved geometry stays authoritative.
-      HorizontalPager(pager, modifier, userScrollEnabled = false, beyondViewportPageCount = 1) { index ->
-        val displayed = HomePresentation.page(widgets, index)
-        val pageWidgets = listOfNotNull(displayed.hero) + displayed.widgets
-        if (HomePresentation.usesCustomSizing(pageWidgets)) {
-          renderGrid(pageWidgets, Modifier.fillMaxSize())
-        } else {
-          BoxWithConstraints(Modifier.fillMaxSize()) {
-            val heroWidth = (maxWidth - 48.dp) / 2
-            Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-              Box(Modifier.width(heroWidth).fillMaxHeight()) {
-                val hero = displayed.hero ?: displayed.widgets.firstOrNull()
-                if (hero != null) render(hero, Modifier.fillMaxSize())
-              }
-              Box(Modifier.weight(1f).fillMaxHeight()) { renderSmall(displayed) }
-            }
-          }
-        }
+    HorizontalPager(pager, modifier.clipToBounds(), userScrollEnabled = false,
+        beyondViewportPageCount = 1) { index ->
+      val active = LocalApprovedLauncherPageActive.current && index == pager.currentPage
+      CompositionLocalProvider(LocalApprovedWidgetPageInput provides active) {
+        ApprovedWidgetPage(HomePresentation.page(widgets, index), widgets, host, manager,
+            onChanged, onEnterEdit, onRemove, editMode && active)
       }
-    } else if (page.hero != null) {
-      BoxWithConstraints(modifier) {
-        val heroWidth = (maxWidth - 48.dp) / 2
-        Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-          Box(Modifier.width(heroWidth).fillMaxHeight()) { render(page.hero, Modifier.fillMaxSize()) }
-          // Retain only adjacent pages. The hero bitmap/view remains a single stable composition.
-          HorizontalPager(pager, Modifier.weight(1f).fillMaxHeight(), userScrollEnabled = false,
-              beyondViewportPageCount = 1) { index ->
-            val displayed = HomePresentation.page(widgets, index)
-            renderSmall(displayed)
-          }
-        }
-      }
-    } else {
-      HorizontalPager(pager, modifier, userScrollEnabled = false, beyondViewportPageCount = 1) { index ->
-        val displayed = HomePresentation.page(widgets, index)
-        BoxWithConstraints(Modifier.fillMaxSize()) {
-          val heroWidth = (maxWidth - 48.dp) / 2
-          Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-            Box(Modifier.width(heroWidth).fillMaxHeight()) {
-              val hero = displayed.widgets.firstOrNull()
-              if (hero != null) render(hero, Modifier.fillMaxSize())
-              else ApprovedHomeSurface(Modifier.fillMaxSize()) {
-                Column(Modifier.align(Alignment.Center).padding(30.dp)) {
-                  Text("Make this Home yours", color = ApprovedHomePalette.Text, fontSize = 36.sp)
-                  ApprovedHomeTextButton("Add widgets", onClick = onEnterEdit)
-                }
-              }
-            }
-            Box(Modifier.weight(1f).fillMaxHeight()) { renderSmall(displayed) }
-          }
-        }
-      }
-    }
     }
   }
   remove?.let { widget ->
@@ -4480,11 +4435,13 @@ private fun ResizeBadge(
     onResizeStart: () -> Unit,
     onResizeDrag: (dragDelta: Offset) -> Unit,
     onResizeEnd: () -> Unit,
+    onResizeCancel: () -> Unit,
 ) {
   // Keep latest callbacks so the long-lived pointerInput lambda always calls the current versions.
   val startState = rememberUpdatedState(onResizeStart)
   val dragState = rememberUpdatedState(onResizeDrag)
   val endState = rememberUpdatedState(onResizeEnd)
+  val cancelState = rememberUpdatedState(onResizeCancel)
   Surface(
       color = Color(0xE6C7C7CC),
       shape = CircleShape,
@@ -4492,14 +4449,19 @@ private fun ResizeBadge(
           .size(48.dp)
           .semantics { contentDescription = "Resize widget" }
           .pointerInput(Unit) {
-            detectDragGestures(
-                onDragStart = { startState.value() },
-                onDragEnd = { endState.value() },
-                onDragCancel = { endState.value() },
-            ) { change, dragAmount ->
-              // Consume so the reorderable grid's drag handle does not also react to this pointer.
-              change.consume()
-              dragState.value(dragAmount)
+            var resizing = false
+            try {
+              detectDragGestures(
+                  onDragStart = { resizing = true; startState.value() },
+                  onDragEnd = { resizing = false; endState.value() },
+                  onDragCancel = { resizing = false; cancelState.value() },
+              ) { change, dragAmount ->
+                // Consume so the reorderable grid's drag handle does not also react to this pointer.
+                change.consume()
+                dragState.value(dragAmount)
+              }
+            } finally {
+              if (resizing) cancelState.value()
             }
           },
   ) {
