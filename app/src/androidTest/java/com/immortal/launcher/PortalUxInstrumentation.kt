@@ -323,6 +323,12 @@ class PortalUxInstrumentation : Instrumentation() {
             if (command.optString("command") == "stop") return
             val name = command.optString("name", "latest").replace(Regex("[^a-zA-Z0-9_-]"), "_")
             try {
+                if (command.optString("command") == "returnHome") {
+                    runOnMainSync { BackHelper.ensureImmortalHome(targetContext) }
+                    waitForIdleSync()
+                    response.writeText(JSONObject().put("name", name).put("success", true).toString())
+                    continue
+                }
                 val active = root(automation)
                 if (command.optString("command") == "recreateHome") {
                     val home = checkNotNull(homeMonitor.lastActivity)

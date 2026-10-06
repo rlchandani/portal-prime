@@ -417,16 +417,7 @@ private fun launchApprovedBuiltin(context: Context, id: String) {
     "tools" -> context.openApprovedHomeTab(ApprovedLauncherTab.TOOLS)
     "settings" -> launchApprovedIntent(context, Intent(context, ImmortalSettingsActivity::class.java))
     "music" -> launchApprovedIntent(context, Intent(context, WebAppActivity::class.java).putExtra(WebAppActivity.EXTRA_URL, WebAppActivity.URL_YT_MUSIC))
-    "calls" -> {
-      DreamPolicy.markBridge(context)
-      val intent = Intent(Intent.ACTION_VIEW, Uri.parse("portal://launcher/home")).setPackage("com.facebook.alohaapps.launcher")
-      if (context.packageManager.resolveActivity(intent, 0) != null && launchApprovedIntent(context, intent)) return
-      if (RemoteInput.available()) { RemoteInput.backRepeat(5, 300L); return }
-      val stock = context.packageManager.queryIntentActivities(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME), 0).map { it.activityInfo }
-          .firstOrNull { it.packageName != context.packageName && it.packageName != "com.android.settings" && it.packageName != "com.android.tv.settings" && !it.name.contains("FallbackHome", true) }
-      if (stock != null) launchApprovedIntent(context, Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER).setComponent(ComponentName(stock.packageName, stock.name)))
-      else { DreamPolicy.clearBridge(context); Toast.makeText(context, "Portal calling is unavailable on this device.", Toast.LENGTH_LONG).show() }
-    }
+    "calls" -> PortalHomeBridge.launch(context)
   }
 }
 private fun recencyLine(app: AppItem): String {

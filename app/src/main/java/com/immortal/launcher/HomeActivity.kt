@@ -273,11 +273,6 @@ internal fun loadApprovedInstalledApps(context: Context): List<AppEntry> {
   }
 }
 
-/** Portal-TV (ripleyhome) fallback for [launchStockHome]: how many system Back presses to reach
- *  Meta's launcher, and the gap between them. Best-effort — on some Portal TVs the burst lands on
- *  the previously-used app instead (issue #91), and it's untestable from here. */
-private const val STOCK_HOME_BACK_PRESSES = 5
-private const val STOCK_HOME_BACK_INTERVAL_MS = 300L
 private const val HOME_APP_WIDGET_HOST_ID = 0x4611
 private const val SAVED_LAUNCHER_TAB = "approved_saved_launcher_tab"
 
@@ -296,9 +291,13 @@ class HomeActivity : ComponentActivity() {
   private var widgetLibraryRequest by mutableStateOf(0)
   private var launcherTab by mutableStateOf(ApprovedLauncherTab.HOME)
   private var appsSearchOpenRequest by mutableStateOf(0)
+  private var pendingResumeIntent: Intent? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    // A restored Activity carries its old launch Intent; only a new launch or onNewIntent
+    // delivery can identify Meta's bootstrap redirect.
+    pendingResumeIntent = if (savedInstanceState == null) intent else null
     launcherTab = ApprovedLauncherTab.fromId(savedInstanceState?.getString(SAVED_LAUNCHER_TAB))
         ?: ApprovedLauncherTab.HOME
     consumeLauncherTabIntent(intent)
@@ -386,6 +385,7 @@ class HomeActivity : ComponentActivity() {
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
+    pendingResumeIntent = intent
     consumeLauncherTabIntent(intent)
     consumeWidgetLibraryIntent(intent)
   }
@@ -424,6 +424,11 @@ class HomeActivity : ComponentActivity() {
   // settings, put them back every time Immortal comes to the foreground.
   override fun onResume() {
     super.onResume()
+    // Meta's cold bootstrap sends MAIN/HOME/CLEAR_TOP to the default launcher. This transient
+    // resume is still part of Calls; apply bounded recovery before treating it as the user's return.
+    val incoming = pendingResumeIntent
+    pendingResumeIntent = null
+    if (PortalHomeHandoffRecovery.recoverColdHome(this, incoming)) return
     // The user is back on Immortal, so any stock-launcher call handoff is over:
     // allow the photo frame to resume its normal screensaver behaviour.
     DreamPolicy.clearBridge(this)
@@ -461,71 +466,13 @@ class HomeActivity : ComponentActivity() {
    * Why a deep link and not a plain HOME launch: the Contacts app
    * (com.facebook.alohaapps.contacts) enforces a signature-based trusted-caller
    * check (Meta's com.facebook.secure framework) that Immortal can never satisfy,
-   * so we must route through the trusted stock launcher. A plain MAIN/HOME launch
-   * cold-starts the stock launcher into its idle "dream" face, whose
-   * DREAMING_STOPPED then makes our own screensaver relaunch over the top and trap
-   * the user (the reported "Calls kicks me back into Immortal"). The stock
-   * launcher's `portal://launcher/home` VIEW deep link instead resumes its
-   * interactive Home tab directly — the Contacts/Favorites calling surface — and we
-   * mark a bridge in flight so [DreamPolicy] doesn't claw the frame back during the
-   * transition. (Launching Contacts directly is rejected as an untrusted caller, so the
-   * hand-off must go through the launcher.)
-   *
-   * Path order: the deep link is primary on touchscreen Portals. The accessibility
-   * Back-press burst is only a Portal-TV (ripleyhome) fallback for when the deep link
-   * doesn't resolve — on a touchscreen Portal a system BACK from Immortal (itself the
-   * home activity) never surfaces the stock launcher, so the burst can't be primary there.
+   * so we route through its `portal://launcher/home` deep link. Even that link can trigger
+   * Meta's idle/dream bootstrap on a cold start; [PortalHomeHandoffRecovery] handles its
+   * bootstrap HOME redirects while preserving [DreamPolicy]'s screensaver suppression.
+   * Both Calls entry points use [PortalHomeBridge] so resolution and fallback cannot drift.
    */
   private fun launchStockHome() {
-    // Suppress the screensaver-relaunch race while the stock home comes forward, and
-    // keep suppressing the holding-frame relaunch until the user returns to Immortal
-    // (cleared in onResume) so the frame can't slam over an in-progress call.
-    // Persisted to SharedPreferences so new Immortal processes spawned after Android
-    // kills our process also see the bridge and return SUPPRESSED (not REDREAM).
-    DreamPolicy.markBridge(this)
-
-    fun fire(intent: Intent): Boolean =
-        runCatching {
-              startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-              true
-            }
-            .getOrDefault(false)
-
-    // 1) Touchscreen Portals (Portal / Portal+ / Go / Mini): deep-link into the stock launcher's
-    //    Home tab. Needs the stock launcher enabled — provisioning leaves it so. Gate on
-    //    resolveActivity: launching an explicit-but-DISABLED component does NOT throw, so an
-    //    unguarded fire() would return true and swallow the tap (Calls silently no-ops) instead of
-    //    falling through. Resolving first means a disabled launcher drops to the fallbacks below.
-    val deepLink =
-        Intent(Intent.ACTION_VIEW, Uri.parse("portal://launcher/home"))
-            .setPackage("com.facebook.alohaapps.launcher")
-    if (packageManager.resolveActivity(deepLink, 0) != null && fire(deepLink)) return
-
-    // 2) Portal TV (ripleyhome): no portal:// deep link, so the VIEW above didn't resolve. Surface
-    //    its stock launcher with a Back-press burst through the accessibility service.
-    if (RemoteInput.available()) {
-      RemoteInput.backRepeat(STOCK_HOME_BACK_PRESSES, STOCK_HOME_BACK_INTERVAL_MS)
-      return
-    }
-
-    // 3) Last resort: this device's real stock HOME, excluding ourselves and the fallback homes.
-    val stock =
-        packageManager
-            .queryIntentActivities(
-                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME), 0)
-            .map { it.activityInfo }
-            .firstOrNull {
-              it.packageName != packageName &&
-                  it.packageName != "com.android.settings" &&
-                  it.packageName != "com.android.tv.settings" &&
-                  !it.name.contains("FallbackHome", ignoreCase = true)
-            }
-    if (stock != null) {
-      fire(
-          Intent(Intent.ACTION_MAIN)
-              .addCategory(Intent.CATEGORY_LAUNCHER)
-              .setComponent(ComponentName(stock.packageName, stock.name)))
-    }
+    PortalHomeBridge.launch(this)
   }
 }
 

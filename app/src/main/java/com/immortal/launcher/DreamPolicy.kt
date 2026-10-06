@@ -40,6 +40,7 @@ object DreamPolicy {
   private const val PREFS = "dream_bridge"
   private const val KEY_BRIDGE_AT = "bridge_at"
   private const val KEY_IN_STOCK_HANDOFF = "in_stock_handoff"
+  private const val KEY_PORTAL_HOME_HANDOFF = "portal_home_handoff"
 
   /** Set by [PhotoDreamService] just before finish() on a user tap. */
   @Volatile var userExitAt: Long = 0L
@@ -67,6 +68,8 @@ object DreamPolicy {
    * idle as usual — we only skip the aggressive "permanent frame" relaunch.
    */
   @Volatile var inStockHandoff: Boolean = false
+  /** Only a Calls handoff may recover Meta's bootstrap redirect; Jarvis also uses suppression. */
+  @Volatile var portalHomeHandoff: Boolean = false
 
   /**
    * Called from [ImmortalApp.onCreate] to restore bridge state after a process restart.
@@ -78,24 +81,27 @@ object DreamPolicy {
     val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     bridgeAt = prefs.getLong(KEY_BRIDGE_AT, 0L)
     inStockHandoff = prefs.getBoolean(KEY_IN_STOCK_HANDOFF, false)
+    portalHomeHandoff = inStockHandoff && prefs.getBoolean(KEY_PORTAL_HOME_HANDOFF, false)
     if (inStockHandoff) Log.i(TAG, "restored bridge from prefs: bridgeAt=$bridgeAt inStockHandoff=true")
   }
 
   /** Called by [HomeActivity.launchStockHome] — persists bridge so new processes see it. */
-  fun markBridge(context: Context) {
+  fun markBridge(context: Context, portalHome: Boolean = false) {
     val now = System.currentTimeMillis()
     bridgeAt = now
     inStockHandoff = true
+    portalHomeHandoff = portalHome
     // commit() (synchronous), not apply(): the whole point of persisting the bridge is the case
     // where Android kills our process during the stock-home handoff. apply() only schedules an
     // async disk write, which QueuedWork is not guaranteed to flush before a low-memory kill — so
     // the freshly-spawned process could read stale (zeroed) prefs and relaunch the frame over the
     // call anyway. commit() flushes before we proceed to bring the stock home forward; the write is
-    // a single long+bool to a dedicated prefs file, fired once at a deliberate Calls tap.
+    // one timestamp and two booleans in a dedicated prefs file, fired at a deliberate handoff.
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit()
         .putLong(KEY_BRIDGE_AT, now)
         .putBoolean(KEY_IN_STOCK_HANDOFF, true)
+        .putBoolean(KEY_PORTAL_HOME_HANDOFF, portalHome)
         .commit()
   }
 
@@ -103,10 +109,12 @@ object DreamPolicy {
   fun clearBridge(context: Context) {
     inStockHandoff = false
     bridgeAt = 0L
+    portalHomeHandoff = false
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit()
         .remove(KEY_BRIDGE_AT)
         .remove(KEY_IN_STOCK_HANDOFF)
+        .remove(KEY_PORTAL_HOME_HANDOFF)
         .apply()
   }
 
