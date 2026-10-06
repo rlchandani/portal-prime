@@ -152,12 +152,12 @@
   }
 
   function projectApps(content) {
-    // The frozen inventory contains glyph fixtures, not Android PackageManager artwork.
-    // Preserve supplied image markup or an explicit local/sample artwork fixture.
+    // Keep the frozen sample inventory, but show exported native icon pixels wherever
+    // the identity matches. Explicit sample artwork remains available to regressions.
     const grid = content.querySelector('.app-grid');
     grid.dataset.liveAppsGrid = '';
     content.querySelector('.detail-heading p').textContent =
-      'Sample installed-app fixtures · supplied artwork is sample data; plain glyphs otherwise.';
+      'Sample installed-app fixtures · matching icons use artwork rendered on the Portal.';
     content.querySelectorAll('.app-with-menu').forEach(wrapper => {
       const tile = wrapper.querySelector('.app-tile[data-action="launch"]');
       const menu = wrapper.querySelector('[data-action="app-menu"]');
@@ -168,14 +168,22 @@
       wrapper.replaceWith(tile);
     });
     grid.querySelector('.app-tile[data-screen="tools"]')?.remove();
+    const storeLabel = grid.querySelector('.app-tile[data-screen="store"] strong');
+    if (storeLabel) storeLabel.textContent = 'App Store';
     grid.querySelectorAll('.app-tile .app-icon').forEach(icon => {
+      const tile = icon.closest('.app-tile');
       const fallback = icon.cloneNode(true);
       fallback.querySelectorAll('img').forEach(image => image.remove());
       fallback.dataset.liveArtwork = 'glyph';
       if (!fallback.childElementCount) fallback.textContent = '◇';
       let image = icon.querySelector('img');
-      const artwork = model.installed.find(app => app.packageName === icon.closest('.app-tile').dataset.pkg)?.artwork;
-      const imageSource = image?.getAttribute('src') || artwork;
+      const artwork = model.installed.find(app => app.packageName === tile.dataset.pkg)?.artwork;
+      const builtin = tile.dataset.screen === 'store' ? 'store'
+        : tile.dataset.screen === 'music' ? 'music'
+        : tile.dataset.screen === 'settings' ? 'settings'
+        : tile.dataset.action === 'external' && tile.dataset.owner === 'Portal' ? 'calls' : null;
+      const native = window.__portalNativeIcons?.[builtin ? `builtin:${builtin}` : tile.dataset.pkg];
+      const imageSource = image?.getAttribute('src') || artwork || native;
       if (typeof imageSource === 'string') {
         let url;
         try { url = new URL(imageSource, document.baseURI); } catch { /* Unavailable fixture artwork uses the glyph. */ }
@@ -189,7 +197,7 @@
           return;
         }
       }
-      icon.dataset.liveArtwork = image ? 'fixture' : 'glyph';
+      icon.dataset.liveArtwork = image ? (!artwork && native ? 'native' : 'fixture') : 'glyph';
       if (image) {
         image.alt = ''; // The tile already supplies the app's accessible label.
         const failed = () => icon.replaceWith(fallback);
@@ -1074,7 +1082,8 @@
     });
   }, 1000);
   window.addEventListener('resize', fit);
-  navigate('home', 'appearance', { push: false });
+  const requestedTab = new URLSearchParams(location.search).get('screen');
+  navigate(tabIds.includes(requestedTab) ? requestedTab : 'home', 'appearance', { push: false });
   ready = true;
   fit();
   window.__portalNavigationDemo = {

@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
@@ -70,6 +69,14 @@ class AppSwitcherActivity : ComponentActivity() {
 }
 
 private data class AppItem(val label: String, val component: ComponentName, val icon: ImageBitmap, val lastUsedMs: Long = 0L, val fgMs: Long = 0L)
+private data class ApprovedAppsInventory(val installed: List<AppItem>, val shortcuts: Map<String, ImageBitmap>)
+
+/** One captured Home snapshot owns both app entries and shortcut artwork. */
+private fun appInventory(context: Context, entries: List<AppEntry>): ApprovedAppsInventory =
+    ApprovedAppsInventory(
+        approvedInstalledEntries(context, entries).map { AppItem(it.label, it.component, it.icon) },
+        approvedShortcutIcons(context, entries),
+    )
 
 /**
  * Native installed-app page; an embedding Home host supplies its theme, header and dock.
@@ -113,9 +120,10 @@ private fun ApprovedAppsContent(
   var lastSuccessfulEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
   var lastRecentEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
   var recents by remember { mutableStateOf<List<AppItem>?>(null) }
-  var allApps by remember {
-    mutableStateOf(peekApprovedInstalledApps(context)?.map { AppItem(it.label, it.component, it.artwork) })
+  var inventory by remember {
+    mutableStateOf(peekApprovedIconInventory()?.let { appInventory(context, it) })
   }
+  val allApps = inventory?.installed
   var badges by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
   var query by remember { mutableStateOf("") }
   var searching by remember { mutableStateOf(initiallySearching) }
@@ -182,7 +190,7 @@ private fun ApprovedAppsContent(
         loadAllApps(context, checkActive)
       }
       kotlinx.coroutines.currentCoroutineContext().ensureActive()
-      allApps = loaded; appsFailure = null
+      inventory = loaded; appsFailure = null
       lastSuccessfulEpoch = epoch
     } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
     catch (error: Exception) { appsFailure = "Your apps couldn’t be loaded. Try again." }
@@ -219,6 +227,7 @@ private fun ApprovedAppsContent(
     folder != null -> ordered.filter { folderOf(it) == folder }
     else -> ordered.filter { folderOf(it) == null }
   }
+  val shortcutIcons = inventory?.shortcuts.orEmpty()
   BackHandler {
     when { menuFor != null -> menuFor = null; folder != null -> folder = null; recent && !initiallyRecent -> recent = false; searching -> { searching = false; query = "" }; else -> onExit() }
   }
@@ -256,13 +265,14 @@ private fun ApprovedAppsContent(
       }
       // Publish installed apps, folders and built-ins together, never a short grid
       // of built-ins that shifts when the asynchronous inventory arrives.
-      val builtins = if (allApps != null && !recent && folder == null && query.isBlank()) listOf("store" to "Immortal App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") else emptyList()
+      val builtins = if (allApps != null && !recent && folder == null && query.isBlank()) listOf("store" to "App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") else emptyList()
       val otherFolders = if (!recent && folder == null && query.isBlank()) folderNames.filterNot { it == "Settings" } else emptyList()
       val tiles = shown.map { app -> AppsTileEntry(app.label, app = app) } + otherFolders.map { AppsTileEntry(it, folder = it) } + builtins.map { AppsTileEntry(it.second, builtin = it.first) }
       items(tiles.size, key = { index -> tiles[index].app?.component?.flattenToString() ?: "${tiles[index].builtin}:${tiles[index].folder}" }, contentType = { "app-tile" }) { index ->
         val entry = tiles[index]
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
           InstalledAppTile(entry, entry.app?.component?.packageName?.let { badges[it] } ?: 0, if (recent) entry.app?.let(::recencyLine) else null,
+              shortcutIcon = shortcutIcons[entry.builtin],
               onOpen = {
                 when {
                   entry.app != null -> if (recent) menuFor = entry.app else launchApp(entry.app)
@@ -339,16 +349,16 @@ private data class AppsTileEntry(val label: String, val app: AppItem? = null, va
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun InstalledAppTile(entry: AppsTileEntry, badge: Int, subtitle: String?, onOpen: () -> Unit, onOptions: () -> Unit) {
+private fun InstalledAppTile(entry: AppsTileEntry, badge: Int, subtitle: String?, shortcutIcon: ImageBitmap?, onOpen: () -> Unit, onOptions: () -> Unit) {
     Column(Modifier.fillMaxWidth().heightIn(min = 205.dp).combinedClickable(
         onClick = onOpen, onLongClickLabel = "App actions",
         onLongClick = if (entry.app != null) onOptions else null)
         .padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
       BadgedBox(badge = { if (badge > 0) Badge { Text(if (badge > 9) "9+" else "$badge") } }) {
         ApprovedAppsIcon(entry.app?.component?.packageName ?: "builtin:${entry.builtin ?: "folder"}",
-            entry.label, 92.dp, entry.app?.icon, plain = true)
+            entry.label, 112.dp, entry.app?.icon ?: shortcutIcon, plain = entry.folder == null)
       }
-      Text(entry.label, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 14.dp))
+      Text(entry.label, color = IosLabel, fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.Normal, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 14.dp))
       if (subtitle != null) Text(subtitle, color = IosSecondary, fontSize = 20.sp, lineHeight = 28.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 7.dp))
     }
 }
@@ -445,15 +455,16 @@ private fun duration(ms: Long): String {
   }
 }
 
-/** Recently-used apps, most-recent first, with usage time; launchable + curated, minus Immortal. */
-private val approvedInstalledIcons = android.util.LruCache<String, ImageBitmap>(64)
-
-private fun cachedApprovedInstalledIcon(context: Context, pkg: String, loadDrawable: () -> android.graphics.drawable.Drawable): ImageBitmap {
-  val update = runCatching { context.packageManager.getPackageInfo(pkg, 0).lastUpdateTime }.getOrDefault(0L)
-  val key = "$pkg:$update"
-  return approvedInstalledIcons.get(key) ?: loadDrawable().toBitmap(144, 144).asImageBitmap().also { approvedInstalledIcons.put(key, it) }
+private fun recentIcon(context: Context, pkg: String, inventory: Map<String, ImageBitmap>, loadDrawable: () -> android.graphics.drawable.Drawable): ImageBitmap {
+  inventory[pkg]?.let { return it }
+  // Rare launchable entries absent from the captured inventory render once on IO.
+  // No independent package cache can outlive Home's package-change invalidation.
+  val drawable = Curation.iconOverride(pkg)
+      ?.let { androidx.core.content.ContextCompat.getDrawable(context, it) } ?: loadDrawable()
+  return IconRenderer.renderAppIcon(context, drawable, 144).asImageBitmap()
 }
 
+/** Recently-used apps, most-recent first, with usage time; launchable + curated, minus Immortal. */
 private fun loadRecents(context: Context, checkActive: () -> Unit): List<AppItem> {
   checkActive()
   val usm =
@@ -462,6 +473,8 @@ private fun loadRecents(context: Context, checkActive: () -> Unit): List<AppItem
   val now = System.currentTimeMillis()
   val stats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, now - 24L * 3600_000, now)
   if (stats.isNullOrEmpty()) return emptyList()
+  val icons = loadApprovedInstalledApps(context).associate { it.component.packageName to it.icon }
+  checkActive()
 
   val lastUsed = HashMap<String, Long>()
   val fg = HashMap<String, Long>()
@@ -487,7 +500,7 @@ private fun loadRecents(context: Context, checkActive: () -> Unit): List<AppItem
               val raw = pm.getApplicationLabel(ai).toString()
               val label = Curation.displayLabel(pkg, raw)
               if (raw in Curation.hiddenLabels || label in Curation.hiddenLabels) return@mapNotNull null
-              val bmp = cachedApprovedInstalledIcon(context, pkg) { pm.getApplicationIcon(ai) }
+              val bmp = recentIcon(context, pkg, icons) { pm.getApplicationIcon(ai) }
               AppItem(label, component, bmp, last, fg[pkg] ?: 0)
             }
             .getOrNull()
@@ -497,10 +510,9 @@ private fun loadRecents(context: Context, checkActive: () -> Unit): List<AppItem
 }
 
 /** All installed launchable apps (for search / drawer), alphabetised, curated, minus Immortal. */
-private fun loadAllApps(context: Context, checkActive: () -> Unit): List<AppItem> {
+private fun loadAllApps(context: Context, checkActive: () -> Unit): ApprovedAppsInventory {
   checkActive()
-  return loadApprovedInstalledApps(context).map {
-        checkActive()
-        AppItem(it.label, it.component, it.artwork)
-      }
+  val entries = loadApprovedIconInventory(context)
+  checkActive()
+  return appInventory(context, entries)
 }

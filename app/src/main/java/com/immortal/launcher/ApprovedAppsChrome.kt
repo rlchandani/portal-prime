@@ -203,9 +203,9 @@ internal fun ApprovedAppsIcon(
     bitmap: androidx.compose.ui.graphics.ImageBitmap? = null, plain: Boolean = false,
 ) {
   val identity = approvedAppIdentity(pkg)
-  if (bitmap != null && (plain || identity == null)) {
-    // Installed artwork owns its shape/background. Do not replace it with a
-    // generic package glyph or add another tile behind it.
+  if (bitmap != null) {
+    // Artwork is already normalized and cached by IconRenderer, shared with Home.
+    // The app's cell stays transparent; the only colored surface belongs to the icon itself.
     androidx.compose.foundation.Image(bitmap, null,
         Modifier.size(size).then(if (plain) Modifier else Modifier.clip(RoundedCornerShape(size / 4))))
   } else {

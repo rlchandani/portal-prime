@@ -20,6 +20,7 @@ import android.view.MotionEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 import java.io.File
+import androidx.compose.ui.graphics.asAndroidBitmap
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -323,6 +324,38 @@ class PortalUxInstrumentation : Instrumentation() {
             if (command.optString("command") == "stop") return
             val name = command.optString("name", "latest").replace(Regex("[^a-zA-Z0-9_-]"), "_")
             try {
+                if (command.optString("command") == "iconProbe") {
+                    val report = IconRendererDeviceRegression.verify(targetContext)
+                    response.writeText(JSONObject().put("name", name).put("success", true)
+                        .put("report", report).toString())
+                    continue
+                }
+                if (command.optString("command") == "exportAppIcons") {
+                    val inventory = checkNotNull(peekApprovedIconInventory())
+                    val exported = File(folder, name).apply { mkdirs() }
+                    val entries = JSONArray()
+                    inventory.forEachIndexed { index, app ->
+                        val image = File(exported, "$index.png")
+                        image.outputStream().use {
+                            check(app.icon.asAndroidBitmap().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it))
+                        }
+                        val builtin = when (app.component.className.substringAfterLast('.')) {
+                            "StoreActivity" -> "store"
+                            "WebAppActivity" -> "music"
+                            "ImmortalSettingsActivity" -> "settings"
+                            "__immortal_calls_bridge__" -> "calls"
+                            "ToolsActivity" -> "tools"
+                            else -> null
+                        }
+                        entries.put(JSONObject().put("packageName", app.component.packageName)
+                            .put("component", app.component.flattenToString()).put("label", app.label)
+                            .put("builtin", builtin ?: JSONObject.NULL).put("image", image.name))
+                    }
+                    File(exported, "manifest.json").writeText(entries.toString())
+                    response.writeText(JSONObject().put("name", name).put("success", true)
+                        .put("count", entries.length()).toString())
+                    continue
+                }
                 if (command.optString("command") == "returnHome") {
                     runOnMainSync { BackHelper.ensureImmortalHome(targetContext) }
                     waitForIdleSync()

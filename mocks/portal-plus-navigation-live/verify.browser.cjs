@@ -819,7 +819,28 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
           getComputedStyle(image.closest('.app-tile')).filter === 'none' &&
           image.parentElement.dataset.liveArtwork === 'fixture';
       }));
-    check('builtin and missing-art Apps glyphs match the legible launcher text palette without background plates',
+    check('builtin Apps shortcuts use exported native artwork with transparent antialiased corners',
+      await parityPage.evaluate(async () => {
+        const tiles = [...document.querySelectorAll('[data-live-apps-grid] .app-tile')]
+          .filter(tile => !tile.dataset.pkg);
+        if (tiles.length !== 4) return false;
+        for (const tile of tiles) {
+          const icon = tile.querySelector('.app-icon');
+          const image = icon.querySelector('img');
+          if (!image || icon.dataset.liveArtwork !== 'native') return false;
+          await image.decode();
+          if (image.naturalWidth !== 144 || image.naturalHeight !== 144) return false;
+          const canvas = document.createElement('canvas');
+          canvas.width = canvas.height = 144;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(image, 0, 0);
+          const pixels = ctx.getImageData(0, 0, 144, 144).data;
+          if (pixels[3] !== 0 || pixels[(72 * 144 + 72) * 4 + 3] !== 255) return false;
+          if (![...pixels].some((value, index) => index % 4 === 3 && value > 0 && value < 255)) return false;
+        }
+        return true;
+      }));
+    check('missing-art sample glyphs retain the legible palette without background plates',
       await parityPage.evaluate(() => {
         const textColor = getComputedStyle(document.querySelector('[data-live-apps-grid]')).color;
         return textColor === 'rgb(244, 247, 249)' &&
@@ -830,6 +851,9 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       }));
     check('Apps explicitly labels the installed inventory as sample fixtures',
       /Sample installed-app fixtures/.test(await parityRoot.locator('[data-tab="apps"]').innerText()));
+    check('Apps labels the native artwork provenance and uses the shorter App Store label',
+      /matching icons use artwork rendered on the Portal/.test(await parityRoot.locator('[data-tab="apps"]').innerText()) &&
+      await parityRoot.locator('[data-live-apps-grid] [data-screen="store"] strong').innerText() === 'App Store');
     await fixtureArtwork.dispatchEvent('error');
     check('unavailable artwork returns to a transparent glyph fallback',
       await parityPage.evaluate(() => {

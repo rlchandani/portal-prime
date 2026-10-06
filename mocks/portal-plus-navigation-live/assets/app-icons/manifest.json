@@ -1,0 +1,97 @@
+{
+  "source": "Native cached AppEntry.icon pixels from Portal+ Android 10",
+  "apkSha256": "9a3118f226f82560b930dbc85a648c41b884011ce397a94e1cda4481dc7e9806",
+  "sizePx": 144,
+  "icons": [
+    {
+      "identity": "com.aurora.store",
+      "label": "Aurora Store",
+      "file": "com.aurora.store.png",
+      "sha256": "57e410bf330fa7150d26cac969936f8b1fc617fe1f236ca22ed2651f89b76443"
+    },
+    {
+      "identity": "org.chromium.chrome",
+      "label": "Browser",
+      "file": "org.chromium.chrome.png",
+      "sha256": "48fc8067dfee64086d18bae6a934120c67d3f23b3cc0badc49c082681c2de5c4"
+    },
+    {
+      "identity": "org.fdroid.fdroid",
+      "label": "F-Droid",
+      "file": "org.fdroid.fdroid.png",
+      "sha256": "00043dc091bd5b80a818a4ecb2f8cd3d215650bd2dd60652dce084634db8ca5c"
+    },
+    {
+      "identity": "io.homeassistant.companion.android.minimal",
+      "label": "Home Assistant",
+      "file": "io.homeassistant.companion.android.minimal.png",
+      "sha256": "9912e202e4ba77b3048ab38ffe7759d3d488c63f9c9cbee03d9bbb545e59aae6"
+    },
+    {
+      "identity": "com.portal.assistant",
+      "label": "Jarvis",
+      "file": "com.portal.assistant.png",
+      "sha256": "082ae5ad98d59fb8ec49829de98b5f661be0655d3ae8ee7711b6033c4ed9aab4"
+    },
+    {
+      "identity": "me.zhanghai.android.files",
+      "label": "Material Files",
+      "file": "me.zhanghai.android.files.png",
+      "sha256": "b7e8da540a3c6dea6cb5fffd7580b445842a92cb8ad5179ea825b9d1b493cfea"
+    },
+    {
+      "identity": "org.schabi.newpipe",
+      "label": "NewPipe",
+      "file": "org.schabi.newpipe.png",
+      "sha256": "ec15828ace477ca26df87af0a2543f1de159f3fc09383fd30b13f7f47e71fe98"
+    },
+    {
+      "identity": "com.facebook.alohaapps.settings",
+      "label": "Portal Settings",
+      "file": "com.facebook.alohaapps.settings.png",
+      "sha256": "0cc3a42873b9f6c832cd3872f5ade9ad69dd808aaa866fbe04a359cd61bb5ab3"
+    },
+    {
+      "identity": "com.portal.calendar",
+      "label": "PortalHub",
+      "file": "com.portal.calendar.png",
+      "sha256": "a4b3b9b534b8c484e3fb3fadd07b565197a3695434e0bf05d7c7002b6ef12c62"
+    },
+    {
+      "identity": "org.videolan.vlc",
+      "label": "VLC",
+      "file": "org.videolan.vlc.png",
+      "sha256": "9857ad128ec3fad18a459117f9cf243d289998bbb9bef4fce3fccba41792cb59"
+    },
+    {
+      "identity": "org.breezyweather",
+      "label": "Weather",
+      "file": "org.breezyweather.png",
+      "sha256": "81a026b38121b8ba5674087a4010824febfab4925eafc5d3e197ed0b738d6f65"
+    },
+    {
+      "identity": "builtin:music",
+      "label": "Music",
+      "file": "builtin-music.png",
+      "sha256": "a3495a7c5aa362d9b6bdf8a65f8bc8973402f64d5819eededeb065588887d313"
+    },
+    {
+      "identity": "builtin:calls",
+      "label": "Calls",
+      "file": "builtin-calls.png",
+      "sha256": "509ba8806ebcc1d69b261cfa66dc4996ad543dd71585e1c93af5bb0652979761"
+    },
+    {
+      "identity": "builtin:settings",
+      "label": "Settings",
+      "file": "builtin-settings.png",
+      "sha256": "e75ba0338e3a0b1b97965646b1657aec8193681bae8207c7e056cc59da8750b4"
+    },
+    {
+      "identity": "builtin:store",
+      "label": "App Store",
+      "file": "builtin-store.png",
+      "sha256": "7a5ad459e51a6fb049d52f545f71c26ecf8a5a592da07a2d769196b250382aac"
+    }
+  ]
+}

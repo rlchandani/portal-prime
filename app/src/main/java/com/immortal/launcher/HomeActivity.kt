@@ -207,7 +207,6 @@ internal data class AppEntry(
     val icon: ImageBitmap,
     val folder: String? = null,
     val uninstallable: Boolean = false,
-    val artwork: ImageBitmap = icon,
 )
 
 private data class WidgetProviderEntry(
@@ -261,17 +260,36 @@ private object ApprovedHomeInventory {
 
 /** Home warms this inventory before Apps is opened; exclude Home's injected shortcuts. */
 internal fun peekApprovedInstalledApps(context: Context): List<AppEntry>? =
-    ApprovedHomeInventory.apps.peek()?.filter {
+    ApprovedHomeInventory.apps.peek()?.let { approvedInstalledEntries(context, it) }
+
+internal fun approvedInstalledEntries(context: Context, inventory: List<AppEntry>): List<AppEntry> =
+    inventory.filter {
       it.component.packageName != context.packageName && it.component != CALLS_COMPONENT
     }
 
+/** Reuse the same already-rendered shortcut artwork as Home; never decode from composition. */
+internal fun peekApprovedIconInventory(): List<AppEntry>? = ApprovedHomeInventory.apps.peek()
+
+internal fun approvedShortcutIcons(context: Context, inventory: List<AppEntry>): Map<String, ImageBitmap> =
+    inventory.mapNotNull { app ->
+      val key = when (app.component) {
+        ComponentName(context, StoreActivity::class.java) -> "store"
+        ComponentName(context, WebAppActivity::class.java) -> "music"
+        ComponentName(context, ImmortalSettingsActivity::class.java) -> "settings"
+        CALLS_COMPONENT -> "calls"
+        else -> null
+      }
+      key?.let { it to app.icon }
+    }.toMap()
+
 /** Run on IO; cold Home and Apps requests share one package/icon scan. */
-internal fun loadApprovedInstalledApps(context: Context): List<AppEntry> {
+internal fun loadApprovedIconInventory(context: Context): List<AppEntry> {
   ApprovedHomeInventory.register(context)
-  return ApprovedHomeInventory.apps.load { loadApps(context.applicationContext) }.filter {
-    it.component.packageName != context.packageName && it.component != CALLS_COMPONENT
-  }
+  return ApprovedHomeInventory.apps.load { loadApps(context.applicationContext) }
 }
+
+internal fun loadApprovedInstalledApps(context: Context): List<AppEntry> =
+    approvedInstalledEntries(context, loadApprovedIconInventory(context))
 
 private const val HOME_APP_WIDGET_HOST_ID = 0x4611
 private const val SAVED_LAUNCHER_TAB = "approved_saved_launcher_tab"
@@ -4571,10 +4589,9 @@ private fun loadApps(context: Context): List<AppEntry> {
               val ai = ri.activityInfo
               val rawLabel = ri.loadLabel(pm).toString()
               // Check for icon override first, then use app's own icon
-              val originalDrawable = ri.loadIcon(pm)
               val drawable = Curation.iconOverride(ai.packageName)
                   ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
-                  ?: originalDrawable
+                  ?: ri.loadIcon(pm)
               // Render with IconRenderer (adaptive composite + squircle mask)
               val bmp: Bitmap = IconRenderer.renderAppIcon(context, drawable, 144)
               // Uninstallable: not a system app OR is an updated system app
@@ -4587,7 +4604,6 @@ private fun loadApps(context: Context): List<AppEntry> {
                   icon = bmp.asImageBitmap(),
                   folder = Curation.folderFor(ai.packageName),
                   uninstallable = isUninstallable,
-                  artwork = originalDrawable.toBitmap(144, 144).asImageBitmap(),
               ) to rawLabel
             }
             .getOrNull()
@@ -4607,7 +4623,7 @@ private fun loadApps(context: Context): List<AppEntry> {
             ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
             ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
         // Inject the Immortal App Store too (StoreActivity — also our own, excluded from the query).
-        val storeIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_apps)
+        val storeIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_store_tile)
             ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
         // Inject a "Calls" tile that bridges to the stock Portal calling surface (the only trusted
         // caller). It has no real Activity — launch is special-cased in onLaunch via CALLS_COMPONENT.
@@ -4851,7 +4867,7 @@ private fun ApprovedFavoriteTile(app: AppEntry, modifier: Modifier, onClick: () 
     Row(Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick)
         .padding(14.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-      Image(app.icon, contentDescription = null, modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp)))
+      Image(app.icon, contentDescription = null, modifier = Modifier.size(56.dp))
       Text(app.label, color = ApprovedHomePalette.Text, fontSize = 22.sp, lineHeight = 30.sp,
           fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (c) 2026 Starbright Lab.
+
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:startColor="#42BAFF" android:endColor="#2362ED"
+                android:startX="0" android:startY="0" android:endX="108" android:endY="108"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+    <path android:pathData="M0,0h108v54h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:startColor="#28FFFFFF" android:endColor="#00FFFFFF"
+                android:startX="54" android:startY="0" android:endX="54" android:endY="54"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M33,37 L75,37 Q81,37 82,43 L86,76 Q86,83 79,83 L29,83 Q22,83 22,76 L26,43 Q27,37 33,37 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFF"
+        android:strokeWidth="5" android:strokeLineCap="round"
+        android:pathData="M41,38 L41,32 A13,13 0,0 1,67 32 L67,38" />
+    <path android:fillColor="#2878F4"
+        android:pathData="M54,47 A3.5,3.5 0,1 0,54 54 A3.5,3.5 0,1 0,54 47 M51,59 L57,59 L57,73 L51,73 Z" />
+</vector>
