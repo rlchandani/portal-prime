@@ -64,46 +64,66 @@ private fun CameraViewerScreen(
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
-    var cameras by remember { mutableStateOf(CameraConfig.load(context)) }
-    var name by remember { mutableStateOf("") }
-    var url by remember { mutableStateOf("rtsp://") }
-    var error by remember { mutableStateOf<String?>(null) }
-    var removal by remember { mutableStateOf<CameraConfig.Camera?>(null) }
-    val current = remember(cameras, streamId) { cameras.firstOrNull { it.id == streamId } }
-    if (streamId != null && current != null) {
-        CameraLiveStream(current, onBack = { activity?.finish() },
-            onVideoCreated = onVideoCreated, onVideoReleased = onVideoReleased)
+    if (streamId != null) {
+        val current = remember(streamId) { CameraConfig.load(context).firstOrNull { it.id == streamId } }
+        if (current != null) {
+            CameraLiveStream(current, onBack = { activity?.finish() },
+                onVideoCreated = onVideoCreated, onVideoReleased = onVideoReleased)
+        } else {
+            // A removed camera must not fall through to a second settings host during viewing.
+            BackHandler { activity?.finish() }
+            Box(Modifier.fillMaxSize().background(Color.Black)) {
+                ApprovedSettingsDialog("Camera unavailable", onDismiss = { activity?.finish() },
+                    help = "This camera is no longer saved. Return to your cameras to choose another.") {
+                    ApprovedEditorsButton("Done") { activity?.finish() }
+                }
+            }
+        }
         return
     }
 
     SettingsScaffold(title = "Cameras", onBack = { activity?.finish() }) {
-        Column {
-            ApprovedEditorsCollection("Your cameras", cameras, key = { it.id }) { camera ->
-                ApprovedEditorsCollectionRow(camera.name, camera.url,
-                    onRemove = { removal = camera }, action = "View", onAction = {
-                        context.startActivity(Intent(context, CameraViewerActivity::class.java)
-                            .putExtra(APPROVED_CAMERA_STREAM_ID, camera.id))
-                    })
-            }
-            ApprovedEditorsForm(actions = {
-                ApprovedEditorsActions(error = error, onCancel = {
-                    name = ""; url = "rtsp://"; error = null; activity?.finish()
-                }) {
-                    // Retain the original literal RTSP predicate; no stricter URL parser or
-                    // required name is introduced. CameraConfig supplies the Camera fallback.
-                    if (!url.startsWith("rtsp://") || url.length <= 8) {
-                        error = "Enter an rtsp:// stream address longer than eight characters."
-                    } else {
-                        CameraConfig.add(context, name, url)
-                        cameras = CameraConfig.load(context)
-                        name = ""; url = "rtsp://"; error = null
-                    }
-                }
+        CameraControlsContent(onDismiss = { activity?.finish() })
+    }
+}
+
+/** Saved camera controls shared by Tools and direct settings launches; View alone opens video. */
+@Composable
+internal fun CameraControlsContent(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val resume = rememberApprovedResume()
+    var cameras by remember(context, resume) { mutableStateOf(CameraConfig.load(context)) }
+    // Unsaved URLs can include credentials; keep form drafts out of saved instance state.
+    var name by remember { mutableStateOf("") }
+    var url by remember { mutableStateOf("rtsp://") }
+    var error by remember { mutableStateOf<String?>(null) }
+    var removal by remember { mutableStateOf<CameraConfig.Camera?>(null) }
+    Column {
+        ApprovedEditorsCollection("Your cameras", cameras, key = { it.id }) { camera ->
+            ApprovedEditorsCollectionRow(camera.name, camera.url,
+                onRemove = { removal = camera }, action = "View", onAction = {
+                    context.startActivity(Intent(context, CameraViewerActivity::class.java)
+                        .putExtra(APPROVED_CAMERA_STREAM_ID, camera.id))
+                })
+        }
+        ApprovedEditorsForm(actions = {
+            ApprovedEditorsActions(error = error, onCancel = {
+                name = ""; url = "rtsp://"; error = null; onDismiss()
             }) {
-                ApprovedEditorsField("Name (optional)", name, { name = it; error = null })
-                Divider()
-                ApprovedEditorsField("RTSP URL", url, { url = it; error = null })
+                // Retain the original literal RTSP predicate; no stricter URL parser or
+                // required name is introduced. CameraConfig supplies the Camera fallback.
+                if (!url.startsWith("rtsp://") || url.length <= 8) {
+                    error = "Enter an rtsp:// stream address longer than eight characters."
+                } else {
+                    CameraConfig.add(context, name, url)
+                    cameras = CameraConfig.load(context)
+                    name = ""; url = "rtsp://"; error = null
+                }
             }
+        }) {
+            ApprovedEditorsField("Name (optional)", name, { name = it; error = null })
+            Divider()
+            ApprovedEditorsField("RTSP URL", url, { url = it; error = null })
         }
     }
     removal?.let { camera ->

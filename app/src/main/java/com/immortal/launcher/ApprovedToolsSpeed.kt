@@ -58,10 +58,16 @@ internal fun ApprovedToolsSpeedScreen(onBack: () -> Unit) {
       }
     }
   }
-  Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 56.dp, vertical = 36.dp)) {
-    ApprovedAppsButton("‹  Tools", onClick = onBack)
-    Spacer(Modifier.height(26.dp))
-    ApprovedAppsHeading("Speed test", "Measure this Portal’s internet connection.")
+  val workspace = LocalApprovedToolWorkspace.current
+  // Tools owns the fixed frame and scrolling; standalone callers retain their existing frame.
+  val modifier = if (workspace) Modifier.fillMaxWidth()
+      else Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 56.dp, vertical = 36.dp)
+  Column(modifier) {
+    if (!workspace) {
+      ApprovedAppsButton("‹  Tools", onClick = onBack)
+      Spacer(Modifier.height(26.dp))
+      ApprovedAppsHeading("Speed test", "Measure this Portal’s internet connection.")
+    }
     SpeedGroup("Connection") {
       SpeedRow("Server", result.server.ifBlank { if (runId == 0) "Cloudflare" else if (phase == SpeedTest.Phase.DONE) "Unavailable" else "Finding server…" })
       SpeedRow("Progress", when (phase) { SpeedTest.Phase.PING -> "Measuring latency…"; SpeedTest.Phase.DOWNLOAD -> "Testing download…"; SpeedTest.Phase.UPLOAD -> "Testing upload…"; SpeedTest.Phase.DONE -> if (runId == 0) "Ready to test" else if (error != null) "Test incomplete" else "Test complete" })

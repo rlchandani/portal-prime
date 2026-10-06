@@ -6,7 +6,13 @@
  */
 'use strict';
 const assert = require('node:assert/strict');
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const playwrightModule = '~/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright';
+assert.ok(!process.env.PLAYWRIGHT_MODULE || process.env.PLAYWRIGHT_MODULE === playwrightModule,
+  'Use only the authorized Playwright runtime');
+const { chromium } = require(playwrightModule);
+const origin = 'http://127.0.0.1:8765';
+assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
+  'Browser verification is restricted to the authorized loopback origin');
 
 (async () => {
   const browser = await chromium.launch({ headless: true, channel: 'chrome' });
@@ -20,7 +26,6 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
   };
   try {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1020 } });
-    const origin = process.env.DEMO_ORIGIN || 'http://127.0.0.1:8765';
     await context.route('**/*', route =>
       new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
     const page = await context.newPage();
@@ -92,8 +97,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await settled();
     check('tool Back returns to Tools list', (await state()).route.screen === 'tools');
     await click('[data-tab="tools"] [data-screen="lamp"]');
+    await click('[data-tab="tools"] [data-screen="lamp-preview"]');
     check('native fullscreen tool boundary is labelled as simulation', await root.locator('.live-handoff-label').textContent() === 'Fullscreen handoff simulation');
     await page.keyboard.press('Escape');
+    await click('[data-tab="tools"] [data-live-action="back"]');
     check('handoff return preserves Tools route', (await state()).route.screen === 'tools');
 
     await click('.live-launcher > .app-header [data-screen="settings"]');
@@ -236,7 +243,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       (await state()).host === 'activity');
     await page.keyboard.press('Escape');
     await settled();
-    for (const route of ['music', 'camera', 'lamp', 'alarm-ring']) {
+    for (const route of ['music', 'camera-preview', 'lamp-preview', 'alarm-ring']) {
       await page.evaluate(route => __portalNavigationDemo.navigate(route), route);
       assert.ok((await state()).simulation, `${route} must mark its fullscreen boundary`);
       await page.keyboard.press('Escape');
@@ -750,6 +757,305 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     check('photo reordering preserves duplicate-photo reachability without duplicate visible IDs',
       photoReached.size === 11 && photoReached.has(9) && photoReached.has(10));
     await photoContext.close();
+
+    // New parity regressions are isolated from all 101 existing checks above.
+    const parityContext = await browser.newContext({ viewport: { width: 1440, height: 1020 } });
+    await parityContext.route('**/*', route =>
+      new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+    const parityPage = await parityContext.newPage();
+    watchPage(parityPage);
+    await parityPage.goto(`${origin}/portal-plus-navigation-live/`);
+    await parityPage.waitForFunction(() => !!window.__portalNavigationDemo);
+    await parityPage.emulateMedia({ reducedMotion: 'reduce' });
+    const parityRoot = parityPage.locator('#navigation-device');
+    const paritySettled = () => parityPage.waitForFunction(() =>
+      document.querySelector('#navigation-device').getAnimations({ subtree: true }).length === 0);
+    const parityClick = async selector => { await parityRoot.locator(selector).click(); await paritySettled(); };
+    const parityState = () => parityPage.evaluate(() => __portalNavigationDemo.getState());
+    const toolsBody = () => parityRoot.locator('.live-tools-stage > :not([hidden])');
+    await parityPage.evaluate(() => {
+      const favorite = document.querySelector('[data-tab="home"] .favorite-grid .app-icon');
+      window.favoriteIconBefore = {
+        background: getComputedStyle(favorite).backgroundColor,
+        radius: getComputedStyle(favorite).borderRadius,
+      };
+      // Deliberate artwork fixture: this is not an extracted Android app icon.
+      __portalMock.model.installed[0].artwork = 'data:image/svg+xml,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="60" viewBox="0 0 80 60"><circle cx="40" cy="30" r="27" fill="#80c5ed"/><path d="M20 30h40M40 8v44" stroke="#183b52" stroke-width="4"/></svg>');
+      const stockSearch = __portalMock.model.installed.find(app => app.packageName === 'com.android.quicksearchbox');
+      if (!stockSearch) throw new Error('Captured stock Google Search fixture is required for this regression');
+      // Bypass the frozen renderer's older exact-label exclusion to test package filtering.
+      stockSearch.name = 'Google Search fixture';
+      __portalMock.model.installed.push({ ...stockSearch,
+        packageName: 'com.google.android.googlequicksearchbox', name: 'Google app fixture' });
+    });
+    await parityClick('.live-launcher > .dock [data-screen="apps"]');
+    const hiddenAppsSelector = '[data-pkg="com.android.quicksearchbox"],[data-pkg="com.google.android.googlequicksearchbox"]';
+    check('Apps filters both captured Google Search package identities even with different labels',
+      await parityPage.locator(`#device .app-grid :is(${hiddenAppsSelector})`).count() === 4 &&
+      await parityRoot.locator(`[data-tab="apps"] :is(${hiddenAppsSelector})`).count() === 0 &&
+      !/Google Search fixture|Google app fixture/.test(await parityRoot.locator('[data-tab="apps"]').innerText()));
+    check('every projected Apps tile has a transparent background without a card border or shadow',
+      await parityPage.evaluate(() => [...document.querySelectorAll('[data-live-apps-grid] .app-tile')].every(tile => {
+        const style = getComputedStyle(tile);
+        return style.backgroundColor === 'rgba(0, 0, 0, 0)' && style.backgroundImage === 'none' &&
+          style.borderTopWidth === '0px' && style.boxShadow === 'none';
+      })));
+    check('every projected Apps icon container is transparent without an artificial square',
+      await parityPage.evaluate(() => [...document.querySelectorAll('[data-live-apps-grid] .app-icon')].every(icon => {
+        const style = getComputedStyle(icon);
+        return style.backgroundColor === 'rgba(0, 0, 0, 0)' && style.backgroundImage === 'none' &&
+          style.borderTopWidth === '0px' && style.boxShadow === 'none' && style.borderRadius === '0px';
+      })));
+    const fixtureArtwork = parityRoot.locator('[data-live-apps-grid] [data-pkg="org.chromium.chrome"] img');
+    await fixtureArtwork.evaluate(image => image.decode());
+    check('supplied installed artwork keeps its pixels in a transparent uncropped image view',
+      await fixtureArtwork.evaluate(image => {
+        const style = getComputedStyle(image);
+        return image.naturalWidth === 80 && image.naturalHeight === 60 && style.objectFit === 'contain' &&
+          style.backgroundColor === 'rgba(0, 0, 0, 0)' && style.borderRadius === '0px' &&
+          style.boxShadow === 'none' && style.borderTopWidth === '0px' &&
+          style.filter === 'none' && style.opacity === '1' &&
+          getComputedStyle(image.closest('.app-tile')).filter === 'none' &&
+          image.parentElement.dataset.liveArtwork === 'fixture';
+      }));
+    check('builtin and missing-art Apps glyphs match the legible launcher text palette without background plates',
+      await parityPage.evaluate(() => {
+        const textColor = getComputedStyle(document.querySelector('[data-live-apps-grid]')).color;
+        return textColor === 'rgb(244, 247, 249)' &&
+          [...document.querySelectorAll('[data-live-apps-grid] .app-icon[data-live-artwork="glyph"]')]
+          .every(icon => icon.dataset.liveArtwork === 'glyph' && !icon.querySelector('img') && !!icon.querySelector('svg') &&
+            getComputedStyle(icon).color === textColor && getComputedStyle(icon.querySelector('svg')).color === textColor &&
+            getComputedStyle(icon).backgroundColor === 'rgba(0, 0, 0, 0)');
+      }));
+    check('Apps explicitly labels the installed inventory as sample fixtures',
+      /Sample installed-app fixtures/.test(await parityRoot.locator('[data-tab="apps"]').innerText()));
+    await fixtureArtwork.dispatchEvent('error');
+    check('unavailable artwork returns to a transparent glyph fallback',
+      await parityPage.evaluate(() => {
+        const icon = document.querySelector('[data-live-apps-grid] [data-pkg="org.chromium.chrome"] .app-icon');
+        return icon.dataset.liveArtwork === 'glyph' && !!icon.querySelector('svg') && !icon.querySelector('img') &&
+          getComputedStyle(icon).color === 'rgb(244, 247, 249)' &&
+          getComputedStyle(icon).backgroundColor === 'rgba(0, 0, 0, 0)';
+      }));
+    await parityPage.keyboard.press('Tab');
+    await parityRoot.locator('[data-live-apps-grid] [data-pkg="org.chromium.chrome"]').focus();
+    check('transparent Apps tiles retain a visible keyboard focus outline',
+      await parityRoot.locator('[data-live-apps-grid] [data-pkg="org.chromium.chrome"]').evaluate(tile =>
+        getComputedStyle(tile).outlineStyle !== 'none' && getComputedStyle(tile).outlineWidth === '3px'));
+    await parityClick('[data-tab="apps"] .primary[data-screen="store"]');
+    check('Store icons keep their own background and shape outside the Apps projection',
+      await parityRoot.locator('[data-tab="apps"] .store-card .app-icon').first().evaluate(icon =>
+        getComputedStyle(icon).backgroundColor !== 'rgba(0, 0, 0, 0)' && getComputedStyle(icon).borderRadius !== '0px'));
+    await parityClick('[data-tab="apps"] [data-live-action="back"]');
+    await parityClick('[data-tab="apps"] [data-screen="app-folder"]');
+    check('Settings folder removes the captured Google Search shortcut while keeping Portal Settings',
+      await parityPage.locator('#device .app-grid [data-pkg="com.android.quicksearchbox"]').count() === 1 &&
+      await parityRoot.locator(`[data-tab="apps"] :is(${hiddenAppsSelector})`).count() === 0 &&
+      await parityRoot.locator('[data-tab="apps"] [data-pkg="com.facebook.alohaapps.settings"]').isVisible());
+    await parityClick('[data-tab="apps"] [data-action="folder-edit"]');
+    check('folder contents picker cannot reintroduce either hidden Google Search package',
+      await parityPage.locator(`#device .modal :is(${hiddenAppsSelector})`).count() === 2 &&
+      await parityRoot.locator(`#live-overlays :is(${hiddenAppsSelector})`).count() === 0 &&
+      await parityRoot.locator('#live-overlays [data-action="folder-toggle"][data-pkg="org.chromium.chrome"]').isVisible());
+    await parityPage.keyboard.press('Escape');
+    await paritySettled();
+    await parityClick('[data-tab="apps"] [data-live-action="back"]');
+    await parityClick('[data-tab="apps"] [data-action="favorites"]');
+    check('favorite apps picker removes both hidden Google Search choices and keeps other apps',
+      await parityPage.locator(`#device .modal :is(${hiddenAppsSelector})`).count() === 2 &&
+      await parityRoot.locator(`#live-overlays :is(${hiddenAppsSelector})`).count() === 0 &&
+      await parityRoot.locator('#live-overlays [data-action="favorite"][data-pkg="org.chromium.chrome"]').isVisible());
+    await parityPage.keyboard.press('Escape');
+    await paritySettled();
+    await parityClick('.live-launcher > .app-header [data-action="search"]');
+    await parityRoot.locator('#global-search').fill('Google');
+    assert.equal(await parityPage.locator(`#device #search-results :is(${hiddenAppsSelector})`).count(), 2,
+      'The original fixture search must expose both identities to make the projection check meaningful');
+    assert.equal(await parityRoot.locator(`#live-overlays :is(${hiddenAppsSelector})`).count(), 0);
+    await parityRoot.locator('#global-search').fill('Browser');
+    check('internal Apps search still finds other apps after filtering Google Search results',
+      await parityRoot.locator('#global-search').isVisible() &&
+      await parityRoot.locator('#search-results [data-action="launch"][data-pkg="org.chromium.chrome"]').isVisible());
+    await parityPage.keyboard.press('Escape');
+    await paritySettled();
+    await parityClick('.live-launcher > .dock [data-screen="home"]');
+    check('Home favorite icon backgrounds and shapes are unchanged',
+      await parityPage.evaluate(() => {
+        const style = getComputedStyle(document.querySelector('[data-tab="home"] .favorite-grid .app-icon'));
+        return style.backgroundColor === favoriteIconBefore.background && style.borderRadius === favoriteIconBefore.radius;
+      }));
+
+    // Include the gated Speed test in the complete Tools route coverage.
+    await parityClick('.live-launcher > .app-header [data-screen="settings"]');
+    await parityRoot.locator('.settings-sidebar #settings-search').fill('Brightness');
+    check('internal Settings search keeps its field and matching setting results',
+      await parityRoot.locator('.settings-sidebar #settings-search').isVisible() &&
+      await parityRoot.locator('.settings-sidebar .settings-results [data-action="search-result"][data-id="display.brightness"]').isVisible());
+    await parityRoot.locator('.settings-sidebar #settings-search').fill('');
+    await parityClick('.settings-sidebar [data-advanced-toggle]');
+    await parityClick('.live-settings > .app-header [data-screen="home"]');
+    await parityClick('.live-launcher > .dock [data-screen="tools"]');
+    await parityPage.evaluate(() => {
+      const panel = document.querySelector('[data-tab="tools"]');
+      const list = panel.querySelector('.screen-body');
+      list.style.maxHeight = '500px'; // Ensure actual list overflow with the short fixture.
+      list.scrollTop = 280;
+      window.toolsAudit = {
+        panel, workspace: panel.querySelector('.live-tools-workspace'),
+        back: panel.querySelector('[data-live-action="back"]'), title: panel.querySelector('#live-tools-title'),
+        list, scroll: list.scrollTop, scrolled: false,
+      };
+    });
+    const openTool = async route => {
+      const tile = parityRoot.locator(`[data-tab="tools"] .tool-card[data-screen="${route}"]`);
+      await tile.scrollIntoViewIfNeeded();
+      // Record the offset at activation, after the browser reveals the target tile.
+      await parityPage.evaluate(() => {
+        toolsAudit.scroll = toolsAudit.list.scrollTop;
+        toolsAudit.scrolled ||= toolsAudit.scroll > 0;
+      });
+      await tile.click();
+      await paritySettled();
+    };
+    const toolRoutes = await parityRoot.locator('[data-tab="tools"] .tool-card').evaluateAll(tiles =>
+      tiles.map(tile => tile.dataset.screen));
+    assert.deepEqual([...toolRoutes].sort(), ['alarm', 'aurora', 'camera', 'converter', 'countdowns', 'intercom',
+      'iss', 'lamp', 'notes', 'speed', 'stories', 'timers'].sort());
+    for (const route of toolRoutes) {
+      await openTool(route);
+      check(`${route} opens controls in the same Tools workspace with one Back/title row`,
+        (await parityState()).host === 'launcher' && (await parityState()).tab === 'tools' &&
+        (await parityState()).route.screen === route && !(await parityState()).simulation &&
+        await parityPage.evaluate(() => {
+          const panel = document.querySelector('[data-tab="tools"]');
+          const workspaceStyle = getComputedStyle(toolsAudit.workspace);
+          const titleStyle = getComputedStyle(toolsAudit.title);
+          const panelStyle = getComputedStyle(panel);
+          return toolsAudit.panel === panel && toolsAudit.workspace === panel.querySelector('.live-tools-workspace') &&
+            toolsAudit.back === panel.querySelector('[data-live-action="back"]') &&
+            toolsAudit.title === panel.querySelector('#live-tools-title') &&
+            panel.querySelectorAll('[data-live-action="back"]').length === 1 &&
+            panel.querySelectorAll('h1').length === 1 && toolsAudit.list.hidden &&
+            panelStyle.paddingTop === '36px' && panelStyle.paddingBottom === '36px' &&
+            panelStyle.paddingLeft === '56px' && panelStyle.paddingRight === '56px' &&
+            workspaceStyle.flexDirection === 'column' && workspaceStyle.gap === '26px' &&
+            getComputedStyle(toolsAudit.back).minHeight === '68px' &&
+            titleStyle.fontSize === '44px' && titleStyle.lineHeight === '56px' &&
+            titleStyle.letterSpacing === '-0.5px' && titleStyle.paddingBottom === '34px' &&
+            !toolsAudit.workspace.querySelector('p') &&
+            getComputedStyle(panel.querySelector('.live-tools-stage > :not([hidden])')).padding === '0px' &&
+            !document.querySelector('.live-activity-window') && document.querySelector('.live-settings').hidden;
+        }));
+      await parityClick('[data-tab="tools"] [data-live-action="back"]');
+      assert.equal((await parityState()).route.screen, 'tools');
+      assert.ok(await parityPage.evaluate(() => toolsAudit.list === document.querySelector('[data-tab="tools"] .screen-body') &&
+        toolsAudit.list.scrollTop === toolsAudit.scroll && !toolsAudit.list.hidden),
+      `${route} Back must retain the list node and actual scroll offset`);
+    }
+    check('every tool returns to the mounted Tools list at the saved scroll offset',
+      await parityPage.evaluate(() => toolsAudit.scrolled));
+    await openTool('stories');
+    const storyName = await toolsBody().locator('[data-action="story"]').first().getAttribute('data-name');
+    await toolsBody().locator('[data-action="story"]').first().click();
+    await paritySettled();
+    check('Bedtime reader stays dark inside the mounted Tools workspace without a modal or Activity',
+      (await parityState()).route.reader === storyName && (await parityState()).host === 'launcher' &&
+      await parityPage.evaluate(() => {
+        const reader = document.querySelector('.live-story-reader');
+        return toolsAudit.workspace === document.querySelector('.live-tools-workspace') &&
+          document.querySelector('#live-tools-title').textContent === __portalNavigationDemo.getState().route.reader &&
+          reader && getComputedStyle(reader).color === 'rgb(244, 247, 249)' &&
+          getComputedStyle(reader).backgroundColor !== 'rgba(0, 0, 0, 0)' &&
+          !document.querySelector('#live-overlays .modal-layer,.live-activity-window') &&
+          /speech playback is simulated/.test(reader.textContent);
+      }));
+    await parityPage.evaluate(() => {
+      const reader = document.querySelector('.live-story-reader');
+      window.storyHeaderY = document.querySelector('.live-tools-workspace').getBoundingClientRect().y;
+      reader.style.maxHeight = '200px';
+      reader.scrollTop = 140;
+      window.storyScroll = reader.scrollTop;
+    });
+    check('Tools Back/title stay fixed while the story body actually scrolls',
+      await parityPage.evaluate(() => storyScroll > 0 &&
+        document.querySelector('.live-tools-workspace').getBoundingClientRect().y === storyHeaderY));
+    await parityClick('[data-tab="tools"] [data-action="story-stop"]');
+    check('story speech action stays explicitly simulated in the reader',
+      (await parityState()).route.reader === storyName &&
+      await toolsBody().locator('[data-action="story-stop"]').textContent() === 'Read aloud' &&
+      await parityRoot.locator('#live-overlays .modal-layer').count() === 0);
+    await parityPage.evaluate(() => {
+      const reader = document.querySelector('.live-story-reader');
+      reader.style.maxHeight = '200px';
+      reader.scrollTop = 140;
+      window.storyScroll = reader.scrollTop;
+    });
+    await parityClick('.live-launcher > .dock [data-screen="apps"]');
+    await parityClick('.live-launcher > .dock [data-screen="tools"]');
+    check('tab return preserves the selected story reader and body scroll',
+      (await parityState()).route.reader === storyName && await parityPage.evaluate(() =>
+        document.querySelector('.live-story-reader').scrollTop === storyScroll &&
+        toolsAudit.workspace === document.querySelector('.live-tools-workspace')));
+    await parityPage.keyboard.press('Escape');
+    await paritySettled();
+    check('Bedtime Back returns from reader to the in-workspace story picker',
+      (await parityState()).route.screen === 'stories' && !(await parityState()).route.reader &&
+      await toolsBody().locator('[data-action="story"]').count() > 0 &&
+      await parityRoot.locator('#live-overlays .modal-layer').count() === 0);
+    await parityClick('[data-tab="tools"] [data-live-action="back"]');
+    check('Bedtime picker Back returns to Tools with the saved list scroll',
+      (await parityState()).route.screen === 'tools' && await parityPage.evaluate(() =>
+        toolsAudit.list.scrollTop === toolsAudit.scroll && !toolsAudit.list.hidden));
+    await openTool('camera');
+    await toolsBody().locator('[data-value="camera.name"]').fill('Sample front door');
+    await toolsBody().locator('[data-value="camera.url"]').fill('rtsp://sample.invalid/front-door');
+    await parityClick('[data-tab="tools"] .live-tools-stage button[type="submit"]');
+    check('Cameras fixture form adds a named sample in the Tools pane',
+      (await parityState()).route.screen === 'camera' && await toolsBody().locator('[data-action="camera-view"]').count() === 1);
+    await parityClick('[data-tab="tools"] [data-action="camera-view"]');
+    check('camera View labels a fullscreen simulation without changing the controls route',
+      (await parityState()).route.screen === 'camera' && (await parityState()).host === 'launcher' &&
+      await parityRoot.locator('.live-handoff-label').textContent() === 'Fullscreen handoff simulation');
+    await parityPage.keyboard.press('Escape');
+    await paritySettled();
+    check('camera simulation returns to its in-tab camera controls',
+      (await parityState()).route.screen === 'camera' && !(await parityState()).simulation &&
+      await toolsBody().locator('[data-action="camera-view"]').isVisible());
+    await parityClick('[data-tab="tools"] [data-live-action="back"]');
+    await openTool('lamp');
+    await toolsBody().locator('[data-value="lamp.warmth"]').evaluate(input => {
+      input.value = '37';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    check('Lamp controls update only the sample fixture and stay in the Tools workspace',
+      (await parityState()).route.screen === 'lamp' && !(await parityState()).simulation &&
+      await parityPage.evaluate(() => __portalMock.getState().values['lamp.warmth'] === 37));
+    await parityPage.evaluate(() => {
+      window.lampContentBefore = document.querySelector('.live-tools-stage > :not([hidden])');
+    });
+    await parityClick('[data-tab="tools"] [data-screen="lamp-preview"]');
+    check('Lamp Preview alone opens the labelled fullscreen display simulation',
+      (await parityState()).route.screen === 'lamp' && (await parityState()).simulation &&
+      await parityRoot.locator('.live-handoff-label').textContent() === 'Fullscreen handoff simulation');
+    await parityClick('#live-overlays [data-live-action="close-simulation"]');
+    check('Lamp display return preserves the mounted controls and edited fixture value',
+      await parityPage.evaluate(() => lampContentBefore === document.querySelector('.live-tools-stage > :not([hidden])') &&
+        document.querySelector('[data-tab="tools"] [data-value="lamp.warmth"]').value === '37') &&
+      !(await parityState()).simulation);
+    await parityClick('.live-launcher > .dock [data-screen="apps"]');
+    await parityClick('.live-launcher > .dock [data-screen="tools"]');
+    check('tab switching retains the tool route, workspace and current controls',
+      (await parityState()).route.screen === 'lamp' && await parityPage.evaluate(() =>
+        toolsAudit.workspace === document.querySelector('.live-tools-workspace') &&
+        lampContentBefore === document.querySelector('.live-tools-stage > :not([hidden])')));
+    await parityPage.keyboard.press('Escape');
+    await paritySettled();
+    check('Escape from a retained tool restores the list and its saved scroll',
+      (await parityState()).route.screen === 'tools' && await parityPage.evaluate(() =>
+        toolsAudit.list === document.querySelector('[data-tab="tools"] .screen-body') &&
+        toolsAudit.list.scrollTop === toolsAudit.scroll && !toolsAudit.list.hidden));
+    await parityContext.close();
     assert.deepEqual(errors, [], 'browser errors');
   } finally {
     console.log(JSON.stringify({ passed: checks.length, checks, browserErrors: errors }, null, 2));

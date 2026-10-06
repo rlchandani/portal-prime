@@ -186,7 +186,6 @@ internal fun approvedAppIdentity(pkg: String): Pair<String, Color>? = when (pkg)
   "org.breezyweather" -> "weather" to Color(0xFF2879B8)
   "org.y20k.transistor" -> "radio" to Color(0xFF2879B8)
   "com.facebook.alohaapps.settings" -> "gear" to Color(0xFF647480)
-  "com.android.quicksearchbox" -> "search" to Color(0xFF647480)
   "com.portal.assistant" -> "notes" to Color(0xFF7661AA)
   "com.portal.calendar" -> "cal" to Color(0xFFCB7338)
   "builtin:store" -> "bag" to Color(0xFF408763)
@@ -194,19 +193,29 @@ internal fun approvedAppIdentity(pkg: String): Pair<String, Color>? = when (pkg)
   "builtin:music" -> "music" to Color(0xFFC84E68)
   "builtin:calls" -> "phone" to Color(0xFF408763)
   "builtin:settings" -> "gear" to Color(0xFF647480)
+  "builtin:folder" -> "folder" to Color(0xFF2879B8)
   else -> null
 }
 
 @Composable
-internal fun ApprovedAppsIcon(pkg: String, label: String, size: Dp, bitmap: androidx.compose.ui.graphics.ImageBitmap? = null) {
+internal fun ApprovedAppsIcon(
+    pkg: String, label: String, size: Dp,
+    bitmap: androidx.compose.ui.graphics.ImageBitmap? = null, plain: Boolean = false,
+) {
   val identity = approvedAppIdentity(pkg)
-  if (identity == null && bitmap != null) {
-    androidx.compose.foundation.Image(bitmap, null, Modifier.size(size).clip(RoundedCornerShape(size / 4)))
+  if (bitmap != null && (plain || identity == null)) {
+    // Installed artwork owns its shape/background. Do not replace it with a
+    // generic package glyph or add another tile behind it.
+    androidx.compose.foundation.Image(bitmap, null,
+        Modifier.size(size).then(if (plain) Modifier else Modifier.clip(RoundedCornerShape(size / 4))))
   } else {
     val (glyph, color) = identity ?: ("bag" to Color(0xFF2879B8))
-    Box(Modifier.size(size).clip(RoundedCornerShape(size / 4)).background(color)
-        .border(1.dp, Color.White.copy(alpha = .18f), RoundedCornerShape(size / 4)), contentAlignment = Alignment.Center) {
-      ApprovedIcon(glyph, modifier = Modifier.size(size * .49f), tint = Color.White)
+    Box(Modifier.size(size).then(if (plain) Modifier else
+        Modifier.clip(RoundedCornerShape(size / 4)).background(color)
+            .border(1.dp, Color.White.copy(alpha = .18f), RoundedCornerShape(size / 4))),
+        contentAlignment = Alignment.Center) {
+      ApprovedIcon(glyph, modifier = Modifier.size(size * if (plain) .65f else .49f),
+          tint = if (plain) IosLabel else Color.White)
     }
   }
 }

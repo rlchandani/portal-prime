@@ -1295,12 +1295,15 @@ internal fun WorldClockContent() {
 }
 
 private data class BootAppOption(val pkg: String, val label: String, val icon: ImageBitmap)
-/** Every launchable app except our own launcher, for the boot-launch picker. */
+/** Launchable apps except our launcher and retired features, for the boot-launch picker. */
 private fun loadLaunchableApps(context: Context): List<BootAppOption> {
   val pm = context.packageManager
   val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
   return pm.queryIntentActivities(intent, 0)
-      .filter { it.activityInfo.packageName != context.packageName }
+      .filter {
+        it.activityInfo.packageName != context.packageName &&
+            it.activityInfo.packageName !in Curation.retiredPackages
+      }
       .mapNotNull { ri ->
         runCatching {
               BootAppOption(

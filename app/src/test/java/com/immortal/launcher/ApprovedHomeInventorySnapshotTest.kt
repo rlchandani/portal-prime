@@ -9,10 +9,48 @@ package com.immortal.launcher
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import org.junit.Assert.*
 import org.junit.Test
 
 class ApprovedHomeInventorySnapshotTest {
+  @Test fun simultaneousHomeAndAppsLoads_scanOnceAndShareTheCompleteSnapshot() {
+    val cache = HomePresentationInventoryCache<String>()
+    val firstStarted = CountDownLatch(1)
+    val releaseFirst = CountDownLatch(1)
+    val secondStarted = CountDownLatch(1)
+    val duplicateScan = CountDownLatch(1)
+    val scans = AtomicInteger()
+    val executor = Executors.newFixedThreadPool(2)
+    try {
+      val home = executor.submit<List<String>> {
+        cache.load {
+          scans.incrementAndGet()
+          firstStarted.countDown()
+          check(releaseFirst.await(5, TimeUnit.SECONDS))
+          listOf("Browser", "VLC")
+        }
+      }
+      assertTrue(firstStarted.await(2, TimeUnit.SECONDS))
+      val apps = executor.submit<List<String>> {
+        secondStarted.countDown()
+        cache.load {
+          scans.incrementAndGet()
+          duplicateScan.countDown()
+          listOf("Browser", "VLC")
+        }
+      }
+      assertTrue(secondStarted.await(2, TimeUnit.SECONDS))
+      assertFalse("Apps must join Home's in-flight scan", duplicateScan.await(200, TimeUnit.MILLISECONDS))
+      releaseFirst.countDown()
+      assertSame(home.get(2, TimeUnit.SECONDS), apps.get(2, TimeUnit.SECONDS))
+      assertEquals(1, scans.get())
+    } finally {
+      releaseFirst.countDown()
+      executor.shutdownNow()
+    }
+  }
+
   @Test fun repeatedLoads_reuseListAndIconIdentityUntilExplicitInvalidation() {
     val cache = HomePresentationInventoryCache<Any>()
     var scans = 0

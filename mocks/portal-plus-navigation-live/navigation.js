@@ -13,6 +13,9 @@
   const model = renderer.model;
   const pages = new Map(model.pages.map(page => [page.id, page]));
   const tabIds = ['home', 'apps', 'tools'];
+  const hiddenAppPackages = new Set([
+    'com.android.quicksearchbox', 'com.google.android.googlequicksearchbox',
+  ]);
   const toolIds = new Set(model.tools.map(tool => tool[0]));
   // Current native boundary supplied by the implementation owner, not inferred from
   // the frozen mock's older Activity inventory.
@@ -22,7 +25,7 @@
   ]);
   const fullscreen = new Set([
     'photos', 'digital-preview', 'welcome-preview', 'wake-light', 'lamp-preview',
-    'alarm-ring', 'ha-dashboard', 'provider-widgets', 'folder-preview', 'music', 'camera', 'lamp',
+    'alarm-ring', 'ha-dashboard', 'provider-widgets', 'folder-preview', 'music', 'camera-preview',
   ]);
   const appPages = new Set(['store', 'app-detail', 'app-folder', 'switcher', 'music']);
   const homePages = new Set(['edit', 'widgets']);
@@ -54,8 +57,8 @@
   let homePage = 0;
   let homeProjection = null;
 
-  const routeKey = route => `${route.category}/${route.screen}`;
-  const routeTitle = route => route.screen === 'settings'
+  const routeKey = route => `${route.category}/${route.screen}${route.reader ? `/reader/${route.reader}` : ''}`;
+  const routeTitle = route => route.reader || (route.screen === 'settings'
     ? model.categories.find(category => category[0] === route.category)?.[1] || 'Settings'
     : pages.get(route.screen)?.title || ({
       home: 'Home', apps: 'Apps', tools: 'Tools', store: 'App Store',
@@ -64,9 +67,10 @@
       photos: 'Photo display', 'digital-preview': 'Digital clock preview',
       'welcome-preview': 'Welcome preview', 'wake-light': 'Wake light',
       'lamp-preview': 'Lamp', 'alarm-ring': 'Alarm ringing',
+      'camera-preview': 'Camera display',
       'ha-dashboard': 'Home Assistant', 'provider-widgets': 'Android widget providers',
       'folder-preview': 'Folder preview',
-    })[route.screen] || route.screen;
+    })[route.screen] || route.screen);
   const button = (label, action) => {
     const node = document.createElement('button');
     node.type = 'button';
@@ -78,6 +82,7 @@
   const sourceMain = () => staging.querySelector('main');
   const routeFromSource = () => {
     const state = renderer.getState();
+    if (current.reader && state.screen === 'stories' && staging.querySelector('.story-text')) return { ...current };
     return { screen: state.screen, category: state.category };
   };
   const activePanel = () => host === 'activity' ? activity.panel : host === 'settings'
@@ -88,6 +93,7 @@
 
   function sourceNavigate(route) {
     renderer.navigate(route.screen, route.category);
+    if (route.reader) renderer.showAction('story', { name: route.reader });
     lastSourceMain = sourceMain();
   }
 
@@ -97,6 +103,7 @@
     return JSON.stringify({
       values: state.values, widgets: state.widgets, source: state.source,
       collections: state.collections, widgetSizes: state.widgetSizes, advanced: state.advanced,
+      installedApps: model.installed.map(({ packageName, name, artwork }) => ({ packageName, name, artwork })),
     });
   }
 
@@ -125,6 +132,7 @@
     // Hidden retained DOM has no scroll geometry; keep the offset saved before hiding it.
     if (!panel?.route || !panel.node.getClientRects().length) return;
     const positions = [...panel.node.querySelectorAll('.screen-body,.detail-body,.home-grid')]
+      .filter(element => element.getClientRects().length)
       .map(element => ({ top: element.scrollTop, left: element.scrollLeft }));
     const homeGrid = panel.node.querySelector('.live-widget-grid');
     const key = homeGrid ? `home/widgets/${homeGrid.dataset.livePage}` : routeKey(panel.route);
@@ -136,10 +144,100 @@
     const key = homeGrid ? `home/widgets/${homeGrid.dataset.livePage}` : routeKey(panel.route);
     const positions = scrollPositions.get(key);
     if (!positions) return;
-    panel.node.querySelectorAll('.screen-body,.detail-body,.home-grid').forEach((element, index) => {
-      element.scrollTop = positions[index]?.top || 0;
-      element.scrollLeft = positions[index]?.left || 0;
+    [...panel.node.querySelectorAll('.screen-body,.detail-body,.home-grid')]
+      .filter(element => element.getClientRects().length).forEach((element, index) => {
+        element.scrollTop = positions[index]?.top || 0;
+        element.scrollLeft = positions[index]?.left || 0;
+      });
+  }
+
+  function projectApps(content) {
+    // The frozen inventory contains glyph fixtures, not Android PackageManager artwork.
+    // Preserve supplied image markup or an explicit local/sample artwork fixture.
+    const grid = content.querySelector('.app-grid');
+    grid.dataset.liveAppsGrid = '';
+    content.querySelector('.detail-heading p').textContent =
+      'Sample installed-app fixtures · supplied artwork is sample data; plain glyphs otherwise.';
+    content.querySelectorAll('.app-with-menu').forEach(wrapper => {
+      const tile = wrapper.querySelector('.app-tile[data-action="launch"]');
+      const menu = wrapper.querySelector('[data-action="app-menu"]');
+      if (!tile || menu?.dataset.pkg !== tile.dataset.pkg) return;
+      tile.dataset.liveAppMenu = '';
+      tile.setAttribute('aria-haspopup', 'dialog');
+      tile.setAttribute('aria-description', 'Touch and hold or right-click for app actions. Keyboard: Shift+F10 or Menu key.');
+      wrapper.replaceWith(tile);
     });
+    grid.querySelector('.app-tile[data-screen="tools"]')?.remove();
+    grid.querySelectorAll('.app-tile .app-icon').forEach(icon => {
+      const fallback = icon.cloneNode(true);
+      fallback.querySelectorAll('img').forEach(image => image.remove());
+      fallback.dataset.liveArtwork = 'glyph';
+      if (!fallback.childElementCount) fallback.textContent = '◇';
+      let image = icon.querySelector('img');
+      const artwork = model.installed.find(app => app.packageName === icon.closest('.app-tile').dataset.pkg)?.artwork;
+      const imageSource = image?.getAttribute('src') || artwork;
+      if (typeof imageSource === 'string') {
+        let url;
+        try { url = new URL(imageSource, document.baseURI); } catch { /* Unavailable fixture artwork uses the glyph. */ }
+        if (url && (url.origin === location.origin || /^data:image\//.test(url.href))) {
+          image ||= document.createElement('img');
+          image.removeAttribute('srcset');
+          image.src = url.href;
+          icon.replaceChildren(image);
+        } else {
+          icon.replaceWith(fallback);
+          return;
+        }
+      }
+      icon.dataset.liveArtwork = image ? 'fixture' : 'glyph';
+      if (image) {
+        image.alt = ''; // The tile already supplies the app's accessible label.
+        const failed = () => icon.replaceWith(fallback);
+        image.addEventListener('error', failed, { once: true });
+        if (image.complete && !image.naturalWidth) queueMicrotask(failed);
+      }
+    });
+  }
+
+  function filterAppEntries(content) {
+    // Filter copied app identities, never the launcher's own search controls or glyphs.
+    content.querySelectorAll('[data-pkg],[data-value]').forEach(control => {
+      const pkg = control.dataset.pkg || (control.dataset.value?.startsWith('boot.')
+        ? control.dataset.value.slice(5) : null);
+      if (!hiddenAppPackages.has(pkg)) return;
+      (control.closest('.app-with-menu,.app-tile,.settings-row,.modal-option,.store-card') || control).remove();
+    });
+    return content;
+  }
+
+  function populateTools(panel, route, content, signature) {
+    if (!panel.workspace) {
+      const workspace = document.createElement('header');
+      workspace.className = 'live-tools-workspace';
+      const backControl = button('← Back', 'back');
+      const title = document.createElement('h1');
+      title.id = 'live-tools-title';
+      workspace.append(backControl, title);
+      const stage = document.createElement('div');
+      stage.className = 'live-tools-stage';
+      stage.setAttribute('aria-labelledby', title.id);
+      panel.node.append(workspace, stage);
+      Object.assign(panel, { workspace, stage, backControl, title });
+    }
+    const list = route.screen === 'tools';
+    const key = list ? 'toolsList' : 'toolsDetail';
+    const previous = panel[key];
+    if (!previous || previous.signature !== signature) {
+      previous?.node.remove();
+      panel.stage.append(content);
+      panel[key] = { node: content, signature };
+    }
+    if (panel.toolsList) panel.toolsList.node.hidden = !list;
+    if (panel.toolsDetail) panel.toolsDetail.node.hidden = list;
+    const parent = panel.history.at(-2);
+    panel.backControl.setAttribute('aria-label', `Back to ${list ? 'Home' : routeTitle(parent || { screen: 'tools' })}`);
+    panel.title.textContent = routeTitle(route);
+    panel.signature = signature;
   }
 
   function indexedWidgets() {
@@ -260,23 +358,28 @@
   }
 
   function cloneContent(route) {
-    if (route.screen === 'home' || route.screen === 'edit') return projectedHome(route);
+    if (route.screen === 'home' || route.screen === 'edit') return filterAppEntries(projectedHome(route));
+    if (route.reader) {
+      const content = document.createElement('section');
+      content.className = 'detail-body live-story-reader';
+      const sample = document.createElement('p');
+      sample.className = 'live-story-label';
+      sample.textContent = 'Sample story text · speech playback is simulated';
+      content.append(sample, staging.querySelector('.story-text').cloneNode(true),
+        staging.querySelector('[data-action="story-stop"]').cloneNode(true));
+      return content;
+    }
     const main = sourceMain();
     const source = main.querySelector('.home-body,.screen-body,.detail-body');
     if (!source) throw new Error(`No approved fixture content for ${route.screen}`);
-    const content = source.cloneNode(true);
+    const content = filterAppEntries(source.cloneNode(true));
     if (route.screen === 'apps') {
-      // Refine only the projected Apps HTML. The approved fixture stays read-only.
-      content.querySelectorAll('.app-with-menu').forEach(wrapper => {
-        const tile = wrapper.querySelector('.app-tile[data-action="launch"]');
-        const menu = wrapper.querySelector('[data-action="app-menu"]');
-        if (!tile || menu?.dataset.pkg !== tile.dataset.pkg) return;
-        tile.dataset.liveAppMenu = '';
-        tile.setAttribute('aria-haspopup', 'dialog');
-        tile.setAttribute('aria-description', 'Touch and hold or right-click for app actions. Keyboard: Shift+F10 or Menu key.');
-        wrapper.replaceWith(tile);
-      });
-      content.querySelector('.app-grid .app-tile[data-screen="tools"]')?.remove();
+      projectApps(content);
+    }
+    if (host === 'launcher' && activeTab === 'tools') {
+      content.querySelector(':scope > [data-screen="settings"]')?.remove();
+      content.querySelector(':scope > .detail-heading')?.remove();
+      return content; // The mounted workspace owns the single Back/title row.
     }
     if (route.screen !== 'home') {
       const originalBack = content.querySelector(':scope > [data-screen="settings"]');
@@ -299,8 +402,11 @@
       const focus = captureFocus();
       if (routeKey(panel.route || route) === routeKey(route)) saveScroll(panel);
       if (appHold && panel.node.contains(appHold.tile)) cancelAppHold();
-      panel.node.replaceChildren(content);
-      panel.signature = signature;
+      if (panel === tabs.get('tools')) populateTools(panel, route, content, signature);
+      else {
+        panel.node.replaceChildren(content);
+        panel.signature = signature;
+      }
       panel.route = { ...route };
       restoreScroll(panel);
       restoreFocus(focus);
@@ -415,14 +521,15 @@
 
   function syncOverlays() {
     if (localSimulation) return;
-    const sourceModal = staging.querySelector('.modal-layer');
+    // The frozen reader dialog is projected into the Tools body, below its fixed heading.
+    const sourceModal = current.reader && staging.querySelector('.story-text') ? null : staging.querySelector('.modal-layer');
     if (sourceModal) cancelAppHold();
     const sourceToast = staging.querySelector('.toast');
     const hadModal = !!overlays.querySelector('.modal-layer');
     const focus = captureFocus();
     overlays.replaceChildren();
     if (sourceModal) {
-      const modal = sourceModal.cloneNode(true);
+      const modal = filterAppEntries(sourceModal.cloneNode(true));
       if (modal.querySelector('.external-note')) {
         const label = document.createElement('strong');
         label.className = 'live-handoff-label';
@@ -569,7 +676,8 @@
     if (fullscreen.has(screen)) {
       return simulate(screen, 'Fullscreen handoff');
     }
-    const route = { screen, category: category || pages.get(screen)?.category || current.category };
+    const route = { screen, category: category || pages.get(screen)?.category || current.category,
+      ...(screen === 'stories' && options.reader ? { reader: options.reader } : {}) };
     const push = options.push !== false;
     if (internalActivities.has(screen)) return presentActivity(route, push, options.alreadyRendered);
     if (host === 'activity') {
@@ -603,7 +711,7 @@
   function back() {
     cancelAppHold();
     if (localSimulation) return closeSimulation();
-    if (staging.querySelector('.modal-layer')) {
+    if (staging.querySelector('.modal-layer') && !current.reader) {
       renderer.showAction('close');
       lastSourceMain = sourceMain();
       syncOverlays();
@@ -796,6 +904,14 @@
       return control.dataset.liveAction === 'back' ? back() : closeSimulation();
     }
     const data = control.dataset;
+    if (data.action === 'story' && host === 'launcher' && activeTab === 'tools') {
+      event.preventDefault();
+      return navigate('stories', null, { reader: data.name });
+    }
+    if (data.action === 'camera-view') {
+      event.preventDefault();
+      return simulate('camera-preview', 'Fullscreen handoff');
+    }
     if (data.action === 'header-pair') {
       event.preventDefault();
       return navigate('phone');

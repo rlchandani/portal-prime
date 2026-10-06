@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -29,6 +30,8 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -64,9 +67,6 @@ class LampActivity : ComponentActivity() {
     private var panelActive = false
     private var originalBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     private var originallyKeptAwake = false
-    private val previewLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) result.data?.let { state = it.lampState() }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,10 +81,7 @@ class LampActivity : ComponentActivity() {
             PortalPrimeTheme(darkTheme = false) {
                 if (preview) LampPreview(state, onChange = { state = it }, onBack = ::finishPreview)
                 else SettingsScaffold(title = "Lamp", onBack = { finish() }) {
-                    LampSettings(state, onChange = { state = it }, onPreview = {
-                        previewLauncher.launch(Intent(this, LampActivity::class.java)
-                            .putExtra(LAMP_PREVIEW, true).withLampState(state))
-                    })
+                    LampControlsContent()
                 }
                 if (preview) LaunchedEffect(state.brightness) { applyBrightness(state.brightness) }
             }
@@ -132,6 +129,27 @@ private fun Intent.lampState() = ApprovedLampState(
     getFloatExtra(LAMP_WARMTH, .6f).coerceIn(0f, 1f), getBooleanExtra(LAMP_RED, false))
 private fun Intent.withLampState(state: ApprovedLampState): Intent =
     putExtra(LAMP_BRIGHTNESS, state.brightness).putExtra(LAMP_WARMTH, state.warmth).putExtra(LAMP_RED, state.red)
+
+private val ApprovedLampStateSaver = listSaver<ApprovedLampState, Any>(
+    save = { listOf(it.brightness, it.warmth, it.red) },
+    restore = { ApprovedLampState(it[0] as Float, it[1] as Float, it[2] as Boolean) },
+)
+
+/** Ephemeral controls stay in their host; only Preview takes ownership of panel brightness. */
+@Composable
+internal fun LampControlsContent() {
+    val context = LocalContext.current
+    var state by rememberSaveable(stateSaver = ApprovedLampStateSaver) {
+        mutableStateOf((context as? android.app.Activity)?.intent?.lampState() ?: ApprovedLampState())
+    }
+    val previewLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) result.data?.let { state = it.lampState() }
+    }
+    LampSettings(state, onChange = { state = it }, onPreview = {
+        previewLauncher.launch(Intent(context, LampActivity::class.java)
+            .putExtra(LAMP_PREVIEW, true).withLampState(state))
+    })
+}
 
 private enum class ApprovedLampControl(val title: String, val min: Int) {
     BRIGHTNESS("Brightness", 5), WARMTH("Warmth", 0),

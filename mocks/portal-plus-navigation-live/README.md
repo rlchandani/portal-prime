@@ -48,10 +48,64 @@ opens the frozen renderer's existing app action dialog. A recognized hold
 suppresses its release click. Movement, scrolling, release, pointer cancellation,
 another contact, navigation, window focus loss, or page visibility changes cancel a
 pending hold. Touch scrolling remains enabled. These refinements apply only to
-the projected Apps page; other categories and Options settings remain available.
-Alarm, countdowns, intercom, stories, timers, notes, converter, ISS, aurora and
-speed details render in the Tools content area. Cameras and Lamp mark their
-fullscreen handoffs. Photos, Music and other fullscreen destinations mark their
+the projected Apps grid; other categories and Options settings remain available.
+Apps tiles and icon containers have transparent backgrounds, no individual card
+borders/shadows, and no artificial colored squares. Builtins and missing-art
+fallbacks use plain glyphs in the launcher text palette (`var(--text)`, native
+IosLabel `#F4F7F9`), without colored tile fills.
+The frozen installed-app inventory supplies glyphs, so its default icons are
+explicitly labelled sample fallbacks. Supplied image markup or an installed
+fixture's optional `artwork` URL is displayed with `object-fit: contain`, without
+a background plate, clipping or tint; the supplied image keeps its original
+pixels and is not replaced by Home icon curation. A failed image falls back to a
+glyph in the same legible text palette.
+Artwork URLs are restricted to this origin or inline image data. This does not
+extract artwork from a Portal or claim that fixture glyphs are real app icons.
+Home favorites, Store icons and app folders retain their approved styling.
+The live projection hides Google Search app entries by both package identities:
+`com.android.quicksearchbox` and `com.google.android.googlequicksearchbox`.
+This also removes captured shortcuts from folders, favorites pickers, recent
+apps, app search results and package choices. The original inventory and frozen
+renderer remain unchanged. Internal Apps/catalog/Settings search fields and
+other results remain available; the shared search glyph is not removed.
+
+Tools keeps one mounted, stacked workspace header within 56 px horizontal /
+36 px vertical outer padding. Back sits on its own row with a 68 px minimum
+height, followed by a 26 px gap and a 44 px title with 56 px line height,
+-0.5 px letter spacing and 34 px bottom padding. The scroll body follows below
+the fixed header with no second inset or generic description. Fixture-specific
+sample labels remain in the body or the demo toolbar.
+Its list DOM stays mounted behind the current detail;
+Back/Escape restores its scroll, and tab switches retain the current tool.
+Tool content changes do not animate the workspace or add a nested slide.
+The browser route mapping, aligned with the native Tools owner's supplied
+boundaries, is:
+
+| Tools tile | In-tab controls route | Display boundary |
+| --- | --- | --- |
+| Alarm | `alarm` | `alarm-ring` fullscreen simulation |
+| Cameras | `camera` | View → `camera-preview` fullscreen simulation |
+| Countdowns | `countdowns` | Sample controls |
+| Lamp | `lamp` | Preview → `lamp-preview` fullscreen simulation |
+| Bedtime story | `stories` picker → `stories` with a `reader` title | Dark in-workspace sample reader; no device TTS |
+| Intercom | `intercom` | Frozen sample audio action; no network audio |
+| Timers | `timers` | Fixture countdowns |
+| Leave a note | `notes` | Sample note/memo actions |
+| Converter | `converter` | Fixture calculations/rates |
+| ISS passes | `iss` | Sample passes |
+| Aurora outlook | `aurora` | Sample readings |
+| Speed test (Advanced) | `speed` | Sample result; no bandwidth test |
+
+Cameras' add/remove form and Lamp's brightness/warmth/red controls run in the
+Tools pane. Camera View and Lamp Preview alone mark fullscreen handoffs; returning
+keeps the controls route and fixture values. No camera stream, screen brightness
+or hardware light is driven. This mapping is the browser implementation; the
+native Tools owner's supplied mapping agrees with these boundaries: all twelve
+tiles enter the shared workspace, only saved-camera View and Lamp Preview leave
+for display, and Bedtime Back returns reader → picker → Tools. The frozen story
+dialog's text and reading controls are projected into the dark Tools body below
+the same fixed heading. Browser speech controls remain explicitly simulated.
+Photos, Music and other fullscreen destinations mark their
 fullscreen handoffs. Third-party and system interfaces retain the approved
 boundary annotations, explicitly labelled as simulations.
 
@@ -86,15 +140,32 @@ does not have.
 `window.__portalNavigationDemo` exposes route/cache diagnostics and navigation
 for browser verification. It is not a device API.
 
-Run the isolated browser checks with a local Playwright installation:
+Run the isolated browser checks with the authorized runtime and existing
+loopback server:
 
 ```sh
-PLAYWRIGHT_MODULE=/path/to/playwright node mocks/portal-plus-navigation-live/verify.browser.cjs
+PLAYWRIGHT_MODULE=~/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright node mocks/portal-plus-navigation-live/verify.browser.cjs
 ```
 
-The gate retains all 93 navigation/Apps/widget checks and adds eight photo-order
-regressions covering actual visual bounds, Home/Customize parity, shared-photo
-page membership and duplicate-photo reachability. Widget tests establish the
+The script rejects any other runtime override or origin; every browser context
+blocks requests outside `http://127.0.0.1:8765`. If browser execution is blocked,
+report that limitation without switching runtimes or bypassing restrictions.
+
+The gate defines 143 checks: it retains all 101 navigation/Apps/widget/photo-order
+checks and adds 42 parity checks, with the
+camera/Lamp fullscreen checks now targeting their explicit display routes.
+It adds transparent tile/container/artwork, legible text-palette glyph, failed-image fallback,
+focus, unchanged Home/Store styling, all twelve Tools routes, common workspace
+identity, retained list scroll, tab return, camera form/display and Lamp
+control/display regressions, plus dark Bedtime reader → picker → Tools returns
+and fixed workspace chrome while the reader body scrolls.
+The artwork regression injects an explicit inline
+sample image; it is not a native app icon capture.
+Google Search regressions use the captured stock shortcut, change its label
+in memory and add the alternate package fixture to prove package-based filtering
+in Apps, the Settings folder, both pickers and internal app search. Internal
+Settings search must still find brightness controls. No frozen fixture file is
+written. Widget tests establish the
 approved photo-first default through the existing Move action because the frozen
 sample's raw order lists Photo last. Coverage includes widget geometry,
 page-local sizing, packing/gutter, indexed actions, pointer, real touch, keyboard,

@@ -59,11 +59,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * In-page overlays for the sky/space tools whose logic already landed but whose UI formerly lived
- * only in ForkHome ([IssPasses], [Aurora]). Hosted full-page by [ToolsActivity] — each is a centered
- * card over a scrim, with an `onDismiss` back to the Tools list. This file holds only rendering; the
- * computation lives in the matching object. More tools (converter, timers, notes, day/year, speed
- * test) hook into the same scaffolding in follow-up changes.
+ * Shared utility content for Home modals and Tools detail workspaces. Home retains its bounded
+ * card, title and Close control; [ApprovedToolWorkspace] supplies the page chrome in Tools.
+ * Computation and persistence stay in the matching feature objects.
  */
 
 /* ------------------------------------------------------------------ ISS passes */
@@ -78,7 +76,7 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("ISS passes", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      ToolTitle("ISS passes")
       ApprovedAppsButton("Refresh passes") { passes = null; retry++ }
       val p = passes
       when {
@@ -157,7 +155,7 @@ internal fun AuroraOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("Aurora outlook", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      ToolTitle("Aurora outlook")
       ApprovedAppsButton("Refresh outlook") { retry++ }
       val st = status
       when {
@@ -255,7 +253,7 @@ internal fun ConverterOverlay(onDismiss: () -> Unit) {
   BackHandler { if (picker != null) picker = null else onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("Converter", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      ToolTitle("Converter")
       ToolGroup("Convert") {
         ToolValueRow("Category", category) { picker = "Category" }
         ToolValueRow("From", from) { picker = "From" }
@@ -308,7 +306,7 @@ internal fun TimersOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("Timers", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      ToolTitle("Timers")
       Text("Start a timer", color = IosSecondary, fontSize = 22.sp)
       val presets = listOf(1, 3, 5, 10, 15, 30)
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
@@ -428,7 +426,7 @@ internal fun NotesOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
-      Text("Leave a note", color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+      ToolTitle("Leave a note")
       message?.let { Text(it, color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp) }
       TextField(
           value = text,
@@ -550,6 +548,10 @@ internal val LocalApprovedToolPage = androidx.compose.runtime.staticCompositionL
 
 @Composable
 internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
+  if (LocalApprovedToolWorkspace.current) {
+    content()
+    return
+  }
   val page = LocalApprovedToolPage.current
   if (!page) KeepInteractiveScreenAwake()
   Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
@@ -558,6 +560,10 @@ internal fun Scrim(onDismiss: () -> Unit, content: @Composable () -> Unit) {
 
 @Composable
 internal fun ToolCard(maxWidth: Int = 860, onClose: (() -> Unit)? = null, content: @Composable () -> Unit) {
+  if (LocalApprovedToolWorkspace.current) {
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(24.dp)) { content() }
+    return
+  }
   val page = LocalApprovedToolPage.current
   val cfg = androidx.compose.ui.platform.LocalConfiguration.current
   if (page) {
@@ -578,6 +584,14 @@ internal fun ToolCard(maxWidth: Int = 860, onClose: (() -> Unit)? = null, conten
 }
 
 internal val ToolWindow: Color @Composable get() = IosCard
+
+/** Home modals keep their title; Tools detail has one heading supplied by its workspace. */
+@Composable
+private fun ToolTitle(title: String) {
+  if (!LocalApprovedToolWorkspace.current) {
+    Text(title, color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
+  }
+}
 
 @Composable
 private fun ToolGroup(title: String, content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {

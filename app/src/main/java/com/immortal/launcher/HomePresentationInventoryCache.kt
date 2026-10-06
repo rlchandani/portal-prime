@@ -6,9 +6,10 @@
  */
 package com.immortal.launcher
 
-/** Loads outside the lock: package broadcasts never wait for bitmap rendering or binder IO. */
+/** One scan at a time; package broadcasts never wait for bitmap rendering or binder IO. */
 internal class HomePresentationInventoryCache<T> {
   private val lock = Any()
+  private val loadingLock = Any()
   private var generation = 0L
   @Volatile private var snapshot: List<T>? = null
 
@@ -21,6 +22,13 @@ internal class HomePresentationInventoryCache<T> {
 
   /** Caller runs on IO. An invalidated in-flight load cannot republish stale app identities. */
   fun load(loader: () -> List<T>): List<T> {
+    snapshot?.let { return it }
+    // Home and Apps may request the same cold inventory before either has finished.
+    // The separate flight lock shares that work without blocking invalidate() or peek().
+    synchronized(loadingLock) { return loadSnapshot(loader) }
+  }
+
+  private fun loadSnapshot(loader: () -> List<T>): List<T> {
     while (true) {
       val version = synchronized(lock) {
         snapshot?.let { return it }

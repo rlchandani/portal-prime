@@ -7,8 +7,6 @@
 
 package com.immortal.launcher
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -37,7 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +47,6 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,12 +55,8 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 /**
- * The full-page "Tools" screen, opened from the built-in Tools tile on the home grid. A plain
- * launcher for the in-process tool features. See docs/design/feature-integration.md (step 3).
- *
- * Tools that already have their own Activity (cameras, countdowns, lamp, bedtime, intercom) launch
- * it directly. Tools whose UI formerly lived only in ForkHome open as an in-page overlay hosted here
- * (see [HomeToolOverlays]); this change adds the sky/space pair (ISS passes, aurora outlook).
+ * Tools list and in-tab detail workspaces, also embedded in the native Home launcher.
+ * Only explicit camera viewing and lamp preview actions hand off to full-screen Activities.
  */
 class ToolsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,19 +66,21 @@ class ToolsActivity : ComponentActivity() {
   }
 }
 
-/** Which in-page tool overlay is showing over the list (or [ToolPage.LIST] for the list itself). */
-private enum class ToolPage {
-  LIST,
-  ISS,
-  AURORA,
-  SPEEDTEST,
-  TIMERS,
-  NOTES,
-  CONVERTER,
-  ALARM,
-  COUNTDOWNS,
-  INTERCOM,
-  BEDTIME,
+/** Which tool detail is open in the tab (or [ToolPage.LIST] for the retained list). */
+private enum class ToolPage(val title: String) {
+  LIST("Tools"),
+  ISS("ISS passes"),
+  AURORA("Aurora outlook"),
+  SPEEDTEST("Speed test"),
+  TIMERS("Timers"),
+  NOTES("Leave a note"),
+  CONVERTER("Converter"),
+  ALARM("Alarm"),
+  CAMERAS("Cameras"),
+  COUNTDOWNS("Countdowns"),
+  LAMP("Lamp"),
+  INTERCOM("Intercom"),
+  BEDTIME("Bedtime story"),
 }
 
 /** Native tool pages; an embedding Home host supplies its theme, header and dock. */
@@ -96,24 +90,37 @@ internal fun ApprovedToolsScreen(
     modifier: Modifier = Modifier,
     embedded: Boolean = false,
 ) {
-  var page by remember { mutableStateOf(ToolPage.LIST) }
+  var page by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(ToolPage.LIST) }
+  // Keep the grid's position outside the conditional detail composition.
+  val listState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
   val back = { page = ToolPage.LIST }
   BackHandler { if (page == ToolPage.LIST) onExit() else back() }
   androidx.compose.runtime.CompositionLocalProvider(LocalApprovedToolPage provides true) {
     val content: @Composable () -> Unit = {
       Box(modifier.fillMaxSize()) {
-        when (page) {
-          ToolPage.LIST -> ToolsScreen(onExit = onExit, onOpen = { page = it })
-          ToolPage.ISS -> IssOverlay(back)
-          ToolPage.AURORA -> AuroraOverlay(back)
-          ToolPage.SPEEDTEST -> SpeedTestOverlay(back)
-          ToolPage.TIMERS -> TimersOverlay(back)
-          ToolPage.NOTES -> NotesOverlay(back)
-          ToolPage.CONVERTER -> ConverterOverlay(back)
-          ToolPage.ALARM -> ToolPageOverlay("Alarm", back) { AlarmContent() }
-          ToolPage.COUNTDOWNS -> ToolPageOverlay("Countdowns", back) { CountdownSettingsContent() }
-          ToolPage.INTERCOM -> ToolPageOverlay("Intercom", back) { IntercomContent() }
-          ToolPage.BEDTIME -> BedtimeOverlay(back)
+        if (page == ToolPage.LIST) {
+          ToolsScreen(listState = listState, onOpen = { page = it })
+        } else {
+          ApprovedToolWorkspace(
+              title = page.title, onDismiss = back,
+              scrollContent = page != ToolPage.BEDTIME,
+          ) {
+            when (page) {
+              ToolPage.ISS -> IssOverlay(back)
+              ToolPage.AURORA -> AuroraOverlay(back)
+              ToolPage.SPEEDTEST -> SpeedTestOverlay(back)
+              ToolPage.TIMERS -> TimersOverlay(back)
+              ToolPage.NOTES -> NotesOverlay(back)
+              ToolPage.CONVERTER -> ConverterOverlay(back)
+              ToolPage.ALARM -> AlarmContent()
+              ToolPage.CAMERAS -> CameraControlsContent(onDismiss = back)
+              ToolPage.COUNTDOWNS -> CountdownSettingsContent()
+              ToolPage.LAMP -> LampControlsContent()
+              ToolPage.INTERCOM -> IntercomContent()
+              ToolPage.BEDTIME -> BedtimeOverlay(back)
+              ToolPage.LIST -> Unit
+            }
+          }
         }
       }
     }
@@ -121,26 +128,17 @@ internal fun ApprovedToolsScreen(
   }
 }
 
-/**
- * A light in-page tool page: a [ToolCard] with a [title] + ✕ close header, holding [content]. Used
- * for the tools converted from standalone activities (Alarm, Countdowns, Intercom). Closing is via
- * the ✕ or Back only — not tap-outside — so accidental taps don't lose your place.
- */
-@Composable
-private fun ToolPageOverlay(title: String, onDismiss: () -> Unit, content: @Composable () -> Unit) {
-  BackHandler { onDismiss() }
-  Scrim(onDismiss) {
-    ToolCard(onClose = onDismiss) {
-      Text(title, color = IosLabel, fontSize = 44.sp, lineHeight = 56.sp, fontWeight = FontWeight.Medium)
-      content()
-    }
-  }
-}
-
 /** Bedtime keeps its dark aesthetic, so it gets a dark card instead of the light [ToolCard]. */
 @Composable
 private fun BedtimeOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
+  if (LocalApprovedToolWorkspace.current) {
+    Surface(color = Color(0xFF0E0E1A), shape = RoundedCornerShape(28.dp),
+        modifier = Modifier.fillMaxSize()) {
+      BedtimeContent(onExit = onDismiss)
+    }
+    return
+  }
   if (LocalApprovedToolPage.current) {
     Column(Modifier.fillMaxSize().padding(horizontal = 56.dp, vertical = 36.dp)) {
       ApprovedAppsButton("‹  Tools", onClick = onDismiss)
@@ -175,16 +173,16 @@ private fun BedtimeOverlay(onDismiss: () -> Unit) {
 private data class ToolItem(val label: String, val description: String, val onOpen: () -> Unit)
 
 @Composable
-private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
-  val context = LocalContext.current
-  val resume = rememberApprovedResume()
+private fun ToolsScreen(
+    listState: androidx.compose.foundation.lazy.grid.LazyGridState,
+    onOpen: (ToolPage) -> Unit,
+) {
   val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
-  fun launch(cls: Class<*>) = context.startActivity(Intent(context, cls))
   val tools = listOf(
       ToolItem("Alarm", "Choose your next wake-up time.") { onOpen(ToolPage.ALARM) },
-      ToolItem("Cameras", "Keep an eye on your home.") { launch(CameraViewerActivity::class.java) },
+      ToolItem("Cameras", "Keep an eye on your home.") { onOpen(ToolPage.CAMERAS) },
       ToolItem("Countdowns", "Count down to a day that matters.") { onOpen(ToolPage.COUNTDOWNS) },
-      ToolItem("Lamp", "A soft glow for your room.") { launch(LampActivity::class.java) },
+      ToolItem("Lamp", "A soft glow for your room.") { onOpen(ToolPage.LAMP) },
       ToolItem("Bedtime story", "Something calm for the evening.") { onOpen(ToolPage.BEDTIME) },
       ToolItem("Intercom", "Talk across the house.") { onOpen(ToolPage.INTERCOM) },
       ToolItem("Timers", "A little time, set aside.") { onOpen(ToolPage.TIMERS) },
@@ -195,6 +193,7 @@ private fun ToolsScreen(onExit: () -> Unit, onOpen: (ToolPage) -> Unit) {
   ) + if (advanced) listOf(ToolItem("Speed test", "Download test and latency.") { onOpen(ToolPage.SPEEDTEST) }) else emptyList()
   androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
       columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(3),
+      state = listState,
       horizontalArrangement = Arrangement.spacedBy(24.dp),
       modifier = Modifier.fillMaxSize().padding(horizontal = 56.dp),
       contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 36.dp, bottom = 24.dp),

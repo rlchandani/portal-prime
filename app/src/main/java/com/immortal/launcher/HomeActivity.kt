@@ -201,12 +201,13 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
 import org.json.JSONObject
 
-private data class AppEntry(
+internal data class AppEntry(
     val label: String,
     val component: ComponentName,
     val icon: ImageBitmap,
     val folder: String? = null,
     val uninstallable: Boolean = false,
+    val artwork: ImageBitmap = icon,
 )
 
 private data class WidgetProviderEntry(
@@ -258,12 +259,27 @@ private object ApprovedHomeInventory {
   }
 }
 
+/** Home warms this inventory before Apps is opened; exclude Home's injected shortcuts. */
+internal fun peekApprovedInstalledApps(context: Context): List<AppEntry>? =
+    ApprovedHomeInventory.apps.peek()?.filter {
+      it.component.packageName != context.packageName && it.component != CALLS_COMPONENT
+    }
+
+/** Run on IO; cold Home and Apps requests share one package/icon scan. */
+internal fun loadApprovedInstalledApps(context: Context): List<AppEntry> {
+  ApprovedHomeInventory.register(context)
+  return ApprovedHomeInventory.apps.load { loadApps(context.applicationContext) }.filter {
+    it.component.packageName != context.packageName && it.component != CALLS_COMPONENT
+  }
+}
+
 /** Portal-TV (ripleyhome) fallback for [launchStockHome]: how many system Back presses to reach
  *  Meta's launcher, and the gap between them. Best-effort — on some Portal TVs the burst lands on
  *  the previously-used app instead (issue #91), and it's untestable from here. */
 private const val STOCK_HOME_BACK_PRESSES = 5
 private const val STOCK_HOME_BACK_INTERVAL_MS = 300L
 private const val HOME_APP_WIDGET_HOST_ID = 0x4611
+private const val SAVED_LAUNCHER_TAB = "approved_saved_launcher_tab"
 
 // Sentinel component for the injected "Calls" grid tile — no real Activity backs it; onLaunch
 // recognizes this and bridges to the stock Portal calling surface via launchStockHome().
@@ -283,6 +299,8 @@ class HomeActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    launcherTab = ApprovedLauncherTab.fromId(savedInstanceState?.getString(SAVED_LAUNCHER_TAB))
+        ?: ApprovedLauncherTab.HOME
     consumeLauncherTabIntent(intent)
     consumeWidgetLibraryIntent(intent)
     enterImmersive()
@@ -358,6 +376,11 @@ class HomeActivity : ComponentActivity() {
         )
       }
     }
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    outState.putString(SAVED_LAUNCHER_TAB, launcherTab.id)
+    super.onSaveInstanceState(outState)
   }
 
   override fun onNewIntent(intent: Intent) {
@@ -4601,9 +4624,10 @@ private fun loadApps(context: Context): List<AppEntry> {
               val ai = ri.activityInfo
               val rawLabel = ri.loadLabel(pm).toString()
               // Check for icon override first, then use app's own icon
+              val originalDrawable = ri.loadIcon(pm)
               val drawable = Curation.iconOverride(ai.packageName)
                   ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
-                  ?: ri.loadIcon(pm)
+                  ?: originalDrawable
               // Render with IconRenderer (adaptive composite + squircle mask)
               val bmp: Bitmap = IconRenderer.renderAppIcon(context, drawable, 144)
               // Uninstallable: not a system app OR is an updated system app
@@ -4616,6 +4640,7 @@ private fun loadApps(context: Context): List<AppEntry> {
                   icon = bmp.asImageBitmap(),
                   folder = Curation.folderFor(ai.packageName),
                   uninstallable = isUninstallable,
+                  artwork = originalDrawable.toBitmap(144, 144).asImageBitmap(),
               ) to rawLabel
             }
             .getOrNull()

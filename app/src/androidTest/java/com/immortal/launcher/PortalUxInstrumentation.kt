@@ -306,6 +306,7 @@ class PortalUxInstrumentation : Instrumentation() {
         val response = File(folder, "response.json")
         request.delete()
         response.delete()
+        val homeMonitor = addMonitor("com.immortal.launcher.HomeActivity", null, false)
         targetContext.startActivity(Intent().setClassName(targetContext.packageName,
             "com.immortal.launcher.HomeActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         sendStatus(0, Bundle().apply { putBoolean("observerReady", true) })
@@ -323,6 +324,14 @@ class PortalUxInstrumentation : Instrumentation() {
             val name = command.optString("name", "latest").replace(Regex("[^a-zA-Z0-9_-]"), "_")
             try {
                 val active = root(automation)
+                if (command.optString("command") == "recreateHome") {
+                    val home = checkNotNull(homeMonitor.lastActivity)
+                    runOnMainSync { home.recreate() }
+                    waitForIdleSync()
+                    SystemClock.sleep(500)
+                    response.writeText(JSONObject().put("name", name).put("success", true).toString())
+                    continue
+                }
                 if (command.optString("command") == "widgetGesture") {
                     widgetGesture(automation, active, command) { phase ->
                         File(folder, "$name-gesture.json").writeText(JSONObject()
@@ -359,6 +368,7 @@ class PortalUxInstrumentation : Instrumentation() {
             }
         }
         } finally {
+            removeMonitor(homeMonitor)
             // Opening the real pairing UI opts in. A test visit must preserve the prior opt-in.
             if (RemotePairing.isEnabled(targetContext) != remoteEnabledBefore) {
                 RemotePairing.setEnabled(targetContext, remoteEnabledBefore)

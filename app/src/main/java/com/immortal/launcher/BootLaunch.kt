@@ -30,7 +30,9 @@ object BootLaunch {
                 .takeIf { it.exists() }
                 ?.readLines()
                 ?.map { it.trim() }
-                ?.filter { it.isNotBlank() && !it.startsWith("#") }
+                ?.filter {
+                  it.isNotBlank() && !it.startsWith("#") && it !in Curation.retiredPackages
+                }
                 ?: emptyList()
           }
           .getOrDefault(emptyList())

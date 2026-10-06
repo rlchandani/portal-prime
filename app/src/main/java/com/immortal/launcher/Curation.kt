@@ -19,6 +19,9 @@ package com.immortal.launcher
  */
 object Curation {
 
+  /** Retired launcher features are also excluded from otherwise unrestricted app pickers. */
+  val retiredPackages = setOf("com.android.quicksearchbox", "com.google.android.googlequicksearchbox")
+
   /** Hidden by package id. */
   val hiddenPackages =
       setOf(
@@ -42,7 +45,7 @@ object Curation {
           // there's no functionality lost and no redundant tile. (Portal Settings stays for the
           // Meta-specific device controls we don't replicate.)
           "com.android.settings",
-      )
+      ) + retiredPackages
 
   /** Hidden by visible label (catches gated apps that share a package). */
   val hiddenLabels = setOf("Help", "Photos", "Debug Camera", "Avatar Editor")
@@ -65,7 +68,6 @@ object Curation {
           "com.facebook.alohaapps.settings" to "Settings",
           "com.facebook.aloha.chargecontrol" to "Settings",
           "com.android.inputmethod.latin" to "Settings",
-          "com.android.quicksearchbox" to "Settings",
           "com.android.tv.quicksettings" to "Settings", // Portal TV "Picture Mode" — useful, fold in
           // falcon's Amazon-link app: needed once to register, then useless. Provisioning auto-opens
           // it for the initial sign-in, so fold it into Settings rather than cluttering the grid.
@@ -78,7 +80,6 @@ object Curation {
           "com.android.settings" to "System Settings",
           "me.zhanghai.android.files" to "Material Files",
           "com.facebook.alohaapps.settings" to "Portal Settings",
-          "com.android.quicksearchbox" to "Google Search",
           "com.amazon.alexa.multimodal.falcon" to "Alexa setup", // it's the account-link app, not the assistant
       )
 
@@ -115,8 +116,6 @@ object Curation {
           "org.videolan.vlc" to R.drawable.icon_vlc_tile,
           "com.aurora.store" to R.drawable.icon_aurora,
           "org.fdroid.fdroid" to R.drawable.icon_fdroid_tile,
-          "com.android.quicksearchbox" to R.drawable.icon_google_tile,
-          "com.google.android.googlequicksearchbox" to R.drawable.icon_google_tile,
           "org.breezyweather" to R.drawable.icon_weather_tile,
           "com.portal.assistant" to R.drawable.icon_jarvis_tile,
           // com.portal.calendar is the app labelled "PortalHub" on this device (orange radio in

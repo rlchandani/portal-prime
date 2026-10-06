@@ -111,8 +111,11 @@ private fun ApprovedAppsContent(
   var resumed by remember(owner) { mutableStateOf(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
   var refresh by remember { mutableStateOf(0) }
   var lastSuccessfulEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
+  var lastRecentEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
   var recents by remember { mutableStateOf<List<AppItem>?>(null) }
-  var allApps by remember { mutableStateOf<List<AppItem>?>(null) }
+  var allApps by remember {
+    mutableStateOf(peekApprovedInstalledApps(context)?.map { AppItem(it.label, it.component, it.artwork) })
+  }
   var badges by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
   var query by remember { mutableStateOf("") }
   var searching by remember { mutableStateOf(initiallySearching) }
@@ -126,7 +129,11 @@ private fun ApprovedAppsContent(
   var renameFolder by remember { mutableStateOf(false) }
   var newFolderName by remember { mutableStateOf("") }
   var moveApp by remember { mutableStateOf<AppItem?>(null) }
-  var failure by remember { mutableStateOf<String?>(null) }
+  var appsFailure by remember { mutableStateOf<String?>(null) }
+  var recentsFailure by remember { mutableStateOf<String?>(null) }
+  val showingRecents = recent && query.isBlank()
+  val failure = if (showingRecents) recentsFailure else appsFailure
+  val displayReady = if (showingRecents) recents != null else allApps != null
   DisposableEffect(owner) {
     val observer = LifecycleEventObserver { _, _ ->
       resumed = owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
@@ -172,13 +179,29 @@ private fun ApprovedAppsContent(
       val loaded = withContext(Dispatchers.IO) {
         val loadingContext = kotlinx.coroutines.currentCoroutineContext()
         val checkActive = { loadingContext.ensureActive() }
-        loadAllApps(context, checkActive) to loadRecents(context, checkActive)
+        loadAllApps(context, checkActive)
       }
       kotlinx.coroutines.currentCoroutineContext().ensureActive()
-      allApps = loaded.first; recents = loaded.second; failure = null
+      allApps = loaded; appsFailure = null
       lastSuccessfulEpoch = epoch
     } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-    catch (error: Exception) { failure = "Your apps couldn’t be loaded. Try again." }
+    catch (error: Exception) { appsFailure = "Your apps couldn’t be loaded. Try again." }
+  }
+  // UsageStats and recent-app icon lookups are not on the All apps opening path.
+  LaunchedEffect(resume, refresh, pageActive, resumed, recent) {
+    if (!recent || !pageActive || !resumed) return@LaunchedEffect
+    val epoch = resume to refresh
+    if (lastRecentEpoch == epoch) return@LaunchedEffect
+    try {
+      val loaded = withContext(Dispatchers.IO) {
+        val loadingContext = kotlinx.coroutines.currentCoroutineContext()
+        loadRecents(context) { loadingContext.ensureActive() }
+      }
+      kotlinx.coroutines.currentCoroutineContext().ensureActive()
+      recents = loaded; recentsFailure = null
+      lastRecentEpoch = epoch
+    } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+    catch (error: Exception) { recentsFailure = "Your recent apps couldn’t be loaded. Try again." }
   }
   val installed = allApps.orEmpty()
   val ordered = UserLayout.applyOrder(installed, order) { it.component.flattenToString() }
@@ -222,15 +245,18 @@ private fun ApprovedAppsContent(
             Text(failure!!, color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 24.dp))
             ApprovedAppsButton("Try again", modifier = Modifier.padding(top = 20.dp)) { refresh++ }
           }
-          if (allApps == null || (recent && recents == null)) Text("Loading apps…", color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 32.dp))
-          if (allApps != null && shown.isEmpty() && (query.isNotBlank() || recent || folder != null)) {
+          if (failure == null && !displayReady) Text("Loading apps…", color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 32.dp))
+          if (failure == null && displayReady &&
+              shown.isEmpty() && (query.isNotBlank() || recent || folder != null)) {
             Text(if (query.isNotBlank()) "No apps match “${query.trim()}”." else if (recent) "No recent apps yet. Usage access may need setup." else "This folder is empty.", color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 32.dp))
             if (recent) ApprovedAppsButton("Usage access", modifier = Modifier.padding(top = 20.dp)) { launchApprovedIntent(context, Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)) }
           }
           Spacer(Modifier.height(36.dp))
         }
       }
-      val builtins = if (!recent && folder == null && query.isBlank()) listOf("store" to "Immortal App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") else emptyList()
+      // Publish installed apps, folders and built-ins together, never a short grid
+      // of built-ins that shifts when the asynchronous inventory arrives.
+      val builtins = if (allApps != null && !recent && folder == null && query.isBlank()) listOf("store" to "Immortal App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") else emptyList()
       val otherFolders = if (!recent && folder == null && query.isBlank()) folderNames.filterNot { it == "Settings" } else emptyList()
       val tiles = shown.map { app -> AppsTileEntry(app.label, app = app) } + otherFolders.map { AppsTileEntry(it, folder = it) } + builtins.map { AppsTileEntry(it.second, builtin = it.first) }
       items(tiles.size, key = { index -> tiles[index].app?.component?.flattenToString() ?: "${tiles[index].builtin}:${tiles[index].folder}" }, contentType = { "app-tile" }) { index ->
@@ -314,18 +340,17 @@ private data class AppsTileEntry(val label: String, val app: AppItem? = null, va
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun InstalledAppTile(entry: AppsTileEntry, badge: Int, subtitle: String?, onOpen: () -> Unit, onOptions: () -> Unit) {
-  Surface(color = IosCard, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, IosDivider)) {
-    Column(Modifier.widthIn(min = 150.dp).heightIn(min = 205.dp).combinedClickable(
+    Column(Modifier.fillMaxWidth().heightIn(min = 205.dp).combinedClickable(
         onClick = onOpen, onLongClickLabel = "App actions",
         onLongClick = if (entry.app != null) onOptions else null)
         .padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
       BadgedBox(badge = { if (badge > 0) Badge { Text(if (badge > 9) "9+" else "$badge") } }) {
-        ApprovedAppsIcon(entry.app?.component?.packageName ?: "builtin:${entry.builtin ?: "folder"}", entry.label, 92.dp, entry.app?.icon)
+        ApprovedAppsIcon(entry.app?.component?.packageName ?: "builtin:${entry.builtin ?: "folder"}",
+            entry.label, 92.dp, entry.app?.icon, plain = true)
       }
       Text(entry.label, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 14.dp))
       if (subtitle != null) Text(subtitle, color = IosSecondary, fontSize = 20.sp, lineHeight = 28.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 7.dp))
     }
-  }
 }
 
 @Composable
@@ -483,28 +508,8 @@ private fun loadRecents(context: Context, checkActive: () -> Unit): List<AppItem
 /** All installed launchable apps (for search / drawer), alphabetised, curated, minus Immortal. */
 private fun loadAllApps(context: Context, checkActive: () -> Unit): List<AppItem> {
   checkActive()
-  val pm = context.packageManager
-  val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-  val seen = HashSet<String>()
-  return pm.queryIntentActivities(intent, 0)
-      .asSequence()
-      .filter { it.activityInfo.packageName != context.packageName && !Curation.isHidden(it.activityInfo.packageName, "") }
-      .mapNotNull { ri ->
+  return loadApprovedInstalledApps(context).map {
         checkActive()
-        if (ri.activityInfo.packageName in seen) return@mapNotNull null
-        runCatching {
-              val ai = ri.activityInfo
-              val raw = ri.loadLabel(pm).toString()
-              if (raw in Curation.hiddenLabels) return@mapNotNull null
-              val bmp = cachedApprovedInstalledIcon(context, ai.packageName) { ri.loadIcon(pm) }
-              seen += ai.packageName
-              AppItem(
-                  Curation.displayLabel(ai.packageName, raw),
-                  ComponentName(ai.packageName, ai.name),
-                  bmp)
-            }
-            .getOrNull()
+        AppItem(it.label, it.component, it.artwork)
       }
-      .sortedBy { it.label.lowercase(Locale.getDefault()) }
-      .toList()
 }
