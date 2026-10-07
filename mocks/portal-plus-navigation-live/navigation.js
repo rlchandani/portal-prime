@@ -56,6 +56,11 @@
   let suppressedAppClick = null;
   let homePage = 0;
   let homeProjection = null;
+  const widgetSwipeSlop = 10; // Logical Portal pixels; paging starts after touch slop.
+  const widgetSwipeThreshold = 64;
+  let widgetSwipe = null;
+  let suppressedWidgetClick = false;
+  let homeSlide = null;
 
   const routeKey = route => `${route.category}/${route.screen}${route.reader ? `/reader/${route.reader}` : ''}`;
   const routeTitle = route => route.reader || (route.screen === 'settings'
@@ -132,7 +137,7 @@
     // Hidden retained DOM has no scroll geometry; keep the offset saved before hiding it.
     if (!panel?.route || !panel.node.getClientRects().length) return;
     const positions = [...panel.node.querySelectorAll('.screen-body,.detail-body,.home-grid')]
-      .filter(element => element.getClientRects().length)
+      .filter(element => element.getClientRects().length && !element.closest('.live-widget-page-outgoing'))
       .map(element => ({ top: element.scrollTop, left: element.scrollLeft }));
     const homeGrid = panel.node.querySelector('.live-widget-grid');
     const key = homeGrid ? `home/widgets/${homeGrid.dataset.livePage}` : routeKey(panel.route);
@@ -145,7 +150,7 @@
     const positions = scrollPositions.get(key);
     if (!positions) return;
     [...panel.node.querySelectorAll('.screen-body,.detail-body,.home-grid')]
-      .filter(element => element.getClientRects().length).forEach((element, index) => {
+      .filter(element => element.getClientRects().length && !element.closest('.live-widget-page-outgoing')).forEach((element, index) => {
         element.scrollTop = positions[index]?.top || 0;
         element.scrollLeft = positions[index]?.left || 0;
       });
@@ -219,6 +224,12 @@
   }
 
   function populateTools(panel, route, content, signature) {
+    // Optional design review: the normal navigation demo keeps its frozen projection.
+    if (window.__portalToolsRedesign) {
+      window.__portalToolsRedesign.mount(panel.node, route);
+      panel.signature = signature;
+      return;
+    }
     if (!panel.workspace) {
       const workspace = document.createElement('header');
       workspace.className = 'live-tools-workspace';
@@ -330,6 +341,11 @@
     const grid = content.querySelector('.home-grid');
     grid.className = 'home-grid live-widget-grid';
     grid.dataset.livePage = homePage;
+    grid.dataset.liveEditing = String(route.screen === 'edit');
+    const viewport = document.createElement('div');
+    viewport.className = 'live-widget-page-viewport';
+    grid.before(viewport);
+    viewport.append(grid);
     grid.replaceChildren();
     packWidgets(selected, span).forEach(({ entry, column, row, width, height }) => {
       const slot = document.createElement('div');
@@ -361,7 +377,11 @@
       toolbar.append(add);
       content.querySelector('.widget-page').prepend(toolbar);
     }
-    content.querySelector('.widget-page > span:not(.live-widget-toolbar)').textContent = `${homePage + 1} of ${pageCount}`;
+    content.querySelectorAll('.widget-page [data-action="page"]').forEach(control => control.remove());
+    const counter = content.querySelector('.widget-page > span:not(.live-widget-toolbar)');
+    counter.textContent = `${homePage + 1} of ${pageCount}`;
+    counter.setAttribute('role', 'status');
+    counter.setAttribute('aria-live', 'polite');
     return content;
   }
 
@@ -407,9 +427,11 @@
     const content = cloneContent(route);
     const signature = content.outerHTML;
     if (force || panel.signature !== signature) {
+      if (panel === tabs.get('home')) cancelHomeSlide();
       const focus = captureFocus();
       if (routeKey(panel.route || route) === routeKey(route)) saveScroll(panel);
       if (appHold && panel.node.contains(appHold.tile)) cancelAppHold();
+      if (widgetSwipe && panel.node.contains(widgetSwipe.grid)) cancelWidgetSwipe();
       if (panel === tabs.get('tools')) populateTools(panel, route, content, signature);
       else {
         panel.node.replaceChildren(content);
@@ -424,7 +446,8 @@
     const isHome = route.screen === 'home' || route.screen === 'edit';
     panel.node.classList.toggle('home-screen', isHome);
     if (isHome) {
-      panel.node.style.background = homeProjection.paint.background;
+      // Home and the redesigned Tools share the launcher's wallpaper and theme wash.
+      panel.node.style.background = 'transparent';
       panel.node.classList.toggle('grain-background', homeProjection.paint.grain);
     } else {
       panel.node.style.background = '';
@@ -477,15 +500,20 @@
     Object.entries(PORTAL_SPEC[theme]).forEach(([key, value]) =>
       element.style.setProperty(`--${key}`, value));
     element.classList.toggle('dark', theme === 'dark');
+    element.dataset.theme = theme;
+    element.style.colorScheme = theme;
   }
 
   function syncChrome() {
     const state = renderer.getState();
-    // The launcher owns a permanently dark palette. The choice belongs to Settings
-    // and its editors; launcher dialogs also inherit the launcher's dark colors.
     applyPalette(canvas, state.theme);
-    applyPalette(launcher, 'dark');
-    applyPalette(overlays, host === 'launcher' ? 'dark' : state.theme);
+    applyPalette(launcher, state.theme);
+    applyPalette(overlays, state.theme);
+    const wallpaper = homeProjection?.paint.background || launcherWallpaper;
+    launcher.style.background = state.theme === 'light'
+      ? `linear-gradient(rgba(242,243,247,0.92),rgba(242,243,247,0.92)), ${wallpaper}`
+      : wallpaper;
+    tabs.forEach(panel => applyPalette(panel.node, state.theme));
     document.getElementById('demo-theme').value = state.theme;
     const editing = host === 'launcher' && activeTab === 'home' && current.screen === 'edit';
     customizeControl.hidden = activeTab !== 'home';
@@ -510,10 +538,22 @@
       node.classList.toggle('selected', node.dataset.id === current.category));
     const themeButton = settingsHeader.querySelector('[data-action="theme"]');
     themeButton.textContent = state.theme === 'light' ? 'Dark appearance' : 'Light appearance';
+    const themeLabel = state.theme === 'dark' ? 'Switch to day theme' : 'Switch to night theme';
+    themeButton.setAttribute('aria-label', themeLabel);
+    const launcherTheme = launcherHeader.querySelector('[data-action="theme"]');
+    const themeGlyph = state.theme === 'dark' ? 'theme_day' : 'theme_night';
+    launcherTheme.setAttribute('aria-label', themeLabel);
+    launcherTheme.title = themeLabel;
+    if (launcherTheme.dataset.glyph !== themeGlyph) {
+      launcherTheme.querySelector('.icon').innerHTML = I[themeGlyph];
+      launcherTheme.dataset.glyph = themeGlyph;
+    }
     document.getElementById('demo-route').textContent =
       `${host === 'activity' ? 'Internal Activity simulation' : host === 'settings' ? 'Settings' : routeTitle({ screen: activeTab })} · ${routeTitle(current)}`;
     if (activity) {
-      activity.window.querySelector('[data-action="theme"]').textContent = themeButton.textContent;
+      const activityTheme = activity.window.querySelector('[data-action="theme"]');
+      activityTheme.textContent = themeButton.textContent;
+      activityTheme.setAttribute('aria-label', themeLabel);
       const sidebar = activity.window.querySelector('.settings-sidebar');
       if (activity.tier !== state.advanced && sourceSidebar) {
         sidebar.querySelector('.sidebar-nav').replaceChildren(
@@ -527,11 +567,23 @@
     document.title = `Immortal · ${routeTitle(current)} · browser navigation demo`;
   }
 
+  function changeTheme() {
+    renderer.showAction('theme');
+    lastSourceMain = sourceMain();
+    // Theme changes update inherited colors and retained chrome only. Reprojecting
+    // bodies or overlays here would discard unsubmitted editors and tool drafts.
+    syncChrome();
+  }
+
   function syncOverlays() {
     if (localSimulation) return;
     // The frozen reader dialog is projected into the Tools body, below its fixed heading.
     const sourceModal = current.reader && staging.querySelector('.story-text') ? null : staging.querySelector('.modal-layer');
-    if (sourceModal) cancelAppHold();
+    if (sourceModal) {
+      cancelAppHold();
+      cancelWidgetSwipe();
+      cancelHomeSlide();
+    }
     const sourceToast = staging.querySelector('.toast');
     const hadModal = !!overlays.querySelector('.modal-layer');
     const focus = captureFocus();
@@ -681,6 +733,8 @@
 
   function navigate(screen, category, options = {}) {
     cancelAppHold();
+    cancelWidgetSwipe();
+    cancelHomeSlide();
     if (fullscreen.has(screen)) {
       return simulate(screen, 'Fullscreen handoff');
     }
@@ -714,9 +768,13 @@
     lastSourceMain = sourceMain();
     syncChrome();
     syncOverlays();
+    window.__portalToolsRedesign?.activate(host === 'launcher' && activeTab === 'tools');
   }
 
   function back() {
+    cancelWidgetSwipe();
+    cancelHomeSlide();
+    if (host === 'launcher' && activeTab === 'tools' && window.__portalToolsRedesign?.back()) return;
     cancelAppHold();
     if (localSimulation) return closeSimulation();
     if (staging.querySelector('.modal-layer') && !current.reader) {
@@ -741,6 +799,8 @@
   }
 
   function simulate(screen, kind) {
+    cancelWidgetSwipe();
+    cancelHomeSlide();
     localSimulation = true;
     modalFocus = document.activeElement;
     const layer = document.createElement('div');
@@ -824,7 +884,7 @@
     mirrorInputs();
     if (type === 'click' && element.dataset.action === 'page' && activeTab === 'home' &&
         ['home', 'edit'].includes(current.screen)) {
-      homePage = (homePage + Number(element.dataset.dir) + homeProjection.pageCount) % homeProjection.pageCount;
+      return pageHome(Number(element.dataset.dir));
     }
     const target = sourceTarget(element);
     if (type === 'click') {
@@ -896,7 +956,109 @@
         Math.hypot(event.clientX - appHold.x, event.clientY - appHold.y) > appHoldSlop) cancelAppHold();
   }
 
+  function pageHome(direction) {
+    cancelHomeSlide();
+    const next = Math.max(0, Math.min(homePage + direction, homeProjection.pageCount - 1));
+    if (next === homePage) return;
+    const oldGrid = tabs.get('home').node.querySelector('.live-widget-grid');
+    const outgoingGrid = oldGrid.cloneNode(true);
+    const scroll = { top: oldGrid.scrollTop, left: oldGrid.scrollLeft };
+    homePage = next;
+    refreshFromSource();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const grid = tabs.get('home').node.querySelector('.live-widget-grid');
+    const outgoing = document.createElement('div');
+    outgoing.className = 'live-widget-page-outgoing';
+    outgoing.inert = true;
+    outgoing.setAttribute('aria-hidden', 'true');
+    outgoingGrid.querySelectorAll('[id]').forEach(element => element.removeAttribute('id'));
+    outgoing.append(outgoingGrid);
+    grid.closest('.live-widget-page-viewport').append(outgoing);
+    outgoingGrid.scrollTop = scroll.top;
+    outgoingGrid.scrollLeft = scroll.left;
+    // Native translates both whole pages by one widget-region width on settlement.
+    const timing = { duration: 180, easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)', fill: 'both' };
+    const slide = { outgoing, animations: [
+      grid.animate([{ transform: `translateX(${-direction * 100}%)` }, { transform: 'translateX(0px)' }], timing),
+      outgoingGrid.animate([{ transform: 'translateX(0px)' }, { transform: `translateX(${direction * 100}%)` }], timing),
+    ] };
+    homeSlide = slide;
+    Promise.all(slide.animations.map(animation => animation.finished)).catch(() => {}).then(() => {
+      if (homeSlide === slide) cancelHomeSlide();
+    });
+  }
+
+  function cancelHomeSlide() {
+    const slide = homeSlide;
+    homeSlide = null;
+    if (!slide) return;
+    slide.animations.forEach(animation => animation.cancel());
+    slide.outgoing.remove();
+  }
+
+  function cancelWidgetSwipe() {
+    if (widgetSwipe) clearTimeout(widgetSwipe.timer);
+    widgetSwipe = null;
+  }
+
+  function startWidgetSwipe(event) {
+    cancelWidgetSwipe(); // A second contact cancels the pending swipe.
+    suppressedWidgetClick = false;
+    if (!event.isPrimary || event.button !== 0 || host !== 'launcher' || activeTab !== 'home' ||
+        !['home', 'edit'].includes(current.screen) || localSimulation || overlays.querySelector('.modal-layer')) return;
+    const grid = event.target.closest?.('.live-widget-grid');
+    if (!grid || !canvas.contains(grid) || grid.closest('[hidden],[inert]')) return;
+    cancelHomeSlide();
+    if (event.target.closest('.live-widget-edit-controls,input,textarea,select,[contenteditable]')) return;
+    const pending = { grid, pointerId: event.pointerId, x: event.clientX, y: event.clientY, axis: null,
+      logicalScale: 1920 / canvas.getBoundingClientRect().width, held: false, timer: null };
+    widgetSwipe = pending;
+    if (current.screen === 'edit' && event.target.closest('.live-widget-slot')) {
+      // Immediate drags page; only a stationary long hold reserves the editing gesture.
+      pending.timer = setTimeout(() => {
+        if (widgetSwipe !== pending || !grid.isConnected) return;
+        pending.held = true;
+        suppressedWidgetClick = true;
+      }, appHoldDelay);
+    }
+    // No capture or preventDefault on press: taps and native vertical scrolling survive.
+  }
+
+  function moveWidgetSwipe(event) {
+    const pending = widgetSwipe;
+    if (!pending || pending.pointerId !== event.pointerId) return;
+    const dx = (event.clientX - pending.x) * pending.logicalScale;
+    const dy = (event.clientY - pending.y) * pending.logicalScale;
+    if (Math.hypot(dx, dy) <= widgetSwipeSlop) return;
+    clearTimeout(pending.timer);
+    suppressedWidgetClick = true;
+    if (pending.held) return;
+    if (!pending.axis) {
+      if (Math.abs(dy) >= Math.abs(dx)) pending.axis = 'vertical';
+      else if (Math.abs(dx) > Math.abs(dy) * 1.5) pending.axis = 'horizontal';
+    }
+    if (pending.axis === 'horizontal') event.preventDefault();
+  }
+
+  function finishWidgetSwipe(event) {
+    const pending = widgetSwipe;
+    if (!pending || pending.pointerId !== event.pointerId) return;
+    moveWidgetSwipe(event);
+    cancelWidgetSwipe();
+    const dx = (event.clientX - pending.x) * pending.logicalScale;
+    const dy = (event.clientY - pending.y) * pending.logicalScale;
+    if (pending.grid.isConnected && !pending.held && pending.axis === 'horizontal' &&
+        Math.abs(dx) - widgetSwipeSlop >= widgetSwipeThreshold && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      pageHome(dx > 0 ? 1 : -1);
+    }
+  }
+
   function onClick(event) {
+    if (suppressedWidgetClick && event.detail > 0) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     const control = event.target.closest('button,[data-action]');
     // A release can land on the newly opened overlay or on the tile after Escape.
     // Keep suppression until the next pointerdown; keyboard menu actions still work.
@@ -912,6 +1074,10 @@
       return control.dataset.liveAction === 'back' ? back() : closeSimulation();
     }
     const data = control.dataset;
+    if (data.action === 'theme') {
+      event.preventDefault();
+      return changeTheme();
+    }
     if (data.action === 'story' && host === 'launcher' && activeTab === 'tools') {
       event.preventDefault();
       return navigate('stories', null, { reader: data.name });
@@ -937,6 +1103,10 @@
         host = 'launcher';
         return navigate('home', null, { push: false, switching: true });
       }
+      if (window.__portalToolsRedesign && host === 'launcher' && activeTab === 'tools' &&
+          data.screen === 'tools' && launcherDock.contains(control)) {
+        return window.__portalToolsRedesign.returnToLibrary();
+      }
       return navigate(data.screen, null, { switching: launcherDock.contains(control) && tabIds.includes(data.screen) });
     }
     if (data.action === 'category') {
@@ -961,6 +1131,8 @@
   }
 
   function fit() {
+    cancelWidgetSwipe();
+    cancelHomeSlide();
     const scale = Math.min(viewport.clientWidth / 1920, viewport.clientHeight / 1280);
     canvas.style.transform = `scale(${scale})`;
     canvas.style.left = `${(viewport.clientWidth - 1920 * scale) / 2}px`;
@@ -984,8 +1156,24 @@
   sourceNavigate({ screen: 'home', category: 'appearance' });
   const launcher = document.createElement('main');
   launcher.className = 'app-screen live-launcher';
+  const launcherWallpaper = sourceMain().style.background || PORTAL_SPEC.dark.background;
+  launcher.style.background = launcherWallpaper;
   const launcherHeader = sourceMain().querySelector('.app-header').cloneNode(true);
   const launcherDock = sourceMain().querySelector('.dock').cloneNode(true);
+  const launcherThemeStyles = document.createElement('style');
+  launcherThemeStyles.textContent = `
+    .live-launcher .photo-copy { color: #f4f7f9; }
+    .live-launcher[data-theme="light"] .primary { color: #ffffff; }
+    .live-launcher[data-theme="light"] .home-screen .weather-main .icon svg { color: #99610f; }
+    .live-launcher[data-theme="light"] .home-screen .weather-low { color: var(--secondary); }
+    .live-launcher[data-theme="light"] .home-screen .quick-control { background: var(--surface2); }
+    .live-launcher[data-theme="light"] .home-screen .quick-control.on { background: var(--selected); }
+    .live-launcher[data-theme="light"] .home-screen .quick-control small { color: var(--secondary); }
+    .live-launcher[data-theme="light"] .home-screen .status-banner {
+      background: #fff0d1; color: #765819; border-color: #cbaa62;
+    }
+  `;
+  document.head.append(launcherThemeStyles);
   const customizeControl = launcherHeader.querySelector('[data-screen="edit"]');
   const tabStage = document.createElement('div');
   tabStage.className = 'live-tab-stage';
@@ -1000,6 +1188,7 @@
   overlays.id = 'live-overlays';
   canvas.append(launcher, settings, overlays);
   document.addEventListener('pointerdown', startAppHold, true);
+  document.addEventListener('pointerdown', startWidgetSwipe, true);
   canvas.addEventListener('contextmenu', event => {
     const tile = appMenuTile(event.target);
     if (!tile) return;
@@ -1008,14 +1197,22 @@
     openAppMenu(tile);
   });
   document.addEventListener('pointermove', moveAppHold, true);
+  document.addEventListener('pointermove', moveWidgetSwipe, true);
+  document.addEventListener('pointerup', finishWidgetSwipe, true);
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
     document.addEventListener(type, event => {
       if (appHold?.pointerId === event.pointerId) cancelAppHold();
+      if (widgetSwipe?.pointerId === event.pointerId) cancelWidgetSwipe();
     }, true);
   }
   document.addEventListener('scroll', cancelAppHold, true);
+  document.addEventListener('scroll', event => {
+    if (widgetSwipe?.grid === event.target) cancelWidgetSwipe();
+  }, true);
   window.addEventListener('blur', cancelAppHold);
+  window.addEventListener('blur', cancelWidgetSwipe);
   document.addEventListener('visibilitychange', cancelAppHold);
+  document.addEventListener('visibilitychange', cancelWidgetSwipe);
   canvas.addEventListener('click', onClick);
   canvas.addEventListener('input', event => {
     if (event.target.type !== 'checkbox') forward(event.target, 'input');
@@ -1027,9 +1224,9 @@
   });
   document.getElementById('demo-back').addEventListener('click', back);
   document.getElementById('demo-theme').addEventListener('change', event => {
-    if (event.target.value !== renderer.getState().theme) renderer.showAction('theme');
-    refreshFromSource();
+    if (event.target.value !== renderer.getState().theme) changeTheme();
   });
+  document.getElementById('demo-theme').closest('label').firstChild.textContent = 'Interface appearance ';
   document.addEventListener('keydown', event => {
     const tile = appMenuTile(event.target);
     if (tile && (event.key === 'Enter' || event.key === ' ')) suppressedAppClick = null;

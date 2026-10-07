@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Immortal Screensaver</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* App host: no picker chrome (that's mock-only). Just the stage + shared clock overlay. */
+  #hint { display: none; }
+  #chrome-mode { display: none; } /* keep the mode label hidden on-device by default */
+  #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.5); font: 300 22px -apple-system, "Segoe UI", sans-serif; background: #000; z-index: 30;
+    transition: opacity .8s ease; }
+  #loading.hide { opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="chrome-scrim"></div>
+  <div id="chrome-vignette"></div>
+  <div id="chrome-clock"><div id="chrome-time">--:--</div><div id="chrome-date"></div></div>
+  <div id="chrome-mode"></div>
+  <div id="loading">Loading your photos…</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+window.Android = {getPhotos: () => JSON.stringify(['wilderness','denali','yosemite'].map((name) => ({url:'../assets/'+name+'.jpg'}))), getMode: () => params.get('mode') || 'kenBurns', getIntervalSec: () => Number(params.get('interval')) || 30, use24Hour: () => params.get('format') === '24h'};
+</script>
+<script src="photos.js"></script>
+<script src="lib-engine.js"></script>
+<script src="modes.js"></script>
+<script src="mode-impls.js"></script>
+<script src="scheduler.js"></script>
+<script>
+(async function () {
+  const stage = document.getElementById("stage");
+
+  // Mode + clock format from the host bridge (falls back to shuffle / 12h).
+  function bridgeMode() {
+    try { if (window.Android && window.Android.getMode) return window.Android.getMode() || "shuffle"; } catch (e) {}
+    if (window.SS_CONFIG && window.SS_CONFIG.mode) return window.SS_CONFIG.mode;
+    return "shuffle";
+  }
+  function use24() {
+    try { if (window.Android && window.Android.use24Hour) return !!window.Android.use24Hour(); } catch (e) {}
+    return false;
+  }
+  // Per-photo dwell in seconds (host bridge). 0 → engine uses its own sensible default.
+  function intervalSec() {
+    try { if (window.Android && window.Android.getIntervalSec) return window.Android.getIntervalSec() || 0; } catch (e) {}
+    if (window.SS_CONFIG && window.SS_CONFIG.intervalSec) return window.SS_CONFIG.intervalSec;
+    return 0;
+  }
+
+  // When the host renders its own native clock/overlays on top (?nativeClock=1), suppress the
+  // engine's built-in clock + scrim so we don't draw two clocks. The engine is then purely the
+  // photo layer; the app's Face overlay (clock face, calendar, now-playing) sits above it.
+  const nativeClock = new URLSearchParams(location.search).has("nativeClock");
+  if (nativeClock) {
+    ["chrome-clock", "chrome-scrim", "chrome-mode"].forEach((id) => {
+      const el = document.getElementById(id); if (el) el.style.display = "none";
+    });
+  } else {
+    // Standalone (browser/dev): the engine draws its own clock honoring 24h.
+    (function clock() {
+      const timeEl = document.getElementById("chrome-time"), dateEl = document.getElementById("chrome-date");
+      const h24 = use24();
+      function tick() {
+        const d = new Date();
+        let h = d.getHours(); const m = String(d.getMinutes()).padStart(2, "0");
+        if (h24) { timeEl.textContent = `${String(h).padStart(2,"0")}:${m}`; }
+        else { const hh = h % 12 || 12; timeEl.textContent = `${hh}:${m}`; }
+        dateEl.textContent = d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+      }
+      tick(); setInterval(tick, 1000);
+    })();
+  }
+
+  // Pre-measure photo dimensions so the very first mode already has correct orientation info.
+  // Cap the initial measure so a huge library doesn't stall the start; the rest measure lazily.
+  if (window.premeasureAll) { try { await window.premeasureAll(6); } catch (e) {} }
+
+  document.getElementById("loading").classList.add("hide");
+
+  if (!window.PHOTOS || !window.PHOTOS.length) {
+    document.getElementById("loading").textContent = "No photos to show";
+    document.getElementById("loading").classList.remove("hide");
+    return;
+  }
+
+  SS.startEngine({
+    stage,
+    mode: bridgeMode(),
+    intervalSec: intervalSec(),
+    onMode: () => {},
+  });
+})();
+</script>
+</body>
+</html>

@@ -16,6 +16,9 @@ import org.json.JSONObject
  * on the home screen; when one elapses it rings through the existing chime system
  * ([ChimePlayer]). Persisted as JSON in SharedPrefs and re-armed via [TimerScheduler]
  * so a running timer survives the launcher being killed or the device rebooting.
+ *
+ * The object monitor serializes every read/modify/write and its scheduling side effect
+ * across Tools, legacy callers, receivers and startup. A caller's own UI lock is insufficient.
  */
 object TimerConfig {
 
@@ -34,7 +37,7 @@ object TimerConfig {
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-  fun load(context: Context): List<Timer> {
+  @Synchronized fun load(context: Context): List<Timer> {
     val raw = prefs(context).getString(KEY, null) ?: return emptyList()
     return runCatching {
       val arr = JSONArray(raw)
@@ -61,7 +64,7 @@ object TimerConfig {
   }
 
   /** Create + persist + schedule a new timer running [durationMs] from now. */
-  fun add(context: Context, label: String, durationMs: Long): Timer {
+  @Synchronized fun add(context: Context, label: String, durationMs: Long): Timer {
     val t = Timer(
         id = System.currentTimeMillis().toString(36) + "-" + (0..9999).random(),
         label = label.ifBlank { "Timer" },
@@ -73,20 +76,20 @@ object TimerConfig {
     return t
   }
 
-  fun remove(context: Context, id: String) {
+  @Synchronized fun remove(context: Context, id: String) {
     val existing = load(context)
     existing.firstOrNull { it.id == id }?.let { TimerScheduler.cancel(context, it) }
     save(context, existing.filterNot { it.id == id })
   }
 
   /** Drop a fired/expired timer without touching its (already-spent) alarm. */
-  fun forget(context: Context, id: String) {
+  @Synchronized fun forget(context: Context, id: String) {
     save(context, load(context).filterNot { it.id == id })
   }
 
   /** Re-arm alarms for every still-pending timer (boot / app start). Expired ones
    *  are dropped. */
-  fun rearmAll(context: Context) {
+  @Synchronized fun rearmAll(context: Context) {
     val now = System.currentTimeMillis()
     val (live, dead) = load(context).partition { it.endAtMillis > now }
     if (dead.isNotEmpty()) save(context, live)

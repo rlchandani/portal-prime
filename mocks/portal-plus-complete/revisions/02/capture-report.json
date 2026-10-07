@@ -1,0 +1,4563 @@
+{
+  "next": 651,
+  "total": 651,
+  "results": [
+    {
+      "id": "light-screen-touch",
+      "screen": "touch",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-display",
+      "screen": "display",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-appearance",
+      "screen": "appearance",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-wallpaper",
+      "screen": "wallpaper",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-screensaver",
+      "screen": "screensaver",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-sources",
+      "screen": "sources",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-styles",
+      "screen": "styles",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-faces",
+      "screen": "faces",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-dismiss",
+      "screen": "dismiss",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-immich",
+      "screen": "immich",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-smb",
+      "screen": "smb",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-dav",
+      "screen": "dav",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-album",
+      "screen": "album",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-web",
+      "screen": "web",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-folder",
+      "screen": "folder",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-albums",
+      "screen": "albums",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-calendar",
+      "screen": "calendar",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-calendar-url",
+      "screen": "calendar-url",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-clock",
+      "screen": "clock",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-quickbar",
+      "screen": "quickbar",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-weather",
+      "screen": "weather",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-world",
+      "screen": "world",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-countdowns",
+      "screen": "countdowns",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-chime",
+      "screen": "chime",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-welcome",
+      "screen": "welcome",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-sunrise",
+      "screen": "sunrise",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-alarm",
+      "screen": "alarm",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-multiroom",
+      "screen": "multiroom",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-mqtt",
+      "screen": "mqtt",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-ha",
+      "screen": "ha",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-ha-entities",
+      "screen": "ha-entities",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-phone",
+      "screen": "phone",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-boot",
+      "screen": "boot",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-device",
+      "screen": "device",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-health",
+      "screen": "health",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-sleep",
+      "screen": "sleep",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-crypto",
+      "screen": "crypto",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-todo",
+      "screen": "todo",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-news",
+      "screen": "news",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-stocks",
+      "screen": "stocks",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-alpaca",
+      "screen": "alpaca",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-options",
+      "screen": "options",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-camera",
+      "screen": "camera",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-lamp",
+      "screen": "lamp",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-intercom",
+      "screen": "intercom",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-timers",
+      "screen": "timers",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-notes",
+      "screen": "notes",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-converter",
+      "screen": "converter",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-stories",
+      "screen": "stories",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-iss",
+      "screen": "iss",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-aurora",
+      "screen": "aurora",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-speed",
+      "screen": "speed",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-apk",
+      "screen": "apk",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-help",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-system",
+      "screen": "system",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-managed",
+      "screen": "managed",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-debug",
+      "screen": "debug",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-home",
+      "screen": "home",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-apps",
+      "screen": "apps",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-app-folder",
+      "screen": "app-folder",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-store",
+      "screen": "store",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-app-detail",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-tools",
+      "screen": "tools",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-edit",
+      "screen": "edit",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-widgets",
+      "screen": "widgets",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-settings",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-photos",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-digital-preview",
+      "screen": "digital-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-welcome-preview",
+      "screen": "welcome-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-wake-light",
+      "screen": "wake-light",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-lamp-preview",
+      "screen": "lamp-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-alarm-ring",
+      "screen": "alarm-ring",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-folder-preview",
+      "screen": "folder-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-ha-dashboard",
+      "screen": "ha-dashboard",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-switcher",
+      "screen": "switcher",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-provider-widgets",
+      "screen": "provider-widgets",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-chime-preview",
+      "screen": "chime-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-screen-music",
+      "screen": "music",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-calendar.url",
+      "screen": "calendar",
+      "dialog": "Calendar feed",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-calendar.range",
+      "screen": "calendar",
+      "dialog": "Show",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-calendar.size",
+      "screen": "calendar",
+      "dialog": "Size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-calendar.side",
+      "screen": "calendar",
+      "dialog": "Side",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.fit",
+      "screen": "screensaver",
+      "dialog": "Fit",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.intervalSec",
+      "screen": "screensaver",
+      "dialog": "Photo interval",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.presenceMode",
+      "screen": "screensaver",
+      "dialog": "Power",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.idleSleepMin",
+      "screen": "screensaver",
+      "dialog": "Idle screen-off",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.overnightStartMin",
+      "screen": "screensaver",
+      "dialog": "Off from",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.overnightEndMin",
+      "screen": "screensaver",
+      "dialog": "Off until",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.sleepTimerMin",
+      "screen": "screensaver",
+      "dialog": "Sleep after",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.soundscape",
+      "screen": "screensaver",
+      "dialog": "Ambient sound",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.soundscapeVolume",
+      "screen": "screensaver",
+      "dialog": "Soundscape volume",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immortal.weatherUnit",
+      "screen": "weather",
+      "dialog": "Temperature unit",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immortal.tileSize",
+      "screen": "appearance",
+      "dialog": "App tile size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immortal.weatherWidget",
+      "screen": "weather",
+      "dialog": "Weather widget",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immortal.clockFormat",
+      "screen": "appearance",
+      "dialog": "Clock",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immortal.snapcastHost",
+      "screen": "multiroom",
+      "dialog": "Snapcast host",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immortal.maPort",
+      "screen": "multiroom",
+      "dialog": "Music Assistant port",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immortal.maUsername",
+      "screen": "multiroom",
+      "dialog": "Music Assistant user",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immortal.maPassword",
+      "screen": "multiroom",
+      "dialog": "Music Assistant password",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-mqtt.host",
+      "screen": "mqtt",
+      "dialog": "Broker host",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-mqtt.port",
+      "screen": "mqtt",
+      "dialog": "Port",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-mqtt.username",
+      "screen": "mqtt",
+      "dialog": "Username",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-mqtt.password",
+      "screen": "mqtt",
+      "dialog": "Password",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-fleet.name",
+      "screen": "device",
+      "dialog": "Device name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-chime.sunriseVariant",
+      "screen": "chime",
+      "dialog": "Sunrise sound",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-chime.volume",
+      "screen": "chime",
+      "dialog": "Volume",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-chime.quietStartMin",
+      "screen": "chime",
+      "dialog": "Quiet from",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-chime.quietEndMin",
+      "screen": "chime",
+      "dialog": "Quiet until",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-sunrise.hour",
+      "screen": "sunrise",
+      "dialog": "Hour",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-sunrise.minute",
+      "screen": "sunrise",
+      "dialog": "Minute",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-sunrise.rampMinutes",
+      "screen": "sunrise",
+      "dialog": "Ramp minutes",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-digitalclock.face",
+      "screen": "clock",
+      "dialog": "Clock face",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-digitalclock.size",
+      "screen": "clock",
+      "dialog": "Size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-digitalclock.layout",
+      "screen": "clock",
+      "dialog": "Position",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-digitalclock.background",
+      "screen": "clock",
+      "dialog": "Background",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-welcome.durationMs",
+      "screen": "welcome",
+      "dialog": "Display duration",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-display.brightness",
+      "screen": "display",
+      "dialog": "Brightness",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-display.mediaVolume",
+      "screen": "display",
+      "dialog": "Media volume",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-display.from",
+      "screen": "display",
+      "dialog": "From",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-display.until",
+      "screen": "display",
+      "dialog": "Until",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-display.warmth",
+      "screen": "display",
+      "dialog": "Warmth",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-wallpaper.mode",
+      "screen": "wallpaper",
+      "dialog": "Background",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-faces.id",
+      "screen": "faces",
+      "dialog": "Photo clock face",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-faces.size",
+      "screen": "faces",
+      "dialog": "Size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-sources.selected",
+      "screen": "sources",
+      "dialog": "Photo source",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immich.url",
+      "screen": "immich",
+      "dialog": "Server address",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immich.key",
+      "screen": "immich",
+      "dialog": "API key",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-immich.album",
+      "screen": "albums",
+      "dialog": "Album",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-smb.host",
+      "screen": "smb",
+      "dialog": "Server",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-smb.share",
+      "screen": "smb",
+      "dialog": "Share name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-smb.path",
+      "screen": "smb",
+      "dialog": "Folder in the share",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-smb.username",
+      "screen": "smb",
+      "dialog": "Username",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-smb.password",
+      "screen": "smb",
+      "dialog": "Password",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-dav.url",
+      "screen": "dav",
+      "dialog": "WebDAV folder address",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-dav.username",
+      "screen": "dav",
+      "dialog": "Username (optional)",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-dav.password",
+      "screen": "dav",
+      "dialog": "Password (optional)",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-album.url",
+      "screen": "album",
+      "dialog": "Shared album link",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-web.url",
+      "screen": "web",
+      "dialog": "Web page address",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-folder.path",
+      "screen": "folder",
+      "dialog": "Folder",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-screensaver.mode",
+      "screen": "styles",
+      "dialog": "Screensaver style",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-dismiss.target",
+      "screen": "dismiss",
+      "dialog": "Open when you tap to exit",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-welcome.greetingNight",
+      "screen": "welcome",
+      "dialog": "Night greeting",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-welcome.greetingMorning",
+      "screen": "welcome",
+      "dialog": "Morning greeting",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-welcome.greetingAfternoon",
+      "screen": "welcome",
+      "dialog": "Afternoon greeting",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-welcome.greetingEvening",
+      "screen": "welcome",
+      "dialog": "Evening greeting",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-welcome.userName",
+      "screen": "welcome",
+      "dialog": "Your name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-welcome.voice",
+      "screen": "welcome",
+      "dialog": "Greeting voice",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-chime.voice",
+      "screen": "chime",
+      "dialog": "Spoken-time voice",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-welcome.textScale",
+      "screen": "welcome",
+      "dialog": "Text size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-welcome.opacity",
+      "screen": "welcome",
+      "dialog": "Background opacity",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-sunrise.days",
+      "screen": "sunrise",
+      "dialog": "Repeat on",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-alarm.hour",
+      "screen": "alarm",
+      "dialog": "Hour",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-alarm.minute",
+      "screen": "alarm",
+      "dialog": "Minute",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-alarm.days",
+      "screen": "alarm",
+      "dialog": "Repeat on",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-countdowns.name",
+      "screen": "countdowns",
+      "dialog": "Name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-countdowns.year",
+      "screen": "countdowns",
+      "dialog": "Year",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-countdowns.month",
+      "screen": "countdowns",
+      "dialog": "Month",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-countdowns.day",
+      "screen": "countdowns",
+      "dialog": "Day",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-countdowns.emoji",
+      "screen": "countdowns",
+      "dialog": "Icon",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-ha.url",
+      "screen": "ha",
+      "dialog": "Base URL",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-ha.token",
+      "screen": "ha",
+      "dialog": "Long-lived token",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-ha.search",
+      "screen": "ha-entities",
+      "dialog": "Search entities",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-crypto.id",
+      "screen": "crypto",
+      "dialog": "CoinGecko id",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-crypto.symbol",
+      "screen": "crypto",
+      "dialog": "Display symbol",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-todo.item",
+      "screen": "todo",
+      "dialog": "What needs doing?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-news.name",
+      "screen": "news",
+      "dialog": "Name (optional)",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-news.url",
+      "screen": "news",
+      "dialog": "RSS / Atom URL",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-stocks.symbol",
+      "screen": "stocks",
+      "dialog": "Symbol",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-alpaca.key",
+      "screen": "alpaca",
+      "dialog": "API Key ID",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-alpaca.secret",
+      "screen": "alpaca",
+      "dialog": "API Secret Key",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-options.type",
+      "screen": "options",
+      "dialog": "Contract type",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-options.deltaMin",
+      "screen": "options",
+      "dialog": "Delta min",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-options.deltaMax",
+      "screen": "options",
+      "dialog": "Delta max",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-options.expiry",
+      "screen": "options",
+      "dialog": "Expiry within (days)",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-options.symbol",
+      "screen": "options",
+      "dialog": "Symbol",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-world.city",
+      "screen": "world",
+      "dialog": "Search city",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-timers.minutes",
+      "screen": "timers",
+      "dialog": "Minutes",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-timers.seconds",
+      "screen": "timers",
+      "dialog": "Seconds",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-notes.message",
+      "screen": "notes",
+      "dialog": "Leave a note",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-converter.kind",
+      "screen": "converter",
+      "dialog": "Measurement",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-converter.value",
+      "screen": "converter",
+      "dialog": "Value",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-converter.from",
+      "screen": "converter",
+      "dialog": "From",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-converter.to",
+      "screen": "converter",
+      "dialog": "To",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-lamp.brightness",
+      "screen": "lamp",
+      "dialog": "Brightness",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-lamp.warmth",
+      "screen": "lamp",
+      "dialog": "Warmth",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-intercom.address",
+      "screen": "intercom",
+      "dialog": "Other Portal’s address",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-camera.name",
+      "screen": "camera",
+      "dialog": "Name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-camera.url",
+      "screen": "camera",
+      "dialog": "RTSP URL",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-control-sources.albumRefresh",
+      "screen": "sources",
+      "dialog": "Refresh album",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-home-page-two",
+      "screen": "home",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-header-pair",
+      "screen": "home",
+      "dialog": "Connect your phone",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-favorite-edit",
+      "screen": "home",
+      "dialog": "Favorite apps",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-app-actions",
+      "screen": "switcher",
+      "dialog": "Browser",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-folder-name",
+      "screen": "app-folder",
+      "dialog": "Rename folder",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-folder-members",
+      "screen": "app-folder",
+      "dialog": "Folder contents",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-widget-move",
+      "screen": "edit",
+      "dialog": "Move widget",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-widget-size",
+      "screen": "edit",
+      "dialog": "Widget size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-widget-remove",
+      "screen": "edit",
+      "dialog": "Remove Today?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-timer-custom",
+      "screen": "timers",
+      "dialog": "Custom timer",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-timer-expired",
+      "screen": "home",
+      "dialog": "Timer · Time’s up",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-source-remove",
+      "screen": "album",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-admin-disable",
+      "screen": "health",
+      "dialog": "Disable screen-off admin?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-memo-permission",
+      "screen": "notes",
+      "dialog": "Microphone access",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-memo-record",
+      "screen": "notes",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-story-read",
+      "screen": "stories",
+      "dialog": "🐢 The Tortoise and the Hare",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-camera-unavailable",
+      "screen": "camera",
+      "dialog": "Front door",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-install-confirm",
+      "screen": "store",
+      "dialog": "Install Jellyfin (stock)?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-store-updates",
+      "screen": "store",
+      "dialog": "Updates",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-apk-confirm",
+      "screen": "apk",
+      "dialog": "Install sample.apk?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-intercom-broadcast",
+      "screen": "intercom",
+      "dialog": "Broadcasting this room",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-system-handoff",
+      "screen": "system",
+      "dialog": "Existing Android screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-search-all",
+      "screen": "home",
+      "dialog": "Search apps and settings",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-phone-help",
+      "screen": "phone",
+      "dialog": "Pair your phone",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-memo-delete",
+      "screen": "notes",
+      "dialog": "Delete voice memo?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-memo-playback",
+      "screen": "notes",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-camera-stream",
+      "screen": "camera",
+      "dialog": "Front door",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-ha-action-error",
+      "screen": "ha-dashboard",
+      "dialog": "Unable to reach this device",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-intercom-listen",
+      "screen": "intercom",
+      "dialog": "Listening",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-intercom-error",
+      "screen": "intercom",
+      "dialog": "Could not connect",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-music-login-success",
+      "screen": "multiroom",
+      "dialog": "Music Assistant",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-music-login-error",
+      "screen": "multiroom",
+      "dialog": "Music Assistant",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-music-setup",
+      "screen": "multiroom",
+      "dialog": "Multi-room audio setup",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-mqtt-setup",
+      "screen": "mqtt",
+      "dialog": "MQTT setup",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-store-source",
+      "screen": "app-detail",
+      "dialog": "Source & requirements",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-store-offline",
+      "screen": "store",
+      "dialog": "Download unavailable",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-store-progress",
+      "screen": "store",
+      "dialog": "Downloading app",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-store-installed",
+      "screen": "store",
+      "dialog": "App installed",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-store-failed",
+      "screen": "store",
+      "dialog": "Installation failed",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-store-update-confirm",
+      "screen": "store",
+      "dialog": "Update VLC?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-apk-failed",
+      "screen": "apk",
+      "dialog": "APK installation failed",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-screen-sleep",
+      "screen": "home",
+      "dialog": "Screen sleeping",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-lamp-sleep",
+      "screen": "lamp-preview",
+      "dialog": "Sleep timer",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-lamp-hidden",
+      "screen": "lamp-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-recent-logs",
+      "screen": "debug",
+      "dialog": "Recent logs",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-timer-running",
+      "screen": "timers",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-app-info-boundary",
+      "screen": "switcher",
+      "dialog": "Existing Android screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-uninstall-boundary",
+      "screen": "switcher",
+      "dialog": "Existing Android screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-calls-boundary",
+      "screen": "apps",
+      "dialog": "Existing Portal screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-widget-provider-boundary",
+      "screen": "provider-widgets",
+      "dialog": "Existing Android / widget provider screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-remove-countdowns",
+      "screen": "countdowns",
+      "dialog": "Remove Family visit?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-remove-crypto",
+      "screen": "crypto",
+      "dialog": "Remove BTC?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-remove-todo",
+      "screen": "todo",
+      "dialog": "Remove Review mock?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-remove-news",
+      "screen": "news",
+      "dialog": "Remove Sample feed?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-remove-stocks",
+      "screen": "stocks",
+      "dialog": "Remove AAPL?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-remove-options",
+      "screen": "options",
+      "dialog": "Remove AAPL?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-remove-camera",
+      "screen": "camera",
+      "dialog": "Remove Front door?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-remove-ha",
+      "screen": "ha-entities",
+      "dialog": "Remove Living room?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-disconnect-calendar-url",
+      "screen": "calendar-url",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-disconnect-immich",
+      "screen": "immich",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-disconnect-smb",
+      "screen": "smb",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-disconnect-dav",
+      "screen": "dav",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-disconnect-web",
+      "screen": "web",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-org.chromium.chrome",
+      "screen": "apps",
+      "dialog": "Existing Browser screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-org.videolan.vlc",
+      "screen": "apps",
+      "dialog": "Existing VLC screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-org.schabi.newpipe",
+      "screen": "apps",
+      "dialog": "Existing NewPipe screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-io.homeassistant.companion.android.minimal",
+      "screen": "apps",
+      "dialog": "Existing Home Assistant screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-me.zhanghai.android.files",
+      "screen": "apps",
+      "dialog": "Existing Material Files screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-org.fdroid.fdroid",
+      "screen": "apps",
+      "dialog": "Existing F-Droid screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-com.aurora.store",
+      "screen": "apps",
+      "dialog": "Existing Aurora Store screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-org.breezyweather",
+      "screen": "apps",
+      "dialog": "Existing Breezy Weather screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-com.portal.assistant",
+      "screen": "apps",
+      "dialog": "Existing Jarvis screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-com.portal.calendar",
+      "screen": "apps",
+      "dialog": "Existing PortalHub screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-com.facebook.alohaapps.settings",
+      "screen": "apps",
+      "dialog": "Existing Portal Settings screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-popup-launch-com.android.quicksearchbox",
+      "screen": "apps",
+      "dialog": "Existing Google Search screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-category-photos",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-category-home",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-category-sound",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-category-connections",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-category-access",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-category-device",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-category-advanced",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-org.jellyfin.mobile",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-org.jellyfin.mobile.portalfin",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-app.smarttube.fdroid",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-de.danoeh.antennapod",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-org.y20k.transistor",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-de.badaix.snapcast",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-io.homeassistant.companion.android.minimal",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-org.breezyweather",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-org.tasks",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-net.gsantner.markor",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.nononsenseapps.feeder",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-org.fossify.calendar",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.aurora.store",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-moe.shizuku.privileged.api",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-me.zhanghai.android.files",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-org.fossify.gallery",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.termux",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.immortal.launcher",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.portal.calendar",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.family.hippomuncher",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.portal.isstracker",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.portal.kasa",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.portal.overlays",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.portal.tts",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-product-com.portal.assistant",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-welcome-step-1",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-welcome-step-2",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-welcome-step-3",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-welcome-step-4",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-welcome-step-5",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-welcome-step-6",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "light-welcome-step-7",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-touch",
+      "screen": "touch",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-display",
+      "screen": "display",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-appearance",
+      "screen": "appearance",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-wallpaper",
+      "screen": "wallpaper",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-screensaver",
+      "screen": "screensaver",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-sources",
+      "screen": "sources",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-styles",
+      "screen": "styles",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-faces",
+      "screen": "faces",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-dismiss",
+      "screen": "dismiss",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-immich",
+      "screen": "immich",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-smb",
+      "screen": "smb",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-dav",
+      "screen": "dav",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-album",
+      "screen": "album",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-web",
+      "screen": "web",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-folder",
+      "screen": "folder",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-albums",
+      "screen": "albums",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-calendar",
+      "screen": "calendar",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-calendar-url",
+      "screen": "calendar-url",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-clock",
+      "screen": "clock",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-quickbar",
+      "screen": "quickbar",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-weather",
+      "screen": "weather",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-world",
+      "screen": "world",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-countdowns",
+      "screen": "countdowns",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-chime",
+      "screen": "chime",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-welcome",
+      "screen": "welcome",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-sunrise",
+      "screen": "sunrise",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-alarm",
+      "screen": "alarm",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-multiroom",
+      "screen": "multiroom",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-mqtt",
+      "screen": "mqtt",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-ha",
+      "screen": "ha",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-ha-entities",
+      "screen": "ha-entities",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-phone",
+      "screen": "phone",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-boot",
+      "screen": "boot",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-device",
+      "screen": "device",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-health",
+      "screen": "health",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-sleep",
+      "screen": "sleep",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-crypto",
+      "screen": "crypto",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-todo",
+      "screen": "todo",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-news",
+      "screen": "news",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-stocks",
+      "screen": "stocks",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-alpaca",
+      "screen": "alpaca",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-options",
+      "screen": "options",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-camera",
+      "screen": "camera",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-lamp",
+      "screen": "lamp",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-intercom",
+      "screen": "intercom",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-timers",
+      "screen": "timers",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-notes",
+      "screen": "notes",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-converter",
+      "screen": "converter",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-stories",
+      "screen": "stories",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-iss",
+      "screen": "iss",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-aurora",
+      "screen": "aurora",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-speed",
+      "screen": "speed",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-apk",
+      "screen": "apk",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-help",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-system",
+      "screen": "system",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-managed",
+      "screen": "managed",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-debug",
+      "screen": "debug",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-home",
+      "screen": "home",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-apps",
+      "screen": "apps",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-app-folder",
+      "screen": "app-folder",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-store",
+      "screen": "store",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-app-detail",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-tools",
+      "screen": "tools",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-edit",
+      "screen": "edit",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-widgets",
+      "screen": "widgets",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-settings",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-photos",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-digital-preview",
+      "screen": "digital-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-welcome-preview",
+      "screen": "welcome-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-wake-light",
+      "screen": "wake-light",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-lamp-preview",
+      "screen": "lamp-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-alarm-ring",
+      "screen": "alarm-ring",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-folder-preview",
+      "screen": "folder-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-ha-dashboard",
+      "screen": "ha-dashboard",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-switcher",
+      "screen": "switcher",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-provider-widgets",
+      "screen": "provider-widgets",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-chime-preview",
+      "screen": "chime-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-screen-music",
+      "screen": "music",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-calendar.url",
+      "screen": "calendar",
+      "dialog": "Calendar feed",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-calendar.range",
+      "screen": "calendar",
+      "dialog": "Show",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-calendar.size",
+      "screen": "calendar",
+      "dialog": "Size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-calendar.side",
+      "screen": "calendar",
+      "dialog": "Side",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.fit",
+      "screen": "screensaver",
+      "dialog": "Fit",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.intervalSec",
+      "screen": "screensaver",
+      "dialog": "Photo interval",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.presenceMode",
+      "screen": "screensaver",
+      "dialog": "Power",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.idleSleepMin",
+      "screen": "screensaver",
+      "dialog": "Idle screen-off",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.overnightStartMin",
+      "screen": "screensaver",
+      "dialog": "Off from",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.overnightEndMin",
+      "screen": "screensaver",
+      "dialog": "Off until",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.sleepTimerMin",
+      "screen": "screensaver",
+      "dialog": "Sleep after",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.soundscape",
+      "screen": "screensaver",
+      "dialog": "Ambient sound",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.soundscapeVolume",
+      "screen": "screensaver",
+      "dialog": "Soundscape volume",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immortal.weatherUnit",
+      "screen": "weather",
+      "dialog": "Temperature unit",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immortal.tileSize",
+      "screen": "appearance",
+      "dialog": "App tile size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immortal.weatherWidget",
+      "screen": "weather",
+      "dialog": "Weather widget",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immortal.clockFormat",
+      "screen": "appearance",
+      "dialog": "Clock",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immortal.snapcastHost",
+      "screen": "multiroom",
+      "dialog": "Snapcast host",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immortal.maPort",
+      "screen": "multiroom",
+      "dialog": "Music Assistant port",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immortal.maUsername",
+      "screen": "multiroom",
+      "dialog": "Music Assistant user",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immortal.maPassword",
+      "screen": "multiroom",
+      "dialog": "Music Assistant password",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-mqtt.host",
+      "screen": "mqtt",
+      "dialog": "Broker host",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-mqtt.port",
+      "screen": "mqtt",
+      "dialog": "Port",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-mqtt.username",
+      "screen": "mqtt",
+      "dialog": "Username",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-mqtt.password",
+      "screen": "mqtt",
+      "dialog": "Password",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-fleet.name",
+      "screen": "device",
+      "dialog": "Device name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-chime.sunriseVariant",
+      "screen": "chime",
+      "dialog": "Sunrise sound",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-chime.volume",
+      "screen": "chime",
+      "dialog": "Volume",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-chime.quietStartMin",
+      "screen": "chime",
+      "dialog": "Quiet from",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-chime.quietEndMin",
+      "screen": "chime",
+      "dialog": "Quiet until",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-sunrise.hour",
+      "screen": "sunrise",
+      "dialog": "Hour",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-sunrise.minute",
+      "screen": "sunrise",
+      "dialog": "Minute",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-sunrise.rampMinutes",
+      "screen": "sunrise",
+      "dialog": "Ramp minutes",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-digitalclock.face",
+      "screen": "clock",
+      "dialog": "Clock face",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-digitalclock.size",
+      "screen": "clock",
+      "dialog": "Size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-digitalclock.layout",
+      "screen": "clock",
+      "dialog": "Position",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-digitalclock.background",
+      "screen": "clock",
+      "dialog": "Background",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-welcome.durationMs",
+      "screen": "welcome",
+      "dialog": "Display duration",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-display.brightness",
+      "screen": "display",
+      "dialog": "Brightness",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-display.mediaVolume",
+      "screen": "display",
+      "dialog": "Media volume",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-display.from",
+      "screen": "display",
+      "dialog": "From",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-display.until",
+      "screen": "display",
+      "dialog": "Until",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-display.warmth",
+      "screen": "display",
+      "dialog": "Warmth",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-wallpaper.mode",
+      "screen": "wallpaper",
+      "dialog": "Background",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-faces.id",
+      "screen": "faces",
+      "dialog": "Photo clock face",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-faces.size",
+      "screen": "faces",
+      "dialog": "Size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-sources.selected",
+      "screen": "sources",
+      "dialog": "Photo source",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immich.url",
+      "screen": "immich",
+      "dialog": "Server address",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immich.key",
+      "screen": "immich",
+      "dialog": "API key",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-immich.album",
+      "screen": "albums",
+      "dialog": "Album",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-smb.host",
+      "screen": "smb",
+      "dialog": "Server",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-smb.share",
+      "screen": "smb",
+      "dialog": "Share name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-smb.path",
+      "screen": "smb",
+      "dialog": "Folder in the share",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-smb.username",
+      "screen": "smb",
+      "dialog": "Username",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-smb.password",
+      "screen": "smb",
+      "dialog": "Password",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-dav.url",
+      "screen": "dav",
+      "dialog": "WebDAV folder address",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-dav.username",
+      "screen": "dav",
+      "dialog": "Username (optional)",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-dav.password",
+      "screen": "dav",
+      "dialog": "Password (optional)",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-album.url",
+      "screen": "album",
+      "dialog": "Shared album link",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-web.url",
+      "screen": "web",
+      "dialog": "Web page address",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-folder.path",
+      "screen": "folder",
+      "dialog": "Folder",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-screensaver.mode",
+      "screen": "styles",
+      "dialog": "Screensaver style",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-dismiss.target",
+      "screen": "dismiss",
+      "dialog": "Open when you tap to exit",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-welcome.greetingNight",
+      "screen": "welcome",
+      "dialog": "Night greeting",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-welcome.greetingMorning",
+      "screen": "welcome",
+      "dialog": "Morning greeting",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-welcome.greetingAfternoon",
+      "screen": "welcome",
+      "dialog": "Afternoon greeting",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-welcome.greetingEvening",
+      "screen": "welcome",
+      "dialog": "Evening greeting",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-welcome.userName",
+      "screen": "welcome",
+      "dialog": "Your name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-welcome.voice",
+      "screen": "welcome",
+      "dialog": "Greeting voice",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-chime.voice",
+      "screen": "chime",
+      "dialog": "Spoken-time voice",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-welcome.textScale",
+      "screen": "welcome",
+      "dialog": "Text size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-welcome.opacity",
+      "screen": "welcome",
+      "dialog": "Background opacity",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-sunrise.days",
+      "screen": "sunrise",
+      "dialog": "Repeat on",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-alarm.hour",
+      "screen": "alarm",
+      "dialog": "Hour",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-alarm.minute",
+      "screen": "alarm",
+      "dialog": "Minute",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-alarm.days",
+      "screen": "alarm",
+      "dialog": "Repeat on",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-countdowns.name",
+      "screen": "countdowns",
+      "dialog": "Name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-countdowns.year",
+      "screen": "countdowns",
+      "dialog": "Year",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-countdowns.month",
+      "screen": "countdowns",
+      "dialog": "Month",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-countdowns.day",
+      "screen": "countdowns",
+      "dialog": "Day",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-countdowns.emoji",
+      "screen": "countdowns",
+      "dialog": "Icon",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-ha.url",
+      "screen": "ha",
+      "dialog": "Base URL",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-ha.token",
+      "screen": "ha",
+      "dialog": "Long-lived token",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-ha.search",
+      "screen": "ha-entities",
+      "dialog": "Search entities",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-crypto.id",
+      "screen": "crypto",
+      "dialog": "CoinGecko id",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-crypto.symbol",
+      "screen": "crypto",
+      "dialog": "Display symbol",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-todo.item",
+      "screen": "todo",
+      "dialog": "What needs doing?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-news.name",
+      "screen": "news",
+      "dialog": "Name (optional)",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-news.url",
+      "screen": "news",
+      "dialog": "RSS / Atom URL",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-stocks.symbol",
+      "screen": "stocks",
+      "dialog": "Symbol",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-alpaca.key",
+      "screen": "alpaca",
+      "dialog": "API Key ID",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-alpaca.secret",
+      "screen": "alpaca",
+      "dialog": "API Secret Key",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-options.type",
+      "screen": "options",
+      "dialog": "Contract type",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-options.deltaMin",
+      "screen": "options",
+      "dialog": "Delta min",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-options.deltaMax",
+      "screen": "options",
+      "dialog": "Delta max",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-options.expiry",
+      "screen": "options",
+      "dialog": "Expiry within (days)",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-options.symbol",
+      "screen": "options",
+      "dialog": "Symbol",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-world.city",
+      "screen": "world",
+      "dialog": "Search city",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-timers.minutes",
+      "screen": "timers",
+      "dialog": "Minutes",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-timers.seconds",
+      "screen": "timers",
+      "dialog": "Seconds",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-notes.message",
+      "screen": "notes",
+      "dialog": "Leave a note",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-converter.kind",
+      "screen": "converter",
+      "dialog": "Measurement",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-converter.value",
+      "screen": "converter",
+      "dialog": "Value",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-converter.from",
+      "screen": "converter",
+      "dialog": "From",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-converter.to",
+      "screen": "converter",
+      "dialog": "To",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-lamp.brightness",
+      "screen": "lamp",
+      "dialog": "Brightness",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-lamp.warmth",
+      "screen": "lamp",
+      "dialog": "Warmth",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-intercom.address",
+      "screen": "intercom",
+      "dialog": "Other Portal’s address",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-camera.name",
+      "screen": "camera",
+      "dialog": "Name",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-camera.url",
+      "screen": "camera",
+      "dialog": "RTSP URL",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-control-sources.albumRefresh",
+      "screen": "sources",
+      "dialog": "Refresh album",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-home-page-two",
+      "screen": "home",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-header-pair",
+      "screen": "home",
+      "dialog": "Connect your phone",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-favorite-edit",
+      "screen": "home",
+      "dialog": "Favorite apps",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-app-actions",
+      "screen": "switcher",
+      "dialog": "Browser",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-folder-name",
+      "screen": "app-folder",
+      "dialog": "Rename folder",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-folder-members",
+      "screen": "app-folder",
+      "dialog": "Folder contents",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-widget-move",
+      "screen": "edit",
+      "dialog": "Move widget",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-widget-size",
+      "screen": "edit",
+      "dialog": "Widget size",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-widget-remove",
+      "screen": "edit",
+      "dialog": "Remove Today?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-timer-custom",
+      "screen": "timers",
+      "dialog": "Custom timer",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-timer-expired",
+      "screen": "home",
+      "dialog": "Timer · Time’s up",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-source-remove",
+      "screen": "album",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-admin-disable",
+      "screen": "health",
+      "dialog": "Disable screen-off admin?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-memo-permission",
+      "screen": "notes",
+      "dialog": "Microphone access",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-memo-record",
+      "screen": "notes",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-story-read",
+      "screen": "stories",
+      "dialog": "🐢 The Tortoise and the Hare",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-camera-unavailable",
+      "screen": "camera",
+      "dialog": "Front door",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-install-confirm",
+      "screen": "store",
+      "dialog": "Install Jellyfin (stock)?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-store-updates",
+      "screen": "store",
+      "dialog": "Updates",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-apk-confirm",
+      "screen": "apk",
+      "dialog": "Install sample.apk?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-intercom-broadcast",
+      "screen": "intercom",
+      "dialog": "Broadcasting this room",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-system-handoff",
+      "screen": "system",
+      "dialog": "Existing Android screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-search-all",
+      "screen": "home",
+      "dialog": "Search apps and settings",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-phone-help",
+      "screen": "phone",
+      "dialog": "Pair your phone",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-memo-delete",
+      "screen": "notes",
+      "dialog": "Delete voice memo?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-memo-playback",
+      "screen": "notes",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-camera-stream",
+      "screen": "camera",
+      "dialog": "Front door",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-ha-action-error",
+      "screen": "ha-dashboard",
+      "dialog": "Unable to reach this device",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-intercom-listen",
+      "screen": "intercom",
+      "dialog": "Listening",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-intercom-error",
+      "screen": "intercom",
+      "dialog": "Could not connect",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-music-login-success",
+      "screen": "multiroom",
+      "dialog": "Music Assistant",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-music-login-error",
+      "screen": "multiroom",
+      "dialog": "Music Assistant",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-music-setup",
+      "screen": "multiroom",
+      "dialog": "Multi-room audio setup",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-mqtt-setup",
+      "screen": "mqtt",
+      "dialog": "MQTT setup",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-store-source",
+      "screen": "app-detail",
+      "dialog": "Source & requirements",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-store-offline",
+      "screen": "store",
+      "dialog": "Download unavailable",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-store-progress",
+      "screen": "store",
+      "dialog": "Downloading app",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-store-installed",
+      "screen": "store",
+      "dialog": "App installed",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-store-failed",
+      "screen": "store",
+      "dialog": "Installation failed",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-store-update-confirm",
+      "screen": "store",
+      "dialog": "Update VLC?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-apk-failed",
+      "screen": "apk",
+      "dialog": "APK installation failed",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-screen-sleep",
+      "screen": "home",
+      "dialog": "Screen sleeping",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-lamp-sleep",
+      "screen": "lamp-preview",
+      "dialog": "Sleep timer",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-lamp-hidden",
+      "screen": "lamp-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-recent-logs",
+      "screen": "debug",
+      "dialog": "Recent logs",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-timer-running",
+      "screen": "timers",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-app-info-boundary",
+      "screen": "switcher",
+      "dialog": "Existing Android screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-uninstall-boundary",
+      "screen": "switcher",
+      "dialog": "Existing Android screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-calls-boundary",
+      "screen": "apps",
+      "dialog": "Existing Portal screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-widget-provider-boundary",
+      "screen": "provider-widgets",
+      "dialog": "Existing Android / widget provider screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-remove-countdowns",
+      "screen": "countdowns",
+      "dialog": "Remove Family visit?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-remove-crypto",
+      "screen": "crypto",
+      "dialog": "Remove BTC?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-remove-todo",
+      "screen": "todo",
+      "dialog": "Remove Review mock?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-remove-news",
+      "screen": "news",
+      "dialog": "Remove Sample feed?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-remove-stocks",
+      "screen": "stocks",
+      "dialog": "Remove AAPL?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-remove-options",
+      "screen": "options",
+      "dialog": "Remove AAPL?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-remove-camera",
+      "screen": "camera",
+      "dialog": "Remove Front door?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-remove-ha",
+      "screen": "ha-entities",
+      "dialog": "Remove Living room?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-disconnect-calendar-url",
+      "screen": "calendar-url",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-disconnect-immich",
+      "screen": "immich",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-disconnect-smb",
+      "screen": "smb",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-disconnect-dav",
+      "screen": "dav",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-disconnect-web",
+      "screen": "web",
+      "dialog": "Remove connection?",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-org.chromium.chrome",
+      "screen": "apps",
+      "dialog": "Existing Browser screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-org.videolan.vlc",
+      "screen": "apps",
+      "dialog": "Existing VLC screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-org.schabi.newpipe",
+      "screen": "apps",
+      "dialog": "Existing NewPipe screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-io.homeassistant.companion.android.minimal",
+      "screen": "apps",
+      "dialog": "Existing Home Assistant screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-me.zhanghai.android.files",
+      "screen": "apps",
+      "dialog": "Existing Material Files screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-org.fdroid.fdroid",
+      "screen": "apps",
+      "dialog": "Existing F-Droid screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-com.aurora.store",
+      "screen": "apps",
+      "dialog": "Existing Aurora Store screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-org.breezyweather",
+      "screen": "apps",
+      "dialog": "Existing Breezy Weather screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-com.portal.assistant",
+      "screen": "apps",
+      "dialog": "Existing Jarvis screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-com.portal.calendar",
+      "screen": "apps",
+      "dialog": "Existing PortalHub screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-com.facebook.alohaapps.settings",
+      "screen": "apps",
+      "dialog": "Existing Portal Settings screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-popup-launch-com.android.quicksearchbox",
+      "screen": "apps",
+      "dialog": "Existing Google Search screen",
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-category-photos",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-category-home",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-category-sound",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-category-connections",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-category-access",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-category-device",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-category-advanced",
+      "screen": "settings",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-org.jellyfin.mobile",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-org.jellyfin.mobile.portalfin",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-app.smarttube.fdroid",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-de.danoeh.antennapod",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-org.y20k.transistor",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-de.badaix.snapcast",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-io.homeassistant.companion.android.minimal",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-org.breezyweather",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-org.tasks",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-net.gsantner.markor",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.nononsenseapps.feeder",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-org.fossify.calendar",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.aurora.store",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-moe.shizuku.privileged.api",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-me.zhanghai.android.files",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-org.fossify.gallery",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.termux",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.immortal.launcher",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.portal.calendar",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.family.hippomuncher",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.portal.isstracker",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.portal.kasa",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.portal.overlays",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.portal.tts",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-product-com.portal.assistant",
+      "screen": "app-detail",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-welcome-step-1",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-welcome-step-2",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-welcome-step-3",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-welcome-step-4",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-welcome-step-5",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-welcome-step-6",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "dark-welcome-step-7",
+      "screen": "help",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-classic",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-shuffle",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-kenBurns",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-diptych",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-framed",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-galleryWall",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-push",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-memories",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-panorama",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-polaroid",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-mosaic",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-filmstrip",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-cinema",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "screensaver-style-heroSidebar",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "photo-clock-face-immortal-classic",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "photo-clock-face-flip",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "photo-clock-face-big",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "photo-clock-face-bold",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "photo-clock-face-minimal",
+      "screen": "photos",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "digital-clock-face-classic",
+      "screen": "digital-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "digital-clock-face-bold",
+      "screen": "digital-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "digital-clock-face-neon",
+      "screen": "digital-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "digital-clock-face-led",
+      "screen": "digital-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "digital-clock-face-flip",
+      "screen": "digital-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "digital-clock-face-analog",
+      "screen": "digital-preview",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-empty-home",
+      "screen": "home",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-empty-health",
+      "screen": "health",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-empty-phone",
+      "screen": "phone",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-empty-ha-dashboard",
+      "screen": "ha-dashboard",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-empty-sources",
+      "screen": "sources",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-offline-home",
+      "screen": "home",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-offline-health",
+      "screen": "health",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-offline-phone",
+      "screen": "phone",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-offline-ha-dashboard",
+      "screen": "ha-dashboard",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-offline-sources",
+      "screen": "sources",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-missing-permission-home",
+      "screen": "home",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-missing-permission-health",
+      "screen": "health",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-missing-permission-phone",
+      "screen": "phone",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-missing-permission-ha-dashboard",
+      "screen": "ha-dashboard",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-missing-permission-sources",
+      "screen": "sources",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-playing-home",
+      "screen": "home",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-playing-health",
+      "screen": "health",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-playing-phone",
+      "screen": "phone",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-playing-ha-dashboard",
+      "screen": "ha-dashboard",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    },
+    {
+      "id": "state-playing-sources",
+      "screen": "sources",
+      "dialog": null,
+      "missing": false,
+      "images": true
+    }
+  ]
+}

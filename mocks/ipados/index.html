@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Immortal · Dusk Aurora Redesign</title>
+<link rel="stylesheet" href="aurora.css"/>
+<style>
+  html,body{overflow-y:auto}
+  .wrap{padding:64px 48px 60px;max-width:1300px;margin:0 auto}
+  h1{font-size:38px;font-weight:700;letter-spacing:-.8px}
+  .sub{color:var(--t-secondary);margin-top:8px;font-size:16px;max-width:860px;line-height:1.55}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;margin-top:34px}
+  a.card{display:block;text-decoration:none;color:inherit;border-radius:20px;padding:22px;transition:.18s;
+    background:var(--glass-bg);backdrop-filter:blur(30px) saturate(1.5);-webkit-backdrop-filter:blur(30px) saturate(1.5);
+    border:.5px solid var(--glass-border);box-shadow:0 .5px 0 var(--glass-highlight) inset,0 18px 40px -18px rgba(0,0,0,.7)}
+  a.card:hover{transform:translateY(-3px);border-color:var(--teal)}
+  .num{color:var(--teal);font-size:12px;font-weight:700;letter-spacing:2px}
+  .name{font-size:21px;font-weight:650;margin-top:6px}
+  .desc{color:var(--t-secondary);font-size:14.5px;margin-top:9px;line-height:1.5}
+  .port{color:var(--cyan);font-size:13px;margin-top:12px}
+  .note{margin-top:32px;color:var(--t-tertiary);font-size:14px;max-width:860px;line-height:1.6}
+  .note b{color:var(--t-secondary)}
+</style>
+</head>
+<body>
+<div id="sky"></div><div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div><div id="stars"></div><div id="grain"></div>
+<div class="wrap">
+  <h1 class="up">Immortal — Dusk Aurora</h1>
+  <div class="sub up" style="animation-delay:.05s">The approved redesign direction: a dusk-aurora wallpaper, dark frosted-glass widgets that each render their own miniature world, and the gradient-squircle icon system. One shared design system (<code>aurora.css</code> + <code>aurora-icons.js</code>) across every screen. Click any mock; F11 for fullscreen.</div>
+  <div class="grid" id="grid"></div>
+  <div class="note up" style="animation-delay:.1s"><b>Portability:</b> everything here maps to existing Compose primitives — glass = <code>LiquidGlass</code> with darker tint values, wallpaper = layered <code>Brush</code> gradients + blur, widget skies/dials = per-widget <code>Brush</code>/<code>Canvas</code>, icons = gradient squircle drawables + white vector glyphs, grouped lists = existing settings rows recolored to the dark palette. No capability the Portal (Android 10, no GMS) lacks.</div>
+</div>
+<script>
+const MOCKS=[
+ ["01","01-home-v3.html","Home & Dashboard","Dusk-aurora wallpaper, dark glass widget rail (clock hero, weather that paints its own sky, calendar, HA tiles that glow when on, day/night world-clock dials, alarm), gradient-squircle app grid. No dock.","HomeActivity + LiquidGlass (darker tint) + widget composables"],
+ ["02","02-settings-v3.html","Settings — FUNCTIONAL replica","The real device settings, fully interactive: all 24 sidebar sections in 5 groups, live search with the real alias index, every toggle/stepper/segment with real conditional visibility, and every sub-screen — style picker (14 modes), clock faces, photo sources (Immich/NAS/WebDAV/web + connect flows), dismiss target, calendar link, MQTT, sunrise day picker, welcome greetings. Click everything.","ImmortalSettingsActivity + SettingsDomains — 1:1"],
+ ["03","03-folder-v3.html","Folder (Tools)","Home blurs and dims behind a centered frosted folder panel; squircle tool icons stagger in; page dots; ✕ close.","ToolsActivity folder overlay"],
+ ["04","04-appstore-v3.html","App Store","Dark glass storefront: aurora-lit hero card, Portal Originals carousel with gradient glows, grouped app rows with Install/Open pills, filter chips.","StoreActivity (dark reskin)"],
+ ["05","05-widgets-v3.html","Widget Board","Every widget in the new language: weather hero with hourly strip, crypto/stocks with sparklines and change pills, to-do with round checks, HA tiles + sensor strip, news with sources, options table, alarm.","ImmortalWidgetShell + each widget composable"],
+ ["06","06-icons-v3.html","App Icon System","The approved squircle spec: gradients, gloss, shadow, 2px line glyphs, size ramp (grid/dock/folder/row), full anatomy + Compose port notes.","LiquidGlassAppIconContent + drawables"],
+ ["07","07-widget-library.html","Widget Library — every size","All 11 widgets at every span the grid supports (1–2 cols × 1–4 rows, default 2×2), interactive size switcher with the real cell grid behind, list-row scaling (3 per row-span), HA tile math, plus the 5 fixed top cards (greeting, today strip, now playing, quick controls, photo memory).","HomeWidgetStore spans + ImmortalWidgetContent — 1:1"],
+];
+document.getElementById("grid").innerHTML=MOCKS.map(([n,href,name,d,p],i)=>
+ `<a class="card up" style="animation-delay:${.08+i*.05}s" href="${href}"><div class="num">MOCK ${n}</div><div class="name">${name}</div><div class="desc">${d}</div><div class="port">↳ ${p}</div></a>`).join("");
+</script>
+</body>
+</html>

@@ -27,28 +27,25 @@ import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import com.immortal.launcher.ui.theme.ApprovedDarkPalette
 
 internal val LocalApprovedHomePopup = compositionLocalOf { false }
-internal val ApprovedHomeTabPalette = ApprovedDarkPalette.copy(
-    background = Color(0xFF14292E), surface = Color(0xFF223B42),
-    surface2 = Color(0xFF2E4851), secondary = Color(0xFFBED0D5),
-    divider = Color(0xFF355059), accent = Color(0xFFB4DCD0), selected = Color(0xFF35594F))
+internal val ApprovedHomeTabPalette = ApprovedDarkPalette
 
 internal object ApprovedHomePalette {
   val Background: Color @Composable get() =
-      if (LocalApprovedHomePopup.current) LocalApprovedPalette.current.background else Color(0xFF14292E)
+      LocalApprovedPalette.current.background
   val Card: Color @Composable get() =
-      if (LocalApprovedHomePopup.current) LocalApprovedPalette.current.surface else Color(0xFF223B42)
+      LocalApprovedPalette.current.surface
   val Chrome: Color @Composable get() =
-      if (LocalApprovedHomePopup.current) LocalApprovedPalette.current.surface2 else Color(0xFF2E4851)
+      LocalApprovedPalette.current.surface2
   val Text: Color @Composable get() =
-      if (LocalApprovedHomePopup.current) LocalApprovedPalette.current.text else Color(0xFFF4F7F9)
+      LocalApprovedPalette.current.text
   val Secondary: Color @Composable get() =
-      if (LocalApprovedHomePopup.current) LocalApprovedPalette.current.secondary else Color(0xFFBED0D5)
+      LocalApprovedPalette.current.secondary
   val Accent: Color @Composable get() =
-      if (LocalApprovedHomePopup.current) LocalApprovedPalette.current.accent else Color(0xFFB4DCD0)
+      LocalApprovedPalette.current.accent
   val Border: Color @Composable get() =
-      if (LocalApprovedHomePopup.current) LocalApprovedPalette.current.divider else Color(0xFF355059)
+      LocalApprovedPalette.current.divider
   val Selected: Color @Composable get() =
-      if (LocalApprovedHomePopup.current) LocalApprovedPalette.current.selected else Color(0xFF35594F)
+      LocalApprovedPalette.current.selected
 }
 
 @Composable
@@ -70,7 +67,7 @@ internal fun ApprovedHomeTextButton(
     onClick: () -> Unit,
 ) {
   Box(modifier.heightIn(min = 52.dp)
-      .tvFocusable(RoundedCornerShape(16.dp)) { if (enabled) onClick() }
+      .tvFocusable(RoundedCornerShape(16.dp), ringColor = ApprovedHomePalette.Accent) { if (enabled) onClick() }
       .padding(horizontal = 20.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
     Text(label, color = ApprovedHomePalette.Accent.copy(alpha = if (enabled) 1f else .4f),
         fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Medium)
@@ -100,7 +97,7 @@ internal fun ApprovedHomeDock(selected: String, onSelect: (String) -> Unit) {
         val active = selected == id
         Row(Modifier.width(176.dp).height(74.dp).clip(RoundedCornerShape(18.dp))
             .background(if (active) ApprovedHomePalette.Selected else Color.Transparent)
-            .tvFocusable(RoundedCornerShape(18.dp)) { onSelect(id) },
+            .tvFocusable(RoundedCornerShape(18.dp), ringColor = ApprovedHomePalette.Accent) { onSelect(id) },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)) {
           ApprovedHomeIcon(id, tint = if (active) ApprovedHomePalette.Accent else ApprovedHomePalette.Secondary)
@@ -121,7 +118,8 @@ internal fun ApprovedHomeWidgetHeading(title: String, icon: String, onOpen: () -
         fontWeight = FontWeight.Medium, maxLines = 1,
         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
     // The negative vertical margin in the approved CSS gives this action a 68dp touch target.
-    Box(Modifier.width(68.dp).height(32.dp).tvFocusable(RoundedCornerShape(9.dp), onClick = onOpen),
+    Box(Modifier.width(68.dp).height(32.dp)
+        .tvFocusable(RoundedCornerShape(9.dp), ringColor = ApprovedHomePalette.Accent, onClick = onOpen),
         contentAlignment = Alignment.Center) {
       Text("Open", color = ApprovedHomePalette.Accent, fontSize = 18.sp, lineHeight = 24.sp,
           fontWeight = FontWeight.Medium)

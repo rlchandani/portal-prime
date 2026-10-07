@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>iPadOS · Folder (Tools)</title>
+<link rel="stylesheet" href="ds.css"/>
+<style>
+  body { overflow: hidden; }
+  #wall { position: fixed; inset: 0; background: radial-gradient(120% 90% at 15% 10%, #6db3f2 0%, #3a7bd5 45%, #2b5876 100%); }
+  /* iPadOS folder: the wallpaper blurs/dims, a centered translucent panel of app icons opens. */
+  #scrim { position: fixed; inset: 0; backdrop-filter: blur(30px) saturate(1.2) brightness(.8); -webkit-backdrop-filter: blur(30px) saturate(1.2) brightness(.8); display: grid; place-items: center; }
+  .folder { width: 980px; border-radius: 40px; padding: 40px 44px 48px;
+      background: rgba(255,255,255,0.22); backdrop-filter: blur(40px) saturate(1.6); -webkit-backdrop-filter: blur(40px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.28); box-shadow: 0 30px 90px -20px rgba(0,0,0,.55); }
+  .folder .head { display: flex; align-items: center; margin-bottom: 30px; }
+  .folder .name { font-size: 30px; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.3); flex: 1; text-align: center; }
+  .folder .close { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.3); color:#fff; display: grid; place-items: center; font-size: 18px; font-weight: 700; }
+  .fgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 34px 20px; }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .app .ic { width: 110px; height: 110px; display: grid; place-items: center; }
+  .app .ic .em { font-size: 52px; }
+  .app .lbl { color: #fff; font-size: 16px; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+  .badge { position: fixed; top: 16px; right: 20px; color: rgba(255,255,255,.7); font-size: 12px; letter-spacing: 1px; z-index: 5; }
+</style>
+</head>
+<body>
+  <div id="wall"></div>
+  <div class="badge">MOCK 03 · FOLDER (Tools, iPadOS popup)</div>
+  <div id="scrim">
+    <div class="folder">
+      <div class="head"><div class="name" style="padding-left:40px">Tools</div><div class="close">✕</div></div>
+      <div class="fgrid" id="fg"></div>
+    </div>
+  </div>
+<script>
+function ic(bg,inner){ return `<div class="ic appicon ${bg}">${inner}</div>`; }
+const tools = [
+  ["Alarm","bg-red","<span class='em'>⏰</span>"],["Cameras","bg-indigo","<span class='em'>📷</span>"],
+  ["Countdowns","bg-orange","<span class='em'>⏳</span>"],["Lamp","bg-yellow","<span class='em'>💡</span>"],
+  ["Bedtime","bg-purple","<span class='em'>📖</span>"],["Intercom","bg-green","<span class='em'>🎙️</span>"],
+  ["Timers","bg-orange","<span class='em'>⏱️</span>"],["Leave a note","bg-yellow","<span class='em'>📝</span>"],
+  ["Converter","bg-cyan","<span class='em'>🔢</span>"],["ISS passes","bg-blue","<span class='em'>🛰️</span>"],
+  ["Aurora","bg-green","<span class='em'>🌌</span>"],["Speed test","bg-indigo","<span class='em'>⚡</span>"],
+];
+document.getElementById("fg").innerHTML = tools.map(([l,b,i])=>`<div class="app">${ic(b,i)}<div class="lbl">${l}</div></div>`).join("");
+</script>
+</body>
+</html>

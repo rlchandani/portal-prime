@@ -24,6 +24,74 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
     page.on('requestfailed', request => errors.push(`${request.failure()?.errorText} ${request.url()}`));
     page.on('response', response => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
   };
+  const touchSessions = new WeakMap();
+  const swipeWidgets = async (page, dx, { dy = 0, gap = false, cancel = false, mouse = false, hold = false,
+    selector = null } = {}) => {
+    let session = touchSessions.get(page);
+    if (!session) {
+      session = await page.context().newCDPSession(page);
+      touchSessions.set(page, session);
+    }
+    const start = await page.evaluate(({ gap, selector }) => {
+      const grid = document.querySelector('[data-tab="home"] .live-widget-grid');
+      const box = grid.getBoundingClientRect();
+      if (selector) {
+        const target = grid.querySelector(selector).getBoundingClientRect();
+        return { x: target.x + target.width / 2, y: target.y + target.height / 2 };
+      }
+      if (gap) {
+        // Also exercise swipes that begin between cards.
+        for (let y = box.top + 20; y < box.bottom - 20; y += 20) {
+          for (let x = box.left + 160; x < box.right - 160; x += 4) {
+            if (document.elementFromPoint(x, y) === grid) return { x, y };
+          }
+        }
+        throw new Error('No visible widget-grid gutter for the editing swipe');
+      }
+      const card = grid.querySelector('.photo-card') || grid.querySelector('.home-card');
+      const cardBox = card.getBoundingClientRect();
+      return {
+        x: cardBox.x + cardBox.width / 2,
+        y: Math.min(box.bottom - 40, Math.max(box.top + 40, cardBox.y + cardBox.height / 2)),
+      };
+    }, { gap, selector });
+    const touch = (type, point) => session.send('Input.dispatchTouchEvent', {
+      type, touchPoints: point ? [{ ...point, id: 0, radiusX: 1, radiusY: 1, force: 1 }] : [],
+    });
+    if (mouse) {
+      await page.mouse.move(start.x, start.y);
+      await page.mouse.down();
+      if (hold) await page.waitForTimeout(600); // Cross the existing 550 ms stationary-hold boundary.
+      await page.mouse.move(start.x + dx, start.y + dy, { steps: 4 });
+      await page.mouse.up();
+    } else {
+      await touch('touchStart', start);
+      if (hold) await page.waitForTimeout(600);
+      for (let step = 1; step <= 4; step++) {
+        await touch('touchMove', { x: start.x + dx * step / 4, y: start.y + dy * step / 4 });
+      }
+      await touch(cancel ? 'touchCancel' : 'touchEnd');
+    }
+    return page.evaluate(() => {
+      const grid = document.querySelector('.live-widget-grid');
+      const outgoing = document.querySelector('.live-widget-page-outgoing');
+      const viewport = grid.closest('.live-widget-page-viewport');
+      return {
+        widgets: grid.getAnimations({ subtree: true }).map(animation => animation.effect.getTiming()),
+        incoming: grid.getAnimations().map(animation => animation.effect.getKeyframes().map(frame => frame.transform)),
+        outgoing: outgoing && {
+          inert: outgoing.inert, hidden: outgoing.getAttribute('aria-hidden'),
+          frames: outgoing.querySelector('.live-widget-grid').getAnimations()
+            .map(animation => animation.effect.getKeyframes().map(frame => frame.transform)),
+          timing: outgoing.getAnimations({ subtree: true }).map(animation => animation.effect.getTiming()),
+          clipped: !!viewport && getComputedStyle(viewport).overflowX === 'hidden' &&
+            getComputedStyle(viewport).overflowY === 'hidden',
+        },
+        chrome: document.querySelector('.live-launcher > .app-header').getAnimations().length +
+          document.querySelector('.live-launcher > .dock').getAnimations().length,
+      };
+    });
+  };
   try {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1020 } });
     await context.route('**/*', route =>
@@ -44,8 +112,69 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
         sidebar: document.querySelector('.live-settings .settings-sidebar'),
         settingsHeader: document.querySelector('.live-settings > .app-header'),
         homePanel: document.querySelector('[data-tab="home"]'),
+        homeBody: document.querySelector('[data-tab="home"] > .home-body'),
+        themeButton: document.querySelector('.live-launcher > .app-header [data-action="theme"]'),
       };
     });
+    check('shared header has no brand outline and keeps five distinct action buttons in native order', await page.evaluate(() => {
+      const header = auditNodes.header;
+      return !header.querySelector('.brand-mark') &&
+        header.querySelectorAll('.round-button').length === 5 &&
+        [...header.querySelectorAll('.round-button')].map(node => node.dataset.screen || node.dataset.action).join(',') ===
+          'header-pair,device-sleep,theme,search,settings' &&
+        header.querySelector('[data-action="header-pair"] path').getAttribute('d').startsWith('M8 2.5h8') &&
+        I.phone.includes('M22 16.9v3') && I.remote !== I.phone &&
+        header.querySelector('[data-action="device-sleep"] path').getAttribute('d').includes('M16 3h5l-5 5h5');
+    }));
+    check('day header offers the night crescent/star with a target-action label', await page.evaluate(() =>
+      auditNodes.themeButton.getAttribute('aria-label') === 'Switch to night theme' &&
+      auditNodes.themeButton.dataset.glyph === 'theme_night'));
+    await click('.live-launcher > .app-header [data-action="theme"]');
+    check('header theme action changes the entire launcher to night without replacing Home', await page.evaluate(() =>
+      __portalNavigationDemo.getState().theme === 'dark' &&
+      auditNodes.homeBody === document.querySelector('[data-tab="home"] > .home-body') &&
+      auditNodes.themeButton === document.querySelector('.live-launcher > .app-header [data-action="theme"]') &&
+      auditNodes.themeButton.getAttribute('aria-label') === 'Switch to day theme' &&
+      auditNodes.themeButton.dataset.glyph === 'theme_day' &&
+      getComputedStyle(auditNodes.homePanel).color === 'rgb(255, 255, 255)' &&
+      !getComputedStyle(document.querySelector('.live-launcher')).backgroundImage.includes('0.92')));
+    await click('.live-launcher > .app-header [data-action="theme"]');
+    check('day theme washes only the shared wallpaper and keeps Home text readable', await page.evaluate(() =>
+      __portalNavigationDemo.getState().theme === 'light' &&
+      auditNodes.homeBody === document.querySelector('[data-tab="home"] > .home-body') &&
+      getComputedStyle(auditNodes.homePanel).color === 'rgb(24, 44, 57)' &&
+      getComputedStyle(auditNodes.homePanel).getPropertyValue('--surface') === '#ffffff' &&
+      getComputedStyle(document.querySelector('.live-launcher')).backgroundImage.includes('0.92') &&
+      getComputedStyle(auditNodes.homePanel).backgroundColor === 'rgba(0, 0, 0, 0)'));
+    check('day Home retains light media captions over a dark photo scrim and uses an amber weather glyph', await page.evaluate(() => {
+      const photo = auditNodes.homePanel.querySelector('.photo-card');
+      return getComputedStyle(photo.querySelector('.photo-copy strong')).color === 'rgb(244, 247, 249)' &&
+        getComputedStyle(photo.querySelector('.photo-copy small')).color === 'rgb(226, 235, 235)' &&
+        getComputedStyle(photo, '::after').backgroundImage.includes('rgba(6, 27, 28, 0.95)') &&
+        getComputedStyle(auditNodes.homePanel.querySelector('.weather-main .icon svg')).color === 'rgb(153, 97, 15)' &&
+        [...auditNodes.homePanel.querySelectorAll('.weather-low')].every(node =>
+          getComputedStyle(node).color === 'rgb(83, 102, 116)');
+    }));
+    await click('.live-launcher > .app-header [data-action="header-pair"]');
+    check('remote glyph preserves the phone pairing Activity flow', (await state()).host === 'activity' &&
+      (await state()).route.screen === 'phone' && await root.locator('.activity-pane .pair-code').count() === 1);
+    await page.keyboard.press('Escape'); await settled();
+    await click('.live-launcher > .app-header [data-action="device-sleep"]');
+    check('crescent/Z preserves the screen-off action', await root.locator('#live-overlays .modal-heading h2')
+      .textContent() === 'Screen off · review simulation');
+    await page.evaluate(() => { window.themeOverlay = document.querySelector('#live-overlays .modal'); });
+    await page.locator('#demo-theme').selectOption('dark');
+    check('open launcher overlay adopts night colors without replacing its dialog', await page.evaluate(() =>
+      themeOverlay === document.querySelector('#live-overlays .modal') &&
+      getComputedStyle(themeOverlay).backgroundColor === 'rgb(43, 43, 43)' &&
+      getComputedStyle(themeOverlay).color === 'rgb(255, 255, 255)'));
+    await page.locator('#demo-theme').selectOption('light');
+    check('open launcher overlay adopts day colors without changing the sleep action', await page.evaluate(() =>
+      themeOverlay === document.querySelector('#live-overlays .modal') &&
+      getComputedStyle(themeOverlay).backgroundColor === 'rgb(255, 255, 255)' &&
+      getComputedStyle(themeOverlay).color === 'rgb(24, 44, 57)' &&
+      themeOverlay.querySelector('.modal-heading h2').textContent === 'Screen off · review simulation'));
+    await page.keyboard.press('Escape'); await settled();
 
     await click('.live-launcher > .dock [data-screen="apps"]');
     await page.evaluate(() => {
@@ -141,6 +270,26 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
     await settled();
     await root.locator('.activity-pane [data-value="immich.url"]').fill('https://example.invalid');
     await root.locator('.activity-pane [data-value="immich.key"]').fill('public-demo-fixture');
+    await page.evaluate(() => {
+      window.themeCredentials = { url: document.querySelector('.activity-pane [data-value="immich.url"]'),
+        key: document.querySelector('.activity-pane [data-value="immich.key"]'),
+        body: document.querySelector('.activity-pane .detail-body') };
+    });
+    await click('.live-activity-window > .app-header [data-action=theme]');
+    check('Settings Activity theme button preserves credential drafts and syncs retained launcher target', await page.evaluate(() =>
+      themeCredentials.url === document.querySelector('.activity-pane [data-value="immich.url"]') &&
+      themeCredentials.key === document.querySelector('.activity-pane [data-value="immich.key"]') &&
+      themeCredentials.body === document.querySelector('.activity-pane .detail-body') &&
+      themeCredentials.url.value === 'https://example.invalid' && themeCredentials.key.value === 'public-demo-fixture' &&
+      getComputedStyle(themeCredentials.body).color === 'rgb(255, 255, 255)' &&
+      auditNodes.themeButton.getAttribute('aria-label') === 'Switch to day theme' &&
+      auditNodes.themeButton.dataset.glyph === 'theme_day' && __portalNavigationDemo.getState().route.screen === 'immich'));
+    await click('.live-activity-window > .app-header [data-action=theme]');
+    check('Settings Activity day theme retains its inputs and day target label', await page.evaluate(() =>
+      themeCredentials.url === document.querySelector('.activity-pane [data-value="immich.url"]') &&
+      themeCredentials.url.value === 'https://example.invalid' &&
+      getComputedStyle(themeCredentials.body).color === 'rgb(24, 44, 57)' &&
+      auditNodes.themeButton.getAttribute('aria-label') === 'Switch to night theme'));
     await click('.activity-pane [data-action="secret"]');
     check('form actions do not accidentally submit or navigate', (await state()).route.screen === 'immich' &&
       (await root.locator('.activity-pane button[type="submit"]').textContent()) === 'Test & connect');
@@ -157,33 +306,22 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
     await page.locator('#demo-theme').selectOption('dark');
     check('Settings appearance applies to the retained Settings shell', await page.evaluate(() =>
       __portalNavigationDemo.getState().theme === 'dark' &&
-      getComputedStyle(document.querySelector('.live-settings > .app-header')).color === 'rgb(244, 247, 249)'));
-    const launcherColors = await page.evaluate(() => [
-      document.querySelector('.live-launcher'),
-      document.querySelector('.live-launcher > .app-header'),
-      document.querySelector('.live-launcher > .dock'),
-      ...document.querySelectorAll('.native-tab-panel'),
-    ].map(node => {
-      const style = getComputedStyle(node);
-      return { background: style.backgroundColor, text: style.color,
-        surface: style.getPropertyValue('--surface'), accent: style.getPropertyValue('--accent') };
-    }));
+      getComputedStyle(document.querySelector('.live-settings > .app-header')).color === 'rgb(255, 255, 255)'));
     await page.locator('#demo-theme').selectOption('light');
-    check('Settings light toggle leaves Home/Apps/Tools colors dark and unchanged',
-      await page.evaluate(expected => {
+    check('Settings theme action applies day colors to Home, Apps, Tools, chrome and overlays',
+      await page.evaluate(() => {
         const nodes = [
           document.querySelector('.live-launcher'), document.querySelector('.live-launcher > .app-header'),
           document.querySelector('.live-launcher > .dock'), ...document.querySelectorAll('.native-tab-panel'),
+          document.querySelector('#live-overlays'), document.querySelector('.live-settings > .app-header'),
         ];
-        const colors = nodes.map(node => {
+        return nodes.every(node => {
           const style = getComputedStyle(node);
-          return { background: style.backgroundColor, text: style.color,
-            surface: style.getPropertyValue('--surface'), accent: style.getPropertyValue('--accent') };
-        });
-        return JSON.stringify(colors) === JSON.stringify(expected) &&
-          getComputedStyle(nodes[1]).color === 'rgb(244, 247, 249)' &&
-          getComputedStyle(document.querySelector('.live-settings > .app-header')).color === 'rgb(24, 44, 57)';
-      }, launcherColors));
+          return style.color === 'rgb(24, 44, 57)' && style.getPropertyValue('--surface') === '#ffffff' &&
+            style.getPropertyValue('--accent') === '#176abb';
+        }) && auditNodes.themeButton.dataset.glyph === 'theme_night' &&
+          auditNodes.themeButton.getAttribute('aria-label') === 'Switch to night theme';
+      }));
     await page.locator('#demo-theme').selectOption('dark');
     await click('.settings-sidebar [data-id="appearance"]');
     for (const screen of ['display', 'appearance', 'wallpaper', 'weather', 'calendar', 'quickbar']) {
@@ -252,7 +390,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
     await click('.live-settings > .app-header [data-screen="home"]');
     check('Home panel stays retained with a dark launcher palette', await page.evaluate(() =>
       auditNodes.homePanel === document.querySelector('[data-tab="home"]') &&
-      getComputedStyle(document.querySelector('.live-launcher > .app-header')).color === 'rgb(244, 247, 249)'));
+      getComputedStyle(document.querySelector('.live-launcher > .app-header')).color === 'rgb(255, 255, 255)'));
     await click('.live-launcher > .dock [data-screen="apps"]');
     await root.locator('[data-tab="apps"] [data-action="launch"]').first().click();
     await settled();
@@ -443,7 +581,174 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       await touchRoot.locator('[data-tab="tools"] [data-screen="alarm"]').isVisible());
     await touchContext.close();
 
-    const widgetContext = await browser.newContext({ viewport: { width: 1440, height: 1020 } });
+    // The live projection and the importing Tools redesign must share swipe behavior.
+    for (const demo of ['portal-plus-navigation-live', 'portal-plus-tools-redesign']) {
+      const swipeContext = await browser.newContext({ viewport: { width: 1440, height: 1020 }, hasTouch: true });
+      await swipeContext.route('**/*', route =>
+        new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+      const swipePage = await swipeContext.newPage();
+      watchPage(swipePage);
+      await swipePage.goto(`${origin}/${demo}/?screen=home`);
+      await swipePage.waitForFunction(() => !!window.__portalNavigationDemo);
+      await swipePage.evaluate(() => __portalMock.showAction('widget-move-to', { from: '8', to: '0' }));
+      await swipePage.waitForFunction(() =>
+        !!document.querySelector('.live-widget-grid [data-live-widget-index="0"][data-live-widget-kind="photo_memory"]'));
+      const swipeRoot = swipePage.locator('#navigation-device');
+      const swipeState = () => swipePage.evaluate(() => __portalNavigationDemo.getState());
+      const swipeSettled = () => swipePage.waitForFunction(() =>
+        document.querySelector('#navigation-device').getAnimations({ subtree: true }).length === 0);
+      const counter = () => swipeRoot.locator('[data-tab="home"] .widget-page > span:not(.live-widget-toolbar)').textContent();
+      await swipePage.evaluate(() => {
+        window.swipeChrome = {
+          header: document.querySelector('.live-launcher > .app-header'),
+          dock: document.querySelector('.live-launcher > .dock'),
+        };
+      });
+      const widgetSlide = await swipeWidgets(swipePage, 140);
+      check(`${demo}: right swipe over a widget advances one page without activating it`,
+        (await swipeState()).homePage === 1 && (await swipeState()).route.screen === 'home' &&
+        !(await swipeState()).simulation && await counter() === '2 of 2');
+      check(`${demo}: whole widget page slides right with a clipped inert outgoing page and stationary chrome`,
+        widgetSlide.widgets.length === 1 && widgetSlide.widgets.every(timing =>
+          timing.duration === 180 && timing.easing === 'cubic-bezier(0.215, 0.61, 0.355, 1)') &&
+        JSON.stringify(widgetSlide.incoming) === JSON.stringify([['translateX(-100%)', 'translateX(0px)']]) &&
+        widgetSlide.outgoing?.inert && widgetSlide.outgoing.hidden === 'true' && widgetSlide.outgoing.clipped &&
+        JSON.stringify(widgetSlide.outgoing.frames) === JSON.stringify([['translateX(0px)', 'translateX(100%)']]) &&
+        widgetSlide.outgoing.timing.every(timing => timing.duration === 180 &&
+          timing.easing === 'cubic-bezier(0.215, 0.61, 0.355, 1)') &&
+        widgetSlide.chrome === 0);
+      await swipeSettled();
+      check(`${demo}: outgoing widget page is removed after settling`,
+        await swipeRoot.locator('.live-widget-page-outgoing').count() === 0);
+      check(`${demo}: paging shows only its counter and preserves the All apps shortcut`,
+        await swipeRoot.locator('[data-tab="home"] [data-action="page"]').count() === 0 &&
+        !/Previous|More widgets/.test(await swipeRoot.locator('[data-tab="home"] .widget-page').innerText()) &&
+        await swipeRoot.locator('[data-tab="home"] .widget-page [data-screen="apps"]').isVisible());
+      await swipeWidgets(swipePage, 140);
+      check(`${demo}: right swipe at the last page clamps without a widget tap`,
+        (await swipeState()).homePage === 1 && !(await swipeState()).simulation && await counter() === '2 of 2');
+      const leftSlide = await swipeWidgets(swipePage, -140);
+      await swipeSettled();
+      check(`${demo}: left swipe returns to the previous page`, (await swipeState()).homePage === 0 && await counter() === '1 of 2');
+      check(`${demo}: whole widget page slides left when returning`,
+        JSON.stringify(leftSlide.incoming) === JSON.stringify([['translateX(100%)', 'translateX(0px)']]) &&
+        JSON.stringify(leftSlide.outgoing?.frames) === JSON.stringify([['translateX(0px)', 'translateX(-100%)']]));
+      await swipeWidgets(swipePage, -140);
+      check(`${demo}: left swipe at the first page clamps without a widget tap`,
+        (await swipeState()).homePage === 0 && !(await swipeState()).simulation);
+      await swipeWidgets(swipePage, 24);
+      check(`${demo}: a short horizontal drag does not page or tap the widget`,
+        (await swipeState()).homePage === 0 && !(await swipeState()).simulation);
+      await swipeWidgets(swipePage, 140, { mouse: true });
+      await swipeSettled();
+      check(`${demo}: desktop dragging over a photo widget advances without dragging the image or tapping`,
+        (await swipeState()).homePage === 1 && !(await swipeState()).simulation);
+      await swipeWidgets(swipePage, -140, { mouse: true });
+      await swipeSettled();
+      check(`${demo}: desktop dragging left returns to the previous page`,
+        (await swipeState()).homePage === 0 && !(await swipeState()).simulation);
+      await swipeWidgets(swipePage, 140, { cancel: true });
+      check(`${demo}: cancelling a horizontal gesture does not page`, (await swipeState()).homePage === 0);
+      await swipeRoot.locator('[data-tab="home"] .photo-card').tap();
+      check(`${demo}: a fresh widget tap still opens its preview after swiping`, (await swipeState()).simulation);
+      await swipePage.keyboard.press('Escape');
+      await swipeSettled();
+      await swipePage.evaluate(() => {
+        const grid = document.querySelector('[data-tab="home"] .live-widget-grid');
+        grid.style.maxHeight = '280px'; // Force real overflow without changing the fixture.
+        grid.scrollTop = 0;
+      });
+      await swipeWidgets(swipePage, 24, { dy: -150 });
+      await swipePage.waitForFunction(() => document.querySelector('.live-widget-grid').scrollTop > 0);
+      check(`${demo}: vertical touch scroll over a widget retains its page without tapping`,
+        (await swipeState()).homePage === 0 && !(await swipeState()).simulation);
+      await swipePage.evaluate(() => {
+        const grid = document.querySelector('.live-widget-grid');
+        grid.style.removeProperty('max-height');
+        grid.scrollTop = 0;
+      });
+      await swipeRoot.locator('.live-launcher > .app-header [data-screen="edit"]').click();
+      await swipeSettled();
+      await swipeWidgets(swipePage, 140);
+      await swipeSettled();
+      check(`${demo}: immediate right swipe over an editing card advances a page`,
+        (await swipeState()).homePage === 1 && (await swipeState()).route.screen === 'edit' &&
+        await counter() === '2 of 2' &&
+        await swipeRoot.locator('.live-widget-edit-controls').count() === 5);
+      await swipeWidgets(swipePage, -140);
+      await swipeSettled();
+      check(`${demo}: immediate left swipe over an editing card returns a page`,
+        (await swipeState()).homePage === 0 && await counter() === '1 of 2');
+      const editBeforeHold = await swipePage.evaluate(() => JSON.stringify(__portalMock.getState().widgets));
+      await swipeWidgets(swipePage, 140, { hold: true });
+      await swipeSettled();
+      check(`${demo}: a stationary editing hold reserves the subsequent drag instead of paging`,
+        (await swipeState()).homePage === 0 && (await swipeState()).route.screen === 'edit' &&
+        await swipePage.evaluate(before => JSON.stringify(__portalMock.getState().widgets) === before, editBeforeHold));
+      await swipeWidgets(swipePage, 140, { selector: '[data-live-widget-index="1"] [data-action="widget-size"]' });
+      check(`${demo}: swipes on editing controls neither page nor open a dialog`,
+        (await swipeState()).homePage === 0 && await swipeRoot.locator('#live-overlays .modal').count() === 0);
+      await swipePage.evaluate(() => {
+        const grid = document.querySelector('.live-widget-grid');
+        const input = document.createElement('input');
+        input.id = 'swipe-input-fixture';
+        input.setAttribute('aria-label', 'Swipe test input');
+        input.style.cssText = 'position:absolute;left:40px;top:40px;width:300px;height:68px';
+        grid.append(input);
+      });
+      await swipeWidgets(swipePage, 140, { selector: '#swipe-input-fixture' });
+      check(`${demo}: swipes on an input leave the page selected`,
+        (await swipeState()).homePage === 0);
+      await swipePage.evaluate(() => document.querySelector('#swipe-input-fixture').remove());
+      await swipeWidgets(swipePage, 140, { gap: true });
+      await swipeSettled();
+      check(`${demo}: editing can page from a gutter with no visible paging links`,
+        (await swipeState()).homePage === 1 && await counter() === '2 of 2' &&
+        await swipeRoot.locator('[data-tab="home"] [data-action="page"]').count() === 0);
+      await swipeWidgets(swipePage, -140, { gap: true });
+      await swipeSettled();
+      await swipeRoot.locator('.live-launcher > .app-header [data-live-widget-done]').click();
+      await swipeSettled();
+      await swipeWidgets(swipePage, 140);
+      await swipePage.evaluate(() => {
+        const grid = document.querySelector('.live-widget-grid');
+        grid.getAnimations().forEach(animation => animation.cancel());
+      });
+      await swipeSettled();
+      check(`${demo}: cancelling the incoming page animation cleans the outgoing clone`,
+        await swipeRoot.locator('.live-widget-page-outgoing').count() === 0);
+      await swipeWidgets(swipePage, -140);
+      await swipePage.evaluate(() => __portalNavigationDemo.navigate('apps'));
+      await swipeSettled();
+      check(`${demo}: navigation cancels the widget slide and removes its outgoing clone`,
+        (await swipeState()).tab === 'apps' && await swipeRoot.locator('.live-widget-page-outgoing').count() === 0);
+      await swipePage.evaluate(() => __portalNavigationDemo.navigate('home'));
+      await swipeSettled();
+      await swipePage.emulateMedia({ reducedMotion: 'reduce' });
+      const reducedSlide = await swipeWidgets(swipePage, 140);
+      await swipeSettled();
+      check(`${demo}: reduced motion paging settles on the requested page`,
+        (await swipeState()).homePage === 1 && await counter() === '2 of 2' && reducedSlide.widgets.length === 0);
+      for (const viewport of [{ width: 960, height: 740 }, { width: 1920, height: 1390 }]) {
+        await swipePage.setViewportSize(viewport);
+        await swipeWidgets(swipePage, -140, { mouse: true });
+        const scale = await swipePage.evaluate(() => document.querySelector('#navigation-device').getBoundingClientRect().width / 1920);
+        await swipeWidgets(swipePage, 72 * scale, { mouse: true });
+        check(`${demo}: 72 logical pixels stays below 64 pixels plus touch slop at scale ${scale}`,
+          (await swipeState()).homePage === 0);
+        await swipeWidgets(swipePage, 76 * scale, { mouse: true });
+        await swipeSettled();
+        check(`${demo}: 76 logical pixels passes 64 pixels plus touch slop at scale ${scale}`,
+          (await swipeState()).homePage === 1);
+      }
+      check(`${demo}: widget paging keeps the mounted launcher header and dock`,
+        await swipePage.evaluate(() =>
+          swipeChrome.header === document.querySelector('.live-launcher > .app-header') &&
+          swipeChrome.dock === document.querySelector('.live-launcher > .dock')));
+      await swipeContext.close();
+    }
+
+    const widgetContext = await browser.newContext({ viewport: { width: 1440, height: 1020 }, hasTouch: true });
     await widgetContext.route('**/*', route =>
       new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
     const widgetPage = await widgetContext.newPage();
@@ -496,8 +801,13 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       assert.equal(await widgetPage.evaluate(() => __portalNavigationDemo.getState().route.screen), 'home',
         'Done must leave editing, including after visiting the widget library');
     };
-    const nextWidgets = () => widgetClick('[data-tab="home"] [data-action="page"][data-dir="1"]');
-    const previousWidgets = () => widgetClick('[data-tab="home"] [data-action="page"][data-dir="-1"]');
+    const pageWidgets = async direction => {
+      const gap = await widgetPage.evaluate(() => __portalNavigationDemo.getState().route.screen === 'edit');
+      await swipeWidgets(widgetPage, direction * 140, { gap });
+      await widgetSettled();
+    };
+    const nextWidgets = () => pageWidgets(1);
+    const previousWidgets = () => pageWidgets(-1);
     const size = async (index, span) => {
       await widgetClick(`[data-live-widget-index="${index}"] [data-action="widget-size"]`);
       await widgetClick(`#live-overlays [data-action="widget-size-set"][data-name="${span}"]`);
@@ -636,6 +946,8 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       (await placements()).some(item => item.index === 0 && item.kind === 'photo_memory' && item.row === '1 / span 3') &&
       await noOverlap());
     const reached = new Set();
+    await previousWidgets();
+    await previousWidgets();
     for (let count = 0; count < 3; count++) {
       (await placements()).forEach(item => reached.add(item.index));
       assert.ok((await placements()).length <= 5, 'editor remains bounded to one page');
@@ -645,7 +957,9 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
     await size(9, '2 × 1');
     check('an explicit photo 2 by 1 preset remains one row instead of becoming a hero default',
       (await placements()).some(item => item.index === 9 && item.row.endsWith('span 1') && item.column.endsWith('span 2')));
-    await nextWidgets();
+    await previousWidgets();
+    await previousWidgets();
+    assert.equal((await layout()).page, '1 of 3', 'return explicitly to page one before resizing Weather');
     await size(4, '2 × 2');
     check('an explicit regular 2 by 2 preset remains two columns instead of becoming a legacy default',
       (await placements()).some(item => item.index === 4 && item.row.endsWith('span 2') && item.column.endsWith('span 2')) &&
@@ -668,7 +982,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
         widgetChrome.dock === document.querySelector('.live-launcher > .dock')));
     await widgetContext.close();
 
-    const photoContext = await browser.newContext({ viewport: { width: 1440, height: 1020 } });
+    const photoContext = await browser.newContext({ viewport: { width: 1440, height: 1020 }, hasTouch: true });
     await photoContext.route('**/*', route =>
       new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
     const photoPage = await photoContext.newPage();
@@ -698,7 +1012,12 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       await photoClick(`[data-live-widget-index="${from}"] [data-action="widget-move"]`);
       await photoClick(`#live-overlays [data-action="widget-move-to"][data-to="${to}"]`);
     };
-    const photoNext = () => photoClick('[data-action="page"][data-dir="1"]');
+    const photoPageWidgets = async direction => {
+      await swipeWidgets(photoPage, direction * 140, { gap: true });
+      await photoPage.waitForFunction(() =>
+        document.querySelector('#navigation-device').getAnimations({ subtree: true }).length === 0);
+    };
+    const photoNext = () => photoPageWidgets(1);
     const approvedPhotoHome = await photoLayout();
     check('saved photo-first default retains the approved dashboard order',
       JSON.stringify(approvedPhotoHome.cards.map(card => card.kind)) ===
@@ -745,6 +1064,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       await photoClick('[data-tab="home"] [data-action="widget-add"][data-kind="photo_memory"]');
     }
     const photoReached = new Set();
+    await photoPageWidgets(-1);
     for (let count = 0; count < 3; count++) {
       const snapshot = await photoLayout();
       const ids = snapshot.cards.map(card => card.index);
@@ -764,7 +1084,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
     const parityPage = await parityContext.newPage();
     watchPage(parityPage);
-    await parityPage.goto(`${origin}/portal-plus-navigation-live/`);
+    await parityPage.goto(`${origin}/portal-plus-navigation-live/?theme=dark`);
     await parityPage.waitForFunction(() => !!window.__portalNavigationDemo);
     await parityPage.emulateMedia({ reducedMotion: 'reduce' });
     const parityRoot = parityPage.locator('#navigation-device');
@@ -843,7 +1163,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
     check('missing-art sample glyphs retain the legible palette without background plates',
       await parityPage.evaluate(() => {
         const textColor = getComputedStyle(document.querySelector('[data-live-apps-grid]')).color;
-        return textColor === 'rgb(244, 247, 249)' &&
+        return textColor === 'rgb(255, 255, 255)' &&
           [...document.querySelectorAll('[data-live-apps-grid] .app-icon[data-live-artwork="glyph"]')]
           .every(icon => icon.dataset.liveArtwork === 'glyph' && !icon.querySelector('img') && !!icon.querySelector('svg') &&
             getComputedStyle(icon).color === textColor && getComputedStyle(icon.querySelector('svg')).color === textColor &&
@@ -859,7 +1179,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       await parityPage.evaluate(() => {
         const icon = document.querySelector('[data-live-apps-grid] [data-pkg="org.chromium.chrome"] .app-icon');
         return icon.dataset.liveArtwork === 'glyph' && !!icon.querySelector('svg') && !icon.querySelector('img') &&
-          getComputedStyle(icon).color === 'rgb(244, 247, 249)' &&
+          getComputedStyle(icon).color === 'rgb(255, 255, 255)' &&
           getComputedStyle(icon).backgroundColor === 'rgba(0, 0, 0, 0)';
       }));
     await parityPage.keyboard.press('Tab');
@@ -989,7 +1309,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
         const reader = document.querySelector('.live-story-reader');
         return toolsAudit.workspace === document.querySelector('.live-tools-workspace') &&
           document.querySelector('#live-tools-title').textContent === __portalNavigationDemo.getState().route.reader &&
-          reader && getComputedStyle(reader).color === 'rgb(244, 247, 249)' &&
+          reader && getComputedStyle(reader).color === 'rgb(255, 255, 255)' &&
           getComputedStyle(reader).backgroundColor !== 'rgba(0, 0, 0, 0)' &&
           !document.querySelector('#live-overlays .modal-layer,.live-activity-window') &&
           /speech playback is simulated/.test(reader.textContent);

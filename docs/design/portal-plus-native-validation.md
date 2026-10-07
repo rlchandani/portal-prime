@@ -80,6 +80,10 @@ memory/disk caching and atomic file publication. The last disposed card cancels
 both queued work and active transfer. Obsolete work cannot overwrite a newer
 request's cache entry. There is no idle marquee or per-frame weather/Sky loop.
 
+The current widget swipe navigation and its device/performance evidence are
+recorded in [portal-plus-widget-paging.md](portal-plus-widget-paging.md).
+It replaces the Previous/More widgets controls with swipes and a page counter.
+
 Touch Home retains at most three adjacent widget pages, with cached data and
 refresh deadlines owned by the Home tab. Paging changes visible layers and input
 eligibility; it does not restart each widget's network producer. Re-entry waits
@@ -291,11 +295,40 @@ investigation; production release options remain unchanged. The first optimized
 candidate `f7e12bcb…` installed and independently matched, but the probe returned
 `NoClassDefFoundError` and produced no accepted timing evidence. Its R8 mapping
 renamed the Kotlin runtime ABI used by the separately compiled test APK.
-The rebuilt screening candidate `bade4da2…` preserves that ABI and built
-successfully; its device measurement is pending after automatic approval review
-returned a temporary service rate limit. This benchmark accommodation is not an
-exact prospective shipping artifact. See the
+The rebuilt screening candidate `bade4da2…` preserves that ABI, built successfully
+and completed one device Settings trial: 120 valid frames, p50 10.54 ms,
+p95 38.51 ms, p99 48.53 ms, maximum 49.96 ms; 36/120 proxy frames exceeded
+the budget. The CPU-stage elapsed proxy had p95 28.50 ms. It still fails the
+screening target; this single trial cannot establish a matched improvement.
+The verified debug APK and original widget data were restored afterward.
+This benchmark accommodation is not an exact prospective shipping artifact. See the
 [R8 investigation](portal-plus-r8-investigation.md).
+
+## Prepared follow-up candidates
+
+Two source changes after checkpoint `0017d61` are uninstalled and unverified:
+
+- Tools supplies its local Back callback to embedded Alarm/Countdown/Intercom
+  bodies. This addresses the inventory's countdown Cancel route, whose fallback
+  can finish HomeActivity. Original-device reproduction and candidate
+  window/data checks have not run: automatic permission review timed out before
+  executing the test.
+- `TvFocus` retains its interaction source and clickable chain across pane
+  activation, using disabled input instead of removing the chain. This is a
+  performance hypothesis. Compose can still detach its internal focus delegate;
+  no improvement is claimed. Explicit caller-disabled behavior was preserved
+  when narrowing the candidate; long press, D-pad focus, app Manage-mode
+  drag/remove and hidden-page input still need native checks.
+
+These candidates are excluded from the passing artifact and test counts above.
+An initial broader candidate built and passed the JVM gate; the final narrowed
+source has not been rebuilt because permission review timed out on the build
+and its one allowed retry. No candidate was installed.
+Permission review also blocked two observer-stop attempts before execution;
+the observer subsequently exited with `INSTRUMENTATION_CODE: 0` at its
+45-minute self-timeout. Its exec handle was polled and confirmed terminal on
+2026-10-05. No waiting observer remains. Explicit retry approval for the
+prepared device checks is still pending.
 
 Warmed navigation and scrolling measurements are recorded separately from
 functional tests. Zero-frame/static-page samples do not establish smoothness.

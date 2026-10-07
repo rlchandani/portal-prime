@@ -1,0 +1,76 @@
+<!doctype html>
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Immortal — UX design study</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="review.css">
+</head>
+<body>
+  <aside class="review-sidebar">
+    <a class="study-brand" href="./">immortal<span>Design study / October 2026</span></a>
+    <p class="study-intro">A more considered home for your Portal.</p>
+    <div class="review-label">Choose a direction</div>
+    <div class="concept-options" aria-label="Design direction">
+      <button data-concept="everyday" class="selected"><span class="concept-letter">A</span><span><strong>Everyday</strong><small>Balanced. Familiar. Recommended.</small></span></button>
+      <button data-concept="gallery"><span class="concept-letter">B</span><span><strong>Gallery</strong><small>Photos first. Room to breathe.</small></span></button>
+      <button data-concept="control"><span class="concept-letter">C</span><span><strong>Control</strong><small>A focused home control center.</small></span></button>
+    </div>
+    <div class="review-label">Explore the experience</div>
+    <nav class="screen-options" aria-label="Prototype screen">
+      <button data-screen="home" class="selected">Home</button>
+      <button data-screen="settings">Settings</button>
+      <button data-screen="source">Connect photo source</button>
+      <button data-screen="customize">Customize home</button>
+      <button data-screen="apps">Apps & folders</button>
+      <button data-screen="store">App Store</button>
+      <button data-screen="photos">Photo display</button>
+    </nav>
+    <div class="review-label">Test a real-world state</div>
+    <select id="scenario" aria-label="Prototype scenario">
+      <option value="normal">Connected / populated</option>
+      <option value="offline">Disconnected / cached content</option>
+      <option value="empty">First use / no calendar or music</option>
+    </select>
+    <div class="study-footer">Interactive concept only.<br>Sample content. No Portal connection.</div>
+  </aside>
+  <main class="review-main">
+    <header class="review-header">
+      <div><h1 id="review-title">Everyday / Home</h1><p id="review-subtitle">The essentials, with a place for everything else.</p></div>
+      <div class="review-tools">
+        <button id="notes-button" aria-expanded="false">Research & recommendation</button>
+        <a id="full-link" href="prototype.html" target="_blank" rel="noopener">Open full screen ↗</a>
+      </div>
+    </header>
+    <div class="review-meta"><span>Portal+ • 3:2 preview</span><span>Click through the prototype. Escape goes back.</span></div>
+    <div class="preview-wrap" id="preview-wrap">
+      <div class="preview-height" id="preview-height">
+        <iframe id="prototype" title="Interactive Immortal prototype" src="prototype.html?concept=everyday&screen=home"></iframe>
+      </div>
+    </div>
+    <div class="concept-caption" id="concept-caption"><b>The recommendation:</b> keep Apple-style grouped settings; adapt the home to a shared household display. Favorite apps are separate from the full library, and frequent actions stay visible.</div>
+    <section id="research-panel" hidden>
+      <div class="research-heading"><h2>Make it easier to use. Then make it beautiful.</h2><a href="research.html" target="_blank" rel="noopener">Read the complete research</a></div>
+      <p class="research-lead">Recommendation: Everyday home + the shared two-pane settings design. This combines familiar iPhone controls, a landscape iPad structure, and smart-display sizing. These are design hypotheses to validate with you, not results from user testing.</p>
+      <div class="research-grid">
+        <article><h3>Establish one hierarchy</h3><p>Glanceable time, weather, and next event. Six favorites. Full apps and tools live one tap away. The dashboard is a starting point rather than a collection of every available feature.</p><a href="https://developer.apple.com/design/human-interface-guidelines/layout" target="_blank" rel="noopener">Apple: layout</a><a href="https://www.nngroup.com/articles/dashboards-preattentive/" target="_blank" rel="noopener">NN/g: dashboards</a></article>
+        <article><h3>Keep the iPhone familiarity</h3><p>Grouped rows, trailing values, switches, and clear disclosure arrows. Eight understandable destinations replace a long feature-by-feature sidebar. Keep deeper settings accessible through search and Advanced.</p><a href="https://developer.apple.com/design/human-interface-guidelines/settings" target="_blank" rel="noopener">Apple: settings</a><a href="https://www.nngroup.com/articles/progressive-disclosure/" target="_blank" rel="noopener">NN/g: progressive disclosure</a></article>
+        <article><h3>Use glass with a purpose</h3><p>Glass belongs on the floating navigation and transient controls. Reading surfaces use stable, sufficiently opaque backgrounds. The Android 10 implementation should use inexpensive tints instead of continuous live blur.</p><a href="https://developer.apple.com/design/human-interface-guidelines/materials" target="_blank" rel="noopener">Apple: materials</a></article>
+        <article><h3>Design for an arm’s length</h3><p>Android’s floor is 48dp; Amazon recommends 68dp targets for hub devices. Prototype rows are generously sized; final dp, text size, and spacing must be checked on the actual Portal and at room distance.</p><a href="https://developer.amazon.com/en-US/alexa/alexa-haus/apl-components" target="_blank" rel="noopener">Amazon: smart-display controls</a><a href="https://developer.android.com/develop/ui/compose/accessibility/api-defaults" target="_blank" rel="noopener">Android: accessible defaults</a></article>
+        <article><h3>Remove the guesswork</h3><p>Visible Customize and Done actions, a Move button alongside dragging, search results that open the relevant setting, connected-state summaries, and errors beside the affected content.</p><a href="https://www.nngroup.com/articles/recognition-and-recall/" target="_blank" rel="noopener">NN/g: recognition</a><a href="https://developer.apple.com/design/human-interface-guidelines/feedback" target="_blank" rel="noopener">Apple: feedback</a></article>
+        <article><h3>Keep navigation predictable</h3><p>Use a stable sidebar and detail pane on wide displays, a back stack on compact displays, and a clear focus indicator for TV remotes. Essential actions never depend on long press or hover.</p><a href="https://developer.android.com/develop/ui/compose/layouts/adaptive/canonical-layouts" target="_blank" rel="noopener">Android: canonical layouts</a><a href="https://developer.apple.com/design/human-interface-guidelines/sidebars" target="_blank" rel="noopener">Apple: sidebars</a></article>
+      </div>
+      <h3 class="source-heading">Sources reviewed</h3>
+      <p>Apple HIG: <a href="https://developer.apple.com/design/human-interface-guidelines/accessibility" target="_blank" rel="noopener">accessibility</a>, <a href="https://developer.apple.com/design/human-interface-guidelines/motion" target="_blank" rel="noopener">motion</a>, <a href="https://developer.apple.com/design/human-interface-guidelines/searching" target="_blank" rel="noopener">searching</a>. Amazon: <a href="https://developer.amazon.com/en-US/alexa/alexa-haus/apl-style-guide" target="_blank" rel="noopener">smart-display type and spacing</a>. Home Assistant: <a href="https://www.home-assistant.io/dashboards/sections/" target="_blank" rel="noopener">sections and contextual visibility</a>. W3C: <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html" target="_blank" rel="noopener">contrast</a> and <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html" target="_blank" rel="noopener">target sizes</a>.</p>
+      <p class="research-footnote">Research reviewed October 4, 2026. The proposed 150–220ms motion, eight-category grouping, and six favorites are product recommendations, not prescribed standards.</p>
+    </section>
+  </main>
+  <script src="review.js"></script>
+</body>
+</html>

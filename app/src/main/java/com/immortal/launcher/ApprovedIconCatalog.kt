@@ -58,7 +58,11 @@ internal fun approvedIconResource(name: String): Int = when (name.lowercase(Loca
     "lock" -> R.drawable.approved_icon_lock
     "intercom", "megaphone" -> R.drawable.approved_icon_megaphone
     "mic" -> R.drawable.approved_icon_mic
-    "moon", "moonz", "sleep" -> R.drawable.approved_icon_moonz
+    "remote", "smartphone" -> R.drawable.approved_icon_remote
+    "theme_day", "sun" -> R.drawable.approved_icon_theme_day
+    "theme_night" -> R.drawable.approved_icon_theme_night
+    "moon" -> R.drawable.approved_icon_moonz
+    "moonz", "sleep" -> R.drawable.approved_icon_sleep
     "builtin:music", "music" -> R.drawable.approved_icon_music
     "com.portal.assistant", "jarvis", "notes",
     "stories", "todo" -> R.drawable.approved_icon_notes

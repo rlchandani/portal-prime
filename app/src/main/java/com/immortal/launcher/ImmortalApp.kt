@@ -74,7 +74,7 @@ class ImmortalApp : Application() {
     SunriseScheduler.reschedule(this)
 
     // Arm the next wake-up alarm per the user's config.
-    AlarmScheduler.reschedule(this)
+    AlarmScheduler.reschedule(this, cancelSnooze = false)
 
     // Bring up the WiFi fleet agent if provisioning enabled it (no-op otherwise).
     FleetAgentService.ensureRunning(this)

@@ -19,7 +19,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 internal object ApprovedToolsSpeedRunner {
   private val workers = Executors.newFixedThreadPool(2) { task -> Thread(task, "ImmortalSpeedTest").apply { isDaemon = true } }
 
-  suspend fun run(result: SpeedTest.Result, onPhase: (SpeedTest.Phase) -> Unit) = suspendCancellableCoroutine<Unit> { continuation ->
+  suspend fun run(result: SpeedTest.Result, onPhase: (SpeedTest.Phase) -> Unit) = suspendCancellableCoroutine<Set<SpeedTest.Phase>> { continuation ->
     val socket = AtomicReference<HttpURLConnection?>(null)
     val future = AtomicReference<Future<*>?>(null)
     fun checkActive() { if (!continuation.isActive || Thread.currentThread().isInterrupted) throw java.util.concurrent.CancellationException() }
@@ -34,8 +34,14 @@ internal object ApprovedToolsSpeedRunner {
     }
     fun close(connection: HttpURLConnection) { socket.compareAndSet(connection, null); connection.disconnect() }
     fun phase(next: SpeedTest.Phase) { checkActive(); onPhase(next) }
-    continuation.invokeOnCancellation { socket.getAndSet(null)?.disconnect(); future.get()?.cancel(true) }
+    continuation.invokeOnCancellation {
+      val connection = socket.getAndSet(null)
+      future.get()?.cancel(true)
+      // HttpURLConnection teardown can wait for a read lock. Never put that on the UI thread.
+      if (connection != null) workers.execute { runCatching { connection.disconnect() } }
+    }
     val submitted = workers.submit {
+      val incomplete = mutableSetOf<SpeedTest.Phase>()
       try {
         runCatching {
           val connection = open("cdn-cgi/trace")
@@ -64,7 +70,7 @@ internal object ApprovedToolsSpeedRunner {
             result.pingMs = average
             result.jitterMs = samples.map { kotlin.math.abs(it - average) }.average()
           }
-        }
+        }.onFailure { checkActive(); incomplete += SpeedTest.Phase.PING }
         phase(SpeedTest.Phase.DOWNLOAD)
         runCatching {
           val started = System.nanoTime()
@@ -89,7 +95,7 @@ internal object ApprovedToolsSpeedRunner {
           }
           checkActive()
           result.downMbps = bytes * 8.0 / 1_000_000.0 / elapsed().coerceAtLeast(.001)
-        }
+        }.onFailure { checkActive(); incomplete += SpeedTest.Phase.DOWNLOAD }
         phase(SpeedTest.Phase.UPLOAD)
         runCatching {
           val connection = open("__up")
@@ -113,12 +119,14 @@ internal object ApprovedToolsSpeedRunner {
               output.flush()
             }
             checkActive()
+            val response = connection.responseCode
+            checkActive()
+            if (response !in 200..299) throw java.io.IOException("Upload rejected")
             result.upMbps = sent * 8.0 / 1_000_000.0 / elapsed().coerceAtLeast(.001)
-            runCatching { connection.responseCode }
           } finally { close(connection) }
-        }
+        }.onFailure { checkActive(); incomplete += SpeedTest.Phase.UPLOAD }
         checkActive()
-        continuation.resume(Unit)
+        continuation.resume(incomplete.toSet())
       } catch (failure: Throwable) {
         if (continuation.isActive) continuation.resumeWithException(failure)
       } finally { socket.getAndSet(null)?.disconnect() }

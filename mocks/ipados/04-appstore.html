@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>iPadOS · App Store</title>
+<link rel="stylesheet" href="ds.css"/>
+<style>
+  body { background: var(--bg-grouped); overflow-x: hidden; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 34px 44px 60px; }
+  .nav { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .search { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--separator); border-radius: 12px; padding: 12px 14px; color: var(--label-2); font-size: 17px; margin: 16px 0 26px; }
+  /* Hero (App Store "Today" style feature card) */
+  .hero { border-radius: 22px; overflow: hidden; position: relative; color: #fff; padding: 30px 34px; min-height: 260px;
+      background: linear-gradient(135deg, #7b2ff7, #f107a3); box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: flex-end; }
+  .hero .kicker { font-size: 13px; font-weight: 700; letter-spacing: 1px; opacity: .85; }
+  .hero .h { font-size: 34px; font-weight: 700; margin: 4px 0 6px; }
+  .hero .d { font-size: 17px; opacity: .92; max-width: 560px; }
+  .hero .get { margin-top: 16px; align-self: flex-start; background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); border-radius: 20px; padding: 9px 22px; font-weight: 600; }
+  .hero .logo { position: absolute; top: 28px; right: 30px; width: 78px; height: 78px; border-radius: 20px; background: rgba(0,0,0,.35); display:grid; place-items:center; font-size: 40px; }
+
+  .sec-h { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin: 34px 0 14px; }
+  .carousel { display: grid; grid-auto-flow: column; grid-auto-columns: 280px; gap: 18px; overflow-x: auto; padding-bottom: 8px; }
+  .fcard { border-radius: 18px; overflow: hidden; color: #fff; padding: 18px; min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end; position: relative; box-shadow: var(--shadow-card); }
+  .fcard .k { font-size: 12px; font-weight: 700; letter-spacing: .6px; opacity: .8; text-transform: uppercase; }
+  .fcard .n { font-size: 20px; font-weight: 700; }
+  .fcard .s { font-size: 14px; opacity: .9; }
+  .fcard .ic { position: absolute; top: 16px; right: 16px; width: 54px; height: 54px; border-radius: 14px; background: rgba(0,0,0,.3); display:grid; place-items:center; font-size:28px; }
+
+  /* App list rows (grouped inset) */
+  .list { background: #fff; border-radius: var(--r-lg); box-shadow: var(--shadow-card); overflow: hidden; }
+  .arow { display: flex; align-items: center; gap: 16px; padding: 16px 18px; position: relative; }
+  .arow + .arow::before { content:""; position:absolute; top:0; left:88px; right:0; height:1px; background: var(--separator); }
+  .arow .ic { width: 60px; height: 60px; border-radius: 14px; display:grid; place-items:center; font-size:30px; color:#fff; flex:none; }
+  .arow .meta { flex: 1; }
+  .arow .meta .n { font-size: 17px; font-weight: 600; }
+  .arow .meta .d { font-size: 14px; color: var(--label-2); }
+  .arow .get { background: var(--fill-tertiary); color: var(--blue); font-weight: 700; font-size: 15px; padding: 7px 20px; border-radius: 16px; }
+  .arow .get.open { color: var(--blue); }
+  .chips { display: flex; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
+  .chip { background: #fff; border: 1px solid var(--separator); border-radius: 18px; padding: 8px 16px; font-size: 15px; color: var(--blue); font-weight: 500; }
+  .badge { position: fixed; top: 14px; right: 20px; color: var(--label-2); font-size: 12px; letter-spacing: 1px; z-index: 5; }
+</style>
+</head>
+<body>
+  <div class="badge">MOCK 04 · APP STORE</div>
+  <div class="wrap">
+    <div class="nav"><div class="t-largeTitle">App Store</div><div class="t-subhead">26 apps picked for Portal</div></div>
+    <div class="search">􀊫 <span>Search apps…</span></div>
+
+    <div class="hero">
+      <div class="logo">∞</div>
+      <div class="kicker">PORTAL PICK</div>
+      <div class="h">Immortal</div>
+      <div class="d">The launcher, screensaver, and app store — the project itself.</div>
+      <div class="get">Install</div>
+    </div>
+
+    <div class="sec-h">Portal Originals</div>
+    <div class="carousel" id="orig"></div>
+
+    <div class="sec-h">Media &amp; Entertainment</div>
+    <div class="list" id="media"></div>
+
+    <div class="chips" id="chips"></div>
+  </div>
+<script>
+const orig = [
+  ["ORIGINAL","Portal Calendar","Always-on family calendar","bg-green","📅"],
+  ["ORIGINAL","HippoMuncher","Head-tracking arcade game","bg-green","🦛"],
+  ["ORIGINAL","ISS Tracker","Live space dashboard","bg-indigo","🛰️"],
+  ["ORIGINAL","Portal-Kasa","TP-Link smart plugs","bg-orange","🔌"],
+  ["ORIGINAL","Portal Overlays","Floating HUD","bg-purple","➕"],
+];
+document.getElementById("orig").innerHTML = orig.map(([k,n,s,b,e])=>
+  `<div class="fcard ${b}"><div class="ic">${e}</div><div class="k">${k}</div><div class="n">${n}</div><div class="s">${s}</div></div>`).join("");
+const media = [
+  ["VLC","VideoLAN","bg-orange","🔶","Open"],["Jellyfin","Jellyfin Project","bg-indigo","🎬","Install"],
+  ["portalfin","Jellyfin for Portal","bg-gray","🅿️","Install"],["SmartTube","Ad-free YouTube","bg-red","📺","Install"],
+  ["NewPipe","Lightweight YouTube","bg-red","▶️","Open"],
+];
+document.getElementById("media").innerHTML = media.map(([n,d,b,e,cta])=>
+  `<div class="arow"><div class="ic ${b}">${e}</div><div class="meta"><div class="n">${n}</div><div class="d">${d}</div></div><div class="get ${cta==='Open'?'open':''}">${cta}</div></div>`).join("");
+document.getElementById("chips").innerHTML = ["Media & Entertainment","Smart Home & Ambient","Productivity","Utilities","Portal Originals","🔎 Search"].map(c=>`<div class="chip">${c}</div>`).join("");
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+/* ==========================================================================
+   Immortal · iPadOS design system  (mock)
+   The single source of truth for the redesign: color, type, spacing, materials,
+   control styles. Every mock imports this. Tuned for a wide landscape display
+   (~2160×1440 / 3:2), viewed across a room, so touch targets are generous.
+   Font: Inter as the SF-Pro substitute (bundled in the real app).
+   ========================================================================== */
+
+/* ---- Font (Inter, local to the mock via Google Fonts CDN for preview) ---- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Type family */
+  --font: "Inter", -apple-system, "SF Pro Display", "Segoe UI", Roboto, system-ui, sans-serif;
+
+  /* ---- iOS/iPadOS system palette (light, "Regular") ---- */
+  --label:            #1c1c1e;      /* primary text */
+  --label-2:          rgba(60,60,67,0.60);   /* secondary */
+  --label-3:          rgba(60,60,67,0.30);   /* tertiary / chevrons */
+  --separator:        rgba(60,60,67,0.16);
+  --bg-grouped:       #f2f2f7;      /* grouped-list background */
+  --bg-elevated:      #ffffff;      /* cards / rows */
+  --fill-quaternary:  rgba(116,116,128,0.08);
+  --fill-tertiary:    rgba(116,116,128,0.12);
+
+  /* System accent colors (iOS) */
+  --blue:   #007aff;
+  --green:  #34c759;
+  --indigo: #5856d6;
+  --orange: #ff9500;
+  --pink:   #ff2d55;
+  --purple: #af52de;
+  --red:    #ff3b30;
+  --teal:   #30b0c7;
+  --yellow: #ffcc00;
+  --cyan:   #32ade6;
+  --gray:   #8e8e93;
+
+  /* ---- Radius scale (iOS "continuous"/squircle feel) ---- */
+  --r-sm: 10px;
+  --r-md: 14px;    /* rows, fields */
+  --r-lg: 18px;    /* cards */
+  --r-xl: 22px;    /* large cards / widgets */
+  --r-icon: 24px;  /* app icon squircle @ ~110px */
+
+  /* ---- Spacing scale (8pt grid) ---- */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s8: 32px; --s10: 40px;
+
+  /* ---- Elevation ---- */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px -12px rgba(0,0,0,0.18);
+  --shadow-icon: 0 6px 16px -6px rgba(0,0,0,0.35);
+  --shadow-pop:  0 20px 60px -20px rgba(0,0,0,0.5);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: var(--font); color: var(--label); -webkit-font-smoothing: antialiased; }
+
+/* ---- Type scale (iOS text styles) ---- */
+.t-largeTitle { font-size: 40px; font-weight: 700; letter-spacing: -0.8px; line-height: 1.1; }
+.t-title1     { font-size: 30px; font-weight: 700; letter-spacing: -0.5px; }
+.t-title2     { font-size: 24px; font-weight: 600; letter-spacing: -0.3px; }
+.t-title3     { font-size: 20px; font-weight: 600; letter-spacing: -0.2px; }
+.t-headline   { font-size: 17px; font-weight: 600; }
+.t-body       { font-size: 17px; font-weight: 400; }
+.t-callout    { font-size: 16px; font-weight: 400; }
+.t-subhead    { font-size: 15px; font-weight: 400; color: var(--label-2); }
+.t-footnote   { font-size: 13px; font-weight: 400; color: var(--label-2); }
+.t-caption    { font-size: 12px; font-weight: 500; color: var(--label-2); letter-spacing: 0.3px; }
+
+/* ---- Grouped inset list (the heart of iOS Settings) ---- */
+.group-header { font-size: 13px; font-weight: 400; color: var(--label-2); text-transform: uppercase;
+  letter-spacing: 0.4px; padding: 20px 20px 7px; }
+.inset-group { background: var(--bg-elevated); border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow-card); }
+.row { display: flex; align-items: center; gap: 14px; padding: 13px 16px; min-height: 52px; position: relative; }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 62px; right: 0; height: 1px; background: var(--separator); }
+.row .icon { width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center; color: #fff; font-size: 16px; flex: none; }
+.row .title { font-size: 17px; flex: 1; }
+.row .value { font-size: 17px; color: var(--label-2); }
+.row .chev { color: var(--label-3); font-size: 19px; margin-left: 4px; }
+.row .arrow-out { color: var(--label-3); font-size: 15px; margin-left: 4px; }
+
+/* iOS switch */
+.switch { width: 51px; height: 31px; border-radius: 16px; background: var(--fill-tertiary); position: relative; flex: none; transition: background .2s; }
+.switch.on { background: var(--green); }
+.switch::after { content:""; position:absolute; top:2px; left:2px; width:27px; height:27px; border-radius:50%; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition: transform .2s; }
+.switch.on::after { transform: translateX(20px); }
+
+/* Segmented control */
+.segmented { display: inline-flex; background: var(--fill-tertiary); border-radius: 9px; padding: 2px; }
+.segmented span { padding: 6px 16px; border-radius: 7px; font-size: 15px; font-weight: 500; color: var(--label); }
+.segmented span.sel { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+
+/* Materials */
+.material { background: rgba(255,255,255,0.72); backdrop-filter: blur(30px) saturate(1.6); -webkit-backdrop-filter: blur(30px) saturate(1.6); }
+.material-dark { background: rgba(30,30,34,0.55); backdrop-filter: blur(30px) saturate(1.6); -webkit-backdrop-filter: blur(30px) saturate(1.6); }
+
+/* App icon squircle */
+.appicon { border-radius: 24%; box-shadow: var(--shadow-icon); position: relative; overflow: hidden; }
+.appicon::after { content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0.05) 40%, transparent 60%); }
+
+/* helper accent-bg classes */
+.bg-blue{background:var(--blue)} .bg-green{background:var(--green)} .bg-indigo{background:var(--indigo)}
+.bg-orange{background:var(--orange)} .bg-pink{background:var(--pink)} .bg-purple{background:var(--purple)}
+.bg-red{background:var(--red)} .bg-teal{background:var(--teal)} .bg-yellow{background:var(--yellow)}
+.bg-cyan{background:var(--cyan)} .bg-gray{background:var(--gray)}

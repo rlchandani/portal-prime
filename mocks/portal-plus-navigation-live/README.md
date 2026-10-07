@@ -21,8 +21,10 @@ Each saved size is an explicit preset, including 2 × 1 and 2 × 2; resizing one
 card never switches the defaults of its neighbors or another page. Entering
 Customize and pressing Done preserve card geometry, the selected page and its
 scroll offset. The mounted header Customize button becomes Done; Add widget
-appears in the existing Favorite apps row. Previous/More widgets remain available
-while editing. Greeting, favorites and the content viewport keep their positions.
+appears in the existing Favorite apps row. Swipe right in the widget area for
+the next page and left for the previous page, in Home or Customize. Paging clamps
+at both ends; only the current-page counter remains visible. The whole widget
+page slides over 180 ms. Greeting, favorites and the content viewport keep their positions.
 Size, Remove, Move and Settings controls overlay the real cards and invoke the
 frozen renderer's existing indexed actions and dialogs. Move uses its existing
 menu, committing only the selected destination. This browser simulation does
@@ -151,8 +153,8 @@ The script rejects any other runtime override or origin; every browser context
 blocks requests outside `http://127.0.0.1:8765`. If browser execution is blocked,
 report that limitation without switching runtimes or bypassing restrictions.
 
-The gate defines 143 checks: it retains all 101 navigation/Apps/widget/photo-order
-checks and adds 42 parity checks, with the
+The gate defines 212 checks: it retains the navigation/Apps/widget/photo-order
+and Tools parity checks, adds widget swipe checks across both importing demos, with the
 camera/Lamp fullscreen checks now targeting their explicit display routes.
 It adds transparent tile/container/artwork, legible text-palette glyph, failed-image fallback,
 focus, unchanged Home/Store styling, all twelve Tools routes, common workspace

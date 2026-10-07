@@ -66,7 +66,7 @@ fun PortalPrimeTheme(
         }
         onDispose { stopObserving() }
     }
-    // Home/ambient surfaces stay dark. Settings and editors follow the persisted appearance.
+    // Launcher pages and editors opt into the saved appearance; immersive ambient views may force dark.
     val useDark = darkTheme || appearance == "dark"
     val palette = if (useDark) ApprovedDarkPalette else ApprovedLightPalette
     val colorScheme = when {

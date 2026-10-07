@@ -1,0 +1,1382 @@
+{
+  "scope": "Current browser mocks only; isolated headless Chrome; loopback requests only",
+  "navigationChecks": 212,
+  "toolsChecks": 130,
+  "lightComparison": [
+    {
+      "route": "portal-plus-complete/native.html / home",
+      "samePixels": true,
+      "beforeSha256": "bf12175c167a130eccf3a630157b983f86a7c6e14f5b73b8bb56b39e7dfebf39",
+      "afterSha256": "bf12175c167a130eccf3a630157b983f86a7c6e14f5b73b8bb56b39e7dfebf39"
+    },
+    {
+      "route": "portal-plus-complete/native.html / apps",
+      "samePixels": true,
+      "beforeSha256": "ee1e379670ff71bd66280a3a893713eebdff5a2f7d7c750c0be4ebe5ee6f36e8",
+      "afterSha256": "ee1e379670ff71bd66280a3a893713eebdff5a2f7d7c750c0be4ebe5ee6f36e8"
+    },
+    {
+      "route": "portal-plus-complete/native.html / settings",
+      "samePixels": true,
+      "beforeSha256": "7ee49a87694e2b5740de87315dc94d490670ce6cf727109835650a268e0b7cf4",
+      "afterSha256": "7ee49a87694e2b5740de87315dc94d490670ce6cf727109835650a268e0b7cf4"
+    },
+    {
+      "route": "portal-plus-complete/native.html / ha-dashboard",
+      "samePixels": true,
+      "beforeSha256": "9c36e4321dd46e4f1645278cabe773e73c87a2e4ef1c2fcfde7ad01cb32508f7",
+      "afterSha256": "9c36e4321dd46e4f1645278cabe773e73c87a2e4ef1c2fcfde7ad01cb32508f7"
+    },
+    {
+      "route": "portal-plus-navigation-live/ / home",
+      "samePixels": true,
+      "beforeSha256": "63707cc222f0a85a115f26497ac39f7e426349c5ab8beb18ed4648dceee7f43e",
+      "afterSha256": "63707cc222f0a85a115f26497ac39f7e426349c5ab8beb18ed4648dceee7f43e"
+    },
+    {
+      "route": "portal-plus-navigation-live/ / apps",
+      "samePixels": true,
+      "beforeSha256": "d5975024aa5fe6dc92792a755cdc477934b3070bee85c14affe1483f51dd859c",
+      "afterSha256": "d5975024aa5fe6dc92792a755cdc477934b3070bee85c14affe1483f51dd859c"
+    },
+    {
+      "route": "portal-plus-navigation-live/ / tools",
+      "samePixels": true,
+      "beforeSha256": "caa50114ec1c94f016ddafa5c63af5ffcaac379c6c928f75501ba028d50b4f3e",
+      "afterSha256": "caa50114ec1c94f016ddafa5c63af5ffcaac379c6c928f75501ba028d50b4f3e"
+    },
+    {
+      "route": "portal-plus-navigation-live/ / settings",
+      "samePixels": true,
+      "beforeSha256": "215a09ee3e075799c1fac0b4927c181714bd2cabad9b63dfb76ac674d290cd14",
+      "afterSha256": "215a09ee3e075799c1fac0b4927c181714bd2cabad9b63dfb76ac674d290cd14"
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / tools",
+      "samePixels": true,
+      "beforeSha256": "a9dfe037f5496200be7e112863b7a33def4374d42f014e81e72efb7c179d5ba0",
+      "afterSha256": "a9dfe037f5496200be7e112863b7a33def4374d42f014e81e72efb7c179d5ba0"
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / tools / alarm",
+      "samePixels": true,
+      "beforeSha256": "8c3ea7a212f0b51066d4b44016196162396342414c295c29dc52f0e9dfc48b79",
+      "afterSha256": "8c3ea7a212f0b51066d4b44016196162396342414c295c29dc52f0e9dfc48b79"
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / tools / notes",
+      "samePixels": true,
+      "beforeSha256": "abc49906ea421ec704da33456a51f0598b926aace7674a182585d2c48d2d2bd4",
+      "afterSha256": "abc49906ea421ec704da33456a51f0598b926aace7674a182585d2c48d2d2bd4"
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / tools / camera",
+      "samePixels": true,
+      "beforeSha256": "fce184d67e0e49feae272ed96483a225fd67d7effdfe8c77c21408d7ffc6fa22",
+      "afterSha256": "fce184d67e0e49feae272ed96483a225fd67d7effdfe8c77c21408d7ffc6fa22"
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / settings",
+      "samePixels": true,
+      "beforeSha256": "215a09ee3e075799c1fac0b4927c181714bd2cabad9b63dfb76ac674d290cd14",
+      "afterSha256": "215a09ee3e075799c1fac0b4927c181714bd2cabad9b63dfb76ac674d290cd14"
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / home",
+      "samePixels": true,
+      "beforeSha256": "dfe0a174d419e55363cadc502f6ef33603f4b54f9b90efa4701684c895306c8d",
+      "afterSha256": "dfe0a174d419e55363cadc502f6ef33603f4b54f9b90efa4701684c895306c8d"
+    }
+  ],
+  "darkMeasurements": [
+    {
+      "route": "portal-plus-complete/native.html / home",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".home-card:not(.photo-card)",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 1093.5,
+            "y": 364.5
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 1094,
+              "y": 365
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".favorite-grid .app-tile",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 76.5,
+            "y": 1242
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 77,
+              "y": 1242
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".dock",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 1080,
+            "y": 1417
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 1080,
+              "y": 1417
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".dock button.selected",
+          "background": "rgb(65, 65, 65)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 684,
+            "y": 1370.25
+          },
+          "expected": 65,
+          "pixel": {
+            "point": {
+              "x": 684,
+              "y": 1370
+            },
+            "rgb": [
+              65,
+              65,
+              65
+            ]
+          }
+        },
+        {
+          "selector": ".quick-control:not(.on)",
+          "background": "rgb(54, 54, 54)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 1870.875,
+            "y": 460.125
+          },
+          "expected": 54,
+          "pixel": {
+            "point": {
+              "x": 1871,
+              "y": 460
+            },
+            "rgb": [
+              54,
+              54,
+              54
+            ]
+          }
+        },
+        {
+          "selector": ".quick-control.on",
+          "background": "rgb(65, 65, 65)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 1650.375,
+            "y": 460.125
+          },
+          "expected": 65,
+          "pixel": {
+            "point": {
+              "x": 1650,
+              "y": 460
+            },
+            "rgb": [
+              65,
+              65,
+              65
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-complete/native.html / apps",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".app-tile",
+          "background": "rgb(54, 54, 54)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 147.09375,
+            "y": 504
+          },
+          "expected": 54,
+          "pixel": {
+            "point": {
+              "x": 147,
+              "y": 504
+            },
+            "rgb": [
+              54,
+              54,
+              54
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-complete/native.html / settings",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".settings-sidebar",
+          "background": "rgb(20, 22, 27)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 13.5,
+            "y": 184.5
+          },
+          "expected": [
+            20,
+            22,
+            27
+          ],
+          "pixel": {
+            "point": {
+              "x": 14,
+              "y": 185
+            },
+            "rgb": [
+              20,
+              22,
+              27
+            ]
+          }
+        },
+        {
+          "selector": ".settings-group",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 499.5,
+            "y": 429.75
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 500,
+              "y": 430
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-complete/native.html / ha-dashboard",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".ha-control",
+          "background": "rgb(54, 54, 54)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 118.125,
+            "y": 597.9375
+          },
+          "expected": 54,
+          "pixel": {
+            "point": {
+              "x": 118,
+              "y": 598
+            },
+            "rgb": [
+              54,
+              54,
+              54
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-navigation-live/ / home",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".home-card:not(.photo-card)",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 76.5,
+            "y": 360
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 77,
+              "y": 360
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".favorite-grid .app-tile",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 76.5,
+            "y": 1242
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 77,
+              "y": 1242
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".dock",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 1080,
+            "y": 1417
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 1080,
+              "y": 1417
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".dock button.selected",
+          "background": "rgb(65, 65, 65)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 684,
+            "y": 1370.25
+          },
+          "expected": 65,
+          "pixel": {
+            "point": {
+              "x": 684,
+              "y": 1370
+            },
+            "rgb": [
+              65,
+              65,
+              65
+            ]
+          }
+        },
+        {
+          "selector": ".quick-control:not(.on)",
+          "background": "rgb(54, 54, 54)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 843.75,
+            "y": 455.625
+          },
+          "expected": 54,
+          "pixel": {
+            "point": {
+              "x": 844,
+              "y": 456
+            },
+            "rgb": [
+              54,
+              54,
+              54
+            ]
+          }
+        },
+        {
+          "selector": ".quick-control.on",
+          "background": "rgb(65, 65, 65)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 626.625,
+            "y": 455.625
+          },
+          "expected": 65,
+          "pixel": {
+            "point": {
+              "x": 627,
+              "y": 456
+            },
+            "rgb": [
+              65,
+              65,
+              65
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-navigation-live/ / apps",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".app-tile",
+          "background": "rgba(0, 0, 0, 0)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 76.5,
+            "y": 504
+          },
+          "expected": "transparent",
+          "pixel": {
+            "point": {
+              "x": 77,
+              "y": 504
+            },
+            "rgb": [
+              20,
+              22,
+              27
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-navigation-live/ / tools",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".tool-card",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 76.5,
+            "y": 470.25
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 77,
+              "y": 470
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-navigation-live/ / settings",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".settings-sidebar",
+          "background": "rgb(20, 22, 27)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 13.5,
+            "y": 184.5
+          },
+          "expected": [
+            20,
+            22,
+            27
+          ],
+          "pixel": {
+            "point": {
+              "x": 14,
+              "y": 185
+            },
+            "rgb": [
+              20,
+              22,
+              27
+            ]
+          }
+        },
+        {
+          "selector": ".settings-group",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 499.5,
+            "y": 517.5
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 500,
+              "y": 518
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / tools",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".tool-entry",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 121.5,
+            "y": 552.251953125
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 122,
+              "y": 552
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / tools / alarm",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".tool-panel",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 459,
+            "y": 436.376953125
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 459,
+              "y": 436
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".primary-button",
+          "background": "rgb(255, 255, 255)",
+          "image": "none",
+          "color": "rgb(20, 22, 27)",
+          "point": {
+            "x": 496.125,
+            "y": 753.50390625
+          },
+          "expected": 255,
+          "pixel": {
+            "point": {
+              "x": 496,
+              "y": 754
+            },
+            "rgb": [
+              255,
+              255,
+              255
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / tools / notes",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".tool-panel",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 459,
+            "y": 436.376953125
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 459,
+              "y": 436
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".note-paper",
+          "background": "rgb(54, 54, 54)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 1417.833984375,
+            "y": 544.376953125
+          },
+          "expected": 54,
+          "pixel": {
+            "point": {
+              "x": 1418,
+              "y": 544
+            },
+            "rgb": [
+              54,
+              54,
+              54
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / tools / camera",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".tool-panel",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 459,
+            "y": 436.376953125
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 459,
+              "y": 436
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".primary-button",
+          "background": "rgb(255, 255, 255)",
+          "image": "none",
+          "color": "rgb(20, 22, 27)",
+          "point": {
+            "x": 850.587890625,
+            "y": 1003.341796875
+          },
+          "expected": 255,
+          "pixel": {
+            "point": {
+              "x": 851,
+              "y": 1003
+            },
+            "rgb": [
+              255,
+              255,
+              255
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / settings",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".settings-sidebar",
+          "background": "rgb(20, 22, 27)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 13.5,
+            "y": 184.5
+          },
+          "expected": [
+            20,
+            22,
+            27
+          ],
+          "pixel": {
+            "point": {
+              "x": 14,
+              "y": 185
+            },
+            "rgb": [
+              20,
+              22,
+              27
+            ]
+          }
+        },
+        {
+          "selector": ".settings-group",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 499.5,
+            "y": 517.5
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 500,
+              "y": 518
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    },
+    {
+      "route": "portal-plus-tools-redesign/ / home",
+      "mode": "dark",
+      "surfaces": [
+        {
+          "selector": ".home-card:not(.photo-card)",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 76.5,
+            "y": 364.5
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 77,
+              "y": 365
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".favorite-grid .app-tile",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 76.5,
+            "y": 1242
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 77,
+              "y": 1242
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".dock",
+          "background": "rgb(43, 43, 43)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 1080,
+            "y": 1417
+          },
+          "expected": 43,
+          "pixel": {
+            "point": {
+              "x": 1080,
+              "y": 1417
+            },
+            "rgb": [
+              43,
+              43,
+              43
+            ]
+          }
+        },
+        {
+          "selector": ".dock button.selected",
+          "background": "rgb(65, 65, 65)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 684,
+            "y": 1370.25
+          },
+          "expected": 65,
+          "pixel": {
+            "point": {
+              "x": 684,
+              "y": 1370
+            },
+            "rgb": [
+              65,
+              65,
+              65
+            ]
+          }
+        },
+        {
+          "selector": ".quick-control:not(.on)",
+          "background": "rgb(54, 54, 54)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 843.75,
+            "y": 460.125
+          },
+          "expected": 54,
+          "pixel": {
+            "point": {
+              "x": 844,
+              "y": 460
+            },
+            "rgb": [
+              54,
+              54,
+              54
+            ]
+          }
+        },
+        {
+          "selector": ".quick-control.on",
+          "background": "rgb(65, 65, 65)",
+          "image": "none",
+          "color": "rgb(255, 255, 255)",
+          "point": {
+            "x": 626.625,
+            "y": 460.125
+          },
+          "expected": 65,
+          "pixel": {
+            "point": {
+              "x": 627,
+              "y": 460
+            },
+            "rgb": [
+              65,
+              65,
+              65
+            ]
+          }
+        }
+      ],
+      "backdropPixel": {
+        "point": {
+          "x": 18,
+          "y": 220
+        },
+        "rgb": [
+          20,
+          22,
+          27
+        ]
+      }
+    }
+  ],
+  "wallpaperChoices": [
+    {
+      "mock": "portal-plus-complete/native.html",
+      "mode": "sky",
+      "image": "linear-gradient(rgb(71, 122, 164), rgb(180, 199, 205) 65%, rgb(239, 208, 160))",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-complete/native.html",
+      "mode": "photo:01_wilderness.jpg",
+      "image": "url(\"http://127.0.0.1:8765/portal-plus-complete/assets/wilderness.jpg\")",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-complete/native.html",
+      "mode": "g_space",
+      "image": "linear-gradient(rgb(26, 58, 107), rgb(13, 31, 66), rgb(8, 15, 32), rgb(2, 4, 8))",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-complete/native.html",
+      "mode": "dusk_aurora",
+      "image": "radial-gradient(at 30% 60%, rgba(57, 100, 107, 0.333), rgba(0, 0, 0, 0) 55%), linear-gradient(rgb(17, 33, 47), rgb(33, 59, 66) 70%, rgb(105, 69, 61))",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-complete/native.html",
+      "mode": "starfield",
+      "image": "radial-gradient(circle at 23% 34%, rgb(255, 255, 255) 0px, rgb(255, 255, 255) 1px, rgba(0, 0, 0, 0) 2px), radial-gradient(circle at 62% 12%, rgb(255, 255, 255) 0px, rgb(255, 255, 255) 1px, rgba(0, 0, 0, 0) 2px), none",
+      "background": "rgb(6, 19, 34)"
+    },
+    {
+      "mock": "portal-plus-complete/native.html",
+      "mode": "screensaver",
+      "image": "url(\"http://127.0.0.1:8765/portal-plus-complete/assets/yosemite.jpg\")",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-complete/native.html",
+      "mode": "dark",
+      "image": "none",
+      "background": "rgb(20, 22, 27)"
+    },
+    {
+      "mock": "portal-plus-navigation-live/",
+      "mode": "sky",
+      "image": "linear-gradient(rgb(71, 122, 164), rgb(180, 199, 205) 65%, rgb(239, 208, 160))",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-navigation-live/",
+      "mode": "photo:01_wilderness.jpg",
+      "image": "url(\"http://127.0.0.1:8765/portal-plus-complete/assets/wilderness.jpg\")",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-navigation-live/",
+      "mode": "g_space",
+      "image": "linear-gradient(rgb(26, 58, 107), rgb(13, 31, 66), rgb(8, 15, 32), rgb(2, 4, 8))",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-navigation-live/",
+      "mode": "dusk_aurora",
+      "image": "radial-gradient(at 30% 60%, rgba(57, 100, 107, 0.333), rgba(0, 0, 0, 0) 55%), linear-gradient(rgb(17, 33, 47), rgb(33, 59, 66) 70%, rgb(105, 69, 61))",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-navigation-live/",
+      "mode": "starfield",
+      "image": "radial-gradient(circle at 23% 34%, rgb(255, 255, 255) 0px, rgb(255, 255, 255) 1px, rgba(0, 0, 0, 0) 2px), radial-gradient(circle at 62% 12%, rgb(255, 255, 255) 0px, rgb(255, 255, 255) 1px, rgba(0, 0, 0, 0) 2px), none",
+      "background": "rgb(6, 19, 34)"
+    },
+    {
+      "mock": "portal-plus-navigation-live/",
+      "mode": "screensaver",
+      "image": "url(\"http://127.0.0.1:8765/portal-plus-complete/assets/yosemite.jpg\")",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-navigation-live/",
+      "mode": "dark",
+      "image": "none",
+      "background": "rgb(20, 22, 27)"
+    },
+    {
+      "mock": "portal-plus-tools-redesign/",
+      "mode": "sky",
+      "image": "linear-gradient(rgb(71, 122, 164), rgb(180, 199, 205) 65%, rgb(239, 208, 160))",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-tools-redesign/",
+      "mode": "photo:01_wilderness.jpg",
+      "image": "url(\"http://127.0.0.1:8765/portal-plus-complete/assets/wilderness.jpg\")",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-tools-redesign/",
+      "mode": "g_space",
+      "image": "linear-gradient(rgb(26, 58, 107), rgb(13, 31, 66), rgb(8, 15, 32), rgb(2, 4, 8))",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-tools-redesign/",
+      "mode": "dusk_aurora",
+      "image": "radial-gradient(at 30% 60%, rgba(57, 100, 107, 0.333), rgba(0, 0, 0, 0) 55%), linear-gradient(rgb(17, 33, 47), rgb(33, 59, 66) 70%, rgb(105, 69, 61))",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-tools-redesign/",
+      "mode": "starfield",
+      "image": "radial-gradient(circle at 23% 34%, rgb(255, 255, 255) 0px, rgb(255, 255, 255) 1px, rgba(0, 0, 0, 0) 2px), radial-gradient(circle at 62% 12%, rgb(255, 255, 255) 0px, rgb(255, 255, 255) 1px, rgba(0, 0, 0, 0) 2px), none",
+      "background": "rgb(6, 19, 34)"
+    },
+    {
+      "mock": "portal-plus-tools-redesign/",
+      "mode": "screensaver",
+      "image": "url(\"http://127.0.0.1:8765/portal-plus-complete/assets/yosemite.jpg\")",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "mock": "portal-plus-tools-redesign/",
+      "mode": "dark",
+      "image": "none",
+      "background": "rgb(20, 22, 27)"
+    }
+  ],
+  "haStates": [
+    {
+      "label": "off",
+      "text": "Ceiling light\nOff",
+      "background": "rgb(54, 54, 54)",
+      "momentary": "rgb(65, 65, 65)"
+    },
+    {
+      "label": "on",
+      "text": "Ceiling light\nOn",
+      "background": "rgb(65, 65, 65)",
+      "momentary": "rgb(65, 65, 65)"
+    },
+    {
+      "label": "Home known light glyphs",
+      "glyphs": [
+        {
+          "on": true,
+          "glyph": "rgb(102, 196, 158)"
+        },
+        {
+          "on": false,
+          "glyph": "rgb(255, 255, 255)"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "result": "PASS",
+  "errorColors": [
+    {
+      "mock": "complete",
+      "screen": "smb",
+      "color": "rgb(255, 116, 125)",
+      "message": "Enter server."
+    },
+    {
+      "mock": "complete",
+      "screen": "camera",
+      "color": "rgb(230, 181, 186)",
+      "message": "Enter rtsp url."
+    },
+    {
+      "mock": "navigation",
+      "screen": "camera",
+      "color": "rgb(230, 181, 186)"
+    },
+    {
+      "mock": "tools-redesign",
+      "screen": "camera",
+      "color": "rgb(230, 181, 186)"
+    }
+  ],
+  "verifiedAtUTC": "2026-10-07T18:54:15.344Z",
+  "homeFavoritesCorrection": {
+    "selector": ".dark .home-screen .favorite-grid .app-tile{background:var(--surface)}",
+    "sourceSha256": "313becc5d421a33e9491d20ca4f0c9c3570795dc51d63a5f1e79f94c4a95b114",
+    "homes": [
+      {
+        "mock": "portal-plus-complete/native.html",
+        "before": "rgb(54, 54, 54)",
+        "after": "rgb(43, 43, 43)",
+        "changedPixels": 163036,
+        "onlyFavoriteTilePixelsChanged": true,
+        "geometryUnchanged": true
+      },
+      {
+        "mock": "portal-plus-navigation-live/",
+        "before": "rgb(54, 54, 54)",
+        "after": "rgb(43, 43, 43)",
+        "changedPixels": 163036,
+        "onlyFavoriteTilePixelsChanged": true,
+        "geometryUnchanged": true
+      },
+      {
+        "mock": "portal-plus-tools-redesign/",
+        "before": "rgb(54, 54, 54)",
+        "after": "rgb(43, 43, 43)",
+        "changedPixels": 163036,
+        "onlyFavoriteTilePixelsChanged": true,
+        "geometryUnchanged": true
+      }
+    ],
+    "unchangedOtherDark": [
+      {
+        "route": "portal-plus-complete/native.html / apps",
+        "samePixels": true,
+        "sha256": "b5e7590210bcf24c8ab76e2383407c333f36c30191215ff2c3a8693dc9aadd02"
+      },
+      {
+        "route": "portal-plus-complete/native.html / settings",
+        "samePixels": true,
+        "sha256": "fe5793136dad350886a8a26ef14c6017b053c4852929fd212a50fd5b01834584"
+      },
+      {
+        "route": "portal-plus-complete/native.html / ha-dashboard",
+        "samePixels": true,
+        "sha256": "12a11d2c93f763cba3bc4fbbfa89fba237d44f72caf98bbc52f6d54d21c94a42"
+      },
+      {
+        "route": "portal-plus-navigation-live/ / apps",
+        "samePixels": true,
+        "sha256": "47d712dca2183bb1706dab9411fa71b1485daca2a8e27f8c578cd214f5f723f4"
+      },
+      {
+        "route": "portal-plus-navigation-live/ / tools",
+        "samePixels": true,
+        "sha256": "a69769c320356705e5343d3833a438a4138e38c9f7c9cde3aec34ba24eaf9174"
+      },
+      {
+        "route": "portal-plus-navigation-live/ / settings",
+        "samePixels": true,
+        "sha256": "f82e3d46d1520fd5da90bb6686504ae4679844e871a0f640d53ea20a731a31a6"
+      },
+      {
+        "route": "portal-plus-tools-redesign/ / tools",
+        "samePixels": true,
+        "sha256": "8135684976b7aa465fe91289e18ea318f867bec0892791326b6f705f861343bb"
+      },
+      {
+        "route": "portal-plus-tools-redesign/ / tools / alarm",
+        "samePixels": true,
+        "sha256": "8c081257eb21e569e352ce38ea60512b4138041349991496fb99c899f6610659"
+      },
+      {
+        "route": "portal-plus-tools-redesign/ / tools / notes",
+        "samePixels": true,
+        "sha256": "717ba3c0c236e73904ca3a1ad7de12ddc5982c05eaec3bcb6460e124007d30d7"
+      },
+      {
+        "route": "portal-plus-tools-redesign/ / tools / camera",
+        "samePixels": true,
+        "sha256": "469afb1bfa18ad38dc0db91d62df498046b497173aad6afacd3261ad9ebb0455"
+      },
+      {
+        "route": "portal-plus-tools-redesign/ / settings",
+        "samePixels": true,
+        "sha256": "f82e3d46d1520fd5da90bb6686504ae4679844e871a0f640d53ea20a731a31a6"
+      }
+    ]
+  }
+}

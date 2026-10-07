@@ -1,0 +1,525 @@
+{
+  "revision": "portal-plus-ipad-01",
+  "width": 2160,
+  "height": 1440,
+  "fontScale": 1,
+  "densityDpi": 180,
+  "items": [
+    {
+      "id": "home",
+      "title": "Home",
+      "group": "Screens",
+      "query": {
+        "screen": "home"
+      },
+      "file": "reference/home.png",
+      "sha256": "c5b505b62bc5e89865b2e7ee8c5316283453b95cb3ca30cca2155c860ee05453",
+      "bytes": 1462066
+    },
+    {
+      "id": "apps",
+      "title": "App library",
+      "group": "Screens",
+      "query": {
+        "screen": "apps"
+      },
+      "file": "reference/apps.png",
+      "sha256": "bef9aa3d73d81f9906aecba3a9c87c4129bfc4fd42916e46af679fdc5f7797a0",
+      "bytes": 151381
+    },
+    {
+      "id": "folder",
+      "title": "App folder",
+      "group": "Screens",
+      "query": {
+        "screen": "folder"
+      },
+      "file": "reference/folder.png",
+      "sha256": "561d1065bfbc634812c149d58a83499d6494d1092aa63345b3834ac5c17c15f3",
+      "bytes": 79586
+    },
+    {
+      "id": "store",
+      "title": "App Store",
+      "group": "Screens",
+      "query": {
+        "screen": "store"
+      },
+      "file": "reference/store.png",
+      "sha256": "4cb6ad4158678f8903bd1577f2a3033c0331924f713fc7c47d80eb03fe650530",
+      "bytes": 126869
+    },
+    {
+      "id": "app-detail",
+      "title": "App details",
+      "group": "Screens",
+      "query": {
+        "screen": "app-detail"
+      },
+      "file": "reference/app-detail.png",
+      "sha256": "9eb04ebee9867ad1881cf51621f6aaf07954f48e0863ffca934e406987eff159",
+      "bytes": 146250
+    },
+    {
+      "id": "tools",
+      "title": "Tools",
+      "group": "Screens",
+      "query": {
+        "screen": "tools"
+      },
+      "file": "reference/tools.png",
+      "sha256": "8b0a155e2e556064a2e4ccd5dac991f4fe73aa80cada3a1743e498a206830ab4",
+      "bytes": 104146
+    },
+    {
+      "id": "timer",
+      "title": "Timer",
+      "group": "Screens",
+      "query": {
+        "screen": "timer"
+      },
+      "file": "reference/timer.png",
+      "sha256": "3825554f8b6f8d0a9343c2ac26a361448bbe4f482203f046968120d249fccfb0",
+      "bytes": 93955
+    },
+    {
+      "id": "edit",
+      "title": "Customize home",
+      "group": "Screens",
+      "query": {
+        "screen": "edit"
+      },
+      "file": "reference/edit.png",
+      "sha256": "a5dc1b2553782445393d3ed8796e8a40b3ebc42dde4357cf3063ece3661a94e7",
+      "bytes": 185130
+    },
+    {
+      "id": "widget-library",
+      "title": "Widget library",
+      "group": "Screens",
+      "query": {
+        "screen": "widget-library"
+      },
+      "file": "reference/widget-library.png",
+      "sha256": "67b3fd143f721aecac1a28c1fd0377246f39c4091bab7c106d71628e169606ea",
+      "bytes": 153532
+    },
+    {
+      "id": "settings",
+      "title": "Settings overview",
+      "group": "Screens",
+      "query": {
+        "screen": "settings"
+      },
+      "file": "reference/settings.png",
+      "sha256": "527cbeb06cab76cce511d5539925a1c9d579bc80aca02a99be07f54e8f9e0ad2",
+      "bytes": 330813
+    },
+    {
+      "id": "sources",
+      "title": "Photo sources",
+      "group": "Screens",
+      "query": {
+        "screen": "sources"
+      },
+      "file": "reference/sources.png",
+      "sha256": "645652a61dadb756d593dffeb68972858377331ade48343dee61aac8864f5be9",
+      "bytes": 179586
+    },
+    {
+      "id": "connect",
+      "title": "Connect Immich",
+      "group": "Screens",
+      "query": {
+        "screen": "connect"
+      },
+      "file": "reference/connect.png",
+      "sha256": "96ae0d7dd3a8de63496f8827e5a9f004ca0cf2435cb42184770eeb5e3c3f5d6c",
+      "bytes": 187955
+    },
+    {
+      "id": "albums",
+      "title": "Choose albums",
+      "group": "Screens",
+      "query": {
+        "screen": "albums"
+      },
+      "file": "reference/albums.png",
+      "sha256": "3cf32f646f6279318e442a7f27c118447a60a78ba4b6f78caf7765c6dce24c7f",
+      "bytes": 1209789
+    },
+    {
+      "id": "clock-picker",
+      "title": "Clock picker",
+      "group": "Screens",
+      "query": {
+        "screen": "clock-picker"
+      },
+      "file": "reference/clock-picker.png",
+      "sha256": "1ae6bf2b268ca354b338803a5ba304c7dfd8b7ffe347d4449cd8b0ecbb6ebf74",
+      "bytes": 898305
+    },
+    {
+      "id": "photos",
+      "title": "Photo display",
+      "group": "Screens",
+      "query": {
+        "screen": "photos"
+      },
+      "file": "reference/photos.png",
+      "sha256": "7db0bf72a6b0a179d638d734b617dd89254f81d28ffe8b258290ec78904f6d97",
+      "bytes": 4429504
+    },
+    {
+      "id": "wallpaper",
+      "title": "Wallpaper picker",
+      "group": "Screens",
+      "query": {
+        "screen": "wallpaper"
+      },
+      "file": "reference/wallpaper.png",
+      "sha256": "2893565edc4b29505564cb0480f3a46db5ad99f3ce522ce22c0182fd5a59103c",
+      "bytes": 445574
+    },
+    {
+      "id": "calendar",
+      "title": "Calendar",
+      "group": "Screens",
+      "query": {
+        "screen": "calendar"
+      },
+      "file": "reference/calendar.png",
+      "sha256": "d8e6087a3c7c8ba8f1924f8c6b8da3fa86b7ff0cf5bafabd6928d354608cc1a9",
+      "bytes": 180262
+    },
+    {
+      "id": "world-clock",
+      "title": "World clock",
+      "group": "Screens",
+      "query": {
+        "screen": "world-clock"
+      },
+      "file": "reference/world-clock.png",
+      "sha256": "742c72993b92e207442effa2b6016009b56924e2e863ddfe0423d2c886032507",
+      "bytes": 123152
+    },
+    {
+      "id": "wake",
+      "title": "Sunrise & wake",
+      "group": "Screens",
+      "query": {
+        "screen": "wake"
+      },
+      "file": "reference/wake.png",
+      "sha256": "9f218410a27f239c92bd6c2b43af824fb047357b383258392e0899aefea52f6b",
+      "bytes": 175732
+    },
+    {
+      "id": "ha",
+      "title": "Home Assistant",
+      "group": "Screens",
+      "query": {
+        "screen": "ha"
+      },
+      "file": "reference/ha.png",
+      "sha256": "56bb1cef6065e73340dcef2c2d093e655b85f70690d5c4fe9772c7508086fa20",
+      "bytes": 179355
+    },
+    {
+      "id": "remote",
+      "title": "Phone remote",
+      "group": "Screens",
+      "query": {
+        "screen": "remote"
+      },
+      "file": "reference/remote.png",
+      "sha256": "7f0021061e2efff8551761e662cb042e9167e727283eb8a0da9003e596c2b1fb",
+      "bytes": 188708
+    },
+    {
+      "id": "health",
+      "title": "Device health",
+      "group": "Screens",
+      "query": {
+        "screen": "health"
+      },
+      "file": "reference/health.png",
+      "sha256": "e8b0a14879a94c6cbfaa49f11deae6b5224444905ef515fde61a33b1b8a8b11a",
+      "bytes": 182046
+    },
+    {
+      "id": "settings-appearance",
+      "title": "Appearance",
+      "group": "Settings categories",
+      "query": {
+        "screen": "settings",
+        "category": "appearance"
+      },
+      "file": "reference/settings-appearance.png",
+      "sha256": "527cbeb06cab76cce511d5539925a1c9d579bc80aca02a99be07f54e8f9e0ad2",
+      "bytes": 330813
+    },
+    {
+      "id": "settings-photos",
+      "title": "Photos & screensaver",
+      "group": "Settings categories",
+      "query": {
+        "screen": "settings",
+        "category": "photos"
+      },
+      "file": "reference/settings-photos.png",
+      "sha256": "10e9eb581129d04b7d0fb4f26116cc1915433b9c13dc2ae5bd64dc91cf1faeda",
+      "bytes": 204652
+    },
+    {
+      "id": "settings-home",
+      "title": "Home & widgets",
+      "group": "Settings categories",
+      "query": {
+        "screen": "settings",
+        "category": "home"
+      },
+      "file": "reference/settings-home.png",
+      "sha256": "bc8de205af413731bbf884b0784fb7cfde520c20473faafcb95805d3ccbbc217",
+      "bytes": 190199
+    },
+    {
+      "id": "settings-sound",
+      "title": "Sound & wake",
+      "group": "Settings categories",
+      "query": {
+        "screen": "settings",
+        "category": "sound"
+      },
+      "file": "reference/settings-sound.png",
+      "sha256": "59e40e9ac128c0345e579f933ada3a1355b1aa6994abff817cc1c56178600be6",
+      "bytes": 185158
+    },
+    {
+      "id": "settings-connections",
+      "title": "Connections",
+      "group": "Settings categories",
+      "query": {
+        "screen": "settings",
+        "category": "connections"
+      },
+      "file": "reference/settings-connections.png",
+      "sha256": "e76dcdf7a6f067808ad81b1d7b0c1370f5a16046853b9778215052dafb7bf221",
+      "bytes": 191606
+    },
+    {
+      "id": "settings-access",
+      "title": "Input & accessibility",
+      "group": "Settings categories",
+      "query": {
+        "screen": "settings",
+        "category": "access"
+      },
+      "file": "reference/settings-access.png",
+      "sha256": "eee7c1ed941b0c291d7270b0fe7d972c0952a37dc73585ee7464a8276b755400",
+      "bytes": 167795
+    },
+    {
+      "id": "settings-device",
+      "title": "Device",
+      "group": "Settings categories",
+      "query": {
+        "screen": "settings",
+        "category": "device"
+      },
+      "file": "reference/settings-device.png",
+      "sha256": "0f9c3d682dfada04b082a3b47231f554d0e28b6c015937a35bbce95b22150cd5",
+      "bytes": 180360
+    },
+    {
+      "id": "settings-advanced",
+      "title": "Advanced",
+      "group": "Settings categories",
+      "query": {
+        "screen": "settings",
+        "category": "advanced"
+      },
+      "file": "reference/settings-advanced.png",
+      "sha256": "0df0025048cd91b0f7f202bad9e06ddfe3fa251458fa4b45f75efb2dd3d0e136",
+      "bytes": 172681
+    },
+    {
+      "id": "settings-dark",
+      "title": "Appearance \u00b7 dark",
+      "group": "States",
+      "query": {
+        "screen": "settings",
+        "theme": "dark"
+      },
+      "file": "reference/settings-dark.png",
+      "sha256": "724ae88318aca529342fba0228737c4af25d276f77b714079cad1a1eaa264be1",
+      "bytes": 330407
+    },
+    {
+      "id": "photos-settings-dark",
+      "title": "Photos & screensaver \u00b7 dark",
+      "group": "States",
+      "query": {
+        "screen": "settings",
+        "category": "photos",
+        "theme": "dark"
+      },
+      "file": "reference/photos-settings-dark.png",
+      "sha256": "6202ec2b633599abb1f9ef639950b489901f209c7087a28f739a40494e141b5e",
+      "bytes": 204212
+    },
+    {
+      "id": "home-offline",
+      "title": "Home \u00b7 offline",
+      "group": "States",
+      "query": {
+        "screen": "home",
+        "scenario": "offline"
+      },
+      "file": "reference/home-offline.png",
+      "sha256": "a9599ee84391f59f9d4b06cbf73d9531f32eaf6bc31ced6969d077b51717f9db",
+      "bytes": 1449957
+    },
+    {
+      "id": "home-empty",
+      "title": "Home \u00b7 first use",
+      "group": "States",
+      "query": {
+        "screen": "home",
+        "scenario": "empty"
+      },
+      "file": "reference/home-empty.png",
+      "sha256": "fce522e44e148abfcfa8110296ca73dc98826f812de000f0c3de65d2150eec8a",
+      "bytes": 1447830
+    },
+    {
+      "id": "edit-move",
+      "title": "Choose widget position",
+      "group": "Interaction states",
+      "query": {
+        "screen": "edit"
+      },
+      "steps": [
+        "Move Weather"
+      ],
+      "file": "reference/edit-move.png",
+      "sha256": "ec1cbc6bcdf75d2c9a49d2b48ceb32dc789c0c48431689c0e76667bc80ad9244",
+      "bytes": 161542
+    },
+    {
+      "id": "favorites-edit",
+      "title": "Choose favorite apps",
+      "group": "Interaction states",
+      "query": {
+        "screen": "settings",
+        "category": "home"
+      },
+      "steps": [
+        "Favorite apps"
+      ],
+      "file": "reference/favorites-edit.png",
+      "sha256": "e6cd72b38afa3c70bf5c18a46579b123a7c91da0b841ac9beab114818bb2eda1",
+      "bytes": 199917
+    },
+    {
+      "id": "source-error",
+      "title": "Source validation error",
+      "group": "Interaction states",
+      "query": {
+        "screen": "connect"
+      },
+      "steps": [
+        "Submit empty source form"
+      ],
+      "file": "reference/source-error.png",
+      "sha256": "6427019a2208a044ee41a66b999faaf828c80f3f73b436d3ebe2ff7f6adca466",
+      "bytes": 195172
+    },
+    {
+      "id": "source-pending",
+      "title": "Testing source connection",
+      "group": "Interaction states",
+      "query": {
+        "screen": "connect"
+      },
+      "steps": [
+        "Enter dummy address and credential",
+        "Test connection; capture before simulated completion"
+      ],
+      "file": "reference/source-pending.png",
+      "sha256": "a7f5a9d9ffa3ef4fb87b1c2fbaf101980643c9e95b4bcd5cffdb638ab7fb2f03",
+      "bytes": 185136
+    },
+    {
+      "id": "control-offline-error",
+      "title": "Household control unavailable",
+      "group": "Interaction states",
+      "query": {
+        "screen": "home",
+        "scenario": "offline"
+      },
+      "steps": [
+        "Tap Living room light"
+      ],
+      "file": "reference/control-offline-error.png",
+      "sha256": "7b412064c22788bf2d6c1f8fddb73bd4cba281b9af070814db1048cb56d8be11",
+      "bytes": 824602
+    },
+    {
+      "id": "store-offline",
+      "title": "App Store offline",
+      "group": "Interaction states",
+      "query": {
+        "screen": "store",
+        "scenario": "offline"
+      },
+      "steps": [],
+      "file": "reference/store-offline.png",
+      "sha256": "086c06441d45f93c33b9feb6eff38784812ef5627fc3aaef0b489c439f4cd0b3",
+      "bytes": 143159
+    },
+    {
+      "id": "connect-smb",
+      "title": "Connect SMB share",
+      "group": "Interaction states",
+      "query": {
+        "screen": "sources"
+      },
+      "steps": [
+        "Choose SMB share"
+      ],
+      "file": "reference/connect-smb.png",
+      "sha256": "7c2c52206ac6254a020d331cf0dca63c9a8cbf7df05e7fabac05048dee2ebefb",
+      "bytes": 197507
+    },
+    {
+      "id": "settings-search",
+      "title": "Settings search results",
+      "group": "Interaction states",
+      "query": {
+        "screen": "settings"
+      },
+      "steps": [
+        "Search Clock face"
+      ],
+      "file": "reference/settings-search.png",
+      "sha256": "6b54ba23d56acffc64dbd48b0c55631fa8e7cd1ca1c3c7a58676ea205af871c0",
+      "bytes": 297505
+    }
+  ],
+  "sourceFiles": {
+    "native.html": "53f654558078dd75a79227f1b86d9c70e50a84e3b8cf483ec0003c3a56cce791",
+    "native.css": "4e953b8c970abac1efae31264919b8121ee6af19b83e999b4486b8492eb4ff96",
+    "app.js": "cc77c654c41e3d21fa10e4b262cff5096010e18fcab6f609564079201b9d607e",
+    "tokens.js": "c5ffb03536bf6589d65d97e21601cb25aaefd99bdaed6a1b4e2d6d611147b85e",
+    "assets/ROBOTO-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "assets/ROBOTO-NOTICE.txt": "3e9e620c75bb8e369d3b77bb0d64e2d435cae3ccc87228c48becca9c2187682c",
+    "assets/Roboto-Bold.ttf": "36f3709dea3e3ce3c6aedc058079e55980825f898f1e901d091c73c40de8bab1",
+    "assets/Roboto-Medium.ttf": "7984aafeaf437899ce89b251d2875fc5048cb7d290152eac070239cca7ff726c",
+    "assets/Roboto-Regular.ttf": "797e35f7f5d6020a5c6ea13b42ecd668bcfb3bbc4baa0e74773527e5b6cb3174",
+    "assets/denali.jpg": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c",
+    "assets/icons.js": "330c9294f667935fcd867a4fdc79493812ef6333797af1685491579662a9f4c1",
+    "assets/wilderness.jpg": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6",
+    "assets/yosemite.jpg": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+  }
+}

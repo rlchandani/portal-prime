@@ -37,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import com.immortal.launcher.ui.components.OnResume
+import com.immortal.launcher.ui.theme.ApprovedDarkPalette
 import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -206,10 +207,10 @@ fun HomeBackground(modifier: Modifier = Modifier) {
           androidx.compose.foundation.layout.Box(
               Modifier.fillMaxSize().background(Color(0x73000000)))
         } else {
-          androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(Color(0xFF1A1A1A)))
+          androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(ApprovedDarkPalette.background))
         }
       }
-      else -> androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(Color(0xFF1A1A1A)))
+      else -> androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(ApprovedDarkPalette.background))
     }
     if (cfg.grain) GrainOverlay()
     NightShiftOverlay()

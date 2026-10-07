@@ -1,0 +1,29 @@
+<!doctype html>
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,"><title>Immortal · complete visual references</title>
+<link rel="stylesheet" href="documents.css">
+<style>
+main{max-width:1680px}header{display:flex;gap:24px;align-items:center;justify-content:space-between}
+.filters{position:sticky;top:0;z-index:3;background:#f3f6f9;padding:18px 0;display:flex;gap:14px;flex-wrap:wrap}
+.filters input,.filters select{padding:14px;border:1px solid #bacbd8;border-radius:12px;font:inherit}
+.filters input{flex:1;min-width:200px}.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
+article{background:white;border:1px solid #d5e0e8;border-radius:18px;overflow:hidden}
+article img{display:block;width:100%;aspect-ratio:3/2;object-fit:contain;background:#132830}
+article .copy{padding:18px}article h2{font-size:20px;margin:0 0 8px}article p{font-size:14px;margin:0 0 12px}
+article a{margin-right:18px}.limit{border-left:4px solid #c58b2c;padding:18px;background:#fff5e3}
+.tag{font-size:12px;color:#89580e}.count{color:#4c6778}
+</style></head><body><main>
+<header><div><a href="./">← Interactive review</a><h1>Every reference, in one place.</h1></div><a href="coverage.html">Source coverage ↗</a></header>
+<p id="intro">Loading the verified reference manifest…</p>
+<p class="limit">References show sample content and the proposed Immortal interface. Existing Android, Portal firmware and third-party interfaces have labelled handoff annotations. Those annotations are review aids and do not ship as new product screens. Native visual parity must be verified on the Portal+ after approval.</p>
+<div class="filters"><input id="search" aria-label="Search references" placeholder="Find a setting, popup, app or state…">
+<select id="theme" aria-label="Filter theme"><option value="">Both themes</option><option value="light">Light</option><option value="dark">Dark</option></select>
+<select id="kind" aria-label="Filter reference type"><option value="">Every type</option></select>
+<select id="ownership" aria-label="Filter ownership"><option value="">All references</option><option value="native">Immortal approval targets</option><option value="boundary">Existing-interface boundaries</option></select></div>
+<p id="count" class="count" aria-live="polite"></p><div id="gallery" class="gallery"></div>
+</main><script src="references.js"></script><script src="gallery.js"></script></body></html>

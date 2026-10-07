@@ -415,7 +415,9 @@ private fun AppsDialog(title: String, onDismiss: () -> Unit, content: @Composabl
 }
 
 private fun launchApprovedIntent(context: Context, intent: Intent): Boolean = runCatching {
-  if (intent.component == ComponentName(context, StoreActivity::class.java))
+  if (intent.component?.packageName == JarvisHandoff.PACKAGE) {
+    check(JarvisHandoff.launch(context))
+  } else if (intent.component == ComponentName(context, StoreActivity::class.java))
     context.startApprovedInternalActivity(intent)
   else context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
   true

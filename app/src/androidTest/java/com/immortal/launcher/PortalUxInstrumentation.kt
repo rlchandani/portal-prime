@@ -45,6 +45,21 @@ class PortalUxInstrumentation : Instrumentation() {
             automation.serviceInfo = automation.serviceInfo.apply {
                 flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
             }
+            if (options.getString("command") == "appearance") {
+                val appearance = AppearanceDeviceChecks.run(this, automation)
+                finish(if (appearance.getBoolean("appearanceCompleted")) 0 else 1, appearance)
+                return
+            }
+            if (options.getString("command") in listOf("toolsSmoke", "toolsPerformance")) {
+                val tools = ToolsUxDeviceChecks.run(this, automation, options)
+                finish(if (tools.getBoolean("toolsCompleted")) 0 else 1, tools)
+                return
+            }
+            if (options.getString("command") == "widgetPaging") {
+                val widgets = WidgetPagingDeviceChecks.run(this, automation)
+                finish(if (widgets.getBoolean("widgetPagingCompleted")) 0 else 1, widgets)
+                return
+            }
             if (options.getString("command") == "touchPaging") {
                 benchmarkTouchPaging(automation)
                 finish(0, Bundle().apply {
@@ -138,14 +153,14 @@ class PortalUxInstrumentation : Instrumentation() {
             check(find(initial, "Appearance") != null && find(initial, "Display") != null)
         } else {
             check(find(initial, "Favorite apps") != null)
-            if (noop || tabs || windowSafety) check(hasInitialPage(initial))
+            check(hasInitialPage(initial))
         }
         val dockLabels = listOf("Apps", "Tools", "Home")
         val initialWindowId = initial.windowId
         check(initialWindowId >= 0)
         // Retain only existing system chrome. Any additional window aborts the window probe,
         // including a non-focusable overlay; package identity was checked on the initial root.
-        val initialSystemWindows = if (windowSafety || settings) {
+        val initialSystemWindows = run {
             val windows = automation.windows
             try {
                 windows.filter {
@@ -155,7 +170,7 @@ class PortalUxInstrumentation : Instrumentation() {
             } finally {
                 windows.forEach { it.recycle() }
             }
-        } else emptySet()
+        }
 
         fun verifyWindow(bounds: Rect) {
             val windows = automation.windows
@@ -164,13 +179,14 @@ class PortalUxInstrumentation : Instrumentation() {
                     ?: error("No single active benchmark window")
                 check(active.id == initialWindowId &&
                     active.type == AccessibilityWindowInfo.TYPE_APPLICATION)
+                check(Rect().also(active::getBoundsInScreen).contains(bounds))
                 windows.forEach { window ->
                     if (window.id != initialWindowId) {
                         check(window.type == AccessibilityWindowInfo.TYPE_SYSTEM &&
-                            window.id in initialSystemWindows && !window.isFocused)
+                            window.id in initialSystemWindows && !window.isActive && !window.isFocused)
                         val windowBounds = Rect().also(window::getBoundsInScreen)
                         check(window.layer <= active.layer ||
-                            !windowBounds.contains(bounds.centerX(), bounds.centerY()))
+                            !Rect.intersects(windowBounds, bounds))
                     }
                 }
             } finally {
@@ -204,6 +220,9 @@ class PortalUxInstrumentation : Instrumentation() {
             return Rect().also(control::getBoundsInScreen).also { check(!it.isEmpty) }
         }
 
+        val density = targetContext.resources.displayMetrics.density
+        var nextSwipe: WidgetPagingDeviceChecks.Swipe? = null
+        var previousSwipe: WidgetPagingDeviceChecks.Swipe? = null
         val gestures = when {
             settings -> {
                 verifySettingsOverview(initial)
@@ -216,29 +235,44 @@ class PortalUxInstrumentation : Instrumentation() {
                 val back = settingsControlBounds(detail, "Settings")
                 tap(back)
                 verifySettingsOverview(root(automation))
-                listOf(display, back)
+                listOf(display to 0, back to 0)
+            }
+            tabs -> dockLabels.map { label ->
+                val node = find(initial, label) ?: error("Dock control absent")
+                Rect().also(node::getBoundsInScreen).also { check(!it.isEmpty) } to 0
             }
             else -> {
-                val next = Rect().also { find(initial, "More widgets")!!.getBoundsInScreen(it) }
-                val previous = Rect().also { find(initial, "Previous")!!.getBoundsInScreen(it) }
-                check(!next.isEmpty && !previous.isEmpty)
-                when {
-                    tabs -> dockLabels.map { label ->
-                        Rect().also { find(initial, label)!!.getBoundsInScreen(it) }.also {
-                            check(!it.isEmpty)
-                        }
-                    }
-                    noop -> listOf(previous, previous)
-                    else -> listOf(next, previous)
+                val page = checkNotNull(WidgetPagingDeviceChecks.page(initial))
+                if (noop) {
+                    previousSwipe = WidgetPagingDeviceChecks.horizontalSwipe(initial, density, right = false)
+                    listOf(previousSwipe!!.bounds() to -1, previousSwipe!!.bounds() to -1)
+                } else {
+                    check(page.count >= 2) { "Paging benchmark requires multiple widget pages" }
+                    nextSwipe = WidgetPagingDeviceChecks.horizontalSwipe(initial, density, right = true)
+                    verifyWindow(nextSwipe!!.bounds())
+                    WidgetPagingDeviceChecks.swipe(automation, nextSwipe!!)
+                    SystemClock.sleep(320)
+                    val second = root(automation)
+                    check(second.packageName?.toString() == targetContext.packageName &&
+                        second.windowId == initialWindowId)
+                    check(WidgetPagingDeviceChecks.page(second) ==
+                        WidgetPagingDeviceChecks.Page(2, page.count))
+                    previousSwipe = WidgetPagingDeviceChecks.horizontalSwipe(second, density, right = false)
+                    verifyWindow(previousSwipe!!.bounds())
+                    WidgetPagingDeviceChecks.swipe(automation, previousSwipe!!)
+                    SystemClock.sleep(320)
+                    check(hasInitialPage(root(automation)))
+                    listOf(nextSwipe!!.bounds() to 1, previousSwipe!!.bounds() to -1)
                 }
             }
         }
 
         fun roundTrip() {
-            gestures.forEachIndexed { index, bounds ->
+            gestures.forEachIndexed { index, (bounds, direction) ->
                 if (!windowSafety) {
                     val active = root(automation)
                     check(active.packageName?.toString() == targetContext.packageName)
+                    check(active.windowId == initialWindowId)
                     if (settings) {
                         check(active.windowId == initialWindowId)
                         check(find(active, "Appearance") != null && find(active, "Display") != null)
@@ -248,12 +282,26 @@ class PortalUxInstrumentation : Instrumentation() {
                         dockLabels.forEach { check(find(active, it) != null) }
                     } else {
                         check(find(active, "Favorite apps") != null)
-                        check(find(active, "More widgets") != null && find(active, "Previous") != null)
+                        WidgetPagingDeviceChecks.region(active)
+                        val page = checkNotNull(WidgetPagingDeviceChecks.page(active))
+                        check(page.number == if (noop || index == 0) 1 else 2)
                     }
                     if (noop) check(hasInitialPage(active))
                 }
-                tap(bounds)
-                if (noop && !windowSafety) check(hasInitialPage(root(automation)))
+                if (direction == 0) tap(bounds)
+                else {
+                    if (windowSafety) verifyWindow(bounds)
+                    WidgetPagingDeviceChecks.swipe(automation, checkNotNull(
+                        if (direction > 0) nextSwipe else previousSwipe))
+                    SystemClock.sleep(320)
+                    if (!windowSafety) {
+                        val active = root(automation)
+                        check(active.windowId == initialWindowId &&
+                            active.packageName?.toString() == targetContext.packageName)
+                        val page = checkNotNull(WidgetPagingDeviceChecks.page(active))
+                        check(page.number == if (noop || index == 1) 1 else 2)
+                    }
+                }
             }
         }
         repeat(6) { roundTrip() }
@@ -278,12 +326,12 @@ class PortalUxInstrumentation : Instrumentation() {
                 .use { it.readBytes() } }
         if (settings) {
             verifySettingsOverview(root(automation))
-        } else if (windowSafety || tabs) {
+        } else {
             val finalHome = root(automation)
             check(finalHome.packageName?.toString() == targetContext.packageName)
             check(finalHome.windowId == initialWindowId)
             check(find(finalHome, "Favorite apps") != null)
-            check(find(finalHome, "More widgets") != null && find(finalHome, "Previous") != null)
+            WidgetPagingDeviceChecks.region(finalHome)
             if (tabs) dockLabels.forEach { check(find(finalHome, it) != null) }
             check(hasInitialPage(finalHome))
         }
@@ -292,14 +340,8 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     /** Only the page counter is inspected; its text is never emitted. */
-    private fun hasInitialPage(node: AccessibilityNodeInfo, depth: Int = 0): Boolean {
-        if (depth > 60) return false
-        if (node.text?.toString()?.matches(Regex("^1 of [1-9][0-9]*$")) == true) return true
-        for (index in 0 until node.childCount) {
-            node.getChild(index)?.let { if (hasInitialPage(it, depth + 1)) return true }
-        }
-        return false
-    }
+    private fun hasInitialPage(node: AccessibilityNodeInfo): Boolean =
+        WidgetPagingDeviceChecks.page(node)?.number == 1
 
     private fun observe(automation: UiAutomation) {
         val folder = File(targetContext.cacheDir, "portal-ux-e2e").apply { mkdirs() }

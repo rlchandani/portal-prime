@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="data:,">
+  <title>Immortal · Tools native device evidence</title>
+  <style>
+    /*
+     * Copyright (c) 2026 Starbright Lab.
+     *
+     * This source code is licensed under the MIT license found in the
+     * LICENSE file in the root directory of this source tree.
+     */
+    @font-face {
+      font-family: Portal;
+      src: url("../portal-plus-complete/assets/Roboto-Regular.ttf");
+      font-display: swap;
+    }
+    :root {
+      color-scheme: light;
+      --page: #f4f7f9;
+      --surface: #ffffff;
+      --ink: #182c39;
+      --muted: #526670;
+      --line: #d2dde2;
+      --accent: #b4dcd0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font: 18px/1.5 Portal, sans-serif;
+    }
+    main { max-width: 1600px; margin: auto; padding: 48px 36px; }
+    header { max-width: 1000px; margin-bottom: 36px; }
+    h1 { margin: 0 0 16px; font-size: 42px; line-height: 1.2; font-weight: 500; }
+    h2 { margin: 0 0 10px; font-size: 26px; line-height: 1.3; font-weight: 500; }
+    h3 { margin: 0 0 8px; font-size: 22px; line-height: 1.3; font-weight: 500; }
+    p { max-width: 78ch; margin: 0 0 16px; color: var(--muted); }
+    a { color: var(--ink); text-underline-offset: 3px; }
+    a:focus-visible { outline: 3px solid #286aa4; outline-offset: 4px; }
+    .skip-link {
+      position: absolute;
+      top: 12px;
+      left: 18px;
+      padding: 12px 18px;
+      border-radius: 14px;
+      background: var(--surface);
+      transform: translateY(-200%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .review-nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    .review-nav a {
+      display: inline-block;
+      padding: 14px 22px;
+      border-radius: 14px;
+      background: var(--accent);
+      text-decoration: none;
+    }
+    .review-nav a.secondary { background: var(--surface); border: 1px solid var(--line); }
+    .device {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      margin: 0 0 24px;
+      padding: 22px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .device div { min-width: 0; }
+    dt { font-size: 16px; color: var(--muted); }
+    dd { margin: 4px 0 0; }
+    .context { margin-bottom: 32px; }
+    .results {
+      max-width: 1000px;
+      padding: 24px;
+      margin-bottom: 40px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+    .results h2 { font-size: 22px; }
+    .results dl { margin: 16px 0; }
+    .results dl div {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .results dl div:last-child { border-bottom: 0; }
+    .results dd { margin: 0; font-size: 16px; }
+    .results p { margin-bottom: 0; font-size: 16px; }
+    .results p + p { margin-top: 10px; }
+    .gallery-intro { margin-bottom: 28px; }
+    .capture-group { margin-bottom: 36px; }
+    .captures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+    figure {
+      min-width: 0;
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+    .captures.single { grid-template-columns: 1fr; }
+    .single figure {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr);
+    }
+    .capture-link { display: block; align-self: start; background: #14262d; }
+    .capture-link:focus-visible { outline-offset: -4px; }
+    img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; }
+    figcaption { padding: 22px 24px; }
+    figcaption p { font-size: 16px; margin-bottom: 12px; }
+    .original { font-size: 16px; }
+    .remaining { padding-top: 28px; border-top: 1px solid var(--line); }
+    .remaining ul { max-width: 78ch; margin: 16px 0 24px; padding-left: 24px; color: var(--muted); }
+    .remaining li { margin-bottom: 8px; }
+    footer { margin-top: 32px; font-size: 16px; color: var(--muted); }
+    @media (max-width: 1100px) {
+      .single figure { grid-template-columns: minmax(0, 3fr) minmax(250px, 2fr); }
+      .captures { gap: 20px; }
+    }
+    @media (max-width: 680px) {
+      main { padding: 28px 18px; }
+      h1 { font-size: 34px; }
+      .device, .captures, .single figure { grid-template-columns: 1fr; }
+      .device { gap: 16px; }
+      .results { padding: 20px; }
+      .results dl div { grid-template-columns: 1fr; gap: 4px; }
+      figcaption { padding: 20px; }
+    }
+    @media print {
+      body { background: var(--surface); }
+      main { padding: 0; }
+      .skip-link, .review-nav, footer { display: none; }
+      figure { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#device-captures">Skip to device captures</a>
+  <main>
+    <header>
+      <h1>Tools on the Portal+.</h1>
+      <p>Actual Android captures from the connected Portal+, including the updated header and day/night appearance. The linked browser review and interactive mock use synthetic data and simulated hardware actions.</p>
+      <nav class="review-nav" aria-label="Tools review navigation">
+        <a href="./review.html">Browser mock gallery</a>
+        <a class="secondary" href="./?screen=tools">Explore the synthetic mock</a>
+      </nav>
+    </header>
+
+    <dl class="device" aria-label="Device capture conditions">
+      <div><dt>Device and capture size</dt><dd>Portal+ · 2160 × 1440 pixels</dd></div>
+      <div><dt>Android version</dt><dd>Android 10 · API 29</dd></div>
+      <div><dt>Connection during validation</dt><dd>Wi-Fi ADB · USB unplugged</dd></div>
+    </dl>
+
+    <section class="context" aria-labelledby="shell-title">
+      <h2 id="shell-title">The existing launcher stays visible.</h2>
+      <p>The existing Sky wallpaper is preserved. The Tools body and left tool rail are transparent over it; cards and setup sheets retain readable surfaces. Workspaces keep the launcher header and bottom dock.</p>
+      <p>Tapping the active bottom Tools tab returns to the library with its filter and scroll preserved. Switching to Home and back retains the selected tool. These navigation observations come from device checks; a still screenshot alone does not demonstrate the return flow. <a href="#validation-results">See validation results.</a></p>
+    </section>
+
+    <section id="device-captures" aria-labelledby="captures-title">
+      <div class="gallery-intro">
+        <h2 id="captures-title">Actual Portal captures</h2>
+        <p>These images are actual Portal captures at 2160 × 1440 pixels. The first four show the October 7 header and shared-theme update. The remaining images preserve earlier Tools-overhaul evidence. These archived captures predate the smaller bottom dock gap; the interactive mock and browser gallery show the updated 16 dp spacing. Open an image to inspect its full resolution.</p>
+      </div>
+
+      <section class="capture-group" aria-labelledby="appearance-title">
+        <h2 id="appearance-title">Updated header and day/night appearance</h2>
+        <p>The five actions are phone remote, sleep, day/night, search and Settings. The decorative outline before immortal is removed. All 95 native appearance checks passed; the existing appearance setting was restored after testing.</p>
+        <p>The final build also passed 405 Tools regression checks. Warm tool switching measured 37.77 ms at p95; the separate repeated-theme interval measured 82.61 ms at p95. These are Android frame-duration samples, not physical input latency. The stricter 16.67 ms frame target remains unmet.</p>
+        <div class="captures">
+          <figure>
+            <a class="capture-link" href="./native-reference/header-tools-day.png">
+              <img src="./native-reference/header-tools-day.png" width="2160" height="1440" alt="Actual Portal Tools library in day mode, with a smartphone remote icon, distinct sleep and night-theme icons, search and settings.">
+            </a>
+            <figcaption><h3>Tools in day mode</h3><p>The library shares the launcher's light wallpaper treatment. There is no separate Tools or rail backdrop.</p></figcaption>
+          </figure>
+          <figure>
+            <a class="capture-link" href="./native-reference/header-tools-night.png">
+              <img src="./native-reference/header-tools-night.png" width="2160" height="1440" alt="Actual Portal Tools library in night mode, with a sun action to switch back to day.">
+            </a>
+            <figcaption><h3>Tools in night mode</h3><p>The selected wallpaper remains in place. The header sun switches back to day; the Z crescent remains the separate sleep control.</p></figcaption>
+          </figure>
+          <figure>
+            <a class="capture-link" href="./native-reference/header-converter-day.png">
+              <img loading="lazy" src="./native-reference/header-converter-day.png" width="2160" height="1440" alt="Actual native Converter in day mode, retaining a temporary value of 7.25 metres.">
+            </a>
+            <figcaption><h3>A retained draft in day mode</h3><p>Cards, text and controls follow the theme. The temporary 7.25 value remains in the same tool.</p></figcaption>
+          </figure>
+          <figure>
+            <a class="capture-link" href="./native-reference/header-converter-night.png">
+              <img loading="lazy" src="./native-reference/header-converter-night.png" width="2160" height="1440" alt="Actual native Converter in night mode with the same temporary 7.25 value.">
+            </a>
+            <figcaption><h3>The same draft in night mode</h3><p>The native check confirms appearance changes retain the Activity and draft. The same choice is shared with Settings.</p></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <div class="gallery-intro">
+        <h2>Earlier Tools-overhaul captures</h2>
+        <p>These preserve the previous build's tool-flow evidence and its four-action header.</p>
+      </div>
+
+      <section class="capture-group" aria-labelledby="library-title">
+        <h2 id="library-title">Tools library</h2>
+        <div class="captures single">
+          <figure>
+            <a class="capture-link" href="./native-reference/library.png" aria-label="Open full-resolution native Tools library capture">
+              <img src="./native-reference/library.png" width="2160" height="1440" alt="Native Tools library with Everyday, Home and downtime, and Discover groups over the Sky wallpaper.">
+            </a>
+            <figcaption>
+              <h3>The library in the launcher</h3>
+              <p>Search, category filters and eleven ordinary tools share the retained header and dock. The existing Sky wallpaper remains visible around the cards, with Tools selected at the bottom.</p>
+              <a class="original" href="./native-reference/library.png">Open full-resolution capture</a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="capture-group" aria-labelledby="alarm-title">
+        <h2 id="alarm-title">Alarm workspace and preview check</h2>
+        <div class="captures">
+          <figure>
+            <a class="capture-link" href="./native-reference/workspace-alarm.png" aria-label="Open full-resolution native Alarm workspace capture">
+              <img loading="lazy" src="./native-reference/workspace-alarm.png" width="2160" height="1440" alt="Native Alarm workspace with the alarm off, a 07:30 time, repeat days and a Preview ringing screen control.">
+            </a>
+            <figcaption>
+              <h3>Alarm workspace</h3>
+              <p>The selected Alarm rail entry, time controls and repeat days sit inside the launcher. Preview is an explicit action; this frame shows the alarm turned off.</p>
+              <a class="original" href="./native-reference/workspace-alarm.png">Open full-resolution capture</a>
+            </figcaption>
+          </figure>
+          <figure>
+            <a class="capture-link" href="./native-reference/alarm-silent-preview.png" aria-label="Open full-resolution native capture associated with the silent alarm preview check">
+              <img loading="lazy" src="./native-reference/alarm-silent-preview.png" width="2160" height="1440" alt="Settled native fullscreen Alarm preview with its time, silent-preview notice, Dismiss and Snooze controls.">
+            </a>
+            <figcaption>
+              <h3>Silent preview check</h3>
+              <p>The explicitly opened preview covers the launcher and states that it makes no sound or real schedule. Dismiss returned to Alarm; this does not establish actual alarm firing or snooze timing.</p>
+              <a class="original" href="./native-reference/alarm-silent-preview.png">Open full-resolution capture</a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="capture-group" aria-labelledby="converter-title">
+        <h2 id="converter-title">Converter</h2>
+        <div class="captures single">
+          <figure>
+            <a class="capture-link" href="./native-reference/workspace-converter.png" aria-label="Open full-resolution native Converter capture">
+              <img loading="lazy" src="./native-reference/workspace-converter.png" width="2160" height="1440" alt="Native Converter workspace showing one metre converted to 3.28084 feet alongside the tool rail.">
+            </a>
+            <figcaption>
+              <h3>A local calculation</h3>
+              <p>Length, value and unit controls sit beside the native result: 1 metre becomes 3.28084 feet. This representative calculation does not establish every unit pair or live currency accuracy.</p>
+              <a class="original" href="./native-reference/workspace-converter.png">Open full-resolution capture</a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="capture-group" aria-labelledby="lamp-title">
+        <h2 id="lamp-title">Lamp workspace and display check</h2>
+        <div class="captures">
+          <figure>
+            <a class="capture-link" href="./native-reference/workspace-lamp.png" aria-label="Open full-resolution native Lamp workspace capture">
+              <img loading="lazy" src="./native-reference/workspace-lamp.png" width="2160" height="1440" alt="Native Lamp workspace with a warm color swatch, brightness and warmth sliders, and red night light off.">
+            </a>
+            <figcaption>
+              <h3>Lamp workspace</h3>
+              <p>Brightness, warmth and red night light controls remain alongside the transparent tool rail. Turn on lamp is the explicit entry to the display.</p>
+              <a class="original" href="./native-reference/workspace-lamp.png">Open full-resolution capture</a>
+            </figcaption>
+          </figure>
+          <figure>
+            <a class="capture-link" href="./native-reference/lamp-display.png" aria-label="Open full-resolution native capture associated with the Lamp display check">
+              <img loading="lazy" src="./native-reference/lamp-display.png" width="2160" height="1440" alt="Settled native fullscreen warm Lamp display with brightness, warmth, red-light and return controls.">
+            </a>
+            <figcaption>
+              <h3>Display check</h3>
+              <p>The warm lamp fills the display, with native brightness and warmth controls. Its explicit return restored the originating Lamp workspace; no saved controls were changed during this capture.</p>
+              <a class="original" href="./native-reference/lamp-display.png">Open full-resolution capture</a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="capture-group" aria-labelledby="countdown-title">
+        <h2 id="countdown-title">Countdown form</h2>
+        <div class="captures single">
+          <figure>
+            <a class="capture-link" href="./native-reference/countdown-add.png" aria-label="Open full-resolution native Add countdown form capture">
+              <img loading="lazy" src="./native-reference/countdown-add.png" width="2160" height="1440" alt="Native Add countdown sheet with name, month, day, yearly repeat, icon, Cancel and Add countdown controls.">
+            </a>
+            <figcaption>
+              <h3>Setup in context</h3>
+              <p>The form opens over the Countdowns workspace. Name, date, repeat and icon controls share the sheet, with explicit Cancel and Add countdown actions.</p>
+              <a class="original" href="./native-reference/countdown-add.png">Open full-resolution capture</a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="capture-group" aria-labelledby="camera-title">
+        <h2 id="camera-title">Camera error</h2>
+        <div class="captures single">
+          <figure>
+            <a class="capture-link" href="./native-reference/camera-unavailable.png" aria-label="Open full-resolution native Camera unavailable capture">
+              <img loading="lazy" src="./native-reference/camera-unavailable.png" width="2160" height="1440" alt="Native Camera unavailable screen with network guidance, Try again and Back to cameras controls.">
+            </a>
+            <figcaption>
+              <h3>An unavailable stream</h3>
+              <p>An unreachable test stream reaches the native error screen with Retry and return controls. This is actual device error UI; it does not establish playback of a compatible household RTSP stream.</p>
+              <a class="original" href="./native-reference/camera-unavailable.png">Open full-resolution capture</a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="capture-group" aria-labelledby="memo-title">
+        <h2 id="memo-title">Note and voice memo</h2>
+        <div class="captures single"><figure>
+          <a class="capture-link" href="./native-reference/notes-memo-deleted.png" aria-label="Open full-resolution native Notes capture">
+            <img loading="lazy" src="./native-reference/notes-memo-deleted.png" width="2160" height="1440" alt="Native Notes workspace after the temporary memo was recorded, played, stopped and deleted, with no note or audio remaining.">
+          </a>
+          <figcaption><h3>Actual audio cycle, cleaned up</h3><p>The native check recorded a short temporary memo, played and stopped it, cancelled deletion once, then confirmed deletion. The screenshot contains no original note or recorded audio. Status feedback now appears above the audio buttons.</p><a class="original" href="./native-reference/notes-memo-deleted.png">Open full-resolution capture</a></figcaption>
+        </figure></div>
+      </section>
+
+      <section class="capture-group" aria-labelledby="story-title">
+        <h2 id="story-title">Story reader</h2>
+        <div class="captures single">
+          <figure>
+            <a class="capture-link" href="./native-reference/story-reader.png" aria-label="Open full-resolution native Story reader capture">
+              <img loading="lazy" src="./native-reference/story-reader.png" width="2160" height="1440" alt="Native reader for The Tortoise and the Hare inside the Tools workspace, with All stories, Read aloud and narration readiness visible.">
+            </a>
+            <figcaption>
+              <h3>Reading inside Tools</h3>
+              <p>The bundled story opens inside the retained workspace and rail, with an All stories return. The native speech engine reached readiness; an additional automatic check observed its Start callback and the explicit Stop action returning to idle. Aural voice quality was not assessed.</p>
+              <a class="original" href="./native-reference/story-reader.png">Open full-resolution capture</a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+    </section>
+
+    <section class="capture-group" aria-labelledby="narration-title">
+      <h2 id="narration-title">Native narration Start and Stop</h2>
+      <div class="captures">
+        <figure><a class="capture-link" href="./native-reference/narration-active.png"><img loading="lazy" src="./native-reference/narration-active.png" width="2160" height="1440" alt="Native story reader reporting Reading aloud after Android's speech-engine start callback."></a><figcaption><h3>The engine started</h3><p>Reading aloud follows Android's actual speech-engine callback. The check then pressed Stop while narration remained active.</p></figcaption></figure>
+        <figure><a class="capture-link" href="./native-reference/narration-stopped.png"><img loading="lazy" src="./native-reference/narration-stopped.png" width="2160" height="1440" alt="Native story reader reporting Narration stopped with Read aloud available again."></a><figcaption><h3>Stop returns to idle</h3><p>The explicit Stop action returned to Narration stopped, with Read aloud available. The check finished by returning to the Tools library.</p></figcaption></figure>
+      </div>
+    </section>
+
+    <section class="capture-group" aria-labelledby="text-keyboard-title">
+      <h2 id="text-keyboard-title">Larger text and keyboard</h2>
+      <p>These additional captures use Android text size at 1.3× on the final benchmark build. The original setting was restored exactly afterward; the camera form was cancelled without saving.</p>
+      <div class="captures">
+        <figure><a class="capture-link" href="./native-reference/font-library.png"><img loading="lazy" src="./native-reference/font-library.png" width="2160" height="1440" alt="Native Tools library with enlarged Android text wrapping inside its cards and the dock still visible."></a><figcaption><h3>Readable wrapping</h3><p>Library text wraps inside the existing cards. Lower groups remain reachable by scrolling above the dock.</p></figcaption></figure>
+        <figure><a class="capture-link" href="./native-reference/font-keyboard.png"><img loading="lazy" src="./native-reference/font-keyboard.png" width="2160" height="1440" alt="Unsaved native camera form at enlarged text size with Cancel and Add camera above the visible keyboard."></a><figcaption><h3>Actions above the keyboard</h3><p>The actual native keyboard leaves Cancel and Add camera visible. Cancel returned to Cameras without adding anything.</p></figcaption></figure>
+      </div>
+    </section>
+
+    <!-- Functional results and measured frame proxy are reported separately. -->
+    <section id="validation-results" class="results" aria-labelledby="results-title">
+      <h2 id="results-title">Validation results</h2>
+      <dl>
+        <div><dt>Build and JVM</dt><dd id="build-results">Reported builds passed; 599 JVM tests passed.</dd></div>
+        <div><dt>Browser mock</dt><dd id="browser-results">119 browser checks passed. This validates simulated browser behavior.</dd></div>
+        <div><dt>Native device</dt><dd id="native-results">Final expanded smoke passed on the benchmark build: 405 assertions, all true (0 false), 66.435 seconds. This is functional run duration, not a rendering performance measurement.</dd></div>
+      </dl>
+      <p id="memo-results">Real memo checks covered Record, Stop, Play, Stop, Delete Cancel and Delete confirmation, restoring the initially absent voice file.</p>
+      <p id="preservation-results">Fingerprints of six configuration stores stayed unchanged. The voice file and microphone grant were preserved; ephemeral lamp controls were restored.</p>
+      <p id="performance-results">Final warmed switching trials measured p95 frame durations of <strong>52.64 / 39.15 / 38.13 ms</strong>. The third trial improved about <strong>38%</strong> over the 61.99 ms baseline. The stricter 16.67 ms p95 target remains unmet; consistent 60 fps is not established. These are Android gfxinfo FrameCompleted − IntendedVsync durations, not physical input latency.</p>
+      <p>Each trial retained 120 valid frames. After 25 additional four-tool cycles, sampled PSS fell from 108,632 to 105,832 KiB; no frames rendered during the 2.046-second idle sample. This is a non-debuggable benchmark build with normal JIT and retained profiles, not a cleared cold-install or long-running leak certification.</p>
+    </section>
+
+    <section class="remaining" aria-labelledby="remaining-title">
+      <h2 id="remaining-title">Still to establish on hardware</h2>
+      <ul>
+        <li>Real alarm firing and snooze timing, and timer completion timing and audio.</li>
+        <li>Playback from a compatible household RTSP camera.</li>
+        <li>Live intercom operation between two Portals.</li>
+        <li>Live feed accuracy, including ISS passes and Aurora forecasts.</li>
+      </ul>
+      <p>This is representative evidence from one Portal+. Pixel-perfect browser parity and validation across all Portal hardware are not established. The synthetic browser mock cannot settle these remaining hardware and network checks.</p>
+    </section>
+    <footer>Immortal Tools review · Native evidence remains in progress.</footer>
+  </main>
+</body>
+</html>

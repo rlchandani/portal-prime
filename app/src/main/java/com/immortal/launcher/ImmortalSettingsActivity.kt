@@ -1606,7 +1606,7 @@ private fun WallpaperSection() {
           mode = WallpaperConfig.DARK
           WallpaperConfig.setMode(context, mode)
         }) {
-          Spacer(Modifier.fillMaxSize().background(Color(0xFF1A1A1A)))
+          Spacer(Modifier.fillMaxSize().background(com.immortal.launcher.ui.theme.ApprovedDarkPalette.background))
         }
         WallpaperConfig.GRADIENTS.forEach { (id, colors) ->
           WallpaperSwatch(id.removePrefix("g_").replaceFirstChar { it.uppercase() }, selected = mode == id, onClick = {

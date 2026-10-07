@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Dusk Aurora · Settings (functional)</title>
+<link rel="stylesheet" href="aurora.css"/>
+<style>
+/* ================= SHELL ================= */
+#panel{position:fixed;inset:64px 40px 28px;display:flex;border-radius:28px;overflow:hidden;
+  border:.5px solid rgba(255,255,255,.14);
+  box-shadow:0 .5px 0 rgba(255,255,255,.2) inset,0 30px 80px -24px rgba(0,0,0,.85)}
+#side{width:400px;background:rgba(14,17,26,.74);backdrop-filter:blur(40px) saturate(1.5);
+  -webkit-backdrop-filter:blur(40px) saturate(1.5);padding:22px 14px;overflow-y:auto;flex:none;
+  border-right:.5px solid rgba(255,255,255,.08)}
+#side h1{font-size:28px;font-weight:700;letter-spacing:-.5px;margin:2px 8px 14px}
+#detail{flex:1;background:rgba(22,26,38,.55);backdrop-filter:blur(40px) saturate(1.5);
+  -webkit-backdrop-filter:blur(40px) saturate(1.5);display:flex;flex-direction:column;min-width:0}
+#dhead{padding:24px 34px 12px;border-bottom:.5px solid rgba(255,255,255,.09);flex:none}
+#dhead .t{font-size:26px;font-weight:700;letter-spacing:-.4px}
+#dhead .s{font-size:13.5px;color:var(--t-secondary);margin-top:4px;line-height:1.45;max-width:760px}
+#dbody{flex:1;overflow-y:auto;padding:18px 34px 44px}
+.dmax{max-width:780px}
+
+/* sidebar rows */
+.slbl{font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--t-tertiary);margin:16px 10px 5px}
+.srow{display:flex;align-items:center;gap:11px;padding:7.5px 10px;border-radius:10px;font-size:14.5px;font-weight:500;cursor:pointer;user-select:none}
+.srow:hover{background:rgba(255,255,255,.05)}
+.srow.sel{background:var(--blue)}
+.badge2{width:27px;height:27px;border-radius:7px;display:grid;place-items:center;flex:none;color:#fff;font-size:13px;font-weight:700}
+.badge2 svg{width:16px;height:16px}
+.srow .out{margin-left:auto;color:rgba(255,255,255,.35);font-size:13px}
+.sres{padding:9px 10px;border-radius:10px;cursor:pointer}
+.sres:hover{background:rgba(255,255,255,.05)}
+.sres .n{font-size:14.5px;font-weight:550}.sres .w{font-size:12px;color:var(--t-tertiary)}
+.nores{color:var(--t-tertiary);font-size:13.5px;padding:10px}
+
+/* ================= COMPONENTS ================= */
+.card{background:rgba(255,255,255,.07);border:.5px solid rgba(255,255,255,.08);border-radius:15px;overflow:visible;margin-bottom:6px}
+.grouplbl{margin:20px 0 7px 14px}
+.rowc{display:flex;align-items:center;gap:12px;padding:11px 15px;min-height:52px;position:relative;font-size:15px}
+.rowc+.rowc::before{content:"";position:absolute;top:0;left:52px;right:0;height:.5px;background:rgba(255,255,255,.09)}
+.rowc.nob::before{left:15px}
+.rowc .rt{flex:1;font-weight:500;min-width:0}
+.rowc .rt .sub{font-size:12.5px;color:var(--t-tertiary);font-weight:400;margin-top:1px;line-height:1.35}
+.rowc .rv{color:var(--t-tertiary);font-size:14px;white-space:nowrap}
+.rowc .chev{color:rgba(255,255,255,.28);font-size:17px;font-weight:600}
+.rowc.tap{cursor:pointer}.rowc.tap:hover{background:rgba(255,255,255,.03)}
+.help{font-size:12.5px;color:var(--t-tertiary);line-height:1.4;padding:0 15px 10px 15px;margin-top:-5px}
+.foot{font-size:12.5px;color:var(--t-tertiary);line-height:1.5;padding:8px 14px 0;margin-bottom:14px}
+.switch{cursor:pointer}
+.badge3{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;color:#fff;font-size:14px;font-weight:700}
+.badge3 svg{width:17px;height:17px}
+/* segmented */
+.seg{cursor:pointer;flex:none}
+.seg div{cursor:pointer;white-space:nowrap}
+/* stepper */
+.stp{display:flex;align-items:center;gap:2px;flex:none}
+.stp button{width:34px;height:31px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:var(--cyan);
+  font-size:16px;font-weight:700;cursor:pointer}
+.stp button:hover{background:rgba(255,255,255,.16)}
+.stp .v{min-width:64px;text-align:center;font-size:14px;font-weight:550;font-variant-numeric:tabular-nums}
+/* slider */
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;max-width:300px;height:4px;border-radius:3px;background:rgba(255,255,255,.18);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.5);cursor:pointer}
+/* dropdown */
+.dd{position:relative;flex:none}
+.ddbtn{color:var(--t-tertiary);font-size:14px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.ddbtn:hover{color:#fff}
+.ddmenu{position:absolute;right:0;top:26px;z-index:50;min-width:210px;border-radius:13px;overflow:hidden;
+  background:rgba(34,39,54,.97);backdrop-filter:blur(30px);border:.5px solid rgba(255,255,255,.14);
+  box-shadow:0 18px 44px -10px rgba(0,0,0,.8)}
+.ddmenu div{padding:9px 14px;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;gap:12px}
+.ddmenu div:hover{background:rgba(255,255,255,.08)}
+.ddmenu .on{font-weight:650}
+.ddmenu .on::after{content:"✓";color:var(--cyan)}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:12px;padding:10px 18px;
+  font-size:14.5px;font-weight:650;cursor:pointer;border:none;font-family:inherit}
+.btn.blue{background:var(--blue);color:#fff}.btn.blue:hover{filter:brightness(1.1)}
+.btn.grey{background:rgba(255,255,255,.1);color:#fff}
+.btn.red{background:#ff453a;color:#fff}
+.btn.orange{background:#ef6c00;color:#fff}
+.btn.wide{width:100%;padding:12px}
+.pill{background:rgba(100,210,255,.14);color:var(--cyan);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:650;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.pill:hover{background:rgba(100,210,255,.22)}
+/* text field */
+.tf{background:rgba(255,255,255,.08);border:.5px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;
+  font-family:inherit;font-size:14px;padding:9px 12px;outline:none;width:100%}
+.tf:focus{border-color:var(--blue)}
+.tf::placeholder{color:rgba(255,255,255,.3)}
+.tf.inline{width:200px;text-align:right;background:transparent;border:none;padding:4px 0}
+/* radio */
+.radio{width:20px;height:20px;border-radius:50%;border:1.8px solid rgba(255,255,255,.35);flex:none;display:grid;place-items:center}
+.radio.on{border-color:var(--blue)}
+.radio.on::after{content:"";width:11px;height:11px;border-radius:50%;background:var(--blue)}
+/* check */
+.ck{color:var(--cyan);font-weight:800;font-size:16px}
+/* day chips */
+.days{display:flex;gap:9px}
+.day{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:13.5px;font-weight:700;cursor:pointer;
+  background:rgba(255,255,255,.1)}
+.day.on{background:var(--blue)}
+/* wallpaper swatches */
+.sw{display:flex;gap:11px;overflow-x:auto;padding:4px 2px 6px}
+.swi{flex:none;text-align:center;cursor:pointer;width:64px}
+.swi .b{width:60px;height:60px;border-radius:13px;border:2.5px solid transparent;box-shadow:0 6px 14px -6px rgba(0,0,0,.6)}
+.swi.on .b{border-color:var(--cyan)}
+.swi .l{font-size:10.5px;margin-top:5px;color:var(--t-tertiary)}
+.swi.on .l{color:var(--cyan);font-weight:650}
+/* emoji chips */
+.emo{display:flex;gap:8px;flex-wrap:wrap}
+.emo div{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:19px;cursor:pointer;background:rgba(255,255,255,.08)}
+.emo div.on{background:rgba(10,132,255,.35);outline:1.5px solid var(--blue)}
+/* health */
+.hbanner{border-radius:13px;padding:12px 16px;font-size:14px;font-weight:550;margin-bottom:14px}
+.hbanner.ok{background:rgba(48,209,88,.14);color:#4cd964}
+.hrow{display:flex;gap:12px;padding:11px 15px;position:relative;align-items:flex-start}
+.hrow+.hrow::before{content:"";position:absolute;top:0;left:44px;right:0;height:.5px;background:rgba(255,255,255,.09)}
+.hrow .ic{color:#4cd964;font-weight:800;font-size:15px;width:18px;flex:none;padding-top:1px}
+.hrow .t{font-weight:600;font-size:14.5px}.hrow .e{font-size:12.5px;color:var(--t-tertiary);margin-top:2px;line-height:1.4}
+/* steps list */
+.steps{padding:4px 15px 13px}
+.steps div{display:flex;gap:9px;font-size:13px;color:var(--t-secondary);line-height:1.5;margin-top:7px}
+.steps b{color:var(--cyan);font-weight:700;flex:none}
+/* status line */
+.status{color:var(--cyan);font-size:13.5px;padding:2px 15px 12px}
+/* subpage overlay */
+#sub{position:fixed;inset:64px 40px 28px;z-index:60;border-radius:28px;display:none;flex-direction:column;
+  background:rgba(13,16,25,.92);backdrop-filter:blur(50px) saturate(1.5);-webkit-backdrop-filter:blur(50px) saturate(1.5);
+  border:.5px solid rgba(255,255,255,.16);box-shadow:0 40px 110px -20px rgba(0,0,0,.95)}
+#sub.open{display:flex}
+#subhead{padding:20px 34px 12px;flex:none;border-bottom:.5px solid rgba(255,255,255,.09)}
+#subhead .back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border-radius:11px;
+  padding:7px 15px;font-size:14px;font-weight:600;color:var(--cyan);cursor:pointer;margin-bottom:12px}
+#subhead .t{font-size:26px;font-weight:700;letter-spacing:-.4px}
+#subhead .s{font-size:13.5px;color:var(--t-secondary);margin-top:4px;max-width:720px;line-height:1.45}
+#subbody{flex:1;overflow-y:auto;padding:18px 34px 44px}
+/* mode/face preview thumbs */
+.mth{width:88px;height:56px;border-radius:9px;flex:none;position:relative;overflow:hidden;background:#0a0e18;border:.5px solid rgba(255,255,255,.12)}
+/* toast */
+#toast{position:fixed;bottom:44px;left:50%;transform:translateX(-50%) translateY(20px);z-index:99;opacity:0;
+  background:rgba(30,35,50,.95);backdrop-filter:blur(20px);border:.5px solid rgba(255,255,255,.16);color:#fff;
+  padding:11px 22px;border-radius:14px;font-size:14px;font-weight:550;transition:.25s;pointer-events:none;
+  box-shadow:0 16px 40px -10px rgba(0,0,0,.8)}
+#toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div id="sky"></div><div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div><div id="stars"></div><div id="grain"></div>
+<div id="status"><div>Immortal</div><div>Saturday, August 1</div><div>65°&ensp;100%</div></div>
+<div class="badge" style="z-index:70">MOCK 02 v4 · SETTINGS — FUNCTIONAL REPLICA</div>
+
+<div id="panel">
+  <div id="side">
+    <h1>Settings</h1>
+    <div class="search" style="margin:0 2px 10px"><span id="schic"></span><input id="q" class="tf" style="background:none;border:none;padding:2px 0;font-size:14.5px" placeholder="Search"/></div>
+    <div id="nav"></div>
+  </div>
+  <div id="detail">
+    <div id="dhead"><div class="t" id="dt"></div><div class="s" id="ds"></div></div>
+    <div id="dbody"><div class="dmax" id="dc"></div></div>
+  </div>
+</div>
+
+<div id="sub">
+  <div id="subhead"><div class="back" onclick="popPage()">‹ Back</div><div class="t" id="st"></div><div class="s" id="ss"></div></div>
+  <div id="subbody"><div class="dmax" id="sc"></div></div>
+</div>
+<div id="toast"></div>
+
+<script src="aurora-icons.js"></script>
+<script>
+/* =========================================================
+   STATE — mirrors the real Config objects & defaults
+   ========================================================= */
+const S = {
+  section:"Screensaver", sub:null, subCtx:null,
+  // screensaver domain
+  ss:{enabled:true, mode:"shuffle", face:"immortal-classic", facesOn:true, faceSize:1,
+      source:"default", folderPath:"", albumUrl:"", albumRefresh:60,
+      fit:"fill", intervalSec:30, shuffle:true, includeVideo:false, cacheEnabled:false,
+      showNowPlaying:true, presenceMode:"ALWAYS_ON", idleSleepMin:0,
+      overnightEnabled:false, overnightStart:23*60, overnightEnd:6*60, nightClock:false,
+      sleepTimerEnabled:false, sleepTimerMin:30, pauseAudioOnSleep:true, closeAppOnSleep:false,
+      soundscape:"off", soundscapeVolume:50, ambientDashboard:false, gestureWave:false, welcomeEnabled:true,
+      dismiss:"Immortal launcher", haDash:"",
+      immich:{connected:false,url:"",key:"",album:""}, smb:{connected:false,host:"",share:"",folder:"",user:""},
+      dav:{connected:false,url:"",user:""}, web:{url:""}},
+  // digital clock domain
+  dc:{enabled:false, face:"classic", size:"medium", layout:"center", background:"black", showDate:true, showSeconds:false},
+  // immortal domain
+  im:{weatherUnit:"auto", tileSize:"standard", weatherWidget:"off", clockFormat:"auto",
+      showMiniPlayer:true, hideStatusBar:true, multiRoomEnabled:false, snapcastHost:"", maPort:8095, maUser:"", maPass:"", maAuthed:false},
+  // chime
+  ch:{hourly:false, spoken:false, golden:false, sunriseVariant:0, volume:60, quiet:false, quietStart:22*60, quietEnd:7*60, voice:"Default voice"},
+  // sunrise
+  sr:{enabled:false, hour:7, minute:0, ramp:20, chime:true, days:[1,2,3,4,5]},
+  // welcome
+  wl:{greet:true, clock:true, date:true, tts:false, voice:"Default voice", name:"",
+      gNight:"Good night", gMorning:"Good morning", gAfternoon:"Good afternoon", gEvening:"Good evening",
+      durMs:3200, textSize:"Medium", opacity:70},
+  // display
+  dp:{brightness:70, autoBright:true, mediaVol:40, nightShift:false, nsFrom:21*60, nsTo:7*60, warmth:45},
+  touchSounds:false,
+  wp:{mode:"Sky", grain:false},
+  cal:{url:"", widgetOn:true, range:"week", size:1, side:"right"},
+  wc:{picked:["New York","London","Tokyo"]},
+  cd:{list:[{name:"Mom's birthday", emoji:"🎂", m:3, d:12, yearly:true}], form:{name:"",emoji:"🎂",m:8,d:1,yearly:true,year:2027}},
+  qb:{enabled:false, alwaysShow:false},
+  mq:{enabled:false, host:"", port:1883, user:"", pass:"", tls:false, status:"Starting…"},
+  boot:{apps:{"Home Assistant":false,"Jellyfin":false,"Music Assistant":false,"Snapcast":true,"VLC":false,"NewPipe":false}},
+  fleet:{name:"Living Room"},
+  debug:false, sleepCountdown:null,
+};
+const VOICES=["Default voice","Kokoro af_heart · English (US) · HQ+","Piper en_US-lessac · HQ","Female voice 1 · US · HQ"];
+const hhmm=m=>`${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`;
+const h12=m=>{let h=Math.floor(m/60),mm=m%60,ap=h<12?"AM":"PM";h=h%12||12;return `${h}:${String(mm).padStart(2,"0")} ${ap}`};
+const toast=t=>{const e=document.getElementById("toast");e.textContent=t;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),1800)};
+const ENGINE=m=>m!=="classic";
+
+/* =========================================================
+   SIDEBAR — exact groups/rows/colors from ImmortalSettingsActivity
+   ========================================================= */
+const NAVROWS=[
+ ["g","SOUND & WAKE"],
+ ["Chime","#FF9F0A","bell"],["Sunrise & Wake","#FFD60A","sun"],["Multi-room Audio","#30D158","music"],
+ ["Welcome Greeting","#FF375F","hand"],["Touch Sounds","#30D158","touch"],
+ ["g","GENERAL"],
+ ["Display","#FF9F0A","display"],["Screensaver","#FF6B35","photo"],["Wallpaper","#5E5CE6","wall"],
+ ["Clock Face","#0A84FF","clock"],["Appearance","#5E5CE6","appear"],["Weather","#0A84FF","weather"],["Sleep Timer","#636366","moon"],
+ ["g","WIDGETS & CONTENT"],
+ ["Calendar","#FF453A","cal"],["World Clock","#0A84FF","globe"],["Countdown","#FF9F0A","hour"],["Quick Buttons","#5E5CE6","grid"],
+ ["g","CONNECTIONS & DEVICE"],
+ ["Home Assistant","#41BDF5","home"],["Phone Remote","#0A84FF","qr"],["Start on Boot","#636366","boot"],
+ ["Device Name","#636366","info"],["About & Device Health","#636366","health"],
+ ["g","SYSTEM"],
+ ["All Android Settings","#636366","gear","out"],
+];
+const NAVIC={bell:I.bell,sun:I.display,music:I.music,hand:I.hand,touch:I.hand,display:I.display,photo:I.photo,
+ wall:I.photo,clock:I.clock,appear:I.gridapps,weather:I.weather,moon:I.moonz,cal:I.cal,globe:I.globe,hour:I.hourglass,
+ grid:I.gridapps,home:I.homeS,qr:I.qr,boot:I.plug,info:I.info,health:I.lock,wifi:I.wifi,bt:I.bt,folder:I.folder,gear:I.gear};
+const SUBTITLES={
+ "Chime":"Gentle ambient cues. All off by default; nothing plays during quiet hours.",
+ "Sunrise & Wake":"Wake to a gradual screen-brightening ramp on the days you choose, optionally finishing with a chime.",
+ "Multi-room Audio":"Show the Snapcast group's track on the now-playing card, with play/pause/skip.",
+ "Welcome Greeting":"The greeting overlay shown when the screensaver starts — text, clock, date and spoken greeting.",
+ "Sleep Timer":"Turn the screensaver off after a set time, with a live countdown; optionally pause audio and close apps.",
+ "Countdown":"Add days-until countdowns (birthdays, trips) shown on the home screen.",
+ "World Clock":"Choose the cities shown by the World Clock widget (the first four in pick order).",
+ "Home Assistant":"Publish this Portal to Home Assistant as auto-discovered entities over your MQTT broker.",
+ "Start on Boot":"Pick which installed apps Immortal relaunches after a reboot.",
+};
+const SEARCH_INDEX={ // alias → section (real index from ImmortalSettingsActivity)
+ "Brightness":"Display","Auto-brightness":"Display","Night Shift":"Display","Volume":"Display","Media volume":"Display",
+ "Photo Source":"Screensaver","Photo Interval":"Screensaver","Shuffle":"Screensaver","Include Video":"Screensaver",
+ "Fit Mode":"Screensaver","Presence Mode":"Screensaver","Overnight screen-off":"Screensaver","Idle screen-off":"Screensaver",
+ "Store media on this device":"Screensaver","Ambient dashboard":"Screensaver","Gesture wave to wake":"Screensaver",
+ "Clock Face":"Clock Face","Clock Format":"Clock Face","Clock style":"Clock Face","Font":"Clock Face","Glow":"Clock Face",
+ "Show Date":"Clock Face","Show Now Playing":"Clock Face","Show Seconds":"Clock Face",
+ "Tile Size":"Appearance","Weather Widget":"Appearance","Show Mini Player":"Appearance","Hide Status Bar":"Appearance",
+ "Temperature Unit":"Weather","Ambient sound":"Chime","Hourly chime":"Chime","Quiet hours":"Chime",
+ "Sunrise alarm":"Sunrise & Wake","Music Assistant":"Multi-room Audio","Snapcast":"Multi-room Audio",
+ "Touch sounds":"Touch Sounds","Calendar feed":"Calendar","World clock cities":"World Clock","Countdown events":"Countdown",
+ "App-switcher button":"Quick Buttons","Home Assistant":"Home Assistant","MQTT":"Home Assistant",
+ "Phone remote":"Phone Remote","Start on boot":"Start on Boot","Device name":"Device Name",
+ "About":"About & Device Health","Device health":"About & Device Health","Debug Mode":"About & Device Health",
+ "Wallpaper":"Wallpaper","Film grain":"Wallpaper","Sleep timer":"Sleep Timer",
+};
+function renderNav(){
+  const q=document.getElementById("q").value.trim().toLowerCase();
+  const nav=document.getElementById("nav");
+  if(q){
+    const names=[...new Set([...NAVROWS.filter(r=>r[0]!=="g").map(r=>r[0]),...Object.keys(SEARCH_INDEX)])];
+    const hits=names.filter(n=>n.toLowerCase().includes(q));
+    nav.innerHTML=hits.length?hits.map(n=>{
+      const sec=SEARCH_INDEX[n]||n;
+      return `<div class="sres" onclick="go('${sec.replace(/'/g,"\\'")}');document.getElementById('q').value='';renderNav()">
+        <div class="n">${n}</div><div class="w">${sec}</div></div>`;
+    }).join(""):`<div class="nores">No results for “${q}”</div>`;
+    return;
+  }
+  nav.innerHTML=NAVROWS.map(r=>{
+    if(r[0]==="g")return `<div class="slbl">${r[1]}</div>`;
+    const [t,c,ic,out]=r;
+    const sel=S.section===t&&!out;
+    return `<div class="srow ${sel?'sel':''}" onclick="${out?`toast('Opens Android ${t} settings ↗')`:`go('${t}')`}">
+      <div class="badge2" style="background:${sel?'rgba(255,255,255,.25)':c}">${NAVIC[ic]||t[0]}</div>
+      <span>${t}</span>${out?'<span class="out">↗</span>':''}</div>`;
+  }).join("");
+}
+function go(sec){S.section=sec;render()}
+
+/* =========================================================
+   COMPONENT BUILDERS
+   ========================================================= */
+const esc=s=>String(s).replace(/"/g,"&quot;");
+let uid=0;const H=[];  // deferred handlers
+function on(fn){H.push(fn);return `H[${H.length-1}]()`}
+function onv(fn){H.push(fn);return `H[${H.length-1}](this.value)`}
+const badge=(c,g)=>`<div class="badge3" style="background:${c}">${g}</div>`;
+const lbl=t=>`<div class="grouplbl slbl" style="margin-left:14px">${t}</div>`;
+const card=inner=>`<div class="card">${inner}</div>`;
+const foot=t=>`<div class="foot">${t}</div>`;
+const help=t=>t?`<div class="help">${t}</div>`:"";
+function tgl(title,val,set,opts={}){
+  return `<div class="rowc tap ${opts.nob?'nob':''}" onclick="${on(()=>{set(!val);render()})}">
+    ${opts.badge||""}<div class="rt">${title}${opts.sub?`<div class="sub">${opts.sub}</div>`:""}</div>
+    <div class="switch ${val?'on':''}"></div></div>${help(opts.help)}`;
+}
+function seg(title,val,options,set,opts={}){
+  return `<div class="rowc nob">${opts.badge||""}<div class="rt">${title}</div>
+    <div class="seg">${options.map(([k,l])=>`<div class="${k===val?'on':''}" onclick="${on(()=>{set(k);render()})}">${l}</div>`).join("")}</div>
+  </div>${help(opts.help)}`;
+}
+function stp(title,valLabel,dec,inc,opts={}){
+  return `<div class="rowc nob">${opts.badge||""}<div class="rt">${title}</div>
+    <div class="stp"><button onclick="${on(()=>{dec();render()})}">−</button>
+    <div class="v">${valLabel}</div><button onclick="${on(()=>{inc();render()})}">+</button></div></div>${help(opts.help)}`;
+}
+function nav2(title,val,click,opts={}){
+  return `<div class="rowc tap ${opts.nob?'nob':''}" onclick="${on(click)}">${opts.badge||""}
+    <div class="rt">${title}${opts.sub?`<div class="sub">${opts.sub}</div>`:""}</div>
+    <span class="rv">${val||"Not set"}</span><span class="chev">›</span></div>${help(opts.help)}`;
+}
+function picker(title,val,options,set,opts={}){
+  const id="dd"+(uid++);
+  return `<div class="rowc nob">${opts.badge||""}<div class="rt">${title}</div>
+    <div class="dd"><div class="ddbtn" onclick="document.getElementById('${id}').style.display='block';event.stopPropagation()">${options.find(o=>o[0]===val)?.[1]||val} <span style="font-size:11px">▾</span></div>
+    <div class="ddmenu" id="${id}" style="display:none">${options.map(([k,l])=>`<div class="${k===val?'on':''}" onclick="${on(()=>{set(k);render()})}">${l}</div>`).join("")}</div></div></div>${help(opts.help)}`;
+}
+function slider(title,val,min,max,set,suffix="%"){
+  return `<div class="rowc nob"><div class="rt" style="flex:0 0 120px">${title}</div>
+    <input type="range" min="${min}" max="${max}" value="${val}" oninput="${onv(v=>{set(+v);render()})}"/>
+    <span class="rv" style="min-width:44px;text-align:right">${val}${suffix}</span></div>`;
+}
+function radio(title,sub,sel,click,icon=""){
+  return `<div class="rowc tap nob" onclick="${on(click)}">${icon}
+    <div class="rt">${title}${sub?`<div class="sub">${sub}</div>`:""}</div>
+    <div class="radio ${sel?'on':''}"></div></div>`;
+}
+function field(ph,val,set,opts={}){
+  return `<div style="padding:8px 15px">${opts.label?`<div style="font-size:12px;color:var(--t-tertiary);margin-bottom:5px">${opts.label}</div>`:""}
+    <input class="tf" type="${opts.pass?'password':'text'}" placeholder="${esc(ph)}" value="${esc(val)}" onchange="${onv(v=>{set(v);render()})}"/></div>`;
+}
+
+/* =========================================================
+   DETAIL SECTIONS — exact content per device
+   ========================================================= */
+const SECTIONS={
+"Chime"(){ const c=S.ch;
+  let out=card(
+    tgl("Hourly chime",c.hourly,v=>c.hourly=v,{help:"A soft chime on the hour.",nob:1})+
+    tgl("Spoken time",c.spoken,v=>c.spoken=v,{help:"Spoken time on the hour (“It's three o'clock”), via TTS."})+
+    tgl("Golden-hour tone",c.golden,v=>c.golden=v,{help:"A sound at sunrise and sunset."}));
+  if(c.golden)out+=lbl("GOLDEN HOUR")+card(stp("Sunrise sound",c.sunriseVariant===0?"Morning":"Rooster",()=>c.sunriseVariant=0,()=>c.sunriseVariant=1));
+  out+=lbl("VOLUME")+card(stp("Volume",c.volume+"%",()=>c.volume=Math.max(0,c.volume-10),()=>c.volume=Math.min(100,c.volume+10),
+    {help:"Playback volume for chimes, spoken time, the golden-hour tone, and the room ping."}));
+  out+=lbl("QUIET HOURS")+card(
+    tgl("Quiet hours",c.quiet,v=>c.quiet=v,{help:"Silence all cues inside a nightly window.",nob:1})+
+    (c.quiet?stp("Quiet from",hhmm(c.quietStart),()=>c.quietStart=(c.quietStart+1410)%1440,()=>c.quietStart=(c.quietStart+30)%1440)+
+             stp("Quiet until",hhmm(c.quietEnd),()=>c.quietEnd=(c.quietEnd+1410)%1440,()=>c.quietEnd=(c.quietEnd+30)%1440):""));
+  if(c.hourly||c.spoken||c.golden){
+    out+=lbl("TEST")+card(`<div style="padding:13px 15px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">`+
+      (c.spoken?picker("Voice",c.voice,VOICES.map(v=>[v,v]),v=>c.voice=v).replace('class="rowc nob"','class="rowc nob" style="flex:1 1 100%;padding:0 0 6px"')+`<span class="pill" onclick="toast('Speaking: “It’s seven o’clock”')">▶ Test voice</span>`:"")+
+      (c.hourly?`<span class="pill" onclick="toast('Playing chime…')">▶ Play chime</span>`:"")+
+      (c.golden?`<span class="pill" onclick="toast('Playing sunrise tone…')">▶ Test sunrise</span><span class="pill" onclick="toast('Playing sunset tone…')">▶ Test sunset</span>`:"")+
+      `<span class="pill" onclick="toast('Ping!')">▶ Play ping</span></div>`);
+  }
+  return out;
+},
+"Sunrise & Wake"(){ const c=S.sr;
+  let out=card(tgl("Enabled",c.enabled,v=>c.enabled=v,{nob:1}));
+  out+=card(
+    stp("Hour",String(c.hour).padStart(2,"0"),()=>c.hour=(c.hour+23)%24,()=>c.hour=(c.hour+1)%24)+
+    stp("Minute",":"+String(c.minute).padStart(2,"0"),()=>c.minute=(c.minute+55)%60,()=>c.minute=(c.minute+5)%60));
+  out+=lbl("WAKE ON")+`<div style="padding:6px 2px 14px"><div class="days">${
+    ["M","T","W","T","F","S","S"].map((d,i)=>{const dow=i+1;
+      return `<div class="day ${c.days.includes(dow)?'on':''}" onclick="${on(()=>{c.days=c.days.includes(dow)?c.days.filter(x=>x!==dow):[...c.days,dow];render()})}">${d}</div>`}).join("")}</div></div>`;
+  out+=slider(`Ramp: ${c.ramp} min`,c.ramp,1,45,v=>c.ramp=v,"");
+  out+=card(tgl("Chime at the end",c.chime,v=>c.chime=v,{nob:1}));
+  out+=`<div style="color:var(--cyan);font-size:15px;padding:6px 4px 14px">${c.enabled?`Next: Mon, ${String(c.hour).padStart(2,"0")}:${String(c.minute).padStart(2,"0")}`:"Alarm is off."}</div>`;
+  out+=`<button class="btn orange wide" onclick="toast('Previewing 1-minute sunrise ramp…')">Preview (1-min ramp)</button>`;
+  return out;
+},
+"Multi-room Audio"(){ const c=S.im;
+  let out=card(`<div style="padding:13px 15px 4px;font-weight:650">Setting it up</div>
+    <div style="padding:0 15px;font-size:13px;color:var(--t-secondary)">Group your Portals into one perfectly in-sync speaker system:</div>
+    <div class="steps">
+      <div><b>1.</b><span>Install and set up Music Assistant as a server on your home network. New to Music Assistant? Learn more at music-assistant.io</span></div>
+      <div><b>2.</b><span>Install Snapcast from the Immortal App Store, and point it at your Music Assistant server.</span></div>
+      <div><b>3.</b><span>Turn on the toggle below, then enter your Music Assistant server's address.</span></div></div>`);
+  out+=card(
+    tgl("Show what the group is playing",c.multiRoomEnabled,v=>c.multiRoomEnabled=v,
+      {sub:"Surfaces the Snapcast group's track on the now-playing card — even when the Music Assistant app isn't open on this Portal.",nob:1})+
+    (c.multiRoomEnabled?
+      `<div style="display:flex;gap:10px;align-items:flex-end;padding-right:15px">${field("192.168.1.50",c.snapcastHost,v=>c.snapcastHost=v,{label:"Music Assistant / Snapcast server IP"}).replace('style="padding:8px 15px"','style="padding:8px 0 8px 15px;flex:1"')}<button class="btn blue" onclick="${on(()=>{toast(c.snapcastHost?'Connecting to '+c.snapcastHost+'…':'Enter a server IP first')})}">Apply</button></div>`+
+      field("8095",String(c.maPort),v=>c.maPort=parseInt(v)||8095,{label:"Music Assistant port (default 8095)"})+
+      field("Username",c.maUser,v=>c.maUser=v,{label:"Music Assistant username"})+
+      field("Password",c.maPass,v=>c.maPass=v,{label:"Music Assistant password",pass:1})+
+      `<div style="padding:6px 15px 12px;display:flex;gap:12px;align-items:center"><button class="btn blue" onclick="${on(()=>{c.maAuthed=true;render()})}">Sign in</button>
+       <span style="font-size:13.5px;color:${c.maAuthed?'#4cd964':'var(--t-tertiary)'}">${c.maAuthed?"Signed in ✓":""}</span></div>`+
+      help("Sends play/pause/skip to Music Assistant, and shows now-playing for AirPlay sources (which don't carry it over Snapcast). Library/radio now-playing works without it.")+
+      `<div class="status">${c.snapcastHost?"Relay: connected to "+c.snapcastHost:"Starting…"}</div>`:""));
+  out+=foot("Join this Portal to the same Snapcast group as your other rooms, then point it at your Music Assistant server. The synced audio is played by the Snapcast app.");
+  return out;
+},
+"Welcome Greeting"(){ const c=S.wl;
+  let out=card(
+    tgl("Show greeting message",c.greet,v=>c.greet=v,{nob:1})+
+    tgl("Show clock",c.clock,v=>c.clock=v)+
+    tgl("Show date",c.date,v=>c.date=v)+
+    tgl("Speak greeting (TTS)",c.tts,v=>c.tts=v));
+  out+=lbl("VOICE")+card(VOICES.map(v=>
+    `<div class="rowc tap nob" onclick="${on(()=>{c.voice=v;render()})}">
+      <div class="radio ${c.voice===v?'on':''}"></div><div class="rt">${v}</div>
+      <button class="btn blue" style="padding:6px 14px;font-size:13px" onclick="event.stopPropagation();toast('Testing: ${esc(v.split(" ·")[0])}…')">Test</button></div>`).join(""))+
+    foot('Voice for the spoken greeting, from the voices installed on this device. Tap Test to hear it. (Enable "Speak greeting" above for it to play on wake.)');
+  const erow=(t,key,def)=>`<div class="rowc nob"><div class="rt">${t}</div>
+    <input class="tf inline" placeholder="${esc(def)}" value="${esc(c[key])}" onchange="${onv(v=>{c[key]=v;render()})}"/></div>`;
+  out+=lbl("GREETINGS")+card(
+    erow("Your name","name","")+erow("Night (22:00-04:59)","gNight","Good night")+
+    erow("Morning (05:00-11:59)","gMorning","Good morning")+erow("Afternoon (12:00-16:59)","gAfternoon","Good afternoon")+
+    erow("Evening (17:00-21:59)","gEvening","Good evening"));
+  out+=lbl("TIMING")+card(stp("Display duration",(c.durMs/1000).toFixed(0)+"s",()=>c.durMs=Math.max(1000,c.durMs-1000),()=>c.durMs=Math.min(10000,c.durMs+1000)))+
+    foot("How long the welcome overlay displays before auto-dismissing.");
+  out+=lbl("TEXT SIZE")+card(seg("Text size",c.textSize,[["Small","Small"],["Medium","Medium"],["Large","Large"]],v=>c.textSize=v));
+  out+=lbl("BACKGROUND")+card(stp("Opacity",c.opacity+"%",()=>c.opacity=Math.max(0,c.opacity-5),()=>c.opacity=Math.min(100,c.opacity+5)))+
+    foot("Background darkness behind the welcome text (0% = transparent, 100% = opaque).");
+  out+=`<button class="btn blue wide" onclick="toast('${esc(c.gEvening)}${c.name?", "+esc(c.name):""} — previewing overlay…')">Preview welcome overlay</button>`+
+    foot("Tip: The welcome overlay appears when the screensaver starts from sleep. Tap anywhere on the overlay to dismiss it early, or wait for it to auto-fade.");
+  return out;
+},
+"Touch Sounds"(){
+  return card(tgl("Touch sounds",S.touchSounds,v=>{S.touchSounds=v;if(v)toast("Would open Android's “modify system settings” grant")},{badge:badge("#30D158","s"),nob:0}))+
+    foot('Plays the system tap sound on touch. Needs the "modify system settings" permission — the first tap opens Android to grant it.');
+},
+"Display"(){ const c=S.dp;
+  let out=lbl("BRIGHTNESS")+card(
+    slider("Brightness",c.brightness,1,100,v=>{c.brightness=v;c.autoBright=false})+
+    tgl("Auto-brightness",c.autoBright,v=>c.autoBright=v,{badge:badge("#FFD60A","a")}))+
+    foot("Adjust the screen brightness, or let it adapt to the room automatically.");
+  out+=lbl("VOLUME")+card(slider("Media",c.mediaVol,0,100,v=>c.mediaVol=v))+
+    foot("Sets the media playback volume (music, videos, chimes).");
+  out+=lbl("NIGHT SHIFT")+card(
+    tgl("Night Shift",c.nightShift,v=>c.nightShift=v,{badge:badge("#FF6B35","N")})+
+    (c.nightShift?
+      stp("From",h12(c.nsFrom),()=>c.nsFrom=(c.nsFrom+1410)%1440,()=>c.nsFrom=(c.nsFrom+30)%1440)+
+      stp("Until",h12(c.nsTo),()=>c.nsTo=(c.nsTo+1410)%1440,()=>c.nsTo=(c.nsTo+30)%1440)+
+      stp("Warmth",c.warmth+"%",()=>c.warmth=Math.max(0,c.warmth-10),()=>c.warmth=Math.min(100,c.warmth+10)):""))+
+    foot("Warms the screen with an amber tint during the night window, easier on the eyes after dark.");
+  return out;
+},
+"Screensaver"(){ const c=S.ss;
+  let out=card(tgl("Show the photo-frame screensaver",c.enabled,v=>c.enabled=v,{badge:badge("#FF6B35","P"),nob:0}));
+  if(c.enabled){
+    out+=card(
+      nav2("Style",MODES.find(m=>m[0]===c.mode)[1],()=>push("mode"),{nob:1,help:"How your photos animate - Shuffle mixes all the cinematic styles, or pick one (Ken Burns, gallery wall, cinema, and more). Tap to preview now."})+
+      nav2("Clock face",FACES.find(f=>f[0]===c.face)[1],()=>push("face"),{help:"Choose how the time looks - the classic corner clock, a big centred clock, or the full-screen flip clock."})+
+      nav2("Photo source",srcLabel(),()=>push("sources"),{help:"Where your photos come from - the built-in feed, your own folder or a shared album, or a self-hosted source like Immich or a NAS."})+
+      nav2("Open when you tap to exit",c.dismiss==="Immortal launcher"?"Immortal launcher":"Opens "+c.dismiss,()=>push("dismiss"),{help:"Tapping the screensaver wakes the Portal. By default that brings you home to Immortal - or pick an app (like Home Assistant) to drop straight into."})+
+      ((c.source==="immich"||c.source==="dav")?tgl("Store media on this device",c.cacheEnabled,v=>c.cacheEnabled=v,{help:"Downloads each photo and video from your server once, then plays it from this device on every loop instead of fetching it again. Videos are shrunk to fit the screen. The frame loads faster and your server does far less work; it uses some of this device's storage."}):""));
+    out+=lbl("DISPLAY")+card(
+      (!ENGINE(c.mode)?seg("Fit",c.fit,[["fill","Fill"],["fit","Fit"]],v=>c.fit=v)+
+        stp("Photo interval",c.intervalSec+"s",()=>c.intervalSec=Math.max(5,c.intervalSec-5),()=>c.intervalSec=Math.min(600,c.intervalSec+5)):"")+
+      tgl("Shuffle",c.shuffle,v=>c.shuffle=v,{nob:!!ENGINE(c.mode)})+
+      tgl("Play videos",c.includeVideo,v=>c.includeVideo=v)+
+      tgl("Show now playing",c.showNowPlaying,v=>c.showNowPlaying=v,{help:"Overlay the current track and cover art on the photo frame while music is playing."})+
+      tgl("Ambient dashboard",c.ambientDashboard,v=>c.ambientDashboard=v)+
+      tgl("Gesture wave to wake",c.gestureWave,v=>c.gestureWave=v)+
+      tgl("Welcome screen",c.welcomeEnabled,v=>c.welcomeEnabled=v));
+    out+=lbl("POWER & SLEEP")+card(
+      seg("Power",c.presenceMode,[["ALWAYS_ON","Always on"],["PRESENCE","Follow presence"]],v=>c.presenceMode=v,
+        {help:"Follow presence: photos while someone's around, screen off (and multi-room music paused) when the room empties. Always on: a permanent frame on mains power."})+
+      stp("Idle screen-off",c.idleSleepMin<=0?"Off":c.idleSleepMin+" min",()=>c.idleSleepMin=Math.max(0,c.idleSleepMin-5),()=>c.idleSleepMin=Math.min(120,c.idleSleepMin+5),
+        {help:"After the screensaver shows this long with no touch, the screen turns off; tap to wake. A simple timer - it can't tell whether someone's in the room."})+
+      tgl("Overnight screen-off",c.overnightEnabled,v=>c.overnightEnabled=v,{help:"Keep the screen off (or show a dim night clock) between two times every night."})+
+      (c.overnightEnabled?
+        stp("Off from",hhmm(c.overnightStart),()=>c.overnightStart=(c.overnightStart+1425)%1440,()=>c.overnightStart=(c.overnightStart+15)%1440)+
+        stp("Off until",hhmm(c.overnightEnd),()=>c.overnightEnd=(c.overnightEnd+1425)%1440,()=>c.overnightEnd=(c.overnightEnd+15)%1440)+
+        tgl("Show a dim night clock",c.nightClock,v=>c.nightClock=v):""));
+    out+=lbl("SLEEP TIMER")+card(
+      tgl("Sleep timer",c.sleepTimerEnabled,v=>c.sleepTimerEnabled=v,{help:"Turn the screensaver off after a set time.",nob:1})+
+      (c.sleepTimerEnabled?
+        stp("Sleep after",c.sleepTimerMin+" min",()=>c.sleepTimerMin=Math.max(1,c.sleepTimerMin-5),()=>c.sleepTimerMin=Math.min(240,c.sleepTimerMin+5))+
+        tgl("Pause audio on sleep",c.pauseAudioOnSleep,v=>c.pauseAudioOnSleep=v)+
+        tgl("Close app on sleep",c.closeAppOnSleep,v=>c.closeAppOnSleep=v):""));
+    out+=lbl("AUDIO")+card(
+      picker("Ambient sound",c.soundscape,[["off","Off"],["rain","Rain"],["ocean","Ocean"],["fireplace","Fireplace"],["white","White noise"],["pink","Pink noise"],["brown","Brown noise"]],v=>c.soundscape=v,
+        {help:"Synthesised ambient sound played while the screensaver shows."})+
+      (c.soundscape!=="off"?stp("Soundscape volume",c.soundscapeVolume+"%",()=>c.soundscapeVolume=Math.max(0,c.soundscapeVolume-5),()=>c.soundscapeVolume=Math.min(100,c.soundscapeVolume+5)):""));
+  }
+  out+=foot("Changes apply as soon as you return to the home screen.");
+  return out;
+},
+"Wallpaper"(){ const c=S.wp;
+  const SWATCHES=[["Dark","#1A1A1A"],["Space","linear-gradient(160deg,#1A3A6B,#0D1F42 45%,#080F20 75%,#020408)"],
+   ["Midnight","linear-gradient(160deg,#0F2027,#203A43,#2C5364)"],["Dusk","linear-gradient(160deg,#41295A,#2F0743)"],
+   ["Ocean","linear-gradient(160deg,#1A2980,#26D0CE)"],["Ember","linear-gradient(160deg,#6A2C70,#B83B5E,#F08A5D)"],
+   ["Aurora","linear-gradient(160deg,#0B486B,#3B8686,#79BD9A)"],["Wilderness","linear-gradient(160deg,#2d5a3d,#1a3a28)"],
+   ["Denali","linear-gradient(160deg,#7899bb,#4a6a8a)"],["Yosemite","linear-gradient(160deg,#b08d57,#6a5a3a)"],
+   ["Screensaver","linear-gradient(160deg,#2C3E50,#4CA1AF)"],["Sky","linear-gradient(160deg,#3A7BD5,#8FD3F4)"],
+   ["Star field","linear-gradient(160deg,#05060F,#0C1430)"]];
+  return lbl("WALLPAPER")+card(
+    `<div style="padding:14px 15px 4px"><div style="font-weight:650;font-size:15.5px">Background</div>
+     <div style="font-size:12.5px;color:var(--t-tertiary);margin:3px 0 10px">A gradient, a photo, or sync with your screensaver (shown blurred). Tap to choose.</div>
+     <div class="sw">${SWATCHES.map(([n,bg])=>`<div class="swi ${c.mode===n?'on':''}" onclick="${on(()=>{c.mode=n;render()})}">
+       <div class="b" style="background:${bg}"></div><div class="l">${n}</div></div>`).join("")}</div></div>`+
+    tgl("Film grain",c.grain,v=>c.grain=v,{sub:"Adds a subtle grain texture over the wallpaper.",nob:1}));
+},
+"Clock Face"(){ const c=S.dc,im=S.im,ss=S.ss;
+  let out=card(
+    nav2("Clock Face",FACES.find(f=>f[0]===ss.face)[1],()=>push("face"),{badge:badge("#0A84FF","c"),nob:0})+
+    picker("Clock Format",im.clockFormat,[["auto","Auto"],["12","12h"],["24","24h"]],v=>im.clockFormat=v,{badge:badge("#FF9F0A","h")})+
+    tgl("Show Now Playing",ss.showNowPlaying,v=>ss.showNowPlaying=v,{badge:badge("#64D2FF","n")}));
+  out+=card(tgl("Digital clock",c.enabled,v=>c.enabled=v,{help:"Use a large clock instead of the photo frame screensaver.",nob:1}));
+  if(c.enabled){
+    out+=lbl("CLOCK FACE")+card(seg("Clock face",c.face,
+      [["classic","Classic"],["bold","Bold"],["neon","Neon"],["led","Retro LED"],["flip","Flip"],["analog","Analog"]],v=>c.face=v));
+    out+=lbl("APPEARANCE")+card(seg("Size",c.size,[["small","Small"],["medium","Medium"],["large","Large"],["xl","XL"]],v=>c.size=v));
+    out+=lbl("LAYOUT & BACKGROUND")+card(
+      seg("Position",c.layout,[["center","Center"],["top","Top"],["bottom","Bottom"],["minimal","Minimal"]],v=>c.layout=v)+
+      seg("Background",c.background,[["black","Black"],["gradient","Gradient"],["red","Red"]],v=>c.background=v));
+    out+=lbl("EXTRAS")+card(
+      tgl("Show date",c.showDate,v=>c.showDate=v,{nob:1})+
+      tgl("Show seconds",c.showSeconds,v=>c.showSeconds=v));
+  }
+  return out;
+},
+"Appearance"(){ const c=S.im;
+  return card(
+    picker("Tile Size",c.tileSize,[["standard","Standard"],["large","Large"],["xl","XL"]],v=>c.tileSize=v,{badge:badge("#5E5CE6","T"),help:"Large is closer to the stock Portal launcher."})+
+    picker("Weather Widget",c.weatherWidget,[["off","Off"],["hourly","Hourly"],["daily","Daily"]],v=>c.weatherWidget=v,{badge:badge("#64D2FF","W"),help:"Show a forecast below your apps. Off by default."})+
+    tgl("Show Mini Player",c.showMiniPlayer,v=>c.showMiniPlayer=v,{badge:badge("#FF375F","m"),help:"Show the current track, cover art and controls in the header while music is playing."})+
+    tgl("Hide Status Bar",c.hideStatusBar,v=>c.hideStatusBar=v,{badge:badge("#636366","S"),help:"Hidden by default for a cleaner full-screen look. Swipe down from the top to reveal it briefly."}));
+},
+"Weather"(){ const c=S.im;
+  return card(picker("Temperature Unit",c.weatherUnit,[["auto","Auto (°F)"],["f","Fahrenheit"],["c","Celsius"]],v=>c.weatherUnit=v,
+    {badge:badge("#0A84FF","u"),help:"Auto follows your Portal's language & region setting."}));
+},
+"Sleep Timer"(){ const c=S.ss;
+  const running=S.sleepCountdown!==null;
+  const t=running?S.sleepCountdown:0;
+  const fmtT=s=>s>=3600?`${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`:`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+  let out=card(`<div style="padding:15px"><div style="display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:16px;font-weight:600">Countdown</span>
+    <span style="font-size:30px;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums">${fmtT(t)}</span></div>
+    <div style="display:flex;gap:10px;margin-top:13px">
+      <button class="btn blue" style="flex:1" onclick="${on(()=>{S.sleepCountdown=c.sleepTimerMin*60;tickSleep();render()})}">Start countdown</button>
+      <button class="btn ${running?'red':'grey'}" style="flex:1" onclick="${on(()=>{S.sleepCountdown=null;render()})}">Stop</button></div></div>`);
+  out+=card(
+    tgl("Sleep Timer",c.sleepTimerEnabled,v=>c.sleepTimerEnabled=v,{nob:1})+
+    (c.sleepTimerEnabled?
+      stp("Turn off after",c.sleepTimerMin+"m",()=>c.sleepTimerMin=Math.max(1,c.sleepTimerMin-5),()=>c.sleepTimerMin=Math.min(240,c.sleepTimerMin+5))+
+      tgl("Pause audio before sleeping",c.pauseAudioOnSleep,v=>c.pauseAudioOnSleep=v)+
+      tgl("Close Immortal before sleeping",c.closeAppOnSleep,v=>c.closeAppOnSleep=v):""));
+  out+=foot("When the timer reaches zero, Immortal pauses audio, closes itself, disables the screensaver, and locks the screen.");
+  return out;
+},
+"Calendar"(){ const c=S.cal;
+  const hasLink=!!c.url;
+  let out=card(
+    nav2("Calendar feed",hasLink?"Google Calendar":"Not set",()=>push("calurl"),{nob:1,help:"A public iCalendar (.ics) link - a Google “secret iCal” address or an Apple iCloud public-calendar link. Shows your upcoming events on the frame."})+
+    (hasLink?tgl("Show calendar",c.widgetOn,v=>c.widgetOn=v):""));
+  if(hasLink&&c.widgetOn){
+    out+=card(
+      seg("Show",c.range,[["day","Day"],["3day","3 days"],["week","Week"],["agenda","Agenda"]],v=>c.range=v)+
+      stp("Size",["Small","Medium","Large"][c.size],()=>c.size=Math.max(0,c.size-1),()=>c.size=Math.min(2,c.size+1))+
+      seg("Side",c.side,[["left","Left"],["right","Right"]],v=>c.side=v));
+  }
+  out+=foot("Add a public iCalendar (.ics) link to show upcoming events on the photo frame.");
+  return out;
+},
+"World Clock"(){ const c=S.wc;
+  const CITIES=[["Cupertino","America/Los Angeles"],["Denver","America/Denver"],["New York","America/New York"],
+   ["São Paulo","America/Sao Paulo"],["London","Europe/London"],["Paris","Europe/Paris"],["Berlin","Europe/Berlin"],
+   ["Cape Town","Africa/Johannesburg"],["Dubai","Asia/Dubai"],["Mumbai","Asia/Kolkata"],["Singapore","Asia/Singapore"],
+   ["Tokyo","Asia/Tokyo"],["Sydney","Australia/Sydney"]];
+  return card(CITIES.map(([n,tz],i)=>{
+    const idx=c.picked.indexOf(n);
+    return `<div class="rowc tap ${i===0?'nob':''}" onclick="${on(()=>{if(idx>=0)c.picked=c.picked.filter(x=>x!==n);else c.picked=[...c.picked,n];render()})}">
+      <div class="rt">${n}<div class="sub">${tz}</div></div>
+      <span class="rv" style="color:${idx>=0&&idx<4?'var(--cyan)':'var(--t-tertiary)'};font-weight:${idx>=0&&idx<4?700:400}">${idx>=0?(idx<4?"#"+(idx+1):"hidden"):""}</span>
+      <div class="switch ${idx>=0?'on':''}"></div></div>`;}).join(""))+
+    foot("Tip: the widget shows up to four clocks. Re-pick a city to move it to the end of the order.");
+},
+"Countdown"(){ const c=S.cd;
+  let out="";
+  if(c.list.length)out+=card(c.list.map((e,i)=>
+    `<div class="rowc ${i===0?'nob':''}"><span style="font-size:19px">${e.emoji}</span>
+     <div class="rt">${e.name}<div class="sub">${String(e.d).padStart(2,"0")}.${String(e.m).padStart(2,"0")}${e.yearly?" · yearly":"."+e.year} — ${daysUntil(e)} days to go</div></div>
+     <button class="btn red" style="padding:6px 12px" onclick="${on(()=>{c.list.splice(i,1);render()})}">✕</button></div>`).join(""));
+  const f=c.form;
+  out+=card(`<div style="padding:14px 15px 4px;font-weight:650">New countdown</div>`+
+    field("Name",f.name,v=>f.name=v)+
+    `<div style="padding:6px 15px"><div class="emo">${["📅","🎂","🎉","✈️","❤️","🎄","🏖️","🎓","💍","🍼","⭐","🏠"].map(e=>
+      `<div class="${f.emoji===e?'on':''}" onclick="${on(()=>{f.emoji=e;render()})}">${e}</div>`).join("")}</div></div>`+
+    stp("Month",String(f.m),()=>{f.m=f.m<=1?12:f.m-1},()=>{f.m=f.m>=12?1:f.m+1})+
+    stp("Day",String(f.d),()=>{f.d=f.d<=1?31:f.d-1},()=>{f.d=f.d>=31?1:f.d+1})+
+    tgl("Repeats every year",f.yearly,v=>f.yearly=v)+
+    (!f.yearly?stp("Year",String(f.year),()=>f.year=Math.max(2000,f.year-1),()=>f.year=Math.min(2100,f.year+1)):"")+
+    `<div style="padding:8px 15px 14px"><button class="btn blue wide" onclick="${on(()=>{if(!f.name)return toast("Give it a name first");c.list.push({name:f.name,emoji:f.emoji,m:f.m,d:f.d,yearly:f.yearly,year:f.year});f.name="";render()})}">Add countdown</button></div>`);
+  return out;
+},
+"Quick Buttons"(){ const c=S.qb;
+  return lbl("QUICK BUTTONS")+card(
+    tgl("App-switcher button",c.enabled,v=>c.enabled=v,{help:"A centered button at the top that opens your recent apps to switch between them.",nob:1})+
+    (c.enabled?tgl("Always show",c.alwaysShow,v=>c.alwaysShow=v,{help:"On: always visible. Off: only while the system top bar is revealed."}):""))+
+    foot("Needs the accessibility-based top-bar watch enabled during setup. The switcher shows your recently used apps; tap one to switch.");
+},
+"Home Assistant"(){ const c=S.mq;
+  let out=card(`<div style="padding:13px 15px 4px;font-weight:650">Setting it up</div><div class="steps">
+    <div><b>1.</b><span>In Home Assistant, add the Mosquitto broker add-on (Settings → Add-ons) and the MQTT integration. New to MQTT? See home-assistant.io/integrations/mqtt</span></div>
+    <div><b>2.</b><span>Turn on the toggle below and enter your broker's address (and login, if any).</span></div>
+    <div><b>3.</b><span>This Portal appears automatically under Settings → Devices as a new MQTT device — no YAML needed.</span></div></div>`);
+  out+=card(
+    tgl("Publish to Home Assistant",c.enabled,v=>{c.enabled=v;c.status=v?"Connecting…":"Starting…"},
+      {sub:"Exposes this Portal's state and controls as Home Assistant entities over MQTT.",nob:1})+
+    (c.enabled?
+      `<div style="display:flex;gap:10px;align-items:flex-end;padding-right:15px">${field("192.168.1.10",c.host,v=>c.host=v,{label:"MQTT broker IP / host"}).replace('style="padding:8px 15px"','style="padding:8px 0 8px 15px;flex:1"')}<button class="btn blue" onclick="${on(()=>{c.status=c.host?"Connected to "+c.host+" ✓":"Enter a broker address";render()})}">Apply</button></div>`+
+      field("1883",String(c.port),v=>c.port=parseInt(v)||1883,{label:"Port (default 1883, or 8883 for TLS)"})+
+      field("Username (optional)",c.user,v=>c.user=v)+
+      field("Password (optional)",c.pass,v=>c.pass=v,{pass:1})+
+      tgl("Use TLS / SSL",c.tls,v=>{c.tls=v;if(v&&c.port===1883)c.port=8883;else if(!v&&c.port===8883)c.port=1883},
+        {sub:"Encrypt the connection (e.g. a broker behind a reverse proxy on port 8883)."})+
+      `<div class="status">${c.status}</div>`:""));
+  out+=foot("Connects to a broker on your LAN over plain MQTT or TLS. Your Portal shows up in Home Assistant automatically as a device with presence, screen, battery, now-playing and a few controls — no configuration.yaml editing.");
+  return out;
+},
+"Phone Remote"(){
+  return card(nav2("Control from your phone","",()=>push("remote"),{badge:badge("#0A84FF","r"),nob:0,sub:"Pair a phone as a remote control for this Portal."}));
+},
+"Start on Boot"(){ const c=S.boot;
+  return card(Object.keys(c.apps).map((a,i)=>
+    tgl(a,c.apps[a],v=>c.apps[a]=v,{nob:i===0,badge:`<div class="badge3" style="background:${["#30D158","#5E5CE6","#FF9F0A","#0A84FF","#FF6B35","#FF453A"][i%6]}">${a[0]}</div>`})).join(""))+
+    foot("These apps relaunch automatically after a reboot — handy for players like Music Assistant that don't restart themselves.");
+},
+"Device Name"(){
+  return card(`<div class="rowc nob">${badge("#636366","i")}<div class="rt">Device name</div>
+    <input class="tf inline" placeholder="Living Room" value="${esc(S.fleet.name)}" onchange="${onv(v=>{const t=v.trim();if(t.length>=1&&t.length<=48){S.fleet.name=t;toast("Saved")}else toast("1–48 characters");render()})}"/></div>`)+
+    foot("Shown in the phone remote and in Home Assistant. 1–48 characters.");
+},
+"About & Device Health"(){
+  const CHECKS=[["Screen off","Turning the screen off — idle timeout, overnight sleep, and the Home Assistant control."],
+   ["Now playing","Showing the current track and album art on the screensaver and home header."],
+   ["Install apps","Installing and updating apps from the Immortal App Store."],
+   ["Frame relaunch","Bringing the photo frame straight back when the system force-wakes the screensaver."],
+   ["System settings","Keeping the screensaver, status bar, and WiFi-debug settings applied (and self-healing them)."]];
+  let out=`<div class="hbanner ok">✓&ensp;Everything's set up correctly.</div>`;
+  out+=card(CHECKS.map(([t,e])=>`<div class="hrow"><div class="ic">✓</div><div><div class="t">${t}</div><div class="e">${e}</div></div></div>`).join(""));
+  out+=lbl("ADVANCED")+card(
+    nav2("Screensaver Source",srcLabel(),()=>push("sources"),{badge:badge("#3A3A3C","/"),nob:0})+
+    tgl("Debug Mode",S.debug,v=>S.debug=v,{badge:badge("#FF453A","D")}));
+  out+=foot("Changes apply as soon as you return to the home screen.");
+  return out;
+},
+};
+function daysUntil(e){const now=new Date(2026,7,1);let t=new Date(e.yearly?2026:e.year,e.m-1,e.d);if(e.yearly&&t<now)t=new Date(2027,e.m-1,e.d);return Math.max(0,Math.round((t-now)/864e5))}
+function srcLabel(){const c=S.ss;return {default:"Immortal photos",folder:"Local folder",album:"Shared album",immich:"Immich",smb:"Network share",dav:"WebDAV",web:"Web page"}[c.source]}
+function tickSleep(){if(S.sleepCountdown===null)return;setTimeout(()=>{if(S.sleepCountdown===null)return;S.sleepCountdown--;if(S.sleepCountdown<=0){S.sleepCountdown=null;toast("Timer done — pausing audio, screen off")}if(S.section==="Sleep Timer")render();tickSleep()},1000)}
+
+/* =========================================================
+   SUB-SCREENS (push navigation)
+   ========================================================= */
+const MODES=[["classic","Classic (crossfade)","The original simple crossfade + gentle zoom."],
+ ["shuffle","Shuffle — all styles","Cycles through all the styles below, matched to each photo's shape."],
+ ["kenBurns","Cinematic Ken Burns","One photo at a time with a slow cinematic pan & zoom; portraits get a blurred fill."],
+ ["diptych","Orientation Diptych","Two portraits side-by-side, landscapes solo, panoramas full-width."],
+ ["framed","Framed Print","Each photo hung as a matted print on a gallery wall."],
+ ["galleryWall","Living Gallery Wall","A living collage of many photos that drift and swap."],
+ ["push","Cinematic Push","The camera pushes through each photo into the next."],
+ ["memories","Memories","Single photos, with occasional titled 'memory' collages."],
+ ["panorama","Panorama Drift","A slow horizontal glide across wide and panoramic shots."],
+ ["polaroid","Polaroid Scatter","Photos drop onto a table as tilted polaroid prints."],
+ ["mosaic","Mosaic Wall","A dense mosaic wall of big and small tiles."],
+ ["filmstrip","Filmstrip Coverflow","Photos glide to center-stage; the room glows with their color."],
+ ["cinema","Cinema Letterbox","Widescreen letterbox framing with film grain."],
+ ["heroSidebar","Hero + Sidebar","A big hero photo beside two stacked portraits."]];
+const FACES=[["immortal-classic","Immortal","Clock, date, weather and now-playing in the corners",0],
+ ["flip","Flip clock","The retro split-flap clock, full screen",1],
+ ["big","Big clock","A large clock, centred and clean",1],
+ ["bold","Bold","A tall condensed clock with the date",1],
+ ["minimal","Minimal","Just the time, quietly in the corner",0]];
+function modeThumb(id){
+  const P={classic:'<div style="position:absolute;inset:8%;background:linear-gradient(135deg,#c98a5e,#4a5a78);border-radius:4px"></div>',
+   shuffle:'<div style="position:absolute;left:6%;top:10%;width:40%;height:55%;background:#c98a5e;border-radius:3px"></div><div style="position:absolute;right:6%;top:10%;width:42%;height:35%;background:#2c4470;border-radius:3px"></div><div style="position:absolute;right:6%;bottom:12%;width:26%;height:34%;background:#1de9b6;border-radius:3px"></div><div style="position:absolute;left:6%;bottom:12%;width:40%;height:20%;background:#7c4dff;border-radius:3px"></div>',
+   kenBurns:'<div style="position:absolute;inset:-15%;background:radial-gradient(circle at 65% 35%,#ffcf7d,#8a5f52 60%,#16294f)"></div>',
+   diptych:'<div style="position:absolute;left:5%;top:8%;bottom:8%;width:43%;background:#8a5f52;border-radius:3px"></div><div style="position:absolute;right:5%;top:8%;bottom:8%;width:43%;background:#2c4470;border-radius:3px"></div>',
+   framed:'<div style="position:absolute;inset:12%;background:#e8e2d0;border-radius:2px"></div><div style="position:absolute;inset:24%;background:linear-gradient(135deg,#4a5a78,#16294f)"></div>',
+   galleryWall:'<div style="position:absolute;left:6%;top:10%;width:30%;height:40%;background:#c98a5e"></div><div style="position:absolute;left:40%;top:10%;width:24%;height:26%;background:#1de9b6"></div><div style="position:absolute;right:6%;top:10%;width:26%;height:52%;background:#2c4470"></div><div style="position:absolute;left:6%;bottom:12%;width:40%;height:32%;background:#7c4dff"></div><div style="position:absolute;left:50%;bottom:12%;width:20%;height:24%;background:#ff9d5c"></div>',
+   push:'<div style="position:absolute;inset:20% 30%;background:#2c4470;border-radius:3px;box-shadow:0 0 0 8px rgba(201,138,94,.5),0 0 0 18px rgba(22,41,79,.5)"></div>',
+   memories:'<div style="position:absolute;inset:10% 20%;background:linear-gradient(135deg,#8a5f52,#16294f);border-radius:3px"></div><div style="position:absolute;bottom:16%;left:0;right:0;text-align:center;font-size:7px;color:#fff;font-weight:700;letter-spacing:1px">SUMMER 2024</div>',
+   panorama:'<div style="position:absolute;top:30%;bottom:30%;left:-20%;right:-20%;background:linear-gradient(90deg,#16294f,#c98a5e,#16294f)"></div>',
+   polaroid:'<div style="position:absolute;left:15%;top:15%;width:32%;height:52%;background:#fff;transform:rotate(-8deg);border-radius:2px"></div><div style="position:absolute;right:18%;top:22%;width:32%;height:52%;background:#fff;transform:rotate(6deg);border-radius:2px"></div>',
+   mosaic:'<div style="position:absolute;inset:6%;display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:2px"><div style="background:#c98a5e;grid-row:span 2"></div><div style="background:#2c4470"></div><div style="background:#1de9b6"></div><div style="background:#7c4dff"></div><div style="background:#ff9d5c"></div></div>',
+   filmstrip:'<div style="position:absolute;left:35%;top:14%;width:30%;height:72%;background:#c98a5e;border-radius:3px;box-shadow:0 0 20px rgba(201,138,94,.8)"></div><div style="position:absolute;left:8%;top:26%;width:20%;height:48%;background:#2c4470;border-radius:3px;opacity:.7"></div><div style="position:absolute;right:8%;top:26%;width:20%;height:48%;background:#16294f;border-radius:3px;opacity:.7"></div>',
+   cinema:'<div style="position:absolute;top:22%;bottom:22%;left:0;right:0;background:linear-gradient(135deg,#4a5a78,#16294f)"></div>',
+   heroSidebar:'<div style="position:absolute;left:5%;top:8%;bottom:8%;width:58%;background:#c98a5e;border-radius:3px"></div><div style="position:absolute;right:5%;top:8%;width:30%;height:40%;background:#2c4470;border-radius:3px"></div><div style="position:absolute;right:5%;bottom:8%;width:30%;height:40%;background:#1de9b6;border-radius:3px"></div>'};
+  return `<div class="mth">${P[id]||""}</div>`;
+}
+const SUBPAGES={
+mode:{t:"Screensaver Style",s:"Pick how your photos animate. Shuffle mixes them all. Tap Start to preview now.",
+  render(){ const c=S.ss;
+    return `<button class="btn blue wide" style="margin-bottom:16px" onclick="toast('Starting screensaver preview…')">▶&ensp;Start screensaver now</button>`+
+      card(MODES.map(([id,l,d],i)=>`<div class="rowc tap ${i===0?'nob':''}" onclick="${on(()=>{c.mode=id;render()})}">
+        ${modeThumb(id)}<div class="rt" style="font-weight:${c.mode===id?700:500}">${l}<div class="sub">${d}</div></div>
+        ${c.mode===id?'<span class="ck">✓</span>':''}</div>`).join(""));
+  }},
+face:{t:"Clock Face",s:"Choose how the time looks on your screensaver.",
+  render(){ const c=S.ss;
+    let out=card(tgl("Show a clock face",c.facesOn,v=>c.facesOn=v,{nob:1}));
+    if(c.facesOn){
+      out+=card(FACES.map(([id,n,tag],i)=>`<div class="rowc tap ${i===0?'nob':''}" onclick="${on(()=>{c.face=id;render()})}">
+        <div class="rt" style="font-weight:${c.face===id?700:500}">${n}<div class="sub">${tag}</div></div>
+        ${c.face===id?'<span class="ck">✓</span>':''}</div>`).join(""));
+      const f=FACES.find(f=>f[0]===c.face);
+      if(f[3])out+=card(stp("Size",["Small","Medium","Large"][c.faceSize],()=>c.faceSize=Math.max(0,c.faceSize-1),()=>c.faceSize=Math.min(2,c.faceSize+1)));
+    } else out+=`<div style="color:var(--t-tertiary);font-size:13.5px;padding:8px 4px 14px">Photos only — no clock or widgets on the screensaver. The now-playing card still follows its own switch in screensaver settings.</div>`;
+    out+=`<button class="btn blue wide" style="margin-top:8px" onclick="toast('Previewing clock face…')">Preview</button>`;
+    out+=foot("More faces — and premium layouts — are coming. Your photos keep showing behind the clock; the flip clock takes over the whole screen on its own.");
+    return out;
+  }},
+sources:{t:"Photo Source",s:"Choose where your screensaver photos come from.",
+  render(){ const c=S.ss;
+    let out=card(nav2("Set up from your phone","",()=>push("remote"),{nob:1,sub:"Pair the phone remote, then enter Immich keys, NAS details, a link, or the calendar from another device on your Wi-Fi."}));
+    out+=lbl("STANDARD")+card(
+      radio("Immortal photos","A calming built-in photo feed (no setup).",c.source==="default",()=>{c.source="default";render()})+
+      radio("My photos & videos",c.source==="folder"?(c.folderPath||"/storage/Photos")+" — 412 items":"Pick a folder of your photos and videos on your Portal.",c.source==="folder",()=>{c.source="folder";c.folderPath="/storage/Photos";render()})+
+      (c.source==="folder"?`<div class="rowc tap" onclick="toast('Would open the folder browser')"><div class="rt" style="color:var(--cyan)">Choose a different folder…</div></div>`:"")+
+      radio("Shared album link",c.source==="album"?(c.albumUrl?"iCloud — "+c.albumUrl.slice(0,28)+"…":"No link yet — tap to paste one."):"Paste a public iCloud or Google Photos share link.",c.source==="album",()=>{c.source="album";render()})+
+      (c.source==="album"?
+        stp("Refresh album",c.albumRefresh<60?c.albumRefresh+"m":(c.albumRefresh/60)+"h",
+          ()=>{const st=[15,30,45,60,120,180,240,360,720,1440];c.albumRefresh=st[Math.max(0,st.indexOf(c.albumRefresh)-1)]},
+          ()=>{const st=[15,30,45,60,120,180,240,360,720,1440];c.albumRefresh=st[Math.min(st.length-1,st.indexOf(c.albumRefresh)+1)]})+
+        `<div class="rowc tap" onclick="${on(()=>push("albumurl"))}"><div class="rt" style="color:var(--cyan)">Paste a different link…</div></div>`:""));
+    out+=lbl("ADVANCED")+foot("Self-hosted sources — pull from your own server or NAS, or point the screensaver at a web frame like Immich Kiosk. These are on your local network.")+card(
+      radio("Immich server",c.source==="immich"?(c.immich.album?`Connected — album “${c.immich.album}”`:"Connected — whole library"):"Pull photos from your self-hosted Immich server.",c.source==="immich",()=>{if(c.immich.connected){c.source="immich";render()}else push("immich")})+
+      (c.source==="immich"?`<div class="rowc tap" onclick="${on(()=>push("immich"))}"><div class="rt" style="color:var(--cyan)">Change Immich server or album…</div></div>`:"")+
+      radio("Network share (NAS)",c.source==="smb"?`Connected — \\\\${c.smb.host}\\${c.smb.share}`:"Show photos from a folder on your NAS over the network.",c.source==="smb",()=>{if(c.smb.connected){c.source="smb";render()}else push("smb")})+
+      (c.source==="smb"?`<div class="rowc tap" onclick="${on(()=>push("smb"))}"><div class="rt" style="color:var(--cyan)">Change network share…</div></div>`:"")+
+      radio("WebDAV folder",c.source==="dav"?"Connected — "+(c.dav.url.slice(0,32)||"")+"…":"Show photos from a WebDAV share or Nextcloud.",c.source==="dav",()=>{if(c.dav.connected){c.source="dav";render()}else push("dav")})+
+      (c.source==="dav"?`<div class="rowc tap" onclick="${on(()=>push("dav"))}"><div class="rt" style="color:var(--cyan)">Change WebDAV folder…</div></div>`:"")+
+      radio("Web page",c.source==="web"?(c.web.url||""):"Render any web page (Immich Kiosk, a dashboard) as the screensaver.",c.source==="web",()=>push("weburl"))+
+      (c.source==="web"?`<div class="rowc tap" onclick="${on(()=>push("weburl"))}"><div class="rt" style="color:var(--cyan)">Change web page…</div></div>`:""));
+    out+=foot("If a source can't be read (server offline, drive unplugged), Immortal falls back to its built-in photos so the frame is never blank.");
+    return out;
+  }},
+immich:{t:"Immich Server",s:"Pull photos straight from your self-hosted Immich server. Enter its address and an API key (Immich → Account Settings → API Keys).",
+  render(){ const c=S.ss.immich;
+    if(!c.connected)return card(
+      field("http://192.168.1.50:2283",c.url,v=>c.url=v)+field("API key",c.key,v=>c.key=v,{pass:1})+
+      `<div style="padding:8px 15px 14px;display:flex;gap:10px"><button class="btn blue" onclick="${on(()=>{if(!c.url)return toast("Enter the server address");c.connected=true;S.ss.source="immich";render()})}">Test &amp; connect</button>
+      <button class="btn grey" onclick="popPage()">Done</button></div>`);
+    return `<div style="color:var(--t-secondary);font-size:14px;margin-bottom:12px">Connected. Choose what to show:</div>`+card(
+      radio("Whole library","All your photos",!c.album,()=>{c.album="";render()})+
+      radio("Family 2025","218 photos",c.album==="Family 2025",()=>{c.album="Family 2025";render()})+
+      radio("Trips","1,043 photos",c.album==="Trips",()=>{c.album="Trips";render()})+
+      radio("Kids","486 photos",c.album==="Kids",()=>{c.album="Kids";render()}))+
+      `<button class="btn grey wide" style="margin-top:12px" onclick="popPage()">Done</button>`;
+  }},
+smb:{t:"Network Share (NAS)",s:"Show photos from a folder on your NAS over your local network (SMB).",
+  render(){ const c=S.ss.smb;
+    return card(
+      field("Server (e.g. 192.168.1.50)",c.host,v=>c.host=v)+field("Share name (e.g. media)",c.share,v=>c.share=v)+
+      field("Folder in the share (optional, e.g. photos)",c.folder,v=>c.folder=v)+
+      field("Username",c.user,v=>c.user=v)+field("Password","",()=>{},{pass:1})+
+      `<div style="padding:8px 15px 14px;display:flex;gap:10px"><button class="btn blue" onclick="${on(()=>{if(!c.host||!c.share)return toast("Enter the server and share name");c.connected=true;S.ss.source="smb";toast("Connected — found 1,204 photos");render()})}">Test &amp; connect</button>
+      <button class="btn grey" onclick="popPage()">Cancel</button></div>`);
+  }},
+dav:{t:"WebDAV Folder",s:"Show photos from a WebDAV folder — a NAS WebDAV share or Nextcloud.",
+  render(){ const c=S.ss.dav;
+    return card(
+      field("http://nas:30035/share/photos/",c.url,v=>c.url=v)+
+      field("Username (optional)",c.user,v=>c.user=v)+field("Password (optional)","",()=>{},{pass:1})+
+      `<div style="padding:8px 15px 14px;display:flex;gap:10px"><button class="btn blue" onclick="${on(()=>{if(!c.url)return toast("Enter the folder address");c.connected=true;S.ss.source="dav";toast("Connected — found 890 photos");render()})}">Test &amp; connect</button>
+      <button class="btn grey" onclick="popPage()">Cancel</button></div>`);
+  }},
+weburl:{t:"Web Page",s:"Show any web page as your screensaver — Immortal displays it fullscreen and the page provides its own clock and layout. Great for Immich Kiosk or a Home Assistant dashboard. Tap the screen to exit.",
+  render(){ const c=S.ss.web;
+    const ok=/^https?:\/\/.+/.test(c.url);
+    return card(field("http://192.168.1.50:3000",c.url,v=>c.url=v)+
+      `<div style="padding:0 15px 10px;font-size:13px;color:${c.url?(ok?"#4cd964":"#ff8a80"):"var(--t-tertiary)"}">${c.url?(ok?"Looks good.":"Start the address with http:// or https://."):"Enter the full address, starting with http:// or https://."}</div>`)+
+      `<div style="display:flex;gap:10px;margin-top:10px"><button class="btn ${ok?'blue':'grey'}" onclick="${on(()=>{if(!ok)return;S.ss.source="web";popPage()})}">Use this page</button>
+      <button class="btn grey" onclick="popPage()">Cancel</button></div>`;
+  }},
+albumurl:{t:"Shared Album Link",s:"Paste a public link from iCloud Shared Albums or Google Photos. Make sure it's shared as \"anyone with the link\" — Immortal can't sign in.",
+  render(){ const c=S.ss;
+    const prov=c.albumUrl.includes("icloud")?"iCloud":c.albumUrl.includes("google")||c.albumUrl.includes("goo.gl")?"Google Photos":null;
+    return card(field("https://photos.icloud.com/shared/album/…",c.albumUrl,v=>c.albumUrl=v)+
+      `<div style="padding:0 15px 10px;font-size:13px;color:${c.albumUrl?(prov?"#4cd964":"#ff8a80"):"var(--t-tertiary)"}">${c.albumUrl?(prov?`Looks like a ${prov} link.`:"That doesn't look like a supported share link yet."):"Examples: iCloud Shared Album, Google Photos shared album."}</div>`)+
+      `<div style="display:flex;gap:10px;margin:10px 0 18px"><button class="btn ${prov?'blue':'grey'}" onclick="${on(()=>{if(!prov)return;c.source="album";popPage()})}">Use this album</button>
+      <button class="btn grey" onclick="popPage()">Cancel</button></div>`+
+      `<div style="font-size:13px;color:var(--t-tertiary);line-height:1.6"><b style="color:var(--t-secondary)">How to get a link:</b><br/>
+      • iPhone Photos: open the shared album → People tab → Share Link.<br/>
+      • Google Photos: open the album → ⋮ → Share → Get link.</div>`;
+  }},
+calurl:{t:"Calendar Link",s:"Paste a private iCalendar (.ics) link from Google Calendar or Apple iCloud. Immortal reads it directly — it can't sign in to your account.",
+  render(){ const c=S.cal;
+    const ok=/\.ics(\?|$)|calendar\.google|icloud\.com/.test(c.url)&&/^(https?|webcal):\/\//.test(c.url);
+    const prov=c.url.includes("google")?"Google Calendar":c.url.includes("icloud")?"Apple iCloud":null;
+    return card(field("https://calendar.google.com/calendar/ical/…/basic.ics",c.url,v=>c.url=v)+
+      `<div style="padding:0 15px 10px;font-size:13px;color:${c.url?(ok?"#4cd964":"#ff8a80"):"var(--t-tertiary)"}">${c.url?(ok?`Looks like a ${prov||"calendar"} link.`:"That doesn't look like a calendar (.ics) link yet."):"Examples: Google “secret address in iCal format”, Apple iCloud public calendar."}</div>`)+
+      `<div style="display:flex;gap:10px;margin:10px 0 18px"><button class="btn ${ok?'blue':'grey'}" onclick="${on(()=>{if(ok)popPage()})}">Use this calendar</button>
+      ${c.url?`<button class="btn grey" style="color:#ff8a80" onclick="${on(()=>{c.url="";popPage()})}">Remove calendar</button>`:""}
+      <button class="btn grey" onclick="popPage()">Cancel</button></div>`+
+      `<div style="font-size:13px;color:var(--t-tertiary);line-height:1.6"><b style="color:var(--t-secondary)">How to get a link:</b><br/>
+      • Google Calendar: Settings → your calendar → “Integrate calendar” → “Secret address in iCal format” (keep it private).<br/>
+      • Apple iCloud: Calendar → share icon → “Public Calendar” → Copy Link (webcal:// works too).</div>`;
+  }},
+dismiss:{t:"Open When Dismissed",s:"Choose what opens when you tap the screensaver to wake the Portal.",
+  render(){ const c=S.ss;
+    const APPS=["Home Assistant","Jellyfin","Music Assistant","NewPipe","VLC"];
+    let out=lbl("HOME ASSISTANT")+card(
+      radio("Home Assistant","Open your Home Assistant dashboard on tap.",c.dismiss==="Home Assistant",()=>{c.dismiss="Home Assistant";render()},
+        `<div class="badge3" style="background:#41BDF5">${I.homeS.replace('currentColor','#fff')}</div>`)+
+      (c.dismiss==="Home Assistant"?field("today-home/security",c.haDash,v=>c.haDash=v,{label:"Dashboard"})+
+        help("The path after your Home Assistant address (e.g. lovelace/0). Leave blank to open your default dashboard."):""));
+    out+=lbl("OR AN APP")+card(
+      radio("Immortal launcher","Return to your home screen (default).",c.dismiss==="Immortal launcher",()=>{c.dismiss="Immortal launcher";render()},
+        `<div class="badge3" style="background:#0A84FF">∞</div>`)+
+      APPS.filter(a=>a!=="Home Assistant").map((a,i)=>radio(a,"",c.dismiss===a,()=>{c.dismiss=a;popPage()},
+        `<div class="badge3" style="background:${["#5E5CE6","#FF9F0A","#FF453A","#FF6B35"][i]}">${a[0]}</div>`)).join(""));
+    return out;
+  }},
+remote:{t:"Control From Your Phone",s:"Use a phone or tablet on the same Wi-Fi as a remote for this Portal — nav buttons and an app launcher, no extra app to install.",
+  render(){
+    return `<div style="display:flex;gap:26px;align-items:flex-start">
+      <div class="card" style="padding:22px;text-align:center;flex:none">
+        <div style="width:190px;height:190px;border-radius:12px;background:#fff;display:grid;place-items:center;margin-bottom:12px">
+          <svg width="150" height="150" viewBox="0 0 29 29" shape-rendering="crispEdges"><rect width="29" height="29" fill="#fff"/><path fill="#000" d="M0 0h7v1H0zM10 0h2v1h-2zM14 0h1v1h-1zM17 0h3v1h-3zM22 0h7v1h-7zM0 1h1v1H0zM6 1h1v1h-1zM8 1h3v1H8zM13 1h3v1h-3zM18 1h1v1h-1zM22 1h1v1h-1zM28 1h1v1h-1zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1h-1zM9 2h2v1H9zM12 2h2v1h-2zM15 2h2v1h-2zM19 2h2v1h-2zM22 2h1v1h-1zM24 2h3v1h-3zM28 2h1v1h-1zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1h-1zM8 3h1v1H8zM11 3h1v1h-1zM14 3h4v1h-4zM19 3h1v1h-1zM22 3h1v1h-1zM24 3h3v1h-3zM28 3h1v1h-1zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1h-1zM9 4h3v1H9zM13 4h1v1h-1zM16 4h2v1h-2zM20 4h1v1h-1zM22 4h1v1h-1zM24 4h3v1h-3zM28 4h1v1h-1zM0 5h1v1H0zM6 5h1v1h-1zM8 5h2v1H8zM12 5h2v1h-2zM15 5h1v1h-1zM17 5h2v1h-2zM22 5h1v1h-1zM28 5h1v1h-1zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h7v1h-7zM9 7h2v1H9zM13 7h3v1h-3zM17 7h1v1h-1zM19 7h2v1h-2zM0 8h2v1H0zM3 8h4v1H3zM8 8h3v1H8zM12 8h1v1h-1zM15 8h2v1h-2zM19 8h3v1h-3zM23 8h2v1h-2zM26 8h2v1h-2z"/></svg>
+        </div>
+        <div style="font-size:13px;color:var(--t-tertiary)">Scan with your phone camera</div></div>
+      <div style="flex:1">
+        <div style="font-size:14px;color:var(--t-secondary);line-height:1.6">…or open <b style="color:#fff">http://192.168.1.42:8722/remote/ui</b> and enter the code:</div>
+        <div style="font-size:44px;font-weight:700;letter-spacing:10px;color:var(--cyan);margin:18px 0 6px">4 8 A 2 K 7</div>
+        <div style="font-size:12.5px;color:var(--t-tertiary)">Code expires in a few minutes.</div>
+        <button class="btn blue" style="margin-top:22px" onclick="popPage()">Done</button></div></div>`;
+  }},
+};
+
+/* =========================================================
+   ROUTER & RENDER
+   ========================================================= */
+const stack=[];
+function push(p){stack.push(p);render()}
+function popPage(){stack.pop();render()}
+function render(){
+  H.length=0;uid=0;
+  renderNav();
+  document.getElementById("dt").textContent=S.section;
+  document.getElementById("ds").textContent=SUBTITLES[S.section]||"";
+  document.getElementById("ds").style.display=SUBTITLES[S.section]?"block":"none";
+  const body=document.getElementById("dbody");
+  const keep=body.scrollTop;
+  document.getElementById("dc").innerHTML=SECTIONS[S.section]?SECTIONS[S.section]():"";
+  body.scrollTop=keep;
+  const sub=document.getElementById("sub");
+  if(stack.length){
+    const p=SUBPAGES[stack[stack.length-1]];
+    sub.classList.add("open");
+    document.getElementById("st").textContent=p.t;
+    document.getElementById("ss").textContent=p.s;
+    document.getElementById("sc").innerHTML=p.render();
+  } else sub.classList.remove("open");
+}
+document.addEventListener("click",()=>document.querySelectorAll(".ddmenu").forEach(m=>m.style.display="none"));
+document.getElementById("q").addEventListener("input",renderNav);
+document.getElementById("schic").innerHTML=I.search;
+render();
+</script>
+</body>
+</html>

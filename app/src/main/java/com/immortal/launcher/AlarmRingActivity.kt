@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -55,12 +58,14 @@ import kotlinx.coroutines.delay
 class AlarmRingActivity : ComponentActivity() {
   companion object {
     const val EXTRA_LABEL = "alarm_label"
-    private const val SNOOZE_RC = 0x5A1D
     private const val SNOOZE_MIN = 9
   }
+  private var preview = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    preview = intent.getBooleanExtra("tools_preview", false)
+    if (preview) applyToolsDisplayBars(this)
     // Show over the lock screen and wake the device.
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
@@ -72,25 +77,41 @@ class AlarmRingActivity : ComponentActivity() {
             WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
 
     val label = intent.getStringExtra(EXTRA_LABEL) ?: "Alarm"
+    val alarm = AlarmConfig.load(this)
+    val previewTime = String.format(Locale.getDefault(), "%02d:%02d", alarm.hour, alarm.minute)
     setContent {
       PortalPrimeTheme(darkTheme = true) {
-        AlarmRingScreen(label = label, onDismiss = ::dismiss, onSnooze = ::snooze)
+        CompositionLocalProvider(LocalApprovedPalette provides ApprovedToolsPalette) {
+          AlarmRingScreen(label, preview, previewTime, onDismiss = ::dismiss, onSnooze = ::snooze)
+        }
       }
     }
   }
 
+  override fun onResume() {
+    super.onResume()
+    if (preview) applyToolsDisplayBars(this)
+  }
+
+  override fun onWindowFocusChanged(hasFocus: Boolean) {
+    super.onWindowFocusChanged(hasFocus)
+    if (preview && hasFocus) applyToolsDisplayBars(this)
+  }
+
   private fun dismiss() {
-    AlarmSound.stop(this)
+    if (!preview) { AlarmSound.stop(this); AlarmReceiver.clearNotification(this) }
     finish()
   }
 
   private fun snooze() {
+    if (preview) { finish(); return }
     AlarmSound.stop(this)
+    AlarmReceiver.clearNotification(this)
     val at = System.currentTimeMillis() + SNOOZE_MIN * 60_000L
-    val intent = Intent(this, AlarmReceiver::class.java).setAction(AlarmScheduler.ACTION_FIRE)
+    val intent = Intent(this, AlarmReceiver::class.java).setAction(AlarmScheduler.ACTION_SNOOZE)
     val pi =
         PendingIntent.getBroadcast(
-            this, SNOOZE_RC, intent,
+            this, AlarmScheduler.SNOOZE_RC, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     val am = getSystemService(AlarmManager::class.java)
     runCatching { am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi) }
@@ -98,65 +119,54 @@ class AlarmRingActivity : ComponentActivity() {
     finish()
   }
 
-  override fun onDestroy() {
-    super.onDestroy()
-    // Safety net: ensure the sound is stopped if the screen goes away by any path.
-    AlarmSound.stop(this)
-  }
+  // Dismiss/Snooze own ringing cleanup. Activity recreation must preserve the
+  // active alert; AlarmSound also has its independent two-minute auto-silence.
 }
 
 @Composable
-private fun AlarmRingScreen(label: String, onDismiss: () -> Unit, onSnooze: () -> Unit) {
+private fun AlarmRingScreen(label: String, preview: Boolean, previewTime: String, onDismiss: () -> Unit, onSnooze: () -> Unit) {
+  BackHandler(onBack = onDismiss)
   var now by remember { mutableStateOf(Date()) }
-  LaunchedEffect(Unit) {
-    while (true) {
+  LaunchedEffect(preview) {
+    while (!preview) {
       now = Date()
       delay(1000)
     }
   }
-  val timeFmt = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
+  val timeFmt = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
 
   Box(
-      modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0F)),
+      modifier = Modifier.fillMaxSize().background(ApprovedToolsPalette.background),
       contentAlignment = Alignment.Center,
   ) {
+    Column(Modifier.fillMaxSize()) {
+    ToolsDisplayHeader("‹ Alarm", if (preview) "Alarm preview" else label, onDismiss)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth().padding(32.dp),
+        modifier = Modifier.fillMaxWidth().weight(1f).padding(32.dp),
     ) {
       Text(
-          text = timeFmt.format(now),
+          text = if (preview) previewTime else timeFmt.format(now),
           color = Color.White,
-          fontSize = 72.sp,
-          fontWeight = FontWeight.Bold,
+          fontSize = 112.sp,
+          fontWeight = FontWeight.Medium,
           textAlign = TextAlign.Center,
       )
       Spacer(Modifier.height(16.dp))
       Text(
-          text = label,
+          text = if (preview) "Your alarm is ringing" else label,
           color = Color(0xCCFFFFFF),
-          fontSize = 22.sp,
+          fontSize = 30.sp,
           textAlign = TextAlign.Center,
       )
-      Spacer(Modifier.height(48.dp))
-      Button(
-          onClick = onDismiss,
-          modifier = Modifier.fillMaxWidth().widthIn(max = 360.dp).height(72.dp),
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252)),
-          contentPadding = PaddingValues(vertical = 16.dp),
-      ) {
-        Text("Dismiss", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+      if (preview) ToolsText("Preview only · no sound or real alarm scheduled", true, Modifier.padding(top = 20.dp))
+      Spacer(Modifier.height(40.dp))
+      androidx.compose.foundation.layout.Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        ToolsButton("Dismiss", primary = true, onClick = onDismiss)
+        ToolsButton("Snooze 9 minutes", onClick = onSnooze)
       }
-      Spacer(Modifier.height(16.dp))
-      Button(
-          onClick = onSnooze,
-          modifier = Modifier.fillMaxWidth().widthIn(max = 360.dp).height(64.dp),
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A33)),
-          contentPadding = PaddingValues(vertical = 14.dp),
-      ) {
-        Text("Snooze 9 min", color = Color.White, fontSize = 20.sp)
-      }
+    }
     }
   }
 }

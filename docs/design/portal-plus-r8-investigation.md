@@ -29,8 +29,16 @@ The narrowly scoped rules are based on the locally resolved dependency bytecode:
   completing. The screening candidate therefore retains Kotlin runtime names
   and members with optimization allowed. This accommodation is benchmark-only
   and means the candidate is not an exact prospective shipping R8 artifact.
-  Shipping validation requires a test artifact built against its matching
+Shipping validation requires a test artifact built against its matching
   optimized application, or an independent framework-only probe.
+
+The rebuilt artifact `bade4da2217d7ead65a5a3654ecbaccf3a1453245b8ebbe2667503d8f6fd9e6a`
+installed and independently matched its hash. One Settings trial completed:
+120 valid frames, p95 elapsed proxy 38.51 ms, maximum 49.96 ms, 36/120 over
+the measured 16.666666 ms screening budget. CPU-stage elapsed proxy p95 was
+28.50 ms. It therefore still fails the target. This is a single screening
+trial, not three paired trials or a comparative improvement claim. The debug
+APK `5f1de1a9…` and original widget bytes were restored afterward.
 
 The rules suppress only the two proven optional missing API families. They
 neither supply those APIs nor make Kerberos or expression filters work on

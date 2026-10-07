@@ -27,6 +27,7 @@ report is the newer evidence checkpoint.
 | Browser preview | 101 assertions, zero browser errors | Preview behavior with sample fixtures; no native geometry, input or rendering pass |
 | Historical timing | Settings p95 34.14 ms on `93a6c45d…`; paging p95 58.75 ms and tabs p95 62.14 ms on `7f9a9065…` | Earlier debug trials only; these exceed the historical assumed 60 Hz proxy budget. They cannot pass or fail final-APK timing |
 | New Settings timing | `409bd1f3…` debug p95 65.91 ms; `484c3cc4…` release-style p95 43.89 ms; observer-free shell-input debug p95 61.90 ms | All fail the measured 60 Hz proxy target; single trials are not matched comparative certification |
+| Optimized screening | `bade4da2…`, one Settings trial: p95 38.51 ms, 36/120 proxy frames over budget; debug APK/layout restored | Still fails the target; benchmark-only Kotlin ABI retention and incomplete provider/runtime checks prevent shipping certification |
 | Current-APK performance | Functional widget artifact `5f1de1a9…` unmeasured | Rendering, input latency, startup and cadence acceptance remain pending |
 
 **Overall gate: PENDING.** Preserve the reported passes above without extending
@@ -40,6 +41,15 @@ Route and registry ID sets were independently compared with source and matched.
 It records source discrepancies and runtime unknowns rather than inheriting
 earlier smoke-test results. Main owns live execution and records
 actual outcomes; this documentation task performs no device operations.
+
+The [widget size inventory](portal-plus-widget-size-inventory.md) expands the
+G8 source denominator to 14 built-ins × 16 admitted sizes: 224 family/size
+pairs and 448 normal/Customize states before font scale or content branches.
+Each actual Android provider adds 16 pairs / 32 mode states. These are required
+cases, not newly executed tests. Its T1–T11 checks cover body/label fit, editing
+targets, competing resize releases, remove-all recovery, differing editor
+handoffs and retained-page work. Keep the existing 62-assertion device subset
+separate from this full matrix.
 
 ## Sources and what transfers to Portal+
 
@@ -351,8 +361,8 @@ verdict. A test count without this mapping is supporting evidence only.
 | G0 Complete source/current-UI census | PENDING | Source route/registry sets mapped; installed-UI truth tables, dynamic instances and runtime coverage counts still need reconciliation |
 | G1–G7 Navigation, Apps, Tools, settings, conditions, dialogs | PENDING | Complete final-artifact state/entry/return evidence, beyond earlier smoke runs |
 | G8 LTR editing subset described in baseline | REPORTED PASS, limited scope | 62 current-APK assertions; preserve exact two-page/nine-widget, temporary oversized-fixture and named injected-pointer scope |
-| G8 Full editing gate | PENDING | Every family/size, RTL, interrupted/cancelled gestures and provider exceptions |
-| G9 Keyboard/accessibility | PENDING | IME/focus/semantics, text scale/contrast/reduced motion and available reader evidence |
+| G8 Full editing gate | PENDING | [Size inventory](portal-plus-widget-size-inventory.md): 224 built-in family/size pairs / 448 mode states before additional axes; every live provider, RTL, interrupted/cancelled gestures and body/action fit remain unmeasured |
+| G9 Keyboard/accessibility | PENDING | [Source contrast screen](portal-plus-contrast-audit.md) covers 59 opaque combinations; actual rendered bindings, IME/focus/semantics, text scale/reduced motion and available reader evidence remain pending |
 | G10/G15 Loading, cadence and resource behavior | PENDING | Actual failure/cancel/arrival/cadence/teardown observations and timings |
 | G11 Complete native geometry/visual acceptance | PENDING | All mapped destinations, popup states and keyboard/scale variants |
 | G12 Rendering/motion; G13 input; G14 startup | PENDING | Final-artifact measurements, verified cadence and shipping-build evidence |

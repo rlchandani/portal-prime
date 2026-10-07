@@ -21,8 +21,8 @@ val ApprovedLightPalette = ApprovedPalette(
     Color(0xFF182C39), Color(0xFF536674), Color(0xFFDCE3EB), Color(0xFF176ABB),
     Color(0xFFD7E7F8), Color(0xFF288B61), false)
 val ApprovedDarkPalette = ApprovedPalette(
-    Color(0xFF14262D), Color(0xFF162B34), Color(0xFF213840), Color(0xFF2B4650),
-    Color(0xFFF4F7F9), Color(0xFFB8C9D0), Color(0xFF38505B), Color(0xFF9ACAFF),
-    Color(0xFF34556F), Color(0xFF66C49E), true, Color(0xFFFF747D))
+    Color(0xFF14161B), Color(0xFF14161B), Color(0xFF2B2B2B), Color(0xFF363636),
+    Color.White, Color(0xFFB8B8B8), Color(0xFF484848), Color.White,
+    Color(0xFF414141), Color(0xFF66C49E), true, Color(0xFFFF747D))
 val LocalApprovedPalette = staticCompositionLocalOf { ApprovedLightPalette }
 val LocalAdvancedSettings = compositionLocalOf { false }

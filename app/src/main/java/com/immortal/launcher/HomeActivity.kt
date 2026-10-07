@@ -53,6 +53,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.focusable
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -60,6 +61,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,6 +72,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -123,6 +126,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -140,6 +144,8 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
@@ -150,6 +156,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onSizeChanged
@@ -328,7 +335,7 @@ class HomeActivity : ComponentActivity() {
       }
     }
     setContent {
-      PortalPrimeTheme(darkTheme = true) {
+      PortalPrimeTheme(darkTheme = false) {
         LauncherScreen(
             widgetLibraryRequest = widgetLibraryRequest,
             appsSearchOpenRequest = appsSearchOpenRequest,
@@ -339,6 +346,10 @@ class HomeActivity : ComponentActivity() {
                 if (cn == CALLS_COMPONENT) {
                   // The "Calls" tile: bridge to the stock Portal calling surface (trusted caller).
                   launchStockHome()
+                } else if (cn.packageName == JarvisHandoff.PACKAGE) {
+                  if (!JarvisHandoff.launch(this@HomeActivity))
+                    android.widget.Toast.makeText(this@HomeActivity, "Jarvis couldn’t be opened.",
+                        android.widget.Toast.LENGTH_LONG).show()
                 } else if (cn.packageName == packageName &&
                     cn.className == ImmortalSettingsActivity::class.java.name) {
                   // Our own iOS-style settings (exported=false, no LAUNCHER filter) — launch it
@@ -748,6 +759,7 @@ private fun ApprovedWidgetArea(
     onEnterEdit: () -> Unit,
     onPageChanged: (Int) -> Unit,
     navigation: ApprovedHomePagerNavigation,
+    preserveCounterFocus: Boolean,
     modifier: Modifier = Modifier,
 ) {
   var remove by remember { mutableStateOf<HomeWidgetStore.HomeWidget?>(null) }
@@ -761,8 +773,38 @@ private fun ApprovedWidgetArea(
     }
     val homeActive = LocalApprovedLauncherPageActive.current
     val focus = androidx.compose.ui.platform.LocalFocusManager.current
-    LaunchedEffect(page.index) { focus.clearFocus(force = true) }
-    BoxWithConstraints(modifier.clipToBounds()) {
+    val currentPage = rememberUpdatedState(page)
+    val pageChanged = rememberUpdatedState(onPageChanged)
+    val slide = remember { Animatable(page.index.toFloat()) }
+    val swipeThreshold = with(androidx.compose.ui.platform.LocalDensity.current) { 64.dp.toPx() }
+    LaunchedEffect(page.index, page.count) {
+      if (!preserveCounterFocus) focus.clearFocus(force = true)
+      // Removed widgets or numbered Move can skip pages outside the retained neighbors.
+      if (slide.value > prepared.lastIndex || abs(slide.value - page.index) > 1f)
+        slide.snapTo(page.index.toFloat())
+      else slide.animateTo(page.index.toFloat(), tween(180, easing = EaseOutCubic))
+    }
+    BoxWithConstraints(modifier.clipToBounds().semantics { contentDescription = "Home widgets" }
+        .then(if (!homeActive || page.count < 2) Modifier else Modifier.pointerInput(page.count) {
+          var distance = 0f
+          detectHorizontalDragGestures(
+              onDragStart = { distance = 0f },
+              onDragCancel = { distance = 0f },
+              onDragEnd = {
+                if (abs(distance) >= swipeThreshold) {
+                  val selected = currentPage.value
+                  // Match the requested physical direction: right advances, left returns.
+                  val next = (selected.index + if (distance > 0f) 1 else -1)
+                      .coerceIn(0, selected.count - 1)
+                  if (next != selected.index) pageChanged.value(next)
+                }
+                distance = 0f
+              },
+          ) { change, delta ->
+            change.consume()
+            distance += delta
+          }
+        })) {
       val widthPx = with(androidx.compose.ui.platform.LocalDensity.current) { maxWidth.toPx() }
       val first = (page.index - 1).coerceAtLeast(0)
       val last = (page.index + 1).coerceAtMost(prepared.lastIndex)
@@ -770,14 +812,15 @@ private fun ApprovedWidgetArea(
         val displayed = prepared[index]
         val selected = index == page.index
         val active = homeActive && selected
-        Box(Modifier.fillMaxSize().graphicsLayer {
-          translationX = when {
-            selected -> 0f
-            index < page.index -> -widthPx
-            else -> widthPx
-          }
-          alpha = if (selected) 1f else 0f
+        // Deferred placement caches the display list; the viewport clips off-screen pages.
+        Box(Modifier.fillMaxSize().absoluteOffset {
+          IntOffset(((slide.value - index) * widthPx).roundToInt(), 0)
         }.then(if (active) Modifier else Modifier.clearAndSetSemantics { })
+            .pointerInput(active) {
+              if (!active) awaitPointerEventScope {
+                while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
+              }
+            }
             .focusProperties { canFocus = active }) {
           CompositionLocalProvider(LocalApprovedWidgetPageInput provides active) {
             ApprovedWidgetPage(displayed, widgets, host, manager, onChanged,
@@ -800,7 +843,7 @@ private fun ApprovedWidgetArea(
           navigation.observe(index)?.let { pageChanged.value(it) }
       }
     }
-    HorizontalPager(pager, modifier.clipToBounds(), userScrollEnabled = false,
+    HorizontalPager(pager, modifier.clipToBounds().semantics { contentDescription = "Home widgets" }, userScrollEnabled = false,
         beyondViewportPageCount = 1) { index ->
       val active = LocalApprovedLauncherPageActive.current && index == pager.currentPage
       CompositionLocalProvider(LocalApprovedWidgetPageInput provides active) {
@@ -905,12 +948,18 @@ private fun ApprovedHomePagedWidgets(
     modifier: Modifier = Modifier,
 ) {
   var pageIndex by remember { mutableStateOf(0) }
+  var counterFocused by remember { mutableStateOf(false) }
   val navigation = remember { ApprovedHomePagerNavigation() }
   val page = remember(widgets, pageIndex) { HomePresentation.page(widgets, pageIndex) }
   LaunchedEffect(page.index) { pageIndex = page.index }
+  val changePage: (Int) -> Unit = { index ->
+    navigation.request(index)
+    pageIndex = index
+  }
   Column(modifier) {
     ApprovedWidgetArea(widgets, page, editMode, host, manager, onChanged,
-        onEnterEdit = onEnterEdit, onPageChanged = { pageIndex = it }, navigation = navigation,
+        onEnterEdit = onEnterEdit, onPageChanged = changePage, navigation = navigation,
+        preserveCounterFocus = counterFocused,
         modifier = Modifier.weight(1f).fillMaxWidth())
     Spacer(Modifier.height(if (compact) 16.dp else 26.dp))
     Row(Modifier.fillMaxWidth().height(if (compact) 44.dp else 52.dp),
@@ -918,15 +967,32 @@ private fun ApprovedHomePagedWidgets(
       Text("Favorite apps", color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 35.sp,
           fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
       if (editMode) ApprovedHomeTextButton("Add widget", onClick = onAddWidget)
-      ApprovedHomeTextButton("Previous", enabled = page.index > 0) {
-        navigation.request(page.index - 1)
-        pageIndex = page.index - 1
-      }
-      Text("${page.index + 1} of ${page.count}", color = ApprovedHomePalette.Text, fontSize = 24.sp)
-      ApprovedHomeTextButton("More widgets", enabled = page.index < page.count - 1) {
-        navigation.request(page.index + 1)
-        pageIndex = page.index + 1
-      }
+      Text("${page.index + 1} of ${page.count}", color = ApprovedHomePalette.Text, fontSize = 24.sp,
+          modifier = Modifier.padding(horizontal = 20.dp).semantics {
+            contentDescription = "Widget page ${page.index + 1} of ${page.count}"
+            customActions = buildList {
+              if (page.index > 0) add(CustomAccessibilityAction("Previous widget page") {
+                changePage(page.index - 1); true
+              })
+              if (page.index < page.count - 1) add(CustomAccessibilityAction("Next widget page") {
+                changePage(page.index + 1); true
+              })
+            }
+          }.onPreviewKeyEvent {
+            if (it.type != KeyEventType.KeyDown) false
+            else {
+              val target = when (it.key) {
+                Key.DirectionRight -> page.index + 1
+                Key.DirectionLeft -> page.index - 1
+                else -> return@onPreviewKeyEvent false
+              }.coerceIn(0, page.count - 1)
+              if (target == page.index) false
+              else {
+                changePage(target)
+                true
+              }
+            }
+          }.onFocusChanged { counterFocused = it.isFocused }.focusable())
       ApprovedHomeTextButton("All apps", onClick = onAllApps)
     }
   }
@@ -993,6 +1059,7 @@ private fun LauncherScreen(
   }
   var showSearch by remember { mutableStateOf(false) }
   var appsSearchRequest by remember { mutableStateOf(0) }
+  var toolsLibraryRequest by rememberSaveable { mutableStateOf(0) }
   var pendingSetting by remember { mutableStateOf<ApprovedSettingsSearchResult?>(null) }
   var searchApplyError by remember { mutableStateOf<String?>(null) }
   var showPair by remember { mutableStateOf(false) }
@@ -1100,7 +1167,9 @@ private fun LauncherScreen(
   BackHandler(enabled = editMode) { editMode = false }
   BackHandler(enabled = selectedTab != ApprovedLauncherTab.HOME) { onSelectTab(ApprovedLauncherTab.HOME) }
   CompositionLocalProvider(
-      com.immortal.launcher.ui.theme.LocalApprovedPalette provides ApprovedHomeTabPalette,
+      com.immortal.launcher.ui.theme.LocalApprovedPalette provides
+          if (com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark) ApprovedHomeTabPalette
+          else com.immortal.launcher.ui.theme.ApprovedLightPalette,
       LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = FontFamily.Default)) {
     Box(Modifier.fillMaxSize()) {
       // A single cached display list for the static/minute-updated wallpaper.
@@ -1109,7 +1178,6 @@ private fun LauncherScreen(
         Row(Modifier.fillMaxWidth().height(108.dp).padding(horizontal = 56.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-            Box(Modifier.width(25.dp).height(32.dp).border(2.dp, ApprovedHomePalette.Text, RoundedCornerShape(15.dp)))
             Text("immortal", color = ApprovedHomePalette.Text, fontSize = 30.sp, lineHeight = 40.sp,
                 fontWeight = FontWeight.Medium, letterSpacing = (-.6).sp)
             Box(Modifier.padding(horizontal = 12.dp).width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))
@@ -1120,17 +1188,18 @@ private fun LauncherScreen(
           Text(when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" }, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
           if (selectedTab == ApprovedLauncherTab.HOME)
             ApprovedHomeTextButton(if (editMode) "Done" else "Customize") { editMode = !editMode }
-          ApprovedHeaderButton("phone", "Connect your phone") {
+          ApprovedHeaderButton("remote", "Connect your phone") {
             val (url, pin) = enableRemoteAndMintPin(context)
             pairUrl = url; pairPin = pin; showPair = true
           }
           ApprovedHeaderButton("sleep", "Sleep screen") { showSleep = true }
+          ApprovedThemeButton()
           val hey by produceState<String?>(null, installedApps) { value = withContext(Dispatchers.IO) { heyPackage(context) } }
           hey?.let { pkg ->
             Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome)
                 .semantics { contentDescription = "Voice assistant" }
                 .tvFocusable(CircleShape, onLongClick = { openHeyPicker(context, pkg) }) { fireHey(context, pkg) },
-                contentAlignment = Alignment.Center) { MicGlyph() }
+                contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
           }
           if (settings.showMiniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(300.dp))
           ApprovedHeaderButton("search", "Search apps and settings") {
@@ -1146,9 +1215,12 @@ private fun LauncherScreen(
             ApprovedHomeGreeting(welcome, use24, compact = connected == false)
             Spacer(Modifier.height(if (connected == false) 16.dp else 28.dp))
             if (connected == false) {
-              Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFF463E2C))
+              val dark = com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark
+              Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
+                  .background(if (dark) Color(0xFF463E2C) else Color(0xFFF6EACF))
                   .padding(horizontal = 23.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("Offline. Saved photos remain available.", color = Color(0xFFF0D9AA), fontSize = 22.sp,
+                Text("Offline. Saved photos remain available.",
+                    color = if (dark) Color(0xFFF0D9AA) else Color(0xFF705215), fontSize = 22.sp,
                     modifier = Modifier.weight(1f))
                 ApprovedHomeTextButton("Connection help") { context.openApprovedHomeSettings("system") }
               }
@@ -1173,7 +1245,8 @@ private fun LauncherScreen(
               openSearchRequest = appsSearchOpenRequest,
               onSelectTab = { id -> ApprovedLauncherTab.fromId(id)?.let(onSelectTab) })
           ApprovedLauncherTab.TOOLS -> ApprovedToolsScreen(
-              onExit = { onSelectTab(ApprovedLauncherTab.HOME) }, embedded = true)
+              onExit = { onSelectTab(ApprovedLauncherTab.HOME) }, embedded = true,
+              libraryRequest = toolsLibraryRequest)
           }
         }
         Spacer(Modifier.height(24.dp))
@@ -1182,12 +1255,16 @@ private fun LauncherScreen(
             when (destination) {
               "apps" -> { editMode = false; onSelectTab(ApprovedLauncherTab.APPS) }
               "photo" -> onStartScreensaver()
-              "tools" -> { editMode = false; onSelectTab(ApprovedLauncherTab.TOOLS) }
+              "tools" -> {
+                editMode = false
+                if (selectedTab == ApprovedLauncherTab.TOOLS) toolsLibraryRequest++
+                else onSelectTab(ApprovedLauncherTab.TOOLS)
+              }
               else -> { editMode = false; onSelectTab(ApprovedLauncherTab.HOME) }
             }
           }
         }
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(16.dp))
       }
       if (showLibrary) ApprovedWidgetLibrary(LocalAdvancedSettings.current, homeWidgets, providers, room, connected,
           onAdd = { kind ->
@@ -1266,7 +1343,9 @@ private fun LauncherScreen(
         ApprovedHomeDialog("Advanced settings", { pendingSetting = null; searchApplyError = null }) {
           Text("Turn on Advanced settings to open ${result.title}. Your existing configuration stays in place.",
               color = ApprovedHomePalette.Secondary, fontSize = 23.sp, lineHeight = 32.sp)
-          searchApplyError?.let { Text(it, color = Color(0xFFFFC8B9), fontSize = 22.sp) }
+          searchApplyError?.let {
+            Text(it, color = com.immortal.launcher.ui.theme.LocalApprovedPalette.current.error, fontSize = 22.sp)
+          }
           Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             ApprovedHomeTextButton("Cancel") { pendingSetting = null; searchApplyError = null }
             ApprovedHomeTextButton("Turn on Advanced settings") {
@@ -2197,43 +2276,10 @@ private fun fireHey(context: android.content.Context, pkg: String) {
   context.sendBroadcast(Intent(HEY_TRIGGER_ACTION).setPackage(pkg))
 }
 
-// Jarvis (com.portal.assistant) exposes an exported WakeHandoffReceiver that starts its listening
-// service on this broadcast — the same hand-off portal-wake uses on gen1. These literal strings are
-// Jarvis's stable "wake contract" (WakeContract), so we mirror them rather than depend on it.
-private const val JARVIS_PKG = "com.portal.assistant"
-private const val JARVIS_WAKE_ACTION = "com.portal.wake.action.WAKE"
-private const val JARVIS_WAKE_EXTRA_ID = "com.portal.wake.extra.ID"
-
-/**
- * Trigger Jarvis. On this Portal (gen2 / Android 10) the OS silences a background sideloaded mic, so a
- * background WAKE broadcast just shows Jarvis's orange bar without actually hearing anything. Jarvis
- * only captures while its OWN UI is foreground — its MainActivity.onResume arms "hey jarvis" detection.
- * So we LAUNCH Jarvis to the foreground (mic works → say "hey jarvis" or tap its mic) rather than fire
- * the deaf background hand-off. Also send the WAKE broadcast as a hint for gen1 units where background
- * capture is allowed. Falls back to the generic launch intent if the explicit component is unavailable.
- */
 private fun triggerJarvis(context: android.content.Context) {
-  DreamPolicy.markBridge(context) // don't let the screensaver claw back over the Jarvis hand-off
-  val launched = runCatching {
-    context.startActivity(
-        Intent(Intent.ACTION_MAIN)
-            .addCategory(Intent.CATEGORY_LAUNCHER)
-            .setClassName(JARVIS_PKG, "$JARVIS_PKG.MainActivity")
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    true
-  }.getOrDefault(false)
-  if (!launched) {
-    runCatching {
-      context.packageManager.getLaunchIntentForPackage(JARVIS_PKG)
-          ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.let { context.startActivity(it) }
-    }
-  }
-  // Gen1 also gets the wake hint (harmless no-op on gen2 where the OS ignores the background mic).
-  runCatching {
-    context.sendBroadcast(
-        Intent(JARVIS_WAKE_ACTION).setPackage(JARVIS_PKG)
-            .putExtra(JARVIS_WAKE_EXTRA_ID, "immortal-quickcontrol"))
-  }
+  if (!JarvisHandoff.launch(context))
+    android.widget.Toast.makeText(context, "Jarvis couldn’t be opened.",
+        android.widget.Toast.LENGTH_LONG).show()
 }
 
 /** Millennium's assistant picker (premium: choose which assistant to talk to). */
@@ -2255,7 +2301,7 @@ private fun openHeyPicker(context: android.content.Context, pkg: String) {
 
 /** White line-art microphone glyph for the header "hey" button. */
 @Composable
-private fun MicGlyph() {
+private fun MicGlyph(tint: Color = Color.White) {
   Canvas(modifier = Modifier.size(28.dp)) {
     val w = size.minDimension
     val s = w * 0.08f
@@ -2267,7 +2313,7 @@ private fun MicGlyph() {
         )
     // Capsule mic body.
     drawRoundRect(
-        color = Color.White,
+        color = tint,
         topLeft = Offset(w * 0.38f, w * 0.16f),
         size = Size(w * 0.24f, w * 0.40f),
         cornerRadius = CornerRadius(w * 0.12f, w * 0.12f),
@@ -2275,7 +2321,7 @@ private fun MicGlyph() {
     )
     // Cradle arc hugging the bottom of the body.
     drawArc(
-        color = Color.White,
+        color = tint,
         startAngle = 20f,
         sweepAngle = 140f,
         useCenter = false,
@@ -2284,8 +2330,8 @@ private fun MicGlyph() {
         style = stroke,
     )
     // Stem + base.
-    drawLine(Color.White, Offset(w * 0.5f, w * 0.72f), Offset(w * 0.5f, w * 0.84f), strokeWidth = s)
-    drawLine(Color.White, Offset(w * 0.38f, w * 0.84f), Offset(w * 0.62f, w * 0.84f), strokeWidth = s)
+    drawLine(tint, Offset(w * 0.5f, w * 0.72f), Offset(w * 0.5f, w * 0.84f), strokeWidth = s)
+    drawLine(tint, Offset(w * 0.38f, w * 0.84f), Offset(w * 0.62f, w * 0.84f), strokeWidth = s)
   }
 }
 
@@ -3571,9 +3617,11 @@ private fun CryptoRow(q: CryptoFeed.Quote) {
 @Composable
 private fun ChangePill(pct: Double, modifier: Modifier = Modifier) {
   val up = pct >= 0
+  val palette = com.immortal.launcher.ui.theme.LocalApprovedPalette.current
+  val tint = if (up) palette.green else if (palette.dark) Color(0xFFFFC8B9) else palette.error
   Text(
       "%s%.1f%%".format(if (up) "+" else "−", kotlin.math.abs(pct)),
-      color = if (up) Color(0xFF66C49E) else Color(0xFFFFC8B9),
+      color = tint,
       fontSize = 18.sp,
       lineHeight = 24.sp,
       fontWeight = FontWeight.Medium,
@@ -3581,7 +3629,7 @@ private fun ChangePill(pct: Double, modifier: Modifier = Modifier) {
       modifier =
           modifier
               .clip(RoundedCornerShape(7.dp))
-              .background(if (up) Color(0x2466C49E) else Color(0x24FFC8B9))
+              .background(tint.copy(alpha = .14f))
               .padding(horizontal = 8.dp, vertical = 4.dp)
               .widthIn(min = 56.dp),
   )
@@ -3590,7 +3638,8 @@ private fun ChangePill(pct: Double, modifier: Modifier = Modifier) {
 /** A tiny price polyline, tinted by direction — the widget-row mini chart from the mock. */
 @Composable
 private fun Sparkline(points: List<Double>, up: Boolean, modifier: Modifier = Modifier) {
-  val color = if (up) Color(0xFF66C49E) else Color(0xFFFFC8B9)
+  val palette = com.immortal.launcher.ui.theme.LocalApprovedPalette.current
+  val color = if (up) palette.green else if (palette.dark) Color(0xFFFFC8B9) else palette.error
   Canvas(modifier) {
     val min = points.min()
     val max = points.max()
@@ -3997,10 +4046,12 @@ private fun HaTile(
     modifier: Modifier = Modifier,
     onToggle: () -> Unit,
 ) {
+  val palette = com.immortal.launcher.ui.theme.LocalApprovedPalette.current
   val bg = when {
     momentary -> ApprovedHomePalette.Selected
-    on -> Color(0xFF416E5E)
-    else -> Color(0xFF2D464E)
+    on -> if (palette.dark) palette.selected
+        else Color(0xFFD7EEE2)
+    else -> ApprovedHomePalette.Chrome
   }
   val fg = ApprovedHomePalette.Text
   val fgSub = ApprovedHomePalette.Secondary
@@ -4012,7 +4063,8 @@ private fun HaTile(
           .padding(20.dp),
       verticalArrangement = Arrangement.SpaceBetween,
   ) {
-    ApprovedHomeIcon(if (momentary) "tools" else "bulb", Modifier.size(32.dp), fg)
+    ApprovedHomeIcon(if (momentary) "tools" else "bulb", Modifier.size(32.dp),
+        if (palette.dark && known && on && !momentary) palette.green else fg)
     Column {
       Text(name, color = fg, fontSize = 23.sp, lineHeight = 30.sp,
           fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -4799,35 +4851,40 @@ private fun appWidgetMinDp(context: Context, raw: Int): Int {
 @Composable
 private fun ApprovedHeaderButton(icon: String, label: String, onClick: () -> Unit) {
   Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome)
-      .semantics { contentDescription = label }.tvFocusable(CircleShape, onClick = onClick),
+      .semantics { contentDescription = label }
+      .tvFocusable(CircleShape, ringColor = ApprovedHomePalette.Accent, onClick = onClick),
       contentAlignment = Alignment.Center) {
     ApprovedHomeIcon(icon, tint = ApprovedHomePalette.Text)
   }
 }
 
-/** Only the default Aurora treatment changes; every explicitly selected wallpaper still works. */
+/** A single day wash keeps chrome readable over every selected wallpaper; night is unchanged. */
 @Composable
 private fun ApprovedHomeBackground() {
   val context = androidx.compose.ui.platform.LocalContext.current
   var wallpaper by remember { mutableStateOf(WallpaperConfig.load(context)) }
   OnResume { wallpaper = WallpaperConfig.load(context) }
-  if (wallpaper.mode == WallpaperConfig.SKY) {
-    Box(Modifier.fillMaxSize()) {
-      ApprovedHomeSky()
-      ApprovedHomeBackgroundEffects(wallpaper.grain)
-    }
-  } else if (wallpaper.mode != WallpaperConfig.DUSK_AURORA) {
-    HomeBackground(Modifier.fillMaxSize())
-  } else {
-    // Frozen revision04 has a static teal-to-ember background, with no idle animation.
-    Box(Modifier.fillMaxSize().background(Brush.verticalGradient(
-        0f to Color(0xFF11212F), .7f to Color(0xFF213B42), 1f to Color(0xFF69453D)))) {
-      Canvas(Modifier.fillMaxSize()) {
-        drawRect(Brush.radialGradient(listOf(Color(0x5539646B), Color.Transparent),
-            center = Offset(size.width * .3f, size.height * .6f), radius = size.width * .55f))
+  val palette = com.immortal.launcher.ui.theme.LocalApprovedPalette.current
+  Box(Modifier.fillMaxSize()) {
+    if (wallpaper.mode == WallpaperConfig.SKY) {
+      Box(Modifier.fillMaxSize()) {
+        ApprovedHomeSky()
+        ApprovedHomeBackgroundEffects(wallpaper.grain)
       }
-      ApprovedHomeBackgroundEffects(wallpaper.grain)
+    } else if (wallpaper.mode != WallpaperConfig.DUSK_AURORA) {
+      HomeBackground(Modifier.fillMaxSize())
+    } else {
+      // Frozen revision04 has a static teal-to-ember background, with no idle animation.
+      Box(Modifier.fillMaxSize().background(Brush.verticalGradient(
+          0f to Color(0xFF11212F), .7f to Color(0xFF213B42), 1f to Color(0xFF69453D)))) {
+        Canvas(Modifier.fillMaxSize()) {
+          drawRect(Brush.radialGradient(listOf(Color(0x5539646B), Color.Transparent),
+              center = Offset(size.width * .3f, size.height * .6f), radius = size.width * .55f))
+        }
+        ApprovedHomeBackgroundEffects(wallpaper.grain)
+      }
     }
+    if (!palette.dark) Box(Modifier.matchParentSize().background(palette.background.copy(alpha = .92f)))
   }
 }
 

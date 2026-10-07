@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>iPadOS · Home & Dashboard</title>
+<link rel="stylesheet" href="ds.css"/>
+<style>
+  body { overflow: hidden; }
+  /* iPadOS home: a wallpaper, a status bar, a left widget rail, a right app grid, a floating dock. */
+  #wall { position: fixed; inset: 0; background:
+      radial-gradient(120% 90% at 15% 10%, #6db3f2 0%, #3a7bd5 45%, #2b5876 100%); }
+  #wall::after { content:""; position:absolute; inset:0; background:
+      radial-gradient(60% 50% at 80% 20%, rgba(255,255,255,0.25), transparent 60%); }
+  #statusbar { position: fixed; top: 0; left: 0; right: 0; height: 40px; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 26px; color: #fff; font-size: 15px; font-weight: 600; z-index: 20; text-shadow: 0 1px 3px rgba(0,0,0,.3); }
+  #stage { position: fixed; inset: 40px 0 0 0; display: flex; gap: 40px; padding: 28px 40px 0; }
+
+  /* ---- Left: widget rail ---- */
+  .rail { width: 500px; display: flex; flex-direction: column; gap: 20px; overflow: hidden; }
+  .widget { border-radius: var(--r-xl); padding: 18px 20px; color: #fff; box-shadow: 0 10px 30px -14px rgba(0,0,0,.5); }
+  .glass { background: rgba(255,255,255,0.16); backdrop-filter: blur(24px) saturate(1.5); -webkit-backdrop-filter: blur(24px) saturate(1.5); border: 1px solid rgba(255,255,255,0.22); }
+  .w-hero .time { font-size: 64px; font-weight: 200; letter-spacing: -2px; line-height: 1; }
+  .w-hero .sub { font-size: 17px; opacity: .9; margin-top: 2px; }
+  .w-row { display: flex; align-items: center; gap: 12px; font-size: 16px; padding: 5px 0; }
+  .w-row .lead { width: 26px; text-align: center; opacity: .95; }
+  .w-row .trail { margin-left: auto; opacity: .7; font-size: 14px; }
+  .w-title { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; opacity: .85; margin-bottom: 8px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* ---- Right: app grid ---- */
+  .grid-area { flex: 1; overflow: hidden; }
+  .appgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 30px 24px; }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 9px; }
+  .app .ic { width: 104px; height: 104px; }
+  .app .lbl { color: #fff; font-size: 15px; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,.4); max-width: 116px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ic svg { width: 54px; height: 54px; }
+  .ic { display: grid; place-items: center; }
+  .ic .em { font-size: 48px; }
+
+  /* ---- Dock ---- */
+  #dock { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 20;
+      display: flex; gap: 22px; padding: 14px 22px; border-radius: 30px;
+      background: rgba(255,255,255,0.28); backdrop-filter: blur(30px) saturate(1.7); -webkit-backdrop-filter: blur(30px) saturate(1.7);
+      border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 16px 50px -12px rgba(0,0,0,.45); }
+  #dock .ic { width: 76px; height: 76px; }
+  #dock .ic svg { width: 40px; height: 40px; }
+  #dock .ic .em { font-size: 36px; }
+  .badge { position: fixed; top: 46px; right: 40px; color: rgba(255,255,255,.7); font-size: 13px; letter-spacing: 1px; z-index: 30; }
+</style>
+</head>
+<body>
+  <div id="wall"></div>
+  <div id="statusbar"><div>Immortal</div><div>Sat, Aug 1</div><div>􀙇 &nbsp; 65°&nbsp; ▂▄▆</div></div>
+  <div class="badge">MOCK 01 · HOME & DASHBOARD</div>
+
+  <div id="stage">
+    <!-- Left widget rail -->
+    <div class="rail">
+      <div class="widget glass w-hero">
+        <div class="time">11:09</div>
+        <div class="sub">Good morning · Saturday, August 1</div>
+      </div>
+
+      <div class="widget glass">
+        <div class="w-row"><span class="lead">▸</span> No upcoming events</div>
+        <div class="w-row"><span class="lead">☀️</span> Feels like 65° <span class="trail">H:76° L:52°</span></div>
+        <div class="w-row"><span class="lead">🌖</span> Waning gibbous <span class="trail">↑5:45 ↓8:44</span></div>
+      </div>
+
+      <div class="two">
+        <div class="widget glass">
+          <div class="w-title" style="color:#ff9f0a">Alarm</div>
+          <div style="font-size:34px;font-weight:300">Off</div>
+          <div style="opacity:.7;font-size:13px;margin-top:2px">No alarm set</div>
+        </div>
+        <div class="widget glass" style="display:flex;gap:10px;justify-content:space-around;align-items:center">
+          <div style="text-align:center"><div style="font-size:26px">🕙</div><div style="font-size:12px;margin-top:4px">EDT</div></div>
+          <div style="text-align:center"><div style="font-size:26px">🕝</div><div style="font-size:12px;margin-top:4px">GMT+1</div></div>
+          <div style="text-align:center"><div style="font-size:26px">🕔</div><div style="font-size:12px;margin-top:4px">GMT+9</div></div>
+        </div>
+      </div>
+
+      <div class="widget glass">
+        <div class="w-title" style="color:#64d2ff">Home</div>
+        <div class="two" style="gap:12px">
+          <div style="background:rgba(255,255,255,.14);border-radius:12px;padding:12px"><div style="font-weight:600">Everything</div><div style="opacity:.7;font-size:13px">Turn off</div></div>
+          <div style="background:var(--blue);border-radius:12px;padding:12px"><div style="font-weight:600">Ambient</div><div style="opacity:.85;font-size:13px">On</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right app grid -->
+    <div class="grid-area">
+      <div class="appgrid" id="grid"></div>
+    </div>
+  </div>
+
+  <!-- Dock -->
+  <div id="dock" id="dockrow"></div>
+
+<script>
+function icon(bg, inner){ return `<div class="ic appicon ${bg}">${inner}</div>`; }
+const GEAR = '<svg viewBox="0 -960 960 960" fill="#fff"><path d="M421-80q-14 0-25-9t-13-23l-15-94q-19-7-40-19t-37-25l-86 40q-14 6-28 1.5T155-226L97-330q-8-13-4.5-27t15.5-23l80-59q-2-9-2.5-20.5T185-480q0-9 .5-20.5T188-521l-80-59q-12-9-15.5-23t4.5-27l58-104q8-13 22-17.5t28 1.5l86 40q16-13 37-25t40-18l15-95q2-14 13-23t25-9h118q14 0 25 9t13 23l15 94q19 7 40.5 18.5T669-710l86-40q14-6 27.5-1.5T804-734l59 104q8 13 4.5 27.5T852-580l-80 57q2 10 2.5 21.5t.5 21.5q0 10-.5 21t-2.5 21l80 58q12 8 15.5 22.5T863-330l-58 104q-8 13-22 17.5t-28-1.5l-86-40q-16 13-36.5 25.5T592-206l-15 94q-2 14-13 23t-25 9H421Zm59-270q54 0 92-38t38-92q0-54-38-92t-92-38q-54 0-92 38t-38 92q0 54 38 92t92 38Z"/></svg>';
+const GRID9 = '<svg viewBox="0 0 24 24" fill="#fff"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/></svg>';
+const apps = [
+  ["Calls","bg-green","<span class='em'>📞</span>"], ["Aurora","bg-purple","<span class='em'>🛍️</span>"],
+  ["Browser","bg-blue","<span class='em'>🌐</span>"], ["F-Droid","bg-indigo","<span class='em'>🤖</span>"],
+  ["Google","bg-gray","<span class='em'>🔎</span>"], ["Jarvis","bg-orange","<span class='em'>🎙️</span>"],
+  ["Files","bg-blue","<span class='em'>📁</span>"], ["NewPipe","bg-red","<span class='em'>▶️</span>"],
+  ["Portal","bg-teal",GEAR], ["PortalHub","bg-orange","<span class='em'>📻</span>"],
+  ["VLC","bg-orange","<span class='em'>🔶</span>"], ["Weather","bg-cyan","<span class='em'>🌤️</span>"],
+  ["Settings","bg-gray",GEAR], ["App Store","bg-indigo",GRID9], ["Home","bg-cyan","<span class='em'>🏠</span>"],
+  ["Tools","bg-teal","<span class='em'>🧰</span>"], ["Calendar","bg-red","<span class='em'>📅</span>"], ["Music","bg-pink","<span class='em'>🎵</span>"],
+];
+document.getElementById("grid").innerHTML = apps.map(([l,b,i])=>`<div class="app">${icon(b,i)}<div class="lbl">${l}</div></div>`).join("");
+const dock = [["Calls","bg-green","<span class='em'>📞</span>"],["Browser","bg-blue","<span class='em'>🌐</span>"],["Home","bg-cyan","<span class='em'>🏠</span>"],["Tools","bg-teal","<span class='em'>🧰</span>"],["Settings","bg-gray",GEAR]];
+document.getElementById("dock").innerHTML = dock.map(([l,b,i])=>icon(b,i)).join("");
+</script>
+</body>
+</html>

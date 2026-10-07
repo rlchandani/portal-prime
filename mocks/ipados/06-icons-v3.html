@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Dusk Aurora · App Icons</title>
+<link rel="stylesheet" href="aurora.css"/>
+<style>
+html,body{overflow-y:auto}
+.wrap{padding:70px 44px 60px;max-width:1300px;margin:0 auto}
+h1{font-size:32px;font-weight:700;letter-spacing:-.6px}
+.note{color:var(--t-secondary);font-size:15px;margin:6px 0 30px;max-width:760px;line-height:1.5}
+.sec{font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--t-tertiary);margin:30px 0 16px}
+.rowx{display:flex;gap:34px;flex-wrap:wrap}
+.spec{display:flex;flex-direction:column;align-items:center;gap:10px}
+.anat{border-radius:22px;padding:24px 28px;max-width:860px;
+  background:var(--glass-bg);backdrop-filter:blur(34px) saturate(1.5);-webkit-backdrop-filter:blur(34px) saturate(1.5);
+  border:.5px solid var(--glass-border);box-shadow:0 .5px 0 var(--glass-highlight) inset,0 22px 44px -18px rgba(0,0,0,.7)}
+.anat li{margin:7px 0;font-size:15px;color:rgba(255,255,255,.9);line-height:1.5}
+.anat b{color:#fff}
+/* size ramp demo */
+.ramp{display:flex;align-items:flex-end;gap:26px}
+.ramp .tile{border-radius:25%}
+</style>
+</head>
+<body>
+<div id="sky"></div><div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div><div id="stars"></div><div id="grain"></div>
+<div id="status"><div>Immortal</div><div>Saturday, August 1</div><div>65°&ensp;100%</div></div>
+<div class="badge" style="z-index:40">MOCK 06 v3 · APP ICONS</div>
+
+<div class="wrap">
+  <h1 class="up">App icons</h1>
+  <div class="note up" style="animation-delay:.05s">The approved system from the home screen: gradient squircles with a top gloss, deep soft shadow, and crisp white line glyphs. Stock apps get masked into the same shape so nothing breaks the grid.</div>
+
+  <div class="sec">Our apps — gradient tiles + line glyphs</div>
+  <div class="rowx" id="ours"></div>
+
+  <div class="sec">Tools &amp; utilities</div>
+  <div class="rowx" id="toolsr"></div>
+
+  <div class="sec">Size ramp — same asset at grid / dock / folder / settings-row scale</div>
+  <div class="ramp" id="ramp"></div>
+
+  <div class="sec">Anatomy</div>
+  <div class="anat up" style="animation-delay:.1s">
+    <ul>
+      <li><b>Shape:</b> squircle, corner radius ≈ 26% of size (96px grid tile → 25px)</li>
+      <li><b>Fill:</b> two-stop diagonal gradient (135°) in the app's accent — light stop top-left, saturated stop bottom-right</li>
+      <li><b>Gloss:</b> top-down white veil 35% → 6% → transparent by 60% height — the "3D candy" finish</li>
+      <li><b>Shadow:</b> 0 12px 24px −8px rgba(0,0,0,.65) — lifts the tile off the dark wallpaper</li>
+      <li><b>Glyph:</b> white line icon, 2px stroke, 50% of tile size, optically centered</li>
+      <li><b>Label:</b> Inter 13.5/500 at 92% white with a soft dark text-shadow</li>
+      <li><b>Compose port:</b> Box(brush gradient, clip RoundedCornerShape(26%)) + gloss overlay Box + Icon(vector) + shadow modifier — all existing primitives</li>
+    </ul>
+  </div>
+</div>
+
+<script src="aurora-icons.js"></script>
+<script>
+const spec=(l,g,ic)=>`<div class="spec up">${tile(g,ic)}<div class="applbl">${l}</div></div>`;
+document.getElementById("ours").innerHTML=[
+ ["Calls",G.green,I.phone],["Browser",G.blue,I.globe],["Jarvis",G.orange,I.mic],["Home",G.cyan,I.home],
+ ["Settings",G.gray,I.gear],["App Store",G.indigo,I.gridapps],["Calendar",G.red,I.cal],["Music",G.pink,I.music],
+].map(a=>spec(...a)).join("");
+document.getElementById("toolsr").innerHTML=[
+ ["Tools",G.teal,I.tools],["Calculator",G.slate,I.calc],["Timer",G.orange,I.timer],["Notes",G.yellow,I.notes],
+ ["Intercom",G.green,I.megaphone],["Bedtime",G.indigo,I.moonz],["Countdowns",G.pink,I.hourglass],["Casting",G.blue,I.tv],
+].map(a=>spec(...a)).join("");
+document.getElementById("ramp").innerHTML=[96,70,56,30].map(s=>
+ `<div class="spec"><div class="tile" style="width:${s}px;height:${s}px;background:${G.cyan}">${I.home.replace('width="48"','')}</div><div class="applbl" style="font-size:12px;color:var(--t-tertiary)">${s}px</div></div>`).join("");
+document.querySelectorAll("#ramp .tile svg").forEach((sv,i)=>{const s=[48,36,28,17][i];sv.style.width=s+"px";sv.style.height=s+"px";});
+</script>
+</body>
+</html>

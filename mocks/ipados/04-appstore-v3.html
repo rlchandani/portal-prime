@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Dusk Aurora · App Store</title>
+<link rel="stylesheet" href="aurora.css"/>
+<style>
+html,body{overflow:hidden}
+#panel{position:fixed;inset:64px 40px 28px;border-radius:28px;overflow-y:auto;
+  background:rgba(16,19,30,.66);backdrop-filter:blur(40px) saturate(1.5);-webkit-backdrop-filter:blur(40px) saturate(1.5);
+  border:.5px solid rgba(255,255,255,.14);
+  box-shadow:0 .5px 0 rgba(255,255,255,.2) inset,0 30px 80px -24px rgba(0,0,0,.85)}
+.wrap{max-width:1260px;margin:0 auto;padding:30px 44px 60px}
+.kicker{font-size:12px;font-weight:700;letter-spacing:1.6px;color:var(--t-tertiary)}
+.nav{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+.nav h1{font-size:36px;font-weight:800;letter-spacing:-.8px;margin-top:2px}
+.nav .srch{width:280px}
+
+/* ============ TODAY MOSAIC ============ */
+.mosaic{display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:210px 210px;gap:16px}
+.story{border-radius:24px;position:relative;overflow:hidden;padding:24px 26px;display:flex;flex-direction:column;
+  justify-content:flex-end;border:.5px solid rgba(255,255,255,.16);box-shadow:0 22px 50px -20px rgba(0,0,0,.75)}
+.story.tall{grid-row:span 2}
+.story .k{font-size:11px;font-weight:800;letter-spacing:1.6px;position:relative;opacity:.9}
+.story .h{font-size:27px;font-weight:800;letter-spacing:-.5px;line-height:1.08;margin:5px 0 4px;position:relative}
+.story .d{font-size:14px;color:rgba(255,255,255,.85);position:relative;max-width:400px;line-height:1.4}
+.story .foot{display:flex;align-items:center;gap:12px;margin-top:14px;position:relative}
+.story .aic{width:44px;height:44px;border-radius:11px;display:grid;place-items:center;position:relative;overflow:hidden;
+  box-shadow:0 8px 16px -6px rgba(0,0,0,.5)}
+.story .aic::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.32),transparent 60%)}
+.story .aic svg{width:23px;height:23px;position:relative;z-index:1}
+.story .fm .n{font-size:14.5px;font-weight:700}
+.story .fm .s{font-size:12px;color:rgba(255,255,255,.65)}
+.story .cta{margin-left:auto;background:rgba(255,255,255,.94);color:#0a1226;border-radius:16px;
+  padding:7px 20px;font-weight:800;font-size:14px}
+.story .cta.ghost{background:rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(8px)}
+/* app of the day: aurora night scene */
+.aotd{background:linear-gradient(180deg,#081020 0%,#122a52 52%,#2b4a74 78%,#c98a5e 108%)}
+.aotd .rib{position:absolute;width:900px;height:210px;left:-80px;top:-50px;transform:rotate(-8deg);filter:blur(46px);
+  opacity:.65;mix-blend-mode:screen;background:linear-gradient(90deg,transparent,#1de9b6 32%,#7c4dff 62%,transparent 90%)}
+.aotd .beam{position:absolute;right:-30px;top:20px;width:300px;height:300px;border-radius:50%;filter:blur(70px);
+  background:radial-gradient(circle,rgba(94,92,230,.5),transparent 70%)}
+/* game story: playful gradient + rings */
+.game{background:linear-gradient(150deg,#ff2d70 0%,#8b3ff5 100%)}
+.game .ring{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.25)}
+.game .r1{width:220px;height:220px;right:-60px;top:-70px}
+.game .r2{width:140px;height:140px;right:-10px;top:10px;border-color:rgba(255,255,255,.16)}
+/* collection story: icon cluster */
+.coll{background:linear-gradient(150deg,#0fb0c9 0%,#155e75 100%)}
+.coll .cluster{position:absolute;right:18px;top:18px;display:grid;grid-template-columns:repeat(2,44px);gap:8px;transform:rotate(6deg)}
+.coll .cluster div{width:44px;height:44px;border-radius:11px;box-shadow:0 8px 16px -6px rgba(0,0,0,.4);position:relative;overflow:hidden}
+.coll .cluster div::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.3),transparent 60%)}
+
+/* ============ RANKED CHART ============ */
+.sech{display:flex;align-items:baseline;justify-content:space-between;margin:36px 0 14px}
+.sech .t{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.sech .all{font-size:14px;color:var(--cyan);font-weight:600}
+.chart{display:grid;grid-template-columns:1fr 1fr;gap:0 36px}
+.crow{display:flex;align-items:center;gap:14px;padding:12px 6px;position:relative}
+.crow+.crow::before,.crow:nth-child(n+2)::before{content:"";position:absolute;top:0;left:66px;right:0;height:.5px;background:rgba(255,255,255,.08)}
+.crow .rank{font-size:17px;font-weight:800;color:var(--t-tertiary);width:22px;text-align:center;font-variant-numeric:tabular-nums}
+.crow .aic{width:52px;height:52px;border-radius:13px;display:grid;place-items:center;flex:none;position:relative;overflow:hidden;
+  box-shadow:0 8px 18px -8px rgba(0,0,0,.6)}
+.crow .aic::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,.05) 45%,transparent 62%)}
+.crow .aic svg{width:26px;height:26px;position:relative;z-index:1}
+.crow .meta{flex:1;min-width:0}
+.crow .meta .n{font-size:15.5px;font-weight:650}
+.crow .meta .d{font-size:12.5px;color:var(--t-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .stars{font-size:10.5px;color:var(--t-tertiary);letter-spacing:1px;margin-top:1px}
+.crow .stars b{color:#ffd66e;letter-spacing:0}
+.get{background:rgba(255,255,255,.12);color:var(--cyan);font-weight:800;font-size:13.5px;padding:6px 18px;border-radius:14px;flex:none}
+.get.open{color:rgba(255,255,255,.75)}
+
+/* ============ CATEGORY TILES ============ */
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.cat{border-radius:18px;padding:16px 18px;min-height:86px;position:relative;overflow:hidden;display:flex;
+  flex-direction:column;justify-content:flex-end;border:.5px solid rgba(255,255,255,.14);
+  box-shadow:0 14px 30px -14px rgba(0,0,0,.6)}
+.cat .n{font-size:16px;font-weight:750;position:relative}
+.cat .c{font-size:12px;color:rgba(255,255,255,.75);position:relative}
+.cat svg{position:absolute;right:12px;top:12px;width:26px;height:26px;opacity:.9}
+</style>
+</head>
+<body>
+<div id="sky"></div><div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div><div id="stars"></div><div id="grain"></div>
+<div id="status"><div>Immortal</div><div>Saturday, August 1</div><div>65°&ensp;100%</div></div>
+<div class="badge" style="z-index:40">MOCK 04 v3.1 · APP STORE</div>
+
+<div id="panel" class="up">
+  <div class="wrap">
+    <div class="nav">
+      <div><div class="kicker">SATURDAY, AUGUST 1</div><h1>Today</h1></div>
+      <div class="search srch" id="sch"></div>
+    </div>
+
+    <div class="mosaic">
+      <div class="story tall aotd up" style="animation-delay:.06s">
+        <div class="rib"></div><div class="beam"></div>
+        <div class="k" style="color:var(--teal)">APP OF THE DAY</div>
+        <div class="h">Your movies,<br/>your server,<br/>the big screen.</div>
+        <div class="d">Jellyfin turns the Portal into the family theater — no subscriptions, no ads, just your library.</div>
+        <div class="foot">
+          <div class="aic" id="a-jf"></div>
+          <div class="fm"><div class="n">Jellyfin</div><div class="s">Media & Entertainment</div></div>
+          <div class="cta">Install</div>
+        </div>
+      </div>
+      <div class="story game up" style="animation-delay:.12s">
+        <div class="ring r1"></div><div class="ring r2"></div>
+        <div class="k">PORTAL ORIGINAL</div>
+        <div class="h">Move your head.<br/>Munch the hippos.</div>
+        <div class="foot">
+          <div class="aic" id="a-hm"></div>
+          <div class="fm"><div class="n">HippoMuncher</div><div class="s">Uses the smart camera</div></div>
+          <div class="cta ghost">Play</div>
+        </div>
+      </div>
+      <div class="story coll up" style="animation-delay:.18s">
+        <div class="cluster" id="clus"></div>
+        <div class="k">COLLECTION</div>
+        <div class="h">The ambient starter kit</div>
+        <div class="d">6 apps that make an idle screen worth looking at.</div>
+        <div class="foot"><div class="cta ghost">See all</div></div>
+      </div>
+    </div>
+
+    <div class="sech up" style="animation-delay:.24s"><div class="t">Top on Portal</div><div class="all">See all ›</div></div>
+    <div class="chart up" style="animation-delay:.28s" id="chart"></div>
+
+    <div class="sech up" style="animation-delay:.34s"><div class="t">Browse</div></div>
+    <div class="cats up" style="animation-delay:.38s" id="cats"></div>
+  </div>
+</div>
+
+<script src="aurora-icons.js"></script>
+<script>
+document.getElementById("sch").innerHTML=I.search+" Apps, games, collections";
+document.getElementById("a-jf").innerHTML=`<div style="position:absolute;inset:0;background:${G.indigo}"></div>`+I.play;
+document.getElementById("a-hm").innerHTML=`<div style="position:absolute;inset:0;background:rgba(0,0,0,.3)"></div>`+I.game;
+document.getElementById("clus").innerHTML=[G.orange,G.indigo,G.teal,G.pink].map(g=>`<div style="background:${g}"></div>`).join("");
+const star="★★★★★";
+const capp=(rk,n,d,g,ic,cta,rating,count)=>`<div class="crow">
+  <div class="rank">${rk}</div>
+  <div class="aic" style="background:${g}">${ic}</div>
+  <div class="meta"><div class="n">${n}</div><div class="d">${d}</div>
+  <div class="stars"><b>${star.slice(0,rating)}</b>${star.slice(rating)} ${count}</div></div>
+  <div class="get ${cta==='Open'?'open':''}">${cta}</div></div>`;
+document.getElementById("chart").innerHTML=[
+ capp(1,"VLC","Plays literally everything",G.orange,I.vlc,"Open",5,"12K"),
+ capp(2,"Jellyfin","Your own media server",G.indigo,I.play,"Install",5,"8.4K"),
+ capp(3,"SmartTube","Ad-free YouTube for TV",G.red,I.tv,"Install",4,"22K"),
+ capp(4,"NewPipe","Lightweight YouTube",G.red,I.play,"Open",4,"31K"),
+ capp(5,"Home Assistant","Control your whole home",G.teal,I.homeS.replace('currentColor','#fff'),"Open",5,"18K"),
+ capp(6,"F-Droid","The free software store",G.indigo,I.robot,"Open",4,"9.1K"),
+ capp(7,"Aurora Store","Play Store, no Google",G.purple,I.bag,"Open",4,"14K"),
+ capp(8,"ISS Tracker","Live space dashboard",G.slate,I.sat,"Install",5,"1.2K"),
+].join("");
+const cat=(n,c,g,ic)=>`<div class="cat" style="background:${g}">${ic}<div class="n">${n}</div><div class="c">${c} apps</div></div>`;
+document.getElementById("cats").innerHTML=[
+ cat("Media","8",  "linear-gradient(150deg,#ff7a6b,#c2201f)",I.play),
+ cat("Smart Home","6","linear-gradient(150deg,#38e0d0,#0b7285)",I.homeS.replace('currentColor','#fff')),
+ cat("Ambient","6","linear-gradient(150deg,#7b7bff,#3b3bb0)",I.photo),
+ cat("Utilities","6","linear-gradient(150deg,#b6bcc6,#5c6472)",I.tools),
+].join("");
+</script>
+</body>
+</html>

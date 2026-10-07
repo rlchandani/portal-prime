@@ -16,6 +16,8 @@ import android.content.Intent
  *  Re-armed on boot and app start, and rescheduled after each fire. */
 object AlarmScheduler {
   const val ACTION_FIRE = "com.immortal.launcher.ALARM_FIRE"
+  internal const val ACTION_SNOOZE = "com.immortal.launcher.ALARM_SNOOZE"
+  internal const val SNOOZE_RC = 0x5A1D
   private const val RC = 0x5A1C
 
   private fun alarms(c: Context) = c.getSystemService(AlarmManager::class.java)
@@ -27,9 +29,14 @@ object AlarmScheduler {
     return PendingIntent.getBroadcast(c, RC, intent, flags)
   }
 
-  /** Cancel any pending alarm and arm the next one per the saved config. */
-  fun reschedule(context: Context) {
+  /** Re-arm regular occurrences. Explicit edits cancel snooze; startup preserves it. */
+  fun reschedule(context: Context, cancelSnooze: Boolean = true) {
     pi(context, create = false)?.let { alarms(context).cancel(it); it.cancel() }
+    if (cancelSnooze) PendingIntent.getBroadcast(context, SNOOZE_RC,
+        Intent(context, AlarmReceiver::class.java).setAction(ACTION_SNOOZE),
+        PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)?.let {
+          alarms(context).cancel(it); it.cancel()
+        }
     val cfg = AlarmConfig.load(context)
     val at = AlarmConfig.nextTrigger(cfg) ?: return
     val p = pi(context, create = true) ?: return

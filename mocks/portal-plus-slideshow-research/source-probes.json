@@ -1,0 +1,28 @@
+{
+  "sceneReadiness": {
+    "outgoingRemovedAfterMs": 1700,
+    "incomingReady": false,
+    "reproduced": true,
+    "scope": "Deterministic source-level scheduler probe with a delayed-image fixture; not device FPS."
+  },
+  "facePan": {
+    "photoAspect": 0.6666666666666666,
+    "viewportAspect": 1.5,
+    "mode": "panV",
+    "elementSizePercent": 225,
+    "focalY": 0.1,
+    "initialTravelFraction": 0,
+    "endVisibleImageRange": [
+      0.5555555555555556,
+      1
+    ],
+    "focusOutsideAtEnd": true,
+    "scope": "Real fitPlan/panStart functions; illustrates that face-first start does not constrain the full pan."
+  },
+  "dwell": {
+    "sourceRule": ".ss-layer.on .ss-hero { animation: kb var(--kbdur, 13s) linear forwards; }",
+    "examplePhotoIntervalSeconds": 30,
+    "defaultMotionSeconds": 13,
+    "stillRemainderSeconds": 17
+  }
+}

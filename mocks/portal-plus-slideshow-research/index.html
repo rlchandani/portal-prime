@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Portal+ slideshow research</title>
+  <link rel="stylesheet" href="research.css">
+  <script src="research.js" defer></script>
+</head>
+<body>
+  <header>
+    <a class="brand" href="#recommendation">Immortal / Slideshow research</a>
+    <nav aria-label="Research sections"><a href="#framing">Framing</a><a href="#evidence">Evidence</a><a href="#sources">Sources</a></nav>
+  </header>
+  <main>
+    <section id="recommendation" class="intro">
+      <p class="date">Connected Portal+ · October 7, 2026</p>
+      <h1>Let the photographs<br>hold your attention.</h1>
+      <p class="lead">A calmer slideshow with prepared images, safe framing and predictable motion. Preserve the photo sources and overlays; overhaul the loading and presentation underneath them.</p>
+      <p class="scope">Research and an interactive geometry illustration. This is not the final slideshow mock or an implemented performance promise.</p>
+    </section>
+    <section id="framing">
+      <div class="section-title"><h2>Keep people in view throughout the move.</h2><p>Centering on a face at the start is not enough.</p></div>
+      <div class="controls">
+        <div class="cases" role="group" aria-label="Illustrated photo"><button data-case="portrait" aria-pressed="true">Portrait</button><button data-case="group" aria-pressed="false">Wide group</button><button data-case="panorama" aria-pressed="false">Panorama</button></div>
+        <label class="check"><input id="regions" type="checkbox" checked> Show protected regions</label>
+      </div>
+      <div class="comparison">
+        <figure><div id="centered" class="viewport" aria-label="Centered cover illustration"></div><figcaption><strong>Centered cover</strong><span id="before-description"></span></figcaption></figure>
+        <figure><div id="safe" class="viewport" aria-label="Recommended framing illustration"></div><figcaption><strong id="safe-title">Constrained framing</strong><span id="after-description"></span></figcaption></figure>
+      </div>
+      <div class="scrubber"><label for="progress">Scrub the proposed motion</label><input id="progress" type="range" min="0" max="100" value="0"><output id="progress-label" for="progress">0%</output></div>
+      <p class="annotation">Illustrated subjects, with manually marked regions. No face detector runs here. The slider demonstrates the geometry rule; it does not benchmark the Portal.</p>
+      <p id="geometry-result" class="result" aria-live="polite"></p>
+    </section>
+    <section class="recommendations">
+      <h2>Three dependable presentations first.</h2>
+      <div class="presentation-grid">
+        <article><h3>Smart frame</h3><p>One image and a small, safe drift. Keep the photograph still when movement would cut into a protected region.</p></article>
+        <article><h3>Portrait pair</h3><p>Two compatible portraits from an album or nearby dates. A single framed portrait when there is no suitable partner.</p></article>
+        <article><h3>Framed photograph</h3><p>The whole image on Meta charcoal. Preserve group photos, panoramas, artwork and scans without a live blurred duplicate.</p></article>
+      </div>
+      <p>Aim to start at 30 seconds per image, a 0.8–1.2 second dissolve and no more than about 3% additional zoom when safe. These are proposed tuning values. Existing styles remain available through a compatibility path until replacements are tested.</p>
+    </section>
+    <section id="evidence">
+      <h2>What the investigation found.</h2>
+      <div class="evidence-grid">
+        <article><h3>Motion stops early</h3><p>Some current zooms last 12–13 seconds, even with a 30-second photo interval. A source probe verified the 17-second still remainder.</p></article>
+        <article><h3>Images can arrive late</h3><p>The actual scene scheduler removed an outgoing fixture after 1.7 seconds while the next image was still unready. A replacement must be ready before the old scene leaves.</p></article>
+        <article><h3>Face data is incomplete</h3><p>The project already bundles ML Kit. Some WebView styles use its cached focal point; Classic does not. Bounds, orientation and full-motion protection need a shared contract.</p></article>
+        <article><h3>Memory needs a real bound</h3><p>A 4,000 × 3,000 native photo can still decode at full size, costing 45.78 MiB before scratch and GPU copies. Compressed cache size does not bound pixel memory.</p></article>
+      </div>
+      <h3 class="table-title">Observed on the connected Portal</h3>
+      <table><tbody>
+        <tr><th scope="row">Hardware</th><td>Android 10 / API 29, Adreno 615, 2160 × 1440 at 60 Hz</td></tr>
+        <tr><th scope="row">Observation</th><td>Six 15-second waits plus command overhead, with the saved library and overlays</td></tr>
+        <tr><th scope="row">Android host frames</th><td>1,152; reported median 19 ms, p95 24 ms, p99 121 ms</td></tr>
+        <tr><th scope="row">Frame deadline counter</th><td>21 missed deadlines; host statistics do not capture the entire WebView presentation</td></tr>
+        <tr><th scope="row">Main app memory</th><td>266.2–410.8 MiB PSS; includes retained Home, services and overlays</td></tr>
+      </tbody></table>
+      <p class="annotation">This is an existing-library observation, not a controlled cold-cache comparison. Intentional still holds are not dropped animation frames. No native code or slideshow setting was changed.</p>
+    </section>
+    <section>
+      <h2>A smaller rendering contract.</h2>
+      <ol class="pipeline">
+        <li><strong>Keep the sources.</strong><span>Local folders, shared albums, Immich, WebDAV and SMB, with their authentication and video eligibility.</span></li>
+        <li><strong>Prepare the next image.</strong><span>Acquire once, normalize orientation, bound decoded pixels, reuse bytes for optional background analysis.</span></li>
+        <li><strong>Validate framing and motion.</strong><span>Keep padded detected regions visible. Show the whole image when analysis is uncertain or a safe crop cannot fit.</span></li>
+        <li><strong>Replace only when ready.</strong><span>One transition owner, bounded lookahead, cancellation on exit and the previous valid photo during slow or offline loading.</span></li>
+      </ol>
+      <p>Recommended destination: a native stage for the default compositions, with the current WebView styles retained as a tested compatibility path. Android 10 supports the required native image and transform primitives; newer RenderEffect blur and AGSL APIs are outside this device’s API level.</p>
+      <details><summary>What must pass before this becomes the new default?</summary><p>Complete-path face containment, EXIF orientations 1–8, no blank transitions, prompt exit, rapid-swipe cancellation, slow/offline sources, image/video handoff, and a two-hour memory soak. Measure moving phases separately, aiming for p95 within 16.7 ms and p99 within 33.3 ms. These targets require a controlled device prototype.</p></details>
+    </section>
+    <section id="sources">
+      <h2>Research you can inspect.</h2>
+      <p>Official product references inform the experience; current code and device evidence determine the engineering recommendation.</p>
+      <div class="source-grid">
+        <a href="https://help.auraframes.com/hc/en-us/articles/360007591474-How-can-I-reposition-the-photos-on-my-frame" target="_blank" rel="noopener">Aura: face priorities and per-photo position</a>
+        <a href="https://help.auraframes.com/hc/en-us/articles/360051589374-Showing-two-portrait-photos-next-to-each-other-Carver-Frames" target="_blank" rel="noopener">Aura: portrait pairing</a>
+        <a href="https://support.google.com/googlehome/answer/9136992?hl=en" target="_blank" rel="noopener">Nest: related pairs and photo controls</a>
+        <a href="https://support.frameo.com/hc/en-us/articles/8714987838098--Why-Is-My-Photo-Cropped" target="_blank" rel="noopener">Frameo: fit and fill adjustments</a>
+        <a href="https://support.apple.com/guide/imovie-iphone/adjust-zoom-effects-knac3eec39c6/ios" target="_blank" rel="noopener">Apple: deliberate Ken Burns endpoints</a>
+        <a href="https://developers.google.com/ml-kit/vision/face-detection/android" target="_blank" rel="noopener">ML Kit: bundled detection and input requirements</a>
+        <a href="https://developer.android.com/topic/performance/issues/render" target="_blank" rel="noopener">Android: rendering and bitmap preparation</a>
+        <a href="https://web.dev/articles/animations-guide" target="_blank" rel="noopener">Web animation: layout, paint and compositing</a>
+      </div>
+      <div class="downloads"><a href="portal-plus-slideshow-research.md" download>Download full recommendation</a><a href="portal-plus-slideshow-face-research.md" download>Face analysis and 17 references</a><a href="portal-plus-slideshow-pipeline-research.md" download>Sources and cache audit</a><a href="device-summary.json" download>Sanitized device measurements</a><a href="source-probes.json" download>Source diagnostic results</a></div>
+    </section>
+  </main>
+  <footer>Research brief. Application implementation awaits a reviewed design and device prototype.</footer>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Dusk Aurora · Widget Library</title>
+<link rel="stylesheet" href="aurora.css"/>
+<style>
+html,body{overflow-y:auto}
+.wrap{padding:64px 44px 70px;max-width:1460px;margin:0 auto}
+h1{font-size:32px;font-weight:700;letter-spacing:-.6px}
+.note{color:var(--t-secondary);font-size:14.5px;margin:6px 0 20px;max-width:900px;line-height:1.5}
+.note b{color:#fff}
+/* picker rail */
+#rail{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:26px}
+.wchip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:.5px solid rgba(255,255,255,.1);
+  border-radius:14px;padding:8px 15px;font-size:14px;font-weight:600;cursor:pointer;user-select:none}
+.wchip:hover{background:rgba(255,255,255,.13)}
+.wchip.on{background:var(--blue);border-color:transparent}
+.wchip .g{font-size:15px}
+/* size buttons */
+#sizes{display:flex;gap:8px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
+#sizes .lb{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--t-tertiary);margin-right:6px}
+.szb{border:.5px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);border-radius:10px;padding:6px 13px;
+  font-size:13px;font-weight:650;cursor:pointer;color:var(--t-secondary);font-variant-numeric:tabular-nums}
+.szb.on{background:rgba(100,210,255,.16);border-color:var(--cyan);color:var(--cyan)}
+.szb.def::after{content:" · default";font-size:10px;opacity:.7}
+/* stage */
+#stage{display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap}
+#preview{flex:none}
+#meta{flex:1;min-width:320px;max-width:560px}
+#meta .mt{font-size:20px;font-weight:700;margin-bottom:4px}
+#meta .md{font-size:14px;color:var(--t-secondary);line-height:1.55}
+#meta table{margin-top:16px;border-collapse:collapse;font-size:13.5px;width:100%}
+#meta td{padding:7px 0;border-top:.5px solid rgba(255,255,255,.09)}
+#meta td:first-child{color:var(--t-tertiary);width:150px}
+/* grid ghost behind the widget: shows the 2-col cell structure */
+#cellwrap{position:relative;border-radius:18px;padding:14px;background:rgba(255,255,255,.03);border:.5px dashed rgba(255,255,255,.14)}
+.ghost{position:absolute;border:.5px dashed rgba(255,255,255,.1);border-radius:14px}
+/* ---- the widget itself (LiquidGlass) ---- */
+.wg{position:relative;border-radius:20px;overflow:hidden;color:#fff;
+  background:var(--glass-bg);backdrop-filter:blur(34px) saturate(1.5);-webkit-backdrop-filter:blur(34px) saturate(1.5);
+  border:.5px solid var(--glass-border);
+  box-shadow:0 .5px 0 var(--glass-highlight) inset,0 18px 40px -16px rgba(0,0,0,.7);
+  padding:14px 16px;display:flex;flex-direction:column;transition:width .28s cubic-bezier(.3,.8,.3,1),height .28s cubic-bezier(.3,.8,.3,1)}
+.wg .sht{font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:7px;flex:none}
+.rowl{display:flex;align-items:baseline;gap:8px;padding:4.5px 0;font-size:13.5px;position:relative}
+.rowl+.rowl::before{content:"";position:absolute;top:0;left:0;right:0;height:.5px;background:rgba(255,255,255,.08)}
+.rowl .sy{font-weight:700;font-size:13px}
+.rowl .nm{color:var(--t-tertiary);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rowl .px{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:500}
+.chg2{font-size:11px;font-weight:700;padding:1.5px 6px;border-radius:6px;min-width:48px;text-align:right;font-variant-numeric:tabular-nums}
+.chg2.u{background:rgba(48,209,88,.18);color:#4cd964}.chg2.d{background:rgba(255,105,97,.16);color:#ff8a80}
+.chip2{background:rgba(255,255,255,.1);border-radius:9px;padding:5px 11px;font-size:12px;font-weight:650;cursor:pointer}
+.chip2.b{background:var(--blue)}
+/* all-sizes board */
+.sech{font-size:20px;font-weight:700;letter-spacing:-.3px;margin:44px 0 6px}
+.sesub{color:var(--t-tertiary);font-size:13.5px;margin-bottom:18px}
+#board{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.bcell{text-align:center}
+.bcell .cap{font-size:12px;color:var(--t-tertiary);margin-top:8px;font-variant-numeric:tabular-nums}
+/* fixed top cards section */
+.fixedcards{display:flex;gap:18px;flex-wrap:wrap}
+.fc{width:372px}
+.fc .cap{font-size:12px;color:var(--t-tertiary);margin-top:7px;text-align:center}
+</style>
+</head>
+<body>
+<div id="sky"></div><div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div><div id="stars"></div><div id="grain"></div>
+<div id="status"><div>Immortal</div><div>Saturday, August 1</div><div>65°&ensp;100%</div></div>
+<div class="badge" style="z-index:40">MOCK 07 · WIDGET LIBRARY</div>
+
+<div class="wrap">
+  <h1 class="up">Widget Library</h1>
+  <div class="note up" style="animation-delay:.04s">Every home widget at every size the grid supports. The grid is <b>2 columns</b>; a widget spans <b>1–2 columns × 1–4 rows</b> (one row ≈ 100dp). List widgets show <b>3 rows per row-span</b> (max 12). Default for all: <b>2×2</b>. Pick a widget, then tap through its sizes — or scan the full matrix below.</div>
+
+  <div id="rail" class="up" style="animation-delay:.08s"></div>
+  <div id="sizes"></div>
+  <div id="stage">
+    <div id="preview"><div id="cellwrap"></div></div>
+    <div id="meta"></div>
+  </div>
+
+  <div class="sech">All sizes at a glance</div>
+  <div class="sesub" id="mxsub"></div>
+  <div id="board"></div>
+
+  <div class="sech">Fixed cards (always at the top — not resizable, not in the picker)</div>
+  <div class="sesub">These render above the widget grid in the left column; some hide themselves when empty.</div>
+  <div class="fixedcards" id="fixed"></div>
+</div>
+
+<script src="aurora-icons.js"></script>
+<script>
+/* Cell math: 1 col ≈ 183dp → render 186px; 1 row = 100dp → 100px; gap 8px */
+const CW=186, RH=100, GAP=8;
+const px=(sx,sy)=>({w:sx*CW+(sx-1)*GAP, h:sy*RH+(sy-1)*GAP});
+const listRows=sy=>Math.min(12,Math.max(2,sy*3));
+const SIZES=[[1,1],[2,1],[1,2],[2,2],[1,3],[2,3],[1,4],[2,4]];
+
+/* ---------- content generators (faithful to device) ---------- */
+const CRYPTO=[["BTC","Bitcoin","$64,210","+2.3%",1],["ETH","Ethereum","$3,180","−1.1%",0],["SOL","Solana","$148","+4.0%",1],
+ ["ADA","Cardano","$0.52","+0.9%",1],["DOT","Polkadot","$6.44","−0.4%",0],["LINK","Chainlink","$14.90","+1.7%",1],
+ ["AVAX","Avalanche","$31.20","+2.8%",1],["MATIC","Polygon","$0.71","−2.1%",0],["UNI","Uniswap","$8.05","+0.6%",1],
+ ["LTC","Litecoin","$78.40","+0.2%",1],["XRP","Ripple","$0.58","−0.8%",0],["ATOM","Cosmos","$7.90","+1.1%",1]];
+const STOCKS=[["AAPL","Apple","228.50","+0.8%",1],["NVDA","NVIDIA","121.40","+3.1%",1],["TSLA","Tesla","242.80","−1.9%",0],
+ ["MSFT","Microsoft","441.10","+0.4%",1],["AMZN","Amazon","186.30","+1.2%",1],["GOOG","Alphabet","172.60","−0.3%",0],
+ ["META","Meta","512.80","+2.2%",1],["SPY","S&P 500 ETF","549.60","+0.5%",1],["QQQ","Nasdaq ETF","475.20","+0.9%",1],
+ ["AMD","AMD","158.70","−1.1%",0],["NFLX","Netflix","645.90","+0.7%",1],["DIS","Disney","96.40","+0.1%",1]];
+const NEWS=[["Markets rally as inflation cools for third straight month"],["New telescope captures sharpest image yet of a distant galaxy"],
+ ["City announces expanded weekend transit service"],["Chip maker unveils 2nm process two years ahead of schedule"],
+ ["Rare aurora visible as far south as Texas this weekend"],["Home batteries hit record installs as prices fall"],
+ ["Open-source photo tool passes 100k stars"],["Transit ridership tops pre-2020 levels for first time"],
+ ["Local library adds 24-hour pickup lockers"],["Storm system brings cooler air by Tuesday"],
+ ["New trail connects riverfront parks"],["Farmers market extends season through October"]];
+const TODOS=[["Buy milk",0],["Call plumber",0],["Water plants",1],["Pick up package",0],["Book dentist",0],["Charge camera",1],
+ ["Meal prep Sunday",0],["Renew passport",0],["Clean filters",1],["Order filament",0],["Text Sam back",0],["Take out recycling",1]];
+const OPTS=[["AAPL 235C 12/20",".27","$4.15"],["NVDA 130C 12/20",".24","$6.80"],["SPY 580P 12/20",".29","$5.45"],
+ ["MSFT 460C 11/21",".22","$7.10"],["TSLA 260C 12/20",".26","$9.35"],["QQQ 490P 11/21",".28","$6.20"],
+ ["META 540C 12/20",".23","$11.40"],["AMD 170C 12/20",".25","$5.85"],["GOOG 180C 11/21",".21","$4.60"],
+ ["AMZN 195C 12/20",".24","$5.15"],["NFLX 680C 12/20",".22","$14.20"],["DIS 100C 11/21",".20","$2.35"]];
+const finRows=(data,sy)=>data.slice(0,listRows(sy)).map(([s,n,p,c,u])=>
+ `<div class="rowl"><span class="sy">${s}</span><span class="nm">${n}</span><span class="px">${p}</span><span class="chg2 ${u?'u':'d'}">${c}</span></div>`).join("");
+const check='<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4 10-10"/></svg>';
+
+function dial(night,rot){return `<div style="width:100%;aspect-ratio:1;max-width:64px;margin:0 auto;border-radius:50%;position:relative;
+  background:${night?'#141821':'#f4f4f6'};border:.5px solid rgba(255,255,255,.2);box-shadow:0 3px 9px -2px rgba(0,0,0,.5)">
+  <div style="position:absolute;left:50%;top:50%;width:2px;height:26%;background:${night?'#fff':'#1a1a1e'};transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(${rot}deg);border-radius:2px"></div>
+  <div style="position:absolute;left:50%;top:50%;width:1.4px;height:36%;background:${night?'#fff':'#1a1a1e'};transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(${rot*12%360}deg);border-radius:2px"></div>
+  <div style="position:absolute;left:50%;top:50%;width:4px;height:4px;border-radius:50%;background:#ff9f0a;transform:translate(-50%,-50%)"></div></div>`}
+
+const WIDGETS={
+calendar:{t:"Calendar",g:"📅",accent:"#fff",src:"ICS feed (Screensaver → Calendar link)",scale:"Scrollable list — taller spans show more event lines",
+ render(sx,sy){
+  const days=[["Today",[["9:00","Standup"],["12:30","Lunch w/ Sam"],["8:00","Movie night"]]],
+   ["Tomorrow",[["10:00","Dentist"],["All day","Water plants"]]],["Monday",[["9:00","Sprint planning"],["3:00","1:1 with Alex"]]]];
+  let lines=[];days.forEach(([d,evs])=>{lines.push(`<div style="font-size:10.5px;font-weight:700;letter-spacing:.8px;color:var(--t-tertiary);padding:5px 0 2px">${d.toUpperCase()}</div>`);
+   evs.forEach(([t,n])=>lines.push(`<div style="display:flex;gap:8px;font-size:12.5px;padding:2.5px 0"><span style="color:var(--cyan);font-variant-numeric:tabular-nums;min-width:44px">${t}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n}</span></div>`))});
+  const max=sy===1?3:sy===2?7:sy===3?11:15;
+  return `<div style="font-size:${sy===1?14:17}px;font-weight:650;margin-bottom:4px">Calendar</div><div style="overflow:hidden">${lines.slice(0,max+Math.ceil(max/3)).join("")}</div>`;
+ }},
+weather:{t:"Weather",g:"☁",accent:"gradient",src:"Open-Meteo",scale:"Hero always; hourly/daily strip needs ≥2 rows (mode from Settings → Appearance)",
+ render(sx,sy){
+  const strip=sy>=2?`<div style="display:flex;justify-content:space-between;margin-top:auto;padding-top:6px">${
+   [["8PM","🌙","63°"],["9PM","🌙","61°"],["10PM","🌙","59°"],["11PM","☁️","57°"],["6AM","🌤","54°"]].slice(0,sx===1?3:5).map(([t,e,d])=>
+   `<div style="text-align:center;font-size:10px;color:rgba(255,255,255,.75)">${t}<div style="font-size:13px;margin:2px 0">${e}</div><b style="font-size:11.5px;color:#fff">${d}</b></div>`).join("")}</div>`:"";
+  return `<div style="position:absolute;inset:0;background:linear-gradient(180deg,#16294f,#2c4470 55%,#8a5f52 90%);z-index:-1"></div>
+   <div style="display:flex;justify-content:space-between"><div><div style="font-size:${sy===1?12:14}px;font-weight:600">Jersey City</div>
+   <div style="font-size:${sy===1?26:sx===1?30:40}px;font-weight:200;line-height:1.1;letter-spacing:-1px">65°</div>
+   ${sy>1||sx>1?`<div style="font-size:11px;color:rgba(255,255,255,.8)">Clear · H:76° L:52°${sx>1?" · ↓8:44":""}</div>`:""}</div>
+   <div style="font-size:${sy===1?18:26}px">🌙</div></div>${strip}`;
+ }},
+world_clock:{t:"World Clock",g:"◷",accent:"none",src:"Local time zones (Settings → World Clock)",scale:"Up to 4 dials; faces shrink to fit — fewer fit at 1-col",
+ render(sx,sy){
+  const zones=[["New York","EDT",231,1],["London","BST",21,1],["Tokyo","JST",261,0],["Dubai","GST",111,0]].slice(0,sx===1?2:4);
+  return `<div style="display:flex;gap:8px;justify-content:space-around;align-items:center;height:100%">${zones.map(([c,z,r,n])=>
+   `<div style="text-align:center;flex:1;min-width:0">${dial(n,r)}
+    ${sy>=2?`<div style="font-size:10.5px;font-weight:700;margin-top:5px">${z}</div><div style="font-size:9.5px;color:var(--t-tertiary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c}</div>`:""}</div>`).join("")}</div>`;
+ }},
+timers:{t:"Timers",g:"⏱",accent:"#FF9F0A",src:"Local",scale:"Fixed content — countdown + preset chips; more air when taller",
+ render(sx,sy){
+  return `<div class="sht" style="color:#FF9F0A">TIMERS</div>
+   <div style="font-size:${sy===1?22:30}px;font-weight:300;font-variant-numeric:tabular-nums">4:32</div>
+   ${sy>=2||sx>=2?`<div style="font-size:11px;color:var(--t-tertiary);margin-top:1px">Pasta — running</div>`:""}
+   <div style="display:flex;gap:7px;margin-top:auto;flex-wrap:wrap">${
+    sy===1&&sx===1?`<span class="chip2 b">⏸</span><span class="chip2">↺</span>`
+    :`<span class="chip2 b">Pause</span><span class="chip2">Reset</span>${sx===2?`<span class="chip2">+1 min</span>`:""}`}</div>`;
+ }},
+alarm:{t:"Alarm",g:"⏰",accent:"#FF453A",src:"Local (AlarmConfig)",scale:"Fixed content — time, next-fire line, on/off + edit chips",
+ render(sx,sy){
+  return `<div class="sht" style="color:#FF453A">ALARM</div>
+   <div style="font-size:${sy===1?22:30}px;font-weight:300">7:30<span style="font-size:${sy===1?11:14}px;color:var(--t-secondary)"> AM</span></div>
+   ${sy>=2||sx===2?`<div style="font-size:11px;color:var(--t-tertiary)">Weekdays · Wed 7:30 AM</div>`:""}
+   <div style="display:flex;gap:7px;margin-top:auto">${sy===1&&sx===1?`<span class="chip2 b">On</span>`:`<span class="chip2 b">Turn off</span><span class="chip2">Edit</span>`}</div>`;
+ }},
+crypto:{t:"Crypto",g:"₿",accent:"#F7931A",src:"CoinGecko",scale:"List — 3 rows per row-span (1×→3, 2×→6, 3×→9, 4×→12)",
+ render(sx,sy){return `<div class="sht" style="color:#F7931A">CRYPTO</div><div style="overflow:hidden">${finRows(CRYPTO,sy)}</div>`}},
+todo:{t:"To-Do",g:"✓",accent:"#30D158",src:"Local (TodoStore)",scale:"List — open items first; footer count; rows scale with height",
+ render(sx,sy){
+  const rows=TODOS.slice(0,listRows(sy)).map(([t,d])=>
+   `<div style="display:flex;align-items:center;gap:8px;padding:3.5px 0;font-size:12.5px;${d?'opacity:.45;text-decoration:line-through':''}">
+    <span style="width:15px;height:15px;border-radius:50%;flex:none;display:grid;place-items:center;${d?'background:#30D158':'border:1.5px solid rgba(255,255,255,.4)'}">${d?check:""}</span>
+    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t}</span></div>`).join("");
+  return `<div class="sht" style="color:#30D158">TO-DO</div><div style="overflow:hidden">${rows}</div>
+   ${sy>=2?`<div style="font-size:10.5px;color:var(--t-tertiary);margin-top:auto;padding-top:4px">8 to do</div>`:""}`;
+ }},
+news:{t:"News",g:"📰",accent:"#FF9F0A",src:"RSS / Atom feeds",scale:"Headline list, 2-line max each; rows scale with height",
+ render(sx,sy){
+  const n=listRows(sy);
+  return `<div class="sht" style="color:#FF9F0A">NEWS</div><div style="overflow:hidden">${NEWS.slice(0,n).map(([h])=>
+   `<div style="font-size:12.5px;line-height:1.3;padding:3.5px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;border-top:.5px solid rgba(255,255,255,.07)">${h}</div>`).join("")}</div>`;
+ }},
+stocks:{t:"Stocks",g:"📈",accent:"#5E5CE6",src:"Alpaca (IEX feed)",scale:"List — 3 rows per row-span (1×→3 … 4×→12)",
+ render(sx,sy){return `<div class="sht" style="color:#5E5CE6">STOCKS</div><div style="overflow:hidden">${finRows(STOCKS,sy)}</div>`}},
+options:{t:"Options",g:"Δ",accent:"#64D2FF",src:"Alpaca option chains (delta-band scan)",scale:"Contract list; title carries the Δ band; rows scale with height",
+ render(sx,sy){
+  return `<div class="sht" style="color:#64D2FF">OPTIONS · 0.20–0.30Δ</div><div style="overflow:hidden">${OPTS.slice(0,listRows(sy)).map(([c,d,p])=>
+   `<div class="rowl"><span style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c}</span><span class="px" style="font-size:11.5px">Δ${d}</span><span style="font-size:11.5px;color:var(--t-secondary);font-variant-numeric:tabular-nums">${p}</span></div>`).join("")}</div>`;
+ }},
+ha:{t:"Home Assistant",g:"🏠",accent:"#64D2FF",src:"HA REST API (30s poll)",scale:"2 tiles per row × row-span rows (1–4 rows of tiles)",
+ render(sx,sy){
+  const tiles=[["Living Room","On · 80%","on","💡"],["Kitchen","Off","off","💡"],["Movie Night","Scene","scene","🎬"],["Bedroom","Off","off","💡"],
+   ["Inside","72.4°","sensor","🌡"],["Humidity","41%","sensor","💧"],["Front Door","Locked","sensor","🔒"],["Power","412 W","sensor","⚡"]];
+  const n=Math.min(tiles.length,(sx===1?1:2)*sy);
+  return `<div class="sht" style="color:#64D2FF">HOME</div>
+   <div style="display:grid;grid-template-columns:repeat(${sx===1?1:2},1fr);gap:7px;overflow:hidden">${tiles.slice(0,n).map(([t,s,k,e])=>
+   `<div style="border-radius:11px;padding:8px 9px;font-size:11.5px;display:flex;flex-direction:column;gap:5px;min-height:0;
+     ${k==='on'?'background:rgba(255,214,110,.94);color:#3d2c00':k==='scene'?'background:rgba(124,77,255,.34)':'background:rgba(255,255,255,.09)'}">
+     <span style="font-size:13px">${e}</span><div><div style="font-weight:650;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t}</div>
+     <div style="font-size:9.5px;opacity:.65">${s}</div></div></div>`).join("")}</div>`;
+ }},
+};
+const ORDER=["calendar","weather","world_clock","timers","alarm","crypto","todo","news","stocks","options","ha"];
+
+/* ---------- fixed top cards ---------- */
+function fixedCards(){
+  const c=(inner,cap)=>`<div class="fc"><div class="wg" style="width:372px;padding:14px 16px">${inner}</div><div class="cap">${cap}</div></div>`;
+  return [
+   c(`<div style="font-size:22px;font-weight:700">Good evening, Rohit</div><div style="font-size:13px;color:var(--t-secondary);margin-top:2px">Saturday, August 1</div>`,"Greeting — always shown"),
+   c(`<div style="display:flex;flex-direction:column;gap:7px;font-size:13.5px">
+      <div style="display:flex;gap:9px;align-items:center">▸ <span>Movie night · 8:00 PM</span></div>
+      <div style="display:flex;gap:9px;align-items:center">☁️ <span>Feels like 65°</span><span style="margin-left:auto;color:var(--t-tertiary);font-size:12px">H:76° L:52°</span></div>
+      <div style="display:flex;gap:9px;align-items:center">🌘 <span>Waning gibbous</span><span style="margin-left:auto;color:var(--t-tertiary);font-size:12px">↑5:45 ↓8:44</span></div>
+      <div style="display:flex;gap:9px;align-items:center">⏰ <span>Alarm · Wed 7:30 AM</span></div>
+      <div style="display:flex;gap:9px;align-items:center">✓ <span>8 to do</span></div>
+      <div style="display:flex;gap:9px;align-items:center">⏳ <span>🎂 Mom's birthday — 223 days</span></div></div>`,"Today strip — rows self-hide when empty"),
+   c(`<div style="display:flex;gap:12px;align-items:center">
+      <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#7c4dff,#ff375f);display:grid;place-items:center;font-size:18px">♪</div>
+      <div style="min-width:0"><div style="font-weight:650;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Midnight City</div>
+      <div style="font-size:12px;color:var(--t-tertiary)">M83 — Hurry Up, We're Dreaming</div></div></div>`,"Now Playing — hides when silent"),
+   c(`<div style="display:flex;gap:9px">${["🎙 Jarvis","💡 Lights","🎬 Scenes","🌡 Climate"].map(x=>`<div class="chip2" style="flex:1;text-align:center">${x}</div>`).join("")}</div>`,"Quick controls — needs assistant/HA installed"),
+   c(`<div style="display:flex;gap:12px;align-items:center">
+      <div style="width:52px;height:52px;border-radius:11px;background:linear-gradient(135deg,#c98a5e,#4a5a78)"></div>
+      <div><div style="font-weight:650;font-size:14px">On this day</div><div style="font-size:12px;color:var(--t-tertiary)">A memory from your photos</div></div></div>`,"Photo memory — hides without local photos"),
+  ].join("");
+}
+
+/* ---------- interactivity ---------- */
+let cur="weather", sz=[2,2];
+function renderRail(){
+  document.getElementById("rail").innerHTML=ORDER.map(k=>
+   `<div class="wchip ${cur===k?'on':''}" onclick="cur='${k}';sz=[2,2];draw()"><span class="g">${WIDGETS[k].g}</span>${WIDGETS[k].t}</div>`).join("");
+  document.getElementById("sizes").innerHTML=`<span class="lb">SIZE</span>`+SIZES.map(([x,y])=>
+   `<button class="szb ${sz[0]===x&&sz[1]===y?'on':''} ${x===2&&y===2?'def':''}" onclick="sz=[${x},${y}];draw()">${x}×${y}</button>`).join("");
+}
+function widgetEl(k,sx,sy,scale=1){
+  const {w,h}=px(sx,sy);
+  return `<div class="wg" style="width:${w*scale}px;height:${h*scale}px;${scale<1?`font-size:${13*scale}px;padding:${14*scale}px ${16*scale}px`:""}">${WIDGETS[k].render(sx,sy)}</div>`;
+}
+function draw(){
+  renderRail();
+  const [sx,sy]=sz, W=WIDGETS[cur], {w,h}=px(2,4);
+  // ghost grid = full 2x4 area, widget drawn at chosen size
+  let ghosts="";
+  for(let gx=0;gx<2;gx++)for(let gy=0;gy<4;gy++)
+    ghosts+=`<div class="ghost" style="left:${14+gx*(CW+GAP)}px;top:${14+gy*(RH+GAP)}px;width:${CW}px;height:${RH}px"></div>`;
+  document.getElementById("cellwrap").innerHTML=
+   `<div style="position:relative;width:${w}px;height:${h}px">${ghosts}<div style="position:absolute;left:14px;top:14px;z-index:2">${widgetEl(cur,sx,sy)}</div></div>`;
+  document.getElementById("meta").innerHTML=
+   `<div class="mt">${W.t} — ${sx}×${sy}</div><div class="md">${W.scale}.</div>
+    <table>
+     <tr><td>Data source</td><td>${W.src}</td></tr>
+     <tr><td>Default size</td><td>2×2</td></tr>
+     <tr><td>All sizes</td><td>1×1 · 2×1 · 1×2 · 2×2 · 1×3 · 2×3 · 1×4 · 2×4</td></tr>
+     <tr><td>Resize</td><td>Edit mode → drag the corner badge; snaps to cells</td></tr>
+     ${["crypto","todo","news","stocks","options"].includes(cur)?`<tr><td>Rows at this size</td><td>${listRows(sy)}</td></tr>`:""}
+     ${cur==="ha"?`<tr><td>Tiles at this size</td><td>${(sx===1?1:2)*sy} (${sx===1?1:2} per row × ${sy})</td></tr>`:""}
+    </table>`;
+  document.getElementById("mxsub").textContent=`${W.t} at all 8 spans — scaled 62% to fit.`;
+  document.getElementById("board").innerHTML=SIZES.map(([x,y])=>
+   `<div class="bcell"><div style="cursor:pointer" onclick="sz=[${x},${y}];draw();window.scrollTo({top:0,behavior:'smooth'})">${widgetEl(cur,x,y,.62)}</div><div class="cap">${x}×${y}${x===2&&y===2?" · default":""}</div></div>`).join("");
+}
+document.getElementById("fixed").innerHTML=fixedCards();
+draw();
+</script>
+</body>
+</html>

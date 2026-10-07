@@ -1,0 +1,51 @@
+<!doctype html>
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Immortal · Tools redesign review</title>
+  <base href="../portal-plus-complete/">
+  <link rel="stylesheet" href="native.css">
+  <link rel="stylesheet" href="complete.css">
+  <link rel="stylesheet" href="../portal-plus-navigation-live/navigation.css">
+  <link rel="stylesheet" href="../portal-plus-tools-redesign/tools.css">
+</head>
+<body>
+  <div class="demo-toolbar">
+    <strong>Tools redesign · review mock</strong>
+    <span>Sample data · does not control your Portal</span>
+    <button id="demo-back" type="button">← Back</button>
+    <label>Settings appearance
+      <select id="demo-theme"><option value="light">Light</option><option value="dark">Dark</option></select>
+    </label>
+    <label>Preview state
+      <select id="tools-scenario">
+        <option value="normal">Normal</option><option value="empty">Empty</option>
+        <option value="offline">Offline</option><option value="permission">Permission needed</option>
+      </select>
+    </label>
+    <label><input id="tools-advanced" type="checkbox"> Advanced tools</label>
+    <span id="demo-route" role="status" aria-live="polite"></span>
+  </div>
+  <div id="demo-viewport">
+    <div id="navigation-device" aria-label="Portal+ Tools design review"></div>
+  </div>
+  <div id="device" hidden inert aria-hidden="true"></div>
+  <script src="assets/icons.js"></script>
+  <script src="tokens.js"></script>
+  <script src="inventory.js"></script>
+  <script src="fixtures.js"></script>
+  <script src="model.js"></script>
+  <script src="settings-tiers.js"></script>
+  <script src="complete.js"></script>
+  <script src="../portal-plus-navigation-live/assets/app-icons.js"></script>
+  <script src="../portal-plus-tools-redesign/tools.js"></script>
+  <script src="../portal-plus-navigation-live/navigation.js"></script>
+</body>
+</html>

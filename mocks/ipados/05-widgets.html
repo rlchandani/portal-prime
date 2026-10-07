@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>iPadOS · Widgets</title>
+<link rel="stylesheet" href="ds.css"/>
+<style>
+  body { overflow-y: auto; background: radial-gradient(120% 90% at 15% 10%, #6db3f2 0%, #3a7bd5 45%, #2b5876 100%); min-height: 100%; }
+  .wrap { padding: 34px 44px 60px; }
+  .title { color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.3); margin-bottom: 6px; }
+  .note { color: rgba(255,255,255,.8); font-size: 15px; margin-bottom: 26px; }
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1200px; }
+  /* Widgets are the LiquidGlass surface used in the real app: translucent tint + light rim. */
+  .w { border-radius: var(--r-xl); padding: 18px 20px; color: #fff;
+       background: rgba(255,255,255,0.16); backdrop-filter: blur(24px) saturate(1.5); -webkit-backdrop-filter: blur(24px) saturate(1.5);
+       border: 1px solid rgba(255,255,255,0.22); box-shadow: 0 10px 30px -14px rgba(0,0,0,.5); min-height: 150px; }
+  .wt { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .lg { grid-column: span 2; }
+  .rowi { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 16px; }
+  .rowi .r { margin-left: auto; opacity: .85; }
+  .pct-up { color: #7bed9f; } .pct-dn { color: #ff9a9a; }
+  .tiles2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tile { border-radius: 14px; padding: 12px 14px; }
+  .tile.on { background: var(--blue); } .tile.off { background: rgba(255,255,255,0.18); }
+  .tile.scene { background: var(--indigo); }
+  .tile .tn { font-weight: 600; font-size: 15px; } .tile .ts { opacity: .8; font-size: 13px; }
+  .checkrow { display:flex; align-items:center; gap:10px; padding:6px 0; font-size:16px; }
+  .checkrow .box { width:20px;height:20px;border-radius:6px;border:2px solid rgba(255,255,255,.7); }
+  .checkrow .box.done { background:#7bed9f; border-color:#7bed9f; }
+  .checkrow.done { opacity:.55; text-decoration: line-through; }
+  .badge { position: fixed; top: 14px; right: 20px; color: rgba(255,255,255,.7); font-size: 12px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div class="badge">MOCK 05 · WIDGETS</div>
+  <div class="wrap">
+    <div class="t-largeTitle title">Widgets</div>
+    <div class="note">Every widget on one homogeneous LiquidGlass surface (the real app's material). Accent title, readable content.</div>
+    <div class="board">
+      <!-- Weather / at-a-glance hero -->
+      <div class="w lg" style="background:linear-gradient(135deg, rgba(58,123,213,.5), rgba(109,179,242,.35));">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><div style="font-size:20px;font-weight:600">Cupertino</div><div style="font-size:54px;font-weight:200;line-height:1">65°</div>
+          <div style="opacity:.9">Partly Cloudy · H:76° L:52°</div></div>
+          <div style="font-size:44px">🌤️</div>
+        </div>
+      </div>
+      <div class="w"><div class="wt" style="color:#ffd60a">Alarm</div><div style="font-size:34px;font-weight:300">Off</div><div style="opacity:.7;font-size:13px">No alarm set</div></div>
+
+      <!-- Crypto -->
+      <div class="w"><div class="wt" style="color:#f7931a">Crypto</div>
+        <div class="rowi">BTC <span class="r">$64,210 <span class="pct-up">+2.3%</span></span></div>
+        <div class="rowi">ETH <span class="r">$3,180 <span class="pct-dn">−1.1%</span></span></div>
+        <div class="rowi">SOL <span class="r">$148 <span class="pct-up">+4.0%</span></span></div>
+      </div>
+      <!-- To-Do -->
+      <div class="w"><div class="wt" style="color:#30d158">To-Do</div>
+        <div class="checkrow"><span class="box"></span>Buy milk</div>
+        <div class="checkrow"><span class="box"></span>Call plumber</div>
+        <div class="checkrow done"><span class="box done"></span>Water plants</div>
+        <div style="opacity:.6;font-size:12px;margin-top:6px">2 to do</div>
+      </div>
+      <!-- Stocks -->
+      <div class="w"><div class="wt" style="color:#5e5ce6">Stocks</div>
+        <div class="rowi">AAPL <span class="r">$228.5 <span class="pct-up">+0.8%</span></span></div>
+        <div class="rowi">NVDA <span class="r">$121.4 <span class="pct-up">+3.1%</span></span></div>
+        <div class="rowi">TSLA <span class="r">$242.8 <span class="pct-dn">−1.9%</span></span></div>
+      </div>
+
+      <!-- HA control (the fixed one) -->
+      <div class="w lg"><div class="wt" style="color:#64d2ff">Home</div>
+        <div class="tiles2">
+          <div class="tile on"><div class="tn">Living Room</div><div class="ts">On</div></div>
+          <div class="tile off"><div class="tn">Kitchen</div><div class="ts">Off</div></div>
+          <div class="tile scene"><div class="tn">Movie Night</div><div class="ts">Tap to run</div></div>
+          <div class="tile off"><div class="tn">Bedroom</div><div class="ts">Off</div></div>
+        </div>
+      </div>
+      <!-- World clock -->
+      <div class="w"><div class="wt" style="color:#64d2ff">World Clock</div>
+        <div style="display:flex;justify-content:space-around;text-align:center;margin-top:6px">
+          <div><div style="font-size:34px">🕙</div><div style="font-weight:600;font-size:13px;margin-top:4px">EDT</div><div style="opacity:.8;font-size:11px">New York</div></div>
+          <div><div style="font-size:34px">🕝</div><div style="font-weight:600;font-size:13px;margin-top:4px">BST</div><div style="opacity:.8;font-size:11px">London</div></div>
+          <div><div style="font-size:34px">🕔</div><div style="font-weight:600;font-size:13px;margin-top:4px">JST</div><div style="opacity:.8;font-size:11px">Tokyo</div></div>
+        </div>
+      </div>
+
+      <!-- News -->
+      <div class="w lg"><div class="wt" style="color:#ff9f0a">News</div>
+        <div class="rowi" style="display:block;line-height:1.35">Markets rally as inflation cools for third straight month</div>
+        <div class="rowi" style="display:block;line-height:1.35">New telescope captures sharpest image of a distant galaxy</div>
+        <div class="rowi" style="display:block;line-height:1.35">City announces expanded weekend transit service</div>
+      </div>
+      <!-- Options -->
+      <div class="w"><div class="wt" style="color:#64d2ff">Options · 0.20–0.30Δ</div>
+        <div class="rowi">AAPL 235C 12/20 <span class="r">Δ.27</span></div>
+        <div class="rowi">NVDA 130C 12/20 <span class="r">Δ.24</span></div>
+        <div class="rowi">SPY 580P 12/20 <span class="r">Δ.29</span></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

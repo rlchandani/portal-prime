@@ -66,17 +66,26 @@ object Aurora {
   @Volatile private var cachedKpAt = 0L
 
   fun status(context: Context): Status? {
-    val (lat, lon) = Weather.coordinates(context) ?: return null
-    val (kpNow, kpForecast) = kpPair() ?: return null
+    ToolsWork.checkpoint()
+    val coords = Weather.coordinates(context)
+    ToolsWork.checkpoint()
+    val (lat, lon) = coords ?: return null
+    val kp = kpPair()
+    ToolsWork.checkpoint()
+    val (kpNow, kpForecast) = kp ?: return null
     return classify(lat, lon, kpNow, kpForecast)
   }
 
   /** (kpNow, kpForecastPeak) from cache or a fresh fetch. Null if it can't be fetched. */
   private fun kpPair(): Pair<Double, Double>? {
+    ToolsWork.checkpoint()
     val cached = cachedKp
     if (cached != null && System.currentTimeMillis() - cachedKpAt < KP_CACHE_MS) return cached
-    val kpNow = fetchCurrentKp() ?: return cached // fall back to stale cache if offline
+    val current = fetchCurrentKp()
+    ToolsWork.checkpoint()
+    val kpNow = current ?: return cached // fall back to stale cache if offline
     val kpForecast = fetchForecastPeakKp().coerceAtLeast(kpNow)
+    ToolsWork.checkpoint()
     val pair = kpNow to kpForecast
     cachedKp = pair
     cachedKpAt = System.currentTimeMillis()
@@ -201,6 +210,7 @@ object Aurora {
             fmt.timeZone = TimeZone.getTimeZone("UTC")
             var peak = 0.0
             for (i in 0 until arr.length()) {
+              ToolsWork.checkpoint()
               val row = arr.get(i)
               // Only future ("predicted") rows; observed/estimated ones are the past.
               if (kindOf(row) != "predicted") continue

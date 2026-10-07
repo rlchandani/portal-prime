@@ -20,19 +20,20 @@ import android.os.Build
  *  arms the next occurrence. */
 class AlarmReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
-    if (intent?.action != AlarmScheduler.ACTION_FIRE) return
+    val snooze = intent?.action == AlarmScheduler.ACTION_SNOOZE
+    if (!snooze && intent?.action != AlarmScheduler.ACTION_FIRE) return
     val cfg = AlarmConfig.load(context)
-    if (cfg.enabled) {
-      AlarmSound.start(context)
-      showAlert(context, cfg)
-    }
+    if (!AlarmDeliveryPolicy.shouldRing(cfg.enabled, snooze)) return
+    AlarmSound.start(context)
+    showAlert(context, cfg)
+    if (!AlarmDeliveryPolicy.shouldAdvanceSchedule(snooze)) return
     if (cfg.days.isEmpty()) {
       // One-shot alarm (no repeat days): turn it off after firing so it doesn't re-arm for the
       // same time tomorrow. Disabling makes nextTrigger return null, so no new alarm is scheduled.
       AlarmConfig.setEnabled(context, false)
     }
     // Re-arm the next matching weekday (a no-op for a now-disabled one-shot).
-    AlarmScheduler.reschedule(context)
+    AlarmScheduler.reschedule(context, cancelSnooze = false)
   }
 
   /**
@@ -66,6 +67,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(cfg.label)
             .setContentText("Alarm")
+            .setContentIntent(pi)
             .setCategory(Notification.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setFullScreenIntent(pi, true)
@@ -75,8 +77,12 @@ class AlarmReceiver : BroadcastReceiver() {
     runCatching { context.startActivity(activity) }
   }
 
-  private companion object {
-    const val CHANNEL = "immortal_alarm"
-    const val NOTIF_ID = 42102
+  companion object {
+    private const val CHANNEL = "immortal_alarm"
+    private const val NOTIF_ID = 42102
+
+    internal fun clearNotification(context: Context) {
+      context.getSystemService(NotificationManager::class.java).cancel(NOTIF_ID)
+    }
   }
 }

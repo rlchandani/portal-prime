@@ -1,0 +1,4574 @@
+{
+  "timestamp": "2026-10-04T22:09:00.406Z",
+  "viewport": {
+    "width": 2160,
+    "height": 1440
+  },
+  "total": 912,
+  "passed": 912,
+  "failed": [],
+  "results": [
+    {
+      "name": "light destination touch",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination display",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination appearance",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination wallpaper",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination screensaver",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination sources",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination styles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination faces",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination dismiss",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination immich",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination smb",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination dav",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination album",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination web",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination folder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination albums",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination calendar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination calendar-url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination clock",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination quickbar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination weather",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination world",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination countdowns",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination welcome",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination alarm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination multiroom",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination mqtt",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination ha",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination ha-entities",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination phone",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination boot",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination device",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination health",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination sleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination crypto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination todo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination news",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination stocks",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination alpaca",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination options",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination camera",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination lamp",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination intercom",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination timers",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination notes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination converter",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination stories",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination iss",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination aurora",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination speed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination apk",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination help",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination system",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination managed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination debug",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination home",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination settings",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination apps",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination app-folder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination store",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination app-detail",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination tools",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination edit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination widgets",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination photos",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination digital-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination welcome-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination wake-light",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination lamp-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination alarm-ring",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination folder-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination ha-dashboard",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination switcher",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination provider-widgets",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination chime-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "light destination music",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination touch",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination display",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination appearance",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination wallpaper",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination screensaver",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination sources",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination styles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination faces",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination dismiss",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination immich",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination smb",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination dav",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination album",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination web",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination folder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination albums",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination calendar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination calendar-url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination clock",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination quickbar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination weather",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination world",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination countdowns",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination welcome",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination alarm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination multiroom",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination mqtt",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination ha",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination ha-entities",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination phone",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination boot",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination device",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination health",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination sleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination crypto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination todo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination news",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination stocks",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination alpaca",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination options",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination camera",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination lamp",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination intercom",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination timers",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination notes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination converter",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination stories",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination iss",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination aurora",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination speed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination apk",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination help",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination system",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination managed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination debug",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination home",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination settings",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination apps",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination app-folder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination store",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination app-detail",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination tools",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination edit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination widgets",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination photos",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination digital-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination welcome-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination wake-light",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination lamp-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination alarm-ring",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination folder-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination ha-dashboard",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination switcher",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination provider-widgets",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination chime-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dark destination music",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control calendar.widgetOn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control calendar.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control calendar.range",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control calendar.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control calendar.side",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.enabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.screensaverStyle",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.clockFace",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.photoSource",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.dismissTarget",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.albumRefreshMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.fit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.intervalSec",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.shuffle",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.includeVideo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.cacheEnabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.cacheBudgetGb",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.batterySaver",
+      "ok": true,
+      "detail": "Correctly unavailable on this Portal+"
+    },
+    {
+      "name": "control screensaver.showNowPlaying",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.antiBurnIn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.presenceMode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.idleSleepMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.overnightEnabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.overnightStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.overnightEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.overnightNightClock",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.sleepTimerEnabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.sleepTimerMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.pauseAudioOnSleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.closeAppOnSleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.soundscape",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.soundscapeVolume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.ambientDashboard",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.gestureWave",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.welcomeEnabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.weatherUnit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.tileSize",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.weatherWidget",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.clockFormat",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.showMiniPlayer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.hideStatusBar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.multiRoomEnabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.snapcastHost",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.maPort",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.maUsername",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immortal.maPassword",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control mqtt.enabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control mqtt.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control mqtt.port",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control mqtt.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control mqtt.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control mqtt.useTls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control mqtt.validateCert",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control quickbar.enabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control quickbar.alwaysShow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control fleet.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control chime.hourlyChimeOn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control chime.spokenTimeOn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control chime.goldenHourOn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control chime.sunriseVariant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control chime.volume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control chime.quietHoursOn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control chime.quietStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control chime.quietEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control sunrise.enabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control sunrise.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control sunrise.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control sunrise.rampMinutes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control sunrise.chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.enabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.style",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.face",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.color",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.font",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.layout",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.background",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.glow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.showDate",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control digitalclock.showSeconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.durationMs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.showGreeting",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.showClock",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.showDate",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.enableTts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control display.brightness",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control display.auto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control display.mediaVolume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control display.nightShift",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control display.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control display.until",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control display.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control display.touchSounds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control wallpaper.mode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control wallpaper.grain",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control faces.enabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control faces.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control faces.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control sources.selected",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immich.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immich.key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control immich.album",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control smb.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control smb.share",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control smb.path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control smb.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control smb.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control dav.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control dav.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control dav.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control album.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control web.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control folder.path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control screensaver.mode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control dismiss.target",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.greetingNight",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.greetingMorning",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.greetingAfternoon",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.greetingEvening",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.userName",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.voice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control chime.voice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.textScale",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control welcome.opacity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control dismiss.haPath",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control sunrise.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control alarm.enabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control alarm.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control alarm.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control alarm.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control countdowns.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control countdowns.year",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control countdowns.month",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control countdowns.day",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control countdowns.emoji",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control countdowns.repeat",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control ha.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control ha.token",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control ha.search",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control crypto.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control crypto.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control todo.item",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control news.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control news.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control stocks.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control alpaca.key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control alpaca.secret",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control options.type",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control options.deltaMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control options.deltaMax",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control options.expiry",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control options.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control world.city",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control timers.minutes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control timers.seconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control notes.message",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control converter.kind",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control converter.value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control converter.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control converter.to",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control lamp.brightness",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control lamp.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control lamp.red",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control intercom.address",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control camera.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control camera.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control debug.enabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "control sources.albumRefresh",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-calendar.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-calendar.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-calendar.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-calendar.range",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-calendar.range",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-calendar.range",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-calendar.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-calendar.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-calendar.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-calendar.side",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-calendar.side",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-calendar.side",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.fit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.fit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.fit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.intervalSec",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.intervalSec",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.intervalSec",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.presenceMode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.presenceMode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.presenceMode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.idleSleepMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.idleSleepMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.idleSleepMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.overnightStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.overnightStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.overnightStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.overnightEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.overnightEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.overnightEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.sleepTimerMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.sleepTimerMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.sleepTimerMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.soundscape",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.soundscape",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.soundscape",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.soundscapeVolume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.soundscapeVolume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.soundscapeVolume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immortal.weatherUnit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immortal.weatherUnit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immortal.weatherUnit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immortal.tileSize",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immortal.tileSize",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immortal.tileSize",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immortal.weatherWidget",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immortal.weatherWidget",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immortal.weatherWidget",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immortal.clockFormat",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immortal.clockFormat",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immortal.clockFormat",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immortal.snapcastHost",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immortal.snapcastHost",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immortal.snapcastHost",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immortal.maPort",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immortal.maPort",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immortal.maPort",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immortal.maUsername",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immortal.maUsername",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immortal.maUsername",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immortal.maPassword",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immortal.maPassword",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immortal.maPassword",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-mqtt.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-mqtt.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-mqtt.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-mqtt.port",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-mqtt.port",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-mqtt.port",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-mqtt.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-mqtt.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-mqtt.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-mqtt.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-mqtt.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-mqtt.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-fleet.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-fleet.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-fleet.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-chime.sunriseVariant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-chime.sunriseVariant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-chime.sunriseVariant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-chime.volume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-chime.volume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-chime.volume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-chime.quietStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-chime.quietStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-chime.quietStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-chime.quietEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-chime.quietEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-chime.quietEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-sunrise.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-sunrise.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-sunrise.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-sunrise.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-sunrise.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-sunrise.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-sunrise.rampMinutes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-sunrise.rampMinutes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-sunrise.rampMinutes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-digitalclock.face",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-digitalclock.face",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-digitalclock.face",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-digitalclock.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-digitalclock.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-digitalclock.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-digitalclock.layout",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-digitalclock.layout",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-digitalclock.layout",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-digitalclock.background",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-digitalclock.background",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-digitalclock.background",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-welcome.durationMs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-welcome.durationMs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-welcome.durationMs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-display.brightness",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-display.brightness",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-display.brightness",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-display.mediaVolume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-display.mediaVolume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-display.mediaVolume",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-display.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-display.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-display.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-display.until",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-display.until",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-display.until",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-display.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-display.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-display.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-wallpaper.mode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-wallpaper.mode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-wallpaper.mode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-faces.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-faces.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-faces.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-faces.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-faces.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-faces.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-sources.selected",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-sources.selected",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-sources.selected",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immich.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immich.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immich.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immich.key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immich.key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immich.key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-immich.album",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-immich.album",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-immich.album",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-smb.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-smb.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-smb.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-smb.share",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-smb.share",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-smb.share",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-smb.path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-smb.path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-smb.path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-smb.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-smb.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-smb.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-smb.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-smb.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-smb.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-dav.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-dav.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-dav.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-dav.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-dav.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-dav.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-dav.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-dav.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-dav.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-album.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-album.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-album.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-web.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-web.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-web.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-folder.path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-folder.path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-folder.path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-screensaver.mode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-screensaver.mode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-screensaver.mode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-dismiss.target",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-dismiss.target",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-dismiss.target",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-welcome.greetingNight",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-welcome.greetingNight",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-welcome.greetingNight",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-welcome.greetingMorning",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-welcome.greetingMorning",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-welcome.greetingMorning",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-welcome.greetingAfternoon",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-welcome.greetingAfternoon",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-welcome.greetingAfternoon",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-welcome.greetingEvening",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-welcome.greetingEvening",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-welcome.greetingEvening",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-welcome.userName",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-welcome.userName",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-welcome.userName",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-welcome.voice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-welcome.voice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-welcome.voice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-chime.voice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-chime.voice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-chime.voice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-welcome.textScale",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-welcome.textScale",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-welcome.textScale",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-welcome.opacity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-welcome.opacity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-welcome.opacity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-dismiss.haPath",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-dismiss.haPath",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-dismiss.haPath",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-sunrise.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-sunrise.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-sunrise.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-alarm.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-alarm.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-alarm.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-alarm.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-alarm.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-alarm.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-alarm.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-alarm.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-alarm.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-countdowns.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-countdowns.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-countdowns.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-countdowns.year",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-countdowns.year",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-countdowns.year",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-countdowns.month",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-countdowns.month",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-countdowns.month",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-countdowns.day",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-countdowns.day",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-countdowns.day",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-countdowns.emoji",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-countdowns.emoji",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-countdowns.emoji",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-ha.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-ha.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-ha.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-ha.token",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-ha.token",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-ha.token",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-ha.search",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-ha.search",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-ha.search",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-crypto.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-crypto.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-crypto.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-crypto.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-crypto.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-crypto.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-todo.item",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-todo.item",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-todo.item",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-news.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-news.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-news.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-news.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-news.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-news.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-stocks.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-stocks.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-stocks.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-alpaca.key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-alpaca.key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-alpaca.key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-alpaca.secret",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-alpaca.secret",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-alpaca.secret",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-options.type",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-options.type",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-options.type",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-options.deltaMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-options.deltaMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-options.deltaMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-options.deltaMax",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-options.deltaMax",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-options.deltaMax",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-options.expiry",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-options.expiry",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-options.expiry",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-options.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-options.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-options.symbol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-world.city",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-world.city",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-world.city",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-timers.minutes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-timers.minutes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-timers.minutes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-timers.seconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-timers.seconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-timers.seconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-notes.message",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-notes.message",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-notes.message",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-converter.kind",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-converter.kind",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-converter.kind",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-converter.value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-converter.value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-converter.value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-converter.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-converter.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-converter.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-converter.to",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-converter.to",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-converter.to",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-lamp.brightness",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-lamp.brightness",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-lamp.brightness",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-lamp.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-lamp.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-lamp.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-intercom.address",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-intercom.address",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-intercom.address",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-camera.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-camera.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-camera.name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-camera.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-camera.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-camera.url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state control-sources.albumRefresh",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible control-sources.albumRefresh",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values control-sources.albumRefresh",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state home-page-two",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values home-page-two",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state header-pair",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible header-pair",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values header-pair",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state favorite-edit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible favorite-edit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values favorite-edit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state app-actions",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible app-actions",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values app-actions",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state folder-name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible folder-name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values folder-name",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state folder-members",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible folder-members",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values folder-members",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state widget-move",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible widget-move",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values widget-move",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state widget-size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible widget-size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values widget-size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state widget-remove",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible widget-remove",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values widget-remove",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state timer-custom",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible timer-custom",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values timer-custom",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state timer-expired",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible timer-expired",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values timer-expired",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state source-remove",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible source-remove",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values source-remove",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state admin-disable",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible admin-disable",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values admin-disable",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state memo-permission",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible memo-permission",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values memo-permission",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state memo-record",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values memo-record",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state story-read",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible story-read",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values story-read",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state camera-unavailable",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible camera-unavailable",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values camera-unavailable",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state install-confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible install-confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values install-confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state store-updates",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible store-updates",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values store-updates",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state apk-confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible apk-confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values apk-confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state intercom-broadcast",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible intercom-broadcast",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values intercom-broadcast",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state system-handoff",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible system-handoff",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values system-handoff",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state search-all",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible search-all",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values search-all",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state setting-prerequisite",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible setting-prerequisite",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values setting-prerequisite",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state phone-help",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible phone-help",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values phone-help",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state memo-delete",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible memo-delete",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values memo-delete",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state memo-playback",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values memo-playback",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state camera-stream",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible camera-stream",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values camera-stream",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state ha-action-error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible ha-action-error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values ha-action-error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state intercom-listen",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible intercom-listen",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values intercom-listen",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state intercom-error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible intercom-error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values intercom-error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state music-login-success",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible music-login-success",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values music-login-success",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state music-login-error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible music-login-error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values music-login-error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state music-setup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible music-setup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values music-setup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state mqtt-setup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible mqtt-setup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values mqtt-setup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state store-source",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible store-source",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values store-source",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state store-offline",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible store-offline",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values store-offline",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state store-progress",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible store-progress",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values store-progress",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state store-installed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible store-installed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values store-installed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state store-failed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible store-failed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values store-failed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state store-update-confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible store-update-confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values store-update-confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state apk-failed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible apk-failed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values apk-failed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state screen-sleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible screen-sleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values screen-sleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state lamp-night",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values lamp-night",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state lamp-hidden",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values lamp-hidden",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state recent-logs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible recent-logs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values recent-logs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state timer-running",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values timer-running",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state app-info-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible app-info-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values app-info-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state uninstall-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible uninstall-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values uninstall-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state calls-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible calls-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values calls-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state widget-provider-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible widget-provider-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values widget-provider-boundary",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state remove-countdowns",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible remove-countdowns",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values remove-countdowns",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state remove-crypto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible remove-crypto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values remove-crypto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state remove-todo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible remove-todo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values remove-todo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state remove-news",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible remove-news",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values remove-news",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state remove-stocks",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible remove-stocks",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values remove-stocks",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state remove-options",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible remove-options",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values remove-options",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state remove-camera",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible remove-camera",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values remove-camera",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state remove-ha",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible remove-ha",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values remove-ha",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state disconnect-calendar-url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible disconnect-calendar-url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values disconnect-calendar-url",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-org.chromium.chrome",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-org.chromium.chrome",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-org.chromium.chrome",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-org.videolan.vlc",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-org.videolan.vlc",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-org.videolan.vlc",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-org.schabi.newpipe",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-org.schabi.newpipe",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-org.schabi.newpipe",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-io.homeassistant.companion.android.minimal",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-io.homeassistant.companion.android.minimal",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-io.homeassistant.companion.android.minimal",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-me.zhanghai.android.files",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-me.zhanghai.android.files",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-me.zhanghai.android.files",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-org.fdroid.fdroid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-org.fdroid.fdroid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-org.fdroid.fdroid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-com.aurora.store",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-com.aurora.store",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-com.aurora.store",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-org.breezyweather",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-org.breezyweather",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-org.breezyweather",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-com.portal.assistant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-com.portal.assistant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-com.portal.assistant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-com.portal.calendar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-com.portal.calendar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-com.portal.calendar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-com.facebook.alohaapps.settings",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-com.facebook.alohaapps.settings",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-com.facebook.alohaapps.settings",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "popup / state launch-com.android.quicksearchbox",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog visible launch-com.android.quicksearchbox",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unresolved values launch-com.android.quicksearchbox",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Immich selection remains single album",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "successful source selection",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "cancel ignores late source result",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "offline failure keeps existing source",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "TLS convenience port",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "custom timer starts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "cancel timer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "clear completed to-do",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "folder rename updates heading",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "resize travels with reordered widget",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "resize updates home layout",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "voice memo recording state",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "voice memo playback and delete",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "actual bundled story",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "device name validates length",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "all thirteen source cities",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "offline conversion source formula",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "six digit pairing PIN",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "QR exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "PIN refresh updates card",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "download cancellation prevents completion",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "installed radio appears in Apps",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "installer failure has retry",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "touch sounds permission keeps prior value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "settings search explains gate without changing preferences",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "available search result highlights exact row",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dialog traps keyboard focus",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Escape closes dialog",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "coverage links open exact popup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gallery preset light-popup-memo-delete",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gallery preset dark-popup-store-installed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gallery preset digital-clock-face-led",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gallery preset dark-category-sound",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "flow state does not run twice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "full device link retains popup",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "icon buttons have accessible names",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "digital clock centered",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "preview Back overlay digital-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "preview Back overlay welcome-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "preview Back overlay lamp-preview",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no runtime errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no external network calls",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "errors": [],
+  "externalNetwork": []
+}

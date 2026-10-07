@@ -51,7 +51,9 @@ internal fun ApprovedHomeWeather(modifier: Modifier = Modifier) {
             fontSize = 94.sp, lineHeight = 100.sp, fontWeight = FontWeight.Normal,
             letterSpacing = (-2).sp, modifier = Modifier.weight(1f))
         if (current == null || current!!.code in 0..3) {
-          ApprovedHomeIcon("weather", Modifier.size(72.dp), androidx.compose.ui.graphics.Color(0xFFF4DB93))
+          ApprovedHomeIcon("weather", Modifier.size(72.dp),
+              if (com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark)
+                androidx.compose.ui.graphics.Color(0xFFF4DB93) else androidx.compose.ui.graphics.Color(0xFF99610F))
         } else Text(Weather.emoji(current!!.code), fontSize = 60.sp)
       }
       Text(current?.city?.ifBlank { "Weather" } ?: "Weather unavailable",

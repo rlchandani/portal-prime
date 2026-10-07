@@ -52,7 +52,8 @@ internal fun ApprovedPackedWidgetGrid(
   val draggedKey by remember { derivedStateOf { preview?.key } }
   val targetKey by remember { derivedStateOf { preview?.targetKey } }
   var dragOwner by remember { mutableStateOf<Any?>(null) }
-  val pageActive = LocalApprovedLauncherPageActive.current && LocalApprovedWidgetPageInput.current
+  // Page activation only controls editing gestures. Normal paging reuses the packed grid.
+  val pageActive = editMode && LocalApprovedLauncherPageActive.current && LocalApprovedWidgetPageInput.current
   var viewportCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
   fun resetDrag() { dragState.reset(); preview = null; dragOwner = null }
   fun cancelDrag(owner: Any) {

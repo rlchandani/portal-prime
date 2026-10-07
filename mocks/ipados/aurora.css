@@ -1,0 +1,120 @@
+/* ============================================================
+   DUSK AURORA design system — shared across all v3 mocks.
+   Ports to Compose: tokens = ImmortalTheme constants,
+   .glass = LiquidGlass composable, .tile = LiquidGlassAppIcon.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap');
+
+:root {
+  /* surfaces */
+  --glass-bg: rgba(22, 26, 38, .52);
+  --glass-border: rgba(255, 255, 255, .14);
+  --glass-highlight: rgba(255, 255, 255, .22);
+  --tile-bg: rgba(255, 255, 255, .09);
+  --tile-border: rgba(255, 255, 255, .07);
+  /* text */
+  --t-primary: #fff;
+  --t-secondary: rgba(255, 255, 255, .66);
+  --t-tertiary: rgba(255, 255, 255, .45);
+  /* accents (iOS dark palette) */
+  --blue: #0a84ff; --green: #30d158; --amber: #ffd66e; --orange: #ff9f0a;
+  --red: #ff6961; --violet: #7c4dff; --teal: #1de9b6; --cyan: #64d2ff; --pink: #ff375f;
+  /* radius */
+  --r-card: 24px; --r-tile: 15px; --r-icon: 25px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased; overflow: hidden; background: #060a14; color: var(--t-primary); }
+
+/* ---- wallpaper: dusk sky + aurora ribbons + stars + grain ---- */
+#sky { position: fixed; inset: 0; z-index: -4; background:
+  linear-gradient(180deg, #050810 0%, #0a1226 34%, #12234a 62%, #27436e 80%, #4b5a78 92%, #6d6a72 100%); }
+.aurora { position: fixed; z-index: -3; filter: blur(60px); opacity: .55; border-radius: 50%;
+  mix-blend-mode: screen; animation: drift 26s ease-in-out infinite alternate; }
+.a1 { width: 1200px; height: 340px; left: -160px; top: 2%; transform: rotate(-9deg);
+  background: linear-gradient(90deg, transparent, #1de9b6 30%, #26c6da 55%, transparent 85%); }
+.a2 { width: 1000px; height: 260px; right: -220px; top: 16%; transform: rotate(7deg); animation-delay: -9s;
+  background: linear-gradient(90deg, transparent, #7c4dff 25%, #1de9b6 65%, transparent 90%); opacity: .35; }
+.a3 { width: 900px; height: 400px; left: 22%; bottom: -6%; filter: blur(80px); opacity: .5; animation: none;
+  background: radial-gradient(closest-side, #ff9d5c 0%, rgba(255,120,60,.35) 45%, transparent 75%); }
+@keyframes drift { from { transform: translateX(-30px) rotate(-9deg); } to { transform: translateX(40px) rotate(-7deg); } }
+#stars { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image:
+  radial-gradient(1.2px 1.2px at 12% 18%, rgba(255,255,255,.9), transparent 60%),
+  radial-gradient(1px 1px at 28% 8%, rgba(255,255,255,.7), transparent 60%),
+  radial-gradient(1.4px 1.4px at 44% 24%, rgba(255,255,255,.8), transparent 60%),
+  radial-gradient(1px 1px at 58% 12%, rgba(255,255,255,.6), transparent 60%),
+  radial-gradient(1.3px 1.3px at 71% 20%, rgba(255,255,255,.85), transparent 60%),
+  radial-gradient(1px 1px at 83% 7%, rgba(255,255,255,.7), transparent 60%),
+  radial-gradient(1.2px 1.2px at 92% 27%, rgba(255,255,255,.75), transparent 60%),
+  radial-gradient(1px 1px at 36% 38%, rgba(255,255,255,.5), transparent 60%),
+  radial-gradient(1.1px 1.1px at 66% 42%, rgba(255,255,255,.55), transparent 60%),
+  radial-gradient(1px 1px at 8% 46%, rgba(255,255,255,.45), transparent 60%); }
+#grain { position: fixed; inset: 0; z-index: -1; opacity: .05; mix-blend-mode: overlay; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+/* ---- chrome ---- */
+#status { position: fixed; top: 0; left: 0; right: 0; height: 42px; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 28px; color: rgba(255,255,255,.92); font-size: 14px;
+  font-weight: 600; z-index: 30; letter-spacing: .2px; }
+.badge { position: fixed; top: 46px; right: 36px; color: rgba(255,255,255,.4); font-size: 11px;
+  letter-spacing: 1.6px; z-index: 30; }
+
+/* ---- entrance ---- */
+.up { opacity: 0; transform: translateY(14px); animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+/* ---- glass card (LiquidGlass) ---- */
+.glass { border-radius: var(--r-card); position: relative; color: #fff; overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: blur(34px) saturate(1.5); -webkit-backdrop-filter: blur(34px) saturate(1.5);
+  border: .5px solid var(--glass-border);
+  box-shadow: 0 .5px 0 var(--glass-highlight) inset, 0 22px 44px -18px rgba(0,0,0,.7); }
+
+/* ---- app icon (kept from v2 — approved) ---- */
+.tile { width: 96px; height: 96px; border-radius: var(--r-icon); display: grid; place-items: center;
+  position: relative; overflow: hidden; box-shadow: 0 12px 24px -8px rgba(0,0,0,.65); }
+.tile::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.06) 42%, transparent 60%); }
+.tile svg { width: 48px; height: 48px; position: relative; z-index: 1; }
+.applbl { color: rgba(255,255,255,.92); font-size: 13.5px; font-weight: 500;
+  text-shadow: 0 1px 6px rgba(0,0,0,.6); max-width: 106px; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---- widget title ---- */
+.wt { font-size: 12px; font-weight: 600; letter-spacing: .4px; display: flex; align-items: center; gap: 6px; }
+.wt svg { width: 14px; height: 14px; }
+
+/* ---- iOS switch ---- */
+.switch { width: 46px; height: 27px; border-radius: 15px; background: rgba(255,255,255,.18); position: relative; flex: none; }
+.switch::after { content: ""; position: absolute; left: 2.5px; top: 2.5px; width: 22px; height: 22px;
+  border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); transition: .2s; }
+.switch.on { background: var(--green); }
+.switch.on::after { left: auto; right: 2.5px; }
+
+/* ---- grouped inset list (dark) ---- */
+.group { background: var(--glass-bg); backdrop-filter: blur(34px) saturate(1.5);
+  -webkit-backdrop-filter: blur(34px) saturate(1.5); border: .5px solid var(--glass-border);
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 .5px 0 var(--glass-highlight) inset, 0 16px 36px -18px rgba(0,0,0,.6); }
+.row { display: flex; align-items: center; gap: 13px; padding: 12px 16px; position: relative; font-size: 15.5px; }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 58px; right: 0; height: .5px;
+  background: rgba(255,255,255,.1); }
+.row .ric { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; flex: none; }
+.row .ric svg { width: 18px; height: 18px; }
+.row .rt { flex: 1; font-weight: 500; }
+.row .rv { color: var(--t-tertiary); font-size: 14.5px; }
+.row .chev { color: rgba(255,255,255,.3); font-size: 16px; }
+.grouplbl { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--t-tertiary); margin: 22px 0 8px 16px; }
+
+/* ---- segmented control ---- */
+.seg { display: flex; background: rgba(255,255,255,.1); border-radius: 9px; padding: 2px; font-size: 13.5px; font-weight: 500; }
+.seg div { padding: 5px 14px; border-radius: 7px; color: var(--t-secondary); }
+.seg .on { background: rgba(255,255,255,.22); color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+
+/* ---- search field ---- */
+.search { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,.1);
+  border: .5px solid rgba(255,255,255,.1); border-radius: 11px; padding: 9px 12px;
+  color: var(--t-tertiary); font-size: 15px; }
+.search svg { width: 16px; height: 16px; }

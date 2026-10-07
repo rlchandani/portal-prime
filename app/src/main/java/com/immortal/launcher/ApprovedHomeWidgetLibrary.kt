@@ -78,18 +78,16 @@ internal fun ApprovedHomeWidgetLibraryScreen(
       }
       onDispose { }
     }
-    // Library uses the saved light/dark app palette; Home's canvas stays independently dark.
+    // Library and the retained launcher share the saved appearance.
     CompositionLocalProvider(LocalApprovedHomePopup provides true) {
       Column(Modifier.fillMaxSize().background(ApprovedHomePalette.Background)) {
         Row(Modifier.fillMaxWidth().height(103.dp).padding(horizontal = 56.dp),
             verticalAlignment = Alignment.CenterVertically) {
           Row(Modifier.heightIn(min = 68.dp)
               .semantics { contentDescription = "Home" }
-              .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, onClick = onHome),
+              .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f,
+                  ringColor = ApprovedHomePalette.Accent, onClick = onHome),
               verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(25.dp, 32.dp)
-                .border(2.dp, ApprovedHomePalette.Text, RoundedCornerShape(15.dp)))
-            Spacer(Modifier.width(18.dp))
             Text("immortal", color = ApprovedHomePalette.Text, fontSize = 30.sp,
                 fontWeight = FontWeight.Medium, letterSpacing = (-.6).sp)
           }
@@ -98,7 +96,8 @@ internal fun ApprovedHomeWidgetLibraryScreen(
           Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp,
               modifier = Modifier.padding(start = 24.dp))
           Row(Modifier.padding(start = 24.dp).heightIn(min = 68.dp)
-              .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, onClick = onBack)
+              .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f,
+                  ringColor = ApprovedHomePalette.Accent, onClick = onBack)
               .padding(horizontal = 20.dp),
               verticalAlignment = Alignment.CenterVertically,
               horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -112,8 +111,9 @@ internal fun ApprovedHomeWidgetLibraryScreen(
               color = ApprovedHomePalette.Secondary, fontSize = 20.sp,
               modifier = Modifier.padding(start = 10.dp, end = 30.dp))
           Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            LibraryRoundAction("phone", "Connect your phone", onPair)
+            LibraryRoundAction("remote", "Connect your phone", onPair)
             LibraryRoundAction("sleep", "Sleep screen", onSleep)
+            ApprovedThemeButton()
             LibraryRoundAction("search", "Search apps and settings", onSearch)
             LibraryRoundAction("settings", "Settings", onSettings)
           }
@@ -153,7 +153,8 @@ internal fun ApprovedHomeWidgetLibraryScreen(
           items(cards, key = { it.key }, contentType = { "widget-choice" }) { card ->
             ApprovedHomeSurface(
                 Modifier.fillMaxWidth().heightIn(min = 244.dp)
-                    .tvFocusable(RoundedCornerShape(24.dp), focusScale = 1f) { onSelect(card.key) },
+                    .tvFocusable(RoundedCornerShape(24.dp), focusScale = 1f,
+                        ringColor = ApprovedHomePalette.Accent) { onSelect(card.key) },
                 radius = 24.dp,
             ) {
               Column(Modifier.fillMaxWidth().padding(28.dp),
@@ -177,7 +178,7 @@ internal fun ApprovedHomeWidgetLibraryScreen(
 private fun LibraryRoundAction(icon: String, label: String, onClick: () -> Unit) {
   Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome)
       .semantics { contentDescription = label }
-      .tvFocusable(CircleShape, focusScale = 1f, onClick = onClick),
+      .tvFocusable(CircleShape, focusScale = 1f, ringColor = ApprovedHomePalette.Accent, onClick = onClick),
       contentAlignment = Alignment.Center) {
     ApprovedHomeIcon(icon, Modifier.size(30.dp), ApprovedHomePalette.Text)
   }
@@ -188,7 +189,9 @@ private fun LibraryPrimaryAction(label: String, onClick: () -> Unit) {
   val palette = com.immortal.launcher.ui.theme.LocalApprovedPalette.current
   Box(Modifier.heightIn(min = 68.dp).clip(RoundedCornerShape(16.dp))
       .background(palette.accent)
-      .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, onClick = onClick)
+      .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f,
+          ringColor = if (palette.dark) palette.background else androidx.compose.ui.graphics.Color.White,
+          onClick = onClick)
       .padding(horizontal = 26.dp, vertical = 18.dp), contentAlignment = Alignment.Center) {
     Text(label, color = if (palette.dark) palette.background else androidx.compose.ui.graphics.Color.White,
         fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium)

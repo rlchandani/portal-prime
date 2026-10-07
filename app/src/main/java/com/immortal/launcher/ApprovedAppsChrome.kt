@@ -56,7 +56,7 @@ internal fun ApprovedAppsShell(
     Box(Modifier.weight(1f).fillMaxWidth(), content = content)
     Spacer(Modifier.height(24.dp))
     ApprovedAppsDock(selected, onExit, Modifier.align(Alignment.CenterHorizontally))
-    Spacer(Modifier.height(32.dp))
+    Spacer(Modifier.height(16.dp))
   }
 }
 
@@ -76,8 +76,6 @@ internal fun ApprovedAppsHeader(onSearch: () -> Unit) {
   }
   Column {
     Row(Modifier.fillMaxWidth().height(103.dp).padding(horizontal = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-      Box(Modifier.size(25.dp, 32.dp).border(2.dp, IosLabel, RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp, bottomEnd = 11.dp, bottomStart = 11.dp)))
-      Spacer(Modifier.width(18.dp))
       Text("immortal", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Medium, letterSpacing = (-0.6).sp)
       Spacer(Modifier.width(30.dp))
       Box(Modifier.width(1.dp).height(40.dp).background(IosDivider))
@@ -86,8 +84,9 @@ internal fun ApprovedAppsHeader(onSearch: () -> Unit) {
       ApprovedAppsGlyph("wifi", IosSecondary, 22.dp)
       Text(if (connected) "Connected" else "Offline", color = IosSecondary, fontSize = 20.sp, modifier = Modifier.padding(start = 10.dp, end = 30.dp))
       Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        ApprovedAppsRoundAction("phone", "Connect your phone") { context.startActivity(Intent(context, RemotePairActivity::class.java)) }
-        ApprovedAppsRoundAction("moon", "Sleep screen") { ScreenControl.sleep(context) }
+        ApprovedAppsRoundAction("remote", "Connect your phone") { context.startActivity(Intent(context, RemotePairActivity::class.java)) }
+        ApprovedAppsRoundAction("sleep", "Sleep screen") { ScreenControl.sleep(context) }
+        ApprovedThemeButton()
         ApprovedAppsRoundAction("search", "Search apps", onSearch)
         ApprovedAppsRoundAction("gear", "Settings") { context.startActivity(Intent(context, ImmortalSettingsActivity::class.java)) }
       }
@@ -99,7 +98,8 @@ internal fun ApprovedAppsHeader(onSearch: () -> Unit) {
 @Composable
 private fun ApprovedAppsRoundAction(glyph: String, label: String, onClick: () -> Unit) {
   Box(Modifier.size(68.dp).clip(CircleShape).background(LocalApprovedPalette.current.surface2)
-      .tvFocusable(CircleShape, focusScale = 1f, onClick = onClick), contentAlignment = Alignment.Center) {
+      .tvFocusable(CircleShape, focusScale = 1f, ringColor = LocalApprovedPalette.current.accent,
+          onClick = onClick), contentAlignment = Alignment.Center) {
     ApprovedAppsGlyph(glyph, IosLabel, 30.dp, label)
   }
 }
@@ -113,7 +113,8 @@ internal fun ApprovedAppsDock(selected: String, onExit: () -> Unit, modifier: Mo
         val active = id == selected
         Row(Modifier.widthIn(min = 176.dp).height(74.dp).clip(RoundedCornerShape(18.dp))
             .background(if (active) LocalApprovedPalette.current.selected else Color.Transparent)
-            .tvFocusable(RoundedCornerShape(18.dp), focusScale = 1f) {
+            .tvFocusable(RoundedCornerShape(18.dp), focusScale = 1f,
+                ringColor = LocalApprovedPalette.current.accent) {
               when (id) {
                 "photos" -> context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
                 else -> ApprovedLauncherTab.fromId(id)?.let { tab ->
@@ -135,7 +136,9 @@ internal fun ApprovedAppsButton(label: String, primary: Boolean = false, enabled
   val shape = RoundedCornerShape(16.dp)
   Box(modifier.heightIn(min = 68.dp).clip(shape)
       .background(if (primary) IosBlue else LocalApprovedPalette.current.surface2)
-      .then(if (enabled) Modifier.tvFocusable(shape, focusScale = 1f, onClick = onClick) else Modifier)
+      .then(if (enabled) Modifier.tvFocusable(shape, focusScale = 1f,
+          ringColor = if (primary) MaterialTheme.colorScheme.onPrimary else LocalApprovedPalette.current.accent,
+          onClick = onClick) else Modifier)
       .padding(horizontal = 26.dp, vertical = 18.dp), contentAlignment = Alignment.Center) {
     Text(label, color = (if (primary) MaterialTheme.colorScheme.onPrimary else IosLabel).copy(alpha = if (enabled) 1f else 0.5f), fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium)
   }

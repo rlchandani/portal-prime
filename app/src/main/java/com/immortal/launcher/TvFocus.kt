@@ -47,24 +47,30 @@ fun Modifier.tvFocusable(
     onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit,
 ): Modifier {
-  if (!enabled || !LocalApprovedLauncherPageActive.current) return this
+  // Preserve the caller's existing disabled behavior (including Manage-mode badges).
+  if (!enabled) return this
+  val pageActive = LocalApprovedLauncherPageActive.current
+  val clickEnabled = pageActive
+  // Cached panes keep their interaction source and click chain across page transitions.
   val source = remember { MutableInteractionSource() }
   val focused by source.collectIsFocusedAsState()
+  val showFocus = clickEnabled && focused
   // Touch cards use focusScale=1: avoid an identity graphics layer and animation
   // state for each visible card. Retain the animated return for TV callers.
   val scale = if (focusScale == 1f) 1f else {
-    val animated by animateFloatAsState(if (focused) focusScale else 1f, label = "tvFocusScale")
-    animated
+    val animated by animateFloatAsState(if (showFocus) focusScale else 1f, label = "tvFocusScale")
+    // Hide a retained pane's focus scale immediately, even while the animation settles.
+    if (clickEnabled) animated else 1f
   }
   val scaled = if (scale == 1f) this else this.scale(scale)
-  val base = if (focused) scaled.border(BorderStroke(3.dp, ringColor), shape) else scaled
-  // Stable clickable when there's no long-press handler (unchanged for every other
-  // caller); only the "hey" button opts into combinedClickable for its picker.
+  val base = if (showFocus) scaled.border(BorderStroke(3.dp, ringColor), shape) else scaled
+  // Retain the caller's click/long-press variant; inactive panes use its disabled state.
   return if (onLongClick != null) {
     base.combinedClickable(
-        interactionSource = source, indication = null, onClick = onClick, onLongClick = onLongClick)
+        interactionSource = source, indication = null, enabled = clickEnabled,
+        onClick = onClick, onLongClick = onLongClick)
   } else {
-    base.clickable(interactionSource = source, indication = null, onClick = onClick)
+    base.clickable(interactionSource = source, indication = null, enabled = clickEnabled, onClick = onClick)
   }
 }
 
@@ -77,11 +83,11 @@ fun Modifier.tvFocusableRow(
     focusFill: Color = Color(0x402E6BE6),
     onClick: () -> Unit,
 ): Modifier {
-  if (!LocalApprovedLauncherPageActive.current) return this
+  val pageActive = LocalApprovedLauncherPageActive.current
   val source = remember { MutableInteractionSource() }
   val focused by source.collectIsFocusedAsState()
-  return this.background(if (focused) focusFill else Color.Transparent)
-      .clickable(interactionSource = source, indication = null, onClick = onClick)
+  return this.background(if (pageActive && focused) focusFill else Color.Transparent)
+      .clickable(interactionSource = source, indication = null, enabled = pageActive, onClick = onClick)
 }
 
 /**

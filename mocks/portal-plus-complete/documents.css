@@ -1,0 +1,40 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+.document-page{background:#f2f3f7;color:#182c39;font-size:17px;line-height:1.75}
+.document-header{background:#fbfcfe;border-bottom:1px solid #dce3eb;padding:18px max(24px,calc((100vw - 1180px)/2));display:flex;justify-content:space-between;gap:24px}
+.document-header a{font-size:15px;text-decoration:none}
+.document-main{max-width:1180px;margin:55px auto 100px;padding:0 28px}
+.document-main h1{font-size:48px;line-height:1.18;letter-spacing:-1.5px;font-weight:500;margin:0 0 18px}
+.document-lead{font-size:20px;color:#536674;margin-bottom:30px}
+.document-nav{display:flex;gap:12px;flex-wrap:wrap;margin:30px 0 50px}
+.document-nav a{background:#fff;border:1px solid #dce3eb;border-radius:10px;padding:10px 15px;text-decoration:none;font-size:15px}
+.document-section{background:#fff;border:1px solid #dce3eb;border-radius:24px;padding:38px;margin:30px 0;scroll-margin-top:25px}
+.document-section h2{font-size:35px;line-height:1.25;letter-spacing:-.7px;font-weight:500;margin:0 0 24px}
+.document-section h3{font-size:25px;line-height:1.4;font-weight:500;margin:35px 0 15px}
+.document-section p{margin:16px 0}
+.document-section ul,.document-section ol{padding-left:25px}
+.document-section li{padding-left:5px;margin:12px 0}
+.document-section code{background:#edf1f5;padding:2px 5px;border-radius:4px;font-size:14px;overflow-wrap:anywhere}
+.document-section pre{background:#edf1f5;border-radius:12px;padding:20px;overflow:auto}
+.document-section pre code{white-space:pre;overflow-wrap:normal;padding:0}
+.table-scroll{overflow-x:auto;margin:24px 0}
+table{border-collapse:collapse;width:100%;text-align:left;font-size:15px;line-height:1.7}
+th{background:#edf1f5;font-weight:500}
+th,td{border:1px solid #dce3eb;vertical-align:top;padding:13px 16px}
+.source-link{font-size:14px;padding-top:24px;border-top:1px solid #dce3eb}
+.gallery-main{max-width:1420px}
+.gallery-section{margin:45px 0}
+.gallery-section>h2{font-size:28px;font-weight:500;margin-bottom:22px}
+.reference-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.reference-card{background:#fff;border:1px solid #dce3eb;border-radius:16px;overflow:hidden;min-width:0}
+.reference-card img{width:100%;height:auto;display:block;background:#14292e;aspect-ratio:3/2}
+.reference-card>div{padding:20px}
+.reference-card h3{font-size:20px;line-height:1.5;font-weight:500;margin:0 0 12px}
+.reference-card p{font-size:14px;line-height:1.6;color:#536674;margin:0 0 12px}
+.reference-card>div>a{display:inline-block;font-size:13px;margin:5px 12px 5px 0}
+@media(max-width:1000px){.reference-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.document-main{margin:35px auto 65px;padding:0 18px}.document-main h1{font-size:36px}.document-section{padding:23px;border-radius:16px}.document-section h2{font-size:28px}.reference-grid{grid-template-columns:1fr}.document-header{padding:18px}}

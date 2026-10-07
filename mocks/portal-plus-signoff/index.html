@@ -1,0 +1,88 @@
+<!doctype html>
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Immortal — Portal+ design review</title>
+  <link rel="stylesheet" href="review.css">
+</head>
+<body>
+  <aside class="review-sidebar">
+    <a class="brand" href="./">immortal<span>Portal+ / Design review 01</span></a>
+    <p class="intro">iPad-inspired layout.<br>iPhone-style settings.</p>
+    <p><a href="../portal-plus-complete/">Open complete review 02 →</a><br><small>This representative revision is preserved for comparison.</small></p>
+    <p class="nav-label">Everyday experience</p>
+    <nav id="screen-nav" aria-label="Mock screens">
+      <button data-screen="home" class="selected">Home</button>
+      <button data-screen="apps">App library</button>
+      <button data-screen="folder">App folder</button>
+      <button data-screen="store">App Store</button>
+      <button data-screen="app-detail">App details</button>
+      <button data-screen="tools">Tools</button>
+      <button data-screen="timer">Timer</button>
+      <button data-screen="edit">Customize home</button>
+      <button data-screen="widget-library">Widget library</button>
+      <button data-screen="settings">Settings overview</button>
+      <button data-screen="settings" data-category="photos">Photos & screensaver</button>
+      <button data-screen="sources">Photo sources</button>
+      <button data-screen="connect">Connect Immich</button>
+      <button data-screen="albums">Choose albums</button>
+      <button data-screen="clock-picker">Clock picker</button>
+      <button data-screen="photos">Photo display</button>
+      <button data-screen="wallpaper">Wallpaper picker</button>
+      <button data-screen="calendar">Calendar</button>
+      <button data-screen="world-clock">World clock</button>
+      <button data-screen="wake">Sunrise & wake</button>
+      <button data-screen="ha">Home Assistant</button>
+      <button data-screen="remote">Phone remote</button>
+      <button data-screen="health">Device health</button>
+    </nav>
+    <p class="nav-label">Settings categories</p>
+    <nav aria-label="Settings review categories">
+      <button data-screen="settings" data-category="appearance">Appearance</button>
+      <button data-screen="settings" data-category="home">Home & widgets</button>
+      <button data-screen="settings" data-category="sound">Sound & wake</button>
+      <button data-screen="settings" data-category="connections">Connections</button>
+      <button data-screen="settings" data-category="access">Input & accessibility</button>
+      <button data-screen="settings" data-category="device">Device</button>
+      <button data-screen="settings" data-category="advanced">Advanced</button>
+    </nav>
+    <p class="nav-label">State & appearance</p>
+    <label class="control-label" for="scenario">Household state</label>
+    <select id="scenario"><option value="normal">Connected / sample content</option><option value="offline">Offline / cached content</option><option value="empty">First use / not configured</option></select>
+    <label class="control-label" for="theme">Settings appearance</label>
+    <select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select>
+    <div class="sidebar-foot">Sample content and local interactions.<br>Your Portal is unchanged.</div>
+  </aside>
+  <main class="review-main">
+    <header class="review-heading"><div><h1 id="title">Home</h1><p>Calibrated to the connected Portal+, with reproducible Android visuals.</p></div><div class="review-actions"><a id="full-link" href="native.html" target="_blank" rel="noopener">Open device view ↗</a><button id="reset">Reset preview</button><button id="evidence-toggle" aria-expanded="false">Buildability & sign-off</button></div></header>
+    <div class="device-meta"><span>2160 × 1440 px · 180 dpi · 1920 × 1280 dp · Android 10</span><span>Preview scaled to fit · Tab/arrow keys navigate · Escape goes back</span></div>
+    <div class="frame-box" id="frame-box"><div class="frame-height"><iframe id="preview" title="Detailed interactive Portal+ mock" src="native.html"></iframe></div></div>
+    <div class="review-caption"><strong>Approval target:</strong> layout, font assets, colors, icons, spacing, controls, navigation, and illustrated states. Every app screen uses Android-reproducible primitives. Review in device view for larger text.<br><a href="gallery.html" target="_blank" rel="noopener">42 full-resolution references ↗</a> · <a href="contract.html" target="_blank" rel="noopener">Design contract & native acceptance ↗</a></div>
+    <section class="evidence" id="evidence" hidden>
+      <h2>A mock we can be held to.</h2>
+      <p>This revision removes live blur, system-font substitution, browser-native switches, and unconstrained responsive sizing. It uses the Portal’s font files and a fixed Android dp canvas. Production Android work has not started.</p>
+      <div class="evidence-grid">
+        <article><span class="status supported">Supported primitives</span><h3>Geometry & surfaces</h3><p>Rows, columns, fixed constraints, rounded rectangles, linear gradients, tints, scrims, image crops, and vector paths map directly to Compose. No Liquid Glass shader or API 31 blur is required.</p></article>
+        <article><span class="status supported">Shared assets</span><h3>Typography & icons</h3><p>Roboto regular, medium, and bold were copied read-only from this Portal. The exact icon paths and reference photos ship with the mock. No Apple-only font, emoji, CDN, or font-provider dependency.</p></article>
+        <article><span class="status supported">Mapped to existing code</span><h3>Behavior & settings</h3><p>All 22 current settings destinations remain accounted for. The ten existing domains remain the source of truth. New navigation, favorites, editing actions, and setup journeys require implementation after approval.</p></article>
+        <article><span class="status pending">On-device proof pending</span><h3>Final visual acceptance</h3><p>Browser and Android text rasterization can differ. The installed Compose UI must be compared at 2160 × 1440 using the same sample content. Visible mismatches must be corrected; any required design deviation comes back for approval.</p></article>
+      </div>
+      <h3>What is outside the visual target</h3>
+      <p>Android’s keyboard, Wi-Fi settings, permissions, package installer, and third-party app screens are rendered by their owners. This mock shows the Immortal handoff, not a promise to restyle those external screens. Real albums, weather, and household controls vary with your content.</p>
+      <h3>Git preservation is part of the brief</h3>
+      <p>After design approval, first record the current state and preserve existing changes, then create a new <code>codex/portal-plus-ipad-ux</code> branch before any Android edits. Do not reset, clean, overwrite, or uninstall to obtain a clean baseline. The current app, settings, signing identity, and previous mocks stay recoverable.</p>
+      <div class="document-links"><a href="contract.html#specification" target="_blank" rel="noopener">Design & implementation contract</a><a href="contract.html#screen-map" target="_blank" rel="noopener">Screen and settings map</a><a href="contract.html#feasibility" target="_blank" rel="noopener">Buildability evidence</a><a href="gallery.html" target="_blank" rel="noopener">Full-size reference gallery</a><a href="../ux-research-2026-10/research.html" target="_blank" rel="noopener">Original 18-source research</a></div>
+      <p class="small-note">This is a design approval preview, not a claim that native fidelity has already been proven. Sign-off freezes the reference; native comparison is a required delivery check.</p>
+    </section>
+  </main>
+  <script src="tokens.js"></script>
+  <script src="review.js"></script>
+</body>
+</html>

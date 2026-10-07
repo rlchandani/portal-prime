@@ -1,0 +1,34 @@
+{
+  "hardware": {
+    "hardware": "cipher",
+    "board": "cipher",
+    "ramKiB": 2848792,
+    "graphics": [
+      "GLES: Qualcomm, Adreno (TM) 615, OpenGL ES 3.2 V@415.0 (GIT@6fec18e925, I6763ffc824, 1723774837) (Date:08/15/24)"
+    ]
+  },
+  "scheduledWaitSeconds": 90,
+  "currentSessionModes": [
+    "10-07 12:01:27.120 kenBurns vp=1920x1280 dpr=1.125",
+    "10-07 12:01:57.144 diptych vp=1920x1280 dpr=1.125",
+    "10-07 12:02:27.185 heroSidebar vp=1920x1280 dpr=1.125",
+    "10-07 12:02:57.207 filmstrip vp=1920x1280 dpr=1.125"
+  ],
+  "hostGfxinfo": {
+    "Total frames rendered": "1152",
+    "Janky frames": "938 (81.42%)",
+    "50th percentile": "19ms",
+    "95th percentile": "24ms",
+    "99th percentile": "121ms",
+    "Number Frame deadline missed": "21",
+    "Number High input latency": "1043",
+    "Number Slow bitmap uploads": "0"
+  },
+  "appPssMiB": {
+    "samples": 6,
+    "minimum": 266.2,
+    "maximum": 410.8,
+    "last": 357.7
+  },
+  "scope": "Existing saved library and overlays; main process includes retained Home/services; host gfxinfo is not a complete WebView delivered-FPS benchmark. Static presentation gaps do not prove jank."
+}

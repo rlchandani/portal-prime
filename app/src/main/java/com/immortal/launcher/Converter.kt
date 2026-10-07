@@ -8,8 +8,6 @@
 package com.immortal.launcher
 
 import android.content.Context
-import java.net.HttpURLConnection
-import java.net.URL
 import org.json.JSONObject
 
 /**
@@ -80,32 +78,50 @@ object Converter {
   /** Convert [amount] [from]→[to] using cached/fetched ECB rates. Null if no rate is
    * available (offline with an empty cache). */
   fun convertCurrency(context: Context, from: String, to: String, amount: Double): Double? {
-    if (from == to) return amount
+    return exchangeRate(context, from, to)?.let { amount * it }
+  }
+
+  /** Fetch one unit rate; ToolsWork callers own and can disconnect the underlying request. */
+  fun exchangeRate(context: Context, from: String, to: String): Double? {
+    ToolsWork.checkpoint()
+    if (from == to) return 1.0
     val rates = rates(context, from) ?: return null
-    val r = rates[to] ?: return null
-    return amount * r
+    ToolsWork.checkpoint()
+    return rates[to]
   }
 
   /** Rates with [base] = 1.0, fetched from Frankfurter and cached per base. */
   private fun rates(context: Context, base: String): Map<String, Double>? {
+    ToolsWork.checkpoint()
     val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     val cacheKey = "rates_$base"
     val tsKey = "rates_${base}_ts"
     val fresh = System.currentTimeMillis() - prefs.getLong(tsKey, 0L) < 6L * 60 * 60 * 1000
+    ToolsWork.checkpoint()
     if (fresh) {
-      prefs.getString(cacheKey, null)?.let { return parseRates(it) }
+      prefs.getString(cacheKey, null)?.let {
+        val cached = parseRates(it)
+        ToolsWork.checkpoint()
+        return cached
+      }
     }
-    val fetched =
-        runCatching {
-              httpGet("https://api.frankfurter.app/latest?from=$base&to=${CURRENCIES.filter { it != base }.joinToString(",")}")
-            }
-            .getOrNull()
-    if (fetched != null && parseRates(fetched) != null) {
+    // Http tracks the socket in the current ToolsWork request and rethrows owned
+    // cancellation. Do not swallow it into the ordinary stale-cache fallback.
+    val fetched = Http.getString(
+        "https://api.frankfurter.app/latest?from=$base&to=${CURRENCIES.filter { it != base }.joinToString(",")}",
+        readTimeoutMs = 10000)
+    ToolsWork.checkpoint()
+    val parsed = fetched?.let(::parseRates)
+    if (parsed != null) {
+      ToolsWork.checkpoint()
       prefs.edit().putString(cacheKey, fetched).putLong(tsKey, System.currentTimeMillis()).apply()
-      return parseRates(fetched)
+      ToolsWork.checkpoint()
+      return parsed
     }
     // Stale cache beats nothing.
-    return prefs.getString(cacheKey, null)?.let { parseRates(it) }
+    val cached = prefs.getString(cacheKey, null)?.let(::parseRates)
+    ToolsWork.checkpoint()
+    return cached
   }
 
   private fun parseRates(json: String): Map<String, Double>? =
@@ -118,11 +134,4 @@ object Converter {
           .getOrNull()
           ?.takeIf { it.isNotEmpty() }
 
-  private fun httpGet(spec: String): String {
-    val c = URL(spec).openConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 10000
-    c.setRequestProperty("User-Agent", "Immortal/1.0")
-    return c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-  }
 }

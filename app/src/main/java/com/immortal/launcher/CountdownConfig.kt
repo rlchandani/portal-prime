@@ -33,6 +33,9 @@ object CountdownConfig {
     /** Whole days from [now] until the next occurrence. 0 = today, negative is past
      * (only possible for one-off events that have already happened). */
     fun daysUntil(now: Calendar = Calendar.getInstance()): Int {
+      CountdownDates.daysUntil(month, day, year, now)?.let { return it }
+      // Preserve the original lenient display for invalid legacy records without rewriting
+      // or deleting their stored dates. New Tools drafts use strict save validation.
       val today = atMidnight(now)
       val target = atMidnight(now).apply {
         set(Calendar.MONTH, month - 1)

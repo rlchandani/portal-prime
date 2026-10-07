@@ -115,7 +115,7 @@ internal fun ApprovedHomePhoto(modifier: Modifier = Modifier, onEnterEdit: (() -
     Box(Modifier.fillMaxSize().background(Brush.verticalGradient(
         0f to Color.Transparent, .4f to Color.Transparent, 1f to Color(0xF2061B1C))))
     Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 36.dp, vertical = 34.dp)) {
-      Text("Photo memory", color = ApprovedHomePalette.Text, fontSize = 36.sp, lineHeight = 46.sp,
+      Text("Photo memory", color = Color(0xFFF4F7F9), fontSize = 36.sp, lineHeight = 46.sp,
           fontWeight = FontWeight.Medium)
       Text(
           when {

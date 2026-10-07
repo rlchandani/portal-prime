@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Dusk Aurora · Widgets</title>
+<link rel="stylesheet" href="aurora.css"/>
+<style>
+html,body{overflow-y:auto}
+.wrap{padding:70px 44px 60px;max-width:1420px;margin:0 auto}
+h1{font-size:32px;font-weight:700;letter-spacing:-.6px}
+.note{color:var(--t-secondary);font-size:15px;margin:6px 0 26px}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.w{border-radius:24px;padding:18px 20px;min-height:190px;position:relative;overflow:hidden;color:#fff;
+  background:var(--glass-bg);backdrop-filter:blur(34px) saturate(1.5);-webkit-backdrop-filter:blur(34px) saturate(1.5);
+  border:.5px solid var(--glass-border);
+  box-shadow:0 .5px 0 var(--glass-highlight) inset,0 22px 44px -18px rgba(0,0,0,.7);
+  display:flex;flex-direction:column}
+.w.wide{grid-column:span 2}
+.rowi{display:flex;align-items:baseline;gap:10px;padding:7px 0;font-size:15.5px;position:relative}
+.rowi+.rowi::before{content:"";position:absolute;top:0;left:0;right:0;height:.5px;background:rgba(255,255,255,.09)}
+.rowi .sym{font-weight:700;font-size:14.5px}
+.rowi .nm{color:var(--t-tertiary);font-size:12.5px}
+.rowi .px{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:500}
+.chg{font-size:12.5px;font-weight:700;padding:2.5px 7px;border-radius:7px;font-variant-numeric:tabular-nums;min-width:58px;text-align:right}
+.chg.upc{background:rgba(48,209,88,.18);color:#4cd964}
+.chg.dnc{background:rgba(255,105,97,.16);color:#ff8a80}
+.spark{margin-left:8px}
+/* weather hero paints its sky */
+.weatherw{background:linear-gradient(180deg,#16294f 0%,#2c4470 46%,#8a5f52 82%,#c98a5e 100%);border-color:rgba(255,255,255,.2)}
+.weatherw .sun{position:absolute;right:22px;top:20px;width:40px;height:40px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#fff3d6,#ffcf7d 60%,#ff9d4d);box-shadow:0 0 30px 7px rgba(255,170,80,.5)}
+.weatherw .hrs{display:flex;justify-content:space-between;margin-top:auto;position:relative;z-index:2}
+.weatherw .h{text-align:center;font-size:12px}
+.weatherw .h .hi{font-size:15px;font-weight:600;margin-top:5px}
+.weatherw .h svg{width:19px;height:19px;margin-top:5px;opacity:.95}
+/* todo */
+.todo .cr{display:flex;align-items:center;gap:11px;padding:8px 0;font-size:15.5px}
+.todo .box{width:21px;height:21px;border-radius:50%;border:1.8px solid rgba(255,255,255,.45);flex:none;display:grid;place-items:center}
+.todo .box.done{background:var(--green);border-color:var(--green)}
+.todo .box svg{width:12px;height:12px}
+.todo .cr.done{opacity:.5;text-decoration:line-through}
+/* HA tiles */
+.ht{border-radius:15px;padding:11px;display:flex;flex-direction:column;gap:12px;
+  background:var(--tile-bg);border:.5px solid var(--tile-border)}
+.ht svg{width:20px;height:20px}
+.ht .n{font-size:12.5px;font-weight:600;line-height:1.2}.ht .s{font-size:10.5px;opacity:.6}
+.ht.on{background:rgba(255,214,110,.94);color:#3d2c00;border-color:transparent;box-shadow:0 6px 18px -6px rgba(255,200,90,.5)}
+.ht.on .s{opacity:.66}
+.ht.scene{background:rgba(124,77,255,.34);border-color:rgba(160,120,255,.3)}
+.tiles4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+/* news */
+.news .art{padding:9px 0;position:relative}
+.news .art+.art::before{content:"";position:absolute;top:0;left:0;right:0;height:.5px;background:rgba(255,255,255,.09)}
+.news .src{font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--cyan)}
+.news .hl{font-size:15px;font-weight:550;line-height:1.35;margin-top:2px}
+.news .tm{font-size:12px;color:var(--t-tertiary);margin-top:2px}
+/* options */
+.opt th,.opt td{font-size:13.5px;text-align:left;padding:6px 4px;font-variant-numeric:tabular-nums}
+.opt th{color:var(--t-tertiary);font-weight:600;font-size:11.5px;letter-spacing:.5px}
+.opt table{width:100%;border-collapse:collapse;margin-top:6px}
+.opt td{border-top:.5px solid rgba(255,255,255,.08)}
+.pill{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}
+.pill.c{background:rgba(48,209,88,.18);color:#4cd964}
+.pill.p{background:rgba(255,105,97,.16);color:#ff8a80}
+</style>
+</head>
+<body>
+<div id="sky"></div><div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div><div id="stars"></div><div id="grain"></div>
+<div id="status"><div>Immortal</div><div>Saturday, August 1</div><div>65°&ensp;100%</div></div>
+<div class="badge" style="z-index:40">MOCK 05 v3 · WIDGETS</div>
+
+<div class="wrap">
+  <h1 class="up">Widgets</h1>
+  <div class="note up" style="animation-delay:.05s">Each widget renders its own miniature world on the shared dark-glass surface.</div>
+  <div class="board">
+
+    <div class="w wide weatherw up" style="animation-delay:.08s">
+      <div class="sun"></div>
+      <div style="position:relative;z-index:2">
+        <div style="font-size:16px;font-weight:600">Jersey City</div>
+        <div style="font-size:52px;font-weight:200;letter-spacing:-2px;line-height:1.05">65°</div>
+        <div style="font-size:13.5px;margin-top:2px">Clear · H:76° L:52°</div>
+      </div>
+      <div class="hrs" id="hrs"></div>
+    </div>
+
+    <div class="w up" style="animation-delay:.12s">
+      <div class="wt" style="color:#f7931a" id="cr-t"></div>
+      <div style="margin-top:8px" id="crypto"></div>
+    </div>
+
+    <div class="w todo up" style="animation-delay:.16s">
+      <div class="wt" style="color:var(--green)" id="td-t"></div>
+      <div style="margin-top:8px" id="todos"></div>
+      <div style="margin-top:auto;font-size:12px;color:var(--t-tertiary)">2 remaining</div>
+    </div>
+
+    <div class="w wide up" style="animation-delay:.20s">
+      <div class="wt" style="color:var(--cyan)" id="hm-t"></div>
+      <div class="tiles4">
+        <div class="ht on"><span id="h1"></span><div><div class="n">Living Room</div><div class="s">On · 80%</div></div></div>
+        <div class="ht"><span id="h2"></span><div><div class="n">Kitchen</div><div class="s">Off</div></div></div>
+        <div class="ht scene"><span id="h3"></span><div><div class="n">Movie Night</div><div class="s">Scene</div></div></div>
+        <div class="ht"><span id="h4"></span><div><div class="n">Bedroom</div><div class="s">Off</div></div></div>
+      </div>
+      <div style="display:flex;gap:18px;margin-top:14px;font-size:13px;color:var(--t-secondary)">
+        <span>🌡 72.4° inside</span><span>💧 41% humidity</span><span>⚡ 412 W</span>
+      </div>
+    </div>
+
+    <div class="w up" style="animation-delay:.24s">
+      <div class="wt" style="color:#5e5ce6" id="st-t"></div>
+      <div style="margin-top:8px" id="stocks"></div>
+    </div>
+
+    <div class="w wide news up" style="animation-delay:.28s">
+      <div class="wt" style="color:var(--orange)" id="nw-t"></div>
+      <div style="margin-top:6px">
+        <div class="art"><div class="src">REUTERS</div><div class="hl">Markets rally as inflation cools for third straight month</div><div class="tm">22 min ago</div></div>
+        <div class="art"><div class="src">ARS TECHNICA</div><div class="hl">New telescope captures sharpest image yet of a distant galaxy</div><div class="tm">1 hr ago</div></div>
+        <div class="art"><div class="src">LOCAL</div><div class="hl">City announces expanded weekend transit service</div><div class="tm">3 hr ago</div></div>
+      </div>
+    </div>
+
+    <div class="w opt up" style="animation-delay:.32s">
+      <div class="wt" style="color:var(--cyan)" id="op-t"></div>
+      <table>
+        <tr><th>CONTRACT</th><th>Δ</th><th>PREM</th></tr>
+        <tr><td>AAPL 235 <span class="pill c">C</span> 12/20</td><td>.27</td><td>$4.15</td></tr>
+        <tr><td>NVDA 130 <span class="pill c">C</span> 12/20</td><td>.24</td><td>$6.80</td></tr>
+        <tr><td>SPY 580 <span class="pill p">P</span> 12/20</td><td>.29</td><td>$5.45</td></tr>
+      </table>
+    </div>
+
+    <div class="w up" style="animation-delay:.36s">
+      <div class="wt" style="color:var(--orange)" id="al-t"></div>
+      <div style="font-size:42px;font-weight:250;margin-top:12px">7:30<span style="font-size:19px;color:var(--t-secondary)"> AM</span></div>
+      <div style="font-size:13px;color:var(--t-tertiary);margin-top:2px">Weekdays · in 11 hr 48 min</div>
+      <div class="switch on" style="margin-top:auto"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="aurora-icons.js"></script>
+<script>
+const spark=(pts,up)=>{const c=up?'#4cd964':'#ff8a80';
+  return `<svg class="spark" width="52" height="18" viewBox="0 0 52 18" fill="none"><path d="${pts}" stroke="${c}" stroke-width="1.6" stroke-linecap="round"/></svg>`;}
+const crow=(sym,nm,px,chg,up,pts)=>`<div class="rowi"><span class="sym">${sym}</span><span class="nm">${nm}</span>${spark(pts,up)}<span class="px">${px}</span><span class="chg ${up?'upc':'dnc'}">${chg}</span></div>`;
+document.getElementById("crypto").innerHTML=[
+ crow("BTC","Bitcoin","$64,210","+2.3%",1,"M2 14 L10 11 L18 12 L27 8 L36 9 L44 5 L50 4"),
+ crow("ETH","Ethereum","$3,180","−1.1%",0,"M2 6 L10 8 L18 7 L27 10 L36 11 L44 12 L50 13"),
+ crow("SOL","Solana","$148","+4.0%",1,"M2 15 L10 13 L18 14 L27 10 L36 7 L44 6 L50 3"),
+].join("");
+document.getElementById("stocks").innerHTML=[
+ crow("AAPL","Apple","228.50","+0.8%",1,"M2 12 L10 11 L18 12 L27 9 L36 8 L44 7 L50 6"),
+ crow("NVDA","NVIDIA","121.40","+3.1%",1,"M2 15 L10 12 L18 13 L27 9 L36 8 L44 5 L50 4"),
+ crow("TSLA","Tesla","242.80","−1.9%",0,"M2 5 L10 7 L18 6 L27 9 L36 10 L44 12 L50 13"),
+].join("");
+const check='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4 10-10"/></svg>';
+document.getElementById("todos").innerHTML=[
+ `<div class="cr"><div class="box"></div>Buy milk</div>`,
+ `<div class="cr"><div class="box"></div>Call plumber</div>`,
+ `<div class="cr done"><div class="box done">${check}</div>Water plants</div>`,
+].join("");
+const sunI='<svg viewBox="0 0 24 24" fill="#ffd66e"><circle cx="12" cy="12" r="5"/></svg>';
+const moonI='<svg viewBox="0 0 24 24" fill="none" stroke="#cfd8ea" stroke-width="2"><path d="M21 12.8A8 8 0 1 1 11.2 3a6 6 0 0 0 9.8 9.8z"/></svg>';
+document.getElementById("hrs").innerHTML=[["8PM",moonI,"63°"],["9PM",moonI,"61°"],["10PM",moonI,"59°"],["11PM",moonI,"57°"],["6AM",sunI,"54°"],["7AM",sunI,"56°"]]
+ .map(([t,ic,d])=>`<div class="h">${t}${ic}<div class="hi">${d}</div></div>`).join("");
+document.getElementById("cr-t").innerHTML=I.clock.replace('currentColor','#f7931a')+" CRYPTO";
+document.getElementById("td-t").innerHTML=I.bell.replace('currentColor','#30d158')+" TO-DO";
+document.getElementById("hm-t").innerHTML=I.homeS.replace('currentColor','#64d2ff')+" MY HOME";
+document.getElementById("st-t").innerHTML=I.clock.replace('currentColor','#5e5ce6')+" STOCKS";
+document.getElementById("nw-t").innerHTML=I.bell.replace('currentColor','#ff9f0a')+" NEWS";
+document.getElementById("op-t").innerHTML=I.clock.replace('currentColor','#64d2ff')+" OPTIONS · 0.20–0.30Δ";
+document.getElementById("al-t").innerHTML=I.bell.replace('currentColor','#ff9f0a')+" ALARM";
+document.getElementById("h1").innerHTML=I.bulb;document.getElementById("h2").innerHTML=I.bulb;
+document.getElementById("h3").innerHTML=I.film;document.getElementById("h4").innerHTML=I.bulb;
+</script>
+</body>
+</html>

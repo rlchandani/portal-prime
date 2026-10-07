@@ -17,7 +17,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -40,6 +39,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,12 +51,12 @@ import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import kotlin.math.roundToInt
 
-private const val LAMP_PREVIEW = "approved_lamp_preview"
+internal const val LAMP_PREVIEW = "approved_lamp_preview"
 private const val LAMP_BRIGHTNESS = "approved_lamp_brightness"
 private const val LAMP_WARMTH = "approved_lamp_warmth"
 private const val LAMP_RED = "approved_lamp_red"
 
-private data class ApprovedLampState(
+internal data class ApprovedLampState(
     val brightness: Float = .9f, val warmth: Float = .6f, val red: Boolean = false,
 )
 
@@ -77,8 +77,9 @@ class LampActivity : ComponentActivity() {
             savedInstanceState.getFloat(LAMP_BRIGHTNESS, .9f),
             savedInstanceState.getFloat(LAMP_WARMTH, .6f), savedInstanceState.getBoolean(LAMP_RED))
             else intent.lampState()
+        if (preview) applyToolsDisplayBars(this)
         setContent {
-            PortalPrimeTheme(darkTheme = false) {
+            PortalPrimeTheme(darkTheme = preview) {
                 if (preview) LampPreview(state, onChange = { state = it }, onBack = ::finishPreview)
                 else SettingsScaffold(title = "Lamp", onBack = { finish() }) {
                     LampControlsContent()
@@ -92,9 +93,15 @@ class LampActivity : ComponentActivity() {
         super.onResume()
         if (preview) {
             panelActive = true
+            applyToolsDisplayBars(this)
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             applyBrightness(state.brightness)
         }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus && preview) applyToolsDisplayBars(this)
     }
 
     override fun onStop() { panelActive = false; restoreWindow(); super.onStop() }
@@ -124,13 +131,13 @@ class LampActivity : ComponentActivity() {
     }
 }
 
-private fun Intent.lampState() = ApprovedLampState(
+internal fun Intent.lampState() = ApprovedLampState(
     getFloatExtra(LAMP_BRIGHTNESS, .9f).coerceIn(.05f, 1f),
     getFloatExtra(LAMP_WARMTH, .6f).coerceIn(0f, 1f), getBooleanExtra(LAMP_RED, false))
-private fun Intent.withLampState(state: ApprovedLampState): Intent =
+internal fun Intent.withLampState(state: ApprovedLampState): Intent =
     putExtra(LAMP_BRIGHTNESS, state.brightness).putExtra(LAMP_WARMTH, state.warmth).putExtra(LAMP_RED, state.red)
 
-private val ApprovedLampStateSaver = listSaver<ApprovedLampState, Any>(
+internal val ApprovedLampStateSaver = listSaver<ApprovedLampState, Any>(
     save = { listOf(it.brightness, it.warmth, it.red) },
     restore = { ApprovedLampState(it[0] as Float, it[1] as Float, it[2] as Boolean) },
 )
@@ -151,7 +158,7 @@ internal fun LampControlsContent() {
     })
 }
 
-private enum class ApprovedLampControl(val title: String, val min: Int) {
+internal enum class ApprovedLampControl(val title: String, val min: Int) {
     BRIGHTNESS("Brightness", 5), WARMTH("Warmth", 0),
 }
 
@@ -179,45 +186,53 @@ private fun LampSettings(state: ApprovedLampState, onChange: (ApprovedLampState)
     }
 }
 
+internal fun toolsLampColor(state: ApprovedLampState): Color {
+    // Preserve the native warmth computation and solid red night-light output.
+    val green = (255 - state.warmth * 60).toInt().coerceIn(0, 255)
+    val blue = (255 - state.warmth * 170).toInt().coerceIn(0, 255)
+    return if (state.red) Color(0xFFFF0000) else Color(255, green, blue)
+}
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LampPreview(state: ApprovedLampState, onChange: (ApprovedLampState) -> Unit, onBack: () -> Unit) {
     // Preview controls stay dark against every lamp color, regardless of settings appearance.
-    PortalPrimeTheme(darkTheme = true) {
+    CompositionLocalProvider(LocalApprovedPalette provides ApprovedToolsPalette) {
         val context = LocalContext.current
         val palette = LocalApprovedPalette.current
-        var controls by remember { mutableStateOf(true) }
-        var editor by remember { mutableStateOf<ApprovedLampControl?>(null) }
-        // Retain the original warmth computation and solid red night-light output.
-        val green = (255 - state.warmth * 60).toInt().coerceIn(0, 255)
-        val blue = (255 - state.warmth * 170).toInt().coerceIn(0, 255)
-        val color = if (state.red) Color(0xFFFF0000) else Color(255, green, blue)
+        var controls by rememberSaveable { mutableStateOf(true) }
+        var editor by rememberSaveable { mutableStateOf<ApprovedLampControl?>(null) }
         BackHandler(onBack = onBack)
-        Box(Modifier.fillMaxSize().background(color).clickable { controls = !controls },
-            contentAlignment = Alignment.Center) {
-            Box(Modifier.align(Alignment.TopStart).padding(start = 40.dp, top = 38.dp)) {
-                LampPreviewButton("Back", back = true, onClick = onBack)
+        Column(Modifier.fillMaxSize()) {
+            ToolsDisplayHeader("‹ Lamp", "Lamp display", onBack) {
+                ToolsButton(if (controls) "Hide controls" else "Show controls") { controls = !controls }
             }
-            if (controls) {
-                Surface(color = palette.surface, shape = RoundedCornerShape(24.dp),
-                    border = BorderStroke(1.dp, palette.divider), modifier = Modifier.width(700.dp)) {
-                    Column(Modifier.padding(horizontal = 36.dp, vertical = 34.dp)) {
-                        Text("Lamp", color = palette.text, fontSize = 34.sp, lineHeight = 44.sp,
-                            fontWeight = FontWeight.Medium)
-                        SectionLabel("Options")
-                        Surface(color = palette.background, shape = RoundedCornerShape(24.dp),
-                            border = BorderStroke(1.dp, palette.divider)) {
-                            Column { LampRows(state, onChange, preview = true, onEdit = { editor = it }) }
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            LampPreviewButton("Hide controls") { controls = false }
-                            LampPreviewButton("Sleep") { ScreenControl.sleep(context) }
+            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().background(toolsLampColor(state))) {
+                if (controls) {
+                    Surface(color = palette.surface, shape = RoundedCornerShape(24.dp),
+                        border = BorderStroke(1.dp, palette.divider),
+                        modifier = Modifier.align(Alignment.BottomEnd).padding(horizontal = 40.dp, vertical = 32.dp)
+                            .widthIn(max = 560.dp).fillMaxWidth()
+                            .heightIn(max = (maxHeight - 64.dp).coerceAtLeast(68.dp))) {
+                        Column(Modifier.verticalScroll(rememberScrollState()).padding(32.dp),
+                            verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                            ToolsLampSliders(state, onChange, onEdit = { editor = it })
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                ToolsButton(if (state.red) "Red light: On" else "Red light: Off",
+                                    modifier = Modifier.semantics {
+                                        contentDescription = "Red night light"
+                                        stateDescription = if (state.red) "On" else "Off"
+                                    }) { onChange(state.copy(red = !state.red)) }
+                                ToolsButton("Sleep") { ScreenControl.sleep(context) }
+                            }
                         }
                     }
                 }
-            } else LampPreviewButton("Show controls") { controls = true }
+            }
         }
         editor?.let { control ->
-            LampControlDialog(control, state, onCancel = { editor = null }) { value ->
+            ToolsLampNumberSheet(control, state, onDismiss = { editor = null }) { value ->
                 onChange(if (control == ApprovedLampControl.BRIGHTNESS) state.copy(brightness = value)
                     else state.copy(warmth = value))
                 editor = null
@@ -276,18 +291,6 @@ private fun LampSliderRow(
             Text("${(value * 100).roundToInt()}%", color = if (preview) Color(0xFFE9EDF3) else palette.secondary,
                 fontSize = 24.sp, lineHeight = 32.sp, modifier = Modifier.width(72.dp))
         }
-    }
-}
-
-@Composable
-private fun LampPreviewButton(label: String, back: Boolean = false, onClick: () -> Unit) {
-    val palette = LocalApprovedPalette.current
-    Surface(color = if (back) Color(0xFF1A3039) else palette.surface2,
-        shape = RoundedCornerShape(16.dp), border = if (back) BorderStroke(1.dp, Color(0xFF657980)) else null,
-        modifier = Modifier.defaultMinSize(minHeight = 68.dp)
-            .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, ringColor = palette.accent, onClick = onClick)) {
-        Text(label, color = Color.White, fontSize = 24.sp, lineHeight = 32.sp,
-            fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp))
     }
 }
 

@@ -1,0 +1,1474 @@
+{
+  "timestamp": "2026-10-04T22:30:04.040Z",
+  "total": 293,
+  "passed": 293,
+  "failed": [],
+  "results": [
+    {
+      "name": "Chime mask 0 voice-test",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 0 play-chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 0 test-sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 0 test-sunset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 0 play-ping",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 0 voice picker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 0 sunrise variant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 1 voice-test",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 1 play-chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 1 test-sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 1 test-sunset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 1 play-ping",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 1 voice picker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 1 sunrise variant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 2 voice-test",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 2 play-chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 2 test-sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 2 test-sunset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 2 play-ping",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 2 voice picker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 2 sunrise variant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 3 voice-test",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 3 play-chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 3 test-sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 3 test-sunset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 3 play-ping",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 3 voice picker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 3 sunrise variant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 4 voice-test",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 4 play-chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 4 test-sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 4 test-sunset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 4 play-ping",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 4 voice picker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 4 sunrise variant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 5 voice-test",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 5 play-chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 5 test-sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 5 test-sunset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 5 play-ping",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 5 voice picker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 5 sunrise variant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 6 voice-test",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 6 play-chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 6 test-sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 6 test-sunset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 6 play-ping",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 6 voice picker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 6 sunrise variant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 7 voice-test",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 7 play-chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 7 test-sunrise",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 7 test-sunset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 7 play-ping",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 7 voice picker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Chime mask 7 sunrise variant",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sleep hides screensaver.sleepTimerMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sleep shows screensaver.pauseAudioOnSleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sleep shows screensaver.closeAppOnSleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sleep shows screensaver.sleepTimerMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sleep shows screensaver.pauseAudioOnSleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sleep shows screensaver.closeAppOnSleep",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.fit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.intervalSec",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.photoSource",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.screensaverStyle",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.clockFace",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.dismissTarget",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver shows screensaver.fit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver shows screensaver.intervalSec",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.fit",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver shows screensaver.intervalSec",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.overnightStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.overnightEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver hides screensaver.overnightNightClock",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver shows screensaver.overnightStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver shows screensaver.overnightEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "screensaver shows screensaver.overnightNightClock",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar hides calendar.widgetOn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar hides calendar.range",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar hides calendar.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar hides calendar.side",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar hides calendar.range",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar hides calendar.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar hides calendar.side",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar shows calendar.widgetOn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar shows calendar.widgetOn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar shows calendar.range",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar shows calendar.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar shows calendar.side",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt hides mqtt.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt hides mqtt.port",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt hides mqtt.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt hides mqtt.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt hides mqtt.useTls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt shows mqtt.enabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt shows mqtt.host",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt shows mqtt.port",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt shows mqtt.username",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt shows mqtt.password",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mqtt shows mqtt.useTls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "multiroom hides immortal.snapcastHost",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "multiroom hides immortal.maPort",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "multiroom hides immortal.maUsername",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "multiroom hides immortal.maPassword",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "multiroom shows immortal.snapcastHost",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "multiroom shows immortal.maPort",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "multiroom shows immortal.maUsername",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "multiroom shows immortal.maPassword",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "chime hides chime.quietStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "chime hides chime.quietEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "chime shows chime.quietStartMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "chime shows chime.quietEndMin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "display hides display.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "display hides display.until",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "display hides display.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "display shows display.from",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "display shows display.until",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "display shows display.warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "faces hides faces.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "faces hides faces.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "faces hides faces.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "faces shows faces.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "faces shows faces.id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "faces shows faces.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "countdowns hides countdowns.year",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "countdowns shows countdowns.year",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source default enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source default enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source folder enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source folder enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source album enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source album enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source immich enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source immich enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source smb enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source smb enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source dav enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source dav enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source web enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Cache source web enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode classic enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode classic enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode shuffle enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode shuffle enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode kenBurns enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode kenBurns enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode diptych enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode diptych enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode framed enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode framed enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode galleryWall enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode galleryWall enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode push enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode push enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode memories enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode memories enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode panorama enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode panorama enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode polaroid enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode polaroid enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode mosaic enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode mosaic enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode filmstrip enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode filmstrip enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode cinema enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode cinema enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode heroSidebar enabled false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Fit mode heroSidebar enabled true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sound volume off",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sound volume rain",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sound volume ocean",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sound volume fire",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sound volume white",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sound volume pink",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sound volume brown",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital false digitalclock.face",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital false digitalclock.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital false digitalclock.layout",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital false digitalclock.background",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital false digitalclock.showDate",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital false digitalclock.showSeconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Legacy clock field hidden digitalclock.style",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Legacy clock field hidden digitalclock.color",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Legacy clock field hidden digitalclock.font",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Legacy clock field hidden digitalclock.glow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital true digitalclock.face",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital true digitalclock.size",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital true digitalclock.layout",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital true digitalclock.background",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital true digitalclock.showDate",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Digital true digitalclock.showSeconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Legacy clock field hidden digitalclock.style",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Legacy clock field hidden digitalclock.color",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Legacy clock field hidden digitalclock.font",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Legacy clock field hidden digitalclock.glow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Quick buttons child false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Quick buttons child true",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Welcome editor stays available welcome.voice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Welcome editor stays available welcome.userName",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Welcome editor stays available welcome.greetingNight",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Welcome editor stays available welcome.greetingMorning",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Welcome editor stays available welcome.greetingAfternoon",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Welcome editor stays available welcome.greetingEvening",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Welcome editor stays available welcome.textScale",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Welcome editor stays available welcome.opacity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Native sunrise remains editable sunrise.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Native sunrise remains editable sunrise.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Native sunrise remains editable sunrise.rampMinutes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Native sunrise remains editable sunrise.chime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Native sunrise remains editable sunrise.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Screensaver master hides entire body",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA dismissal path editor exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA dismissal path hides outside HA mode",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Disabled countdown stays stopped",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sleep countdown starts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sleep countdown stops",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA discovery respects HaClient domain filter",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA picker excludes unsupported climate",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA picker excludes unsupported cover",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA picker excludes unsupported media_player",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA group cap is twelve",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA overflow hint",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA search entity id uncaps list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA searched groups cannot collapse",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA explicit no matches",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA empty discovery has no fake groups",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA empty discovery hides search",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Web source hides Immortal overlays",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar-url blank save disabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar-url absent removal for blank initial",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar-url accepts webcal://example.invalid/calendar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar-url accepts https://calendar.google.com/calendar/ical/sample",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar-url accepts https://example.invalid/feed.ics",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar-url rejects https://example.invalid/home",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "calendar-url rejects ftp://example.invalid/feed.ics",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "album blank save disabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "album absent removal for blank initial",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "album accepts https://photos.icloud.com/shared/album/sample",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "album accepts https://photos.app.goo.gl/sample",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "album accepts https://nas.invalid/mo/sharing/sample",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "album rejects https://example.invalid/photos",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "album rejects https://nas.invalid/mo/sharing/",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "web blank save disabled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "web absent removal for blank initial",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "web accepts http://example.invalid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "web accepts https://example.invalid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "web rejects ftp://example.invalid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "web rejects HTTPS://example.invalid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "existing calendar exposes removal",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "folder roots have no Use button",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "folder navigation updates breadcrumb",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "folder offers Up",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "folder selection only inside folder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "folder Up returns to roots",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dav empty media does not connect",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dav empty media explains failure",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "smb empty media does not connect",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "smb empty media explains failure",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "smb successful media count displayed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "smb success has Done",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "smb success hides credentials",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "smb Done returns to frame",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dav successful media count displayed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dav success has Done",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dav success hides credentials",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dav Done returns to frame",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Immich no albums offers whole library",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Disabled multiroom hides Sign in",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Enabled multiroom shows Sign in",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Sound preview cannot bypass disabled parents",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HA target step is one degree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Review harness exposes voice through its parent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "All observed offline voice labels included",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Calendar search never manufactures a feed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Alarm editor stays available alarm.hour",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Alarm editor stays available alarm.minute",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Alarm editor stays available alarm.days",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Alarm minute wraps by five",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Options uses native default delta band",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Camera rejects unsupported address rtsp://x",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Camera rejects unsupported address rtsps://sample.invalid/stream",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Camera rejects unsupported address RTSP://sample.invalid/stream",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Camera optional name falls back to Camera",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Crypto optional symbol falls back to normalized ID",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Clear completed absent with no completed items",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Clear completed appears only with completed items",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Clearing completed removes its action",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Lamp normal mode shows Warmth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Lamp night light hides Warmth and retains Brightness",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Lamp hidden controls remove the panel",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Lamp controls can be restored",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no runtime errors",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "errors": []
+}

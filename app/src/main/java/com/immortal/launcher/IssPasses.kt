@@ -71,9 +71,16 @@ object IssPasses {
    *   anything lower is lost behind buildings/trees from an indoor Portal anyway).
    */
   fun predict(context: Context, max: Int = 5, horizonDeg: Double = 10.0): List<Pass> {
-    val (lat, lon) = Weather.coordinates(context) ?: return emptyList()
-    val sat = loadSat(context) ?: return emptyList()
-    return runCatching { scan(sat, lat, lon, max, horizonDeg) }.getOrDefault(emptyList())
+    ToolsWork.checkpoint()
+    val coords = Weather.coordinates(context)
+    ToolsWork.checkpoint()
+    val (lat, lon) = coords ?: return emptyList()
+    val sat = loadSat(context)
+    ToolsWork.checkpoint()
+    if (sat == null) return emptyList()
+    val passes = runCatching { scan(sat, lat, lon, max, horizonDeg) }
+    ToolsWork.checkpoint()
+    return passes.getOrDefault(emptyList())
   }
 
   /** The very next pass (or null), for the compact home tile subtitle. */
@@ -103,6 +110,7 @@ object IssPasses {
     var prevMs = 0L
 
     for (i in 0..steps) {
+      ToolsWork.checkpoint()
       val tMs = nowMs + (i * STEP_S * 1000).toLong()
       val look = lookAngle(sat, tMs, obs, latRad, lonRad) ?: continue
       val elDeg = look.first / DEG
@@ -204,6 +212,7 @@ object IssPasses {
     var l2 = prefs.getString("tle2", null)
     if (l1 == null || l2 == null || age > TLE_FRESH_MS) {
       val fetched = fetchTle()
+      ToolsWork.checkpoint()
       if (fetched != null) {
         l1 = fetched.first
         l2 = fetched.second
@@ -229,21 +238,32 @@ object IssPasses {
       val l2 = lines.firstOrNull { it.startsWith("2 ") }
       if (l1 != null && l2 != null) return l1 to l2
     }
+    ToolsWork.checkpoint()
     runCatching {
       val j = JSONObject(httpGet("https://api.wheretheiss.at/v1/satellites/$CATNR/tles"))
       val l1 = j.optString("line1").trim()
       val l2 = j.optString("line2").trim()
       if (l1.startsWith("1 ") && l2.startsWith("2 ")) return l1 to l2
     }
+    ToolsWork.checkpoint()
     return null
   }
 
   private fun httpGet(spec: String): String {
+    ToolsWork.checkpoint()
     val c = URL(spec).openConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 10000
-    c.setRequestProperty("User-Agent", "Immortal/1.0")
-    return c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
+    try {
+      ToolsWork.track(c)
+      c.connectTimeout = 8000
+      c.readTimeout = 10000
+      c.setRequestProperty("User-Agent", "Immortal/1.0")
+      ToolsWork.checkpoint()
+      val body = c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
+      ToolsWork.checkpoint()
+      return body
+    } finally {
+      runCatching { ToolsWork.disconnect(c) }
+    }
   }
 
   // ---- Geometry helpers --------------------------------------------------------
@@ -452,6 +472,7 @@ object IssPasses {
       var sineo1 = 0.0
       var coseo1 = 0.0
       while (abs(tem5) >= 1.0e-12 && ktr <= 10) {
+        ToolsWork.checkpoint()
         sineo1 = sin(eo1)
         coseo1 = cos(eo1)
         tem5 = 1.0 - coseo1 * axnl - sineo1 * aynl

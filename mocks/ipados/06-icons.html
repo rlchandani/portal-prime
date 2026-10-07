@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>iPadOS · App Icon Styling</title>
+<link rel="stylesheet" href="ds.css"/>
+<style>
+  body { overflow-y:auto; background: radial-gradient(120% 90% at 15% 10%, #6db3f2 0%, #3a7bd5 45%, #2b5876 100%); min-height:100%; }
+  .wrap { padding: 34px 44px 60px; }
+  .title { color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.3); }
+  .note { color: rgba(255,255,255,.85); font-size:15px; margin:6px 0 26px; max-width: 780px; }
+  .sec { color:#fff; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; opacity:.85; margin: 28px 0 14px; }
+  .row { display:flex; gap:30px; flex-wrap:wrap; }
+  .spec { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .spec .lbl { color:#fff; font-size:14px; opacity:.9; }
+  .ic { width:120px; height:120px; display:grid; place-items:center; }
+  .ic .em { font-size:56px; }
+  .ic svg { width:58px; height:58px; }
+  /* squircle w/ gloss = .appicon from ds.css */
+  .anatomy { background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.24); border-radius: 20px; padding: 22px; color:#fff; max-width: 820px; }
+  .anatomy li { margin: 6px 0; font-size: 15px; opacity:.92; }
+  .badge { position: fixed; top: 14px; right: 20px; color: rgba(255,255,255,.7); font-size: 12px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div class="badge">MOCK 06 · APP ICON STYLING</div>
+  <div class="wrap">
+    <div class="t-largeTitle title">App icons</div>
+    <div class="note">One consistent squircle system: 24% continuous-corner radius, a soft drop shadow for depth, and a top-down gloss sheen — applied uniformly so every icon (stock app or ours) reads as a premium iOS tile.</div>
+
+    <div class="sec">Our custom icons (gradient tiles)</div>
+    <div class="row" id="ours"></div>
+
+    <div class="sec">Stock apps (masked into the same squircle)</div>
+    <div class="row" id="stock"></div>
+
+    <div class="sec">Anatomy</div>
+    <div class="anatomy">
+      <ul>
+        <li><b>Shape:</b> continuous-corner squircle, radius ≈ 24% of the icon size (110px → ~26px)</li>
+        <li><b>Shadow:</b> 0 6px 16px −6px rgba(0,0,0,.35) for a lifted, tactile feel</li>
+        <li><b>Gloss:</b> a subtle top-down white gradient (28%→0) for the "candy" finish</li>
+        <li><b>Custom icons:</b> a diagonal 2–3 stop gradient in the app's accent + a centered white glyph</li>
+        <li><b>Stock icons:</b> the app's own icon, center-cropped and masked to the squircle so it matches</li>
+        <li><b>Label:</b> Inter 15/500, white, one line, 1px shadow for legibility on any wallpaper</li>
+      </ul>
+    </div>
+  </div>
+<script>
+function ic(bg,inner){ return `<div class="ic appicon ${bg}">${inner}</div>`; }
+const GEAR='<svg viewBox="0 -960 960 960" fill="#fff"><path d="M421-80q-14 0-25-9t-13-23l-15-94q-19-7-40-19t-37-25l-86 40q-14 6-28 1.5T155-226L97-330q-8-13-4.5-27t15.5-23l80-59q-2-9-2.5-20.5T185-480q0-9 .5-20.5T188-521l-80-59q-12-9-15.5-23t4.5-27l58-104q8-13 22-17.5t28 1.5l86 40q16-13 37-25t40-18l15-95q2-14 13-23t25-9h118q14 0 25 9t13 23l15 94q19 7 40.5 18.5T669-710l86-40q14-6 27.5-1.5T804-734l59 104q8 13 4.5 27.5T852-580l-80 57q2 10 2.5 21.5t.5 21.5q0 10-.5 21t-2.5 21l80 58q12 8 15.5 22.5T863-330l-58 104q-8 13-22 17.5t-28-1.5l-86-40q-16 13-36.5 25.5T592-206l-15 94q-2 14-13 23t-25 9H421Zm59-270q54 0 92-38t38-92q0-54-38-92t-92-38q-54 0-92 38t-38 92q0 54 38 92t92 38Z"/></svg>';
+const ours = [["Settings","bg-gray",GEAR],["Tools","bg-teal","<span class='em'>🧰</span>"],["Calls","bg-green","<span class='em'>📞</span>"],["Home","bg-cyan","<span class='em'>🏠</span>"],["App Store","bg-indigo","<span class='em'>▦</span>"]];
+document.getElementById("ours").innerHTML = ours.map(([l,b,i])=>`<div class="spec">${ic(b,i)}<div class="lbl">${l}</div></div>`).join("");
+const stock = [["Browser","bg-blue","<span class='em'>🌐</span>"],["VLC","bg-orange","<span class='em'>🔶</span>"],["Jarvis","bg-purple","<span class='em'>🎙️</span>"],["NewPipe","bg-red","<span class='em'>▶️</span>"],["Weather","bg-cyan","<span class='em'>🌤️</span>"]];
+document.getElementById("stock").innerHTML = stock.map(([l,b,i])=>`<div class="spec">${ic(b,i)}<div class="lbl">${l}</div></div>`).join("");
+</script>
+</body>
+</html>

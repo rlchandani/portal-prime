@@ -540,3 +540,11 @@ all 95 registry IDs/types/titles/predicates/bindings and all 76 supplemental
 IDs/titles/pages against the source; verify local document links. These checks
 do not pass G0. The applicable **entry × control/action × state × return**
 denominator is still pending, especially dynamic rows and platform handoffs.
+
+### Prepared changes after inventory checkpoint
+
+D16 is addressed in a working-tree candidate by providing
+`LocalApprovedSettingsBack = onDismiss` at `ToolPageOverlay`. It has not been
+installed or reproduced on the device because automatic permission review
+timed out before executing the navigation test. This note does not convert its
+source diagnosis into a runtime pass.
