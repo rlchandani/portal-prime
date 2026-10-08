@@ -73,6 +73,7 @@ class PhotoDreamService : DreamService() {
   override fun onDreamingStopped() {
     Log.i(TAG, "onDreamingStopped")
     super.onDreamingStopped()
+    DreamPolicy.onImmortalDreamingStopped(this)
   }
 
   override fun onWakeUp() {

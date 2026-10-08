@@ -16,8 +16,8 @@ import android.content.IntentFilter
 /**
  * Process-wide hooks. As the home app our process is effectively persistent, so a
  * runtime-registered receiver here behaves like a manifest one without the
- * background-broadcast restrictions: DREAMING_STOPPED → [DreamPolicy.onDreamingStopped]
- * (keep the photo frame up when the system force-wakes the screensaver).
+ * background-broadcast restrictions. DREAMING_STOPPED is a presence observation only;
+ * PhotoDreamService's own stop callback owns automatic photo-frame recovery.
  */
 class ImmortalApp : Application() {
   override fun onCreate() {

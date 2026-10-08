@@ -265,7 +265,7 @@ object SleepScheduler {
       }
 
   /**
-   * Called from [DreamPolicy.onDreamingStopped] before it would relaunch the photo frame. Returns
+   * Called from [DreamPolicy.onImmortalDreamingStopped] before it would relaunch the photo frame. Returns
    * true if the overnight window owns the screen and the caller must NOT relaunch (we either left a
    * live session alone, or re-blanked the dark window in place). Returns false to allow the normal
    * relaunch (outside the window, or night-clock mode where the relaunch renders the clock).

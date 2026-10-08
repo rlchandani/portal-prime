@@ -70,6 +70,11 @@ class PortalUxInstrumentation : Instrumentation() {
                 finish(if (dashboard.getBoolean("homeDashboardCompleted")) 0 else 1, dashboard)
                 return
             }
+            if (options.getString("command") == "dreamRecovery") {
+                val recovery = DreamRecoveryDeviceChecks.run(this, automation)
+                finish(if (recovery.getBoolean("dreamRecoveryCompleted")) 0 else 1, recovery)
+                return
+            }
             if (options.getString("command") == "slideshowReport") {
                 finish(0, SlideshowValidationReport.read(targetContext,
                     requireNotNull(options.getString("runId"))))

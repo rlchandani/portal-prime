@@ -162,11 +162,17 @@ object DreamPolicy {
       }
 
   /**
-   * Called on ACTION_DREAMING_STOPPED. Classifies the stop once ([classifyDreamStop]), records
-   * the presence consequence in the shared [PresenceHub] (which the music companion reads), and
-   * — as the screensaver's own reaction — re-asserts the holding frame only on a force-wake.
+   * Observe the system broadcast for presence only. It contains no component identity: Meta's
+   * own dream can stop while the user is navigating, so this signal must never open our frame.
    */
-  fun onDreamingStopped(context: Context) {
+  fun onDreamingStopped(context: Context) =
+      handleDreamStopped(context, recoverImmortalFrame = false)
+
+  /** Only [PhotoDreamService]'s lifecycle callback proves that our screensaver was interrupted. */
+  internal fun onImmortalDreamingStopped(context: Context) =
+      handleDreamStopped(context, recoverImmortalFrame = true)
+
+  private fun handleDreamStopped(context: Context, recoverImmortalFrame: Boolean) {
     if (!ScreensaverConfig.load(context).enabled) {
       Log.i(TAG, "screensaver disabled; not relaunching frame")
       return
@@ -180,11 +186,11 @@ object DreamPolicy {
             inStockHandoff = inStockHandoff,
             interactive = pm?.isInteractive == true,
         )
-    Log.i(TAG, "dream stopped; verdict = $verdict")
+    Log.i(TAG, "dream stopped; source = ${if (recoverImmortalFrame) "Immortal" else "system"}; verdict = $verdict")
     // Single source of truth: tell the hub the presence consequence (it broadcasts to the
     // companion). SUPPRESSED (a Calls handoff) leaves presence untouched.
     PresenceHub.onDreamStopped(context, verdict)
-    if (verdict != DreamStopVerdict.REDREAM) return
+    if (!recoverImmortalFrame || verdict != DreamStopVerdict.REDREAM) return
     // Inside the overnight window the SleepScheduler owns the screen. In dark mode, relaunching the
     // frame would wake the screen just to blank it again — a flash every time a stray sibling/system
     // dream cycles overnight (issue #73). Let the scheduler re-blank in place instead.

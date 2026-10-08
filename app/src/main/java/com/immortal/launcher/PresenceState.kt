@@ -159,8 +159,8 @@ object PresenceHub {
           addAction(Intent.ACTION_POWER_DISCONNECTED)
         }
     // DREAMING_STOPPED is intentionally NOT handled here — it's routed through
-    // [DreamPolicy.onDreamingStopped], which owns the frame action and then calls
-    // [onDreamStopped] so the hub stays the single source of truth.
+    // [DreamPolicy.onDreamingStopped] for presence observation. Only the owned
+    // PhotoDreamService callback can also recover the frame.
     val receiver =
         object : BroadcastReceiver() {
           override fun onReceive(c: Context, intent: Intent) {
