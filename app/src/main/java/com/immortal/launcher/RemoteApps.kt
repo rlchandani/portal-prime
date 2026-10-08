@@ -10,9 +10,13 @@ package com.immortal.launcher
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Handler
+import android.os.Looper
 import androidx.core.graphics.drawable.toBitmap
 import java.io.ByteArrayOutputStream
 import java.util.Locale
+import java.util.concurrent.FutureTask
+import java.util.concurrent.TimeUnit
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -68,9 +72,39 @@ object RemoteApps {
             ?: context.packageManager.getLeanbackLaunchIntentForPackage(pkg)
             ?: return false
     return runCatching {
-          context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-          true
-        }
-        .getOrDefault(false)
+      if (!dismissDreamOnMain()) false
+      else {
+        context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        true
+      }
+    }.getOrDefault(false)
+  }
+
+  private fun dismissDreamOnMain(): Boolean {
+    val dismiss = {
+      // The selected app owns this navigation. Finish only Immortal's Dream and
+      // record the deliberate exit before its recovery callback can run.
+      ImmortalDreamNavigation.dismissForNavigation()
+      true
+    }
+    if (Looper.myLooper() == Looper.getMainLooper()) return dismiss()
+
+    // HTTP and scene workers are off-main; only the Dream lifecycle needs main.
+    // Launch afterwards on the caller, so timed-out work cannot open an app later.
+    val main = Handler(Looper.getMainLooper())
+    val task = FutureTask(dismiss)
+    if (!main.post(task)) return false
+    return try {
+      task.get(2, TimeUnit.SECONDS)
+    } catch (_: InterruptedException) {
+      Thread.currentThread().interrupt()
+      false
+    } catch (_: Exception) {
+      false
+    } finally {
+      // Discard a queued dismissal if the main thread did not process it in time.
+      task.cancel(false)
+      main.removeCallbacks(task)
+    }
   }
 }
