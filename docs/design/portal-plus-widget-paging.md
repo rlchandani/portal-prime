@@ -2,12 +2,13 @@
 
 Validated October 7, 2026 on the connected Portal+, Android 10 / API 29,
 2160 × 1440, density 180 dpi, 60 Hz. Work remains on
-`codex/portal-plus-approved-ux`.
+`codex/portal-plus-widget-page-order`.
 
 ## Behavior
 
-- In the Home widget area, a physical right swipe advances one page; a left swipe
-  returns one page. The first and last pages clamp without wrapping.
+- In the Home widget area, a physical right-to-left swipe advances from page 1
+  to page 2; left-to-right returns to page 1. The first and last pages clamp
+  without wrapping. Pages increase from left to right.
 - The Favorite apps row shows the current page and actual total, such as
   `1 of 2`. Previous and More widgets buttons are removed.
 - The same immediate swipe works in Customize. A stationary long press still
@@ -44,9 +45,43 @@ threshold distances are normalized to the 1920 px logical canvas. Existing
 browser Move/Size dialogs remain simulations; native held reorder and edge
 scrolling are verified on the device.
 
-## Verification
+The direction was corrected on October 7 after the user's clarification. The
+original implementation followed an earlier request for right-swipe advancement.
+`HomePresentation.pageAfterSwipe` now maps a left swipe to the next index;
+`pageOffset` places later pages to the right and moves both pages left when
+advancing. Labels continue to use the same page index as widget membership.
+The cached placement animation, duration, widget order and sizes are unchanged.
 
-The benchmark APK used for this widget paging validation is non-debuggable,
+## Direction correction validation
+
+The corrected benchmark APK is installed on the connected Portal+:
+
+```text
+applicationId: com.immortal.launcher.debug
+SHA256: 6a9d411ee6b1e0bde74c8b735fb8e332a0fea36ef2749e14ca1f1aafe46fb76d
+```
+
+- Debug, benchmark and test APK builds passed.
+- All 697 unit tests passed. The new paging regressions cover left-to-next,
+  right-to-previous, both boundaries and the spatial placement of neighboring
+  pages at the start, midpoint and end of a slide.
+- The native `widgetPaging` probe passed 245 assertions on the saved two-page
+  layout. It checks labels against visible widgets, physical swipe direction,
+  cancellation, short gestures, boundaries, Home/Customize continuity,
+  accessibility navigation followed by touch, and held-reorder cancellation.
+  Widget preferences and their file remained unchanged.
+- Browser verification passed 212 checks across the navigation and importing
+  Tools mocks, with no browser errors. It verifies both animation directions
+  alongside the page counter and visible widget identities.
+- After six warm-up swipes, twenty measured swipes produced a rolling
+  120-frame sample: median 7.72 ms, p95 21.12 ms, p99 28.46 ms, with nine frames
+  above 16.67 ms. The full interval recorded 20 janky frames out of 260.
+  These results overlap the earlier Home measurements below; this small
+  direction correction establishes correct behavior, not fewer missed frames.
+
+## Original verification
+
+The benchmark APK used for the original widget paging validation is non-debuggable,
 uses the existing debug package and signing key, and preserves device
 configuration. The subsequent [Meta charcoal update](portal-plus-meta-colors.md)
 records the currently installed colors and fresh device checks:

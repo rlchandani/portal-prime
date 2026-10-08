@@ -604,16 +604,16 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
           dock: document.querySelector('.live-launcher > .dock'),
         };
       });
-      const widgetSlide = await swipeWidgets(swipePage, 140);
-      check(`${demo}: right swipe over a widget advances one page without activating it`,
+      const widgetSlide = await swipeWidgets(swipePage, -140);
+      check(`${demo}: left swipe over a widget advances one page without activating it`,
         (await swipeState()).homePage === 1 && (await swipeState()).route.screen === 'home' &&
         !(await swipeState()).simulation && await counter() === '2 of 2');
-      check(`${demo}: whole widget page slides right with a clipped inert outgoing page and stationary chrome`,
+      check(`${demo}: whole widget page slides left with a clipped inert outgoing page and stationary chrome`,
         widgetSlide.widgets.length === 1 && widgetSlide.widgets.every(timing =>
           timing.duration === 180 && timing.easing === 'cubic-bezier(0.215, 0.61, 0.355, 1)') &&
-        JSON.stringify(widgetSlide.incoming) === JSON.stringify([['translateX(-100%)', 'translateX(0px)']]) &&
+        JSON.stringify(widgetSlide.incoming) === JSON.stringify([['translateX(100%)', 'translateX(0px)']]) &&
         widgetSlide.outgoing?.inert && widgetSlide.outgoing.hidden === 'true' && widgetSlide.outgoing.clipped &&
-        JSON.stringify(widgetSlide.outgoing.frames) === JSON.stringify([['translateX(0px)', 'translateX(100%)']]) &&
+        JSON.stringify(widgetSlide.outgoing.frames) === JSON.stringify([['translateX(0px)', 'translateX(-100%)']]) &&
         widgetSlide.outgoing.timing.every(timing => timing.duration === 180 &&
           timing.easing === 'cubic-bezier(0.215, 0.61, 0.355, 1)') &&
         widgetSlide.chrome === 0);
@@ -624,30 +624,30 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
         await swipeRoot.locator('[data-tab="home"] [data-action="page"]').count() === 0 &&
         !/Previous|More widgets/.test(await swipeRoot.locator('[data-tab="home"] .widget-page').innerText()) &&
         await swipeRoot.locator('[data-tab="home"] .widget-page [data-screen="apps"]').isVisible());
-      await swipeWidgets(swipePage, 140);
-      check(`${demo}: right swipe at the last page clamps without a widget tap`,
-        (await swipeState()).homePage === 1 && !(await swipeState()).simulation && await counter() === '2 of 2');
-      const leftSlide = await swipeWidgets(swipePage, -140);
-      await swipeSettled();
-      check(`${demo}: left swipe returns to the previous page`, (await swipeState()).homePage === 0 && await counter() === '1 of 2');
-      check(`${demo}: whole widget page slides left when returning`,
-        JSON.stringify(leftSlide.incoming) === JSON.stringify([['translateX(100%)', 'translateX(0px)']]) &&
-        JSON.stringify(leftSlide.outgoing?.frames) === JSON.stringify([['translateX(0px)', 'translateX(-100%)']]));
       await swipeWidgets(swipePage, -140);
-      check(`${demo}: left swipe at the first page clamps without a widget tap`,
+      check(`${demo}: left swipe at the last page clamps without a widget tap`,
+        (await swipeState()).homePage === 1 && !(await swipeState()).simulation && await counter() === '2 of 2');
+      const returnSlide = await swipeWidgets(swipePage, 140);
+      await swipeSettled();
+      check(`${demo}: right swipe returns to the previous page`, (await swipeState()).homePage === 0 && await counter() === '1 of 2');
+      check(`${demo}: whole widget page slides right when returning`,
+        JSON.stringify(returnSlide.incoming) === JSON.stringify([['translateX(-100%)', 'translateX(0px)']]) &&
+        JSON.stringify(returnSlide.outgoing?.frames) === JSON.stringify([['translateX(0px)', 'translateX(100%)']]));
+      await swipeWidgets(swipePage, 140);
+      check(`${demo}: right swipe at the first page clamps without a widget tap`,
         (await swipeState()).homePage === 0 && !(await swipeState()).simulation);
-      await swipeWidgets(swipePage, 24);
+      await swipeWidgets(swipePage, -24);
       check(`${demo}: a short horizontal drag does not page or tap the widget`,
         (await swipeState()).homePage === 0 && !(await swipeState()).simulation);
-      await swipeWidgets(swipePage, 140, { mouse: true });
+      await swipeWidgets(swipePage, -140, { mouse: true });
       await swipeSettled();
       check(`${demo}: desktop dragging over a photo widget advances without dragging the image or tapping`,
         (await swipeState()).homePage === 1 && !(await swipeState()).simulation);
-      await swipeWidgets(swipePage, -140, { mouse: true });
+      await swipeWidgets(swipePage, 140, { mouse: true });
       await swipeSettled();
-      check(`${demo}: desktop dragging left returns to the previous page`,
+      check(`${demo}: desktop dragging right returns to the previous page`,
         (await swipeState()).homePage === 0 && !(await swipeState()).simulation);
-      await swipeWidgets(swipePage, 140, { cancel: true });
+      await swipeWidgets(swipePage, -140, { cancel: true });
       check(`${demo}: cancelling a horizontal gesture does not page`, (await swipeState()).homePage === 0);
       await swipeRoot.locator('[data-tab="home"] .photo-card').tap();
       check(`${demo}: a fresh widget tap still opens its preview after swiping`, (await swipeState()).simulation);
@@ -658,7 +658,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
         grid.style.maxHeight = '280px'; // Force real overflow without changing the fixture.
         grid.scrollTop = 0;
       });
-      await swipeWidgets(swipePage, 24, { dy: -150 });
+      await swipeWidgets(swipePage, -24, { dy: -150 });
       await swipePage.waitForFunction(() => document.querySelector('.live-widget-grid').scrollTop > 0);
       check(`${demo}: vertical touch scroll over a widget retains its page without tapping`,
         (await swipeState()).homePage === 0 && !(await swipeState()).simulation);
@@ -669,23 +669,23 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       });
       await swipeRoot.locator('.live-launcher > .app-header [data-screen="edit"]').click();
       await swipeSettled();
-      await swipeWidgets(swipePage, 140);
+      await swipeWidgets(swipePage, -140);
       await swipeSettled();
-      check(`${demo}: immediate right swipe over an editing card advances a page`,
+      check(`${demo}: immediate left swipe over an editing card advances a page`,
         (await swipeState()).homePage === 1 && (await swipeState()).route.screen === 'edit' &&
         await counter() === '2 of 2' &&
         await swipeRoot.locator('.live-widget-edit-controls').count() === 5);
-      await swipeWidgets(swipePage, -140);
+      await swipeWidgets(swipePage, 140);
       await swipeSettled();
-      check(`${demo}: immediate left swipe over an editing card returns a page`,
+      check(`${demo}: immediate right swipe over an editing card returns a page`,
         (await swipeState()).homePage === 0 && await counter() === '1 of 2');
       const editBeforeHold = await swipePage.evaluate(() => JSON.stringify(__portalMock.getState().widgets));
-      await swipeWidgets(swipePage, 140, { hold: true });
+      await swipeWidgets(swipePage, -140, { hold: true });
       await swipeSettled();
       check(`${demo}: a stationary editing hold reserves the subsequent drag instead of paging`,
         (await swipeState()).homePage === 0 && (await swipeState()).route.screen === 'edit' &&
         await swipePage.evaluate(before => JSON.stringify(__portalMock.getState().widgets) === before, editBeforeHold));
-      await swipeWidgets(swipePage, 140, { selector: '[data-live-widget-index="1"] [data-action="widget-size"]' });
+      await swipeWidgets(swipePage, -140, { selector: '[data-live-widget-index="1"] [data-action="widget-size"]' });
       check(`${demo}: swipes on editing controls neither page nor open a dialog`,
         (await swipeState()).homePage === 0 && await swipeRoot.locator('#live-overlays .modal').count() === 0);
       await swipePage.evaluate(() => {
@@ -696,20 +696,20 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
         input.style.cssText = 'position:absolute;left:40px;top:40px;width:300px;height:68px';
         grid.append(input);
       });
-      await swipeWidgets(swipePage, 140, { selector: '#swipe-input-fixture' });
+      await swipeWidgets(swipePage, -140, { selector: '#swipe-input-fixture' });
       check(`${demo}: swipes on an input leave the page selected`,
         (await swipeState()).homePage === 0);
       await swipePage.evaluate(() => document.querySelector('#swipe-input-fixture').remove());
-      await swipeWidgets(swipePage, 140, { gap: true });
+      await swipeWidgets(swipePage, -140, { gap: true });
       await swipeSettled();
       check(`${demo}: editing can page from a gutter with no visible paging links`,
         (await swipeState()).homePage === 1 && await counter() === '2 of 2' &&
         await swipeRoot.locator('[data-tab="home"] [data-action="page"]').count() === 0);
-      await swipeWidgets(swipePage, -140, { gap: true });
+      await swipeWidgets(swipePage, 140, { gap: true });
       await swipeSettled();
       await swipeRoot.locator('.live-launcher > .app-header [data-live-widget-done]').click();
       await swipeSettled();
-      await swipeWidgets(swipePage, 140);
+      await swipeWidgets(swipePage, -140);
       await swipePage.evaluate(() => {
         const grid = document.querySelector('.live-widget-grid');
         grid.getAnimations().forEach(animation => animation.cancel());
@@ -717,7 +717,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       await swipeSettled();
       check(`${demo}: cancelling the incoming page animation cleans the outgoing clone`,
         await swipeRoot.locator('.live-widget-page-outgoing').count() === 0);
-      await swipeWidgets(swipePage, -140);
+      await swipeWidgets(swipePage, 140);
       await swipePage.evaluate(() => __portalNavigationDemo.navigate('apps'));
       await swipeSettled();
       check(`${demo}: navigation cancels the widget slide and removes its outgoing clone`,
@@ -725,18 +725,18 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       await swipePage.evaluate(() => __portalNavigationDemo.navigate('home'));
       await swipeSettled();
       await swipePage.emulateMedia({ reducedMotion: 'reduce' });
-      const reducedSlide = await swipeWidgets(swipePage, 140);
+      const reducedSlide = await swipeWidgets(swipePage, -140);
       await swipeSettled();
       check(`${demo}: reduced motion paging settles on the requested page`,
         (await swipeState()).homePage === 1 && await counter() === '2 of 2' && reducedSlide.widgets.length === 0);
       for (const viewport of [{ width: 960, height: 740 }, { width: 1920, height: 1390 }]) {
         await swipePage.setViewportSize(viewport);
-        await swipeWidgets(swipePage, -140, { mouse: true });
+        await swipeWidgets(swipePage, 140, { mouse: true });
         const scale = await swipePage.evaluate(() => document.querySelector('#navigation-device').getBoundingClientRect().width / 1920);
-        await swipeWidgets(swipePage, 72 * scale, { mouse: true });
+        await swipeWidgets(swipePage, -72 * scale, { mouse: true });
         check(`${demo}: 72 logical pixels stays below 64 pixels plus touch slop at scale ${scale}`,
           (await swipeState()).homePage === 0);
-        await swipeWidgets(swipePage, 76 * scale, { mouse: true });
+        await swipeWidgets(swipePage, -76 * scale, { mouse: true });
         await swipeSettled();
         check(`${demo}: 76 logical pixels passes 64 pixels plus touch slop at scale ${scale}`,
           (await swipeState()).homePage === 1);
@@ -803,7 +803,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
     };
     const pageWidgets = async direction => {
       const gap = await widgetPage.evaluate(() => __portalNavigationDemo.getState().route.screen === 'edit');
-      await swipeWidgets(widgetPage, direction * 140, { gap });
+      await swipeWidgets(widgetPage, -direction * 140, { gap });
       await widgetSettled();
     };
     const nextWidgets = () => pageWidgets(1);
@@ -1013,7 +1013,7 @@ assert.ok(!process.env.DEMO_ORIGIN || process.env.DEMO_ORIGIN === origin,
       await photoClick(`#live-overlays [data-action="widget-move-to"][data-to="${to}"]`);
     };
     const photoPageWidgets = async direction => {
-      await swipeWidgets(photoPage, direction * 140, { gap: true });
+      await swipeWidgets(photoPage, -direction * 140, { gap: true });
       await photoPage.waitForFunction(() =>
         document.querySelector('#navigation-device').getAnimations({ subtree: true }).length === 0);
     };

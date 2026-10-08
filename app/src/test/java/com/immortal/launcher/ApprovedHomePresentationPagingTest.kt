@@ -35,6 +35,27 @@ class ApprovedHomePresentationPagingTest {
     assertEquals(1, HomePresentation.page(emptyList(), 12).count)
   }
 
+  @Test fun swipingLeftAdvancesAndSwipingRightReturns_withoutWrapping() {
+    val widgets = (0..7).map { widget("id$it") }
+    val first = HomePresentation.page(widgets, 0)
+    val second = HomePresentation.page(widgets, 1)
+    assertEquals(1, HomePresentation.pageAfterSwipe(first, swipeRight = false))
+    assertEquals(0, HomePresentation.pageAfterSwipe(second, swipeRight = true))
+    assertEquals(0, HomePresentation.pageAfterSwipe(first, swipeRight = true))
+    assertEquals(1, HomePresentation.pageAfterSwipe(second, swipeRight = false))
+    assertEquals(0, HomePresentation.pageAfterSwipe(
+        HomePresentation.page(emptyList(), 0), swipeRight = false))
+  }
+
+  @Test fun increasingPagesSitToTheRight_andMoveLeftTogetherWhenAdvancing() {
+    assertEquals(0f, HomePresentation.pageOffset(0, 0f), 0f)
+    assertEquals(1f, HomePresentation.pageOffset(1, 0f), 0f)
+    assertEquals(-.5f, HomePresentation.pageOffset(0, .5f), 0f)
+    assertEquals(.5f, HomePresentation.pageOffset(1, .5f), 0f)
+    assertEquals(-1f, HomePresentation.pageOffset(0, 1f), 0f)
+    assertEquals(0f, HomePresentation.pageOffset(1, 1f), 0f)
+  }
+
   @Test fun multiplePhotoWidgetsAndAppWidgets_allRemainReachable() {
     val first = widget("photo1", HomeWidgetStore.KIND_PHOTO_MEMORY)
     val second = widget("photo2", HomeWidgetStore.KIND_PHOTO_MEMORY)

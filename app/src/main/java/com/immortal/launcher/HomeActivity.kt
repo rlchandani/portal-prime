@@ -793,9 +793,7 @@ private fun ApprovedWidgetArea(
               onDragEnd = {
                 if (abs(distance) >= swipeThreshold) {
                   val selected = currentPage.value
-                  // Match the requested physical direction: right advances, left returns.
-                  val next = (selected.index + if (distance > 0f) 1 else -1)
-                      .coerceIn(0, selected.count - 1)
+                  val next = HomePresentation.pageAfterSwipe(selected, swipeRight = distance > 0f)
                   if (next != selected.index) pageChanged.value(next)
                 }
                 distance = 0f
@@ -814,7 +812,7 @@ private fun ApprovedWidgetArea(
         val active = homeActive && selected
         // Deferred placement caches the display list; the viewport clips off-screen pages.
         Box(Modifier.fillMaxSize().absoluteOffset {
-          IntOffset(((slide.value - index) * widthPx).roundToInt(), 0)
+          IntOffset((HomePresentation.pageOffset(index, slide.value) * widthPx).roundToInt(), 0)
         }.then(if (active) Modifier else Modifier.clearAndSetSemantics { })
             .pointerInput(active) {
               if (!active) awaitPointerEventScope {

@@ -21,8 +21,8 @@ Each saved size is an explicit preset, including 2 × 1 and 2 × 2; resizing one
 card never switches the defaults of its neighbors or another page. Entering
 Customize and pressing Done preserve card geometry, the selected page and its
 scroll offset. The mounted header Customize button becomes Done; Add widget
-appears in the existing Favorite apps row. Swipe right in the widget area for
-the next page and left for the previous page, in Home or Customize. Paging clamps
+appears in the existing Favorite apps row. Swipe left in the widget area for
+the next page and right for the previous page, in Home or Customize. Paging clamps
 at both ends; only the current-page counter remains visible. The whole widget
 page slides over 180 ms. Greeting, favorites and the content viewport keep their positions.
 Size, Remove, Move and Settings controls overlay the real cards and invoke the

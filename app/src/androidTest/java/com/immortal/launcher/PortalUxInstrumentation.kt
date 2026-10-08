@@ -273,11 +273,11 @@ class PortalUxInstrumentation : Instrumentation() {
             else -> {
                 val page = checkNotNull(WidgetPagingDeviceChecks.page(initial))
                 if (noop) {
-                    previousSwipe = WidgetPagingDeviceChecks.horizontalSwipe(initial, density, right = false)
+                    previousSwipe = WidgetPagingDeviceChecks.horizontalSwipe(initial, density, right = true)
                     listOf(previousSwipe!!.bounds() to -1, previousSwipe!!.bounds() to -1)
                 } else {
                     check(page.count >= 2) { "Paging benchmark requires multiple widget pages" }
-                    nextSwipe = WidgetPagingDeviceChecks.horizontalSwipe(initial, density, right = true)
+                    nextSwipe = WidgetPagingDeviceChecks.horizontalSwipe(initial, density, right = false)
                     verifyWindow(nextSwipe!!.bounds())
                     WidgetPagingDeviceChecks.swipe(automation, nextSwipe!!)
                     SystemClock.sleep(320)
@@ -286,7 +286,7 @@ class PortalUxInstrumentation : Instrumentation() {
                         second.windowId == initialWindowId)
                     check(WidgetPagingDeviceChecks.page(second) ==
                         WidgetPagingDeviceChecks.Page(2, page.count))
-                    previousSwipe = WidgetPagingDeviceChecks.horizontalSwipe(second, density, right = false)
+                    previousSwipe = WidgetPagingDeviceChecks.horizontalSwipe(second, density, right = true)
                     verifyWindow(previousSwipe!!.bounds())
                     WidgetPagingDeviceChecks.swipe(automation, previousSwipe!!)
                     SystemClock.sleep(320)

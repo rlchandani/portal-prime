@@ -31,8 +31,9 @@ import kotlin.math.abs
  * command=widgetPaging: physical content swipes in one test-owned Home Activity.
  *
  * Requires an already migrated, saved layout with at least two widget pages. No fixture
- * widgets, settings, app-widget IDs or permissions are written. Right advances and left
- * goes back, on release at 64 dp; boundaries, cancellation and vertical intent are tested.
+ * widgets, settings, app-widget IDs or permissions are written. Right-to-left advances and
+ * left-to-right goes back, on release at 64 dp; boundaries, cancellation and vertical intent
+ * are tested.
  * Customize paging and a held reorder preview/cancel use existing, uniquely described
  * built-in cards when safe. A committed reorder is deliberately outside this probe.
  *
@@ -101,7 +102,10 @@ internal object WidgetPagingDeviceChecks {
         return regions.single().also { check(screen.contains(it)) }
     }
 
-    /** Start over a visible card body, away from its bottom edit controls and screen edges. */
+    /**
+     * Start over a visible card body, away from its bottom edit controls and screen edges.
+     * right is physical movement: true is left-to-right; false is right-to-left.
+     */
     fun horizontalSwipe(root: AccessibilityNodeInfo, density: Float, right: Boolean,
         distanceDp: Float = 128f): Swipe {
         val area = region(root)
@@ -223,14 +227,14 @@ internal object WidgetPagingDeviceChecks {
                 capture("home-page-one")
                 val pageOneCards = geometry()
 
-                gesture(right = false, expected = first, name = "left_clamps_first")
-                gesture(right = true, expected = first, name = "below_64dp_right",
+                gesture(right = true, expected = first, name = "right_clamps_first")
+                gesture(right = false, expected = first, name = "below_64dp_left",
                     distanceDp = 63f)
-                gesture(right = true, expected = first, name = "below_accumulated_64dp_right",
+                gesture(right = false, expected = first, name = "below_accumulated_64dp_left",
                     distanceDp = touchSlopDp + 62f)
-                gesture(right = true, expected = first, name = "cancel_right", cancel = true)
+                gesture(right = false, expected = first, name = "cancel_left", cancel = true)
                 val second = Page(2, first.count)
-                gesture(right = true, expected = second, name = "right_advances_on_release",
+                gesture(right = false, expected = second, name = "left_advances_on_release",
                     distanceDp = touchSlopDp + 66f, checkRelease = true)
                 capture("home-page-two")
                 val pageTwoCards = geometry()
@@ -239,21 +243,21 @@ internal object WidgetPagingDeviceChecks {
                 else skips.put("distinct_page_content",
                     "Visible widget kinds and bounds are identical on the first two pages")
                 verticalIntent(second, "page_two_")
-                gesture(right = false, expected = second, name = "below_64dp_left",
+                gesture(right = true, expected = second, name = "below_64dp_right",
                     distanceDp = 63f)
-                gesture(right = false, expected = second, name = "below_accumulated_64dp_left",
+                gesture(right = true, expected = second, name = "below_accumulated_64dp_right",
                     distanceDp = touchSlopDp + 62f)
-                gesture(right = false, expected = second, name = "cancel_left", cancel = true)
-                gesture(right = false, expected = first, name = "left_returns_on_release",
+                gesture(right = true, expected = second, name = "cancel_right", cancel = true)
+                gesture(right = true, expected = first, name = "right_returns_on_release",
                     distanceDp = touchSlopDp + 66f, checkRelease = true)
 
                 for (number in 2..first.count)
-                    gesture(true, Page(number, first.count), "right_to_page_$number")
-                val last = Page(first.count, first.count)
-                repeat(2) { gesture(true, last, "right_clamps_last_$it") }
-                for (number in first.count - 1 downTo 1)
                     gesture(false, Page(number, first.count), "left_to_page_$number")
-                repeat(2) { gesture(false, first, "left_clamps_first_$it") }
+                val last = Page(first.count, first.count)
+                repeat(2) { gesture(false, last, "left_clamps_last_$it") }
+                for (number in first.count - 1 downTo 1)
+                    gesture(true, Page(number, first.count), "right_to_page_$number")
+                repeat(2) { gesture(true, first, "right_clamps_first_$it") }
 
                 accessibilityPaging(first, second)
                 verticalIntent(first)
@@ -430,6 +434,10 @@ internal object WidgetPagingDeviceChecks {
                 assertPage(expected, name)
             }
             apply(true, second, "accessible_next")
+            gesture(right = true, expected = first, name = "right_returns_after_accessible_next",
+                checkRelease = true)
+            gesture(right = false, expected = second, name = "left_advances_before_accessible_previous",
+                checkRelease = true)
             apply(false, first, "accessible_previous")
         }
 
@@ -515,7 +523,7 @@ internal object WidgetPagingDeviceChecks {
             assertPage(first, "customize_entry")
             verify("home_customize_geometry_matches", geometry() == beforeCards)
             val editOne = geometry()
-            gesture(true, second, "customize_right", checkRelease = true)
+            gesture(false, second, "customize_left_advances", checkRelease = true)
             val editTwo = geometry()
             tap("Done")
             editing = false
@@ -524,11 +532,11 @@ internal object WidgetPagingDeviceChecks {
             tap("Customize")
             editing = true
             assertPage(second, "customize_retains_page_two")
-            gesture(false, first, "customize_left", checkRelease = true)
+            gesture(true, first, "customize_right_returns", checkRelease = true)
             verify("customize_round_trip_geometry_matches", geometry() == editOne)
-            gesture(true, first, "customize_short", distanceDp = 63f)
-            gesture(true, first, "customize_cancel", cancel = true)
-            gesture(false, first, "customize_left_clamps_first")
+            gesture(false, first, "customize_short_left", distanceDp = 63f)
+            gesture(false, first, "customize_cancel_left", cancel = true)
+            gesture(true, first, "customize_right_clamps_first")
             heldReorderCancel(first)
             tap("Done")
             editing = false

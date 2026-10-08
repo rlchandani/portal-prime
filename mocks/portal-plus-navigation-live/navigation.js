@@ -979,8 +979,8 @@
     // Native translates both whole pages by one widget-region width on settlement.
     const timing = { duration: 180, easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)', fill: 'both' };
     const slide = { outgoing, animations: [
-      grid.animate([{ transform: `translateX(${-direction * 100}%)` }, { transform: 'translateX(0px)' }], timing),
-      outgoingGrid.animate([{ transform: 'translateX(0px)' }, { transform: `translateX(${direction * 100}%)` }], timing),
+      grid.animate([{ transform: `translateX(${direction * 100}%)` }, { transform: 'translateX(0px)' }], timing),
+      outgoingGrid.animate([{ transform: 'translateX(0px)' }, { transform: `translateX(${-direction * 100}%)` }], timing),
     ] };
     homeSlide = slide;
     Promise.all(slide.animations.map(animation => animation.finished)).catch(() => {}).then(() => {
@@ -1049,7 +1049,7 @@
     const dy = (event.clientY - pending.y) * pending.logicalScale;
     if (pending.grid.isConnected && !pending.held && pending.axis === 'horizontal' &&
         Math.abs(dx) - widgetSwipeSlop >= widgetSwipeThreshold && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      pageHome(dx > 0 ? 1 : -1);
+      pageHome(dx < 0 ? 1 : -1);
     }
   }
 

@@ -32,6 +32,13 @@ internal object HomePresentation {
     return Page(hero, remaining.drop(index * 4).take(4), index, count)
   }
 
+  /** Pages increase to the right: a left swipe advances, a right swipe returns. */
+  fun pageAfterSwipe(page: Page, swipeRight: Boolean): Int =
+      (page.index + if (swipeRight) -1 else 1).coerceIn(0, page.count - 1)
+
+  /** Offset in viewport widths; both neighboring pages move with the finger's direction. */
+  fun pageOffset(pageIndex: Int, scrollPosition: Float): Float = pageIndex - scrollPosition
+
   /** Sharing the photo across pages must not override its saved relative position. */
   fun pageWidgets(widgets: List<HomeWidgetStore.HomeWidget>, page: Page): List<HomeWidgetStore.HomeWidget> {
     val positions = widgets.mapIndexed { index, widget -> widget.key to index }.toMap()
