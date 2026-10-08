@@ -108,10 +108,11 @@ private fun ApprovedAppsRoundAction(glyph: String, label: String, onClick: () ->
 internal fun ApprovedAppsDock(selected: String, onExit: () -> Unit, modifier: Modifier = Modifier) {
   val context = LocalContext.current
   Surface(modifier = modifier, color = IosCard, shape = RoundedCornerShape(26.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider)) {
-    Row(Modifier.height(92.dp).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(Modifier.height(92.dp).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically) {
       listOf(Triple("home", "Home", "home"), Triple("apps", "Apps", "gridapps"), Triple("photos", "Photos", "photo"), Triple("tools", "Tools", "tools")).forEach { (id, label, glyph) ->
         val active = id == selected
-        Row(Modifier.widthIn(min = 176.dp).height(74.dp).clip(RoundedCornerShape(18.dp))
+        Row(Modifier.widthIn(min = 176.dp).fillMaxHeight().clip(RoundedCornerShape(18.dp))
             .background(if (active) LocalApprovedPalette.current.selected else Color.Transparent)
             .tvFocusable(RoundedCornerShape(18.dp), focusScale = 1f,
                 ringColor = LocalApprovedPalette.current.accent) {

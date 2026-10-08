@@ -92,10 +92,11 @@ internal fun ApprovedHomeIcon(
 @Composable
 internal fun ApprovedHomeDock(selected: String, onSelect: (String) -> Unit) {
   ApprovedHomeSurface(radius = 26.dp, modifier = Modifier.height(92.dp)) {
-    Row(Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(Modifier.fillMaxHeight().padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically) {
       listOf("home" to "Home", "apps" to "Apps", "photo" to "Photos", "tools" to "Tools").forEach { (id, label) ->
         val active = selected == id
-        Row(Modifier.width(176.dp).height(74.dp).clip(RoundedCornerShape(18.dp))
+        Row(Modifier.width(176.dp).fillMaxHeight().clip(RoundedCornerShape(18.dp))
             .background(if (active) ApprovedHomePalette.Selected else Color.Transparent)
             .tvFocusable(RoundedCornerShape(18.dp), ringColor = ApprovedHomePalette.Accent) { onSelect(id) },
             verticalAlignment = Alignment.CenterVertically,
