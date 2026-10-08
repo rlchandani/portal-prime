@@ -263,7 +263,7 @@ class RemoteCompanionPolicyTest {
     history.reconcileInstall(id, "installed_readback", true)
     assertFalse(history.find(id)!!.getBoolean("backendMayContinue"))
     assertFalse(history.find(id)!!.getBoolean("retrySupported"))
-    assertEquals("failed", history.find(id)!!.getString("state"))
+    assertEquals("succeeded", history.find(id)!!.getString("state"))
     assertNotNull(history.start("update", JSONObject()))
   }
 

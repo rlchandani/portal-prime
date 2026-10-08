@@ -29,6 +29,22 @@ internal object RemoteCompanionOperationPolicy {
     return RemoteCompanionValidation(if (valid) emptyList() else listOf("unsupported_operation"))
   }
   fun compatible(app: CatalogApp, sdk: Int, device: String): Boolean = RemoteLayoutPolicy.packageName(app.packageName) && StoreCatalog.isCompatible(app.minSdk, sdk) && (app.devices.isEmpty() || device in app.devices)
+  fun shouldDownloadUpdate(installed: Long, latest: Long?): Boolean = latest == null || latest > installed
+
+  /** A terminal result code, or null when the downloaded archive may be handed off. */
+  fun archiveResult(
+      requestedPackage: String,
+      archivePackage: String?,
+      minSdk: Int?,
+      sdk: Int,
+      archiveVersion: Long,
+      installedForUpdate: Long?,
+  ): String? = when {
+    archivePackage != requestedPackage -> "package_mismatch"
+    minSdk == null || minSdk > sdk -> "incompatible"
+    installedForUpdate != null && archiveVersion <= installedForUpdate -> "up_to_date"
+    else -> null
+  }
 }
 
 /** One worker for both scenes and installs; no unbounded work queue or thread per phone request. */
@@ -85,8 +101,8 @@ internal class RemoteCompanionOperations(private val context: Context) {
     val installed = StoreCatalog.installedVersionCode(context, app.packageName)
     if (update) {
       if (installed == null) return result(false, "not_installed")
-      val latest = StoreCatalog.latestVersionCode(app) ?: return result(false, "version_unavailable")
-      if (latest <= installed) return result(true, "up_to_date")
+      val latest = StoreCatalog.latestVersionCode(app)
+      if (!RemoteCompanionOperationPolicy.shouldDownloadUpdate(installed, latest)) return result(true, "up_to_date")
     }
     val apk = File(context.cacheDir, "${app.packageName}.companion.apk")
     var handedOff = false
@@ -94,8 +110,11 @@ internal class RemoteCompanionOperations(private val context: Context) {
       StoreCatalog.download(StoreCatalog.resolveApkUrl(app), apk)
       // Catalog metadata alone cannot override the APK's own package or Android compatibility.
       val archive = context.packageManager.getPackageArchiveInfo(apk.path, 0)
-      if (archive?.packageName != app.packageName) return result(false, "package_mismatch")
+          ?: return result(false, "package_mismatch")
       val version = if (Build.VERSION.SDK_INT >= 28) archive.longVersionCode else @Suppress("DEPRECATION") archive.versionCode.toLong()
+      val archiveResult = RemoteCompanionOperationPolicy.archiveResult(app.packageName, archive.packageName,
+          archive.applicationInfo?.minSdkVersion, Build.VERSION.SDK_INT, version, if (update) installed else null)
+      if (archiveResult != null) return result(archiveResult == "up_to_date", archiveResult)
       // Remove stale daemon evidence before persisting the handoff fence. A crash at any
       // later point is conservative: no helper return or process restart clears it.
       if (plan.mode == "silent") {

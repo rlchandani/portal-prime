@@ -49,9 +49,9 @@ object HeadlessInstaller {
                     if (Build.VERSION.SDK_INT >= 33)
                         intent.getParcelableExtra(Intent.EXTRA_INTENT, Intent::class.java)
                     else @Suppress("DEPRECATION") intent.getParcelableExtra(Intent.EXTRA_INTENT)
-                confirm?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                // Surface the system dialog; InstallConfirmService taps "Install".
-                runCatching { app.startActivity(confirm) }
+                // The receiver runs on the main thread: exit our dream before showing the
+                // system dialog, so InstallConfirmService can reach its "Install" button.
+                runCatching { InstallerNavigation.launchConfirmation(app, confirm) }
                     .onFailure { Log.w(TAG, "couldn't launch installer dialog for $pkg", it) }
               }
               PackageInstaller.STATUS_SUCCESS -> {

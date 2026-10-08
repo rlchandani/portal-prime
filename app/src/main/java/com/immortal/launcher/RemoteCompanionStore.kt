@@ -46,7 +46,20 @@ internal class RemoteCompanionHistory(saved: JSONArray = JSONArray(), private va
           (item.optBoolean("backendMayContinue") || restarted && item.optString("installPhase") != "preparing"))
       if (restarted) item.put("state", "interrupted").put("error", "process_restarted")
       item.put("installUncertain", uncertain).put("backendMayContinue", uncertain).put("cancelSupported", false)
-          .put("retrySupported", retryable(item))
+      val reconciliation = item.optJSONObject("reconciliation")
+      val results = item.optJSONArray("results") ?: JSONArray()
+      val pendingResult = (0 until results.length()).any {
+        results.optJSONObject(it)?.let { r -> r.optBoolean("backendMayContinue") || r.optBoolean("installUncertain") } == true
+      }
+      // Older polls cleared the fence but left timeout/interruption results behind. Native
+      // success while the worker was running still permits a completed readback mismatch.
+      if (install && !uncertain && reconciliation != null && reconciliation.opt("ok") is Boolean &&
+          reconciliation.optString("evidence").isNotEmpty() &&
+          (reconciliation.optString("evidence") != "native_installer_success" ||
+              item.optString("state") == "interrupted" || pendingResult)) {
+        reconcileTerminalOutcome(item, reconciliation)
+      }
+      item.put("retrySupported", retryable(item))
       entries += item
     }
     save()
@@ -97,10 +110,32 @@ internal class RemoteCompanionHistory(saved: JSONArray = JSONArray(), private va
   @Synchronized fun reconcileInstall(id: String, evidence: String, succeeded: Boolean) {
     val e = entries.firstOrNull { it.optString("id") == id } ?: return
     if (!e.optBoolean("installUncertain")) return
+    val now = System.currentTimeMillis()
+    val reconciliation = JSONObject().put("evidence", evidence).put("ok", succeeded).put("at", now)
+    reconcileTerminalOutcome(e, reconciliation)
     e.put("installUncertain", false).put("backendMayContinue", false).put("installConfirmed", succeeded)
-        .put("reconciliation", JSONObject().put("evidence", evidence).put("ok", succeeded).put("at", System.currentTimeMillis()))
-        .put("updatedAt", System.currentTimeMillis()).put("retrySupported", retryable(e))
+        .put("reconciliation", reconciliation).put("updatedAt", now).put("retrySupported", retryable(e))
     save()
+  }
+  /** Late native evidence replaces an unresolved terminal outcome, retaining the earlier audit. */
+  private fun reconcileTerminalOutcome(e: JSONObject, reconciliation: JSONObject) {
+    if (e.optString("state") !in setOf("failed", "interrupted")) return
+    if (!reconciliation.has("previous")) {
+      val previous = JSONObject().put("state", e.optString("state"))
+          .put("results", JSONArray((e.optJSONArray("results") ?: JSONArray()).toString()))
+          .put("updatedAt", e.optLong("updatedAt"))
+          .put("backendMayContinue", e.optBoolean("backendMayContinue"))
+          .put("installUncertain", e.optBoolean("installUncertain"))
+      if (e.has("error")) previous.put("error", e.get("error"))
+      reconciliation.put("previous", previous)
+    }
+    val succeeded = reconciliation.getBoolean("ok")
+    val result = JSONObject().put("ok", succeeded).put("result", if (succeeded) "installed" else "install_failed")
+        .put("backendMayContinue", false).put("installUncertain", false)
+    e.optJSONObject("installEvidence")?.optString("packageName")?.takeIf { it.isNotEmpty() }
+        ?.let { result.put("packageName", it) }
+    e.put("state", if (succeeded) "succeeded" else "failed").put("results", JSONArray().put(result))
+    e.remove("error")
   }
   @Synchronized fun finish(id: String, results: JSONArray) {
     val e = entries.firstOrNull { it.optString("id") == id } ?: return
