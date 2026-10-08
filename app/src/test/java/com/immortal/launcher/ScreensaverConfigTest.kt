@@ -14,6 +14,50 @@ import org.junit.Test
 
 class ScreensaverConfigTest {
 
+  private val legacyModes = listOf(
+      "classic", "shuffle", "kenBurns", "diptych", "framed", "galleryWall", "push", "memories",
+      "panorama", "polaroid", "mosaic", "filmstrip", "cinema", "heroSidebar")
+
+  @Test
+  fun freshInstallation_usesSmartFrame_withoutWritingPreferences() {
+    val prefs = ScreensaverTestPrefs()
+    assertEquals("smartFrame", ScreensaverConfig.Settings().mode)
+    assertEquals("smartFrame", ScreensaverConfig.load(prefs.context).mode)
+    assertEquals(0, prefs.writeCount)
+    assertFalse(prefs.contains("mode"))
+  }
+
+  @Test
+  fun savedLegacyStyle_isPreserved_withoutMigrationWrites() {
+    legacyModes.forEach { mode ->
+      val prefs = ScreensaverTestPrefs(mapOf("mode" to mode))
+      assertEquals(mode, ScreensaverConfig.load(prefs.context).mode)
+      assertEquals("loading $mode must not rewrite preferences", 0, prefs.writeCount)
+      assertEquals(mode, prefs.getString("mode", null))
+    }
+  }
+
+  @Test
+  fun preferredAndLegacyStyles_roundTripThroughModeSetter() {
+    (listOf("smartFrame", "portraitPair", "wholePhoto") + legacyModes).forEach { mode ->
+      val prefs = ScreensaverTestPrefs()
+      ScreensaverConfig.setMode(prefs.context, mode)
+      assertEquals("selected style $mode must persist", mode, ScreensaverConfig.load(prefs.context).mode)
+    }
+  }
+
+  @Test
+  fun nativeStyles_doNotUseTheWebEngine_andLegacyRoutingStaysIntact() {
+    listOf("smartFrame", "portraitPair", "wholePhoto", "classic").forEach {
+      assertFalse("$it must use a native renderer", ScreensaverConfig.usesEngine(it))
+      assertEquals(it != "classic", ScreensaverConfig.isNativeStage(it))
+    }
+    (legacyModes - "classic").forEach {
+      assertTrue("$it must keep its existing engine", ScreensaverConfig.usesEngine(it))
+      assertFalse("$it must keep its existing engine", ScreensaverConfig.isNativeStage(it))
+    }
+  }
+
   @Test
   fun clampInterval_keepsWithinBounds() {
     assertEquals(5, ScreensaverConfig.clampInterval(1))

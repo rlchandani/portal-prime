@@ -76,13 +76,15 @@ class PhotoFramePreviewActivity : ComponentActivity() {
       return
     }
 
-    frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false))
+    frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
+        interactivePreview = !intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock)
     // Only the screensaver-continuation launch (DreamPolicy's force-wake handoff) honours the
     // "open when dismissed" choice — to the user that frame IS the screensaver, so a tap must
     // behave like PhotoDreamService's tap (issue #146). Deliberate on-demand starts (settings
     // preview, face picker, header button, MQTT command) keep returning to where they came from.
     // The night clock never launches anything — a 3am tap should just hand back, dark.
     launchDismissOnExit = intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock
+    frame.interactivePreview = !launchDismissOnExit && !nightClock
     frame.onExit = {
       Log.i(TAG, "onExit (tap) -> finish(), launchDismiss=$launchDismissOnExit")
       // The user tapped the frame: they're unambiguously here. Without this the continuation
@@ -151,6 +153,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     super.onNewIntent(intent)
     setIntent(intent)
     launchDismissOnExit = intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock
+    frame.updatePreviewInteraction(!launchDismissOnExit && !nightClock)
     Log.i(TAG, "onNewIntent (reused instance): launchDismiss=$launchDismissOnExit")
   }
 
@@ -170,6 +173,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   // Feed all touches to the controller's gesture detector (tap = exit,
   // horizontal swipe = prev/next) at the window level for reliability.
   override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+    if (frame.dispatchViewerControls(ev)) return true
     frame.onTouch(ev)
     return true
   }

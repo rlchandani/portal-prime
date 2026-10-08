@@ -129,7 +129,8 @@
   // [focal] is the face's position along the pan axis (fx or fy, 0..1; undefined = no
   // face → start at 0). [sizePct] is the element's size along that axis as a percentage
   // of the cell (from fitPlan). The start centers the face in the visible window,
-  // clamped to the travel range; the alternating animation still tours the whole photo.
+  // clamped to the travel range. Callers with a cached face point keep this offset static;
+  // a point alone cannot establish safe bounds for an animated tour.
   window.SS.panStart = function (focal, sizePct) {
     if (!(focal >= 0)) return 0;
     const visible = 100 / sizePct;          // window size as a fraction of the photo

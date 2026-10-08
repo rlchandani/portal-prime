@@ -55,6 +55,13 @@ class SettingsDomain<S>(
           spec.metaJson(c, s)?.let { meta ->
             meta.put("tier", if (SettingsPresentation.isAdvanced(id, spec.key)) "advanced" else "everyday")
             meta.put("shortHelp", SettingsPresentation.conciseHelp(id, spec.key, meta.optString("help")))
+            meta.optJSONArray("options")?.let { options ->
+              for (index in 0 until options.length()) {
+                val option = options.getJSONObject(index)
+                option.put("tier", if (SettingsPresentation.isAdvancedOption(
+                    id, spec.key, option.getString("value"))) "advanced" else "everyday")
+              }
+            }
             sections[spec.key]?.let { meta.put("section", it) }
             if (defJson != null && defJson.has(spec.key)) meta.put("default", defJson.get(spec.key))
             controls.put(meta)

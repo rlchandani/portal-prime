@@ -189,15 +189,40 @@ object SettingsDomains {
                       help =
                           "Turn this off to let your Portal's screen sleep on its own timer (or run " +
                               "your own screensaver). Immortal won't switch it back on."),
-                  NavSpec(
-                      "screensaverStyle",
-                      "Style",
-                      value = { _, s -> ScreensaverConfig.modeLabel(s.mode) },
-                      activity = ScreensaverModeActivity::class.java,
+                  EnumSpec(
+                      "mode",
+                      "Screensaver style",
+                      get = { it.mode },
+                      set = ScreensaverConfig::setMode,
+                      options = ScreensaverConfig.MODES.map { it to ScreensaverConfig.modeLabel(it) },
+                      coerce = { v -> v.takeIf { it in ScreensaverConfig.MODES } },
                       help =
-                          "How your photos animate - Shuffle mixes all the cinematic styles, or pick " +
-                              "one (Ken Burns, gallery wall, cinema, and more). Tap to preview now.",
+                          "Smart frame shows one photo with gentle motion. Portrait pair places two " +
+                              "portraits together. Whole photo preserves the complete image. Existing " +
+                              "styles remain available.",
                       visible = { _, s -> s.enabled }),
+                  BoolSpec(
+                      "photo_motion",
+                      "Gentle photo motion",
+                      get = { it.photoMotion },
+                      set = ScreensaverConfig::setPhotoMotion,
+                      help = "Let photos move gently when there is room. Off keeps them still between dissolves.",
+                      visible = { _, s ->
+                        s.enabled && ScreensaverConfig.isNativeStage(s.mode) &&
+                            s.mode != ScreensaverConfig.MODE_WHOLE
+                      }),
+                  BoolSpec(
+                      "keep_people_in_frame",
+                      "Keep people in frame",
+                      get = { it.keepPeopleInFrame },
+                      set = ScreensaverConfig::setKeepPeopleInFrame,
+                      help =
+                          "Keep detected faces visible throughout the photo's motion. When a safe " +
+                              "crop cannot fit, show the whole photo.",
+                      visible = { _, s ->
+                        s.enabled && (s.mode == ScreensaverConfig.MODE_SMART ||
+                            s.mode == ScreensaverConfig.MODE_PORTRAITS)
+                      }),
                   NavSpec(
                       "clockFace",
                       "Clock face",
@@ -242,9 +267,8 @@ object SettingsDomains {
                       // refresh cadence is fine for every album source; the phone remote can still
                       // set it. (Was network-album-only: !s.usesFolder && source != DEFAULT.)
                       visible = { _, _ -> false }),
-                  // Fit only affects the Classic renderer — the engine controls its own per-mode
-                  // framing — so it's hidden in engine modes to avoid a dead control. Photo interval
-                  // now drives the engine too (via the getIntervalSec bridge), so it stays visible.
+                  // Fit only affects Classic. The native stage and engine styles own their framing.
+                  // Photo interval drives all renderers, so it stays visible.
                   EnumSpec(
                       "fit",
                       "Fit",
@@ -253,7 +277,7 @@ object SettingsDomains {
                       options =
                           listOf(ScreensaverConfig.FIT_FILL to "Fill", ScreensaverConfig.FIT_FIT to "Fit"),
                       coerce = { FleetScreensaver.coerceFit(it) },
-                      visible = { _, s -> s.enabled && !ScreensaverConfig.usesEngine(s.mode) }),
+                      visible = { _, s -> s.enabled && s.mode == ScreensaverConfig.MODE_CLASSIC }),
                   IntSpec(
                       "intervalSec",
                       "Photo interval",

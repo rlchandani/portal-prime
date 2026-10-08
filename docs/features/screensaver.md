@@ -3,9 +3,37 @@
 `PhotoDreamService` / `PhotoFrameController` — a photo frame with stock-style
 clock/battery/date/weather widgets that doubles as the Portal's screensaver.
 
-Swipe to change photos, tap to exit.
+In the idle screensaver, swipe to change photos and tap to exit. In the deliberate
+Photos viewer, tap to reveal Previous, Pause/Resume, Next, Adjust and Done.
 
 ![The photo-frame screensaver showing a large clock over a landscape photo](../img/screensaver.png)
+
+## Photo presentation
+
+Choose a style in **Settings → Photos → Screensaver style**:
+
+- **Smart frame** shows one photo with a gentle dissolve and optional slow motion.
+  It is the default for new installations.
+- **Portrait pair** places two distinct adjacent portrait photos side by side.
+  A single portrait or a landscape photo displays on its own.
+- **Whole photo** shows the entire image without panning or cropping, on a
+  charcoal matte.
+
+**Gentle photo motion** and **Keep people in frame** are available for Smart frame
+and Portrait pair. People framing analyzes small photo copies on the device and
+caches face boxes for later presentations. It uploads no photos. When analysis
+is not ready, no face is found, or all faces cannot safely fit into a moving crop,
+the whole photo remains visible. Face detection cannot guarantee that every face
+will be found.
+
+In the Photos viewer, **Adjust** pauses the image so you can drag it and set the
+zoom. **Save position** remembers that photo's framing without editing the
+original file; **Cancel** restores the previous composition and pause state.
+**Show whole photo** resets the adjustment to its uncropped position.
+
+Previously selected Classic and WebView styles remain available under advanced
+styles and keep their saved IDs. The native styles retain the existing photo
+sources, video support, clock/calendar overlays and sleep policy.
 
 ## Clock faces
 

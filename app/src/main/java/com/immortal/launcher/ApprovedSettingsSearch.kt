@@ -43,7 +43,7 @@ internal fun approvedPageForControl(domain: String, key: String): String? = when
         else -> null
     }
     "screensaver" -> when (key) {
-        "screensaverStyle" -> "styles"
+        "mode", "screensaverStyle" -> "styles"
         "clockFace" -> "faces"
         "photoSource", "albumRefreshMin" -> "sources"
         "dismissTarget" -> "dismiss"

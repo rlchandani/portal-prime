@@ -6,6 +6,8 @@
  */
 package com.immortal.launcher.settings
 
+import com.immortal.launcher.ScreensaverConfig
+
 /** Presentation policy shared by the native renderer and phone schema. Never mutates settings. */
 object SettingsPresentation {
   private val advancedPages = setOf(
@@ -28,7 +30,9 @@ object SettingsPresentation {
       "digitalclock.glow", "debug.enabled")
   private val shortHelp = mapOf(
       "screensaver.enabled" to "Show photos when your Portal is idle.",
-      "screensaver.screensaverStyle" to "Choose how your photos move.",
+      "screensaver.mode" to "Choose how your photos appear.",
+      "screensaver.photo_motion" to "Let photos move gently between transitions.",
+      "screensaver.keep_people_in_frame" to "Keep detected faces visible as photos move.",
       "screensaver.clockFace" to "Choose how the time appears.",
       "screensaver.photoSource" to "Choose the photos on your screen.",
       "screensaver.dismissTarget" to "Choose what opens when you leave the screensaver.",
@@ -42,6 +46,17 @@ object SettingsPresentation {
       "chime.quietHoursOn" to "Keep chimes quiet during these hours.")
 
   fun isAdvanced(domainId: String, key: String): Boolean = "$domainId.$key" in advancedControls
+  fun isAdvancedOption(domainId: String, key: String, value: String): Boolean =
+      domainId == "screensaver" && key == "mode" && !ScreensaverConfig.isNativeStage(value)
+
+  /** Preserve a saved legacy selection even when its other choices are hidden. */
+  fun visibleEnumOptions(
+      domainId: String, key: String, options: List<Pair<String, String>>,
+      selected: String, advanced: Boolean,
+  ): List<Pair<String, String>> = options.filter { (value, _) ->
+    advanced || value == selected || !isAdvancedOption(domainId, key, value)
+  }
+
   fun isAdvancedPage(page: String): Boolean = page in advancedPages
   @Suppress("UNUSED_PARAMETER")
   fun conciseHelp(domainId: String, key: String, fallback: String?): String =

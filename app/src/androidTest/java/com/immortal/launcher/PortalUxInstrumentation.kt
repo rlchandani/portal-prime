@@ -45,6 +45,35 @@ class PortalUxInstrumentation : Instrumentation() {
             automation.serviceInfo = automation.serviceInfo.apply {
                 flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
             }
+            if (options.getString("command") == "slideshowReport") {
+                finish(0, SlideshowValidationReport.read(targetContext,
+                    requireNotNull(options.getString("runId"))))
+                return
+            }
+            if (options.getString("command") == "slideshowCleanup") {
+                finish(0, SlideshowValidationReport.cleanupFixtures(targetContext))
+                return
+            }
+            if (options.getString("command") == "slideshowEnableSmart") {
+                val applied = com.immortal.launcher.settings.SettingsRegistry.apply(targetContext,
+                    "screensaver", JSONObject().put("mode", ScreensaverConfig.MODE_SMART))
+                check(applied == setOf("mode"))
+                finish(0, Bundle().apply {
+                    putBoolean("smartFrameSelected",
+                        ScreensaverConfig.load(targetContext).mode == ScreensaverConfig.MODE_SMART)
+                })
+                return
+            }
+            if (options.getString("command") == "faceProbe") {
+                val face = SlideshowFaceDeviceProbe.run(this)
+                finish(0, face)
+                return
+            }
+            if (options.getString("command") == "slideshow") {
+                val slideshow = SlideshowDeviceChecks.run(this, automation, options)
+                finish(if (slideshow.getBoolean("slideshowCompleted")) 0 else 1, slideshow)
+                return
+            }
             if (options.getString("command") == "appearance") {
                 val appearance = AppearanceDeviceChecks.run(this, automation)
                 finish(if (appearance.getBoolean("appearanceCompleted")) 0 else 1, appearance)

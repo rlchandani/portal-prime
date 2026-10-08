@@ -22,7 +22,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.immortal.launcher.settings.EnumSpec
+import com.immortal.launcher.settings.SettingsDomains
+import com.immortal.launcher.settings.SettingsPresentation
+import com.immortal.launcher.settings.SettingsRegistry
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+import org.json.JSONObject
 
 class ScreensaverModeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,11 +49,15 @@ private fun ScreensaverModeScreen() {
 internal fun ScreensaverModeContent() {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
-    var mode by remember { mutableStateOf(ScreensaverConfig.load(context).mode) }
+    val domain = SettingsDomains.screensaver
+    val spec = domain.specs.first { it.key == "mode" } as EnumSpec<ScreensaverConfig.Settings>
+    var mode by remember { mutableStateOf(spec.get(domain.load(context))) }
+    val advanced = rememberApprovedAdvanced()
+    var advancedConsent by remember { mutableStateOf(false) }
     DisposableEffect(owner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                mode = ScreensaverConfig.load(context).mode
+                mode = spec.get(domain.load(context))
             }
         }
         owner.lifecycle.addObserver(observer)
@@ -56,13 +65,23 @@ internal fun ScreensaverModeContent() {
     }
     ApprovedSettingsSectionLabel("Options")
     Card {
-        PickerRow("Screensaver style", mode,
-            ScreensaverConfig.MODES.map { PickerOption(it, ScreensaverConfig.modeLabel(it)) }) { selected ->
-            // The existing rich style picker owns this field; renderer IDs stay untouched.
-            ScreensaverConfig.setMode(context, selected)
-            mode = ScreensaverConfig.load(context).mode
+        PickerRow(spec.title, mode,
+            SettingsPresentation.visibleEnumOptions(domain.id, spec.key, spec.options, mode, advanced)
+                .map { (value, label) -> PickerOption(value, label) }) { selected ->
+            domain.apply(context, JSONObject().put(spec.key, selected))
+            mode = spec.get(domain.load(context))
         }
     }
+    if (!advanced) ApprovedSettingsTextButton("More styles in Advanced settings") {
+        advancedConsent = true
+    }
+    if (advancedConsent) ApprovedSettingsAdvancedConsent(
+        onEnable = {
+            SettingsRegistry.apply(context, "immortal", JSONObject().put("advancedSettings", true))
+            advancedConsent = false
+        },
+        onCancel = { advancedConsent = false },
+    )
     ApprovedSourcesPreviewFooter {
         context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
     }

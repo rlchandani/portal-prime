@@ -49,36 +49,44 @@ object ScreensaverConfig {
   const val FIT_FILL = "fill" // crop to fill the screen
   const val FIT_FIT = "fit" // letterbox to show the whole image
 
-  // Screensaver render "mode" — the animated engine (WebView) to use. "classic" keeps the legacy
-  // native crossfade + Ken Burns renderer; every other value runs the bundled HTML/JS engine
-  // (assets/screensaver) with that mode, and "shuffle" cycles the engine's modes intelligently.
+  // Preferred presentations use the bounded native stage. Saved legacy IDs retain their renderer:
+  // Classic uses the original native path; Shuffle and ENGINE_MODES use the bundled WebView.
+  const val MODE_SMART = "smartFrame"
+  const val MODE_PORTRAITS = "portraitPair"
+  const val MODE_WHOLE = "wholePhoto"
   const val MODE_CLASSIC = "classic"
   const val MODE_SHUFFLE = "shuffle"
   // Engine mode ids — MUST match the SS.MODES keys in assets/screensaver/modes.js.
   val ENGINE_MODES = listOf(
       "kenBurns", "diptych", "framed", "galleryWall", "push", "memories",
       "panorama", "polaroid", "mosaic", "filmstrip", "cinema", "heroSidebar")
-  // Full ordered list for the settings picker: Classic, Shuffle, then each engine mode.
-  val MODES = listOf(MODE_CLASSIC, MODE_SHUFFLE) + ENGINE_MODES
+  // Preferred styles first; all existing IDs stay selectable and valid for saved preferences.
+  val MODES = listOf(MODE_SMART, MODE_PORTRAITS, MODE_WHOLE, MODE_CLASSIC, MODE_SHUFFLE) + ENGINE_MODES
   fun modeLabel(m: String): String = when (m) {
-    MODE_CLASSIC -> "Classic (crossfade)"
-    MODE_SHUFFLE -> "Shuffle — all styles"
-    "kenBurns" -> "Cinematic Ken Burns"
-    "diptych" -> "Orientation Diptych"
-    "framed" -> "Framed Print"
-    "galleryWall" -> "Living Gallery Wall"
-    "push" -> "Cinematic Push"
-    "memories" -> "Memories"
-    "panorama" -> "Panorama Drift"
-    "polaroid" -> "Polaroid Scatter"
-    "mosaic" -> "Mosaic Wall"
-    "filmstrip" -> "Filmstrip Coverflow"
-    "cinema" -> "Cinema Letterbox"
-    "heroSidebar" -> "Hero + Sidebar"
+    MODE_SMART -> "Smart frame"
+    MODE_PORTRAITS -> "Portrait pair"
+    MODE_WHOLE -> "Whole photo"
+    MODE_CLASSIC -> "Classic (existing)"
+    MODE_SHUFFLE -> "Shuffle - all styles (existing)"
+    "kenBurns" -> "Cinematic Ken Burns (existing)"
+    "diptych" -> "Orientation Diptych (existing)"
+    "framed" -> "Framed Print (existing)"
+    "galleryWall" -> "Living Gallery Wall (existing)"
+    "push" -> "Cinematic Push (existing)"
+    "memories" -> "Memories (existing)"
+    "panorama" -> "Panorama Drift (existing)"
+    "polaroid" -> "Polaroid Scatter (existing)"
+    "mosaic" -> "Mosaic Wall (existing)"
+    "filmstrip" -> "Filmstrip Coverflow (existing)"
+    "cinema" -> "Cinema Letterbox (existing)"
+    "heroSidebar" -> "Hero + Sidebar (existing)"
     else -> m
   }
-  /** True when [mode] should run the WebView engine (anything other than the legacy classic path). */
-  fun usesEngine(mode: String): Boolean = mode != MODE_CLASSIC
+  fun isNativeStage(mode: String): Boolean =
+      mode == MODE_SMART || mode == MODE_PORTRAITS || mode == MODE_WHOLE
+
+  /** Existing engine IDs keep their WebView; Classic and the preferred styles remain native. */
+  fun usesEngine(mode: String): Boolean = mode != MODE_CLASSIC && !isNativeStage(mode)
   const val DEFAULT_INTERVAL = 30
   const val DEFAULT_ALBUM_REFRESH_MIN = 60
   // On-device media-cache storage limit, in GB (the "Storage limit" control's range). Capped at
@@ -155,9 +163,10 @@ object ScreensaverConfig {
       // etc. A power-user "bring your own frame" option — not the promoted default.
       val webUrl: String? = null,
       val fit: String = FIT_FILL,
-      // Render mode: the animated engine to use (see MODE_* / ENGINE_MODES). Defaults to Shuffle so
-      // the premium multi-style engine is the out-of-the-box experience; "classic" = legacy renderer.
-      val mode: String = MODE_SHUFFLE,
+      // New installations start with Smart frame. Explicit saved legacy styles remain unchanged.
+      val mode: String = MODE_SMART,
+      val photoMotion: Boolean = true,
+      val keepPeopleInFrame: Boolean = true,
       val intervalSec: Int = DEFAULT_INTERVAL,
       val albumRefreshMin: Int = DEFAULT_ALBUM_REFRESH_MIN,
       val shuffle: Boolean = false,
@@ -301,7 +310,9 @@ object ScreensaverConfig {
         davPass = p.getString("dav_pass", null),
         webUrl = p.getString("web_url", null),
         fit = p.getString("fit", FIT_FILL) ?: FIT_FILL,
-        mode = p.getString("mode", MODE_SHUFFLE)?.takeIf { it in MODES } ?: MODE_SHUFFLE,
+        mode = p.getString("mode", MODE_SMART)?.takeIf { it in MODES } ?: MODE_SMART,
+        photoMotion = p.getBoolean("photo_motion", true),
+        keepPeopleInFrame = p.getBoolean("keep_people_in_frame", true),
         intervalSec = clampInterval(p.getInt("interval_sec", DEFAULT_INTERVAL)),
         albumRefreshMin =
             clampAlbumRefresh(p.getInt("album_refresh_min", DEFAULT_ALBUM_REFRESH_MIN)),
@@ -422,7 +433,13 @@ object ScreensaverConfig {
   fun setFit(c: Context, fit: String) = prefs(c).edit().putString("fit", fit).apply()
 
   fun setMode(c: Context, mode: String) =
-      prefs(c).edit().putString("mode", if (mode in MODES) mode else MODE_SHUFFLE).apply()
+      prefs(c).edit().putString("mode", if (mode in MODES) mode else MODE_SMART).apply()
+
+  fun setPhotoMotion(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("photo_motion", on).apply()
+
+  fun setKeepPeopleInFrame(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("keep_people_in_frame", on).apply()
 
   fun setInterval(c: Context, sec: Int) =
       prefs(c).edit().putInt("interval_sec", clampInterval(sec)).apply()

@@ -31,6 +31,18 @@
 <script>
 (async function () {
   const stage = document.getElementById("stage");
+  let engine = null, closed = false, requestedPause = false, clockTimer = null;
+  // Available during initial dimension measurement. This bridge belongs only to this asset page.
+  window.immortalSlideshow = {
+    next: () => engine && !closed ? engine.next() : false,
+    previous: () => engine && !closed ? engine.previous() : false,
+    pause: () => { requestedPause = true; if (engine && !closed) engine.pause(); },
+    resume: () => { requestedPause = false; if (engine && !closed) engine.resume(); },
+  };
+  addEventListener("pagehide", () => {
+    closed = true; clearInterval(clockTimer);
+    if (engine) engine.stop();
+  }, { once: true });
 
   // Mode + clock format from the host bridge (falls back to shuffle / 12h).
   function bridgeMode() {
@@ -69,15 +81,21 @@
         else { const hh = h % 12 || 12; timeEl.textContent = `${hh}:${m}`; }
         dateEl.textContent = d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
       }
-      tick(); setInterval(tick, 1000);
+      tick(); clockTimer = setInterval(tick, 1000);
     })();
   }
 
   // Pre-measure photo dimensions so the very first mode already has correct orientation info.
   // Cap the initial measure so a huge library doesn't stall the start; the rest measure lazily.
-  if (window.premeasureAll) { try { await window.premeasureAll(6); } catch (e) {} }
-
-  document.getElementById("loading").classList.add("hide");
+  if (window.premeasureAll) {
+    let measureTimer;
+    try {
+      await Promise.race([window.premeasureAll(6),
+        new Promise(resolve => { measureTimer = setTimeout(resolve, 1500); })]);
+    } catch (_) {}
+    finally { clearTimeout(measureTimer); }
+  }
+  if (closed) return;
 
   if (!window.PHOTOS || !window.PHOTOS.length) {
     document.getElementById("loading").textContent = "No photos to show";
@@ -85,12 +103,14 @@
     return;
   }
 
-  SS.startEngine({
+  engine = SS.startEngine({
     stage,
     mode: bridgeMode(),
     intervalSec: intervalSec(),
     onMode: () => {},
+    onReady: () => document.getElementById("loading").classList.add("hide"),
   });
+  if (requestedPause) engine.pause();
 })();
 </script>
 </body>

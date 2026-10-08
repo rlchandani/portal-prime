@@ -530,7 +530,7 @@ object RemoteHtml {
       b.onclick=function(){setPut(domId,ctl.key,!ctl.value);};row.appendChild(b);
     }else if(ctl.type==='enum'){
       var seg=document.createElement('div');seg.className='setseg';
-      (ctl.options||[]).forEach(function(o){var b=document.createElement('button');b.textContent=o.label;if(o.value===ctl.value)b.className='on';b.onclick=function(){setPut(domId,ctl.key,o.value);};seg.appendChild(b);});
+      (ctl.options||[]).filter(function(o){return o.tier!=='advanced'||remoteAdvanced()||o.value===ctl.value;}).forEach(function(o){var b=document.createElement('button');b.textContent=o.label;if(o.value===ctl.value)b.className='on';b.onclick=function(){setPut(domId,ctl.key,o.value);};seg.appendChild(b);});
       row.appendChild(seg);
     }else if(ctl.type==='int'){
       var st=document.createElement('div');st.className='setstep';

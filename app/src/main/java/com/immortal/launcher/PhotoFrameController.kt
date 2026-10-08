@@ -14,6 +14,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
@@ -75,6 +76,8 @@ class PhotoFrameController(
     private val unsplashQuery: String = "nature,landscape,scenic",
     private val weatherRefreshMs: Long = 30 * 60_000L,
     private val calendarRefreshMs: Long = 30 * 60_000L,
+    /** Deliberate Photos viewer; Dream/continuation retains tap-to-dismiss. */
+    var interactivePreview: Boolean = false,
 ) {
   private val io = Executors.newSingleThreadExecutor()
   // Decode-once screen-sized copies of local photos for the engine (see [EngineScaledCache]).
@@ -92,6 +95,22 @@ class PhotoFrameController(
   private lateinit var photoBack: ImageView
   // True when [photoBack] is currently the front (visible) layer and [photo] is the back.
   private var photoBackIsFront = false
+  private lateinit var nativeStage: SlideshowStage
+  private val pixelBudget = SlideshowPixelBudget()
+  private val nativeLoaderDelegate = lazy {
+    SlideshowLoader(context, pixelBudget, onCancelTransports = { cancelPhotoTransports() })
+  }
+  private val nativeLoader get() = nativeLoaderDelegate.value
+  @Volatile private var stopped = false
+  private val nativeNavigation = SlideshowNavigation()
+  private var nativeStarting = false
+  private var afterNativeStartup: (() -> Unit)? = null
+  private var videoReady = false
+  private var paused = false
+  private var holdDeadline = 0L
+  private var remainingHold = 0L
+  private var nativeFailures = 0
+  private lateinit var viewerControls: SlideshowViewerControls
   private lateinit var videoView: VideoView
 
   // tvOS-style slow zoom/pan ("Ken Burns") on the photo layer. Runs over the dwell time and is
@@ -154,6 +173,7 @@ class PhotoFrameController(
   // Local-folder playback state.
   private var localMode = false
   private var playlist: List<MediaItem> = emptyList()
+  private var localDeckKeys: List<String> = emptyList()
   private var localIndex = -1
   // Bumped on every advance so a slow image-decode or an old video's completion
   // callback can tell it's been superseded and bow out.
@@ -180,7 +200,7 @@ class PhotoFrameController(
   private var remoteVideos: Set<String> = emptySet()
   // Optional custom fetcher for the remote path: when set (SMB), each "url" is fetched through
   // this instead of an HTTP download, so SMB reuses all the remote advance/tick/fallback logic.
-  private var remoteFetch: ((String) -> Bitmap?)? = null
+  private var remoteFetch: ((String, Int) -> Bitmap?)? = null
   private var smbSource: SmbSource? = null
   // On-device media cache for stable-URL HTTP sources (Immich, WebDAV): images are stored as
   // fetched, videos as 1200x800 derivatives, so each asset is pulled from the server once and
@@ -200,8 +220,17 @@ class PhotoFrameController(
   private var webView: android.webkit.WebView? = null
 
   // Web-feed history so swipes can go back as well as forward.
-  private val history = ArrayList<Bitmap>()
+  private val history = ArrayList<Bitmap>() // Classic retains its original history policy.
+  private val nativeHistory = ArrayList<SlideshowPhoto>()
+  private val photoIdentities = java.util.WeakHashMap<Bitmap, String>()
   private var index = -1
+  private val photoTransportGeneration = java.util.concurrent.atomic.AtomicLong()
+  private val photoTransportLock = Any()
+  private val photoConnections = HashSet<HttpURLConnection>()
+  private val photoStreams = HashSet<java.io.InputStream>()
+  private val photoCancelIo = Executors.newSingleThreadExecutor { runnable ->
+    Thread(runnable, "slideshow-close-transports").apply { isDaemon = true }
+  }
 
   // Default-feed source-chain state (see [fetchWebPhoto]).
   // Wikimedia Commons featured-landscape image list: fetched once per session, then cycled.
@@ -246,19 +275,44 @@ class PhotoFrameController(
         if (abs(dx) > 120 && abs(dx) > abs(dy) * 1.5f) {
           if (dx < 0) next() else prev()
         } else if (abs(dx) < 48 && abs(dy) < 48) {
-          onExit?.invoke()
+          if (interactivePreview && nativePhotoMode)
+            viewerControls.toggle()
+          else onExit?.invoke()
         }
       }
     }
   }
 
   val view: View by lazy { buildUi() }
+  private var nativePhotoMode = false
 
   fun start() {
+    stopped = false
     settings = ScreensaverConfig.load(context)
-    // Caching off? Reclaim any space a previous "on" session left behind (best-effort, off-thread).
-    if (!settings.cacheEnabled) Thread { MediaCache.purge(context) }.start()
+    val root = view as FrameLayout
     val source = PhotoFrameSource.from(settings, allowWebPage = faceOverride == null)
+    nativePhotoMode = ScreensaverConfig.isNativeStage(settings.mode) && source !is PhotoFrameSource.WebPage
+    if (nativePhotoMode) {
+      nativeStarting = true
+      nativeStage.visibility = View.VISIBLE
+      root.setBackgroundColor(SlideshowStage.MATTE)
+      // A local bundled image is immediately available while source discovery is underway.
+      // It never waits behind calendar/weather requests or a failing network provider.
+      nativeLoader.load(
+          SlideshowAsset("feed", { bundledBitmap() }, contentIdentity = true,
+              identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } }),
+          emptyList(), null, false, false,
+          { photos, _ ->
+            if (!stopped) {
+              if (!localMode && !remoteMode) rememberNativePhoto(photos.first())
+              presentNative(photos)
+            }
+          }, { finishNativeStartup() })
+    }
+    // Caching off? Reclaim any space a previous "on" session left behind (best-effort, off-thread).
+    if (!settings.cacheEnabled) Thread {
+      if (!stopped && !ScreensaverConfig.load(context).cacheEnabled) MediaCache.purge(context)
+    }.apply { name = "slideshow-cache-housekeeping"; start() }
     applyFit()
     refreshCalendar.run()
     calendarTick.run()
@@ -332,6 +386,9 @@ class PhotoFrameController(
               if (LocalMedia.isAccessible(source.path)) LocalMedia.enumerate(source.path, source.includeVideo)
               else emptyList()
           val ordered = if (source.shuffle) list.shuffled() else list
+          val deckKeys = if (ScreensaverConfig.isNativeStage(settings.mode)) {
+            ordered.map { localKey(it.path) }
+          } else emptyList()
           // Engine mode: precompute each photo's ORIENTED w/h (header-only decode) so the
           // orientation-aware mode scheduler in modes.js can match photos to modes, and drop
           // sub-[MIN_PHOTO_EDGE] thumbnails/junk that cheapen the wall. Bounded to
@@ -363,6 +420,7 @@ class PhotoFrameController(
                 urls
               } else emptyList()
           ui.post {
+            if (stopped) return@post
             if (useEngine && engineUrls.isNotEmpty()) {
               startEngine(engineUrls, dims = engineDims)
               engineActive = true
@@ -374,6 +432,7 @@ class PhotoFrameController(
             }
             if (ordered.isNotEmpty()) {
               playlist = ordered
+              localDeckKeys = deckKeys
               localMode = true
               localIndex = -1
               advanceLocal(+1)
@@ -390,6 +449,7 @@ class PhotoFrameController(
           val album = RemoteAlbum.fetch(source.url, m.widthPixels, m.heightPixels)
           val urls = album?.photoUrls.orEmpty()
           ui.post {
+            if (stopped) return@post
             if (urls.isNotEmpty()) {
               val ordered = if (source.shuffle) urls.shuffled() else urls
               // Shared-album URLs are direct https with no auth header, so the WebView engine can
@@ -397,12 +457,12 @@ class PhotoFrameController(
               // The album keeps refreshing underneath (scheduleEngineAlbumRefresh): photos the
               // user adds in Google Photos / iCloud appear without touching the Portal.
               if (ScreensaverConfig.usesEngine(settings.mode)) {
-                startEngine(ordered); engineActive = true
-                scheduleEngineAlbumRefresh(source.url, ordered, source.shuffle)
+                 startEngine(ordered, authHeaders = album?.headers.orEmpty()); engineActive = true
+                scheduleEngineAlbumRefresh(source.url, ordered, source.shuffle, album?.headers.orEmpty())
                 return@post
               }
               remoteUrls = ordered
-              remoteHeaders = emptyMap()
+              remoteHeaders = album?.headers.orEmpty()
               remoteMode = true
               remoteIndex = -1
               remoteFailStreak = 0
@@ -420,7 +480,9 @@ class PhotoFrameController(
           val media =
               ImmichSource.listMedia(source.url, source.key, source.albumId, source.includeVideo)
                   .orEmpty()
+          if (!stopped && media.isNotEmpty() && !ScreensaverConfig.usesEngine(settings.mode)) enableMediaCache()
           ui.post {
+            if (stopped) return@post
             if (media.isNotEmpty()) {
               val ordered = if (source.shuffle) media.shuffled() else media
               // Engine mode: images only (WebView can't play the video URLs), auth via header inject.
@@ -436,8 +498,7 @@ class PhotoFrameController(
               remoteMode = true
               remoteIndex = -1
               remoteFailStreak = 0
-              enableMediaCache()
-              advanceRemote(+1)
+               advanceRemote(+1)
               schedulePrefetch()
             } else {
               // Server unreachable / album empty → never leave the frame blank. Say so: the
@@ -453,7 +514,9 @@ class PhotoFrameController(
           val media =
               DavSource.listMedia(source.url, source.user, source.pass, source.includeVideo)
                   .orEmpty()
+          if (!stopped && media.isNotEmpty() && !ScreensaverConfig.usesEngine(settings.mode)) enableMediaCache()
           ui.post {
+            if (stopped) return@post
             if (media.isNotEmpty()) {
               val ordered = if (source.shuffle) media.shuffled() else media
               if (ScreensaverConfig.usesEngine(settings.mode)) {
@@ -468,8 +531,7 @@ class PhotoFrameController(
               remoteMode = true
               remoteIndex = -1
               remoteFailStreak = 0
-              enableMediaCache()
-              advanceRemote(+1)
+               advanceRemote(+1)
               schedulePrefetch()
             } else {
               startWeb()
@@ -488,20 +550,23 @@ class PhotoFrameController(
             )
         io.execute {
           val paths = if (src.connect()) src.listImages() else emptyList()
+          if (stopped || paths.isEmpty()) {
+            runCatching { src.close() }
+            if (!stopped) ui.post { if (!stopped) startWeb() }
+            return@execute
+          }
           ui.post {
-            if (paths.isNotEmpty()) {
-              smbSource = src
-              remoteUrls = if (source.shuffle) paths.shuffled() else paths
-              remoteFetch = { p -> src.openStream(p)?.use { decodeBoundedStream(it) } }
-              remoteMode = true
-              remoteIndex = -1
-              remoteFailStreak = 0
-              advanceRemote(+1)
-            } else {
-              // Share unreachable / no images → never leave the frame blank.
-              src.close()
-              startWeb()
+            if (stopped) {
+              Thread { runCatching { src.close() } }.start()
+              return@post
             }
+            smbSource = src
+            remoteUrls = if (source.shuffle) paths.shuffled() else paths
+            remoteFetch = { p, edge -> src.openStream(p)?.use { decodeBoundedStream(it, edge) } }
+            remoteMode = true
+            remoteIndex = -1
+            remoteFailStreak = 0
+            advanceRemote(+1)
           }
         }
       }
@@ -561,6 +626,7 @@ class PhotoFrameController(
       dims: Map<String, Pair<Int, Int>> = emptyMap(),
       authHeaders: Map<String, String> = emptyMap(),
   ) {
+    if (stopped) return
     val wv =
         object : android.webkit.WebView(context) {
           override fun onTouchEvent(event: MotionEvent): Boolean = false
@@ -707,6 +773,15 @@ class PhotoFrameController(
   private var engineActive = false
 
   fun stop() {
+    stopped = true
+    gen++
+    nativeStarting = false
+    afterNativeStartup = null
+    cancelPhotoTransports()
+    if (nativeLoaderDelegate.isInitialized()) nativeLoader.close()
+    if (this::nativeStage.isInitialized) nativeStage.stop()
+    clearNativeHistory()
+    if (this::viewerControls.isInitialized) viewerControls.stop()
     // Halt the WebView's JS timers + GPU compositing IMMEDIATELY so the heavy scene stops competing
     // with the return-to-home transition — this is what made tap-to-exit feel slow. (destroy() must
     // still run on the main thread just below; pausing first makes the hand-off snappy.)
@@ -741,6 +816,7 @@ class PhotoFrameController(
     io.shutdownNow()
     metaIo.shutdownNow()
     transcodeIo.shutdownNow()
+    photoCancelIo.shutdown() // Drain owned closes; never wait for a network read on the UI thread.
   }
 
   // --- UI ---------------------------------------------------------------------
@@ -764,6 +840,13 @@ class PhotoFrameController(
     videoView.visibility = View.GONE
     root.addView(videoView, FrameLayout.LayoutParams(MATCH, MATCH, Gravity.CENTER))
 
+    // Draw the ready photograph above the SurfaceView's transparent hole until video renders.
+    nativeStage = SlideshowStage(context, pixelBudget).apply {
+      visibility = View.GONE
+      onPresented = { finishNativeStartup() }
+    }
+    root.addView(nativeStage, FrameLayout.LayoutParams(MATCH, MATCH))
+
     root.addView(faceRenderer.view)
     buildCalendar(root)
 
@@ -777,6 +860,24 @@ class PhotoFrameController(
     welcomeOverlay = buildWelcomeOverlay()
     welcomeOverlay.visibility = View.GONE
     root.addView(welcomeOverlay, FrameLayout.LayoutParams(MATCH, MATCH))
+    viewerControls = SlideshowViewerControls(
+        context, nativeStage,
+        onPrevious = { prev() }, onNext = { next() }, onPause = { setPaused(it) },
+        onExit = { onExit?.invoke() },
+        onSave = { key, adjustment, callback ->
+          nativeLoader.savePosition(key, adjustment) { saved ->
+            if (saved) {
+              for (at in nativeHistory.indices) {
+                if (nativeHistory[at].key == key)
+                  nativeHistory[at] = nativeHistory[at].copy(adjustment = adjustment)
+              }
+            }
+            callback(saved)
+          }
+        },
+        onEditingStart = { cancelNativeRequest() })
+    root.addView(viewerControls, FrameLayout.LayoutParams(MATCH, WRAP, Gravity.BOTTOM))
+    viewerControls.visibility = View.GONE
     return root
   }
 
@@ -1227,7 +1328,7 @@ class PhotoFrameController(
       }
 
   private fun fetchWeather() {
-    io.execute {
+    metaIo.execute {
       // Shared resilient fetch: cached location + multi-provider geolocation.
       val w = Weather.fetch(context)
       if (w.isNotBlank()) weatherText = w
@@ -1244,6 +1345,123 @@ class PhotoFrameController(
   }
 
   private fun intervalMs(): Long = settings.intervalSec * 1000L
+  private fun analyzePeople(): Boolean =
+      settings.keepPeopleInFrame && settings.mode != ScreensaverConfig.MODE_WHOLE
+
+  private fun localKey(path: String): String {
+    val file = java.io.File(path)
+    return "local:$path:${file.length()}:${file.lastModified()}"
+  }
+
+  private fun localAsset(path: String, key: String = localKey(path)): SlideshowAsset =
+      SlideshowAsset(key, { edge -> decodeBoundedFile(path, edge) }, {
+        orientedImageDims(path)?.let { it.second > it.first } ?: false
+      }, revisionVerified = true,
+          identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } })
+
+  private fun remoteKey(url: String): String = "remote:${settings.source}:$url"
+
+  private fun remoteAsset(url: String): SlideshowAsset {
+    val headers = remoteHeaders
+    val fetch = remoteFetch
+    return SlideshowAsset(remoteKey(url), { edge -> fetchRemoteImage(url, edge, headers, fetch) },
+        contentIdentity = true,
+        identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } })
+  }
+
+  private fun deferNativeStartup(action: () -> Unit): Boolean {
+    if (!ScreensaverConfig.isNativeStage(settings.mode) || !nativeStarting) return false
+    afterNativeStartup = action
+    return true
+  }
+
+  private fun finishNativeStartup() {
+    if (!nativeStarting || stopped) return
+    nativeStarting = false
+    val action = afterNativeStartup
+    afterNativeStartup = null
+    if (action != null) ui.post { if (!stopped) action() }
+  }
+
+  private fun cancelNativeRequest() {
+    gen++
+    afterNativeStartup = null
+    nativeNavigation.cancelRequest()
+    if (nativeLoaderDelegate.isInitialized()) nativeLoader.cancel()
+    // Editing an old photo must not allow a pending video to take over later.
+    if (videoView.visibility == View.VISIBLE) restorePhotoAfterVideo()
+  }
+
+  private fun rememberNativePhoto(prepared: SlideshowPhoto) {
+    if (nativeHistory.lastOrNull()?.key == prepared.key) nativeHistory[nativeHistory.lastIndex] = prepared
+    else {
+      while (nativeHistory.size >= 2) nativeHistory.removeAt(0)
+      nativeHistory.add(prepared)
+    }
+    index = nativeHistory.lastIndex
+    pixelBudget.setOwner("history", nativeHistory.map {
+      SlideshowPixelBudget.Entry(it.bitmap, it.bitmap.allocationByteCount.toLong())
+    })
+  }
+
+  private fun clearNativeHistory() {
+    nativeHistory.clear()
+    pixelBudget.setOwner("history", emptyList())
+    if (ScreensaverConfig.isNativeStage(settings.mode)) index = -1
+  }
+
+  private fun presentNative(photos: List<SlideshowPhoto>) {
+    if (stopped) return
+    nativeStage.visibility = View.VISIBLE
+    photo.visibility = View.GONE
+    photoBack.visibility = View.GONE
+    val occupied = faceRenderer.photoOcclusions().toMutableList()
+    if (calendarPanel.visibility == View.VISIBLE && calendarPanel.width > 0) {
+      occupied.add(Rect(calendarPanel.left - dp(20), calendarPanel.top - dp(20),
+          calendarPanel.right + dp(20), calendarPanel.bottom + dp(20)))
+    }
+    nativeStage.show(photos,
+        settings.fit == ScreensaverConfig.FIT_FILL && settings.mode != ScreensaverConfig.MODE_WHOLE,
+        settings.photoMotion && settings.mode != ScreensaverConfig.MODE_WHOLE, intervalMs(), occupied)
+    if (paused) nativeStage.pause() else nativeStage.resume()
+    viewerControls.photoChanged()
+    Log.i("ImmortalSlideshow", "ready native scene: photos=${photos.size}, pixels=${photos.sumOf { it.bitmap.width.toLong() * it.bitmap.height }}")
+  }
+
+  private fun armHold(task: Runnable, delay: Long = intervalMs()) {
+    ui.removeCallbacks(task)
+    holdDeadline = android.os.SystemClock.uptimeMillis() + delay
+    remainingHold = delay
+    if (!paused && !stopped) ui.postDelayed(task, delay)
+  }
+
+  private fun setPaused(value: Boolean) {
+    if (paused == value) return
+    paused = value
+    if (value) {
+      remainingHold = (holdDeadline - android.os.SystemClock.uptimeMillis()).coerceAtLeast(100L)
+      ui.removeCallbacks(localTick); ui.removeCallbacks(remoteTick); ui.removeCallbacks(rotate)
+      nativeStage.pause()
+      if (videoView.visibility == View.VISIBLE) runCatching { videoView.pause() }
+    } else {
+      nativeStage.resume()
+      if (videoView.visibility == View.VISIBLE) runCatching { videoView.start() }
+      val tick = when { localMode -> localTick; remoteMode -> remoteTick; else -> rotate }
+      armHold(tick, remainingHold.coerceAtLeast(100L))
+    }
+  }
+
+  fun dispatchViewerControls(event: MotionEvent): Boolean =
+      interactivePreview && nativePhotoMode &&
+          viewerControls.dispatchViewerTouch(event)
+
+  fun updatePreviewInteraction(enabled: Boolean) {
+    interactivePreview = enabled
+    if (!enabled && this::viewerControls.isInitialized) {
+      viewerControls.resetInteraction()
+      setPaused(false)
+    }
+  }
 
   // --- periodic loops ---------------------------------------------------------
   private val calendarTick =
@@ -1265,7 +1483,7 @@ class PhotoFrameController(
       object : Runnable {
         override fun run() {
           webNext()
-          ui.postDelayed(this, intervalMs())
+          if (!ScreensaverConfig.isNativeStage(settings.mode)) ui.postDelayed(this, intervalMs())
         }
       }
 
@@ -1283,7 +1501,7 @@ class PhotoFrameController(
           }
           val url = settings.calendarUrl
           if (settings.usesCalendar && !url.isNullOrBlank()) {
-            io.execute {
+            metaIo.execute {
               val events = CalendarFeed.fetch(url)
               ui.post {
                 calendarEvents = events
@@ -1299,7 +1517,12 @@ class PhotoFrameController(
       }
   // --- navigation (branches on the active source) -----------------------------
   fun next() {
+    if (stopped) return
+    if (deferNativeStartup { next() }) return
+    viewerControls.cancelEdit()
+    if (viewerControls.isEditing) return
     when {
+      engineActive -> webView?.evaluateJavascript("window.immortalSlideshow?.next()", null)
       localMode -> advanceLocal(+1)
       remoteMode -> advanceRemote(+1)
       else -> webNext()
@@ -1307,7 +1530,12 @@ class PhotoFrameController(
   }
 
   fun prev() {
+    if (stopped) return
+    if (deferNativeStartup { prev() }) return
+    viewerControls.cancelEdit()
+    if (viewerControls.isEditing) return
     when {
+      engineActive -> webView?.evaluateJavascript("window.immortalSlideshow?.previous()", null)
       localMode -> advanceLocal(-1)
       remoteMode -> advanceRemote(-1)
       else -> webPrev()
@@ -1323,23 +1551,58 @@ class PhotoFrameController(
       }
 
   private fun advanceLocal(dir: Int) {
+    if (stopped) return
+    if (deferNativeStartup { advanceLocal(dir) }) return
+    if (viewerControls.isEditing) return
     ui.removeCallbacks(localTick)
     if (playlist.isEmpty()) {
       startWeb()
       return
     }
     gen++
-    localIndex = ((localIndex + dir) % playlist.size + playlist.size) % playlist.size
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      clearNativeHistory()
+      localIndex = nativeNavigation.request(dir, localDeckKeys)
+    } else localIndex = ((localIndex + dir) % playlist.size + playlist.size) % playlist.size
     val item = playlist[localIndex]
     if (item.isVideo) showVideo(item.path, gen) else showLocalImage(item.path, gen)
   }
 
   private fun showLocalImage(path: String, g: Int) {
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      val anchor = localIndex
+      val partners = (1 until minOf(playlist.size, 2)).map { offset ->
+        (anchor + offset) % playlist.size
+      }.filterNot { playlist[it].isVideo }.map { localAsset(playlist[it].path, localDeckKeys[it]) }
+      val nextIndex = (anchor + 1) % playlist.size
+      val next = playlist.getOrNull(nextIndex)?.takeUnless { it.isVideo }
+          ?.let { localAsset(it.path, localDeckKeys[nextIndex]) }
+      nativeLoader.load(localAsset(path, localDeckKeys[anchor]), partners, next,
+          settings.mode == ScreensaverConfig.MODE_PORTRAITS, analyzePeople(),
+          { photos, partner ->
+            if (g != gen || stopped) return@load
+            nativeFailures = 0
+            stopVideo()
+            nativeNavigation.commit(photos.first().sourceKey, partner)
+            presentNative(photos)
+            loadCaptionForLocal(path, g)
+            armHold(localTick)
+          }, {
+            nativeNavigation.skipFailed()
+            if (++nativeFailures >= playlist.size) startWeb() else advanceLocal(+1)
+          }, nextAfterPartner = { key ->
+            val at = localDeckKeys.indexOf(key)
+            val nextAt = (at + 1) % playlist.size
+            playlist.getOrNull(nextAt)?.takeUnless { it.isVideo }
+                ?.let { localAsset(it.path, localDeckKeys[nextAt]) }
+          })
+      return
+    }
     stopVideo()
     io.execute {
       val bmp = runCatching { decodeCorrected(path) }.getOrNull()
       ui.post {
-        if (g != gen) return@post // superseded by a newer advance
+        if (g != gen || stopped) { bmp?.recycle(); return@post }
         if (bmp == null) {
           advanceLocal(+1) // skip an unreadable file
           return@post
@@ -1366,29 +1629,30 @@ class PhotoFrameController(
    * The bound never upscales (small images decode untouched) and uses a power-of-two
    * [BitmapFactory.Options.inSampleSize], the only value the decoder honours efficiently.
    */
-  private fun sampleSizeFor(w: Int, h: Int): Int {
-    val longest = maxOf(w, h)
-    return if (longest > MAX_EDGE) Integer.highestOneBit(longest / MAX_EDGE) else 1
-  }
-
-  private fun decodeBoundedFile(path: String): Bitmap? {
-    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    BitmapFactory.decodeFile(path, bounds)
-    val opts =
-        BitmapFactory.Options().apply { inSampleSize = sampleSizeFor(bounds.outWidth, bounds.outHeight) }
-    return BitmapFactory.decodeFile(path, opts)
+  private fun decodeBoundedFile(path: String, maxEdge: Int = 2400): Bitmap? {
+    if (!ScreensaverConfig.isNativeStage(settings.mode)) return SlideshowDecoder.file(path, maxEdge)
+    return runCatching {
+      java.io.File(path).inputStream().use { decodeBoundedStream(it, maxEdge) }
+    }.getOrNull()
   }
 
   /** Stream variant: buffers to bytes so the bounds pass can run before the real decode. */
-  private fun decodeBoundedStream(input: java.io.InputStream): Bitmap? = decodeBoundedBytes(input.readBytes())
+  private fun decodeBoundedStream(input: java.io.InputStream, maxEdge: Int = 2400): Bitmap? {
+    if (!ScreensaverConfig.isNativeStage(settings.mode)) return SlideshowDecoder.stream(input, maxEdge)
+    val bytes = SlideshowDecoder.readEncoded(input) ?: return null
+    return decodeBoundedBytes(bytes, maxEdge)
+  }
 
   /** Two-pass decode of in-memory image bytes, bounded to [MAX_EDGE] (see [sampleSizeFor]). */
-  private fun decodeBoundedBytes(bytes: ByteArray): Bitmap? {
-    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
-    val opts =
-        BitmapFactory.Options().apply { inSampleSize = sampleSizeFor(bounds.outWidth, bounds.outHeight) }
-    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
+  private fun decodeBoundedBytes(bytes: ByteArray, maxEdge: Int = 2400): Bitmap? {
+    val bitmap = SlideshowDecoder.bytes(bytes, maxEdge) ?: return null
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      // Encoded identity survives sampling, presentation resizing, and changes of serving URL.
+      val hash = java.security.MessageDigest.getInstance("SHA-256").digest(bytes)
+          .joinToString("") { "%02x".format(it.toInt() and 255) }
+      synchronized(photoIdentities) { photoIdentities[bitmap] = "encoded:$hash" }
+    }
+    return bitmap
   }
 
   /**
@@ -1402,38 +1666,7 @@ class PhotoFrameController(
    * the upright orientation so a quirky file still shows (just unrotated) instead of
    * being skipped.
    */
-  private fun decodeCorrected(path: String): Bitmap? {
-    val bmp = decodeBoundedFile(path) ?: return null
-    val orientation =
-        runCatching {
-              ExifInterface(path)
-                  .getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-            }
-            .getOrDefault(ExifInterface.ORIENTATION_NORMAL)
-    val matrix = Matrix()
-    when (orientation) {
-      ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
-      ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
-      ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
-      ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.preScale(-1f, 1f)
-      ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.preScale(1f, -1f)
-      ExifInterface.ORIENTATION_TRANSPOSE -> {
-        matrix.postRotate(90f)
-        matrix.preScale(-1f, 1f)
-      }
-      ExifInterface.ORIENTATION_TRANSVERSE -> {
-        matrix.postRotate(-90f)
-        matrix.preScale(-1f, 1f)
-      }
-      else -> return bmp // NORMAL / UNDEFINED — already upright, no copy needed
-    }
-    // createBitmap allocates a second full-size bitmap; free the source once the
-    // rotated copy exists so peak memory stays at one image (Portal heaps are small
-    // and phone photos are large).
-    val rotated = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, matrix, true)
-    if (rotated != bmp) bmp.recycle()
-    return rotated
-  }
+  private fun decodeCorrected(path: String): Bitmap? = SlideshowDecoder.file(path)
 
   /**
    * Fast ORIENTED dimensions of a local image: a header-only bounds decode plus the EXIF
@@ -1462,13 +1695,14 @@ class PhotoFrameController(
   }
 
   private fun showVideo(path: String, g: Int) {
-    cancelKenBurns()
-    faceRenderer.setCaption(null, null)
-    photo.setImageDrawable(null)
-    photo.visibility = View.GONE
-    photoBack.setImageDrawable(null)
-    photoBack.visibility = View.GONE
-    videoView.visibility = View.VISIBLE
+    beginVideo(g, localDeckKeys.getOrNull(localIndex) ?: localKey(path)) { nativeFailures = 0 }
+    fun failed() {
+      if (g != gen || stopped) return
+      restorePhotoAfterVideo()
+      nativeNavigation.skipFailed()
+      if (ScreensaverConfig.isNativeStage(settings.mode) && ++nativeFailures >= playlist.size) startWeb()
+      else advanceLocal(+1)
+    }
     runCatching {
           videoView.setOnPreparedListener { mp ->
             mp.isLooping = false
@@ -1477,21 +1711,63 @@ class PhotoFrameController(
             mp.setOnVideoSizeChangedListener { _, w, h -> if (g == gen) applyVideoFit(w, h) }
             if (g == gen) {
               applyVideoFit(mp.videoWidth, mp.videoHeight)
-              videoView.start()
+              if (!paused) videoView.start()
             }
           }
           videoView.setOnCompletionListener {
-            if (g == gen) advanceLocal(+1)
+            if (g == gen && !stopped) {
+              if (!videoReady) nativeNavigation.skipFailed()
+              advanceLocal(+1)
+            }
           }
           videoView.setOnErrorListener { _, _, _ ->
-            if (g == gen) advanceLocal(+1)
+            failed()
             true
           }
           videoView.setVideoPath(path)
           // Safety net: advance even if a clip is very long or never reports done.
-          ui.postDelayed(localTick, maxOf(intervalMs(), 5 * 60_000L))
+          armHold(localTick, maxOf(intervalMs(), 5 * 60_000L))
         }
-        .onFailure { if (g == gen) advanceLocal(+1) }
+        .onFailure { failed() }
+  }
+
+  private fun beginVideo(g: Int, key: String, onRendered: () -> Unit) {
+    stopVideo()
+    val native = ScreensaverConfig.isNativeStage(settings.mode)
+    if (native) {
+      nativeLoader.cancel()
+      nativeStage.pause()
+      if (nativeStage.currentPhoto != null) nativeStage.visibility = View.VISIBLE
+    }
+    cancelKenBurns()
+    faceRenderer.setCaption(null, null)
+    photo.setImageDrawable(null)
+    photo.visibility = View.GONE
+    photoBack.setImageDrawable(null)
+    photoBack.visibility = View.GONE
+    videoView.visibility = View.VISIBLE
+    videoView.setOnInfoListener { _, what, _ ->
+      if (g == gen && !stopped && what == android.media.MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+        videoReady = true
+        if (native) {
+          nativeNavigation.commit(key, null)
+          nativeStage.visibility = View.GONE
+          viewerControls.photoChanged()
+        }
+        onRendered()
+      }
+      false
+    }
+    if (native) viewerControls.photoChanged()
+  }
+
+  private fun restorePhotoAfterVideo() {
+    stopVideo()
+    if (ScreensaverConfig.isNativeStage(settings.mode) && nativeStage.currentPhoto != null) {
+      nativeStage.visibility = View.VISIBLE
+      if (paused) nativeStage.pause() else nativeStage.resume()
+      viewerControls.photoChanged()
+    }
   }
 
   private fun stopVideo() {
@@ -1507,6 +1783,7 @@ class PhotoFrameController(
         photoBackIsFront = false
       }
     }
+    videoReady = false
   }
 
   // --- remote album playback (iCloud / Google Photos public shares) -----------
@@ -1530,9 +1807,9 @@ class PhotoFrameController(
             val fresh = RemoteAlbum.fetch(shareUrl, m.widthPixels, m.heightPixels)
             val urls = fresh?.photoUrls.orEmpty()
             ui.post {
+              if (stopped || !remoteMode) return@post
               if (remoteMode && urls.isNotEmpty()) {
-                remoteUrls = urls
-                if (remoteIndex >= remoteUrls.size) remoteIndex = -1
+                applyRemoteManifest(urls, fresh?.headers.orEmpty())
                 remoteFailStreak = 0
               }
               scheduleRemoteRefresh()
@@ -1542,6 +1819,7 @@ class PhotoFrameController(
       }
 
   private fun scheduleRemoteRefresh() {
+    if (stopped || !remoteMode) return
     ui.removeCallbacks(remoteRefresh)
     ui.postDelayed(remoteRefresh, settings.albumRefreshMin * 60_000L)
   }
@@ -1554,23 +1832,28 @@ class PhotoFrameController(
   // URLs, and the shuffle-beat crossfade hides the swap.
   private var engineAlbumRefresh: Runnable? = null
 
-  private fun scheduleEngineAlbumRefresh(shareUrl: String, current: List<String>, shuffle: Boolean) {
+  private fun scheduleEngineAlbumRefresh(
+      shareUrl: String, current: List<String>, shuffle: Boolean,
+      currentHeaders: Map<String, String> = emptyMap(),
+  ) {
     engineAlbumRefresh?.let { ui.removeCallbacks(it) }
     val task = object : Runnable {
       override fun run() {
-        if (!engineActive) return
+        if (!engineActive || stopped) return
         val m = context.resources.displayMetrics
         io.execute {
-          val fresh = RemoteAlbum.fetch(shareUrl, m.widthPixels, m.heightPixels)?.photoUrls.orEmpty()
+          val album = RemoteAlbum.fetch(shareUrl, m.widthPixels, m.heightPixels)
+          val fresh = album?.photoUrls.orEmpty()
+          val headers = album?.headers.orEmpty()
           ui.post {
-            if (!engineActive) return@post
-            if (fresh.isNotEmpty() && fresh.toSet() != current.toSet()) {
+            if (!engineActive || stopped) return@post
+            if (fresh.isNotEmpty() && (fresh.toSet() != current.toSet() || headers != currentHeaders)) {
               Log.i(TAG, "album changed (${current.size} -> ${fresh.size} photos); restarting engine")
               val ordered = if (shuffle) fresh.shuffled() else fresh
               webView?.let { runCatching { it.stopLoading(); it.destroy() } }
               webView = null
-              startEngine(ordered)
-              scheduleEngineAlbumRefresh(shareUrl, ordered, shuffle)
+              startEngine(ordered, authHeaders = headers)
+              scheduleEngineAlbumRefresh(shareUrl, ordered, shuffle, headers)
             } else {
               // Unchanged or transient failure: keep showing what we have, try again later.
               ui.postDelayed(this, settings.albumRefreshMin * 60_000L)
@@ -1583,7 +1866,26 @@ class PhotoFrameController(
     ui.postDelayed(task, settings.albumRefreshMin * 60_000L)
   }
 
+  private fun applyRemoteManifest(urls: List<String>, headers: Map<String, String>) {
+    if (urls == remoteUrls && headers == remoteHeaders) return
+    val oldUrl = remoteUrls.getOrNull(remoteIndex)
+    val keepVideo = videoView.visibility == View.VISIBLE && oldUrl != null && oldUrl in urls
+    remoteUrls = urls
+    remoteHeaders = headers
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      if (!keepVideo) cancelNativeRequest()
+      nativeNavigation.refresh(urls.map(::remoteKey))
+      remoteIndex = if (keepVideo) urls.indexOfFirst { it == oldUrl }
+          else urls.indexOfFirst { remoteKey(it) == nativeNavigation.currentKey }
+      if (!keepVideo && !viewerControls.isEditing)
+        armHold(remoteTick, (holdDeadline - android.os.SystemClock.uptimeMillis()).coerceAtLeast(100L))
+    } else remoteIndex = urls.indexOfFirst { it == oldUrl }
+  }
+
   private fun advanceRemote(dir: Int) {
+    if (stopped) return
+    if (deferNativeStartup { advanceRemote(dir) }) return
+    if (viewerControls.isEditing) return
     ui.removeCallbacks(remoteTick)
     if (remoteUrls.isEmpty()) {
       startWeb()
@@ -1597,7 +1899,10 @@ class PhotoFrameController(
       return
     }
     gen++
-    remoteIndex = ((remoteIndex + dir) % remoteUrls.size + remoteUrls.size) % remoteUrls.size
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      clearNativeHistory()
+      remoteIndex = nativeNavigation.request(dir, remoteUrls.map(::remoteKey))
+    } else remoteIndex = ((remoteIndex + dir) % remoteUrls.size + remoteUrls.size) % remoteUrls.size
     val url = remoteUrls[remoteIndex]
     val g = gen
     if (url in remoteVideos) {
@@ -1612,11 +1917,34 @@ class PhotoFrameController(
       }
       return
     }
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      val anchor = remoteIndex
+      val deck = remoteUrls
+      val partners = (1 until minOf(deck.size, 2)).map { offset -> deck[(anchor + offset) % deck.size] }
+          .filterNot { it in remoteVideos }.map(::remoteAsset)
+      val next = deck.getOrNull((anchor + 1) % deck.size)?.takeUnless { it in remoteVideos }
+          ?.let(::remoteAsset)
+      nativeLoader.load(remoteAsset(url), partners, next,
+          settings.mode == ScreensaverConfig.MODE_PORTRAITS, analyzePeople(),
+          { photos, partner ->
+            if (g != gen || stopped) return@load
+            stopVideo()
+            remoteFailStreak = 0; remoteReresolveStreak = 0
+            nativeNavigation.commit(photos.first().sourceKey, partner)
+            presentNative(photos)
+            if (smbSource != null) loadCaptionForSmb(url, g) else faceRenderer.setCaption(null, null)
+            armHold(remoteTick)
+          }, { nativeNavigation.skipFailed(); remoteFailStreak++; advanceRemote(+1) }, nextAfterPartner = { key ->
+            val at = deck.indexOfFirst { remoteKey(it) == key }
+            deck.getOrNull((at + 1) % deck.size)?.takeUnless { it in remoteVideos }?.let(::remoteAsset)
+          })
+      return
+    }
     stopVideo()
     io.execute {
       val bmp = runCatching { fetchRemoteImage(url) }.getOrNull()
       ui.post {
-        if (g != gen) return@post // superseded by a newer advance
+        if (g != gen || stopped) { bmp?.recycle(); return@post }
         if (!remoteMode) return@post // raced with startWeb() flipping us off
         if (bmp == null) {
           remoteFailStreak++
@@ -1652,6 +1980,10 @@ class PhotoFrameController(
       g: Int,
       cachedFile: java.io.File? = null,
   ) {
+    beginVideo(g, remoteKey(remoteUrls[remoteIndex])) {
+      remoteFailStreak = 0
+      remoteReresolveStreak = 0
+    }
     fun dropCorruptCache() {
       cachedFile?.let { f ->
         Log.w(TAG, "cached video failed to play; deleting for re-fetch: ${f.name}")
@@ -1659,13 +1991,14 @@ class PhotoFrameController(
         prefetchFull = false // space freed; let the prefetch worker re-warm this slot
       }
     }
-    cancelKenBurns()
-    faceRenderer.setCaption(null, null)
-    photo.setImageDrawable(null)
-    photo.visibility = View.GONE
-    photoBack.setImageDrawable(null)
-    photoBack.visibility = View.GONE
-    videoView.visibility = View.VISIBLE
+    fun failed() {
+      if (g != gen || stopped) return
+      dropCorruptCache()
+      restorePhotoAfterVideo()
+      nativeNavigation.skipFailed()
+      remoteFailStreak++
+      advanceRemote(+1)
+    }
     runCatching {
           videoView.setOnPreparedListener { mp ->
             mp.isLooping = false
@@ -1673,34 +2006,25 @@ class PhotoFrameController(
             // Some streams only report their real dimensions after prepare.
             mp.setOnVideoSizeChangedListener { _, w, h -> if (g == gen) applyVideoFit(w, h) }
             if (g == gen) {
-              remoteFailStreak = 0
-              remoteReresolveStreak = 0
               applyVideoFit(mp.videoWidth, mp.videoHeight)
-              videoView.start()
+              if (!paused) videoView.start()
             }
           }
           videoView.setOnCompletionListener {
-            if (g == gen) advanceRemote(+1)
-          }
-          videoView.setOnErrorListener { _, _, _ ->
-            dropCorruptCache()
-            if (g == gen) {
-              remoteFailStreak++
+            if (g == gen && !stopped) {
+              if (!videoReady) nativeNavigation.skipFailed()
               advanceRemote(+1)
             }
+          }
+          videoView.setOnErrorListener { _, _, _ ->
+            failed()
             true
           }
           videoView.setVideoURI(uri, headers)
           // Safety net: advance even if a clip is very long or never reports done.
-          ui.postDelayed(remoteTick, maxOf(intervalMs(), 5 * 60_000L))
+          armHold(remoteTick, maxOf(intervalMs(), 5 * 60_000L))
         }
-        .onFailure {
-          dropCorruptCache()
-          if (g == gen) {
-            remoteFailStreak++
-            advanceRemote(+1)
-          }
-        }
+        .onFailure { failed() }
   }
 
   /**
@@ -1715,7 +2039,7 @@ class PhotoFrameController(
    * sustained outage still settles on the fallback instead of re-fetching forever.
    */
   private fun reresolveOrFallback() {
-    if (remoteReresolving) return
+    if (stopped || remoteReresolving) return
     val shareUrl = settings.albumUrl
     if (!settings.usesUrl || shareUrl.isNullOrBlank() || remoteReresolveStreak >= MAX_RERESOLVE) {
       startWeb()
@@ -1729,10 +2053,9 @@ class PhotoFrameController(
       val urls = fresh?.photoUrls.orEmpty()
       ui.post {
         remoteReresolving = false
-        if (!remoteMode) return@post // raced with a source change / startWeb()
+        if (!remoteMode || stopped) return@post // raced with a source change / exit
         if (urls.isNotEmpty()) {
-          remoteUrls = if (settings.shuffle) urls.shuffled() else urls
-          remoteIndex = -1
+          applyRemoteManifest(if (settings.shuffle) urls.shuffled() else urls, fresh?.headers.orEmpty())
           remoteFailStreak = 0
           advanceRemote(+1)
         } else {
@@ -1745,6 +2068,13 @@ class PhotoFrameController(
 
   // --- web feed (default + fallback) ------------------------------------------
   private fun startWeb() {
+    if (stopped) return
+    if (deferNativeStartup { startWeb() }) return
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      cancelNativeRequest()
+      nativeNavigation.reset()
+      if (localMode || remoteMode) clearNativeHistory()
+    }
     localMode = false
     remoteMode = false
     remoteHeaders = emptyMap()
@@ -1752,14 +2082,27 @@ class PhotoFrameController(
     remoteFetch = null
     smbSource?.let { s -> io.execute { runCatching { s.close() } } }
     smbSource = null
+    ui.removeCallbacks(localTick)
     ui.removeCallbacks(remoteTick)
     ui.removeCallbacks(remoteRefresh)
-    stopVideo()
+    restorePhotoAfterVideo()
     rotate.run()
   }
 
   /** Forward through history, loading a fresh photo when at the end. */
   private fun webNext() {
+    if (stopped || viewerControls.isEditing) return
+    if (deferNativeStartup { webNext() }) return
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      ui.removeCallbacks(rotate)
+      cancelNativeRequest()
+      if (index in 0 until nativeHistory.lastIndex) {
+        index++
+        presentNativeHistory(nativeHistory[index])
+        armHold(rotate)
+      } else loadFresh()
+      return
+    }
     if (index in 0 until history.size - 1) {
       index++
       show(history[index])
@@ -1770,16 +2113,46 @@ class PhotoFrameController(
 
   /** Back through history (no-op at the start). */
   private fun webPrev() {
+    if (stopped || viewerControls.isEditing) return
+    if (deferNativeStartup { webPrev() }) return
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      ui.removeCallbacks(rotate)
+      cancelNativeRequest()
+      if (index > 0) index--
+      nativeHistory.getOrNull(index)?.let(::presentNativeHistory)
+      armHold(rotate)
+      return
+    }
     if (index > 0) {
       index--
       show(history[index])
     }
   }
 
+  private fun presentNativeHistory(photo: SlideshowPhoto) {
+    val regions = if (analyzePeople()) nativeLoader.cachedRegions(photo.key).orEmpty() else emptyList()
+    presentNative(listOf(photo.copy(regions = regions)))
+  }
+
   private fun loadFresh() {
+    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      val g = ++gen
+      nativeLoader.load(SlideshowAsset("feed", { fetchWebPhoto() }, contentIdentity = true,
+              identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } }),
+          emptyList(), null, false, analyzePeople(),
+          { photos, _ ->
+            if (g != gen || stopped) return@load
+            stopVideo()
+            rememberNativePhoto(photos.first())
+            presentNative(photos)
+            armHold(rotate)
+          }, { if (g == gen && !stopped) armHold(rotate) })
+      return
+    }
     io.execute {
       val bmp = fetchWebPhoto() ?: return@execute
       ui.post {
+        if (stopped) { bmp.recycle(); return@post }
         photo.visibility = View.VISIBLE
         if (history.size >= 6) history.removeAt(0) // cap memory; GC reclaims
         history.add(bmp)
@@ -1799,20 +2172,23 @@ class PhotoFrameController(
   //   4. Bundled   — CC0/public-domain photos shipped in the APK; can't fail, so a
   //                  fresh device with no network yet — or a day every web source is
   //                  down (e.g. the Picsum outage that prompted this) — is never blank.
-  private val webSources: List<Pair<String, () -> Bitmap?>> by lazy {
+  private val webSources: List<Pair<String, (Long) -> Bitmap?>> by lazy {
     buildList {
       if (unsplashKey.isNotBlank()) add("unsplash" to ::unsplashBitmap)
       add("picsum" to ::picsumBitmap)
       add("wikimedia" to ::wikimediaBitmap)
-      add("bundled" to ::bundledBitmap)
+      add("bundled" to { generation: Long -> if (photoRequestCurrent(generation)) bundledBitmap() else null })
     }
   }
 
   private fun fetchWebPhoto(): Bitmap? {
+    val generation = photoTransportGeneration.get()
     val now = System.currentTimeMillis()
     for ((name, fetch) in webSources) {
+      if (!photoRequestCurrent(generation)) return null
       if ((sourceCooldownUntil[name] ?: 0L) > now) continue // dead recently; skip until cooldown
-      val bmp = runCatching { fetch() }.getOrNull()
+      val bmp = runCatching { fetch(generation) }.getOrNull()
+      if (!photoRequestCurrent(generation)) { bmp?.recycle(); return null }
       if (bmp != null) return bmp
       Log.w(TAG, "screensaver photo source '$name' unavailable; backing off")
       sourceCooldownUntil[name] = now + SOURCE_COOLDOWN_MS
@@ -1821,7 +2197,10 @@ class PhotoFrameController(
     // assets are unreadable). Retry the whole chain ignoring cooldowns rather than
     // leave the frame blank.
     for ((_, fetch) in webSources) {
-      runCatching { fetch() }.getOrNull()?.let { return it }
+      if (!photoRequestCurrent(generation)) return null
+      val bmp = runCatching { fetch(generation) }.getOrNull()
+      if (!photoRequestCurrent(generation)) { bmp?.recycle(); return null }
+      if (bmp != null) return bmp
     }
     Log.w(TAG, "screensaver: no photo source available")
     return null
@@ -1980,13 +2359,14 @@ class PhotoFrameController(
   }
 
   // --- default-feed sources (tried in turn by [fetchWebPhoto]) ----------------
-  private fun picsumBitmap(): Bitmap? {
+  private fun picsumBitmap(generation: Long): Bitmap? {
     val m = context.resources.displayMetrics
     return downloadBitmap(
-        "https://picsum.photos/${m.widthPixels}/${m.heightPixels}?random=${System.currentTimeMillis()}")
+        "https://picsum.photos/${m.widthPixels}/${m.heightPixels}?random=${System.currentTimeMillis()}",
+        generation = generation)
   }
 
-  private fun unsplashBitmap(): Bitmap? {
+  private fun unsplashBitmap(generation: Long): Bitmap? {
     val m = context.resources.displayMetrics
     // Match the Unsplash crop to the screen aspect so portrait panels (e.g. Portal
     // Mini at 800x1280) don't get a letterboxed/upscaled landscape shot.
@@ -1994,8 +2374,8 @@ class PhotoFrameController(
     val json =
         httpGet(
             "https://api.unsplash.com/photos/random?orientation=$orientation" +
-                "&query=$unsplashQuery&client_id=$unsplashKey")
-    return downloadBitmap(JSONObject(json).getJSONObject("urls").getString("regular"))
+                "&query=$unsplashQuery&client_id=$unsplashKey", generation)
+    return downloadBitmap(JSONObject(json).getJSONObject("urls").getString("regular"), generation = generation)
   }
 
   /**
@@ -2003,22 +2383,23 @@ class PhotoFrameController(
    * category. The file list is fetched once per session (then shuffled and cycled),
    * so steady state is just a thumbnail download from Wikimedia's upload CDN.
    */
-  private fun wikimediaBitmap(): Bitmap? {
-    if (wikimediaUrls.isEmpty()) wikimediaUrls = fetchWikimediaUrls()
+  private fun wikimediaBitmap(generation: Long): Bitmap? {
+    if (wikimediaUrls.isEmpty()) wikimediaUrls = fetchWikimediaUrls(generation)
+    if (!photoRequestCurrent(generation)) return null
     if (wikimediaUrls.isEmpty()) return null
     val url = wikimediaUrls[wikimediaIdx % wikimediaUrls.size]
     wikimediaIdx++
-    return downloadBitmap(url)
+    return downloadBitmap(url, generation = generation)
   }
 
-  private fun fetchWikimediaUrls(): List<String> {
+  private fun fetchWikimediaUrls(generation: Long): List<String> {
     val width = context.resources.displayMetrics.widthPixels.coerceIn(640, 1920)
     val json =
         httpGet(
             "https://commons.wikimedia.org/w/api.php?action=query&format=json" +
                 "&generator=categorymembers&gcmtype=file&gcmlimit=200" +
                 "&gcmtitle=Category:Featured_pictures_of_landscapes" +
-                "&prop=imageinfo&iiprop=url&iiurlwidth=$width")
+                "&prop=imageinfo&iiprop=url&iiurlwidth=$width", generation)
     val pages =
         JSONObject(json).optJSONObject("query")?.optJSONObject("pages") ?: return emptyList()
     val urls = ArrayList<String>()
@@ -2052,22 +2433,73 @@ class PhotoFrameController(
   }
 
   // --- data -------------------------------------------------------------------
-  private fun httpGet(spec: String): String {
-    val c = URL(spec).openConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 8000
-    c.setRequestProperty("User-Agent", USER_AGENT)
-    return c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
+  private fun photoRequestCurrent(generation: Long): Boolean =
+      !stopped && generation == photoTransportGeneration.get() && !Thread.currentThread().isInterrupted
+
+  /** Epoch invalidation is synchronous; physical closes are serialized away from the UI. */
+  private fun cancelPhotoTransports() {
+    val closing = synchronized(photoTransportLock) {
+      photoTransportGeneration.incrementAndGet()
+      val snapshot = photoConnections.toList() to photoStreams.toList()
+      photoConnections.clear()
+      photoStreams.clear()
+      snapshot
+    }
+    if (closing.first.isEmpty() && closing.second.isEmpty()) return
+    photoCancelIo.execute {
+      closing.first.forEach { runCatching { it.disconnect() } }
+      closing.second.forEach { runCatching { it.close() } }
+    }
   }
 
-  private fun downloadBitmap(spec: String, headers: Map<String, String> = emptyMap()): Bitmap? {
+  private fun <T> withPhotoConnection(
+      spec: String, headers: Map<String, String>, timeout: Int, generation: Long,
+      read: (java.io.InputStream) -> T,
+  ): T {
+    if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
     val c = URL(spec).openConnection() as HttpURLConnection
     c.connectTimeout = 8000
-    c.readTimeout = 12000
+    c.readTimeout = timeout
     c.instanceFollowRedirects = true
     c.setRequestProperty("User-Agent", USER_AGENT)
     headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
-    return c.inputStream.use { decodeBoundedStream(it) }
+    var input: java.io.InputStream? = null
+    try {
+      synchronized(photoTransportLock) {
+        if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
+        photoConnections.add(c)
+      }
+      val stream = c.inputStream
+      input = stream
+      synchronized(photoTransportLock) {
+        if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
+        photoStreams.add(stream)
+      }
+      return read(stream)
+    } finally {
+      synchronized(photoTransportLock) {
+        photoConnections.remove(c)
+        input?.let { photoStreams.remove(it) }
+      }
+      runCatching { c.disconnect() }
+      runCatching { input?.close() }
+    }
+  }
+
+  private fun httpGet(spec: String, generation: Long): String =
+      withPhotoConnection(spec, emptyMap(), 8000, generation) { input ->
+        val bytes = SlideshowDecoder.readEncoded(input, 2 * 1024 * 1024)
+            ?: throw java.io.IOException("Photo manifest unavailable")
+        if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
+        bytes.toString(Charsets.UTF_8)
+      }
+
+  private fun downloadBitmap(
+      spec: String, headers: Map<String, String> = emptyMap(), maxEdge: Int = 2400,
+      generation: Long = photoTransportGeneration.get(),
+  ): Bitmap? = withPhotoConnection(spec, headers, 12000, generation) { input ->
+    val bitmap = decodeBoundedStream(input, maxEdge)
+    if (photoRequestCurrent(generation)) bitmap else { bitmap?.recycle(); null }
   }
 
   // --- on-device media cache (Immich / WebDAV) --------------------------------
@@ -2080,7 +2512,7 @@ class PhotoFrameController(
    * immediately evicted) without ever helping.
    */
   private fun enableMediaCache() {
-    if (mediaCache != null || !settings.cacheEnabled) return
+    if (stopped || mediaCache != null || !settings.cacheEnabled) return
     val ceiling = settings.cacheBudgetGb.toLong() * 1024L * 1024L * 1024L
     val free = context.filesDir.usableSpace
     val budget = MediaCache.defaultBudget(free, ceiling)
@@ -2088,7 +2520,9 @@ class PhotoFrameController(
       Log.w(TAG, "media cache enabled but disk too full (free=${free / MB}MB -> budget=${budget / MB}MB); not caching")
       return
     }
-    mediaCache = MediaCache(context, budget).also { it.enforceBudget() } // apply a lowered cap now
+    val cache = MediaCache(context, budget).also { it.enforceBudget() } // worker-only scan/eviction
+    if (stopped) return
+    mediaCache = cache
     transcoder = VideoTranscoder(context)
     Log.i(TAG, "media cache on: budget=${budget / MB}MB (cap=${settings.cacheBudgetGb}GB, free=${free / MB}MB)")
   }
@@ -2098,28 +2532,32 @@ class PhotoFrameController(
    * decodes straight from disk with no network; a miss downloads the bytes, caches them, and
    * decodes. SMB (a custom [remoteFetch]) and the uncached sources fall back to the direct path.
    */
-  private fun fetchRemoteImage(url: String): Bitmap? {
+  private fun fetchRemoteImage(
+      url: String, maxEdge: Int = 2400, headers: Map<String, String> = remoteHeaders,
+      fetch: ((String, Int) -> Bitmap?)? = remoteFetch,
+  ): Bitmap? {
+    val generation = photoTransportGeneration.get()
+    if (!photoRequestCurrent(generation)) return null
     val cache = mediaCache
-    if (cache != null && remoteFetch == null) {
+    if (cache != null && fetch == null) {
       cache.getIfPresent(url, isVideo = false)?.let { f ->
-        runCatching { decodeBoundedFile(f.path) }.getOrNull()?.let { return it }
+        runCatching { decodeBoundedFile(f.path, maxEdge) }.getOrNull()?.let { return it }
       }
-      val bytes = runCatching { downloadBytes(url, remoteHeaders) }.getOrNull() ?: return null
+      val bytes = runCatching { downloadBytes(url, headers, generation) }.getOrNull() ?: return null
+      if (!photoRequestCurrent(generation)) return null
       cache.putImage(url, bytes)
-      return decodeBoundedBytes(bytes)
+      if (!photoRequestCurrent(generation)) return null
+      return decodeBoundedBytes(bytes, maxEdge)
     }
-    return remoteFetch?.invoke(url) ?: downloadBitmap(url, remoteHeaders)
+    // An SMB miss is not an HTTP URL; let the source fail rather than retrying another transport.
+    return if (fetch != null) fetch(url, maxEdge) else downloadBitmap(url, headers, maxEdge, generation)
   }
 
   /** Raw bytes of an authed HTTP GET (for caching before decode). Null on failure. */
-  private fun downloadBytes(spec: String, headers: Map<String, String>): ByteArray? {
-    val c = URL(spec).openConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 12000
-    c.instanceFollowRedirects = true
-    c.setRequestProperty("User-Agent", USER_AGENT)
-    headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
-    return c.inputStream.use { it.readBytes() }
+  private fun downloadBytes(
+      spec: String, headers: Map<String, String>, generation: Long,
+  ): ByteArray? = withPhotoConnection(spec, headers, 12000, generation) { input ->
+    SlideshowDecoder.readEncoded(input)?.takeIf { photoRequestCurrent(generation) }
   }
 
   /** Stream an authed HTTP GET straight to [dst] (for the video prefetch source). */

@@ -12,6 +12,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ApprovedSettingsSearchRoutingTest {
+    @Test fun slideshowStyleSearchReachesTheStylePicker() {
+        assertEquals("styles", approvedPageForControl("screensaver", "mode"))
+        val style = approvedSettingsSearchIndex().single { it.id == "screensaver.mode" }
+        assertEquals("styles", style.page)
+    }
+
     @Test fun sleepControlsOpenTheirOwnScreen() {
         listOf("sleepTimerEnabled", "sleepTimerMin", "pauseAudioOnSleep", "closeAppOnSleep")
             .forEach { assertEquals("sleep", approvedPageForControl("screensaver", it)) }

@@ -253,7 +253,9 @@ private fun <S> SettingControl(
                 val selected = if (domainId == "immortal" && s.key == "settingsTheme") {
                     if (com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark) "dark" else "light"
                 } else s.get(snapshot)
-                PickerRow(s.title, selected, s.options.map { (value, label) -> PickerOption(value, label) }) {
+                val options = SettingsPresentation.visibleEnumOptions(
+                    domainId, s.key, s.options, selected, advanced)
+                PickerRow(s.title, selected, options.map { (value, label) -> PickerOption(value, label) }) {
                     onApply(s.key, it)
                 }
             }

@@ -1,151 +1,179 @@
-// Unified engine: owns the stage, runs the scheduler, and hands control to one mode at a time.
-// A mode's run(ctx, pool) returns a cleanup function; the engine calls it before the next mode.
-//
-// Shared ctx given to each mode:
-//   ctx.root   — the stage element to render into (cleared between modes)
-//   ctx.deck   — the shuffled photo pool (array of {seed,w,h,kind})
-//   ctx.cursor — { i } rotating cursor into the deck (shared so photos don't repeat across beats)
-//   ctx.W, ctx.H — viewport size
-//   ctx.url(photo, longEdge) — build an image URL
-//   ctx.done() — a mode may call this to end its beat early (optional)
-
+// One visible composition, one preparing composition, and one bounded outgoing dissolve.
+// Modes return a cleanup function with ready/pause/resume; readiness includes load AND decode.
 (function () {
   const SS = window.SS;
-
-  function url(photo, longEdge) { return window.photoUrl(photo, longEdge); }
-
-  window.SS.startEngine = function (opts) {
-    const stage = opts.stage;
-    const deck = window.shuffled(window.PHOTOS.slice());
-    const cursor = { i: 0 };
-    // Per-photo dwell comes from the user's interval (host bridge, seconds). Single-photo modes
-    // hold each photo this long; collage modes derive a gentler micro-motion cadence from it.
-    // Falls back to 12s (research sweet spot) when no host interval is provided (dev/browser).
-    const intervalSec = (opts.intervalSec && opts.intervalSec > 0) ? opts.intervalSec : 12;
-    const intervalMs = Math.min(600, Math.max(5, intervalSec)) * 1000;
-    // microMs drives visible IMAGE SWAPS → tie it to the interval so a photo changes ~every
-    // interval (not 4x faster). ambientMs drives pure MOTION (e.g. the mosaic spotlight) that should
-    // stay gentle regardless of interval.
-    const microMs = intervalMs;
-    const ambientMs = Math.min(9000, Math.max(3500, Math.round(intervalMs / 4)));
-    // opts.mode: a specific mode id, or "shuffle" to let the scheduler choose each beat.
-    let prev = null;
-    let currentCleanup = null;
-    let currentLayer = null;
-    let beatTimer = null;
-    let fadeTimer = null;
-
-    // Modes render into a per-beat layer, not the bare stage, so beats can crossfade:
-    // the new layer fades in OVER the still-running old mode, then the old one is torn
-    // down — no flash-to-black between shuffle modes. XFADE matches the .ss-beat CSS.
-    const XFADE_MS = 1600;
-
-    function ctx(layer) {
-      return {
-        root: layer, deck, cursor, W: innerWidth, H: innerHeight, url,
-        photoMs: intervalMs, microMs: microMs, ambientMs: ambientMs,
-        done: () => advance(),
-      };
+  SS.startEngine = function (opts) {
+    const stage = opts.stage, deck = window.shuffled(window.PHOTOS.slice()), cursor = { i: 0 };
+    const intervalMs = Math.min(600, Math.max(5, Number(opts.intervalSec) || 30)) * 1000;
+    const XFADE_MS = 1600, MOTION_OVERLAP_MS = 2400;
+    let current = null, incoming = null, outgoing = null, prev = null;
+    let stopped = false, paused = false, queued = null, promotionFrame = null;
+    let history = [], historyIndex = -1;
+    const clocks = { beat: null, fade: null, resize: null };
+    const pausedAnimations = new Set();
+    function arm(key, fn, ms) {
+      disarm(key);
+      const clock = { fn, remaining: ms, due: Date.now() + ms, id: null };
+      clocks[key] = clock;
+      if (!paused) clock.id = setTimeout(() => { clocks[key] = null; fn(); }, ms);
     }
-
-    // A fade in flight: the outgoing layer + its mode's cleanup, torn down when the fade
-    // ends — or flushed early if a new beat / stop() arrives first (never leaked: a mode's
-    // cleanup stops its timers, and an unstopped mode would keep mutating a dead layer).
-    let pendingFade = null;
-    let queuedAdvance = false;
-    let stopped = false;
-    function flushFade() {
-      clearTimeout(fadeTimer);
-      if (pendingFade) {
-        const { cleanup, layer } = pendingFade;
-        pendingFade = null;
-        if (cleanup) { try { cleanup(); } catch (_) {} }
-        layer.remove();
+    function disarm(key) { if (clocks[key]) clearTimeout(clocks[key].id); clocks[key] = null; }
+    function dispose(scene) {
+      if (!scene) return;
+      scene.live = false;
+      if (scene.cleanup) { try { scene.cleanup(); } catch (_) {} }
+      scene.layer.remove();
+    }
+    function remember(scene, start) {
+      scene.start = start;
+      if (scene !== current) return;
+      history = history.slice(0, historyIndex + 1);
+      history.push({ modeId: scene.modeId, start });
+      if (history.length > 32) history.shift();
+      historyIndex = history.length - 1;
+    }
+    function finishFade() {
+      dispose(outgoing); outgoing = null;
+      if (queued && !stopped && !paused) {
+        const direction = queued; queued = null; advance(direction);
       }
-      // A beat that arrived mid-fade was deferred (not stacked); run it now the fade is done.
-      if (queuedAdvance && !stopped) { queuedAdvance = false; advance(); }
     }
-
-    function clearStage() {
-      flushFade();
-      if (currentCleanup) { try { currentCleanup(); } catch (_) {} currentCleanup = null; }
-      currentLayer = null;
-      stage.innerHTML = "";
+    function promote(scene) {
+      if (stopped || paused || incoming !== scene || !scene.live || !scene.ready) return;
+      incoming = null;
+      outgoing = current; current = scene;
+      if (scene.historyIndex != null) historyIndex = scene.historyIndex;
+      else remember(scene, scene.start);
+      prev = scene.modeId;
+      if (outgoing) {
+        outgoing.layer.classList.add("freeze");
+        outgoing.cleanup.pause();
+      }
+      scene.layer.classList.remove("freeze");
+      scene.layer.classList.add("on");
+      if (opts.onMode) opts.onMode(SS.MODES[scene.modeId].name, scene.modeId);
+      if (opts.onReady) opts.onReady();
+      if (outgoing) arm("fade", finishFade, XFADE_MS + 100);
+      if (!opts.mode || opts.mode === "shuffle") {
+        arm("beat", () => advance("auto"), Math.max(SS.BEAT[scene.modeId] || intervalMs, intervalMs));
+      }
     }
-
-    // Presence-aware people bias: while someone is in front of the frame (host bridge
-    // signal), the beat's deck leads with photos of people. Checked once per beat — the
-    // bridge call is cheap but there's no reason to ask more often than modes change.
+    function present(scene) {
+      if (promotionFrame != null) cancelAnimationFrame(promotionFrame);
+      promotionFrame = requestAnimationFrame(() => { promotionFrame = null; promote(scene); });
+    }
     function beatDeck() {
       let watching = false;
       try { watching = !!(window.Android && window.Android.isWatching && window.Android.isWatching()); } catch (_) {}
       return SS.peopleDeck(deck, watching);
     }
-
-    function advance() {
-      // Re-entrancy guard: never rip out a half-faded layer. If a crossfade is still in flight,
-      // defer this advance until it completes (coalesced) instead of stacking a second fade —
-      // stacked/flushed layers were the "two images coasting" ghost.
-      if (pendingFade) { queuedAdvance = true; return; }
-      clearTimeout(beatTimer);
-      const enabled = opts.enabledModes && opts.enabledModes.length ? opts.enabledModes : SS.MODE_IDS;
-      let modeId;
-      if (opts.mode && opts.mode !== "shuffle") modeId = opts.mode;
-      else modeId = SS.pickNextMode(enabled, deck, prev);
-      prev = modeId;
-
-      const impl = SS.MODES[modeId];
-      if (!impl) { modeId = "kenBurns"; }
-      const label = (SS.MODES[modeId] && SS.MODES[modeId].name) || modeId;
-      if (opts.onMode) opts.onMode(label, modeId);
-      try { console.log("[ss] beat " + modeId + " vp=" + innerWidth + "x" + innerHeight + " dpr=" + (window.devicePixelRatio || 1)); } catch (_) {}
-
-      // Crossfade beats: the new mode renders into a fresh layer that fades in over the
-      // still-running old one; the old layer (and its mode's timers) is torn down only
-      // after the fade completes. First beat has nothing to fade over → shown immediately.
-      const oldLayer = currentLayer, oldCleanup = currentCleanup;
+    function advance(direction = "next") {
+      if (stopped || !deck.length || (paused && direction === "auto")) return false;
+      if (outgoing) { queued = direction; return true; }
+      disarm("beat");
+      if (incoming) { dispose(incoming); incoming = null; }
+      if (promotionFrame != null) { cancelAnimationFrame(promotionFrame); promotionFrame = null; }
+      let target = null, targetIndex = null;
+      if (direction === "previous" && historyIndex > 0) targetIndex = historyIndex - 1;
+      else if (direction === "next" && historyIndex >= 0 && historyIndex + 1 < history.length) targetIndex = historyIndex + 1;
+      if (targetIndex != null) target = history[targetIndex];
+      if (direction === "previous" && !target && current) target = { modeId: current.modeId, start: Math.max(0, current.start - 1) };
+      let modeId = target ? target.modeId : opts.mode && opts.mode !== "shuffle" ?
+          opts.mode : SS.pickNextMode(opts.enabledModes || SS.MODE_IDS, deck, prev);
+      if (!SS.MODES[modeId]) modeId = "kenBurns";
+      if (target) cursor.i = target.start;
       const layer = document.createElement("div");
-      layer.className = "ss-beat";
+      layer.className = "ss-beat freeze";
+      layer.style.setProperty("--motion-duration", (intervalMs + MOTION_OVERLAP_MS) + "ms");
       stage.appendChild(layer);
-      currentLayer = layer;
-      currentCleanup = SS.MODES[modeId].run(ctx(layer), beatDeck()) || null;
-      if (oldLayer) {
-        oldLayer.classList.add("freeze"); // stop the outgoing mode animating during the crossfade
-        pendingFade = { cleanup: oldCleanup, layer: oldLayer };
-        requestAnimationFrame(() => layer.classList.add("on"));
-        fadeTimer = setTimeout(flushFade, XFADE_MS + 100);
-      } else {
-        layer.classList.add("on");
+      const scene = { layer, modeId, start: cursor.i, historyIndex: targetIndex, live: true, ready: false };
+      incoming = scene;
+      const ctx = {
+        root: layer, deck, cursor, W: innerWidth, H: innerHeight,
+        url: (photo, edge) => window.photoUrl(photo, edge),
+        photoMs: intervalMs, microMs: intervalMs, motionMs: intervalMs + MOTION_OVERLAP_MS,
+        ambientMs: Math.min(9000, Math.max(3500, Math.round(intervalMs / 4))),
+        record: start => { if (scene.live) remember(scene, start); },
+        done: () => { if (scene === current && scene.live) advance("auto"); },
+      };
+      try {
+        scene.cleanup = SS.MODES[modeId].run(ctx, beatDeck());
+        if (paused) scene.cleanup.pause();
+        Promise.resolve(scene.cleanup.ready).then(ok => {
+          if (!scene.live || stopped || incoming !== scene) return;
+          if (!ok) {
+            dispose(scene); incoming = null;
+            // Keep the last decoded scene while a source fails; retry without a tight loop.
+            arm("beat", () => advance("auto"), Math.min(intervalMs, 5000));
+            return;
+          }
+          scene.ready = true;
+          if (!paused) present(scene);
+        });
+      } catch (_) {
+        dispose(scene); incoming = null;
+        arm("beat", () => advance("auto"), Math.min(intervalMs, 5000));
       }
-
-      // Single-mode (non-shuffle) modes loop themselves internally; in shuffle we time each beat.
-      // Honor the user's interval: a mode holds at least as long as one photo dwell, so a long
-      // interval slows scene changes (not clamped by the mode's base beat) while a short one still
-      // lets a mode compose 2-3 photos before rotating.
-      const beat =
-          (opts.mode && opts.mode !== "shuffle") ? null : Math.max(SS.BEAT[modeId] || 9000, intervalMs);
-      if (beat) beatTimer = setTimeout(advance, beat);
+      return true;
     }
-
-    advance();
-    // ONE-SHOT boot recovery only. A DreamService WebView can deliver its first layout at a
-    // degenerate (tiny) size, so the opening mode composes into a corner. Recover exactly once,
-    // and only when the viewport grows from that degenerate state to ~full-screen. We must NOT
-    // re-advance on ordinary viewport changes — that was tearing down live beats mid-photo and
-    // stacking half-faded crossfades (the "jumps to a new mode" + "two images coasting" bugs).
-    let recovered = false, resizeTimer = null;
-    const bootDegenerate = innerWidth < screen.width * 0.6 || innerHeight < screen.height * 0.6;
-    addEventListener("resize", () => {
-      if (recovered || !bootDegenerate) return;
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        const full = innerWidth >= screen.width * 0.8 && innerHeight >= screen.height * 0.8;
-        if (full && !pendingFade) { recovered = true; advance(); }
+    function pause() {
+      if (paused || stopped) return;
+      paused = true;
+      Object.values(clocks).filter(Boolean).forEach(clock => {
+        if (clock.id != null) { clock.remaining = Math.max(0, clock.due - Date.now()); clearTimeout(clock.id); clock.id = null; }
+      });
+      [current, incoming, outgoing].filter(Boolean).forEach(scene => {
+        scene.cleanup.pause();
+        // CSS transitions where supported; timers and admission pause on every supported engine.
+        try {
+          scene.layer.getAnimations({ subtree: true }).forEach(animation => {
+            if (animation.playState === "running") { animation.pause(); pausedAnimations.add(animation); }
+          });
+        } catch (_) {}
+        scene.layer.classList.add("paused");
+      });
+    }
+    function resume() {
+      if (!paused || stopped) return;
+      paused = false;
+      pausedAnimations.forEach(animation => { try { animation.play(); } catch (_) {} }); pausedAnimations.clear();
+      [current, incoming].filter(Boolean).forEach(scene => { scene.layer.classList.remove("paused"); scene.cleanup.resume(); });
+      if (outgoing) outgoing.layer.classList.remove("paused");
+      Object.keys(clocks).forEach(key => {
+        const clock = clocks[key];
+        if (clock) arm(key, clock.fn, clock.remaining);
+      });
+      if (incoming && incoming.ready) present(incoming);
+    }
+    let recovered = false;
+    const bootDegenerate = innerWidth < screen.width * .6 || innerHeight < screen.height * .6;
+    function onResize() {
+      if (stopped || recovered || !bootDegenerate) return;
+      arm("resize", () => {
+        if (innerWidth >= screen.width * .8 && innerHeight >= screen.height * .8 && !outgoing) {
+          recovered = true; advance("auto");
+        }
       }, 300);
-    });
+    }
+    addEventListener("resize", onResize);
+    advance();
+    function navigate(direction) {
+      if (stopped) return false;
+      if (current && !incoming && !outgoing && current.cleanup[direction]) return current.cleanup[direction]();
+      return advance(direction);
+    }
     return {
-      advance,
-      stop: () => { stopped = true; clearTimeout(beatTimer); clearTimeout(resizeTimer); clearStage(); },
+      advance: () => navigate("next"), next: () => navigate("next"), previous: () => navigate("previous"),
+      pause, resume,
+      stop() {
+        if (stopped) return;
+        stopped = true; queued = null;
+        Object.keys(clocks).forEach(disarm);
+        if (promotionFrame != null) cancelAnimationFrame(promotionFrame);
+        removeEventListener("resize", onResize);
+        [incoming, current, outgoing].forEach(dispose); incoming = current = outgoing = null;
+        pausedAnimations.clear(); stage.innerHTML = "";
+      },
     };
   };
 })();

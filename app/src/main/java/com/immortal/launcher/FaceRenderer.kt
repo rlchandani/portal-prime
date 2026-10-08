@@ -84,6 +84,20 @@ class FaceRenderer(
   // Position buckets (a vertical stack per used grid cell), created on demand.
   private val buckets = HashMap<GridPosition, LinearLayout>()
 
+  /** Measured widget areas in window pixels, padded for the small burn-in drift. */
+  fun photoOcclusions(): List<android.graphics.Rect> =
+      if (view.visibility != View.VISIBLE) emptyList() else buckets.values.mapNotNull { bucket ->
+    if (bucket.visibility != View.VISIBLE || bucket.width <= 0 || bucket.height <= 0 ||
+        bucket.childCount == 0) null
+    else {
+      val position = IntArray(2)
+      bucket.getLocationInWindow(position)
+      val padding = dp(12)
+      android.graphics.Rect(position[0] - padding, position[1] - padding,
+          position[0] + bucket.width + padding, position[1] + bucket.height + padding)
+    }
+  }
+
   // Time-bearing views the tick refreshes; null when the face omits them.
   private var clockFace: ClockFaceView? = null
   private var dateView: TextView? = null

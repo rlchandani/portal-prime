@@ -12,12 +12,35 @@ window.EASE = {
 };
 
 // ---- Preload + decode (kills the transition hitch; onload alone isn't enough) ----
-window.preloadDecoded = async function (url) {
-  const img = new Image();
-  img.decoding = "async";
-  img.src = url;
-  try { await img.decode(); } catch (_) { /* fall through — cached or errored */ }
-  return url;
+window.preloadDecoded = function (url, signal) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    let settled = false;
+    const timeout = setTimeout(() => finish(false), 30000);
+    function finish(ok) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      img.onload = img.onerror = null;
+      if (signal) signal.removeEventListener("abort", cancel);
+      if (!ok) img.src = "";
+      if (ok) resolve(url); else reject(new Error("Image preparation failed"));
+    }
+    function cancel() { finish(false); }
+    if (signal) {
+      signal.addEventListener("abort", cancel, { once: true });
+      if (signal.aborted) { cancel(); return; }
+    }
+    img.decoding = "async";
+    img.onload = async () => {
+      try {
+        if (img.decode) await img.decode();
+        finish(img.naturalWidth > 0 && img.naturalHeight > 0);
+      } catch (_) { finish(false); }
+    };
+    img.onerror = () => finish(false);
+    img.src = url;
+  });
 };
 
 // ---- Ken Burns: scale 1.0→~1.12, translate bounded so edges never reveal black ----

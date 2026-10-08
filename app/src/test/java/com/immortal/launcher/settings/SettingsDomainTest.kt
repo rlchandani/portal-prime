@@ -1,6 +1,8 @@
 package com.immortal.launcher.settings
 
 import android.content.Context
+import com.immortal.launcher.ScreensaverConfig
+import com.immortal.launcher.ScreensaverTestPrefs
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -17,6 +19,127 @@ import org.mockito.Mockito.mock
  * is exercised on-device; here we lock the machinery with recording setters.
  */
 class SettingsDomainTest {
+
+  private val slideshowKeys = setOf("mode", "photo_motion", "keep_people_in_frame", "fit")
+
+  /** The real registered specs and defaults; omit unrelated hardware and app-picker metadata. */
+  private fun slideshowDomain(prefs: ScreensaverTestPrefs) =
+      SettingsDomain(
+          id = "screensaver",
+          title = SettingsDomains.screensaver.title,
+          load = { ScreensaverConfig.load(prefs.context) },
+          specs = SettingsDomains.screensaver.specs.filter { it.key in slideshowKeys },
+          defaults = SettingsDomains.screensaver.defaults,
+      )
+
+  private fun slideshowControls(prefs: ScreensaverTestPrefs): Map<String, JSONObject> {
+    val controls = slideshowDomain(prefs).schemaJson(prefs.context).getJSONArray("controls")
+    return (0 until controls.length()).associate {
+      val control = controls.getJSONObject(it)
+      control.getString("key") to control
+    }
+  }
+
+  @Test
+  fun slideshowSchema_exposesValidatedStylesAndDefaultNativeControls() {
+    val controls = slideshowControls(ScreensaverTestPrefs())
+    assertTrue("the style must be writable from the remote", "mode" in controls)
+    val mode = controls.getValue("mode")
+    assertEquals("enum", mode.getString("type"))
+    assertEquals("smartFrame", mode.getString("value"))
+    assertEquals("smartFrame", mode.getString("default"))
+    val options = mode.getJSONArray("options")
+    val values = (0 until options.length()).map { options.getJSONObject(it).getString("value") }
+    assertEquals(listOf("smartFrame", "portraitPair", "wholePhoto"), values.take(3))
+    assertEquals(
+        setOf("smartFrame", "portraitPair", "wholePhoto", "classic", "shuffle", "kenBurns",
+            "diptych", "framed", "galleryWall", "push", "memories", "panorama", "polaroid",
+            "mosaic", "filmstrip", "cinema", "heroSidebar"),
+        values.toSet())
+    assertEquals(values.size, values.toSet().size)
+    values.forEachIndexed { index, value ->
+      assertEquals(if (ScreensaverConfig.isNativeStage(value)) "everyday" else "advanced",
+          options.getJSONObject(index).getString("tier"))
+    }
+    listOf("photo_motion", "keep_people_in_frame").forEach { key ->
+      assertTrue("$key must be a registry control", key in controls)
+      assertEquals("bool", controls.getValue(key).getString("type"))
+      assertTrue(controls.getValue(key).getBoolean("value"))
+      assertTrue(controls.getValue(key).getBoolean("default"))
+    }
+  }
+
+  @Test
+  fun slideshowControls_gateIdenticallyForDeviceAndRemote_withoutClearingStoredChoices() {
+    val prefs = ScreensaverTestPrefs(mapOf("photo_motion" to false, "keep_people_in_frame" to false))
+    val nativeControls = setOf("photo_motion", "keep_people_in_frame")
+    val expected = mapOf(
+        "smartFrame" to nativeControls,
+        "portraitPair" to nativeControls,
+        "wholePhoto" to emptySet(),
+        "classic" to emptySet(),
+        "shuffle" to emptySet(),
+        "kenBurns" to emptySet())
+    expected.forEach { (mode, visible) ->
+      prefs.edit().putString("mode", mode).apply()
+      val controls = slideshowControls(prefs)
+      assertEquals("remote controls for $mode", visible, controls.keys.intersect(nativeControls))
+      val snapshot = ScreensaverConfig.load(prefs.context)
+      val deviceVisible = SettingsDomains.screensaver.specs.filter {
+        it.key in nativeControls && it.visibleWhen(prefs.context, snapshot)
+      }.map { it.key }.toSet()
+      assertEquals("device controls for $mode", visible, deviceVisible)
+      val values = SettingsDomains.screensaver.flatJson(snapshot)
+      assertFalse(values.getBoolean("photo_motion"))
+      assertFalse(values.getBoolean("keep_people_in_frame"))
+      assertEquals("fit must only affect Classic", mode == "classic", "fit" in controls)
+    }
+    prefs.edit().putString("mode", "smartFrame").putBoolean("enabled", false).apply()
+    assertTrue(slideshowControls(prefs).keys.intersect(nativeControls + "mode").isEmpty())
+  }
+
+  @Test
+  fun slideshowApply_roundTripsBooleansAndAllStyles_throughTheRegisteredSetters() {
+    val prefs = ScreensaverTestPrefs()
+    val domain = SettingsDomains.screensaver
+    val applied = domain.applyValues(prefs.context,
+        JSONObject().put("photo_motion", false).put("keep_people_in_frame", false))
+    assertEquals(setOf("photo_motion", "keep_people_in_frame"), applied)
+    var values = domain.flatJson(ScreensaverConfig.load(prefs.context))
+    assertFalse(values.getBoolean("photo_motion"))
+    assertFalse(values.getBoolean("keep_people_in_frame"))
+    val modes = listOf("smartFrame", "portraitPair", "wholePhoto", "classic", "shuffle", "kenBurns",
+        "diptych", "framed", "galleryWall", "push", "memories", "panorama", "polaroid",
+        "mosaic", "filmstrip", "cinema", "heroSidebar")
+    modes.forEach { mode ->
+      assertEquals(setOf("mode"), domain.applyValues(prefs.context, JSONObject().put("mode", mode)))
+      values = domain.flatJson(ScreensaverConfig.load(prefs.context))
+      assertEquals(mode, values.getString("mode"))
+      assertEquals(mode, slideshowControls(prefs).getValue("mode").getString("value"))
+    }
+    assertEquals(setOf("photo_motion", "keep_people_in_frame"),
+        domain.applyValues(prefs.context,
+            JSONObject().put("photo_motion", true).put("keep_people_in_frame", true)))
+    values = domain.flatJson(ScreensaverConfig.load(prefs.context))
+    assertTrue(values.getBoolean("photo_motion"))
+    assertTrue(values.getBoolean("keep_people_in_frame"))
+  }
+
+  @Test
+  fun slideshowApply_rejectsUnknownStylesAndWrongTypes_withoutWritesOrReset() {
+    val prefs = ScreensaverTestPrefs(mapOf("mode" to "diptych"))
+    val domain = SettingsDomains.screensaver
+    assertTrue("style validation must be declared",
+        domain.specs.any { it.key == "mode" && it is EnumSpec })
+    assertTrue(domain.applyValues(prefs.context,
+        JSONObject().put("mode", "unknown").put("photo_motion", 3)
+            .put("keep_people_in_frame", "maybe")).isEmpty())
+    listOf(17, true, JSONObject.NULL, JSONObject()).forEach {
+      assertTrue(domain.applyValues(prefs.context, JSONObject().put("mode", it)).isEmpty())
+    }
+    assertEquals(0, prefs.writeCount)
+    assertEquals("diptych", ScreensaverConfig.load(prefs.context).mode)
+  }
 
   private data class Snap(
       val flag: Boolean = false,
@@ -196,7 +319,10 @@ class SettingsDomainTest {
             .filter { !java.lang.reflect.Modifier.isStatic(it.modifiers) }
             .map { it.name }
             .toSet()
-    val specKeys = (SettingsDomains.screensaver.specs + SettingsDomains.calendar.specs).map { it.key }.toSet()
+    // The new controls use snake_case wire keys while their immutable snapshot fields are camelCase.
+    val wireFields = mapOf("photo_motion" to "photoMotion", "keep_people_in_frame" to "keepPeopleInFrame")
+    val specKeys = (SettingsDomains.screensaver.specs + SettingsDomains.calendar.specs)
+        .map { wireFields[it.key] ?: it.key }.toSet()
     // Fields not bound by a direct value spec, and why: photo-source credentials + the clock-face
     // and dismiss-target pickers are managed by their own Activities (reached via a NavSpec); the
     // calendar fields are owned by the calendar domain under different wire keys (widgetOn/url/
@@ -207,9 +333,6 @@ class SettingsDomainTest {
             "smbHost", "smbShare", "smbPath", "smbUser", "smbPass",
             "davUrl", "davUser", "davPass", "webUrl",
             "facesEnabled", "faceId", "faceSizeIndex",
-            // Render style ("mode") is managed by ScreensaverModeActivity via the "screensaverStyle"
-            // NavSpec (same pattern as faceId/clockFace).
-            "mode",
             "dismissAppComponent", "dismissHaDashboard",
             "calendarUrl", "calendarEnabled", "calendarRange", "calendarSize", "calendarSide",
         )
