@@ -50,6 +50,13 @@ object FleetScreensaver {
   fun sourcesJson(s: ScreensaverConfig.Settings): JSONObject =
       JSONObject()
           .put("source", currentSource(s))
+          .put("folderPath", s.folderPath ?: "")
+          .put("hasImmichKey", !s.immichKey.isNullOrBlank())
+          .put("hasSmbPass", !s.smbPass.isNullOrBlank())
+          .put("hasDavPass", !s.davPass.isNullOrBlank())
+          .put("immichKeyConfigured", !s.immichKey.isNullOrBlank())
+          .put("smbPassConfigured", !s.smbPass.isNullOrBlank())
+          .put("davPassConfigured", !s.davPass.isNullOrBlank())
           .put("immichUrl", s.immichUrl ?: "")
           .put("immichKey", s.immichKey ?: "")
           .put("immichAlbumId", s.immichAlbumId ?: "")
@@ -77,6 +84,7 @@ object FleetScreensaver {
   /** The active photo-source as a Setup-form key (immich/smb/dav/web/album/default). Pure. */
   internal fun currentSource(s: ScreensaverConfig.Settings): String =
       when {
+        s.usesFolder -> "folder"
         s.usesImmich -> "immich"
         s.usesSmb -> "smb"
         s.usesDav -> "dav"

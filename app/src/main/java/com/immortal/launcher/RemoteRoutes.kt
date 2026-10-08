@@ -27,8 +27,13 @@ import org.json.JSONObject
  */
 class RemoteRoutes(private val context: Context) {
 
+  private val companion by lazy { RemoteCompanionRoutes(context) }
+
   fun handle(req: FleetHttpServer.Request): FleetHttpServer.Response =
       when (req.path) {
+        "/remote/companion", "/remote/layout", "/remote/snapshot", "/remote/catalog",
+        "/remote/operation", "/remote/operations", "/remote/jarvis", "/remote/scenes",
+        "/remote/scene", "/remote/photos", "/remote/photo", "/remote/photo-upload" -> companion.handle(req)
         // Public (LAN-guarded only): the page itself carries no secrets, and pairing
         // is gated by the PIN shown on the Portal's screen.
         "/remote/ui" -> requireMethod("GET", req) { html(RemoteHtml.PAGE) }
@@ -169,6 +174,14 @@ class RemoteRoutes(private val context: Context) {
   private fun key(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val body = parseJson(req.bodyText()) ?: return json(400, err("bad_json"))
     val action = body.optString("action")
+    // The paired Home button owns Immortal's home, even when the stock launcher is default.
+    if (action == "home") {
+      val opened = runCatching {
+        context.startActivity(Intent(context, HomeActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        true
+      }.getOrDefault(false)
+      return json(if (opened) 200 else 500, JSONObject().put("ok", opened).put("action", "home").put("dispatched", opened))
+    }
     // The Portal has no system Recents; "apps" opens the launcher's own app switcher instead.
     if (action == "apps") return openAppSwitcher()
     // "screensaver" starts the photo frame (same as the home-screen screensaver button).
@@ -275,8 +288,8 @@ class RemoteRoutes(private val context: Context) {
    * calendar; POST applies a new source and/or calendar feed through the same fleet config path,
    * then reaffirms screensaver ownership so it takes effect.
    */
-  private fun sources(req: FleetHttpServer.Request): FleetHttpServer.Response =
-      when (req.method) {
+  private fun sources(req: FleetHttpServer.Request): FleetHttpServer.Response {
+    return when (req.method) {
         "GET" -> {
           val s = ScreensaverConfig.load(context)
           json(200, ok().put("sources", FleetScreensaver.sourcesJson(s)).put("calendar", FleetCalendar.toJson(s)))
@@ -285,7 +298,9 @@ class RemoteRoutes(private val context: Context) {
           val body = parseJson(req.bodyText())
           if (body == null) json(400, err("bad_json"))
           else {
-            val applied = FleetScreensaver.apply(context, body).toMutableList()
+            val prepared = RemoteCompanionSources.prepare(body, ScreensaverConfig.load(context))
+            if (prepared.error != null) return json(400, err(prepared.error))
+            val applied = FleetScreensaver.apply(context, prepared.body!!).toMutableList()
             // Optional calendar feed in the same save: {"calendarUrl":"…"} → FleetCalendar {"url"}.
             if (body.has("calendarUrl")) {
               applied += FleetCalendar.apply(context, JSONObject().put("url", body.optString("calendarUrl")))
@@ -303,6 +318,8 @@ class RemoteRoutes(private val context: Context) {
         else -> json(405, err("method_not_allowed"))
       }
 
+  }
+
   /**
    * List an Immich server's albums for the Setup form's album picker: POST `{"url":"…","key":"…"}`
    * — the form's live field values, so the picker works before the connection is saved; blank
@@ -315,8 +332,11 @@ class RemoteRoutes(private val context: Context) {
     val body = parseJson(req.bodyText()) ?: return json(400, err("bad_json"))
     val stored = ScreensaverConfig.load(context)
     val url = body.optString("url").ifBlank { stored.immichUrl ?: "" }
-    val key = body.optString("key").ifBlank { stored.immichKey ?: "" }
-    if (url.isBlank() || key.isBlank()) return json(400, err("immich_credentials_required"))
+    val candidate = JSONObject().put("immichUrl", url)
+    body.optString("key").takeIf { it.isNotBlank() }?.let { candidate.put("immichKey", it) }
+    val prepared = RemoteCompanionSources.prepare(candidate, stored)
+    if (prepared.error != null) return json(400, err("immich_credentials_required"))
+    val key = prepared.body!!.getString("immichKey")
     val albums = ImmichSource.listAlbums(url, key) ?: return json(502, err("immich_unreachable"))
     return json(200, ok().put("albums", FleetScreensaver.albumsJson(albums)))
   }

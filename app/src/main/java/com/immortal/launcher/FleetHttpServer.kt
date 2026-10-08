@@ -9,6 +9,7 @@ package com.immortal.launcher
 
 import android.util.Log
 import java.io.ByteArrayOutputStream
+import java.io.Closeable
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetAddress
@@ -122,7 +123,10 @@ class FleetHttpServer(
       val jsonBytes: ByteArray?,
       val streamLength: Long,
       val streamWriter: ((OutputStream) -> Unit)?,
-  ) {
+      private val onClose: () -> Unit = {},
+  ) : Closeable {
+    private var closed = false
+    @Synchronized override fun close() { if (!closed) { closed = true; onClose() } }
     /** Source-compatible JSON response (what [FleetRoutes] returns everywhere). */
     constructor(
         status: Int,
@@ -135,8 +139,9 @@ class FleetHttpServer(
           contentType: String,
           length: Long,
           headers: Map<String, String> = emptyMap(),
+          onClose: () -> Unit = {},
           writer: (OutputStream) -> Unit,
-      ) = Response(status, contentType, headers, null, length, writer)
+      ) = Response(status, contentType, headers, null, length, writer, onClose)
 
       /** A 204 CORS preflight reply (empty body) for an OPTIONS request. */
       fun preflight() =
@@ -150,7 +155,8 @@ class FleetHttpServer(
               ),
               null,
               0L,
-          ) {}
+              streamWriter = {},
+          )
     }
   }
 
@@ -224,8 +230,10 @@ class FleetHttpServer(
                 Log.w(TAG, "handler error", it)
                 Response(500, """{"ok":false,"error":"server_error"}""")
               }
-      runCatching { req.drainRemaining() } // so close() can't RST away our response
-      runCatching { writeResponse(out, resp) }
+      resp.use {
+        runCatching { req.drainRemaining() } // so close() can't RST away our response
+        runCatching { writeResponse(out, it) }
+      }
     }
   }
 

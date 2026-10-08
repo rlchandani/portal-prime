@@ -161,6 +161,15 @@ class FleetScreensaverTest {
   }
 
   @Test
+  fun localFolderSourceRoundTripsReadback() {
+    val s = ScreensaverConfig.Settings(source = ScreensaverConfig.SOURCE_FOLDER, folderPath = "/sdcard/Pictures/Phone")
+    assertEquals("folder", FleetScreensaver.currentSource(s))
+    val json = FleetScreensaver.sourcesJson(s)
+    assertEquals("folder", json.getString("source"))
+    assertEquals("/sdcard/Pictures/Phone", json.getString("folderPath"))
+  }
+
+  @Test
   fun currentSource_mapsActiveSource() {
     fun src(s: ScreensaverConfig.Settings) = FleetScreensaver.currentSource(s)
     assertEquals("default", src(ScreensaverConfig.Settings()))
