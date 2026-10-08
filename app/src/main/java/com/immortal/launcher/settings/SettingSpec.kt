@@ -240,7 +240,7 @@ class StringSpec<S>(
 
   override fun applyFrom(c: Context, body: JSONObject): Boolean {
     val k = firstPresent(key, aliases, body) ?: return false
-    val v = body.optString(k)
+    val v = body.opt(k) as? String ?: return false
     // A blank submit for a secret means "leave it unchanged" (the field is masked, not cleared).
     if (secret && v.isBlank()) return false
     if (!applyWhen(v)) return false

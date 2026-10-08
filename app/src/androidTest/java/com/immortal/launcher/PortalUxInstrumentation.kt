@@ -45,6 +45,31 @@ class PortalUxInstrumentation : Instrumentation() {
             automation.serviceInfo = automation.serviceInfo.apply {
                 flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
             }
+            if (options.getString("command") == "homeDashboardSetup") {
+                val url = requireNotNull(options.getString("url"))
+                val applied = com.immortal.launcher.settings.SettingsDomains.homeDashboard.apply(
+                    targetContext, JSONObject().put("url", url))
+                check(applied == setOf("url"))
+                // The instrumentation process exits immediately. An empty synchronous commit
+                // flushes the registry's pending apply without writing settings around it.
+                check(targetContext.getSharedPreferences("immortal_home_dashboard",
+                    android.content.Context.MODE_PRIVATE).edit().commit())
+                finish(0, Bundle().apply {
+                    putBoolean("homeDashboardConfigured", HomeDashboardConfig.configured(targetContext))
+                })
+                return
+            }
+            if (options.getString("command") == "homeDashboardOpen") {
+                finish(0, Bundle().apply {
+                    putBoolean("dashboardOpened", HomeDashboardActivity.openDashboard(targetContext))
+                })
+                return
+            }
+            if (options.getString("command") == "homeDashboardSmoke") {
+                val dashboard = HomeDashboardDeviceChecks.run(this, automation)
+                finish(if (dashboard.getBoolean("homeDashboardCompleted")) 0 else 1, dashboard)
+                return
+            }
             if (options.getString("command") == "slideshowReport") {
                 finish(0, SlideshowValidationReport.read(targetContext,
                     requireNotNull(options.getString("runId"))))

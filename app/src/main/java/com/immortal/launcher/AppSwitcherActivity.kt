@@ -214,7 +214,7 @@ private fun ApprovedAppsContent(
   val installed = allApps.orEmpty()
   val ordered = UserLayout.applyOrder(installed, order) { it.component.flattenToString() }
   val installedIds = ordered.map { it.component.flattenToString() }
-  val builtinIds = listOf(StoreActivity::class.java, ToolsActivity::class.java, WebAppActivity::class.java, ImmortalSettingsActivity::class.java)
+  val builtinIds = listOf(StoreActivity::class.java, ToolsActivity::class.java, WebAppActivity::class.java, ImmortalSettingsActivity::class.java, HomeDashboardActivity::class.java)
       .map { ComponentName(context.packageName, it.name).flattenToString() } + ComponentName("com.immortal.launcher", "__immortal_calls_bridge__").flattenToString()
   val knownIds = (installedIds + builtinIds).toSet()
   val favoriteKeys = (order.filter { it in knownIds } + installedIds + builtinIds).distinct().take(6)
@@ -265,7 +265,10 @@ private fun ApprovedAppsContent(
       }
       // Publish installed apps, folders and built-ins together, never a short grid
       // of built-ins that shifts when the asynchronous inventory arrives.
-      val builtins = if (allApps != null && !recent && folder == null && query.isBlank()) listOf("store" to "App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") else emptyList()
+      val builtins = if (allApps != null && !recent && folder == null && query.isBlank())
+        listOf("store" to "App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") +
+            if ("dashboard" in shortcutIcons) listOf("dashboard" to "Home dashboard") else emptyList()
+        else emptyList()
       val otherFolders = if (!recent && folder == null && query.isBlank()) folderNames.filterNot { it == "Settings" } else emptyList()
       val tiles = shown.map { app -> AppsTileEntry(app.label, app = app) } + otherFolders.map { AppsTileEntry(it, folder = it) } + builtins.map { AppsTileEntry(it.second, builtin = it.first) }
       items(tiles.size, key = { index -> tiles[index].app?.component?.flattenToString() ?: "${tiles[index].builtin}:${tiles[index].folder}" }, contentType = { "app-tile" }) { index ->
@@ -429,6 +432,7 @@ private fun launchApprovedBuiltin(context: Context, id: String) {
     "tools" -> context.openApprovedHomeTab(ApprovedLauncherTab.TOOLS)
     "settings" -> launchApprovedIntent(context, Intent(context, ImmortalSettingsActivity::class.java))
     "music" -> launchApprovedIntent(context, Intent(context, WebAppActivity::class.java).putExtra(WebAppActivity.EXTRA_URL, WebAppActivity.URL_YT_MUSIC))
+    "dashboard" -> HomeDashboardActivity.openDashboard(context)
     "calls" -> PortalHomeBridge.launch(context)
   }
 }

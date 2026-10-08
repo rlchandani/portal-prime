@@ -196,6 +196,7 @@ internal fun approvedAppIdentity(pkg: String): Pair<String, Color>? = when (pkg)
   "builtin:music" -> "music" to Color(0xFFC84E68)
   "builtin:calls" -> "phone" to Color(0xFF408763)
   "builtin:settings" -> "gear" to Color(0xFF647480)
+  "builtin:dashboard" -> "home" to Color(0xFF2879B8)
   "builtin:folder" -> "folder" to Color(0xFF2879B8)
   else -> null
 }

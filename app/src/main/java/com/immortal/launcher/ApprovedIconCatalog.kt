@@ -49,7 +49,7 @@ internal fun approvedIconResource(name: String): Int = when (name.lowercase(Loca
     "news", "org.chromium.chrome", "org.mozilla.firefox" -> R.drawable.approved_icon_globe
     "apps", "grid", "gridapps" -> R.drawable.approved_icon_gridapps
     "hand" -> R.drawable.approved_icon_hand
-    "ha", "home", "home assistant",
+    "ha", "home", "home assistant", "home dashboard", "builtin:dashboard",
     "homeassistant", "io.homeassistant.companion.android", "io.homeassistant.companion.android.minimal" -> R.drawable.approved_icon_home
     "ha_widget", "home_s", "homes" -> R.drawable.approved_icon_home_s
     "countdowns", "hourglass" -> R.drawable.approved_icon_hourglass

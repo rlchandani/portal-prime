@@ -542,6 +542,7 @@ class SettingsDomainTest {
             "WelcomeConfig",
             "SunriseConfig",
             "QuickBarConfig",
+            "HomeDashboardConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",
             "FleetConfig",

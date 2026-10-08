@@ -18,6 +18,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+import com.immortal.launcher.ui.theme.LocalAdvancedSettings
+import com.immortal.launcher.settings.SettingsDomains
+import org.json.JSONObject
 
 
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,7 +41,7 @@ class HaSettingsActivity : ComponentActivity() {
         val entities = intent.getStringExtra(APPROVED_SETTINGS_PAGE) == "ha-entities"
         setContent {
             PortalPrimeTheme(darkTheme = false) {
-                SettingsScaffold(title = if (entities) "Choose Home Assistant entities" else "Home Assistant controls",
+                SettingsScaffold(title = if (entities) "Choose Home Assistant entities" else "Home dashboard",
                     onBack = { finish() }) { ApprovedEditorsHaContent(entities) }
             }
         }
@@ -51,6 +54,7 @@ internal fun HaSettingsContent() { ApprovedEditorsHaContent(entitiesOnly = false
 @Composable
 private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
     val context = LocalContext.current
+    if (!entitiesOnly && HomeDashboardSettings()) return
     val back = rememberApprovedSettingsBack()
     val scope = rememberCoroutineScope()
     val requests = remember { ApprovedEditorsRequestGate() }
@@ -258,6 +262,30 @@ private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
             pinned = HaConfig.entities(context)
         }
     }
+}
+
+/** The ordinary page contains the web dashboard; native API controls remain in Advanced. */
+@Composable
+private fun HomeDashboardSettings(): Boolean {
+    val context = LocalContext.current
+    var snapshot by remember { mutableStateOf(HomeDashboardConfig.load(context)) }
+    var error by remember { mutableStateOf<String?>(null) }
+    Column {
+        SettingsList(SettingsDomains.homeDashboard, snapshot, onApply = { key, value ->
+            val applied = SettingsDomains.homeDashboard.apply(context, JSONObject().put(key, value))
+            error = if (key in applied) null else "Enter a complete http:// or https:// dashboard address."
+            snapshot = HomeDashboardConfig.load(context)
+        })
+        error?.let { FooterNote(it) }
+        if (snapshot.url.isNotBlank()) {
+            Card {
+                NavRow("Open dashboard") { HomeDashboardActivity.openDashboard(context) }
+            }
+        }
+        FooterNote("Your dashboard opens in the Portal browser and keeps its saved sign-in. " +
+            "It runs when you open it, keeping Home lightweight.")
+    }
+    return snapshot.url.isNotBlank() && !LocalAdvancedSettings.current
 }
 
 @Composable

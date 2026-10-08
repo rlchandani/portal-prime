@@ -152,7 +152,7 @@ internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("lamp", "Lamp", "sound", LampActivity::class.java),
     ApprovedSettingsPage("multiroom", "Multi-room audio", "connections", standaloneActivity = MultiRoomActivity::class.java),
     ApprovedSettingsPage("mqtt", "MQTT publishing", "connections", standaloneActivity = MqttActivity::class.java),
-    ApprovedSettingsPage("ha", "Home Assistant controls", "connections", standaloneActivity = HaSettingsActivity::class.java),
+    ApprovedSettingsPage("ha", "Home dashboard", "connections", standaloneActivity = HaSettingsActivity::class.java),
     ApprovedSettingsPage("ha-entities", "Choose Home Assistant entities", "connections", HaSettingsActivity::class.java),
     ApprovedSettingsPage("ha-dashboard", "Home Assistant", "connections", HaDashboardActivity::class.java),
     ApprovedSettingsPage("phone", "Phone remote", "connections", RemotePairActivity::class.java),

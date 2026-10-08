@@ -265,6 +265,9 @@ private object ApprovedHomeInventory {
   }
 }
 
+/** A dashboard address changes the shortcut inventory, without another package scan on each frame. */
+internal fun invalidateApprovedDashboardInventory() = ApprovedHomeInventory.invalidate()
+
 /** Home warms this inventory before Apps is opened; exclude Home's injected shortcuts. */
 internal fun peekApprovedInstalledApps(context: Context): List<AppEntry>? =
     ApprovedHomeInventory.apps.peek()?.let { approvedInstalledEntries(context, it) }
@@ -282,6 +285,7 @@ internal fun approvedShortcutIcons(context: Context, inventory: List<AppEntry>):
       val key = when (app.component) {
         ComponentName(context, StoreActivity::class.java) -> "store"
         ComponentName(context, WebAppActivity::class.java) -> "music"
+        ComponentName(context, HomeDashboardActivity::class.java) -> "dashboard"
         ComponentName(context, ImmortalSettingsActivity::class.java) -> "settings"
         CALLS_COMPONENT -> "calls"
         else -> null
@@ -364,6 +368,8 @@ class HomeActivity : ComponentActivity() {
                 } else if (cn.packageName == packageName &&
                     cn.className == ToolsActivity::class.java.name) {
                   launcherTab = ApprovedLauncherTab.TOOLS
+                } else if (cn == ComponentName(this@HomeActivity, HomeDashboardActivity::class.java)) {
+                  HomeDashboardActivity.openDashboard(this@HomeActivity)
                 } else if (cn.packageName == packageName &&
                     cn.className == WebAppActivity::class.java.name) {
                   // The Music tile: YouTube Music's PWA in the kiosk WebView (no GMS client).
@@ -2894,6 +2900,7 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
   val haPackage = installed.firstOrNull { it.startsWith("io.homeassistant.") }
   val haInstalled = haPackage != null
   val assistantInstalled = "com.portal.assistant" in installed
+  val dashboardConfigured = remember(refresh) { HomeDashboardConfig.configured(context) }
   fun launch(pkg: String) {
     runCatching { pm.getLaunchIntentForPackage(pkg)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.let { context.startActivity(it) } }
   }
@@ -2901,7 +2908,11 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
   data class QC(val icon: String, val label: String, val description: String, val onTap: () -> Unit)
   val tiles = buildList {
     if (assistantInstalled) add(QC("mic", "Hey Jarvis", "Open your assistant") { triggerJarvis(context) })
-    if (haInstalled) {
+    if (dashboardConfigured) {
+      add(QC("ha", "Home dashboard", "Open your dashboard") {
+        HomeDashboardActivity.openDashboard(context)
+      })
+    } else if (haInstalled) {
       add(QC("bulb", "Lights", "Open Home Assistant") { launch(haPackage.orEmpty()) })
       add(QC("film", "Scenes", "Open Home Assistant") { launch(haPackage.orEmpty()) })
       add(QC("weather", "Climate", "Open Home Assistant") { launch(haPackage.orEmpty()) })
@@ -3950,6 +3961,21 @@ private fun expiryShort(iso: String): String =
 @Composable
 private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3) {
   val context = androidx.compose.ui.platform.LocalContext.current
+  var dashboardConfigured by remember { mutableStateOf(HomeDashboardConfig.configured(context)) }
+  OnResume { dashboardConfigured = HomeDashboardConfig.configured(context) }
+  if (dashboardConfigured) {
+    ImmortalWidgetShell(title = "Home Assistant", openPage = "ha", modifier = modifier,
+        onOpen = { HomeDashboardActivity.openDashboard(context) }) {
+      Text("Your home dashboard", color = ApprovedHomePalette.Text, fontSize = 26.sp,
+          lineHeight = 34.sp, fontWeight = FontWeight.Medium)
+      Text("Open your rooms, devices and scenes.", color = ApprovedHomePalette.Secondary,
+          fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 14.dp))
+      ApprovedHomeTextButton("Open dashboard", onClick = {
+        HomeDashboardActivity.openDashboard(context)
+      })
+    }
+    return
+  }
   val scope = androidx.compose.runtime.rememberCoroutineScope()
   var entities by remember { mutableStateOf(HaConfig.entities(context)) }
   var configured by remember { mutableStateOf(HaConfig.isConfigured(context)) }
@@ -4688,6 +4714,15 @@ private fun loadApps(context: Context): List<AppEntry> {
         val musicIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_music_tile)
             ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
         var out = apps
+        if (HomeDashboardConfig.configured(context)) {
+          val dashboardIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_ha_tile)
+              ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+          if (dashboardIcon != null) out = out + AppEntry(
+              label = "Home dashboard",
+              component = ComponentName(context, HomeDashboardActivity::class.java),
+              icon = dashboardIcon,
+          )
+        }
         if (musicIcon != null) {
           out = out + AppEntry(
               label = "Music",

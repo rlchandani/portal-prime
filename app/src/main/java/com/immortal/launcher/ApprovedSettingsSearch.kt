@@ -53,6 +53,7 @@ internal fun approvedPageForControl(domain: String, key: String): String? = when
     "calendar" -> if (key == "url") "calendar-url" else "calendar"
     "digitalclock" -> "clock"
     "fleet" -> "device"
+    "home_dashboard" -> "ha"
     else -> approvedSettingsPage(domain)?.id
 }
 

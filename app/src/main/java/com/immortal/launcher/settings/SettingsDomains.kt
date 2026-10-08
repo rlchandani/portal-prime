@@ -29,6 +29,8 @@ import com.immortal.launcher.ScreensaverDismiss
 import com.immortal.launcher.ScreensaverDismissAppActivity
 import com.immortal.launcher.ScreensaverSourcesActivity
 import com.immortal.launcher.ImmortalSettings
+import com.immortal.launcher.HomeDashboardConfig
+import com.immortal.launcher.invalidateApprovedDashboardInventory
 import com.immortal.launcher.MqttConfig
 import com.immortal.launcher.MqttService
 import com.immortal.launcher.MultiRoomService
@@ -1210,6 +1212,27 @@ object SettingsDomains {
           defaults = { WelcomeConfig.Settings() },
       )
 
+  val homeDashboard: SettingsDomain<HomeDashboardConfig.Settings> =
+      SettingsDomain(
+          id = "home_dashboard",
+          title = "Home dashboard",
+          load = HomeDashboardConfig::load,
+          specs =
+              listOf(
+                  StringSpec(
+                      key = "url",
+                      title = "Dashboard address",
+                      get = { it.url },
+                      set = HomeDashboardConfig::setUrl,
+                      applyWhen = { HomeDashboardConfig.normalizeUrl(it) != null },
+                      help = "An HTTP or HTTPS dashboard address. Leave blank to disable.",
+                  ),
+              ),
+          defaults = { HomeDashboardConfig.Settings() },
+          onApplied = { _, _ -> invalidateApprovedDashboardInventory() },
+      )
+
   val all: List<SettingsDomain<*>> =
-      listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime, digitalclock, welcome, sunrise)
+      listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime, digitalclock, welcome, sunrise,
+          homeDashboard)
 }
