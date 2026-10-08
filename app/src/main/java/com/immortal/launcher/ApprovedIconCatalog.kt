@@ -17,7 +17,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 
-// Generated from frozen Portal+ revision 04. Use the generator to update the catalog.
+// Generated from frozen Portal+ revision 04 plus separately maintained header glyphs.
+// Use the generator to update the catalog; native header drawables are maintained separately.
 // Source paths, stroke widths/caps/joins, fill rules and alpha live in the drawables.
 // Aliases follow the approved dock, widget, tool and installed-app glyph assignments.
 @DrawableRes
@@ -49,8 +50,9 @@ internal fun approvedIconResource(name: String): Int = when (name.lowercase(Loca
     "news", "org.chromium.chrome", "org.mozilla.firefox" -> R.drawable.approved_icon_globe
     "apps", "grid", "gridapps" -> R.drawable.approved_icon_gridapps
     "hand" -> R.drawable.approved_icon_hand
-    "ha", "home", "home assistant", "home dashboard", "builtin:dashboard",
-    "homeassistant", "io.homeassistant.companion.android", "io.homeassistant.companion.android.minimal" -> R.drawable.approved_icon_home
+    "builtin:dashboard", "ha", "home",
+    "home assistant", "home dashboard", "homeassistant",
+    "io.homeassistant.companion.android", "io.homeassistant.companion.android.minimal" -> R.drawable.approved_icon_home
     "ha_widget", "home_s", "homes" -> R.drawable.approved_icon_home_s
     "countdowns", "hourglass" -> R.drawable.approved_icon_hourglass
     "info" -> R.drawable.approved_icon_info
@@ -58,17 +60,12 @@ internal fun approvedIconResource(name: String): Int = when (name.lowercase(Loca
     "lock" -> R.drawable.approved_icon_lock
     "intercom", "megaphone" -> R.drawable.approved_icon_megaphone
     "mic" -> R.drawable.approved_icon_mic
-    "remote", "smartphone" -> R.drawable.approved_icon_remote
-    "theme_day", "sun" -> R.drawable.approved_icon_theme_day
-    "theme_night" -> R.drawable.approved_icon_theme_night
     "moon" -> R.drawable.approved_icon_moonz
-    "moonz", "sleep" -> R.drawable.approved_icon_sleep
     "builtin:music", "music" -> R.drawable.approved_icon_music
     "com.portal.assistant", "jarvis", "notes",
     "stories", "todo" -> R.drawable.approved_icon_notes
     "builtin:calls", "calls", "phone" -> R.drawable.approved_icon_phone
-    "photo", "photo_memory", "photos",
-    "screensaver" -> R.drawable.approved_icon_photo
+    "photo", "photo_memory", "photos" -> R.drawable.approved_icon_photo
     "play" -> R.drawable.approved_icon_play
     "plug" -> R.drawable.approved_icon_plug
     "plus" -> R.drawable.approved_icon_plus
@@ -86,6 +83,11 @@ internal fun approvedIconResource(name: String): Int = when (name.lowercase(Loca
     "weather" -> R.drawable.approved_icon_weather
     "speed", "wifi" -> R.drawable.approved_icon_wifi
     "close", "x" -> R.drawable.approved_icon_x
+    "remote", "smartphone" -> R.drawable.approved_icon_remote
+    "moonz", "sleep" -> R.drawable.approved_icon_sleep
+    "sun", "theme_day" -> R.drawable.approved_icon_theme_day
+    "theme_night" -> R.drawable.approved_icon_theme_night
+    "screensaver" -> R.drawable.portal_icon_screensaver
     else -> R.drawable.approved_icon_info
 }
 

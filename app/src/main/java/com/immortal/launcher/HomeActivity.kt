@@ -1187,6 +1187,7 @@ private fun LauncherScreen(
             Box(Modifier.padding(horizontal = 12.dp).width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))
             Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
           }
+          ApprovedHeaderButton("screensaver", "Start screensaver", onStartScreensaver)
           Spacer(Modifier.weight(1f))
           ApprovedHomeIcon("wifi", Modifier.size(22.dp))
           Text(when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" }, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
@@ -1258,7 +1259,6 @@ private fun LauncherScreen(
           ApprovedHomeDock(selectedTab.id) { destination ->
             when (destination) {
               "apps" -> { editMode = false; onSelectTab(ApprovedLauncherTab.APPS) }
-              "photo" -> onStartScreensaver()
               "tools" -> {
                 editMode = false
                 if (selectedTab == ApprovedLauncherTab.TOOLS) toolsLibraryRequest++

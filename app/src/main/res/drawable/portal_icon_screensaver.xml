@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2026 Starbright Lab.
+
+    This source code is licensed under the MIT license found in the
+    LICENSE file in the root directory of this source tree.
+
+    Portal's stock ic_ambient geometry. Redundant collinear vertical segments
+    are collapsed to their endpoints; proportions, curves and cutouts are preserved.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="37dp"
+    android:height="31dp"
+    android:viewportWidth="37"
+    android:viewportHeight="31">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M29,2.7501C30.1259,2.7501 31.3608,2.7798 32.351,3.4653C33.2443,4.0837 34.25,5.4825 34.25,9.0001V19.5001C34.25,20.1904 34.8096,20.7501 35.5,20.7501C36.1904,20.7501 36.75,20.1904 36.75,19.5001V9.0001C36.75,5.0176 35.5891,2.6664 33.774,1.4098C32.0959,0.2481 30.1345,0.2493 29.0743,0.25L29,0.2501H12C11.3096,0.2501 10.75,0.8097 10.75,1.5001C10.75,2.1904 11.3096,2.7501 12,2.7501H29ZM4,6.5001H27C28.933,6.5001 30.5,8.0671 30.5,10.0001V27.0001C30.5,28.9331 28.933,30.5001 27,30.5001H4C2.067,30.5001 0.5,28.9331 0.5,27.0001V10.0001C0.5,8.0671 2.067,6.5001 4,6.5001ZM10.5,20L13.5795,23.5559L18.5,17L24.1292,24.5H14.3971H12.8708H6.6029L10.5,20ZM27.5,9.5001H3.5V27.5001H27.5V9.5001Z" />
+</vector>

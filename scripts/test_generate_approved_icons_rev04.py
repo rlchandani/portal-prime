@@ -42,9 +42,11 @@ class ApprovedIconConversionTest(unittest.TestCase):
                 "scripts/resources/approved-icons-rev04.json",
                 "app/src/main/java/com/immortal/launcher/ApprovedIconCatalog.kt",
             )
-            outputs = tuple(str(path.relative_to(icons.ROOT)) for path in
-                            (icons.ROOT / "app/src/main/res/drawable").glob("approved_icon_*.xml"))
-            for relative in inputs + outputs:
+            outputs = tuple(f"app/src/main/res/drawable/{icons.resource_name(name)}.xml"
+                            for name in icons.load_icons())
+            native = tuple(f"app/src/main/res/drawable/{resource}.xml"
+                           for resource in sorted(set(icons.NATIVE_ICON_RESOURCES.values())))
+            for relative in inputs + outputs + native:
                 source = icons.ROOT / relative
                 self.assertTrue(source.is_file(), f"Missing reproducible input: {relative}")
                 target = root / relative
@@ -172,15 +174,21 @@ class ApprovedIconConversionTest(unittest.TestCase):
 
     def test_fresh_clone_generates_and_checks_identical_outputs_without_mocks(self):
         with self.fresh_clone() as root:
-            outputs = list((root / "app/src/main/res/drawable").glob("approved_icon_*.xml"))
+            outputs = [root / f"app/src/main/res/drawable/{icons.resource_name(name)}.xml"
+                       for name in icons.load_icons()]
             self.assertEqual(len(outputs), 45)
             outputs.append(root / "app/src/main/java/com/immortal/launcher/ApprovedIconCatalog.kt")
             expected = {path: path.read_bytes() for path in outputs}
+            native = {root / f"app/src/main/res/drawable/{resource}.xml":
+                      (root / f"app/src/main/res/drawable/{resource}.xml").read_bytes()
+                      for resource in set(icons.NATIVE_ICON_RESOURCES.values())}
             for path in outputs:
                 path.unlink()
             generated = self.run_generator(root)
             self.assertEqual(generated.returncode, 0, generated.stderr)
             for path, contents in expected.items():
+                self.assertEqual(path.read_bytes(), contents, path.name)
+            for path, contents in native.items():
                 self.assertEqual(path.read_bytes(), contents, path.name)
             verified = self.run_generator(root, "--check")
             self.assertEqual(verified.returncode, 0, verified.stderr)

@@ -39,7 +39,7 @@ ALIASES = {
     "moon": "moonz", "sleep": "moonz",
     "calls": "phone", "builtin:calls": "phone",
     "apps": "gridapps", "grid": "gridapps",
-    "photos": "photo", "photo_memory": "photo", "screensaver": "photo",
+    "photos": "photo", "photo_memory": "photo",
     "工具": "tools", "quick_controls": "tools", "builtin:tools": "tools",
     "calendar": "cal", "today": "cal", "portalhub": "cal", "com.portal.calendar": "cal",
     "store": "bag", "curated": "bag", "builtin:store": "bag",
@@ -50,6 +50,7 @@ ALIASES = {
     "org.videolan.vlc": "vlc",
     "newpipe": "film", "org.schabi.newpipe": "film", "camera": "film",
     "ha": "home", "home assistant": "home", "homeassistant": "home",
+    "home dashboard": "home", "builtin:dashboard": "home",
     "io.homeassistant.companion.android": "home",
     "io.homeassistant.companion.android.minimal": "home",
     "home_s": "homeS", "ha_widget": "homeS",
@@ -65,6 +66,14 @@ ALIASES = {
     "close": "x", "calculator": "calc", "converter": "calc",
     "crypto": "calc", "stocks": "calc", "options": "calc",
     "timers": "timer", "intercom": "megaphone", "countdowns": "hourglass",
+}
+# Header glyphs are maintained separately from the immutable revision 04 artwork.
+NATIVE_ICON_RESOURCES = {
+    "remote": "approved_icon_remote", "smartphone": "approved_icon_remote",
+    "theme_day": "approved_icon_theme_day", "sun": "approved_icon_theme_day",
+    "theme_night": "approved_icon_theme_night",
+    "moonz": "approved_icon_sleep", "sleep": "approved_icon_sleep",
+    "screensaver": "portal_icon_screensaver",
 }
 COPYRIGHT = """Copyright (c) 2026 Starbright Lab.
 
@@ -301,11 +310,19 @@ def catalog(library):
     branches = []
     for name in sorted(names):
         # Keep the generated cases readable without dynamic resource lookup.
-        aliases = sorted(names[name])
+        aliases = sorted(names[name] - NATIVE_ICON_RESOURCES.keys())
+        if not aliases:
+            continue
         lines = [", ".join(f'"{alias}"' for alias in aliases[index:index + 3])
-                 for index in range(0, len(aliases), 3)]
+                  for index in range(0, len(aliases), 3)]
         branches.append("    " + ",\n    ".join(lines) +
                         f" -> R.drawable.{resource_name(name)}")
+    native = defaultdict(set)
+    for alias, resource in NATIVE_ICON_RESOURCES.items():
+        native[resource].add(alias)
+    for resource, aliases in sorted(native.items()):
+        branches.append("    " + ", ".join(f'"{alias}"' for alias in sorted(aliases)) +
+                        f" -> R.drawable.{resource}")
     copyright_lines = "\n".join(" * " + line if line else " *"
                                 for line in COPYRIGHT.splitlines())
     return f"""/*
@@ -324,7 +341,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 
-// Generated from frozen Portal+ revision 04. Use the generator to update the catalog.
+// Generated from frozen Portal+ revision 04 plus separately maintained header glyphs.
+// Use the generator to update the catalog; native header drawables are maintained separately.
 // Source paths, stroke widths/caps/joins, fill rules and alpha live in the drawables.
 // Aliases follow the approved dock, widget, tool and installed-app glyph assignments.
 @DrawableRes

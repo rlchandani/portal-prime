@@ -80,6 +80,10 @@ internal fun ApprovedAppsHeader(onSearch: () -> Unit) {
       Spacer(Modifier.width(30.dp))
       Box(Modifier.width(1.dp).height(40.dp).background(IosDivider))
       Text(FleetConfig.name(context), color = IosSecondary, fontSize = 22.sp, modifier = Modifier.padding(start = 24.dp))
+      Spacer(Modifier.width(24.dp))
+      ApprovedAppsRoundAction("screensaver", "Start screensaver") {
+        context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
+      }
       Spacer(Modifier.weight(1f))
       ApprovedAppsGlyph("wifi", IosSecondary, 22.dp)
       Text(if (connected) "Connected" else "Offline", color = IosSecondary, fontSize = 20.sp, modifier = Modifier.padding(start = 10.dp, end = 30.dp))
@@ -110,17 +114,14 @@ internal fun ApprovedAppsDock(selected: String, onExit: () -> Unit, modifier: Mo
   Surface(modifier = modifier, color = IosCard, shape = RoundedCornerShape(26.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider)) {
     Row(Modifier.height(92.dp).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically) {
-      listOf(Triple("home", "Home", "home"), Triple("apps", "Apps", "gridapps"), Triple("photos", "Photos", "photo"), Triple("tools", "Tools", "tools")).forEach { (id, label, glyph) ->
+      listOf(Triple("home", "Home", "home"), Triple("apps", "Apps", "gridapps"), Triple("tools", "Tools", "tools")).forEach { (id, label, glyph) ->
         val active = id == selected
         Row(Modifier.widthIn(min = 176.dp).fillMaxHeight().clip(RoundedCornerShape(18.dp))
             .background(if (active) LocalApprovedPalette.current.selected else Color.Transparent)
             .tvFocusable(RoundedCornerShape(18.dp), focusScale = 1f,
                 ringColor = LocalApprovedPalette.current.accent) {
-              when (id) {
-                "photos" -> context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
-                else -> ApprovedLauncherTab.fromId(id)?.let { tab ->
-                  if (context.openApprovedHomeTab(tab)) onExit()
-                }
+              ApprovedLauncherTab.fromId(id)?.let { tab ->
+                if (context.openApprovedHomeTab(tab)) onExit()
               }
             }.padding(horizontal = 25.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
           val color = if (active) IosBlue else IosSecondary
