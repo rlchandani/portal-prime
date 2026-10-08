@@ -11,6 +11,7 @@ import android.service.dreams.DreamService
 import android.util.Log
 import android.view.MotionEvent
 import android.view.WindowManager
+import java.lang.ref.WeakReference
 
 /**
  * Native photo-frame screensaver. Reproduces the stock Portal idle screen
@@ -26,6 +27,7 @@ class PhotoDreamService : DreamService() {
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
+    ImmortalDreamNavigation.attached(this)
     Log.i(TAG, "attached: dream starting")
     // Interactive so we receive touch and can exit on tap (verified on device).
     // Fullscreen for an immersive frame — tap-to-exit is the way out.
@@ -82,6 +84,7 @@ class PhotoDreamService : DreamService() {
   }
 
   override fun onDetachedFromWindow() {
+    ImmortalDreamNavigation.detached(this)
     Log.i(TAG, "detached: dream ending")
     if (this::frame.isInitialized) frame.stop()
     super.onDetachedFromWindow()
@@ -89,5 +92,26 @@ class PhotoDreamService : DreamService() {
 
   private companion object {
     const val TAG = "ImmortalDream"
+  }
+}
+
+/** Main-thread lifecycle bridge. It owns only Immortal's dream, never a system/Meta dream. */
+internal object ImmortalDreamNavigation {
+  private var active = WeakReference<PhotoDreamService>(null)
+
+  fun attached(service: PhotoDreamService) { active = WeakReference(service) }
+
+  fun detached(service: PhotoDreamService) {
+    if (active.get() === service) active.clear()
+  }
+
+  fun dismissForNavigation(): Boolean {
+    val service = active.get() ?: return false
+    active.clear()
+    // A remote navigation request is an intentional exit, not an interrupted dream.
+    // Bypass the tap-dismiss app: the caller has already selected its destination.
+    DreamPolicy.userExitAt = System.currentTimeMillis()
+    service.finish()
+    return true
   }
 }

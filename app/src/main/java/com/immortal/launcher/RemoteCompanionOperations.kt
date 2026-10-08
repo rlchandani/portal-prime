@@ -62,8 +62,8 @@ internal class RemoteCompanionOperations(private val context: Context) {
     val action = body.optString("action")
     val dispatched = when (action) {
       "launch" -> RemoteApps.launch(context, body.getString("packageName"))
-      "home" -> open(HomeActivity::class.java)
-      "apps" -> open(AppSwitcherActivity::class.java)
+      "home" -> context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
+      "apps" -> context.openApprovedHomeTab(ApprovedLauncherTab.APPS)
       "screensaver" -> open(PhotoFramePreviewActivity::class.java)
       "wake", "sleep" -> {
         if (action == "wake") ScreenControl.wake(context) else ScreenControl.sleep(context)

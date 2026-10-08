@@ -426,7 +426,10 @@ class HomeActivity : ComponentActivity() {
   }
 
   private fun consumeLauncherTabIntent(incoming: Intent) {
-    ApprovedLauncherTab.fromId(incoming.getStringExtra(APPROVED_HOME_TAB))?.let { launcherTab = it }
+    ApprovedLauncherTab.fromId(incoming.getStringExtra(APPROVED_HOME_TAB))?.let {
+      ImmortalDreamNavigation.dismissForNavigation()
+      launcherTab = it
+    }
     if (incoming.getBooleanExtra(APPROVED_HOME_SEARCH, false)) {
       launcherTab = ApprovedLauncherTab.APPS
       appsSearchOpenRequest++

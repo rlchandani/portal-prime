@@ -176,10 +176,7 @@ class RemoteRoutes(private val context: Context) {
     val action = body.optString("action")
     // The paired Home button owns Immortal's home, even when the stock launcher is default.
     if (action == "home") {
-      val opened = runCatching {
-        context.startActivity(Intent(context, HomeActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-        true
-      }.getOrDefault(false)
+      val opened = context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
       return json(if (opened) 200 else 500, JSONObject().put("ok", opened).put("action", "home").put("dispatched", opened))
     }
     // The Portal has no system Recents; "apps" opens the launcher's own app switcher instead.

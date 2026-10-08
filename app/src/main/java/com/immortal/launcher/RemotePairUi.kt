@@ -8,6 +8,10 @@
 package com.immortal.launcher
 
 import android.content.Context
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,11 +23,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -65,6 +73,15 @@ fun enableRemoteAndMintPin(context: Context): Pair<String?, String?> {
  */
 @Composable
 fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
+  val context = LocalContext.current
+  fun photoAccessGranted() = listOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+      Manifest.permission.WRITE_EXTERNAL_STORAGE).all {
+    context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED
+  }
+  var photoAccess by remember { mutableStateOf(photoAccessGranted()) }
+  val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+    photoAccess = photoAccessGranted()
+  }
   Surface(color = IosCard, shape = RoundedCornerShape(24.dp), modifier = modifier.fillMaxWidth()) {
     if (url == null) {
       Text(
@@ -91,6 +108,14 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
           Text(url, color = IosBlue, fontSize = 24.sp, lineHeight = 36.sp)
           Text("Enter the pairing code. It expires in a few minutes.",
               color = IosSecondary, fontSize = 22.sp, lineHeight = 32.sp)
+          if (!photoAccess) {
+            Text("To import photos from your phone, allow file access on this Portal.",
+                color = IosSecondary, fontSize = 20.sp, lineHeight = 28.sp)
+            TextButton(onClick = {
+              permission.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+                  Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            }) { Text("Allow photo imports", color = IosBlue, fontSize = 22.sp) }
+          }
         }
         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
         qr?.let { image ->
