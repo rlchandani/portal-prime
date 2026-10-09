@@ -19,6 +19,29 @@ noisy desktop proxy measurements, not evidence of faster Portal rendering. No
 production filter/layout change was promoted. A Portal comparison and broader image
 coverage are required before choosing a rendering change.
 
+## Source-opacity proof
+
+The subsequent source audit found that Filmstrip does **not** always receive a
+prepared JPEG. Native `scaledUrlForSize` returns only ready local derivatives;
+`photos.js` falls back to the original URL when preparation is absent, pending,
+skipped or unsuccessful. Remote sources bypass this local derivative path. The
+photo deck carries dimensions and optional face coordinates, but no alpha or
+resolution-provenance flag.
+
+Successful app-owned `EngineScaledCache` output is explicitly JPEG encoded and
+published by rename. Original local PNG/WebP/GIF files and remote server responses
+have no enforced opacity guarantee. An inferred MIME type is not evidence of alpha
+absence. Even the slide and its backdrop may resolve differently because they
+request different size tiers.
+
+An overlay experiment therefore needs provenance for the exact URL assigned to
+each slide, with unknown/original fallbacks retaining the existing filter. It must
+resolve that URL once for assignment and preload. The audit also confirmed that
+Filmstrip uses centered CSS cover; its slide does not invoke face-aware background
+positioning. Neither the overlay nor a framing change is implemented or deployed
+from this evidence. Physical comparison and image-coverage verification remain
+required.
+
 ## Settings diagnostic draft
 
 A parallel worker implemented a test-APK-only probe for Appearance, Photos &
