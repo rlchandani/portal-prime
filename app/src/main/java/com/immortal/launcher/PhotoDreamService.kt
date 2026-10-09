@@ -114,6 +114,9 @@ internal object ImmortalDreamNavigation {
     if (preview.get() === activity) preview.clear()
   }
 
+  /** Called on main by navigation admission; only Immortal registers here. */
+  fun hasOwnedSurface(): Boolean = active.get() != null || preview.get() != null
+
   fun dismissForNavigation(): Boolean {
     val service = active.get()
     val activity = preview.get()

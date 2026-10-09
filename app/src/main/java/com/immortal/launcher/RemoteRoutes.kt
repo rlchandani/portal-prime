@@ -29,6 +29,9 @@ class RemoteRoutes(private val context: Context) {
 
   private val companion by lazy { RemoteCompanionRoutes(context) }
 
+  // One provider-owned read cache. Static requests never reopen assets after the first read.
+  private val remoteAssets = mutableMapOf<String, ByteArray>()
+
   fun handle(req: FleetHttpServer.Request): FleetHttpServer.Response =
       when (req.path) {
         "/remote/companion", "/remote/layout", "/remote/snapshot", "/remote/catalog",
@@ -37,6 +40,8 @@ class RemoteRoutes(private val context: Context) {
         // Public (LAN-guarded only): the page itself carries no secrets, and pairing
         // is gated by the PIN shown on the Portal's screen.
         "/remote/ui" -> requireMethod("GET", req) { html(RemoteHtml.PAGE) }
+        "/remote/assets/control-center.css", "/remote/assets/control-center.js",
+        "/remote/assets/core.mjs" -> requireMethod("GET", req) { staticAsset(req.path) }
         // PWA install surface: the manifest + app icon let the remote be added to the phone's
         // home screen as a standalone app, whose storage isn't evicted like a browser tab's —
         // the durable home for the synced roster. Public (no secrets), like the page itself.
@@ -490,6 +495,17 @@ class RemoteRoutes(private val context: Context) {
       block: () -> FleetHttpServer.Response,
   ): FleetHttpServer.Response = if (req.method == method) block() else json(405, err("method_not_allowed"))
 
+  private fun staticAsset(path: String): FleetHttpServer.Response {
+    val asset = staticAssetName(path) ?: return json(404, err("not_found"))
+    val bytes = synchronized(remoteAssets) {
+      remoteAssets[asset] ?: runCatching { context.assets.open("remote/$asset").use { it.readBytes() } }
+          .getOrNull()?.also { remoteAssets[asset] = it }
+    } ?: return json(404, err("not_found"))
+    val type = if (asset.endsWith(".css")) "text/css; charset=utf-8" else "text/javascript; charset=utf-8"
+    return FleetHttpServer.Response.stream(200, type, bytes.size.toLong(),
+        headers = mapOf("Cache-Control" to "no-cache", "X-Content-Type-Options" to "nosniff")) { it.write(bytes) }
+  }
+
   private fun html(page: String): FleetHttpServer.Response {
     val bytes = page.toByteArray(Charsets.UTF_8)
     return FleetHttpServer.Response.stream(200, "text/html; charset=utf-8", bytes.size.toLong()) {
@@ -507,6 +523,14 @@ class RemoteRoutes(private val context: Context) {
   private fun json(status: Int, obj: JSONObject) = FleetHttpServer.Response(status, obj.toString())
 
   internal companion object {
+    /** Exact allowlist: no user-controlled path reaches AssetManager. */
+    internal fun staticAssetName(path: String): String? = when (path) {
+      "/remote/assets/control-center.css" -> "control-center.css"
+      "/remote/assets/control-center.js" -> "control-center.js"
+      "/remote/assets/core.mjs" -> "core.mjs"
+      else -> null
+    }
+
     /** Extract the token from an `Authorization: Bearer <token>` header. Pure. */
     internal fun bearer(header: String?): String? {
       val h = header?.trim() ?: return null

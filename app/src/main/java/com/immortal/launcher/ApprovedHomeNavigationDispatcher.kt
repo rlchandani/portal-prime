@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-/** Window focus also excludes a Dream, preview, dialog or another app above a resumed Home. */
+/** Window focus excludes unrelated overlays; registered owned frames are also checked at admission. */
 internal fun approvedRetainedHomeEligible(
     resumed: Boolean,
     focused: Boolean,
@@ -137,7 +137,7 @@ internal object ApprovedHomeNavigation {
 
     val prepare: () -> (() -> Boolean) = {
       val host = hosts.foreground(expected) {
-        (caller == null || caller === it) && approvedRetainedHomeEligible(
+        (caller == null || caller === it) && !ImmortalDreamNavigation.hasOwnedSurface() && approvedRetainedHomeEligible(
             resumed = it.lifecycle.currentState == Lifecycle.State.RESUMED,
             focused = it.hasWindowFocus(),
             destroyed = it.isDestroyed,

@@ -126,6 +126,37 @@ class ApprovedHomeNavigationBoundaryTest {
     } finally { ImmortalDreamNavigation.detached(preview) }
   }
 
+  @Test fun ownedDreamAboveApparentlyFocusedHomeStillUsesDismissalFallback() = withHost { f ->
+    val dream = Mockito.mock(PhotoDreamService::class.java)
+    ImmortalDreamNavigation.attached(dream)
+    try {
+      assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS))
+      assertFallback(f.launches.single(), newTask = true)
+      assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
+      Mockito.verify(dream, Mockito.never()).finish()
+      consumeTabIntent(f.home, f.launches.single().intent)
+      Mockito.verify(dream).finish()
+      assertEquals(ApprovedLauncherTab.APPS, f.tab.value)
+      f.launches.clear()
+      assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.HOME))
+      assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
+      assertTrue(f.launches.isEmpty())
+    } finally { ImmortalDreamNavigation.detached(dream) }
+  }
+
+  @Test fun ownedPreviewAboveApparentlyFocusedHomeStillUsesDismissalFallback() = withHost { f ->
+    val preview = Mockito.mock(PhotoFramePreviewActivity::class.java)
+    ImmortalDreamNavigation.attached(preview)
+    try {
+      assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS))
+      assertFallback(f.launches.single(), newTask = true)
+      assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
+      consumeTabIntent(f.home, f.launches.single().intent)
+      Mockito.verify(preview).finish()
+      assertEquals(ApprovedLauncherTab.APPS, f.tab.value)
+    } finally { ImmortalDreamNavigation.detached(preview) }
+  }
+
   @Test fun workerAppliesOnMainAndNeverConstructsAnIntentForDirectSelection() = withHost(onMain = false) { f ->
     Mockito.mockConstruction(Handler::class.java) { handler, _ ->
       Mockito.doAnswer { it.getArgument<Runnable>(0).run(); true }

@@ -44,7 +44,8 @@ unchanged. Full Home resume hooks remain owned by real Android resumes.
   registers a target. Old lifecycle callbacks cannot clear a replacement host.
 - Direct selection requires the captured registration to remain current, lifecycle RESUMED,
   window focus, and an Activity that is neither finishing nor destroyed. An active stock
-  handoff also excludes it. An Activity caller must be that same Home; service callers may
+  handoff or registered Immortal Dream/preview also excludes it, even if Home still reports
+  window focus. An Activity caller must be that same Home; service callers may
   select the foreground host. A prior registration cannot become valid after pause/resume,
   even when the Activity object is the same.
 - An unfocused Home under another app, owned frame, Meta surface or dialog uses the existing
@@ -118,3 +119,13 @@ blocker remains in the focused candidate.
 Changed source is limited to HomeActivity.kt, ApprovedHomeNavigation.kt and the new
 ApprovedHomeNavigationDispatcher.kt. New tests are ApprovedHomeNavigationDispatcherTest.kt
 and ApprovedHomeNavigationBoundaryTest.kt. This new note is the only documentation change.
+
+## Owned-frame admission follow-up
+
+A focused regression run reproduced two failures when Home reported focus while an owned
+Dream or preview remained attached: direct selection could leave Apps behind that frame.
+Admission now checks ImmortalDreamNavigation's registered owned surfaces explicitly and uses
+the existing Intent dismissal path in that case. It does not inspect or react to Meta's Dream.
+The matching GREEN run passed 36 dispatcher, boundary and Dream-navigation tests, with zero
+failures/errors. Log: /private/tmp/portal-retained-owned-frame-green.log. Full final build and
+physical validation follow this addition.

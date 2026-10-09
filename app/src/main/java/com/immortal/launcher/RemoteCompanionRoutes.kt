@@ -65,7 +65,7 @@ internal class RemoteCompanionRoutes(private val context: Context) {
     return json(200, ok().put("protocolVersion", 1).put("deviceId", RemoteCompanionStore.id(context))
         .put("name", FleetConfig.name(context)).put("model", Build.MODEL).put("apiLevel", Build.VERSION.SDK_INT)
         .put("app", JSONObject().put("versionCode", code).put("versionName", pi.versionName))
-        .put("capabilities", JSONObject().put("layout", true).put("snapshot", true).put("catalog", catalog().isNotEmpty()).put("operations", true).put("scenes", true).put("photos", RemoteCompanionPhotos.available()).put("photoLibrary", true).put("jarvis", jarvis.optBoolean("supported")))
+        .put("capabilities", JSONObject().put("layout", true).put("snapshot", true).put("catalog", catalog().isNotEmpty()).put("operations", true).put("scenes", true).put("sceneRevisions", true).put("photos", RemoteCompanionPhotos.available()).put("photoLibrary", true).put("jarvis", jarvis.optBoolean("supported")))
         .put("presence", JSONObject().put("presence", presence.presence.name).put("screen", presence.screen.name).put("confident", presence.confident))
         .put("install", JSONObject().put("mode", plan.mode).put("daemonAvailable", plan.daemonAvailable).put("legacyInstaller", plan.legacy).put("dialogFixed", plan.dialogFixed).put("paused", plan.paused).put("autoConfirm", SettingsGuard.isInstallConfirmEnabled(context)))
         .put("canWriteSecureSettings", SettingsGuard.canWriteSecureSettings(context)))
@@ -148,14 +148,21 @@ internal class RemoteCompanionRoutes(private val context: Context) {
     return json(202, ok().put("operation", op))
   }
   private fun scenes(method: String, body: JSONObject): FleetHttpServer.Response = synchronized(RemoteCompanionStore.mutationLock) {
+    var saved = RemoteCompanionStore.scenes(context)
+    fun sceneRevision(value: JSONArray) = RemoteSnapshotPolicy.revision(JSONObject().put("scenes", value), JSONObject())
     if (method == "POST") {
-      if (!body.only("scenes")) return@synchronized json(400, error("unknown_field"))
+      if (!body.only("scenes", "expectedRevision")) return@synchronized json(400, error("unknown_field"))
+      // Optional for older clients. New editors capture this revision before editing; the
+      // comparison and replacement share the same lock, including schedule cancellation.
+      if (body.has("expectedRevision") && body.opt("expectedRevision") != sceneRevision(saved))
+        return@synchronized json(409, error("stale_revision"))
       val scenes = body.optJSONArray("scenes") ?: return@synchronized json(400, error("scenes_required"))
       val valid = RemoteScenes.validate(scenes)
       if (!valid.valid) return@synchronized invalid(valid)
       RemoteScenes.replace(context, scenes)
+      saved = RemoteCompanionStore.scenes(context)
     }
-    json(200, ok().put("scenes", RemoteCompanionStore.scenes(context)).put("scheduleMode", "local_inexact"))
+    json(200, ok().put("scenes", saved).put("revision", sceneRevision(saved)).put("scheduleMode", "local_inexact"))
   }
   private fun scene(body: JSONObject): FleetHttpServer.Response {
     if (!body.only("id") || !RemoteScenePolicy.validId(body.opt("id"))) return json(400, error("id_required"))
