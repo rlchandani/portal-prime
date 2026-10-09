@@ -605,6 +605,9 @@ class PhotoFrameController(
     }
     wv.webViewClient = android.webkit.WebViewClient() // keep navigation inside the WebView
     (view as FrameLayout).addView(wv, FrameLayout.LayoutParams(MATCH, MATCH))
+    // pauseTimers() is process-wide; resume any suspension left by an older frame lifecycle.
+    wv.resumeTimers()
+    wv.onResume()
     wv.loadUrl(url)
     webView = wv
   }
@@ -765,6 +768,9 @@ class PhotoFrameController(
         runCatching {
           @Suppress("DEPRECATION") context.packageManager.getPackageInfo(context.packageName, 0).versionCode
         }.getOrDefault(0)
+    // Resume before loading: dimension measurement, image admission and promotion need JS timers.
+    wv.resumeTimers()
+    wv.onResume()
     wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1&v=$assetVer")
     webView = wv
   }
@@ -782,10 +788,9 @@ class PhotoFrameController(
     if (this::nativeStage.isInitialized) nativeStage.stop()
     clearNativeHistory()
     if (this::viewerControls.isInitialized) viewerControls.stop()
-    // Halt the WebView's JS timers + GPU compositing IMMEDIATELY so the heavy scene stops competing
-    // with the return-to-home transition — this is what made tap-to-exit feel slow. (destroy() must
-    // still run on the main thread just below; pausing first makes the hand-off snappy.)
-    webView?.let { runCatching { it.onPause(); it.pauseTimers() } }
+    // Pause only this view before destroying it. pauseTimers() would suspend every WebView in
+    // Immortal, freezing the next slideshow's loading screen and any live web-based clock face.
+    webView?.let { runCatching { it.onPause() } }
     scaledCache.cancel() // don't keep burning CPU on copies while Home redraws
     ui.removeCallbacks(dashboardCycle)
     ui.removeCallbacksAndMessages(null)

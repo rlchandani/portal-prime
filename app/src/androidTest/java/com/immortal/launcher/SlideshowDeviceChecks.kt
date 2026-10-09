@@ -57,6 +57,9 @@ import org.json.JSONObject
  * Smart soak enables people framing and includes NASA in the local library, counting warm
  * cached face presentations and sampled native motion. It uses no remote photo source.
  * legacySmoke=true adds optional Ken Burns/filmstrip bridge checks on the two synthetic portraits.
+ * legacyOnly=true skips native smoke and checks four legacy launches/three re-entries with a
+ * 90-second probe budget, including same-mode re-entry and an independent WebView heartbeat.
+ * After the first exit passes, seed a global timer pause before launch two to check startup recovery.
  *
  * Temporary globals use the registry and supported atomic source setters. Snapshot values
  * remain in memory; exact original key presence, source, secure Dream settings and presence
@@ -77,6 +80,7 @@ internal object SlideshowDeviceChecks {
   private const val WAIT_MS = 10_000L
   private const val POLL_MS = 80L
   private const val SMOKE_LIMIT_MS = 180_000L
+  private const val LEGACY_LIMIT_MS = 90_000L
   private const val MAX_SOAK_SECONDS = 7200L
   private val modes = setOf("smartFrame", "portraitPair", "wholePhoto")
   private class ProbeFailure(val assertion: String) : RuntimeException()
@@ -116,6 +120,7 @@ internal object SlideshowDeviceChecks {
     private var safePositionSave = false
     private var configured = false
     private var host: Activity? = null
+    private var legacyHeartbeat: WebView? = null
     private var metrics: SlideshowDeviceMetrics? = null
     private var loader: SlideshowLoader? = null
     private var phase = "setup"
@@ -136,12 +141,21 @@ internal object SlideshowDeviceChecks {
         val soak = optionLong("soakSeconds", 0)
         require(soak in 0..MAX_SOAK_SECONDS)
         require(options.getString("soakMode", "smartFrame") in modes)
+        val legacyOnly = optionBoolean("legacyOnly")
+        if (legacyOnly) {
+          require(soak == 0L && !optionBoolean("pixelsOnly"))
+          smokeDeadline = started + LEGACY_LIMIT_MS
+        }
         check(folder.mkdirs())
         check(fixtures.root.mkdirs())
         snapshot()
         fixtures.create()
-        fixtures.installVideo(instrumentation.context)
-        if (optionBoolean("dreamOnly")) {
+        if (!legacyOnly) fixtures.installVideo(instrumentation.context)
+        if (legacyOnly) {
+          skips.put("native_smoke_face_inference_video_soak", "legacyOnly=true")
+          metrics = SlideshowDeviceMetrics()
+          legacyBridgeChecks(reentries = true)
+        } else if (optionBoolean("dreamOnly")) {
           require(soak == 0L && !optionBoolean("pixelsOnly"))
           dreamLifecycle()
         } else if (optionBoolean("startupOnly")) {
@@ -237,7 +251,8 @@ internal object SlideshowDeviceChecks {
         putString("slideshowReport", summary.toString())
         putString("report", "$relative/private.json")
         putString("privateArtifactPaths", JSONArray(listOf(
-            "$relative/private.json", "$relative/samples-private.jsonl", "$relative/fixtures")).toString())
+            "$relative/private.json", "$relative/samples-private.jsonl") +
+            if (optionBoolean("legacyOnly")) emptyList() else listOf("$relative/fixtures")).toString())
       }
     }
 
@@ -895,16 +910,87 @@ internal object SlideshowDeviceChecks {
       doneExits()
     }
 
-    private fun legacyBridgeChecks() {
+    private fun legacyBridgeChecks(reentries: Boolean = false) {
       phase = "legacy_bridge"
-      for (mode in listOf("kenBurns", "filmstrip")) {
+      val sequence = if (reentries) listOf("kenBurns", "kenBurns", "filmstrip", "filmstrip")
+          else listOf("kenBurns", "filmstrip")
+      val cycles = JSONArray()
+      measurements.put("legacyCycles", cycles).put("legacyCycleCount", 0)
+          .put("legacyCompletedCycleCount", 0).put("legacyReentryCount", 0)
+          .put("legacySeededRecoveryCount", 0)
+      if (reentries) {
+        val heartbeat = main {
+          WebView(context).also {
+            legacyHeartbeat = it
+            SlideshowLegacyDeviceChecks.startHeartbeat(it)
+          }
+        }
+        measurements.put("legacyHeartbeatBeforeEntry", SlideshowLegacyDeviceChecks.heartbeat(
+            instrumentation, heartbeat, "legacy_heartbeat_before_entry", ::demand, ::bounded))
+      }
+      var previousActivity: Activity? = null
+      var previousWeb: WebView? = null
+      for ((index, mode) in sequence.withIndex()) {
+        bounded()
+        val label = "legacy_cycle_${index + 1}"
+        phase = label
+        val cycle = JSONObject().put("cycle", index + 1).put("mode", mode)
+            .put("reentry", index > 0).put("ready", false).put("completed", false)
+            .put("seededTimerPause", false).put("seededTimerRecovery", false)
+        cycles.put(cycle)
+        measurements.put("legacyCycleCount", cycles.length())
         configure(fixtures.pair, mode, 30)
-        launch(mode, 1)
-        val web = main { readField(controller(), "webView") as WebView }
-        measurements.put("${mode}_deviceBridge", SlideshowLegacyDeviceChecks.run(
-            instrumentation, web, mode, fixtures.pair.path, ::demand))
-        closeHost()
-        checkpoint()
+        val begin = SystemClock.elapsedRealtime()
+        cycle.put("readinessLatencyMs", JSONObject.NULL)
+        try {
+          if (reentries && index == 1) {
+            // Cycle one's exit heartbeat already passed. Emulate an older build's global pause
+            // only now, so it cannot hide the original regression at the first exit.
+            main { checkNotNull(legacyHeartbeat).pauseTimers() }
+            cycle.put("seededTimerPause", true)
+          }
+          launch(mode, 1)
+          measurements.put("legacyReentryCount", index)
+          val activity = checkNotNull(host)
+          val web = main { readField(controller(), "webView") as WebView }
+          demand("${label}_fresh_activity_and_webview", main {
+            activity !== previousActivity && web !== previousWeb && !activity.isDestroyed
+          })
+          val bridge = SlideshowLegacyDeviceChecks.run(instrumentation, web, mode,
+              fixtures.pair.path, { assertion, pass -> demand("${label}_$assertion", pass) },
+              cycle, begin, ::bounded)
+          measurements.put("${mode}_deviceBridge", bridge)
+          if (cycle.getBoolean("seededTimerPause")) {
+            demand("${label}_seeded_pause_scene_ready", cycle.getBoolean("ready"))
+            // A JS evaluation callback alone does not prove global timers have resumed.
+            cycle.put("heartbeatAfterSeededStartup", SlideshowLegacyDeviceChecks.heartbeat(
+                instrumentation, checkNotNull(legacyHeartbeat), "${label}_seeded_pause_timer_recovered",
+                ::demand, ::bounded))
+            cycle.put("seededTimerRecovery", true)
+            measurements.put("legacySeededRecoveryCount", 1)
+          }
+          previousActivity = activity
+          previousWeb = web
+          closeHost() // Await onDestroy/PhotoFrameController.stop before the next launch.
+          cycle.put("exited", true)
+          legacyHeartbeat?.let { heartbeat ->
+            cycle.put("heartbeatAfterExit", SlideshowLegacyDeviceChecks.heartbeat(
+                instrumentation, heartbeat, "${label}_other_webview_keeps_ticking", ::demand, ::bounded))
+          }
+          cycle.put("completed", true)
+          measurements.put("legacyCompletedCycleCount", index + 1)
+          checkpoint()
+        } finally {
+          if (cycle.isNull("readinessLatencyMs"))
+            cycle.put("readinessLatencyMs", SystemClock.elapsedRealtime() - begin)
+        }
+      }
+      if (reentries) {
+        demand("legacy_three_exit_reentries_completed",
+            measurements.getInt("legacyCompletedCycleCount") == 4 &&
+                measurements.getInt("legacyReentryCount") == 3)
+        demand("legacy_seeded_startup_recovery_completed",
+            measurements.getInt("legacySeededRecoveryCount") == 1)
       }
     }
 
@@ -1419,6 +1505,15 @@ internal object SlideshowDeviceChecks {
       }
       attempt("owned_loader_closed") { main { loader?.close() }; loader = null }
       attempt("owned_preview_destroyed") { closeHost() }
+      attempt("legacy_heartbeat_destroyed_and_timers_restored") {
+        main {
+          legacyHeartbeat?.let { web ->
+            // Only cleanup may undo global suppression after the regression has been observed.
+            try { web.resumeTimers() } finally { web.stopLoading(); web.destroy() }
+          }
+          legacyHeartbeat = null
+        }
+      }
       attempt("owned_adjustment_metadata_removed") {
         // Await only newly observed threads created by our Save action before removing its key.
         ownedPositionWrites.forEach { thread -> thread.join(4000); check(!thread.isAlive) }
@@ -1480,6 +1575,13 @@ internal object SlideshowDeviceChecks {
       attempt("owned_pixels_released_after_preview_destroyed") {
         // The stage is cleared/destroyed before the test releases its synthetic allocations.
         if (host == null) releaseOwnedPixels()
+      }
+      attempt("legacy_owned_fixtures_removed") {
+        if (optionBoolean("legacyOnly") && fixtures.root.exists()) {
+          check(host == null)
+          check(fixtures.root.canonicalFile.parentFile == folder.canonicalFile)
+          check(fixtures.root.deleteRecursively())
+        }
       }
       attempt("frame_listener_released") { main { metrics?.detach() }; metrics?.close() }
       monitors.forEach { instrumentation.removeMonitor(it) }
