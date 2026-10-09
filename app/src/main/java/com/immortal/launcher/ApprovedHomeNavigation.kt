@@ -48,11 +48,13 @@ internal fun Context.openApprovedHomeSettings(page: String) {
 /** Return to Home's retained pages rather than creating another Apps or Tools host. */
 internal fun Context.openApprovedHomeTab(tab: ApprovedLauncherTab, searchApps: Boolean = false): Boolean =
     runCatching {
-      startApprovedInternalActivity(Intent(this, HomeActivity::class.java)
-          .putExtra(APPROVED_HOME_TAB, tab.id)
-          .putExtra(APPROVED_HOME_SEARCH, searchApps)
-          .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
-      true
+      ApprovedHomeNavigation.dispatch(approvedNavigationActivity(), tab, searchApps) {
+        startApprovedInternalActivity(Intent(this, HomeActivity::class.java)
+            .putExtra(APPROVED_HOME_TAB, tab.id)
+            .putExtra(APPROVED_HOME_SEARCH, searchApps)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+        true
+      }
     }.getOrDefault(false)
 
 /** Keep the existing Apps entry point for callers outside the launcher. */

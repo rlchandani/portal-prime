@@ -23,7 +23,18 @@ Zero collector callback drops does not mean zero dropped display frames. The hos
 | Living Area | HomeActivity | 107.75 ms | 460 / 1446 |
 | Living Area | PhotoFramePreviewActivity | 110 ms | 1129 / 1801 |
 
-Home has multi-second maxima during the mixed workflow, including queue/layout cost. Preview has additional renderer command cost. Separate retained Home/Apps measurement is the next isolation step; the mixed run cannot attribute those stalls to one transition.
+Home has multi-second maxima during the mixed workflow, including queue/layout cost. Preview has additional renderer command cost. The mixed run cannot attribute those stalls to one transition.
+
+## Retained Home/Apps isolation
+
+A separate 60-second run completed 20 Home/Apps cycles in each room, after a two-second warm-up. It used the same installed resource-cleanup build. Both captures stopped explicitly with zero active listeners and no worker left running; both rooms returned to slideshow preview. No API request failed.
+
+| Room | Frames | Steady frames over 16.67 ms | p50 | p95 | p99 | Maximum |
+|---|---:|---:|---:|---:|---:|---:|
+| Family Area | 518 | 144 / 517 | 13.25 ms | 91.75 ms | 111.75 ms | 133.05 ms |
+| Living Area | 518 | 131 / 517 | 12.5 ms | 71.5 ms | 89 ms | 110.27 ms |
+
+The multi-second mixed-workflow stalls did not recur in this isolated run, but tab transitions still produced over-budget host frames. Mean layout cost was 0.12/0.15 ms and mean animation cost was 10.45/8.87 ms (Family/Living). This is an isolation baseline, not evidence of a speedup. Remote tab requests still used an Activity intent in this build; a foreground-only retained-state dispatcher is being evaluated against the same finite test.
 
 ## Broader work still required
 

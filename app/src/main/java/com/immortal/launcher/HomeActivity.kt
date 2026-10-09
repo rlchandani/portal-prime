@@ -428,15 +428,19 @@ class HomeActivity : ComponentActivity() {
     consumeWidgetLibraryIntent(intent)
   }
 
+  /** Main-thread state application shared by the retained-host route and Intent delivery. */
+  internal fun selectApprovedHomeTab(tab: ApprovedLauncherTab, searchApps: Boolean) {
+    launcherTab = if (searchApps) ApprovedLauncherTab.APPS else tab
+    if (searchApps) appsSearchOpenRequest++
+  }
+
   private fun consumeLauncherTabIntent(incoming: Intent) {
-    ApprovedLauncherTab.fromId(incoming.getStringExtra(APPROVED_HOME_TAB))?.let {
+    val tab = ApprovedLauncherTab.fromId(incoming.getStringExtra(APPROVED_HOME_TAB))
+    val search = incoming.getBooleanExtra(APPROVED_HOME_SEARCH, false)
+    if (tab != null) {
       ImmortalDreamNavigation.dismissForNavigation()
-      launcherTab = it
-    }
-    if (incoming.getBooleanExtra(APPROVED_HOME_SEARCH, false)) {
-      launcherTab = ApprovedLauncherTab.APPS
-      appsSearchOpenRequest++
-    }
+      selectApprovedHomeTab(tab, search)
+    } else if (search) selectApprovedHomeTab(ApprovedLauncherTab.APPS, true)
     incoming.removeExtra(APPROVED_HOME_TAB)
     incoming.removeExtra(APPROVED_HOME_SEARCH)
   }
@@ -477,12 +481,19 @@ class HomeActivity : ComponentActivity() {
     // The user is back on the launcher: end the idle session and, inside the overnight window,
     // arm the touch-renewed "you have the device" session. SleepScheduler owns that policy.
     SleepScheduler.onReturnedToLauncher(this)
+    ApprovedHomeNavigation.resumed(this)
   }
 
   override fun onPause() {
+    ApprovedHomeNavigation.unavailable(this)
     super.onPause()
     // Don't carry a pending overnight re-sleep into another activity or a real sleep.
     SleepScheduler.onLeftLauncher()
+  }
+
+  override fun onDestroy() {
+    ApprovedHomeNavigation.unavailable(this)
+    super.onDestroy()
   }
 
   // dispatchTouchEvent is the top of the input chain, so it sees every touch before Compose
