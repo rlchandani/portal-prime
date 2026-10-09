@@ -50,6 +50,11 @@ internal object FramePerformanceCapture {
     val thread = HandlerThread("immortal-perf", Process.THREAD_PRIORITY_BACKGROUND).apply { start() }
     val handler = Handler(thread.looper)
     val histograms = LinkedHashMap<String, FramePerformanceHistogram>()
+    // Allocated only by an explicit sampleMain opt-in. No Activity/Window references in the sampler.
+    val mainSamples = if (request.sampleMain) MainThreadSampleHistogram() else null
+    var sampleMainActive = false // Guarded by the session monitor, like the histograms.
+    var sampler: Runnable? = null
+    var nextSampleUptime = 0L // Collector-owned after the initial post.
     val bindings = ArrayList<Binding>() // Main thread only; snapshot uses attached count below.
     var attached = 0
     var rejectedHosts = 0
@@ -127,11 +132,80 @@ internal object FramePerformanceCapture {
       main.postDelayed(s.expiry, request.durationSec * 1000L)
       windows.removeAll { it.window.get() == null }
       for (w in windows) w.window.get()?.let { attach(s, it, w.host) }
+      startMainSampling(s)
       true
     }
   }
 
   fun stop(): Boolean = onMain { closeCurrent(); true }
+
+  private fun startMainSampling(s: Session) {
+    val histogram = s.mainSamples ?: return
+    synchronized(s) {
+      s.sampler = Runnable { sampleMain(s) }
+      s.nextSampleUptime = SystemClock.uptimeMillis()
+      s.sampleMainActive = true
+      if (!s.handler.post(s.sampler!!)) {
+        histogram.recordDroppedTicks(1)
+        s.sampleMainActive = false
+      }
+    }
+  }
+
+  /** Stack reads happen on the existing collector Handler, never on the sampled main thread. */
+  private fun sampleMain(s: Session) {
+    check(Looper.myLooper() == s.handler.looper)
+    val histogram = s.mainSamples ?: return
+    synchronized(s) {
+      if (current !== s || s.closedAt != null || !s.sampleMainActive) return
+      if (SystemClock.elapsedRealtime() >= s.deadline) {
+        requestExpiry(s)
+        return
+      }
+      if (!histogram.canSample) { s.sampleMainActive = false; return }
+    }
+    // getStackTrace is public since API 1. The VM returns a transient array; aggregation inspects
+    // at most 64 entries and retains only bounded class/method strings. Do not hold the session
+    // monitor during the VM read: main-thread stop/snapshot/lifecycle work must remain unblocked.
+    val stack = try { Looper.getMainLooper().thread.stackTrace } catch (_: RuntimeException) { null }
+    synchronized(s) {
+      val now = SystemClock.elapsedRealtime()
+      val accept = current === s && s.closedAt == null && s.sampleMainActive && now < s.deadline
+      if (stack == null) histogram.recordError()
+      else if (accept) histogram.record(stack)
+      else histogram.recordDroppedSample()
+      if (!accept) {
+        if (current === s && s.closedAt == null && now >= s.deadline) requestExpiry(s)
+        return
+      }
+      if (!histogram.canSample) { s.sampleMainActive = false; return }
+      val uptime = SystemClock.uptimeMillis()
+      var next = s.nextSampleUptime + MainThreadSampleHistogram.INTERVAL_MS
+      if (next < uptime) {
+        // Skip elapsed cadence slots instead of flooding the shared FrameMetrics handler.
+        val skipped = (uptime - next + MainThreadSampleHistogram.INTERVAL_MS - 1) /
+            MainThreadSampleHistogram.INTERVAL_MS
+        histogram.recordDroppedTicks(skipped)
+        next += skipped * MainThreadSampleHistogram.INTERVAL_MS
+      }
+      s.nextSampleUptime = next
+      if (now + (next - uptime) >= s.deadline) {
+        s.sampleMainActive = false
+      } else if (!s.handler.postAtTime(s.sampler!!, next)) {
+        histogram.recordDroppedTicks(1)
+        s.sampleMainActive = false
+      }
+    }
+  }
+
+  /** Caller holds the session monitor; reuse the owned expiry callback so close can remove it. */
+  private fun requestExpiry(s: Session) {
+    s.sampleMainActive = false
+    if (!s.stopRequested) {
+      s.stopRequested = true
+      main.post(s.expiry)
+    }
+  }
 
   private fun attach(s: Session, window: Window, host: String) {
     if (synchronized(s) { s.closedAt != null } || SystemClock.elapsedRealtime() >= s.deadline) return
@@ -167,10 +241,7 @@ internal object FramePerformanceCapture {
       synchronized(s) {
         if (current !== s || s.closedAt != null) return@OnFrameMetricsAvailableListener
         if (now >= s.deadline) {
-          if (!s.stopRequested) {
-            s.stopRequested = true
-            main.post { if (current === s) closeCurrent(expired = true) }
-          }
+          requestExpiry(s)
           return@OnFrameMetricsAvailableListener
         }
         if (histogram.record(metrics.getMetric(FrameMetrics.TOTAL_DURATION), dropped,
@@ -192,6 +263,10 @@ internal object FramePerformanceCapture {
     synchronized(s) {
       if (s.closedAt != null) return
       s.closedAt = if (expired) minOf(SystemClock.elapsedRealtime(), s.deadline) else SystemClock.elapsedRealtime()
+      s.sampleMainActive = false
+      // Remove only this session's sampler; do not disturb other collector/profiler callbacks.
+      s.sampler?.let { s.handler.removeCallbacks(it) }
+      s.sampler = null
     }
     main.removeCallbacks(s.expiry)
     s.wakeReceiver?.let { runCatching { application.unregisterReceiver(it) } }
@@ -219,17 +294,18 @@ internal object FramePerformanceCapture {
     val now = SystemClock.elapsedRealtime()
     if (s != null && now >= s.deadline) synchronized(s) {
       if (s.closedAt == null && !s.stopRequested) {
-        s.stopRequested = true
-        main.post { if (current === s) closeCurrent(expired = true) }
+        requestExpiry(s)
       }
     }
     val result = JSONObject().put("ok", true).put("scope", "Immortal Window host metrics")
         .put("deliveredFpsMeasured", false).put("maxHosts", MAX_HOSTS).put("maxLiveWindows", MAX_WINDOWS)
     if (s == null) return result.put("active", false).put("collectorRunning", false)
-        .put("activeListeners", 0).put("hosts", JSONObject())
+        .put("sampleMain", false).put("sampleMainActive", false).put("activeListeners", 0).put("hosts", JSONObject())
     synchronized(s) {
       result.put("sessionId", s.id).put("phase", s.request.phase)
           .put("durationSec", s.request.durationSec)
+          .put("sampleMain", s.request.sampleMain)
+          .put("sampleMainActive", s.sampleMainActive && s.closedAt == null && now < s.deadline)
           .put("active", s.closedAt == null && now < s.deadline)
           .put("elapsedMs", (minOf(s.closedAt ?: now, s.deadline) - s.began).coerceAtLeast(0))
           .put("remainingMs", if (s.closedAt == null) (s.deadline - now).coerceAtLeast(0) else 0)
@@ -237,6 +313,7 @@ internal object FramePerformanceCapture {
           .put("untrackedHosts", s.rejectedHosts).put("untrackedWindows", s.rejectedWindows)
           .put("attachFailures", s.attachFailures)
           .put("hosts", JSONObject().apply { s.histograms.forEach { (name, h) -> put(name, h.snapshot()) } })
+      s.mainSamples?.let { result.put("mainThreadSamples", it.snapshot()) }
     }
     // Sample only on explicit reads, outside the per-frame lock/handler.
     val memory = Debug.MemoryInfo()

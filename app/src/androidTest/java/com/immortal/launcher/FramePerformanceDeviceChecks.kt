@@ -36,8 +36,8 @@ internal object FramePerformanceDeviceChecks {
       return hosts.keys().asSequence().sumOf { hosts.getJSONObject(it).getLong("frames") }
     }
     fun capture(): JSONObject = FramePerformanceCapture.snapshot()
-    fun startCapture(): Boolean = FramePerformanceCapture.start(checkNotNull(
-        FramePerformanceRequest.parse(JSONObject().put("action","start").put("durationSec",10).put("phase","home"))))
+    fun startCapture(sampleMain: Boolean = false): Boolean = FramePerformanceCapture.start(checkNotNull(
+        FramePerformanceRequest.parse(JSONObject().put("action","start").put("durationSec",10).put("phase","home").put("sampleMain",sampleMain))))
     fun waitFor(label: String, ms: Long=4000, condition: () -> Boolean) {
       val deadline=SystemClock.elapsedRealtime()+ms
       while (SystemClock.elapsedRealtime()<deadline) {
@@ -48,11 +48,18 @@ internal object FramePerformanceDeviceChecks {
     }
     try {
       demand("initial_stop",FramePerformanceCapture.stop())
-      activity=instrumentation.startActivitySync(Intent(instrumentation.targetContext,HomeActivity::class.java)
-          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+      // Home is singleTask and may already be the emulator's launcher: startActivitySync
+      // can wait forever when it receives onNewIntent instead of a new Activity. A standard
+      // host gives this probe its own Window and a bounded launch wait.
+      val monitor=instrumentation.addMonitor(ImmortalSettingsActivity::class.java.name,null,false)
+      try {
+        instrumentation.targetContext.startActivity(Intent(instrumentation.targetContext,
+            ImmortalSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_MULTIPLE_TASK))
+        activity=instrumentation.waitForMonitorWithTimeout(monitor,8000)
+      } finally { instrumentation.removeMonitor(monitor) }
       val host=checkNotNull(activity)
       instrumentation.runOnMainSync {
-        // Replace Home's content only for this owned, finished test Activity. A static test
+        // Replace content only for this owned, finished test Activity. A static test
         // surface avoids background widget/clock renders and keeps the Window attached.
         val surface=FrameLayout(host)
         host.setContentView(surface)
@@ -69,7 +76,9 @@ internal object FramePerformanceDeviceChecks {
         }
         ready
       }
-      demand("capture_start",startCapture())
+      demand("capture_start",startCapture(sampleMain = true))
+      waitFor("actual_main_thread_samples") { capture().optJSONObject("mainThreadSamples")?.optLong("samples", 0) ?: 0 > 0 }
+      demand("sampler_active_only_on_opt_in", capture().getBoolean("sampleMainActive"))
       waitFor("real_window_frames") { total(capture())>=5 }
       val first=capture()
       results.put("first",first)
@@ -84,6 +93,8 @@ internal object FramePerformanceDeviceChecks {
       val second=capture()
       demand("fresh_generation",second.getLong("sessionId")>first.getLong("sessionId"))
       demand("replacement_counters_reset",total(second)==0L)
+      demand("replacement_without_opt_in_has_no_sampler", !second.getBoolean("sampleMainActive") &&
+          !second.has("mainThreadSamples"))
       instrumentation.runOnMainSync {
         animation?.resume()
       }
@@ -95,7 +106,7 @@ internal object FramePerformanceDeviceChecks {
       val held=total(capture())
       SystemClock.sleep(300)
       demand("no_frames_after_stop",held==total(capture()))
-      demand("expiry_capture_start",startCapture())
+      demand("expiry_capture_start",startCapture(sampleMain = true))
       waitFor("expiry_has_live_frames") { total(capture())>=5 }
       instrumentation.runOnMainSync {
         animation?.cancel(); animation=null
@@ -108,19 +119,27 @@ internal object FramePerformanceDeviceChecks {
       val expired=capture()
       demand("deadline_releases_listener_without_external_stop",!expired.getBoolean("active")&&
           expired.getInt("activeListeners")==0&&!expired.getBoolean("collectorRunning"))
+      demand("deadline_releases_sampler", !expired.getBoolean("sampleMainActive"))
+      val expiredSamples = expired.getJSONObject("mainThreadSamples").getLong("ticks")
       results.put("expired",expired)
       demand("expiry_retains_actual_frames",total(expired)>=5)
       demand("expiry_caps_elapsed",expired.getLong("elapsedMs")==10000L)
       val expiredCount=total(expired)
       SystemClock.sleep(300)
       demand("no_frames_after_expiry",total(capture())==expiredCount)
+      demand("no_samples_after_expiry", capture().getJSONObject("mainThreadSamples").getLong("ticks") == expiredSamples)
       demand("destroy_capture_start",startCapture())
+      val beforeDestroyListeners=capture().getInt("activeListeners")
+      demand("owned_window_bound_before_destroy",beforeDestroyListeners>=1)
       instrumentation.runOnMainSync {
         animation?.cancel();animation=null
         (overlay?.parent as? ViewGroup)?.removeView(overlay);overlay=null
         host.finish()
       }
-      waitFor("destroyed_window_listener_removed") { capture().getInt("activeListeners")==0 }
+      // Other pre-existing Windows stay tracked; only this probe's listener must detach.
+      waitFor("destroyed_window_listener_removed") {
+        capture().getInt("activeListeners")==beforeDestroyListeners-1
+      }
       demand("final_stop",FramePerformanceCapture.stop())
       demand("completed",true)
     } catch (failure: Throwable) {
