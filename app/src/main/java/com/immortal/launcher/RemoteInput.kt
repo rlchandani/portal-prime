@@ -115,24 +115,31 @@ object RemoteInput {
    * if a service is connected, an editable field has input focus, and the platform
    * accepted the edit. No IME swap needed — we set the node's text directly.
    */
+  @Suppress("DEPRECATION") // Portal API 28/29 still pools accessibility nodes.
   fun typeText(text: String, mode: String): Boolean {
     val svc = service ?: return false
-    val node = focusedEditable(svc) ?: return false
-    val next = nextText(node.text?.toString() ?: "", text, mode)
-    val args =
-        Bundle().apply {
-          putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, next)
-        }
-    return runCatching { node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args) }
-        .onFailure { Log.w(TAG, "typeText failed", it) }
-        .getOrDefault(false)
-  }
-
-  /** The input-focused editable node, or null if nothing editable has focus. */
-  private fun focusedEditable(svc: AccessibilityService): AccessibilityNodeInfo? {
-    val root = svc.rootInActiveWindow ?: return null
-    val focused = root.findFocus(AccessibilityNodeInfo.FOCUS_INPUT)
-    return if (focused != null && focused.isEditable) focused else null
+    val root = svc.rootInActiveWindow ?: return false
+    var focused: AccessibilityNodeInfo? = null
+    try {
+      focused = root.findFocus(AccessibilityNodeInfo.FOCUS_INPUT)
+      val node = focused ?: return false
+      if (!node.isEditable) return false
+      val next = nextText(node.text?.toString() ?: "", text, mode)
+      val args =
+          Bundle().apply {
+            putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, next)
+          }
+      return runCatching { node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args) }
+          .onFailure { Log.w(TAG, "typeText failed", it) }
+          .getOrDefault(false)
+    } finally {
+      // findFocus can return root itself; release each object once, after its last use.
+      try {
+        if (focused !== root) focused?.recycle()
+      } finally {
+        root.recycle()
+      }
+    }
   }
 
   // --- touchpad (gesture dispatch + on-TV cursor) -----------------------------

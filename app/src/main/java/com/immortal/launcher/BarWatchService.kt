@@ -50,16 +50,23 @@ class BarWatchService : AccessibilityService() {
 
   private fun updateBar() {
     val ws = runCatching { windows }.getOrNull() ?: return
-    val dm = resources.displayMetrics
-    val r = Rect()
-    // The status/top bar is a TYPE_SYSTEM window pinned to the top edge, spanning most of the
-    // width and only a sliver tall — distinct from full-height system windows.
-    val barShown =
-        ws.any { w ->
-          if (w.type != AccessibilityWindowInfo.TYPE_SYSTEM) return@any false
-          w.getBoundsInScreen(r)
-          r.top <= 0 && r.width() >= dm.widthPixels / 2 && r.height() in 1..(dm.heightPixels / 4)
-        }
-    QuickBar.setBarVisible(barShown)
+    try {
+      val dm = resources.displayMetrics
+      val r = Rect()
+      // The status/top bar is a TYPE_SYSTEM window pinned to the top edge, spanning most of the
+      // width and only a sliver tall — distinct from full-height system windows.
+      val barShown =
+          ws.any { w ->
+            if (w.type != AccessibilityWindowInfo.TYPE_SYSTEM) return@any false
+            w.getBoundsInScreen(r)
+            r.top <= 0 && r.width() >= dm.widthPixels / 2 && r.height() in 1..(dm.heightPixels / 4)
+          }
+      QuickBar.setBarVisible(barShown)
+    } finally {
+      // Android 9/10 pools these objects. Release the entire acquired list, including windows
+      // skipped by any's short circuit and windows left after a stale-window exception.
+      @Suppress("DEPRECATION")
+      ws.forEach { it.recycle() }
+    }
   }
 }
