@@ -104,6 +104,11 @@ class PortalUxInstrumentation : Instrumentation() {
                 finish(if (slideshow.getBoolean("slideshowCompleted")) 0 else 1, slideshow)
                 return
             }
+            if (options.getString("command") == "framePerformance") {
+                val frames = FramePerformanceDeviceChecks.run(this)
+                finish(if (frames.getBoolean("framePerformanceCompleted")) 0 else 1, frames)
+                return
+            }
             if (options.getString("command") == "appearance") {
                 val appearance = AppearanceDeviceChecks.run(this, automation)
                 finish(if (appearance.getBoolean("appearanceCompleted")) 0 else 1, appearance)

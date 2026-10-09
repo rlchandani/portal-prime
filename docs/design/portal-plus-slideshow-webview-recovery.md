@@ -51,10 +51,12 @@ adb shell am instrument -w -e command slideshow -e legacyOnly true \
 ```
 
 The test preserves registry/source/secure Dream settings and removes its owned
-photo fixtures. Legacy face warm-up workers are untracked and can persist
-synthetic entries in the shared face cache. It deliberately avoids rewriting
-that shared cache during teardown, which would race workers holding older
-snapshots. These regression runs used an emulator rather than household data.
+photo fixtures. At revision `5d4ba15`, legacy face warm-up workers were untracked
+and could persist synthetic entries in the shared face cache. Teardown avoided
+rewriting that shared cache, which would race workers holding older snapshots.
+These regression runs used an emulator rather than household data. The subsequent
+[legacy analysis and Wi-Fi diagnostics validation](portal-plus-wifi-frame-validation.md)
+records the cancellation/cache correction and another complete regression run.
 
 ## Portal validation
 

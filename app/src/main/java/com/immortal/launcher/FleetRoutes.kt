@@ -67,11 +67,35 @@ class FleetRoutes(private val context: Context) {
       "/fs/write" -> requireMethod("POST", req) { fsWrite(req) }
       "/logcat" -> requireMethod("GET", req) { logcat(req) }
       "/diag" -> requireMethod("GET", req) { resp(200, FleetDiag.snapshot()) }
+      "/perf" -> performance(req)
       else -> resp(404, err("not_found"))
     }
   }
 
   // --- endpoints --------------------------------------------------------------
+
+  /** Ephemeral operator diagnostics; no preferences, content capture or scheduled monitoring. */
+  private fun performance(req: FleetHttpServer.Request): FleetHttpServer.Response = when (req.method) {
+    "GET" -> resp(200, FramePerformanceCapture.snapshot())
+    "POST" -> {
+      val body = parseJson(req.bodyText())
+      val command = body?.let { FramePerformanceRequest.parse(it) }
+      if (command == null) resp(400, err("invalid_capture_command"))
+      else if (command.action == "start" && !DevMode.isEnabled(context)) resp(403, err("dev_mode_required"))
+      else {
+        try {
+          val applied = if (command.action == "start") FramePerformanceCapture.start(command)
+              else FramePerformanceCapture.stop()
+          if (applied) resp(200, FramePerformanceCapture.snapshot())
+          else resp(503, err("capture_command_not_applied"))
+        } catch (_: FramePerformanceCommandPending) {
+          // A begun command cannot be cancelled safely. Report uncertainty instead of inviting a retry.
+          resp(202, ok().put("result", "completion_unconfirmed").put("checkStateBeforeRetry", true))
+        }
+      }
+    }
+    else -> resp(405, err("method_not_allowed"))
+  }
 
   private fun info(): FleetHttpServer.Response {
     val (code, vname) = appVersion()
@@ -106,7 +130,7 @@ class FleetRoutes(private val context: Context) {
             .put("devMode", DevMode.isEnabled(context))
             .put(
                 "capabilities",
-                JSONObject().put("files", true).put("diag", true).put("calendar", true).put("screensaver", true).put("dev", true).put("logcat", canReadLogs()))
+                JSONObject().put("files", true).put("diag", true).put("calendar", true).put("screensaver", true).put("dev", true).put("logcat", canReadLogs()).put("performance", true))
     // Installed catalog apps + a CHEAP (no-network) update hint from the catalog pin.
     // The authoritative F-Droid check is POST /update {"dryRun":true}, kept off the
     // hot dashboard-poll path so /info stays fast across a whole wall of devices.

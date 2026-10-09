@@ -101,6 +101,7 @@ class PhotoFrameController(
     SlideshowLoader(context, pixelBudget, onCancelTransports = { cancelPhotoTransports() })
   }
   private val nativeLoader get() = nativeLoaderDelegate.value
+  private var legacyFaceStore: FaceFocusStore? = null
   @Volatile private var stopped = false
   private val nativeNavigation = SlideshowNavigation()
   private var nativeStarting = false
@@ -630,6 +631,7 @@ class PhotoFrameController(
       authHeaders: Map<String, String> = emptyMap(),
   ) {
     if (stopped) return
+    legacyFaceStore?.close()
     val wv =
         object : android.webkit.WebView(context) {
           override fun onTouchEvent(event: MotionEvent): Boolean = false
@@ -687,7 +689,7 @@ class PhotoFrameController(
     // Cached face focal points ride along as fx/fy (0..1) so crops and pans keep faces in
     // frame; photos not yet analyzed get no fx/fy (engine centers) and are warmed up in the
     // background for the NEXT run — detection never delays tonight's screensaver.
-    val faceStore = FaceFocusStore(context)
+    val faceStore = FaceFocusStore(context).also { legacyFaceStore = it }
     val photosJson =
         org.json.JSONArray().apply {
           photoUrls.forEach { u ->
@@ -703,12 +705,9 @@ class PhotoFrameController(
             put(o)
           }
         }.toString()
-    // Face warm-up on a dedicated thread (best-effort; no-ops on hardware where ML Kit face
-    // detection is unavailable). Kept for the sources/devices where it does populate focal points.
-    Thread {
-      runCatching { faceStore.warmUp(photoUrls, authHeaders) }
-          .onFailure { Log.w(TAG, "face warm-up failed (faces won't be kept in frame this run)", it) }
-    }.start()
+    // Legacy people weighting also feeds presence-based deck ordering when framing is off.
+    // Keep that behavior; the frame-owned handle bounds work and cancels on exit/replacement.
+    faceStore.startWarmUp(photoUrls, authHeaders)
     val mode = settings.mode
     val use24 = ImmortalSettings.use24HourClock(context)
     wv.addJavascriptInterface(
@@ -780,6 +779,8 @@ class PhotoFrameController(
 
   fun stop() {
     stopped = true
+    legacyFaceStore?.close()
+    legacyFaceStore = null
     gen++
     nativeStarting = false
     afterNativeStartup = null

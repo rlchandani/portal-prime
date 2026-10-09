@@ -62,6 +62,7 @@ class PhotoDreamService : DreamService() {
       true
     }
     setContentView(root)
+    window?.let { FramePerformanceCapture.track(it, "PhotoDreamService") }
     frame.start()
   }
 
@@ -86,6 +87,7 @@ class PhotoDreamService : DreamService() {
   override fun onDetachedFromWindow() {
     ImmortalDreamNavigation.detached(this)
     Log.i(TAG, "detached: dream ending")
+    window?.let { FramePerformanceCapture.untrack(it) }
     if (this::frame.isInitialized) frame.stop()
     super.onDetachedFromWindow()
   }
