@@ -48,7 +48,7 @@ class RemoteRoutes(private val context: Context) {
         "/remote/icon" -> requireMethod("GET", req) { icon(req) }
         // Album art isn't sensitive either — served unauthenticated like icons so the cover
         // can be an <img src> without leaking the token. LAN-guarded like everything else.
-        "/remote/art" -> requireMethod("GET", req) { art() }
+        "/remote/art" -> requireMethod("GET", req) { art(req) }
         // Authenticated: anything that reads the app list or drives input.
         "/remote/apps" -> authed(req) { apps() }
         "/remote/nowplaying" -> authed(req) { requireMethod("GET", req) { nowplaying() } }
@@ -138,8 +138,14 @@ class RemoteRoutes(private val context: Context) {
   }
 
   /** The current album art as PNG (in-memory bitmap, or a resolved metadata URI). */
-  private fun art(): FleetHttpServer.Response {
-    val png = RemoteMedia.artPng(context) ?: return json(404, err("no_art"))
+  private fun art(req: FleetHttpServer.Request): FleetHttpServer.Response {
+    val snapshot = NowPlayingHub.current ?: return json(404, err("no_art"))
+    val requestedVersion = req.queryParam("v")
+    if (requestedVersion != null && requestedVersion != RemoteMedia.artVersion(snapshot).toString())
+      return json(409, err("stale_art"))
+    // Resolve the same immutable snapshot whose version was checked, even if the track changes
+    // while a URI cover is loading. Old clients without v retain the existing relay behavior.
+    val png = RemoteMedia.artPng(context, snapshot) ?: return json(404, err("no_art"))
     return FleetHttpServer.Response.stream(200, "image/png", png.size.toLong()) { it.write(png) }
   }
 

@@ -97,8 +97,8 @@ object RemoteMedia {
    * device-local `content://`/`file://` the phone itself can't fetch, so the Portal reads it here
    * and relays the bytes. `http(s)://` URIs are fetched directly. Bounded + downscaled.
    */
-  fun artPng(context: Context): ByteArray? {
-    val s = NowPlayingHub.current ?: return null
+  fun artPng(context: Context, snapshot: NowPlayingState? = NowPlayingHub.current): ByteArray? {
+    val s = snapshot ?: return null
     val bmp = s.artBitmap ?: MediaArt.resolveUri(context, s.artUrl) ?: return null
     return runCatching {
           ByteArrayOutputStream().use { out ->
@@ -109,6 +109,6 @@ object RemoteMedia {
         .getOrNull()
   }
 
-  private fun artVersion(s: NowPlayingState): Int =
+  internal fun artVersion(s: NowPlayingState): Int =
       listOf(s.title, s.artist, s.album, s.artUrl).joinToString("").hashCode()
 }
