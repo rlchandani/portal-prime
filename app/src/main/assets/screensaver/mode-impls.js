@@ -243,12 +243,12 @@
     // background in place — an instant hard cut whenever the image was already cached.
     const t = makeTimers(ctx); const singles = [mk(), mk()]; singles.forEach(s => ctx.root.appendChild(s.root)); let sCur = 0;
     const collage = el("ss-collage", ctx.root); const title = el("ss-mtitle", ctx.root); const big = el("big", title); const sub = el("sub", title);
-    let beat = 0; const TITLES = [["Over the Years", "a look back"], ["This Weekend", "recently added"], ["On Our Travels", "places you've been"], ["Golden Hours", "favorites"]];
+    let beat = 0;
     function mk() { const root = el("ss-single"); const fill = el("ss-fill", root); const hero = el("ss-hero", root); return { root, fill, hero }; }
     async function showSingle() { const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 2200); if (!await t.load(u)) return false; collage.classList.remove("on"); const S = singles[1 - sCur]; bg(S.fill, u); bg(S.hero, u, "contain"); kbVars(S.hero, p); S.hero.style.animation = "none"; void S.hero.offsetWidth; S.hero.style.animation = ""; singles[sCur].root.classList.remove("on"); S.root.classList.add("on"); sCur = 1 - sCur; }
     async function showCollage() {
       const ps = SS.take(deck, ctx.cursor, ["any", "any", "any"]); if (!await t.load(ps.map(p => ctx.url(p, 1100)))) return false;
-      singles.forEach(s => s.root.classList.remove("on")); const [tt, ss] = TITLES[Math.floor(Math.random() * TITLES.length)]; big.textContent = tt; sub.textContent = ss; collage.innerHTML = "";
+      singles.forEach(s => s.root.classList.remove("on")); big.textContent = "Photo memories"; sub.textContent = ""; collage.innerHTML = "";
       const W = ctx.W, H = ctx.H; const slots = [{ l: W * .08, t: H * .16, w: W * .42, h: H * .5 }, { l: W * .53, t: H * .1, w: W * .36, h: H * .42 }, { l: W * .5, t: H * .56, w: W * .4, h: H * .3 }];
       ps.forEach((p, i) => { const s = slots[i]; const tile = el("ss-mtile", collage); tile.style.left = s.l + "px"; tile.style.top = s.t + "px"; tile.style.width = s.w + "px"; tile.style.height = s.h + "px"; tile.style.transitionDelay = (i * .15) + "s"; const im = el("ss-img breathe", tile); bg(im, ctx.url(p, 1100)); faceBg(im, p); im.style.animationDelay = (-Math.random() * 8) + "s"; });
       t.frame(() => { collage.classList.add("on"); title.classList.add("on"); }); t.after(() => title.classList.remove("on"), 4500);
@@ -284,7 +284,7 @@
     // MAX clamps to the pool so the table can never demand more distinct photos than exist;
     // dropping the oldest print always frees a seed before the next pick.
     const t = makeTimers(ctx); const table = el("ss-table", ctx.root); let live = []; const MAX = SS.slots(deck, 6);
-    const CAPS = ["good times", "summer '24", "us", "♥", "don't forget", "golden hour", "home", "the trip"];
+    // The legacy input has no verified per-photo caption. Never invent a date, place or event.
     // Uniform-random placement clumps (independent points cluster and leave dead zones), so
     // scatter over a virtual grid instead: one print per cell, jittered inside it. Every print
     // then lands in its own region of the screen — guaranteed spread, still messy-looking.
@@ -311,7 +311,7 @@
       // Big prints (2x the original 300/240) — the table is a 2160px wall display.
       const pw = a >= 1 ? 600 : 480; const ph = Math.round(pw / a);
       const inner = el("ss-ph", pl); inner.style.width = pw + "px"; inner.style.height = ph + "px"; bg(inner, ctx.url(p, 1400));
-      const cap = el("ss-cap", pl); cap.textContent = CAPS[Math.floor(Math.random() * CAPS.length)]; table.appendChild(pl); pl.style.transitionDelay = delay + "ms";
+      table.appendChild(pl); pl.style.transitionDelay = delay + "ms";
       place(pl, pw, ph, cell);
       const rot = (Math.random() * 2 - 1) * 11;
       pl.style.transform = `rotate(${rot}deg) scale(0.86)`;
