@@ -1020,24 +1020,6 @@ private fun ApprovedHomePagedWidgets(
 }
 
 @Composable
-private fun ApprovedHomeWidgetListening(host: AppWidgetHost) {
-  val owner = LocalLifecycleOwner.current
-  DisposableEffect(host, owner) {
-    val observer = LifecycleEventObserver { _, event ->
-      if (event == Lifecycle.Event.ON_START) runCatching { host.startListening() }
-      if (event == Lifecycle.Event.ON_STOP) runCatching { host.stopListening() }
-    }
-    owner.lifecycle.addObserver(observer)
-    if (owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
-      runCatching { host.startListening() }
-    onDispose {
-      owner.lifecycle.removeObserver(observer)
-      runCatching { host.stopListening() }
-    }
-  }
-}
-
-@Composable
 private fun LauncherScreen(
     widgetLibraryRequest: Int,
     appsSearchOpenRequest: Int,
@@ -1232,7 +1214,7 @@ private fun LauncherScreen(
         ApprovedLauncherTabs(selectedTab, Modifier.weight(1f).fillMaxWidth()) { tab ->
           when (tab) {
           ApprovedLauncherTab.HOME -> {
-          ApprovedHomeWidgetListening(host)
+          ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
           Column(Modifier.fillMaxSize().padding(horizontal = 56.dp).padding(top = if (connected == false) 8.dp else 20.dp)) {
             ApprovedHomeGreeting(welcome, use24, compact = connected == false)
             Spacer(Modifier.height(if (connected == false) 16.dp else 28.dp))
