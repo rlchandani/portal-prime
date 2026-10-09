@@ -55,4 +55,55 @@ class ImmortalDreamNavigationTest {
       DreamPolicy.userExitAt = before
     }
   }
+  @Test fun navigationFinishesAnOwnedPreviewEvenWhenHomeWasCold() {
+    val preview = Mockito.mock(PhotoFramePreviewActivity::class.java)
+    val before = DreamPolicy.userExitAt
+    try {
+      DreamPolicy.userExitAt = 0L
+      ImmortalDreamNavigation.attached(preview)
+      assertTrue(ImmortalDreamNavigation.dismissForNavigation())
+      assertTrue(DreamPolicy.userExitAt > 0L)
+      assertFalse(ImmortalDreamNavigation.dismissForNavigation())
+      Mockito.verify(preview, Mockito.times(1)).finish()
+    } finally {
+      ImmortalDreamNavigation.detached(preview)
+      DreamPolicy.userExitAt = before
+    }
+  }
+
+  @Test fun oldPreviewDestructionCannotDetachItsReplacement() {
+    val old = Mockito.mock(PhotoFramePreviewActivity::class.java)
+    val next = Mockito.mock(PhotoFramePreviewActivity::class.java)
+    val before = DreamPolicy.userExitAt
+    try {
+      ImmortalDreamNavigation.attached(old)
+      ImmortalDreamNavigation.attached(next)
+      ImmortalDreamNavigation.detached(old)
+      assertTrue(ImmortalDreamNavigation.dismissForNavigation())
+      Mockito.verify(next).finish()
+      Mockito.verify(old, Mockito.never()).finish()
+    } finally {
+      ImmortalDreamNavigation.detached(next)
+      DreamPolicy.userExitAt = before
+    }
+  }
+
+  @Test fun deliberateNavigationStopsBothOwnedSurfacesBeforeAnyRecovery() {
+    val preview = Mockito.mock(PhotoFramePreviewActivity::class.java)
+    val dream = Mockito.mock(PhotoDreamService::class.java)
+    val before = DreamPolicy.userExitAt
+    try {
+      ImmortalDreamNavigation.attached(preview)
+      ImmortalDreamNavigation.attached(dream)
+      assertTrue(ImmortalDreamNavigation.dismissForNavigation())
+      Mockito.verify(dream).finish()
+      Mockito.verify(preview).finish()
+      assertFalse(ImmortalDreamNavigation.dismissForNavigation())
+    } finally {
+      ImmortalDreamNavigation.detached(preview)
+      ImmortalDreamNavigation.detached(dream)
+      DreamPolicy.userExitAt = before
+    }
+  }
+
 }

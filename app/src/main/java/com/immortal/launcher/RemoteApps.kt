@@ -82,14 +82,14 @@ object RemoteApps {
 
   private fun dismissDreamOnMain(): Boolean {
     val dismiss = {
-      // The selected app owns this navigation. Finish only Immortal's Dream and
+      // The selected app owns this navigation. Finish only Immortal's owned frame surfaces and
       // record the deliberate exit before its recovery callback can run.
       ImmortalDreamNavigation.dismissForNavigation()
       true
     }
     if (Looper.myLooper() == Looper.getMainLooper()) return dismiss()
 
-    // HTTP and scene workers are off-main; only the Dream lifecycle needs main.
+    // HTTP and scene workers are off-main; frame lifecycle calls need main.
     // Launch afterwards on the caller, so timed-out work cannot open an app later.
     val main = Handler(Looper.getMainLooper())
     val task = FutureTask(dismiss)

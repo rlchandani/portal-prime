@@ -97,9 +97,10 @@ class PhotoDreamService : DreamService() {
   }
 }
 
-/** Main-thread lifecycle bridge. It owns only Immortal's dream, never a system/Meta dream. */
+/** Main-thread bridge for Immortal's Dream and preview; never a system/Meta screensaver. */
 internal object ImmortalDreamNavigation {
   private var active = WeakReference<PhotoDreamService>(null)
+  private var preview = WeakReference<PhotoFramePreviewActivity>(null)
 
   fun attached(service: PhotoDreamService) { active = WeakReference(service) }
 
@@ -107,13 +108,23 @@ internal object ImmortalDreamNavigation {
     if (active.get() === service) active.clear()
   }
 
+  fun attached(activity: PhotoFramePreviewActivity) { preview = WeakReference(activity) }
+
+  fun detached(activity: PhotoFramePreviewActivity) {
+    if (preview.get() === activity) preview.clear()
+  }
+
   fun dismissForNavigation(): Boolean {
-    val service = active.get() ?: return false
+    val service = active.get()
+    val activity = preview.get()
+    if (service == null && activity == null) return false
     active.clear()
-    // A remote navigation request is an intentional exit, not an interrupted dream.
-    // Bypass the tap-dismiss app: the caller has already selected its destination.
+    preview.clear()
+    // Clear ownership and mark intent before either surface's asynchronous exit callbacks.
+    // A cold Home may be in another task; bringing it forward cannot clear that preview's stack.
     DreamPolicy.userExitAt = System.currentTimeMillis()
-    service.finish()
+    service?.finish()
+    activity?.finish()
     return true
   }
 }

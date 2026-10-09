@@ -83,15 +83,17 @@
   window.premeasureAll = premeasureAll;
 
   // Engine helpers (mirror the mock's API so mode code is unchanged).
-  // Prefer the host's screen-sized copy of a local photo once it exists (decode-once cache, see
-  // EngineScaledCache.kt): a 12MP original is a ~46MB texture, the copy ~17MB. Remote/proxied
-  // photos are already sized by the app. A hit is memoized per photo; a miss is re-asked next time
-  // because the copy may land mid-session.
-  window.photoUrl = function (p) {
-    if (p._scaled) return p._scaled;
+  // Ask for the slot's size at load cadence, never per animation frame. Revalidate ready files
+  // on each load: the native disk budget may evict a copy while this page is still alive.
+  window.photoUrl = function (p, requestedEdge) {
+    const edge = typeof requestedEdge === "number" && Number.isFinite(requestedEdge) && requestedEdge > 0
+      ? Math.max(320, Math.min(2400, Math.ceil(requestedEdge))) : 2400;
     try {
-      const s = window.Android && window.Android.scaledUrl ? window.Android.scaledUrl(p.url) : "";
-      if (s) { p._scaled = s; return s; }
+      const host = window.Android;
+      const ready = host && typeof host.scaledUrlForSize === "function"
+        ? host.scaledUrlForSize(p.url, edge)
+        : host && typeof host.scaledUrl === "function" ? host.scaledUrl(p.url) : "";
+      if (typeof ready === "string" && ready.length) return ready;
     } catch (_) {}
     return p.url;
   };

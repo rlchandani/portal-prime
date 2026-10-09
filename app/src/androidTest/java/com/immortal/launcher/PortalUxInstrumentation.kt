@@ -104,6 +104,16 @@ class PortalUxInstrumentation : Instrumentation() {
                 finish(if (slideshow.getBoolean("slideshowCompleted")) 0 else 1, slideshow)
                 return
             }
+            if (options.getString("command") == "engineDerivatives") {
+                val derivatives = EngineDerivativeDeviceChecks.run(this)
+                finish(if (derivatives.getBoolean("derivativesCompleted")) 0 else 1, derivatives)
+                return
+            }
+            if (options.getString("command") == "remoteAppsNavigation") {
+                val navigation = RemoteAppsNavigationDeviceChecks.run(this, automation, options)
+                finish(if (navigation.getBoolean("remoteAppsNavigationCompleted")) 0 else 1, navigation)
+                return
+            }
             if (options.getString("command") == "framePerformance") {
                 val frames = FramePerformanceDeviceChecks.run(this)
                 finish(if (frames.getBoolean("framePerformanceCompleted")) 0 else 1, frames)

@@ -205,8 +205,8 @@ class RemoteRoutes(private val context: Context) {
       val opened = context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
       return json(if (opened) 200 else 500, JSONObject().put("ok", opened).put("action", "home").put("dispatched", opened))
     }
-    // The Portal has no system Recents; "apps" opens the launcher's own app switcher instead.
-    if (action == "apps") return openAppSwitcher()
+    // Apps shares Home's retained page, including its navigation out of the photo frame.
+    if (action == "apps") return openAppsTab()
     // "screensaver" starts the photo frame (same as the home-screen screensaver button).
     if (action == "screensaver") return openScreensaver()
     if (RemoteInput.globalActionCode(action) == null) return json(400, err("unknown_action"))
@@ -215,21 +215,13 @@ class RemoteRoutes(private val context: Context) {
     return json(200, ok().put("action", action).put("dispatched", dispatched))
   }
 
-  /** Bring up Immortal's in-app app switcher ([AppSwitcherActivity]) — our stand-in for the
-   *  Portal's missing system Recents. Same-app start, so the non-exported activity is fine. */
-  private fun openAppSwitcher(): FleetHttpServer.Response {
-    val ok = startAppSwitcher()
+  /** Select Apps in the retained Home host, just like the paired Home button. */
+  private fun openAppsTab(): FleetHttpServer.Response {
+    val ok = startAppsTab()
     return json(if (ok) 200 else 500, JSONObject().put("ok", ok).put("action", "apps"))
   }
 
-  private fun startAppSwitcher(): Boolean =
-      runCatching {
-            context.startActivity(
-                Intent(context, AppSwitcherActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            true
-          }
-          .getOrDefault(false)
+  private fun startAppsTab(): Boolean = context.openApprovedHomeTab(ApprovedLauncherTab.APPS)
 
   /** Start the photo-frame screensaver ([PhotoFramePreviewActivity]) — the same thing the
    *  home-screen screensaver button does. Same-app start, so the non-exported activity is fine. */
@@ -444,9 +436,8 @@ class RemoteRoutes(private val context: Context) {
       when (s.optString("type")) {
         "launch" -> RemoteApps.launch(context, s.optString("packageName"))
         "key" ->
-            // "recents" maps to the in-app switcher too (the Portal has no system Recents), matching
-            // the live Recents button — otherwise a "recents" preset step would silently no-op.
-            if (s.optString("action") == "apps" || s.optString("action") == "recents") startAppSwitcher()
+            // Legacy "recents" steps share the Apps button's retained Home page.
+            if (s.optString("action") == "apps" || s.optString("action") == "recents") startAppsTab()
             else RemoteInput.globalAction(s.optString("action"))
         "text" -> RemoteInput.typeText(s.optString("text"), s.optString("mode").ifBlank { "set" })
         "wait" -> runCatching { Thread.sleep(clampWaitMs(s.optLong("ms", 300))) }

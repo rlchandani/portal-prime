@@ -718,13 +718,14 @@ class PhotoFrameController(
           // hardcoded ~9s step, so the user's interval actually takes effect in engine modes.
           @android.webkit.JavascriptInterface fun getIntervalSec(): Int = settings.intervalSec
           @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
-          // Screen-sized copy of a local photo if the cache has one ("" otherwise → use the original).
-          // Pure stat()s, never a decode, so a miss costs nothing on the load path.
+          // Ready derivatives only: bridge calls never decode or compress on the load path.
           @android.webkit.JavascriptInterface
-          fun scaledUrl(url: String): String {
+          fun scaledUrl(url: String): String = scaledUrlForSize(url, EngineScaledCache.TARGET_EDGE)
+          @android.webkit.JavascriptInterface
+          fun scaledUrlForSize(url: String, edge: Int): String {
             if (!url.startsWith("file://")) return ""
-            val f = scaledCache.resolve(url.removePrefix("file://")) ?: return ""
-            return "file://" + f.absolutePath
+            val file = scaledCache.resolveAndRequest(url.removePrefix("file://"), edge) ?: return ""
+            return "file://" + file.absolutePath
           }
           // Live presence for the engine's people-bias: the deck leans toward photos of
           // people while someone is actually in front of the frame. Reads the hub fresh

@@ -322,6 +322,9 @@ class HomeActivity : ComponentActivity() {
   private var appsSearchOpenRequest by mutableStateOf(0)
   private var pendingResumeIntent: Intent? = null
 
+  /** Read-only navigation diagnostics; never simulate Android lifecycle callbacks to read state. */
+  internal fun approvedCurrentTab(): ApprovedLauncherTab = launcherTab
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // A restored Activity carries its old launch Intent; only a new launch or onNewIntent

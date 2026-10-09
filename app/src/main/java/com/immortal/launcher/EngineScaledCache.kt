@@ -9,106 +9,166 @@ package com.immortal.launcher
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ColorSpace
 import android.graphics.Matrix
+import android.os.Build
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.security.MessageDigest
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Decode-once, screen-sized copies of local photos for the HTML screensaver engine.
- *
- * The engine's WebView loads folder photos straight from disk, so a 12MP camera original is decoded
- * to a ~46MB texture every time it appears — that decode + upload is the per-transition hitch on the
- * Portal's weak GPU, and nine of them blow past Chromium's decoded-image cache so nothing stays warm.
- * Here each oversized photo is scaled ONCE to [targetEdge] (EXIF rotation baked in) on a low-priority
- * background thread and written to [dir]; the engine asks [resolve] per load and gets the small copy
- * when it exists, the original otherwise. Nothing is ever decoded on the load path — the earlier
- * on-the-fly downsampler made images visibly "buffer" in.
- *
- * Entries are keyed by the original's path + size + mtime, so an edited photo is simply a new key;
- * the directory is trimmed oldest-first to [budgetBytes] after every write.
+ * Prepared local-photo derivatives for the HTML engine. Slot sizes round up to bounded tiers;
+ * full-screen requests retain zoom headroom. The bridge only stats ready files and enqueues work.
+ * One process-wide low-priority decoder serves all frame owners, with a bounded pending queue.
+ * File identity includes size/mtime and tier. Completed atomic writes alone are exposed to WebView.
  */
 class EngineScaledCache(
     private val dir: File,
     private val targetEdge: Int = TARGET_EDGE,
     private val budgetBytes: Long = BUDGET_BYTES,
 ) {
-  /** A cached file as seen by the eviction planner: name, byte size, and write time. */
   data class Entry(val name: String, val bytes: Long, val writtenAt: Long)
+  init { require(targetEdge in 1..TARGET_EDGE); require(budgetBytes >= 0) }
 
-  private val cancelled = AtomicBoolean(false)
-  private val running = AtomicBoolean(false)
-
-  /** The ready scaled copy for [originalPath], or null when none (missing, in progress, or not needed). */
-  fun resolve(originalPath: String): File? {
-    val orig = File(originalPath)
-    if (!orig.isFile) return null
-    val f = File(dir, keyFor(originalPath, orig.length(), orig.lastModified()))
-    return if (f.isFile && f.length() > 0L) f else null
+  private val owner = work.owner()
+  private val warming = AtomicBoolean(false)
+  private var maintained = false // Accessed only by the shared serial decoder.
+  // Remember small originals without repeatedly opening their headers. Identity changes on edits.
+  private val unneeded = object : LinkedHashMap<String, Boolean>(16, 0.75f, true) {
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Boolean>): Boolean = size > 1200
   }
 
-  /**
-   * Scale every not-yet-cached photo in [paths], in order, on one low-priority thread. Idempotent:
-   * a second call while a warm is running is ignored. Stops early after [cancel].
-   */
+  fun resolve(originalPath: String, requestedEdge: Int = targetEdge): File? {
+    val original = File(originalPath)
+    if (!original.isFile) return null
+    return ready(original, derivativeEdge(requestedEdge, targetEdge))
+  }
+
+  /** Return a ready copy now; asynchronously prepare the requested tier if it is absent. */
+  fun resolveAndRequest(originalPath: String, requestedEdge: Int): File? {
+    val original = File(originalPath)
+    if (!original.isFile) return null
+    val edge = derivativeEdge(requestedEdge, targetEdge)
+    ready(original, edge)?.let { return it }
+    request(original, edge)
+    // A ready larger copy is safe while the smaller one is prepared. Never upscale a smaller copy.
+    for (larger in TIERS) {
+      if (larger > edge && larger <= targetEdge) ready(original, larger)?.let { return it }
+    }
+    if (targetEdge > edge) return ready(original, targetEdge)
+    return null
+  }
+
+  private fun ready(original: File, edge: Int): File? =
+      File(dir, keyFor(original.path, original.length(), original.lastModified(), edge))
+          .takeIf { it.isFile && it.length() > 0L }
+
+  /** One queued warm step at a time; all enumeration/stats happen off UI, behind visible requests. */
   fun warm(paths: List<String>) {
-    if (!running.compareAndSet(false, true)) return
-    cancelled.set(false)
-    Thread(
-            {
-              try {
-                dir.mkdirs()
-                for (p in paths) {
-                  if (cancelled.get()) break
-                  if (resolve(p) != null) continue
-                  runCatching { scaleOne(p) }.onFailure { Log.w(TAG, "scale failed for $p: ${it.message}") }
-                }
-                trimToBudget()
-              } finally {
-                running.set(false)
-              }
-            },
-            "ss-scaled-cache")
-        .apply { priority = Thread.MIN_PRIORITY }
-        .start()
+    if (!warming.compareAndSet(false, true)) return
+    val pending = paths.take(300)
+    fun enqueue(index: Int) {
+      if (index >= pending.size) { warming.set(false); return }
+      val accepted = owner.submit("warm:$index") { current ->
+        val original = File(pending[index])
+        if (current() && original.isFile && ready(original, targetEdge) == null) {
+          val bytes = original.length()
+          val modified = original.lastModified()
+          val key = keyFor(original.path, bytes, modified, targetEdge)
+          if (!synchronized(unneeded) { unneeded.containsKey(key) }) {
+            runCatching { scaleOne(original, bytes, modified, targetEdge, key, current) }
+                .onFailure { Log.w(TAG, "Local photo derivative failed: ${it.javaClass.simpleName}") }
+          }
+        }
+        // Tail-enqueue after each photo: already queued visible requests run before the next warm.
+        if (current()) enqueue(index + 1) else warming.set(false)
+      }
+      if (!accepted) warming.set(false) // Warming is expendable when visible work fills the queue.
+    }
+    enqueue(0)
   }
 
-  /** Stop the warm loop after the photo in flight (called when the screensaver exits). */
-  fun cancel() = cancelled.set(true)
+  fun cancel() = owner.close()
 
-  private fun scaleOne(path: String) {
-    val orig = File(path)
-    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    BitmapFactory.decodeFile(path, bounds)
-    val w = bounds.outWidth
-    val h = bounds.outHeight
-    if (w <= 0 || h <= 0 || !needsScaling(w, h, targetEdge)) return
-    val opts = BitmapFactory.Options().apply { inSampleSize = sampleSizeFor(maxOf(w, h), targetEdge) }
-    val src = BitmapFactory.decodeFile(path, opts) ?: return
-    val (tw, th) = targetSize(src.width, src.height, targetEdge)
-    val m = Matrix().apply { postScale(tw.toFloat() / src.width, th.toFloat() / src.height) }
-    applyExifRotation(m, path, tw, th)
-    val out = Bitmap.createBitmap(src, 0, 0, src.width, src.height, m, true)
-    if (out !== src) src.recycle()
-    val dst = File(dir, keyFor(path, orig.length(), orig.lastModified()))
-    val tmp = File(dir, dst.name + ".part")
-    try {
-      FileOutputStream(tmp).use { out.compress(Bitmap.CompressFormat.JPEG, QUALITY, it) }
-      if (!tmp.renameTo(dst)) throw IllegalStateException("rename failed")
-    } finally {
-      out.recycle()
-      tmp.delete()
+  private fun request(original: File, edge: Int) {
+    val bytes = original.length()
+    val modified = original.lastModified()
+    val key = keyFor(original.path, bytes, modified, edge)
+    if (synchronized(unneeded) { unneeded.containsKey(key) }) return
+    owner.submit(key) { current ->
+      runCatching { scaleOne(original, bytes, modified, edge, key, current) }
+          .onFailure { Log.w(TAG, "Local photo derivative failed: ${it.javaClass.simpleName}") }
+    }
+  }
+
+  private fun scaleOne(original: File, bytes: Long, modified: Long, edge: Int, key: String,
+      current: () -> Boolean) {
+    fun valid(): Boolean = current() && original.isFile && original.length() == bytes &&
+        original.lastModified() == modified
+    if (!valid() || ready(original, edge) != null) return
+    if (!maintained) {
+      // With one decoder globally, no other job can own a partial in this cache directory.
+      dir.listFiles()?.filter { it.isFile && it.name.endsWith(".part") }?.forEach { it.delete() }
+      trimToBudget()
+      maintained = true
+    }
+    // Pin one opened revision. An atomic path replacement must not swap the header and pixels.
+    FileInputStream(original).use { input ->
+      val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+      BitmapFactory.decodeStream(input, null, bounds)
+      val w = bounds.outWidth
+      val h = bounds.outHeight
+      if (w <= 0 || h <= 0 || !valid()) return
+      if (!needsScaling(w, h, edge)) {
+        synchronized(unneeded) { unneeded[key] = true }
+        return
+      }
+      val opts = BitmapFactory.Options().apply {
+        inSampleSize = boundedSampleSize(w, h, edge)
+        inScaled = false
+        inPreferredConfig = Bitmap.Config.ARGB_8888
+        if (Build.VERSION.SDK_INT >= 26) inPreferredColorSpace = ColorSpace.get(ColorSpace.Named.SRGB)
+      }
+      input.channel.position(0)
+      val src = BitmapFactory.decodeStream(input, null, opts) ?: return
+      var out: Bitmap? = null
+      val dst = File(dir, key)
+      val tmp = File(dir, key + ".part")
+      try {
+        if (!valid() || src.width.toLong() * src.height > MAX_SOURCE_PIXELS) return
+        val outputEdge = minOf(edge, maxOf(src.width, src.height))
+        val (tw, th) = targetSize(src.width, src.height, outputEdge)
+        val matrix = Matrix().apply { postScale(tw.toFloat() / src.width, th.toFloat() / src.height) }
+        input.channel.position(0)
+        applyExifRotation(matrix, input, tw, th)
+        out = Bitmap.createBitmap(src, 0, 0, src.width, src.height, matrix, true)
+        if (out !== src) src.recycle()
+        if (!valid()) return
+        dir.mkdirs()
+        FileOutputStream(tmp).use {
+          check(out.compress(Bitmap.CompressFormat.JPEG, QUALITY, it)) { "JPEG compression failed" }
+        }
+        if (!valid()) return
+        check(tmp.renameTo(dst)) { "Derivative publication failed" }
+        trimToBudget()
+      } finally {
+        out?.takeIf { !it.isRecycled }?.recycle()
+        if (!src.isRecycled) src.recycle()
+        tmp.delete()
+      }
     }
   }
 
   /** Bake the EXIF orientation into the copy (a rotated copy has no tag, so it renders upright). */
-  private fun applyExifRotation(m: Matrix, path: String, tw: Int, th: Int) {
+  private fun applyExifRotation(m: Matrix, input: InputStream, tw: Int, th: Int) {
     val o =
         runCatching {
-              ExifInterface(path).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+              ExifInterface(input).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
             }
             .getOrDefault(ExifInterface.ORIENTATION_NORMAL)
     val cx = tw / 2f
@@ -137,12 +197,31 @@ class EngineScaledCache(
     // Disk budget for copies (~600KB each at QUALITY → ~250 photos). Trimmed oldest-first.
     const val BUDGET_BYTES = 160L * 1024 * 1024
     const val QUALITY = 88
+    // At most ~48 MiB of ARGB source pixels plus one <=2400-edge output; one decoder globally.
+    const val MAX_SOURCE_PIXELS = 12L * 1024 * 1024
+    private val TIERS = intArrayOf(600, 1200, 1800, TARGET_EDGE)
+    private val work = EngineDerivativeWork()
+
+    fun derivativeEdge(requested: Int, maximum: Int = TARGET_EDGE): Int {
+      val cap = maximum.coerceIn(1, TARGET_EDGE)
+      val wanted = if (requested <= 0) cap else requested.coerceAtMost(cap)
+      return (TIERS.firstOrNull { it >= wanted } ?: cap).coerceAtMost(cap)
+    }
+
+    fun boundedSampleSize(w: Int, h: Int, target: Int): Int {
+      var sample = sampleSizeFor(maxOf(w, h), target.coerceAtLeast(1))
+      while (((w.toLong() + sample - 1) / sample) * ((h.toLong() + sample - 1) / sample) > MAX_SOURCE_PIXELS) {
+        sample *= 2
+      }
+      return sample
+    }
     // Originals within this factor of the target aren't worth a copy (little texture saving).
     private const val MIN_RATIO = 1.25
 
     /** Stable, path-safe file name for the copy of an original with this identity. */
-    fun keyFor(path: String, bytes: Long, mtime: Long): String {
-      val d = MessageDigest.getInstance("SHA-1").digest("$path|$bytes|$mtime".toByteArray())
+    fun keyFor(path: String, bytes: Long, mtime: Long, edge: Int = TARGET_EDGE): String {
+      val identity = "$path|$bytes|$mtime" + if (edge == TARGET_EDGE) "" else "|edge=$edge"
+      val d = MessageDigest.getInstance("SHA-1").digest(identity.toByteArray())
       return d.joinToString("") { "%02x".format(it) } + ".jpg"
     }
 

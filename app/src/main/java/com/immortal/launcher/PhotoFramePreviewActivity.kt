@@ -120,6 +120,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     }
 
     setContentView(frame.view)
+    ImmortalDreamNavigation.attached(this)
     frame.start()
 
     if (nightClock) {
@@ -179,6 +180,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   }
 
   override fun onDestroy() {
+    ImmortalDreamNavigation.detached(this)
     powerReceiver?.let { runCatching { unregisterReceiver(it) } }
     nightWatch.removeCallbacks(nightWatchTick)
     if (this::frame.isInitialized) frame.stop()
