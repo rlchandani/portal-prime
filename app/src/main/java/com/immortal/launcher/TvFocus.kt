@@ -25,8 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 
 /**
@@ -49,28 +52,41 @@ fun Modifier.tvFocusable(
 ): Modifier {
   // Preserve the caller's existing disabled behavior (including Manage-mode badges).
   if (!enabled) return this
-  val pageActive = LocalApprovedLauncherPageActive.current
-  val clickEnabled = pageActive
+  val gate = LocalApprovedLauncherInputGate.current
+  // Legacy screens retain disabled semantics; retained tabs keep their click nodes
+  // stable and reject inactive actions at invocation.
+  val clickEnabled = if (gate == null) LocalApprovedLauncherPageActive.current else true
   // Cached panes keep their interaction source and click chain across page transitions.
   val source = remember { MutableInteractionSource() }
   val focused by source.collectIsFocusedAsState()
-  val showFocus = clickEnabled && focused
+  val showFocus = focused && (gate?.active ?: clickEnabled)
   // Touch cards use focusScale=1: avoid an identity graphics layer and animation
   // state for each visible card. Retain the animated return for TV callers.
   val scale = if (focusScale == 1f) 1f else {
     val animated by animateFloatAsState(if (showFocus) focusScale else 1f, label = "tvFocusScale")
     // Hide a retained pane's focus scale immediately, even while the animation settles.
-    if (clickEnabled) animated else 1f
+    if (animated == 1f || (gate?.active ?: clickEnabled)) animated else 1f
   }
   val scaled = if (scale == 1f) this else this.scale(scale)
-  val base = if (showFocus) scaled.border(BorderStroke(3.dp, ringColor), shape) else scaled
-  // Retain the caller's click/long-press variant; inactive panes use its disabled state.
+  val ring = if (showFocus) scaled.border(BorderStroke(3.dp, ringColor), shape) else scaled
+  // Each child needs its own guard: a focusable widget parent stops traversal to
+  // the page-level properties. Leave active canFocus at its existing default.
+  val base = if (gate == null) ring else ring.focusProperties { if (!gate.active) canFocus = false }
+  val click: () -> Unit = { if (gate?.acceptsAction() ?: clickEnabled) onClick() }
+  val haptics = if (gate != null && onLongClick != null) LocalHapticFeedback.current else null
   return if (onLongClick != null) {
     base.combinedClickable(
         interactionSource = source, indication = null, enabled = clickEnabled,
-        onClick = onClick, onLongClick = onLongClick)
+        hapticFeedbackEnabled = gate == null,
+        onClick = click, onLongClick = {
+          if (gate?.acceptsAction() ?: clickEnabled) {
+            onLongClick()
+            // CombinedClickable otherwise requests feedback even for a rejected hold.
+            haptics?.performHapticFeedback(HapticFeedbackType.LongPress)
+          }
+        })
   } else {
-    base.clickable(interactionSource = source, indication = null, enabled = clickEnabled, onClick = onClick)
+    base.clickable(interactionSource = source, indication = null, enabled = clickEnabled, onClick = click)
   }
 }
 
@@ -83,11 +99,16 @@ fun Modifier.tvFocusableRow(
     focusFill: Color = Color(0x402E6BE6),
     onClick: () -> Unit,
 ): Modifier {
-  val pageActive = LocalApprovedLauncherPageActive.current
+  val gate = LocalApprovedLauncherInputGate.current
+  val clickEnabled = if (gate == null) LocalApprovedLauncherPageActive.current else true
   val source = remember { MutableInteractionSource() }
   val focused by source.collectIsFocusedAsState()
-  return this.background(if (pageActive && focused) focusFill else Color.Transparent)
-      .clickable(interactionSource = source, indication = null, enabled = pageActive, onClick = onClick)
+  val showFocus = focused && (gate?.active ?: clickEnabled)
+  val base = this.background(if (showFocus) focusFill else Color.Transparent)
+  val focusable = if (gate == null) base else base.focusProperties { if (!gate.active) canFocus = false }
+  return focusable.clickable(interactionSource = source, indication = null, enabled = clickEnabled) {
+    if (gate?.acceptsAction() ?: clickEnabled) onClick()
+  }
 }
 
 /**

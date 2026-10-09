@@ -5,6 +5,10 @@ The phone-first browser control center is committed on
 `codex/companion-multi-portal` at `bc5f292`, version 1.6.0-control-center / code 10.
 Local Git hooks were disabled; no GitHub connection or remote operation was used.
 
+Ongoing product requirement: optimize for phone use first. New layouts, controls,
+dialogs and performance checks must start with mobile viewports; desktop support
+is secondary. Preserve the mobile checks below when extending any web feature.
+
 ## Build and review
 
 - Portal: 954 JVM tests, zero failures/errors/skips; debug APK build passed.

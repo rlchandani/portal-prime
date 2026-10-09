@@ -56,6 +56,34 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 
 internal val LocalApprovedLauncherPageActive = compositionLocalOf { true }
+
+/**
+ * A retained page's input permission is checked by input/focus handlers, not every
+ * button's composition. The generation also cancels a held touch across hide/show.
+ * All mutation is owned by the page's main-thread lifecycle/pointer handlers.
+ */
+internal class LauncherPageInputGate {
+  var active by mutableStateOf(false)
+    private set
+  private var generation = 0L
+  private var touchGeneration: Long? = null
+
+  fun update(active: Boolean) {
+    if (this.active != active) {
+      generation++
+      this.active = active
+    }
+  }
+
+  fun beginTouch() {
+    if (touchGeneration == null) touchGeneration = generation
+  }
+
+  fun acceptsAction(): Boolean = active && (touchGeneration == null || touchGeneration == generation)
+  fun endTouch() { touchGeneration = null }
+}
+
+internal val LocalApprovedLauncherInputGate = compositionLocalOf<LauncherPageInputGate?> { null }
 internal val LocalApprovedLauncherHostOwner = compositionLocalOf<LifecycleOwner?> { null }
 internal val LocalApprovedWidgetPageInput = compositionLocalOf { true }
 
@@ -146,22 +174,32 @@ internal fun ApprovedLauncherTabs(
       key(tab) {
       val active = tab == selected
       val drawing = tab in visible
+      val input = remember(hostOwner) { LauncherPageInputGate() }
       Box(Modifier.fillMaxSize()
           // Placement keeps descendant geometry on cached integer offsets rather than
           // transforming every descendant rectangle through an animated layer matrix.
           .absoluteOffset { IntOffset((offsets[tab.ordinal].value * widthPx).roundToInt(), 0) }
           .graphicsLayer { alpha = if (drawing) 1f else 0f }
           .focusProperties { canFocus = active }
-          .pointerInput(active) {
-            if (!active) awaitPointerEventScope {
-              while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
-            }
+          .pointerInput(input) {
+            try {
+              awaitPointerEventScope {
+                while (true) {
+                  val event = awaitPointerEvent(PointerEventPass.Initial)
+                  if (event.changes.any { it.pressed }) input.beginTouch()
+                  if (!input.acceptsAction()) event.changes.forEach { it.consume() }
+                  // Consume a stale release before clearing the gesture. Clickable's
+                  // child handler then sees cancellation, even after a quick return.
+                  if (event.changes.none { it.pressed }) input.endTouch()
+                }
+              }
+            } finally { input.endTouch() }
           }.then(if (active) Modifier else Modifier.clearAndSetSemantics { })) {
         CompositionLocalProvider(
             LocalApprovedLauncherPageActive provides active,
             LocalApprovedLauncherHostOwner provides hostOwner,
         ) {
-          ApprovedLauncherPageLifecycle(active) { content(tab) }
+          ApprovedLauncherPageLifecycle(active, input) { content(tab) }
         }
       }
       }
@@ -176,24 +214,31 @@ private class LauncherPageOwner : LifecycleOwner {
 
 /** CREATED disables inactive Back callbacks and existing RESUMED/STARTED refresh hooks. */
 @Composable
-internal fun ApprovedLauncherPageLifecycle(active: Boolean, content: @Composable () -> Unit) {
+internal fun ApprovedLauncherPageLifecycle(
+    active: Boolean,
+    input: LauncherPageInputGate? = null,
+    content: @Composable () -> Unit,
+) {
   val host = LocalLifecycleOwner.current
   val page = remember(host) { LauncherPageOwner() }
   var foreground by remember(host) { mutableStateOf(host.lifecycle.currentState) }
-  DisposableEffect(host, page) {
+  DisposableEffect(host, page, input) {
     val observer = LifecycleEventObserver { _, _ -> foreground = host.lifecycle.currentState }
     host.lifecycle.addObserver(observer)
     onDispose {
       host.lifecycle.removeObserver(observer)
       page.registry.currentState = Lifecycle.State.DESTROYED
+      input?.update(false)
     }
   }
   SideEffect {
+    input?.update(active && foreground.isAtLeast(Lifecycle.State.STARTED))
     val state = if (active || foreground <= Lifecycle.State.CREATED) foreground else Lifecycle.State.CREATED
     if (page.registry.currentState != state) page.registry.currentState = state
   }
   CompositionLocalProvider(
       LocalLifecycleOwner provides page,
+      LocalApprovedLauncherInputGate provides input,
       LocalApprovedLauncherPageActive provides (active && foreground.isAtLeast(Lifecycle.State.STARTED)),
       content = content,
   )

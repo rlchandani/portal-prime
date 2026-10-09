@@ -45,6 +45,11 @@ class PortalUxInstrumentation : Instrumentation() {
             automation.serviceInfo = automation.serviceInfo.apply {
                 flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
             }
+            if (options.getString("command") == "tabActivation") {
+                result.putAll(TabActivationDeviceChecks.run(this))
+                finish(if (result.getBoolean("tabActivationCompleted")) 0 else 1, result)
+                return
+            }
             if (options.getString("command") == "tabPlacement") {
                 result.putAll(TabPlacementDeviceChecks.run(this))
                 finish(if (result.getBoolean("tabPlacementCompleted")) 0 else 1, result)
