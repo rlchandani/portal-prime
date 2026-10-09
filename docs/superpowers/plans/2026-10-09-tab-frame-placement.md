@@ -22,10 +22,10 @@ subhierarchy and cached-offset paths. This is a lead, not current hardware proof
 8. [x] If the evidence supports transformed bounds, prepare exactly one positional
    change: lambda absoluteOffset, retaining visibility/lifecycle/input and duration.
 9. [x] Repeat the same fixture, full JVM/build and both-room install verification.
-10. [ ] Compare unprofiled same-cadence baseline/candidate runs, preserving matching
+10. [x] Compare unprofiled same-cadence baseline/candidate runs, preserving matching
     artifacts and original slideshow configuration. Do not use sampled captures
     as timing benchmarks. Reject or revise the hypothesis if tails do not improve.
-11. [ ] Record the result, restore an accepted artifact on both rooms, stop owned
+11. [x] Record the result, restore an accepted artifact on both rooms, stop owned
     resources and keep wider performance gaps explicit.
 
 Reference: Android's Compose phases guide explains lambda offset reads in the
@@ -42,7 +42,7 @@ concerns descendant coordinate bookkeeping, not the usual eager-state-read bug.
   8 Family and 6 Living samples. After placement: zero observed in both; this is
   bounded wall-time sampling, not proof of zero execution or measured CPU time.
 - First unprofiled baseline/candidate: Family p95 67.5/64.5 ms and over-budget
-  94/81; Living p95 65.25/57.75 ms and over-budget 94/82. Repeat crossover pending.
+  94/81; Living p95 65.25/57.75 ms and over-budget 94/82. Repeat crossover completed; details in the design ledger.
 - A repeated old runtime probe timed out waiting in startActivitySync while main
   was idle in nativePollOnce. Home is singleTask. The probe now uses an 8-second
   monitor and a fresh standard Settings Activity with NEW_TASK | MULTIPLE_TASK.
@@ -51,3 +51,20 @@ concerns descendant coordinate bookkeeping, not the usual eager-state-read bug.
   software-renderer emulator; these are interaction/lifecycle, not hardware timing.
 - Independent review caught the task-reuse ownership edge; the correction was
   reviewed and passed the actual two-instance marker check.
+
+## Crossover conclusion
+
+- Non-debuggable A–B–A–B: aggregate mean 18.34→17.00 ms in Family and
+  17.93→15.96 ms in Living; fewer over-budget frames in both candidate trials.
+- Family p95 is mixed and no tail improvement is established there. Living p95
+  is lower in both candidate trials. All still fail the 16.67 ms host proxy gate.
+- Revise the main-cause hypothesis rather than claim a tail fix: retain the limited
+  geometry/average-frame gain and attribute remaining activation/semantics work next.
+- Full trial table, artifacts, scope and remaining gaps:
+  [design ledger](../../design/portal-plus-tab-frame-placement.md).
+
+- Final status: both agents reachable, profiling inactive, collector stopped,
+  zero active listeners, READ_LOGS capability preserved. Preview navigation requests
+  were accepted after every capture; visible photo/Dream recovery is not certified.
+- All owned subagents are closed and the read-only emulator exited with snapshots
+  disabled. The wider performance goal remains active.

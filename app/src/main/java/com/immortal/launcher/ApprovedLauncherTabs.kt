@@ -12,6 +12,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -28,6 +29,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.ProduceStateScope
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -51,6 +53,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.roundToInt
 
 internal val LocalApprovedLauncherPageActive = compositionLocalOf { true }
 internal val LocalApprovedLauncherHostOwner = compositionLocalOf<LifecycleOwner?> { null }
@@ -125,7 +128,7 @@ internal fun ApprovedLauncherTabs(
     previous = selected
     visited = visited + selected
     visible = visible + selected
-    // The new page gets one initial layout; subsequent frames update only layer translation.
+    // The new page gets one initial layout; subsequent frames read offsets during placement.
     withFrameNanos { }
     coroutineScope {
       visible.forEach { tab ->
@@ -144,10 +147,11 @@ internal fun ApprovedLauncherTabs(
       val active = tab == selected
       val drawing = tab in visible
       Box(Modifier.fillMaxSize()
-          .graphicsLayer {
-            translationX = offsets[tab.ordinal].value * widthPx
-            alpha = if (drawing) 1f else 0f
-          }.focusProperties { canFocus = active }
+          // Placement keeps descendant geometry on cached integer offsets rather than
+          // transforming every descendant rectangle through an animated layer matrix.
+          .absoluteOffset { IntOffset((offsets[tab.ordinal].value * widthPx).roundToInt(), 0) }
+          .graphicsLayer { alpha = if (drawing) 1f else 0f }
+          .focusProperties { canFocus = active }
           .pointerInput(active) {
             if (!active) awaitPointerEventScope {
               while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
