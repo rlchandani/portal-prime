@@ -7,6 +7,8 @@
 package com.immortal.launcher
 
 import java.io.File
+import java.io.ByteArrayInputStream
+import org.json.JSONObject
 import java.nio.file.Files
 import org.junit.Assert.*
 import org.junit.Test
@@ -87,6 +89,25 @@ class RemoteCompanionPhotoTest {
       stream.getOrNull()?.close()
       assertTrue(stream.isFailure)
     } finally { folder.deleteRecursively() }
+  }
+
+  @Test fun pathsRejectAndroidAtAnyDepth() {
+    val root = Files.createTempDirectory("remote-nested-private").toFile()
+    try {
+      for (path in listOf("/sdcard/Pictures/Android", "/sdcard/Pictures/aNdRoId/data/photo.jpg")) {
+        assertNull(path, RemoteCompanionPhotoPolicy.resolve(root, path, true))
+        assertNull(path, RemoteCompanionPhotoPolicy.resolve(root, path, false))
+      }
+    } finally { root.deleteRecursively() }
+  }
+
+  @Test fun listingRejectsAmbiguousOrUnsupportedRecursiveFlagsBeforeFilesystemAccess() {
+    for (flag in listOf("recursive=0", "recursive=true", "recursive=", "recursive", "recursive=%ZZ", "recursive=1&recursive=1")) {
+      val request = FleetHttpServer.Request("GET", "/remote/photos", "path=%2Fsdcard&$flag", emptyMap(), ByteArrayInputStream(byteArrayOf()), 0)
+      val response = RemoteCompanionPhotos.handle(request)
+      assertEquals(flag, 400, response.status)
+      assertEquals(flag, "invalid_recursive", JSONObject(response.jsonBytes!!.toString(Charsets.UTF_8)).getString("error"))
+    }
   }
 
 }

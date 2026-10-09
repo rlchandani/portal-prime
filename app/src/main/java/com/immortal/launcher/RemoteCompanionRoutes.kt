@@ -65,7 +65,7 @@ internal class RemoteCompanionRoutes(private val context: Context) {
     return json(200, ok().put("protocolVersion", 1).put("deviceId", RemoteCompanionStore.id(context))
         .put("name", FleetConfig.name(context)).put("model", Build.MODEL).put("apiLevel", Build.VERSION.SDK_INT)
         .put("app", JSONObject().put("versionCode", code).put("versionName", pi.versionName))
-        .put("capabilities", JSONObject().put("layout", true).put("snapshot", true).put("catalog", catalog().isNotEmpty()).put("operations", true).put("scenes", true).put("photos", RemoteCompanionPhotos.available()).put("jarvis", jarvis.optBoolean("supported")))
+        .put("capabilities", JSONObject().put("layout", true).put("snapshot", true).put("catalog", catalog().isNotEmpty()).put("operations", true).put("scenes", true).put("photos", RemoteCompanionPhotos.available()).put("photoLibrary", true).put("jarvis", jarvis.optBoolean("supported")))
         .put("presence", JSONObject().put("presence", presence.presence.name).put("screen", presence.screen.name).put("confident", presence.confident))
         .put("install", JSONObject().put("mode", plan.mode).put("daemonAvailable", plan.daemonAvailable).put("legacyInstaller", plan.legacy).put("dialogFixed", plan.dialogFixed).put("paused", plan.paused).put("autoConfirm", SettingsGuard.isInstallConfirmEnabled(context)))
         .put("canWriteSecureSettings", SettingsGuard.canWriteSecureSettings(context)))

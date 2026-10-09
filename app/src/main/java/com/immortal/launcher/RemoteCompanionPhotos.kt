@@ -16,7 +16,6 @@ import java.io.Closeable
 import java.io.EOFException
 import java.io.OutputStream
 import java.util.Locale
-import org.json.JSONArray
 import org.json.JSONObject
 
 /** Pure filesystem policy, injectable root for JVM tests; /sdcard is the only wire root. */
@@ -27,7 +26,7 @@ internal object RemoteCompanionPhotoPolicy {
   fun resolve(root: File, path: String, directory: Boolean): File? = runCatching {
     if (path.length > 1024 || !(path == "/sdcard" || path.startsWith("/sdcard/"))) return null
     val segments = path.removePrefix("/sdcard").removePrefix("/").let { if (it.isEmpty()) emptyList() else it.split('/') }
-    if (segments.any { it.isBlank() || it.startsWith('.') || it.any { c -> c.code < 32 || c == '\\' || c == ':' } } || segments.firstOrNull()?.equals("Android", true) == true) return null
+    if (segments.any { it.isBlank() || it.startsWith('.') || it.any { c -> c.code < 32 || c == '\\' || c == ':' } } || segments.any { it.equals("Android", true) }) return null
     val canonicalRoot = root.canonicalFile
     var file = canonicalRoot
     for (segment in segments) {
@@ -102,28 +101,25 @@ internal object RemoteCompanionPhotos {
   fun available(): Boolean = root.isDirectory && root.canRead() && root.canWrite()
   fun allowedFolder(path: String): Boolean = RemoteCompanionPhotoPolicy.resolve(root, path, true) != null
 
-  fun handle(req: FleetHttpServer.Request): FleetHttpServer.Response = synchronized(lock) {
-    val expected = when (req.path) { "/remote/photos" -> setOf("GET"); "/remote/photo-upload" -> setOf("POST"); else -> setOf("GET", "DELETE") }
+  fun handle(req: FleetHttpServer.Request, storageRoot: File = root): FleetHttpServer.Response {
+    // Discovery owns no mutation/thumbnail state: slow storage must not hold their lock.
+    if (req.path == "/remote/photos") return RemoteCompanionPhotoIndex(storageRoot).handle(req)
+    return handlePhoto(req, storageRoot)
+  }
+  private fun handlePhoto(req: FleetHttpServer.Request, storageRoot: File): FleetHttpServer.Response = synchronized(lock) {
+    val expected = if (req.path == "/remote/photo-upload") setOf("POST") else setOf("GET", "DELETE")
     if (req.method !in expected) return@synchronized error(405, "method_not_allowed")
     val path = req.queryParam("path") ?: return@synchronized error(400, "path_required")
     val directory = req.path != "/remote/photo"
-    val file = RemoteCompanionPhotoPolicy.resolve(root, path, directory) ?: return@synchronized error(400, "invalid_path")
+    val file = RemoteCompanionPhotoPolicy.resolve(storageRoot, path, directory) ?: return@synchronized error(400, "invalid_path")
     when (req.path) {
-      "/remote/photos" -> {
-        if (!file.isDirectory) return@synchronized error(404, "folder_not_found")
-        val entries = file.listFiles() ?: return@synchronized error(403, "not_readable")
-        val selected = entries.asSequence().filter { it.isFile && RemoteCompanionPhotoPolicy.validName(it.name) && RemoteCompanionPhotoPolicy.resolve(root, "$path/${it.name}".replace("//", "/"), false) != null }.take(501).toList()
-        val files = JSONArray()
-        selected.take(500).forEach { f -> files.put(JSONObject().put("name", f.name).put("path", path.trimEnd('/') + "/" + f.name).put("size", f.length()).put("modified", f.lastModified())) }
-        json(200, JSONObject().put("ok", true).put("path", path).put("files", files).put("freeBytes", file.usableSpace).put("truncated", selected.size > 500))
-      }
       "/remote/photo-upload" -> {
         val name = req.queryParam("name") ?: return@synchronized error(400, "name_required")
         if (!RemoteCompanionPhotoPolicy.validName(name)) return@synchronized error(400, "invalid_name")
         if (req.contentLength !in 1..RemoteCompanionPhotoPolicy.MAX_BYTES) return@synchronized error(413, "upload_size_limit")
         val mime = req.header("content-type")?.substringBefore(';')?.trim()?.lowercase(Locale.ROOT)
         if (mime != null && mime !in setOf("image/jpeg", "image/png", "image/webp", "image/gif", "application/octet-stream")) return@synchronized error(415, "unsupported_media_type")
-        if (!file.exists() && !file.mkdirs() || !file.isDirectory || RemoteCompanionPhotoPolicy.resolve(root, path, true) != file) return@synchronized error(403, "folder_unavailable")
+        if (!file.exists() && !file.mkdirs() || !file.isDirectory || RemoteCompanionPhotoPolicy.resolve(storageRoot, path, true) != file) return@synchronized error(403, "folder_unavailable")
         if (file.usableSpace < req.contentLength + 1024 * 1024L) return@synchronized error(507, "insufficient_space")
         val result = RemoteCompanionPhotoPolicy.store(file, name, req.contentLength, req::streamBodyTo) { image -> validImage(image, name) }
         if (result != "stored") return@synchronized error(if (result == "collision") 409 else 400, result)
