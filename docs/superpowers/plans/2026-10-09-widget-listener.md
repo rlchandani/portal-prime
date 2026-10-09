@@ -33,4 +33,6 @@ Retain the listener ownership fix for lifecycle/resource correctness. Family tim
 improves in both pairs; Living is mixed and missed-budget fractions remain around
 16%. No consistent rendering improvement across both rooms is proven. The complete
 trial table and limitations are in the [listener ledger](../../design/portal-plus-widget-listener.md).
-A finite passive connection check remains in progress; the wider goal is active.
+The finite five-minute passive connection check completed: 20 samples per room,
+zero failures and no remaining measurement resources. This is HTTP liveness
+evidence; the wider performance/UX goal is active.

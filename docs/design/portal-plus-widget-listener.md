@@ -109,8 +109,11 @@ the archived benchmark SHA-256. Slideshow configuration matched before/after the
 second baseline→candidate installation in both rooms. Preview requests were accepted;
 visible Dream recovery is not certified by that response.
 
-A finite five-minute passive HTTP check is running; it is not yet a completed
-endurance result. The broader performance/UX goal remains active.
+The finite five-minute passive HTTP check completed with 20 samples per room and
+zero failed requests. Family median/max request latency was 33.70/51.86 ms; Living
+was 45.11/60.17 ms. Both final collector states were inactive with zero listeners
+and no stack sampler. This proves HTTP liveness over that interval, not visual
+slideshow endurance or app readiness. The broader performance/UX goal remains active.
 
 ## Next measurement boundary
 
