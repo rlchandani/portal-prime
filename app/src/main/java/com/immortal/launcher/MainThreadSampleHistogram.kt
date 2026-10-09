@@ -21,7 +21,68 @@ internal class MainThreadSampleHistogram {
     var waiting = 0L
     var outsideNativePoll = 0L
     var outsideNativePollWaiting = 0L
+
+    fun observe(waitingObservation: Boolean, nativePoll: Boolean) {
+      samples++
+      if (waitingObservation) waiting++
+      if (!nativePoll) {
+        outsideNativePoll++
+        if (waitingObservation) outsideNativePollWaiting++
+      }
+    }
+
+    fun snapshot(): JSONObject = JSONObject().put("samples", samples).put("waitingSamples", waiting)
+        .put("otherSamples", samples - waiting).put("nativePollSamples", samples - outsideNativePoll)
+        .put("outsideNativePollSamples", outsideNativePoll)
+        .put("outsideNativePollWaitingSamples", outsideNativePollWaiting)
+        .put("outsideNativePollOtherSamples", outsideNativePoll - outsideNativePollWaiting)
   }
+
+  /** One selected identity per observation; independent admission and no retained frame objects. */
+  private class SelectedHistogram(private val maxSymbols: Int) {
+    private val symbols = LinkedHashMap<String, Counts>()
+    private val selected = Counts()
+    private var admittedSamples = 0L
+    private var discardedAdmissions = 0L
+    private var oversizedIdentities = 0L
+
+    fun record(frame: StackTraceElement, waiting: Boolean, nativePoll: Boolean) {
+      selected.observe(waiting, nativePoll)
+      if (frame.className.length.toLong() + 1 + frame.methodName.length > MAX_SYMBOL_CHARS) {
+        oversizedIdentities++
+        return
+      }
+      val identity = frame.className + "." + frame.methodName
+      val counts = symbols[identity] ?: if (symbols.size < maxSymbols) {
+        Counts().also { symbols[identity] = it }
+      } else {
+        discardedAdmissions++ // One selected identity rejected this observation; no fallback.
+        return
+      }
+      admittedSamples++
+      counts.observe(waiting, nativePoll)
+    }
+
+    fun snapshot(observations: Long, depthLimit: Int): JSONObject = selected.snapshot()
+        .put("observations", observations).put("admittedSamples", admittedSamples)
+        .put("identity", "class.method; one selected identity per observation")
+        .put("maxSymbols", maxSymbols).put("uniqueSymbols", symbols.size)
+        .put("symbolLimitReached", symbols.size == maxSymbols)
+        .put("maxSymbolChars", MAX_SYMBOL_CHARS).put("maxTopFrames", MAX_TOP_FRAMES)
+        .put("depthLimit", depthLimit).put("waitingClassificationDepthLimit", MAX_DEPTH)
+        .put("discardedAdmissions", discardedAdmissions).put("oversizedIdentities", oversizedIdentities)
+        .put("topFrames", JSONArray().apply {
+          symbols.entries.sortedWith(compareByDescending<Map.Entry<String, Counts>> { it.value.samples }
+              .thenBy { it.key }).take(MAX_TOP_FRAMES).forEach { (symbol, c) ->
+                put(c.snapshot().put("symbol", symbol))
+              }
+        })
+  }
+
+  private val leafHistogram = SelectedHistogram(MAX_LEAF_SYMBOLS)
+  private val firstAppHistogram = SelectedHistogram(MAX_APP_SYMBOLS)
+  private var noAppMatchSamples = 0L
+  private var depthLimitedNoAppMatchSamples = 0L
   private val symbols = LinkedHashMap<String, Counts>()
   // Fixed counters remain available after dynamic symbol saturation. No per-sample keys or
   // retained stacks: a temporary bit mask marks each family at most once in the inspected depth.
@@ -69,6 +130,21 @@ internal class MainThreadSampleHistogram {
     // Classification describes primitive presence in the inspected depth, not thread CPU state.
     val waiting = (0 until depth).any { isWaitPrimitive(stack[it]) }
     if (waiting) waitingSamples++
+    // These admissions precede and are independent of the inclusive symbol map. Leaf selection
+    // excludes only exact nativePollOnce; launcher selection includes poll/wait observations.
+    if (!nativePoll) leafHistogram.record(stack[0], waiting, nativePoll)
+    var firstAppIndex = -1
+    for (i in 0 until depth) {
+      if (stack[i].className.startsWith(APP_CLASS_PREFIX)) {
+        firstAppIndex = i
+        break
+      }
+    }
+    if (firstAppIndex >= 0) firstAppHistogram.record(stack[firstAppIndex], waiting, nativePoll)
+    else {
+      noAppMatchSamples++
+      if (stack.size > depth) depthLimitedNoAppMatchSamples++
+    }
     var matchedFamilies = 0
     for (i in 0 until depth) {
       for (family in operationRules.indices) {
@@ -159,6 +235,14 @@ internal class MainThreadSampleHistogram {
         .put("discardedDepthFrames", discardedDepthFrames).put("discardedSymbols", discardedSymbols)
         .put("oversizedFrames", oversizedFrames).put("topFrames", topFrames(false))
         .put("outsideNativePollFrames", topFrames(true))
+        .put("leafHistogram", leafHistogram.snapshot(samples, 1)
+            .put("selection", "Literal stack[0], excluding exactly android.os.MessageQueue.nativePollOnce")
+            .put("excludedNativePollSamples", nativePollSamples))
+        .put("firstAppHistogram", firstAppHistogram.snapshot(samples, MAX_DEPTH)
+            .put("selection", "First classPrefix match nearest stack[0] within depthLimit; no fallback when identity is rejected")
+            .put("classPrefix", APP_CLASS_PREFIX).put("noMatchSamples", noAppMatchSamples)
+            .put("depthLimitedNoMatchSamples", depthLimitedNoAppMatchSamples)
+            .put("noMatchMeaning", "No exact prefix match within inspected depth; matches beyond that depth are unknown"))
         .put("operationFamilyDepthLimit", MAX_DEPTH)
         .put("operationFamilyCounting", "Inclusive once per non-empty observation, before dynamic symbol admission; families may overlap")
         .put("operationFamilyZeroMeaning", "No matching frame observed within the inspected depth; absence between observations or beyond that depth is unknown")
@@ -226,6 +310,9 @@ internal class MainThreadSampleHistogram {
     const val INTERVAL_MS = 10L
     private const val MAX_DEPTH = 64
     private const val MAX_SYMBOLS = 256
+    private const val MAX_LEAF_SYMBOLS = 128
+    private const val MAX_APP_SYMBOLS = 96
+    private const val APP_CLASS_PREFIX = "com.immortal.launcher."
     private const val MAX_SYMBOL_CHARS = 512
     private const val MAX_TICKS = 6000L
     private const val MAX_TOP_FRAMES = 24
