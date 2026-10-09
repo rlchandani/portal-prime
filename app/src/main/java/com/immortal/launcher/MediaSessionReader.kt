@@ -185,6 +185,11 @@ object MediaSessionReader {
 
   /** Map a controller's metadata + playback state into a [NowPlayingState] and publish. */
   private fun publishFrom(c: MediaController) {
+    NowPlayingHub.publish(snapshotFrom(c))
+  }
+
+  /** Read an immutable snapshot without publishing or retaining the controller. */
+  internal fun snapshotFrom(c: MediaController): NowPlayingState {
     val md = c.metadata
     val ps = c.playbackState
     val state =
@@ -216,17 +221,17 @@ object MediaSessionReader {
                 ?: str(MediaMetadata.METADATA_KEY_ART_URI)
                 ?: str(MediaMetadata.METADATA_KEY_DISPLAY_ICON_URI)
 
-    NowPlayingHub.publish(
-        NowPlayingState(
-            state = state,
-            title = title.orEmpty(),
-            artist = artist.orEmpty(),
-            album = album.orEmpty(),
-            artUrl = artUri.orEmpty(),
-            durationMs = md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L,
-            positionMs = ps?.position ?: 0L,
-            source = c.packageName,
-            artBitmap = artBitmap))
+    return NowPlayingState(
+        state = state,
+        title = title.orEmpty(),
+        artist = artist.orEmpty(),
+        album = album.orEmpty(),
+        artUrl = artUri.orEmpty(),
+        durationMs = md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L,
+        positionMs = ps?.position ?: 0L,
+        source = c.packageName,
+        artBitmap = artBitmap,
+        canSeek = ((ps?.actions ?: 0L) and MediaPlaybackState.ACTION_SEEK_TO) != 0L)
   }
 
   /** Scale album art down to [ART_MAX_EDGE] into a new bitmap; never recycle the

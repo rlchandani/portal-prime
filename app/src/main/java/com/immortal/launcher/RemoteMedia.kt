@@ -9,6 +9,7 @@ package com.immortal.launcher
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
 import java.io.ByteArrayOutputStream
@@ -26,12 +27,12 @@ object RemoteMedia {
   // touch the Android main looper; only command() — on-device — ever needs it.
   private val main by lazy { Handler(Looper.getMainLooper()) }
 
-  /** Current now-playing as JSON for `/remote/nowplaying`. `{active:false}` when nothing plays. */
+  /** Current now-playing as JSON for `/remote/nowplaying`. `active:false` when nothing plays. */
   fun stateJson(): JSONObject = stateJson(NowPlayingHub.current)
 
   /** Pure serializer (testable): the live [stateJson] delegates here with [NowPlayingHub.current]. */
   internal fun stateJson(s: NowPlayingState?): JSONObject {
-    if (s == null) return JSONObject().put("active", false)
+    if (s == null) return JSONObject().put("active", false).put("canSeek", false)
     return JSONObject()
         .put("active", true)
         .put("title", s.title)
@@ -40,12 +41,37 @@ object RemoteMedia {
         .put("durationMs", s.durationMs)
         .put("positionMs", s.positionMs)
         .put("playing", s.state == PlaybackState.PLAYING)
+        .put("canSeek", s.canSeek)
         .put("source", s.source)
         .put("hasArt", s.artBitmap != null || s.artUrl.isNotBlank())
         // Changes only when the track changes, so the phone caches the cover and refetches
         // /remote/art (a fresh ?v=) just once per track instead of every poll.
         .put("artVersion", artVersion(s))
   }
+
+  /** Music volume is transient system state, independent of any media session or preferences. */
+  internal data class VolumeState(
+      val level: Int,
+      val max: Int,
+      val muted: Boolean,
+      val canSet: Boolean,
+  ) {
+    fun toJson(): JSONObject =
+        JSONObject().put("level", level).put("max", max).put("muted", muted).put("canSet", canSet)
+  }
+
+  internal fun volumeState(audio: AudioManager): VolumeState {
+    val max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+    return VolumeState(
+        level = audio.getStreamVolume(AudioManager.STREAM_MUSIC),
+        max = max,
+        muted = audio.isStreamMute(AudioManager.STREAM_MUSIC),
+        canSet = !audio.isVolumeFixed && max > 0)
+  }
+
+  /** Pure combined serializer; the single-argument overload still needs no Android services. */
+  internal fun stateJson(s: NowPlayingState?, volume: VolumeState): JSONObject =
+      stateJson(s).put("volume", volume.toJson())
 
   /**
    * Dispatch a transport command. Posts to the main thread because [MediaSessionReader]'s

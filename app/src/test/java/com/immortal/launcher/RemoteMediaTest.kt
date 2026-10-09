@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 package com.immortal.launcher
 
 import org.junit.Assert.assertEquals
@@ -5,6 +12,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import android.media.AudioManager
+import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 
 class RemoteMediaTest {
 
@@ -12,6 +22,7 @@ class RemoteMediaTest {
   fun stateJson_nullIsInactive() {
     val j = RemoteMedia.stateJson(null)
     assertFalse(j.getBoolean("active"))
+    assertFalse(j.getBoolean("canSeek"))
   }
 
   @Test
@@ -28,6 +39,7 @@ class RemoteMediaTest {
     val j = RemoteMedia.stateJson(s)
     assertTrue(j.getBoolean("active"))
     assertTrue(j.getBoolean("playing"))
+    assertFalse(j.getBoolean("canSeek"))
     assertEquals("Song", j.getString("title"))
     assertEquals("Band", j.getString("artist"))
     assertEquals("Record", j.getString("album"))
@@ -58,5 +70,36 @@ class RemoteMediaTest {
     // Position/playback changes shouldn't churn the cover; the title (track) changing should.
     assertEquals(ver("Track One"), ver("Track One"))
     assertNotEquals(ver("Track One"), ver("Track Two"))
+  }
+
+  @Test fun stateJson_seekCapabilityDoesNotChangeLegacyTrackFieldsOrArtVersion() {
+    val original = NowPlayingState(PlaybackState.PLAYING, title = "Synthetic track", source = "com.synthetic.player")
+    val before = RemoteMedia.stateJson(original)
+    val after = RemoteMedia.stateJson(original.copy(canSeek = true))
+    assertFalse(before.getBoolean("canSeek"))
+    assertTrue(after.getBoolean("canSeek"))
+    after.put("canSeek", false)
+    assertEquals(before.toString(), after.toString())
+  }
+
+  @Test fun volumeSnapshotAndSerializerAreIndependentOfLaterAudioAndJsonChanges() {
+    val audio = Mockito.mock(AudioManager::class.java)
+    `when`(audio.getStreamVolume(AudioManager.STREAM_MUSIC)).thenReturn(7)
+    `when`(audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)).thenReturn(15)
+    val first = RemoteMedia.volumeState(audio)
+    `when`(audio.getStreamVolume(AudioManager.STREAM_MUSIC)).thenReturn(0)
+    `when`(audio.isStreamMute(AudioManager.STREAM_MUSIC)).thenReturn(true)
+    val second = RemoteMedia.volumeState(audio)
+    assertEquals(7, first.level)
+    assertFalse(first.muted)
+    assertEquals(0, second.level)
+    assertTrue(second.muted)
+    assertTrue(second.canSet)
+    val combined = RemoteMedia.stateJson(null, first)
+    combined.getJSONObject("volume").put("level", 99)
+    val fresh = RemoteMedia.stateJson(null, first)
+    assertEquals(7, fresh.getJSONObject("volume").getInt("level"))
+    assertFalse(fresh.getBoolean("active"))
+    assertFalse(fresh.getBoolean("canSeek"))
   }
 }

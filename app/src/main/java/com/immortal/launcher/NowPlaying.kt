@@ -38,6 +38,8 @@ data class NowPlayingState(
      * metadata. In-process only — never make this Parcelable.
      */
     val artBitmap: Bitmap? = null,
+    /** Whether the active media session advertises seek transport. */
+    val canSeek: Boolean = false,
 ) {
   /** True when there's an actual track to show (playing or paused, with a title). */
   val active: Boolean

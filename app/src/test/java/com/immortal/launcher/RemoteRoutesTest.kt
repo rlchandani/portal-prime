@@ -41,4 +41,15 @@ class RemoteRoutesTest {
     assertEquals(0L, RemoteRoutes.clampWaitMs(-5L))
     assertEquals(10_000L, RemoteRoutes.clampWaitMs(999_999L))
   }
+
+  @Test fun volumeLevelAcceptsOnlyIntegersWithinTheExactStreamRange() {
+    assertEquals(0, RemoteRoutes.validatedVolumeLevel(0, 15))
+    assertEquals(15, RemoteRoutes.validatedVolumeLevel(15, 15))
+    assertEquals(7, RemoteRoutes.validatedVolumeLevel(7L, 15))
+    assertEquals(0, RemoteRoutes.validatedVolumeLevel(0, 0))
+    for (value in listOf(null, true, "7", 0.5, 7.0, -1, 16, Long.MAX_VALUE, 4_294_967_296L)) {
+      assertNull("value=$value", RemoteRoutes.validatedVolumeLevel(value, 15))
+    }
+    assertNull(RemoteRoutes.validatedVolumeLevel(0, -1))
+  }
 }

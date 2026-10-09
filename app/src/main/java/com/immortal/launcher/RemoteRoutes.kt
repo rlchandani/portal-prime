@@ -51,9 +51,9 @@ class RemoteRoutes(private val context: Context) {
         "/remote/art" -> requireMethod("GET", req) { art() }
         // Authenticated: anything that reads the app list or drives input.
         "/remote/apps" -> authed(req) { apps() }
-        "/remote/nowplaying" -> authed(req) { json(200, ok().put("np", RemoteMedia.stateJson())) }
+        "/remote/nowplaying" -> authed(req) { requireMethod("GET", req) { nowplaying() } }
         "/remote/media" -> authed(req) { media(req) }
-        "/remote/volume" -> authed(req) { volume(req) }
+        "/remote/volume" -> authed(req) { requireMethod("POST", req) { volume(req) } }
         "/remote/key" -> authed(req) { key(req) }
         "/remote/launch" -> authed(req) { launch(req) }
         "/remote/text" -> authed(req) { text(req) }
@@ -154,21 +154,41 @@ class RemoteRoutes(private val context: Context) {
     return json(if (dispatched) 200 else 409, JSONObject().put("ok", dispatched).put("action", action))
   }
 
-  /** Media volume for the active (music) stream: `{"dir":"up|down|mute"}`. Shows the system
-   *  volume UI on the TV. Uses AudioManager directly — no accessibility needed. */
+  /** Current media capabilities and a fresh music-volume snapshot, even when nothing plays. */
+  private fun nowplaying(): FleetHttpServer.Response {
+    return runCatching {
+      val audio = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+          ?: return json(503, err("audio_unavailable"))
+      json(200, ok().put("np", RemoteMedia.stateJson(NowPlayingHub.current, RemoteMedia.volumeState(audio))))
+    }.getOrElse { json(500, err("volume_failed")) }
+  }
+
+  /** Music volume: `{"dir":"up|down|mute|set","level":…}`. Set takes a stream index,
+   *  validated before dispatch; Android owns any normal mute behavior of setStreamVolume. */
   private fun volume(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val body = parseJson(req.bodyText()) ?: return json(400, err("bad_json"))
     val dir = body.optString("dir")
-    val adjust =
-        when (dir) {
+    if (dir !in setOf("up", "down", "mute", "set")) return json(400, err("unknown_dir"))
+    return runCatching {
+      val audio = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+          ?: return json(503, err("audio_unavailable"))
+      val max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+      val level = if (dir == "set") {
+        validatedVolumeLevel(body.opt("level"), max) ?: return json(400, err("invalid_level"))
+      } else null
+      if (audio.isVolumeFixed || max <= 0) return json(409, err("volume_fixed"))
+      if (level != null) {
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, level, AudioManager.FLAG_SHOW_UI)
+      } else {
+        val adjust = when (dir) {
           "up" -> AudioManager.ADJUST_RAISE
           "down" -> AudioManager.ADJUST_LOWER
-          "mute" -> AudioManager.ADJUST_TOGGLE_MUTE
-          else -> return json(400, err("unknown_dir"))
+          else -> AudioManager.ADJUST_TOGGLE_MUTE
         }
-    val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    runCatching { am.adjustStreamVolume(AudioManager.STREAM_MUSIC, adjust, AudioManager.FLAG_SHOW_UI) }
-    return json(200, ok().put("dir", dir))
+        audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, adjust, AudioManager.FLAG_SHOW_UI)
+      }
+      json(200, ok().put("dir", dir))
+    }.getOrElse { json(500, err("volume_failed")) }
   }
 
   private fun key(req: FleetHttpServer.Request): FleetHttpServer.Response {
@@ -495,6 +515,16 @@ class RemoteRoutes(private val context: Context) {
       val h = header?.trim() ?: return null
       if (!h.regionMatches(0, "Bearer ", 0, 7, ignoreCase = true)) return null
       return h.substring(7).trim().ifBlank { null }
+    }
+
+    /** Accept only JSON integer indices in the stream's range, without coercion or overflow. */
+    internal fun validatedVolumeLevel(value: Any?, max: Int): Int? {
+      val level = when (value) {
+        is Int -> value.toLong()
+        is Long -> value
+        else -> return null
+      }
+      return if (level >= 0L && level <= max.toLong()) level.toInt() else null
     }
 
     /** Clamp a preset "wait" step to a sane bound (0..10s) so a typo can't hang the runner. Pure. */
