@@ -34,6 +34,7 @@ These are metadata HTTP measurements, not rendered UI or slideshow frame-rate cl
 
 Toolkit 1.5.3 was installed on the paired Pixel. Its 463 JVM tests and 17 generated-fixture
 emulator UI workflows passed. The visible physical-phone workflow remains pending a
-secure-screen unlock; it has not been claimed as tested. The five-minute metadata soak
-is recorded privately under the primary checkout's build/fleet/diagnostics directory.
+secure-screen unlock; it has not been claimed as tested. The 303.57-second soak completed 100 requests per room with zero failures and consistently
+returned 12 photos. Family median/p95 was 48.44/67.31 ms; Living was 55.81/74.11 ms.
+The raw summary is retained privately in the primary checkout's build/fleet/diagnostics directory.
 The broader Portal performance and UX goal remains active.
