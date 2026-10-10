@@ -40,6 +40,10 @@ internal object FramePerformanceCapture {
   private val windows = ArrayList<Tracked>()
   private var sequence = 0L
   @Volatile private var current: Session? = null
+  private val settingsSearchPreparationProbe = SettingsSearchPreparationProbe(
+      currentMeasurement = ::settingsSearchPreparationMeasurement,
+      nanoTime = SystemClock::elapsedRealtimeNanos,
+  )
   private data class Tracked(val window: WeakReference<Window>, val host: String,
       var attachListener: View.OnAttachStateChangeListener? = null)
   private data class Binding(val window: WeakReference<Window>, val budgetNs: Long,
@@ -50,6 +54,7 @@ internal object FramePerformanceCapture {
     val thread = HandlerThread("immortal-perf", Process.THREAD_PRIORITY_BACKGROUND).apply { start() }
     val handler = Handler(thread.looper)
     val histograms = LinkedHashMap<String, FramePerformanceHistogram>()
+    val settingsSearchPreparation = SettingsSearchPreparationSamples()
     // Allocated only by an explicit sampleMain opt-in. No Activity/Window references in the sampler.
     val mainSamples = if (request.sampleMain) MainThreadSampleHistogram() else null
     var sampleMainActive = false // Guarded by the session monitor, like the histograms.
@@ -138,6 +143,26 @@ internal object FramePerformanceCapture {
   }
 
   fun stop(): Boolean = onMain { closeCurrent(); true }
+
+  /** The current preparation path is measured only for an explicitly active capture. */
+  fun <T> measureSettingsSearchIndex(prepare: () -> List<T>): List<T> =
+      settingsSearchPreparationProbe.prepare(prepare)
+
+  private fun settingsSearchPreparationMeasurement(): SettingsSearchPreparationMeasurement? {
+    val s = current ?: return null
+    synchronized(s) {
+      if (current !== s || s.closedAt != null || SystemClock.elapsedRealtime() >= s.deadline) return null
+    }
+    return SettingsSearchPreparationMeasurement { durationNs, entryCount ->
+      val now = SystemClock.elapsedRealtime()
+      synchronized(s) {
+        if (current === s && s.closedAt == null && now < s.deadline) {
+          s.settingsSearchPreparation.record(now - s.began, durationNs, entryCount,
+              Looper.myLooper() === Looper.getMainLooper())
+        }
+      }
+    }
+  }
 
   private fun startMainSampling(s: Session) {
     val histogram = s.mainSamples ?: return
@@ -313,6 +338,7 @@ internal object FramePerformanceCapture {
           .put("untrackedHosts", s.rejectedHosts).put("untrackedWindows", s.rejectedWindows)
           .put("attachFailures", s.attachFailures)
           .put("hosts", JSONObject().apply { s.histograms.forEach { (name, h) -> put(name, h.snapshot()) } })
+      result.put("settingsSearchPreparation", s.settingsSearchPreparation.snapshot())
       s.mainSamples?.let { result.put("mainThreadSamples", it.snapshot()) }
     }
     // Sample only on explicit reads, outside the per-frame lock/handler.

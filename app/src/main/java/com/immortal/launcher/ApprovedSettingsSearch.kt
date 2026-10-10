@@ -72,35 +72,36 @@ private fun approvedPageForSpec(domain: String, spec: SettingSpec<*>): String? {
 }
 
 /** Registry titles/help plus native editor field names. No fixture values or credentials. */
-internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> {
-    val entries = mutableListOf<ApprovedSettingsSearchResult>()
-    ApprovedSettingsPages.forEach { entries += ApprovedSettingsSearchResult(it.title, it.id) }
-    SettingsRegistry.domains.forEach { raw ->
-        @Suppress("UNCHECKED_CAST")
-        val domain = raw as SettingsDomain<Any>
-        domain.specs.forEach { spec ->
-            val title: String
-            val help: String?
-            when (spec) {
-                is BoolSpec<*> -> { title = spec.title; help = spec.help }
-                is IntSpec<*> -> { title = spec.title; help = spec.help }
-                is EnumSpec<*> -> { title = spec.title; help = spec.help }
-                is StringSpec<*> -> { title = spec.title; help = spec.help }
-                is NavSpec<*> -> { title = spec.title; help = spec.help }
-                is DerivedSpec<*> -> return@forEach
+internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> =
+    FramePerformanceCapture.measureSettingsSearchIndex {
+        val entries = mutableListOf<ApprovedSettingsSearchResult>()
+        ApprovedSettingsPages.forEach { entries += ApprovedSettingsSearchResult(it.title, it.id) }
+        SettingsRegistry.domains.forEach { raw ->
+            @Suppress("UNCHECKED_CAST")
+            val domain = raw as SettingsDomain<Any>
+            domain.specs.forEach { spec ->
+                val title: String
+                val help: String?
+                when (spec) {
+                    is BoolSpec<*> -> { title = spec.title; help = spec.help }
+                    is IntSpec<*> -> { title = spec.title; help = spec.help }
+                    is EnumSpec<*> -> { title = spec.title; help = spec.help }
+                    is StringSpec<*> -> { title = spec.title; help = spec.help }
+                    is NavSpec<*> -> { title = spec.title; help = spec.help }
+                    is DerivedSpec<*> -> return@forEach
+                }
+                // Registry visibility remains authoritative. Hidden managed controls appear in
+                // the read-only audit; conditional controls remain searchable with prerequisites.
+                val managed = "${domain.id}.${spec.key}" in ApprovedManagedControls
+                val page = (if (managed) "managed" else approvedPageForSpec(domain.id, spec))
+                    ?: return@forEach
+                entries += ApprovedSettingsSearchResult(title, page,
+                    domain.id, spec.key, help.orEmpty(), managed)
             }
-            // Registry visibility remains authoritative. Hidden managed controls appear in
-            // the read-only audit; conditional controls remain searchable with prerequisites.
-            val managed = "${domain.id}.${spec.key}" in ApprovedManagedControls
-            val page = (if (managed) "managed" else approvedPageForSpec(domain.id, spec))
-                ?: return@forEach
-            entries += ApprovedSettingsSearchResult(title, page,
-                domain.id, spec.key, help.orEmpty(), managed)
         }
+        entries += ApprovedNativeSettingsFields
+        entries.distinctBy { it.id.ifBlank { "page:${it.page}" } }
     }
-    entries += ApprovedNativeSettingsFields
-    return entries.distinctBy { it.id.ifBlank { "page:${it.page}" } }
-}
 
 internal fun approvedSettingsSearch(index: List<ApprovedSettingsSearchResult>, query: String): List<ApprovedSettingsSearchResult> {
     if (query.isBlank()) return emptyList()
