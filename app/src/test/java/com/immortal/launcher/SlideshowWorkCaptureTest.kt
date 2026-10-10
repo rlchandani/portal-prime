@@ -103,6 +103,20 @@ class SlideshowWorkCaptureTest {
     assertTrue(sample.getBoolean("onMain"))
   }
 
+  @Test fun startupStagesUseTheExistingBoundedSessionAndMainAttribution() = withFixture { f ->
+    val s = f.session(); f.select(s); f.resetCounters()
+    for (stage in listOf(SlideshowWorkStage.CONTROLLER_CONSTRUCTION, SlideshowWorkStage.VIEW_BUILD,
+        SlideshowWorkStage.CONTROLLER_START, SlideshowWorkStage.WEB_VIEW_CONSTRUCTION)) {
+      val span = startedSpan(stage)
+      span.finish()
+      val recorded = f.samples(s).getJSONObject("stages").getJSONObject(stage.key)
+      assertEquals(1L, recorded.getLong("records"))
+      assertEquals(1L, recorded.getLong("mainThreadRecords"))
+      assertEquals(2.5, recorded.getDouble("meanMs"), 0.0)
+    }
+    assertEquals(4L, f.samples(s).getLong("records"))
+  }
+
   @Test fun suppliedWorkerLooperAttributionIsRecorded() = withFixture { f ->
     val s = f.session(); f.select(s); f.onMain = false
     val span = startedSpan(SlideshowWorkStage.METADATA_PREPARATION)

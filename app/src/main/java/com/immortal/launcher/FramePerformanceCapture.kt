@@ -319,6 +319,8 @@ internal object FramePerformanceCapture {
         FramePerformanceHistogram(budget).also { s.histograms[key] = it }
       } else { s.rejectedHosts++; null }
     } ?: return
+    // One reusable buffer per active binding; paired detail copies only a new worst frame.
+    val componentBuffer = LongArray(componentIds.size)
     val listener = Window.OnFrameMetricsAvailableListener { _, metrics, dropped ->
       val now = SystemClock.elapsedRealtime()
       synchronized(s) {
@@ -327,10 +329,10 @@ internal object FramePerformanceCapture {
           requestExpiry(s)
           return@OnFrameMetricsAvailableListener
         }
-        if (histogram.record(metrics.getMetric(FrameMetrics.TOTAL_DURATION), dropped,
-            metrics.getMetric(FrameMetrics.FIRST_DRAW_FRAME) == 1L)) {
-          for (i in componentIds.indices) histogram.component(i, metrics.getMetric(componentIds[i]))
-        }
+        for (i in componentIds.indices) componentBuffer[i] = metrics.getMetric(componentIds[i])
+        // Receipt time is not vsync/presentation time; each component is from this same callback.
+        histogram.recordDetailed(metrics.getMetric(FrameMetrics.TOTAL_DURATION), dropped,
+            metrics.getMetric(FrameMetrics.FIRST_DRAW_FRAME) == 1L, now - s.began, componentBuffer)
       }
     }
     runCatching {

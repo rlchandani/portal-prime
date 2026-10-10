@@ -78,8 +78,11 @@ class PhotoFramePreviewActivity : ComponentActivity() {
       return
     }
 
-    frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
-        interactivePreview = !intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock)
+    val construction = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.CONTROLLER_CONSTRUCTION)
+    try {
+      frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
+          interactivePreview = !intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock)
+    } finally { construction?.finish() }
     // Only the screensaver-continuation launch (DreamPolicy's force-wake handoff) honours the
     // "open when dismissed" choice — to the user that frame IS the screensaver, so a tap must
     // behave like PhotoDreamService's tap (issue #146). Deliberate on-demand starts (settings

@@ -14,6 +14,10 @@ internal enum class SlideshowWorkStage(val key: String, val event: Boolean = fal
   WEB_VIEW_ADMISSION("webViewAdmission"),
   ENGINE_PAGE_FINISHED("enginePageFinished", true),
   ENGINE_RETIRED("engineRetired", true),
+  CONTROLLER_CONSTRUCTION("controllerConstruction"),
+  VIEW_BUILD("viewBuild"),
+  CONTROLLER_START("controllerStart"),
+  WEB_VIEW_CONSTRUCTION("webViewConstruction"),
 }
 
 /**

@@ -59,7 +59,7 @@ class SlideshowWorkSamplesTest {
       assertTrue(samples.record(stage, 900_000L, if (stage.event) 0L else 900_000_000_000L, false))
     }
     val snapshot = samples.snapshot()
-    assertCounts(snapshot, 8L)
+    assertCounts(snapshot, SlideshowWorkStage.entries.size * 2L)
     for ((key, kind) in expectedKinds) {
       if (kind == "event") assertStage(snapshot, key, records = 2L, main = 1L, other = 1L)
       else assertStage(snapshot, key, 2L, 1L, 1L, 900_000.0, 450_000.0, 900_000.0,
@@ -80,7 +80,7 @@ class SlideshowWorkSamplesTest {
     for (stage in SlideshowWorkStage.entries) for ((elapsed, duration) in invalid)
       assertFalse(samples.record(stage, elapsed, duration, true))
     val snapshot = samples.snapshot()
-    assertCounts(snapshot, 1L, invalid = 32L)
+    assertCounts(snapshot, 1L, invalid = SlideshowWorkStage.entries.size * invalid.size.toLong())
     assertEquals(1, snapshot.getJSONArray("samples").length())
     assertStage(snapshot, "webViewAdmission", records = 1L, other = 1L,
         total = .25, mean = .25, max = .25, otherTotal = .25, otherMean = .25, otherMax = .25)
@@ -89,7 +89,7 @@ class SlideshowWorkSamplesTest {
     assertStage(snapshot, "engineRetired")
     // Invalid input must not poison subsequent admission.
     assertTrue(samples.record(SlideshowWorkStage.METADATA_PREPARATION, 0L, 0L, true))
-    assertCounts(samples.snapshot(), 2L, invalid = 32L)
+    assertCounts(samples.snapshot(), 2L, invalid = SlideshowWorkStage.entries.size * invalid.size.toLong())
   }
 
   @Test fun eventStagesRejectEveryNonZeroDuration() {
@@ -187,7 +187,9 @@ class SlideshowWorkSamplesTest {
 
   private val expectedKinds = linkedMapOf(
       "metadataPreparation" to "elapsed", "webViewAdmission" to "elapsed",
-      "enginePageFinished" to "event", "engineRetired" to "event")
+      "enginePageFinished" to "event", "engineRetired" to "event",
+      "controllerConstruction" to "elapsed", "viewBuild" to "elapsed",
+      "controllerStart" to "elapsed", "webViewConstruction" to "elapsed")
 
   private fun assertCounts(snapshot: JSONObject, records: Long, invalid: Long = 0L, discarded: Long = 0L) {
     assertEquals(setOf("measurement", "records", "invalidRecords", "discardedRecords",

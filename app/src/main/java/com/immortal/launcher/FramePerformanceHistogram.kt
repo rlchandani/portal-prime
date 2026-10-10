@@ -26,6 +26,12 @@ internal class FramePerformanceHistogram(private val budgetNs: Long) {
   private var over33 = 0L
   private var total = 0L
   private var maximum = 0L
+  private var detailedFrames = 0L
+  private var invalidDetails = 0L
+  private var worstDetailedNanos = 0L
+  private var worstElapsedMs = 0L
+  private var worstFirstDraw = false
+  private val worstComponents = LongArray(8)
 
   fun record(nanos: Long, dropped: Int, firstDraw: Boolean): Boolean {
     drops += dropped.coerceAtLeast(0)
@@ -40,6 +46,26 @@ internal class FramePerformanceHistogram(private val budgetNs: Long) {
     total += nanos
     maximum = maxOf(maximum, nanos)
     bins[(nanos / 250_000L).coerceAtMost(2000).toInt()]++
+    return true
+  }
+
+  /** Primitive-only capture entry; caller reuses the component buffer. */
+  fun recordDetailed(nanos: Long, dropped: Int, firstDraw: Boolean,
+      elapsedMs: Long, componentNanos: LongArray): Boolean {
+    require(componentNanos.size == sums.size)
+    if (!record(nanos, dropped, firstDraw)) return false
+    for (i in componentNanos.indices) component(i, componentNanos[i])
+    if (elapsedMs !in 0L..900_000L) {
+      invalidDetails++
+      return true // Aggregate timing remains valid; timestamp cannot describe the worst frame.
+    }
+    detailedFrames++
+    if (nanos > worstDetailedNanos) {
+      worstDetailedNanos = nanos
+      worstElapsedMs = elapsedMs
+      worstFirstDraw = firstDraw
+      componentNanos.copyInto(worstComponents)
+    }
     return true
   }
 
@@ -81,6 +107,14 @@ internal class FramePerformanceHistogram(private val budgetNs: Long) {
           .put("meanMs", if (samples[i] == 0L) JSONObject.NULL else sums[i].toDouble() / samples[i] / 1e6)
           .put("maxMs", maxima[i] / 1e6))
     })
+    out.put("detailedFrames", detailedFrames).put("invalidDetailSamples", invalidDetails)
+        .put("worstFrame", if (worstDetailedNanos == 0L || worstDetailedNanos != maximum) JSONObject.NULL
+        else JSONObject().put("elapsedMs", worstElapsedMs).put("totalMs", worstDetailedNanos / 1e6)
+            .put("firstDraw", worstFirstDraw).put("components", JSONObject().apply {
+              for (i in names.indices) put(names[i],
+                  if (worstComponents[i] in 0L..60_000_000_000L) worstComponents[i] / 1e6
+                  else JSONObject.NULL)
+            }))
     return out
   }
 

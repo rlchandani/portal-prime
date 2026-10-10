@@ -298,10 +298,18 @@ class PhotoFrameController(
     }
   }
 
-  val view: View by lazy { buildUi() }
+  val view: View by lazy {
+    val construction = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.VIEW_BUILD)
+    try { buildUi() } finally { construction?.finish() }
+  }
   private var nativePhotoMode = false
 
   fun start() {
+    val startup = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.CONTROLLER_START)
+    try { startFrame() } finally { startup?.finish() }
+  }
+
+  private fun startFrame() {
     stopped = false
     settings = ScreensaverConfig.load(context)
     val root = view as FrameLayout
@@ -677,11 +685,13 @@ class PhotoFrameController(
               // Keep the previous view owned while metadata prepares. No new WebView exists
               // before admission, so stop/reload cannot strand an unattached allocation.
               retireWebView()
-              val wv =
-                  object : android.webkit.WebView(context) {
-                    override fun onTouchEvent(event: MotionEvent): Boolean = false
-                    override fun performClick(): Boolean = false
-                  }
+              val construction = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.WEB_VIEW_CONSTRUCTION)
+              val wv = try {
+                object : android.webkit.WebView(context) {
+                  override fun onTouchEvent(event: MotionEvent): Boolean = false
+                  override fun performClick(): Boolean = false
+                }
+              } finally { construction?.finish() }
               // Register immediately so any later bridge/layout/load failure has Main-owned cleanup.
               webView = wv
               wv.setBackgroundColor(Color.BLACK)
