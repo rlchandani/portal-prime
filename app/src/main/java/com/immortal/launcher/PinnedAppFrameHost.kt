@@ -78,9 +78,14 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
         return pkg !in homePackages
     }
 
+    /** Unguarded observation needs only the current app; pin/reveal guards need all identities. */
+    private fun observationWindows(): List<PinAppWindow> =
+        if (pinned || covered || nativeCover || pendingReveal != null) readPinAppWindows(service)
+        else listOfNotNull(readPinAppWindow(service))
+
     override fun pinCurrent(): Boolean {
         if (closed || covered || nativeCover || ImmortalDreamNavigation.hasOwnedSurface()) return false
-        val window = current(readPinAppWindows(service))
+        val window = readPinAppWindow(service)
         if (!eligible(window)) return false
         val selected = window ?: return false
         if (!policy.pin(PinnedWindowIdentity(selected.packageName, selected.windowId))) return false
@@ -96,7 +101,7 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
 
     override fun markSessionExpired() {
         if (closed) return
-        policy.expire(identity(current(readPinAppWindows(service))))
+        policy.expire(identity(readPinAppWindow(service)))
         cancelReveal()
         surface?.let { showLostSession(it) }
         windowsChanged()
@@ -114,7 +119,7 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
 
     override fun windowsChanged() {
         if (closed) return
-        val windows = readPinAppWindows(service)
+        val windows = observationWindows()
         val foreground = current(windows)
         // These are actual TYPE_APPLICATION roots. Native TYPE_SYSTEM Dreams and our
         // TYPE_ACCESSIBILITY_OVERLAY are excluded by the reader, not by pin eligibility.
@@ -423,7 +428,7 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
     }
 
     override fun status(): JSONObject {
-        val windows = readPinAppWindows(service)
+        val windows = observationWindows()
         val foreground = current(windows)
         return JSONObject().put("ok", true).put("available", !closed).put("pinned", pinned).put("covered", covered)
             .put("nativeCover", nativeCover).put("lost", policy.lost).put("expired", policy.expired).put("label", label)

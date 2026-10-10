@@ -59,7 +59,8 @@ class PinWindowReaderTest {
         PinAppWindow("com.synthetic.focused", 12, true, false),
         readPinAppWindow(service(active.window, focused.window, underneath.window)),
     )
-    listOf(active, focused, underneath).forEach(::assertMetadataOnlyAndReleased)
+    assertForegroundRootReadAndReleased(focused)
+    listOf(active, underneath).forEach(::assertForegroundRootSkippedAndReleased)
   }
 
   @Test fun singleSelectionUsesFirstFocusedInWindowOrder() {
@@ -70,7 +71,8 @@ class PinWindowReaderTest {
         PinAppWindow("com.synthetic.first", 21, true, false),
         readPinAppWindow(service(first.window, second.window)),
     )
-    listOf(first, second).forEach(::assertMetadataOnlyAndReleased)
+    assertForegroundRootReadAndReleased(first)
+    assertForegroundRootSkippedAndReleased(second)
   }
 
   @Test fun singleSelectionFallsBackToFirstActiveInWindowOrder() {
@@ -82,7 +84,8 @@ class PinWindowReaderTest {
         PinAppWindow("com.synthetic.first", 31, false, true),
         readPinAppWindow(service(underneath.window, first.window, second.window)),
     )
-    listOf(underneath, first, second).forEach(::assertMetadataOnlyAndReleased)
+    assertForegroundRootReadAndReleased(first)
+    listOf(underneath, second).forEach(::assertForegroundRootSkippedAndReleased)
   }
 
   @Test fun singleSelectionReturnsNullWhenAllApplicationWindowsAreUnfocusedAndInactive() {
@@ -90,7 +93,7 @@ class PinWindowReaderTest {
 
     assertNull(readPinAppWindow(service(underneath.window)))
 
-    assertMetadataOnlyAndReleased(underneath)
+    assertForegroundRootSkippedAndReleased(underneath)
   }
 
   @Test fun emptyWindowSnapshotReturnsNoMetadata() {
@@ -185,10 +188,7 @@ class PinWindowReaderTest {
 
     assertNull(readPinAppWindow(service(invalid.window)))
 
-    Mockito.verify(invalid.window).recycle()
-    Mockito.verify(invalid.root).packageName
-    Mockito.verify(invalid.root).recycle()
-    Mockito.verifyNoMoreInteractions(invalid.root)
+    assertForegroundRootSkippedAndReleased(invalid)
   }
 
   @Test fun staleMetadataAtEachReadReleasesTheRootAndPreservesOtherWindows() {
@@ -310,6 +310,20 @@ class PinWindowReaderTest {
       Mockito.mock(AccessibilityService::class.java).also {
         `when`(it.windows).thenReturn(windows.toList())
       }
+
+  private fun assertForegroundRootReadAndReleased(snapshot: AppSnapshot) {
+    Mockito.verify(snapshot.window).root
+    Mockito.verify(snapshot.window).recycle()
+    Mockito.verify(snapshot.root).packageName
+    Mockito.verify(snapshot.root).recycle()
+    Mockito.verifyNoMoreInteractions(snapshot.root)
+  }
+
+  private fun assertForegroundRootSkippedAndReleased(snapshot: AppSnapshot) {
+    Mockito.verify(snapshot.window, Mockito.never()).root
+    Mockito.verify(snapshot.window).recycle()
+    Mockito.verifyNoInteractions(snapshot.root)
+  }
 
   private fun assertMetadataOnlyAndReleased(snapshot: AppSnapshot) {
     Mockito.verify(snapshot.root).packageName
