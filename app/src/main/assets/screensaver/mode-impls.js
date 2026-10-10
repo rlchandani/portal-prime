@@ -12,6 +12,8 @@
 
   // ---- tiny DOM helpers -----------------------------------------------------
   function el(cls, parent) { const d = document.createElement("div"); if (cls) d.className = cls; if (parent) parent.appendChild(d); return d; }
+  // Publish the exact URL admitted by t.load. Resolve again only for a new preparation
+  // so derivative completion/eviction cannot silently substitute an unprepared resource.
   function bg(node, url, size) { node.style.backgroundImage = `url("${url}")`; node.style.backgroundSize = size || "cover"; node.style.backgroundPosition = "center"; node.style.backgroundRepeat = "no-repeat"; }
   // Anchor a cover-crop on the detected face (fx/fy in 0..1) so heads aren't clipped. Falls back to
   // the CSS default (a top-biased center) when the photo has no focal point yet.
@@ -155,15 +157,17 @@
     const frames = [el("ss-frame"), el("ss-frame")]; frames.forEach(f => ctx.root.appendChild(f));
     let cur = 0;
     function coverCell(p) { const c = el("ss-cell"); const im = el("ss-img drift", c); bg(im, ctx.url(p, 1400)); faceBg(im, p); im.style.animationDelay = (-Math.random() * 8) + "s"; return c; }
-    function containCell(p) { const c = el("ss-cell contain"); const fill = el("ss-fill", c); bg(fill, ctx.url(p, 1400)); const im = el("ss-img", c); bg(im, ctx.url(p, 1800), "contain"); return c; }
+    function containCell(fillUrl, imageUrl) { const c = el("ss-cell contain"); const fill = el("ss-fill", c); bg(fill, fillUrl); const im = el("ss-img", c); bg(im, imageUrl, "contain"); return c; }
     async function step() {
       const f = frames[1 - cur]; f.innerHTML = "";
       const c = SS.counts(deck); const roll = Math.random();
-      let urls = [];
-      if (roll < 0.28 && c.pano) { const p = SS.take(deck, ctx.cursor, ["pano"])[0]; f.appendChild(containCell(p)); urls = [ctx.url(p, 1800)]; }
-      else if (roll < 0.6 && c.landscape) { const p = SS.take(deck, ctx.cursor, ["landscape"])[0]; f.appendChild(containCell(p)); urls = [ctx.url(p, 1800)]; }
-      else { const ps = SS.take(deck, ctx.cursor, ["portrait", "portrait"]); ps.forEach(p => f.appendChild(containCell(p))); urls = ps.map(p => ctx.url(p, 1800)); }
-      if (!await t.load(urls)) return false;
+      let ps;
+      if (roll < 0.28 && c.pano) ps = SS.take(deck, ctx.cursor, ["pano"]);
+      else if (roll < 0.6 && c.landscape) ps = SS.take(deck, ctx.cursor, ["landscape"]);
+      else ps = SS.take(deck, ctx.cursor, ["portrait", "portrait"]);
+      const resources = ps.map(p => ({ fillUrl: ctx.url(p, 1400), imageUrl: ctx.url(p, 1800) }));
+      if (!await t.load([].concat(...resources.map(r => [r.fillUrl, r.imageUrl])))) return false;
+      resources.forEach(r => f.appendChild(containCell(r.fillUrl, r.imageUrl)));
       frames[cur].classList.remove("on"); f.classList.add("on"); cur = 1 - cur;
     }
     t.start(step); t.every(step, ctx.photoMs);
@@ -222,7 +226,7 @@
   // ---- 04 Living gallery wall (justified rows + swaps) ----------------------
   MODES.galleryWall = { name: "Living Gallery Wall", run(ctx, deck) {
     const t = makeTimers(ctx); const wall = el("ss-wall", ctx.root); let cells = [];
-    function buildImg(p) { const img = el("ss-img kb"); bg(img, ctx.url(p, 1200)); faceBg(img, p); if (Math.random() < 0.4) { img.classList.remove("kb"); return img; } img.style.setProperty("--d", (14 + Math.random() * 8) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
+    function buildImg(p, url) { const img = el("ss-img kb"); bg(img, url); faceBg(img, p); if (Math.random() < 0.4) { img.classList.remove("kb"); return img; } img.style.setProperty("--d", (14 + Math.random() * 8) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
     function layout() {
       const W = ctx.W, H = ctx.H, pad = 16, gutter = 12; const targetH = H > 1000 ? 300 : 240;
       const rows = Math.max(2, Math.round((H - pad * 2 + gutter) / (targetH + gutter)));
@@ -244,10 +248,10 @@
       while (cells.length < target.length) { const e = el("ss-gcell", wall); cells.push({ el: e, img: null, photo: null }); }
       while (cells.length > target.length) { cells.pop().el.remove(); }
       target.forEach((slot, i) => { const c = cells[i]; c.el.style.left = slot.left + "px"; c.el.style.top = slot.top + "px"; c.el.style.width = slot.width + "px"; c.el.style.height = slot.height + "px";
-        if (c.photo !== slot.photo) { const img = buildImg(slot.photo); c.el.appendChild(img); const old = c.img; t.frame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = slot.photo; } });
+        if (c.photo !== slot.photo) { const img = buildImg(slot.photo, slot.url); c.el.appendChild(img); const old = c.img; t.frame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = slot.photo; } });
     }
-    async function rebuild() { const slots = layout(); if (!await t.load(slots.map(s => ctx.url(s.photo, 1200)))) return false; render(slots); }
-    async function swap() { if (!cells.length) return; const onWall = cells.map(x => x.photo && x.photo.seed).filter(Boolean); if (!SS.unused(deck, onWall).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; let p = null; const wallSet = new Set(onWall); for (let k = 0; k < deck.length; k++) { const cand = deck[(ctx.cursor.i + k) % deck.length]; if (!wallSet.has(cand.seed) && SS.bucket(cand) === SS.bucket(c.photo)) { p = cand; ctx.cursor.i += k + 1; break; } } if (!p) p = SS.take(deck, ctx.cursor, ["any"], onWall)[0]; if (!await t.load(ctx.url(p, 1200))) return false; const img = buildImg(p); c.el.appendChild(img); const old = c.img; t.frame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
+    async function rebuild() { const slots = layout().map(s => ({ ...s, url: ctx.url(s.photo, 1200) })); if (!await t.load(slots.map(s => s.url))) return false; render(slots); }
+    async function swap() { if (!cells.length) return; const onWall = cells.map(x => x.photo && x.photo.seed).filter(Boolean); if (!SS.unused(deck, onWall).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; let p = null; const wallSet = new Set(onWall); for (let k = 0; k < deck.length; k++) { const cand = deck[(ctx.cursor.i + k) % deck.length]; if (!wallSet.has(cand.seed) && SS.bucket(cand) === SS.bucket(c.photo)) { p = cand; ctx.cursor.i += k + 1; break; } } if (!p) p = SS.take(deck, ctx.cursor, ["any"], onWall)[0]; const url = ctx.url(p, 1200); if (!await t.load(url)) return false; const img = buildImg(p, url); c.el.appendChild(img); const old = c.img; t.frame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
     t.start(rebuild); t.every(swap, ctx.microMs);
     return t.cleanup;
   }};
@@ -277,10 +281,10 @@
     function mk() { const root = el("ss-single"); const fill = el("ss-fill", root); const hero = el("ss-hero", root); return { root, fill, hero }; }
     async function showSingle() { const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 2200); if (!await t.load(u)) return false; collage.classList.remove("on"); const S = singles[1 - sCur]; bg(S.fill, u); bg(S.hero, u, "contain"); kbVars(S.hero, p); S.hero.style.animation = "none"; void S.hero.offsetWidth; S.hero.style.animation = ""; singles[sCur].root.classList.remove("on"); S.root.classList.add("on"); sCur = 1 - sCur; }
     async function showCollage() {
-      const ps = SS.take(deck, ctx.cursor, ["any", "any", "any"]); if (!await t.load(ps.map(p => ctx.url(p, 1100)))) return false;
+      const ps = SS.take(deck, ctx.cursor, ["any", "any", "any"]), urls = ps.map(p => ctx.url(p, 1100)); if (!await t.load(urls)) return false;
       singles.forEach(s => s.root.classList.remove("on")); big.textContent = "Photo memories"; sub.textContent = ""; collage.innerHTML = "";
       const W = ctx.W, H = ctx.H; const slots = [{ l: W * .08, t: H * .16, w: W * .42, h: H * .5 }, { l: W * .53, t: H * .1, w: W * .36, h: H * .42 }, { l: W * .5, t: H * .56, w: W * .4, h: H * .3 }];
-      ps.forEach((p, i) => { const s = slots[i]; const tile = el("ss-mtile", collage); tile.style.left = s.l + "px"; tile.style.top = s.t + "px"; tile.style.width = s.w + "px"; tile.style.height = s.h + "px"; tile.style.transitionDelay = (i * .15) + "s"; const im = el("ss-img breathe", tile); bg(im, ctx.url(p, 1100)); faceBg(im, p); im.style.animationDelay = (-Math.random() * 8) + "s"; });
+      ps.forEach((p, i) => { const s = slots[i]; const tile = el("ss-mtile", collage); tile.style.left = s.l + "px"; tile.style.top = s.t + "px"; tile.style.width = s.w + "px"; tile.style.height = s.h + "px"; tile.style.transitionDelay = (i * .15) + "s"; const im = el("ss-img breathe", tile); bg(im, urls[i]); faceBg(im, p); im.style.animationDelay = (-Math.random() * 8) + "s"; });
       t.frame(() => { collage.classList.add("on"); title.classList.add("on"); }); t.after(() => title.classList.remove("on"), 4500);
     }
     function step() { beat++; return beat % 6 === 0 ? showCollage() : showSingle(); }
@@ -332,7 +336,7 @@
     async function drop(delay = 0) {
       const excluded = live.length >= MAX ? live.slice(1) : live;
       const p = SS.take(deck, ctx.cursor, ["any"], excluded.map(x => x.photo.seed))[0];
-      if (!await t.load(ctx.url(p, 1400))) return false;
+      const url = ctx.url(p, 1400); if (!await t.load(url)) return false;
       if (live.length >= MAX) { const old = live.shift(); freeCells.push(old.cell); old.el.style.opacity = "0"; old.el.style.transform += " translateY(-30px)"; t.after(() => old.el.remove(), 1000); }
       if (!freeCells.length) return;
       const cell = freeCells.splice(Math.floor(Math.random() * freeCells.length), 1)[0];
@@ -340,7 +344,7 @@
       const pl = el("ss-polaroid"); const a = aspect(p);
       // Big prints (2x the original 300/240) — the table is a 2160px wall display.
       const pw = a >= 1 ? 600 : 480; const ph = Math.round(pw / a);
-      const inner = el("ss-ph", pl); inner.style.width = pw + "px"; inner.style.height = ph + "px"; bg(inner, ctx.url(p, 1400));
+      const inner = el("ss-ph", pl); inner.style.width = pw + "px"; inner.style.height = ph + "px"; bg(inner, url);
       table.appendChild(pl); pl.style.transitionDelay = delay + "ms";
       place(pl, pw, ph, cell);
       const rot = (Math.random() * 2 - 1) * 11;
@@ -366,11 +370,11 @@
     // itself to the cover crop, so it pans through its full extent instead of Ken Burns.
     // A cached point cannot prove a safe motion path: keep that focus still. Cover crops
     // anchor on it; photos without a point retain the existing pan presentation.
-    function mkImg(p, rect) {
+    function mkImg(p, rect, url) {
       const plan = SS.fitPlan(aspect(p), rect.w / rect.h);
       if (plan.mode !== "cover") {
         const img = el(plan.mode === "panV" ? "ss-img panv" : "ss-img panh");
-        bg(img, ctx.url(p, 1200));
+        bg(img, url);
         if (plan.mode === "panV") { img.style.height = plan.size + "%"; img.style.setProperty("--travel", -(plan.size - 100) / plan.size * 100 + "%"); }
         else { img.style.width = plan.size + "%"; img.style.setProperty("--travel", -(plan.size - 100) / plan.size * 100 + "%"); }
         // Follow the configured hold plus dissolve, including long slideshow intervals.
@@ -384,7 +388,7 @@
         }
         return img;
       }
-      const img = el("ss-img kb"); bg(img, ctx.url(p, 1200)); if (Math.random() < 0.4) img.classList.remove("kb"); img.style.setProperty("--d", (12 + Math.random() * 6) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s";
+      const img = el("ss-img kb"); bg(img, url); if (Math.random() < 0.4) img.classList.remove("kb"); img.style.setProperty("--d", (12 + Math.random() * 6) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s";
       faceBg(img, p);
       return img;
     }
@@ -393,16 +397,16 @@
     function onWall() { return cells.map(x => x.photo && x.photo.seed).filter(Boolean); }
     function setRect(cell, r) { cell.rect = r; cell.c.style.left = r.x + "px"; cell.c.style.top = r.y + "px"; cell.c.style.width = r.w + "px"; cell.c.style.height = r.h + "px"; }
     // Replace a cell's image (crossfade in place — the cell itself never moves).
-    function setImg(cell, p) { const img = mkImg(p, cell.rect); cell.c.appendChild(img); const old = cell.img; t.frame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); cell.img = img; cell.photo = p; }
+    function setImg(cell, p, url) { const img = mkImg(p, cell.rect, url); cell.c.appendChild(img); const old = cell.img; t.frame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); cell.img = img; cell.photo = p; }
     async function build() {
       const selected = [];
       const slots = bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, SS.slots(deck, 9)).map(rect => {
         const photo = SS.take(deck, ctx.cursor, [wantFor(rect.w / rect.h)], selected)[0];
         selected.push(photo.seed); return { rect, photo };
-      });
-      if (!await t.load(slots.map(s => ctx.url(s.photo, 1200)))) return false;
-      slots.forEach(({ rect, photo }) => {
-        const c = el("ss-mcell", wall), cell = { c, img: mkImg(photo, rect), photo, rect };
+      }).map(s => ({ ...s, url: ctx.url(s.photo, 1200) }));
+      if (!await t.load(slots.map(s => s.url))) return false;
+      slots.forEach(({ rect, photo, url }) => {
+        const c = el("ss-mcell", wall), cell = { c, img: mkImg(photo, rect, url), photo, rect };
         setRect(cell, rect); c.appendChild(cell.img); cells.push(cell);
       });
       spotlight();
@@ -411,13 +415,13 @@
     // wall, exchange two same-appetite tiles' photos instead (crossfades, no movement).
     async function swap() {
       if (!cells.length) return;
-      if (SS.unused(deck, onWall()).length) { const c = cells[Math.floor(Math.random() * cells.length)]; const p = SS.take(deck, ctx.cursor, [wantFor(c.rect.w / c.rect.h)], onWall())[0]; if (!await t.load(ctx.url(p, 1200))) return false; setImg(c, p); return; }
+      if (SS.unused(deck, onWall()).length) { const c = cells[Math.floor(Math.random() * cells.length)]; const p = SS.take(deck, ctx.cursor, [wantFor(c.rect.w / c.rect.h)], onWall())[0]; const url = ctx.url(p, 1200); if (!await t.load(url)) return false; setImg(c, p, url); return; }
       const groups = {};
       cells.forEach(c => { const k = wantFor(c.rect.w / c.rect.h); (groups[k] = groups[k] || []).push(c); });
       const eligible = Object.values(groups).filter(g => g.length >= 2);
       if (!eligible.length) return;
       const [a, b] = window.shuffled(eligible[Math.floor(Math.random() * eligible.length)]).slice(0, 2);
-      const pa = a.photo; if (!await t.load([ctx.url(pa, 1200), ctx.url(b.photo, 1200)])) return false; setImg(a, b.photo); setImg(b, pa);
+      const pa = a.photo, pb = b.photo, ua = ctx.url(pa, 1200), ub = ctx.url(pb, 1200); if (!await t.load([ua, ub])) return false; setImg(a, pb, ub); setImg(b, pa, ua);
     }
     // One tile gently lifts while the rest dim a touch; the focus wanders per beat.
     function spotlight() { const i = Math.floor(Math.random() * cells.length); cells.forEach((c, k) => c.c.classList.toggle("spot", k === i)); }
@@ -433,11 +437,14 @@
   MODES.filmstrip = { name: "Filmstrip Coverflow", run(ctx, deck) {
     const t = makeTimers(ctx); const bdA = el("ss-bd", ctx.root), bdB = el("ss-bd", ctx.root); bdB.style.opacity = "0"; const track = el("ss-track", ctx.root);
     const items = []; const set = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, 12)).fill("any"));
-    set.forEach(p => { const s = el("ss-slide", track); const h = ctx.H * 0.62, w = h * aspect(p); s.style.width = w + "px"; const im = el("ss-img", s); im.style.width = w + "px"; im.style.height = "100%"; bg(im, ctx.url(p, 1400)); items.push({ el: s, w, photo: p }); });
     let center = 0, top = false;
     async function go(i) { const u = ctx.url(items[i].photo, 1000); if (!await t.load(u)) return false; items.forEach((s, k) => s.el.classList.toggle("center", k === i)); let off = 0; for (let k = 0; k < i; k++) off += items[k].w + 60; off += items[i].w / 2; track.style.transform = `translateX(${-off}px)`; const b = top ? bdA : bdB, o = top ? bdB : bdA; bg(b, u); b.style.opacity = "1"; o.style.opacity = "0"; top = !top; center = i; }
     function loop() { return go((center + 1) % items.length); }
-    t.start(async () => { if (!await t.load(set.map(p => ctx.url(p, 1400)))) return false; return go(0); });
+    t.start(async () => {
+      const urls = set.map(p => ctx.url(p, 1400)); if (!await t.load(urls)) return false;
+      set.forEach((p, i) => { const s = el("ss-slide", track); const h = ctx.H * 0.62, w = h * aspect(p); s.style.width = w + "px"; const im = el("ss-img", s); im.style.width = w + "px"; im.style.height = "100%"; bg(im, urls[i]); items.push({ el: s, w, photo: p }); });
+      return go(0);
+    });
     t.every(loop, ctx.microMs);
     t.cleanup.next = () => t.navigate(() => go((center + 1) % items.length));
     t.cleanup.previous = () => t.navigate(() => go((center + items.length - 1) % items.length));
