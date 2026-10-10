@@ -6,6 +6,16 @@
  */
 package com.immortal.launcher
 
-/** Suspend boundary for Apps badges; baseline retrieval still runs synchronously on the caller. */
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
+
+/** Keep notification Binder retrieval off the caller; discard a cancelled blocking read. */
 internal suspend fun loadApprovedAppBadges(): Map<String, Int> =
-    MediaNotificationListenerService.activeCountsByPackage()
+    withContext(Dispatchers.IO) {
+      currentCoroutineContext().ensureActive()
+      val badges = MediaNotificationListenerService.activeCountsByPackage()
+      currentCoroutineContext().ensureActive()
+      badges
+    }

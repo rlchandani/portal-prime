@@ -176,11 +176,17 @@ private fun ApprovedAppsContent(
       searching = true
     }
   }
+  // Badge retrieval refreshes independently so a slow Binder read cannot delay app preparation.
+  LaunchedEffect(resume, refresh, pageActive, resumed) {
+    if (!pageActive || !resumed) return@LaunchedEffect
+    val loaded = loadApprovedAppBadges()
+    kotlinx.coroutines.currentCoroutineContext().ensureActive()
+    badges = loaded
+  }
   LaunchedEffect(resume, refresh, pageActive, resumed) {
     if (!pageActive || !resumed) return@LaunchedEffect
     assignments = UserLayout.load(context)
     order = UserLayout.loadOrder(context)
-    badges = loadApprovedAppBadges()
     val epoch = resume to refresh
     if (lastSuccessfulEpoch == epoch) return@LaunchedEffect
     try {
