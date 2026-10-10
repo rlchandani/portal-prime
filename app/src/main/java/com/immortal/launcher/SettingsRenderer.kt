@@ -107,24 +107,13 @@ internal fun <S> prepareSettingsList(
 ): PreparedSettingsList<S> {
     val context = LocalContext.current
     val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
-    val groups = LinkedHashMap<String?, MutableList<SettingSpec<S>>>()
-    domain.specs.filter { spec ->
-        spec.key !in exclude && spec !is DerivedSpec<*> &&
-            spec.visibleWhen(context, snapshot) &&
-            (advanced || !SettingsPresentation.isAdvanced(domain.id, spec.key)) &&
-            (domain.id != "screensaver" || snapshot !is ScreensaverConfig.Settings ||
-                snapshot.enabled || spec.key == "enabled")
-    }.forEach { spec ->
-        val section = if (SettingsPresentation.isAdvanced(domain.id, spec.key)) "Advanced options"
-            else domain.sections[spec.key]
-        groups.getOrPut(section) { mutableListOf() }.add(spec)
+    val visibility = prepareSettingsVisibility(domain, snapshot, advanced, exclude) {
+        it.visibleWhen(context, snapshot)
     }
-    val projection = approvedSettingsLazyProjection(domain.id, groups) { it.key }
     val requested = LocalApprovedRequestedControl.current
         ?: (context as? Activity)?.intent?.getStringExtra(APPROVED_SETTINGS_CONTROL)
-    val hint = !advanced && domain.specs.any { it.key !in exclude &&
-        it.visibleWhen(context, snapshot) && SettingsPresentation.isAdvanced(domain.id, it.key) }
-    return PreparedSettingsList(domain, snapshot, advanced, projection, requested, hint, onApply)
+    return PreparedSettingsList(domain, snapshot, advanced, visibility.projection, requested,
+        visibility.showAdvancedHint, onApply)
 }
 
 /** Emits rows into an existing scroll owner; creates no nested list or bounded viewport. */
