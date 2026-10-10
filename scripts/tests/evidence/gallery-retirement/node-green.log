@@ -1,0 +1,17 @@
+✔ Gallery Wall retires a zero-opacity obsolete image when pause straddles its fade (2.875708ms)
+✔ retirement requires the exact obsolete target, opacity property, and computed zero (1.156208ms)
+✔ the existing fallback retires only computed-zero obsolete images (1.334375ms)
+✔ the fallback removes completed invisible images without a transition event (1.820459ms)
+✔ superseded replacements retire independently without touching the current image (2.230584ms)
+✔ global pause/resume retains fallback timing and visible images (2.147333ms)
+✔ cleanup releases all retirement handlers/timers and rejects delayed callbacks (2.323958ms)
+✔ cleanup during initial decode prevents publication and timer creation (0.746458ms)
+✔ cleanup during a paused replacement decode prevents late publication (0.758875ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 71.156291

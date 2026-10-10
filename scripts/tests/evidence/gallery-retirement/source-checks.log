@@ -1,0 +1,55 @@
+PASS product edits confined to Gallery Wall block
+PASS unchanged app/src/main/assets/screensaver/styles.css
+PASS unchanged app/src/main/assets/screensaver/scheduler.js
+PASS unchanged app/src/main/assets/screensaver/lib-engine.js
+SHA256 46a76ecd7802eae1e682a08c8e932c332efa0682009beb948ab2b05085470895 app/src/main/assets/screensaver/mode-impls.js
+CHECK app/src/main/assets/screensaver/mode-impls.js exit 0
+SHA256 5e38e458812262621020312efb3e4c58c4c7bdd4dc366d498c2192626692ff0d scripts/tests/slideshow_gallery_retirement.test.mjs
+CHECK scripts/tests/slideshow_gallery_retirement.test.mjs exit 0
+SHA256 1aaf0bf51b66fe445553e15b12d7b7b1bdfeb1e09c2d3823638e0bf361d4b4e3 scripts/gallery_retirement_browser.mjs
+CHECK scripts/gallery_retirement_browser.mjs exit 0
+COMMAND node scripts/verify_slideshow_engine.cjs exit 0
+PASS outgoing scene survives incoming load and decode, including failure
+PASS cleanup cancels pending image completion and a stopped engine cannot restart
+PASS manual next supersedes slow incoming work instead of building queued scenes
+PASS single-photo next and previous navigate the deck
+PASS pause preserves remaining dwell and suspends pending promotion until resume
+PASS every named style gates initial composition on decode and cancels late completion
+PASS motion duration follows the configured dwell and covers the fade
+PASS cached face focus stays still throughout a mismatched mosaic pan
+PASS decode failure and timeout retain the ready scene with bounded retries
+PASS pause during a dissolve keeps the outgoing layer until resumed
+PASS bundled page exposes the exact bridge before measurement and honors early pause/exit
+PASS filmstrip next/previous move the centered photograph even when the deck fits on the strip
+PASS CSS classes retain motion ownership while transition and programmatic animations pause
+PASS CSS animation ownership also respects the native interface without a name property
+14/14 source fixtures passed (not device benchmarks).
+
+COMMAND node scripts/test_slideshow_sources.mjs exit 0
+✔ small and full-screen slots pass distinct requested sizes to the actual bridge (2.23875ms)
+✔ evicted derivatives are revalidated rather than permanently memoized (0.580542ms)
+✔ size requests are bounded and invalid values use the full-screen default (1.097166ms)
+✔ older hosts retain ready full-screen fallback behavior (0.3325ms)
+✔ bridge failure or a malformed result keeps the original source (1.33025ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8.961416
+
+COMMAND node scripts/test_slideshow_labels.mjs exit 0
+✔ Polaroid photos never receive invented captions, including later drops (3.444667ms)
+✔ Memories collages use a neutral heading without fabricated dates or travel claims (1.370959ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6.965166
+
+PASS git diff --check

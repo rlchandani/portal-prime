@@ -1,0 +1,491 @@
+✖ Gallery Wall retires a zero-opacity obsolete image when pause straddles its fade (14.786416ms)
+✖ retirement requires the exact obsolete target, opacity property, and computed zero (1.459917ms)
+✖ the existing fallback retires only computed-zero obsolete images (1.975709ms)
+✔ the fallback removes completed invisible images without a transition event (1.123209ms)
+✖ superseded replacements retire independently without touching the current image (2.152458ms)
+✔ global pause/resume retains fallback timing and visible images (2.62275ms)
+✔ cleanup releases all retirement handlers/timers and rejects delayed callbacks (1.431458ms)
+✔ cleanup during initial decode prevents publication and timer creation (0.806584ms)
+✔ cleanup during a paused replacement decode prevents late publication (2.267833ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 5
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 87.462625
+
+✖ failing tests:
+
+test at scripts/tests/slideshow_gallery_retirement.test.mjs:108:1
+✖ Gallery Wall retires a zero-opacity obsolete image when pause straddles its fade (14.786416ms)
+  AssertionError [ERR_ASSERTION]: Completed invisible image must retire while removal timer is paused
+  + actual - expected
+
+  + <ref *1> Element {
+  +   children: [
+  +     Element {
+  +       children: [],
+  +       className: 'ss-img kb',
+  +       opacity: '0',
+  +       parentNode: [Circular *1],
+  +       style: {
+  +         '--d': '18s',
+  +         '--dx': '0.0%',
+  +         '--dy': '0.0%',
+  +         animationDelay: '-5s',
+  +         backgroundImage: 'url("generated://generated-1")',
+  +         backgroundPosition: 'center',
+  +         backgroundRepeat: 'no-repeat',
+  +         backgroundSize: 'cover',
+  +         opacity: '0',
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     },
+  +     Element {
+  +       children: [],
+  +       className: 'ss-img kb',
+  +       opacity: '1',
+  +       parentNode: [Circular *1],
+  +       style: {
+  +         '--d': '18s',
+  +         '--dx': '0.0%',
+  +         '--dy': '0.0%',
+  +         animationDelay: '-5s',
+  +         backgroundImage: 'url("generated://generated-10")',
+  +         backgroundPosition: 'center',
+  +         backgroundRepeat: 'no-repeat',
+  +         backgroundSize: 'cover',
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     }
+  +   ],
+  +   className: 'ss-gcell',
+  +   opacity: '1',
+  +   parentNode: <ref *3> Element {
+  +     children: [
+  +       <ref *2> Element {
+  +         children: [
+  +           Element {
+  +             children: [],
+  +             className: 'ss-img kb',
+  +             opacity: '1',
+  +             parentNode: [Circular *2],
+  +             style: {
+  +               '--d': '18s',
+  +               '--dx': '0.0%',
+  +               '--dy': '0.0%',
+  +               animationDelay: '-5s',
+  +               backgroundImage: 'url("generated://generated-0")',
+  +               backgroundPosition: 'center',
+  +               backgroundRepeat: 'no-repeat',
+  +               backgroundSize: 'cover',
+  +               setProperty: [Function: setProperty]
+  +             }
+  +           }
+  +         ],
+  +         className: 'ss-gcell',
+  +         opacity: '1',
+  +         parentNode: [Circular *3],
+  +         style: {
+  +           height: '568px',
+  +           left: '-1781.12px',
+  +           setProperty: [Function: setProperty],
+  +           top: '16px',
+  +           width: '568px'
+  +         }
+  +       },
+  +       [Circular *1]
+  +     ],
+  +     className: 'ss-wall',
+  +     opacity: '1',
+  +     parentNode: Element {
+  +       children: [
+  +         [Circular *3]
+  +       ],
+  +       className: '',
+  +       opacity: '1',
+  +       parentNode: null,
+  +       style: {
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     },
+  +     style: {
+  +       setProperty: [Function: setProperty]
+  +     }
+  +   },
+  +   style: {
+  +     height: '568px',
+  +     left: '-1213.12px',
+  +     setProperty: [Function: setProperty],
+  +     top: '16px',
+  +     width: '568px'
+  +   }
+  + }
+  - null
+
+      at TestContext.<anonymous> (file://~/.codex/worktrees/portal-gallery-retirement/portal-prime/scripts/tests/slideshow_gallery_retirement.test.mjs:115:12)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [Element],
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/tests/slideshow_gallery_retirement.test.mjs:121:1
+✖ retirement requires the exact obsolete target, opacity property, and computed zero (1.459917ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + <ref *1> Element {
+  +   children: [
+  +     Element {
+  +       children: [],
+  +       className: 'ss-img kb',
+  +       opacity: '0',
+  +       parentNode: [Circular *1],
+  +       style: {
+  +         '--d': '18s',
+  +         '--dx': '0.0%',
+  +         '--dy': '0.0%',
+  +         animationDelay: '-5s',
+  +         backgroundImage: 'url("generated://generated-1")',
+  +         backgroundPosition: 'center',
+  +         backgroundRepeat: 'no-repeat',
+  +         backgroundSize: 'cover',
+  +         opacity: '0',
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     },
+  +     Element {
+  +       children: [],
+  +       className: 'ss-img kb',
+  +       opacity: '0',
+  +       parentNode: [Circular *1],
+  +       style: {
+  +         '--d': '18s',
+  +         '--dx': '0.0%',
+  +         '--dy': '0.0%',
+  +         animationDelay: '-5s',
+  +         backgroundImage: 'url("generated://generated-10")',
+  +         backgroundPosition: 'center',
+  +         backgroundRepeat: 'no-repeat',
+  +         backgroundSize: 'cover',
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     }
+  +   ],
+  +   className: 'ss-gcell',
+  +   opacity: '1',
+  +   parentNode: <ref *3> Element {
+  +     children: [
+  +       <ref *2> Element {
+  +         children: [
+  +           Element {
+  +             children: [],
+  +             className: 'ss-img kb',
+  +             opacity: '1',
+  +             parentNode: [Circular *2],
+  +             style: {
+  +               '--d': '18s',
+  +               '--dx': '0.0%',
+  +               '--dy': '0.0%',
+  +               animationDelay: '-5s',
+  +               backgroundImage: 'url("generated://generated-0")',
+  +               backgroundPosition: 'center',
+  +               backgroundRepeat: 'no-repeat',
+  +               backgroundSize: 'cover',
+  +               setProperty: [Function: setProperty]
+  +             }
+  +           }
+  +         ],
+  +         className: 'ss-gcell',
+  +         opacity: '1',
+  +         parentNode: [Circular *3],
+  +         style: {
+  +           height: '568px',
+  +           left: '-1781.12px',
+  +           setProperty: [Function: setProperty],
+  +           top: '16px',
+  +           width: '568px'
+  +         }
+  +       },
+  +       [Circular *1]
+  +     ],
+  +     className: 'ss-wall',
+  +     opacity: '1',
+  +     parentNode: Element {
+  +       children: [
+  +         [Circular *3]
+  +       ],
+  +       className: '',
+  +       opacity: '1',
+  +       parentNode: null,
+  +       style: {
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     },
+  +     style: {
+  +       setProperty: [Function: setProperty]
+  +     }
+  +   },
+  +   style: {
+  +     height: '568px',
+  +     left: '-1213.12px',
+  +     setProperty: [Function: setProperty],
+  +     top: '16px',
+  +     width: '568px'
+  +   }
+  + }
+  - null
+
+      at TestContext.<anonymous> (file://~/.codex/worktrees/portal-gallery-retirement/portal-prime/scripts/tests/slideshow_gallery_retirement.test.mjs:130:43)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Element],
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/tests/slideshow_gallery_retirement.test.mjs:137:1
+✖ the existing fallback retires only computed-zero obsolete images (1.975709ms)
+  AssertionError [ERR_ASSERTION]: A delayed CSS fade must not be cut short by the fallback
+  + actual - expected
+
+  + null
+  - <ref *1> Element {
+  -   children: [
+  -     Element {
+  -       children: [],
+  -       className: 'ss-img kb',
+  -       opacity: '1',
+  -       parentNode: [Circular *1],
+  -       style: {
+  -         '--d': '18s',
+  -         '--dx': '0.0%',
+  -         '--dy': '0.0%',
+  -         animationDelay: '-5s',
+  -         backgroundImage: 'url("generated://generated-10")',
+  -         backgroundPosition: 'center',
+  -         backgroundRepeat: 'no-repeat',
+  -         backgroundSize: 'cover',
+  -         setProperty: [Function: setProperty]
+  -       }
+  -     }
+  -   ],
+  -   className: 'ss-gcell',
+  -   opacity: '1',
+  -   parentNode: <ref *3> Element {
+  -     children: [
+  -       <ref *2> Element {
+  -         children: [
+  -           Element {
+  -             children: [],
+  -             className: 'ss-img kb',
+  -             opacity: '1',
+  -             parentNode: [Circular *2],
+  -             style: {
+  -               '--d': '18s',
+  -               '--dx': '0.0%',
+  -               '--dy': '0.0%',
+  -               animationDelay: '-5s',
+  -               backgroundImage: 'url("generated://generated-0")',
+  -               backgroundPosition: 'center',
+  -               backgroundRepeat: 'no-repeat',
+  -               backgroundSize: 'cover',
+  -               setProperty: [Function: setProperty]
+  -             }
+  -           }
+  -         ],
+  -         className: 'ss-gcell',
+  -         opacity: '1',
+  -         parentNode: [Circular *3],
+  -         style: {
+  -           height: '568px',
+  -           left: '-1781.12px',
+  -           setProperty: [Function: setProperty],
+  -           top: '16px',
+  -           width: '568px'
+  -         }
+  -       },
+  -       [Circular *1]
+  -     ],
+  -     className: 'ss-wall',
+  -     opacity: '1',
+  -     parentNode: Element {
+  -       children: [
+  -         [Circular *3]
+  -       ],
+  -       className: '',
+  -       opacity: '1',
+  -       parentNode: null,
+  -       style: {
+  -         setProperty: [Function: setProperty]
+  -       }
+  -     },
+  -     style: {
+  -       setProperty: [Function: setProperty]
+  -     }
+  -   },
+  -   style: {
+  -     height: '568px',
+  -     left: '-1213.12px',
+  -     setProperty: [Function: setProperty],
+  -     top: '16px',
+  -     width: '568px'
+  -   }
+  - }
+
+      at TestContext.<anonymous> (file://~/.codex/worktrees/portal-gallery-retirement/portal-prime/scripts/tests/slideshow_gallery_retirement.test.mjs:142:12)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: [Element],
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/tests/slideshow_gallery_retirement.test.mjs:158:1
+✖ superseded replacements retire independently without touching the current image (2.152458ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + <ref *1> Element {
+  +   children: [
+  +     Element {
+  +       children: [],
+  +       className: 'ss-img kb',
+  +       opacity: '0',
+  +       parentNode: [Circular *1],
+  +       style: {
+  +         '--d': '18s',
+  +         '--dx': '0.0%',
+  +         '--dy': '0.0%',
+  +         animationDelay: '-5s',
+  +         backgroundImage: 'url("generated://generated-1")',
+  +         backgroundPosition: 'center',
+  +         backgroundRepeat: 'no-repeat',
+  +         backgroundSize: 'cover',
+  +         opacity: '0',
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     },
+  +     Element {
+  +       children: [],
+  +       className: 'ss-img kb',
+  +       opacity: '.2',
+  +       parentNode: [Circular *1],
+  +       style: {
+  +         '--d': '18s',
+  +         '--dx': '0.0%',
+  +         '--dy': '0.0%',
+  +         animationDelay: '-5s',
+  +         backgroundImage: 'url("generated://generated-10")',
+  +         backgroundPosition: 'center',
+  +         backgroundRepeat: 'no-repeat',
+  +         backgroundSize: 'cover',
+  +         opacity: '0',
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     },
+  +     Element {
+  +       children: [],
+  +       className: 'ss-img kb',
+  +       opacity: '1',
+  +       parentNode: [Circular *1],
+  +       style: {
+  +         '--d': '18s',
+  +         '--dx': '0.0%',
+  +         '--dy': '0.0%',
+  +         animationDelay: '-5s',
+  +         backgroundImage: 'url("generated://generated-11")',
+  +         backgroundPosition: 'center',
+  +         backgroundRepeat: 'no-repeat',
+  +         backgroundSize: 'cover',
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     }
+  +   ],
+  +   className: 'ss-gcell',
+  +   opacity: '1',
+  +   parentNode: <ref *3> Element {
+  +     children: [
+  +       <ref *2> Element {
+  +         children: [
+  +           Element {
+  +             children: [],
+  +             className: 'ss-img kb',
+  +             opacity: '1',
+  +             parentNode: [Circular *2],
+  +             style: {
+  +               '--d': '18s',
+  +               '--dx': '0.0%',
+  +               '--dy': '0.0%',
+  +               animationDelay: '-5s',
+  +               backgroundImage: 'url("generated://generated-0")',
+  +               backgroundPosition: 'center',
+  +               backgroundRepeat: 'no-repeat',
+  +               backgroundSize: 'cover',
+  +               setProperty: [Function: setProperty]
+  +             }
+  +           }
+  +         ],
+  +         className: 'ss-gcell',
+  +         opacity: '1',
+  +         parentNode: [Circular *3],
+  +         style: {
+  +           height: '568px',
+  +           left: '-1781.12px',
+  +           setProperty: [Function: setProperty],
+  +           top: '16px',
+  +           width: '568px'
+  +         }
+  +       },
+  +       [Circular *1]
+  +     ],
+  +     className: 'ss-wall',
+  +     opacity: '1',
+  +     parentNode: Element {
+  +       children: [
+  +         [Circular *3]
+  +       ],
+  +       className: '',
+  +       opacity: '1',
+  +       parentNode: null,
+  +       style: {
+  +         setProperty: [Function: setProperty]
+  +       }
+  +     },
+  +     style: {
+  +       setProperty: [Function: setProperty]
+  +     }
+  +   },
+  +   style: {
+  +     height: '568px',
+  +     left: '-1213.12px',
+  +     setProperty: [Function: setProperty],
+  +     top: '16px',
+  +     width: '568px'
+  +   }
+  + }
+  - null
+
+      at TestContext.<anonymous> (file://~/.codex/worktrees/portal-gallery-retirement/portal-prime/scripts/tests/slideshow_gallery_retirement.test.mjs:166:24)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Element],
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

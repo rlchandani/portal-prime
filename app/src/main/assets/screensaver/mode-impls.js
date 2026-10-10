@@ -226,6 +226,25 @@
   // ---- 04 Living gallery wall (justified rows + swaps) ----------------------
   MODES.galleryWall = { name: "Living Gallery Wall", run(ctx, deck) {
     const t = makeTimers(ctx); const wall = el("ss-wall", ctx.root); let cells = [];
+    const retiring = new Map(); let disposed = false;
+    function retire(cell, old) {
+      if (disposed || retiring.get(old) !== cell || cell.img === old || old.parentNode !== cell.el) return;
+      // Promotion pauses timers, but an obsolete image can still finish its CSS fade.
+      // Never remove visible content, including a fade suspended by global pause.
+      if (Number(getComputedStyle(old).opacity) !== 0) return;
+      old.ontransitionend = null; retiring.delete(old); old.remove();
+    }
+    function replace(cell, photo, url) {
+      const img = buildImg(photo, url), old = cell.img;
+      cell.el.appendChild(img); cell.img = img; cell.photo = photo;
+      if (!old) return;
+      retiring.set(old, cell);
+      old.ontransitionend = event => {
+        if (event.target === old && event.propertyName === "opacity") retire(cell, old);
+      };
+      t.frame(() => { if (retiring.get(old) === cell && cell.img !== old) old.style.opacity = "0"; });
+      t.after(() => retire(cell, old), 1200); // Existing fallback; transitionend also works while paused.
+    }
     function buildImg(p, url) { const img = el("ss-img kb"); bg(img, url); faceBg(img, p); if (Math.random() < 0.4) { img.classList.remove("kb"); return img; } img.style.setProperty("--d", (14 + Math.random() * 8) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
     function layout() {
       const W = ctx.W, H = ctx.H, pad = 16, gutter = 12; const targetH = H > 1000 ? 300 : 240;
@@ -248,12 +267,19 @@
       while (cells.length < target.length) { const e = el("ss-gcell", wall); cells.push({ el: e, img: null, photo: null }); }
       while (cells.length > target.length) { cells.pop().el.remove(); }
       target.forEach((slot, i) => { const c = cells[i]; c.el.style.left = slot.left + "px"; c.el.style.top = slot.top + "px"; c.el.style.width = slot.width + "px"; c.el.style.height = slot.height + "px";
-        if (c.photo !== slot.photo) { const img = buildImg(slot.photo, slot.url); c.el.appendChild(img); const old = c.img; t.frame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = slot.photo; } });
+        if (c.photo !== slot.photo) replace(c, slot.photo, slot.url); });
     }
     async function rebuild() { const slots = layout().map(s => ({ ...s, url: ctx.url(s.photo, 1200) })); if (!await t.load(slots.map(s => s.url))) return false; render(slots); }
-    async function swap() { if (!cells.length) return; const onWall = cells.map(x => x.photo && x.photo.seed).filter(Boolean); if (!SS.unused(deck, onWall).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; let p = null; const wallSet = new Set(onWall); for (let k = 0; k < deck.length; k++) { const cand = deck[(ctx.cursor.i + k) % deck.length]; if (!wallSet.has(cand.seed) && SS.bucket(cand) === SS.bucket(c.photo)) { p = cand; ctx.cursor.i += k + 1; break; } } if (!p) p = SS.take(deck, ctx.cursor, ["any"], onWall)[0]; const url = ctx.url(p, 1200); if (!await t.load(url)) return false; const img = buildImg(p, url); c.el.appendChild(img); const old = c.img; t.frame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); c.img = img; c.photo = p; }
+    async function swap() { if (!cells.length) return; const onWall = cells.map(x => x.photo && x.photo.seed).filter(Boolean); if (!SS.unused(deck, onWall).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; let p = null; const wallSet = new Set(onWall); for (let k = 0; k < deck.length; k++) { const cand = deck[(ctx.cursor.i + k) % deck.length]; if (!wallSet.has(cand.seed) && SS.bucket(cand) === SS.bucket(c.photo)) { p = cand; ctx.cursor.i += k + 1; break; } } if (!p) p = SS.take(deck, ctx.cursor, ["any"], onWall)[0]; const url = ctx.url(p, 1200); if (!await t.load(url)) return false; replace(c, p, url); }
     t.start(rebuild); t.every(swap, ctx.microMs);
-    return t.cleanup;
+    const cleanup = () => {
+      if (disposed) return;
+      disposed = true; t.cleanup();
+      retiring.forEach((cell, old) => { old.ontransitionend = null; }); retiring.clear();
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
+    cleanup.pause = t.cleanup.pause; cleanup.resume = t.cleanup.resume;
+    return cleanup;
   }};
 
   // ---- 05 Cinematic push -----------------------------------------------------
