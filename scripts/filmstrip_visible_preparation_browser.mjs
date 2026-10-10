@@ -37,6 +37,7 @@ export function installNativeFrameBarrier(target) {
   target.filmstripNativeFrame = () => new Promise(resolve => requestFrame(() => requestFrame(resolve)));
 }
 const controlOnly = process.argv.includes('--control-only');
+const resizeChecks = process.argv.includes('--resize-checks');
 const caseFilter = process.argv.find(a => a.startsWith('--case='))?.slice(7);
 const out = process.argv.find(a => a.startsWith('--out='))?.slice(6);
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -102,8 +103,8 @@ async function difference(a, b, state) {
   }
   return { changedPixels, maxChannelDelta, clipInteriors, bounds: changedPixels ? [minX, minY, maxX, maxY] : null, bands, baselinePixelSha256: hash(A.data), comparedPixelSha256: hash(B.data) };
 }
-async function render(browser, source, photos, viewport) {
-  const context = await browser.newContext({ viewport, deviceScaleFactor: 1, colorScheme: 'dark',
+async function render(browser, source, photos, viewport, resize = null) {
+  const context = await browser.newContext({ viewport, ...(resize ? { screen: resize.screen } : {}), deviceScaleFactor: 1, colorScheme: 'dark',
     reducedMotion: 'no-preference' });
   await context.setOffline(true); await context.route('**/*', route => route.abort());
   const page = await context.newPage(), shots = new Map(), states = {}, errors = [], diagnostics = {};
@@ -115,17 +116,18 @@ async function render(browser, source, photos, viewport) {
     await page.evaluate('(' + installNativeFrameBarrier.toString() + ')(window)');
     await page.clock.install({ time: 0 }); await page.clock.pauseAt(1000);
     await page.setContent(`<style>${css}</style><div id="stage" style="background:#204060"></div>`);
-    await page.evaluate(photos => {
+    await page.evaluate(({ photos, resizeWhen }) => {
       window.PHOTOS = photos; window.aspect = p => p.w / p.h; window.shuffled = xs => xs.slice();
       Math.random = () => .5;
-      window.fixture = { ready: 0, prepared: false, resolutions: [], decodes: 0, decoded: new Set() };
+      window.fixture = { ready: 0, prepared: false, resolutions: [], decodes: 0, decoded: new Set(),
+        resizeWhen, holdStarted: false, releaseDecode: null };
       window.photoUrl = (p, edge) => {
         fixture.resolutions.push({ seed: p.seed, edge }); return p.url + '#edge=' + edge;
       };
       fixture.flush = () => {
         for (const n of document.querySelectorAll('.ss-beat, .ss-track, .ss-slide, .ss-bd')) getComputedStyle(n).transform;
       };
-    }, photos);
+    }, { photos, resizeWhen: resize?.when || null });
     for (const { source: code } of common.slice(0, 2)) await page.addScriptTag({ content: code });
     await page.addScriptTag({ content: source });
     await page.evaluate(() => {
@@ -135,7 +137,12 @@ async function render(browser, source, photos, viewport) {
         // Force both initial layouts to have an established pre-go style, regardless
         // of real image/decode completion speed. No visible animation duration changes.
         if (url.endsWith('#edge=1000')) fixture.flush();
-        const value = await decode(url, signal); fixture.decoded.add(url); return value;
+        const value = await decode(url, signal);
+        if (fixture.resizeWhen === 'during-decode' && !fixture.holdStarted) {
+          fixture.holdStarted = true;
+          await new Promise(resolve => { fixture.releaseDecode = resolve; });
+        }
+        fixture.decoded.add(url); return value;
       };
       const run = SS.MODES.filmstrip.run;
       SS.MODES.filmstrip.run = (...args) => {
@@ -202,12 +209,25 @@ async function render(browser, source, photos, viewport) {
       for (let i = 0; i < 200; i++) { if (await page.evaluate(fn)) return; await wait(10); }
       throw Error(label);
     }
+    if (resize?.when === 'during-decode') {
+      await until(() => fixture.holdStarted, 'Initial decoder must reach the controlled admission gate');
+      await page.setViewportSize(resize.viewport); viewport = resize.viewport;
+      await page.evaluate(() => fixture.releaseDecode());
+    }
     await until(() => fixture.prepared, 'Real decoded Filmstrip must become ready');
     const initialCounts = await page.evaluate(() => ({ decodes: fixture.decodes, resolutions: fixture.resolutions.slice(),
       preparedSlots: [...document.querySelectorAll('.ss-slide > .ss-img')].filter(n => n.style.backgroundImage).length }));
     await page.evaluate(() => { fixture.initial = fixture.collect(); fixture.seek(fixture.initial, 0); });
     await page.clock.runFor(32); assert.equal(await page.evaluate(() => fixture.ready), 1);
     await page.evaluate(() => { fixture.initial = fixture.collect(); fixture.seek(fixture.initial, 0); });
+    if (resize?.when === 'after-ready') {
+      await page.setViewportSize(resize.viewport); viewport = resize.viewport;
+      await page.evaluate(() => { fixture.initial = fixture.collect(); fixture.seek(fixture.initial, 0); });
+      await page.evaluate(() => filmstripNativeFrame());
+    }
+    // The virtual JS clock stays below the scheduler's 300ms recovery deadline.
+    // Real native paint therefore checks the existing scene during the vulnerable
+    // interval, before a replacement scene could hide incomplete exposure.
     async function snapshot(phase) {
       assert.equal(await page.evaluate(() => fixture.allPrepared()), true, 'No undecoded URL may be published');
       const absentImageBounds = await page.evaluate(() => fixture.absentImageBounds());
@@ -271,7 +291,7 @@ async function render(browser, source, photos, viewport) {
 async function main() {
   ({ chromium } = require('playwright')); sharp = require('sharp');
   const report = { base, mode: controlOnly ? 'baseline-control' : 'candidate',
-    caseFilter: caseFilter || null, phaseAdmission: legacyPhaseAdmission ? 'legacy-no-native-start-frame' : 'two-native-start-frames',
+    caseFilter: caseFilter || null, resizeChecks, phaseAdmission: legacyPhaseAdmission ? 'legacy-no-native-start-frame' : 'two-native-start-frames',
     baselineRepeats, candidateRepeats: controlOnly ? 0 : candidateRepeats,
     probeSha256: hash(readFileSync(fileURLToPath(import.meta.url))),
     sourceSha256: Object.fromEntries(Object.entries(sources).map(([k, v]) => [k, hash(v)])),
@@ -288,32 +308,37 @@ async function main() {
     report.browser = await browser.version(); assert.match(report.browser, /^155\./);
     const preparedCases = [];
     // Complete the entire baseline repeat matrix BEFORE evaluating any candidate.
-    for (const format of ['jpeg', 'png', 'webp']) for (const viewport of [{ width: 600, height: 900 }, { width: 1200, height: 600 }]) {
+    const matrix = resizeChecks ? ['during-decode', 'after-ready'].map(when => ({
+      format: 'png', viewport: { width: 320, height: 200 },
+      resize: { when, screen: { width: 1920, height: 1080 }, viewport: { width: 1920, height: 1080 } },
+    })) : ['jpeg', 'png', 'webp'].flatMap(format => [{ width: 600, height: 900 }, { width: 1200, height: 600 }]
+      .map(viewport => ({ format, viewport, resize: null })));
+    for (const { format, viewport, resize } of matrix) {
       if (caseFilter && caseFilter !== `${format}:${viewport.width}`) continue;
       const fixtures = await generate(format);
-      const A = await render(browser, sources.baseline, fixtures.photos, viewport), controls = [], repeatDiagnostics = [];
+      const A = await render(browser, sources.baseline, fixtures.photos, viewport, resize), controls = [], repeatDiagnostics = [];
       for (let repeat = 1; repeat < baselineRepeats; repeat++) {
-        const C = await render(browser, sources.baseline, fixtures.photos, viewport);
+        const C = await render(browser, sources.baseline, fixtures.photos, viewport, resize);
         for (const [phase, bytes] of A.shots) controls.push({ repeat, phase,
           geometryEqual: JSON.stringify(A.states[phase]) === JSON.stringify(C.states[phase]),
           ...await difference(bytes, C.shots.get(phase), A.states[phase]) });
         if (diagnostic) repeatDiagnostics.push(C.diagnostics);
       }
       const stable = controls.every(c => !c.changedPixels && !c.maxChannelDelta && c.geometryEqual);
-      const entry = { format, viewport, fixtureHashes: fixtures.hashes, controls, stable, passed: stable,
+      const entry = { format, viewport, resize, fixtureHashes: fixtures.hashes, controls, stable, passed: stable,
         baselineInitial: A.initialCounts, baselineFinal: A.finalCounts,
         ...(diagnostic ? { baselineDiagnostics: A.diagnostics, repeatDiagnostics } : {}) };
       report.cases.push(entry); preparedCases.push({ entry, fixtures, A });
       failed ||= !stable;
-      console.log(`${format} ${viewport.width}x${viewport.height}: baseline ${controls.filter(c => !c.changedPixels && !c.maxChannelDelta && c.geometryEqual).length}/${controls.length} exact`);
+      console.log(`${format} ${viewport.width}x${viewport.height}${resize ? " " + resize.when : ""}: baseline ${controls.filter(c => !c.changedPixels && !c.maxChannelDelta && c.geometryEqual).length}/${controls.length} exact`);
     }
-    assert.equal(preparedCases.length, caseFilter ? 1 : 6, 'Never silently skip a matrix case');
+    assert.equal(preparedCases.length, caseFilter ? 1 : resizeChecks ? 2 : 6, 'Never silently skip a matrix case');
     report.allBaselineControlsStable = !failed;
     if (!controlOnly && !failed) {
       for (const { entry, fixtures, A } of preparedCases) {
         const comparisons = [], candidateRuns = [];
         for (let repeat = 0; repeat < candidateRepeats; repeat++) {
-          const B = await render(browser, sources.candidate, fixtures.photos, entry.viewport);
+          const B = await render(browser, sources.candidate, fixtures.photos, entry.viewport, entry.resize);
           for (const [phase, bytes] of A.shots) comparisons.push({ repeat, phase,
             geometryEqual: JSON.stringify(A.states[phase]) === JSON.stringify(B.states[phase]),
             ...await difference(bytes, B.shots.get(phase), A.states[phase]) });
@@ -327,7 +352,7 @@ async function main() {
         entry.comparisons = comparisons; entry.candidateRuns = candidateRuns;
         entry.pixelsEqual = pixelsEqual; entry.geometryEqual = geometryEqual; entry.reduced = reduced;
         entry.passed = pixelsEqual && geometryEqual && reduced; failed ||= !entry.passed;
-        console.log(`${entry.format} ${entry.viewport.width}x${entry.viewport.height}: candidate ${comparisons.filter(c => !c.changedPixels && !c.maxChannelDelta && c.geometryEqual).length}/${comparisons.length} exact, reduced=${reduced}`);
+        console.log(`${entry.format} ${entry.viewport.width}x${entry.viewport.height}${entry.resize ? " " + entry.resize.when : ""}: candidate ${comparisons.filter(c => !c.changedPixels && !c.maxChannelDelta && c.geometryEqual).length}/${comparisons.length} exact, reduced=${reduced}`);
       }
     } else if (!controlOnly) console.log('Baseline matrix unstable; ALL candidate evaluations blocked');
   } catch (error) { failed = true; report.error = error.stack; console.error(error.stack); }

@@ -480,7 +480,7 @@
   MODES.filmstrip = { name: "Filmstrip Coverflow", run(ctx, deck) {
     const t = makeTimers(ctx); const bdA = el("ss-bd", ctx.root), bdB = el("ss-bd", ctx.root); bdB.style.opacity = "0"; const track = el("ss-track", ctx.root);
     const items = []; const set = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, 12)).fill("any"));
-    let center = 0, top = false, admitted = false, bounded = false, disposed = false, preparation = null;
+    let center = 0, top = false, admitted = false, bounded = false, disposed = false, preparation = null, viewportBound = 0;
     // The unchanged CSS scales at most 1.12 and has a 70px black shadow blur.
     // 512 local pixels deliberately overbound its finite raster support, spread
     // and offset; 2px additionally cover flex/subpixel rounding over twelve slots.
@@ -489,6 +489,13 @@
       try {
         if (!(Number.isFinite(ctx.W) && ctx.W > 0 && Number.isFinite(ctx.H) && ctx.H > 0) ||
             items.some(s => !(Number.isFinite(s.w) && s.w > 0 && Number.isFinite(s.off)))) return false;
+        // Native WebView layout can recover from a small initial measurement or
+        // swap orientation. Card widths/offsets stay fixed; admit the horizontal
+        // exposure for either full-display orientation before declaring ready.
+        const screen = window.screen;
+        if (!screen || ![screen.width, screen.height].every(n => Number.isFinite(n) && n > 0)) return false;
+        viewportBound = Math.max(screen.width, screen.height);
+        if (ctx.W > viewportBound || ctx.H > viewportBound) return false;
         const root = ctx.root.getBoundingClientRect(), tr = track.getBoundingClientRect(), ts = getComputedStyle(track);
         if (![root.width, root.height, root.left, tr.left, tr.height].every(Number.isFinite) ||
             Math.abs(root.width - ctx.W) > 1 || Math.abs(root.height - ctx.H) > 1 ||
@@ -512,9 +519,9 @@
     function needed(s, from, to) {
       if (!bounded) return true;
       const radius = (s.w / 2 + SHADOW_PAD) * MAX_SCALE + ROUNDING_PAD;
-      const left = ctx.W / 2 + s.off - Math.max(from, to) - radius;
-      const right = ctx.W / 2 + s.off - Math.min(from, to) + radius;
-      return right >= 0 && left <= ctx.W;
+      const left = viewportBound / 2 + s.off - Math.max(from, to) - radius;
+      const right = viewportBound / 2 + s.off - Math.min(from, to) + radius;
+      return right >= 0 && left <= viewportBound;
     }
     async function prepare(urls) {
       const controller = new AbortController();

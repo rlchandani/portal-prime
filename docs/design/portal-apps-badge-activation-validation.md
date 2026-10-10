@@ -52,3 +52,5 @@ The broader goal remains active. Settings/swipes, actual tab and touch readiness
 ## Evidence boundary
 
 Private immutable results are under ignored `build/fleet/diagnostics/apps-badge-activation-2026-10-10/`, `apps-badge-comparison-2026-10-10/` and `runtime-profile-state-2026-10-10/`. Both rooms finish on the tested candidate with collectors inactive and known Home windows restored. Protocol source snapshots/hashes, corrected RED/GREEN evidence, native build hashes, deployment results and final numeric analysis are preserved. Exported device data is bounded numeric verification, fixed labels and package/window ownership. Household photos, screenshots, visible UI text, DOM, credentials and complete configurations were not exported. No GitHub connection, authentication, push or release is performed.
+
+The corrected Filmstrip follow-up, resize regression, withheld first comparison and next hardware gates are recorded in [Filmstrip preparation validation](portal-filmstrip-preparation-validation.md).

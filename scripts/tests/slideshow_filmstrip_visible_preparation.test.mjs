@@ -14,8 +14,9 @@ const assets = new URL('../../app/src/main/assets/screensaver/', import.meta.url
 // Execute the actual mode and timer owner. Synthetic DOM geometry and controlled
 // decode gates are not raster evidence; the companion Chrome test supplies that.
 function fixture({ W = 1000, H = 600, aspects = Array(12).fill(1.5), uncertain = false,
-  ignoreAbort = false, start = 0 } = {}) {
+  ignoreAbort = false, start = 0, physicalScreen = { width: W, height: H } } = {}) {
   let now = 0, serial = 1, generation = 1;
+  const viewport = { width: W, height: H };
   const timers = new Map(), requests = [], calls = [], writes = [], decoded = new Set(), records = [];
   function schedule(fn, ms) { const id = serial++; timers.set(id, { fn, at: now + ms }); return id; }
   class Element {
@@ -34,20 +35,20 @@ function fixture({ W = 1000, H = 600, aspects = Array(12).fill(1.5), uncertain =
     }
     appendChild(child) { child.parentNode = this; this.children.push(child); return child; }
     getBoundingClientRect() {
-      if (this === root) return { x: 0, y: 0, left: 0, top: 0, width: uncertain ? W + 100 : W, height: H };
-      if (this.className === 'ss-track') return { left: W / 2, top: 0, height: H };
-      const w = Number.parseFloat(this.style.width), h = H * .62;
+      if (this === root) return { x: 0, y: 0, left: 0, top: 0, width: uncertain ? viewport.width + 100 : viewport.width, height: viewport.height };
+      if (this.className === 'ss-track') return { left: viewport.width / 2, top: 0, height: viewport.height };
+      const w = Number.parseFloat(this.style.width), h = viewport.height * .62;
       const i = this.parentNode.children.indexOf(this);
       const left = this.parentNode.children.slice(0, i).reduce((n, s) => n + Number.parseFloat(s.style.width) + 60, 0);
-      return { left: W / 2 + left + w * .15, top: H / 2 - h * .35, width: w * .7, height: h * .7 };
+      return { left: viewport.width / 2 + left + w * .15, top: viewport.height / 2 - h * .35, width: w * .7, height: h * .7 };
     }
   }
   const root = new Element();
   function style(node) {
     if (node === root) return { transform: 'none' };
     if (node.className === 'ss-track') return { display: 'flex', flexDirection: 'row', alignItems: 'center',
-      position: 'absolute', left: W / 2 + 'px', gap: '60px' };
-    const w = Number.parseFloat(node.style.width), h = H * .62;
+      position: 'absolute', left: viewport.width / 2 + 'px', gap: '60px' };
+    const w = Number.parseFloat(node.style.width), h = viewport.height * .62;
     return { width: w + 'px', height: h + 'px', transform: 'matrix(0.7, 0, 0, 0.7, 0, 0)',
       boxShadow: 'rgba(0, 0, 0, 0.9) 0px 30px 70px -20px',
       transitionProperty: 'transform, opacity, filter',
@@ -55,6 +56,7 @@ function fixture({ W = 1000, H = 600, aspects = Array(12).fill(1.5), uncertain =
       transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1), ease, ease' };
   }
   const window = {
+    screen: physicalScreen,
     aspect: p => p.w / p.h,
     preloadDecoded(url, signal) {
       const request = { url, signal, status: 'pending' }; requests.push(request);
@@ -110,8 +112,8 @@ function fixture({ W = 1000, H = 600, aspects = Array(12).fill(1.5), uncertain =
       const off = from == null ? offsets[to] * frame / 200
         : offsets[from] + (offsets[to] - offsets[from]) * frame / 200;
       widths.forEach((w, i) => {
-        const x = W / 2 + offsets[i] - off, radius = (w / 2 + 160) * 1.12 + 2;
-        if (x + radius >= 0 && x - radius <= W) answer.add(i);
+        const x = viewport.width / 2 + offsets[i] - off, radius = (w / 2 + 160) * 1.12 + 2;
+        if (x + radius >= 0 && x - radius <= viewport.width) answer.add(i);
       });
     }
     return answer;
@@ -123,7 +125,8 @@ function fixture({ W = 1000, H = 600, aspects = Array(12).fill(1.5), uncertain =
   }
   return { cleanup, flush, finishExcept, slides, current, snapshot, requests, calls, writes, timers,
     cursor, records, advance, assertExposure, get ready() { return ready; },
-    generation: n => { generation = n; } };
+    generation: n => { generation = n; },
+    resize: (width, height) => { viewport.width = width; viewport.height = height; } };
 }
 
 test('initial readiness excludes a held fully offscreen decoder but retains all twelve geometry slots', async () => {
@@ -289,6 +292,43 @@ test('one failed demand decode aborts every sibling before another preparation c
     r.generation(3); const retry = r.cleanup.next(); await r.finishExcept();
     assert.equal(await retry, true); r.assertExposure(0, 1);
   } finally { r.cleanup(); }
+});
+
+test('physical screen envelope covers viewport expansion while initial decode is pending', async () => {
+  const r = fixture({ W: 320, H: 200, physicalScreen: { width: 1920, height: 1080 } });
+  try {
+    await r.finishExcept(q => q.url.startsWith('generated://0/1400/'));
+    assert.equal(r.ready, undefined);
+    r.resize(1920, 1080);
+    await r.finishExcept(); assert.equal(r.ready, true); r.assertExposure(null, 0);
+    assert.ok(r.calls.filter(c => c.edge === 1400).length < 12, 'Screen envelope should retain bounded preparation');
+  } finally { r.cleanup(); }
+});
+
+test('physical screen envelope covers expansion after readiness and subsequent navigation', async () => {
+  const r = fixture({ W: 320, H: 200, physicalScreen: { width: 1080, height: 1920 } });
+  try {
+    await r.finishExcept(); assert.equal(r.ready, true);
+    r.resize(1920, 1080); r.assertExposure(null, 0);
+    const next = r.cleanup.next(); await r.finishExcept(); assert.equal(await next, true);
+    r.assertExposure(0, 1);
+    r.resize(1080, 1920); r.assertExposure(0, 1);
+    const previous = r.cleanup.previous(); await r.finishExcept(); assert.equal(await previous, true);
+    r.assertExposure(1, 0);
+  } finally { r.cleanup(); }
+});
+
+test('unknown or inconsistent physical screen bounds retain full preparation', async () => {
+  for (const physicalScreen of [null, { width: NaN, height: 600 }, { width: 0, height: 600 },
+    { width: 500, height: 500 }]) {
+    const r = fixture({ physicalScreen });
+    try {
+      await r.finishExcept(q => q.url.startsWith('generated://11/1400/'));
+      assert.equal(r.ready, undefined, 'Untrusted screen metadata must retain the complete decode gate');
+      assert.equal(r.calls.filter(c => c.edge === 1400).length, 12);
+      await r.finishExcept(); assert.equal(r.ready, true); r.assertExposure(null, 0);
+    } finally { r.cleanup(); }
+  }
 });
 
 test('uncertain viewport geometry fails open to original complete preparation', async () => {
