@@ -8,6 +8,26 @@ Photos viewer, tap to reveal Previous, Pause/Resume, Next, Adjust and Done.
 
 ![The photo-frame screensaver showing a large clock over a landscape photo](../img/screensaver.png)
 
+## Return to a pinned app
+
+Open an app and navigate to the page you want to keep, such as your Home Assistant
+browser dashboard. Swipe down to reveal the Portal's system top bar, then tap the
+**pin** button. A blue pin means that app's current session is selected. Tap it
+again to unpin.
+
+Immortal's photo screensaver can cover that session. Tapping the screensaver
+reveals the existing app window; Immortal does not launch the app, navigate to its
+URL or create another browser view. A system interruption of Immortal's photo
+screensaver uses a continuation curtain above the same app. The paired remote's
+screensaver and Back actions use this same return path.
+
+Home or deliberately opening another app ends the pin. It is a runtime session,
+not an Android kiosk lock: it does not survive an Immortal/device restart, and
+Android or a browser may independently destroy or reload an app. A detected lost
+session shows a local message with **Go Home** rather than silently reopening it.
+The photo source, sleep and overnight settings still apply. This return path is
+implemented for Immortal's photo Dream and its continuation curtain.
+
 ## Photo presentation
 
 Choose a style in **Settings → Photos → Screensaver style**:

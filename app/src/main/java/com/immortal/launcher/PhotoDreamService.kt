@@ -11,6 +11,7 @@ import android.service.dreams.DreamService
 import android.util.Log
 import android.view.MotionEvent
 import android.view.WindowManager
+import android.widget.FrameLayout
 import java.lang.ref.WeakReference
 
 /**
@@ -24,10 +25,17 @@ import java.lang.ref.WeakReference
  */
 class PhotoDreamService : DreamService() {
   private lateinit var frame: PhotoFrameController
+  private var pinnedOrigin = false
+  private var frameStopped = false
+  private var lostPanelShown = false
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
+    frameStopped = false
+    lostPanelShown = false
+    pinnedOrigin = PinnedAppScreensaver.hasPin()
     ImmortalDreamNavigation.attached(this)
+    PinnedAppScreensaver.nativeDreamAttached()
     Log.i(TAG, "attached: dream starting")
     // Interactive so we receive touch and can exit on tap (verified on device).
     // Fullscreen for an immersive frame — tap-to-exit is the way out.
@@ -43,14 +51,22 @@ class PhotoDreamService : DreamService() {
         WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
     frame = PhotoFrameController(this)
     frame.onExit = {
-      Log.i(TAG, "onExit (tap) -> finish()")
-      // Mark this as a USER exit so DreamPolicy doesn't relaunch the frame.
-      DreamPolicy.userExitAt = System.currentTimeMillis()
-      // If the user chose an app to open on dismiss (e.g. their Home Assistant
-      // dashboard), launch it; otherwise this is a no-op and we fall back to the
-      // launcher — same as before, and also the path when that app is uninstalled.
-      ScreensaverDismiss.launchChosenApp(this)
-      finish()
+      exitPinnedDream(
+          pinnedOrigin = pinnedOrigin,
+          pinnedNow = PinnedAppScreensaver.hasPin(),
+          admitPinnedReturn = PinnedAppScreensaver::nativeDreamTapped,
+          showLostSession = ::showLostSession,
+          launchConfiguredApp = {
+            DreamPolicy.userExitAt = System.currentTimeMillis()
+            ScreensaverDismiss.launchChosenApp(this)
+          },
+          finishDream = {
+            Log.i(TAG, "onExit (tap) -> finish()")
+            DreamPolicy.userExitAt = System.currentTimeMillis()
+            if (pinnedOrigin || PinnedAppScreensaver.hasPin()) SleepScheduler.onReturnedToApp(this)
+            finish()
+          },
+      )
     }
     val root = frame.view
     // Tap dismisses, horizontal swipe changes photo (handled by the controller).
@@ -76,7 +92,7 @@ class PhotoDreamService : DreamService() {
   override fun onDreamingStopped() {
     Log.i(TAG, "onDreamingStopped")
     super.onDreamingStopped()
-    DreamPolicy.onImmortalDreamingStopped(this)
+    DreamPolicy.onImmortalDreamingStopped(this, pinnedOrigin)
   }
 
   override fun onWakeUp() {
@@ -86,10 +102,30 @@ class PhotoDreamService : DreamService() {
 
   override fun onDetachedFromWindow() {
     ImmortalDreamNavigation.detached(this)
+    PinnedAppScreensaver.nativeDreamDetached()
     Log.i(TAG, "detached: dream ending")
     window?.let { FramePerformanceCapture.untrack(it) }
-    if (this::frame.isInitialized) frame.stop()
+    stopFrameOnce()
     super.onDetachedFromWindow()
+  }
+
+  private fun showLostSession() {
+    if (lostPanelShown || !this::frame.isInitialized) return
+    lostPanelShown = true
+    val root = frame.view as FrameLayout
+    root.setOnTouchListener(null)
+    root.addView(pinnedSessionLostPanel(this) {
+      openApprovedHomeTab(ApprovedLauncherTab.HOME)
+    }, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+    stopFrameOnce()
+  }
+
+  private fun stopFrameOnce() {
+    if (!frameStopped && this::frame.isInitialized) {
+      frameStopped = true
+      frame.onExit = null
+      frame.stop()
+    }
   }
 
   private companion object {
@@ -115,12 +151,14 @@ internal object ImmortalDreamNavigation {
   }
 
   /** Called on main by navigation admission; only Immortal registers here. */
-  fun hasOwnedSurface(): Boolean = active.get() != null || preview.get() != null
+  fun hasOwnedSurface(): Boolean = active.get() != null || preview.get() != null || PinnedAppScreensaver.hasFrame()
 
   fun dismissForNavigation(): Boolean {
     val service = active.get()
     val activity = preview.get()
-    if (service == null && activity == null) return false
+    val hadOverlay = PinnedAppScreensaver.hasFrame()
+    PinnedAppScreensaver.release()
+    if (service == null && activity == null && !hadOverlay) return false
     active.clear()
     preview.clear()
     // Clear ownership and mark intent before either surface's asynchronous exit callbacks.

@@ -249,11 +249,11 @@ class MqttPublisher(private val appContext: Context) {
           "screen_power" ->
               if (payload.trim().equals("ON", ignoreCase = true)) ScreenControl.wake(appContext)
               else ScreenControl.sleep(appContext)
-          "go_home" ->
-              appContext.startActivity(
-                  Intent(Intent.ACTION_MAIN)
-                      .addCategory(Intent.CATEGORY_HOME)
-                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+          "go_home" -> PinnedAppScreensaver.navigation {
+            appContext.startActivity(Intent(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            true
+          }
           "open" -> openTarget(payload)
           "identify" ->
               Toast.makeText(appContext, "Immortal · ${FleetConfig.name(appContext)}", Toast.LENGTH_LONG)
@@ -262,16 +262,13 @@ class MqttPublisher(private val appContext: Context) {
           "media_next" -> NowPlayingHub.next()
           "media_previous" -> NowPlayingHub.previous()
           "notify" -> handleNotify(payload)
-          // Show the photo frame on demand — the same surface the launcher's header
-          // screensaver button launches (HomeActivity.onStartScreensaver). This is the
-          // in-app photo frame as a foreground Activity, not the system dream, so it stays
-          // consistent with the header button: screen/state remains "interactive", and the
-          // go_home command dismisses it. We don't try to start the system dream (no public
-          // API; Somnambulator/IDreamManager reflection is device-fragile on Portal).
-          "screensaver" ->
-              appContext.startActivity(
-                  Intent(appContext, PhotoFramePreviewActivity::class.java)
-                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+          // Select the pinned cover or the existing preview Activity on main. Both keep
+          // screen/state interactive; explicit go_home navigation retires the owned surface.
+          "screensaver" -> PinnedAppScreensaver.selectFrame {
+            appContext.startActivity(Intent(appContext, PhotoFramePreviewActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            true
+          }
           else -> Log.w(TAG, "unknown command $obj")
         }
       }
@@ -295,27 +292,30 @@ class MqttPublisher(private val appContext: Context) {
   /**
    * Dispatch a target string without touching any entity state. Same grammar as [openTarget]
    * (full URL, installed package name, or bare HA dashboard path). Returns true when a target
-   * was launched, false for a blank or unroutable input (e.g. no HA app installed for a path).
+   * navigation was accepted, false for blank, unroutable or rejected input. An admitted
+   * timeout remains accepted because its launch may still complete on main.
    */
   private fun routeTarget(payload: String): Boolean {
     val t = payload.trim()
     if (t.isBlank()) return false
     val pm = appContext.packageManager
-    when {
+    val intent = when {
       t.startsWith("http://") || t.startsWith("https://") || t.startsWith("homeassistant://") ->
-          appContext.startActivity(
-              Intent(Intent.ACTION_VIEW, Uri.parse(t)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-      pm.getLaunchIntentForPackage(t) != null ->
-          appContext.startActivity(pm.getLaunchIntentForPackage(t)!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-      else -> {
+          Intent(Intent.ACTION_VIEW, Uri.parse(t))
+      else -> pm.getLaunchIntentForPackage(t) ?: run {
         val pkg = ScreensaverDismiss.installedHaPackage(appContext) ?: return false
-        appContext.startActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse(ScreensaverDismiss.haDeepLink(t)))
-                .setPackage(pkg)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        Intent(Intent.ACTION_VIEW, Uri.parse(ScreensaverDismiss.haDeepLink(t))).setPackage(pkg)
       }
     }
-    return true
+    return try {
+      PinnedAppScreensaver.navigation {
+        appContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        true
+      }.optBoolean("ok")
+    } catch (_: PinnedCommandPending) {
+      Log.i(TAG, "target navigation completion unconfirmed")
+      true // Accepted navigation must not be treated as a rejected command to retry.
+    }
   }
 
   /**

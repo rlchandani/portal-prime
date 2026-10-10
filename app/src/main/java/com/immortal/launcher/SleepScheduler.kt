@@ -158,6 +158,12 @@ object SleepScheduler {
     main.removeCallbacks(nightSessionElapsed)
   }
 
+  /** Returning to a pinned external app ends the ambient idle session without launching Home. */
+  internal fun onReturnedToApp(context: Context) {
+    cancelIdle(context)
+    onLeftLauncher()
+  }
+
   /** The daytime idle alarm fired: turn the system Dream off so it can't re-light, then blank. */
   fun onIdleElapsed(context: Context) {
     SettingsGuard.setSystemScreensaverEnabled(context, false)
@@ -381,23 +387,35 @@ object SleepScheduler {
   }
 
   private fun closeCurrentApp(context: Context) {
-    val intent =
-        Intent(context, HomeActivity::class.java)
-            .setAction("com.immortal.launcher.CLOSE_CURRENT_APP")
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    runCatching { context.startActivity(intent) }
-        .onSuccess { Log.i(TAG, "close-app intent sent") }
-        .onFailure { Log.w(TAG, "failed to send close-app intent", it) }
+    try {
+      val result = PinnedAppScreensaver.navigation {
+        context.startActivity(Intent(context, HomeActivity::class.java)
+            .setAction("com.immortal.launcher.CLOSE_CURRENT_APP").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        true
+      }
+      if (result.optBoolean("ok")) Log.i(TAG, "close-app intent sent")
+      else Log.w(TAG, "close-app navigation not dispatched")
+    } catch (_: PinnedCommandPending) {
+      Log.i(TAG, "close-app navigation completion unconfirmed")
+    } catch (e: Exception) {
+      Log.w(TAG, "failed to send close-app intent", e)
+    }
   }
 
-  /** Show [PhotoFramePreviewActivity], which renders the dimmed night clock while in the window. */
+  /** The pinned host reconciles its overnight cover; the legacy path retains the night-clock Activity. */
   private fun launchNightClock(context: Context) {
-    runCatching {
-          context.startActivity(
-              Intent(context, PhotoFramePreviewActivity::class.java)
-                  .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
-        }
-        .onFailure { Log.w(TAG, "night clock launch failed", it) }
+    try {
+      val result = PinnedAppScreensaver.selectFrame {
+        context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+        true
+      }
+      if (!result.optBoolean("ok")) Log.w(TAG, "night clock unavailable")
+    } catch (_: PinnedCommandPending) {
+      Log.i(TAG, "night clock completion unconfirmed")
+    } catch (e: Exception) {
+      Log.w(TAG, "night clock launch failed", e)
+    }
   }
 
   private fun nowMinuteOfDay(): Int {

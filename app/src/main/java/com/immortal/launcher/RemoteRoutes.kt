@@ -15,6 +15,25 @@ import kotlin.concurrent.thread
 import org.json.JSONArray
 import org.json.JSONObject
 
+/** Admission boundary shared by HTTP and companion actions; decisions belong to the manager. */
+internal data class PinnedNavigationDispatch(
+    val selectFrame: (() -> Boolean) -> JSONObject = PinnedAppScreensaver::selectFrame,
+    val navigation: (() -> Boolean) -> JSONObject = PinnedAppScreensaver::navigation,
+    val command: (String) -> JSONObject = PinnedAppScreensaver::command,
+    val readStatus: () -> JSONObject = PinnedAppScreensaver::readStatus,
+    val back: (() -> Boolean) -> JSONObject = PinnedAppScreensaver::back,
+)
+
+/** Resolve eligibility before navigation admission so an unavailable app leaves the cover alone. */
+internal fun PinnedNavigationDispatch.launchApp(context: Context, packageName: String): JSONObject {
+  val intent = context.packageManager.getLaunchIntentForPackage(packageName)
+      ?: context.packageManager.getLeanbackLaunchIntentForPackage(packageName)
+      ?: return JSONObject().put("ok", false)
+  return navigation {
+    runCatching { context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true }.getOrDefault(false)
+  }
+}
+
 /**
  * The phone-remote HTTP surface (`/remote/…`), delegated to from [FleetRoutes]. Served
  * by the same always-on, LAN-guarded fleet agent, but with its **own** auth: the public
@@ -25,7 +44,11 @@ import org.json.JSONObject
  * Phase 1 is the Tier-A soft remote: global-action nav buttons + an app-launcher grid.
  * Keyboard, focus nav, gesture touchpad and presets extend these same routes later.
  */
-class RemoteRoutes(private val context: Context) {
+class RemoteRoutes internal constructor(
+    private val context: Context,
+    private val pinned: PinnedNavigationDispatch,
+) {
+  constructor(context: Context) : this(context, PinnedNavigationDispatch())
 
   private val companion by lazy { RemoteCompanionRoutes(context) }
 
@@ -59,6 +82,7 @@ class RemoteRoutes(private val context: Context) {
         "/remote/nowplaying" -> authed(req) { requireMethod("GET", req) { nowplaying() } }
         "/remote/media" -> authed(req) { media(req) }
         "/remote/volume" -> authed(req) { requireMethod("POST", req) { volume(req) } }
+        "/remote/pin" -> authed(req) { pin(req) }
         "/remote/key" -> authed(req) { key(req) }
         "/remote/launch" -> authed(req) { launch(req) }
         "/remote/text" -> authed(req) { text(req) }
@@ -210,10 +234,12 @@ class RemoteRoutes(private val context: Context) {
       val opened = context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
       return json(if (opened) 200 else 500, JSONObject().put("ok", opened).put("action", "home").put("dispatched", opened))
     }
+    if (action == "dashboard") return openDashboard()
     // Apps shares Home's retained page, including its navigation out of the photo frame.
     if (action == "apps") return openAppsTab()
     // "screensaver" starts the photo frame (same as the home-screen screensaver button).
     if (action == "screensaver") return openScreensaver()
+    if (action == "back") return back()
     if (RemoteInput.globalActionCode(action) == null) return json(400, err("unknown_action"))
     if (!RemoteInput.available()) return json(503, err("no_accessibility"))
     val dispatched = RemoteInput.globalAction(action)
@@ -228,25 +254,71 @@ class RemoteRoutes(private val context: Context) {
 
   private fun startAppsTab(): Boolean = context.openApprovedHomeTab(ApprovedLauncherTab.APPS)
 
-  /** Start the photo-frame screensaver ([PhotoFramePreviewActivity]) — the same thing the
-   *  home-screen screensaver button does. Same-app start, so the non-exported activity is fine. */
-  private fun openScreensaver(): FleetHttpServer.Response {
-    val ok =
-        runCatching {
-              context.startActivity(
-                  Intent(context, PhotoFramePreviewActivity::class.java)
-                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-              true
-            }
-            .getOrDefault(false)
-    return json(if (ok) 200 else 500, JSONObject().put("ok", ok).put("action", "screensaver"))
+  /** Select the pinned cover on main, or launch the existing preview when no pin is present. */
+  private fun openScreensaver(): FleetHttpServer.Response = pinnedResponse("screensaver", 500) {
+    pinned.selectFrame {
+      runCatching {
+        context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        true
+      }.getOrDefault(false)
+    }
+  }
+
+  private fun openDashboard(): FleetHttpServer.Response = pinnedResponse("dashboard", 503) {
+    pinned.navigation { HomeDashboardActivity.openDashboard(context) }
+  }
+
+  private fun back(): FleetHttpServer.Response = try {
+    var legacyUnavailable = false
+    val result = pinned.back {
+      // The manager chooses dismissal or this action together on main.
+      legacyUnavailable = !RemoteInput.available()
+      !legacyUnavailable && RemoteInput.globalAction("back")
+    }
+    if (legacyUnavailable) json(503, err("no_accessibility"))
+    else json(if (result.optBoolean("ok")) 200 else 409,
+        result.put("action", "back").put("dispatched", result.optBoolean("ok")))
+  } catch (_: PinnedCommandPending) {
+    pendingResponse("back")
+  }
+
+  private fun pin(req: FleetHttpServer.Request): FleetHttpServer.Response = when (req.method) {
+    "GET" -> try { json(200, pinned.readStatus()) }
+        catch (_: PinnedCommandPending) { pendingResponse() }
+    "POST" -> {
+      val action = parseJson(req.bodyText())?.optString("action")
+      if (action !in setOf("pin", "unpin", "show")) json(400, err("invalid_pin_action"))
+      else pinCommand(action!!)
+    }
+    else -> json(405, err("method_not_allowed"))
+  }
+
+  private fun pinCommand(action: String): FleetHttpServer.Response =
+      pinnedResponse { pinned.command(action) }
+
+  private fun pinnedResponse(
+      action: String? = null,
+      failureStatus: Int = 409,
+      dispatch: () -> JSONObject,
+  ): FleetHttpServer.Response = try {
+    val result = dispatch()
+    action?.let { result.put("action", it) }
+    json(if (result.optBoolean("ok")) 200 else failureStatus, result)
+  } catch (_: PinnedCommandPending) {
+    pendingResponse(action)
+  }
+
+  private fun pendingResponse(action: String? = null): FleetHttpServer.Response {
+    val result = ok().put("result", "completion_unconfirmed").put("checkStateBeforeRetry", true)
+    action?.let { result.put("action", it) }
+    return json(202, result)
   }
 
   private fun launch(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val body = parseJson(req.bodyText()) ?: return json(400, err("bad_json"))
     val pkg = body.optString("packageName").ifBlank { null } ?: return json(400, err("packageName_required"))
-    val launched = RemoteApps.launch(context, pkg)
-    return json(if (launched) 200 else 404, JSONObject().put("ok", launched).put("packageName", pkg))
+    return pinnedResponse("launch", 404) { pinned.launchApp(context, pkg).put("packageName", pkg) }
   }
 
   /** Edit the focused field: `{"mode":"set|append|backspace|clear","text":"…"}`. */
@@ -439,11 +511,16 @@ class RemoteRoutes(private val context: Context) {
     for (i in 0 until steps.length()) {
       val s = steps.optJSONObject(i) ?: continue
       when (s.optString("type")) {
-        "launch" -> RemoteApps.launch(context, s.optString("packageName"))
-        "key" ->
-            // Legacy "recents" steps share the Apps button's retained Home page.
-            if (s.optString("action") == "apps" || s.optString("action") == "recents") startAppsTab()
-            else RemoteInput.globalAction(s.optString("action"))
+        "launch" -> pinnedResponse("launch", 404) { pinned.launchApp(context, s.optString("packageName")) }
+        "key" -> when (s.optString("action")) {
+          // Legacy "recents" steps share the Apps button's retained Home page.
+          "apps", "recents" -> startAppsTab()
+          "home" -> context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
+          "screensaver" -> openScreensaver()
+          "dashboard" -> openDashboard()
+          "back" -> back()
+          else -> RemoteInput.globalAction(s.optString("action"))
+        }
         "text" -> RemoteInput.typeText(s.optString("text"), s.optString("mode").ifBlank { "set" })
         "wait" -> runCatching { Thread.sleep(clampWaitMs(s.optLong("ms", 300))) }
         "config" -> applyConfig(s.optString("target").ifBlank { "screensaver" }, s.optJSONObject("body"))

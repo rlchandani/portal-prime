@@ -36,6 +36,14 @@ class DreamRecoveryOwnershipTest {
     }
 
     @Test
+    fun pinnedOriginWithoutAnAccessibilityHostNeverFallsBackToPreviewActivity() {
+        withContext { context ->
+            DreamPolicy.onImmortalDreamingStopped(context, pinnedOrigin = true)
+            Mockito.verify(context, Mockito.never()).startActivity(Mockito.any(Intent::class.java))
+        }
+    }
+
+    @Test
     fun ownedTapExitDoesNotRecoverOverTheUser() {
         withContext { context ->
             DreamPolicy.userExitAt = System.currentTimeMillis()

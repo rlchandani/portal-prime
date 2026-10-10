@@ -48,7 +48,10 @@ internal object RemoteCompanionOperationPolicy {
 }
 
 /** One worker for both scenes and installs; no unbounded work queue or thread per phone request. */
-internal class RemoteCompanionOperations(private val context: Context) {
+internal class RemoteCompanionOperations(
+    private val context: Context,
+    private val pinned: PinnedNavigationDispatch = PinnedNavigationDispatch(),
+) {
   val history = RemoteCompanionHistory(RemoteCompanionStore.history(context)) { RemoteCompanionStore.update(context, "operations", it) }
   private val worker = Executors.newSingleThreadExecutor { task -> Thread(task, "remote-companion-operation").apply { isDaemon = true } }
   private val deadlines = ScheduledThreadPoolExecutor(1) { task -> Thread(task, "remote-companion-deadline").apply { isDaemon = true } }.apply { removeOnCancelPolicy = true }
@@ -63,12 +66,21 @@ internal class RemoteCompanionOperations(private val context: Context) {
       history.finish(op.getString("id"), JSONArray().put(result(false, "deadline_exceeded").put("backendMayContinue", true)))
     }, 5, TimeUnit.MINUTES)
     worker.execute {
+      var mainCompletionUnconfirmed = false
       try {
-        val result = runCatching { work(op.getString("id")) }.getOrElse { JSONArray().put(result(false, "backend_failed")) }
-        history.finish(op.getString("id"), result)
+        val results = runCatching { work(op.getString("id")) }.getOrElse {
+          JSONArray().put(if (it is PinnedCommandPending) pendingResult() else result(false, "backend_failed"))
+        }
+        mainCompletionUnconfirmed = (0 until results.length()).any {
+          val result = results.optJSONObject(it)
+          result != null && result.optString("result") == "completion_unconfirmed" && result.optBoolean("backendMayContinue")
+        }
+        history.finish(op.getString("id"), results)
       } finally {
         deadline.cancel(false)
-        try { history.backendStopped(op.getString("id")) } finally { backendBusy = false }
+        // Our worker has stopped, but an admitted main action may still be running.
+        try { if (!mainCompletionUnconfirmed) history.backendStopped(op.getString("id")) }
+        finally { backendBusy = false }
       }
     }
     return op
@@ -76,21 +88,30 @@ internal class RemoteCompanionOperations(private val context: Context) {
 
   fun action(body: JSONObject): JSONObject {
     val action = body.optString("action")
-    val dispatched = when (action) {
-      "launch" -> RemoteApps.launch(context, body.getString("packageName"))
-      "home" -> context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
-      "apps" -> context.openApprovedHomeTab(ApprovedLauncherTab.APPS)
-      "screensaver" -> open(PhotoFramePreviewActivity::class.java)
-      "wake", "sleep" -> {
-        if (action == "wake") ScreenControl.wake(context) else ScreenControl.sleep(context)
-        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        pm.isInteractive == (action == "wake")
+    return try {
+      val dispatched = when (action) {
+        "launch" -> pinned.launchApp(context, body.getString("packageName")).optBoolean("ok")
+        "home" -> context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
+        "apps" -> context.openApprovedHomeTab(ApprovedLauncherTab.APPS)
+        "screensaver" -> pinned.selectFrame { open(PhotoFramePreviewActivity::class.java) }.optBoolean("ok")
+        "back" -> pinned.back { RemoteInput.globalAction(action) }.optBoolean("ok")
+        "wake", "sleep" -> {
+          if (action == "wake") ScreenControl.wake(context) else ScreenControl.sleep(context)
+          val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+          pm.isInteractive == (action == "wake")
+        }
+        in RemoteScenePolicy.media -> RemoteMedia.command(action, 0)
+        else -> RemoteInput.globalAction(action)
       }
-      in RemoteScenePolicy.media -> RemoteMedia.command(action, 0)
-      else -> RemoteInput.globalAction(action)
+      result(dispatched, if (dispatched) "dispatched" else "not_dispatched").put("action", action)
+    } catch (_: PinnedCommandPending) {
+      pendingResult().put("action", action)
     }
-    return result(dispatched, if (dispatched) "dispatched" else "not_dispatched").put("action", action)
   }
+
+  private fun pendingResult(): JSONObject = result(true, "completion_unconfirmed")
+      .put("backendMayContinue", true).put("checkStateBeforeRetry", true)
+
   private fun open(clazz: Class<*>): Boolean = runCatching { context.startActivity(Intent(context, clazz).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true }.getOrDefault(false)
 
   fun install(id: String, app: CatalogApp, update: Boolean): JSONObject {

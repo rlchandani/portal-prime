@@ -12,6 +12,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
+import android.graphics.Rect
+import org.json.JSONObject
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -42,6 +44,39 @@ object QuickBar {
   private var wm: WindowManager? = null
   private var view: View? = null
   @Volatile private var barVisible = false
+  private var switcher: View? = null
+  private var pinButton: ImageView? = null
+  private var pinAvailable = false
+  private var pinned = false
+  private var frameCovered = false
+
+  /** Main-thread diagnostics for our own control; never inspect another app's nodes/content. */
+  fun pinControlStatus(): JSONObject {
+    val button = pinButton
+    val bounds = Rect()
+    val visible = button?.getGlobalVisibleRect(bounds) == true && view?.isShown == true
+    if (visible) {
+      val origin = IntArray(2)
+      view?.getLocationOnScreen(origin)
+      bounds.offset(origin[0], origin[1]) // getGlobalVisibleRect is relative to this window's root
+    } else bounds.setEmpty()
+    val location = IntArray(2)
+    button?.getLocationOnScreen(location)
+    val dm = host?.resources?.displayMetrics
+    return JSONObject().put("barVisible", barVisible).put("available", pinAvailable)
+        .put("selected", pinned).put("frameCovered", frameCovered)
+        .put("attached", view?.isAttachedToWindow == true).put("visible", visible)
+        .put("left", bounds.left).put("top", bounds.top).put("right", bounds.right).put("bottom", bounds.bottom)
+        .put("displayWidth", dm?.widthPixels ?: 0).put("displayHeight", dm?.heightPixels ?: 0)
+        .put("density", dm?.density ?: 0f)
+        .put("buttonX", location[0]).put("buttonY", location[1])
+        .put("buttonWidth", button?.width ?: 0).put("buttonHeight", button?.height ?: 0)
+  }
+
+  fun setPinState(available: Boolean, selected: Boolean, covered: Boolean) {
+    pinAvailable = available; pinned = selected; frameCovered = covered
+    main.post { refresh() }
+  }
 
   /** Add the (initially evaluated) cluster overlay, hosted by the accessibility service. */
   fun attach(service: AccessibilityService) {
@@ -61,7 +96,8 @@ object QuickBar {
                   // matching the back/home buttons (rather than flush to the top edge).
                   statusBarHeight(service),
                   WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-                  WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                  WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                      WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                   PixelFormat.TRANSLUCENT,
               )
               .apply { gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL }
@@ -75,6 +111,8 @@ object QuickBar {
     main.post {
       view?.let { v -> runCatching { wm?.removeView(v) } }
       view = null
+      switcher = null; pinButton = null
+      pinAvailable = false; pinned = false; frameCovered = false
       host = null
       wm = null
     }
@@ -95,8 +133,16 @@ object QuickBar {
     // BarWatchService is baseline-enabled now (it also backs the remote + the Calls→stock-home
     // bridge), so the service being connected no longer implies the quick-button feature is on.
     // Gate the cluster on its own setting; show only when enabled AND (always-show or bar shown).
-    val visible = QuickBarConfig.isEnabled(ctx) && (QuickBarConfig.alwaysShow(ctx) || barVisible)
-    v.visibility = if (visible) View.VISIBLE else View.GONE
+    val showSwitcher = QuickBarConfig.isEnabled(ctx) && (QuickBarConfig.alwaysShow(ctx) || barVisible)
+    val showPin = (pinAvailable || pinned) && barVisible && !frameCovered
+    switcher?.visibility = if (showSwitcher) View.VISIBLE else View.GONE
+    pinButton?.apply {
+      visibility = if (showPin) View.VISIBLE else View.GONE
+      contentDescription = if (pinned) "Unpin app" else "Pin app for screensaver return"
+      tooltipText = contentDescription
+      setColorFilter(if (pinned) 0xFF83BAFF.toInt() else 0xFFFFFFFF.toInt())
+    }
+    v.visibility = if (!frameCovered && (showSwitcher || showPin)) View.VISIBLE else View.GONE
   }
 
   private fun statusBarHeight(ctx: Context): Int {
@@ -112,7 +158,21 @@ object QuickBar {
       LinearLayout(ctx).apply {
         orientation = LinearLayout.HORIZONTAL
         gravity = Gravity.CENTER
-        addView(appSwitcherButton(ctx))
+        addView(appSwitcherButton(ctx).also { switcher = it })
+        addView(appSwitcherButton(ctx).let { template ->
+          (template as ImageView).apply {
+            setImageResource(R.drawable.ic_pin_app)
+            setOnClickListener {
+              if (PinnedAppScreensaver.hasPin()) {
+                PinnedAppScreensaver.release()
+                android.widget.Toast.makeText(ctx, "App unpinned", android.widget.Toast.LENGTH_SHORT).show()
+              } else if (!PinnedAppScreensaver.pinCurrent()) {
+                android.widget.Toast.makeText(ctx, "Open an app first, then pin it here", android.widget.Toast.LENGTH_SHORT).show()
+              }
+              PinnedAppScreensaver.windowsChanged()
+            }
+          }
+        }.also { pinButton = it })
       }
 
   /** A pill sized/shaped to match the system bar's back/home buttons, with the standard recents glyph. */

@@ -111,55 +111,90 @@ class ApprovedHomeNavigationBoundaryTest {
     assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
   }
 
-  @Test fun ownedFrameAboveHomeUsesFallbackAndIsDismissedOnlyOnIntentConsumption() = withHost { f ->
+  @Test fun unfocusedHomeRetiresPreviewBeforeFallbackAndConsumesTheIntentOnce() = withHost { f ->
     val preview = Mockito.mock(PhotoFramePreviewActivity::class.java)
+    var retired = false
+    Mockito.doAnswer {
+      assertTrue(DreamPolicy.userExitAt > 0L)
+      assertFalse(ImmortalDreamNavigation.hasOwnedSurface())
+      assertTrue(f.launches.isEmpty())
+      retired = true
+      null
+    }.`when`(preview).finish()
+    Mockito.doAnswer {
+      assertTrue("Retirement must precede Home eligibility checking", retired)
+      false
+    }.`when`(f.home).hasWindowFocus()
     ImmortalDreamNavigation.attached(preview)
     try {
-      `when`(f.home.hasWindowFocus()).thenReturn(false)
       assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS))
       assertFallback(f.launches.single(), newTask = true)
-      Mockito.verify(preview, Mockito.never()).finish()
+      assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
+      Mockito.verify(preview, Mockito.times(1)).finish()
+      consumeTabIntent(f.home, f.launches.single().intent)
       consumeTabIntent(f.home, f.launches.single().intent)
       assertEquals(ApprovedLauncherTab.APPS, f.tab.value)
-      Mockito.verify(preview).finish()
-      assertTrue(DreamPolicy.userExitAt > 0L)
+      assertEquals(1, f.launches.size)
+      Mockito.verify(f.home, Mockito.times(1)).selectApprovedHomeTab(ApprovedLauncherTab.APPS, false)
+      Mockito.verify(preview, Mockito.times(1)).finish()
     } finally { ImmortalDreamNavigation.detached(preview) }
   }
 
-  @Test fun ownedDreamAboveApparentlyFocusedHomeStillUsesDismissalFallback() = withHost { f ->
+  @Test fun focusedHomeSelectsDirectlyAfterOwnedDreamRetirement() = withHost { f ->
     val dream = Mockito.mock(PhotoDreamService::class.java)
+    var retired = false
+    Mockito.doAnswer {
+      assertTrue(DreamPolicy.userExitAt > 0L)
+      assertFalse(ImmortalDreamNavigation.hasOwnedSurface())
+      retired = true
+      null
+    }.`when`(dream).finish()
+    Mockito.doAnswer {
+      assertTrue("Dream retirement must precede focused Home selection", retired)
+      true
+    }.`when`(f.home).hasWindowFocus()
     ImmortalDreamNavigation.attached(dream)
     try {
       assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS))
-      assertFallback(f.launches.single(), newTask = true)
-      assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
-      Mockito.verify(dream, Mockito.never()).finish()
-      consumeTabIntent(f.home, f.launches.single().intent)
-      Mockito.verify(dream).finish()
       assertEquals(ApprovedLauncherTab.APPS, f.tab.value)
-      f.launches.clear()
+      assertTrue(f.intents.isEmpty())
+      assertTrue(f.launches.isEmpty())
+      Mockito.verify(dream, Mockito.times(1)).finish()
+      Mockito.verify(f.home, Mockito.times(1)).selectApprovedHomeTab(ApprovedLauncherTab.APPS, false)
       assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.HOME))
       assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
       assertTrue(f.launches.isEmpty())
+      Mockito.verify(dream, Mockito.times(1)).finish()
     } finally { ImmortalDreamNavigation.detached(dream) }
   }
 
-  @Test fun ownedPreviewAboveApparentlyFocusedHomeStillUsesDismissalFallback() = withHost { f ->
+  @Test fun focusedHomeSelectsDirectlyAfterOwnedPreviewRetirement() = withHost { f ->
     val preview = Mockito.mock(PhotoFramePreviewActivity::class.java)
+    var retired = false
+    Mockito.doAnswer {
+      assertTrue(DreamPolicy.userExitAt > 0L)
+      assertFalse(ImmortalDreamNavigation.hasOwnedSurface())
+      retired = true
+      null
+    }.`when`(preview).finish()
+    Mockito.doAnswer {
+      assertTrue("Preview retirement must precede focused Home selection", retired)
+      true
+    }.`when`(f.home).hasWindowFocus()
     ImmortalDreamNavigation.attached(preview)
     try {
       assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS))
-      assertFallback(f.launches.single(), newTask = true)
-      assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
-      consumeTabIntent(f.home, f.launches.single().intent)
-      Mockito.verify(preview).finish()
       assertEquals(ApprovedLauncherTab.APPS, f.tab.value)
+      assertTrue(f.intents.isEmpty())
+      assertTrue(f.launches.isEmpty())
+      Mockito.verify(preview, Mockito.times(1)).finish()
+      Mockito.verify(f.home, Mockito.times(1)).selectApprovedHomeTab(ApprovedLauncherTab.APPS, false)
     } finally { ImmortalDreamNavigation.detached(preview) }
   }
 
   @Test fun workerAppliesOnMainAndNeverConstructsAnIntentForDirectSelection() = withHost(onMain = false) { f ->
     Mockito.mockConstruction(Handler::class.java) { handler, _ ->
-      Mockito.doAnswer { it.getArgument<Runnable>(0).run(); true }
+      Mockito.doAnswer { f.runOnMain(it.getArgument(0)); true }
           .`when`(handler).post(Mockito.any(Runnable::class.java))
     }.use { handlers ->
       assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS, searchApps = true))
@@ -188,7 +223,7 @@ class ApprovedHomeNavigationBoundaryTest {
       val posted = requireNotNull(queued)
       // A pause while queued must not convert cancellation into a late fallback.
       ApprovedHomeNavigation.unavailable(f.home)
-      posted.run()
+      f.runOnMain(posted)
       assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
       assertEquals(0, f.search.value)
       assertTrue(f.launches.isEmpty())
@@ -207,27 +242,32 @@ class ApprovedHomeNavigationBoundaryTest {
         assertFalse(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS, searchApps = true))
         assertTrue(Thread.currentThread().isInterrupted)
       } finally { Thread.interrupted() }
-      requireNotNull(queued).run()
+      f.runOnMain(requireNotNull(queued))
       assertEquals(0, f.search.value)
       assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
       assertTrue(f.launches.isEmpty())
     }
   }
 
-  @Test fun hostReplacedBeforeMainDispatchFallsBackWithoutTouchingEitherHost() = withHost(onMain = false) { f ->
+  @Test fun hostReplacedDuringFocusValidationFallsBackWithoutSelectingEitherHost() = withHost(onMain = false) { f ->
     val replacement = Mockito.mock(HomeActivity::class.java)
+    Mockito.doAnswer {
+      ApprovedHomeNavigation.resumed(replacement)
+      ApprovedHomeNavigation.unavailable(f.home)
+      true
+    }.`when`(f.home).hasWindowFocus()
     Mockito.mockConstruction(Handler::class.java) { handler, _ ->
-      Mockito.doAnswer {
-        ApprovedHomeNavigation.resumed(replacement)
-        ApprovedHomeNavigation.unavailable(f.home)
-        it.getArgument<Runnable>(0).run()
-        true
-      }.`when`(handler).post(Mockito.any(Runnable::class.java))
-    }.use {
+      Mockito.doAnswer { f.runOnMain(it.getArgument(0)); true }
+          .`when`(handler).post(Mockito.any(Runnable::class.java))
+    }.use { handlers ->
       try {
         assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS))
+        assertEquals(1, handlers.constructed().size)
         assertFallback(f.launches.single(), newTask = true)
         assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
+        assertTrue(Mockito.mockingDetails(f.home).invocations.none {
+          it.method.name == "selectApprovedHomeTab"
+        })
         Mockito.verifyNoInteractions(replacement)
       } finally { ApprovedHomeNavigation.unavailable(replacement) }
     }
@@ -238,8 +278,8 @@ class ApprovedHomeNavigationBoundaryTest {
       Mockito.doAnswer {
         `when`(f.home.hasWindowFocus()).thenReturn(false)
         val posted = it.getArgument<Runnable>(0)
-        posted.run()
-        posted.run()
+        f.runOnMain(posted)
+        f.runOnMain(posted)
         true
       }.`when`(handler).post(Mockito.any(Runnable::class.java))
     }.use {
@@ -249,10 +289,11 @@ class ApprovedHomeNavigationBoundaryTest {
     }
   }
 
-  @Test fun workerThatExpiresWhileCheckingFocusCannotSelectAfterReturn() = withHost(onMain = false) { f ->
+  @Test fun admittedWorkerFocusTimeoutIsAcceptedAndCompletesExactlyOnceAfterRelease() = withHost(onMain = false) { f ->
     val entered = CountDownLatch(1)
     val release = CountDownLatch(1)
     var uiWorker: Thread? = null
+    var posted: Runnable? = null
     Mockito.doAnswer {
       entered.countDown()
       check(release.await(5, TimeUnit.SECONDS))
@@ -260,21 +301,31 @@ class ApprovedHomeNavigationBoundaryTest {
     }.`when`(f.home).hasWindowFocus()
     Mockito.mockConstruction(Handler::class.java) { handler, _ ->
       Mockito.doAnswer {
-        val posted = it.getArgument<Runnable>(0)
-        uiWorker = Thread { posted.run() }.apply { start() }
+        posted = it.getArgument(0)
+        uiWorker = Thread { f.runOnMain(requireNotNull(posted)) }.apply { start() }
         true
       }.`when`(handler).post(Mockito.any(Runnable::class.java))
-    }.use {
+    }.use { handlers ->
       try {
-        assertFalse(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS, searchApps = true))
+        // Focus validation is already inside the manager's admitted navigation closure.
+        assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS, searchApps = true))
         assertTrue(entered.await(1, TimeUnit.SECONDS))
+        assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
+        assertEquals(0, f.search.value)
+        assertTrue(f.launches.isEmpty())
       } finally {
         release.countDown()
         requireNotNull(uiWorker).join(2_000)
       }
       assertFalse(requireNotNull(uiWorker).isAlive)
-      assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
-      assertEquals(0, f.search.value)
+      assertEquals(1, handlers.constructed().size)
+      assertEquals(ApprovedLauncherTab.APPS, f.tab.value)
+      assertEquals(1, f.search.value)
+      f.runOnMain(requireNotNull(posted))
+      assertEquals(1, f.search.value)
+      Mockito.verify(f.home, Mockito.times(1)).hasWindowFocus()
+      Mockito.verify(f.home, Mockito.times(1)).selectApprovedHomeTab(ApprovedLauncherTab.APPS, true)
+      assertTrue(f.intents.isEmpty())
       assertTrue(f.launches.isEmpty())
     }
   }
@@ -294,22 +345,26 @@ class ApprovedHomeNavigationBoundaryTest {
     Mockito.mockConstruction(Handler::class.java) { handler, _ ->
       Mockito.doAnswer {
         posted = it.getArgument(0)
-        uiWorker = Thread { requireNotNull(posted).run() }.apply { start() }
+        uiWorker = Thread { f.runOnMain(requireNotNull(posted)) }.apply { start() }
         true
       }.`when`(handler).post(Mockito.any(Runnable::class.java))
     }.use {
       try {
         assertTrue(f.context.openApprovedHomeTab(ApprovedLauncherTab.APPS, searchApps = true))
         assertTrue(entered.await(1, TimeUnit.SECONDS))
+        assertEquals(ApprovedLauncherTab.HOME, f.tab.value)
+        assertEquals(0, f.search.value)
       } finally {
         release.countDown()
         requireNotNull(uiWorker).join(2_000)
       }
+      assertFalse(requireNotNull(uiWorker).isAlive)
       assertSame(uiWorker, selectedOn)
       assertEquals(ApprovedLauncherTab.APPS, f.tab.value)
       assertEquals(1, f.search.value)
-      requireNotNull(posted).run()
+      f.runOnMain(requireNotNull(posted))
       assertEquals(1, f.search.value)
+      Mockito.verify(f.home, Mockito.times(1)).selectApprovedHomeTab(ApprovedLauncherTab.APPS, true)
       assertTrue(f.intents.isEmpty())
       assertTrue(f.launches.isEmpty())
     }
@@ -341,6 +396,23 @@ class ApprovedHomeNavigationBoundaryTest {
   }
 
   private class Fixture {
+    private val callerThread = Thread.currentThread()
+    val mainLooper = Mockito.mock(Looper::class.java)
+    var callerLooper: Looper? = null
+
+    /** Mockito static mocks are thread-local; model the public main Looper on the executing thread. */
+    fun runOnMain(runnable: Runnable) {
+      if (Thread.currentThread() === callerThread) {
+        val previous = callerLooper
+        callerLooper = mainLooper
+        try { runnable.run() } finally { callerLooper = previous }
+      } else Mockito.mockStatic(Looper::class.java).use { loopers ->
+        loopers.`when`<Looper> { Looper.getMainLooper() }.thenReturn(mainLooper)
+        loopers.`when`<Looper> { Looper.myLooper() }.thenReturn(mainLooper)
+        runnable.run()
+      }
+    }
+
     val home = Mockito.mock(HomeActivity::class.java, Mockito.CALLS_REAL_METHODS)
     val context = Mockito.mock(Context::class.java)
     val lifecycle = Mockito.mock(Lifecycle::class.java)
@@ -373,13 +445,13 @@ class ApprovedHomeNavigationBoundaryTest {
     val bridge = DreamPolicy.inStockHandoff
     val exit = DreamPolicy.userExitAt
     DreamPolicy.inStockHandoff = false
-    val main = Mockito.mock(Looper::class.java)
     val fixture = Fixture()
+    fixture.callerLooper = if (onMain) fixture.mainLooper else null
     ApprovedHomeNavigation.resumed(fixture.home)
     try {
       Mockito.mockStatic(Looper::class.java).use { loopers ->
-        loopers.`when`<Looper> { Looper.getMainLooper() }.thenReturn(main)
-        if (onMain) loopers.`when`<Looper> { Looper.myLooper() }.thenReturn(main)
+        loopers.`when`<Looper> { Looper.getMainLooper() }.thenReturn(fixture.mainLooper)
+        loopers.`when`<Looper> { Looper.myLooper() }.thenAnswer { fixture.callerLooper }
         Mockito.mockConstruction(Intent::class.java) { intent, construction ->
           val launch = Launch(intent, construction.arguments()[1])
           fixture.intents[intent] = launch

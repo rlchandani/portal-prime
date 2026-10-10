@@ -169,10 +169,10 @@ object DreamPolicy {
       handleDreamStopped(context, recoverImmortalFrame = false)
 
   /** Only [PhotoDreamService]'s lifecycle callback proves that our screensaver was interrupted. */
-  internal fun onImmortalDreamingStopped(context: Context) =
-      handleDreamStopped(context, recoverImmortalFrame = true)
+  internal fun onImmortalDreamingStopped(context: Context, pinnedOrigin: Boolean = false) =
+      handleDreamStopped(context, recoverImmortalFrame = true, pinnedOrigin = pinnedOrigin)
 
-  private fun handleDreamStopped(context: Context, recoverImmortalFrame: Boolean) {
+  private fun handleDreamStopped(context: Context, recoverImmortalFrame: Boolean, pinnedOrigin: Boolean = false) {
     if (!ScreensaverConfig.load(context).enabled) {
       Log.i(TAG, "screensaver disabled; not relaunching frame")
       return
@@ -195,6 +195,12 @@ object DreamPolicy {
     // frame would wake the screen just to blank it again — a flash every time a stray sibling/system
     // dream cycles overnight (issue #73). Let the scheduler re-blank in place instead.
     if (SleepScheduler.handleRedreamDuringOvernight(context)) return
+    if (pinnedOrigin || PinnedAppScreensaver.hasPin()) {
+      // An accessibility overlay preserves the underlying external task. Never fall back to
+      // the launcher Activity if attaching this curtain fails: that would displace the app.
+      if (!PinnedAppScreensaver.showFrame()) Log.w(TAG, "pinned frame recovery unavailable")
+      return
+    }
     runCatching {
       context.startActivity(
           Intent(context, PhotoFramePreviewActivity::class.java)

@@ -9,6 +9,7 @@ package com.immortal.launcher
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Looper
 import java.io.ByteArrayInputStream
 import org.json.JSONArray
 import org.json.JSONObject
@@ -95,7 +96,12 @@ class RemoteRoutesNavigationTest {
       val fixture = Fixture()
       Mockito.doAnswer { call -> launches += checkNotNull(intents[call.getArgument<Intent>(0)]); null }
           .`when`(fixture.context).startActivity(Mockito.any(Intent::class.java))
-      block(fixture, launches)
+      Mockito.mockStatic(Looper::class.java).use { loops ->
+        val main = Mockito.mock(Looper::class.java)
+        loops.`when`<Looper> { Looper.getMainLooper() }.thenReturn(main)
+        loops.`when`<Looper> { Looper.myLooper() }.thenReturn(main)
+        block(fixture, launches)
+      }
     }
   }
 

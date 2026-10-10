@@ -25,20 +25,31 @@ import android.view.accessibility.AccessibilityWindowInfo
  * the other still needs it.)
  */
 class BarWatchService : AccessibilityService() {
+  private var pinnedFrame: PinnedAppFrameHost? = null
 
   override fun onServiceConnected() {
     QuickBar.attach(this) // host the cluster as a TYPE_ACCESSIBILITY_OVERLAY (renders on the bar)
     RemoteInput.register(this) // let the phone-remote routes drive input through us
     RemoteCursor.attach(this) // host the remote touchpad's on-TV pointer overlay
     NotificationOverlay.attach(this) // host MQTT-notify toasts (see MqttPublisher.handleNotify)
+    pinnedFrame = PinnedAppFrameHost(this).also { PinnedAppScreensaver.attach(it) }
     updateBar()
+    PinnedAppScreensaver.windowsChanged()
   }
 
   override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-    if (event?.eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED) updateBar()
+    if (event?.eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED) {
+      updateBar()
+      PinnedAppScreensaver.windowsChanged()
+    }
   }
 
   override fun onUnbind(intent: android.content.Intent?): Boolean {
+    pinnedFrame?.let {
+      PinnedAppScreensaver.detach(it)
+      it.close()
+    }
+    pinnedFrame = null
     QuickBar.detach()
     RemoteInput.unregister()
     RemoteCursor.detach()

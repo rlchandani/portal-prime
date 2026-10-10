@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <queries>
+        <package android:name="com.immortal.launcher.debug" />
+        <package android:name="com.android.systemui" />
+    </queries>
+    <application android:usesCleartextTraffic="true"
+        android:appComponentFactory="com.immortal.launcher.PinFixtureComponentFactory"
+        tools:replace="android:appComponentFactory">
+        <!-- These components live in the external test APK, never the launcher APK/process. -->
+        <activity
+            android:name="com.immortal.launcher.PinFixtureActivity"
+            android:process=":pin_fixture"
+            android:exported="true"
+            android:label="Pinned app runtime fixture"
+            android:excludeFromRecents="true"
+            android:taskAffinity="com.immortal.launcher.debug.test.pin_fixture"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <provider
+            android:name="com.immortal.launcher.PinFixtureBridgeProvider"
+            android:authorities="com.immortal.launcher.debug.test.pin-fixture"
+            android:process=":pin_fixture"
+            android:exported="true"
+            android:grantUriPermissions="false" />
+    </application>
+</manifest>

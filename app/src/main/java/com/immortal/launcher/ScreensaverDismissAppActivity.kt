@@ -110,10 +110,12 @@ object ScreensaverDismiss {
 
   /**
    * Launch the chosen target, if any. Called from the dream's tap-to-dismiss handler.
-   * Returns true if something was launched. Best-effort: any failure is swallowed so the
+   * Returns true when handled, including a pinned session with no launch. Any failure is swallowed so the
    * dream still finishes to the launcher.
    */
   fun launchChosenApp(context: Context): Boolean {
+    // Finishing an owned Dream reveals the pinned app. Never send it another launch intent.
+    if (PinnedAppScreensaver.hasPin()) return true
     val cfg = ScreensaverConfig.load(context)
 
     // 1. Home Assistant dashboard / app.
