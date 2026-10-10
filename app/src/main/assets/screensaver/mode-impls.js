@@ -480,18 +480,95 @@
   MODES.filmstrip = { name: "Filmstrip Coverflow", run(ctx, deck) {
     const t = makeTimers(ctx); const bdA = el("ss-bd", ctx.root), bdB = el("ss-bd", ctx.root); bdB.style.opacity = "0"; const track = el("ss-track", ctx.root);
     const items = []; const set = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, 12)).fill("any"));
-    let center = 0, top = false;
-    async function go(i) { const u = ctx.url(items[i].photo, 1000); if (!await t.load(u)) return false; items.forEach((s, k) => s.el.classList.toggle("center", k === i)); let off = 0; for (let k = 0; k < i; k++) off += items[k].w + 60; off += items[i].w / 2; track.style.transform = `translateX(${-off}px)`; const b = top ? bdA : bdB, o = top ? bdB : bdA; bg(b, u); b.style.opacity = "1"; o.style.opacity = "0"; top = !top; center = i; }
+    let center = 0, top = false, admitted = false, bounded = false, disposed = false, preparation = null;
+    // The unchanged CSS scales at most 1.12 and has a 70px black shadow blur.
+    // 512 local pixels deliberately overbound its finite raster support, spread
+    // and offset; 2px additionally cover flex/subpixel rounding over twelve slots.
+    const MAX_SCALE = 1.12, SHADOW_PAD = 512, ROUNDING_PAD = 2;
+    function knownGeometry() {
+      try {
+        if (!(Number.isFinite(ctx.W) && ctx.W > 0 && Number.isFinite(ctx.H) && ctx.H > 0) ||
+            items.some(s => !(Number.isFinite(s.w) && s.w > 0 && Number.isFinite(s.off)))) return false;
+        const root = ctx.root.getBoundingClientRect(), tr = track.getBoundingClientRect(), ts = getComputedStyle(track);
+        if (![root.width, root.height, root.left, tr.left, tr.height].every(Number.isFinite) ||
+            Math.abs(root.width - ctx.W) > 1 || Math.abs(root.height - ctx.H) > 1 ||
+            getComputedStyle(ctx.root).transform !== "none" || ts.position !== "absolute" ||
+            ts.display !== "flex" || ts.flexDirection !== "row" || ts.alignItems !== "center" ||
+            ts.gap !== "60px" || Math.abs(tr.left - root.left - ctx.W / 2) > 1 ||
+            Math.abs(tr.height - ctx.H) > 1) return false;
+        return items.every(s => {
+          const p = getComputedStyle(s.el), r = s.el.getBoundingClientRect();
+          return Math.abs(parseFloat(p.width) - s.w) < 1 && Math.abs(parseFloat(p.height) - ctx.H * .62) < 1 &&
+            p.transform === "matrix(0.7, 0, 0, 0.7, 0, 0)" &&
+            p.boxShadow === "rgba(0, 0, 0, 0.9) 0px 30px 70px -20px" &&
+            p.transitionProperty === "transform, opacity, filter" &&
+            p.transitionDuration === "1.4s, 1.4s, 1.4s" &&
+            p.transitionTimingFunction === "cubic-bezier(0.22, 1, 0.36, 1), ease, ease" &&
+            Math.abs(r.left - root.left - (ctx.W / 2 + s.off - s.w * .35)) < ROUNDING_PAD &&
+            Math.abs(r.width - s.w * .7) < 1 && Math.abs(r.height - ctx.H * .62 * .7) < 1;
+        });
+      } catch (_) { return false; } // Unknown geometry retains original full admission.
+    }
+    function needed(s, from, to) {
+      if (!bounded) return true;
+      const radius = (s.w / 2 + SHADOW_PAD) * MAX_SCALE + ROUNDING_PAD;
+      const left = ctx.W / 2 + s.off - Math.max(from, to) - radius;
+      const right = ctx.W / 2 + s.off - Math.min(from, to) + radius;
+      return right >= 0 && left <= ctx.W;
+    }
+    async function prepare(urls) {
+      const controller = new AbortController();
+      preparation = controller;
+      try {
+        await Promise.all(Array.from(new Set(urls)).map(url => window.preloadDecoded(url, controller.signal)));
+      } catch (_) { return false; }
+      finally {
+        // Failure/disposal cancels siblings before another serialized batch starts.
+        controller.abort();
+        if (preparation === controller) preparation = null;
+      }
+      // Reuse the timer owner's pause/disposal gate without decoding a second time.
+      return !disposed && await t.load([]);
+    }
+    async function go(i) {
+      if (disposed || !items[i]) return false;
+      const from = admitted ? items[center].off : 0, to = items[i].off;
+      // Retain all previously prepared images. Their earlier admission envelope
+      // also covers interrupted CSS motion; wrap pans include intermediate cards.
+      const batch = items.filter(s => !s.prepared && needed(s, from, to))
+        .map(s => ({ item: s, url: ctx.url(s.photo, 1400) }));
+      const u = ctx.url(items[i].photo, 1000);
+      if (!await prepare(batch.map(s => s.url).concat(u)) || disposed) return false;
+      // Commit one complete batch after decode/pause/ownership gates. Never
+      // re-resolve at publication, or replace/clear an already-live image.
+      batch.forEach(({ item, url }) => { bg(item.img, url); item.prepared = true; });
+      items.forEach((s, k) => s.el.classList.toggle("center", k === i));
+      track.style.transform = `translateX(${-to}px)`;
+      const b = top ? bdA : bdB, o = top ? bdB : bdA;
+      bg(b, u); b.style.opacity = "1"; o.style.opacity = "0";
+      top = !top; center = i; admitted = true;
+    }
     function loop() { return go((center + 1) % items.length); }
     t.start(async () => {
-      const urls = set.map(p => ctx.url(p, 1400)); if (!await t.load(urls)) return false;
-      set.forEach((p, i) => { const s = el("ss-slide", track); const h = ctx.H * 0.62, w = h * aspect(p); s.style.width = w + "px"; const im = el("ss-img", s); im.style.width = w + "px"; im.style.height = "100%"; bg(im, urls[i]); items.push({ el: s, w, photo: p }); });
+      let left = 0;
+      set.forEach(p => {
+        const s = el("ss-slide", track), h = ctx.H * .62, w = h * aspect(p);
+        s.style.width = w + "px";
+        const im = el("ss-img", s); im.style.width = w + "px"; im.style.height = "100%";
+        im.style.backgroundSize = "cover"; im.style.backgroundPosition = "center"; im.style.backgroundRepeat = "no-repeat";
+        items.push({ el: s, img: im, w, off: left + w / 2, photo: p, prepared: false });
+        left += w + 60;
+      });
+      bounded = knownGeometry();
       return go(0);
     });
     t.every(loop, ctx.microMs);
-    t.cleanup.next = () => t.navigate(() => go((center + 1) % items.length));
-    t.cleanup.previous = () => t.navigate(() => go((center + items.length - 1) % items.length));
-    return t.cleanup;
+    const cleanup = () => { disposed = true; if (preparation) preparation.abort(); t.cleanup(); };
+    Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
+    cleanup.pause = t.cleanup.pause; cleanup.resume = t.cleanup.resume;
+    cleanup.next = () => t.navigate(() => go((center + 1) % items.length));
+    cleanup.previous = () => t.navigate(() => go((center + items.length - 1) % items.length));
+    return cleanup;
   }};
 
   // ---- 11 Cinema letterbox ---------------------------------------------------
