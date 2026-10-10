@@ -56,6 +56,7 @@ From `provisioning/`, with an existing registered device:
 ```bash
 ./fleetctl dev on --device Kitchen
 ./fleetctl raw POST /perf '{"action":"start","durationSec":60,"phase":"slideshow"}' --device Kitchen
+./fleetctl raw GET /perf/state --device Kitchen
 ./fleetctl raw GET /perf --device Kitchen
 ./fleetctl raw POST /perf '{"action":"stop"}' --device Kitchen
 ```
@@ -65,6 +66,13 @@ an observation; it does not navigate or filter windows. Supported labels are `al
 `home`, `apps`, `tools`, `settings`, `slideshow`, `launch` and `idle`. Starting replaces
 the previous session; stopping or expiry retains its final in-memory results. Only
 start requires developer mode; authenticated reads and stop remain available.
+
+Use authenticated GET `/perf/state` for repeated ownership and cleanup checks. It reads
+live capture identity, phase, deadline, sampling state, collector state and listener counts,
+without serializing metrics or sampling memory. It shares the same expiry handling as the
+full report and does not cache the response or create a collector. It is read-only; POST
+returns 405. A closed capture can still have listeners awaiting asynchronous cleanup, so
+verify `collectorRunning == false` and `activeListeners == 0` as well as `active == false`.
 
 Results include observed frame counts, callback drops, first-draw and steady-frame
 budget exceedances, 0.25 ms histogram percentiles, timing components and memory sampled
@@ -76,7 +84,7 @@ Expiry stops accepting frames at the monotonic deadline, removes observers/liste
 and quits the collector asynchronously. A screen-wake/lifecycle check handles delayed
 main-thread timers after sleep. A `202 completion_unconfirmed` response means a command
 began but its completion was not confirmed within the response deadline: inspect GET
-`/perf` before retrying. `503 capture_command_not_applied` means it did not begin or failed.
+`/perf/state` before retrying. `503 capture_command_not_applied` means it did not begin or failed.
 
 These are **host Window timings**, not compositor-delivered FPS. They do not measure
 Chrome's frames, arbitrary website readiness, Dialog windows, system surfaces, or all

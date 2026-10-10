@@ -418,7 +418,12 @@ internal object FramePerformanceCapture {
     }
   }
 
-  fun snapshot(): JSONObject {
+  fun snapshot(): JSONObject = snapshot(includeMetrics = true)
+
+  /** Live, expiring ownership state for repeated safety checks; no histograms or memory sampling. */
+  fun stateSnapshot(): JSONObject = snapshot(includeMetrics = false)
+
+  private fun snapshot(includeMetrics: Boolean): JSONObject {
     val s = current
     val now = SystemClock.elapsedRealtime()
     if (s != null && now >= s.deadline) synchronized(s) {
@@ -428,14 +433,19 @@ internal object FramePerformanceCapture {
     }
     // This immutable state read never constructs a coordinator, executor or WebView.
     val startup = WebViewStartupPreparation.snapshot()
-    val result = JSONObject().put("ok", true).put("scope", "Immortal Window host metrics")
+    val result = JSONObject().put("ok", true).put("scope",
+        if (includeMetrics) "Immortal Window host metrics" else "Immortal capture ownership state")
         .put("deliveredFpsMeasured", false).put("maxHosts", MAX_HOSTS).put("maxLiveWindows", MAX_WINDOWS)
         .put("webViewBackgroundStartup", JSONObject()
             .put("enabled", BuildConfig.PORTAL_WEBVIEW_BACKGROUND_STARTUP)
             .put("pending", startup.pending).put("attempted", startup.attempted)
             .put("completed", startup.completed).put("failed", startup.failed))
-    if (s == null) return result.put("active", false).put("collectorRunning", false)
-        .put("sampleMain", false).put("sampleMainActive", false).put("activeListeners", 0).put("hosts", JSONObject())
+    if (s == null) {
+      result.put("active", false).put("collectorRunning", false)
+          .put("sampleMain", false).put("sampleMainActive", false).put("activeListeners", 0)
+      if (includeMetrics) result.put("hosts", JSONObject())
+      return result
+    }
     synchronized(s) {
       result.put("sessionId", s.id).put("phase", s.request.phase)
           .put("durationSec", s.request.durationSec)
@@ -447,7 +457,8 @@ internal object FramePerformanceCapture {
           .put("collectorRunning", s.thread.isAlive).put("activeListeners", s.attached)
           .put("untrackedHosts", s.rejectedHosts).put("untrackedWindows", s.rejectedWindows)
           .put("attachFailures", s.attachFailures)
-          .put("hosts", JSONObject().apply { s.histograms.forEach { (name, h) -> put(name, h.snapshot()) } })
+      if (!includeMetrics) return result
+      result.put("hosts", JSONObject().apply { s.histograms.forEach { (name, h) -> put(name, h.snapshot()) } })
       result.put("settingsSearchPreparation", s.settingsSearchPreparation.snapshot())
       result.put("settingsUiWork", s.settingsUiWork.snapshot())
       result.put("slideshowWork", s.slideshowWork.snapshot())

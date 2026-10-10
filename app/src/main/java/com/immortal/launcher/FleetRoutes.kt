@@ -68,6 +68,7 @@ class FleetRoutes(private val context: Context) {
       "/logcat" -> requireMethod("GET", req) { logcat(req) }
       "/diag" -> requireMethod("GET", req) { resp(200, FleetDiag.snapshot()) }
       "/perf" -> performance(req)
+      "/perf/state" -> requireMethod("GET", req) { resp(200, FramePerformanceCapture.stateSnapshot()) }
       else -> resp(404, err("not_found"))
     }
   }
