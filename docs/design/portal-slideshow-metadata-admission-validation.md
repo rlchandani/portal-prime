@@ -43,9 +43,16 @@ The page-finished callback occurred at a median approximately 0.60–0.66 second
 
 ## Longer testing and next attribution
 
-The fifteen-minute device soak is a separate pending check at the time of this report. Its protocol preserves original idle/presence policies, polls only numeric diagnostics, checks capture ownership, requires automatic listener/thread shutdown at expiry, and returns Home with configuration equality. Seven virtual-clock cases passed, including lost start responses, unrelated sessions, incomplete expiry cleanup and malformed/non-finite measurements. Simulated protocol verification is not a completed device soak.
+The fifteen-minute candidate device soak subsequently completed on both rooms, with nine checkpoints through the 900-second expiry. Original idle/presence policies remained in place. Each capture automatically stopped its collector/listeners, explicit cleanup was confirmed, both rooms returned Home, and full settings schema/screensaver configuration equality was verified. Seven virtual-clock cases had first exercised lost responses, unrelated sessions, incomplete automatic expiry cleanup and malformed/non-finite measurements. Those simulations were protocol checks; the later device records establish the bounded real run.
 
-A successful soak will establish only the bounded observations recorded by that run. Process memory does not include all external Chromium renderer memory; engine page completion does not demonstrate continued photo advancement. Neither result can establish leak-free behavior, delivered FPS or final performance acceptance.
+| Room | Recorded preview frames | Steady frames over the 16.67 ms budget | Mean recorded preview frame ms | Maximum recorded preview frame ms | App PSS KiB, start → end |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Family Area | 19,436 | 9,182 / 19,434 (47.25%) | 21.28 | 550.70 | 158,950 → 137,700 |
+| Living Area | 15,996 | 11,606 / 15,994 (72.56%) | 25.56 | 369.33 | 154,711 → 149,157 |
+
+Each room recorded two first-draw frames, zero callback drops and zero invalid frame samples. Frame counts increased between checkpoints, establishing continued Window drawing, not photo advancement. The largest Family frame appeared after the 750-second checkpoint; the poor timings therefore cannot all be described as initial entry costs. These observations fail the intended smoothness objective despite healthy capture lifecycle and cleanup. No matched baseline or cause for the continuing stalls is established by this soak.
+
+App PSS fluctuated: Family ranged from 111,235 to 158,950 KiB, and Living from 145,551 to 169,084 KiB. The end values were lower than the start values, but this is insufficient to claim leak-free behavior. Process memory does not include all external Chromium renderer memory; engine page completion does not demonstrate a decoded visible photograph or continued photo advancement. Window duration/budget ratios are not delivered slideshow FPS or physical touch latency. The broader performance acceptance remains open.
 
 Next attribution should separate WebView construction from whole admission and inspect surrounding startup/layout/queued work during the long frames. Source review ruled out the selected Flip clock as a hidden WebView initializer: the active clock factory selects native clock rendering. A separate WebView prewarm experiment may help fresh-process startup, but cannot by itself explain repeated stalls in these warmed runs. The selected provider and supported startup APIs remain unverified.
 
