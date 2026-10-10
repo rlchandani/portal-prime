@@ -118,6 +118,9 @@ object QuickBar {
     }
   }
 
+  /** Raw system-bar state; independent of switcher configuration and pin eligibility. */
+  internal fun isBarVisible(): Boolean = barVisible
+
   /** Called by [BarWatchService] when the system top bar is revealed / hidden. */
   fun setBarVisible(visible: Boolean) {
     barVisible = visible

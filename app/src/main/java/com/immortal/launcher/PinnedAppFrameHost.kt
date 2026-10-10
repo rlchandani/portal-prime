@@ -108,13 +108,21 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
     }
 
     override fun release() {
+        // Only an empty, hidden release can omit the trailing root read. Capture before clearing;
+        // ownership release and captured-surface cleanup always run, including repeated admission.
+        val skipObservation = !pinned && !covered && !nativeCover && pendingReveal == null &&
+            retirement.pendingCount == 0 && !ImmortalDreamNavigation.hasOwnedSurface() &&
+            !QuickBar.isBarVisible()
         policy.release()
         nativeCover = false
         nativeDetachGraceUntil = 0L
         cancelReveal()
         removeSurface()
         label = ""
-        if (!closed) windowsChanged()
+        if (!closed) {
+            if (skipObservation) QuickBar.setPinState(false, false, false)
+            else windowsChanged()
+        }
     }
 
     override fun windowsChanged() {
