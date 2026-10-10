@@ -103,7 +103,7 @@ class SlideshowWorkCaptureTest {
     assertTrue(sample.getBoolean("onMain"))
   }
 
-  @Test fun actualWorkerThreadAttributionIsRecorded() = withFixture { f ->
+  @Test fun suppliedWorkerLooperAttributionIsRecorded() = withFixture { f ->
     val s = f.session(); f.select(s); f.onMain = false
     val span = startedSpan(SlideshowWorkStage.METADATA_PREPARATION)
     span.finish(); span.finish()
