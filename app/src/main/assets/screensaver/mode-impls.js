@@ -114,6 +114,7 @@
     };
     return {
       load, frame, cleanup,
+      cancel: task => { if (task) { clearTimeout(task.id); task.id = null; tasks.delete(task); } },
       every: (fn, ms) => add(fn, ms, true), after: (fn, ms) => add(fn, ms, false),
       async navigate(fn) {
         const ok = await run(fn);
@@ -227,23 +228,39 @@
   MODES.galleryWall = { name: "Living Gallery Wall", run(ctx, deck) {
     const t = makeTimers(ctx); const wall = el("ss-wall", ctx.root); let cells = [];
     const retiring = new Map(); let disposed = false;
+    function release(old, entry) {
+      if (old.ontransitionend === entry.handler) old.ontransitionend = null;
+      t.cancel(entry.fallback); entry.fallback = null; retiring.delete(old);
+    }
     function retire(cell, old) {
-      if (disposed || retiring.get(old) !== cell || cell.img === old || old.parentNode !== cell.el) return;
-      // Promotion pauses timers, but an obsolete image can still finish its CSS fade.
-      // Never remove visible content, including a fade suspended by global pause.
-      if (Number(getComputedStyle(old).opacity) !== 0) return;
-      old.ontransitionend = null; retiring.delete(old); old.remove();
+      const entry = retiring.get(old);
+      if (disposed || !entry || entry.cell !== cell || cell.img === old) return false;
+      if (old.parentNode !== cell.el) { release(old, entry); return true; }
+      // Missing style information is not transparency. Preserve content until CSS confirms zero.
+      let opacity;
+      try { opacity = getComputedStyle(old).opacity; } catch (_) { return false; }
+      if (typeof opacity !== "string" ||
+          !/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(opacity.trim()) || Number(opacity) !== 0) return false;
+      release(old, entry); old.remove(); return true;
+    }
+    function fallback(cell, old) {
+      const entry = retiring.get(old);
+      if (disposed || !entry || entry.cell !== cell) return;
+      entry.fallback = null;
+      if (!retire(cell, old) && retiring.get(old) === entry)
+        entry.fallback = t.after(() => fallback(cell, old), 1200);
     }
     function replace(cell, photo, url) {
       const img = buildImg(photo, url), old = cell.img;
       cell.el.appendChild(img); cell.img = img; cell.photo = photo;
       if (!old) return;
-      retiring.set(old, cell);
-      old.ontransitionend = event => {
+      const entry = { cell, fallback: null, handler: null };
+      entry.handler = event => {
         if (event.target === old && event.propertyName === "opacity") retire(cell, old);
       };
-      t.frame(() => { if (retiring.get(old) === cell && cell.img !== old) old.style.opacity = "0"; });
-      t.after(() => retire(cell, old), 1200); // Existing fallback; transitionend also works while paused.
+      retiring.set(old, entry); old.ontransitionend = entry.handler;
+      t.frame(() => { if (retiring.get(old) === entry && cell.img !== old) old.style.opacity = "0"; });
+      entry.fallback = t.after(() => fallback(cell, old), 1200);
     }
     function buildImg(p, url) { const img = el("ss-img kb"); bg(img, url); faceBg(img, p); if (Math.random() < 0.4) { img.classList.remove("kb"); return img; } img.style.setProperty("--d", (14 + Math.random() * 8) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
     function layout() {
@@ -275,7 +292,7 @@
     const cleanup = () => {
       if (disposed) return;
       disposed = true; t.cleanup();
-      retiring.forEach((cell, old) => { old.ontransitionend = null; }); retiring.clear();
+      retiring.forEach((entry, old) => release(old, entry)); retiring.clear();
     };
     Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
     cleanup.pause = t.cleanup.pause; cleanup.resume = t.cleanup.resume;

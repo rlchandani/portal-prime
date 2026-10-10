@@ -53,6 +53,7 @@ internal object FramePerformanceCapture {
       currentMeasurement = ::slideshowWorkMeasurement,
       nanoTime = SystemClock::elapsedRealtimeNanos,
   )
+  @PublishedApi internal val imageResolutionProbe = EngineImageResolutionProbe(::imageResolutionMeasurement)
   private data class Tracked(val window: WeakReference<Window>, val host: String,
       var attachListener: View.OnAttachStateChangeListener? = null)
   private data class Binding(val window: WeakReference<Window>, val budgetNs: Long,
@@ -67,6 +68,7 @@ internal object FramePerformanceCapture {
     val settingsUiWork = SettingsUiWorkSamples()
     val slideshowWork = SlideshowWorkSamples()
     val slideshowStyles = SlideshowStyleSamples()
+    val imageResolution = EngineImageResolutionSamples()
     // Allocated only by an explicit sampleMain opt-in. No Activity/Window references in the sampler.
     val mainSamples = if (request.sampleMain) MainThreadSampleHistogram() else null
     var sampleMainActive = false // Guarded by the session monitor, like the histograms.
@@ -177,6 +179,25 @@ internal object FramePerformanceCapture {
               Looper.myLooper() === Looper.getMainLooper()) {
             s.slideshowStyles.record(host, style, received - s.began, now - s.began)
           }
+        }
+      }
+    }
+  }
+
+  /** Bridge-resolution counts need no Main acceptance or frame/presentation attribution. */
+  inline fun <T> measureImageResolution(resolve: (EngineImageResolutionMeasurement?) -> T): T =
+      imageResolutionProbe.resolve(resolve)
+
+  private fun imageResolutionMeasurement(): EngineImageResolutionMeasurement? {
+    val s = current ?: return null
+    synchronized(s) {
+      // No clock, token or callbacks when inactive/closed. Selection binds to this capture identity.
+      if (current !== s || s.closedAt != null || SystemClock.elapsedRealtime() >= s.deadline) return null
+    }
+    return EngineImageResolutionMeasurement { result, requested, delivered, maximum ->
+      synchronized(s) {
+        if (current === s && s.closedAt == null && SystemClock.elapsedRealtime() < s.deadline) {
+          s.imageResolution.record(result, requested, delivered, maximum)
         }
       }
     }
@@ -431,6 +452,7 @@ internal object FramePerformanceCapture {
       result.put("settingsUiWork", s.settingsUiWork.snapshot())
       result.put("slideshowWork", s.slideshowWork.snapshot())
       result.put("slideshowStyles", s.slideshowStyles.snapshot())
+      result.put("imageResolution", s.imageResolution.snapshot())
       s.mainSamples?.let { result.put("mainThreadSamples", it.snapshot()) }
     }
     // Sample only on explicit reads, outside the per-frame lock/handler.

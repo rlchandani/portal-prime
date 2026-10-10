@@ -103,3 +103,27 @@ dimensions or every style pairing. DOM retirement counts establish lifecycle onl
 No performance improvement or cause of the soak tails is claimed. Main owns
 integration, build/deployment and any later matched hardware A/B. This branch is
 frozen after the local commit; no remote Git, hooks, devices or Gradle were used.
+
+## Corrected main integration
+
+Main integrated the worker candidate, then independent review reproduced malformed-opacity
+coercion and a late zero-opacity fade missing the original one-shot fallback. Three additional
+actual-mode tests first failed against that candidate (12 tests: nine passed, three failed).
+The corrected implementation requires a valid numeric CSS-opacity string representing zero.
+An unresolved image has one owned fallback check every 1200ms; retirement cancels its task,
+clears its own handler and releases the entry. Scene disposal cancels all work, and a moved
+node releases bookkeeping without removing it from its new parent. The shared timer owner
+adds `cancel(task)` for Gallery's use; other modes' scheduling and CSS remain unchanged.
+
+The corrected combined lifecycle/resource/style suites passed all 68 tests. Fresh isolated
+Chrome evidence for the corrected product source again passed 36 exact, zero-tolerance pixel
+comparisons across the three generated formats. The main source SHA-256 and raw comparison
+results are preserved under `build/fleet/diagnostics/slideshow-gallery-integration-2026-10-10/`
+in `final-browser-green.json`, alongside immutable review RED/GREEN logs. The manifest below
+now describes the corrected source/test files; the worker RED/GREEN logs remain historical
+controls for the original worker implementation, not a claim that they execute the final code.
+
+DOM retirement and owned callback cancellation do not establish immediate renderer/GPU-memory
+release or improved Portal frame timings. Native integration passed 1448 JVM tests and built
+both APK variants. Two-room deployment and the new tier-aware 900-second run provide the next
+hardware validation; overall performance acceptance remains open.

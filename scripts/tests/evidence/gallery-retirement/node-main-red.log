@@ -1,0 +1,299 @@
+TAP version 13
+# Subtest: Gallery Wall retires a zero-opacity obsolete image when pause straddles its fade
+ok 1 - Gallery Wall retires a zero-opacity obsolete image when pause straddles its fade
+  ---
+  duration_ms: 2.300666
+  type: 'test'
+  ...
+# Subtest: retirement requires the exact obsolete target, opacity property, and computed zero
+ok 2 - retirement requires the exact obsolete target, opacity property, and computed zero
+  ---
+  duration_ms: 1.808458
+  type: 'test'
+  ...
+# Subtest: the existing fallback retires only computed-zero obsolete images
+ok 3 - the existing fallback retires only computed-zero obsolete images
+  ---
+  duration_ms: 1.206
+  type: 'test'
+  ...
+# Subtest: the fallback removes completed invisible images without a transition event
+ok 4 - the fallback removes completed invisible images without a transition event
+  ---
+  duration_ms: 0.861375
+  type: 'test'
+  ...
+# Subtest: superseded replacements retire independently without touching the current image
+ok 5 - superseded replacements retire independently without touching the current image
+  ---
+  duration_ms: 1.243833
+  type: 'test'
+  ...
+# Subtest: global pause/resume retains fallback timing and visible images
+ok 6 - global pause/resume retains fallback timing and visible images
+  ---
+  duration_ms: 0.662292
+  type: 'test'
+  ...
+# Subtest: cleanup releases all retirement handlers/timers and rejects delayed callbacks
+ok 7 - cleanup releases all retirement handlers/timers and rejects delayed callbacks
+  ---
+  duration_ms: 0.881834
+  type: 'test'
+  ...
+# Subtest: cleanup during initial decode prevents publication and timer creation
+ok 8 - cleanup during initial decode prevents publication and timer creation
+  ---
+  duration_ms: 0.365708
+  type: 'test'
+  ...
+# Subtest: cleanup during a paused replacement decode prevents late publication
+ok 9 - cleanup during a paused replacement decode prevents late publication
+  ---
+  duration_ms: 0.427667
+  type: 'test'
+  ...
+# Subtest: malformed computed opacity cannot retire through completion or fallback
+not ok 10 - malformed computed opacity cannot retire through completion or fallback
+  ---
+  duration_ms: 1.280125
+  type: 'test'
+  location: '~/.codex/worktrees/portal-companion-api/portal-prime/scripts/tests/slideshow_gallery_retirement.test.mjs:218:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Malformed opacity cannot retire via transitionend
+    + actual - expected
+    
+    + null
+    - <ref *1> Element {
+    -   children: [
+    -     Element {
+    -       children: [],
+    -       className: 'ss-img kb',
+    -       opacity: '1',
+    -       parentNode: [Circular *1],
+    -       style: {
+    -         '--d': '18s',
+    -         '--dx': '0.0%',
+    -         '--dy': '0.0%',
+    -         animationDelay: '-5s',
+    -         backgroundImage: 'url("generated://generated-10")',
+    -         backgroundPosition: 'center',
+    -         backgroundRepeat: 'no-repeat',
+    -         backgroundSize: 'cover',
+    -         setProperty: [Function: setProperty]
+    -       }
+    -     }
+    -   ],
+    -   className: 'ss-gcell',
+    -   opacity: '1',
+    -   parentNode: <ref *3> Element {
+    -     children: [
+    -       <ref *2> Element {
+    -         children: [
+    -           Element {
+    -             children: [],
+    -             className: 'ss-img kb',
+    -             opacity: '1',
+    -             parentNode: [Circular *2],
+    -             style: {
+    -               '--d': '18s',
+    -               '--dx': '0.0%',
+    -               '--dy': '0.0%',
+    -               animationDelay: '-5s',
+    -               backgroundImage: 'url("generated://generated-0")',
+    -               backgroundPosition: 'center',
+    -               backgroundRepeat: 'no-repeat',
+    -               backgroundSize: 'cover',
+    -               setProperty: [Function: setProperty]
+    -             }
+    -           }
+    -         ],
+    -         className: 'ss-gcell',
+    -         opacity: '1',
+    -         parentNode: [Circular *3],
+    -         style: {
+    -           height: '568px',
+    -           left: '-1781.12px',
+    -           setProperty: [Function: setProperty],
+    -           top: '16px',
+    -           width: '568px'
+    -         }
+    -       },
+    -       [Circular *1]
+    -     ],
+    -     className: 'ss-wall',
+    -     opacity: '1',
+    -     parentNode: Element {
+    -       children: [
+    -         [Circular *3]
+    -       ],
+    -       className: '',
+    -       opacity: '1',
+    -       parentNode: null,
+    -       style: {
+    -         setProperty: [Function: setProperty]
+    -       }
+    -     },
+    -     style: {
+    -       setProperty: [Function: setProperty]
+    -     }
+    -   },
+    -   style: {
+    -     height: '568px',
+    -     left: '-1213.12px',
+    -     setProperty: [Function: setProperty],
+    -     top: '16px',
+    -     width: '568px'
+    -   }
+    - }
+    
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: late zero without a transition event remains covered by the owned fallback
+not ok 11 - late zero without a transition event remains covered by the owned fallback
+  ---
+  duration_ms: 0.886167
+  type: 'test'
+  location: '~/.codex/worktrees/portal-companion-api/portal-prime/scripts/tests/slideshow_gallery_retirement.test.mjs:231:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    A late invisible image must retire without an event
+    + actual - expected
+    
+    + <ref *1> Element {
+    +   children: [
+    +     Element {
+    +       children: [],
+    +       className: 'ss-img kb',
+    +       ontransitionend: [Function (anonymous)],
+    +       opacity: '0',
+    +       parentNode: [Circular *1],
+    +       style: {
+    +         '--d': '18s',
+    +         '--dx': '0.0%',
+    +         '--dy': '0.0%',
+    +         animationDelay: '-5s',
+    +         backgroundImage: 'url("generated://generated-1")',
+    +         backgroundPosition: 'center',
+    +         backgroundRepeat: 'no-repeat',
+    +         backgroundSize: 'cover',
+    +         opacity: '0',
+    +         setProperty: [Function: setProperty]
+    +       }
+    +     },
+    +     Element {
+    +       children: [],
+    +       className: 'ss-img kb',
+    +       opacity: '1',
+    +       parentNode: [Circular *1],
+    +       style: {
+    +         '--d': '18s',
+    +         '--dx': '0.0%',
+    +         '--dy': '0.0%',
+    +         animationDelay: '-5s',
+    +         backgroundImage: 'url("generated://generated-10")',
+    +         backgroundPosition: 'center',
+    +         backgroundRepeat: 'no-repeat',
+    +         backgroundSize: 'cover',
+    +         setProperty: [Function: setProperty]
+    +       }
+    +     }
+    +   ],
+    +   className: 'ss-gcell',
+    +   opacity: '1',
+    +   parentNode: <ref *3> Element {
+    +     children: [
+    +       <ref *2> Element {
+    +         children: [
+    +           Element {
+    +             children: [],
+    +             className: 'ss-img kb',
+    +             opacity: '1',
+    +             parentNode: [Circular *2],
+    +             style: {
+    +               '--d': '18s',
+    +               '--dx': '0.0%',
+    +               '--dy': '0.0%',
+    +               animationDelay: '-5s',
+    +               backgroundImage: 'url("generated://generated-0")',
+    +               backgroundPosition: 'center',
+    +               backgroundRepeat: 'no-repeat',
+    +               backgroundSize: 'cover',
+    +               setProperty: [Function: setProperty]
+    +             }
+    +           }
+    +         ],
+    +         className: 'ss-gcell',
+    +         opacity: '1',
+    +         parentNode: [Circular *3],
+    +         style: {
+    +           height: '568px',
+    +           left: '-1781.12px',
+    +           setProperty: [Function: setProperty],
+    +           top: '16px',
+    +           width: '568px'
+    +         }
+    +       },
+    +       [Circular *1]
+    +     ],
+    +     className: 'ss-wall',
+    +     opacity: '1',
+    +     parentNode: Element {
+    +       children: [
+    +         [Circular *3]
+    +       ],
+    +       className: '',
+    +       opacity: '1',
+    +       parentNode: null,
+    +       style: {
+    +         setProperty: [Function: setProperty]
+    +       }
+    +     },
+    +     style: {
+    +       setProperty: [Function: setProperty]
+    +     }
+    +   },
+    +   style: {
+    +     height: '568px',
+    +     left: '-1213.12px',
+    +     setProperty: [Function: setProperty],
+    +     top: '16px',
+    +     width: '568px'
+    +   }
+    + }
+    - null
+    
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: event retirement cancels its fallback and resume does not rearm dead work
+not ok 12 - event retirement cancels its fallback and resume does not rearm dead work
+  ---
+  duration_ms: 0.436917
+  type: 'test'
+  location: '~/.codex/worktrees/portal-companion-api/portal-prime/scripts/tests/slideshow_gallery_retirement.test.mjs:246:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Completion cancels the obsolete fallback
+    
+    2 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 2
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file://~/.codex/worktrees/portal-companion-api/portal-prime/scripts/tests/slideshow_gallery_retirement.test.mjs:251:12)
+    async Test.run (node:internal/test_runner/test:1113:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:788:7)
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 9
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 56.105375

@@ -1,0 +1,418 @@
+TAP version 13
+# Subtest: Framed Print breathes throughout fades, retires hidden slots, and revives them over eight swaps
+ok 1 - Framed Print breathes throughout fades, retires hidden slots, and revives them over eight swaps
+  ---
+  duration_ms: 15.221458
+  type: 'test'
+  ...
+# Subtest: only completion of the slot opacity fade may retire its print
+ok 2 - only completion of the slot opacity fade may retire its print
+  ---
+  duration_ms: 3.902667
+  type: 'test'
+  ...
+# Subtest: rapid slot reuse invalidates old retirement callbacks
+ok 3 - rapid slot reuse invalidates old retirement callbacks
+  ---
+  duration_ms: 5.761458
+  type: 'test'
+  ...
+# Subtest: pause and resume preserve the outstanding retirement timer remaining time
+ok 4 - pause and resume preserve the outstanding retirement timer remaining time
+  ---
+  duration_ms: 3.323959
+  type: 'test'
+  ...
+# Subtest: destruction cancels retirement and repeat callbacks and stops both prints
+ok 5 - destruction cancels retirement and repeat callbacks and stops both prints
+  ---
+  duration_ms: 3.146833
+  type: 'test'
+  ...
+# Subtest: destruction during preparation prevents late publication
+ok 6 - destruction during preparation prevents late publication
+  ---
+  duration_ms: 1.67025
+  type: 'test'
+  ...
+# Subtest: Gallery Wall retires a zero-opacity obsolete image when pause straddles its fade
+ok 7 - Gallery Wall retires a zero-opacity obsolete image when pause straddles its fade
+  ---
+  duration_ms: 3.258666
+  type: 'test'
+  ...
+# Subtest: retirement requires the exact obsolete target, opacity property, and computed zero
+ok 8 - retirement requires the exact obsolete target, opacity property, and computed zero
+  ---
+  duration_ms: 2.394083
+  type: 'test'
+  ...
+# Subtest: the existing fallback retires only computed-zero obsolete images
+ok 9 - the existing fallback retires only computed-zero obsolete images
+  ---
+  duration_ms: 1.461125
+  type: 'test'
+  ...
+# Subtest: the fallback removes completed invisible images without a transition event
+ok 10 - the fallback removes completed invisible images without a transition event
+  ---
+  duration_ms: 1.493042
+  type: 'test'
+  ...
+# Subtest: superseded replacements retire independently without touching the current image
+ok 11 - superseded replacements retire independently without touching the current image
+  ---
+  duration_ms: 1.803334
+  type: 'test'
+  ...
+# Subtest: global pause/resume retains fallback timing and visible images
+ok 12 - global pause/resume retains fallback timing and visible images
+  ---
+  duration_ms: 0.782417
+  type: 'test'
+  ...
+# Subtest: cleanup releases all retirement handlers/timers and rejects delayed callbacks
+ok 13 - cleanup releases all retirement handlers/timers and rejects delayed callbacks
+  ---
+  duration_ms: 1.137292
+  type: 'test'
+  ...
+# Subtest: cleanup during initial decode prevents publication and timer creation
+ok 14 - cleanup during initial decode prevents publication and timer creation
+  ---
+  duration_ms: 0.471125
+  type: 'test'
+  ...
+# Subtest: cleanup during a paused replacement decode prevents late publication
+ok 15 - cleanup during a paused replacement decode prevents late publication
+  ---
+  duration_ms: 0.858458
+  type: 'test'
+  ...
+# Subtest: malformed computed opacity cannot retire through completion or fallback
+ok 16 - malformed computed opacity cannot retire through completion or fallback
+  ---
+  duration_ms: 5.301
+  type: 'test'
+  ...
+# Subtest: late zero without a transition event remains covered by the owned fallback
+ok 17 - late zero without a transition event remains covered by the owned fallback
+  ---
+  duration_ms: 1.403167
+  type: 'test'
+  ...
+# Subtest: event retirement cancels its fallback and resume does not rearm dead work
+ok 18 - event retirement cancels its fallback and resume does not rearm dead work
+  ---
+  duration_ms: 1.030875
+  type: 'test'
+  ...
+# Subtest: kenBurns: first composition publishes only its exact decoded resources
+ok 19 - kenBurns: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 12.298833
+  type: 'test'
+  ...
+# Subtest: diptych: first composition publishes only its exact decoded resources
+ok 20 - diptych: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 8.775625
+  type: 'test'
+  ...
+# Subtest: framed: first composition publishes only its exact decoded resources
+ok 21 - framed: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 7.788917
+  type: 'test'
+  ...
+# Subtest: galleryWall: first composition publishes only its exact decoded resources
+ok 22 - galleryWall: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 9.549583
+  type: 'test'
+  ...
+# Subtest: push: first composition publishes only its exact decoded resources
+ok 23 - push: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 9.867333
+  type: 'test'
+  ...
+# Subtest: memories: first composition publishes only its exact decoded resources
+ok 24 - memories: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 5.938791
+  type: 'test'
+  ...
+# Subtest: panorama: first composition publishes only its exact decoded resources
+ok 25 - panorama: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 8.389042
+  type: 'test'
+  ...
+# Subtest: polaroid: first composition publishes only its exact decoded resources
+ok 26 - polaroid: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 4.911083
+  type: 'test'
+  ...
+# Subtest: mosaic: first composition publishes only its exact decoded resources
+ok 27 - mosaic: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 10.184125
+  type: 'test'
+  ...
+# Subtest: filmstrip: first composition publishes only its exact decoded resources
+ok 28 - filmstrip: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 6.562708
+  type: 'test'
+  ...
+# Subtest: cinema: first composition publishes only its exact decoded resources
+ok 29 - cinema: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 6.5685
+  type: 'test'
+  ...
+# Subtest: heroSidebar: first composition publishes only its exact decoded resources
+ok 30 - heroSidebar: first composition publishes only its exact decoded resources
+  ---
+  duration_ms: 6.978417
+  type: 'test'
+  ...
+# Subtest: diptych: a subsequent swap resolves fresh resources and carries them through decode
+ok 31 - diptych: a subsequent swap resolves fresh resources and carries them through decode
+  ---
+  duration_ms: 12.485292
+  type: 'test'
+  ...
+# Subtest: galleryWall: a subsequent swap resolves fresh resources and carries them through decode
+ok 32 - galleryWall: a subsequent swap resolves fresh resources and carries them through decode
+  ---
+  duration_ms: 13.145958
+  type: 'test'
+  ...
+# Subtest: mosaic: a subsequent swap resolves fresh resources and carries them through decode
+ok 33 - mosaic: a subsequent swap resolves fresh resources and carries them through decode
+  ---
+  duration_ms: 11.753666
+  type: 'test'
+  ...
+# Subtest: polaroid: a subsequent swap resolves fresh resources and carries them through decode
+ok 34 - polaroid: a subsequent swap resolves fresh resources and carries them through decode
+  ---
+  duration_ms: 12.637791
+  type: 'test'
+  ...
+# Subtest: Memories: the sixth beat carries the three decoded collage resources
+ok 35 - Memories: the sixth beat carries the three decoded collage resources
+  ---
+  duration_ms: 43.272375
+  type: 'test'
+  ...
+# Subtest: Mosaic: exchanging two occupied tiles carries each corresponding prepared resource
+ok 36 - Mosaic: exchanging two occupied tiles carries each corresponding prepared resource
+  ---
+  duration_ms: 10.230708
+  type: 'test'
+  ...
+# Subtest: Filmstrip: next and previous freshly prepare the backdrop while retaining decoded strip resources
+ok 37 - Filmstrip: next and previous freshly prepare the backdrop while retaining decoded strip resources
+  ---
+  duration_ms: 21.503792
+  type: 'test'
+  ...
+# Subtest: mosaic: eviction and rebuilding revalidate even a previously displayed photo
+ok 38 - mosaic: eviction and rebuilding revalidate even a previously displayed photo
+  ---
+  duration_ms: 16.272834
+  type: 'test'
+  ...
+# Subtest: polaroid: eviction and rebuilding revalidate even a previously displayed photo
+ok 39 - polaroid: eviction and rebuilding revalidate even a previously displayed photo
+  ---
+  duration_ms: 18.117041
+  type: 'test'
+  ...
+# Subtest: filmstrip: eviction and rebuilding revalidate even a previously displayed photo
+ok 40 - filmstrip: eviction and rebuilding revalidate even a previously displayed photo
+  ---
+  duration_ms: 22.60575
+  type: 'test'
+  ...
+# Subtest: an evicted in-flight resource fails admission; retry decodes the original before replacing the current scene
+ok 41 - an evicted in-flight resource fails admission; retry decodes the original before replacing the current scene
+  ---
+  duration_ms: 17.411
+  type: 'test'
+  ...
+# Subtest: a derivative becoming ready during an original decode is used only by a subsequent preparation
+ok 42 - a derivative becoming ready during an original decode is used only by a subsequent preparation
+  ---
+  duration_ms: 11.445167
+  type: 'test'
+  ...
+# Subtest: pause holds prepared resource publication and promotion until resume
+ok 43 - pause holds prepared resource publication and promotion until resume
+  ---
+  duration_ms: 16.433917
+  type: 'test'
+  ...
+# Subtest: diptych: destruction during decode prevents late publication and releases all timers
+ok 44 - diptych: destruction during decode prevents late publication and releases all timers
+  ---
+  duration_ms: 1.171959
+  type: 'test'
+  ...
+# Subtest: galleryWall: destruction during decode prevents late publication and releases all timers
+ok 45 - galleryWall: destruction during decode prevents late publication and releases all timers
+  ---
+  duration_ms: 0.742375
+  type: 'test'
+  ...
+# Subtest: polaroid: destruction during decode prevents late publication and releases all timers
+ok 46 - polaroid: destruction during decode prevents late publication and releases all timers
+  ---
+  duration_ms: 0.675125
+  type: 'test'
+  ...
+# Subtest: mosaic: destruction during decode prevents late publication and releases all timers
+ok 47 - mosaic: destruction during decode prevents late publication and releases all timers
+  ---
+  duration_ms: 0.722583
+  type: 'test'
+  ...
+# Subtest: filmstrip: destruction during decode prevents late publication and releases all timers
+ok 48 - filmstrip: destruction during decode prevents late publication and releases all timers
+  ---
+  duration_ms: 0.683042
+  type: 'test'
+  ...
+# Subtest: Memories: destruction during a pending collage decode prevents late publication
+ok 49 - Memories: destruction during a pending collage decode prevents late publication
+  ---
+  duration_ms: 30.147208
+  type: 'test'
+  ...
+# Subtest: superseded incoming resources cannot publish into a replacement scene
+ok 50 - superseded incoming resources cannot publish into a replacement scene
+  ---
+  duration_ms: 19.191625
+  type: 'test'
+  ...
+# Subtest: an empty engine deck never prepares or publishes a resource
+ok 51 - an empty engine deck never prepares or publishes a resource
+  ---
+  duration_ms: 3.385417
+  type: 'test'
+  ...
+# Subtest: native finite IDs cover every actual bundled scheduler style
+ok 52 - native finite IDs cover every actual bundled scheduler style
+  ---
+  duration_ms: 1.75925
+  type: 'test'
+  ...
+# Subtest: kenBurns: emits only its finite ID after decoded promotion
+ok 53 - kenBurns: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 2.325375
+  type: 'test'
+  ...
+# Subtest: diptych: emits only its finite ID after decoded promotion
+ok 54 - diptych: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 1.337084
+  type: 'test'
+  ...
+# Subtest: framed: emits only its finite ID after decoded promotion
+ok 55 - framed: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 1.908
+  type: 'test'
+  ...
+# Subtest: galleryWall: emits only its finite ID after decoded promotion
+ok 56 - galleryWall: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 0.84
+  type: 'test'
+  ...
+# Subtest: push: emits only its finite ID after decoded promotion
+ok 57 - push: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 0.76375
+  type: 'test'
+  ...
+# Subtest: memories: emits only its finite ID after decoded promotion
+ok 58 - memories: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 0.693708
+  type: 'test'
+  ...
+# Subtest: panorama: emits only its finite ID after decoded promotion
+ok 59 - panorama: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 0.545209
+  type: 'test'
+  ...
+# Subtest: polaroid: emits only its finite ID after decoded promotion
+ok 60 - polaroid: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 0.511208
+  type: 'test'
+  ...
+# Subtest: mosaic: emits only its finite ID after decoded promotion
+ok 61 - mosaic: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 0.588459
+  type: 'test'
+  ...
+# Subtest: filmstrip: emits only its finite ID after decoded promotion
+ok 62 - filmstrip: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 0.655666
+  type: 'test'
+  ...
+# Subtest: cinema: emits only its finite ID after decoded promotion
+ok 63 - cinema: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 0.627125
+  type: 'test'
+  ...
+# Subtest: heroSidebar: emits only its finite ID after decoded promotion
+ok 64 - heroSidebar: emits only its finite ID after decoded promotion
+  ---
+  duration_ms: 0.605708
+  type: 'test'
+  ...
+# Subtest: failed incoming scene and a page closed before decode emit no style
+ok 65 - failed incoming scene and a page closed before decode emit no style
+  ---
+  duration_ms: 1.329958
+  type: 'test'
+  ...
+# Subtest: paused promotion waits for resume before reporting
+ok 66 - paused promotion waits for resume before reporting
+  ---
+  duration_ms: 0.465083
+  type: 'test'
+  ...
+# Subtest: a superseded scene cannot report after late decode
+ok 67 - a superseded scene cannot report after late decode
+  ---
+  duration_ms: 0.339042
+  type: 'test'
+  ...
+# Subtest: missing or throwing optional native bridge preserves scene readiness and future navigation
+ok 68 - missing or throwing optional native bridge preserves scene readiness and future navigation
+  ---
+  duration_ms: 1.027708
+  type: 'test'
+  ...
+1..68
+# tests 68
+# suites 0
+# pass 68
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 432.158541

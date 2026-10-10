@@ -774,7 +774,9 @@ class PhotoFrameController(
                     @android.webkit.JavascriptInterface
                     fun scaledUrlForSize(url: String, edge: Int): String {
                       if (!url.startsWith("file://")) return ""
-                      val file = scaledCache.resolveAndRequest(url.removePrefix("file://"), edge) ?: return ""
+                      val file = FramePerformanceCapture.measureImageResolution { measurement ->
+                        scaledCache.resolveAndRequest(url.removePrefix("file://"), edge, measurement)
+                      } ?: return ""
                       return "file://" + file.absolutePath
                     }
                     // Live presence for the engine's people-bias: the deck leans toward photos of

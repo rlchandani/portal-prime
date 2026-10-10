@@ -1,0 +1,578 @@
+{
+  "base": "227d2ffe0fb8baefebbf1670686731827927966c",
+  "red": false,
+  "tolerance": {
+    "maxChannelDelta": 0,
+    "changedPixels": 0
+  },
+  "sourceSha256": {
+    "baseline": "6273a902876570c1b58c6a6177054f6dc9e592fc7007306bd0be2f5910d95138",
+    "candidate": "85035aeb7169cc80242b29a4af47ce9aacd30758a79ce9f3077d1a0314bed6e2"
+  },
+  "cssSha256": "bf8e040fe18dae5c52dfaac582630a358ff761104a53b001d74770caaae0e516",
+  "browserArgs": [
+    "--disable-gpu",
+    "--disable-threaded-animation"
+  ],
+  "cases": [
+    {
+      "format": "jpeg",
+      "generatedImageSha256": [
+        "d2383befd8eb10ca5175d43d7d4a18bc8779b410d751e8c9597147af0d4958ae",
+        "e58adbd99aa03b8ed080bb118b1f939954c82a8e9c5a5d6eac16ee6a0bfa9aa6",
+        "f813a0b283871df1a0ab6823963c144a68732197666178e59ac29f0231291946",
+        "69e13d1c1af7027e46ed4f3df16e1b94556938ea683fa21783ce5a14333099d9",
+        "daf3e0d1931fd3ff4504fd08a78be5ce105859242680af4fef77c9117844ba42",
+        "4705fbf533c86b03fa4cd7509b604db3cba7c7867bba067e236a1e2dfb734a17",
+        "1c438e178b86e694821b9fbcd3a0b141bf99c5a5b93d3254493999c83645045f",
+        "f4fc27bfd099773b1bc25ea26954c06422885546ed33608feda392aad6f5b0ac",
+        "ca0590d10a5cdaf9344de0c068857d477b75605ed50031e59b5af300bb11ba1f",
+        "13d9501fd3bac1cad9c5bd9b309135664166a2049c1c542fd55e46f4df389d59",
+        "b0977acd072d92987f124201d92926aa9c9abdc1a0c2684b7f4b4cb16b4175bb",
+        "d13891aff9ebb26ca68cdc8aa2b62c78eb83a8febc5ad2fca9fa51ef55cb4130",
+        "6d1c39c6d7b7db00d4f82c0c9facc1f4bcfd52ebcf4683d561c5afdb70691e5e",
+        "d6067405bb226d8c12eb89ec39999ea817c902ae160448b6c389af6067833795"
+      ],
+      "baseline": {
+        "globalPause": {
+          "transitionState": "paused",
+          "opacity": 0.197597,
+          "connected": true,
+          "resumedState": "running"
+        },
+        "geometry": {
+          "x": -53.078125,
+          "y": 16,
+          "width": 454.84375,
+          "height": 272.546875,
+          "shadow": "rgba(0, 0, 0, 0.7) 0px 10px 30px -12px",
+          "radius": "6px",
+          "focus": "70% 25%"
+        },
+        "dissolve-200": {
+          "opacity": 0.0198807,
+          "connected": true
+        },
+        "just-before-zero": {
+          "opacity": 4.41012e-7,
+          "connected": true
+        },
+        "zero": {
+          "opacity": 0,
+          "connectedAtEnd": true,
+          "connected": true,
+          "nativeEnds": 1,
+          "handlerReleased": true,
+          "currentConnected": true
+        },
+        "disposed": {
+          "children": 0,
+          "oldHandlerReleased": true
+        }
+      },
+      "candidate": {
+        "globalPause": {
+          "transitionState": "paused",
+          "opacity": 0.197597,
+          "connected": true,
+          "resumedState": "running"
+        },
+        "geometry": {
+          "x": -53.078125,
+          "y": 16,
+          "width": 454.84375,
+          "height": 272.546875,
+          "shadow": "rgba(0, 0, 0, 0.7) 0px 10px 30px -12px",
+          "radius": "6px",
+          "focus": "70% 25%"
+        },
+        "dissolve-200": {
+          "opacity": 0.0198807,
+          "connected": true
+        },
+        "just-before-zero": {
+          "opacity": 4.41012e-7,
+          "connected": true
+        },
+        "zero": {
+          "opacity": 0,
+          "connectedAtEnd": true,
+          "connected": false,
+          "nativeEnds": 1,
+          "handlerReleased": true,
+          "currentConnected": true
+        },
+        "disposed": {
+          "children": 0,
+          "oldHandlerReleased": true
+        }
+      },
+      "comparisons": [
+        {
+          "phase": "rest",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "662571c8a1e69afdbf4f7fb63543ff69e881c3855d9042507392f7bb2bc4e221",
+          "candidatePixelSha256": "662571c8a1e69afdbf4f7fb63543ff69e881c3855d9042507392f7bb2bc4e221"
+        },
+        {
+          "phase": "fade-start",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "f97f31e4cb43f669bf51978bea7b9a59297fc919aed51301349927351941d6b4",
+          "candidatePixelSha256": "f97f31e4cb43f669bf51978bea7b9a59297fc919aed51301349927351941d6b4"
+        },
+        {
+          "phase": "fade-350",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "602cf02b955ecbdf8014fc705b9aa355065459d3a759a86a36cc294e7ead2ea2",
+          "candidatePixelSha256": "602cf02b955ecbdf8014fc705b9aa355065459d3a759a86a36cc294e7ead2ea2"
+        },
+        {
+          "phase": "fade-mid",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "2df2a46a98d4bc3ad35988f6a9d336bd7b2d2412b825d446f08adfd876e2f068",
+          "candidatePixelSha256": "2df2a46a98d4bc3ad35988f6a9d336bd7b2d2412b825d446f08adfd876e2f068"
+        },
+        {
+          "phase": "fade-700",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "572f1837af598f8c71c787b810d8c3bc08dadf00ad3c8e41ac09d419d5875654",
+          "candidatePixelSha256": "572f1837af598f8c71c787b810d8c3bc08dadf00ad3c8e41ac09d419d5875654"
+        },
+        {
+          "phase": "promotion-start",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "572f1837af598f8c71c787b810d8c3bc08dadf00ad3c8e41ac09d419d5875654",
+          "candidatePixelSha256": "572f1837af598f8c71c787b810d8c3bc08dadf00ad3c8e41ac09d419d5875654"
+        },
+        {
+          "phase": "dissolve-200",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "a52cbd6f82a617a83bd97d9e2a2ed01a09e9fee856bf669dd4e1c14c7d0082dc",
+          "candidatePixelSha256": "a52cbd6f82a617a83bd97d9e2a2ed01a09e9fee856bf669dd4e1c14c7d0082dc"
+        },
+        {
+          "phase": "just-before-zero",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "7eb68ffd8cf48f3982f62b256ea15bddd674775905bb45c67c52592a4998743e",
+          "candidatePixelSha256": "7eb68ffd8cf48f3982f62b256ea15bddd674775905bb45c67c52592a4998743e"
+        },
+        {
+          "phase": "zero-alpha",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "a6763ec13a34e4613401ece41d9a6450a7f3dfe9a775bfc5701561bd964ef926",
+          "candidatePixelSha256": "a6763ec13a34e4613401ece41d9a6450a7f3dfe9a775bfc5701561bd964ef926"
+        },
+        {
+          "phase": "dissolve-mid",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "a2bb66a01a256e0066784eea73113bc06ef419349524ec7625cfe9c5923ddb8e",
+          "candidatePixelSha256": "a2bb66a01a256e0066784eea73113bc06ef419349524ec7625cfe9c5923ddb8e"
+        },
+        {
+          "phase": "dissolve-complete",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "4fea1491e99649fa3220f0be09914e1394ffa1cdc46a20d8943e01a6c0657cab",
+          "candidatePixelSha256": "4fea1491e99649fa3220f0be09914e1394ffa1cdc46a20d8943e01a6c0657cab"
+        },
+        {
+          "phase": "outgoing-disposed",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "af9d92c06947d5cccb060e4ec2651503c18fb5e397539712a4d31575755364b3",
+          "candidatePixelSha256": "af9d92c06947d5cccb060e4ec2651503c18fb5e397539712a4d31575755364b3"
+        }
+      ],
+      "pixelsEqual": true,
+      "geometryEqual": true,
+      "retired": true,
+      "clean": true,
+      "passed": true
+    },
+    {
+      "format": "png",
+      "generatedImageSha256": [
+        "a0f972ae26938324d2e0c0f4fb4f6f2a6fa4de02cda68662326b15590fba1d17",
+        "742d211843bce88d321f9aac1bd5b20880354b79fcf0db4b580a09e8f9fb0fc0",
+        "8cbd84b5086f23b00d8771b4d2a4aa6e2deb446048143c547c9826c45e408aef",
+        "16ff38337d01132a7a4c4de34569be523eb83a3506d6dbcde2c60982e3b90f06",
+        "0d834909bdf8df9f728b755a8af7fdf15b698a62521a12753bb7047a27881700",
+        "e79c8c5197b09cb4ed397f492f0daf835d0117c8cc16e1aee17c7734038ddd9a",
+        "c30d8f72588461b485700555ce2fe9c4ff567a76b78a7392253dfc4999634536",
+        "db440c5f921158bffb9c4d6db5e9a7dc18bd60909e775880920871a06a11f8b2",
+        "f8ecee66c1987f2d645232639ce19fe3e3c6ad87dc5b772660e6c829e52871a3",
+        "b4c7213ede67c1e40a9940318cb8d91cb3034b89f6505e82b70e2e69dd99b762",
+        "9bba9fe5d54ac34938efc1b539733b0862344e90bed508ba200968d1d444d7b5",
+        "de5090f1ac1db6bed5af50221d9f39f44cabf662de44b4dcc35a621ce7118f80",
+        "8c4e1008ad6851feaa2979a6a9ab990b3a142b07f0bd531428bb214b2796847b",
+        "b3a30dafb7dcfa15bacbbd92b01c38b75dbf2ba33ac3ee5ed13e6f8b32965195"
+      ],
+      "baseline": {
+        "globalPause": {
+          "transitionState": "paused",
+          "opacity": 0.197597,
+          "connected": true,
+          "resumedState": "running"
+        },
+        "geometry": {
+          "x": -53.078125,
+          "y": 16,
+          "width": 454.84375,
+          "height": 272.546875,
+          "shadow": "rgba(0, 0, 0, 0.7) 0px 10px 30px -12px",
+          "radius": "6px",
+          "focus": "70% 25%"
+        },
+        "dissolve-200": {
+          "opacity": 0.0198807,
+          "connected": true
+        },
+        "just-before-zero": {
+          "opacity": 4.41012e-7,
+          "connected": true
+        },
+        "zero": {
+          "opacity": 0,
+          "connectedAtEnd": true,
+          "connected": true,
+          "nativeEnds": 1,
+          "handlerReleased": true,
+          "currentConnected": true
+        },
+        "disposed": {
+          "children": 0,
+          "oldHandlerReleased": true
+        }
+      },
+      "candidate": {
+        "globalPause": {
+          "transitionState": "paused",
+          "opacity": 0.197597,
+          "connected": true,
+          "resumedState": "running"
+        },
+        "geometry": {
+          "x": -53.078125,
+          "y": 16,
+          "width": 454.84375,
+          "height": 272.546875,
+          "shadow": "rgba(0, 0, 0, 0.7) 0px 10px 30px -12px",
+          "radius": "6px",
+          "focus": "70% 25%"
+        },
+        "dissolve-200": {
+          "opacity": 0.0198807,
+          "connected": true
+        },
+        "just-before-zero": {
+          "opacity": 4.41012e-7,
+          "connected": true
+        },
+        "zero": {
+          "opacity": 0,
+          "connectedAtEnd": true,
+          "connected": false,
+          "nativeEnds": 1,
+          "handlerReleased": true,
+          "currentConnected": true
+        },
+        "disposed": {
+          "children": 0,
+          "oldHandlerReleased": true
+        }
+      },
+      "comparisons": [
+        {
+          "phase": "rest",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "35deee203907aee73b5d6af93824194559d00666ba6d95c8e582bee3e2275ae3",
+          "candidatePixelSha256": "35deee203907aee73b5d6af93824194559d00666ba6d95c8e582bee3e2275ae3"
+        },
+        {
+          "phase": "fade-start",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "93897b959ed51edad0e5e617589d24fb8c06db392c5f059632b9a8d182896ebf",
+          "candidatePixelSha256": "93897b959ed51edad0e5e617589d24fb8c06db392c5f059632b9a8d182896ebf"
+        },
+        {
+          "phase": "fade-350",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "b87d44e1d61245bbb87261c1eeeff43ff554080ac690b33e6c4b38479edd5b5a",
+          "candidatePixelSha256": "b87d44e1d61245bbb87261c1eeeff43ff554080ac690b33e6c4b38479edd5b5a"
+        },
+        {
+          "phase": "fade-mid",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "46ad6e9574c384d3393276b5af414b64d80bb61139222eca041f7799521a4165",
+          "candidatePixelSha256": "46ad6e9574c384d3393276b5af414b64d80bb61139222eca041f7799521a4165"
+        },
+        {
+          "phase": "fade-700",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "50e240ce361b7649bc62ca4d187e7b872c611d099686ebe99d924f3338103d2d",
+          "candidatePixelSha256": "50e240ce361b7649bc62ca4d187e7b872c611d099686ebe99d924f3338103d2d"
+        },
+        {
+          "phase": "promotion-start",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "50e240ce361b7649bc62ca4d187e7b872c611d099686ebe99d924f3338103d2d",
+          "candidatePixelSha256": "50e240ce361b7649bc62ca4d187e7b872c611d099686ebe99d924f3338103d2d"
+        },
+        {
+          "phase": "dissolve-200",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "f7e9e40469ad0ac6a9ae3518ae638f2c03fc15ab180eda82b76f32f1224a6815",
+          "candidatePixelSha256": "f7e9e40469ad0ac6a9ae3518ae638f2c03fc15ab180eda82b76f32f1224a6815"
+        },
+        {
+          "phase": "just-before-zero",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "02c26bc274a490818c5f3dccd6ff2c969074f20c2dcc347c10ae7bdedeb4fbc0",
+          "candidatePixelSha256": "02c26bc274a490818c5f3dccd6ff2c969074f20c2dcc347c10ae7bdedeb4fbc0"
+        },
+        {
+          "phase": "zero-alpha",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "79b90bbab1300e695c5cb558796fa651851efddd20b0a911c1fb0b62af1c2648",
+          "candidatePixelSha256": "79b90bbab1300e695c5cb558796fa651851efddd20b0a911c1fb0b62af1c2648"
+        },
+        {
+          "phase": "dissolve-mid",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "115f40632dfbcda6af351bde3155b1075996d1fc10451ffa169f1e1a808ce970",
+          "candidatePixelSha256": "115f40632dfbcda6af351bde3155b1075996d1fc10451ffa169f1e1a808ce970"
+        },
+        {
+          "phase": "dissolve-complete",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "e5641680cfa6b9ea23d250c2d6c128cb5b4839303c6dbe57e1f92d4d22cc21d8",
+          "candidatePixelSha256": "e5641680cfa6b9ea23d250c2d6c128cb5b4839303c6dbe57e1f92d4d22cc21d8"
+        },
+        {
+          "phase": "outgoing-disposed",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "935b4d2ebd1d0dbcd2cc3ae26f819cd9f04dc56ed7da939ccf38cdda9ee91c51",
+          "candidatePixelSha256": "935b4d2ebd1d0dbcd2cc3ae26f819cd9f04dc56ed7da939ccf38cdda9ee91c51"
+        }
+      ],
+      "pixelsEqual": true,
+      "geometryEqual": true,
+      "retired": true,
+      "clean": true,
+      "passed": true
+    },
+    {
+      "format": "webp",
+      "generatedImageSha256": [
+        "9f8add9ba6d5fba8f690dfd1e0f08a973f526fe3ebe461ecac72e99c71a6af75",
+        "8b8a83f97b460e59ee4fae3ee234799dcee5ad4c596ef50e5c1d06e49aef705f",
+        "efe8f8f99c5afe7e5f87b6d836b6d97c7670a2fee8b4b67ce249584a7a1f720c",
+        "c8b5bdf66ac7800bf37ea59fce03b014a27f1acf430fd21bc4ed4a2d05d3f68b",
+        "efc2fd93b9a55956074bd7bad4fc13a9de5cf633f10024a84ad9e502116d1860",
+        "c46acd8297f6a5303e36e75e133a00c9f39ceee803cd01eca869788348a459e4",
+        "9b7f79e8eb8d60783ed5665ba9f5dd5a324bea6474f3516454fd0d180ba7ed01",
+        "983018583c5742251a88cc01b90d0c979bd89fa883bb3d31a2247a094dc2982b",
+        "73ca89c23537bc70fab1e1ea7e78ad03299cef1f03f66e59e4805daf2effac3c",
+        "afbd87b062bbb9fa1393ca7c35b26907cee27847552c483080f775f0e3b669c0",
+        "239907600b12a042ec698f3cf6d6830c708d818987597bf4fb1b38cf78f0be5b",
+        "9b7d4e835805b457738066b0db64251b35a4d06f9adeac14642e06bf3948d0a8",
+        "6fce0459bff9efa820d8aff240fcd9322c0a68ab752d3fca4a5a84f8058b029b",
+        "346a72664eb6e3c79ba5f8489a68e90be441029a0635fce25226bd9227e14ec7"
+      ],
+      "baseline": {
+        "globalPause": {
+          "transitionState": "paused",
+          "opacity": 0.197597,
+          "connected": true,
+          "resumedState": "running"
+        },
+        "geometry": {
+          "x": -53.078125,
+          "y": 16,
+          "width": 454.84375,
+          "height": 272.546875,
+          "shadow": "rgba(0, 0, 0, 0.7) 0px 10px 30px -12px",
+          "radius": "6px",
+          "focus": "70% 25%"
+        },
+        "dissolve-200": {
+          "opacity": 0.0198807,
+          "connected": true
+        },
+        "just-before-zero": {
+          "opacity": 4.41012e-7,
+          "connected": true
+        },
+        "zero": {
+          "opacity": 0,
+          "connectedAtEnd": true,
+          "connected": true,
+          "nativeEnds": 1,
+          "handlerReleased": true,
+          "currentConnected": true
+        },
+        "disposed": {
+          "children": 0,
+          "oldHandlerReleased": true
+        }
+      },
+      "candidate": {
+        "globalPause": {
+          "transitionState": "paused",
+          "opacity": 0.197597,
+          "connected": true,
+          "resumedState": "running"
+        },
+        "geometry": {
+          "x": -53.078125,
+          "y": 16,
+          "width": 454.84375,
+          "height": 272.546875,
+          "shadow": "rgba(0, 0, 0, 0.7) 0px 10px 30px -12px",
+          "radius": "6px",
+          "focus": "70% 25%"
+        },
+        "dissolve-200": {
+          "opacity": 0.0198807,
+          "connected": true
+        },
+        "just-before-zero": {
+          "opacity": 4.41012e-7,
+          "connected": true
+        },
+        "zero": {
+          "opacity": 0,
+          "connectedAtEnd": true,
+          "connected": false,
+          "nativeEnds": 1,
+          "handlerReleased": true,
+          "currentConnected": true
+        },
+        "disposed": {
+          "children": 0,
+          "oldHandlerReleased": true
+        }
+      },
+      "comparisons": [
+        {
+          "phase": "rest",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "0000a459d5fdec14aa6e9797caab654ebe26480c9e0dc1a1041f7143a048f1bb",
+          "candidatePixelSha256": "0000a459d5fdec14aa6e9797caab654ebe26480c9e0dc1a1041f7143a048f1bb"
+        },
+        {
+          "phase": "fade-start",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "506d74c5709a7332238870d532618e6430313620ee59b1fa0f01ff940c202e55",
+          "candidatePixelSha256": "506d74c5709a7332238870d532618e6430313620ee59b1fa0f01ff940c202e55"
+        },
+        {
+          "phase": "fade-350",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "148af01670c7d19997351c26a6e1d0c37ce0faa86e92dd29d8fb6b0e2c5b02bd",
+          "candidatePixelSha256": "148af01670c7d19997351c26a6e1d0c37ce0faa86e92dd29d8fb6b0e2c5b02bd"
+        },
+        {
+          "phase": "fade-mid",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "779c2e72bc8e7bf689419df00bc4d7b6c96de1291f26239b0d8b8ba2e4c3e13c",
+          "candidatePixelSha256": "779c2e72bc8e7bf689419df00bc4d7b6c96de1291f26239b0d8b8ba2e4c3e13c"
+        },
+        {
+          "phase": "fade-700",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "b4d1627d9c9510af1947a64a6897f81cf47234649881c2c4a0b082a66793e290",
+          "candidatePixelSha256": "b4d1627d9c9510af1947a64a6897f81cf47234649881c2c4a0b082a66793e290"
+        },
+        {
+          "phase": "promotion-start",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "b4d1627d9c9510af1947a64a6897f81cf47234649881c2c4a0b082a66793e290",
+          "candidatePixelSha256": "b4d1627d9c9510af1947a64a6897f81cf47234649881c2c4a0b082a66793e290"
+        },
+        {
+          "phase": "dissolve-200",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "24a5adcc49997475bd595804eccb4ed4d5bfc7fbb67a4086193be3ecd64fcd28",
+          "candidatePixelSha256": "24a5adcc49997475bd595804eccb4ed4d5bfc7fbb67a4086193be3ecd64fcd28"
+        },
+        {
+          "phase": "just-before-zero",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "373bcdd96854f958e80632de3e642453a67c5b89c95052d9b780834edc268715",
+          "candidatePixelSha256": "373bcdd96854f958e80632de3e642453a67c5b89c95052d9b780834edc268715"
+        },
+        {
+          "phase": "zero-alpha",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "45163e76155914d58d39d72f2fa87ec85ae97b252996be804746d0adffad6e76",
+          "candidatePixelSha256": "45163e76155914d58d39d72f2fa87ec85ae97b252996be804746d0adffad6e76"
+        },
+        {
+          "phase": "dissolve-mid",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "a0f76f65669a737d7f0444e0df850f9be1837dee579ccad3f6f633d371e8d915",
+          "candidatePixelSha256": "a0f76f65669a737d7f0444e0df850f9be1837dee579ccad3f6f633d371e8d915"
+        },
+        {
+          "phase": "dissolve-complete",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "c6d9f9e51e9c56be8b0f26c9e0f7d29b25f262f461a5d42e113aff8f0282ec10",
+          "candidatePixelSha256": "c6d9f9e51e9c56be8b0f26c9e0f7d29b25f262f461a5d42e113aff8f0282ec10"
+        },
+        {
+          "phase": "outgoing-disposed",
+          "changedPixels": 0,
+          "maxChannelDelta": 0,
+          "baselinePixelSha256": "2d9bc7999bdbc563866d4265e32fef721cbbd4c49b85b1c35350d14d36c03ad7",
+          "candidatePixelSha256": "2d9bc7999bdbc563866d4265e32fef721cbbd4c49b85b1c35350d14d36c03ad7"
+        }
+      ],
+      "pixelsEqual": true,
+      "geometryEqual": true,
+      "retired": true,
+      "clean": true,
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Synthetic Chrome rendering and lifecycle evidence, not Portal WebView or GPU performance evidence.",
+    "Software rendering and main-thread animation sampling; CSS phases and transition times are explicitly sampled.",
+    "Generated fixtures contain no household data. This does not certify Portal raster/compositor equivalence."
+  ],
+  "browser": "155.0.8059.40",
+  "passed": true
+}

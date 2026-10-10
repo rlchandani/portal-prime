@@ -50,18 +50,42 @@ class EngineScaledCache(
   }
 
   /** Return a ready copy now; asynchronously prepare the requested tier if it is absent. */
-  fun resolveAndRequest(originalPath: String, requestedEdge: Int): File? {
+  fun resolveAndRequest(originalPath: String, requestedEdge: Int): File? =
+      resolveAndRequest(originalPath, requestedEdge, null)
+
+  /** Observe the actual chosen branch without a second lookup, extra stats or decoder work. */
+  internal fun resolveAndRequest(originalPath: String, requestedEdge: Int,
+      measurement: EngineImageResolutionMeasurement?): File? {
     val original = File(originalPath)
-    if (!original.isFile) return null
     val edge = derivativeEdge(requestedEdge, targetEdge)
-    ready(original, edge)?.let { return it }
+    if (!original.isFile) {
+      if (measurement != null) observe(measurement, EngineImageResolutionResult.MISSING_ORIGINAL, edge)
+      return null
+    }
+    ready(original, edge)?.let {
+      if (measurement != null) observe(measurement, EngineImageResolutionResult.REQUESTED_TIER_READY, edge, edge)
+      return it
+    }
     request(original, edge)
     // A ready larger copy is safe while the smaller one is prepared. Never upscale a smaller copy.
     for (larger in TIERS) {
-      if (larger > edge && larger <= targetEdge) ready(original, larger)?.let { return it }
+      if (larger > edge && larger <= targetEdge) ready(original, larger)?.let {
+        if (measurement != null) observe(measurement, EngineImageResolutionResult.LARGER_TIER_READY, edge, larger)
+        return it
+      }
     }
-    if (targetEdge > edge) return ready(original, targetEdge)
+    if (targetEdge > edge) ready(original, targetEdge)?.let {
+      if (measurement != null) observe(measurement, EngineImageResolutionResult.LARGER_TIER_READY, edge, targetEdge)
+      return it
+    }
+    // null makes the bridge retain the original URL. It says nothing about original pixel size.
+    if (measurement != null) observe(measurement, EngineImageResolutionResult.ORIGINAL_FALLBACK, edge)
     return null
+  }
+
+  private fun observe(measurement: EngineImageResolutionMeasurement, result: EngineImageResolutionResult,
+      requestedEdge: Int, deliveredEdge: Int = 0) {
+    runCatching { measurement.record(result, requestedEdge, deliveredEdge, targetEdge) }
   }
 
   private fun ready(original: File, edge: Int): File? =

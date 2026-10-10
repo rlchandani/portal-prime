@@ -6,6 +6,52 @@
     "changedPixels": 0
   },
   "results": {
+    "nodeReviewRed": {
+      "tests": 12,
+      "passed": 9,
+      "failed": 3
+    },
+    "combinedNodeGreen": {
+      "tests": 68,
+      "passed": 68,
+      "failed": 0
+    },
+    "browserMainGreen": {
+      "formats": 3,
+      "pixelComparisons": 36,
+      "changedPixels": 0,
+      "maxChannelDelta": 0
+    },
+    "nativeIntegration": {
+      "tests": 1448,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "sha256": {
+    "app/src/main/assets/screensaver/mode-impls.js": "85035aeb7169cc80242b29a4af47ce9aacd30758a79ce9f3077d1a0314bed6e2",
+    "scripts/tests/slideshow_gallery_retirement.test.mjs": "54e46b3555337176cf223da0d06315a1d12ac21bf5a7869a0fd8b30b04acf534",
+    "scripts/gallery_retirement_browser.mjs": "1aaf0bf51b66fe445553e15b12d7b7b1bdfeb1e09c2d3823638e0bf361d4b4e3",
+    "scripts/tests/evidence/gallery-retirement/README.md": "fdaa142b129dc7082870f5d9cbb40e9a96166f24482c79dc0f78b7559e8b1175",
+    "scripts/tests/evidence/gallery-retirement/browser-green.json": "1fdf95a0c5f4115241038119c6273827305f0b71833747d66102e51b7cb7f431",
+    "scripts/tests/evidence/gallery-retirement/browser-red.json": "39f27a76f0e4a10ea473572b412e7663424776ed7579335bcdf7da954cf3a796",
+    "scripts/tests/evidence/gallery-retirement/node-green.log": "9a6b266e347428bf7aa139a01c37e7e15c145283aee092a8e63d7317599227c0",
+    "scripts/tests/evidence/gallery-retirement/node-red.log": "d8e8bccf157fee111f234b43bf689a0753f71d999ba0489728a1cbdeec35fb25",
+    "scripts/tests/evidence/gallery-retirement/regressions.log": "613e3c450dd43d16d0ef072f191c9b0467d24187290f561a41a5266eec4b4596",
+    "scripts/tests/evidence/gallery-retirement/source-checks.log": "593b10e2f9119631ec14b68a9dc3f9d5bfcd35bd5e46bb11ae949d1e896a4a1a",
+    "scripts/tests/evidence/gallery-retirement/browser-main-green.json": "23abd8040d943032fc67a691651cf86e03fef86cec8aaf550747898cf7533af1",
+    "scripts/tests/evidence/gallery-retirement/node-main-red.log": "3c7b9794939bf3c011e1ad3dd0bba858ecc9159058eeaad07182f364d57e8135",
+    "scripts/tests/evidence/gallery-retirement/node-main-green.log": "ae68ad0a7b9fb3bd980d8a1f98e1b336ccc0b944edcff3182ec601cbde16b7b1"
+  },
+  "mainIntegration": {
+    "sourceSha256": "85035aeb7169cc80242b29a4af47ce9aacd30758a79ce9f3077d1a0314bed6e2",
+    "testsSha256": "54e46b3555337176cf223da0d06315a1d12ac21bf5a7869a0fd8b30b04acf534",
+    "readmeSha256": "fdaa142b129dc7082870f5d9cbb40e9a96166f24482c79dc0f78b7559e8b1175",
+    "pixelEvidenceSha256": "23abd8040d943032fc67a691651cf86e03fef86cec8aaf550747898cf7533af1",
+    "note": "Current sha256 entries describe checked-in files. Historical worker controls remain explicitly separate."
+  },
+  "historicalWorkerResults": {
     "nodeRed": {
       "exit": 1,
       "pass": 5,
@@ -37,7 +83,7 @@
       2
     ]
   },
-  "sha256": {
+  "historicalWorkerSourceSha256": {
     "app/src/main/assets/screensaver/mode-impls.js": "46a76ecd7802eae1e682a08c8e932c332efa0682009beb948ab2b05085470895",
     "scripts/tests/slideshow_gallery_retirement.test.mjs": "5e38e458812262621020312efb3e4c58c4c7bdd4dc366d498c2192626692ff0d",
     "scripts/gallery_retirement_browser.mjs": "1aaf0bf51b66fe445553e15b12d7b7b1bdfeb1e09c2d3823638e0bf361d4b4e3",

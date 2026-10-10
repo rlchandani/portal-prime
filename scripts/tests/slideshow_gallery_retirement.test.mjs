@@ -213,3 +213,43 @@ test('cleanup during a paused replacement decode prevents late publication', asy
   r.cleanup(); r.cleanup.resume(); await r.flush();
   assert.deepEqual(r.images(), before); assert.equal(r.pending.size, 0);
 });
+
+// Unavailable/malformed style information must never be treated as transparent content.
+test('malformed computed opacity cannot retire through completion or fallback', async () => {
+  for (const opacity of ['', ' ', null, undefined, '0x0', 'not-a-number', 0]) {
+    const { r, old, cell } = await swapped();
+    try {
+      old.opacity = opacity; r.end(old);
+      assert.equal(old.parentNode, cell, 'Malformed opacity cannot retire via transitionend');
+      await r.advanceTo(6200);
+      assert.equal(old.parentNode, cell, 'Malformed opacity cannot retire via the fallback');
+    } finally { r.cleanup(); }
+  }
+});
+
+// A consumed first fallback must not orphan a delayed fade whose completion event is lost.
+test('late zero without a transition event remains covered by the owned fallback', async () => {
+  const { r, old, cell } = await swapped();
+  try {
+    old.opacity = '.4'; await r.advanceTo(6200);
+    assert.equal(old.parentNode, cell);
+    old.opacity = '0'; await r.advanceTo(7399);
+    assert.equal(old.parentNode, cell, 'Visible images stay until an actual guarded check');
+    await r.advanceTo(7400);
+    assert.equal(old.parentNode, null, 'A late invisible image must retire without an event');
+    assert.equal(old.ontransitionend == null, true);
+    assert.equal(r.pending.size, 1, 'Only the existing repeating swap remains');
+  } finally { r.cleanup(); }
+});
+
+// Successful event retirement must cancel its fallback, including the paused schedule.
+test('event retirement cancels its fallback and resume does not rearm dead work', async () => {
+  const { r, old } = await swapped();
+  try {
+    assert.equal(r.pending.size, 2);
+    old.opacity = '0'; r.end(old);
+    assert.equal(r.pending.size, 1, 'Completion cancels the obsolete fallback');
+    r.cleanup.pause(); r.cleanup.resume();
+    assert.equal(r.pending.size, 1, 'Resume must not restore a retired-image callback');
+  } finally { r.cleanup(); }
+});
