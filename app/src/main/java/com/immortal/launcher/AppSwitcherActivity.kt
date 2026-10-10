@@ -218,22 +218,44 @@ private fun ApprovedAppsContent(
     catch (error: Exception) { recentsFailure = "Your recent apps couldn’t be loaded. Try again." }
   }
   val installed = allApps.orEmpty()
-  val ordered = UserLayout.applyOrder(installed, order) { it.component.flattenToString() }
-  val installedIds = ordered.map { it.component.flattenToString() }
-  val builtinIds = listOf(StoreActivity::class.java, ToolsActivity::class.java, WebAppActivity::class.java, ImmortalSettingsActivity::class.java, HomeDashboardActivity::class.java)
-      .map { ComponentName(context.packageName, it.name).flattenToString() } + ComponentName("com.immortal.launcher", "__immortal_calls_bridge__").flattenToString()
-  val knownIds = (installedIds + builtinIds).toSet()
-  val favoriteKeys = (order.filter { it in knownIds } + installedIds + builtinIds).distinct().take(6)
+  // Retained-page activation reuses preparation until its immutable data inputs change.
+  val ordered = remember(installed, order) {
+    UserLayout.applyOrder(installed, order) { it.component.flattenToString() }
+  }
+  val installedIds = remember(ordered) { ordered.map { it.component.flattenToString() } }
+  val packageName = context.packageName
+  val builtinIds = remember(packageName) {
+    listOf(StoreActivity::class.java, ToolsActivity::class.java, WebAppActivity::class.java, ImmortalSettingsActivity::class.java, HomeDashboardActivity::class.java)
+        .map { ComponentName(packageName, it.name).flattenToString() } + ComponentName("com.immortal.launcher", "__immortal_calls_bridge__").flattenToString()
+  }
+  val favoriteKeys = remember(order, installedIds, builtinIds) {
+    val knownIds = (installedIds + builtinIds).toSet()
+    (order.filter { it in knownIds } + installedIds + builtinIds).distinct().take(6)
+  }
   fun folderOf(app: AppItem): String? = (assignments[app.component.packageName] ?: Curation.folderFor(app.component.packageName))?.takeIf { it.isNotBlank() }
   fun launchApp(app: AppItem) { if (launchApprovedIntent(context, Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER).setComponent(app.component)) && !embedded) onExit() }
-  val folderNames = installed.mapNotNull { folderOf(it) }.distinct()
-  val shown = when {
-    query.isNotBlank() -> ordered.filter { "${it.label} ${it.component.packageName}".contains(query.trim(), true) }
-    recent -> recents.orEmpty()
-    folder != null -> ordered.filter { folderOf(it) == folder }
-    else -> ordered.filter { folderOf(it) == null }
+  val folderNames = remember(installed, assignments) {
+    installed.mapNotNull { folderOf(it) }.distinct()
+  }
+  val shown = remember(ordered, assignments, query, recent, recents, folder) {
+    when {
+      query.isNotBlank() -> ordered.filter { "${it.label} ${it.component.packageName}".contains(query.trim(), true) }
+      recent -> recents.orEmpty()
+      folder != null -> ordered.filter { folderOf(it) == folder }
+      else -> ordered.filter { folderOf(it) == null }
+    }
   }
   val shortcutIcons = inventory?.shortcuts.orEmpty()
+  // Publish installed apps, folders and built-ins together, never a short grid
+  // of built-ins that shifts when the asynchronous inventory arrives.
+  val tiles = remember(shown, folderNames, allApps != null, recent, folder, query, shortcutIcons) {
+    val builtins = if (allApps != null && !recent && folder == null && query.isBlank())
+      listOf("store" to "App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") +
+          if ("dashboard" in shortcutIcons) listOf("dashboard" to "Home dashboard") else emptyList()
+      else emptyList()
+    val otherFolders = if (!recent && folder == null && query.isBlank()) folderNames.filterNot { it == "Settings" } else emptyList()
+    shown.map { app -> AppsTileEntry(app.label, app = app) } + otherFolders.map { AppsTileEntry(it, folder = it) } + builtins.map { AppsTileEntry(it.second, builtin = it.first) }
+  }
   BackHandler {
     when { menuFor != null -> menuFor = null; folder != null -> folder = null; recent && !initiallyRecent -> recent = false; searching -> { searching = false; query = "" }; else -> onExit() }
   }
@@ -269,14 +291,6 @@ private fun ApprovedAppsContent(
           Spacer(Modifier.height(36.dp))
         }
       }
-      // Publish installed apps, folders and built-ins together, never a short grid
-      // of built-ins that shifts when the asynchronous inventory arrives.
-      val builtins = if (allApps != null && !recent && folder == null && query.isBlank())
-        listOf("store" to "App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") +
-            if ("dashboard" in shortcutIcons) listOf("dashboard" to "Home dashboard") else emptyList()
-        else emptyList()
-      val otherFolders = if (!recent && folder == null && query.isBlank()) folderNames.filterNot { it == "Settings" } else emptyList()
-      val tiles = shown.map { app -> AppsTileEntry(app.label, app = app) } + otherFolders.map { AppsTileEntry(it, folder = it) } + builtins.map { AppsTileEntry(it.second, builtin = it.first) }
       items(tiles.size, key = { index -> tiles[index].app?.component?.flattenToString() ?: "${tiles[index].builtin}:${tiles[index].folder}" }, contentType = { "app-tile" }) { index ->
         val entry = tiles[index]
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
