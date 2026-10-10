@@ -22,7 +22,24 @@ The private soak protocol passed fourteen virtual-clock ownership, expiry, respo
 
 The integrated web remote also updates meaningful operation progress within existing keyed Apps and Activity cards. A successful install still reads current metadata once. The generated-content Chrome probe retained all app icons with zero new icon reads for changing progress and identical-metadata completion; changed metadata took one full render and 24 icon reads, compared to two renders and 28 reads in its pre-progress baseline. The probe verified control bounds at 402 × 874. This is work-count/identity evidence, not physical phone latency or delivered FPS. See [progress evidence](../../scripts/tests/remote_mobile_progress_evidence.md).
 
-Hardware deployment and the new 900-second shuffled captures are the next validation step.
+## Two-device 900-second result
+
+The integrated benchmark build was installed on Family Area and Living Area. Both served the expected remote-controller bytes in three consecutive authenticated reads. Screensaver configuration and the settings schema matched their pre-install state; the startup-preparation experiment remained disabled.
+
+Both explicit captures ran to their 900-second deadline with Main stack sampling disabled. The protocol then verified that the collector stopped, the known preview window left, and the original Home window returned. Original screensaver configuration and schema remained unchanged. Every recorded metadata-preparation span ran off Main, with no dropped frame callbacks or invalid frame samples.
+
+| Room | Preview frame samples | Steady samples above the 16.67 ms budget | Histogram p95 / p99 | Largest frame | Guarded promotions / distinct styles |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Family Area | 18,400 | 11,751 / 18,398 | 33.25 / 77.5 ms | 564.28 ms | 30 / 10 |
+| Living Area | 26,012 | 17,629 / 26,010 | 32.75 / 49 ms | 392.20 ms | 30 / 10 |
+
+Family's retained 525.17 ms frame included 468.29 ms of queue delay. Its nearest earlier accepted report was Push, following Ken Burns, outside the 1.7-second promotion-proximity heuristic. Living retained a 342.30 ms frame with 334.99 ms in command submission and a nearby 334.18 ms frame with 312.78 ms of queue delay; the nearest earlier report was Filmstrip, following Gallery Wall. These callbacks can overlap a single burst and do not count independent stall events. Neither association establishes the originating composition or graphics cause.
+
+Bridge-to-Main acceptance delay reached 278 ms on Family and 30 ms on Living, so receipt and acceptance cannot be substituted for each other. Each device reported ten of twelve styles; this run is not complete per-style coverage. The bounded recorder retained only the top 32 eligible samples per host, including first draws. App PSS varied during the run and excluded the external Chromium renderer; no leak-free or memory-improvement claim follows.
+
+The recorded frame tails still contradict performance acceptance. The next candidate removes fully transparent obsolete Gallery Wall images when their transition completes, preserving the visible image and fallback cleanup. Separately, source inspection shows that a requested smaller derivative can fall back to a larger ready tier or the original while asynchronous preparation proceeds. That path needs measurement before changing image quality, readiness policy or cache tiers. Broader browser, navigation, phone and long-uptime validation remains open.
+
+Private immutable evidence is stored under `build/fleet/diagnostics/slideshow-style-attribution-2026-10-10/`: `combined-deployment-verification.json`, `served-controller-verification.json`, each room's nine checkpoints and summary, and `style-soak-analysis.json`. These files contain fixed identities, counts, timings and cleanup booleans; configuration and household photo data were kept in memory.
 
 ## Interpretation limits
 
