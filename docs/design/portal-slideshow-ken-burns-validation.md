@@ -52,6 +52,8 @@ The separate visible/entering-resource prototype `a270fb1` is also frozen, rejec
 
 ## Navigation and remaining acceptance
 
+The subsequent [Home/Apps isolation and diagnostic-state validation](portal-home-apps-performance-validation.md) records the next installed build, observer sensitivity and remaining rendering work. That build leaves the reverted slideshow assets unchanged.
+
 A separate bounded navigation harness is prepared for Home, Apps, Chromium, Back, preview, Apps from preview and return Home. Its final checks distinguish the known Home window from the preview window. Nine virtual safety cases cover normal/delayed navigation, stuck Home, foreign preflight, lost start/stop responses, unchanged versus replaced capture identity, unapplied stop and final-metrics rejection. A reviewer reproduced two initial P2 issues; regression tests failed before correction and passed afterward. Completion now requires sanitized final metrics, and ambiguous stop completion is reconciled against the expected capture without blindly repeating stop. The physical run completed twenty cycles on each Portal, covering 364 accepted action requests including setup and cleanup. Each Apps-from-preview check returned to the known original Home window, excluding the preview window. Collectors stopped, final metrics passed validation, original Home returned and complete configuration/schema stayed unchanged. This is a scoped command/window regression result, not full visual or performance acceptance.
 
 | Room | Home samples | Home p95 / p99 (ms) | Home largest (ms) | Browser window observation p95 (ms) | Apps from preview window observation p95 (ms) |
