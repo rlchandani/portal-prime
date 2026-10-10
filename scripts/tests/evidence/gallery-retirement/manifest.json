@@ -41,7 +41,7 @@
     "scripts/tests/evidence/gallery-retirement/regressions.log": "613e3c450dd43d16d0ef072f191c9b0467d24187290f561a41a5266eec4b4596",
     "scripts/tests/evidence/gallery-retirement/source-checks.log": "593b10e2f9119631ec14b68a9dc3f9d5bfcd35bd5e46bb11ae949d1e896a4a1a",
     "scripts/tests/evidence/gallery-retirement/browser-main-green.json": "23abd8040d943032fc67a691651cf86e03fef86cec8aaf550747898cf7533af1",
-    "scripts/tests/evidence/gallery-retirement/node-main-red.log": "3c7b9794939bf3c011e1ad3dd0bba858ecc9159058eeaad07182f364d57e8135",
+    "scripts/tests/evidence/gallery-retirement/node-main-red.log": "1fcf31489c447dd59cc8d842511eb80bf6ac4249f48bccef10594146ef8212e0",
     "scripts/tests/evidence/gallery-retirement/node-main-green.log": "ae68ad0a7b9fb3bd980d8a1f98e1b336ccc0b944edcff3182ec601cbde16b7b1"
   },
   "mainIntegration": {
@@ -49,7 +49,8 @@
     "testsSha256": "54e46b3555337176cf223da0d06315a1d12ac21bf5a7869a0fd8b30b04acf534",
     "readmeSha256": "fdaa142b129dc7082870f5d9cbb40e9a96166f24482c79dc0f78b7559e8b1175",
     "pixelEvidenceSha256": "23abd8040d943032fc67a691651cf86e03fef86cec8aaf550747898cf7533af1",
-    "note": "Current sha256 entries describe checked-in files. Historical worker controls remain explicitly separate."
+    "note": "Current sha256 entries describe checked-in files. Historical worker controls remain explicitly separate.",
+    "copiedLogs": "Checked-in main logs normalize trailing blank whitespace only; private original RED/GREEN logs are retained unchanged."
   },
   "historicalWorkerResults": {
     "nodeRed": {

@@ -63,7 +63,7 @@ not ok 10 - malformed computed opacity cannot retire through completion or fallb
   error: |-
     Malformed opacity cannot retire via transitionend
     + actual - expected
-    
+
     + null
     - <ref *1> Element {
     -   children: [
@@ -147,7 +147,7 @@ not ok 10 - malformed computed opacity cannot retire through completion or fallb
     -     width: '568px'
     -   }
     - }
-    
+
   code: 'ERR_TEST_FAILURE'
   ...
 # Subtest: late zero without a transition event remains covered by the owned fallback
@@ -160,7 +160,7 @@ not ok 11 - late zero without a transition event remains covered by the owned fa
   error: |-
     A late invisible image must retire without an event
     + actual - expected
-    
+
     + <ref *1> Element {
     +   children: [
     +     Element {
@@ -263,7 +263,7 @@ not ok 11 - late zero without a transition event remains covered by the owned fa
     +   }
     + }
     - null
-    
+
   code: 'ERR_TEST_FAILURE'
   ...
 # Subtest: event retirement cancels its fallback and resume does not rearm dead work
@@ -275,9 +275,9 @@ not ok 12 - event retirement cancels its fallback and resume does not rearm dead
   failureType: 'testCodeFailure'
   error: |-
     Completion cancels the obsolete fallback
-    
+
     2 !== 1
-    
+
   code: 'ERR_ASSERTION'
   name: 'AssertionError'
   expected: 1
