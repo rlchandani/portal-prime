@@ -18,6 +18,8 @@ internal enum class SlideshowWorkStage(val key: String, val event: Boolean = fal
   VIEW_BUILD("viewBuild"),
   CONTROLLER_START("controllerStart"),
   WEB_VIEW_CONSTRUCTION("webViewConstruction"),
+  NATIVE_FILMSTRIP_PREPARATION("nativeFilmstripPreparation"),
+  NATIVE_FILMSTRIP_ADMISSION("nativeFilmstripAdmission"),
 }
 
 /**

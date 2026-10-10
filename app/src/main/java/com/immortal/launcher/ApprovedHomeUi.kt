@@ -6,28 +6,315 @@
  */
 package com.immortal.launcher
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.TimeInterpolator
+import android.animation.ValueAnimator
+import android.content.Context
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCompositionContext
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import com.immortal.launcher.ui.theme.ApprovedDarkPalette
 
 internal val LocalApprovedHomePopup = compositionLocalOf { false }
 internal val ApprovedHomeTabPalette = ApprovedDarkPalette
+
+/**
+ * Home's retained pages have native drawing boundaries. Animating a Compose placement or layer
+ * calls its owner's onLayoutChange on every frame, invalidating the page's semantics geometry.
+ * Here only native View translations change per frame; page layout and semantics stay local.
+ * The child compositions inherit the current theme/content and share the parent's recomposer.
+ */
+@Composable
+internal fun ApprovedHomeTabs(
+    selected: ApprovedLauncherTab,
+    modifier: Modifier = Modifier,
+    content: @Composable (ApprovedLauncherTab) -> Unit,
+) {
+  if (!BuildConfig.PORTAL_NATIVE_HOME_TABS) {
+    ApprovedLauncherTabs(selected, modifier, content)
+    return
+  }
+  val hostOwner = LocalLifecycleOwner.current
+  val composition = rememberCompositionContext()
+  val latestContent = rememberUpdatedState(content)
+  val focus = LocalFocusManager.current
+  val view = LocalView.current
+  val clearFocus = rememberUpdatedState {
+    focus.clearFocus(force = true)
+    view.findFocus()?.clearFocus()
+  }
+  // Keep the saveable key outside the identity-keyed owner group: the Activity changes on restore.
+  val pageIds = rememberSaveable { IntArray(ApprovedLauncherTab.entries.size) { View.generateViewId() } }
+  key(hostOwner) {
+    AndroidView(
+        modifier = modifier.clipToBounds(),
+        factory = { context ->
+          ApprovedHomeTabViews(context, selected, hostOwner, onSelection = { clearFocus.value() }) { tab ->
+            val page = ApprovedHomeTabView(ComposeView(context).apply {
+              id = pageIds[tab.ordinal]
+              setParentCompositionContext(composition)
+              // Temporary detach must retain drafts; final release still disposes explicitly.
+              setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(hostOwner))
+            }, hostOwner)
+            page.view.setContent {
+              val active = page.active
+              val pageFocus = LocalFocusManager.current
+              LaunchedEffect(active) {
+                if (!active) pageFocus.clearFocus(force = true)
+              }
+              Box(Modifier.fillMaxSize().focusProperties { canFocus = active }
+                  .pointerInput(page.input) {
+                    try {
+                      awaitPointerEventScope {
+                        while (true) {
+                          val event = awaitPointerEvent(PointerEventPass.Initial)
+                          if (event.changes.any { it.pressed }) page.input.beginTouch()
+                          if (!page.input.acceptsAction()) event.changes.forEach { it.consume() }
+                          // Reject a release from a hold that crossed a hide/show boundary.
+                          if (event.changes.none { it.pressed }) page.input.endTouch()
+                        }
+                      }
+                    } finally { page.input.endTouch() }
+                  }.then(if (active) Modifier else Modifier.clearAndSetSemantics { })) {
+                CompositionLocalProvider(
+                    LocalLifecycleOwner provides hostOwner,
+                    LocalApprovedLauncherPageActive provides active,
+                    LocalApprovedLauncherHostOwner provides hostOwner,
+                ) {
+                  ApprovedLauncherPageLifecycle(active, page.input) { latestContent.value(tab) }
+                }
+              }
+            }
+            page
+          }
+        },
+        update = { it.select(selected) },
+        onRelease = { it.release() },
+    )
+  }
+}
+
+private class ApprovedHomeTabView(val view: ComposeView, private val host: LifecycleOwner) {
+  val input = LauncherPageInputGate()
+  var active by mutableStateOf(false)
+    private set
+
+  fun activate(value: Boolean) {
+    // Close the input gate at admission, before the child composition applies its lifecycle.
+    input.update(value && host.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
+    active = value
+    view.descendantFocusability = if (value) ViewGroup.FOCUS_AFTER_DESCENDANTS else ViewGroup.FOCUS_BLOCK_DESCENDANTS
+    view.importantForAccessibility = if (value) View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+        else View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+  }
+}
+
+/** At most three attached pages; hidden pages retain state while their existing lifecycle pauses. */
+private class ApprovedHomeTabViews(
+    context: Context,
+    initial: ApprovedLauncherTab,
+    private val host: LifecycleOwner,
+    private val onSelection: () -> Unit,
+    private val createPage: (ApprovedLauncherTab) -> ApprovedHomeTabView,
+) : FrameLayout(context) {
+  private val transition = ApprovedHomeTabTransition(initial)
+  private val pages = linkedMapOf<ApprovedLauncherTab, ApprovedHomeTabView>()
+  private var animator: ValueAnimator? = null
+  private var pending: ApprovedHomeTabTransition.Plan? = null
+  private var released = false
+  private var attached = false
+  private val lifecycleObserver = LifecycleEventObserver { _, event ->
+    if (!released) {
+      if (event == Lifecycle.Event.ON_DESTROY) release()
+      else synchronizeAnimation()
+    }
+  }
+
+  init {
+    clipChildren = true
+    clipToPadding = true
+    if (host.lifecycle.currentState == Lifecycle.State.DESTROYED) release()
+    else {
+      ensurePage(initial)
+      updatePages()
+      host.lifecycle.addObserver(lifecycleObserver)
+    }
+  }
+
+  fun select(tab: ApprovedLauncherTab) {
+    if (released) return
+    val plan = transition.select(tab) ?: return
+    // The new plan owns positions before cancel can deliver callbacks from the old animator.
+    cancelAnimation()
+    onSelection()
+    val incoming = ensurePage(tab)
+    updatePages()
+    applyPositions()
+    pending = plan
+    // First-use content gets its initial measure/layout before the slide starts.
+    if (width > 0 && incoming.view.isLaidOut && !isLayoutRequested) synchronizeAnimation()
+    else requestLayout()
+  }
+
+  private fun ensurePage(tab: ApprovedLauncherTab): ApprovedHomeTabView =
+      pages.getOrPut(tab) {
+        createPage(tab).also {
+          it.activate(tab == transition.selected)
+          // Match the previous host's Home/Apps/Tools draw order even after out-of-order visits.
+          val index = pages.keys.count { existing -> existing.ordinal < tab.ordinal }
+          addView(it.view, index, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        }
+      }
+
+  private fun updatePages() {
+    pages.forEach { (tab, page) ->
+      page.activate(tab == transition.selected)
+      // INVISIBLE keeps measurement and composition; no offscreen page display list is drawn.
+      page.view.visibility = if (tab in transition.visible) View.VISIBLE else View.INVISIBLE
+    }
+  }
+
+  private fun applyPositions() {
+    pages.forEach { (tab, page) -> page.view.translationX = transition.offset(tab) * width }
+  }
+
+  private fun canRunPageMotion(): Boolean = !released && attached &&
+      host.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+
+  private fun synchronizeAnimation(afterLayout: Boolean = false) {
+    if (released) return
+    val current = animator
+    if (!canRunPageMotion()) current?.pause()
+    else if (current != null) {
+      if (current.isPaused) current.resume()
+    } else startPending(afterLayout)
+  }
+
+  private fun startPending(afterLayout: Boolean = false) {
+    if (!canRunPageMotion() || width <= 0) return
+    val incoming = pages[transition.selected]?.view ?: return
+    // onLayout has laid out children before the host clears its own layout-request flag.
+    if (!incoming.isLaidOut || (!afterLayout && isLayoutRequested)) return
+    val plan = pending ?: return
+    pending = null
+    val next = ValueAnimator.ofFloat(0f, 1f).apply {
+      duration = 160L
+      interpolator = TimeInterpolator { FastOutSlowInEasing.transform(it) }
+      addUpdateListener {
+        if (animator === it && canRunPageMotion() && transition.advance(plan, it.animatedValue as Float))
+          applyPositions()
+      }
+      addListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator) {
+          if (!released && animator === animation && transition.finish(plan)) {
+            animator = null
+            updatePages()
+            applyPositions()
+          }
+        }
+      })
+    }
+    // A zero system animation scale can finish synchronously inside start().
+    animator = next
+    next.start()
+  }
+
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    attached = true
+    applyPositions()
+    synchronizeAnimation()
+  }
+
+  override fun onDetachedFromWindow() {
+    // isAttachedToWindow may still be true during this callback; close our gate first.
+    attached = false
+    synchronizeAnimation()
+    super.onDetachedFromWindow()
+  }
+
+  override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+    super.onLayout(changed, left, top, right, bottom)
+    applyPositions()
+    synchronizeAnimation(afterLayout = true)
+  }
+
+  override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
+    super.onSizeChanged(width, height, oldWidth, oldHeight)
+    // The animator owns normalized positions, so resizing preserves its current progress.
+    applyPositions()
+  }
+
+  private fun cancelAnimation() {
+    val old = animator
+    animator = null
+    old?.removeAllUpdateListeners()
+    old?.removeAllListeners()
+    old?.cancel()
+  }
+
+  fun release() {
+    if (released) return
+    released = true
+    attached = false
+    host.lifecycle.removeObserver(lifecycleObserver)
+    pending = null
+    transition.settle()
+    cancelAnimation()
+    pages.values.forEach {
+      it.input.update(false)
+      // Uninstall the host-lifecycle observer as well as disposing the composition. Otherwise
+      // an early release retains the obsolete page View until the Activity is destroyed.
+      it.view.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+      it.view.disposeComposition()
+    }
+    removeAllViews()
+    pages.clear()
+  }
+}
 
 internal object ApprovedHomePalette {
   val Background: Color @Composable get() =

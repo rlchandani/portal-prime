@@ -40,6 +40,12 @@ android {
     buildConfigField("boolean", "PORTAL_WEBVIEW_BACKGROUND_STARTUP",
         (providers.gradleProperty("portalWebViewBackgroundStartup").orNull == "true").toString())
 
+    // Isolated native rendering candidates; defaults remain the measured retained implementation.
+    buildConfigField("boolean", "PORTAL_NATIVE_FILMSTRIP",
+        (providers.gradleProperty("portalNativeFilmstrip").orNull == "true").toString())
+    buildConfigField("boolean", "PORTAL_NATIVE_HOME_TABS",
+        (providers.gradleProperty("portalNativeHomeTabs").orNull == "true").toString())
+
     // Portal hardware is ARM only (gen-1/gen-2 Snapdragon, Portal TV Amlogic).
     // Kept as a guard so any future native dependency can't drag x86/x86_64 .so
     // files no Portal can run into the APK.

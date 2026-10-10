@@ -68,6 +68,7 @@ class FleetRoutes(private val context: Context) {
       "/logcat" -> requireMethod("GET", req) { logcat(req) }
       "/diag" -> requireMethod("GET", req) { resp(200, FleetDiag.snapshot()) }
       "/perf" -> performance(req)
+      "/perf/filmstrip-render" -> requireMethod("GET", req) { FilmstripScreenshot.render(context) }
       "/perf/state" -> requireMethod("GET", req) {
         resp(200, if (req.queryParam("readiness") == "1") FramePerformanceCapture.readinessSnapshot()
             else FramePerformanceCapture.stateSnapshot())
@@ -88,9 +89,11 @@ class FleetRoutes(private val context: Context) {
       else if (command.action == "start" && !DevMode.isEnabled(context)) resp(403, err("dev_mode_required"))
       else {
         try {
-          val applied = if (command.action == "start") FramePerformanceCapture.start(command)
-              else FramePerformanceCapture.stop()
-          if (applied) resp(200, FramePerformanceCapture.snapshot())
+          val applied = if (command.action == "start") {
+            FilmstripScreenshot.withPerformanceStart { FramePerformanceCapture.start(command) }
+          } else FramePerformanceCapture.stop()
+          if (applied == null) resp(409, err("filmstrip_busy"))
+          else if (applied) resp(200, FramePerformanceCapture.snapshot())
           else resp(503, err("capture_command_not_applied"))
         } catch (_: FramePerformanceCommandPending) {
           // A begun command cannot be cancelled safely. Report uncertainty instead of inviting a retry.

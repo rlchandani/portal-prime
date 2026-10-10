@@ -1221,7 +1221,7 @@ private fun LauncherScreen(
           }
           ApprovedHeaderButton("settings", "Settings") { context.launchSafely(ImmortalSettingsActivity::class.java) }
         }
-        ApprovedLauncherTabs(selectedTab, Modifier.weight(1f).fillMaxWidth()) { tab ->
+        ApprovedHomeTabs(selectedTab, Modifier.weight(1f).fillMaxWidth()) { tab ->
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })

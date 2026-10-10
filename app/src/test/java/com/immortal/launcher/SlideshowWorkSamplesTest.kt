@@ -189,7 +189,8 @@ class SlideshowWorkSamplesTest {
       "metadataPreparation" to "elapsed", "webViewAdmission" to "elapsed",
       "enginePageFinished" to "event", "engineRetired" to "event",
       "controllerConstruction" to "elapsed", "viewBuild" to "elapsed",
-      "controllerStart" to "elapsed", "webViewConstruction" to "elapsed")
+      "controllerStart" to "elapsed", "webViewConstruction" to "elapsed",
+      "nativeFilmstripPreparation" to "elapsed", "nativeFilmstripAdmission" to "elapsed")
 
   private fun assertCounts(snapshot: JSONObject, records: Long, invalid: Long = 0L, discarded: Long = 0L) {
     assertEquals(setOf("measurement", "records", "invalidRecords", "discardedRecords",

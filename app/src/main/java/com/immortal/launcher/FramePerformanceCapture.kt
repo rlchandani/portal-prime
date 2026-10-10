@@ -450,6 +450,9 @@ internal object FramePerformanceCapture {
             .put("enabled", BuildConfig.PORTAL_WEBVIEW_BACKGROUND_STARTUP)
             .put("pending", startup.pending).put("attempted", startup.attempted)
             .put("completed", startup.completed).put("failed", startup.failed))
+    if (includeMetrics || includeReadiness) {
+      FilmstripRuntimeProbe.snapshot()?.let { result.put("nativeFilmstrip", it) }
+    }
     if (s == null) {
       result.put("active", false).put("collectorRunning", false)
           .put("sampleMain", false).put("sampleMainActive", false).put("activeListeners", 0)

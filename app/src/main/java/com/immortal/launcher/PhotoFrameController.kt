@@ -101,6 +101,10 @@ class PhotoFrameController(
     SlideshowLoader(context, pixelBudget, onCancelTransports = { cancelPhotoTransports() }, ui = ui)
   }
   private val nativeLoader get() = nativeLoaderDelegate.value
+  private var nativeFilmstrip: FilmstripEngine? = null
+  private data class NativeFilmstripInput(val urls: List<String>, val dims: Map<String, Pair<Int, Int>>,
+      val headers: Map<String, String>, val warmLocal: Boolean)
+  private var nativeFilmstripInput: NativeFilmstripInput? = null
   private var legacyFaceStore: FaceFocusStore? = null
   // Main owns both a pending store and the admitted WebView; preparation owns no Android view.
   private val legacyPreparationDelegate = lazy {
@@ -656,8 +660,13 @@ class PhotoFrameController(
       dims: Map<String, Pair<Int, Int>> = emptyMap(),
       authHeaders: Map<String, String> = emptyMap(),
       warmLocalCopies: Boolean = false,
+      forceLegacy: Boolean = false,
   ) {
     if (stopped) return
+    if (BuildConfig.PORTAL_NATIVE_FILMSTRIP && settings.mode == "filmstrip" && !forceLegacy) {
+      startNativeFilmstrip(photoUrls, dims, authHeaders, warmLocalCopies)
+      return
+    }
     if (legacyPreparationDelegate.isInitialized()) legacyPreparation.cancel()
     val owner = ++legacyEngineRevision
     legacyFaceStore?.close()
@@ -852,6 +861,63 @@ class PhotoFrameController(
   }
 
   @androidx.annotation.MainThread
+  private fun startNativeFilmstrip(photoUrls: List<String>, dims: Map<String, Pair<Int, Int>>,
+      authHeaders: Map<String, String>, warmLocalCopies: Boolean) {
+    val urls = photoUrls.toList()
+    val headers = authHeaders.toMap()
+    val fetch = remoteFetch
+    val decoder: (String, Int) -> Bitmap? = { url, edge ->
+      if (url.startsWith("file://")) decodeBoundedFile(android.net.Uri.parse(url).path ?: "", edge)
+      else fetchRemoteImage(url, edge, headers, fetch)
+    }
+    val input = NativeFilmstripInput(urls,dims.toMap(),headers,warmLocalCopies)
+    nativeFilmstrip?.let {
+      nativeFilmstripInput = input
+      it.reload(urls,decoder,PresenceHub.current.presence == Presence.PRESENT)
+      return
+    }
+    retireLegacyEngine()
+    nativeFilmstripInput = input
+    val owner = ++legacyEngineRevision
+    val faceStore = FaceFocusStore(context.applicationContext).also { legacyFaceStore = it }
+    engineActive = true
+    val root = view as FrameLayout
+    val stage = FilmstripEngine(context, urls, intervalMs(),
+        decode = decoder,
+        weight = faceStore::weightFor,
+        watching = PresenceHub.current.presence == Presence.PRESENT,
+        onAdmitted = {
+          if (!stopped && owner == legacyEngineRevision && nativeFilmstrip != null) {
+            val host = when (context) {
+              is PhotoFramePreviewActivity -> SlideshowStyleHost.PREVIEW
+              is PhotoDreamService -> SlideshowStyleHost.DREAM
+              else -> SlideshowStyleHost.UNKNOWN
+            }
+            FramePerformanceCapture.prepareSlideshowStyleReport(host, SlideshowStyle.FILMSTRIP)?.accept()
+            nativeFilmstripInput?.let { faceStore.startWarmUp(it.urls, it.headers) }
+          }
+        },
+        onFailure = {
+          if (!stopped && owner == legacyEngineRevision && nativeFilmstrip != null) {
+            val current = nativeFilmstripInput ?: input
+            val refresh = engineAlbumPlan
+            retireLegacyEngine()
+            startEngine(current.urls, current.dims, current.headers, current.warmLocal, forceLegacy = true)
+            refresh?.let { scheduleEngineAlbumRefresh(it.shareUrl,it.current,it.shuffle,it.headers) }
+          }
+        })
+    nativeFilmstrip = stage // Main owns the stage before layout/start can fail.
+    root.addView(stage, FrameLayout.LayoutParams(MATCH, MATCH))
+    runCatching { faceRenderer.view.bringToFront() }
+    runCatching { calendarPanel.bringToFront() }
+    dashboardPanel?.let { runCatching { it.bringToFront() } }
+    runCatching { welcomeOverlay.bringToFront() }
+    stage.setHostActive(hostActive)
+    stage.setPaused(paused)
+    stage.start()
+  }
+
+  @androidx.annotation.MainThread
   private fun failLegacyEngine(owner: Long, faceStore: FaceFocusStore, error: Exception) {
     if (stopped || owner != legacyEngineRevision || legacyFaceStore !== faceStore) return
     Log.w("ImmortalSlideshow", "Legacy metadata/attachment failed: ${error.javaClass.simpleName}")
@@ -865,10 +931,18 @@ class PhotoFrameController(
   private fun retireLegacyEngine() {
     if (legacyPreparationDelegate.isInitialized()) legacyPreparation.cancel()
     legacyEngineRevision++
+    nativeFilmstrip?.let { stage ->
+      nativeFilmstrip = null
+      nativeFilmstripInput = null
+      if (engineActive) FramePerformanceCapture.markSlideshowWork(SlideshowWorkStage.ENGINE_RETIRED)
+      stage.close()
+      (stage.parent as? android.view.ViewGroup)?.removeView(stage)
+    }
     legacyFaceStore?.close()
     legacyFaceStore = null
     engineAlbumRefresh?.let { ui.removeCallbacks(it) }
     engineAlbumRefresh = null
+    engineAlbumPlan = null
     retireWebView()
     engineActive = false
   }
@@ -909,6 +983,7 @@ class PhotoFrameController(
       }
       kenBurns?.pause(); kenBurnsBack?.pause(); photoFade?.pause()
       nativeStage.setHostActive(false)
+      nativeFilmstrip?.setHostActive(false)
       faceRenderer.setHostActive(false)
       webView?.let { wv ->
         if (engineActive) applyEnginePlayback(wv)
@@ -923,6 +998,7 @@ class PhotoFrameController(
         if (engineActive) applyEnginePlayback(wv)
       }
       nativeStage.setHostActive(true)
+      nativeFilmstrip?.setHostActive(true)
       kenBurns?.resume(); kenBurnsBack?.resume(); photoFade?.resume()
       faceRenderer.setHostActive(true)
       if (videoView.visibility == View.VISIBLE) {
@@ -1612,6 +1688,7 @@ class PhotoFrameController(
   private fun setPaused(value: Boolean) {
     if (paused == value) return
     paused = value
+    nativeFilmstrip?.setPaused(value)
     if (value) {
       remainingHold = (holdDeadline - playbackUptime()).coerceAtLeast(100L)
       ui.removeCallbacks(localTick); ui.removeCallbacks(remoteTick); ui.removeCallbacks(rotate)
@@ -1696,6 +1773,7 @@ class PhotoFrameController(
     viewerControls.cancelEdit()
     if (viewerControls.isEditing) return
     when {
+      nativeFilmstrip != null -> nativeFilmstrip?.next()
       engineActive -> webView?.evaluateJavascript("window.immortalSlideshow?.next()", null)
       localMode -> advanceLocal(+1)
       remoteMode -> advanceRemote(+1)
@@ -1709,6 +1787,7 @@ class PhotoFrameController(
     viewerControls.cancelEdit()
     if (viewerControls.isEditing) return
     when {
+      nativeFilmstrip != null -> nativeFilmstrip?.previous()
       engineActive -> webView?.evaluateJavascript("window.immortalSlideshow?.previous()", null)
       localMode -> advanceLocal(-1)
       remoteMode -> advanceRemote(-1)
@@ -2011,12 +2090,16 @@ class PhotoFrameController(
   // the show for a no-op. The restart itself is cheap: the engine rebuilds from cache-warm
   // URLs, and the shuffle-beat crossfade hides the swap.
   private var engineAlbumRefresh: Runnable? = null
+  private data class EngineAlbumPlan(val shareUrl: String, val current: List<String>, val shuffle: Boolean,
+      val headers: Map<String, String>)
+  private var engineAlbumPlan: EngineAlbumPlan? = null
 
   private fun scheduleEngineAlbumRefresh(
       shareUrl: String, current: List<String>, shuffle: Boolean,
       currentHeaders: Map<String, String> = emptyMap(),
   ) {
     engineAlbumRefresh?.let { ui.removeCallbacks(it) }
+    engineAlbumPlan = EngineAlbumPlan(shareUrl,current.toList(),shuffle,currentHeaders.toMap())
     val owner = legacyEngineRevision
     val task = object : Runnable {
       override fun run() {
