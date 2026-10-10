@@ -86,13 +86,13 @@ internal class RemoteCompanionOperations(
     return op
   }
 
-  fun action(body: JSONObject): JSONObject {
+  fun action(body: JSONObject, onNavigated: () -> Unit = {}): JSONObject {
     val action = body.optString("action")
     return try {
       val dispatched = when (action) {
-        "launch" -> pinned.launchApp(context, body.getString("packageName")).optBoolean("ok")
-        "home" -> context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
-        "apps" -> context.openApprovedHomeTab(ApprovedLauncherTab.APPS)
+        "launch" -> pinned.launchApp(context, body.getString("packageName"), onNavigated).optBoolean("ok")
+        "home" -> context.openApprovedHomeTab(ApprovedLauncherTab.HOME, onNavigated = onNavigated)
+        "apps" -> context.openApprovedHomeTab(ApprovedLauncherTab.APPS, onNavigated = onNavigated)
         "screensaver" -> pinned.selectFrame { open(PhotoFramePreviewActivity::class.java) }.optBoolean("ok")
         "back" -> pinned.back { RemoteInput.globalAction(action) }.optBoolean("ok")
         "wake", "sleep" -> {

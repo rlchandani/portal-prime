@@ -69,6 +69,24 @@ object ScreenControl {
         .onFailure { Log.w(TAG, "wake() failed", it) }
   }
 
+  /** Renew native idle only for a successfully admitted remote user navigation. */
+  fun noteRemoteNavigation(context: Context) {
+    runCatching {
+      val pm = context.getSystemService(PowerManager::class.java)
+      if (!pm.isInteractive) {
+        wake(context)
+      } else {
+        // ON_AFTER_RELEASE renews Android's timer without injecting a touch or resuming an app.
+        // Release immediately; the finite timeout is a backstop if release fails.
+        @Suppress("DEPRECATION") // Public activity signal on API 28/29 without DEVICE_POWER.
+        val lock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE,
+            "immortal:remote-navigation")
+        try { lock.acquire(1_000L) }
+        finally { if (lock.isHeld) lock.release() }
+      }
+    }.onFailure { Log.w(TAG, "remote navigation activity signal failed", it) }
+  }
+
   /** Blank the screen now, if we hold the device-admin force-lock policy. */
   fun sleep(context: Context) {
     if (!isAdminActive(context)) {

@@ -25,12 +25,14 @@ internal data class PinnedNavigationDispatch(
 )
 
 /** Resolve eligibility before navigation admission so an unavailable app leaves the cover alone. */
-internal fun PinnedNavigationDispatch.launchApp(context: Context, packageName: String): JSONObject {
+internal fun PinnedNavigationDispatch.launchApp(context: Context, packageName: String,
+    onNavigated: () -> Unit = {}): JSONObject {
   val intent = context.packageManager.getLaunchIntentForPackage(packageName)
       ?: context.packageManager.getLeanbackLaunchIntentForPackage(packageName)
       ?: return JSONObject().put("ok", false)
   return navigation {
-    runCatching { context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true }.getOrDefault(false)
+    runCatching { context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true }
+        .getOrDefault(false).acknowledgeNavigation(onNavigated)
   }
 }
 
@@ -47,6 +49,7 @@ internal fun PinnedNavigationDispatch.launchApp(context: Context, packageName: S
 class RemoteRoutes internal constructor(
     private val context: Context,
     private val pinned: PinnedNavigationDispatch,
+    private val onUserNavigation: () -> Unit = { ScreenControl.noteRemoteNavigation(context) },
 ) {
   constructor(context: Context) : this(context, PinnedNavigationDispatch())
 
@@ -231,10 +234,10 @@ class RemoteRoutes internal constructor(
     val action = body.optString("action")
     // The paired Home button owns Immortal's home, even when the stock launcher is default.
     if (action == "home") {
-      val opened = context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
+      val opened = context.openApprovedHomeTab(ApprovedLauncherTab.HOME, onNavigated = onUserNavigation)
       return json(if (opened) 200 else 500, JSONObject().put("ok", opened).put("action", "home").put("dispatched", opened))
     }
-    if (action == "dashboard") return openDashboard()
+    if (action == "dashboard") return openDashboard(onUserNavigation)
     // Apps shares Home's retained page, including its navigation out of the photo frame.
     if (action == "apps") return openAppsTab()
     // "screensaver" starts the photo frame (same as the home-screen screensaver button).
@@ -248,11 +251,12 @@ class RemoteRoutes internal constructor(
 
   /** Select Apps in the retained Home host, just like the paired Home button. */
   private fun openAppsTab(): FleetHttpServer.Response {
-    val ok = startAppsTab()
+    val ok = startAppsTab(onUserNavigation)
     return json(if (ok) 200 else 500, JSONObject().put("ok", ok).put("action", "apps"))
   }
 
-  private fun startAppsTab(): Boolean = context.openApprovedHomeTab(ApprovedLauncherTab.APPS)
+  private fun startAppsTab(onNavigated: () -> Unit = {}): Boolean =
+      context.openApprovedHomeTab(ApprovedLauncherTab.APPS, onNavigated = onNavigated)
 
   /** Select the pinned cover on main, or launch the existing preview when no pin is present. */
   private fun openScreensaver(): FleetHttpServer.Response = pinnedResponse("screensaver", 500) {
@@ -265,8 +269,8 @@ class RemoteRoutes internal constructor(
     }
   }
 
-  private fun openDashboard(): FleetHttpServer.Response = pinnedResponse("dashboard", 503) {
-    pinned.navigation { HomeDashboardActivity.openDashboard(context) }
+  private fun openDashboard(onNavigated: () -> Unit = {}): FleetHttpServer.Response = pinnedResponse("dashboard", 503) {
+    pinned.navigation { HomeDashboardActivity.openDashboard(context).acknowledgeNavigation(onNavigated) }
   }
 
   private fun back(): FleetHttpServer.Response = try {
@@ -318,7 +322,7 @@ class RemoteRoutes internal constructor(
   private fun launch(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val body = parseJson(req.bodyText()) ?: return json(400, err("bad_json"))
     val pkg = body.optString("packageName").ifBlank { null } ?: return json(400, err("packageName_required"))
-    return pinnedResponse("launch", 404) { pinned.launchApp(context, pkg).put("packageName", pkg) }
+    return pinnedResponse("launch", 404) { pinned.launchApp(context, pkg, onUserNavigation).put("packageName", pkg) }
   }
 
   /** Edit the focused field: `{"mode":"set|append|backspace|clear","text":"…"}`. */

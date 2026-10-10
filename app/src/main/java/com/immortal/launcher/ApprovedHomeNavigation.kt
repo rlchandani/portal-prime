@@ -45,8 +45,15 @@ internal fun Context.openApprovedHomeSettings(page: String) {
   }
 }
 
+/** Run only within navigation admission; failed activity signalling cannot undo a launch. */
+internal fun Boolean.acknowledgeNavigation(onNavigated: () -> Unit): Boolean {
+  if (this) runCatching { onNavigated() }
+  return this
+}
+
 /** Return to Home's retained pages rather than creating another Apps or Tools host. */
-internal fun Context.openApprovedHomeTab(tab: ApprovedLauncherTab, searchApps: Boolean = false): Boolean =
+internal fun Context.openApprovedHomeTab(tab: ApprovedLauncherTab, searchApps: Boolean = false,
+    onNavigated: () -> Unit = {}): Boolean =
     try {
       PinnedAppScreensaver.navigation {
         ApprovedHomeNavigation.dispatch(approvedNavigationActivity(), tab, searchApps) {
@@ -55,7 +62,7 @@ internal fun Context.openApprovedHomeTab(tab: ApprovedLauncherTab, searchApps: B
               .putExtra(APPROVED_HOME_SEARCH, searchApps)
               .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
           true
-        }
+        }.acknowledgeNavigation(onNavigated)
       }.optBoolean("ok")
     } catch (_: PinnedCommandPending) {
       // The entire navigation was admitted, including its launch. As with the existing Home

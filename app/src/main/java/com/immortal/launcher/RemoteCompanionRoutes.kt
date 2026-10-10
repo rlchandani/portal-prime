@@ -146,7 +146,9 @@ internal class RemoteCompanionRoutes(private val context: Context) {
     val type = immutable.getString("type")
     val app = catalog().firstOrNull { it.packageName == immutable.optString("packageName") }
     val op = operations.start(type, immutable) { id ->
-      JSONArray().put(if (type == "action") operations.action(immutable) else operations.install(id, app!!, type == "update"))
+      JSONArray().put(if (type == "action") operations.action(immutable) {
+        ScreenControl.noteRemoteNavigation(context)
+      } else operations.install(id, app!!, type == "update"))
     } ?: return json(409, error(if (type in setOf("install", "update") && operations.history.hasUncertainInstall()) "install_state_uncertain" else "busy"))
     return json(202, ok().put("operation", op))
   }
