@@ -138,18 +138,75 @@
   MODES.kenBurns = { name: "Cinematic Ken Burns", run(ctx, deck) {
     const t = makeTimers(ctx);
     const layers = [mk(), mk()]; layers.forEach(l => ctx.root.appendChild(l.root));
-    function mk() { const root = el("ss-layer"); const fill = el("ss-fill", root); const hero = el("ss-hero", root); return { root, fill, hero }; }
-    let cur = 0;
+    let cur = 0, disposed = false;
+    const FADE_MS = 2200; // Matches .ss-layer; at most one owned fallback per slot.
+    function mk() {
+      const root = el("ss-layer"); const fill = el("ss-fill", root); const hero = el("ss-hero", root);
+      return { root, fill, hero, generation: 0, retiring: null };
+    }
+    function release(L) {
+      const entry = L.retiring;
+      if (!entry) return;
+      if (L.root.ontransitionend === entry.handler) L.root.ontransitionend = null;
+      t.cancel(entry.fallback); L.retiring = null;
+    }
+    function owns(L, entry) {
+      return !disposed && L.retiring === entry && L.generation === entry.generation &&
+        L.root.parentNode === ctx.root && !L.root.classList.contains("on");
+    }
+    function retire(L, entry) {
+      if (!owns(L, entry)) return false;
+      // Unknown/blank opacity is not transparency, and near-zero still contributes pixels.
+      let opacity;
+      try { opacity = getComputedStyle(L.root).opacity; } catch (_) { return false; }
+      if (typeof opacity !== "string" ||
+          !/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(opacity.trim()) || Number(opacity) !== 0) return false;
+      // Number() underflow must not turn a nonzero significand into permission to retire.
+      if (/[1-9]/.test(opacity.split(/[eE]/)[0])) return false;
+      release(L);
+      L.fill.style.backgroundImage = "none"; L.hero.style.backgroundImage = "none";
+      L.hero.style.animation = "none"; L.hero.classList.remove("ss-motion");
+      L.hero.style.willChange = "auto";
+      return true;
+    }
+    function fallback(L, entry) {
+      if (!owns(L, entry)) return;
+      entry.fallback = null;
+      // Delayed CSS or a lost event must not orphan a slot after the first check.
+      if (!retire(L, entry) && owns(L, entry))
+        entry.fallback = t.after(() => fallback(L, entry), FADE_MS);
+    }
+    function fading(L) {
+      const entry = { generation: ++L.generation, fallback: null, handler: null };
+      L.retiring = entry;
+      entry.handler = event => {
+        if (event.target === L.root && event.propertyName === "opacity") retire(L, entry);
+      };
+      L.root.ontransitionend = entry.handler;
+      entry.fallback = t.after(() => fallback(L, entry), FADE_MS);
+    }
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0];
       const u = ctx.url(p, 2200); if (!await t.load(u)) return false;
       const L = layers[1 - cur];
+      release(L); L.generation++;
+      // Restore the CSS hint and live motion before promotion, including reused slots.
+      L.hero.style.willChange = "";
       bg(L.fill, u, "cover"); bg(L.hero, u, "contain"); kbVars(L.hero, p);
       L.hero.style.animation = "none"; void L.hero.offsetWidth; L.hero.style.animation = "";
-      layers[cur].root.classList.remove("on"); L.root.classList.add("on"); cur = 1 - cur;
+      const outgoing = layers[cur], wasLive = outgoing.root.classList.contains("on");
+      outgoing.root.classList.remove("on"); L.root.classList.add("on"); cur = 1 - cur;
+      if (wasLive) fading(outgoing);
     }
     t.start(step); t.every(step, ctx.photoMs);
-    return t.cleanup;
+    const cleanup = () => {
+      if (disposed) return;
+      disposed = true; t.cleanup();
+      layers.forEach(L => { L.generation++; release(L); });
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
+    cleanup.pause = t.cleanup.pause; cleanup.resume = t.cleanup.resume;
+    return cleanup;
   }};
 
   // ---- 02 Diptych (orientation-aware pairing) -------------------------------

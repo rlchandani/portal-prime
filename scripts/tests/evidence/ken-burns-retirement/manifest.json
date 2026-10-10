@@ -1,0 +1,135 @@
+{
+  "base": "c53ff61a935b777731a70d0b06875ecf24e46bf4",
+  "branch": "codex/ken-burns-retirement",
+  "frozenCandidateSourceSha256": "94b92ef5d21b8374f08b5343d5f32ac1421c77ea66fb16c8c7d1844c79adf8fc",
+  "kenBurnsBlockSha256": "710cf7bef089ed0a431934f2cd875ed588ed9bbdf7c8f45bf97a534cefea1eb5",
+  "outsideKenBurnsBlockUnchanged": true,
+  "allowedSourceFiles": [
+    "app/src/main/assets/screensaver/mode-impls.js",
+    "scripts/tests/slideshow_ken_burns_retirement.test.mjs",
+    "scripts/ken_burns_retirement_browser.mjs"
+  ],
+  "allowedEvidenceDirectory": "scripts/tests/evidence/ken-burns-retirement/",
+  "sourceFilesSha256": {
+    "app/src/main/assets/screensaver/mode-impls.js": "94b92ef5d21b8374f08b5343d5f32ac1421c77ea66fb16c8c7d1844c79adf8fc",
+    "scripts/tests/slideshow_ken_burns_retirement.test.mjs": "ca30d62190e5fc0890f5e595a5e35eb15fd40756ba254213084c6313190fb048",
+    "scripts/ken_burns_retirement_browser.mjs": "5b4c90fbed8b548b0329644bfd8a45a714aaa38457bf3f6a10d864c138335bb3"
+  },
+  "evidenceFilesSha256": {
+    "scripts/tests/evidence/ken-burns-retirement/README.md": "d061e3e2f6fcadb39f47eb1d7c9df76ebd4949e16d8a865444eecfb80ae6753a",
+    "scripts/tests/evidence/ken-burns-retirement/browser-attempt-01.json": "5a6f9da14add4077ce182b941b756b212286e3a6d284f7dd7dd94d6ec19fab4e",
+    "scripts/tests/evidence/ken-burns-retirement/browser-green-final.json": "69ab84c4a6ea58e9ddfa32b69ed8921f5d9a6f08416b1daf45eb732a15a6168a",
+    "scripts/tests/evidence/ken-burns-retirement/browser-green-frozen.json": "04a1f1ca77cbb6b51a5c31a1a30e7a60b3100d40a76326fd5e28a76e5803aeb6",
+    "scripts/tests/evidence/ken-burns-retirement/browser-red-base.json": "0637a37f895b3d571c34a280f3d58b89363d7d9d933724183d92f9808452738c",
+    "scripts/tests/evidence/ken-burns-retirement/node-green-13.tap.gz": "2ccdc935355c9cf8fd60d6c3f17aab7127683e5cf5531cf795cb7a5d2bf7018c",
+    "scripts/tests/evidence/ken-burns-retirement/node-green-frozen.tap.gz": "08ec1a44f9a66251142c24c774712b136251e3866b6ced466539bf6c35a649d0",
+    "scripts/tests/evidence/ken-burns-retirement/node-green.tap.gz": "e6e0da203f32ca9e80d6bbdc1cf342d73bb52c06392cf268d5046185db1a4587",
+    "scripts/tests/evidence/ken-burns-retirement/node-red-13-base.tap.gz": "24d1ca2029d87438d42d17d7e6e00c4df139b9cba3896bd311f1f4aac2491168",
+    "scripts/tests/evidence/ken-burns-retirement/node-red-base.tap.gz": "cdbe6d9ff61b8de489608407588a2d902cb88103c2579f15f01b93a7dbb26934",
+    "scripts/tests/evidence/ken-burns-retirement/node-red-final-base.tap.gz": "d843209ee04c76fb4d85e89873bb15cc0e90034fc778e88ffc0bf8543779e18e",
+    "scripts/tests/evidence/ken-burns-retirement/node-red-frozen-base.tap.gz": "2bd3ee760ad0f9d7e1fdc74ba40ca2971bcbb2e5193bb53072054688912ccf79",
+    "scripts/tests/evidence/ken-burns-retirement/node-red-underflow-candidate.tap.gz": "3955209dc03cf83ca39f65bf9f9babb571786da9bd7a302919cc9e6cdecf70d7",
+    "scripts/tests/evidence/ken-burns-retirement/node-suite-final.tap.gz": "3104454820f05e37d1a6fa4734b7c006a630cbeefd62a6cbb0e35eedc25fc574",
+    "scripts/tests/evidence/ken-burns-retirement/node-suite-first.tap.gz": "bcbb570179cde36f3b3f8ef3aa4dff91dd36a148d6c0dceffeacb9e4f7dd130d",
+    "scripts/tests/evidence/ken-burns-retirement/node-suite-frozen.tap.gz": "4432edef8457806581b7a38fd7a06a237b2106eb2ee1670537e8e4c5c68adc2f"
+  },
+  "results": {
+    "focusedRed": {
+      "total": 13,
+      "failed": 10,
+      "passed": 3,
+      "exit": 1
+    },
+    "focusedGreen": {
+      "total": 13,
+      "passed": 13,
+      "failed": 0,
+      "exit": 0
+    },
+    "javascriptSuite": {
+      "total": 156,
+      "passed": 155,
+      "failed": 0,
+      "skipped": 1,
+      "exit": 0
+    },
+    "browser": {
+      "version": "155.0.8059.40",
+      "candidateComparisons": 66,
+      "baselineRepeatComparisons": 66,
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "allFormatsPass": true,
+      "nativeZeroRetirements": 9,
+      "exit": 0
+    },
+    "browserNegativeControl": {
+      "allPixelsAndControlsEqual": true,
+      "allFormatsRetirementRejected": true,
+      "exit": 1
+    }
+  },
+  "checks": {
+    "nodeSyntax": true,
+    "gitDiffCheck": true,
+    "byteIdenticalOutsideMode": true,
+    "gitStagedDiffCheck": true
+  },
+  "logArchives": {
+    "scripts/tests/evidence/ken-burns-retirement/node-green-13.tap.gz": {
+      "originalFilename": "node-green-13.tap",
+      "uncompressedSha256": "18c5e431dabac87ba9493e8f9d23975e0f7f33bdc8d8950dc17a1fe6586d5c19",
+      "uncompressedBytes": 1352
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-green-frozen.tap.gz": {
+      "originalFilename": "node-green-frozen.tap",
+      "uncompressedSha256": "d051a99893087246639c96b0f018e33d90b19d5a25737d14980fce290aeb013e",
+      "uncompressedBytes": 1350
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-green.tap.gz": {
+      "originalFilename": "node-green.tap",
+      "uncompressedSha256": "1e2c0d09d5cab001559efdb3964f259a637a7c6fe3256fd0641f19412e0f64c8",
+      "uncompressedBytes": 1253
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-red-13-base.tap.gz": {
+      "originalFilename": "node-red-13-base.tap",
+      "uncompressedSha256": "7e9f9a831f3c957f72f4ff6690ff21a374a6b1983d09d63062acc79505a9da13",
+      "uncompressedBytes": 10280
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-red-base.tap.gz": {
+      "originalFilename": "node-red-base.tap",
+      "uncompressedSha256": "2b24b85fa80295484ee6068972bbc0a522031876ccf3e1d3b8501d4dd3626624",
+      "uncompressedBytes": 8473
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-red-final-base.tap.gz": {
+      "originalFilename": "node-red-final-base.tap",
+      "uncompressedSha256": "17ec88da640f92c6b120e31de7e4f73b38f0634aaf2e54fb7c0510337363411b",
+      "uncompressedBytes": 9421
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-red-frozen-base.tap.gz": {
+      "originalFilename": "node-red-frozen-base.tap",
+      "uncompressedSha256": "89ec746a8894f8eb0156dbcfe91047b4a128380237811d30bec39d816f77eb56",
+      "uncompressedBytes": 10295
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-red-underflow-candidate.tap.gz": {
+      "originalFilename": "node-red-underflow-candidate.tap",
+      "uncompressedSha256": "314e42526b7380e406feb7da008df42d45b5bd3dbe90ac1ab2f9d429f3872a9b",
+      "uncompressedBytes": 2227
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-suite-final.tap.gz": {
+      "originalFilename": "node-suite-final.tap",
+      "uncompressedSha256": "7626bc5c77af30c503448fab7ee575fff1c86512d29b790b19f50951239b2b98",
+      "uncompressedBytes": 16760
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-suite-first.tap.gz": {
+      "originalFilename": "node-suite-first.tap",
+      "uncompressedSha256": "b30ee0a316084ede3f4715eb484e95b33fe1782a429f51ffc2edb04ab1bcfcf4",
+      "uncompressedBytes": 16675
+    },
+    "scripts/tests/evidence/ken-burns-retirement/node-suite-frozen.tap.gz": {
+      "originalFilename": "node-suite-frozen.tap",
+      "uncompressedSha256": "0dbc315a78afad7a2868ea9091a7aecf450856d342830e8ba1a6c272016f5241",
+      "uncompressedBytes": 16764
+    }
+  }
+}
