@@ -76,6 +76,8 @@ let tab = 'home',
   pollTimer = null,
   noticeTimer = null,
   pairDiscoveryTimer = null;
+let renderedOperations = null,
+  renderedOperationsError = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -374,7 +376,12 @@ function abortReads() {
   for (const controller of pageReads.values()) controller.abort();
   pageReads.clear();
 }
-async function read(key, path, accept, { renderAfter = true, timeout = 12000 } = {}) {
+async function read(
+  key,
+  path,
+  accept,
+  { renderAfter = true, renderWhen = null, timeout = 12000 } = {},
+) {
   if (!room() || document.hidden || connectionState === 'expired') return;
   pageReads.get(key)?.abort();
   const controller = new AbortController(),
@@ -385,7 +392,7 @@ async function read(key, path, accept, { renderAfter = true, timeout = 12000 } =
     if (!session.current(ticket) || document.hidden) return;
     accept(response);
     delete data[`${key}Error`];
-    if (renderAfter) render();
+    if (renderAfter && (!renderWhen || renderWhen())) render();
     return response;
   } catch (error) {
     if (!session.current(ticket) || error.code === 'aborted') return;
@@ -395,7 +402,7 @@ async function read(key, path, accept, { renderAfter = true, timeout = 12000 } =
       connectionState = 'offline';
       updateHeader();
     }
-    if (renderAfter) render();
+    if (renderAfter && (!renderWhen || renderWhen())) render();
   } finally {
     if (pageReads.get(key) === controller) pageReads.delete(key);
   }
@@ -456,6 +463,10 @@ function startPolling() {
       if (detail === 'activity' || (tab === 'apps' && supported('operations')))
         await read('operations', '/remote/operations', acceptOperations, {
           renderAfter: !document.activeElement?.matches('input,textarea,select'),
+          // Use rendered state so changes deferred by focused input are still shown.
+          renderWhen: () =>
+            JSON.stringify(data.operations) !== renderedOperations ||
+            JSON.stringify(data.operationsError) !== renderedOperationsError,
         });
       if (connectionState === 'offline' || !data.companion) await status();
       startPolling();
@@ -908,6 +919,10 @@ function render() {
   else if (tab === 'apps') body = appsPage();
   else body = settingsPage();
   page.replaceChildren(...[back, body].filter(Boolean));
+  if (tab === 'apps' || detail === 'activity') {
+    renderedOperations = JSON.stringify(data.operations);
+    renderedOperationsError = JSON.stringify(data.operationsError);
+  }
   if (focus) {
     const restore = [...page.querySelectorAll('[data-focus]')].find(
       (n) => n.dataset.focus === focus,
