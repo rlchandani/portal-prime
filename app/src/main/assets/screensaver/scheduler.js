@@ -127,7 +127,12 @@
         // CSS transitions where supported; timers and admission pause on every supported engine.
         try {
           scene.layer.getAnimations({ subtree: true }).forEach(animation => {
-            if (animation.playState === "running") { animation.pause(); pausedAnimations.add(animation); }
+            // CSS owns paused/freeze/retired. API play() would override those later rules.
+            const cssAnimation = typeof animation.animationName === "string" ||
+                (typeof CSSAnimation !== "undefined" && animation instanceof CSSAnimation);
+            if (!cssAnimation && animation.playState === "running") {
+              animation.pause(); pausedAnimations.add(animation);
+            }
           });
         } catch (_) {}
         scene.layer.classList.add("paused");

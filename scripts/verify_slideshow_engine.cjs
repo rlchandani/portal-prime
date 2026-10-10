@@ -53,7 +53,7 @@ function fixture({ mode = "kenBurns", intervalSec = 30, photos, actualModes = tr
   }
   const context = {
     Image, AbortController, innerWidth: 1920, innerHeight: 1280, screen: { width: 1920, height: 1280 },
-    console: { log() {} }, document: { createElement: element },
+    console: { log() {}, info() {} }, document: { createElement: element },
     setTimeout: timeout, clearTimeout: key => timers.delete(key),
     setInterval: (fn, ms) => timeout(fn, ms, true), clearInterval: key => timers.delete(key),
     requestAnimationFrame: fn => timeout(fn, 16), cancelAnimationFrame: key => timers.delete(key),
@@ -246,6 +246,49 @@ test("filmstrip next/previous move the centered photograph even when the deck fi
   assert.match(center(), /fixture:b/);
   engine.previous(); await f.settle(); await f.readyImages(); await f.tick(1800);
   assert.match(center(), /fixture:a/); engine.stop();
+});
+
+
+test("CSS classes retain motion ownership while transition and programmatic animations pause", async () => {
+  const f = fixture(), engine = f.start(); await f.settle(); await f.readyImages();
+  function animation(extra = {}, state = "running") {
+    return { ...extra, playState: state, pauses: 0, plays: 0,
+      pause() { this.pauses++; this.playState = "paused"; },
+      play() { this.plays++; this.playState = "running"; } };
+  }
+  const css = animation({ animationName: "breathe" });
+  const transition = animation({ transitionProperty: "opacity" });
+  const programmatic = animation(), held = animation({}, "paused");
+  const layer = f.stage.children[0];
+  layer.getAnimations = options => {
+    assert.equal(options.subtree, true);
+    return [css, transition, programmatic, held];
+  };
+  try {
+    engine.pause(); assert(layer.classList.contains("paused"));
+    assert.equal(css.pauses, 0, "API pause would take ownership from the CSS rules");
+    assert.equal(transition.playState, "paused"); assert.equal(programmatic.playState, "paused");
+    engine.resume(); assert.equal(layer.classList.contains("paused"), false);
+    assert.equal(css.plays, 0, "API play would override later CSS retirement/freeze");
+    assert.equal(transition.plays, 1); assert.equal(programmatic.plays, 1);
+    assert.equal(held.plays, 0, "An independently paused animation must remain paused");
+  } finally { engine.stop(); }
+});
+test("CSS animation ownership also respects the native interface without a name property", async () => {
+  const f = fixture(), engine = f.start(); await f.settle(); await f.readyImages();
+  class CSSAnimation {
+    constructor() { this.playState = "running"; this.pauses = 0; this.plays = 0; }
+    pause() { this.pauses++; this.playState = "paused"; }
+    play() { this.plays++; this.playState = "running"; }
+  }
+  f.context.CSSAnimation = CSSAnimation;
+  const css = new CSSAnimation(), layer = f.stage.children[0];
+  layer.getAnimations = () => [css];
+  try {
+    engine.pause(); assert(layer.classList.contains("paused"));
+    engine.resume(); assert.equal(layer.classList.contains("paused"), false);
+    assert.equal(css.pauses, 0); assert.equal(css.plays, 0);
+  } finally { engine.stop(); }
 });
 
 (async () => {
