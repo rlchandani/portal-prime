@@ -6,6 +6,7 @@
  */
 // Opt-in native Chrome DOM/layout/decode coverage. All resources are fulfilled in memory.
 // No live server, existing browser profile, screenshots, DOM dumps, or latency benchmark.
+// Baseline is the local controller before incremental progress rendering; core/CSS/HTML are shared.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -59,7 +60,8 @@ function instrument({ origin }) {
   ]));
   localStorage.setItem('immortal_remote_active', '0');
   const work = {
-    createdElements: 0, registeredListeners: 0, replacedPages: 0, pending: 0, pendingBodies: 0,
+    createdElements: 0, registeredListeners: 0, replacedPages: 0, replacedIcons: 0,
+    replacedOperationContents: 0, replacedHistoryLists: 0, pending: 0, pendingBodies: 0,
   };
   const create = document.createElement.bind(document);
   document.createElement = (...args) => {
@@ -74,6 +76,9 @@ function instrument({ origin }) {
   const replace = Element.prototype.replaceChildren;
   Element.prototype.replaceChildren = function (...args) {
     if (this.id === 'page') work.replacedPages++;
+    if (this.classList.contains('icon')) work.replacedIcons++;
+    if (this.matches('.history-list > section')) work.replacedOperationContents++;
+    if (this.classList.contains('history-list')) work.replacedHistoryLists++;
     return replace.apply(this, args);
   };
   const fetcher = window.fetch.bind(window);
@@ -131,6 +136,11 @@ async function capture(page, counts) {
       root: document.getElementById('page').firstElementChild,
       list: document.querySelector('.apps-list'),
       icons: [...document.querySelectorAll('.apps-list .icon img')],
+      search: document.querySelector('[data-focus="apps-search"]'),
+      searchValue: document.querySelector('[data-focus="apps-search"]')?.value,
+      active: document.activeElement, scrollY: window.scrollY,
+      history: document.querySelector('.history-list'),
+      operationCards: [...document.querySelectorAll('.history-list > section')],
     };
   });
   return { ...counts };
@@ -144,10 +154,20 @@ async function result(page, counts, before) {
       createdElements: work.createdElements - start.work.createdElements,
       registeredListeners: work.registeredListeners - start.work.registeredListeners,
       replacedPages: work.replacedPages - start.work.replacedPages,
+      replacedIcons: work.replacedIcons - start.work.replacedIcons,
+      replacedOperationContents: work.replacedOperationContents - start.work.replacedOperationContents,
+      replacedHistoryLists: work.replacedHistoryLists - start.work.replacedHistoryLists,
       rootRetained: document.getElementById('page').firstElementChild === start.root,
       listRetained: document.querySelector('.apps-list') === start.list,
       iconsRetained: icons.length === start.icons.length &&
         icons.every((img, i) => img === start.icons[i] && img.isConnected),
+      searchRetained: document.querySelector('[data-focus="apps-search"]') === start.search,
+      draftRetained: document.querySelector('[data-focus="apps-search"]')?.value === start.searchValue,
+      focusRetained: document.activeElement === start.active && start.active.isConnected,
+      scrollRetained: window.scrollY === start.scrollY,
+      historyRetained: document.querySelector('.history-list') === start.history,
+      operationCardsRetained: [...document.querySelectorAll('.history-list > section')].length === start.operationCards.length &&
+        [...document.querySelectorAll('.history-list > section')].every((card, i) => card === start.operationCards[i]),
       decodedIcons: icons.filter((img) => img.complete && img.naturalWidth === 2 &&
         img.naturalHeight === 2).length,
     };
@@ -202,7 +222,7 @@ async function mobileBounds(page) {
   });
 }
 
-test('synthetic Chrome mobile operations polls retain native app/icon nodes and recover rendered state', {
+test('synthetic Chrome mobile operation progress retains native cards/icons and refreshes completion metadata', {
   skip: enabled ? false : 'Set IMMORTAL_REMOTE_CHROME=1 for isolated synthetic Chrome; no browser dependency loaded.',
   timeout: 45000,
 }, async (t) => {
@@ -211,7 +231,7 @@ test('synthetic Chrome mobile operations polls retain native app/icon nodes and 
   const { chromium } = require('playwright');
   assert.equal(require('playwright/package.json').version, '1.62.1', 'fixture_playwright_version');
   const controller = source === 'baseline'
-    ? execFileSync('git', ['show', '4d512a5:app/src/main/assets/remote/control-center.js'],
+    ? execFileSync('git', ['-c', 'core.hooksPath=/dev/null', 'show', '699f2c8:app/src/main/assets/remote/control-center.js'],
       { cwd: root, encoding: 'utf8' })
     : read('app/src/main/assets/remote/control-center.js');
   const html = read('app/src/main/java/com/immortal/launcher/RemoteHtml.kt').match(/"""([\s\S]*?)"""/)[1].trim();
@@ -324,12 +344,14 @@ test('synthetic Chrome mobile operations polls retain native app/icon nodes and 
     });
     await settle(page);
     const catalogBounds = await mobileBounds(page);
-    const pendingBefore = await capture(page, counts);
+    await page.locator('[data-focus="apps-search"]').fill('Fixture');
+    await settle(page);
     fixture.operations = [{
       id: 'fixture-operation', type: 'install', target: { packageName: apps[0].packageName },
       state: 'running', results: [], updatedAt: 1000, retrySupported: false, cancelSupported: false,
     }];
     await page.evaluate(() => document.querySelector('[data-focus="apps-search"]').focus());
+    const pendingBefore = await capture(page, counts);
     await poll();
     const focused = await result(page, counts, pendingBefore);
     await page.evaluate(() => document.activeElement.blur());
@@ -340,6 +362,18 @@ test('synthetic Chrome mobile operations polls retain native app/icon nodes and 
       return card.textContent.includes('Running') &&
         [...card.querySelectorAll('button')].some((button) => button.textContent === 'Update' && button.disabled);
     });
+    await page.evaluate(() => {
+      const button = document.querySelectorAll('.apps-list > section')[8].querySelector('button');
+      button.focus({ preventScroll: true });
+      window.scrollTo({ top: 600, behavior: 'instant' });
+    });
+    const progressBefore = await capture(page, counts);
+    fixture.operations = [{ ...fixture.operations[0], updatedAt: 2000,
+      results: [{ ok: true, result: 'fixture_progress' }] }];
+    await poll();
+    const progress = await result(page, counts, progressBefore);
+    const progressVisible = await page.evaluate(() =>
+      document.querySelector('.apps-list > section').textContent.includes('fixture_progress'));
     const errorBefore = await capture(page, counts);
     fixture.error = true;
     await poll();
@@ -358,11 +392,60 @@ test('synthetic Chrome mobile operations polls retain native app/icon nodes and 
     const completed = await result(page, counts, completedBefore);
     const completedVisible = await page.evaluate(() =>
       document.querySelector('.apps-list > section').textContent.includes('Finished'));
+    fixture.operations = [{ ...fixture.operations[0], state: 'running', results: [] }];
+    await poll();
+    const metadataBefore = await capture(page, counts);
+    apps[0] = { ...apps[0], versionName: '2.0', description: '', updateAvailable: false };
+    fixture.operations = [{ ...fixture.operations[0], state: 'succeeded',
+      results: [{ ok: true, result: 'installed' }] }];
+    await poll();
+    const changedMetadata = await result(page, counts, metadataBefore);
+    const metadataVisible = await page.evaluate(() => {
+      const card = document.querySelector('.apps-list > section');
+      return card.textContent.includes('2.0') && [...card.querySelectorAll('button')].some((button) =>
+        button.textContent === 'Up to date' && button.disabled);
+    });
+    const completionBounds = await mobileBounds(page);
     await page.evaluate(() => {
       [...document.querySelectorAll('button.action-row')].find((button) =>
         button.querySelector('strong')?.textContent === 'Activity').click();
     });
     await settle(page, false);
+    fixture.operations = apps.map((app, i) => ({
+      id: `fixture-operation-${i}`, type: 'install', target: { packageName: app.packageName },
+      state: i === 1 ? 'failed' : 'running', results: [], updatedAt: 1000,
+      retrySupported: i === 1, cancelSupported: false,
+    }));
+    await poll(false);
+    await page.evaluate(() => {
+      document.querySelectorAll('.history-list > section')[1].querySelector('button').focus({ preventScroll: true });
+      window.scrollTo({ top: 600, behavior: 'instant' });
+    });
+    const activityProgressBefore = await capture(page, counts);
+    fixture.operations[0] = { ...fixture.operations[0], updatedAt: 2000,
+      results: [{ ok: true, result: 'fixture_activity_progress' }] };
+    fixture.operations[1] = { ...fixture.operations[1], updatedAt: 2000,
+      results: [{ ok: false, result: 'fixture_activity_failure' }] };
+    await poll(false);
+    const activityProgress = await result(page, counts, activityProgressBefore);
+    const activityProgressVisible = await page.evaluate(() => {
+      const cards = document.querySelectorAll('.history-list > section');
+      return cards[0].textContent.includes('fixture_activity_progress') &&
+        cards[1].textContent.includes('fixture_activity_failure');
+    });
+    fixture.operations = [fixture.operations[1], fixture.operations[0], ...fixture.operations.slice(2)];
+    await poll(false);
+    const activityReordered = await page.evaluate(() => {
+      const { start } = window.__pollProbe;
+      const cards = document.querySelectorAll('.history-list > section');
+      return { keyedOrder: cards[0] === start.operationCards[1] && cards[1] === start.operationCards[0],
+        focusRetained: document.activeElement === start.active && start.active.isConnected,
+        scrollRetained: window.scrollY === start.scrollY };
+    });
+    await page.evaluate(() => {
+      window.__pollProbe.healthyHistory = document.querySelector('.history-list');
+      window.__pollProbe.healthyCards = [...document.querySelectorAll('.history-list > section')];
+    });
     const activityBefore = await capture(page, counts);
     fixture.error = true;
     await poll(false);
@@ -378,21 +461,28 @@ test('synthetic Chrome mobile operations polls retain native app/icon nodes and 
     const activityRecovery = await result(page, counts, activityRecoveryBefore);
     const recoveredVisible = await page.evaluate(() => {
       const page = document.getElementById('page');
-      return !page.textContent.includes('Activity unavailable') && page.textContent.includes('Finished');
+      return !page.textContent.includes('Activity unavailable') && page.textContent.includes('fixture_activity_progress');
+    });
+    const recoveryIdentity = await page.evaluate(() => {
+      const { healthyHistory, healthyCards } = window.__pollProbe;
+      return document.querySelector('.history-list') === healthyHistory &&
+        [...document.querySelectorAll('.history-list > section')].length === healthyCards.length &&
+        [...document.querySelectorAll('.history-list > section')].every((card, i) => card === healthyCards[i]);
     });
     const report = {
       chromeVersion: browser.version().split('.').map(Number),
-      clockControlled: true, pngBytes: png.length, noEarlyPoll, bounds, catalogBounds,
-      idle, focused, pending, pendingVisible, firstError, repeatedError, recovery,
-      completed, completedVisible, activityFirstError, errorVisible, activityRepeatedError,
-      activityRecovery, recoveredVisible, unknownRequests, blockedSockets, pageErrors,
+      clockControlled: true, pngBytes: png.length, noEarlyPoll, bounds, catalogBounds, completionBounds,
+      idle, focused, pending, pendingVisible, progress, progressVisible, firstError, repeatedError, recovery,
+      completed, completedVisible, changedMetadata, metadataVisible, activityProgress, activityProgressVisible,
+      activityReordered, activityFirstError, errorVisible, activityRepeatedError,
+      activityRecovery, recoveredVisible, recoveryIdentity, unknownRequests, blockedSockets, pageErrors,
     };
     t.diagnostic(JSON.stringify({ [source]: report }));
     assert.equal(unknownRequests, 0, 'fixture_unknown_requests');
     assert.equal(blockedSockets, 0, 'fixture_unexpected_websockets');
     assert.equal(pageErrors, 0, 'fixture_page_errors');
     assert.equal(noEarlyPoll, true, 'fixture_no_poll_before_4000ms');
-    for (const check of [bounds, catalogBounds]) {
+    for (const check of [bounds, catalogBounds, completionBounds]) {
       assert.equal(check.viewportWidth, 402, 'fixture_viewport_width');
       assert.equal(check.viewportHeight, 874, 'fixture_viewport_height');
       assert.equal(check.rows, 24, 'fixture_app_rows');
@@ -403,13 +493,14 @@ test('synthetic Chrome mobile operations polls retain native app/icon nodes and 
     }
     assert.equal(bounds.controls, 24, 'fixture_installed_controls');
     assert.equal(catalogBounds.controls, 48, 'fixture_catalog_controls');
-    assert.equal(focused.rootRetained && focused.listRetained && focused.iconsRetained, true, 'fixture_focused_state');
-    assert.equal(pending.replacedPages > 0 && pendingVisible, true, 'fixture_pending_rendered');
-    assert.equal(firstError.replacedPages > 0 && recovery.replacedPages > 0, true, 'fixture_apps_error_recovery');
+    assert.equal(focused.rootRetained && focused.listRetained && focused.iconsRetained &&
+      focused.focusRetained && focused.draftRetained, true, 'fixture_focused_state');
+    assert.equal(pendingVisible, true, 'fixture_pending_rendered');
+    assert.equal(firstError.operationsReads === 1 && recovery.operationsReads === 1, true, 'fixture_apps_error_recovery');
     assert.equal(completed.catalogReads, 1, 'fixture_install_completion_refresh');
     assert.equal(completedVisible, true, 'fixture_install_completion_rendered');
-    assert.equal(activityFirstError.replacedPages > 0 && errorVisible, true, 'fixture_activity_error_rendered');
-    assert.equal(activityRecovery.replacedPages > 0 && recoveredVisible, true, 'fixture_activity_recovered');
+    assert.equal(errorVisible, true, 'fixture_activity_error_rendered');
+    assert.equal(recoveredVisible, true, 'fixture_activity_recovered');
     for (const unchanged of [idle, repeatedError, activityRepeatedError]) {
       assert.equal(unchanged.operationsReads, 3, 'fixture_three_poll_reads');
       assert.equal(unchanged.iconReads, 0, 'unchanged_polls_no_icon_reads');
@@ -420,6 +511,29 @@ test('synthetic Chrome mobile operations polls retain native app/icon nodes and 
         'unchanged_polls_native_node_identity');
     }
     assert.equal(idle.decodedIcons, 24, 'fixture_native_png_decode');
+    for (const changed of [pending, progress, firstError, recovery, completed]) {
+      assert.equal(changed.iconReads, 0, 'changed_operations_no_icon_reads');
+      assert.equal(changed.replacedPages, 0, 'changed_operations_no_page_replacements');
+      assert.equal(changed.replacedIcons, 0, 'changed_operations_no_icon_replacements');
+      assert.equal(changed.draftRetained, true, 'changed_operations_retained_draft');
+      assert.equal(changed.rootRetained && changed.listRetained && changed.iconsRetained && changed.searchRetained,
+        true, 'changed_operations_native_node_identity');
+    }
+    assert.equal(progressVisible, true, 'fixture_changed_progress_visible');
+    assert.equal(progress.focusRetained && progress.scrollRetained, true, 'fixture_progress_focus_scroll');
+    assert.equal(changedMetadata.catalogReads, 1, 'fixture_changed_metadata_refresh');
+    assert.equal(changedMetadata.replacedPages, 1, 'fixture_changed_metadata_single_render');
+    assert.equal(metadataVisible, true, 'fixture_changed_metadata_accurate');
+    assert.equal(activityProgressVisible, true, 'fixture_activity_changed_progress_visible');
+    assert.equal(activityProgress.replacedPages, 0, 'fixture_activity_no_page_replacement');
+    assert.equal(activityProgress.replacedOperationContents, 2, 'fixture_only_changed_operation_contents');
+    assert.equal(activityProgress.replacedHistoryLists, 0, 'fixture_unchanged_activity_order');
+    assert.equal(activityProgress.historyRetained && activityProgress.operationCardsRetained &&
+      activityProgress.focusRetained && activityProgress.scrollRetained, true, 'fixture_activity_keyed_focus_scroll');
+    assert.equal(activityReordered.keyedOrder && activityReordered.focusRetained && activityReordered.scrollRetained,
+      true, 'fixture_activity_reorder_identity_focus_scroll');
+    assert.equal(activityFirstError.rootRetained && activityRecovery.rootRetained, true, 'fixture_activity_error_mount');
+    assert.equal(recoveryIdentity, true, 'fixture_activity_recovery_card_identity');
   } finally {
     await browser.close();
   }

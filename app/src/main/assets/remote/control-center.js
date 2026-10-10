@@ -77,7 +77,8 @@ let tab = 'home',
   noticeTimer = null,
   pairDiscoveryTimer = null;
 let renderedOperations = null,
-  renderedOperationsError = null;
+  renderedOperationsError = null,
+  operationsView = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -380,7 +381,7 @@ async function read(
   key,
   path,
   accept,
-  { renderAfter = true, renderWhen = null, timeout = 12000 } = {},
+  { renderAfter = true, renderWhen = null, renderWith = render, timeout = 12000 } = {},
 ) {
   if (!room() || document.hidden || connectionState === 'expired') return;
   pageReads.get(key)?.abort();
@@ -392,7 +393,7 @@ async function read(
     if (!session.current(ticket) || document.hidden) return;
     accept(response);
     delete data[`${key}Error`];
-    if (renderAfter && (!renderWhen || renderWhen())) render();
+    if (renderAfter && (!renderWhen || renderWhen())) renderWith();
     return response;
   } catch (error) {
     if (!session.current(ticket) || error.code === 'aborted') return;
@@ -402,7 +403,7 @@ async function read(
       connectionState = 'offline';
       updateHeader();
     }
-    if (renderAfter && (!renderWhen || renderWhen())) render();
+    if (renderAfter && (!renderWhen || renderWhen())) renderWith();
   } finally {
     if (pageReads.get(key) === controller) pageReads.delete(key);
   }
@@ -463,6 +464,7 @@ function startPolling() {
       if (detail === 'activity' || (tab === 'apps' && supported('operations')))
         await read('operations', '/remote/operations', acceptOperations, {
           renderAfter: !document.activeElement?.matches('input,textarea,select'),
+          renderWith: renderOperations,
           // Use rendered state so changes deferred by focused input are still shown.
           renderWhen: () =>
             JSON.stringify(data.operations) !== renderedOperations ||
@@ -840,6 +842,7 @@ function loadVisible(force = false) {
   }
 }
 function render() {
+  operationsView = null;
   updateHeader();
   $('navigation').replaceChildren(
     ...['home', 'remote', 'photos', 'apps', 'settings'].map((name) =>
@@ -920,8 +923,7 @@ function render() {
   else body = settingsPage();
   page.replaceChildren(...[back, body].filter(Boolean));
   if (tab === 'apps' || detail === 'activity') {
-    renderedOperations = JSON.stringify(data.operations);
-    renderedOperationsError = JSON.stringify(data.operationsError);
+    rememberOperations();
   }
   if (focus) {
     const restore = [...page.querySelectorAll('[data-focus]')].find(
@@ -2766,12 +2768,20 @@ function renderUpload() {
   const node = $('upload-status');
   if (node) node.replaceWith(uploadPanel());
 }
-async function loadApps() {
-  if (appMode === 'catalog') {
-    if (data.companion && !supported('catalog')) return;
-    return read('catalog', '/remote/catalog', (r) => (data.catalog = r.apps || []));
-  }
-  return read('apps', '/remote/apps', (r) => (data.apps = r.apps || []));
+async function loadApps({ changedOnly = false } = {}) {
+  const key = appMode === 'catalog' ? 'catalog' : 'apps';
+  if (key === 'catalog' && data.companion && !supported('catalog')) return;
+  return read(key, `/remote/${key}`, (r) => (data[key] = r.apps || []), {
+    // Completion still reads fresh metadata; manual refresh always renders.
+    renderWhen: changedOnly
+      ? () =>
+          !operationsView ||
+          operationsView.kind !== 'apps' ||
+          operationsView.key !== key ||
+          JSON.stringify(data[key]) !== operationsView.metadata ||
+          !!data[`${key}Error`]
+      : null,
+  });
 }
 function appsPage() {
   const entries = appMode === 'catalog' ? data.catalog : data.apps;
@@ -2787,7 +2797,9 @@ function appsPage() {
   const error = appMode === 'catalog' ? data.catalogError : data.appsError;
   thumbs.clear();
   const ticket = session.capture();
-  return sections(
+  const records = new Map();
+  let list = null;
+  const body = sections(
     heading('Apps', 'Launch apps and manage the Immortal catalog.'),
     group(
       field(
@@ -2831,11 +2843,11 @@ function appsPage() {
           )
         : !filtered.length
           ? empty('No apps to show', 'Refresh or adjust your search.')
-          : el(
+          : (list = el(
               'div',
               { class: 'apps-list' },
-              filtered.slice(appPage * 24, (appPage + 1) * 24).map((app) => appCard(app, ticket)),
-            ),
+              filtered.slice(appPage * 24, (appPage + 1) * 24).map((app) => appCard(app, ticket, records)),
+            )),
     filtered.length > 24
       ? el(
           'div',
@@ -2867,8 +2879,14 @@ function appsPage() {
         )
       : null,
   );
+  if (list)
+    operationsView = {
+      kind: 'apps', ticket, root: list, records,
+      key: appMode === 'catalog' ? 'catalog' : 'apps', metadata: JSON.stringify(entries),
+    };
+  return body;
 }
-function appCard(app, ticket) {
+function appCard(app, ticket, records) {
   const pkg = app.packageName;
   const installed = appMode === 'installed' || app.installed === true;
   const op = (data.operations || []).find((o) => o.target?.packageName === pkg);
@@ -2915,13 +2933,18 @@ function appCard(app, ticket) {
         : null,
     ),
   );
+  let installButton = null,
+    installDisabled = false,
+    statusNode = null,
+    statusKey = null;
   if (appMode === 'catalog') {
     const compatible = app.compatible === true;
     const latest = installed && app.updateAvailable === false;
     const action = installed ? 'update' : 'install';
+    installDisabled = !compatible || latest || !supported('operations');
     card.append(
       actions(
-        button(
+        (installButton = button(
           !compatible
             ? 'Incompatible'
             : latest
@@ -2934,22 +2957,38 @@ function appCard(app, ticket) {
           () => beginOperation({ type: action, packageName: pkg }, ticket),
           {
             kind: 'primary',
-            disabled: !compatible || latest || pending || !supported('operations'),
+            disabled: installDisabled || pending,
           },
-        ),
+        )),
       ),
     );
     if (!compatible) card.append(text('This catalog app is not compatible with this Portal.'));
   }
-  if (op) {
-    const view = operationView(op);
-    card.append(
-      text(
-        `${view.label}${view.detail ? `: ${view.detail}` : ''}`,
-        view.tone === 'error' ? 'error' : 'detail',
-      ),
-    );
-  }
+  const update = (operation) => {
+    if (installButton) {
+      const disabled =
+        installDisabled || operation?.state === 'running' || operation?.installUncertain === true;
+      if (installButton.disabled !== disabled) installButton.disabled = disabled;
+    }
+    const view = operation ? operationView(operation) : null;
+    const key = view ? JSON.stringify([view.label, view.detail, view.tone]) : null;
+    if (key === statusKey) return;
+    statusKey = key;
+    if (!view) {
+      statusNode?.remove();
+      statusNode = null;
+      return;
+    }
+    const label = `${view.label}${view.detail ? `: ${view.detail}` : ''}`;
+    if (!statusNode) {
+      statusNode = text('');
+      card.append(statusNode);
+    }
+    statusNode.textContent = label;
+    statusNode.className = view.tone === 'error' ? 'error' : 'detail';
+  };
+  update(op);
+  records.set(pkg, update);
   return card;
 }
 async function beginOperation(body, ticket = session.capture()) {
@@ -3200,26 +3239,89 @@ function acceptOperations(response) {
       previous.get(operation.id).state !== 'succeeded' &&
       operationView(operation).tone === 'success',
   );
-  if (completedInstall && tab === 'apps') loadApps();
+  if (completedInstall && tab === 'apps') loadApps({ changedOnly: true });
+}
+function rememberOperations() {
+  renderedOperations = JSON.stringify(data.operations);
+  renderedOperationsError = JSON.stringify(data.operationsError);
+}
+function renderOperations() {
+  const view = operationsView;
+  if (!view || !view.root.isConnected || !session.current(view.ticket)) return render();
+  const active = document.activeElement;
+  const left = window.scrollX, top = window.scrollY;
+  if (view.kind === 'apps') {
+    const byPackage = new Map();
+    for (const operation of data.operations || []) {
+      const pkg = operation.target?.packageName;
+      if (!byPackage.has(pkg)) byPackage.set(pkg, operation);
+    }
+    for (const [pkg, update] of view.records) update(byPackage.get(pkg));
+  } else updateActivity(view);
+  rememberOperations();
+  // Reordering or replacing a changed operation's contents may detach its action temporarily.
+  if (active?.isConnected && document.activeElement !== active) active.focus({ preventScroll: true });
+  if (window.scrollX !== left || window.scrollY !== top)
+    window.scrollTo({ left, top, behavior: 'instant' });
 }
 function activityPage() {
-  const operations = data.operations;
-  return sections(
-    heading('Activity', 'Progress and results retained on the Portal.'),
-    data.operationsError
-      ? failure('Activity unavailable', data.operationsError, () => loadVisible())
-      : !operations
-        ? empty('Activity', 'Loading operations…')
-        : !operations.length
-          ? empty('No recent operations', 'Catalog installs and scenes will appear here.')
-          : el(
-              'div',
-              { class: 'history-list' },
-              operations.map((op) => operationCard(op)),
-            ),
-  );
+  const view = {
+    kind: 'activity', ticket: session.capture(), root: el('div'),
+    list: el('div', { class: 'history-list' }), records: new Map(), state: null,
+  };
+  updateActivity(view);
+  operationsView = view;
+  return sections(heading('Activity', 'Progress and results retained on the Portal.'), view.root);
 }
-function operationCard(op) {
+function updateActivity(view) {
+  const operations = data.operations;
+  const state = data.operationsError
+    ? `error:${JSON.stringify(data.operationsError)}`
+    : !operations ? 'loading' : !operations.length ? 'empty' : 'list';
+  if (state !== 'list') {
+    if (state !== view.state)
+      view.root.replaceChildren(
+        data.operationsError
+          ? failure('Activity unavailable', data.operationsError, () => loadVisible())
+          : !operations
+            ? empty('Activity', 'Loading operations…')
+            : empty('No recent operations', 'Catalog installs and scenes will appear here.'),
+      );
+    if (state === 'empty') {
+      view.records.clear();
+      view.list.replaceChildren();
+    }
+  } else {
+    const ids = new Set(), nodes = [];
+    for (const operation of operations) {
+      ids.add(operation.id);
+      const key = JSON.stringify(operation);
+      const actionsKey = JSON.stringify([
+        operation.retrySupported === true, operation.cancelSupported === true,
+      ]);
+      let record = view.records.get(operation.id);
+      if (!record || record.key !== key) {
+        const node = operationCard(
+          operation, record?.actionsKey === actionsKey ? record.actions : null,
+        );
+        if (record) record.node.replaceChildren(...node.children);
+        else record = { node };
+        record.key = key;
+        record.actionsKey = actionsKey;
+        record.actions = record.node.children[record.node.children.length - 1];
+        view.records.set(operation.id, record);
+      }
+      nodes.push(record.node);
+    }
+    for (const id of view.records.keys()) if (!ids.has(id)) view.records.delete(id);
+    if (view.list.children.length !== nodes.length ||
+        nodes.some((node, i) => view.list.children[i] !== node))
+      view.list.replaceChildren(...nodes);
+    if (view.root.firstChild !== view.list) view.root.replaceChildren(view.list);
+  }
+  view.state = state;
+}
+function operationCard(op, retainedActions = null) {
   const view = operationView(op);
   const name =
     op.target?.name || op.target?.packageName || op.target?.id || op.target?.action || op.type;
@@ -3254,7 +3356,7 @@ function operationCard(op) {
     op.reconciliation
       ? text(`Confirmed by ${op.reconciliation.evidence?.replace(/_/g, ' ') || 'device evidence'}.`)
       : null,
-    actions(
+    retainedActions || actions(
       op.retrySupported === true
         ? button('Retry', () => beginOperation({ type: 'retry', id: op.id }), { kind: 'outline' })
         : null,

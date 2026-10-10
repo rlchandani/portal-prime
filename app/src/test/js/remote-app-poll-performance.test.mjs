@@ -86,7 +86,7 @@ for (const view of ['Apps', 'Activity']) {
     const healthyPage = page.firstChild;
     fixture.offline = true;
     await h.tick(4000);
-    assert.equal(page.firstChild === healthyPage, false, 'The first error must render.');
+    assert.equal(page.firstChild === healthyPage, true, 'Render the first error within the mounted page.');
     assert.equal(h.eval('data.operationsError.code'), 'unreachable');
     if (view === 'Activity') assert.match(page.textContent, /Activity unavailable/);
     else assert.equal(update().disabled, true, 'Keep the pending install disabled through failures.');
@@ -112,13 +112,13 @@ for (const view of ['Apps', 'Activity']) {
     fixture.offline = false;
     fixture.errorCode = 'timeout';
     await h.tick(4000);
-    assert.equal(page.firstChild === firstErrorPage, false, 'Changed errors must render.');
+    assert.equal(page.firstChild === firstErrorPage, true, 'Render changed errors within the mounted page.');
     assert.equal(h.eval('data.operationsError.code'), 'timeout');
     if (view === 'Activity') assert.match(page.textContent, /took too long/);
     const changedErrorPage = page.firstChild;
     fixture.errorCode = null;
     await h.tick(4000);
-    assert.equal(page.firstChild === changedErrorPage, false, 'Recovery must render.');
+    assert.equal(page.firstChild === changedErrorPage, true, 'Render recovery within the mounted page.');
     assert.equal(h.eval('data.operationsError'), undefined);
     if (view === 'Activity') {
       assert.equal(page.textContent.includes('Activity unavailable'), false);
@@ -182,8 +182,9 @@ test('an operation accepted while search is focused becomes visible after focus 
   assert.equal(h.eval('data.operations[0].state'), 'running', 'Still accept the poll result.');
   h.document.activeElement = null;
   await h.tick(4000);
-  assert.equal(list() === initialList, false);
+  assert.equal(list() === initialList, true);
   assert.equal(update().disabled, true, 'Render a previously accepted pending operation.');
+  assert.match(initialList.textContent, /Running/);
   const updatedList = list();
   await h.tick(4000);
   assert.equal(list() === updatedList, true, 'Once rendered, unchanged pending state needs no rebuild.');
