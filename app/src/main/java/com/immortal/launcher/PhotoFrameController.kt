@@ -643,154 +643,164 @@ class PhotoFrameController(
       authHeaders: Map<String, String> = emptyMap(),
   ) {
     if (stopped) return
-    legacyFaceStore?.close()
-    val wv =
-        object : android.webkit.WebView(context) {
-          override fun onTouchEvent(event: MotionEvent): Boolean = false
-          override fun performClick(): Boolean = false
-        }
-    wv.setBackgroundColor(Color.BLACK)
-    wv.isVerticalScrollBarEnabled = false
-    wv.isHorizontalScrollBarEnabled = false
-    wv.overScrollMode = View.OVER_SCROLL_NEVER
-    wv.settings.apply {
-      javaScriptEnabled = true
-      domStorageEnabled = true
-      mediaPlaybackRequiresUserGesture = false
-      // Local engine + local photo files: allow file access (same as the flip-clock face WebView).
-      allowFileAccess = true
-      @Suppress("DEPRECATION")
-      allowFileAccessFromFileURLs = true
-    }
-    // LOCAL photos load natively (fast, no on-the-fly decode → no image "buffering"; the WebView's
-    // Chromium honors EXIF orientation itself, so portraits stay upright). Only REMOTE sources that
-    // need auth headers are intercepted and re-fetched with those headers; everything else (incl.
-    // local file:// and the engine's own assets) falls through to normal loading.
-    wv.webViewClient =
-        object : android.webkit.WebViewClient() {
-          override fun onPageFinished(v: android.webkit.WebView, url: String) {
-            if (!stopped && webView === v) applyEnginePlayback(v)
+    val admission = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.WEB_VIEW_ADMISSION)
+    try {
+      legacyFaceStore?.close()
+      val wv =
+          object : android.webkit.WebView(context) {
+            override fun onTouchEvent(event: MotionEvent): Boolean = false
+            override fun performClick(): Boolean = false
           }
-
-          override fun shouldInterceptRequest(
-              v: android.webkit.WebView,
-              req: android.webkit.WebResourceRequest,
-          ): android.webkit.WebResourceResponse? {
-            if (authHeaders.isEmpty()) return null
-            val u = req.url
-            val scheme = u.scheme?.lowercase()
-            if (scheme != "http" && scheme != "https") return null
-            if (!req.method.equals("GET", ignoreCase = true)) return null
-            val bytes = Http.getBytes(u.toString(), headers = authHeaders) ?: return null
-            val mime = when {
-              u.toString().endsWith(".png", true) -> "image/png"
-              u.toString().endsWith(".webp", true) -> "image/webp"
-              u.toString().endsWith(".gif", true) -> "image/gif"
-              else -> "image/jpeg"
-            }
-            return android.webkit.WebResourceResponse(mime, "utf-8", java.io.ByteArrayInputStream(bytes))
-          }
-        }
-    // Forward the engine's JS console to logcat (tag "ImmortalEngine") — the WebView was a black box
-    // before (no console reached a bug report), which made field diagnosis impossible.
-    wv.webChromeClient =
-        object : android.webkit.WebChromeClient() {
-          override fun onConsoleMessage(m: android.webkit.ConsoleMessage): Boolean {
-            Log.i("ImmortalEngine", "${m.message()} @${m.sourceId()}:${m.lineNumber()}")
-            return true
-          }
-        }
-
-    // JS bridge: the engine calls Android.getPhotos()/getMode()/use24Hour() to pull its inputs.
-    // Cached face focal points ride along as fx/fy (0..1) so crops and pans keep faces in
-    // frame; photos not yet analyzed get no fx/fy (engine centers) and are warmed up in the
-    // background for the NEXT run — detection never delays tonight's screensaver.
-    val faceStore = FaceFocusStore(context).also { legacyFaceStore = it }
-    val photosJson =
-        org.json.JSONArray().apply {
-          photoUrls.forEach { u ->
-            val o = JSONObject().put("url", u)
-            dims[u]?.let { (w, h) -> o.put("w", w).put("h", h) }
-            faceStore.focusFor(u)?.let { f ->
-              o.put("fx", String.format(java.util.Locale.US, "%.3f", f.fx).toDouble())
-              o.put("fy", String.format(java.util.Locale.US, "%.3f", f.fy).toDouble())
-            }
-            faceStore.weightFor(u).takeIf { it > 0f }?.let { pw ->
-              o.put("pw", String.format(java.util.Locale.US, "%.2f", pw).toDouble())
-            }
-            put(o)
-          }
-        }.toString()
-    // Legacy people weighting also feeds presence-based deck ordering when framing is off.
-    // Keep that behavior; the frame-owned handle bounds work and cancels on exit/replacement.
-    faceStore.startWarmUp(photoUrls, authHeaders)
-    val mode = settings.mode
-    val use24 = ImmortalSettings.use24HourClock(context)
-    wv.addJavascriptInterface(
-        object {
-          @android.webkit.JavascriptInterface fun getPhotos(): String = photosJson
-          @android.webkit.JavascriptInterface fun getMode(): String = mode
-          // Per-photo dwell (seconds). The engine holds each photo this long instead of its old
-          // hardcoded ~9s step, so the user's interval actually takes effect in engine modes.
-          @android.webkit.JavascriptInterface fun getIntervalSec(): Int = settings.intervalSec
-          @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
-          // Ready derivatives only: bridge calls never decode or compress on the load path.
-          @android.webkit.JavascriptInterface
-          fun scaledUrl(url: String): String = scaledUrlForSize(url, EngineScaledCache.TARGET_EDGE)
-          @android.webkit.JavascriptInterface
-          fun scaledUrlForSize(url: String, edge: Int): String {
-            if (!url.startsWith("file://")) return ""
-            val file = scaledCache.resolveAndRequest(url.removePrefix("file://"), edge) ?: return ""
-            return "file://" + file.absolutePath
-          }
-          // Live presence for the engine's people-bias: the deck leans toward photos of
-          // people while someone is actually in front of the frame. Reads the hub fresh
-          // per call (the engine polls at mode-beat cadence, a few times a minute).
-          @android.webkit.JavascriptInterface
-          fun isWatching(): Boolean = PresenceHub.current.presence == Presence.PRESENT
-        },
-        "Android")
-
-    // The engine is the opaque PHOTO layer. Add it on top of the photo ImageViews, then lift the
-    // native overlays (clock face, calendar, ambient dashboard, now-playing, welcome) ABOVE it by
-    // re-adding them last — so every overlay setting keeps working across engine modes, exactly like
-    // the classic renderer, while the WebView stays the opaque base (no home/photo bleed-through in
-    // the gaps a mode leaves). The engine's own HTML clock is suppressed (?nativeClock=1) to avoid a
-    // double clock — the Face overlay is the single clock everywhere.
-    val root = view as FrameLayout
-    // Pin the WebView to the root's REAL pixel size, not MATCH. When the engine attaches before
-    // the host window's first layout (DreamService does this), a MATCH WebView can get measured
-    // at its 256px unmeasured default and keep rendering the page in a narrow left strip with
-    // the rest black. Explicit pixels now + a layout listener for any later size change.
-    fun engineParams(): FrameLayout.LayoutParams =
-        if (root.width > 0 && root.height > 0) FrameLayout.LayoutParams(root.width, root.height)
-        else FrameLayout.LayoutParams(MATCH, MATCH)
-    root.addView(wv, engineParams())
-    root.addOnLayoutChangeListener { _, l, t, r, b, ol, ot, or2, ob ->
-      if ((r - l) != (or2 - ol) || (b - t) != (ob - ot)) {
-        if (root.width > 0 && root.height > 0) wv.layoutParams = engineParams()
+      wv.setBackgroundColor(Color.BLACK)
+      wv.isVerticalScrollBarEnabled = false
+      wv.isHorizontalScrollBarEnabled = false
+      wv.overScrollMode = View.OVER_SCROLL_NEVER
+      wv.settings.apply {
+        javaScriptEnabled = true
+        domStorageEnabled = true
+        mediaPlaybackRequiresUserGesture = false
+        // Local engine + local photo files: allow file access (same as the flip-clock face WebView).
+        allowFileAccess = true
+        @Suppress("DEPRECATION")
+        allowFileAccessFromFileURLs = true
       }
-    }
-    // Re-stack the overlays above the engine (bringToFront preserves their relative order).
-    runCatching { faceRenderer.view.bringToFront() }
-    runCatching { calendarPanel.bringToFront() }
-    dashboardPanel?.let { runCatching { it.bringToFront() } }
-    runCatching { welcomeOverlay.bringToFront() }
-    // Bust the WebView cache on app UPDATES by versioning the asset URL (VERSION_CODE bumps each
-    // release) rather than clearCache(true) on every start — clearing every start wiped the disk
-    // cache during the most latency-sensitive moment of cold start. Same URL within a version keeps
-    // normal in-session caching.
-    val assetVer =
-        runCatching {
-          @Suppress("DEPRECATION") context.packageManager.getPackageInfo(context.packageName, 0).versionCode
-        }.getOrDefault(0)
-    // Resume before loading: dimension measurement, image admission and promotion need JS timers.
-    wv.resumeTimers()
-    wv.onResume()
-    webView = wv
-    val initiallyPaused = if (hostActive && !paused) 0 else 1
-    wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1&v=$assetVer&hostPaused=$initiallyPaused")
-    if (!hostActive) wv.onPause()
+      // LOCAL photos load natively (fast, no on-the-fly decode → no image "buffering"; the WebView's
+      // Chromium honors EXIF orientation itself, so portraits stay upright). Only REMOTE sources that
+      // need auth headers are intercepted and re-fetched with those headers; everything else (incl.
+      // local file:// and the engine's own assets) falls through to normal loading.
+      wv.webViewClient =
+          object : android.webkit.WebViewClient() {
+            override fun onPageFinished(v: android.webkit.WebView, url: String) {
+              if (!stopped && webView === v) {
+                FramePerformanceCapture.markSlideshowWork(SlideshowWorkStage.ENGINE_PAGE_FINISHED)
+                applyEnginePlayback(v)
+              }
+            }
+
+            override fun shouldInterceptRequest(
+                v: android.webkit.WebView,
+                req: android.webkit.WebResourceRequest,
+            ): android.webkit.WebResourceResponse? {
+              if (authHeaders.isEmpty()) return null
+              val u = req.url
+              val scheme = u.scheme?.lowercase()
+              if (scheme != "http" && scheme != "https") return null
+              if (!req.method.equals("GET", ignoreCase = true)) return null
+              val bytes = Http.getBytes(u.toString(), headers = authHeaders) ?: return null
+              val mime = when {
+                u.toString().endsWith(".png", true) -> "image/png"
+                u.toString().endsWith(".webp", true) -> "image/webp"
+                u.toString().endsWith(".gif", true) -> "image/gif"
+                else -> "image/jpeg"
+              }
+              return android.webkit.WebResourceResponse(mime, "utf-8", java.io.ByteArrayInputStream(bytes))
+            }
+          }
+      // Forward the engine's JS console to logcat (tag "ImmortalEngine") — the WebView was a black box
+      // before (no console reached a bug report), which made field diagnosis impossible.
+      wv.webChromeClient =
+          object : android.webkit.WebChromeClient() {
+            override fun onConsoleMessage(m: android.webkit.ConsoleMessage): Boolean {
+              Log.i("ImmortalEngine", "${m.message()} @${m.sourceId()}:${m.lineNumber()}")
+              return true
+            }
+          }
+
+      // JS bridge: the engine calls Android.getPhotos()/getMode()/use24Hour() to pull its inputs.
+      // Cached face focal points ride along as fx/fy (0..1) so crops and pans keep faces in
+      // frame; photos not yet analyzed get no fx/fy (engine centers) and are warmed up in the
+      // background for the NEXT run — detection never delays tonight's screensaver.
+      val faceStore = FaceFocusStore(context).also { legacyFaceStore = it }
+      val photosJson = run {
+        val preparation = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.METADATA_PREPARATION)
+        try {
+          org.json.JSONArray().apply {
+            photoUrls.forEach { u ->
+              val o = JSONObject().put("url", u)
+              dims[u]?.let { (w, h) -> o.put("w", w).put("h", h) }
+              faceStore.focusFor(u)?.let { f ->
+                o.put("fx", String.format(java.util.Locale.US, "%.3f", f.fx).toDouble())
+                o.put("fy", String.format(java.util.Locale.US, "%.3f", f.fy).toDouble())
+              }
+              faceStore.weightFor(u).takeIf { it > 0f }?.let { pw ->
+                o.put("pw", String.format(java.util.Locale.US, "%.2f", pw).toDouble())
+              }
+              put(o)
+            }
+          }.toString()
+        } finally { preparation?.finish() }
+      }
+      // Legacy people weighting also feeds presence-based deck ordering when framing is off.
+      // Keep that behavior; the frame-owned handle bounds work and cancels on exit/replacement.
+      faceStore.startWarmUp(photoUrls, authHeaders)
+      val mode = settings.mode
+      val use24 = ImmortalSettings.use24HourClock(context)
+      wv.addJavascriptInterface(
+          object {
+            @android.webkit.JavascriptInterface fun getPhotos(): String = photosJson
+            @android.webkit.JavascriptInterface fun getMode(): String = mode
+            // Per-photo dwell (seconds). The engine holds each photo this long instead of its old
+            // hardcoded ~9s step, so the user's interval actually takes effect in engine modes.
+            @android.webkit.JavascriptInterface fun getIntervalSec(): Int = settings.intervalSec
+            @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
+            // Ready derivatives only: bridge calls never decode or compress on the load path.
+            @android.webkit.JavascriptInterface
+            fun scaledUrl(url: String): String = scaledUrlForSize(url, EngineScaledCache.TARGET_EDGE)
+            @android.webkit.JavascriptInterface
+            fun scaledUrlForSize(url: String, edge: Int): String {
+              if (!url.startsWith("file://")) return ""
+              val file = scaledCache.resolveAndRequest(url.removePrefix("file://"), edge) ?: return ""
+              return "file://" + file.absolutePath
+            }
+            // Live presence for the engine's people-bias: the deck leans toward photos of
+            // people while someone is actually in front of the frame. Reads the hub fresh
+            // per call (the engine polls at mode-beat cadence, a few times a minute).
+            @android.webkit.JavascriptInterface
+            fun isWatching(): Boolean = PresenceHub.current.presence == Presence.PRESENT
+          },
+          "Android")
+
+      // The engine is the opaque PHOTO layer. Add it on top of the photo ImageViews, then lift the
+      // native overlays (clock face, calendar, ambient dashboard, now-playing, welcome) ABOVE it by
+      // re-adding them last — so every overlay setting keeps working across engine modes, exactly like
+      // the classic renderer, while the WebView stays the opaque base (no home/photo bleed-through in
+      // the gaps a mode leaves). The engine's own HTML clock is suppressed (?nativeClock=1) to avoid a
+      // double clock — the Face overlay is the single clock everywhere.
+      val root = view as FrameLayout
+      // Pin the WebView to the root's REAL pixel size, not MATCH. When the engine attaches before
+      // the host window's first layout (DreamService does this), a MATCH WebView can get measured
+      // at its 256px unmeasured default and keep rendering the page in a narrow left strip with
+      // the rest black. Explicit pixels now + a layout listener for any later size change.
+      fun engineParams(): FrameLayout.LayoutParams =
+          if (root.width > 0 && root.height > 0) FrameLayout.LayoutParams(root.width, root.height)
+          else FrameLayout.LayoutParams(MATCH, MATCH)
+      root.addView(wv, engineParams())
+      root.addOnLayoutChangeListener { _, l, t, r, b, ol, ot, or2, ob ->
+        if ((r - l) != (or2 - ol) || (b - t) != (ob - ot)) {
+          if (root.width > 0 && root.height > 0) wv.layoutParams = engineParams()
+        }
+      }
+      // Re-stack the overlays above the engine (bringToFront preserves their relative order).
+      runCatching { faceRenderer.view.bringToFront() }
+      runCatching { calendarPanel.bringToFront() }
+      dashboardPanel?.let { runCatching { it.bringToFront() } }
+      runCatching { welcomeOverlay.bringToFront() }
+      // Bust the WebView cache on app UPDATES by versioning the asset URL (VERSION_CODE bumps each
+      // release) rather than clearCache(true) on every start — clearing every start wiped the disk
+      // cache during the most latency-sensitive moment of cold start. Same URL within a version keeps
+      // normal in-session caching.
+      val assetVer =
+          runCatching {
+            @Suppress("DEPRECATION") context.packageManager.getPackageInfo(context.packageName, 0).versionCode
+          }.getOrDefault(0)
+      // Resume before loading: dimension measurement, image admission and promotion need JS timers.
+      wv.resumeTimers()
+      wv.onResume()
+      webView = wv
+      val initiallyPaused = if (hostActive && !paused) 0 else 1
+      wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1&v=$assetVer&hostPaused=$initiallyPaused")
+      if (!hostActive) wv.onPause()
+    } finally { admission?.finish() }
   }
 
   /** True once the engine WebView has been created (so ticks/crossfade paths bail out). */
@@ -888,6 +898,8 @@ class PhotoFrameController(
     cancelKenBurns()
     faceRenderer.stop()
     if (this::videoView.isInitialized) runCatching { videoView.stopPlayback() }
+    if (engineActive && webView != null)
+      FramePerformanceCapture.markSlideshowWork(SlideshowWorkStage.ENGINE_RETIRED)
     webView?.let { runCatching { it.stopLoading(); it.destroy() } }
     webView = null
     engineActive = false

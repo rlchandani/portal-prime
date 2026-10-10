@@ -48,6 +48,10 @@ internal object FramePerformanceCapture {
       currentMeasurement = ::settingsUiWorkMeasurement,
       nanoTime = SystemClock::elapsedRealtimeNanos,
   )
+  private val slideshowWorkProbe = SlideshowWorkProbe(
+      currentMeasurement = ::slideshowWorkMeasurement,
+      nanoTime = SystemClock::elapsedRealtimeNanos,
+  )
   private data class Tracked(val window: WeakReference<Window>, val host: String,
       var attachListener: View.OnAttachStateChangeListener? = null)
   private data class Binding(val window: WeakReference<Window>, val budgetNs: Long,
@@ -60,6 +64,7 @@ internal object FramePerformanceCapture {
     val histograms = LinkedHashMap<String, FramePerformanceHistogram>()
     val settingsSearchPreparation = SettingsSearchPreparationSamples()
     val settingsUiWork = SettingsUiWorkSamples()
+    val slideshowWork = SlideshowWorkSamples()
     // Allocated only by an explicit sampleMain opt-in. No Activity/Window references in the sampler.
     val mainSamples = if (request.sampleMain) MainThreadSampleHistogram() else null
     var sampleMainActive = false // Guarded by the session monitor, like the histograms.
@@ -148,6 +153,30 @@ internal object FramePerformanceCapture {
   }
 
   fun stop(): Boolean = onMain { closeCurrent(); true }
+
+  fun slideshowWorkEnabled(): Boolean = runCatching {
+    val s = current ?: return@runCatching false
+    synchronized(s) { current === s && s.closedAt == null && SystemClock.elapsedRealtime() < s.deadline }
+  }.getOrDefault(false)
+
+  fun beginSlideshowWork(stage: SlideshowWorkStage): SlideshowWorkSpan? = slideshowWorkProbe.begin(stage)
+  fun markSlideshowWork(stage: SlideshowWorkStage) = slideshowWorkProbe.mark(stage)
+
+  private fun slideshowWorkMeasurement(stage: SlideshowWorkStage): SlideshowWorkMeasurement? {
+    val s = current ?: return null
+    synchronized(s) {
+      if (current !== s || s.closedAt != null || SystemClock.elapsedRealtime() >= s.deadline) return null
+    }
+    return SlideshowWorkMeasurement { durationNs ->
+      val now = SystemClock.elapsedRealtime()
+      synchronized(s) {
+        if (current === s && s.closedAt == null && now < s.deadline) {
+          s.slideshowWork.record(stage, now - s.began, durationNs,
+              Looper.myLooper() === Looper.getMainLooper())
+        }
+      }
+    }
+  }
 
   fun settingsUiWorkEnabled(): Boolean = runCatching {
     val s = current ?: return@runCatching false
@@ -369,6 +398,7 @@ internal object FramePerformanceCapture {
           .put("hosts", JSONObject().apply { s.histograms.forEach { (name, h) -> put(name, h.snapshot()) } })
       result.put("settingsSearchPreparation", s.settingsSearchPreparation.snapshot())
       result.put("settingsUiWork", s.settingsUiWork.snapshot())
+      result.put("slideshowWork", s.slideshowWork.snapshot())
       s.mainSamples?.let { result.put("mainThreadSamples", it.snapshot()) }
     }
     // Sample only on explicit reads, outside the per-frame lock/handler.
