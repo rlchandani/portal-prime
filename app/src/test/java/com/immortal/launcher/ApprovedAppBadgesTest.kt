@@ -105,16 +105,15 @@ class ApprovedAppBadgesTest {
   }
 
   @Test fun eachReadUsesFreshNotificationsAndPreservesClearableSummaryFiltering() = withBoundListener { service ->
-    Mockito.`when`(service.activeNotifications).thenReturn(
-        arrayOf(
-            notification("fixture.chat"),
-            notification("fixture.chat"),
-            notification("fixture.music"),
-            notification("fixture.chat", clearable = false, flags = Notification.FLAG_ONGOING_EVENT),
-            notification("fixture.music", flags = Notification.FLAG_GROUP_SUMMARY),
-        ),
-        arrayOf(notification("fixture.download")),
+    val initial = arrayOf(
+        notification("fixture.chat"),
+        notification("fixture.chat"),
+        notification("fixture.music"),
+        notification("fixture.chat", clearable = false, flags = Notification.FLAG_ONGOING_EVENT),
+        notification("fixture.music", flags = Notification.FLAG_GROUP_SUMMARY),
     )
+    val updated = arrayOf(notification("fixture.download"))
+    Mockito.`when`(service.activeNotifications).thenReturn(initial, updated)
     runBlocking {
       assertEquals(mapOf("fixture.chat" to 2, "fixture.music" to 1), loadApprovedAppBadges())
       assertEquals(mapOf("fixture.download" to 1), loadApprovedAppBadges())
