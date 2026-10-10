@@ -180,7 +180,7 @@ private fun ApprovedAppsContent(
     if (!pageActive || !resumed) return@LaunchedEffect
     assignments = UserLayout.load(context)
     order = UserLayout.loadOrder(context)
-    badges = MediaNotificationListenerService.activeCountsByPackage()
+    badges = loadApprovedAppBadges()
     val epoch = resume to refresh
     if (lastSuccessfulEpoch == epoch) return@LaunchedEffect
     try {
