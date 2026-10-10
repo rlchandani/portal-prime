@@ -115,7 +115,7 @@ class FramePerformanceHistogramTest {
     assertEquals(0.0, second.getJSONObject("components").getDouble("draw"), 0.0)
   }
 
-  @Test fun detailedRetentionStaysOneFrameAcrossManyAcceptedRecords() {
+  @Test fun worstFrameStaysOnePairedFrameAcrossManyAcceptedRecords() {
     val h = FramePerformanceHistogram(16_666_667L)
     val reused = LongArray(8)
     repeat(100_000) { index ->
@@ -128,6 +128,21 @@ class FramePerformanceHistogramTest {
     assertEquals(100.0, worst.getDouble("totalMs"), 0.0)
     assertTrue(worst.getBoolean("firstDraw"))
     assertEquals(8, worst.getJSONObject("components").length())
+  }
+
+  @Test fun tailJournalPreservesSlowSteadyFramesBehindALargerFirstDraw() {
+    val h = FramePerformanceHistogram(16_666_667L)
+    h.recordDetailed(450_000_000L, 0, true, 12, parts(400, 0, 0, 0, 0, 0, 30, 0))
+    h.recordDetailed(120_000_000L, 0, false, 60_000, parts(100, 0, 0, 0, 0, 0, 10, 0))
+    h.recordDetailed(600_000_000L, 0, false, -1, LongArray(8))
+    val snapshot = h.snapshot()
+    assertEquals(3L, snapshot.getLong("frames")); assertEquals(1L, snapshot.getLong("invalidDetailSamples"))
+    assertTrue(snapshot.isNull("worstFrame"))
+    val tail = snapshot.getJSONObject("slowFrames")
+    assertEquals(2L, tail.getLong("eligibleFrames")); assertEquals(2, tail.getJSONArray("frames").length())
+    val steady = tail.getJSONArray("frames").getJSONObject(1)
+    assertFalse(steady.getBoolean("firstDraw")); assertEquals(60_000L, steady.getLong("elapsedMs"))
+    assertEquals(100.0, steady.getJSONObject("components").getDouble("queued"), 0.0)
   }
 
   @Test fun quantilesAndBudgetUseBoundedBuckets() {

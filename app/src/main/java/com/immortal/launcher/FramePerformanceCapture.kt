@@ -24,6 +24,7 @@ import android.view.Window
 import android.view.View
 import androidx.core.content.ContextCompat
 import java.lang.ref.WeakReference
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.FutureTask
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -65,6 +66,7 @@ internal object FramePerformanceCapture {
     val settingsSearchPreparation = SettingsSearchPreparationSamples()
     val settingsUiWork = SettingsUiWorkSamples()
     val slideshowWork = SlideshowWorkSamples()
+    val slideshowStyles = SlideshowStyleSamples()
     // Allocated only by an explicit sampleMain opt-in. No Activity/Window references in the sampler.
     val mainSamples = if (request.sampleMain) MainThreadSampleHistogram() else null
     var sampleMainActive = false // Guarded by the session monitor, like the histograms.
@@ -158,6 +160,27 @@ internal object FramePerformanceCapture {
     val s = current ?: return@runCatching false
     synchronized(s) { current === s && s.closedAt == null && SystemClock.elapsedRealtime() < s.deadline }
   }.getOrDefault(false)
+
+  /** Select at bridge receipt; a queued Main callback cannot write into a later capture. */
+  fun prepareSlideshowStyleReport(host: SlideshowStyleHost, style: SlideshowStyle): SlideshowStyleReport? {
+    val s = current ?: return null
+    val received = synchronized(s) {
+      if (current !== s || s.closedAt != null) return null
+      SystemClock.elapsedRealtime().also { if (it >= s.deadline) return null }
+    }
+    val accepted = AtomicBoolean(false)
+    return SlideshowStyleReport {
+      if (accepted.compareAndSet(false, true)) {
+        val now = SystemClock.elapsedRealtime()
+        synchronized(s) {
+          if (current === s && s.closedAt == null && now < s.deadline &&
+              Looper.myLooper() === Looper.getMainLooper()) {
+            s.slideshowStyles.record(host, style, received - s.began, now - s.began)
+          }
+        }
+      }
+    }
+  }
 
   fun beginSlideshowWork(stage: SlideshowWorkStage): SlideshowWorkSpan? = slideshowWorkProbe.begin(stage)
   fun markSlideshowWork(stage: SlideshowWorkStage) = slideshowWorkProbe.mark(stage)
@@ -407,6 +430,7 @@ internal object FramePerformanceCapture {
       result.put("settingsSearchPreparation", s.settingsSearchPreparation.snapshot())
       result.put("settingsUiWork", s.settingsUiWork.snapshot())
       result.put("slideshowWork", s.slideshowWork.snapshot())
+      result.put("slideshowStyles", s.slideshowStyles.snapshot())
       s.mainSamples?.let { result.put("mainThreadSamples", it.snapshot()) }
     }
     // Sample only on explicit reads, outside the per-frame lock/handler.

@@ -32,6 +32,7 @@ internal class FramePerformanceHistogram(private val budgetNs: Long) {
   private var worstElapsedMs = 0L
   private var worstFirstDraw = false
   private val worstComponents = LongArray(8)
+  private val slowFrames = FramePerformanceSlowFrames()
 
   fun record(nanos: Long, dropped: Int, firstDraw: Boolean): Boolean {
     drops += dropped.coerceAtLeast(0)
@@ -60,6 +61,7 @@ internal class FramePerformanceHistogram(private val budgetNs: Long) {
       return true // Aggregate timing remains valid; timestamp cannot describe the worst frame.
     }
     detailedFrames++
+    slowFrames.record(nanos, firstDraw, elapsedMs, componentNanos)
     if (nanos > worstDetailedNanos) {
       worstDetailedNanos = nanos
       worstElapsedMs = elapsedMs
@@ -115,6 +117,7 @@ internal class FramePerformanceHistogram(private val budgetNs: Long) {
                   if (worstComponents[i] in 0L..60_000_000_000L) worstComponents[i] / 1e6
                   else JSONObject.NULL)
             }))
+    out.put("slowFrames", slowFrames.snapshot())
     return out
   }
 

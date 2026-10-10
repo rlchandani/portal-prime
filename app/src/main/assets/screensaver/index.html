@@ -109,7 +109,12 @@
     stage,
     mode: bridgeMode(),
     intervalSec: intervalSec(),
-    onMode: () => {},
+    onMode: (_, modeId) => {
+      // Code-defined style only, once per decoded promotion; optional diagnostics never stop playback.
+      try {
+        if (window.Android && window.Android.reportPresentedStyle) window.Android.reportPresentedStyle(modeId);
+      } catch (_) {}
+    },
     onReady: () => {
       document.getElementById("loading").classList.add("hide");
       if (!readyLogged) {

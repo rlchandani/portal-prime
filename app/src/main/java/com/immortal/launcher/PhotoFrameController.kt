@@ -748,8 +748,20 @@ class PhotoFrameController(
                       return true
                     }
                   }
+              val styleReporter = SlideshowStyleReporter(
+                  host = when (context) {
+                    is PhotoFramePreviewActivity -> SlideshowStyleHost.PREVIEW
+                    is PhotoDreamService -> SlideshowStyleHost.DREAM
+                    else -> SlideshowStyleHost.UNKNOWN
+                  },
+                  prepare = FramePerformanceCapture::prepareSlideshowStyleReport,
+                  postMain = { task -> ui.post { task() } },
+                  isCurrent = { !stopped && owner == legacyEngineRevision && legacyFaceStore === faceStore &&
+                      engineActive && webView === wv && hostActive && !paused })
               wv.addJavascriptInterface(
                   object {
+                    @android.webkit.JavascriptInterface
+                    fun reportPresentedStyle(modeId: String) { styleReporter.receive(modeId) }
                     @android.webkit.JavascriptInterface fun getPhotos(): String = photosJson
                     @android.webkit.JavascriptInterface fun getMode(): String = mode
                     // Per-photo dwell (seconds). The engine holds each photo this long instead of its old
