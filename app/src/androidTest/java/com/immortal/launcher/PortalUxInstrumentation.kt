@@ -45,6 +45,12 @@ class PortalUxInstrumentation : Instrumentation() {
             automation.serviceInfo = automation.serviceInfo.apply {
                 flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
             }
+            if (options.getString("command") in setOf("packageInventorySetup", "packageInventoryCleanup")) {
+                result.putAll(PackageInventoryDeviceChecks.run(this,
+                    options.getString("command") == "packageInventoryCleanup"))
+                finish(if (result.getBoolean("packageInventoryCompleted")) 0 else 1, result)
+                return
+            }
             if (options.getString("command") == "pinnedApp") {
                 result.putAll(PinnedAppDeviceChecks.run(this))
                 finish(if (result.getBoolean("pinnedAppCompleted")) 0 else 1, result)

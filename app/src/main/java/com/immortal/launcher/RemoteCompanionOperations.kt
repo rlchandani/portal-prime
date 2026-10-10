@@ -149,14 +149,21 @@ internal class RemoteCompanionOperations(
       handedOff = true
       val succeeded = if (plan.mode == "silent") InstallDaemon.install(context, apk, app.packageName)
           else HeadlessInstaller.install(context, apk, app.packageName)
-      if (succeeded) history.reconcileInstall(id, "native_installer_success", true)
+      if (succeeded) reconcileInstallInventory(id, "native_installer_success", true)
       val readback = StoreCatalog.installedVersionCode(context, app.packageName)
       val verified = succeeded && readback != null && readback >= version
       result(verified, if (verified) "installed" else if (succeeded) "installed_readback_mismatch" else "install_failed_or_timed_out")
           .put("backendMayContinue", !succeeded).put("installUncertain", !succeeded)
           .put("packageName", app.packageName).put("installedVersionCode", readback ?: JSONObject.NULL)
     } catch (e: Exception) { result(false, "download_or_install_failed").put("backendMayContinue", handedOff).put("installUncertain", handedOff) }
-    finally { apk.delete() }
+    finally {
+      if (handedOff) InstalledPackageVersions.invalidate()
+      apk.delete()
+    }
+  }
+  private fun reconcileInstallInventory(id: String, evidence: String, succeeded: Boolean) {
+    InstalledPackageVersions.invalidate()
+    history.reconcileInstall(id, evidence, succeeded)
   }
   /** Native evidence only; absence of a queue file or restarting this app is not evidence. */
   @Synchronized fun reconcileInstalls() {
@@ -174,8 +181,8 @@ internal class RemoteCompanionOperations(
           val queue = File(context.getExternalFilesDir(null), "installq")
           val done = File(queue, "$pkg.apk.done")
           val failed = File(queue, "$pkg.apk.failed")
-          if (done.isFile && done.lastModified() >= at) history.reconcileInstall(entry.getString("id"), "daemon_done", true)
-          else if (failed.isFile && failed.lastModified() >= at) history.reconcileInstall(entry.getString("id"), "daemon_failed", false)
+          if (done.isFile && done.lastModified() >= at) reconcileInstallInventory(entry.getString("id"), "daemon_done", true)
+          else if (failed.isFile && failed.lastModified() >= at) reconcileInstallInventory(entry.getString("id"), "daemon_failed", false)
         }
         "dialog" -> runCatching {
           // A missing session alone cannot prove success. Require a freshly installed
@@ -184,7 +191,7 @@ internal class RemoteCompanionOperations(
           val installed = context.packageManager.getPackageInfo(pkg, 0)
           val version = if (Build.VERSION.SDK_INT >= 28) installed.longVersionCode else @Suppress("DEPRECATION") installed.versionCode.toLong()
           if (installed.lastUpdateTime >= at && version >= evidence.getLong("versionCode"))
-            history.reconcileInstall(entry.getString("id"), "installed_readback", true)
+            reconcileInstallInventory(entry.getString("id"), "installed_readback", true)
         }
       }
     }

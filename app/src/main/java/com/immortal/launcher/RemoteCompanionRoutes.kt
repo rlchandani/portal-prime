@@ -115,9 +115,12 @@ internal class RemoteCompanionRoutes(private val context: Context) {
   }
 
   private fun catalogResponse(): FleetHttpServer.Response {
+    val entries = catalog()
+    val versions = InstalledPackageVersions.snapshot(context, entries.mapTo(HashSet()) { it.packageName })
     val apps = JSONArray()
-    for (app in catalog()) {
-      val installed = StoreCatalog.installedVersionCode(context, app.packageName)
+    for (app in entries) {
+      val installed = if (versions != null) versions.versionCode(app.packageName)
+          else StoreCatalog.installedVersionCode(context, app.packageName)
       apps.put(JSONObject().put("packageName", app.packageName).put("name", app.name).put("description", app.description).put("category", app.category)
           .put("minSdk", app.minSdk ?: JSONObject.NULL).put("compatible", RemoteCompanionOperationPolicy.compatible(app, Build.VERSION.SDK_INT, operations.deviceKind()))
           .put("installed", installed != null).put("installedVersionCode", installed ?: JSONObject.NULL).put("versionCode", app.versionCode ?: JSONObject.NULL)

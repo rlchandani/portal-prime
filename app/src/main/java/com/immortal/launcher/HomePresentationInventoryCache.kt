@@ -20,6 +20,14 @@ internal class HomePresentationInventoryCache<T> {
     snapshot = null
   }
 
+  /** Expiry must never discard a replacement published after its first observation. */
+  fun invalidateIfCurrent(expected: List<T>): Boolean = synchronized(lock) {
+    if (snapshot !== expected) return@synchronized false
+    generation++
+    snapshot = null
+    true
+  }
+
   /** Caller runs on IO. An invalidated in-flight load cannot republish stale app identities. */
   fun load(loader: () -> List<T>): List<T> {
     snapshot?.let { return it }

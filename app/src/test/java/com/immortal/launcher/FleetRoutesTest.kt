@@ -39,6 +39,34 @@ class FleetRoutesTest {
   }
 
   @Test
+  fun progressDoesNotInvalidateButEveryTerminalOutcomeDoes() {
+    var invalidations = 0
+    val invalidate = { invalidations++; Unit }
+    assertNull(FleetRoutes.terminalResultAndInvalidate("Downloading…", invalidate))
+    assertEquals(0, invalidations)
+    assertEquals(true, FleetRoutes.terminalResultAndInvalidate("Installed ✓", invalidate))
+    assertEquals(1, invalidations)
+    assertEquals(false, FleetRoutes.terminalResultAndInvalidate("Error: generated failure", invalidate))
+    assertEquals(2, invalidations)
+  }
+
+  @Test
+  fun lateCompletionRefreshesInventoryRebuiltAfterWaiterTimedOut() {
+    val context = org.mockito.Mockito.mock(android.content.Context::class.java)
+    org.mockito.Mockito.`when`(context.applicationContext).thenReturn(context)
+    var version = 1L
+    val cache = InstalledVersionInventory({ 100L }, { _, _ -> true }, { _, _ -> mapOf("app" to version) })
+    assertEquals(1L, requireNotNull(cache.snapshot(context, setOf("app"))).versionCode("app"))
+    // The HTTP waiter expired, but the installer is still working. A poll in this gap
+    // legitimately sees the old package and can populate a new five-second snapshot.
+    cache.invalidate()
+    assertEquals(1L, requireNotNull(cache.snapshot(context, setOf("app"))).versionCode("app"))
+    version = 2L
+    assertEquals(true, FleetRoutes.terminalResultAndInvalidate("Installed ✓", cache::invalidate))
+    assertEquals(2L, requireNotNull(cache.snapshot(context, setOf("app"))).versionCode("app"))
+  }
+
+  @Test
   fun constantTimeEquals_matchesOnlyIdentical() {
     assertTrue(FleetRoutes.constantTimeEquals("abc123", "abc123"))
     assertTrue(FleetRoutes.constantTimeEquals("", ""))

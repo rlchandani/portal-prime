@@ -134,9 +134,12 @@ class FleetRoutes(private val context: Context) {
     // Installed catalog apps + a CHEAP (no-network) update hint from the catalog pin.
     // The authoritative F-Droid check is POST /update {"dryRun":true}, kept off the
     // hot dashboard-poll path so /info stays fast across a whole wall of devices.
+    val entries = catalog
+    val versions = InstalledPackageVersions.snapshot(context, entries.mapTo(HashSet()) { it.packageName })
     val arr = JSONArray()
-    for (app in catalog) {
-      val installed = StoreCatalog.installedVersionCode(context, app.packageName) ?: continue
+    for (app in entries) {
+      val installed = (if (versions != null) versions.versionCode(app.packageName)
+          else StoreCatalog.installedVersionCode(context, app.packageName)) ?: continue
       val a = JSONObject().put("packageName", app.packageName).put("name", app.name).put("installed", installed)
       app.versionCode?.let {
         a.put("catalogVersion", it)
@@ -149,16 +152,19 @@ class FleetRoutes(private val context: Context) {
   }
 
   private fun apps(): FleetHttpServer.Response {
-    if (catalog.isEmpty()) return resp(503, err("catalog_not_ready"))
+    val entries = catalog
+    if (entries.isEmpty()) return resp(503, err("catalog_not_ready"))
+    val versions = InstalledPackageVersions.snapshot(context, entries.mapTo(HashSet()) { it.packageName })
     val arr = JSONArray()
-    for (app in catalog) {
+    for (app in entries) {
       val a =
           JSONObject()
               .put("name", app.name)
               .put("packageName", app.packageName)
               .put("source", app.source)
               .put("category", app.category)
-              .put("installed", StoreCatalog.isInstalled(context, app.packageName))
+              .put("installed", if (versions != null) versions.versionCode(app.packageName) != null
+                  else StoreCatalog.isInstalled(context, app.packageName))
       app.versionCode?.let { a.put("versionCode", it) }
       arr.put(a)
     }
@@ -344,6 +350,8 @@ class FleetRoutes(private val context: Context) {
     return try {
       if (m.mode == "silent") silentInstall(app) else dialogInstall(app)
     } finally {
+      // Publish completion only after invalidating any pre-install read snapshot.
+      InstalledPackageVersions.invalidate()
       inFlight.remove(app.packageName)
     }
   }
@@ -382,6 +390,8 @@ class FleetRoutes(private val context: Context) {
           else HeadlessInstaller.install(context, apk, pkg)
       if (ok) "installed" else "failed"
     } finally {
+      // Publish completion only after invalidating any pre-install read snapshot.
+      InstalledPackageVersions.invalidate()
       inFlight.remove(pkg)
     }
   }
@@ -391,7 +401,7 @@ class FleetRoutes(private val context: Context) {
     val latch = CountDownLatch(1)
     val result = AtomicReference<Boolean?>(null)
     StoreCatalog.install(context, app) { _, msg ->
-      terminalResult(msg)?.let {
+      terminalResultAndInvalidate(msg)?.let {
         result.set(it)
         latch.countDown()
       }
@@ -550,6 +560,16 @@ class FleetRoutes(private val context: Context) {
     /** Derive the install-mode label reported in /info and gating /install. Pure. */
     internal fun modeFor(daemonAvailable: Boolean, paused: Boolean): String =
         InstallLifecycle.modeFor(daemonAvailable, paused)
+
+    /** A downloader/installer may publish after its HTTP waiter has already timed out. */
+    internal fun terminalResultAndInvalidate(
+        message: String,
+        invalidate: () -> Unit = InstalledPackageVersions::invalidate,
+    ): Boolean? {
+      val terminal = terminalResult(message) ?: return null
+      invalidate()
+      return terminal
+    }
 
     /** Map a store status string to a terminal result, or null for progress updates. Pure. */
     internal fun terminalResult(msg: String): Boolean? = InstallLifecycle.terminalResult(msg)

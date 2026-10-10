@@ -28,6 +28,8 @@ class ImmortalApp : Application() {
     CrashGuard.install(this)
     // Weak window tracking is dormant until an operator starts a bounded Fleet capture.
     FramePerformanceCapture.init(this)
+    // Package events invalidate read metadata without scans or work on this main thread.
+    InstalledPackageVersions.register(this)
     // Restore bridge state persisted by HomeActivity.launchStockHome. If Android killed our
     // process while the stock Portal home was in the foreground and a new process is now
     // starting to handle a PhotoDreamService instance, DreamPolicy would otherwise see
