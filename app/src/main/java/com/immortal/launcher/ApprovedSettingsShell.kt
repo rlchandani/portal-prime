@@ -127,6 +127,7 @@ internal fun ApprovedSettingsShell(
     lazyDetail: ApprovedSettingsLazyDetail?,
     content: @Composable () -> Unit,
 ) {
+    val composition = FramePerformanceCapture.beginSettingsUiWork(SettingsUiWorkStage.SHELL_COMPOSITION)
     KeepInteractiveScreenAwake()
     val context = LocalContext.current
     val navigate = rememberApprovedSettingsNavigator()
@@ -137,6 +138,7 @@ internal fun ApprovedSettingsShell(
                 context.packageManager.getPackageInfo(context.packageName, 0).versionName
             }.getOrNull()
         }
+        FramePerformanceCapture.markSettingsUiWork(SettingsUiWorkStage.VERSION_PUBLISHED)
     }
     val focus = LocalFocusManager.current
     val appliedAdvanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
@@ -172,7 +174,7 @@ internal fun ApprovedSettingsShell(
     CompositionLocalProvider(
         LocalApprovedEnableAdvanced provides { consent = true },
     ) {
-        Column(Modifier.fillMaxSize().background(IosBackground)) {
+        Column(Modifier.settingsUiWorkMeasure(SettingsUiWorkStage.SHELL_MEASURE).fillMaxSize().background(IosBackground)) {
             Row(
                 Modifier.fillMaxWidth().height(Sizes.headerHeight - 1.dp).padding(horizontal = 56.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -246,11 +248,13 @@ internal fun ApprovedSettingsShell(
                             }
                         }
                         LazyColumn(
-                            Modifier.weight(1f).fillMaxWidth().padding(top = 28.dp).focusGroup(),
+                            Modifier.settingsUiWorkMeasure(SettingsUiWorkStage.SIDEBAR_MEASURE).weight(1f).fillMaxWidth().padding(top = 28.dp).focusGroup(),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             items(ApprovedSettingsCategories.filter { it.id != "advanced" || appliedAdvanced },
                                 key = { it.id }) { item ->
+                                    val itemComposition = FramePerformanceCapture.beginSettingsUiWork(
+                                        SettingsUiWorkStage.SIDEBAR_ITEM_COMPOSITION)
                                     val selected = displayedCategory == item.id
                                     Row(
                                         Modifier.fillMaxWidth().height(76.dp)
@@ -270,6 +274,7 @@ internal fun ApprovedSettingsShell(
                                             fontSize = 22.sp, lineHeight = 30.sp,
                                             fontWeight = if (selected) FontWeight.Medium else FontWeight.Normal)
                                     }
+                                    itemComposition?.finish()
                                 }
                         }
                         Column(Modifier.padding(horizontal = 12.dp)) {
@@ -306,9 +311,11 @@ internal fun ApprovedSettingsShell(
                     retainInactive = page == null || approvedSettingsPage(page)?.standaloneActivity == null,
                 )
                 if (localNavigation) {
-                    ApprovedSettingsDetailPanes(detail, Modifier.weight(1f).fillMaxHeight()) { consent = true }
+                    ApprovedSettingsDetailPanes(detail, Modifier.weight(1f).fillMaxHeight()
+                        .settingsUiWorkMeasure(SettingsUiWorkStage.DETAIL_MEASURE)) { consent = true }
                 } else {
-                    ApprovedSettingsDetailBody(detail, Modifier.weight(1f).fillMaxHeight()) { consent = true }
+                    ApprovedSettingsDetailBody(detail, Modifier.weight(1f).fillMaxHeight()
+                        .settingsUiWorkMeasure(SettingsUiWorkStage.DETAIL_MEASURE)) { consent = true }
                 }
             }
         }
@@ -330,6 +337,7 @@ internal fun ApprovedSettingsShell(
             ApprovedSettingsTextButton("Done") { applyError = null }
         }
     }
+    composition?.finish()
 }
 
 private class SettingsPane(initial: ApprovedSettingsDetail) {
@@ -352,6 +360,7 @@ private fun ApprovedSettingsDetailPanes(
     val distance = with(LocalDensity.current) { 24.dp.toPx() }
     SideEffect { panes.firstOrNull { it.id == selected }?.detail = detail }
     LaunchedEffect(selected) {
+        FramePerformanceCapture.markSettingsUiWork(SettingsUiWorkStage.PANE_EFFECT_START)
         focus.clearFocus(force = true)
         var incoming = panes.firstOrNull { it.id == selected }
         if (incoming == null) {
@@ -368,6 +377,7 @@ private fun ApprovedSettingsDetailPanes(
                 launch { pane.opacity.animateTo(if (pane === target) 1f else 0f, tween(160)) }
             }
         }
+        FramePerformanceCapture.markSettingsUiWork(SettingsUiWorkStage.PANE_EFFECT_END)
     }
     Box(modifier.clipToBounds()) {
         panes.forEach { pane ->
@@ -406,6 +416,7 @@ private fun ApprovedSettingsDetailBody(
     modifier: Modifier,
     onAdvanced: () -> Unit,
 ) {
+    val composition = FramePerformanceCapture.beginSettingsUiWork(SettingsUiWorkStage.DETAIL_COMPOSITION)
     // Outgoing transition content retains its own request; the next route never inherits it.
     CompositionLocalProvider(LocalApprovedRequestedControl provides detail.requested) {
         if (detail.lazy == null) {
@@ -434,12 +445,15 @@ private fun ApprovedSettingsDetailBody(
             }
         }
     }
+    composition?.finish()
 }
 
 @Composable
 private fun ApprovedSettingsSearchField(query: String, onChange: (String) -> Unit) {
+    val composition = FramePerformanceCapture.beginSettingsUiWork(SettingsUiWorkStage.SEARCH_COMPOSITION)
     val color = IosSecondary
-    Surface(color = IosCard, shape = RoundedCornerShape(16.dp),
+    Surface(modifier = Modifier.settingsUiWorkMeasure(SettingsUiWorkStage.SEARCH_MEASURE),
+        color = IosCard, shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, IosDivider)) {
         Row(Modifier.fillMaxWidth().height(68.dp).padding(horizontal = 20.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -455,6 +469,7 @@ private fun ApprovedSettingsSearchField(query: String, onChange: (String) -> Uni
             )
         }
     }
+    composition?.finish()
 }
 
 @Composable

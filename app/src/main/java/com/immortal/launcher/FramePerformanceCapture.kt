@@ -44,6 +44,10 @@ internal object FramePerformanceCapture {
       currentMeasurement = ::settingsSearchPreparationMeasurement,
       nanoTime = SystemClock::elapsedRealtimeNanos,
   )
+  private val settingsUiWorkProbe = SettingsUiWorkProbe(
+      currentMeasurement = ::settingsUiWorkMeasurement,
+      nanoTime = SystemClock::elapsedRealtimeNanos,
+  )
   private data class Tracked(val window: WeakReference<Window>, val host: String,
       var attachListener: View.OnAttachStateChangeListener? = null)
   private data class Binding(val window: WeakReference<Window>, val budgetNs: Long,
@@ -55,6 +59,7 @@ internal object FramePerformanceCapture {
     val handler = Handler(thread.looper)
     val histograms = LinkedHashMap<String, FramePerformanceHistogram>()
     val settingsSearchPreparation = SettingsSearchPreparationSamples()
+    val settingsUiWork = SettingsUiWorkSamples()
     // Allocated only by an explicit sampleMain opt-in. No Activity/Window references in the sampler.
     val mainSamples = if (request.sampleMain) MainThreadSampleHistogram() else null
     var sampleMainActive = false // Guarded by the session monitor, like the histograms.
@@ -143,6 +148,30 @@ internal object FramePerformanceCapture {
   }
 
   fun stop(): Boolean = onMain { closeCurrent(); true }
+
+  fun settingsUiWorkEnabled(): Boolean = runCatching {
+    val s = current ?: return@runCatching false
+    synchronized(s) { current === s && s.closedAt == null && SystemClock.elapsedRealtime() < s.deadline }
+  }.getOrDefault(false)
+
+  fun beginSettingsUiWork(stage: SettingsUiWorkStage): SettingsUiWorkSpan? = settingsUiWorkProbe.begin(stage)
+  fun markSettingsUiWork(stage: SettingsUiWorkStage) = settingsUiWorkProbe.mark(stage)
+
+  private fun settingsUiWorkMeasurement(stage: SettingsUiWorkStage): SettingsUiWorkMeasurement? {
+    val s = current ?: return null
+    synchronized(s) {
+      if (current !== s || s.closedAt != null || SystemClock.elapsedRealtime() >= s.deadline) return null
+    }
+    return SettingsUiWorkMeasurement { durationNs ->
+      val now = SystemClock.elapsedRealtime()
+      synchronized(s) {
+        if (current === s && s.closedAt == null && now < s.deadline) {
+          s.settingsUiWork.record(stage, now - s.began, durationNs,
+              Looper.myLooper() === Looper.getMainLooper())
+        }
+      }
+    }
+  }
 
   /** The current preparation path is measured only for an explicitly active capture. */
   fun <T> measureSettingsSearchIndex(prepare: () -> List<T>): List<T> =
@@ -339,6 +368,7 @@ internal object FramePerformanceCapture {
           .put("attachFailures", s.attachFailures)
           .put("hosts", JSONObject().apply { s.histograms.forEach { (name, h) -> put(name, h.snapshot()) } })
       result.put("settingsSearchPreparation", s.settingsSearchPreparation.snapshot())
+      result.put("settingsUiWork", s.settingsUiWork.snapshot())
       s.mainSamples?.let { result.put("mainThreadSamples", it.snapshot()) }
     }
     // Sample only on explicit reads, outside the per-frame lock/handler.
