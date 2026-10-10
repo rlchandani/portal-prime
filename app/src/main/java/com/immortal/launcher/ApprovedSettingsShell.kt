@@ -136,14 +136,6 @@ internal fun ApprovedSettingsShell(
     val context = LocalContext.current
     val navigate = rememberApprovedSettingsNavigator()
     val localNavigation = LocalApprovedSettingsNavigate.current != null
-    val versionName by produceState<String?>(null, context.applicationContext) {
-        value = withContext(Dispatchers.IO) {
-            runCatching {
-                context.packageManager.getPackageInfo(context.packageName, 0).versionName
-            }.getOrNull()
-        }
-        FramePerformanceCapture.markSettingsUiWork(SettingsUiWorkStage.VERSION_PUBLISHED)
-    }
     val focus = LocalFocusManager.current
     val appliedAdvanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
     var query by remember { mutableStateOf("") }
@@ -305,11 +297,7 @@ internal fun ApprovedSettingsShell(
                                     modifier = Modifier.weight(1f))
                                 ApprovedSettingsSwitch(appliedAdvanced)
                             }
-                            Text(FleetConfig.name(context), color = IosLabel, fontSize = 22.sp,
-                                fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 10.dp))
-                            Text("${android.os.Build.MODEL} · Immortal${versionName?.let { " $it" }.orEmpty()}",
-                                color = IosSecondary, fontSize = 18.sp,
-                                modifier = Modifier.padding(top = 5.dp))
+                            ApprovedSettingsDeviceIdentity(FleetConfig.name(context))
                         }
                     }
                     Box(Modifier.width(1.dp).fillMaxHeight().background(IosDivider))
@@ -350,6 +338,25 @@ internal fun ApprovedSettingsShell(
         }
     }
     composition?.finish()
+}
+
+/** Version publication recomposes only these labels, not the category sidebar. */
+@Composable
+private fun ApprovedSettingsDeviceIdentity(deviceName: String) {
+    val context = LocalContext.current
+    val versionName by produceState<String?>(null, context.applicationContext) {
+        value = withContext(Dispatchers.IO) {
+            runCatching {
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName
+            }.getOrNull()
+        }
+        FramePerformanceCapture.markSettingsUiWork(SettingsUiWorkStage.VERSION_PUBLISHED)
+    }
+    Text(deviceName, color = IosLabel, fontSize = 22.sp,
+        fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 10.dp))
+    Text("${android.os.Build.MODEL} · Immortal${versionName?.let { " $it" }.orEmpty()}",
+        color = IosSecondary, fontSize = 18.sp,
+        modifier = Modifier.padding(top = 5.dp))
 }
 
 private class SettingsPane(initial: ApprovedSettingsDetail) {
