@@ -423,7 +423,10 @@ internal object FramePerformanceCapture {
   /** Live, expiring ownership state for repeated safety checks; no histograms or memory sampling. */
   fun stateSnapshot(): JSONObject = snapshot(includeMetrics = false)
 
-  private fun snapshot(includeMetrics: Boolean): JSONObject {
+  /** Same bounded promotion records as the full report, with ownership but no frame/memory reads. */
+  fun readinessSnapshot(): JSONObject = snapshot(includeMetrics = false, includeReadiness = true)
+
+  private fun snapshot(includeMetrics: Boolean, includeReadiness: Boolean = false): JSONObject {
     val s = current
     val now = SystemClock.elapsedRealtime()
     if (s != null && now >= s.deadline) synchronized(s) {
@@ -457,7 +460,10 @@ internal object FramePerformanceCapture {
           .put("collectorRunning", s.thread.isAlive).put("activeListeners", s.attached)
           .put("untrackedHosts", s.rejectedHosts).put("untrackedWindows", s.rejectedWindows)
           .put("attachFailures", s.attachFailures)
-      if (!includeMetrics) return result
+      if (!includeMetrics) {
+        if (includeReadiness) result.put("slideshowStyles", s.slideshowStyles.snapshot())
+        return result
+      }
       result.put("hosts", JSONObject().apply { s.histograms.forEach { (name, h) -> put(name, h.snapshot()) } })
       result.put("settingsSearchPreparation", s.settingsSearchPreparation.snapshot())
       result.put("settingsUiWork", s.settingsUiWork.snapshot())

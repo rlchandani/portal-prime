@@ -50,8 +50,8 @@ class FramePerformanceStateReadTest {
       Mockito.`when`(prefs.getString("token", null)).thenReturn("generated-test-token")
       return FleetRoutes(context)
     }
-    fun request(method: String = "GET", authenticated: Boolean = true) = FleetHttpServer.Request(
-        method, "/perf/state", "", if (authenticated) mapOf("authorization" to "Bearer generated-test-token") else emptyMap(),
+    fun request(method: String = "GET", authenticated: Boolean = true, query: String = "") = FleetHttpServer.Request(
+        method, "/perf/state", query, if (authenticated) mapOf("authorization" to "Bearer generated-test-token") else emptyMap(),
         ByteArrayInputStream(byteArrayOf()), 0)
   }
 
@@ -160,5 +160,72 @@ class FramePerformanceStateReadTest {
     assertEquals(405, response.status)
     assertEquals(0, f.clockReads)
     assertNull(f.current.get(FramePerformanceCapture))
+  }
+
+  @Test fun readinessRouteReturnsTheBoundedCurrentPromotionWithoutMemoryDiagnostics() = fixture { f ->
+    val session = f.session(41); f.select(session); f.now += 15
+    val samples = f.field(session, "slideshowStyles").get(session) as SlideshowStyleSamples
+    samples.record(SlideshowStyleHost.PREVIEW, SlideshowStyle.FILMSTRIP, 5, 10)
+    val response = f.routes().handle(f.request(query = "readiness=1"))
+    assertEquals(200, response.status)
+    val value = JSONObject(String(requireNotNull(response.jsonBytes), Charsets.UTF_8))
+    assertEquals(41L, value.getLong("sessionId"))
+    assertEquals(samples.snapshot().toString(), value.getJSONObject("slideshowStyles").toString())
+    f.assertLight(value)
+    assertFalse(f.state().has("slideshowStyles"))
+  }
+
+  @Test fun readinessRouteFollowsReplacementAndRetainsExpiredPromotionWithCleanupRequested() = fixture { f ->
+    val first = f.session(51); f.select(first)
+    val samples = f.field(first, "slideshowStyles").get(first) as SlideshowStyleSamples
+    samples.record(SlideshowStyleHost.PREVIEW, SlideshowStyle.FILMSTRIP, 5, 10)
+    fun read() = JSONObject(String(requireNotNull(
+        f.routes().handle(f.request(query = "readiness=1")).jsonBytes), Charsets.UTF_8))
+    assertEquals(1, read().getJSONObject("slideshowStyles").getInt("records"))
+    val second = f.session(52); f.select(second)
+    assertEquals(52L, read().getLong("sessionId"))
+    assertEquals(0, read().getJSONObject("slideshowStyles").getInt("records"))
+    (f.field(second, "slideshowStyles").get(second) as SlideshowStyleSamples)
+        .record(SlideshowStyleHost.PREVIEW, SlideshowStyle.MOSAIC, 5, 10)
+    f.now += 10_001
+    val expired = read()
+    assertFalse(expired.getBoolean("active"))
+    assertEquals(10_000L, expired.getLong("elapsedMs"))
+    assertEquals(1, expired.getJSONObject("slideshowStyles").getInt("records"))
+    assertEquals("mosaic", expired.getJSONObject("slideshowStyles").getJSONArray("events")
+        .getJSONObject(0).getString("style"))
+    assertTrue(f.field(second, "stopRequested").getBoolean(second))
+    f.assertLight(expired)
+  }
+
+  @Test fun defaultAndUnknownReadinessQueryKeepTheExistingMinimalResponse() = fixture { f ->
+    f.select(f.session())
+    for (query in listOf("", "readiness=0", "readiness=true", "readiness=other")) {
+      val response = f.routes().handle(f.request(query = query))
+      assertEquals(200, response.status)
+      val value = JSONObject(String(requireNotNull(response.jsonBytes), Charsets.UTF_8))
+      assertFalse(value.has("slideshowStyles"))
+      f.assertLight(value)
+    }
+  }
+
+  @Test fun readinessQueryCannotBypassAuthenticationOrTheReadOnlyMethodGuard() = fixture { f ->
+    val routes = f.routes()
+    assertEquals(401, routes.handle(f.request(authenticated = false, query = "readiness=1")).status)
+    assertEquals(405, routes.handle(f.request(method = "POST", query = "readiness=1")).status)
+    assertEquals(0, f.clockReads)
+    assertEquals(0, f.memoryReads)
+    assertNull(f.current.get(FramePerformanceCapture))
+  }
+
+  @Test fun readinessReadWithoutCaptureDoesNotConstructASessionOrSamples() = fixture { f ->
+    val response = f.routes().handle(f.request(query = "readiness=1"))
+    assertEquals(200, response.status)
+    val value = JSONObject(String(requireNotNull(response.jsonBytes), Charsets.UTF_8))
+    assertFalse(value.getBoolean("active"))
+    assertFalse(value.has("sessionId"))
+    assertFalse(value.has("slideshowStyles"))
+    assertNull(f.current.get(FramePerformanceCapture))
+    f.assertLight(value)
   }
 }
