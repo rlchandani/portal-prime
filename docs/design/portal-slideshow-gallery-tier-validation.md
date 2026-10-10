@@ -29,9 +29,9 @@ Bridge-to-Main admission delay reached 118 ms on Family and 75 ms on Living. Fam
 
 The previous shuffled run used different randomized compositions and content. Its lower or higher timings cannot establish matched-content regression or improvement. Each current device reported fewer than all twelve styles. Window timing components are not summed; command submission is not GPU execution. App PSS excludes the separate Chromium renderer and cannot establish leak-free behavior or immediate GPU-memory release.
 
-## Current next work
+## Follow-up validation
 
-Two isolated candidates are being evaluated: relocating Filmstrip brightness to its image child while preserving exact generated pixels, and releasing Ken Burns hidden-slot backgrounds/animation promotion only after the outgoing slot is fully transparent. Neither candidate is installed or performance-accepted at this boundary. They need independent review, integration checks and comparable physical-device validation.
+The subsequent [Ken Burns retirement and repeat report](portal-slideshow-ken-burns-validation.md) records reviewed correctness, exact generated pixels, and eight completed fixed-style captures. They do not establish a consistent performance improvement. The Filmstrip child-brightness candidate was rejected after 57 of 63 pixel comparisons differed and was never installed. A separate visible-resource preparation candidate is still being evaluated.
 
 Browser document readiness, complete settings/swipe flows, physical phone acceptance and longer stability remain open. The companion generated-component rerun is pending Pixel unlock; the earlier header failures were diagnosed as mismatched installed test-APK bytecode, and installing matching bytecode alone is not a passing UI result.
 
