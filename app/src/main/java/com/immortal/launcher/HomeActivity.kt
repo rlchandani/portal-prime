@@ -321,6 +321,7 @@ class HomeActivity : ComponentActivity() {
   private var launcherTab by mutableStateOf(ApprovedLauncherTab.HOME)
   private var appsSearchOpenRequest by mutableStateOf(0)
   private var pendingResumeIntent: Intent? = null
+  private var cancelWebViewStartup: (() -> Unit)? = null
 
   /** Read-only navigation diagnostics; never simulate Android lifecycle callbacks to read state. */
   internal fun approvedCurrentTab(): ApprovedLauncherTab = launcherTab
@@ -482,9 +483,16 @@ class HomeActivity : ComponentActivity() {
     // arm the touch-renewed "you have the device" session. SleepScheduler owns that policy.
     SleepScheduler.onReturnedToLauncher(this)
     ApprovedHomeNavigation.resumed(this)
+    if (BuildConfig.PORTAL_WEBVIEW_BACKGROUND_STARTUP) {
+      cancelWebViewStartup?.invoke()
+      cancelWebViewStartup =
+          WebViewStartupPreparation.scheduleForHome(applicationContext, window.decorView)
+    }
   }
 
   override fun onPause() {
+    cancelWebViewStartup?.invoke()
+    cancelWebViewStartup = null
     ApprovedHomeNavigation.unavailable(this)
     super.onPause()
     // Don't carry a pending overnight re-sleep into another activity or a real sleep.
@@ -492,6 +500,8 @@ class HomeActivity : ComponentActivity() {
   }
 
   override fun onDestroy() {
+    cancelWebViewStartup?.invoke()
+    cancelWebViewStartup = null
     ApprovedHomeNavigation.unavailable(this)
     super.onDestroy()
   }

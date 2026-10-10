@@ -36,6 +36,10 @@ android {
     versionName = "1.64"
     testInstrumentationRunner = "com.immortal.launcher.PortalUxInstrumentation"
 
+    // Controlled A/B candidate; normal builds keep WebView preparation dormant.
+    buildConfigField("boolean", "PORTAL_WEBVIEW_BACKGROUND_STARTUP",
+        (providers.gradleProperty("portalWebViewBackgroundStartup").orNull == "true").toString())
+
     // Portal hardware is ARM only (gen-1/gen-2 Snapdragon, Portal TV Amlogic).
     // Kept as a guard so any future native dependency can't drag x86/x86_64 .so
     // files no Portal can run into the APK.
@@ -109,7 +113,10 @@ android {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
-  buildFeatures { compose = true }
+  buildFeatures {
+    compose = true
+    buildConfig = true
+  }
 }
 
 dependencies {
@@ -122,6 +129,8 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.exifinterface)
   implementation(libs.androidx.lifecycle.runtime.ktx)
+  // Stable background-only startup API; minSdk 24, with supported legacy-provider fallback.
+  implementation("androidx.webkit:webkit:1.17.1")
   // Smooth drag-to-reorder + animated reflow for the home-screen app grid (Apache-2.0).
   implementation(libs.reorderable)
   debugImplementation(libs.androidx.compose.ui.tooling)

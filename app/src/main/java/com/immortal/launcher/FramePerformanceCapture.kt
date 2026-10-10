@@ -382,8 +382,14 @@ internal object FramePerformanceCapture {
         requestExpiry(s)
       }
     }
+    // This immutable state read never constructs a coordinator, executor or WebView.
+    val startup = WebViewStartupPreparation.snapshot()
     val result = JSONObject().put("ok", true).put("scope", "Immortal Window host metrics")
         .put("deliveredFpsMeasured", false).put("maxHosts", MAX_HOSTS).put("maxLiveWindows", MAX_WINDOWS)
+        .put("webViewBackgroundStartup", JSONObject()
+            .put("enabled", BuildConfig.PORTAL_WEBVIEW_BACKGROUND_STARTUP)
+            .put("pending", startup.pending).put("attempted", startup.attempted)
+            .put("completed", startup.completed).put("failed", startup.failed))
     if (s == null) return result.put("active", false).put("collectorRunning", false)
         .put("sampleMain", false).put("sampleMainActive", false).put("activeListeners", 0).put("hosts", JSONObject())
     synchronized(s) {
