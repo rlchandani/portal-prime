@@ -87,4 +87,51 @@ class SlideshowStyleCaptureTest {
     assertEquals(0L, f.samples(s).getLong("records"))
   }
 
+  private class SuspendedQueue(private val f: Fixture) {
+    var ownerCurrent = true
+    private val wrappers = mutableListOf<Runnable>()
+    val queue = PausableFrameCallbacks(clock = { f.now },
+        schedule = { wrapper, _ -> wrappers.add(wrapper); true },
+        cancel = { wrapper -> wrappers.removeAll { it === wrapper } })
+    val reporter = SlideshowStyleReporter(SlideshowStyleHost.PREVIEW,
+        prepare = FramePerformanceCapture::prepareSlideshowStyleReport,
+        postMain = { task -> queue.post { task() } }, isCurrent = { ownerCurrent })
+    fun drain() {
+      val pending = wrappers.toList(); wrappers.clear(); pending.forEach { it.run() }
+    }
+  }
+
+  @Test fun realPausedQueueResumePreservesOriginalReceiptAndIncludesSuspensionInAdmissionDelay() = fixture { f ->
+    val s = f.session(); f.select(s); val q = SuspendedQueue(f)
+    f.now += 20; q.reporter.receive("filmstrip"); q.queue.setActive(false)
+    assertEquals(1, q.queue.pendingCount)
+    f.now += 3_000; q.drain(); assertEquals(0L, f.samples(s).getLong("records"))
+    q.queue.setActive(true); q.drain(); q.drain()
+    val snapshot = f.samples(s); assertEquals(1L, snapshot.getLong("records"))
+    val event = snapshot.getJSONArray("events").getJSONObject(0)
+    assertEquals(20L, event.getLong("receivedElapsedMs")); assertEquals(3_020L, event.getLong("acceptedElapsedMs"))
+    assertEquals(3_000L, event.getLong("mainAdmissionDelayMs")); assertEquals(0, q.queue.pendingCount)
+  }
+
+  @Test fun realPausedQueueRejectsReportsAfterCaptureReplacementClosureExpiryOrOwnerRetirement() = fixture { f ->
+    for (change in listOf("replace", "close", "expire", "retire")) {
+      val first = f.session(); f.select(first); val q = SuspendedQueue(f)
+      q.reporter.receive("filmstrip"); q.queue.setActive(false)
+      val replacement = if (change == "replace") f.session().also { f.select(it) } else null
+      if (change == "close") f.close(first)
+      if (change == "expire") f.now += 10_001
+      if (change == "retire") q.ownerCurrent = false
+      q.queue.setActive(true); q.drain()
+      assertEquals(0L, f.samples(first).getLong("records"))
+      if (replacement != null) assertEquals(0L, f.samples(replacement).getLong("records"))
+    }
+  }
+
+  @Test fun closingTheRealPausedQueuePermanentlyDiscardsPendingStyleReport() = fixture { f ->
+    val s = f.session(); f.select(s); val q = SuspendedQueue(f)
+    q.reporter.receive("filmstrip"); q.queue.setActive(false); q.queue.close()
+    q.queue.setActive(true); q.drain()
+    assertEquals(0, q.queue.pendingCount); assertEquals(0L, f.samples(s).getLong("records"))
+  }
+
 }
