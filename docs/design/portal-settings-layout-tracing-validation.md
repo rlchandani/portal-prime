@@ -42,7 +42,7 @@ Both ten-entry cohorts completed with screensaver configuration and full setting
 
 ## Next measured candidate
 
-Replace only the bounded eight/nine-category lazy sidebar with a keyed scrolling Column, preserving category order, advanced gating, dimensions, focus/click actions and accessibility. This is supported by the measured sidebar cost and Android guidance to avoid lazy virtualization for collections of roughly one to ten items. It remains a hypothesis until a matched comparison confirms improvement; moving item composition out of measure is not itself proof of less total work.
+Replace only the bounded seven/eight-category lazy sidebar with a keyed scrolling Column, preserving category order, advanced gating, dimensions, focus/click actions and accessibility. This is supported by the measured sidebar cost and Android guidance to avoid lazy virtualization for collections of roughly one to ten items. It remains a hypothesis until a matched comparison confirms improvement; moving item composition out of measure is not itself proof of less total work.
 
 Reference: https://developer.android.com/agents/skills/jetpack-compose/jetpack-compose-performance/references/lazy-layouts
 
@@ -51,3 +51,7 @@ First-use search initialization, work outside shell boundaries, slideshow tail l
 ## Post-cohort navigation regression
 
 Both rooms passed five navigation cycles and 30 foreground checks each, including Apps from slideshow. A pin/cover/tap sequence returned to the identical existing Chromium window in both rooms. Returning Home cleared pin/cover and cleanup ownership settled; configuration stayed unchanged and collectors were inactive. Hide dispatch was8,560 microseconds Family /2,428 microseconds Living, not a visible latency measurement. No browser or photo content was exported.
+
+Source-count correction: ApprovedSettingsCategories defines seven normal categories and eight with Advanced enabled. The raw baseline observed eight item-composition invocations per entry; invocations are not, by themselves, a unique-category cardinality proof. Earlier 8/9 planning wording was inaccurate and is corrected in the sidebar candidate plan.
+
+The next candidate's completed repeated comparison and scoped functional/navigation results are recorded in [bounded sidebar validation](portal-settings-bounded-sidebar-validation.md). The root-phase sum is explicitly incomplete because the candidate records an extra sidebar composition round outside it.

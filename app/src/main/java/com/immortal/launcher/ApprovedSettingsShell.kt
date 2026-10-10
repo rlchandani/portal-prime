@@ -56,6 +56,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.CollectionItemInfo
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.collectionItemInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -150,6 +154,9 @@ internal fun ApprovedSettingsShell(
     val results = remember(searchIndex, query) { approvedSettingsSearch(searchIndex, query) }
     val palette = LocalApprovedPalette.current
     val displayedCategory = if (category == "advanced" && !appliedAdvanced) "device" else category
+    val sidebarCategories = remember(appliedAdvanced) {
+        ApprovedSettingsCategories.filter { it.id != "advanced" || appliedAdvanced }
+    }
 
     fun applyAdvanced(on: Boolean): Boolean {
         val applied = SettingsDomains.immortal.apply(context, JSONObject().put("advancedSettings", on))
@@ -247,17 +254,21 @@ internal fun ApprovedSettingsShell(
                                 }
                             }
                         }
-                        LazyColumn(
-                            Modifier.settingsUiWorkMeasure(SettingsUiWorkStage.SIDEBAR_MEASURE).weight(1f).fillMaxWidth().padding(top = 28.dp).focusGroup(),
+                        Column(
+                            Modifier.settingsUiWorkMeasure(SettingsUiWorkStage.SIDEBAR_MEASURE)
+                                .weight(1f).fillMaxWidth().padding(top = 28.dp).focusGroup()
+                                .verticalScroll(rememberScrollState())
+                                .semantics { collectionInfo = CollectionInfo(sidebarCategories.size, 1) },
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            items(ApprovedSettingsCategories.filter { it.id != "advanced" || appliedAdvanced },
-                                key = { it.id }) { item ->
+                            sidebarCategories.forEachIndexed { index, item ->
+                                key(item.id) {
                                     val itemComposition = FramePerformanceCapture.beginSettingsUiWork(
                                         SettingsUiWorkStage.SIDEBAR_ITEM_COMPOSITION)
                                     val selected = displayedCategory == item.id
                                     Row(
                                         Modifier.fillMaxWidth().height(76.dp)
+                                            .semantics { collectionItemInfo = CollectionItemInfo(index, 1, 0, 1) }
                                             .background(if (selected) IosFocusTint else Color.Transparent,
                                                 RoundedCornerShape(14.dp))
                                             .tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f,
@@ -276,6 +287,7 @@ internal fun ApprovedSettingsShell(
                                     }
                                     itemComposition?.finish()
                                 }
+                            }
                         }
                         Column(Modifier.padding(horizontal = 12.dp)) {
                             Spacer(Modifier.height(22.dp))
