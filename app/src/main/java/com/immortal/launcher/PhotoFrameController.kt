@@ -754,7 +754,12 @@ class PhotoFrameController(
                     is PhotoDreamService -> SlideshowStyleHost.DREAM
                     else -> SlideshowStyleHost.UNKNOWN
                   },
-                  prepare = FramePerformanceCapture::prepareSlideshowStyleReport,
+                  prepare = { host, style ->
+                    FramePerformanceCapture.prepareSlideshowStyleReport(host, style) {
+                      SlideshowLayerObservation(wv.layerType, wv.isHardwareAccelerated,
+                          wv.isAttachedToWindow, wv.width, wv.height)
+                    }
+                  },
                   postMain = { task -> ui.post { task() } },
                   isCurrent = { !stopped && owner == legacyEngineRevision && legacyFaceStore === faceStore &&
                       engineActive && webView === wv && hostActive && !paused })

@@ -60,6 +60,38 @@ class SlideshowStyleSamplesTest {
     assertEquals(0L, totals.getLong("previewRecords"))
   }
 
+  @Test fun invalidLayerStateCannotEnterDiagnosticsOrDiscardValidStyleReadiness() {
+    val s = SlideshowStyleSamples()
+    for (layer in listOf(
+        SlideshowLayerObservation(-1, true, true, 2160, 1440),
+        SlideshowLayerObservation(3, true, true, 2160, 1440),
+        SlideshowLayerObservation(2, true, true, -1, 1440),
+        SlideshowLayerObservation(2, true, true, 2160, 32_769)))
+      assertTrue(s.record(SlideshowStyleHost.PREVIEW, SlideshowStyle.FILMSTRIP, 0, 1, layer))
+    val snapshot = s.snapshot()
+    assertEquals(4L, snapshot.getLong("records"))
+    assertEquals(0L, snapshot.getLong("layerRecords"))
+    assertEquals(4L, snapshot.getLong("invalidLayerRecords"))
+    repeat(4) { assertFalse(snapshot.getJSONArray("events").getJSONObject(it).has("webViewLayer")) }
+  }
+
+  @Test fun boundedLayerSnapshotsAreDetachedAndContainOnlyFiveScalars() {
+    val s = SlideshowStyleSamples()
+    val layer = SlideshowLayerObservation(2, true, true, 2160, 1440)
+    repeat(SlideshowStyleSamples.MAX_RECORDS + 1) {
+      s.record(SlideshowStyleHost.PREVIEW, SlideshowStyle.FILMSTRIP, 0, 1, layer)
+    }
+    val snapshot = s.snapshot()
+    assertEquals(129L, snapshot.getLong("layerRecords"))
+    assertEquals(0L, snapshot.getLong("invalidLayerRecords"))
+    assertEquals(128, snapshot.getJSONArray("events").length())
+    val observed = snapshot.getJSONArray("events").getJSONObject(0).getJSONObject("webViewLayer")
+    assertEquals(setOf("layerType", "hardwareAccelerated", "attached", "widthPx", "heightPx"), observed.keys().asSequence().toSet())
+    observed.put("widthPx", 1)
+    assertEquals(2160, s.snapshot().getJSONArray("events").getJSONObject(0)
+        .getJSONObject("webViewLayer").getInt("widthPx"))
+  }
+
   @Test fun snapshotsAreDetachedFromTheStoredEvents() {
     val s = SlideshowStyleSamples()
     s.record(SlideshowStyleHost.UNKNOWN, SlideshowStyle.FRAMED, 0, 900_000)

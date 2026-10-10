@@ -164,7 +164,11 @@ internal object FramePerformanceCapture {
   }.getOrDefault(false)
 
   /** Select at bridge receipt; a queued Main callback cannot write into a later capture. */
-  fun prepareSlideshowStyleReport(host: SlideshowStyleHost, style: SlideshowStyle): SlideshowStyleReport? {
+  fun prepareSlideshowStyleReport(host: SlideshowStyleHost, style: SlideshowStyle): SlideshowStyleReport? =
+      prepareSlideshowStyleReport(host, style) { null }
+
+  fun prepareSlideshowStyleReport(host: SlideshowStyleHost, style: SlideshowStyle,
+      observeLayer: () -> SlideshowLayerObservation?): SlideshowStyleReport? {
     val s = current ?: return null
     val received = synchronized(s) {
       if (current !== s || s.closedAt != null) return null
@@ -173,11 +177,14 @@ internal object FramePerformanceCapture {
     val accepted = AtomicBoolean(false)
     return SlideshowStyleReport {
       if (accepted.compareAndSet(false, true)) {
-        val now = SystemClock.elapsedRealtime()
         synchronized(s) {
+          val now = SystemClock.elapsedRealtime()
           if (current === s && s.closedAt == null && now < s.deadline &&
               Looper.myLooper() === Looper.getMainLooper()) {
-            s.slideshowStyles.record(host, style, received - s.began, now - s.began)
+            // Read the owned view only on Main and only inside this admitted capture.
+            // Optional observation failure must not suppress the style readiness report.
+            val layer = runCatching(observeLayer).getOrNull()
+            s.slideshowStyles.record(host, style, received - s.began, now - s.began, layer)
           }
         }
       }
@@ -478,7 +485,9 @@ internal object FramePerformanceCapture {
     val runtime = Runtime.getRuntime()
     return result.put("memory", JSONObject().put("pssKiB", memory.totalPss)
         .put("nativeBytes", Debug.getNativeHeapAllocatedSize())
-        .put("javaBytes", runtime.totalMemory() - runtime.freeMemory()))
+        .put("javaBytes", runtime.totalMemory() - runtime.freeMemory())
+        .put("graphicsKiB", memory.getMemoryStat("summary.graphics")?.toLongOrNull()
+            ?.takeIf { it >= 0 } ?: JSONObject.NULL))
   }
 
   private fun onMain(action: () -> Boolean): Boolean {

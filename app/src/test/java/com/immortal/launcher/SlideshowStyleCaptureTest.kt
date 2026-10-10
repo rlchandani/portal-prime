@@ -13,6 +13,9 @@ import android.os.SystemClock
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mockito
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
 class SlideshowStyleCaptureTest {
   private class Fixture {
@@ -29,6 +32,8 @@ class SlideshowStyleCaptureTest {
     fun samples(session: Any) = (session.javaClass.getDeclaredField("slideshowStyles").apply { isAccessible = true }
         .get(session) as SlideshowStyleSamples).snapshot()
     fun report() = FramePerformanceCapture.prepareSlideshowStyleReport(SlideshowStyleHost.PREVIEW, SlideshowStyle.FILMSTRIP)
+    fun report(observeLayer: () -> SlideshowLayerObservation?) = FramePerformanceCapture.prepareSlideshowStyleReport(
+        SlideshowStyleHost.PREVIEW, SlideshowStyle.FILMSTRIP, observeLayer)
   }
   private fun fixture(block: (Fixture) -> Unit) {
     val f = Fixture()
@@ -85,6 +90,179 @@ class SlideshowStyleCaptureTest {
     val s = f.session(); f.select(s); val report = f.report(); assertNotNull(report)
     f.onMain = false; report!!.accept()
     assertEquals(0L, f.samples(s).getLong("records"))
+  }
+
+  @Test fun inactivePrepareDoesNotReadLayerSupplierOrClock() = fixture { f ->
+    var layerReads = 0
+    assertNull(f.report { layerReads++; null })
+    assertEquals(0, layerReads); assertEquals(0, f.clockReads)
+  }
+  @Test fun closedPrepareDoesNotReadLayerSupplierOrClock() = fixture { f ->
+    val s = f.session(); f.select(s); f.close(s); f.clockReads = 0
+    var layerReads = 0
+    assertNull(f.report { layerReads++; null })
+    assertEquals(0, layerReads); assertEquals(0, f.clockReads)
+    assertEquals(0L, f.samples(s).getLong("records"))
+  }
+  @Test fun expiredPrepareDoesNotReadLayerSupplierAtOrAfterDeadline() = fixture { f ->
+    for (elapsed in listOf(10_000L, 10_001L)) {
+      val s = f.session(); f.select(s); f.now += elapsed
+      var layerReads = 0
+      assertNull(f.report { layerReads++; null })
+      assertEquals(0, layerReads); assertEquals(0L, f.samples(s).getLong("records"))
+    }
+  }
+  @Test fun mainAcceptanceReadsLatestLayerStateOnceAndPreservesBridgeReceipt() = fixture { f ->
+    val s = f.session(); f.select(s)
+    var layer = SlideshowLayerObservation(layerType = 0, hardwareAccelerated = false,
+        attached = false, widthPx = 0, heightPx = 0)
+    var layerReads = 0
+    var observedOnMain = false
+    var observedAt = 0L
+    f.onMain = false; f.now += 5
+    val report = f.report {
+      layerReads++; observedOnMain = f.onMain; observedAt = f.now
+      layer
+    }
+    assertNotNull(report); assertEquals(0, layerReads)
+    assertEquals(0L, f.samples(s).getLong("records"))
+    layer = SlideshowLayerObservation(layerType = 2, hardwareAccelerated = true,
+        attached = true, widthPx = 1920, heightPx = 1080)
+    f.onMain = true; f.now += 20; report!!.accept()
+    assertEquals(1, layerReads); assertTrue(observedOnMain); assertEquals(f.now, observedAt)
+    layer = SlideshowLayerObservation(layerType = 1, hardwareAccelerated = false,
+        attached = false, widthPx = 640, heightPx = 480)
+    f.now += 30; report.accept()
+    assertEquals(1, layerReads)
+    val samples = f.samples(s); assertEquals(1L, samples.getLong("records"))
+    val events = samples.getJSONArray("events"); assertEquals(1, events.length())
+    val event = events.getJSONObject(0)
+    assertEquals("PhotoFramePreviewActivity", event.getString("host"))
+    assertEquals("filmstrip", event.getString("style"))
+    assertEquals(5L, event.getLong("receivedElapsedMs")); assertEquals(25L, event.getLong("acceptedElapsedMs"))
+    assertEquals(20L, event.getLong("mainAdmissionDelayMs"))
+    val observed = event.getJSONObject("webViewLayer")
+    assertEquals(2, observed.getInt("layerType")); assertTrue(observed.getBoolean("hardwareAccelerated"))
+    assertTrue(observed.getBoolean("attached"))
+    assertEquals(1920, observed.getInt("widthPx")); assertEquals(1080, observed.getInt("heightPx"))
+  }
+  @Test fun detachedLayerWithZeroBoundsIsStillRecorded() = fixture { f ->
+    val s = f.session(); f.select(s)
+    val report = f.report {
+      SlideshowLayerObservation(layerType = 0, hardwareAccelerated = false,
+          attached = false, widthPx = 0, heightPx = 0)
+    }
+    assertNotNull(report); report!!.accept()
+    val samples = f.samples(s); assertEquals(1L, samples.getLong("records"))
+    val observed = samples.getJSONArray("events").getJSONObject(0).getJSONObject("webViewLayer")
+    assertEquals(0, observed.getInt("layerType")); assertFalse(observed.getBoolean("hardwareAccelerated"))
+    assertFalse(observed.getBoolean("attached"))
+    assertEquals(0, observed.getInt("widthPx")); assertEquals(0, observed.getInt("heightPx"))
+  }
+  @Test fun captureReplacementRejectsAcceptanceBeforeReadingLayerSupplier() = fixture { f ->
+    val first = f.session(); val second = f.session(); f.select(first)
+    var layerReads = 0
+    val report = f.report { layerReads++; null }; assertNotNull(report)
+    assertEquals(0, layerReads)
+    f.select(second); report!!.accept(); report.accept()
+    assertEquals(0, layerReads)
+    assertEquals(0L, f.samples(first).getLong("records")); assertEquals(0L, f.samples(second).getLong("records"))
+  }
+  @Test fun captureClosureRejectsAcceptanceBeforeReadingLayerSupplier() = fixture { f ->
+    val s = f.session(); f.select(s)
+    var layerReads = 0
+    val report = f.report { layerReads++; null }; assertNotNull(report)
+    assertEquals(0, layerReads)
+    f.close(s); report!!.accept(); report.accept()
+    assertEquals(0, layerReads); assertEquals(0L, f.samples(s).getLong("records"))
+  }
+  @Test fun expiredAcceptanceRejectsBeforeReadingLayerSupplierAtOrAfterDeadline() = fixture { f ->
+    for (elapsed in listOf(10_000L, 10_001L)) {
+      val s = f.session(); f.select(s)
+      var layerReads = 0
+      val report = f.report { layerReads++; null }; assertNotNull(report)
+      assertEquals(0, layerReads)
+      f.now += elapsed; report!!.accept(); report.accept()
+      assertEquals(0, layerReads); assertEquals(0L, f.samples(s).getLong("records"))
+    }
+  }
+  @Test fun expiryWhileMainWaitsForSessionMonitorRejectsLayerObservation() = fixture { f ->
+    val s = f.session(); f.select(s)
+    var layerReads = 0
+    val report = f.report { layerReads++; null }; assertNotNull(report)
+    val caller = Thread.currentThread()
+    val monitorHeld = CountDownLatch(1)
+    val acceptanceStarting = CountDownLatch(1)
+    val workerFailure = AtomicReference<Throwable?>(null)
+    val holder = Thread({
+      try {
+        synchronized(s) {
+          monitorHeld.countDown()
+          check(acceptanceStarting.await(5, TimeUnit.SECONDS)) { "Main did not begin acceptance" }
+          val waitDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+          while (caller.state != Thread.State.BLOCKED) {
+            check(System.nanoTime() < waitDeadline) { "Main did not block on the session monitor" }
+            Thread.sleep(1)
+          }
+          // No mocked Android calls on this worker. Unlock publishes the clock advance to Main.
+          f.now += 10_001
+        }
+      } catch (failure: Throwable) {
+        workerFailure.set(failure)
+      }
+    }, "slideshow-style-monitor-contention").apply { isDaemon = true }
+    holder.start()
+    try {
+      assertTrue("Worker did not acquire the session monitor", monitorHeld.await(5, TimeUnit.SECONDS))
+      acceptanceStarting.countDown()
+      report!!.accept()
+    } finally {
+      acceptanceStarting.countDown()
+      holder.interrupt()
+      holder.join(5_000)
+      assertFalse("Session monitor worker did not terminate", holder.isAlive)
+    }
+    workerFailure.get()?.let { throw AssertionError("Session monitor coordination failed", it) }
+    assertEquals(0, layerReads)
+    assertEquals(0L, f.samples(s).getLong("records"))
+  }
+  @Test fun wrongThreadAcceptanceNeverReadsLayerSupplierEvenIfRetriedOnMain() = fixture { f ->
+    val s = f.session(); f.select(s)
+    var layerReads = 0
+    val report = f.report { layerReads++; null }; assertNotNull(report)
+    assertEquals(0, layerReads)
+    f.onMain = false; report!!.accept()
+    assertEquals(0, layerReads); assertEquals(0L, f.samples(s).getLong("records"))
+    f.onMain = true; report.accept()
+    assertEquals(0, layerReads); assertEquals(0L, f.samples(s).getLong("records"))
+  }
+  @Test fun nullLayerSupplierStillRecordsStyleOnceWithoutLayer() = fixture { f ->
+    val s = f.session(); f.select(s)
+    var layerReads = 0
+    val report = f.report { layerReads++; null }; assertNotNull(report)
+    assertEquals(0, layerReads)
+    report!!.accept(); report.accept()
+    assertEquals(1, layerReads)
+    val samples = f.samples(s); assertEquals(1L, samples.getLong("records"))
+    val events = samples.getJSONArray("events"); assertEquals(1, events.length())
+    val event = events.getJSONObject(0)
+    assertEquals("filmstrip", event.getString("style")); assertFalse(event.has("webViewLayer"))
+    assertEquals(1L, samples.getJSONObject("styles").getJSONObject("filmstrip").getLong("previewRecords"))
+  }
+  @Test fun failingLayerSupplierStillRecordsStyleOnceWithoutLayer() = fixture { f ->
+    val s = f.session(); f.select(s)
+    var layerReads = 0
+    val report = f.report { layerReads++; error("synthetic layer observation failure") }; assertNotNull(report)
+    assertEquals(0, layerReads)
+    f.now += 20; report!!.accept(); report.accept()
+    assertEquals(1, layerReads)
+    val samples = f.samples(s); assertEquals(1L, samples.getLong("records"))
+    val events = samples.getJSONArray("events"); assertEquals(1, events.length())
+    val event = events.getJSONObject(0)
+    assertEquals("PhotoFramePreviewActivity", event.getString("host"))
+    assertEquals("filmstrip", event.getString("style")); assertFalse(event.has("webViewLayer"))
+    assertEquals(0L, event.getLong("receivedElapsedMs")); assertEquals(20L, event.getLong("acceptedElapsedMs"))
+    assertEquals(1L, samples.getJSONObject("styles").getJSONObject("filmstrip").getLong("previewRecords"))
   }
 
   private class SuspendedQueue(private val f: Fixture) {

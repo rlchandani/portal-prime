@@ -27,25 +27,44 @@ internal enum class SlideshowStyleHost(val key: String) {
 
 internal fun interface SlideshowStyleReport { fun accept() }
 
+/** Scalar view state only; no Context, View, image identity or arbitrary text is retained. */
+internal data class SlideshowLayerObservation(
+    val layerType: Int,
+    val hardwareAccelerated: Boolean,
+    val attached: Boolean,
+    val widthPx: Int,
+    val heightPx: Int,
+) {
+  fun valid(): Boolean = layerType in 0..2 && widthPx in 0..32_768 && heightPx in 0..32_768
+  fun snapshot(): JSONObject = JSONObject().put("layerType", layerType)
+      .put("hardwareAccelerated", hardwareAccelerated).put("attached", attached)
+      .put("widthPx", widthPx).put("heightPx", heightPx)
+}
+
 /** Pure, bounded promotion observations. Caller serializes access. */
 internal class SlideshowStyleSamples {
   private data class Event(val host: SlideshowStyleHost, val style: SlideshowStyle,
-      val receivedElapsedMs: Long, val acceptedElapsedMs: Long)
+      val receivedElapsedMs: Long, val acceptedElapsedMs: Long, val layer: SlideshowLayerObservation?)
   private val events = ArrayList<Event>(MAX_RECORDS)
   private val counts = Array(SlideshowStyle.entries.size) { LongArray(SlideshowStyleHost.entries.size) }
   private var records = 0L
   private var invalidRecords = 0L
   private var discardedRecords = 0L
+  private var layerRecords = 0L
+  private var invalidLayerRecords = 0L
 
   fun record(host: SlideshowStyleHost, style: SlideshowStyle, receivedElapsedMs: Long,
-      acceptedElapsedMs: Long): Boolean {
+      acceptedElapsedMs: Long, layer: SlideshowLayerObservation? = null): Boolean {
     if (receivedElapsedMs !in 0L..900_000L || acceptedElapsedMs !in receivedElapsedMs..900_000L) {
       invalidRecords++
       return false
     }
+    val validLayer = layer?.takeIf { it.valid() }
+    if (layer != null && validLayer == null) invalidLayerRecords++
+    if (validLayer != null) layerRecords++
     records++
     counts[style.ordinal][host.ordinal]++
-    if (events.size < MAX_RECORDS) events.add(Event(host, style, receivedElapsedMs, acceptedElapsedMs))
+    if (events.size < MAX_RECORDS) events.add(Event(host, style, receivedElapsedMs, acceptedElapsedMs, validLayer))
     else discardedRecords++
     return true
   }
@@ -56,10 +75,13 @@ internal class SlideshowStyleSamples {
       .put("styleBeforeFirstReportKnown", false)
       .put("records", records).put("invalidRecords", invalidRecords)
       .put("discardedRecords", discardedRecords).put("maxRecords", MAX_RECORDS)
+      .put("layerRecords", layerRecords).put("invalidLayerRecords", invalidLayerRecords)
       .put("events", JSONArray().apply {
         for (event in events) put(JSONObject().put("host", event.host.key).put("style", event.style.wireId)
             .put("receivedElapsedMs", event.receivedElapsedMs).put("acceptedElapsedMs", event.acceptedElapsedMs)
-            .put("mainAdmissionDelayMs", event.acceptedElapsedMs - event.receivedElapsedMs))
+            .put("mainAdmissionDelayMs", event.acceptedElapsedMs - event.receivedElapsedMs).apply {
+              event.layer?.let { put("webViewLayer", it.snapshot()) }
+            })
       })
       .put("styles", JSONObject().apply {
         for (style in SlideshowStyle.entries) {
