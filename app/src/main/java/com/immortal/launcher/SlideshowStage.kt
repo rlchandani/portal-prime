@@ -44,6 +44,7 @@ internal class SlideshowStage(
   private var editOriginal: Presentation? = null
   private var editSnapshot: Composition.Snapshot? = null
   private var paused = false
+  private var hostActive = true
   var onPresented: (() -> Unit)? = null
   val currentPhoto: SlideshowPhoto? get() = shown?.photos?.firstOrNull()
   val photoCount: Int get() = shown?.photos?.size ?: 0
@@ -87,7 +88,7 @@ internal class SlideshowStage(
     val outgoing = current
     val layer = layers[incoming]
     layer.display(presentation, width, height)
-    if (paused) layer.pause()
+    if (paused || !hostActive) layer.pause()
     layer.visibility = View.VISIBLE
     layer.bringToFront()
     shown = presentation
@@ -114,13 +115,25 @@ internal class SlideshowStage(
         }
       })
       start()
+      if (!hostActive) pause()
     }
     onPresented?.invoke()
   }
 
   // Explicit navigation still completes its dissolve while paused, freeing the old slot.
   fun pause() { paused = true; layers.forEach { it.pause() } }
-  fun resume() { paused = false; layers.forEach { it.resume() } }
+  fun resume() { paused = false; if (hostActive) layers.forEach { it.resume() } }
+
+  /** A covered host freezes the dissolve too; explicit user pause still permits navigation. */
+  fun setHostActive(value: Boolean) {
+    if (hostActive == value) return
+    hostActive = value
+    if (!value) { fade?.pause(); layers.forEach { it.pause() } }
+    else {
+      fade?.resume()
+      if (!paused) layers.forEach { it.resume() }
+    }
+  }
 
   fun adjust(adjustment: SlideshowAdjustment?) {
     val old = shown ?: return
@@ -153,7 +166,7 @@ internal class SlideshowStage(
       shown = original
       layers[current].display(original, width, height)
       if (snapshot != null) layers[current].restore(snapshot, width, height)
-      if (paused) layers[current].pause()
+      if (paused || !hostActive) layers[current].pause()
       layers[current].alpha = 1f
     }
     own("edit", null)
@@ -181,7 +194,7 @@ internal class SlideshowStage(
     if (next != null) { present(next); own("pending", null) }
     else shown?.let {
       layers[current].display(it, w, h)
-      if (paused) layers[current].pause()
+      if (paused || !hostActive) layers[current].pause()
     }
   }
 

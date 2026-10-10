@@ -30,6 +30,9 @@ class FlipWebClockFaceView(
 ) : ClockFaceView {
 
   override val fullBleed: Boolean = true
+  private var hostActive = true
+  private var disposed = false
+  private var pageReady = false
 
   @SuppressLint("SetJavaScriptEnabled")
   private val web =
@@ -58,6 +61,13 @@ class FlipWebClockFaceView(
         }
         webViewClient =
             object : WebViewClient() {
+              override fun onPageFinished(view: WebView, url: String) {
+                if (disposed) return
+                pageReady = true
+                // A retained host can hide before the local page finishes loading.
+                if (!hostActive) applyHostActivity()
+              }
+
               override fun onReceivedError(
                   view: WebView,
                   request: android.webkit.WebResourceRequest,
@@ -76,7 +86,48 @@ class FlipWebClockFaceView(
     // The HTML self-ticks; nothing to push from here.
   }
 
+  override fun setHostActive(active: Boolean) {
+    if (disposed || hostActive == active) return
+    hostActive = active
+    if (active) web.onResume() else web.onPause()
+    if (pageReady) applyHostActivity()
+  }
+
+  private fun applyHostActivity() {
+    // onPause() alone does not stop JavaScript timers. Touch only this clock page's interval
+    // and CSS animations; WebView.pauseTimers() would also freeze unrelated WebViews.
+    web.evaluateJavascript(
+        """
+        (function() {
+          if (typeof mainTimer === 'undefined' || !document.body) return;
+          clearInterval(mainTimer);
+          mainTimer = null;
+          clearTimeout(hoverTimer);
+          var style = document.getElementById('immortal-host-suspension');
+          if ($hostActive) {
+            if (style) style.remove();
+            // Reuse the page's initial paint path to discard a partially flipped old minute.
+            dsphur = null;
+            dspmin = null;
+            document.body.dispatchEvent(new CustomEvent('_updateTime'));
+            mainTimer = setInterval(function() {
+              document.body.dispatchEvent(new CustomEvent('_updateTime'));
+            }, 250);
+          } else if (!style) {
+            style = document.createElement('style');
+            style.id = 'immortal-host-suspension';
+            style.textContent =
+              '.flip,.flip::before,.flip::after{animation-play-state:paused!important}';
+            document.head.appendChild(style);
+          }
+        })();
+        """.trimIndent(),
+        null)
+  }
+
   override fun dispose() {
+    if (disposed) return
+    disposed = true
     runCatching {
       web.stopLoading()
       web.destroy()

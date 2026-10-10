@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import kotlin.math.abs
 
 /**
@@ -52,6 +53,10 @@ class FaceRenderer(
   private val io = Executors.newSingleThreadExecutor()
   private val ui = Handler(Looper.getMainLooper())
   private val assets = AssetResolver(context)
+  private val work = FaceRendererWorkState()
+  private var weatherRequest: Future<*>? = null
+  private var artRequest: Future<*>? = null
+  private var artRequestId = 0L
 
   private var face: Face = Face("immortal-classic")
 
@@ -124,7 +129,8 @@ class FaceRenderer(
   private var npArt: ImageView? = null
   private var npTitle: TextView? = null
   private var npArtist: TextView? = null
-  private var lastArtUrl: String = ""
+  // null means unbound/retry; an empty URL means the current track has no artwork.
+  private var lastArtUrl: String? = null
   private var lastArtBitmap: Bitmap? = null
   private var npListener: NowPlayingHub.Listener? = null
 
@@ -135,23 +141,57 @@ class FaceRenderer(
   private var captionDate: TextView? = null
 
   fun start(face: Face) {
+    if (!work.start()) return
     this.face = face
     antiBurnInOn = ScreensaverConfig.load(context).antiBurnIn
     buildOverlay()
+    if (work.isActive) resumeHostWork()
+  }
+
+  /**
+   * Suspend owned work while the host is hidden, retaining every overlay view. Main thread only;
+   * independent of the user's playback pause. May be set before [start]; [stop] remains terminal.
+   */
+  fun setHostActive(active: Boolean) {
+    if (!work.setHostActive(active)) return
+    if (work.isActive) resumeHostWork() else suspendHostWork()
+  }
+
+  private fun resumeHostWork() {
+    val token = work.token() ?: return
+    clockFace?.setHostActive(true)
     tick.run()
     refreshWeather.run()
-    // Now-playing is independent of the face (see buildOverlay): subscribe whenever the user has
-    // the setting on, so music shows on every face — even the full-bleed flip clock.
-    if (ScreensaverConfig.load(context).showNowPlaying) {
-      npListener = NowPlayingHub.Listener { state -> ui.post { updateNowPlaying(state) } }
+    if (nowPlayingCard != null && npListener == null) {
+      npListener = NowPlayingHub.Listener {
+        if (work.isCurrent(token)) ui.post {
+          // A detached listener may still be in a publisher's snapshot. Read the latest track
+          // here so a queued replay cannot overwrite newer state.
+          if (work.isCurrent(token)) updateNowPlaying(NowPlayingHub.current)
+        }
+      }
       NowPlayingHub.addListener(npListener!!)
+      updateNowPlaying(NowPlayingHub.current)
     }
   }
 
-  fun stop() {
+  private fun suspendHostWork() {
     ui.removeCallbacksAndMessages(null)
     npListener?.let { NowPlayingHub.removeListener(it) }
     npListener = null
+    weatherRequest?.cancel(true)
+    weatherRequest = null
+    // A discarded download must be retried on resume even if the track's URL did not change.
+    if (artRequest != null) lastArtUrl = null
+    cancelArtRequest()
+    clockFace?.setHostActive(false)
+    timerThumb?.animate()?.cancel()
+  }
+
+  /** Permanently release this renderer; neither [start] nor [setHostActive] can restart it. */
+  fun stop() {
+    if (!work.stop()) return
+    suspendHostWork()
     clockFace?.dispose()
     io.shutdownNow()
   }
@@ -304,6 +344,7 @@ class FaceRenderer(
    * Forgiving by design: a horizontal drag anywhere moves the thumb, and sliding ~80% silences it.
    */
   fun handleAlarmTouch(ev: MotionEvent): Boolean {
+    if (!work.isActive) return false
     val overlay = timerAlarmOverlay ?: return false
     if (overlay.visibility != View.VISIBLE) return false
     val thumb = timerThumb ?: return true
@@ -342,6 +383,7 @@ class FaceRenderer(
   private fun buildClockCluster(clock: ClockSpec) {
     val made = makeClockFace(context, clock, assets)
     clockFace = made
+    made.setHostActive(work.hostActive)
     made.update(Date(), blinkOn)
 
     // A full-bleed clock (WebView) is its own full-screen layer that positions itself; it sits
@@ -455,10 +497,12 @@ class FaceRenderer(
 
   /** Reflect the latest now-playing state (main thread). Mirrors the original behaviour. */
   private fun updateNowPlaying(s: NowPlayingState?) {
+    val token = work.token() ?: return
     val card = nowPlayingCard ?: return
     if (s == null || !s.active) {
+      cancelArtRequest()
       card.visibility = View.GONE
-      lastArtUrl = ""
+      lastArtUrl = null
       lastArtBitmap = null
       return
     }
@@ -470,23 +514,40 @@ class FaceRenderer(
     val bitmap = s.artBitmap
     if (bitmap != null) {
       if (bitmap !== lastArtBitmap) {
+        cancelArtRequest()
         lastArtBitmap = bitmap
-        lastArtUrl = ""
+        lastArtUrl = null
         art.visibility = View.VISIBLE
         art.setImageBitmap(bitmap)
       }
-    } else if (s.artUrl != lastArtUrl) {
+    } else if (s.artUrl != lastArtUrl || lastArtBitmap != null) {
+      cancelArtRequest()
       lastArtBitmap = null
       lastArtUrl = s.artUrl
       art.setImageBitmap(null)
       val want = s.artUrl
       art.visibility = if (want.isNotBlank()) View.VISIBLE else View.GONE
-      if (want.isNotBlank())
-          io.execute {
-            val bmp = runCatching { downloadBitmap(want) }.getOrNull()
-            ui.post { if (lastArtUrl == want) art.setImageBitmap(bmp) }
+      if (want.isNotBlank()) {
+        val requestId = artRequestId
+        artRequest = io.submit {
+          if (!work.isCurrent(token) || Thread.currentThread().isInterrupted) return@submit
+          val bmp = runCatching { downloadBitmap(want) }.getOrNull()
+          if (!work.isCurrent(token) || Thread.currentThread().isInterrupted) return@submit
+          ui.post {
+            if (work.isCurrent(token) && artRequestId == requestId && lastArtUrl == want) {
+              artRequest = null
+              art.setImageBitmap(bmp)
+            }
           }
+        }
+      }
     }
+  }
+
+  private fun cancelArtRequest() {
+    artRequestId++
+    artRequest?.cancel(true)
+    artRequest = null
   }
 
   /**
@@ -536,6 +597,7 @@ class FaceRenderer(
    * face).
    */
   fun setCaption(place: String?, date: String?, memory: String? = null) {
+    if (work.isStopped) return
     val col = captionPanel ?: return
     val p = place?.takeIf { it.isNotBlank() }
     val d = date?.takeIf { it.isNotBlank() }
@@ -563,6 +625,7 @@ class FaceRenderer(
   private val tick =
       object : Runnable {
         override fun run() {
+          if (!work.isActive) return
           val now = Date()
           blinkOn = !blinkOn
           clockFace?.update(now, blinkOn)
@@ -612,9 +675,19 @@ class FaceRenderer(
   private val refreshWeather =
       object : Runnable {
         override fun run() {
-          io.execute {
-            val w = Weather.fetch(context)
-            if (w.isNotBlank()) weatherText = w
+          val token = work.token() ?: return
+          if (weatherRequest == null) {
+            weatherRequest = io.submit {
+              if (!work.isCurrent(token) || Thread.currentThread().isInterrupted) return@submit
+              val w = runCatching { Weather.fetch(context) }.getOrDefault("")
+              if (!work.isCurrent(token) || Thread.currentThread().isInterrupted) return@submit
+              ui.post {
+                if (work.isCurrent(token)) {
+                  weatherRequest = null
+                  if (w.isNotBlank()) weatherText = w
+                }
+              }
+            }
           }
           ui.postDelayed(this, weatherRefreshMs)
         }

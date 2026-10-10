@@ -37,6 +37,8 @@ import androidx.core.view.WindowInsetsControllerCompat
 class PhotoFramePreviewActivity : ComponentActivity() {
   private lateinit var frame: PhotoFrameController
   private var powerReceiver: BroadcastReceiver? = null
+  private var screenReceiver: BroadcastReceiver? = null
+  private var hostStarted = false
 
   // Read from the *latest* intent (onCreate or onNewIntent), never captured in a closure:
   // this activity is singleTask, so a relaunch while the frame is already up reuses the live
@@ -122,6 +124,14 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     setContentView(frame.view)
     ImmortalDreamNavigation.attached(this)
     frame.start()
+    screenReceiver = object : BroadcastReceiver() {
+      override fun onReceive(context: Context, intent: Intent) { updateHostVisibility() }
+    }
+    androidx.core.content.ContextCompat.registerReceiver(this, screenReceiver,
+        IntentFilter().apply {
+          addAction(Intent.ACTION_SCREEN_ON)
+          addAction(Intent.ACTION_SCREEN_OFF)
+        }, androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED)
 
     if (nightClock) {
       // The clock stays up all window (no idle screen-off); just watch for the window to end.
@@ -158,6 +168,29 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     Log.i(TAG, "onNewIntent (reused instance): launchDismiss=$launchDismissOnExit")
   }
 
+  override fun onStart() {
+    super.onStart()
+    hostStarted = true
+    updateHostVisibility()
+  }
+
+  override fun onPause() {
+    if (this::frame.isInitialized) frame.retainVideoPosition()
+    super.onPause()
+  }
+
+  override fun onStop() {
+    hostStarted = false
+    updateHostVisibility()
+    super.onStop()
+  }
+
+  private fun updateHostVisibility() {
+    if (!this::frame.isInitialized) return
+    val power = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+    frame.setHostActive(hostStarted && power.isInteractive)
+  }
+
   private fun applyKeepScreenOn() {
     val cfg = ScreensaverConfig.load(this)
     val keep =
@@ -182,6 +215,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   override fun onDestroy() {
     ImmortalDreamNavigation.detached(this)
     powerReceiver?.let { runCatching { unregisterReceiver(it) } }
+    screenReceiver?.let { runCatching { unregisterReceiver(it) } }
     nightWatch.removeCallbacks(nightWatchTick)
     if (this::frame.isInitialized) frame.stop()
     super.onDestroy()

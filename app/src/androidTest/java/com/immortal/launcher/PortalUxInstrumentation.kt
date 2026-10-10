@@ -41,6 +41,11 @@ class PortalUxInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         try {
+            if (options.getString("command") == "retainedPreview") {
+                val retained = RetainedPreviewDeviceChecks.run(this)
+                finish(if (retained.getBoolean("retainedPreviewCompleted")) 0 else 1, retained)
+                return
+            }
             val automation = getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
             automation.serviceInfo = automation.serviceInfo.apply {
                 flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS

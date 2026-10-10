@@ -31,7 +31,9 @@
 <script>
 (async function () {
   const stage = document.getElementById("stage"), startupAt = performance.now();
-  let engine = null, closed = false, requestedPause = false, clockTimer = null, readyLogged = false;
+  let engine = null, closed = false,
+      requestedPause = new URLSearchParams(location.search).get("hostPaused") === "1",
+      clockTimer = null, readyLogged = false;
   // Available during initial dimension measurement. This bridge belongs only to this asset page.
   window.immortalSlideshow = {
     next: () => engine && !closed ? engine.next() : false,

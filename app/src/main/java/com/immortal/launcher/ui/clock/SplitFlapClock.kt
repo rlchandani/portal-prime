@@ -45,6 +45,9 @@ class SplitFlapClockFaceView(
     // flip progress per digit: 0f = idle, 0..1f = flipping
     private val flipProgress    = FloatArray(4) { 0f }
     private val animators       = arrayOfNulls<ValueAnimator>(4)
+    private var hostActive = true
+    private var disposed = false
+    private var refreshImmediately = false
 
     private val cardPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = CardDeep.toArgb()
@@ -160,7 +163,16 @@ class SplitFlapClockFaceView(
     }
 
     override fun update(now: Date, blinkOn: Boolean) {
+        if (!hostActive || disposed) return
         val digits = timeFmt.format(now).toCharArray()
+        if (refreshImmediately) {
+            // Hidden time is not an animation backlog: show the current minute on the first tick.
+            digits.copyInto(displayedDigits)
+            digits.copyInto(pendingDigits)
+            refreshImmediately = false
+            view.invalidate()
+            return
+        }
         for (i in 0..3) {
             if (digits[i] != displayedDigits[i] && flipProgress[i] == 0f) {
                 flipDigit(i, digits[i])
@@ -168,7 +180,26 @@ class SplitFlapClockFaceView(
         }
     }
 
+    override fun setHostActive(active: Boolean) {
+        if (disposed || hostActive == active) return
+        hostActive = active
+        refreshImmediately = true
+        if (!active) cancelFlips()
+    }
+
+    private fun cancelFlips() {
+        for (i in animators.indices) {
+            animators[i]?.cancel()
+            animators[i] = null
+            displayedDigits[i] = pendingDigits[i]
+            flipProgress[i] = 0f
+        }
+    }
+
     override fun dispose() {
-        animators.forEach { it?.cancel() }
+        if (disposed) return
+        disposed = true
+        hostActive = false
+        cancelFlips()
     }
 }

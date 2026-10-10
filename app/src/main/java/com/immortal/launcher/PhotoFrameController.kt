@@ -7,6 +7,8 @@
 
 package com.immortal.launcher
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -17,8 +19,6 @@ import android.graphics.Matrix
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
-import android.os.Handler
-import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.text.TextUtils
 import android.util.Log
@@ -85,7 +85,7 @@ class PhotoFrameController(
   // A separate single-thread executor for caption work (EXIF read + the reverse-geocode
   // network call), so an 8s geocode lookup can never stall the image-decode pipeline on [io].
   private val metaIo = Executors.newSingleThreadExecutor()
-  private val ui = Handler(Looper.getMainLooper())
+  private val ui = PausableFrameCallbacks()
 
   private lateinit var photo: ImageView
   // Second photo layer for crossfade transitions. Sits behind [photo] in the z-order;
@@ -98,7 +98,7 @@ class PhotoFrameController(
   private lateinit var nativeStage: SlideshowStage
   private val pixelBudget = SlideshowPixelBudget()
   private val nativeLoaderDelegate = lazy {
-    SlideshowLoader(context, pixelBudget, onCancelTransports = { cancelPhotoTransports() })
+    SlideshowLoader(context, pixelBudget, onCancelTransports = { cancelPhotoTransports() }, ui = ui)
   }
   private val nativeLoader get() = nativeLoaderDelegate.value
   private var legacyFaceStore: FaceFocusStore? = null
@@ -107,7 +107,11 @@ class PhotoFrameController(
   private var nativeStarting = false
   private var afterNativeStartup: (() -> Unit)? = null
   private var videoReady = false
-  private var paused = false
+  private var paused = false // User choice; covering the host must never overwrite it.
+  @Volatile private var hostActive = true
+  private var hostSuspendedAt = 0L
+  private var retainedVideoPosition = 0
+  private var photoFade: AnimatorSet? = null
   private var holdDeadline = 0L
   private var remainingHold = 0L
   private var nativeFailures = 0
@@ -362,7 +366,9 @@ class PhotoFrameController(
     // always-on dream process is never put at risk.
     if (settings.gestureWave) {
       runCatching {
-        gestureCamera = GestureCamera(context) { ui.post { runCatching { next() } } }.also { it.start() }
+        gestureCamera = GestureCamera(context) {
+          if (hostActive && !stopped) ui.post { if (hostActive && !stopped) runCatching { next() } }
+        }.also { it.start() }
       }
     }
 
@@ -604,13 +610,19 @@ class PhotoFrameController(
       loadWithOverviewMode = true
       useWideViewPort = true
     }
-    wv.webViewClient = android.webkit.WebViewClient() // keep navigation inside the WebView
+    wv.webViewClient = object : android.webkit.WebViewClient() {
+      override fun onPageFinished(v: android.webkit.WebView, url: String) {
+        if (!stopped && webView === v && !hostActive) v.onPause()
+      }
+    } // Keep navigation inside this retained document.
+
     (view as FrameLayout).addView(wv, FrameLayout.LayoutParams(MATCH, MATCH))
     // pauseTimers() is process-wide; resume any suspension left by an older frame lifecycle.
     wv.resumeTimers()
     wv.onResume()
-    wv.loadUrl(url)
     webView = wv
+    wv.loadUrl(url)
+    if (!hostActive) wv.onPause()
   }
 
   /**
@@ -655,12 +667,16 @@ class PhotoFrameController(
     // need auth headers are intercepted and re-fetched with those headers; everything else (incl.
     // local file:// and the engine's own assets) falls through to normal loading.
     wv.webViewClient =
-        if (authHeaders.isEmpty()) android.webkit.WebViewClient()
-        else object : android.webkit.WebViewClient() {
+        object : android.webkit.WebViewClient() {
+          override fun onPageFinished(v: android.webkit.WebView, url: String) {
+            if (!stopped && webView === v) applyEnginePlayback(v)
+          }
+
           override fun shouldInterceptRequest(
               v: android.webkit.WebView,
               req: android.webkit.WebResourceRequest,
           ): android.webkit.WebResourceResponse? {
+            if (authHeaders.isEmpty()) return null
             val u = req.url
             val scheme = u.scheme?.lowercase()
             if (scheme != "http" && scheme != "https") return null
@@ -771,12 +787,69 @@ class PhotoFrameController(
     // Resume before loading: dimension measurement, image admission and promotion need JS timers.
     wv.resumeTimers()
     wv.onResume()
-    wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1&v=$assetVer")
     webView = wv
+    val initiallyPaused = if (hostActive && !paused) 0 else 1
+    wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1&v=$assetVer&hostPaused=$initiallyPaused")
+    if (!hostActive) wv.onPause()
   }
 
   /** True once the engine WebView has been created (so ticks/crossfade paths bail out). */
   private var engineActive = false
+
+  /** Suspend a retained host without destroying its photo, WebView, or user pause choice. */
+  @androidx.annotation.MainThread
+  fun setHostActive(value: Boolean) {
+    if (stopped || hostActive == value) return
+    val now = android.os.SystemClock.uptimeMillis()
+    if (!value) {
+      hostSuspendedAt = now
+      hostActive = false
+      ui.setActive(false)
+      if (videoView.visibility == View.VISIBLE) {
+        retainVideoPosition()
+        runCatching { videoView.pause() }
+      }
+      kenBurns?.pause(); kenBurnsBack?.pause(); photoFade?.pause()
+      nativeStage.setHostActive(false)
+      faceRenderer.setHostActive(false)
+      webView?.let { wv ->
+        if (engineActive) applyEnginePlayback(wv)
+        wv.onPause()
+      }
+    } else {
+      // The callback queue freezes delays. Keep the viewer's pause deadline on that same clock.
+      if (holdDeadline > 0L) holdDeadline += now - hostSuspendedAt
+      hostActive = true
+      webView?.let { wv ->
+        wv.onResume()
+        if (engineActive) applyEnginePlayback(wv)
+      }
+      nativeStage.setHostActive(true)
+      kenBurns?.resume(); kenBurnsBack?.resume(); photoFade?.resume()
+      faceRenderer.setHostActive(true)
+      if (videoView.visibility == View.VISIBLE) {
+        if (retainedVideoPosition > 0) videoView.seekTo(retainedVideoPosition)
+        retainedVideoPosition = 0
+        if (!paused) runCatching { videoView.start() }
+      }
+      ui.setActive(true)
+    }
+  }
+
+  /** Capture before Android tears down VideoView's surface; onStop may be too late. */
+  fun retainVideoPosition() {
+    if (stopped || !this::videoView.isInitialized || videoView.visibility != View.VISIBLE) return
+    val position = runCatching { videoView.currentPosition }.getOrDefault(0)
+    if (position > 0) retainedVideoPosition = position
+  }
+
+  private fun playbackUptime(): Long =
+      if (hostActive) android.os.SystemClock.uptimeMillis() else hostSuspendedAt
+
+  private fun applyEnginePlayback(wv: android.webkit.WebView) {
+    val action = if (hostActive && !paused) "resume" else "pause"
+    wv.evaluateJavascript("window.immortalSlideshow?.$action()", null)
+  }
 
   fun stop() {
     stopped = true
@@ -795,7 +868,7 @@ class PhotoFrameController(
     webView?.let { runCatching { it.onPause() } }
     scaledCache.cancel() // don't keep burning CPU on copies while Home redraws
     ui.removeCallbacks(dashboardCycle)
-    ui.removeCallbacksAndMessages(null)
+    ui.close()
     runCatching { gestureCamera?.stop() }
     gestureCamera = null
     // TTS stop/shutdown is an IPC round-trip to the system TTS service, and soundscape.stop() can
@@ -809,6 +882,9 @@ class PhotoFrameController(
       runCatching { ttsRef?.shutdown() }
       runCatching { soundscape.stop() }
     }.start()
+    photoFade?.removeAllListeners()
+    photoFade?.cancel()
+    photoFade = null
     cancelKenBurns()
     faceRenderer.stop()
     if (this::videoView.isInitialized) runCatching { videoView.stopPlayback() }
@@ -1437,7 +1513,7 @@ class PhotoFrameController(
 
   private fun armHold(task: Runnable, delay: Long = intervalMs()) {
     ui.removeCallbacks(task)
-    holdDeadline = android.os.SystemClock.uptimeMillis() + delay
+    holdDeadline = playbackUptime() + delay
     remainingHold = delay
     if (!paused && !stopped) ui.postDelayed(task, delay)
   }
@@ -1446,13 +1522,13 @@ class PhotoFrameController(
     if (paused == value) return
     paused = value
     if (value) {
-      remainingHold = (holdDeadline - android.os.SystemClock.uptimeMillis()).coerceAtLeast(100L)
+      remainingHold = (holdDeadline - playbackUptime()).coerceAtLeast(100L)
       ui.removeCallbacks(localTick); ui.removeCallbacks(remoteTick); ui.removeCallbacks(rotate)
       nativeStage.pause()
       if (videoView.visibility == View.VISIBLE) runCatching { videoView.pause() }
     } else {
       nativeStage.resume()
-      if (videoView.visibility == View.VISIBLE) runCatching { videoView.start() }
+      if (hostActive && videoView.visibility == View.VISIBLE) runCatching { videoView.start() }
       val tick = when { localMode -> localTick; remoteMode -> remoteTick; else -> rotate }
       armHold(tick, remainingHold.coerceAtLeast(100L))
     }
@@ -1718,17 +1794,22 @@ class PhotoFrameController(
             mp.setOnVideoSizeChangedListener { _, w, h -> if (g == gen) applyVideoFit(w, h) }
             if (g == gen) {
               applyVideoFit(mp.videoWidth, mp.videoHeight)
-              if (!paused) videoView.start()
+              if (hostActive && !paused && !stopped) {
+                if (retainedVideoPosition > 0) videoView.seekTo(retainedVideoPosition)
+                videoView.start()
+              }
             }
           }
           videoView.setOnCompletionListener {
-            if (g == gen && !stopped) {
-              if (!videoReady) nativeNavigation.skipFailed()
-              advanceLocal(+1)
+            ui.post {
+              if (g == gen && !stopped) {
+                if (!videoReady) nativeNavigation.skipFailed()
+                advanceLocal(+1)
+              }
             }
           }
           videoView.setOnErrorListener { _, _, _ ->
-            failed()
+            ui.post { failed() }
             true
           }
           videoView.setVideoPath(path)
@@ -1778,6 +1859,7 @@ class PhotoFrameController(
   }
 
   private fun stopVideo() {
+    retainedVideoPosition = 0
     if (this::videoView.isInitialized && videoView.visibility != View.GONE) {
       runCatching { videoView.stopPlayback() }
       videoView.visibility = View.GONE
@@ -2014,17 +2096,22 @@ class PhotoFrameController(
             mp.setOnVideoSizeChangedListener { _, w, h -> if (g == gen) applyVideoFit(w, h) }
             if (g == gen) {
               applyVideoFit(mp.videoWidth, mp.videoHeight)
-              if (!paused) videoView.start()
+              if (hostActive && !paused && !stopped) {
+                if (retainedVideoPosition > 0) videoView.seekTo(retainedVideoPosition)
+                videoView.start()
+              }
             }
           }
           videoView.setOnCompletionListener {
-            if (g == gen && !stopped) {
-              if (!videoReady) nativeNavigation.skipFailed()
-              advanceRemote(+1)
+            ui.post {
+              if (g == gen && !stopped) {
+                if (!videoReady) nativeNavigation.skipFailed()
+                advanceRemote(+1)
+              }
             }
           }
           videoView.setOnErrorListener { _, _, _ ->
-            failed()
+            ui.post { failed() }
             true
           }
           videoView.setVideoURI(uri, headers)
@@ -2242,23 +2329,25 @@ class PhotoFrameController(
 
     // Crossfade: fade the incoming layer in while the outgoing layer fades out over 1 500 ms.
     val crossfadeDuration = 1_500L
-    backView.animate()
-        .alpha(1f)
-        .setDuration(crossfadeDuration)
-        .setInterpolator(AccelerateDecelerateInterpolator())
-        .start()
-    frontView.animate()
-        .alpha(0f)
-        .setDuration(crossfadeDuration)
-        .setInterpolator(AccelerateDecelerateInterpolator())
-        .withEndAction {
-          // After the crossfade the old front is transparent — clear its bitmap to free
-          // memory; it will receive the next incoming image on the next show() call.
+    photoFade?.removeAllListeners()
+    photoFade?.cancel()
+    val fade = AnimatorSet().apply {
+      playTogether(ObjectAnimator.ofFloat(backView, View.ALPHA, 1f),
+          ObjectAnimator.ofFloat(frontView, View.ALPHA, 0f))
+      duration = crossfadeDuration
+      interpolator = AccelerateDecelerateInterpolator()
+      addListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator) {
+          if (stopped || photoFade !== animation) return
           frontView.setImageDrawable(null)
-          // Flip the role flag so the next call to show() uses the correct layers.
           photoBackIsFront = !photoBackIsFront
+          photoFade = null
         }
-        .start()
+      })
+    }
+    photoFade = fade
+    fade.start()
+    if (!hostActive) fade.pause()
   }
 
   /**
@@ -2317,6 +2406,7 @@ class PhotoFrameController(
     set.duration = intervalMs() + 1200L
     set.interpolator = LinearInterpolator()
     set.start()
+    if (!hostActive) set.pause()
     if (storeFront) kenBurns = set else kenBurnsBack = set
   }
 

@@ -38,6 +38,8 @@ interface ClockFaceView {
    *  rather than a small view placed in a grid bucket. */
   val fullBleed: Boolean
     get() = false
+  /** Suspend transient animation/page work without replacing [view]. Main thread only. */
+  fun setHostActive(active: Boolean) {}
   /** Release resources (e.g. a WebView) when the overlay tears down. */
   fun dispose() {}
 }

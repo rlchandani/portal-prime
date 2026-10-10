@@ -8,8 +8,6 @@ package com.immortal.launcher
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 
 internal data class SlideshowAsset(
@@ -26,9 +24,10 @@ internal class SlideshowLoader(
     context: Context,
     private val budget: SlideshowPixelBudget = SlideshowPixelBudget(),
     private val onCancelTransports: () -> Unit = {},
+    // Share the host queue so late decoded scenes remain budgeted until the host returns.
+    private val ui: PausableFrameCallbacks = PausableFrameCallbacks(),
 ) : AutoCloseable {
   private val work = SlideshowWork()
-  private val ui = Handler(Looper.getMainLooper())
   private val faceDelegate = lazy { SlideshowFaceStore(context) }
   private val positions = SlideshowFramingStore(context.filesDir)
   private data class Warm(val key: String, val bitmap: Bitmap, val identity: String?)

@@ -210,13 +210,13 @@ test("pause during a dissolve keeps the outgoing layer until resumed", async () 
 });
 test("bundled page exposes the exact bridge before measurement and honors early pause/exit", async () => {
   const inline = fs.readFileSync(path.join(assets, "index.html"), "utf8").match(/<script>([\s\S]*?)<\/script>/)[1];
-  for (const exit of [false, true]) {
+  for (const [initialPause, exit] of [[false, false], [false, true], [true, false], [true, true]]) {
     const f = fixture(), elements = new Map([["stage", f.stage]]);
     f.context.document.getElementById = id => {
       if (!elements.has(id)) elements.set(id, f.context.document.createElement("div"));
       return elements.get(id);
     };
-    f.context.location = { search: "?nativeClock=1" };
+    f.context.location = { search: `?nativeClock=1&hostPaused=${initialPause ? 1 : 0}` };
     f.context.URLSearchParams = URLSearchParams;
     f.context.SS_CONFIG = { mode: "kenBurns", intervalSec: 30 };
     let measured;
@@ -225,7 +225,7 @@ test("bundled page exposes the exact bridge before measurement and honors early 
     const bridge = f.context.immortalSlideshow;
     assert(bridge, "bridge unavailable while dimensions are pending");
     assert.deepEqual(Object.keys(bridge).sort(), ["next", "pause", "previous", "resume"]);
-    bridge.pause();
+    if (!initialPause) bridge.pause();
     if (exit) f.events.get("pagehide")();
     measured(); await f.settle(); await f.tick(50);
     assert.equal(f.images.length, 0, "early pause or exit was lost");
