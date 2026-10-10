@@ -481,10 +481,18 @@
     const t = makeTimers(ctx); const bdA = el("ss-bd", ctx.root), bdB = el("ss-bd", ctx.root); bdB.style.opacity = "0"; const track = el("ss-track", ctx.root);
     const items = []; const set = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, 12)).fill("any"));
     let center = 0, top = false, admitted = false, bounded = false, disposed = false, preparation = null, viewportBound = 0;
+    let paused = false, navigating = false, culling = false, listening = false, settleMs = 0, trackWidth = 0;
+    let liveFrom = 0, liveTo = 0, revision = 0, guard = null, proofFrame = null, attempts = 0, settled = false;
     // The unchanged CSS scales at most 1.12 and has a 70px black shadow blur.
     // 512 local pixels deliberately overbound its finite raster support, spread
     // and offset; 2px additionally cover flex/subpixel rounding over twelve slots.
     const MAX_SCALE = 1.12, SHADOW_PAD = 512, ROUNDING_PAD = 2;
+    // Computed matrices may serialize subpixels. Retain this whole endpoint band
+    // inside the existing 2px rounding pad; this is not a raster-test tolerance.
+    const ENDPOINT_PAD = .01;
+    function zeroDelays(value) {
+      return typeof value === "string" && value.split(",").every(v => /^0(?:\.0+)?(?:ms|s)$/.test(v.trim()));
+    }
     function knownGeometry() {
       try {
         if (!(Number.isFinite(ctx.W) && ctx.W > 0 && Number.isFinite(ctx.H) && ctx.H > 0) ||
@@ -503,8 +511,11 @@
             ts.display !== "flex" || ts.flexDirection !== "row" || ts.alignItems !== "center" ||
             ts.gap !== "60px" || Math.abs(tr.left - root.left - ctx.W / 2) > 1 ||
             Math.abs(tr.height - ctx.H) > 1) return false;
-        return items.every(s => {
+        let timingKnown = ts.transitionProperty === "transform" && ts.transitionDuration === "1.4s" &&
+          zeroDelays(ts.transitionDelay) && ts.transitionTimingFunction === "cubic-bezier(0.22, 1, 0.36, 1)";
+        const cardsKnown = items.every(s => {
           const p = getComputedStyle(s.el), r = s.el.getBoundingClientRect();
+          timingKnown = timingKnown && zeroDelays(p.transitionDelay);
           return Math.abs(parseFloat(p.width) - s.w) < 1 && Math.abs(parseFloat(p.height) - ctx.H * .62) < 1 &&
             p.transform === "matrix(0.7, 0, 0, 0.7, 0, 0)" &&
             p.boxShadow === "rgba(0, 0, 0, 0.9) 0px 30px 70px -20px" &&
@@ -514,6 +525,10 @@
             Math.abs(r.left - root.left - (ctx.W / 2 + s.off - s.w * .35)) < ROUNDING_PAD &&
             Math.abs(r.width - s.w * .7) < 1 && Math.abs(r.height - ctx.H * .62 * .7) < 1;
         });
+        // Track and card motion both have the validated 1400ms maximum. The
+        // separate backdrop fade never changes a card's horizontal support.
+        if (cardsKnown && timingKnown) settleMs = 1500;
+        return cardsKnown;
       } catch (_) { return false; } // Unknown geometry retains original full admission.
     }
     function needed(s, from, to) {
@@ -522,6 +537,98 @@
       const left = viewportBound / 2 + s.off - Math.max(from, to) - radius;
       const right = viewportBound / 2 + s.off - Math.min(from, to) + radius;
       return right >= 0 && left <= viewportBound;
+    }
+    function visibility(from, to, shrink = false) {
+      items.forEach(s => {
+        const visible = !culling || (needed(s, from, to) && (!shrink || s.visible));
+        if (s.visible !== visible) {
+          s.img.style.visibility = visible ? "visible" : "hidden";
+          s.visible = visible;
+        }
+      });
+    }
+    function revokeSettlement() {
+      revision++; attempts = 0; settled = false;
+      if (guard !== null) clearTimeout(guard);
+      if (proofFrame !== null) cancelAnimationFrame(proofFrame);
+      guard = proofFrame = null;
+    }
+    function ownsSettlement(owner, to) {
+      return !disposed && !paused && !navigating && !preparation && culling && admitted && !settled &&
+        revision === owner && items[center].off === to;
+    }
+    function endpoint(to) {
+      try {
+        const ts = getComputedStyle(track), match = /^(matrix|matrix3d)\(([^)]+)\)$/.exec(ts.transform);
+        if (!match) return null;
+        const m = match[2].split(",").map(Number);
+        if (!m.every(Number.isFinite)) return null;
+        let x;
+        if (match[1] === "matrix" && m.length === 6 &&
+            m[0] === 1 && m[1] === 0 && m[2] === 0 && m[3] === 1 && m[5] === 0) x = m[4];
+        else if (match[1] === "matrix3d" && m.length === 16 &&
+            m.every((n, i) => i === 12 || n === ([0, 5, 10, 15].includes(i) ? 1 : 0))) x = m[12];
+        else return null;
+        if (Math.abs(x + to) > ENDPOINT_PAD) return null;
+        const root = ctx.root.getBoundingClientRect(), tr = track.getBoundingClientRect(), screen = window.screen;
+        if (!screen || ![screen.width, screen.height].every(n => Number.isFinite(n) && n > 0) ||
+            Math.max(screen.width, screen.height) !== viewportBound ||
+            ![root.width, root.height, root.left, tr.left, tr.width, tr.height].every(Number.isFinite) ||
+            root.width <= 0 || root.height <= 0 || root.width > viewportBound || root.height > viewportBound ||
+            getComputedStyle(ctx.root).transform !== "none" || ts.position !== "absolute" ||
+            ts.display !== "flex" || ts.flexDirection !== "row" || ts.alignItems !== "center" || ts.gap !== "60px" ||
+            Math.abs(tr.left - root.left - root.width / 2 - x) > ROUNDING_PAD ||
+            Math.abs(tr.width - trackWidth) > ROUNDING_PAD || Math.abs(tr.height - root.height) > 1) return null;
+        return -x;
+      } catch (_) { return null; } // Unreadable paint cannot authorize a narrower mask.
+    }
+    function verifySettlement(owner, to) {
+      if (!ownsSettlement(owner, to) || proofFrame !== null || attempts >= 2) return;
+      attempts++;
+      const first = requestAnimationFrame(() => {
+        if (proofFrame !== first || !ownsSettlement(owner, to)) return;
+        proofFrame = null;
+        const a = endpoint(to);
+        if (a === null || !ownsSettlement(owner, to)) return;
+        const second = requestAnimationFrame(() => {
+          if (proofFrame !== second || !ownsSettlement(owner, to)) return;
+          proofFrame = null;
+          const b = endpoint(to);
+          if (b === null || !ownsSettlement(owner, to)) return;
+          // Two owned frame boundaries agree with the current target. Preserve
+          // the serialization band, maximum scale and shadow for resting cards.
+          liveFrom = Math.min(to - ENDPOINT_PAD, a, b);
+          liveTo = Math.max(to + ENDPOINT_PAD, a, b);
+          visibility(liveFrom, liveTo, true);
+          revokeSettlement(); settled = true;
+        });
+        proofFrame = second;
+      });
+      proofFrame = first;
+    }
+    function armSettlement() {
+      const owner = revision, to = admitted ? items[center].off : 0;
+      if (!ownsSettlement(owner, to) || guard !== null ||
+          !items.some(s => s.visible && !needed(s, to - ENDPOINT_PAD, to + ENDPOINT_PAD))) return;
+      // One finite guard plus strict end events permit at most two attempts.
+      // A deadline only requests computed-state proof; it never hides anything.
+      const id = setTimeout(() => {
+        if (guard !== id || !ownsSettlement(owner, to)) return;
+        guard = null; verifySettlement(owner, to);
+      }, settleMs);
+      guard = id;
+    }
+    function onTrackEnd(event) {
+      if (event.type !== "transitionend" || event.target !== track || event.propertyName !== "transform" || event.pseudoElement) return;
+      const to = admitted ? items[center].off : 0;
+      if (items.some(s => s.visible && !needed(s, to - ENDPOINT_PAD, to + ENDPOINT_PAD)))
+        verifySettlement(revision, to);
+    }
+    function onResize() {
+      if (disposed) return;
+      // The live mask already covers both physical-screen orientations. Revoke
+      // an older proof without changing the scene, even between its two frames.
+      revokeSettlement(); armSettlement();
     }
     async function prepare(urls) {
       const controller = new AbortController();
@@ -539,21 +646,33 @@
     }
     async function go(i) {
       if (disposed || !items[i]) return false;
-      const from = admitted ? items[center].off : 0, to = items[i].off;
-      // Retain all previously prepared images. Their earlier admission envelope
-      // also covers interrupted CSS motion; wrap pans include intermediate cards.
-      const batch = items.filter(s => !s.prepared && needed(s, from, to))
-        .map(s => ({ item: s, url: ctx.url(s.photo, 1400) }));
-      const u = ctx.url(items[i].photo, 1000);
-      if (!await prepare(batch.map(s => s.url).concat(u)) || disposed) return false;
-      // Commit one complete batch after decode/pause/ownership gates. Never
-      // re-resolve at publication, or replace/clear an already-live image.
-      batch.forEach(({ item, url }) => { bg(item.img, url); item.prepared = true; });
-      items.forEach((s, k) => s.el.classList.toggle("center", k === i));
-      track.style.transform = `translateX(${-to}px)`;
-      const b = top ? bdA : bdB, o = top ? bdB : bdA;
-      bg(b, u); b.style.opacity = "1"; o.style.opacity = "0";
-      top = !top; center = i; admitted = true;
+      revokeSettlement(); navigating = true;
+      try {
+        const from = admitted ? items[center].off : 0, to = items[i].off;
+        // Retain every prepared image and the entire still-live motion range.
+        // An interrupted pan starts inside that range, not at the last center.
+        const nextFrom = Math.min(liveFrom, from, to), nextTo = Math.max(liveTo, from, to);
+        const batch = items.filter(s => !s.prepared && needed(s, nextFrom, nextTo))
+          .map(s => ({ item: s, url: ctx.url(s.photo, 1400) }));
+        const u = ctx.url(items[i].photo, 1000);
+        if (!await prepare(batch.map(s => s.url).concat(u)) || disposed) return false;
+        while (paused && !disposed) if (!await t.load([])) return false;
+        if (disposed) return false;
+        // Commit one complete batch after decode/pause/ownership gates. Never
+        // re-resolve at publication, or replace/clear an already-live image.
+        batch.forEach(({ item, url }) => { bg(item.img, url); item.prepared = true; });
+        liveFrom = nextFrom; liveTo = nextTo;
+        visibility(liveFrom, liveTo); // Reveal the complete union before motion.
+        items.forEach((s, k) => s.el.classList.toggle("center", k === i));
+        track.style.transform = `translateX(${-to}px)`;
+        const b = top ? bdA : bdB, o = top ? bdB : bdA;
+        bg(b, u); b.style.opacity = "1"; o.style.opacity = "0";
+        top = !top; center = i; admitted = true;
+      } finally {
+        navigating = false;
+        // A failed batch retains the old scene and may re-verify its endpoint.
+        if (!disposed) armSettlement();
+      }
     }
     function loop() { return go((center + 1) % items.length); }
     t.start(async () => {
@@ -563,16 +682,40 @@
         s.style.width = w + "px";
         const im = el("ss-img", s); im.style.width = w + "px"; im.style.height = "100%";
         im.style.backgroundSize = "cover"; im.style.backgroundPosition = "center"; im.style.backgroundRepeat = "no-repeat";
-        items.push({ el: s, img: im, w, off: left + w / 2, photo: p, prepared: false });
+        items.push({ el: s, img: im, w, off: left + w / 2, photo: p, prepared: false, visible: true });
         left += w + 60;
       });
+      trackWidth = Math.max(0, left - (items.length ? 60 : 0));
       bounded = knownGeometry();
+      culling = bounded && settleMs > 0 && typeof requestAnimationFrame === "function" &&
+        typeof cancelAnimationFrame === "function" && typeof track.addEventListener === "function" &&
+        typeof track.removeEventListener === "function" && typeof window.addEventListener === "function" &&
+        typeof window.removeEventListener === "function";
+      if (culling) {
+        track.addEventListener("transitionend", onTrackEnd);
+        window.addEventListener("resize", onResize); listening = true;
+      }
       return go(0);
     });
     t.every(loop, ctx.microMs);
-    const cleanup = () => { disposed = true; if (preparation) preparation.abort(); t.cleanup(); };
+    const cleanup = () => {
+      if (disposed) return;
+      disposed = true; revokeSettlement();
+      if (listening) {
+        track.removeEventListener("transitionend", onTrackEnd);
+        window.removeEventListener("resize", onResize); listening = false;
+      }
+      if (preparation) preparation.abort(); t.cleanup();
+    };
     Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
-    cleanup.pause = t.cleanup.pause; cleanup.resume = t.cleanup.resume;
+    cleanup.pause = () => {
+      if (disposed || paused) return;
+      paused = true; revokeSettlement(); t.cleanup.pause();
+    };
+    cleanup.resume = () => {
+      if (disposed || !paused) return;
+      paused = false; revokeSettlement(); t.cleanup.resume(); armSettlement();
+    };
     cleanup.next = () => t.navigate(() => go((center + 1) % items.length));
     cleanup.previous = () => t.navigate(() => go((center + items.length - 1) % items.length));
     return cleanup;
