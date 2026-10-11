@@ -1,9 +1,13 @@
 # Family Area Settings: accepted direct Appearance rows
 
-Direct Appearance rows are enabled by default and installed on Family Area.
-The same signed APK passed eight native functional checks and a matched
-control/candidate/control performance gate. The final default benchmark rebuild
-is byte-for-byte identical to that measured and installed APK.
+Direct Appearance rows are enabled by default. This document records the first
+accepted Settings improvement on Family Area. The same signed APK passed eight
+native functional checks and a matched control/candidate/control performance
+gate. The final default benchmark rebuild was byte-for-byte identical to that
+measured APK.
+
+Family Area now runs the additional [Settings Baseline Profile improvement](portal-settings-baseline-profile.md),
+which retains these direct rows and the same application bytecode.
 
 ## Measured result
 
@@ -134,7 +138,7 @@ Local diagnostics live under `~/portal-prime/build/fleet/diagnostics/`:
 - `settings-appearance-direct-rows-2026-10-11/hardware-facts.json`:
   actual hardware read.
 
-Measured and installed candidate APK SHA-256:
+Measured and originally installed direct-row candidate APK SHA-256:
 `5c185e77a0e8708603bf285790343b503681ab6ea704a478414fb7600a256e86`.
 Functional postflight SHA-256:
 `541c3913b1494f5389ba24a8bce868507e8214540d1e727ca7677a932c8e6023`.

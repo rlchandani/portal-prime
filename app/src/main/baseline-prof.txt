@@ -1,0 +1,16 @@
+# Settings interactions happen after the launcher starts; compile these hot paths.
+# Keep this scoped to Settings rather than marking the entire launcher as startup code.
+HPLcom/immortal/launcher/ImmortalSettingsActivity;->onCreate(Landroid/os/Bundle;)V
+HPLcom/immortal/launcher/ImmortalSettingsActivity$**;->**(**)**
+HPLcom/immortal/launcher/ImmortalSettingsActivityKt;->**(**)**
+HPLcom/immortal/launcher/ImmortalSettingsActivityKt$**;->**(**)**
+HPLcom/immortal/launcher/SettingsRendererKt;->**(**)**
+HPLcom/immortal/launcher/SettingsRendererKt$**;->**(**)**
+HPLcom/immortal/launcher/SettingsComponentsKt;->**(**)**
+HPLcom/immortal/launcher/SettingsComponentsKt$**;->**(**)**
+HPLcom/immortal/launcher/ApprovedSettingsShellKt;->**(**)**
+HPLcom/immortal/launcher/ApprovedSettingsShellKt$**;->**(**)**
+HPLcom/immortal/launcher/ApprovedSettingsRowsKt;->**(**)**
+HPLcom/immortal/launcher/ApprovedSettingsRowsKt$**;->**(**)**
+HPLcom/immortal/launcher/ApprovedSettingsNavigationKt;->**(**)**
+HPLcom/immortal/launcher/ApprovedSettingsNavigationKt$**;->**(**)**
