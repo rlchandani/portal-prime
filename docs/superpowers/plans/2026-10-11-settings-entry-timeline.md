@@ -38,8 +38,9 @@ Living Area and the phone were untouched.
   settingsEntryTimeline report.
 - No additional listener or diagnostic clock outside admitted captures. First pre-draw
   listener removes itself; Activity destruction also removes it.
-- Only the existing Home gear's actual startActivity boundary is measured as an observed
-  launch. Other entry paths remain explicitly unmatched; no inferred launch latency.
+- The Home header gear and injected Settings app tile have distinct callbacks; both actual
+  startActivity boundaries are measured. Other entry paths remain explicitly unmatched;
+  no inferred launch latency.
 
 ## Execution
 
@@ -73,3 +74,41 @@ Living Area and the phone were untouched.
 - Fresh read-only Family check confirmed the accepted APK, no active collector, no live
   listeners. No device navigation or candidate installation in that check.
 - The native run and paired timing analysis remain pending; no speed improvement claim.
+
+## First native attempt: failed, accepted restoration verified
+
+The original diagnostic protocol/manifest remain immutable:
+protocol 882de385ca56bc11f72298256fa90cbcc65cef73c1d880606b7d00b3dd601514,
+manifest 0e06544c73f32b805206b0a3560613c4617be2dd07559944d2df6d1aae263d4e.
+The candidate and final accepted direct SDK/profile/OAT admission both passed with fresh
+cache code 1. The first warmup failed; zero warmups, timed entries or owned stops were
+accepted. No timings from this attempt can be used as valid evidence.
+
+Two concrete issues changed the next action:
+
+1. The header gear calls launchSafely directly, bypassing the onLaunch callback used by
+   the injected Settings app tile. The first implementation observed the tile only.
+   The header is now wired to the measured launch wrapper with the identical NEW_TASK
+   intent and failure-swallowing behavior; ordinary UI/navigation stays unchanged.
+2. The new runner added full 37 MB APK reads before every POST. An APK read before STOP
+   exhausted the 15-second capture deadline; the owned cohort correctly rejected it.
+   A separate retry will retain the 15-second deadline and pre/post APK hashes, but use
+   acknowledged live capture identity during TAP/STOP. The original trial is not rewritten.
+   Failure evidence must retain unobserved/missing-stage numeric timelines instead of
+   requiring valid admission when writing a failed warmup.
+
+Native session 64212 exited 1. Cleanup SDK-bootstrap/accepted installation completed,
+fresh cache code 1 and exact actual reference/DM/OAT evidence were verified again,
+configuration/schema/source groups preserved, Home restored, collectors inactive.
+Final accepted admission SHA is
+bb531d2a50817ed6e9b9e47347854eb1bc897d2deedaf730b2ae7ac525ca509e.
+No performance improvement claim or promotion; Living Area/phone remain untouched.
+
+Header-path retry local gate: 1,678 tests / 195 suites with zero failures/errors/skips;
+debug and benchmark builds passed. Frozen source
+ce47a5d0207a4d5cfada406ef47b6966ad2cd3a15bcb3da0932198046deaa922 (786 files).
+Ordinary APK b4a16bc339c5574a0e08299c43ba41adeacc78c4adde01d4985a74d15693bc1d;
+bootstrap 84b96f13447726edc5905c0f3fd287584b09ff8de7131718dd20b1ce1fa4cc47,
+pinned to that ordinary APK. Both are 37,150,356 bytes and match the accepted certificate.
+Bundled SDK mapping decoded/validated successfully; no own-app profile rules.
+The separate retry runner and native capture remain pending.

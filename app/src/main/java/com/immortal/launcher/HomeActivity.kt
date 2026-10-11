@@ -1219,7 +1219,13 @@ private fun LauncherScreen(
           ApprovedHeaderButton("search", "Search apps and settings") {
             if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
           }
-          ApprovedHeaderButton("settings", "Settings") { context.launchSafely(ImmortalSettingsActivity::class.java) }
+          ApprovedHeaderButton("settings", "Settings") {
+            runCatching {
+              FramePerformanceCapture.launchSettings(context,
+                  Intent(context, ImmortalSettingsActivity::class.java)
+                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
+          }
         }
         ApprovedHomeTabs(selectedTab, Modifier.weight(1f).fillMaxWidth()) { tab ->
           when (tab) {
