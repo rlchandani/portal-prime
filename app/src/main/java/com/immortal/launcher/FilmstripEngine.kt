@@ -40,6 +40,11 @@ internal class FilmstripEngine(
     watching: Boolean,
     private val onAdmitted: () -> Unit,
     private val onFailure: () -> Unit,
+    private val orderedSelection: Boolean = false,
+    private val externallyClocked: Boolean = false,
+    sharedBudget: SlideshowPixelBudget? = null,
+    private val publishOwnProbe: Boolean = true,
+    private val onStateChanged: (FilmstripRuntimeProbe.State) -> Unit = {},
 ) : FrameLayout(context), AutoCloseable {
   private data class Pixels(val photo: Bitmap, val backdrop: Bitmap, val reusedPhoto: Boolean = false) {
     val bytes: Long get() = photo.allocationByteCount.toLong() + backdrop.allocationByteCount
@@ -57,7 +62,8 @@ internal class FilmstripEngine(
   private val density = resources.displayMetrics.density
   private val work = SlideshowWork()
   private val ui = PausableFrameCallbacks()
-  private val budget = SlideshowPixelBudget(256L * 1024 * 1024)
+  private val budget = sharedBudget ?: SlideshowPixelBudget(256L * 1024 * 1024)
+  private val pixelOwner = "filmstrip-${nextPixelOwner.incrementAndGet()}"
   private val backgrounds = Array(2) { ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_CROP } }
   private val backgroundLayer = FrameLayout(context).apply { clipChildren = false }
   private val track = FrameLayout(context).apply { clipChildren = false; clipToPadding = false }
@@ -90,7 +96,9 @@ internal class FilmstripEngine(
 
   init {
     setBackgroundColor(Color.BLACK)
-    clipChildren = true
+    // A translated viewport-sized track must overflow its own bounds. Clip once to
+    // this stationary viewport instead of clipping each translated child rectangle.
+    clipChildren = false
     backgrounds.forEach { backgroundLayer.addView(it, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)) }
     addView(backgroundLayer, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     backgrounds[1].alpha = 0f
@@ -99,6 +107,14 @@ internal class FilmstripEngine(
     // Parent controller owns tap/gesture dispatch, just like its legacy WebView.
     isClickable = false
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+  }
+
+  override fun dispatchDraw(canvas: Canvas) {
+    val save = canvas.save()
+    try {
+      canvas.clipRect(0,0,width,height)
+      super.dispatchDraw(canvas)
+    } finally { canvas.restoreToCount(save) }
   }
 
   fun start() {
@@ -126,15 +142,15 @@ internal class FilmstripEngine(
     val frozenDecode = decode
     val frozenWatching = watching
     val revision = ++preparationRevision
-    val budgetKey = "deck-$revision"
+    val budgetKey = "$pixelOwner-deck-$revision"
     work.submit { current ->
       val span = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.NATIVE_FILMSTRIP_PREPARATION)
       val images = ArrayList<Pixels>(12)
       var handedOff = false
       try {
         // Same legacy selection: shuffled unique deck, stable people bias while watched, at most 12.
-        val shuffled = frozenUrls.distinct().shuffled()
-        val deck = (if (frozenWatching) shuffled.sortedByDescending { weight(it) } else shuffled).take(12)
+        val shuffled = if (orderedSelection) frozenUrls else frozenUrls.distinct().shuffled()
+        val deck = (if (!orderedSelection && frozenWatching) shuffled.sortedByDescending { weight(it) } else shuffled).take(12)
         val count = reusePhotos?.size ?: deck.size
         for (index in 0 until count) {
           if (!current()) throw CancellationException()
@@ -143,7 +159,20 @@ internal class FilmstripEngine(
           var photo: Bitmap? = null
           var backdrop: Bitmap? = null
           try {
-            photo = reusePhotos?.get(index) ?: runCatching { frozenDecode(deck[index], 1400) }.getOrNull() ?: continue
+            photo = reusePhotos?.get(index) ?: try {
+              frozenDecode(deck[index], 1400)
+            } catch (unsupported: NativeFilmstripUnsupportedFormat) {
+              // Falling back must preserve animated cards, rather than silently skipping them.
+              throw unsupported
+            } catch (cancelled: CancellationException) {
+              throw cancelled
+            } catch (_: Exception) {
+              null
+            }
+            if (photo == null) {
+              if (orderedSelection) throw IllegalStateException("Filmstrip selected card unavailable")
+              continue
+            }
             if (!current()) throw CancellationException()
             backdrop = FilmstripBackdrop.prepare(context, photo, viewportWidth, viewportHeight, density)
             if (!current()) throw CancellationException()
@@ -194,7 +223,7 @@ internal class FilmstripEngine(
         }
         budget.setOwner(previous.budgetKey,emptyList())
         reportState()
-        FilmstripScreenshot.bind(this,prepared.sourceUrls)
+        if (publishOwnProbe) FilmstripScreenshot.bind(this,prepared.sourceUrls)
         return // Keep current card, live motion, dissolve alpha, timer and style admission.
       }
       motion?.removeAllListeners(); motion?.cancel(); motion = null
@@ -236,7 +265,7 @@ internal class FilmstripEngine(
       topBackground = 0
       backdropIndices.fill(0)
       show(0, initial = true)
-      FilmstripScreenshot.bind(this, prepared.sourceUrls)
+      if (publishOwnProbe) FilmstripScreenshot.bind(this, prepared.sourceUrls)
       onAdmitted()
     } finally { span?.finish() }
   }
@@ -246,19 +275,21 @@ internal class FilmstripEngine(
     val geometry = FilmstripGeometry.layout(width/density,height/density,
         images.map { it.photo.width.toFloat()/it.photo.height }) ?: return
     layout = geometry
-    // Physical-pixel bounds are assigned only on admission/resize, never inside an animation frame.
-    geometry.cards.forEachIndexed { index, card ->
-      cards[index].container.layoutParams = LayoutParams(
-          (card.width*density).roundToInt().coerceAtLeast(1),
-          (card.height*density).roundToInt().coerceAtLeast(1)).apply {
-        leftMargin = (width/2f+(card.offset-card.width/2f)*density).roundToInt()
-        topMargin = ((height-card.height*density)/2f).roundToInt()
+    // Calculate against the viewport before entering LayoutParams.apply: that receiver's
+    // width/height are the child dimensions, not this engine's screen dimensions.
+    geometry.cards.indices.forEach { index ->
+      val bounds = checkNotNull(FilmstripGeometry.cardPixelBounds(geometry,index,density))
+      cards[index].container.layoutParams = LayoutParams(bounds.width,bounds.height).apply {
+        leftMargin = bounds.left
+        topMargin = bounds.top
       }
     }
     track.translationX = if (initial) 0f else -geometry.cards[center].offset*density
+    val backdrop = checkNotNull(FilmstripGeometry.backdropPixelBounds(geometry,density))
     backgrounds.forEach {
-      it.layoutParams = LayoutParams((width*1.38f).roundToInt(),(height*1.38f).roundToInt()).apply {
-        leftMargin = -(width*.19f).roundToInt(); topMargin = -(height*.19f).roundToInt()
+      it.layoutParams = LayoutParams(backdrop.width,backdrop.height).apply {
+        leftMargin = backdrop.left
+        topMargin = backdrop.top
       }
     }
   }
@@ -269,19 +300,22 @@ internal class FilmstripEngine(
     center = index
     motion?.removeAllListeners(); motion?.cancel()
     val transforms = ArrayList<Animator>()
-    fun property(view: View, name: String, value: Float, transform: Boolean = true) {
+    fun property(view: View, name: String, current: Float, value: Float, transform: Boolean = true) {
+      // A settled deck changes two cards. Avoid allocating/updating animators for the other
+      // ten, while still retargeting every interrupted property from its current value.
+      if (current == value) return
       transforms.add(ObjectAnimator.ofFloat(view,name,value).apply {
         duration = 1400L
         interpolator = if (transform) transformCurve else fadeCurve
       })
     }
-    property(track,"translationX",-geometry.cards[index].offset*density)
+    property(track,"translationX",track.translationX,-geometry.cards[index].offset*density)
     cards.forEachIndexed { ordinal, card ->
       val selected = ordinal == index
       val scale = if (selected) 1.12f else .7f
-      property(card.container,"scaleX",scale); property(card.container,"scaleY",scale)
-      property(card.container,"alpha",if (selected) 1f else .4f,false)
-      property(card.dimmer,"alpha",if (selected) 0f else .45f,false)
+      property(card.container,"scaleX",card.container.scaleX,scale); property(card.container,"scaleY",card.container.scaleY,scale)
+      property(card.container,"alpha",card.container.alpha,if (selected) 1f else .4f,false)
+      property(card.dimmer,"alpha",card.dimmer.alpha,if (selected) 0f else .45f,false)
     }
     motion = AnimatorSet().apply { playTogether(transforms); start() }
     if (!initial) requestBackdrop(index)
@@ -323,17 +357,19 @@ internal class FilmstripEngine(
     budget.setOwner(value.budgetKey,emptyList())
   }
 
-  private fun move(direction: Int) {
-    val count = scene?.images?.size ?: return
+  private fun move(direction: Int): Boolean {
+    val count = scene?.images?.size ?: return false
+    if (closed || count == 0) return false
     advances++
     show((center+direction+count)%count)
+    return true
   }
-  fun next() { if (!closed) move(+1) }
-  fun previous() { if (!closed) move(-1) }
+  fun next(): Boolean = move(+1)
+  fun previous(): Boolean = move(-1)
 
   private fun armTick() {
     ui.removeCallbacks(tick)
-    if (!closed && !userPaused) ui.postDelayed(tick,intervalMillis.coerceAtLeast(5000L))
+    if (!externallyClocked && !closed && !userPaused) ui.postDelayed(tick,intervalMillis.coerceAtLeast(5000L))
   }
 
   fun setPaused(value: Boolean) {
@@ -379,9 +415,15 @@ internal class FilmstripEngine(
   }
 
   private fun reportState() {
-    FilmstripRuntimeProbe.record(this, FilmstripRuntimeProbe.State(scene != null, cards.size,
-        center, advances, scene?.images?.sumOf { it.bytes } ?: 0L, width, height, userPaused, hostActive))
+    val state = runtimeState()
+    if (publishOwnProbe) FilmstripRuntimeProbe.record(this, state)
+    onStateChanged(state)
   }
+
+  fun runtimeState() = FilmstripRuntimeProbe.State(scene != null, cards.size,
+      center, advances, scene?.images?.sumOf { it.bytes } ?: 0L, width, height, userPaused, hostActive)
+
+  private companion object { val nextPixelOwner = java.util.concurrent.atomic.AtomicLong() }
 
   override fun close() {
     if (closed) return

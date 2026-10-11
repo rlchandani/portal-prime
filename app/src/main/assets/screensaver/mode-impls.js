@@ -70,7 +70,7 @@
       finally { busy = false; }
     }
     function schedule(task) {
-      if (!active || paused || !started) return;
+      if (!active || paused || (!started && !task.preparation)) return;
       task.due = Date.now() + task.remaining;
       task.id = setTimeout(async () => {
         task.id = null;
@@ -79,8 +79,8 @@
         if (task.repeat && active) { task.remaining = task.ms; schedule(task); }
       }, task.remaining);
     }
-    function add(fn, ms, repeat) {
-      const task = { fn, ms, repeat, remaining: ms, id: null };
+    function add(fn, ms, repeat, preparation = false) {
+      const task = { fn, ms, repeat, preparation, remaining: ms, id: null };
       tasks.add(task); schedule(task); return task;
     }
     function frame(fn) {
@@ -116,6 +116,8 @@
       load, frame, cleanup,
       cancel: task => { if (task) { clearTimeout(task.id); task.id = null; tasks.delete(task); } },
       every: (fn, ms) => add(fn, ms, true), after: (fn, ms) => add(fn, ms, false),
+      // Bridge deadlines run before readiness, but consume only active playback time.
+      deadline: (fn, ms) => add(fn, ms, false, true),
       async navigate(fn) {
         const ok = await run(fn);
         if (ok) tasks.forEach(task => {
@@ -125,11 +127,121 @@
       },
       start(fn) {
         ready = run(fn).then(ok => {
-          if (ok) { started = true; tasks.forEach(schedule); }
+          if (ok) { started = true; tasks.forEach(task => { if (task.id == null) schedule(task); }); }
           return ok;
         });
       },
     };
+  }
+
+  // Only live native Filmstrip adapters register callbacks; legacy/browser modes bypass this.
+  const nativeFilmstrips = new Map();
+  const NATIVE_TIMEOUT_MS = 8000;
+  SS.nativeFilmstripPrepared = (token, ok) => {
+    const entry = nativeFilmstrips.get(token);
+    if (entry && entry.preparation) entry.preparation.reply(ok === true);
+  };
+  SS.nativeFilmstripCommandDone = (token, requestId, ok) => {
+    const entry = nativeFilmstrips.get(token), request = entry && entry.commands.get(requestId);
+    if (request) request.reply(ok === true);
+  };
+  function nativeFilmstripAvailable(ctx, set) {
+    try {
+      const host = window.Android, photos = window.PHOTOS;
+      return typeof ctx.nativeToken === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(ctx.nativeToken) &&
+        !nativeFilmstrips.has(ctx.nativeToken) && nativeFilmstrips.size < 3 &&
+        Array.isArray(photos) && set.length >= 1 && set.length <= 12 &&
+        new Set(set.map(p => p.id)).size === set.length &&
+        set.every(p => Number.isInteger(p.id) && p.id >= 0 && p.id < photos.length && photos[p.id] === p) &&
+        host && typeof host.supportsNativeFilmstrip === "function" && host.supportsNativeFilmstrip() === true &&
+        typeof host.prepareNativeFilmstrip === "function" && typeof host.nativeFilmstripCommand === "function";
+    } catch (_) { return false; }
+  }
+  function runNativeFilmstrip(ctx, set) {
+    const t = makeTimers(ctx), token = ctx.nativeToken, host = window.Android;
+    const entry = { preparation: null, commands: new Map() };
+    let active = true, paused = false, requested = false, legacy = null, requestId = 0;
+    nativeFilmstrips.set(token, entry);
+    const nextId = () => { requestId = requestId % 2147483647 + 1; return requestId; };
+    // Register before calling the bridge. Synchronous callbacks cannot override rejection.
+    function wait(register, remove, start) {
+      return new Promise(resolve => {
+        let accepted = null, early = null, finished = false, timer = null;
+        const request = {
+          finish(ok) {
+            if (finished) return;
+            finished = true; t.cancel(timer); remove(request); resolve(active && ok);
+          },
+          reply(ok) { if (accepted === null) early = ok; else request.finish(accepted && ok); },
+        };
+        register(request);
+        timer = t.deadline(() => request.finish(false), NATIVE_TIMEOUT_MS);
+        try { accepted = start() === true; } catch (_) { accepted = false; }
+        if (!accepted) request.finish(false);
+        else if (early !== null) request.finish(early);
+      });
+    }
+    function command(action) {
+      if (!active || !requested) return Promise.resolve(false);
+      const control = action === "pause" || action === "resume";
+      if (control) Array.from(entry.commands.values()).filter(r => r.control).forEach(r => r.finish(false));
+      if (entry.commands.size >= 2) return Promise.resolve(false);
+      const id = nextId();
+      const pending = wait(r => { r.control = control; entry.commands.set(id, r); },
+        r => { if (entry.commands.get(id) === r) entry.commands.delete(id); },
+        () => host.nativeFilmstripCommand(token, action, id));
+      pending.cancel = () => { const request = entry.commands.get(id); if (request) request.finish(false); };
+      return pending;
+    }
+    function retireNative() {
+      if (nativeFilmstrips.get(token) === entry) nativeFilmstrips.delete(token);
+      if (entry.preparation) entry.preparation.finish(false);
+      Array.from(entry.commands.values()).forEach(r => r.finish(false));
+      if (requested) {
+        requested = false;
+        try { host.nativeFilmstripCommand(token, "release", nextId()); } catch (_) {}
+      }
+    }
+    const cleanup = () => {
+      if (!active) return;
+      active = false; delete cleanup.nativeToken;
+      retireNative(); t.cleanup(); if (legacy) legacy();
+    };
+    cleanup.pause = () => {
+      if (!active || paused) return;
+      paused = true;
+      if (legacy) legacy.pause(); else { t.cleanup.pause(); command("pause"); }
+    };
+    cleanup.resume = () => {
+      if (!active || !paused) return;
+      paused = false;
+      if (legacy) legacy.resume(); else { t.cleanup.resume(); command("resume"); }
+    };
+    async function move(action) {
+      return !!cleanup.nativeToken && await command(action) && await t.load([]);
+    }
+    cleanup.next = () => legacy ? legacy.next() : t.navigate(() => move("next"));
+    cleanup.previous = () => legacy ? legacy.previous() : t.navigate(() => move("previous"));
+    cleanup.restore = () => command("restore");
+    t.every(() => move("next"), ctx.microMs);
+    t.start(async () => {
+      const ok = await wait(r => { entry.preparation = r; },
+        r => { if (entry.preparation === r) entry.preparation = null; },
+        () => { requested = true; return host.prepareNativeFilmstrip(token, JSON.stringify(set.map(p => p.id))); });
+      return ok && await t.load([]);
+    });
+    const ready = t.cleanup.ready.then(async ok => {
+      if (!active) return false;
+      if (ok) { cleanup.nativeToken = token; return true; }
+      retireNative(); t.cleanup();
+      // The selection and cursor already belong to this scene. Never take a second set.
+      legacy = runSelectedFilmstrip(ctx, set);
+      if (paused) legacy.pause();
+      const admitted = await legacy.ready;
+      return active && admitted === true;
+    });
+    Object.defineProperty(cleanup, "ready", { get: () => ready });
+    return cleanup;
   }
 
   const MODES = {};
@@ -478,8 +590,12 @@
 
   // ---- 10 Filmstrip coverflow ------------------------------------------------
   MODES.filmstrip = { name: "Filmstrip Coverflow", run(ctx, deck) {
+    const set = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, 12)).fill("any"));
+    return nativeFilmstripAvailable(ctx, set) ? runNativeFilmstrip(ctx, set) : runSelectedFilmstrip(ctx, set);
+  }};
+  function runSelectedFilmstrip(ctx, set) {
     const t = makeTimers(ctx); const bdA = el("ss-bd", ctx.root), bdB = el("ss-bd", ctx.root); bdB.style.opacity = "0"; const track = el("ss-track", ctx.root);
-    const items = []; const set = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, 12)).fill("any"));
+    const items = [];
     let center = 0, top = false, admitted = false, bounded = false, disposed = false, preparation = null, viewportBound = 0;
     // The unchanged CSS scales at most 1.12 and has a 70px black shadow blur.
     // 512 local pixels deliberately overbound its finite raster support, spread
@@ -576,7 +692,7 @@
     cleanup.next = () => t.navigate(() => go((center + 1) % items.length));
     cleanup.previous = () => t.navigate(() => go((center + items.length - 1) % items.length));
     return cleanup;
-  }};
+  }
 
   // ---- 11 Cinema letterbox ---------------------------------------------------
   MODES.cinema = { name: "Cinema Letterbox", run(ctx, deck) {

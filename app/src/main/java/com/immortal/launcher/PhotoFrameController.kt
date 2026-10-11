@@ -102,6 +102,7 @@ class PhotoFrameController(
   }
   private val nativeLoader get() = nativeLoaderDelegate.value
   private var nativeFilmstrip: FilmstripEngine? = null
+  private var hybridFilmstrip: HybridFilmstripHost? = null
   private data class NativeFilmstripInput(val urls: List<String>, val dims: Map<String, Pair<Int, Int>>,
       val headers: Map<String, String>, val warmLocal: Boolean)
   private var nativeFilmstripInput: NativeFilmstripInput? = null
@@ -677,6 +678,7 @@ class PhotoFrameController(
     val mode = settings.mode
     val intervalSec = settings.intervalSec
     val use24 = ImmortalSettings.use24HourClock(context)
+    val frozenFetch = remoteFetch
     val faceStore = FaceFocusStore(context.applicationContext).also { legacyFaceStore = it }
     engineActive = true // Preparing is already legacy-owned; do not admit native playback.
     legacyPreparation.request(
@@ -757,6 +759,23 @@ class PhotoFrameController(
                       return true
                     }
                   }
+              val hybrid = if (BuildConfig.PORTAL_NATIVE_FILMSTRIP && mode == "shuffle" && !forceLegacy) {
+                HybridFilmstripHost(view as FrameLayout,wv,urls,intervalSec.toLong()*1000,
+                    decode={ url,edge ->
+                      decodeNativeFilmstrip(url, edge, headers, frozenFetch)
+                    },
+                    isCurrent={ !stopped && owner == legacyEngineRevision && webView === wv && legacyFaceStore === faceStore },
+                    liftOverlays={
+                      runCatching { faceRenderer.view.bringToFront() }
+                      runCatching { calendarPanel.bringToFront() }
+                      dashboardPanel?.let { runCatching { it.bringToFront() } }
+                      runCatching { welcomeOverlay.bringToFront() }
+                    }).also {
+                  hybridFilmstrip = it
+                  it.setHostActive(hostActive)
+                  it.setPaused(paused)
+                }
+              } else null
               val styleReporter = SlideshowStyleReporter(
                   host = when (context) {
                     is PhotoFramePreviewActivity -> SlideshowStyleHost.PREVIEW
@@ -765,7 +784,8 @@ class PhotoFrameController(
                   },
                   prepare = { host, style ->
                     FramePerformanceCapture.prepareSlideshowStyleReport(host, style) {
-                      SlideshowLayerObservation(wv.layerType, wv.isHardwareAccelerated,
+                      if (style == SlideshowStyle.FILMSTRIP && hybrid?.hasActiveNative == true) null
+                      else SlideshowLayerObservation(wv.layerType, wv.isHardwareAccelerated,
                           wv.isAttachedToWindow, wv.width, wv.height)
                     }
                   },
@@ -776,6 +796,13 @@ class PhotoFrameController(
                   object {
                     @android.webkit.JavascriptInterface
                     fun reportPresentedStyle(modeId: String) { styleReporter.receive(modeId) }
+                    @android.webkit.JavascriptInterface fun supportsNativeFilmstrip(): Boolean = hybrid != null
+                    @android.webkit.JavascriptInterface fun prepareNativeFilmstrip(token: String, idsJson: String): Boolean =
+                        hybrid?.prepare(token,idsJson) ?: false
+                    @android.webkit.JavascriptInterface fun nativeFilmstripCommand(token: String, action: String, requestId: Int): Boolean =
+                        hybrid?.command(token,action,requestId) ?: false
+                    @android.webkit.JavascriptInterface fun promoteNativeFilmstrip(incoming: String, outgoing: String, handoffId: Int): Boolean =
+                        hybrid?.promote(incoming,outgoing,handoffId) ?: false
                     @android.webkit.JavascriptInterface fun getPhotos(): String = photosJson
                     @android.webkit.JavascriptInterface fun getMode(): String = mode
                     // Per-photo dwell (seconds). The engine holds each photo this long instead of its old
@@ -867,8 +894,7 @@ class PhotoFrameController(
     val headers = authHeaders.toMap()
     val fetch = remoteFetch
     val decoder: (String, Int) -> Bitmap? = { url, edge ->
-      if (url.startsWith("file://")) decodeBoundedFile(android.net.Uri.parse(url).path ?: "", edge)
-      else fetchRemoteImage(url, edge, headers, fetch)
+      decodeNativeFilmstrip(url, edge, headers, fetch)
     }
     val input = NativeFilmstripInput(urls,dims.toMap(),headers,warmLocalCopies)
     nativeFilmstrip?.let {
@@ -949,6 +975,8 @@ class PhotoFrameController(
 
   @androidx.annotation.MainThread
   private fun retireWebView() {
+    hybridFilmstrip?.close()
+    hybridFilmstrip = null
     engineLayoutRoot?.let { root ->
       engineLayoutListener?.let { runCatching { root.removeOnLayoutChangeListener(it) } }
     }
@@ -984,6 +1012,7 @@ class PhotoFrameController(
       kenBurns?.pause(); kenBurnsBack?.pause(); photoFade?.pause()
       nativeStage.setHostActive(false)
       nativeFilmstrip?.setHostActive(false)
+      hybridFilmstrip?.setHostActive(false)
       faceRenderer.setHostActive(false)
       webView?.let { wv ->
         if (engineActive) applyEnginePlayback(wv)
@@ -999,6 +1028,7 @@ class PhotoFrameController(
       }
       nativeStage.setHostActive(true)
       nativeFilmstrip?.setHostActive(true)
+      hybridFilmstrip?.setHostActive(true)
       kenBurns?.resume(); kenBurnsBack?.resume(); photoFade?.resume()
       faceRenderer.setHostActive(true)
       if (videoView.visibility == View.VISIBLE) {
@@ -1689,6 +1719,8 @@ class PhotoFrameController(
     if (paused == value) return
     paused = value
     nativeFilmstrip?.setPaused(value)
+    hybridFilmstrip?.setPaused(value)
+    if (hybridFilmstrip != null) webView?.let(::applyEnginePlayback)
     if (value) {
       remainingHold = (holdDeadline - playbackUptime()).coerceAtLeast(100L)
       ui.removeCallbacks(localTick); ui.removeCallbacks(remoteTick); ui.removeCallbacks(rotate)
@@ -2796,6 +2828,37 @@ class PhotoFrameController(
     mediaCache = cache
     transcoder = VideoTranscoder(context)
     Log.i(TAG, "media cache on: budget=${budget / MB}MB (cap=${settings.cacheBudgetGb}GB, free=${free / MB}MB)")
+  }
+
+  /** Inspect encoded content once, on the worker, without changing any other slideshow mode. */
+  private fun decodeNativeFilmstrip(
+      url: String, maxEdge: Int, headers: Map<String, String>,
+      fetch: ((String, Int) -> Bitmap?)?,
+  ): Bitmap? {
+    if (url.startsWith("file://")) {
+      return SlideshowDecoder.nativeFilmstripFile(android.net.Uri.parse(url).path ?: "", maxEdge)
+    }
+    // SMB's bitmap-only transport cannot prove that its original was static. Keep its legacy path.
+    if (fetch != null) throw NativeFilmstripUnsupportedFormat()
+    val generation = photoTransportGeneration.get()
+    if (!photoRequestCurrent(generation)) return null
+    val cache = mediaCache
+    cache?.getIfPresent(url, isVideo = false)?.let { file ->
+      // Cache filenames may end in .jpg even when the stored bytes are GIF or WebP.
+      SlideshowDecoder.nativeFilmstripFile(file.path, maxEdge)?.let { bitmap ->
+        if (photoRequestCurrent(generation)) return bitmap
+        bitmap.recycle()
+        return null
+      }
+    }
+    val encoded = runCatching { downloadBytes(url, headers, generation) }.getOrNull() ?: return null
+    if (!photoRequestCurrent(generation)) return null
+    cache?.putImage(url, encoded)
+    if (!photoRequestCurrent(generation)) return null
+    val bitmap = SlideshowDecoder.nativeFilmstripBytes(encoded, maxEdge)
+    if (photoRequestCurrent(generation)) return bitmap
+    bitmap?.recycle()
+    return null
   }
 
   /**

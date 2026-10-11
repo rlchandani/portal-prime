@@ -138,6 +138,17 @@ internal fun ApprovedHomeTabs(
 }
 
 private class ApprovedHomeTabView(val view: ComposeView, private val host: LifecycleOwner) {
+  // Translate a plain native drawing boundary, keeping Compose's own host coordinates stable.
+  val layer = FrameLayout(view.context).apply {
+    importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+    clipChildren = true
+    addView(view, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+  }
+  private val originalLayerType = layer.layerType
+  fun cacheDrawing(value: Boolean) {
+    val target = if (value && layer.isHardwareAccelerated) View.LAYER_TYPE_HARDWARE else originalLayerType
+    if (layer.layerType != target) layer.setLayerType(target,null)
+  }
   val input = LauncherPageInputGate()
   var active by mutableStateOf(false)
     private set
@@ -205,7 +216,7 @@ private class ApprovedHomeTabViews(
           it.activate(tab == transition.selected)
           // Match the previous host's Home/Apps/Tools draw order even after out-of-order visits.
           val index = pages.keys.count { existing -> existing.ordinal < tab.ordinal }
-          addView(it.view, index, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+          addView(it.layer, index, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         }
       }
 
@@ -213,12 +224,12 @@ private class ApprovedHomeTabViews(
     pages.forEach { (tab, page) ->
       page.activate(tab == transition.selected)
       // INVISIBLE keeps measurement and composition; no offscreen page display list is drawn.
-      page.view.visibility = if (tab in transition.visible) View.VISIBLE else View.INVISIBLE
+      page.layer.visibility = if (tab in transition.visible) View.VISIBLE else View.INVISIBLE
     }
   }
 
   private fun applyPositions() {
-    pages.forEach { (tab, page) -> page.view.translationX = transition.offset(tab) * width }
+    pages.forEach { (tab, page) -> page.layer.translationX = transition.offset(tab) * width }
   }
 
   private fun canRunPageMotion(): Boolean = !released && attached &&
@@ -227,10 +238,16 @@ private class ApprovedHomeTabViews(
   private fun synchronizeAnimation(afterLayout: Boolean = false) {
     if (released) return
     val current = animator
-    if (!canRunPageMotion()) current?.pause()
-    else if (current != null) {
+    if (!canRunPageMotion()) {
+      current?.pause()
+      cacheVisiblePages(false)
+    } else if (current != null) {
+      cacheVisiblePages(true)
       if (current.isPaused) current.resume()
-    } else startPending(afterLayout)
+    } else {
+      cacheVisiblePages(true)
+      startPending(afterLayout)
+    }
   }
 
   private fun startPending(afterLayout: Boolean = false) {
@@ -240,6 +257,7 @@ private class ApprovedHomeTabViews(
     if (!incoming.isLaidOut || (!afterLayout && isLayoutRequested)) return
     val plan = pending ?: return
     pending = null
+    cacheVisiblePages(true)
     val next = ValueAnimator.ofFloat(0f, 1f).apply {
       duration = 160L
       interpolator = TimeInterpolator { FastOutSlowInEasing.transform(it) }
@@ -252,6 +270,7 @@ private class ApprovedHomeTabViews(
           if (!released && animator === animation && transition.finish(plan)) {
             animator = null
             updatePages()
+            cacheVisiblePages(true)
             applyPositions()
           }
         }
@@ -288,6 +307,14 @@ private class ApprovedHomeTabViews(
     applyPositions()
   }
 
+  private fun cacheVisiblePages(value: Boolean) {
+    // Keep built textures across tab visits (at most three pages), rather than allocating
+    // them for every 160ms movement. Stop/detach/release clears all cached pages.
+    pages.forEach { (tab,page) ->
+      if (!value || tab in transition.visible) page.cacheDrawing(value)
+    }
+  }
+
   private fun cancelAnimation() {
     val old = animator
     animator = null
@@ -305,6 +332,7 @@ private class ApprovedHomeTabViews(
     transition.settle()
     cancelAnimation()
     pages.values.forEach {
+      it.cacheDrawing(false)
       it.input.update(false)
       // Uninstall the host-lifecycle observer as well as disposing the composition. Otherwise
       // an early release retains the obsolete page View until the Activity is destroyed.

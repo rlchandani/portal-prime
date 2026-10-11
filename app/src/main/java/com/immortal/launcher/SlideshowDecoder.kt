@@ -31,12 +31,27 @@ import java.net.SocketTimeoutException
  * must close its transport to unblock a stuck read, since BitmapFactory is not interruptible.
  */
 object SlideshowDecoder {
-  fun file(path: String, maxEdge: Int = 2400): Bitmap? {
+  fun file(path: String, maxEdge: Int = 2400): Bitmap? = file(path, maxEdge, false)
+
+  /** Native cards cannot animate encoded images; reject the whole deck before Bitmap decode. */
+  fun nativeFilmstripFile(path: String, maxEdge: Int = 1400): Bitmap? = file(path, maxEdge, true)
+
+  fun nativeFilmstripBytes(encoded: ByteArray, maxEdge: Int = 1400): Bitmap? {
+    if (cancelled() || maxEdge <= 0 || encoded.isEmpty() ||
+        encoded.size > SlideshowDecodeBudget.MAX_ENCODED_BYTES) return null
+    if (!NativeFilmstripFormat.isConfirmedStatic(encoded)) throw NativeFilmstripUnsupportedFormat()
+    return bytes(encoded, maxEdge)
+  }
+
+  private fun file(path: String, maxEdge: Int, nativeFilmstrip: Boolean): Bitmap? {
     if (cancelled() || maxEdge <= 0) return null
     return try {
       val file = File(path)
       if (!file.isFile || file.length() !in 1..SlideshowDecodeBudget.MAX_ENCODED_BYTES.toLong()) null
-      else file.inputStream().use { stream(it, maxEdge) }
+      else file.inputStream().use {
+        if (nativeFilmstrip) readEncoded(it)?.let { encoded -> nativeFilmstripBytes(encoded, maxEdge) }
+        else stream(it, maxEdge)
+      }
     } catch (_: IOException) {
       null
     } catch (_: SecurityException) {

@@ -43,12 +43,15 @@ const out = process.argv.find(a => a.startsWith('--out='))?.slice(6);
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const baseline = file => execFileSync('git', ['show', `${base}:${assets}${file}`], { cwd: root, encoding: 'utf8' });
 const current = file => readFileSync(root + assets + file, 'utf8');
-const css = baseline('styles.css'); assert.equal(current('styles.css'), css, 'CSS must remain unchanged');
-const common = ['lib-engine.js', 'modes.js', 'scheduler.js'].map(file => {
-  const source = baseline(file); assert.equal(current(file), source, `${file} must remain unchanged`);
-  return { file, source, sha256: hash(source) };
-});
-const sources = { baseline: baseline('mode-impls.js'), candidate: current('mode-impls.js') };
+let css, common, sources;
+function initializeFrozenSources() {
+  css = baseline('styles.css'); assert.equal(current('styles.css'), css, 'CSS must remain unchanged');
+  common = ['lib-engine.js', 'modes.js', 'scheduler.js'].map(file => {
+    const source = baseline(file); assert.equal(current(file), source, `${file} must remain unchanged`);
+    return { file, source, sha256: hash(source) };
+  });
+  sources = { baseline: baseline('mode-impls.js'), candidate: current('mode-impls.js') };
+}
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function generate(format) {
@@ -289,6 +292,7 @@ async function render(browser, source, photos, viewport, resize = null) {
   } finally { await context.close(); }
 }
 async function main() {
+  initializeFrozenSources();
   ({ chromium } = require('playwright')); sharp = require('sharp');
   const report = { base, mode: controlOnly ? 'baseline-control' : 'candidate',
     caseFilter: caseFilter || null, resizeChecks, phaseAdmission: legacyPhaseAdmission ? 'legacy-no-native-start-frame' : 'two-native-start-frames',

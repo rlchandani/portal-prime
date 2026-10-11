@@ -40,11 +40,15 @@ android {
     buildConfigField("boolean", "PORTAL_WEBVIEW_BACKGROUND_STARTUP",
         (providers.gradleProperty("portalWebViewBackgroundStartup").orNull == "true").toString())
 
-    // Isolated native rendering candidates; defaults remain the measured retained implementation.
+    // Filmstrip passed Family Area timing/compatibility gates; false keeps the legacy escape hatch.
     buildConfigField("boolean", "PORTAL_NATIVE_FILMSTRIP",
-        (providers.gradleProperty("portalNativeFilmstrip").orNull == "true").toString())
+        ((providers.gradleProperty("portalNativeFilmstrip").orNull ?: "true") == "true").toString())
+    // Native Home has not met its timing gate and remains opt-in for controlled experiments.
     buildConfigField("boolean", "PORTAL_NATIVE_HOME_TABS",
         (providers.gradleProperty("portalNativeHomeTabs").orNull == "true").toString())
+
+    // Fixed-control functional probes stay dormant in production variants.
+    buildConfigField("boolean", "PORTAL_HOME_UI_DIAGNOSTICS", "false")
 
     // Portal hardware is ARM only (gen-1/gen-2 Snapdragon, Portal TV Amlogic).
     // Kept as a guard so any future native dependency can't drag x86/x86_64 .so
@@ -92,6 +96,8 @@ android {
     // changing them belongs in a separately measured candidate.
     create("benchmark") {
       initWith(getByName("release"))
+      // Benchmark-only test access; Fleet auth, Dev Mode, Window and collector guards remain.
+      buildConfigField("boolean", "PORTAL_HOME_UI_DIAGNOSTICS", "true")
       applicationIdSuffix = ".debug"
       isDebuggable = false
       signingConfig = signingConfigs.getByName("debug")

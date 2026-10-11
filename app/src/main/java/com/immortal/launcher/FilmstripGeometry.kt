@@ -6,6 +6,8 @@
  */
 package com.immortal.launcher
 
+import kotlin.math.roundToInt
+
 /**
  * Pure geometry for the filmstrip in screensaver/mode-impls.js and styles.css.
  * Dimensions are caller-supplied CSS units; the gap remains 60 in those units.
@@ -25,6 +27,25 @@ internal object FilmstripGeometry {
 
   /** Scaled card bounds, excluding the CSS shadow, clipping and backdrop. */
   data class Rect(val left: Float, val top: Float, val width: Float, val height: Float)
+
+  data class PixelBounds(val left: Int, val top: Int, val width: Int, val height: Int)
+
+  /** Android layout bounds before property transforms; viewport coordinates are explicit. */
+  fun cardPixelBounds(layout: Layout, index: Int, density: Float): PixelBounds? {
+    if (!valid(layout) || index !in layout.cards.indices || !positive(density)) return null
+    val card = layout.cards[index]
+    return PixelBounds(((layout.width/2f+card.offset-card.width/2f)*density).roundToInt(),
+        ((layout.height-card.height)/2f*density).roundToInt(),
+        (card.width*density).roundToInt().coerceAtLeast(1),
+        (card.height*density).roundToInt().coerceAtLeast(1))
+  }
+
+  fun backdropPixelBounds(layout: Layout, density: Float): PixelBounds? {
+    if (!valid(layout) || !positive(density)) return null
+    return PixelBounds(-(layout.width*density*.19f).roundToInt(),
+        -(layout.height*density*.19f).roundToInt(),
+        (layout.width*density*1.38f).roundToInt(),(layout.height*density*1.38f).roundToInt())
+  }
 
   private const val MAX_CARDS = 12
   private const val HEIGHT_FRACTION = .62

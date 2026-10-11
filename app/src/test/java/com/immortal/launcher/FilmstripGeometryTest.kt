@@ -15,6 +15,32 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class FilmstripGeometryTest {
+  @Test fun androidCardBoundsUseTheViewportForEveryCenteredCard() {
+    val layout = FilmstripGeometry.layout(1080f,720f,List(12) { 1.5f })!!
+    for (index in layout.cards.indices) {
+      val bounds = FilmstripGeometry.cardPixelBounds(layout,index,2f)!!
+      assertEquals(1080f,bounds.left+bounds.width/2f-layout.cards[index].offset*2f,1f)
+      assertEquals(720f,bounds.top+bounds.height/2f,1f)
+      assertTrue(bounds.top > 0)
+    }
+  }
+  @Test fun androidBackdropOverscanIsCenteredOnTheFullViewport() {
+    val layout = FilmstripGeometry.layout(1080f,720f,listOf(1f))!!
+    val bounds = FilmstripGeometry.backdropPixelBounds(layout,2f)!!
+    assertEquals(1080f,bounds.left+bounds.width/2f,1f)
+    assertEquals(720f,bounds.top+bounds.height/2f,1f)
+    assertEquals(2981,bounds.width)
+    assertEquals(1987,bounds.height)
+  }
+  @Test fun androidPixelBoundsRejectInvalidDensityAndRetainPortraitCentering() {
+    val layout = FilmstripGeometry.layout(720f,1080f,listOf(.5f,1.5f))!!
+    assertNull(FilmstripGeometry.cardPixelBounds(layout,0,0f))
+    assertNull(FilmstripGeometry.backdropPixelBounds(layout,Float.NaN))
+    val bounds = FilmstripGeometry.cardPixelBounds(layout,1,2f)!!
+    assertEquals(720f,bounds.left+bounds.width/2f-layout.cards[1].offset*2f,1f)
+    assertEquals(1080f,bounds.top+bounds.height/2f,1f)
+  }
+
   @Test fun mixedAspectsKeepFractionalSizesAndSixtyCssUnitGaps() {
     val layout = FilmstripGeometry.layout(1200.5f, 801.25f, listOf(.5f, 1.625f, 2.25f))!!
     assertEquals(1200.5f, layout.width, 0f)

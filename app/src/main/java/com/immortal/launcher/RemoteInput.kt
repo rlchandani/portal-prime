@@ -10,10 +10,15 @@ package com.immortal.launcher
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.accessibilityservice.GestureDescription
+import android.content.Context
 import android.graphics.Path
+import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityWindowInfo
 import kotlin.concurrent.thread
 
 /**
@@ -139,6 +144,109 @@ object RemoteInput {
       } finally {
         root.recycle()
       }
+    }
+  }
+
+  // --- private native Home functional diagnostics ----------------------------
+
+  /** The service and pooled nodes remain private; only finite sanitized data escapes. */
+  internal fun homeUiSnapshot(context: Context): HomeUiDiagnostics.Read {
+    val svc = service ?: return HomeUiDiagnostics.Read(error = "home_ui_service_unavailable")
+    return readHomeUi(svc, context)
+  }
+
+  internal fun homeUiLongPress(context: Context, x: Double, y: Double,
+      deadline: Long): FleetHttpServer.Response {
+    val svc = service ?: return HomeUiDiagnostics.error(409, "home_ui_service_unavailable")
+    val read = readHomeUi(svc, context)
+    val state = read.state ?: return HomeUiDiagnostics.error(409, read.error ?: "home_ui_unavailable")
+    // A same-package settings/credential Activity or active dialog is not a Home touch target.
+    if (state.truncated || !state.dockPresent()) return HomeUiDiagnostics.error(409, "home_ui_dock_required")
+    if (!HomeUiDiagnostics.validPoint(x, y, state.width, state.height))
+      return HomeUiDiagnostics.error(400, "home_ui_point_outside_screen")
+    // Functional runs use the fixed public app row. A hold on an ordinary setting/control
+    // could become its click on release; restrict this endpoint to actual app long-click nodes.
+    if (!state.publicLongPressTarget(x, y)) return HomeUiDiagnostics.error(409, "home_ui_public_app_required")
+    if (HomeUiDiagnostics.collectorBusy()) return HomeUiDiagnostics.error(409, "home_ui_perf_busy")
+    if (service !== svc || !gesturesAvailable()) return HomeUiDiagnostics.error(409, "home_ui_gestures_unavailable")
+    // A busy Main may finish a tree read after its caller timed out. Never send a late touch.
+    if (SystemClock.elapsedRealtime() >= deadline) return HomeUiDiagnostics.error(503, "home_ui_main_timeout")
+    val path = Path().apply { moveTo(x.toFloat(), y.toFloat()) }
+    val accepted = dispatch(svc, path, HomeUiDiagnostics.LONG_PRESS_MS)
+    // Dispatch acceptance is not functional success. The operator must GET the resulting menu.
+    return FleetHttpServer.Response(if (accepted) 200 else 503,
+        org.json.JSONObject().put("ok", accepted).put("accepted", accepted)
+            .put("durationMs", HomeUiDiagnostics.LONG_PRESS_MS).put("verifyWithGet", true).toString())
+  }
+
+  @Suppress("DEPRECATION") // Portal API 28/29 pools both nodes and windows.
+  private fun readHomeUi(svc: AccessibilityService, context: Context): HomeUiDiagnostics.Read {
+    val root = svc.rootInActiveWindow ?: return HomeUiDiagnostics.Read(error = "home_ui_no_active_root")
+    var window: AccessibilityWindowInfo? = null
+    try {
+      if (root.packageName?.toString() != context.packageName)
+        return HomeUiDiagnostics.Read(error = "home_ui_foreign_window")
+      window = root.window
+      if (window?.type != AccessibilityWindowInfo.TYPE_APPLICATION || window?.isActive != true)
+        return HomeUiDiagnostics.Read(error = "home_ui_application_window_required")
+      val dm = svc.resources.displayMetrics
+      val width = dm.widthPixels
+      val height = dm.heightPixels
+      if (width <= 0 || height <= 0) return HomeUiDiagnostics.Read(error = "home_ui_screen_unavailable")
+      // Query only this immutable public allowlist. No inventory refresh or labels are read.
+      val installed = listOf("org.chromium.chrome", "com.android.chrome", "com.android.browser",
+          "com.portal.assistant").filter { pkg ->
+        runCatching { context.packageManager.getApplicationInfo(pkg, 0) }.isSuccess
+      }.toSet()
+      val allowedPublic = buildSet {
+        if (installed.any { it != "com.portal.assistant" }) { add("browser"); add("chromium") }
+        if ("com.portal.assistant" in installed) add("jarvis")
+      }
+      val nodes = ArrayList<HomeUiDiagnostics.Node>()
+      var visited = 0
+      var childReads = 0
+      var truncated = false
+      fun walk(node: AccessibilityNodeInfo, parent: Int, depth: Int) {
+        if (visited >= HomeUiDiagnostics.MAX_NODES) { truncated = true; return }
+        val index = visited++
+        if (node.packageName?.toString() != context.packageName) return
+        val rect = Rect()
+        node.getBoundsInScreen(rect)
+        val bounds = HomeUiDiagnostics.Bounds(rect.left, rect.top, rect.right, rect.bottom)
+        val visible = node.isVisibleToUser && bounds.visible(width, height)
+        val editable = node.isEditable
+        val password = node.isPassword
+        if (visible) {
+          // Editable values never enter label matching. Only a fixed hint can match a search.
+          val textKey = if (!editable && !password) HomeUiDiagnostics.fixedKey(node.text) else null
+          val descriptionKey = if (!password) HomeUiDiagnostics.fixedKey(node.contentDescription) else null
+          val candidate = textKey ?: descriptionKey
+          val key = candidate?.takeUnless { it in setOf("browser", "chromium", "jarvis") && it !in allowedPublic }
+          val hint = if (!password && Build.VERSION.SDK_INT >= 26)
+            HomeUiDiagnostics.fixedKey(node.hintText) else null
+          val searchHint = listOf(hint, descriptionKey).firstOrNull { it == "searchApps" || it == "searchInstalledApps" }
+          nodes.add(HomeUiDiagnostics.Node(parent, bounds, key, node.isClickable, node.isLongClickable,
+              node.isFocused, node.isAccessibilityFocused, editable, password,
+              node.className?.toString() == "android.widget.EditText", searchHint,
+              if (editable && !password) node.text?.length ?: 0 else null, id = index))
+        }
+        val children = node.childCount
+        if (depth >= HomeUiDiagnostics.MAX_DEPTH) { if (children > 0) truncated = true; return }
+        for (i in 0 until children) {
+          if (visited >= HomeUiDiagnostics.MAX_NODES || childReads >= HomeUiDiagnostics.MAX_NODES - 1) {
+            truncated = true; break
+          }
+          childReads++
+          val child = node.getChild(i) ?: continue
+          try { walk(child, index, depth + 1) } finally { child.recycle() }
+        }
+      }
+      walk(root, -1, 0)
+      return HomeUiDiagnostics.Read(HomeUiDiagnostics.State(width, height, visited, truncated, nodes))
+    } catch (_: Exception) {
+      return HomeUiDiagnostics.Read(error = "home_ui_read_failed")
+    } finally {
+      try { window?.recycle() } finally { root.recycle() }
     }
   }
 
