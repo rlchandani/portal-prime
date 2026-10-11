@@ -204,6 +204,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
 import org.json.JSONObject
@@ -264,6 +265,10 @@ private object ApprovedHomeInventory {
     }.getOrDefault(false)
   }
 }
+
+/** Package changes refresh every consumer of the shared app artwork inventory. */
+internal val approvedIconInventoryRevision: StateFlow<Long>
+  get() = ApprovedHomeInventory.revision
 
 /** A dashboard address changes the shortcut inventory, without another package scan on each frame. */
 internal fun invalidateApprovedDashboardInventory() = ApprovedHomeInventory.invalidate()

@@ -10,7 +10,6 @@ package com.immortal.launcher
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -31,6 +30,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,11 +47,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import java.util.Locale
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -179,13 +179,6 @@ object ScreensaverDismiss {
   }
 }
 
-/** One installed, launchable app shown in the picker. */
-private data class PickEntry(
-    val label: String,
-    val component: ComponentName,
-    val icon: ImageBitmap,
-)
-
 /**
  * Picker for the "open this when the screensaver is dismissed" setting. Offers a Home
  * Assistant section (only when an HA app is installed) with an optional dashboard deep
@@ -209,21 +202,33 @@ private enum class ApprovedEditorsDismissPopup { TARGET, APPS, HA_PATH }
 internal fun ScreensaverDismissContent() {
   val context = LocalContext.current
   var settings by remember { mutableStateOf(ScreensaverConfig.load(context)) }
-  var haPkg by remember { mutableStateOf<String?>(null) }
-  var apps by remember { mutableStateOf<List<PickEntry>?>(null) }
-  var haIcon by remember { mutableStateOf<ImageBitmap?>(null) }
+  val inventoryRevision by approvedIconInventoryRevision.collectAsState()
+  var inventory by remember { mutableStateOf<ScreensaverAppInventory?>(null) }
+  var loadedRevision by remember { mutableStateOf<Long?>(null) }
+  var loadFailed by remember { mutableStateOf(false) }
+  var retryCount by remember { mutableStateOf(0) }
+  val choicesReady = inventory != null && loadedRevision == inventoryRevision
+  val apps = if (choicesReady) inventory?.apps else null
+  val haPkg = if (choicesReady) inventory?.haPackage else null
+  val haIcon = if (choicesReady) inventory?.haIcon else null
   var popup by remember { mutableStateOf<ApprovedEditorsDismissPopup?>(null) }
   var path by remember { mutableStateOf("") }
   var query by remember { mutableStateOf("") }
   val advanced = rememberApprovedAdvanced()
   // Composition-owned IO cancels when this rich editor leaves the Settings pane.
   val application = context.applicationContext
-  LaunchedEffect(application) {
-    val result = withContext(Dispatchers.IO) {
-      val pkg = ScreensaverDismiss.installedHaPackage(application)
-      Triple(pkg, pkg?.let { ScreensaverDismiss.appIcon(application, it) }, loadLaunchableApps(application))
+  LaunchedEffect(application, inventoryRevision, retryCount) {
+    loadedRevision = null
+    loadFailed = false
+    try {
+      val result = withContext(Dispatchers.IO) { loadScreensaverAppInventory(application) }
+      inventory = result
+      loadedRevision = inventoryRevision
+    } catch (cancelled: CancellationException) {
+      throw cancelled
+    } catch (_: Exception) {
+      loadFailed = true
     }
-    haPkg = result.first; haIcon = result.second; apps = result.third
   }
   val matches = remember(apps, query) {
     val q = query.trim()
@@ -251,6 +256,10 @@ internal fun ScreensaverDismissContent() {
       }, modifier = Modifier.semantics {
         contentDescription = "Open when you tap to exit"
       }) { popup = ApprovedEditorsDismissPopup.TARGET }
+    }
+    if (loadFailed) {
+      FooterNote("Your installed apps couldn't be loaded. Try again.")
+      ApprovedEditorsButton("Try again") { retryCount++ }
     }
     if (settings.dismissHaDashboard != null && haPkg == null && apps != null) {
       FooterNote("The Home Assistant companion app is unavailable. The screensaver returns to Immortal.")
@@ -292,7 +301,8 @@ internal fun ScreensaverDismissContent() {
       ApprovedEditorsField("Search installed apps", query, { query = it }, placeholder = "Name or package")
       Card {
         val list = matches
-        if (list == null) ApprovedEditorsEmpty("Finding your apps…")
+        if (list == null) ApprovedEditorsEmpty(if (loadFailed) "Your apps couldn't be loaded."
+          else "Finding your apps…")
         else if (list.isEmpty()) ApprovedEditorsEmpty(if (query.isBlank()) "No launchable apps found."
           else "No apps match \"$query\".")
         else LazyColumn(Modifier.fillMaxWidth().heightIn(max = 560.dp)) {
@@ -305,6 +315,10 @@ internal fun ScreensaverDismissContent() {
             }
           }
         }
+      }
+      if (loadFailed) {
+        Spacer(Modifier.size(16.dp))
+        ApprovedEditorsButton("Try again") { retryCount++ }
       }
       Spacer(Modifier.size(24.dp))
       ApprovedEditorsButton("Cancel") { popup = null }
@@ -342,36 +356,4 @@ private fun DismissRow(
     RadioButton(selected, onClick = null,
       colors = RadioButtonDefaults.colors(selectedColor = IosBlue, unselectedColor = IosChevron))
   }
-}
-
-/**
- * Installed launchable apps, mirroring the launcher's own curation (hidden packages,
- * label overrides, one tile per package) so the picker shows the same friendly set the
- * user sees on the home screen — minus Immortal itself.
- */
-private fun loadLaunchableApps(context: Context): List<PickEntry> {
-  val pm = context.packageManager
-  val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-  return pm.queryIntentActivities(intent, 0)
-      .filter {
-        val pkg = it.activityInfo.packageName
-        pkg != context.packageName && !Curation.isHidden(pkg, "")
-      }
-      .mapNotNull { ri ->
-        runCatching {
-              val ai = ri.activityInfo
-              val rawLabel = ri.loadLabel(pm).toString()
-              val bmp: Bitmap = ri.loadIcon(pm).toBitmap(144, 144)
-              PickEntry(
-                  label = Curation.displayLabel(ai.packageName, rawLabel),
-                  component = ComponentName(ai.packageName, ai.name),
-                  icon = bmp.asImageBitmap(),
-              ) to rawLabel
-            }
-            .getOrNull()
-      }
-      .filterNot { (_, raw) -> raw in Curation.hiddenLabels }
-      .map { it.first }
-      .distinctBy { it.component.packageName }
-      .sortedBy { it.label.lowercase(Locale.getDefault()) }
 }
