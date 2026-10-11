@@ -297,6 +297,8 @@ class NavSpec<S>(
     val activity: Class<*>,
     val help: String? = null,
     val visible: (Context, S) -> Boolean = { _, _ -> true },
+    /** UI-only execution policy for labels that query an Android service. */
+    val valueOnWorker: Boolean = false,
 ) : SettingSpec<S> {
   override fun visibleWhen(c: Context, s: S) = visible(c, s)
 

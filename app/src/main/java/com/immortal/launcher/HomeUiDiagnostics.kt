@@ -54,7 +54,10 @@ internal object HomeUiDiagnostics {
       // Static category and embedded page titles from ApprovedSettingsNavigation. Shared
       // titles use one key; their separate nodes/bounds identify the sidebar and detail pane.
       "Photos & screensaver" to "photosScreensaver", "Home & widgets" to "homeWidgets",
-      "Slideshow" to "slideshowSettings", "Home Assistant dashboard" to "homeAssistantDashboard",
+      "Slideshow" to "slideshowSettings",
+      "Slideshow settings list" to "slideshowSettingsList",
+      "Slideshow destination ready" to "slideshowDestinationReady",
+      "Slideshow destination unavailable" to "slideshowDestinationUnavailable", "Home Assistant dashboard" to "homeAssistantDashboard",
       "Settings Back" to "settingsBack", "Settings Forward" to "settingsForward",
       "Adjust brightness" to "displayBrightnessSlider", "Adjust media volume" to "displayVolumeSlider",
       "Sound & wake" to "soundWake", "Connections" to "connections",

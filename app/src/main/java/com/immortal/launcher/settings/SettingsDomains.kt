@@ -251,7 +251,8 @@ object SettingsDomains {
                       help =
                           "Tapping the screensaver wakes the Portal. By default that brings you home to " +
                               "Immortal - or pick an app (like Home Assistant) to drop straight into.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      valueOnWorker = true),
                   DerivedSpec("source", get = { it.source }),
                   DerivedSpec("folderPath", get = { it.folderPath ?: "" }),
                   DerivedSpec("albumUrl", get = { it.albumUrl ?: "" }),

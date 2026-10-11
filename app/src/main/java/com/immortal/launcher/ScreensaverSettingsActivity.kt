@@ -99,7 +99,7 @@ internal fun screensaverSettingsDetail(): ApprovedSettingsLazyDetail {
   LaunchedEffect(requested, index) { if (index != null) scroll.scrollToItem(index) }
   val firstFocus = remember { FocusRequester() }
   var focusedOnce by remember { mutableStateOf(false) }
-  return ApprovedSettingsLazyDetail(scroll) {
+  return ApprovedSettingsLazyDetail(scroll, accessibilityLabel = "Slideshow settings list") {
     item(key = "screensaver.enabled", contentType = "master") {
       // The host creates this list model before its incoming pane mounts. Request focus
       // from the attached row, once per visit, rather than before the FocusRequester attaches.

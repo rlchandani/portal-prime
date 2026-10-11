@@ -95,6 +95,7 @@ internal fun rememberApprovedAdvanced(): Boolean = com.immortal.launcher.ui.them
 
 internal data class ApprovedSettingsLazyDetail(
     val state: LazyListState,
+    val accessibilityLabel: String? = null,
     val body: LazyListScope.() -> Unit,
 )
 
@@ -456,7 +457,9 @@ private fun ApprovedSettingsDetailBody(
             }
         } else {
             LazyColumn(
-                observedModifier.focusGroup(),
+                observedModifier.focusGroup().then(detail.lazy.accessibilityLabel?.let { label ->
+                    Modifier.semantics { contentDescription = label }
+                } ?: Modifier),
                 state = detail.lazy.state,
                 contentPadding = PaddingValues(start = 48.dp, end = 48.dp, top = 40.dp, bottom = 80.dp),
             ) {

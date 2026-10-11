@@ -25,6 +25,7 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -42,6 +43,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
@@ -60,6 +62,8 @@ import com.immortal.launcher.settings.SettingSpec
 import com.immortal.launcher.settings.SettingsDomain
 import com.immortal.launcher.settings.SettingsPresentation
 import com.immortal.launcher.settings.StringSpec
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 
 /**
  * Registry-driven native rows. Presentation filtering is additive to every existing parent
@@ -300,13 +304,43 @@ private fun <S> SettingControl(
             }
             is NavSpec<*> -> {
                 val s = spec as NavSpec<S>
-                NavRow(s.title, s.value(context, snapshot)) {
-                    open(s.activity)
+                if (s.valueOnWorker) {
+                    WorkerNavigationRow(domainId, s, snapshot) { open(s.activity) }
+                } else {
+                    NavRow(s.title, s.value(context, snapshot)) { open(s.activity) }
                 }
             }
             is DerivedSpec<*> -> Unit
         }
     }
+}
+
+/** Only service-backed values opt in; snapshot-only rows keep their immediate labels. */
+@Composable
+private fun <S> WorkerNavigationRow(domainId: String, spec: NavSpec<S>, snapshot: S, onOpen: () -> Unit) {
+    val application = LocalContext.current.applicationContext
+    val owner = LocalLifecycleOwner.current
+    val pageActive = LocalApprovedLauncherPageActive.current
+    val loaded by produceState<SettingNavigationValue>(SettingNavigationValue.Loading,
+        application, spec, snapshot, owner, pageActive) {
+        if (!pageActive) return@produceState
+        owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            value = SettingNavigationValue.Loading
+            value = loadSettingNavigationValue { spec.value(application, snapshot) }
+        }
+    }
+    val label = when (val state = loaded) {
+        SettingNavigationValue.Loading -> "Loading…"
+        is SettingNavigationValue.Ready -> state.text
+        SettingNavigationValue.Unavailable -> "Unavailable"
+    }
+    val marker = if (domainId == "screensaver" && spec.key == "dismissTarget") when (loaded) {
+        is SettingNavigationValue.Ready -> "Slideshow destination ready"
+        SettingNavigationValue.Unavailable -> "Slideshow destination unavailable"
+        SettingNavigationValue.Loading -> null
+    } else null
+    NavRow(spec.title, label, modifier = if (marker == null) Modifier else
+        Modifier.semantics { contentDescription = marker }, onClick = onOpen)
 }
 
 /** Numeric choices open the approved dialog; bounds/wrapping come exclusively from the spec. */
