@@ -180,7 +180,7 @@ then completed. Neither stop is a product performance failure.
 | Filmstrip p95 | At least 20% lower than both fresh baselines | 53.25/50.50 to 14.50 ms; 71.3–72.8% lower | Passed and deployed |
 | Filmstrip p99 | At least 20% lower than both fresh baselines | 120.50/125.50 to 17.50 ms; 85.5–86.1% lower | Passed and deployed |
 | Filmstrip mean | No regression above 5% | 29.14/28.80 to 10.14 ms; 64.8–65.2% lower | Passed |
-| Home performance | Same p95/p99 gate | Common trial p95 45.50 ms, p99 70.00 ms; both gates failed | Established renderer retained; outlier unresolved |
+| Home performance | Same p95/p99 gate | Shipped renderer: mean 13.99 ms, p95 45.75 ms, p99 58.00 ms; no accepted Home optimization | Established renderer retained; outlier unresolved |
 | Home controls | All seven fixed scenarios | 7/7 passed on exact final APK | Passed |
 | Image geometry/navigation | Mixed-size and one-photo cases | 2/2 cases, 14 generated-only screenshots | Passed |
 | Shuffle soak | 900 seconds; both handoff directions; app PSS at most 512 MiB and growth at most 256 MiB | 284 observations; 131.5–209.3 MiB app PSS; peak growth 43.4 MiB from start | Passed |
@@ -195,3 +195,22 @@ not establish improvements for every other slideshow style. Actual screen-off/wa
 needs a device sleep capability change before it can be physically tested; that capability was
 not modified. The final native shadow is not claimed pixel-identical to the old CSS shadow.
 No delivered FPS or end-to-end physical touch latency claim is made.
+
+
+## Final deployed Home measurement
+
+One descriptive block on the exact deployed v10 APK completed thirty Home/Apps cycles with
+782 measured frames. Mean was 13.99 ms, p95 45.75 ms, p99 58.00 ms, maximum 80.50 ms;
+120/782 frames exceeded the 16.67 ms budget (15.35%). Callback drops, invalid samples and
+overflow samples were all zero. Installed bytes, configuration, schema and sources remained
+unchanged, and the owned collector stopped. There were no Living Area operations.
+
+The worst recorded frame had 62.01 ms of animation work (77.0% of its 80.50 ms total),
+11.83 ms draw and 0.22 ms layout. This narrows the next investigation toward animation-time
+composition/semantics work; one worst-frame decomposition does not independently establish
+a specific causal code path. This single block describes the shipped Home renderer; it is
+not a new paired comparison or evidence of an accepted Home improvement.
+
+Two extra setup attempts stopped before starting collectors. The corrected setup waits for
+the owned Home Window and uses each endpoint's actual acknowledgement schema: Home returns
+`dispatched`, while Apps returns `ok`/`action`. The final timed cadence stayed unchanged.
