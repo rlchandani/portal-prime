@@ -31,12 +31,18 @@ object DevicePermissions {
       val fix: String,
   )
 
-  fun all(context: Context): List<Check> =
-      listOf(
+  data class Snapshot(val checks: List<Check>, val adminActive: Boolean)
+
+  fun all(context: Context): List<Check> = snapshot(context).checks
+
+  /** One administrator query supplies both the health row and the uninstall control. */
+  fun snapshot(context: Context): Snapshot {
+    val adminActive = ScreenControl.isAdminActive(context)
+    val checks = listOf(
           Check(
               title = "Screen off",
               enables = "Turning the screen off — idle timeout, overnight sleep, and the Home Assistant control.",
-              granted = ScreenControl.isAdminActive(context),
+              granted = adminActive,
               degraded = "The screen can't be turned off automatically or from Home Assistant; it stays on.",
               fix = "Re-run Immortal setup — it activates the screen-off device admin (dpm set-active-admin).",
           ),
@@ -69,6 +75,8 @@ object DevicePermissions {
               fix = "Re-run Immortal setup — it grants write-secure-settings (pm grant WRITE_SECURE_SETTINGS).",
           ),
       )
+    return Snapshot(checks, adminActive)
+  }
 
   /** Count of capabilities that aren't granted — 0 means a healthy device. */
   fun issueCount(context: Context): Int = all(context).count { !it.granted }

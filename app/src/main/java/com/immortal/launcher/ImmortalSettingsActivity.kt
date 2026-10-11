@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import androidx.compose.foundation.horizontalScroll
@@ -58,6 +59,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -1405,11 +1407,42 @@ internal fun DeviceHealthScreen(onBack: () -> Unit) {
  *  Activity host) and by the two-panel settings detail panel. */
 @Composable
 internal fun DeviceHealthContent() {
-  val context = LocalContext.current
-  val checks = remember { DevicePermissions.all(context) }
-  val issues = checks.count { !it.granted }
-  var adminActive by remember { mutableStateOf(ScreenControl.isAdminActive(context)) }
+  val context = LocalContext.current.applicationContext
+  val owner = LocalLifecycleOwner.current
+  var refresh by remember { mutableStateOf(0) }
   var confirmingDisable by remember { mutableStateOf(false) }
+  var disablingAdmin by remember { mutableStateOf(false) }
+  val scope = rememberCoroutineScope()
+  val health by produceState<DeviceHealthLoad>(DeviceHealthLoad.Checking, context, owner, refresh) {
+    owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+      confirmingDisable = false
+      value = DeviceHealthLoad.Checking
+      value = loadDeviceHealth { DevicePermissions.snapshot(context) }
+      // Query once per resume, with cancellation on departure and no idle polling.
+      awaitCancellation()
+    }
+  }
+  val snapshot = when (val result = health) {
+    is DeviceHealthLoad.Ready -> result.snapshot
+    else -> {
+      Card {
+        Column(Modifier.padding(28.dp).semantics {
+          contentDescription = if (result == DeviceHealthLoad.Checking)
+            "Checking device permissions" else "Device health check unavailable"
+        }) {
+          Text(if (result == DeviceHealthLoad.Checking) "Checking device permissions…"
+            else "Could not check device permissions.", color = IosSecondary, fontSize = Sizes.rowTitle)
+          if (result == DeviceHealthLoad.Unavailable) {
+            ApprovedSettingsTextButton("Try again") { refresh++ }
+          }
+        }
+      }
+      return
+    }
+  }
+  val checks = snapshot.checks
+  val issues = checks.count { !it.granted }
+  val adminActive = snapshot.adminActive
 
   Column {
       // Summary banner — green when healthy, amber when something needs attention.
@@ -1417,7 +1450,7 @@ internal fun DeviceHealthContent() {
       Surface(
           color = if (issues == 0) Color(0xFFE6F7EA) else Color(0xFFFDF1DD),
           shape = RoundedCornerShape(14.dp),
-          modifier = Modifier.fillMaxWidth(),
+          modifier = Modifier.fillMaxWidth().semantics { contentDescription = "Device health checked" },
       ) {
         Text(
             if (issues == 0) "✓  Everything's set up correctly."
@@ -1471,19 +1504,29 @@ internal fun DeviceHealthContent() {
             modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 10.dp),
         )
         Text(
-            if (confirmingDisable) "Tap again to confirm — this stops automatic screen-off"
+            if (disablingAdmin) "Disabling screen-off admin…"
+            else if (confirmingDisable) "Tap again to confirm — this stops automatic screen-off"
             else "Disable screen-off admin",
             color = IosRed,
             fontSize = Sizes.actionButton,
             fontWeight = if (confirmingDisable) FontWeight.SemiBold else FontWeight.Normal,
             modifier =
-                Modifier.tvFocusable(RoundedCornerShape(8.dp)) {
+                Modifier.tvFocusable(RoundedCornerShape(8.dp), enabled = !disablingAdmin) {
+                      // Reject burst input immediately, before the disabled row can recompose.
+                      if (disablingAdmin) return@tvFocusable
                       // Two-tap arm: a single stray remote press shouldn't tear down device admin
                       // (which silently breaks screensaver sleep + the HA screen-off control).
                       if (confirmingDisable) {
-                        ScreenControl.deactivateAdmin(context)
-                        adminActive = ScreenControl.isAdminActive(context)
                         confirmingDisable = false
+                        disablingAdmin = true
+                        scope.launch {
+                          try {
+                            withContext(Dispatchers.IO) { ScreenControl.deactivateAdmin(context) }
+                            refresh++
+                          } finally {
+                            disablingAdmin = false
+                          }
+                        }
                       } else {
                         confirmingDisable = true
                       }

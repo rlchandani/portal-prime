@@ -60,6 +60,9 @@ internal object HomeUiDiagnostics {
       "Home dashboard" to "homeDashboard", "Intercom" to "intercom", "Device name" to "deviceName",
       "Sleep timer" to "sleepTimer", "About & device health" to "aboutDeviceHealth",
       "Android & Portal settings" to "androidPortalSettings",
+      "Checking device permissions" to "deviceHealthChecking",
+      "Device health checked" to "deviceHealthChecked",
+      "Device health check unavailable" to "deviceHealthUnavailable",
   )
   private val settingsKeys = settingsLabels.values.toSet()
 

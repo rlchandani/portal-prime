@@ -426,4 +426,28 @@ class HomeUiDiagnosticsTest {
     assertNull(snapshot.searchNode())
     assertFalse(snapshot.publicLongPressTarget(50.0, 120.0))
   }
+
+  @Test fun healthStatusesAreReadOnlySettingsEvidence() {
+    val statuses = mapOf("Checking device permissions" to "deviceHealthChecking",
+        "Device health checked" to "deviceHealthChecked",
+        "Device health check unavailable" to "deviceHealthUnavailable")
+    for ((label, key) in statuses) {
+      val snapshot = state(listOf(node(HomeUiDiagnostics.fixedKey(label), left = 300, right = 900)))
+      assertFalse(snapshot.eligible())
+      assertFalse(snapshot.publicLongPressTarget(350.0, 150.0))
+      assertNull(snapshot.searchNode())
+      val rows = snapshot.json().getJSONArray("nodes")
+      assertEquals(1, rows.length())
+      assertEquals(key, rows.getJSONObject(0).getString("key"))
+    }
+  }
+
+  @Test fun healthEvidenceNeverPublishesEditablePasswordOrPermissionDetails() {
+    assertNull(HomeUiDiagnostics.fixedKey("Screen off: granted"))
+    assertNull(HomeUiDiagnostics.fixedKey("Device health checked: PRIVATE_VALUE"))
+    val key = HomeUiDiagnostics.fixedKey("Device health checked")
+    val snapshot = state(listOf(node(key, editable = true), node(key, password = true)))
+    assertEquals(0, snapshot.json().getJSONArray("nodes").length())
+  }
+
 }
