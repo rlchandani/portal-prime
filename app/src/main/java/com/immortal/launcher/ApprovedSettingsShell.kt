@@ -9,8 +9,6 @@ package com.immortal.launcher
 
 import android.app.Activity
 import android.content.Intent
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
@@ -84,8 +82,6 @@ import androidx.compose.foundation.lazy.items
 import org.json.JSONObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 internal val LocalApprovedEnableAdvanced = staticCompositionLocalOf<() -> Unit> { {} }
 
@@ -361,12 +357,11 @@ private fun ApprovedSettingsDeviceIdentity(deviceName: String) {
 
 private class SettingsPane(initial: ApprovedSettingsDetail) {
     val id = "${initial.routeKey}/${initial.requested.orEmpty()}"
-    var detail by mutableStateOf(initial)
-    val opacity = Animatable(1f)
-    var entering by mutableStateOf(true)
+    // Updated after a committed composition; inactive panes retain their own route and draft.
+    var detail = initial
 }
 
-/** Keep at most four visited detail panes; animation changes only their display layers. */
+/** Replace the detail immediately while retaining at most four visited scalar panes. */
 @Composable
 private fun ApprovedSettingsDetailPanes(
     detail: ApprovedSettingsDetail,
@@ -376,51 +371,38 @@ private fun ApprovedSettingsDetailPanes(
     val selected = "${detail.routeKey}/${detail.requested.orEmpty()}"
     var panes by remember { mutableStateOf(listOf(SettingsPane(detail))) }
     val focus = LocalFocusManager.current
-    val distance = with(LocalDensity.current) { 24.dp.toPx() }
-    SideEffect { panes.firstOrNull { it.id == selected }?.detail = detail }
+    // Admit the incoming pane in this composition, rather than waiting for an effect to add it.
+    val target = remember(selected) { panes.firstOrNull { it.id == selected } ?: SettingsPane(detail) }
+    val displayed = remember(panes, target) {
+        (panes.filter { it !== target && it.detail.retainInactive } + target).takeLast(4)
+    }
+    SideEffect {
+        target.detail = detail
+        panes = displayed
+    }
     LaunchedEffect(selected) {
         FramePerformanceCapture.markSettingsUiWork(SettingsUiWorkStage.PANE_EFFECT_START)
         focus.clearFocus(force = true)
-        var incoming = panes.firstOrNull { it.id == selected }
-        if (incoming == null) {
-            incoming = SettingsPane(detail)
-            incoming.opacity.snapTo(0f)
-        }
-        val target = incoming
-        target.entering = true
-        panes.filter { it !== target }.forEach { it.entering = false }
-        // Moving a selected pane to the end makes this a bounded least-recently-used cache.
-        panes = (panes.filter { it !== target && it.detail.retainInactive } + target).takeLast(4)
-        coroutineScope {
-            panes.forEach { pane ->
-                launch { pane.opacity.animateTo(if (pane === target) 1f else 0f, tween(160)) }
-            }
-        }
         FramePerformanceCapture.markSettingsUiWork(SettingsUiWorkStage.PANE_EFFECT_END)
     }
     Box(modifier.clipToBounds()) {
-        panes.forEach { pane ->
-            val active = pane.id == selected
-            // Rich editors own TTS, HTTP requests, polling and drafts. Dispose them as soon
-            // as navigation leaves them rather than retaining those resources out of view.
-            if (active || pane.detail.retainInactive) {
-                key(pane.id) {
-                    Box(Modifier.fillMaxSize().zIndex(if (active) 1f else 0f)
-                        .graphicsLayer {
-                            val progress = pane.opacity.value
-                            alpha = progress
-                            translationX = (if (pane.entering) distance else -distance) * (1f - progress)
-                        }.focusProperties { canFocus = active }
-                        .then(if (active) Modifier else Modifier.clearAndSetSemantics { })
-                        .pointerInput(active) {
-                            if (!active) awaitPointerEventScope {
-                                while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
-                            }
-                        }) {
-                        CompositionLocalProvider(LocalApprovedLauncherPageActive provides active) {
-                            ApprovedLauncherPageLifecycle(active) {
-                                ApprovedSettingsDetailBody(pane.detail, Modifier.fillMaxSize(), onAdvanced)
-                            }
+        displayed.forEach { pane ->
+            val active = pane === target
+            // Rich editors dispose on departure; retained scalar panes stop input and lifecycle work.
+            key(pane.id) {
+                Box(Modifier.fillMaxSize().zIndex(if (active) 1f else 0f)
+                    .graphicsLayer { alpha = if (active) 1f else 0f }
+                    .focusProperties { canFocus = active }
+                    .then(if (active) Modifier else Modifier.clearAndSetSemantics { })
+                    .pointerInput(active) {
+                        if (!active) awaitPointerEventScope {
+                            while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
+                        }
+                    }) {
+                    CompositionLocalProvider(LocalApprovedLauncherPageActive provides active) {
+                        ApprovedLauncherPageLifecycle(active) {
+                            ApprovedSettingsDetailBody(if (active) detail else pane.detail,
+                                Modifier.fillMaxSize(), onAdvanced)
                         }
                     }
                 }
