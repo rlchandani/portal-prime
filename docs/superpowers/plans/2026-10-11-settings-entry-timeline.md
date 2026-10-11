@@ -48,10 +48,10 @@ Living Area and the phone were untouched.
 - [x] Add capture admission tests before implementation; first run fails on absent APIs.
 - [x] Implement pure recorder, capture integration and lifecycle markers.
 - [x] Run focused tests, full unit gate and debug/benchmark builds; freeze artifact inputs.
-- [ ] Review a diagnostic-only runner: 20 warmups + 10 fresh entries, strict collector
+- [x] Review a diagnostic-only runner: 20 warmups + 10 fresh entries, strict collector
   ownership, installed identity and source/configuration guards.
-- [ ] Capture only Family Area, then unconditionally restore and verify the accepted APK.
-- [ ] Analyze paired entry stages and existing frame components; select the next actual
+- [x] Capture only Family Area, then unconditionally restore and verify the accepted APK.
+- [x] Analyze paired entry stages and existing frame components; select the next actual
   optimization from evidence. Diagnostic instrumentation is not a speed improvement.
 
 ## Local validation ledger
@@ -112,3 +112,72 @@ bootstrap 84b96f13447726edc5905c0f3fd287584b09ff8de7131718dd20b1ce1fa4cc47,
 pinned to that ordinary APK. Both are 37,150,356 bytes and match the accepted certificate.
 Bundled SDK mapping decoded/validated successfully; no own-app profile rules.
 The separate retry runner and native capture remain pending.
+
+## Header-path diagnostic: completed, accepted restoration verified
+
+The reviewed retry passed 102 offline contracts (80 runner / 22 analyzer). Native
+session 80078 exited 0 with 20 verified warmups, 10 measured entries and 30 verified
+collector stops; run 496b172e43e14c01b493491ff576f9cb. The original failed trial remains
+failed and immutable. Retry manifest
+4474901faf61a855bc8a95cc1e2a677bc5684e2b766bb6e17332ec98343b729b.
+Offline analyzer session 68436 exited 0. Analysis SHA-256: 0c7998f2b27a04c6f03bdabeceb370541ce526cfecf25d5a3e997d047a3ba2af.
+
+Median recorder intervals (10 entries): launch-to-create 32.4519 ms; create body
+4.6180 ms; resume body 0.6550 ms; create-to-first-pre-draw 71.6288 ms;
+launch-to-first-pre-draw 107.6365 ms; launch-to-frame-callback receipt 123.4978 ms;
+launch-to-focus 132.5862 ms. Callback receipt/pre-draw are not display presentation
+or physical touch latency. Overlapping intervals are not added.
+
+Measured search preparation median was 0.3589 ms, shell composition 10.9174 ms and
+shell measurement 10.8357 ms. Across each entry's component maxima, median layout
+was 50.6401 ms and unknown/main-thread delay was 69.2058 ms. Those maxima need not
+belong to the same frame. Reusing the search index is not selected: its observed
+cost is too small to explain this delay. No speed improvement or promotion.
+
+Candidate cache code 3 retained its one-byte size heuristic warning; fresh actual
+reference/DM and structural OAT evidence passed independently. Accepted cleanup
+restored cache code 1 with fresh direct SDK admission
+8a75b7aca0ca29b57381ae333f17a33d629937ae1acc2118e632fb7cf4a4e753.
+Accepted APK identity, configuration/schema/source groups, Home and inactive
+collectors were verified; Living Area and the phone were untouched.
+
+## Next bounded experiment: immediate Settings window handoff
+
+Source inspection found a separate configured 160 ms Android window alpha fade
+for ImmortalSettingsActivity. The earlier detail-pane transition removal does not
+remove this window animation. This is a UX handoff cost, not a causal explanation
+of the measured FrameMetrics components; do not subtract 160 ms from the recorder
+results or claim measured display latency.
+
+The candidate adds a Settings-specific theme inheriting the existing preview and
+window policy, with windowAnimationStyle null. Only ImmortalSettingsActivity uses
+it. No settings, persistence, route, layout or proposed cascading columns change.
+Rich editors and other Activities retain their current policy.
+
+- [x] Validate debug/benchmark resource linkage and run the unit gate.
+- [ ] Freeze candidate/build inputs in a separate experiment directory.
+- [ ] Verify Settings/Home/search/back on Family Area, including first-draw handoff.
+- [ ] Compare fresh runtime evidence and accept only verified improvement with
+      preserved behavior; otherwise restore the accepted APK and exact source.
+
+Local candidate validation completed: 1,678 tests / 195 suites, zero failures,
+errors or skips; debug and benchmark builds passed. Compiled manifest selects
+Theme.SampleApp.Settings resource 0x7f110111, whose compiled parent remains the
+existing Navigation theme and whose windowAnimationStyle is a null reference.
+The benchmark is non-debuggable, has the accepted signing certificate, and
+retains the established filmstrip/Home/diagnostics/background-startup flags.
+
+Frozen candidate app source: 01786a3daf2d0defc1442686d1ec872e1d94dc568f512ed2d94d8c514dba592d
+(786 files). Ordinary APK: 8407fd11adbd394d1b1a8cf60944757eb8826ebeb0f16419c72af77fa8f006e1;
+bootstrap: a46acf04a4631709e6e43d7a2b6e4f181f28e9a4fc15647e1cae97d119fbfd44,
+both 37,150,452 bytes. Bootstrap metadata is enabled and targets the ordinary
+SHA. Bundled SDK profile decoder/DEX validation passed with zero own-app entries
+(expected mapper exit 1); actual installed admission remains a native-test step.
+
+The current API 29 fleet has no compositor screen-stream or general screenshot
+backend. FrameMetrics, lifecycle markers and compiled window policy cannot prove
+an instantaneous compositor handoff; other transition participants/system policy
+may still animate. Native behavior and rendering regressions remain untested for
+this candidate. No acceptance or performance gain is claimed. Family remains on
+the restored accepted APK. A separate diagnostic-only native driver is being
+prepared; the original failed trial and completed header-path results stay immutable.

@@ -414,7 +414,7 @@
             android:name=".ImmortalSettingsActivity"
             android:exported="false"
             android:label="Immortal Settings"
-            android:theme="@style/Theme.SampleApp.Navigation"
+            android:theme="@style/Theme.SampleApp.Settings"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- Friendly, non-technical guided tour. Opened from the Help tile and once

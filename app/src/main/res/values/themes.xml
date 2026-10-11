@@ -19,6 +19,12 @@
         <item name="android:windowAnimationStyle">@style/Animation.Immortal.Navigation</item>
     </style>
 
+    <!-- Settings keeps the previous surface until its first draw, then appears immediately.
+         Its detail pages already replace content in the same window. -->
+    <style name="Theme.SampleApp.Settings" parent="Theme.SampleApp.Navigation">
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
     <style name="Animation.Immortal.Navigation" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/portal_navigation_enter</item>
         <item name="android:activityOpenExitAnimation">@anim/portal_navigation_stay</item>
