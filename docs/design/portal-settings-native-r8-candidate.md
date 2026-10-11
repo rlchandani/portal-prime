@@ -123,6 +123,20 @@ Candidate SHA-256:
 Previous accepted SHA-256:
 `d1635e3271943c8ed0d447d9ebe6da98692c5cb96d506b203980ade34026f2b4`.
 
+## Header Home follow-up on the accepted artifact
+
+A separate 14.95-second native probe passed three Header Home returns across
+fresh Settings pages: original hidden system bar, visible system bar, and the
+original hidden state again. The actual header target moved 68 physical pixels
+when the system bar appeared. Two matching fresh target bounds were read before
+each single tap; no uncertain tap was retried. Original settings, Home and the
+inactive collector were verified, with the exact accepted APK retained and no
+installation or timing capture. The historical timeout was not reproduced;
+this does not establish its original root cause or claim an app-code fix.
+
+Evidence: `settings-header-home-2026-10-11/postflight.json` beneath the diagnostic
+root above.
+
 ## Official guidance
 
 - [Compose performance](https://developer.android.com/develop/ui/compose/performance).
