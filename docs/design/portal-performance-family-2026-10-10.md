@@ -180,7 +180,7 @@ then completed. Neither stop is a product performance failure.
 | Filmstrip p95 | At least 20% lower than both fresh baselines | 53.25/50.50 to 14.50 ms; 71.3–72.8% lower | Passed and deployed |
 | Filmstrip p99 | At least 20% lower than both fresh baselines | 120.50/125.50 to 17.50 ms; 85.5–86.1% lower | Passed and deployed |
 | Filmstrip mean | No regression above 5% | 29.14/28.80 to 10.14 ms; 64.8–65.2% lower | Passed |
-| Home performance | Same p95/p99 gate | Latest restored baseline: mean 13.91 ms, p95 45.00 ms, p99 60.75 ms; no accepted Home optimization | Established renderer retained; outlier unresolved |
+| Home performance | Same p95/p99 gate | Latest restored baseline: mean 14.24 ms, p95 45.00 ms, p99 60.75 ms; no accepted Home optimization | Established renderer retained; outlier unresolved |
 | Home controls | All seven fixed scenarios | 7/7 passed on exact final APK | Passed |
 | Image geometry/navigation | Mixed-size and one-photo cases | 2/2 cases, 14 generated-only screenshots | Passed |
 | Shuffle soak | 900 seconds; both handoff directions; app PSS at most 512 MiB and growth at most 256 MiB | 284 observations; 131.5–209.3 MiB app PSS; peak growth 43.4 MiB from start | Passed |
@@ -350,3 +350,79 @@ with Home foreground, the collector inactive and settings, schema and photo-sour
 preserved. Living Area had zero operations and retains the same accepted build. Home remains
 unresolved. The next diagnostic priority is separating entering Apps from returning Home,
 rather than attributing aggregate tail timing to tile complexity alone.
+
+
+## Direction-separated and continuous Home attribution
+
+Twenty-four short captures on the exact accepted APK separated entering Apps from returning
+Home, with twelve captures per direction and no install or product-source change. They retained
+313 frames: 157 entering Apps and 156 returning Home. Weighted means were 10.75 ms and 11.30 ms;
+8.28% and 11.54% exceeded the 16.67 ms budget. Each short capture retained only 13–14 frames,
+so its p95 and p99 resolve to the maximum histogram bucket. The median capture maxima were
+19.375 ms and 21.875 ms; these are not pooled p95/p99 and must not be compared as such with
+continuous measurements. Animation was the dominant paired component in 21 of 24 worst frames.
+
+A subsequent faithful continuous thirty-cycle block on the same accepted APK, without reinstall
+or Main sampling, retained 782 frames. Mean was 14.00 ms, p95 37.50 ms, p99 46.25 ms and maximum
+51.52 ms; 123/782 frames (15.73%) exceeded 16.67 ms. Callback drops, invalid samples, overflow,
+listener-attachment failures and untracked frames were all zero. The worst frame paired 32.76 ms
+of animation work, 7.30 ms draw and 7.02 ms commands. Its callback receipt was 78 ms after the
+existing pre-command capture-state read for entering Apps. Earlier checkpoint worst frames were
+associated with returning Home, so both directions still have slow frames during motion.
+
+Command association is callback-receipt timing, not vsync, presentation, physical touch latency
+or a causal stack trace. Differences between short captures and continuous cadence do not prove
+an optimization, observer bug or specific regression. Thermal, JIT and cache state remain
+uncontrolled. Both runs independently verified the exact accepted 19abed09… APK, all settings,
+schema and photo-source groups unchanged, Home foreground and the owned collector inactive.
+Living Area had zero operations. These observations change the next diagnostic focus to work
+performed during page motion; they add no accepted Home performance gain.
+
+
+## Settled-page interaction admission experiment
+
+A false-default candidate retained Compose UI 1.10.4, page lifecycle, drawing, animation and
+producers. Only the selected page's input, focus and descendant accessibility admission waited
+for the existing visible-page set to become a singleton after settlement. The dock stayed
+interactive throughout. Existing touch generations rejected a held gesture across withdrawal
+and readmission; no animation offset was read during composition. Seven pure-predicate tests
+covered initial, incoming, moving, settled, reversed, empty and wrong-singleton states. The
+candidate's full debug/benchmark gate passed 1,576 Android tests across 187 suites, with zero
+failures, errors or skips.
+
+Read-only review found no concrete fix-required bug, but identified promotion checks absent
+from those predicate tests: actual first-entry/mid-slide/three-page interruption, and DOWN while
+blocked followed by UP after admission. They were not performed because the timing gate failed.
+Outside timed capture, each block exposed 68 settled Apps accessibility nodes; the two fixed
+public Browser/Jarvis controls remained clickable and long-clickable. This verifies settled
+external controls, not moving descendant admission or physical touch correctness.
+
+The Family-only thirty-cycle-per-block comparison retained 2,346 frames:
+
+| Home Window metric | Accepted build before | Settlement candidate | Accepted build after |
+| --- | ---: | ---: | ---: |
+| Frames | 783 | 782 | 781 |
+| Mean | 13.63 ms | 14.42 ms | 14.24 ms |
+| p95 | 35.75 ms | 45.25 ms | 45.00 ms |
+| p99 | 44.00 ms | 63.50 ms | 60.75 ms |
+| Above 16.67 ms budget | 16.09% | 15.86% | 16.52% |
+
+Candidate p95 was 0.6–26.6% worse and p99 4.5–44.3% worse than the controls. Mean was 5.8%
+worse than the first control and 1.3% worse than the second. The 20% tail threshold failed
+against both, and the 5% mean limit failed against the first. All callbacks had zero reported
+drops, invalid samples and overflow. Process replacement and thermal/JIT/cache state remain
+uncontrolled; this establishes failed acceptance, not a specific causal regression or RAM gain.
+
+The candidate was rejected. Its frozen APK and all four source files remain private. The
+experimental flag, UI patch, helper and seven tests were removed, restoring the exact accepted
+76b4079c… app source snapshot. Default debug/benchmark builds and 1,569 tests across 186 suites
+then passed, with no failures, errors or skips. The rebuilt APK differs from the accepted one
+in classes3.dex and assets/dexopt/baseline.prof; it was not installed or promoted.
+
+The hardware runner independently restored the exact accepted 19abed09… APK on Family Area,
+with Home foreground, the owned collector inactive, and full settings, schema and photo-source
+groups preserved. Living Area had zero operations. Home remains unresolved. The next diagnostic
+step is stronger bounded method-level attribution, rather than another speculative renderer or
+semantics change. Android's API21 sampling method tracing can run inside the app without ADB or
+root, but API29 validity, process-wide ownership, independent expiry, artifact bounds and cleanup
+must be verified. Profiling runs are attribution only; acceptance timing remains unprofiled.
