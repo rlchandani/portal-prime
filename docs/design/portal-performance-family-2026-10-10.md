@@ -498,3 +498,58 @@ preserved. Living Area had zero operations. The diagnostic APK was not promoted 
 improvement. Home remains unresolved. The next isolated product experiment tests one-most-recent-
 raw-value layout decoding caches while continuing to read current preferences; it will require
 fresh unprofiled comparisons before acceptance.
+
+
+## Layout decoding cache — rejected after complete comparison
+
+Chronological observations motivated a bounded candidate: each of four persisted layout fields
+kept only its most recently decoded raw value, while continuing to read current preferences on
+every call. Oversized values bypassed the cache. Ten regression tests plus twelve existing layout
+tests passed for both opt-in and default paths; the full candidate build passed 1,602 tests
+across 190 suites. The candidate retained Compose UI 1.10.4, native Filmstrip and the accepted
+Home renderer, animation and lifecycle. It changed no saved settings or layouts.
+
+A fresh Family-only, unprofiled before/candidate/after comparison completed thirty Home/Apps
+cycles per block with the same checkpoint-only driver. There were no extra accessibility-tree
+reads during the capture and no Main stack sampling.
+
+| Home Window metric | Accepted build before | Layout-cache candidate | Accepted build after |
+| --- | ---: | ---: | ---: |
+| Frames | 779 | 783 | 782 |
+| Mean | 13.93 ms | 13.45 ms | 13.99 ms |
+| p95 | 43.50 ms | 41.75 ms | 45.00 ms |
+| p99 | 58.50 ms | 61.25 ms | 67.00 ms |
+| Above 16.67 ms budget | 16.17% | 15.45% | 15.22% |
+
+The candidate improved p95 only 4.0–7.2%. Its p99 was 4.7% worse than the first control and
+8.6% better than the second. Both 20% tail gates failed. Mean improved 3.4–3.8%, but that does
+not compensate for the missed tails. All three captures reported zero dropped callbacks,
+invalid samples or overflow. These are Window callback timings, not delivered FPS or physical
+tap latency; process replacement, thermal state, JIT and caches were not controlled. Memory
+samples therefore do not establish a causal RAM gain.
+
+The runner independently restored the exact accepted 19abed09... APK, Home foreground, owned
+collector inactive and full settings/schema/photo-source groups preserved. Living Area had zero
+operations. The three experimental source files were preserved privately and removed, restoring
+committed app-source hash 157ba794... . The default debug/benchmark builds and all 1,592 tests
+across 189 suites passed again. No new performance improvement was promoted.
+
+Protocol review also ruled out per-command pinned-window queries as an explanation of the
+unprofiled timing tails: the normal driver queries pinned status at preparation, checkpoints and
+cleanup, not on every navigation command. The sampled diagnostic used a different protocol,
+so its ForegroundCandidate observations cannot be transferred to the unprofiled comparison.
+
+Home remains unresolved and is the sole current priority. Official Compose guidance recommends
+keeping animation reads out of composition and layout when possible; the current retained Home
+already defers offsets to placement. AndroidX's accessibility implementation notes describe
+semantics copy/diff work on the UI event loop and batched bounds processing. Inspection of the
+pinned 1.10.4 constructor found two evaluations of the same replaced-children getter; the 1.11.4
+constructor evaluates it once. A narrow build-only backport is being verified separately, with
+exact class-identity guards and no blanket dependency upgrade. Its 36 standalone JVM checks pass,
+but SemanticsNode is a contract stub in that harness: actual Android-tree behavior, APK integration
+and hardware performance are not yet established. The next test must remain unprofiled.
+
+References: [Compose performance guidance](https://developer.android.com/develop/ui/compose/performance/bestpractices),
+[Compose phases](https://developer.android.com/develop/ui/compose/phases),
+[animation guidance](https://developer.android.com/develop/ui/compose/animation/quick-guide), and
+[AndroidX accessibility implementation notes](https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/ui/ui/src/androidMain/kotlin/androidx/compose/ui/platform/accessibility/android_a11y_implementation_notes.md).
