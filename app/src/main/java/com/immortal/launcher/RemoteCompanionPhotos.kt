@@ -48,26 +48,42 @@ internal object RemoteCompanionPhotoPolicy {
     }
   }
 
-  /** Reserve without replacement, verify a temporary file, then publish it by atomic rename. */
-  @Synchronized fun store(folder: File, name: String, expected: Int, write: (OutputStream) -> Long, verify: (File) -> Boolean): String {
+  private val publicationLock = Any()
+
+  /** Receive and verify privately, then reserve and publish under the short mutation lock. */
+  fun store(folder: File, name: String, expected: Int, write: (OutputStream) -> Long,
+      verify: (File) -> Boolean, publishLock: Any = publicationLock,
+      canPublish: () -> Boolean = { true }): String {
     if (!validName(name) || expected !in 1..MAX_BYTES) return "invalid_upload"
     val destination = File(folder, name)
     if (destination.exists()) return "collision"
-    val temp = File.createTempFile(".immortal-upload-", ".tmp", folder)
-    var reserved = false
+    var temp: File? = null
+    var stagingParent: String? = null
     return try {
-      val bytes = FileOutputStream(temp).use { out -> val count = write(out); out.fd.sync(); count }
-      if (bytes != expected.toLong() || temp.length() != expected.toLong()) return "incomplete_upload"
-      if (!verify(temp)) return "invalid_image"
-      // createNewFile is O_EXCL: concurrent uploads can never replace an existing photo.
-      if (!destination.createNewFile()) return "collision"
-      reserved = true
-      if (!temp.renameTo(destination)) return "commit_failed"
-      reserved = false
-      "stored"
-    } catch (e: Exception) { "upload_failed" }
-    finally { temp.delete(); if (reserved && destination.length() == 0L) destination.delete() }
+      stagingParent = folder.canonicalPath
+      val staged = File.createTempFile(".immortal-upload-", ".tmp", folder)
+      temp = staged
+      val bytes = FileOutputStream(staged).use { out -> val count = write(out); out.fd.sync(); count }
+      if (bytes != expected.toLong() || staged.length() != expected.toLong()) return "incomplete_upload"
+      if (!verify(staged)) return "invalid_image"
+      synchronized(publishLock) {
+        // Recheck the canonical folder after the network transfer, before touching the destination.
+        if (!canPublish()) return@synchronized "folder_unavailable"
+        // O_EXCL prevents replacing another upload; readers cannot observe this reservation.
+        if (!destination.createNewFile()) return@synchronized "collision"
+        var committed = false
+        try {
+          if (!staged.renameTo(destination)) return@synchronized "commit_failed"
+          committed = true
+          "stored"
+        } finally {
+          if (!committed && destination.length() == 0L) destination.delete()
+        }
+      }
+    } catch (_: Exception) { "upload_failed" }
+    finally { temp?.let { runCatching { if (it.parentFile?.canonicalPath == stagingParent) it.delete() } } }
   }
+
 }
 
 /** Open under the photo mutation lock; unlink/reupload cannot change this response's inode. */
@@ -104,43 +120,48 @@ internal object RemoteCompanionPhotos {
   fun handle(req: FleetHttpServer.Request, storageRoot: File = root): FleetHttpServer.Response {
     // Discovery owns no mutation/thumbnail state: slow storage must not hold their lock.
     if (req.path == "/remote/photos") return RemoteCompanionPhotoIndex(storageRoot).handle(req)
+    if (req.path == "/remote/photo-upload") return upload(req, storageRoot)
     return handlePhoto(req, storageRoot)
   }
   private fun handlePhoto(req: FleetHttpServer.Request, storageRoot: File): FleetHttpServer.Response = synchronized(lock) {
-    val expected = if (req.path == "/remote/photo-upload") setOf("POST") else setOf("GET", "DELETE")
-    if (req.method !in expected) return@synchronized error(405, "method_not_allowed")
+    if (req.method !in setOf("GET", "DELETE")) return@synchronized error(405, "method_not_allowed")
     val path = req.queryParam("path") ?: return@synchronized error(400, "path_required")
     val directory = req.path != "/remote/photo"
     val file = RemoteCompanionPhotoPolicy.resolve(storageRoot, path, directory) ?: return@synchronized error(400, "invalid_path")
-    when (req.path) {
-      "/remote/photo-upload" -> {
-        val name = req.queryParam("name") ?: return@synchronized error(400, "name_required")
-        if (!RemoteCompanionPhotoPolicy.validName(name)) return@synchronized error(400, "invalid_name")
-        if (req.contentLength !in 1..RemoteCompanionPhotoPolicy.MAX_BYTES) return@synchronized error(413, "upload_size_limit")
-        val mime = req.header("content-type")?.substringBefore(';')?.trim()?.lowercase(Locale.ROOT)
-        if (mime != null && mime !in setOf("image/jpeg", "image/png", "image/webp", "image/gif", "application/octet-stream")) return@synchronized error(415, "unsupported_media_type")
-        if (!file.exists() && !file.mkdirs() || !file.isDirectory || RemoteCompanionPhotoPolicy.resolve(storageRoot, path, true) != file) return@synchronized error(403, "folder_unavailable")
-        if (file.usableSpace < req.contentLength + 1024 * 1024L) return@synchronized error(507, "insufficient_space")
-        val result = RemoteCompanionPhotoPolicy.store(file, name, req.contentLength, req::streamBodyTo) { image -> validImage(image, name) }
-        if (result != "stored") return@synchronized error(if (result == "collision") 409 else 400, result)
-        json(200, JSONObject().put("ok", true).put("path", path.trimEnd('/') + "/" + name).put("bytes", req.contentLength))
-      }
-      else -> {
-        if (!file.isFile || file.length() !in 1..RemoteCompanionPhotoPolicy.MAX_BYTES.toLong()) return@synchronized error(404, "photo_not_found")
-        if (!validImage(file, file.name)) return@synchronized error(415, "invalid_image")
-        if (req.method == "DELETE") {
-          if (!file.delete()) return@synchronized error(403, "delete_failed")
-          clearCache()
-          json(200, JSONObject().put("ok", true).put("path", path))
-        } else if (req.queryParam("thumbnail") == "1") {
-          val thumb = thumbnail(file) ?: return@synchronized error(415, "thumbnail_unavailable")
-          FleetHttpServer.Response.stream(200, "image/jpeg", thumb.size.toLong()) { it.write(thumb) }
-        } else {
-          val mime = when (file.extension.lowercase(Locale.ROOT)) { "png" -> "image/png"; "webp" -> "image/webp"; "gif" -> "image/gif"; else -> "image/jpeg" }
-          RemoteCompanionPhotoStream(file).response(mime)
-        }
-      }
+    if (!file.isFile || file.length() !in 1..RemoteCompanionPhotoPolicy.MAX_BYTES.toLong()) return@synchronized error(404, "photo_not_found")
+    if (!validImage(file, file.name)) return@synchronized error(415, "invalid_image")
+    if (req.method == "DELETE") {
+      if (!file.delete()) return@synchronized error(403, "delete_failed")
+      clearCache()
+      json(200, JSONObject().put("ok", true).put("path", path))
+    } else if (req.queryParam("thumbnail") == "1") {
+      val thumb = thumbnail(file) ?: return@synchronized error(415, "thumbnail_unavailable")
+      FleetHttpServer.Response.stream(200, "image/jpeg", thumb.size.toLong()) { it.write(thumb) }
+    } else {
+      val mime = when (file.extension.lowercase(Locale.ROOT)) { "png" -> "image/png"; "webp" -> "image/webp"; "gif" -> "image/gif"; else -> "image/jpeg" }
+      RemoteCompanionPhotoStream(file).response(mime)
     }
+  }
+  // The potentially slow body and image validation own only a hidden temporary file.
+  // Publication shares the read/delete lock, so final files remain complete and immutable.
+  private fun upload(req: FleetHttpServer.Request, storageRoot: File): FleetHttpServer.Response {
+    if (req.method != "POST") return error(405, "method_not_allowed")
+    val path = req.queryParam("path") ?: return error(400, "path_required")
+    val file = RemoteCompanionPhotoPolicy.resolve(storageRoot, path, true) ?: return error(400, "invalid_path")
+    val name = req.queryParam("name") ?: return error(400, "name_required")
+    if (!RemoteCompanionPhotoPolicy.validName(name)) return error(400, "invalid_name")
+    if (req.contentLength !in 1..RemoteCompanionPhotoPolicy.MAX_BYTES) return error(413, "upload_size_limit")
+    val mime = req.header("content-type")?.substringBefore(';')?.trim()?.lowercase(Locale.ROOT)
+    if (mime != null && mime !in setOf("image/jpeg", "image/png", "image/webp", "image/gif", "application/octet-stream")) return error(415, "unsupported_media_type")
+    if (!file.isDirectory) file.mkdirs()
+    // Another upload may have created it between the two checks.
+    if (!file.isDirectory || RemoteCompanionPhotoPolicy.resolve(storageRoot, path, true) != file) return error(403, "folder_unavailable")
+    if (file.usableSpace < req.contentLength + 1024 * 1024L) return error(507, "insufficient_space")
+    val result = RemoteCompanionPhotoPolicy.store(file, name, req.contentLength,
+        write = req::streamBodyTo, verify = { image -> validImage(image, name) }, publishLock = lock,
+        canPublish = { file.isDirectory && RemoteCompanionPhotoPolicy.resolve(storageRoot, path, true) == file })
+    if (result != "stored") return error(if (result == "collision") 409 else 400, result)
+    return json(200, JSONObject().put("ok", true).put("path", path.trimEnd('/') + "/" + name).put("bytes", req.contentLength))
   }
   private fun validImage(file: File, name: String): Boolean {
     val prefix = ByteArray(12)
