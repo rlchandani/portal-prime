@@ -42,6 +42,8 @@ internal object HomeUiDiagnostics {
       "Now-playing mini-player" to "showMiniPlayer", "immortal.showMiniPlayer" to "showMiniPlayer",
       "Hide status bar" to "hideStatusBar", "immortal.hideStatusBar" to "hideStatusBar",
       "Display" to "display", "Wallpaper" to "wallpaper",
+      "Wallpaper previews ready" to "wallpaperPreviewsReady",
+      "Wallpaper previews unavailable" to "wallpaperPreviewsUnavailable",
       "Home screen" to "homeScreen", "Advanced options" to "advancedOptions",
       "Standard" to "choiceStandard", "Large" to "choiceLarge", "XL" to "choiceXL",
       "Auto" to "choiceAuto", "12-hour" to "choice12", "24-hour" to "choice24",

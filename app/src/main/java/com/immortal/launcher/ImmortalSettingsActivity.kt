@@ -1757,6 +1757,15 @@ private fun WallpaperSection() {
   var mode by remember { mutableStateOf(WallpaperConfig.load(context).mode) }
   var grain by remember { mutableStateOf(WallpaperConfig.load(context).grain) }
 
+  val application = context.applicationContext
+  val pageActive = LocalApprovedLauncherPageActive.current
+  val thumbnails by produceState<Map<String, ImageBitmap>?>(null, application, pageActive) {
+    if (!pageActive || value != null) return@produceState
+    val decoded = loadWallpaperPreviews(WallpaperConfig.PHOTOS.map { it.first },
+        decode = { decodeWallpaperPreview(application, it) }, discard = { it.recycle() })
+    value = decoded.mapValues { it.value.asImageBitmap() }
+  }
+
   ApprovedSettingsSectionLabel("Wallpaper")
   Card {
     Column(modifier = Modifier.padding(18.dp)) {
@@ -1769,7 +1778,14 @@ private fun WallpaperSection() {
       )
       Spacer(Modifier.size(14.dp))
       Row(
-          modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+          modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).semantics {
+            // Only signal ready after the complete bitmap batch has actually been published.
+            contentDescription = when {
+              thumbnails == null -> "Wallpaper previews loading"
+              thumbnails?.size == WallpaperConfig.PHOTOS.size -> "Wallpaper previews ready"
+              else -> "Wallpaper previews unavailable"
+            }
+          },
           horizontalArrangement = Arrangement.spacedBy(12.dp),
       ) {
         WallpaperSwatch("Dusk Aurora", selected = mode == WallpaperConfig.DUSK_AURORA, onClick = {
@@ -1799,19 +1815,7 @@ private fun WallpaperSection() {
           }
         }
         WallpaperConfig.PHOTOS.forEach { (id, label) ->
-          val thumb by androidx.compose.runtime.produceState<ImageBitmap?>(null, id) {
-            value = withContext(Dispatchers.IO) {
-              runCatching {
-                context.assets.open("photoframe_fallback/${id.removePrefix(WallpaperConfig.PHOTO_PREFIX)}")
-                    .use { android.graphics.BitmapFactory.decodeStream(it) }
-                    ?.let { bitmap ->
-                      val scaled = android.graphics.Bitmap.createScaledBitmap(bitmap, 240, 145, true)
-                      if (scaled !== bitmap) bitmap.recycle()
-                      scaled.asImageBitmap()
-                    }
-              }.getOrNull()
-            }
-          }
+          val thumb = thumbnails?.get(id)
           WallpaperSwatch(label, selected = mode == id, onClick = {
             mode = id
             WallpaperConfig.setMode(context, id)
