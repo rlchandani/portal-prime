@@ -122,6 +122,33 @@ import org.json.JSONObject
  * cards (12dp radius), blue toggles, uppercase section headers.
  */
 class ImmortalSettingsActivity : ComponentActivity() {
+  private var entryReport: SettingsEntryReport? = null
+  private var entryFirstDraw: SettingsEntryFirstDrawObservation? = null
+
+  private fun observeEntryFirstDraw() {
+    val report = entryReport ?: return
+    if (report.record(SettingsEntryStage.CREATE_FINISHED))
+      entryFirstDraw = FramePerformanceCapture.bindSettingsEntry(window, report)
+  }
+
+  override fun onResume() {
+    entryReport?.record(SettingsEntryStage.RESUME_STARTED)
+    super.onResume()
+    entryReport?.record(SettingsEntryStage.RESUME_FINISHED)
+  }
+
+  override fun onWindowFocusChanged(hasFocus: Boolean) {
+    if (hasFocus) entryReport?.record(SettingsEntryStage.FOCUS_GAINED)
+    super.onWindowFocusChanged(hasFocus)
+  }
+
+  override fun onDestroy() {
+    entryFirstDraw?.dispose()
+    entryFirstDraw = null
+    entryReport?.record(SettingsEntryStage.DESTROYED)
+    entryReport = null
+    super.onDestroy()
+  }
   private var history by mutableStateOf(ApprovedSettingsHistory.initial(ApprovedSettingsRoute()))
   private val route: ApprovedSettingsRoute get() = history.current
 
@@ -154,6 +181,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    entryReport = FramePerformanceCapture.beginSettingsCreate(intent)
     super.onCreate(savedInstanceState)
     val restored = savedInstanceState?.getParcelableArrayList<Bundle>("approved_settings_history")
         ?.map { ApprovedSettingsRoute(it.getString("page"), it.getString("category") ?: "appearance",
@@ -174,6 +202,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
         }
       }
     }
+    observeEntryFirstDraw()
   }
 
   override fun onNewIntent(intent: Intent) {

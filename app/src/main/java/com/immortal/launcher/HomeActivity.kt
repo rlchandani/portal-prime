@@ -362,7 +362,7 @@ class HomeActivity : ComponentActivity() {
                     cn.className == ImmortalSettingsActivity::class.java.name) {
                   // Our own iOS-style settings (exported=false, no LAUNCHER filter) — launch it
                   // directly with an explicit intent rather than the generic MAIN/LAUNCHER one.
-                  startActivity(
+                  FramePerformanceCapture.launchSettings(this@HomeActivity,
                       Intent(this@HomeActivity, ImmortalSettingsActivity::class.java)
                           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 } else if (cn.packageName == packageName &&

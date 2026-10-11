@@ -30,8 +30,19 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import org.json.JSONObject
 
+/** A primitive entry identity bound to one explicit capture; it retains no UI objects. */
+internal class SettingsEntryReport internal constructor(
+    internal val sessionId: Long,
+    internal val entryId: Long,
+    private val accept: (SettingsEntryStage) -> Boolean,
+) {
+  fun record(stage: SettingsEntryStage): Boolean = runCatching { accept(stage) }.getOrDefault(false)
+}
+
 /** Explicit, expiring Fleet diagnostics. No collector thread or listener while inactive. */
 internal object FramePerformanceCapture {
+  internal const val SETTINGS_ENTRY_SESSION = "immortal.diagnostic.settings.session"
+  internal const val SETTINGS_ENTRY_ID = "immortal.diagnostic.settings.entry"
   private const val MAX_WINDOWS = 24
   private const val MAX_HOSTS = 128
   private val main by lazy { Handler(Looper.getMainLooper()) }
@@ -58,14 +69,19 @@ internal object FramePerformanceCapture {
       var attachListener: View.OnAttachStateChangeListener? = null)
   private data class Binding(val window: WeakReference<Window>, val budgetNs: Long,
       val listener: Window.OnFrameMetricsAvailableListener)
+  private data class SettingsEntryWindow(val window: WeakReference<Window>, val report: SettingsEntryReport,
+      val firstDraw: SettingsEntryFirstDrawObservation)
   private class Session(val id: Long, val request: FramePerformanceRequest) {
     val began = SystemClock.elapsedRealtime()
+    val beganNs = SystemClock.elapsedRealtimeNanos()
     val deadline = began + request.durationSec * 1000L
     val thread = HandlerThread("immortal-perf", Process.THREAD_PRIORITY_BACKGROUND).apply { start() }
     val handler = Handler(thread.looper)
     val histograms = LinkedHashMap<String, FramePerformanceHistogram>()
     val settingsSearchPreparation = SettingsSearchPreparationSamples()
     val settingsUiWork = SettingsUiWorkSamples()
+    val settingsEntryTimeline = SettingsEntryTimeline()
+    val settingsEntryWindows = ArrayList<SettingsEntryWindow>() // Main-owned weak windows.
     val slideshowWork = SlideshowWorkSamples()
     val slideshowStyles = SlideshowStyleSamples()
     val imageResolution = EngineImageResolutionSamples()
@@ -126,7 +142,12 @@ internal object FramePerformanceCapture {
       val removed = s.bindings.filter { it.window.get() == null || it.window.get() === window }
       for (b in removed) b.window.get()?.let { runCatching { it.removeOnFrameMetricsAvailableListener(b.listener) } }
       s.bindings.removeAll(removed.toSet())
-      synchronized(s) { s.attached = s.bindings.size }
+      synchronized(s) {
+        val entries = s.settingsEntryWindows.filter { it.window.get() == null || it.window.get() === window }
+        entries.forEach { it.firstDraw.dispose() }
+        s.settingsEntryWindows.removeAll(entries.toSet())
+        s.attached = s.bindings.size
+      }
     }
   }
 
@@ -228,6 +249,86 @@ internal object FramePerformanceCapture {
       }
     }
   }
+
+  /**
+   * Observe the actual Settings startActivity boundary, rather than intent construction.
+   * Inactive navigation keeps the original intent and incurs no diagnostic clock/listener.
+   */
+  fun launchSettings(context: Context, intent: Intent) {
+    val report = beginSettingsLaunch()
+    if (report != null) runCatching {
+      intent.putExtra(SETTINGS_ENTRY_SESSION, report.sessionId)
+      intent.putExtra(SETTINGS_ENTRY_ID, report.entryId)
+    }
+    try {
+      context.startActivity(intent)
+    } catch (error: RuntimeException) {
+      report?.record(SettingsEntryStage.LAUNCH_FAILED)
+      throw error
+    }
+    report?.record(SettingsEntryStage.LAUNCH_RETURNED)
+  }
+
+  private fun admitsSettingsEntry(s: Session): Boolean =
+      current === s && s.closedAt == null &&
+          (s.request.phase == "settings" || s.request.phase == "all" || s.request.phase == "launch") &&
+          SystemClock.elapsedRealtime() < s.deadline
+
+  private fun settingsEntryReport(s: Session, entryId: Long) =
+      SettingsEntryReport(s.id, entryId) { stage ->
+        synchronized(s) {
+          if (!admitsSettingsEntry(s) ||
+              (stage != SettingsEntryStage.FIRST_FRAME_RECEIVED &&
+                  Looper.myLooper() !== Looper.getMainLooper())) false
+          else s.settingsEntryTimeline.record(entryId, stage, SystemClock.elapsedRealtimeNanos() - s.beganNs)
+        }
+      }
+
+  private fun beginSettingsLaunch(): SettingsEntryReport? = runCatching {
+    val s = current ?: return@runCatching null
+    synchronized(s) {
+      if (s.closedAt != null || s.request.phase !in setOf("settings", "all", "launch") ||
+          Looper.myLooper() !== Looper.getMainLooper() || !admitsSettingsEntry(s)) return@runCatching null
+      s.settingsEntryTimeline.launchRequested(SystemClock.elapsedRealtimeNanos() - s.beganNs)
+          ?.let { settingsEntryReport(s, it) }
+    }
+  }.getOrNull()
+
+  /** An old intent/callback must never be adopted by a replacement diagnostic session. */
+  fun beginSettingsCreate(intent: Intent): SettingsEntryReport? = runCatching {
+    val s = current ?: return@runCatching null
+    synchronized(s) {
+      if (s.closedAt != null || s.request.phase !in setOf("settings", "all", "launch") ||
+          Looper.myLooper() !== Looper.getMainLooper() || !admitsSettingsEntry(s)) return@runCatching null
+      val launchId = if (intent.hasExtra(SETTINGS_ENTRY_SESSION)) {
+        if (intent.getLongExtra(SETTINGS_ENTRY_SESSION, -1L) != s.id) return@runCatching null
+        intent.getLongExtra(SETTINGS_ENTRY_ID, -1L)
+      } else null
+      s.settingsEntryTimeline.createStarted(SystemClock.elapsedRealtimeNanos() - s.beganNs, launchId)
+          ?.let { settingsEntryReport(s, it) }
+    }
+  }.getOrNull()
+
+  fun bindSettingsEntry(window: Window, report: SettingsEntryReport): SettingsEntryFirstDrawObservation? =
+      runCatching {
+        check(Looper.myLooper() === Looper.getMainLooper())
+        val s = current ?: return@runCatching null
+        synchronized(s) {
+          if (report.sessionId != s.id || !admitsSettingsEntry(s)) return@runCatching null
+          val old = s.settingsEntryWindows.filter { it.window.get() == null || it.window.get() === window }
+          old.forEach { it.firstDraw.dispose() }
+          s.settingsEntryWindows.removeAll(old.toSet())
+          if (s.settingsEntryWindows.size >= MAX_WINDOWS) return@runCatching null
+          val decor = window.decorView
+          val observer = decor.viewTreeObserver
+          val observation = SettingsEntryFirstDrawObservation(decor) {
+            report.record(SettingsEntryStage.FIRST_PRE_DRAW)
+          }
+          observer.addOnPreDrawListener(observation)
+          s.settingsEntryWindows.add(SettingsEntryWindow(WeakReference(window), report, observation))
+          observation
+        }
+      }.getOrNull()
 
   fun settingsUiWorkEnabled(): Boolean = runCatching {
     val s = current ?: return@runCatching false
@@ -374,7 +475,7 @@ internal object FramePerformanceCapture {
     } ?: return
     // One reusable buffer per active binding; paired detail copies only a new worst frame.
     val componentBuffer = LongArray(componentIds.size)
-    val listener = Window.OnFrameMetricsAvailableListener { _, metrics, dropped ->
+    val listener = Window.OnFrameMetricsAvailableListener { frameWindow, metrics, dropped ->
       val now = SystemClock.elapsedRealtime()
       synchronized(s) {
         if (current !== s || s.closedAt != null) return@OnFrameMetricsAvailableListener
@@ -384,8 +485,13 @@ internal object FramePerformanceCapture {
         }
         for (i in componentIds.indices) componentBuffer[i] = metrics.getMetric(componentIds[i])
         // Receipt time is not vsync/presentation time; each component is from this same callback.
+        val firstDraw = metrics.getMetric(FrameMetrics.FIRST_DRAW_FRAME) == 1L
         histogram.recordDetailed(metrics.getMetric(FrameMetrics.TOTAL_DURATION), dropped,
-            metrics.getMetric(FrameMetrics.FIRST_DRAW_FRAME) == 1L, now - s.began, componentBuffer)
+            firstDraw, now - s.began, componentBuffer)
+        if (firstDraw && host == ImmortalSettingsActivity::class.java.simpleName) {
+          s.settingsEntryWindows.firstOrNull { it.window.get() === frameWindow }
+              ?.report?.record(SettingsEntryStage.FIRST_FRAME_RECEIVED)
+        }
       }
     }
     runCatching {
@@ -411,6 +517,10 @@ internal object FramePerformanceCapture {
     s.wakeReceiver = null
     for (b in s.bindings) b.window.get()?.let { runCatching { it.removeOnFrameMetricsAvailableListener(b.listener) } }
     s.bindings.clear()
+    synchronized(s) {
+      s.settingsEntryWindows.forEach { it.firstDraw.dispose() }
+      s.settingsEntryWindows.clear()
+    }
     for (tracked in windows) {
       tracked.attachListener?.let { observer ->
         tracked.window.get()?.peekDecorView()?.removeOnAttachStateChangeListener(observer)
@@ -479,6 +589,7 @@ internal object FramePerformanceCapture {
       result.put("hosts", JSONObject().apply { s.histograms.forEach { (name, h) -> put(name, h.snapshot()) } })
       result.put("settingsSearchPreparation", s.settingsSearchPreparation.snapshot())
       result.put("settingsUiWork", s.settingsUiWork.snapshot())
+      result.put("settingsEntryTimeline", s.settingsEntryTimeline.snapshot())
       result.put("slideshowWork", s.slideshowWork.snapshot())
       result.put("slideshowStyles", s.slideshowStyles.snapshot())
       result.put("imageResolution", s.imageResolution.snapshot())
