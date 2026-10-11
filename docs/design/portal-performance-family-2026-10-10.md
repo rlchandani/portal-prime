@@ -180,7 +180,7 @@ then completed. Neither stop is a product performance failure.
 | Filmstrip p95 | At least 20% lower than both fresh baselines | 53.25/50.50 to 14.50 ms; 71.3–72.8% lower | Passed and deployed |
 | Filmstrip p99 | At least 20% lower than both fresh baselines | 120.50/125.50 to 17.50 ms; 85.5–86.1% lower | Passed and deployed |
 | Filmstrip mean | No regression above 5% | 29.14/28.80 to 10.14 ms; 64.8–65.2% lower | Passed |
-| Home performance | Same p95/p99 gate | Latest restored baseline: mean 14.03 ms, p95 47.25 ms, p99 64.25 ms; no accepted Home optimization | Established renderer retained; outlier unresolved |
+| Home performance | Same p95/p99 gate | Latest restored baseline: mean 13.91 ms, p95 45.00 ms, p99 60.75 ms; no accepted Home optimization | Established renderer retained; outlier unresolved |
 | Home controls | All seven fixed scenarios | 7/7 passed on exact final APK | Passed |
 | Image geometry/navigation | Mixed-size and one-photo cases | 2/2 cases, 14 generated-only screenshots | Passed |
 | Shuffle soak | 900 seconds; both handoff directions; app PSS at most 512 MiB and growth at most 256 MiB | 284 observations; 131.5–209.3 MiB app PSS; peak growth 43.4 MiB from start | Passed |
@@ -298,3 +298,55 @@ no legacy-offscreen initializer packaged. Its rebuilt APK differs from the accep
 classes3.dex and assets/dexopt/baseline.prof and was not installed or promoted. Both rooms retain
 the exact physically accepted artifact. The latest descriptive restored Home block above remains
 an unresolved baseline, not a shipped optimization.
+
+
+## Compact app-tile semantics experiment
+
+A subsequent candidate kept the shipped Compose UI 1.10.4 and established Home renderer,
+changing only installed-app tile semantics. Each tile exposed one action node: exact launch
+label as content description, full notification count and usage subtitle as state description,
+and an accurate tap label. Recent-app taps announced the app-actions menu. The existing
+combinedClickable modifier preceded clearing so Compose retained its generated click, long-click
+and focus semantics; visuals, layout and callbacks were unchanged. An explicit false-default
+build property isolated the candidate. Six helper tests covered exact labels, full counts,
+recency, empty state, tile types and Recent-app action meaning. The complete candidate gate
+passed 1,575 tests across 187 suites; independent static review found no blocker.
+
+Outside the timed collector, the fixed-control endpoint measured the exposed Apps tree:
+68 nodes before, 46 for the candidate and 68 after. Both fixed Browser/Jarvis controls remained
+clickable and long-clickable, with the dock and Apps page visible and no truncation. This is a
+32.4% external node-count reduction; it does not measure internal operations or CPU cost. No
+arbitrary node labels, queries or state descriptions were exported. Physical focus traversal
+and dynamic badge/subtitle announcements were not tested; they remain promotion requirements
+for any future candidate using this policy.
+
+The fresh Family-only thirty-cycle-per-block comparison, without Main sampling, was:
+
+| Home Window metric | Accepted build before | Compact tile candidate | Accepted build after |
+| --- | ---: | ---: | ---: |
+| Frames | 782 | 782 | 780 |
+| Mean | 13.73 ms | 13.59 ms | 13.91 ms |
+| p95 | 38.25 ms | 45.75 ms | 45.00 ms |
+| p99 | 47.50 ms | 63.50 ms | 60.75 ms |
+| Above 16.67 ms budget | 16.88% | 15.47% | 15.38% |
+
+Mean improved only 1.0–2.3%, while p95 was 1.7–19.6% worse and p99 4.5–33.7% worse than
+the two controls. The 20% tail gate failed. All 2,344 frames had zero callback drops, invalid
+samples and overflow samples. The node reduction therefore did not resolve the aggregate
+Home/Apps outlier in this trial; it is not evidence that all semantics work is negligible or
+that every navigation direction behaved the same way. Process replacement, thermal, JIT and
+cache state remain uncontrolled, so no RAM gain or specific causal regression is claimed.
+
+The candidate was rejected. Its APK and all four changed source files remain in private
+evidence. The flag, UI patch, helper and helper tests were removed from the product source;
+the restored snapshot exactly matches the accepted 76b4079c… source. The restored default
+debug/benchmark build passed all 1,569 tests across 186 suites with no failures, errors or
+skips; Compose UI stayed at 1.10.4 and the tile policy was absent from the APK. Rebuilt
+classes3.dex and assets/dexopt/baseline.prof differ from the accepted artifact, so that rebuild
+was not installed or promoted.
+
+The hardware protocol independently restored the exact accepted 19abed09… APK on Family Area,
+with Home foreground, the collector inactive and settings, schema and photo-source groups
+preserved. Living Area had zero operations and retains the same accepted build. Home remains
+unresolved. The next diagnostic priority is separating entering Apps from returning Home,
+rather than attributing aggregate tail timing to tile complexity alone.
