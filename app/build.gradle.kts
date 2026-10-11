@@ -126,9 +126,14 @@ android {
       signingConfig = signingConfigs.getByName("debug")
       matchingFallbacks += "release"
       // Opt-in candidate: compare with the faithful baseline before changing release.
-      if (providers.gradleProperty("portalBenchmarkOptimize").orNull == "true") {
+      val nativeR8 = providers.gradleProperty("portalBenchmarkNativeR8").orNull == "true"
+      if (nativeR8 || providers.gradleProperty("portalBenchmarkOptimize").orNull == "true") {
         isMinifyEnabled = true
-        proguardFiles("benchmark-rules.pro")
+        if (nativeR8) {
+          proguardFiles("portal-r8-rules.pro", "benchmark-r8-native-rules.pro")
+        } else {
+          proguardFiles("benchmark-rules.pro")
+        }
       }
     }
     // Release-faithful iteration build. Same applicationId + same signing key + minify off
