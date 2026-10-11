@@ -460,4 +460,19 @@ class HomeUiDiagnosticsTest {
       assertEquals(1, snapshot.json().getJSONArray("nodes").length())
     }
   }
+
+  @Test fun displaySliderLabelsExposeOnlyBoundsAndNeverHomeInputEligibility() {
+    for ((label, key) in listOf("Adjust brightness" to "displayBrightnessSlider",
+        "Adjust media volume" to "displayVolumeSlider")) {
+      assertEquals(key, HomeUiDiagnostics.fixedKey(label))
+      val snapshot = state(listOf(node(HomeUiDiagnostics.fixedKey(label), left = 300, right = 900)))
+      val response = snapshot.json()
+      assertEquals(key, response.getJSONArray("nodes").getJSONObject(0).getString("key"))
+      assertFalse(response.getBoolean("eligible"))
+      assertFalse(response.toString().contains(label))
+      assertFalse(snapshot.publicLongPressTarget(400.0, 120.0))
+      assertNull(snapshot.searchNode())
+    }
+  }
+
 }

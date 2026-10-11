@@ -53,6 +53,7 @@ internal object HomeUiDiagnostics {
       "Photos & screensaver" to "photosScreensaver", "Home & widgets" to "homeWidgets",
       "Slideshow" to "slideshowSettings", "Home Assistant dashboard" to "homeAssistantDashboard",
       "Settings Back" to "settingsBack", "Settings Forward" to "settingsForward",
+      "Adjust brightness" to "displayBrightnessSlider", "Adjust media volume" to "displayVolumeSlider",
       "Sound & wake" to "soundWake", "Connections" to "connections",
       "Input & accessibility" to "inputAccessibility", "Device" to "device", "Advanced" to "advanced",
       "Photo clock faces" to "photoClockFaces", "Digital clock" to "digitalClock",

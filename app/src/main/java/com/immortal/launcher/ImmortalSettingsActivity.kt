@@ -619,6 +619,7 @@ private data class DisplaySnapshot(
 @Composable
 private fun DisplaySection() {
   val context = LocalContext.current
+  val writes = remember(context.applicationContext) { DisplayWrites.queue(context) }
   var snapshot by remember(context) { mutableStateOf<DisplaySnapshot?>(null) }
   var loadFailed by remember(context) { mutableStateOf(false) }
   var editRevision by remember(context) { mutableStateOf(0) }
@@ -632,6 +633,8 @@ private fun DisplaySection() {
       loadFailed = false
       val revision = editRevision
       val loaded = withContext(Dispatchers.IO) {
+        // A pane can resume while its final drag value is still being applied in the background.
+        writes.awaitIdle()
         runCatching {
           DisplaySnapshot(
               canWrite = DisplayControl.canWrite(context),
@@ -687,12 +690,12 @@ private fun DisplaySection() {
               val percent = it.toInt()
               // A manual brightness write also turns adaptive brightness off.
               updateDisplay { current -> current.copy(brightness = percent, autoBrightness = false) }
-              DisplayControl.setBrightnessPercent(context, percent)
+              writes.submit(DisplayEdit.Brightness(percent))
             },
             valueRange = 1f..100f,
             colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = IosBlue,
                 activeTrackColor = IosBlue, inactiveTrackColor = IosDivider),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).semantics { contentDescription = "Adjust brightness" },
         )
         Text("$brightness%", color = IosSecondary, fontSize = Sizes.rowValue,
             modifier = Modifier.width(90.dp), textAlign = TextAlign.End)
@@ -703,7 +706,7 @@ private fun DisplaySection() {
           checked = display.autoBrightness,
           onChange = { on ->
             updateDisplay { it.copy(autoBrightness = on) }
-            DisplayControl.setAutoBrightness(context, on)
+            writes.submit(DisplayEdit.AutoBrightness(on))
           },
       )
     }
@@ -723,12 +726,12 @@ private fun DisplaySection() {
           onValueChange = {
             val percent = it.toInt()
             updateDisplay { current -> current.copy(volume = percent) }
-            DisplayControl.setMediaVolumePercent(context, percent)
+            writes.submit(DisplayEdit.Volume(percent))
           },
           valueRange = 0f..100f,
           colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = IosBlue,
               activeTrackColor = IosBlue, inactiveTrackColor = IosDivider),
-          modifier = Modifier.weight(1f),
+          modifier = Modifier.weight(1f).semantics { contentDescription = "Adjust media volume" },
       )
       Text("$volume%", color = IosSecondary, fontSize = Sizes.rowValue,
           modifier = Modifier.width(90.dp), textAlign = TextAlign.End)
