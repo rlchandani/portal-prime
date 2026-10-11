@@ -328,10 +328,11 @@ internal fun NavRow(
     subLabel: String = "",
     iconColor: Color = Color(0xFF636366),
     iconSymbol: String = "",
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = Sizes.rowMinHeight)
             .tvFocusableRow(focusFill = IosFocusTint) { onClick() }

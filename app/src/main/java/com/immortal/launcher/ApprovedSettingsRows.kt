@@ -140,9 +140,9 @@ internal fun ApprovedSettingsChevron(back: Boolean = false) {
 }
 
 @Composable
-internal fun ApprovedSettingsBackButton(label: String, onClick: () -> Unit) {
+internal fun ApprovedSettingsBackButton(label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Row(
-        Modifier.defaultMinSize(minHeight = 68.dp)
+        modifier.defaultMinSize(minHeight = 68.dp)
             .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, ringColor = IosBlue, onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,

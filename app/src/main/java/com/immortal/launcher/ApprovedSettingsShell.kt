@@ -142,6 +142,19 @@ internal fun ApprovedSettingsShell(
     val results = remember(searchIndex, query) { approvedSettingsSearch(searchIndex, query) }
     val palette = LocalApprovedPalette.current
     val displayedCategory = if (category == "advanced" && !appliedAdvanced) "device" else category
+    val diagnosticQueryToken = if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) remember(query) { Any() } else null
+    if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) {
+        val host = context as? ImmortalSettingsActivity
+        val control = LocalApprovedRequestedControl.current
+        SideEffect {
+            host?.settingsUiProbe?.publish(
+                SettingsUiProbeRoute(displayedCategory, page, control), diagnosticQueryToken!!, query.length,
+                results.map { result ->
+                    val destination = approvedSettingsRoute(result.page, result.id.ifBlank { null })
+                    SettingsUiProbeRoute(destination.category, destination.page, destination.control)
+                })
+        }
+    }
     val sidebarCategories = remember(appliedAdvanced) {
         ApprovedSettingsCategories.filter { it.id != "advanced" || appliedAdvanced }
     }
@@ -175,7 +188,8 @@ internal fun ApprovedSettingsShell(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                ApprovedSettingsBackButton("Home") {
+                ApprovedSettingsBackButton("Home", modifier = if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
+                    Modifier.settingsUiTarget("home", "home") else Modifier) {
                     context.startActivity(Intent(context, HomeActivity::class.java)
                         .putExtra("approved_home_tab", "home")
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
@@ -219,6 +233,9 @@ internal fun ApprovedSettingsShell(
                                             items(results, key = { it.id.ifBlank { "page:${it.page}" } }) { result ->
                                                 Row(
                                                     Modifier.fillMaxWidth()
+                                                        .then(if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
+                                                            Modifier.settingsUiTarget("result", results.indexOf(result).toString(),
+                                                                queryToken = diagnosticQueryToken) else Modifier)
                                                         .tvFocusableRow(focusFill = IosFocusTint) { openSearch(result) }
                                                         .padding(24.dp),
                                                     verticalAlignment = Alignment.CenterVertically,
@@ -256,6 +273,8 @@ internal fun ApprovedSettingsShell(
                                     val selected = displayedCategory == item.id
                                     Row(
                                         Modifier.fillMaxWidth().height(76.dp)
+                                            .then(if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
+                                                Modifier.settingsUiTarget("category", item.id) else Modifier)
                                             .semantics { collectionItemInfo = CollectionItemInfo(index, 1, 0, 1) }
                                             .background(if (selected) IosFocusTint else Color.Transparent,
                                                 RoundedCornerShape(14.dp))
@@ -418,11 +437,13 @@ private fun ApprovedSettingsDetailBody(
     onAdvanced: () -> Unit,
 ) {
     val composition = FramePerformanceCapture.beginSettingsUiWork(SettingsUiWorkStage.DETAIL_COMPOSITION)
+    val observedModifier = if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
+        modifier.settingsUiDrawn(detail.routeKey, detail.requested) else modifier
     // Outgoing transition content retains its own request; the next route never inherits it.
     CompositionLocalProvider(LocalApprovedRequestedControl provides detail.requested) {
         if (detail.lazy == null) {
             Column(
-                modifier.verticalScroll(rememberScrollState())
+                observedModifier.verticalScroll(rememberScrollState())
                     .padding(start = 64.dp, end = 64.dp, top = 32.dp, bottom = 80.dp).focusGroup(),
             ) {
                 ApprovedSettingsDetailHeading(detail.title, detail.subtitle, detail.onBack)
@@ -430,7 +451,7 @@ private fun ApprovedSettingsDetailBody(
             }
         } else {
             LazyColumn(
-                modifier.focusGroup(),
+                observedModifier.focusGroup(),
                 state = detail.lazy.state,
                 contentPadding = PaddingValues(start = 64.dp, end = 64.dp, top = 32.dp, bottom = 80.dp),
             ) {
@@ -453,7 +474,9 @@ private fun ApprovedSettingsDetailBody(
 private fun ApprovedSettingsSearchField(query: String, onChange: (String) -> Unit) {
     val composition = FramePerformanceCapture.beginSettingsUiWork(SettingsUiWorkStage.SEARCH_COMPOSITION)
     val color = IosSecondary
-    Surface(modifier = Modifier.settingsUiWorkMeasure(SettingsUiWorkStage.SEARCH_MEASURE),
+    Surface(modifier = Modifier.settingsUiWorkMeasure(SettingsUiWorkStage.SEARCH_MEASURE)
+        .then(if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
+            Modifier.settingsUiTarget("search", "input") else Modifier),
         color = IosCard, shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, IosDivider)) {
         Row(Modifier.fillMaxWidth().height(68.dp).padding(horizontal = 20.dp),
@@ -477,7 +500,7 @@ private fun ApprovedSettingsSearchField(query: String, onChange: (String) -> Uni
 private fun ApprovedSettingsDetailHeading(title: String, subtitle: String, onBack: (() -> Unit)?) {
     Column {
         if (onBack != null) {
-            ApprovedSettingsBackButton("Settings", onBack)
+            ApprovedSettingsBackButton("Settings", onClick = onBack)
         }
         Text(title, color = IosLabel, fontSize = 40.sp, lineHeight = 52.sp,
             fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 12.dp))

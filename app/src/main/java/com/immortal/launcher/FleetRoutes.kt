@@ -69,6 +69,7 @@ class FleetRoutes(private val context: Context) {
       "/diag" -> requireMethod("GET", req) { resp(200, FleetDiag.snapshot()) }
       "/perf" -> performance(req)
       "/perf/home-ui" -> HomeUiDiagnostics.handle(context, req)
+      "/perf/settings-ui" -> SettingsUiDiagnostics.handle(context, req)
       "/perf/filmstrip-render" -> requireMethod("GET", req) { FilmstripScreenshot.render(context) }
       "/perf/state" -> requireMethod("GET", req) {
         resp(200, if (req.queryParam("readiness") == "1") FramePerformanceCapture.readinessSnapshot()

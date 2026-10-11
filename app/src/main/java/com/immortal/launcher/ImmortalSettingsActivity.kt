@@ -122,6 +122,10 @@ import org.json.JSONObject
  * cards (12dp radius), blue toggles, uppercase section headers.
  */
 class ImmortalSettingsActivity : ComponentActivity() {
+  internal var settingsUiProbe: SettingsUiProbeStore? = null
+    private set
+  internal fun settingsUiRequestedRoute() = SettingsUiProbeRoute(route.category, route.page, route.control)
+  internal fun settingsUiHistoryDepth() = history.entries.size
   private var entryReport: SettingsEntryReport? = null
   private var entryFirstDraw: SettingsEntryFirstDrawObservation? = null
 
@@ -134,7 +138,13 @@ class ImmortalSettingsActivity : ComponentActivity() {
   override fun onResume() {
     entryReport?.record(SettingsEntryStage.RESUME_STARTED)
     super.onResume()
+    if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) SettingsUiDiagnostics.resumed(this)
     entryReport?.record(SettingsEntryStage.RESUME_FINISHED)
+  }
+
+  override fun onPause() {
+    if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) SettingsUiDiagnostics.paused(this)
+    super.onPause()
   }
 
   override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -143,6 +153,9 @@ class ImmortalSettingsActivity : ComponentActivity() {
   }
 
   override fun onDestroy() {
+    settingsUiProbe?.clear()
+    settingsUiProbe = null
+    if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) SettingsUiDiagnostics.paused(this)
     entryFirstDraw?.dispose()
     entryFirstDraw = null
     entryReport?.record(SettingsEntryStage.DESTROYED)
@@ -183,6 +196,13 @@ class ImmortalSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     entryReport = FramePerformanceCapture.beginSettingsCreate(intent)
     super.onCreate(savedInstanceState)
+    if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) {
+      val index = approvedSettingsSearchIndex()
+      settingsUiProbe = SettingsUiProbeStore(
+          ApprovedSettingsCategories.map { it.id }.toSet(),
+          (ApprovedSettingsPages.map { it.id } + index.map { it.page }).toSet(),
+          index.map { it.id }.filter { it.isNotEmpty() }.toSet())
+    }
     val restored = savedInstanceState?.getParcelableArrayList<Bundle>("approved_settings_history")
         ?.map { ApprovedSettingsRoute(it.getString("page"), it.getString("category") ?: "appearance",
             it.getString("control")) }
@@ -277,7 +297,8 @@ private fun ApprovedSettingsRouteContent(
             Card {
               pages.forEachIndexed { index, destination ->
                 if (index > 0) Divider()
-                NavRow(destination.title) {
+                NavRow(destination.title, modifier = if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
+                    Modifier.settingsUiTarget("nav", destination.id, route.detailKey, control = route.control) else Modifier) {
                   navigate(approvedSettingsRoute(destination.id, category = category.id))
                 }
               }
@@ -289,7 +310,9 @@ private fun ApprovedSettingsRouteContent(
         Card {
           category.pages.forEachIndexed { index, id ->
             if (index > 0) Divider()
-            NavRow(approvedSettingsPage(id)?.title ?: id) {
+            NavRow(approvedSettingsPage(id)?.title ?: id,
+                modifier = if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
+                    Modifier.settingsUiTarget("nav", id, route.detailKey, control = route.control) else Modifier) {
               navigate(approvedSettingsRoute(id, category = category.id))
             }
           }
