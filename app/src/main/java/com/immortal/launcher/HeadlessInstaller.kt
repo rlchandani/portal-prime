@@ -73,6 +73,20 @@ object HeadlessInstaller {
     // interactive install the user later triggers themselves.
     InstallAutoConfirm.arm()
     return try {
+      // This experiment is restricted to our own package on the profile format's supported APIs.
+      // Prepare before opening a session: invalid metadata must fail, never silently measure APK-only.
+      val dexMetadata =
+          if (BuildConfig.PORTAL_SELF_INSTALL_DEX_METADATA && Build.VERSION.SDK_INT in 28..30 &&
+              pkg == app.packageName &&
+              SelfInstallDexMetadata.matchesTarget(apk, BuildConfig.PORTAL_SELF_INSTALL_DEX_METADATA_APK_SHA256)) {
+            val archivePackage = app.packageManager.getPackageArchiveInfo(apk.absolutePath, 0)?.packageName
+            require(
+                SelfInstallDexMetadata.eligible(
+                    true, Build.VERSION.SDK_INT, pkg, app.packageName, archivePackage)) {
+                  "Invalid self-install package"
+                }
+            SelfInstallDexMetadata.prepareRequired(apk)
+          } else null
       val pi = app.packageManager.packageInstaller
       val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
       val sessionId = pi.createSession(params)
@@ -80,6 +94,13 @@ object HeadlessInstaller {
         session.openWrite("base.apk", 0, apk.length()).use { out ->
           apk.inputStream().use { it.copyTo(out) }
           session.fsync(out)
+        }
+        if (dexMetadata != null) {
+          // Android pairs dex metadata with the staged APK by basename in the same session.
+          session.openWrite("base.dm", 0, dexMetadata.size.toLong()).use { out ->
+            out.write(dexMetadata)
+            session.fsync(out)
+          }
         }
         val flags =
             if (Build.VERSION.SDK_INT >= 31)

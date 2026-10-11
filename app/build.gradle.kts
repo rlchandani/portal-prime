@@ -40,6 +40,16 @@ android {
     buildConfigField("boolean", "PORTAL_WEBVIEW_BACKGROUND_STARTUP",
         (providers.gradleProperty("portalWebViewBackgroundStartup").orNull == "true").toString())
 
+    // Opt-in Family-only compilation experiment, pinned to one APK; other installs allow rollback.
+    val selfProfileEnabled = providers.gradleProperty("portalSelfInstallDexMetadata").orNull == "true"
+    val selfProfileTarget = if (selfProfileEnabled)
+        providers.gradleProperty("portalSelfInstallDexMetadataApkSha256").orNull.orEmpty() else ""
+    if (selfProfileEnabled && !selfProfileTarget.matches(Regex("[a-f0-9]{64}"))) {
+      throw GradleException("The self-install profile experiment requires a lowercase SHA-256 APK target")
+    }
+    buildConfigField("boolean", "PORTAL_SELF_INSTALL_DEX_METADATA", selfProfileEnabled.toString())
+    buildConfigField("String", "PORTAL_SELF_INSTALL_DEX_METADATA_APK_SHA256", "\"$selfProfileTarget\"")
+
     // Filmstrip passed Family Area timing/compatibility gates; false keeps the legacy escape hatch.
     buildConfigField("boolean", "PORTAL_NATIVE_FILMSTRIP",
         ((providers.gradleProperty("portalNativeFilmstrip").orNull ?: "true") == "true").toString())
