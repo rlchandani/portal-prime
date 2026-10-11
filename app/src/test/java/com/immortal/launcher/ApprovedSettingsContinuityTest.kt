@@ -21,6 +21,19 @@ class ApprovedSettingsContinuityTest {
             }
     }
 
+    @Test fun screensaverDestinationSharesThePaneAndPreservesRegistryNavigation() {
+        val page = approvedSettingsPage("dismiss")!!
+        assertNull("Destination picker must render in the Settings pane", page.activity)
+        assertEquals(ScreensaverDismissAppActivity::class.java, page.standaloneActivity)
+        val spec = com.immortal.launcher.settings.SettingsDomains.screensaver.specs
+            .filterIsInstance<com.immortal.launcher.settings.NavSpec<*>>()
+            .single { it.key == "dismissTarget" }
+        assertEquals(page.standaloneActivity, spec.activity)
+        assertEquals("dismiss", approvedSettingsSearchIndex().single {
+            it.id == "screensaver.dismissTarget"
+        }.page)
+    }
+
     @Test fun fullscreenActionsKeepTheirOwnDestination() {
         assertEquals(LampActivity::class.java, approvedSettingsPage("lamp")?.activity)
         assertEquals(CameraViewerActivity::class.java, approvedSettingsPage("cameras")?.activity)

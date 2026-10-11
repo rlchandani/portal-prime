@@ -461,6 +461,19 @@ class HomeUiDiagnosticsTest {
     }
   }
 
+  @Test fun destinationPickerPublicMarkersDoNotExposeChoicesOrEnableHomeInput() {
+    for ((label, key) in listOf("Open when you tap to exit" to "slideshowExitDestination",
+        "Slideshow app choices ready" to "slideshowAppChoicesReady",
+        "Choose an installed app" to "chooseInstalledApp")) {
+      assertEquals(key, HomeUiDiagnostics.fixedKey(label))
+      val snapshot = state(listOf(node(key, left = 300, right = 900)))
+      assertEquals(key, snapshot.json().getJSONArray("nodes").getJSONObject(0).getString("key"))
+      assertFalse(snapshot.eligible())
+      assertFalse(snapshot.publicLongPressTarget(400.0, 120.0))
+      assertNull(HomeUiDiagnostics.fixedKey("$label: PRIVATE_APP_NAME"))
+    }
+  }
+
   @Test fun displaySliderLabelsExposeOnlyBoundsAndNeverHomeInputEligibility() {
     for ((label, key) in listOf("Adjust brightness" to "displayBrightnessSlider",
         "Adjust media volume" to "displayVolumeSlider")) {

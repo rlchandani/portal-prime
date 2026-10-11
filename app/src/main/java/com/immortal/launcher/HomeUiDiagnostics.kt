@@ -55,6 +55,9 @@ internal object HomeUiDiagnostics {
       // titles use one key; their separate nodes/bounds identify the sidebar and detail pane.
       "Photos & screensaver" to "photosScreensaver", "Home & widgets" to "homeWidgets",
       "Slideshow" to "slideshowSettings",
+      "Open when you tap to exit" to "slideshowExitDestination",
+      "Slideshow app choices ready" to "slideshowAppChoicesReady",
+      "Choose an installed app" to "chooseInstalledApp",
       "Slideshow settings list" to "slideshowSettingsList",
       "Slideshow destination ready" to "slideshowDestinationReady",
       "Slideshow destination unavailable" to "slideshowDestinationUnavailable", "Home Assistant dashboard" to "homeAssistantDashboard",

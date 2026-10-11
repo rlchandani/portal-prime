@@ -392,6 +392,7 @@ private fun ApprovedNativeSettingsPage(page: String) {
     // Screensaver uses the same single lazy list as its standalone wrapper via lazyDetail.
     "screensaver" -> Unit
     "sources" -> ScreensaverSourcesContent(onDone = back)
+    "dismiss" -> ScreensaverDismissContent()
     "styles" -> ScreensaverModeContent()
     "faces" -> FacePickerContent()
     "clock" -> ClockSettingsContent()

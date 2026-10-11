@@ -129,7 +129,7 @@ internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("styles", "Screensaver style", "photos", standaloneActivity = ScreensaverModeActivity::class.java),
     ApprovedSettingsPage("faces", "Photo clock faces", "photos", standaloneActivity = FacePickerActivity::class.java),
     ApprovedSettingsPage("clock", "Digital clock", "photos", standaloneActivity = ClockSettingsActivity::class.java),
-    ApprovedSettingsPage("dismiss", "Open when you tap to exit", "photos", ScreensaverDismissAppActivity::class.java),
+    ApprovedSettingsPage("dismiss", "Open when you tap to exit", "photos", standaloneActivity = ScreensaverDismissAppActivity::class.java),
     ApprovedSettingsPage("folder", "Choose photo folder", "photos", FolderPickerActivity::class.java),
     ApprovedSettingsPage("album", "Shared album link", "photos", AlbumUrlEntryActivity::class.java),
     ApprovedSettingsPage("immich", "Connect Immich", "photos", ImmichConnectActivity::class.java),

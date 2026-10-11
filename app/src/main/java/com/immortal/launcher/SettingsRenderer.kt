@@ -10,6 +10,7 @@ package com.immortal.launcher
 import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -339,8 +340,11 @@ private fun <S> WorkerNavigationRow(domainId: String, spec: NavSpec<S>, snapshot
         SettingNavigationValue.Unavailable -> "Slideshow destination unavailable"
         SettingNavigationValue.Loading -> null
     } else null
-    NavRow(spec.title, label, modifier = if (marker == null) Modifier else
-        Modifier.semantics { contentDescription = marker }, onClick = onOpen)
+    // Separate readiness from the clickable row's title; neither includes the saved app label.
+    Box(if (marker == null) Modifier else Modifier.semantics { contentDescription = marker }) {
+        NavRow(spec.title, label, modifier = Modifier.semantics { contentDescription = spec.title },
+            onClick = onOpen)
+    }
 }
 
 /** Numeric choices open the approved dialog; bounds/wrapping come exclusively from the spec. */

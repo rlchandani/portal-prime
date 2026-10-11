@@ -15,7 +15,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +42,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
@@ -194,14 +195,18 @@ private data class PickEntry(
 class ScreensaverDismissAppActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { PortalPrimeTheme(darkTheme = false) { DismissAppScreen { finish() } } }
+    setContent { PortalPrimeTheme(darkTheme = false) {
+      SettingsScaffold(title = "Open when you tap to exit", onBack = { finish() }) {
+        ScreensaverDismissContent()
+      }
+    } }
   }
 }
 
 private enum class ApprovedEditorsDismissPopup { TARGET, APPS, HA_PATH }
 
 @Composable
-private fun DismissAppScreen(onDone: () -> Unit) {
+internal fun ScreensaverDismissContent() {
   val context = LocalContext.current
   var settings by remember { mutableStateOf(ScreensaverConfig.load(context)) }
   var haPkg by remember { mutableStateOf<String?>(null) }
@@ -211,11 +216,12 @@ private fun DismissAppScreen(onDone: () -> Unit) {
   var path by remember { mutableStateOf("") }
   var query by remember { mutableStateOf("") }
   val advanced = rememberApprovedAdvanced()
-  // Lifecycle-owned IO replaces the old unowned thread that could update a closed picker.
-  LaunchedEffect(context) {
+  // Composition-owned IO cancels when this rich editor leaves the Settings pane.
+  val application = context.applicationContext
+  LaunchedEffect(application) {
     val result = withContext(Dispatchers.IO) {
-      val pkg = ScreensaverDismiss.installedHaPackage(context)
-      Triple(pkg, pkg?.let { ScreensaverDismiss.appIcon(context, it) }, loadLaunchableApps(context))
+      val pkg = ScreensaverDismiss.installedHaPackage(application)
+      Triple(pkg, pkg?.let { ScreensaverDismiss.appIcon(application, it) }, loadLaunchableApps(application))
     }
     haPkg = result.first; haIcon = result.second; apps = result.third
   }
@@ -231,8 +237,9 @@ private fun DismissAppScreen(onDone: () -> Unit) {
     ScreensaverConfig.setDismissHaDashboard(context, settings.dismissHaDashboard.orEmpty())
     refresh(); popup = null
   }
-  BackHandler { onDone() }
-  SettingsScaffold(title = "Open when you tap to exit", onBack = onDone) {
+  Column(if (apps == null) Modifier else Modifier.semantics {
+    contentDescription = "Slideshow app choices ready"
+  }) {
     SectionLabel("Options")
     Card {
       NavRow("Open when you tap to exit", value = when {
@@ -241,6 +248,8 @@ private fun DismissAppScreen(onDone: () -> Unit) {
           it.component.flattenToString() == settings.dismissAppComponent
         }?.label ?: "Chosen app"
         else -> "Immortal launcher"
+      }, modifier = Modifier.semantics {
+        contentDescription = "Open when you tap to exit"
       }) { popup = ApprovedEditorsDismissPopup.TARGET }
     }
     if (settings.dismissHaDashboard != null && haPkg == null && apps != null) {
@@ -270,7 +279,8 @@ private fun DismissAppScreen(onDone: () -> Unit) {
         }
         Divider()
         DismissRow(null, "Choose an installed app", "Uses the apps installed on your Portal.",
-          settings.dismissHaDashboard == null && settings.dismissAppComponent != null) {
+          settings.dismissHaDashboard == null && settings.dismissAppComponent != null,
+          modifier = Modifier.semantics { contentDescription = "Choose an installed app" }) {
           query = ""; popup = ApprovedEditorsDismissPopup.APPS
         }
       }
@@ -314,9 +324,10 @@ private fun DismissAppScreen(onDone: () -> Unit) {
 
 @Composable
 private fun DismissRow(
-    icon: ImageBitmap?, title: String, subtitle: String?, selected: Boolean, onClick: () -> Unit,
+    icon: ImageBitmap?, title: String, subtitle: String?, selected: Boolean,
+    modifier: Modifier = Modifier, onClick: () -> Unit,
 ) {
-  Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = 116.dp)
+  Row(modifier.fillMaxWidth().defaultMinSize(minHeight = 116.dp)
       .tvFocusableRow(focusFill = IosFocusTint, onClick = onClick)
       .padding(horizontal = 24.dp, vertical = 23.dp),
     verticalAlignment = Alignment.CenterVertically,
