@@ -426,3 +426,12 @@ step is stronger bounded method-level attribution, rather than another speculati
 semantics change. Android's API21 sampling method tracing can run inside the app without ADB or
 root, but API29 validity, process-wide ownership, independent expiry, artifact bounds and cleanup
 must be verified. Profiling runs are attribution only; acceptance timing remains unprofiled.
+
+
+The Android 10 ART implementation was subsequently inspected before adding that trace. Its
+`Trace::Start` silently returns when tracing is already active; a successful void Java call
+therefore cannot establish ownership. It also disables JIT code-cache garbage collection for
+the remainder of the process, including sampling mode. No ART trace was started. The chosen
+next diagnostic is bounded chronological busy-stack records and read intervals in the existing
+explicit `sampleMain` path, with a lower retained slow-frame threshold only for sampled captures.
+That diagnostic is not implemented yet; normal timing comparisons must remain unprofiled.
