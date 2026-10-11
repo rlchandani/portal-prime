@@ -1,7 +1,8 @@
 # Family Area Settings: accepted Baseline Profile improvement
 
 A Settings-specific Baseline Profile is committed in `app/src/main/baseline-prof.txt`
-and its measured APK is installed on Family Area. This follows the accepted
+and its measured improvement is retained in the now installed
+[native R8 build](portal-settings-native-r8-candidate.md). This follows the accepted
 [direct Appearance rows](portal-settings-hardware-and-appearance-candidate.md).
 It reduces the median largest frame by a further **15.29%–20.55%** against that
 already improved build. No application bytecode or UI behavior changed.
@@ -104,7 +105,7 @@ Evidence is under `~/portal-prime/build/fleet/diagnostics/`:
 - `settings-app-baseline-promoted-2026-10-11/postflight.json`: successful
   candidate promotion, linked to both comparison and restoration attestation.
 
-Current installed candidate APK SHA-256:
+Accepted profile-candidate APK SHA-256 (before native R8 promotion):
 `d1635e3271943c8ed0d447d9ebe6da98692c5cb96d506b203980ade34026f2b4`.
 Previous accepted control APK SHA-256:
 `5c185e77a0e8708603bf285790343b503681ab6ea704a478414fb7600a256e86`.

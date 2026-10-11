@@ -7,7 +7,9 @@ gate. The final default benchmark rebuild was byte-for-byte identical to that
 measured APK.
 
 Family Area now runs the additional [Settings Baseline Profile improvement](portal-settings-baseline-profile.md),
-which retains these direct rows and the same application bytecode.
+which retains these direct rows. The subsequent
+[native R8 improvement](portal-settings-native-r8-candidate.md) is installed on Family Area;
+its measured benchmark is now the default.
 
 ## Measured result
 

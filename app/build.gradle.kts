@@ -106,9 +106,9 @@ android {
       // Lets a debug build install alongside a provisioned release for testing.
       applicationIdSuffix = ".debug"
     }
-    // Measure release rendering without replacing a provisioned release or losing the
-    // debug device's configuration. Keep release optimization options for a fair comparison;
-    // changing them belongs in a separately measured candidate.
+    // Measure without replacing a provisioned release or losing the debug device's
+    // configuration. Native R8 is the accepted Family Area benchmark default;
+    // explicit portalBenchmarkNativeR8=false retains the unoptimized control.
     create("benchmark") {
       initWith(getByName("release"))
       // Benchmark-only test access; Fleet auth, Dev Mode, Window and collector guards remain.
@@ -125,9 +125,11 @@ android {
       isDebuggable = false
       signingConfig = signingConfigs.getByName("debug")
       matchingFallbacks += "release"
-      // Opt-in candidate: compare with the faithful baseline before changing release.
-      val nativeR8 = providers.gradleProperty("portalBenchmarkNativeR8").orNull == "true"
-      if (nativeR8 || providers.gradleProperty("portalBenchmarkOptimize").orNull == "true") {
+      // Preserve the older external-probe compatibility mode when explicitly requested.
+      val compatibilityR8 = providers.gradleProperty("portalBenchmarkOptimize").orNull == "true"
+      val nativeR8 = providers.gradleProperty("portalBenchmarkNativeR8").orNull
+          ?.let { it == "true" } ?: !compatibilityR8
+      if (nativeR8 || compatibilityR8) {
         isMinifyEnabled = true
         if (nativeR8) {
           proguardFiles("portal-r8-rules.pro", "benchmark-r8-native-rules.pro")
