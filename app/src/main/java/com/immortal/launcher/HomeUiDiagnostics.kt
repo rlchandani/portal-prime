@@ -31,9 +31,9 @@ internal object HomeUiDiagnostics {
     fun json() = JSONArray(listOf(left, top, right, bottom))
   }
 
-  // Appearance's fixed registry titles/row descriptions, shell labels and dialog choices.
+  // Fixed public Settings titles/row descriptions, shell labels and dialog choices.
   // These public selectors do not export stored values or grant Home input eligibility.
-  private val appearanceLabels = mapOf(
+  private val settingsLabels = mapOf(
       "Settings" to "settingsTitle", "App appearance" to "appAppearance",
       "Appearance" to "appearance", "immortal.settingsTheme" to "settingsTheme",
       "App tile size" to "tileSize", "immortal.tileSize" to "tileSize",
@@ -48,8 +48,20 @@ internal object HomeUiDiagnostics {
       "Close dialog" to "menuDismiss", "Show advanced options" to "advancedHint",
       "Advanced settings" to "advancedTitle",
       "Turn on Advanced settings" to "consentEnable", "Cancel" to "consentCancel",
+      // Static category and embedded page titles from ApprovedSettingsNavigation. Shared
+      // titles use one key; their separate nodes/bounds identify the sidebar and detail pane.
+      "Photos & screensaver" to "photosScreensaver", "Home & widgets" to "homeWidgets",
+      "Sound & wake" to "soundWake", "Connections" to "connections",
+      "Input & accessibility" to "inputAccessibility", "Device" to "device", "Advanced" to "advanced",
+      "Photo clock faces" to "photoClockFaces", "Digital clock" to "digitalClock",
+      "Photo sources" to "photoSources", "Weather" to "weather", "Calendar" to "calendar",
+      "Alarm" to "alarm", "Quick buttons" to "quickButtons", "Touch sounds" to "touchSounds",
+      "Sounds" to "sounds", "Welcome greeting" to "welcomeGreeting", "Sunrise & wake" to "sunriseWake",
+      "Home dashboard" to "homeDashboard", "Intercom" to "intercom", "Device name" to "deviceName",
+      "Sleep timer" to "sleepTimer", "About & device health" to "aboutDeviceHealth",
+      "Android & Portal settings" to "androidPortalSettings",
   )
-  private val appearanceKeys = appearanceLabels.values.toSet()
+  private val settingsKeys = settingsLabels.values.toSet()
 
   // Only these fixed source labels can become response keys. Never serialize a node label.
   private val labels = mapOf(
@@ -64,7 +76,7 @@ internal object HomeUiDiagnostics {
       "Browser" to "browser", "Chromium" to "chromium", "Jarvis" to "jarvis",
       "Your apps" to "appsHeading", "Installed apps on this Portal." to "appsSubtitle",
       "Small things that make the day easier." to "toolsSubtitle",
-  ) + appearanceLabels
+  ) + settingsLabels
   private val fixedKeys = labels.values.toSet()
   internal fun fixedKey(value: CharSequence?): String? {
     if (value == null || value.length > 80) return null
@@ -193,7 +205,7 @@ internal object HomeUiDiagnostics {
         } else {
           val key = node.key
           if (!node.editable && !node.password && key != null && key in fixedKeys &&
-              (eligible || (!truncated && key in appearanceKeys)) &&
+              (eligible || (!truncated && key in settingsKeys)) &&
               key !in setOf("appsHeading", "appsSubtitle", "toolsSubtitle", "searchInstalledApps", "searchApps"))
             rows.put(row(node, key))
         }

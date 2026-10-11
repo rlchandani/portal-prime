@@ -137,6 +137,17 @@ this does not establish its original root cause or claim an app-code fix.
 Evidence: `settings-header-home-2026-10-11/postflight.json` beneath the diagnostic
 root above.
 
+## Broader navigation follow-up
+
+A read-only Settings-inspector extension passes the 1,732-test gate and enables
+broader native navigation coverage. The bounded continuation passes 16 checks
+(four overviews and 12 page/Back visits) before stopping at Welcome greeting's
+heading verification. Its report remains incomplete; the inspector candidate
+is not retained. Family Area is restored to this measured `a622…` artifact with
+unchanged configuration and exact compilation-profile verification. No new
+frame measurements or speed improvement are claimed. See
+[the native coverage record](portal-settings-native-navigation-coverage.md).
+
 ## Official guidance
 
 - [Compose performance](https://developer.android.com/develop/ui/compose/performance).

@@ -311,6 +311,113 @@ class HomeUiDiagnosticsTest {
     assertNull(HomeUiDiagnostics.fixedKey("light"))
   }
 
+  // Literal source titles from ApprovedSettingsNavigation; expected wire keys are independent
+  // of the inspector map, and do not require initializing the navigation or settings registry.
+  private val settingsNavigationLabels = mapOf(
+      "Appearance" to "appearance", "Photos & screensaver" to "photosScreensaver",
+      "Home & widgets" to "homeWidgets", "Sound & wake" to "soundWake",
+      "Connections" to "connections", "Input & accessibility" to "inputAccessibility",
+      "Device" to "device", "Advanced" to "advanced",
+      "Display" to "display", "App appearance" to "appAppearance", "Wallpaper" to "wallpaper",
+      "Photo clock faces" to "photoClockFaces", "Digital clock" to "digitalClock",
+      "Photo sources" to "photoSources", "Weather" to "weather", "Calendar" to "calendar",
+      "Alarm" to "alarm", "Quick buttons" to "quickButtons", "Touch sounds" to "touchSounds",
+      "Sounds" to "sounds", "Welcome greeting" to "welcomeGreeting", "Sunrise & wake" to "sunriseWake",
+      "Home dashboard" to "homeDashboard", "Intercom" to "intercom", "Device name" to "deviceName",
+      "Sleep timer" to "sleepTimer", "About & device health" to "aboutDeviceHealth",
+      "Android & Portal settings" to "androidPortalSettings",
+  )
+
+  @Test fun sourceDefinedSettingsTitlesExportFixedKeysOnNonEligibleSurfaces() {
+    for ((title, key) in settingsNavigationLabels) {
+      assertEquals(title, key, HomeUiDiagnostics.fixedKey(title))
+      val snapshot = state(listOf(node(HomeUiDiagnostics.fixedKey(title), left = 300, right = 900)))
+      val response = snapshot.json()
+      val rows = response.getJSONArray("nodes")
+      assertFalse(title, response.getBoolean("eligible"))
+      assertEquals(title, 1, rows.length())
+      assertEquals(key, rows.getJSONObject(0).getString("key"))
+      assertEquals("[300,100,900,150]", rows.getJSONObject(0).getJSONArray("bounds").toString())
+      assertFalse(response.toString().contains("\"$title\""))
+    }
+  }
+
+  @Test fun sharedCategoryAndPageTitlesKeepOneKeyAndDistinctTouchAndHeadingBounds() {
+    for ((title, key) in listOf("Photos & screensaver" to "photosScreensaver",
+        "Home & widgets" to "homeWidgets")) {
+      val row = node(left = 0, right = 250, parent = 80, id = 40)
+      val label = node(HomeUiDiagnostics.fixedKey(title), 20, 110, 230, 140,
+          parent = 40, clickable = false, id = 41)
+      val heading = node(HomeUiDiagnostics.fixedKey(title), 300, 60, 900, 90,
+          parent = 90, clickable = false, id = 42)
+      val snapshot = state(listOf(row, label, heading))
+      val rows = snapshot.json().getJSONArray("nodes")
+      assertEquals(title, 2, rows.length())
+      assertEquals(key, rows.getJSONObject(0).getString("key"))
+      assertEquals(key, rows.getJSONObject(1).getString("key"))
+      assertTrue(rows.getJSONObject(0).getBoolean("clickable"))
+      assertFalse(rows.getJSONObject(1).getBoolean("clickable"))
+      assertEquals("[0,100,250,150]", rows.getJSONObject(0).getJSONArray("bounds").toString())
+      assertEquals("[300,60,900,90]", rows.getJSONObject(1).getJSONArray("bounds").toString())
+      assertFalse(snapshot.eligible())
+    }
+  }
+
+  @Test fun settingsNavigationTitlesDoNotBroadenHomeSearchMenuOrLongPressAdmission() {
+    val nodes = settingsNavigationLabels.keys.mapIndexed { i, title ->
+      node(HomeUiDiagnostics.fixedKey(title), top = 20 + i * 20, bottom = 36 + i * 20)
+          .copy(longClickable = true)
+    }
+    val field = node(top = 600, bottom = 650, editable = true)
+    val settings = state(nodes + field.copy(searchHint = "searchInstalledApps"))
+    assertFalse(settings.eligible())
+    assertFalse(settings.dockPresent())
+    assertFalse(settings.appMenuPresent())
+    assertNull(settings.searchNode())
+    val home = state(dock() + nodes + field)
+    assertTrue(home.eligible())
+    assertFalse(home.appsPageVisible())
+    assertFalse(home.toolsLibraryVisible())
+    assertNull(home.searchNode())
+    nodes.forEach {
+      assertFalse(settings.publicLongPressTarget(50.0, it.bounds.top + 1.0))
+      assertFalse(home.publicLongPressTarget(50.0, it.bounds.top + 1.0))
+    }
+    val menu = listOf(node("menuOpen"), node("menuAppInfo"), node("menuMove"), node("menuAddFavorite"))
+    assertFalse(state(menu + nodes + field).appMenuPresent())
+    val partial = state(nodes, truncated = true)
+    assertEquals(0, partial.json().getJSONArray("nodes").length())
+    assertFalse(partial.eligible())
+    assertNull(partial.searchNode())
+  }
+
+  @Test fun settingsNavigationExportNeverDisclosesEditablePasswordUnknownOrValueText() {
+    val fields = settingsNavigationLabels.keys.flatMap { title ->
+      val key = HomeUiDiagnostics.fixedKey(title)
+      assertNull(HomeUiDiagnostics.fixedKey("$title = PRIVATE_VALUE_SENTINEL"))
+      listOf(node(key, editable = true).copy(textLength = 137),
+          node(key, password = true).copy(searchHint = "PRIVATE_PASSWORD_SENTINEL", textLength = 203))
+    }
+    val snapshot = state(listOf(node(HomeUiDiagnostics.fixedKey("App appearance")),
+        node("PRIVATE_FIELD_SENTINEL"),
+        node(editable = true, hint = "searchApps").copy(textLength = 251)) + fields)
+    val response = snapshot.json()
+    val rows = response.getJSONArray("nodes")
+    assertEquals(1, rows.length())
+    assertEquals("appAppearance", rows.getJSONObject(0).getString("key"))
+    assertEquals(setOf("key", "bounds", "clickable", "longClickable", "focused",
+        "accessibilityFocused", "editable"), rows.getJSONObject(0).keys().asSequence().toSet())
+    assertFalse(response.getBoolean("eligible"))
+    assertFalse(response.getBoolean("focusedEditable"))
+    assertNull(snapshot.searchNode())
+    for (privateText in listOf("PRIVATE_FIELD_SENTINEL", "PRIVATE_PASSWORD_SENTINEL",
+        "PRIVATE_VALUE_SENTINEL", "inputTextLength", "searchApps")) {
+      assertFalse(response.toString().contains(privateText))
+    }
+    assertNull(HomeUiDiagnostics.fixedKey("https://private.invalid/Weather?q=secret"))
+    assertNull(HomeUiDiagnostics.fixedKey("PRIVATE_FIELD_SENTINEL"))
+  }
+
   @Test fun truncatedSettingsTreeCannotExportAppearanceRowsOrAuthorizeInput() {
     val snapshot = state(listOf(node(HomeUiDiagnostics.fixedKey("Appearance")),
         node(HomeUiDiagnostics.fixedKey("Standard"))), truncated = true)
