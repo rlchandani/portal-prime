@@ -159,7 +159,7 @@ from 134,667 to 214,290 KiB app PSS. WebView-to-native and native-to-WebView han
 and memory returned near or below its starting value after the native beat. Configuration, schema,
 source groups and the retained APK were restored. No household pixels or album metadata were exported.
 
-The ordinary default build, without renderer-property overrides, is byte-for-byte identical to the
+At the delivery checkpoint, the ordinary default build without renderer-property overrides was byte-for-byte identical to the
 physically tested v10 APK: SHA-256 `19abed09f4fd88cfa8a0875a7e1af8a2ce8ee4b1f016312649a85417f9c38f65`,
 37,133,972 bytes. That build repeated the full 1,569-test Android gate with no failures, errors or skips.
 The benchmark-only Home observation override does not enable the native Home renderer.
@@ -180,7 +180,7 @@ then completed. Neither stop is a product performance failure.
 | Filmstrip p95 | At least 20% lower than both fresh baselines | 53.25/50.50 to 14.50 ms; 71.3–72.8% lower | Passed and deployed |
 | Filmstrip p99 | At least 20% lower than both fresh baselines | 120.50/125.50 to 17.50 ms; 85.5–86.1% lower | Passed and deployed |
 | Filmstrip mean | No regression above 5% | 29.14/28.80 to 10.14 ms; 64.8–65.2% lower | Passed |
-| Home performance | Same p95/p99 gate | Latest restored baseline: mean 14.23 ms, p95 46.00 ms, p99 61.75 ms; no accepted Home optimization | Established renderer retained; outlier unresolved |
+| Home performance | Same p95/p99 gate | Latest restored baseline: mean 14.03 ms, p95 47.25 ms, p99 64.25 ms; no accepted Home optimization | Established renderer retained; outlier unresolved |
 | Home controls | All seven fixed scenarios | 7/7 passed on exact final APK | Passed |
 | Image geometry/navigation | Mixed-size and one-photo cases | 2/2 cases, 14 generated-only screenshots | Passed |
 | Shuffle soak | 900 seconds; both handoff directions; app PSS at most 512 MiB and growth at most 256 MiB | 284 observations; 131.5–209.3 MiB app PSS; peak growth 43.4 MiB from start | Passed |
@@ -259,3 +259,42 @@ including scroll-ancestor geometry and region work. This supplies a specific nex
 isolate the offscreen semantics change while preserving the current accessible controls and
 remote/pinned-app behavior. It is a mechanism hypothesis, not a causal explanation for the
 observed regression. There is still no accepted new Home performance gain.
+
+
+## Isolated offscreen traversal experiment
+
+A follow-up candidate kept Compose UI 1.11.4 but disabled only its new offscreen accessibility
+child-traversal flag at process startup, before first UI composition. The existing AndroidX
+Startup provider retained ProfileInstaller and lifecycle initialization. The initializer was
+included only for the explicit candidate, with the dependency and source-set overrides absent
+from normal builds. Three regression tests established flag isolation, startup invocation and
+idempotency; the full candidate gate passed 1,572 tests across 187 suites.
+
+A fresh Family-only comparison completed three thirty-cycle blocks, with Main sampling disabled:
+
+| Home Window metric | Shipped 1.10.4 before | 1.11.4 with legacy offscreen traversal | Shipped 1.10.4 after |
+| --- | ---: | ---: | ---: |
+| Frames | 782 | 782 | 782 |
+| Mean | 13.60 ms | 14.49 ms | 14.03 ms |
+| p95 | 37.00 ms | 47.00 ms | 47.25 ms |
+| p99 | 46.50 ms | 62.75 ms | 64.25 ms |
+| Above 16.67 ms budget | 15.60% | 16.50% | 16.50% |
+
+The candidate failed the 20% tail gate against both controls and the 5% mean gate against the
+first control. Its p95/p99 were 27.0%/34.9% worse than the first baseline and only 0.5%/2.3%
+better than the final baseline. This is not an accepted Home improvement or a causal comparison
+against the earlier 1.11.4 trial. All 2,346 frames had zero callback drops, invalid samples or
+overflow samples.
+
+The candidate was rejected. Its APK and complete changed sources remain private evidence;
+the dependency override and initializer were removed. The exact accepted 19abed09… APK was
+restored on Family Area, Home foreground, with the collector inactive and settings, schema and
+photo-source groups preserved. Living Area had zero operations. Direct runtime flag inspection
+was not performed; compiled policy, initializer packaging and unit invocation are the available
+mechanism evidence.
+
+The restored-default build passed all 1,569 Android tests and resolved Compose UI 1.10.4, with
+no legacy-offscreen initializer packaged. Its rebuilt APK differs from the accepted APK in
+classes3.dex and assets/dexopt/baseline.prof and was not installed or promoted. Both rooms retain
+the exact physically accepted artifact. The latest descriptive restored Home block above remains
+an unresolved baseline, not a shipped optimization.
