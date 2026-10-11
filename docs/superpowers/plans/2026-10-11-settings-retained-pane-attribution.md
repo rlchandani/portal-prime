@@ -53,14 +53,16 @@
 
 **Files:** New ignored/private diagnostic artifacts and a committed result report.
 
-- [ ] Freeze current source, compiled signed APK, flags, local driver and protocol.
-- [ ] Deploy only to Family; save/config-compare settings and photo sources in memory.
-- [ ] Use verified native routes to exercise warmed categories and scalar pages; separate active/inactive callback records, constraints and durations from root/frame work.
-- [ ] Attribute observable work honestly; absent boundary callbacks leave descendant-only work unresolved.
-- [ ] Restore accepted APK and SDK profile unconditionally, verify Home/inactive/config/source state.
-- [ ] If significant hidden work is observed, separately test active-only measurement without changing retained composition; otherwise reject this hypothesis and target remaining measured cost.
+- [x] Freeze current source, compiled signed APK, flags, local driver and protocol.
+- [x] Deploy only to Family; save/config-compare settings and photo sources in memory.
+- [x] Use verified native routes to exercise warmed categories and scalar pages; separate active/inactive callback records, constraints and durations from root/frame work.
+- [x] Attribute observable work honestly; absent boundary callbacks leave descendant-only work unresolved.
+- [x] Restore accepted APK and SDK profile unconditionally, verify Home/inactive/config/source state.
+- [x] If significant hidden work is observed, separately test active-only measurement without changing retained composition; otherwise reject this hypothesis and target remaining measured cost.
 - [ ] Keep instrumentation disabled in any final matched speed comparison.
 
 **Ruling:** Attribution builds keep the existing UI-work observer elements attached outside recording, too. Otherwise START/recomposition could add layout nodes and manufacture hidden-pane work. Ordinary builds retain the prior conditional observer behavior.
 
-**Completed local evidence:** 1,719 unit tests in 198 suites, zero failures/errors/skips; debug and opt-in benchmark builds passed. Actual packaged DEX flags show pane/UI diagnostics false in debug and true in the attribution benchmark. APK signing certificate/package/non-debuggable benchmark checks passed. The tested private APK and source inventory are preserved in `build/fleet/diagnostics/settings-pane-attribution-2026-10-11`. Native attribution is still pending; no speed improvement or hypothesis confirmation is claimed.
+**Completed local evidence:** 1,719 unit tests in 198 suites, zero failures/errors/skips; debug and opt-in benchmark builds passed. Actual packaged DEX flags show pane/UI diagnostics false in debug and true in the attribution benchmark. APK signing certificate/package/non-debuggable benchmark checks passed. The tested private APK and source inventory are preserved in `build/fleet/diagnostics/settings-pane-attribution-2026-10-11`. The separate frozen Family retry completed 52 captures (10 warm-up, 30 category, 12 scalar), 173/173 acknowledged inputs and 12 verified Back operations, after correcting a Display-only driver guard in the preserved incomplete run. Retry helpers/analyzer passed 54 tests normally and with Python optimization. Exact accepted APK/SDK profile, configuration/photo sources, source inventory, Home and inactive collector restoration all passed; Living/phone operations remained zero. Category hidden boundary work was 0.108073 ms median (maximum 0.264531 ms). First Appearance visible measurement was 80.200208 ms versus 0.224791 ms median for five repeat visits; first Wallpaper was 34.566771 ms versus 0.438385 ms for five repeat visits. Active scalar attribution matched each route. Inclusive instrumented observations are not CPU/interaction latency or speed improvements, and descendant-only work remains unresolved.
+
+**Decision:** Do not change retained-pane measurement on this evidence. Target first-visible-page construction/measurement/rendering next; preserve existing UX and registry behavior. A final matched speed comparison with instrumentation disabled remains required before promoting any optimization. See `docs/design/portal-settings-pane-attribution-probe.md` for the full trial, limits and provenance.
