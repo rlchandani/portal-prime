@@ -7,18 +7,40 @@
 package com.immortal.launcher
 
 /** Routes retain navigation history; resource-owning editor compositions do not stay hidden. */
-internal data class ApprovedSettingsHistory(val entries: List<ApprovedSettingsRoute>) {
-    val current: ApprovedSettingsRoute get() = entries.last()
-
-    fun navigate(next: ApprovedSettingsRoute): ApprovedSettingsHistory = when {
-        next.page == null -> ApprovedSettingsHistory(listOf(next))
-        next == current -> this
-        next.detailKey == current.detailKey -> copy(entries = entries.dropLast(1) + next)
-        else -> copy(entries = (entries + next).takeLast(32))
+internal data class ApprovedSettingsHistory(
+    val entries: List<ApprovedSettingsRoute>,
+    val position: Int = entries.lastIndex,
+) {
+    init {
+        require(entries.isNotEmpty()) { "Settings history must contain at least one route" }
+        require(position in entries.indices) { "Settings history position must be in range" }
     }
 
-    fun back(): ApprovedSettingsHistory = if (entries.size > 1) copy(entries = entries.dropLast(1))
-        else initial(ApprovedSettingsRoute(category = current.category))
+    val current: ApprovedSettingsRoute get() = entries[position]
+    val canGoBack: Boolean get() = position > 0
+    val canGoForward: Boolean get() = position < entries.lastIndex
+
+    fun navigate(next: ApprovedSettingsRoute): ApprovedSettingsHistory {
+        if (next == current) return this
+        val visited = entries.take(position + 1)
+        val updated = if (next.detailKey == current.detailKey) visited.dropLast(1) + next
+            else visited + next
+        return ApprovedSettingsHistory(updated.takeLast(32))
+    }
+
+    fun back(allowed: (ApprovedSettingsRoute) -> Boolean = { true }): ApprovedSettingsHistory {
+        for (index in position - 1 downTo 0) {
+            if (allowed(entries[index])) return copy(position = index)
+        }
+        return this
+    }
+
+    fun forward(allowed: (ApprovedSettingsRoute) -> Boolean = { true }): ApprovedSettingsHistory {
+        for (index in position + 1..entries.lastIndex) {
+            if (allowed(entries[index])) return copy(position = index)
+        }
+        return this
+    }
 
     companion object {
         fun initial(route: ApprovedSettingsRoute) = ApprovedSettingsHistory(

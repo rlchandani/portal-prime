@@ -11,6 +11,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +33,13 @@ internal data class ApprovedSettingsRoute(
 internal val LocalApprovedSettingsNavigate =
     staticCompositionLocalOf<((ApprovedSettingsRoute) -> Unit)?> { null }
 internal val LocalApprovedSettingsBack = staticCompositionLocalOf<(() -> Unit)?> { null }
+
+/** Only the heading consumes this changing state; retained editor bodies need not recompose. */
+internal data class ApprovedSettingsHistoryControls(
+    val onBack: (() -> Unit)?, val onForward: (() -> Unit)?,
+    val backTitle: String? = null, val forwardTitle: String? = null,
+)
+internal val LocalApprovedSettingsHistoryControls = compositionLocalOf<ApprovedSettingsHistoryControls?> { null }
 
 /** Cancel leaves a local editor; standalone wrappers still finish their own Activity. */
 @Composable
@@ -83,7 +91,7 @@ internal val ApprovedSettingsCategories = listOf(
     ApprovedSettingsCategory("photos", "Photos & screensaver", "Choose your photos and screensaver.",
         approvedIconResource("photo"), listOf("screensaver", "faces", "clock", "sources")),
     ApprovedSettingsCategory("home", "Home & widgets",
-        "Set up your home. Individual widget options live in Home & widgets.",
+        "Set up your home layout and individual widgets.",
         approvedIconResource("gridapps"), listOf("widgets", "weather", "calendar", "alarm", "quickbar")),
     ApprovedSettingsCategory("sound", "Sound & wake", "Sounds, greetings and wake schedules.",
         approvedIconResource("bell"), listOf("touch", "chime", "welcome", "sunrise", "alarm", "lamp")),
@@ -116,7 +124,7 @@ internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("display", "Display", "appearance"),
     ApprovedSettingsPage("appearance", "App appearance", "appearance"),
     ApprovedSettingsPage("wallpaper", "Wallpaper", "appearance"),
-    ApprovedSettingsPage("screensaver", "Photos & screensaver", "photos", standaloneActivity = ScreensaverSettingsActivity::class.java),
+    ApprovedSettingsPage("screensaver", "Slideshow", "photos", standaloneActivity = ScreensaverSettingsActivity::class.java),
     ApprovedSettingsPage("sources", "Photo sources", "photos", standaloneActivity = ScreensaverSourcesActivity::class.java),
     ApprovedSettingsPage("styles", "Screensaver style", "photos", standaloneActivity = ScreensaverModeActivity::class.java),
     ApprovedSettingsPage("faces", "Photo clock faces", "photos", standaloneActivity = FacePickerActivity::class.java),
@@ -130,7 +138,7 @@ internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("smb", "Connect SMB / NAS", "photos", SmbConnectActivity::class.java),
     ApprovedSettingsPage("dav", "Connect WebDAV", "photos", DavConnectActivity::class.java),
     ApprovedSettingsPage("web", "Web page", "photos", WebUrlEntryActivity::class.java),
-    ApprovedSettingsPage("widgets", "Home & widgets", "home", HomeActivity::class.java),
+    ApprovedSettingsPage("widgets", "Home dashboard", "home"),
     ApprovedSettingsPage("cameras", "Cameras", "home", CameraViewerActivity::class.java),
     ApprovedSettingsPage("weather", "Weather", "home"),
     ApprovedSettingsPage("calendar", "Calendar", "home"),
@@ -152,7 +160,7 @@ internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("lamp", "Lamp", "sound", LampActivity::class.java),
     ApprovedSettingsPage("multiroom", "Multi-room audio", "connections", standaloneActivity = MultiRoomActivity::class.java),
     ApprovedSettingsPage("mqtt", "MQTT publishing", "connections", standaloneActivity = MqttActivity::class.java),
-    ApprovedSettingsPage("ha", "Home dashboard", "connections", standaloneActivity = HaSettingsActivity::class.java),
+    ApprovedSettingsPage("ha", "Home Assistant dashboard", "connections", standaloneActivity = HaSettingsActivity::class.java),
     ApprovedSettingsPage("ha-entities", "Choose Home Assistant entities", "connections", HaSettingsActivity::class.java),
     ApprovedSettingsPage("ha-dashboard", "Home Assistant", "connections", HaDashboardActivity::class.java),
     ApprovedSettingsPage("phone", "Phone remote", "connections", RemotePairActivity::class.java),

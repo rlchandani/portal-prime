@@ -180,14 +180,26 @@ class ImmortalSettingsActivity : ComponentActivity() {
     syncRouteIntent()
   }
 
+  private fun permittedHistoryRoute(next: ApprovedSettingsRoute, advanced: Boolean): Boolean =
+      advanced || (next.category != "advanced" &&
+          next.page?.let(com.immortal.launcher.settings.SettingsPresentation::isAdvancedPage) != true)
+
   private fun backLocal() {
-    history = history.back()
+    val advanced = ImmortalSettings.advancedSettings(this)
+    history = history.back { permittedHistoryRoute(it, advanced) }
     syncRouteIntent()
   }
 
-  /** Paired Back uses exactly the header's local history; an overview keeps platform Back. */
+  private fun forwardLocal() {
+    val advanced = ImmortalSettings.advancedSettings(this)
+    history = history.forward { permittedHistoryRoute(it, advanced) }
+    syncRouteIntent()
+  }
+
+  /** Remote and physical Back use the same visited-page history as the header. */
   internal fun handleRemoteSettingsBack(): Boolean {
-    if (route.page == null) return false
+    val advanced = ImmortalSettings.advancedSettings(this)
+    if (history.back { permittedHistoryRoute(it, advanced) } == history) return false
     backLocal()
     return true
   }
@@ -217,17 +229,34 @@ class ImmortalSettingsActivity : ComponentActivity() {
     val restored = savedInstanceState?.getParcelableArrayList<Bundle>("approved_settings_history")
         ?.map { ApprovedSettingsRoute(it.getString("page"), it.getString("category") ?: "appearance",
             it.getString("control")) }
-    history = if (restored.isNullOrEmpty()) ApprovedSettingsHistory.initial(readRoute(intent))
-        else ApprovedSettingsHistory(restored.takeLast(32))
+    history = if (restored.isNullOrEmpty()) ApprovedSettingsHistory.initial(readRoute(intent)) else {
+      val entries = restored.takeLast(32)
+      val removed = restored.size - entries.size
+      val position = ((savedInstanceState?.getInt("approved_settings_history_position", restored.lastIndex) ?: restored.lastIndex) - removed)
+          .coerceIn(0, entries.lastIndex)
+      ApprovedSettingsHistory(entries, position)
+    }
     syncRouteIntent()
     setContent {
       PortalPrimeTheme(darkTheme = false) {
         val navigate = remember { ::navigateLocal }
         val back = remember { ::backLocal }
+        val forward = remember { ::forwardLocal }
+        val advanced = rememberApprovedAdvanced()
+        val previous = history.back { permittedHistoryRoute(it, advanced) }.takeIf { it != history }
+        val next = history.forward { permittedHistoryRoute(it, advanced) }.takeIf { it != history }
+        fun routeTitle(target: ApprovedSettingsRoute): String =
+            target.page?.let { approvedSettingsPage(it)?.title }
+                ?: ApprovedSettingsCategories.firstOrNull { it.id == target.category }?.title.orEmpty()
+        val controls = ApprovedSettingsHistoryControls(
+            onBack = previous?.let { back }, onForward = next?.let { forward },
+            backTitle = previous?.current?.let(::routeTitle), forwardTitle = next?.current?.let(::routeTitle),
+        )
         CompositionLocalProvider(
             LocalApprovedRequestedControl provides route.control,
             LocalApprovedSettingsNavigate provides navigate,
             LocalApprovedSettingsBack provides back,
+            LocalApprovedSettingsHistoryControls provides controls,
         ) {
           ImmortalSettingsScreen(route)
         }
@@ -248,6 +277,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
         putString("page", entry.page); putString("category", entry.category); putString("control", entry.control)
       }
     }))
+    outState.putInt("approved_settings_history_position", history.position)
     super.onSaveInstanceState(outState)
   }
 }
@@ -259,7 +289,8 @@ private fun ImmortalSettingsScreen(route: ApprovedSettingsRoute) {
   val category = ApprovedSettingsCategories.firstOrNull { it.id == route.category }
       ?: ApprovedSettingsCategories.first()
   val backToCategory = rememberApprovedSettingsBack()
-  BackHandler(enabled = route.page != null, onBack = backToCategory)
+  val historyControls = LocalApprovedSettingsHistoryControls.current
+  BackHandler(enabled = historyControls?.onBack != null, onBack = backToCategory)
   var prerequisite by remember(route) { mutableStateOf<String?>(null) }
   LaunchedEffect(route) {
     route.control?.takeIf { it.isNotBlank() }?.let { control ->
@@ -407,7 +438,7 @@ private fun ApprovedNativeSettingsPage(page: String) {
     "touch" -> ApprovedTouchSounds()
     "device" -> DeviceNameSection()
     "widgets" -> {
-      SectionLabel("Home & widgets")
+      SectionLabel("Home dashboard")
       Card {
         NavRow("Customize home", subLabel = "Touch and hold a widget on Home to move, resize or remove it.") {
           context.startActivity(Intent(context, HomeActivity::class.java))

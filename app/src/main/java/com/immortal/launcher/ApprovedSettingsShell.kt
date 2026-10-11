@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -58,6 +59,9 @@ import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.CollectionItemInfo
 import androidx.compose.ui.semantics.collectionInfo
 import androidx.compose.ui.semantics.collectionItemInfo
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -445,7 +449,7 @@ private fun ApprovedSettingsDetailBody(
         if (detail.lazy == null) {
             Column(
                 observedModifier.verticalScroll(rememberScrollState())
-                    .padding(start = 64.dp, end = 64.dp, top = 32.dp, bottom = 80.dp).focusGroup(),
+                    .padding(start = 48.dp, end = 48.dp, top = 40.dp, bottom = 80.dp).focusGroup(),
             ) {
                 ApprovedSettingsDetailHeading(detail.title, detail.subtitle, detail.onBack)
                 if (detail.gated) ApprovedSettingsAdvancedGate(onAdvanced) else detail.content()
@@ -454,7 +458,7 @@ private fun ApprovedSettingsDetailBody(
             LazyColumn(
                 observedModifier.focusGroup(),
                 state = detail.lazy.state,
-                contentPadding = PaddingValues(start = 64.dp, end = 64.dp, top = 32.dp, bottom = 80.dp),
+                contentPadding = PaddingValues(start = 48.dp, end = 48.dp, top = 40.dp, bottom = 80.dp),
             ) {
                 // The heading remains an ordinary scrolling item.
                 item(key = "settings:detail-heading", contentType = "detail-heading") {
@@ -499,16 +503,44 @@ private fun ApprovedSettingsSearchField(query: String, onChange: (String) -> Uni
 
 @Composable
 private fun ApprovedSettingsDetailHeading(title: String, subtitle: String, onBack: (() -> Unit)?) {
+    val controls = LocalApprovedSettingsHistoryControls.current
+        ?: ApprovedSettingsHistoryControls(onBack, null)
     Column {
-        if (onBack != null) {
-            ApprovedSettingsBackButton("Settings", onClick = onBack)
+        Row(verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+            Surface(color = LocalApprovedPalette.current.surface2, shape = RoundedCornerShape(50.dp),
+                border = BorderStroke(1.dp, IosDivider)) {
+                Row(Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    ApprovedSettingsHistoryButton(false, controls.onBack, controls.backTitle)
+                    Box(Modifier.width(1.dp).height(38.dp).background(IosDivider))
+                    ApprovedSettingsHistoryButton(true, controls.onForward, controls.forwardTitle)
+                }
+            }
+            Text(title, color = IosLabel, fontSize = 38.sp, lineHeight = 48.sp,
+                fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
         }
-        Text(title, color = IosLabel, fontSize = 40.sp, lineHeight = 52.sp,
-            fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 12.dp))
         if (subtitle.isNotEmpty()) {
             Text(subtitle, color = IosSecondary, fontSize = 23.sp, lineHeight = 34.sp,
                 modifier = Modifier.padding(top = 12.dp))
         }
-        Spacer(Modifier.height(34.dp))
+        Spacer(Modifier.height(30.dp))
+    }
+}
+
+@Composable
+private fun ApprovedSettingsHistoryButton(forward: Boolean, onClick: (() -> Unit)?, destination: String?) {
+    val label = if (forward) "Settings Forward" else "Settings Back"
+    Box(Modifier.width(66.dp).height(62.dp)
+        .tvFocusable(RoundedCornerShape(32.dp), enabled = onClick != null, focusScale = 1f,
+            ringColor = IosBlue, onClick = { onClick?.invoke() })
+        .semantics {
+            contentDescription = label
+            role = Role.Button
+            if (onClick == null) disabled()
+            if (destination != null) stateDescription = "${if (forward) "Forward" else "Back"} to $destination"
+        }, contentAlignment = Alignment.Center) {
+        ApprovedIcon("chevL", tint = if (onClick == null) IosLabel.copy(alpha = .32f) else IosLabel,
+            modifier = Modifier.width(28.dp).height(34.dp).rotate(if (forward) 180f else 0f))
     }
 }

@@ -450,4 +450,14 @@ class HomeUiDiagnosticsTest {
     assertEquals(0, snapshot.json().getJSONArray("nodes").length())
   }
 
+
+  @Test fun settingsHistorySelectorsDoNotGrantHomeInputEligibility() {
+    for (label in listOf("Settings Back", "Settings Forward", "Slideshow", "Home Assistant dashboard")) {
+      val snapshot = state(listOf(node(HomeUiDiagnostics.fixedKey(label))))
+      assertFalse(snapshot.eligible())
+      assertFalse(snapshot.publicLongPressTarget(50.0, 120.0))
+      assertNull(snapshot.searchNode())
+      assertEquals(1, snapshot.json().getJSONArray("nodes").length())
+    }
+  }
 }
