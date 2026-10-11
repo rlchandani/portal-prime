@@ -60,6 +60,9 @@ internal object FramePerformanceCapture {
       currentMeasurement = ::settingsUiWorkMeasurement,
       nanoTime = SystemClock::elapsedRealtimeNanos,
   )
+  private val settingsPaneWorkProbe by lazy {
+    SettingsPaneWorkProbe(::settingsPaneWorkMeasurement, SystemClock::elapsedRealtimeNanos)
+  }
   private val slideshowWorkProbe = SlideshowWorkProbe(
       currentMeasurement = ::slideshowWorkMeasurement,
       nanoTime = SystemClock::elapsedRealtimeNanos,
@@ -80,6 +83,7 @@ internal object FramePerformanceCapture {
     val histograms = LinkedHashMap<String, FramePerformanceHistogram>()
     val settingsSearchPreparation = SettingsSearchPreparationSamples()
     val settingsUiWork = SettingsUiWorkSamples()
+    val settingsPaneWork = if (BuildConfig.PORTAL_SETTINGS_PANE_DIAGNOSTICS) SettingsPaneWorkSamples() else null
     val settingsEntryTimeline = SettingsEntryTimeline()
     val settingsEntryWindows = ArrayList<SettingsEntryWindow>() // Main-owned weak windows.
     val slideshowWork = SlideshowWorkSamples()
@@ -354,6 +358,30 @@ internal object FramePerformanceCapture {
     }
   }
 
+  fun beginSettingsPaneWork(pane: SettingsPaneWorkId, active: Boolean,
+      minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): SettingsPaneWorkSpan? =
+      if (BuildConfig.PORTAL_SETTINGS_PANE_DIAGNOSTICS)
+        settingsPaneWorkProbe.begin(pane, active, minWidth, maxWidth, minHeight, maxHeight)
+      else null
+
+  private fun settingsPaneWorkMeasurement(pane: SettingsPaneWorkId, active: Boolean,
+      minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): SettingsPaneWorkMeasurement? {
+    val s = current ?: return null
+    val samples = s.settingsPaneWork ?: return null
+    synchronized(s) {
+      if (current !== s || s.closedAt != null || SystemClock.elapsedRealtime() >= s.deadline) return null
+    }
+    return SettingsPaneWorkMeasurement { durationNs ->
+      val now = SystemClock.elapsedRealtime()
+      synchronized(s) {
+        if (current === s && s.closedAt == null && now < s.deadline) {
+          samples.record(pane, active, now - s.began, durationNs,
+              minWidth, maxWidth, minHeight, maxHeight, Looper.myLooper() === Looper.getMainLooper())
+        }
+      }
+    }
+  }
+
   /** The current preparation path is measured only for an explicitly active capture. */
   fun <T> measureSettingsSearchIndex(prepare: () -> List<T>): List<T> =
       settingsSearchPreparationProbe.prepare(prepare)
@@ -589,6 +617,7 @@ internal object FramePerformanceCapture {
       result.put("hosts", JSONObject().apply { s.histograms.forEach { (name, h) -> put(name, h.snapshot()) } })
       result.put("settingsSearchPreparation", s.settingsSearchPreparation.snapshot())
       result.put("settingsUiWork", s.settingsUiWork.snapshot())
+      s.settingsPaneWork?.let { result.put("settingsPaneWork", it.snapshot()) }
       result.put("settingsEntryTimeline", s.settingsEntryTimeline.snapshot())
       result.put("slideshowWork", s.slideshowWork.snapshot())
       result.put("slideshowStyles", s.slideshowStyles.snapshot())

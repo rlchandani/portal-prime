@@ -409,7 +409,8 @@ private fun ApprovedSettingsDetailPanes(
             val active = pane === target
             // Rich editors dispose on departure; retained scalar panes stop input and lifecycle work.
             key(pane.id) {
-                Box(Modifier.fillMaxSize().zIndex(if (active) 1f else 0f)
+                val work = rememberSettingsPaneWorkModifier(pane.detail.routeKey.substringAfter('/'), active)
+                Box(Modifier.fillMaxSize().then(work).zIndex(if (active) 1f else 0f)
                     .graphicsLayer { alpha = if (active) 1f else 0f }
                     .focusProperties { canFocus = active }
                     .then(if (active) Modifier else Modifier.clearAndSetSemantics { })

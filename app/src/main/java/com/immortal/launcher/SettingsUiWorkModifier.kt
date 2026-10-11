@@ -23,6 +23,8 @@ private val settingsUiMeasurementModifiers: List<Modifier> by lazy {
 
 /** No measurement node when composition occurs outside an explicit capture. */
 internal fun Modifier.settingsUiWorkMeasure(stage: SettingsUiWorkStage): Modifier {
-  if (stage.event || !FramePerformanceCapture.settingsUiWorkEnabled()) return this
+  // Attribution builds keep observer identity stable when recording starts or stops.
+  if (stage.event || (!BuildConfig.PORTAL_SETTINGS_PANE_DIAGNOSTICS &&
+      !FramePerformanceCapture.settingsUiWorkEnabled())) return this
   return then(settingsUiMeasurementModifiers[stage.ordinal])
 }

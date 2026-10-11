@@ -60,6 +60,7 @@ android {
     // Fixed-control functional probes stay dormant in production variants.
     buildConfigField("boolean", "PORTAL_HOME_UI_DIAGNOSTICS", "false")
     buildConfigField("boolean", "PORTAL_SETTINGS_UI_DIAGNOSTICS", "false")
+    buildConfigField("boolean", "PORTAL_SETTINGS_PANE_DIAGNOSTICS", "false")
 
     // Portal hardware is ARM only (gen-1/gen-2 Snapdragon, Portal TV Amlogic).
     // Kept as a guard so any future native dependency can't drag x86/x86_64 .so
@@ -112,6 +113,9 @@ android {
       // Functional observation has separate opt-in; never use it for timing comparisons.
       buildConfigField("boolean", "PORTAL_SETTINGS_UI_DIAGNOSTICS",
           (providers.gradleProperty("portalSettingsUiDiagnostics").orNull == "true").toString())
+      // Work attribution only; disabled for ordinary and final speed-comparison builds.
+      buildConfigField("boolean", "PORTAL_SETTINGS_PANE_DIAGNOSTICS",
+          (providers.gradleProperty("portalSettingsPaneDiagnostics").orNull == "true").toString())
       applicationIdSuffix = ".debug"
       isDebuggable = false
       signingConfig = signingConfigs.getByName("debug")
