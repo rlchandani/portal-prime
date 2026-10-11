@@ -62,6 +62,9 @@ android {
     buildConfigField("boolean", "PORTAL_SETTINGS_UI_DIAGNOSTICS", "false")
     buildConfigField("boolean", "PORTAL_SETTINGS_PANE_DIAGNOSTICS", "false")
 
+    // Controlled Appearance rendering candidate; ordinary builds retain the accepted path.
+    buildConfigField("boolean", "PORTAL_SETTINGS_DIRECT_APPEARANCE_ROWS", "false")
+
     // Portal hardware is ARM only (gen-1/gen-2 Snapdragon, Portal TV Amlogic).
     // Kept as a guard so any future native dependency can't drag x86/x86_64 .so
     // files no Portal can run into the APK.
@@ -116,6 +119,8 @@ android {
       // Work attribution only; disabled for ordinary and final speed-comparison builds.
       buildConfigField("boolean", "PORTAL_SETTINGS_PANE_DIAGNOSTICS",
           (providers.gradleProperty("portalSettingsPaneDiagnostics").orNull == "true").toString())
+      buildConfigField("boolean", "PORTAL_SETTINGS_DIRECT_APPEARANCE_ROWS",
+          (providers.gradleProperty("portalSettingsDirectAppearanceRows").orNull == "true").toString())
       applicationIdSuffix = ".debug"
       isDebuggable = false
       signingConfig = signingConfigs.getByName("debug")

@@ -372,10 +372,17 @@ private fun ApprovedNativeSettingsPage(page: String) {
     "boot" -> BootAppsContent()
     "ha" -> HaSettingsContent()
     "intercom" -> IntercomContent()
-    "appearance" -> SettingsList(SettingsDomains.immortal, immortal,
-        exclude = SettingsDomains.immortal.specs.map { it.key }.toSet() -
-            setOf("tileSize", "showMiniPlayer", "hideStatusBar", "clockFormat", "settingsTheme")) { k, v ->
-      applyImmortal(k, v)
+    "appearance" -> {
+      val domain = SettingsDomains.immortal
+      val exclude = domain.specs.map { it.key }.toSet() -
+          setOf("tileSize", "showMiniPlayer", "hideStatusBar", "clockFormat", "settingsTheme")
+      val onApply: (String, Any) -> Unit = { k, v -> applyImmortal(k, v) }
+      if (BuildConfig.PORTAL_SETTINGS_DIRECT_APPEARANCE_ROWS) {
+        // Keep the retained detail's existing scroll owner; avoid a second list for these rows.
+        SettingsRows(domain, immortal, exclude, onApply)
+      } else {
+        SettingsList(domain, immortal, exclude, onApply)
+      }
     }
     "weather" -> SettingsList(SettingsDomains.immortal, immortal,
         exclude = SettingsDomains.immortal.specs.map { it.key }.toSet() -

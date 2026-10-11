@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -86,6 +87,27 @@ fun <S> SettingsList(
     }
 }
 
+/** Emits a small registry projection directly into the caller's scrolling Column. */
+@Composable
+internal fun <S> SettingsRows(
+    domain: SettingsDomain<S>,
+    snapshot: S,
+    exclude: Set<String> = emptySet(),
+    onApply: (String, Any) -> Unit,
+) {
+    val model = prepareSettingsList(domain, snapshot, exclude, onApply)
+    model.projection.items.forEach { item ->
+        key(item.id) {
+            SettingsProjectionItem(model, item)
+        }
+    }
+    if (model.showAdvancedHint) {
+        key("${model.domain.id}:advanced-hint") {
+            SettingsAdvancedHint()
+        }
+    }
+}
+
 internal data class PreparedSettingsList<S>(
     val domain: SettingsDomain<S>,
     val snapshot: S,
@@ -119,26 +141,39 @@ internal fun <S> prepareSettingsList(
 /** Emits rows into an existing scroll owner; creates no nested list or bounded viewport. */
 internal fun <S> LazyListScope.settingsListItems(model: PreparedSettingsList<S>) {
     items(model.projection.items, key = { it.id }, contentType = { it.kind }) { item ->
-        when (item.kind) {
-            ApprovedSettingsLazyKind.HEADER -> {
-                if (item.firstGroup) ApprovedSettingsSectionLabel(item.section!!)
-                else SectionLabel(item.section!!)
-            }
-            ApprovedSettingsLazyKind.GAP -> Spacer(Modifier.size(22.dp))
-            ApprovedSettingsLazyKind.CONTROL -> ApprovedSettingsLazyRow(
-                item.id, item.firstRow, item.lastRow, model.requested,
-            ) {
-                SettingControl(model.domain.id, item.value!!, model.snapshot, model.advanced, model.onApply)
-            }
-        }
+        SettingsProjectionItem(model, item)
     }
     if (model.showAdvancedHint) {
         item(key = "${model.domain.id}:advanced-hint", contentType = "advanced-hint") {
-            Text("More customization is available in Advanced settings.", color = IosSecondary,
-                fontSize = 21.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 30.dp))
-            ApprovedSettingsTextButton("Show advanced options", LocalApprovedEnableAdvanced.current)
+            SettingsAdvancedHint()
         }
     }
+}
+
+@Composable
+private fun <S> SettingsProjectionItem(
+    model: PreparedSettingsList<S>,
+    item: ApprovedSettingsLazyItem<SettingSpec<S>>,
+) {
+    when (item.kind) {
+        ApprovedSettingsLazyKind.HEADER -> {
+            if (item.firstGroup) ApprovedSettingsSectionLabel(item.section!!)
+            else SectionLabel(item.section!!)
+        }
+        ApprovedSettingsLazyKind.GAP -> Spacer(Modifier.size(22.dp))
+        ApprovedSettingsLazyKind.CONTROL -> ApprovedSettingsLazyRow(
+            item.id, item.firstRow, item.lastRow, model.requested,
+        ) {
+            SettingControl(model.domain.id, item.value!!, model.snapshot, model.advanced, model.onApply)
+        }
+    }
+}
+
+@Composable
+private fun SettingsAdvancedHint() {
+    Text("More customization is available in Advanced settings.", color = IosSecondary,
+        fontSize = 21.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 30.dp))
+    ApprovedSettingsTextButton("Show advanced options", LocalApprovedEnableAdvanced.current)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
