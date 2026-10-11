@@ -35,14 +35,7 @@ internal fun approvedSourcesThumbnail(item: MediaItem): Bitmap? {
                 val retriever = MediaMetadataRetriever()
                 try {
                     retriever.setDataSource(item.path)
-                    retriever.getFrameAtTime(0)?.let { frame ->
-                        val edge = max(frame.width, frame.height)
-                        if (edge <= 512) frame else {
-                            val width = (frame.width * 512L / edge).toInt().coerceAtLeast(1)
-                            val height = (frame.height * 512L / edge).toInt().coerceAtLeast(1)
-                            Bitmap.createScaledBitmap(frame, width, height, true).also { frame.recycle() }
-                        }
-                    }
+                    approvedVideoFrame(retriever)
                 } finally { runCatching { retriever.release() } }
             } else {
                 val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -63,4 +56,10 @@ internal fun approvedSourcesThumbnail(item: MediaItem): Bitmap? {
     } finally {
         approvedSourcesDecodeSlots.release()
     }
+}
+
+/** Removes only a caller-owned generated fixture; normal preview ownership is unchanged. */
+internal fun approvedSourcesDiscardPreview(item: MediaItem): Bitmap? {
+    val file = File(item.path)
+    return approvedSourcesPreviewCache.remove("${item.path}:${file.lastModified()}:${file.length()}")
 }
