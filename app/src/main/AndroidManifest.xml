@@ -159,6 +159,8 @@
              internal-only like the other tile activities. -->
         <activity
             android:name=".WebAppActivity"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.web"
             android:exported="false"
             android:label="Music"
             android:screenOrientation="landscape"
