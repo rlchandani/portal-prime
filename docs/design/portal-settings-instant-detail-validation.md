@@ -39,3 +39,12 @@ Evidence is private under build/fleet/diagnostics/settings-instant-detail-2026-1
 Living Area had no test/profiling operations. This accepts the requested UI motion removal;
 Settings startup performance remains a separate task. Sparse/cold callback distributions
 from these functional checks are not used to claim a general speed improvement.
+
+
+The same verified artifact was subsequently deployed to Living Area. Independent installed
+APK hashing matched a564577a... on both rooms. Living deployment preserved full configuration,
+settings schema and photo-source groups, ended with the collector inactive and Home verified,
+and started zero performance captures. This was deployment verification only, not duplicate
+Living UI/performance testing. The new exact accepted rollback artifact for subsequent Settings
+work is the saved candidate-benchmark.apk in this evidence directory; the previous 19abed09...
+artifact remains retained for recovery/history.
