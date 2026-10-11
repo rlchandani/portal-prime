@@ -553,3 +553,148 @@ References: [Compose performance guidance](https://developer.android.com/develop
 [Compose phases](https://developer.android.com/develop/ui/compose/phases),
 [animation guidance](https://developer.android.com/develop/ui/compose/animation/quick-guide), and
 [AndroidX accessibility implementation notes](https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/ui/ui/src/androidMain/kotlin/androidx/compose/ui/platform/accessibility/android_a11y_implementation_notes.md).
+
+
+## Constructor-only semantics backport — rejected; comparison conditions corrected
+
+The build-only backport was packaged against Compose UI 1.10.4. Independent inspection of
+28,248 Android classes found exactly one changed class: `SemanticsNodeCopy`. Its packaged
+constructor calls the replaced-children getter once; the exact accepted APK calls it twice.
+Thirty-six constructor checks, eleven jar-merger checks and five checks against AGP's actual
+module-descriptor matcher passed. These checks establish the bounded bytecode change, not
+Android-tree correctness or a performance improvement. No repository app source changed for
+this experiment. The default unit gate remained 1,592 passing tests across 189 suites.
+
+A Family-only unprofiled comparison completed thirty Home/Apps cycles in each block:
+
+| Home Window metric | Accepted before | Constructor candidate | Accepted after |
+| --- | ---: | ---: | ---: |
+| Frames | 778 | 781 | 780 |
+| Mean | 13.02 ms | 14.36 ms | 13.61 ms |
+| p95 | 35.00 ms | 43.50 ms | 43.50 ms |
+| p99 | 46.00 ms | 64.00 ms | 62.00 ms |
+| Above 16.67 ms budget | 15.81% | 16.39% | 15.64% |
+
+The candidate did not meet either 20% tail gate or the 5% mean-regression limit against both
+controls. It was not promoted. All captures reported zero callback drops, invalid samples,
+overflow and invalid detail samples. The exact accepted 19abed09... APK was independently
+restored with Home foreground, no active collector and full configuration/schema/source groups
+preserved. Living Area had zero operations.
+
+Review then found a concrete comparison mismatch: `deploy_verified` skips installation when
+the requested APK is already present. The first control therefore retained a warm process,
+while the candidate and last control restarted. Their process-local capture identifiers were
+2, 1 and 1. This prevents attributing the timing difference to the constructor alone. Earlier
+rejections remain conservative product decisions, but those comparisons do not establish a
+causal regression or prove an optimization ineffective under matched startup conditions.
+
+The next controls use three consecutive accepted-build captures without requesting an install
+or process restart. Same Home-window identity and incrementing process-local capture identifiers
+are checked between blocks; PID is not directly measured. This measures natural drift under the
+same protocol. A subsequent candidate comparison must give every measured block the same
+restart and warm-up treatment. Thermal state, JIT and cache state remain uncontrolled unless
+separately established. All reported values remain Window callback timings, not delivered FPS,
+physical touch latency or CPU percentages. Home/Apps remains the sole unresolved priority.
+
+
+## Same-process accepted controls — completed
+
+Three consecutive thirty-cycle captures completed without installing an APK or requesting a
+process restart. The same Home-window identity and capture identifiers 2, 3 and 4 were verified.
+The exact accepted APK and all settings/schema/photo-source groups remained unchanged; the
+collector ended inactive. Living Area had zero operations.
+
+| Home Window metric | Control 1 | Control 2 | Control 3 |
+| --- | ---: | ---: | ---: |
+| Frames | 781 | 782 | 780 |
+| Mean | 12.88 ms | 13.81 ms | 13.72 ms |
+| p95 | 36.50 ms | 36.75 ms | 35.75 ms |
+| p99 | 46.00 ms | 45.25 ms | 44.25 ms |
+
+The maximum-minus-minimum range was 7.2% of the minimum for mean, 2.8% for p95 and 4.0% for
+p99. This is an observed range over three controls, not a confidence interval or proof that
+warm/cold state caused all earlier drift. No Main sampling or extra UI-tree reads ran during
+collection. A following candidate will receive the same explicit restart and thirty-cycle
+preliminary warm-up as each control, then a separate thirty-cycle measured capture. Persisted
+ART profiles, thermal state and JIT compilation remain uncontrolled. Android's official
+[measurement guidance](https://developer.android.com/topic/performance/measuring-performance)
+and [Macrobenchmark compilation guidance](https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview#compilationmode)
+explain why compilation and warm-up conditions matter.
+
+
+## Producer activation — rejected after matched startup and warm-up
+
+The three-file candidate moved Home producer visibility observation from composition into
+`snapshotFlow`, retaining caller keys, last values, single-flight cancellation and refresh
+cadence. Eleven focused tests passed. Candidate and disabled-default builds each passed all
+1,603 tests across 190 suites. Independent packaged DEX inspection confirmed the stable producer
+state path and the nullable-provider Boolean fallback. No behavior or speed claim followed from
+those source checks.
+
+The corrected comparison forced an install in every before/candidate/after block. Each block
+completed a thirty-cycle preliminary capture with process-local identifier 1, verified closure,
+then thirty measured cycles with identifier 2 in the same Home window. All six captures preserved
+full settings/schema/source groups. Twenty-six offline ownership/analysis tests passed before
+hardware execution; the validator also accepted twenty-one saved real control payloads offline.
+Ninety-seven offline Home/Apps quality-runner cases passed, but physical candidate quality was
+not run because the performance gate failed.
+
+| Home Window measured metric | Accepted before | Producer candidate | Accepted after |
+| --- | ---: | ---: | ---: |
+| Frames | 782 | 782 | 782 |
+| Mean | 12.78 ms | 13.31 ms | 12.81 ms |
+| p95 | 36.25 ms | 36.75 ms | 36.25 ms |
+| p99 | 45.25 ms | 44.75 ms | 46.00 ms |
+| Above 16.67 ms budget | 14.96% | 15.73% | 15.47% |
+
+The candidate was 1.38% worse at p95; p99 improved only 1.10–2.72%. Mean regressed 3.95–4.19%.
+The 20% tail gates failed. There were zero callback drops, invalid samples, overflow or invalid
+detail samples. The exact accepted APK was restored, Home foreground and collector inactive,
+with all configuration preserved. Living Area had zero operations. The three exact experimental
+source changes were removed; app-source hash returned to 157ba794... . No new improvement was
+promoted.
+
+The first control's preliminary/measurement p95 was 47.00/36.25 ms and p99 74.00/45.25 ms.
+This observed warm-up difference supports matching test preparation, not a causal diagnosis of
+JIT alone. Persisted ART profiles, thermal state and scheduling remain uncontrolled. An offline
+APK audit found baseline.prof, baseline.profm, ProfileInstaller 1.4.0 and an enabled Startup
+initializer in both the accepted and producer APK. Missing packaging is ruled out; actual device
+profile installation/compilation and Home code coverage remain unverified.
+
+A second static audit refined the accessibility hypothesis. Compose 1.10.4 scheduling predicates
+ignore native shown-state and NO_HIDE_DESCENDANTS ancestry; an already queued checker can still
+measure/layout and diff. However, the current inactive clearAndSetSemantics wrapper DOES prune
+its descendant tree after composition commits. Repeated full hidden-grid copying is therefore
+not a supported explanation. Residual hidden-owner work is conditional, and its runtime cost
+remains unmeasured. No accessibility guard or service disabling was introduced.
+
+Home/Apps remains the sole priority. The next bounded comparison enables the existing native
+page drawing boundary with the corrected matched preparation. Earlier native controls shared
+the discovered warm/cold mismatch, providing a concrete reason for this repeat. App source,
+visual content, 160 ms animation, input/lifecycle rules, Compose UI 1.10.4 and native Filmstrip
+remain as committed; the build flag selects the already present native renderer. This is not a
+new feature or an accepted fix.
+
+
+## User acceptance and priority change — 11 October 2026
+
+The user accepted the current Home/Apps experience as good enough and explicitly requested moving
+on. Home performance tuning is therefore closed at the user's chosen acceptance level; this does
+not mean the earlier numerical tail gate passed. The established renderer remains enabled and no
+rejected optimization is promoted.
+
+The already running matched native comparison was interrupted during its first preliminary control
+at eighteen cycles. Its nested cleanup verified the owned collector closed, pendingStart false and
+Home restored. The outer cleanup independently verified exact accepted 19abed09... APK bytes/hash,
+inactive collector, full configuration/settings schema/source-group preservation and known Home
+foreground. No native-candidate deployment occurred; no measured comparison or speed claim is made
+from this partial warm-up. Living Area had zero operations.
+
+The next recommended target is Settings opening and category-switch responsiveness on Family Area.
+Earlier retained footer-isolation measurements still recorded median per-entry largest frames of
+123.70 and 107.09 ms across two Family blocks. These are historical Window callback measurements,
+not current-build opening latency or a fresh baseline. A current exact-build baseline must precede
+further optimization. The existing sidebar and footer work reductions are retained; no repeated
+healthy-feature sweeps, duplicate Living profiling or new Home experiments are planned. Success
+should include improved repeated entry/category tails, stable visual content and complete basic/
+Advanced/search behavior, rather than only fewer composition invocations.
