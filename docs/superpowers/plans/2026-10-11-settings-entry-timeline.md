@@ -216,3 +216,55 @@ Retryable only, inactive/session checks before either attempt and after success,
 bounded inactive-read time; no capture deadline expansion, active TAP/STOP retry,
 mutation retry or identity-mismatch retry. All existing artifact/SDK/OAT/ownership
 and restoration gates stay required. The failed trial remains failed.
+
+
+## Bounded inactive-read retry: completed and analyzed
+
+The separate sibling trial used the unchanged null-window-animation candidate,
+source and SDK artifacts. The only driver change was bounded transport retry
+at inactive full-APK identity reads. It passed 117 offline contracts (95 runner,
+22 analyzer). Native session 36034 exited 0; analyzer session 12353 exited 0.
+No transport retry was needed in the successful run.
+
+Run db1a74e8f7f4495f8cf6e8e45473bd1c: 20 verified warmups, 10 measured entries, 30 verified collector
+stops, zero capture failures. Manifest 95026b0b70ff4041717f96eb96cfd7d8669e3d893b731f25ad94edcc8a85d2d9.
+Postflight efffc07b19b9447efe961a07405141efa02b38f615db928018b5e7b9af3e5691.
+Count trace 4b4ffabc1d1d1a2914daecc31b47f0576c3a56b1dd3845ba9f8ef3bcaeec4819.
+Analysis 37a40f27540a607c1650e3744dc7d52c74dfa89c50a399058eedf506a890a099.
+
+Median recorder intervals over ten measured entries: launch-to-create
+30.2227 ms; create body
+5.0874 ms; resume body
+0.4871 ms; create-to-first-pre-draw
+73.7870 ms; launch-to-first-pre-draw
+106.9500 ms; launch-to-frame-callback receipt
+126.3924 ms; launch-to-focus
+136.4178 ms. First pre-draw ranged from
+81.6008 to
+124.7041 ms. These are recorder/callback
+intervals, not physical tap or compositor presentation latency.
+
+Across each entry's frame-component maxima, median queued delay was
+65.4547 ms and layout
+56.6912 ms. They may
+belong to different frames and are not added. Median per-entry largest Settings
+frame was 92.3633 ms. The historical header
+dataset is not a fresh A/B control. No causal speed-improvement, performance
+acceptance, instantaneous handoff, or automatic candidate-promotion claim.
+
+Candidate cache code 3 retained the one-byte size warning; fresh complete actual
+SDK reference/DM equality and structural own OAT admission passed independently.
+Accepted APK bc6af47b4184de27f81fc59c6502871bb8a796505c59c1e047ae859dd3f28298
+was restored with fresh cache code 1 and final direct admission
+6248ae8290622fbd1d088d63d398056e4425b86c99a3734310c5b0930c6971dd.
+Configuration/schema/photo-source groups, app source, Home and inactive
+collectors were verified. Main independently rechecked frozen source inputs
+before recording this result. Living Area and the phone had zero operations.
+All prior failed and completed trial roots remain immutable.
+
+This test verifies repeated Settings startup/first-draw capture and Home
+recovery. Category selection, search, Back and compositor appearance still
+need their own native functional evidence; the broader checklist above remains
+open. Ordinary scalar details already use local ApprovedSettingsHistory routes
+inside the same Activity with immediate pane replacement. The browser cascade
+mock remains awaiting human signoff and no native cascading columns were added.
