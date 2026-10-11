@@ -31,6 +31,26 @@ internal object HomeUiDiagnostics {
     fun json() = JSONArray(listOf(left, top, right, bottom))
   }
 
+  // Appearance's fixed registry titles/row descriptions, shell labels and dialog choices.
+  // These public selectors do not export stored values or grant Home input eligibility.
+  private val appearanceLabels = mapOf(
+      "Settings" to "settingsTitle", "App appearance" to "appAppearance",
+      "Appearance" to "appearance", "immortal.settingsTheme" to "settingsTheme",
+      "App tile size" to "tileSize", "immortal.tileSize" to "tileSize",
+      "Clock" to "clockFormat", "immortal.clockFormat" to "clockFormat",
+      "Now-playing mini-player" to "showMiniPlayer", "immortal.showMiniPlayer" to "showMiniPlayer",
+      "Hide status bar" to "hideStatusBar", "immortal.hideStatusBar" to "hideStatusBar",
+      "Display" to "display", "Wallpaper" to "wallpaper",
+      "Home screen" to "homeScreen", "Advanced options" to "advancedOptions",
+      "Standard" to "choiceStandard", "Large" to "choiceLarge", "XL" to "choiceXL",
+      "Auto" to "choiceAuto", "12-hour" to "choice12", "24-hour" to "choice24",
+      "Light" to "choiceLight", "Dark" to "choiceDark",
+      "Close dialog" to "menuDismiss", "Show advanced options" to "advancedHint",
+      "Advanced settings" to "advancedTitle",
+      "Turn on Advanced settings" to "consentEnable", "Cancel" to "consentCancel",
+  )
+  private val appearanceKeys = appearanceLabels.values.toSet()
+
   // Only these fixed source labels can become response keys. Never serialize a node label.
   private val labels = mapOf(
       "Home" to "home", "Apps" to "apps", "Tools" to "tools",
@@ -44,7 +64,7 @@ internal object HomeUiDiagnostics {
       "Browser" to "browser", "Chromium" to "chromium", "Jarvis" to "jarvis",
       "Your apps" to "appsHeading", "Installed apps on this Portal." to "appsSubtitle",
       "Small things that make the day easier." to "toolsSubtitle",
-  )
+  ) + appearanceLabels
   private val fixedKeys = labels.values.toSet()
   internal fun fixedKey(value: CharSequence?): String? {
     if (value == null || value.length > 80) return null
@@ -166,13 +186,14 @@ internal object HomeUiDiagnostics {
       val eligible = eligible()
       val search = searchNode()
       val rows = JSONArray()
-      if (eligible) controls.forEach { node ->
+      controls.forEach { node ->
         val searchKey = search?.takeIf { it.first === node }?.second
         if (searchKey != null) {
           rows.put(row(node, searchKey).put("inputTextLength", node.textLength ?: 0))
         } else {
           val key = node.key
           if (!node.editable && !node.password && key != null && key in fixedKeys &&
+              (eligible || (!truncated && key in appearanceKeys)) &&
               key !in setOf("appsHeading", "appsSubtitle", "toolsSubtitle", "searchInstalledApps", "searchApps"))
             rows.put(row(node, key))
         }

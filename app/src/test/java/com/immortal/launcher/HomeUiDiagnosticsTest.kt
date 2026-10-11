@@ -215,4 +215,108 @@ class HomeUiDiagnosticsTest {
     assertNull(HomeUiDiagnostics.fixedKey("No apps match “Browser”"))
     assertNull(HomeUiDiagnostics.fixedKey("Private app"))
   }
+
+  @Test fun appearanceControlsExportPublicGeometryWithoutAdmittingSettingsAsHome() {
+    val labels = listOf("Settings", "App appearance", "Appearance", "App tile size",
+        "Now-playing mini-player", "Clock", "Hide status bar")
+    val snapshot = state(labels.mapIndexed { i, label ->
+      node(HomeUiDiagnostics.fixedKey(label), top = 20 + i * 80, bottom = 80 + i * 80)
+          .copy(longClickable = true)
+    })
+    val response = snapshot.json()
+    val rows = response.getJSONArray("nodes")
+    assertEquals(listOf("settingsTitle", "appAppearance", "appearance", "tileSize",
+        "showMiniPlayer", "clockFormat", "hideStatusBar"),
+        (0 until rows.length()).map { rows.getJSONObject(it).getString("key") })
+    assertFalse(response.getBoolean("eligible"))
+    assertFalse(snapshot.dockPresent())
+    assertFalse(snapshot.appMenuPresent())
+    assertNull(snapshot.searchNode())
+    assertFalse(snapshot.publicLongPressTarget(50.0, 210.0))
+    // Even with a real dock, a newly labelled control is never a public app long-press target.
+    assertFalse(state(dock() + snapshot.nodes).publicLongPressTarget(50.0, 210.0))
+    assertEquals("[0,260,100,320]", rows.getJSONObject(3).getJSONArray("bounds").toString())
+    assertFalse(response.toString().contains("App tile size"))
+    assertFalse(response.toString().contains("inputTextLength"))
+  }
+
+  @Test fun registryDescriptionAliasesResolveAnUnmergedControlAndRetainItsTouchBounds() {
+    val row = node(left = 100, top = 200, right = 500, bottom = 300, parent = 80, id = 40)
+    val label = node(HomeUiDiagnostics.fixedKey("immortal.tileSize"),
+        120, 220, 280, 260, parent = 40, clickable = false, id = 41)
+    val snapshot = state(listOf(row, label))
+    val controls = snapshot.json().getJSONArray("nodes")
+    assertEquals(1, controls.length())
+    assertEquals("tileSize", controls.getJSONObject(0).getString("key"))
+    assertTrue(controls.getJSONObject(0).getBoolean("clickable"))
+    assertEquals("[100,200,500,300]", controls.getJSONObject(0).getJSONArray("bounds").toString())
+    val aliases = state(listOf("immortal.settingsTheme", "immortal.clockFormat",
+        "immortal.showMiniPlayer", "immortal.hideStatusBar").map { node(HomeUiDiagnostics.fixedKey(it)) })
+        .json().getJSONArray("nodes")
+    assertEquals(listOf("settingsTheme", "clockFormat", "showMiniPlayer", "hideStatusBar"),
+        (0 until aliases.length()).map { aliases.getJSONObject(it).getString("key") })
+  }
+
+  @Test fun pickerChoicesAndDismissalExportOnlyFixedKeysOnADialogSurface() {
+    val dialogs = listOf(
+        listOf("Appearance", "Light", "Dark", "Close dialog") to
+            listOf("appearance", "choiceLight", "choiceDark", "menuDismiss"),
+        listOf("App tile size", "Standard", "Large", "XL", "Close dialog") to
+            listOf("tileSize", "choiceStandard", "choiceLarge", "choiceXL", "menuDismiss"),
+        listOf("Clock", "Auto", "12-hour", "24-hour", "Close dialog") to
+            listOf("clockFormat", "choiceAuto", "choice12", "choice24", "menuDismiss"))
+    for ((labels, keys) in dialogs) {
+      val snapshot = state(labels.map { node(HomeUiDiagnostics.fixedKey(it)) })
+      val rows = snapshot.json().getJSONArray("nodes")
+      assertEquals(keys, (0 until rows.length()).map { rows.getJSONObject(it).getString("key") })
+      assertFalse(snapshot.eligible())
+      assertNull(snapshot.searchNode())
+      assertFalse(snapshot.json().toString().contains("inputTextLength"))
+    }
+  }
+
+  @Test fun advancedConsentAndAppearanceNavigationStayReadOnlyPublicSelectors() {
+    val labels = listOf("Display", "Wallpaper", "Home screen", "Advanced options",
+        "Show advanced options", "Advanced settings", "Turn on Advanced settings", "Cancel")
+    val snapshot = state(labels.map { node(HomeUiDiagnostics.fixedKey(it)) })
+    val rows = snapshot.json().getJSONArray("nodes")
+    assertEquals(listOf("display", "wallpaper", "homeScreen", "advancedOptions",
+        "advancedHint", "advancedTitle", "consentEnable", "consentCancel"),
+        (0 until rows.length()).map { rows.getJSONObject(it).getString("key") })
+    assertFalse(snapshot.eligible())
+    assertFalse(snapshot.publicLongPressTarget(50.0, 120.0))
+  }
+
+  @Test fun settingsExportStillExcludesUnknownEditablePasswordAndSearchDrafts() {
+    val snapshot = state(listOf(
+        node(HomeUiDiagnostics.fixedKey("App appearance")),
+        node("PRIVATE_LABEL_SENTINEL"),
+        node(HomeUiDiagnostics.fixedKey("Appearance"), editable = true).copy(textLength = 137),
+        node(HomeUiDiagnostics.fixedKey("App tile size"), password = true),
+        node(HomeUiDiagnostics.fixedKey("Cancel"), editable = true),
+        node(HomeUiDiagnostics.fixedKey("Close dialog"), password = true),
+        node(editable = true, hint = "searchApps").copy(textLength = 203),
+        node(HomeUiDiagnostics.fixedKey("Search settings"), editable = true)))
+    val response = snapshot.json()
+    val rows = response.getJSONArray("nodes")
+    assertEquals(1, rows.length())
+    assertEquals("appAppearance", rows.getJSONObject(0).getString("key"))
+    assertNull(snapshot.searchNode())
+    assertFalse(response.getBoolean("focusedEditable"))
+    assertFalse(response.toString().contains("PRIVATE_LABEL_SENTINEL"))
+    assertFalse(response.toString().contains("inputTextLength"))
+    assertFalse(response.toString().contains("searchApps"))
+    assertNull(HomeUiDiagnostics.fixedKey("Private Appearance value"))
+    assertNull(HomeUiDiagnostics.fixedKey("https://private.invalid/immortal.tileSize"))
+    assertNull(HomeUiDiagnostics.fixedKey("light"))
+  }
+
+  @Test fun truncatedSettingsTreeCannotExportAppearanceRowsOrAuthorizeInput() {
+    val snapshot = state(listOf(node(HomeUiDiagnostics.fixedKey("Appearance")),
+        node(HomeUiDiagnostics.fixedKey("Standard"))), truncated = true)
+    assertEquals(0, snapshot.json().getJSONArray("nodes").length())
+    assertFalse(snapshot.eligible())
+    assertNull(snapshot.searchNode())
+    assertFalse(snapshot.publicLongPressTarget(50.0, 120.0))
+  }
 }

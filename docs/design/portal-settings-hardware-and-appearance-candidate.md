@@ -1,8 +1,9 @@
 # Family Area Settings: hardware and direct-row candidate
 
-The Family Area hardware can support responsive Settings, but the current
-first-open candidate is not a proven production speed improvement. Keep it
-opt-in until a bounded comparison and the affected control checks pass.
+The Family Area hardware can support responsive Settings. The direct-row
+candidate remains disabled by default: its native acceptance cycle stopped
+before the affected controls or timing samples were reached. No production
+speed improvement is established, and no candidate was promoted.
 
 ## Hardware read from the actual device
 
@@ -102,29 +103,46 @@ The candidate's 42 measured selections recorded inactive outer-pane measurement
 spans of at most 0.234 ms. This does not rule out descendant-only work, but it
 does not justify rewriting retained panes as the next step.
 
-## Decision and bounded remaining work
+## Decision: do not promote this candidate
 
-Focus only on first-open Appearance. Do not repeat the broad Home, Apps, phone,
-or multi-device performance sweep.
+The subsequent matched-build acceptance cycle did not reach an Appearance
+picker, toggle, search result, or timing sample. Stop this comparison attempt;
+do not repeat installs or add instrumentation merely to obtain a favorable
+number. Keep the candidate opt-in and the installed accepted APK unchanged.
 
-The remaining acceptance cycle is:
+Five benchmark variants were built from one source fingerprint: control,
+candidate, their SDK-profile bootstrap builds, and a separate functional build.
+The timing variants disabled the Settings UI and pane observers. The full JVM
+suite passed **1,725 tests in 198 suites**, with zero failures, errors, or skips;
+this includes six new tests for the fixed public Appearance inspector keys.
+Seven file-only comparison assertions also passed. Those assertions do not
+establish the real Portal's clickable geometry or navigation behavior.
 
-1. Compare the two Appearance paths using the same current source, build type,
-   diagnostic configuration, compilation treatment, and fresh-page recipe.
-   Check total Settings frame work, not merely the child measurement span.
-2. Check affected pickers, dismissal, theme changes, requested first/last rows,
-   Advanced visibility, reachable last rows, and leave/return behavior.
-3. Require a useful repeatable gain without a tail or functional regression.
-   Otherwise leave the candidate disabled and record that decision.
+The native driver exposed test-driver failures rather than proving a product
+regression or a rendering improvement. Its initial entry observation failed;
+a later attempt rejected a transient foreground surface; the last attempt
+verified the Home dock but timed out waiting for the expected Appearance
+navigation row. The final driver recorded **zero completed functional checks
+and zero timed blocks**. The exact cause of that last selector mismatch was
+not established. Do not label it a processor, RAM, animation, or product fault.
 
-One bounded comparison cycle should produce a ship-or-reject decision. Do not
-add another profiler or rewrite unrelated UI to rescue an inconclusive result.
-The expired six-hour window remains expired; this report does not restart it.
+Final postflight evidence confirms:
 
-The 16.67 ms reported frame budget explains visible jank. It is not a promise
-that every first-open frame on this hardware will meet 16.67 ms. No universal
-latency guarantee, final tap-to-display target, or production speedup has been
-established by these attribution samples.
+| Check | Result |
+| --- | --- |
+| Candidate accepted for deployment | No |
+| New proven performance gain | None |
+| Accepted APK restored | Yes, exact hash |
+| Accepted SDK compilation profile restored | Yes, exact profile sets |
+| Original configuration unchanged | Yes |
+| Home restored | Yes |
+| Performance collector inactive | Yes |
+| Living Area / phone operations | 0 / 0 |
+
+The expired six-hour window remains expired. The 16.67 ms frame budget explains
+visible jank; it is not a guarantee for every first-open frame on this device.
+The earlier attribution numbers remain observations, not physical
+tap-to-display latency or a controlled speedup.
 
 ## Evidence
 
@@ -132,6 +150,14 @@ Private local diagnostics are under
 `build/fleet/diagnostics/settings-appearance-direct-rows-2026-10-11/`:
 `hardware-facts.json`, `analysis.json`, `postflight.json`, `build-admission.json`,
 and the 52 capture files. They contain no committed registry credentials.
+
+The stopped acceptance cycle is recorded in local
+`build/fleet/diagnostics/settings-appearance-matched-window-ready-2026-10-11/postflight.json`.
+The reusable matched APKs and build admission are in
+`build/fleet/diagnostics/settings-appearance-matched-2026-10-11/`.
+Current matched app-source fingerprint:
+`1b44088e317f2fb8f88a134b476b29c122179d2e84cdc4dc714874d13dcbbee6`.
+The fingerprint below belongs to the earlier attribution run.
 
 - Candidate full app-source fingerprint:
   `fe1e16b50a779b78996360fcf72b3a7787e1746caf4411f2d9fab5b86fdc5415`.
