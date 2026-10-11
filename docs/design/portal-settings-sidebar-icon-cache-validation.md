@@ -79,8 +79,12 @@ The candidate does not reintroduce the removed detail-panel slide or fade.
 All ninety cohort captures and two navigation captures closed. Full configuration, settings
 schema and photo-source groups remained unchanged, Home was restored and installed APK
 hashes were independently verified at each boundary. Living Area and the phone had zero
-performance/UI-test operations. The control leaves Family Area on the accepted baseline until
-final candidate rollout; Living rollout is deployment verification only.
+performance/UI-test operations. Final rollout installed the accepted candidate on both Family
+Area and Living Area. Each room returned a confirmed deployment receipt and independently
+verified installed APK SHA-256 and byte length. Full configuration, settings schema and
+photo-source groups were preserved; the collector was inactive, Home navigation was verified
+and no cleanup debt remained. This final rollout started zero performance captures and zero
+UI-test actions on either room. Living Area received deployment verification only.
 
 Accepted candidate benchmark: 37,150,356 bytes, SHA-256
 `bc6af47b4184de27f81fc59c6502871bb8a796505c59c1e047ae859dd3f28298`.
