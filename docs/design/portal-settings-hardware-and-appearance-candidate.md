@@ -1,194 +1,155 @@
-# Family Area Settings: hardware and direct-row candidate
+# Family Area Settings: accepted direct Appearance rows
 
-The Family Area hardware can support responsive Settings. All eight affected
-native Appearance checks now pass. The direct-row candidate remains disabled
-by default pending a clean controlled performance comparison; no candidate has
-been promoted and no production speedup is yet established.
+Direct Appearance rows are enabled by default and installed on Family Area.
+The same signed APK passed eight native functional checks and a matched
+control/candidate/control performance gate. The final default benchmark rebuild
+is byte-for-byte identical to that measured and installed APK.
 
-## Hardware read from the actual device
+## Measured result
 
-Observed 2026-10-11 15:02:22 UTC using read-only Fleet requests. No hardware,
-Android, or app configuration was changed.
+Each block used two warm-up fresh Settings pages followed by five measured
+fresh pages. All selections stayed within the same Settings window. The process
+was warm; this is not a fully cold process or operating-system startup test.
 
-| Fact | Device observation |
+| Quantity | Control before | Direct rows | Control after |
+| --- | ---: | ---: | ---: |
+| Median largest frame during Appearance opening | 63.317 ms | 47.448 ms | 68.659 ms |
+| Worst frame across the five samples | 72.286 ms | 54.037 ms | 95.908 ms |
+| Measured fresh Settings pages | 5 | 5 | 5 |
+
+The median largest frame fell **25.06%–30.89%** against the two controls.
+The worst observed frame fell **25.24%–43.66%**. The control medians differed
+by 8.44%. All predeclared gates passed:
+
+- Candidate median at least 10% below both control medians.
+- Candidate worst frame no more than 10% above either control's worst frame.
+- Control median drift no more than 15%.
+
+Timing APKs shared the same app source, build type, signing certificate and
+compilation treatment. Each block verified its installed APK, bundled dex
+metadata, exact SDK profile and APK-specific compiled output. Settings UI and
+pane work observers were disabled; the capture explicitly used
+`sampleSettingsWork:false`. There were zero Settings work-observer records.
+
+These measurements establish a repeatable improvement in this small matched
+comparison. They measure the largest rendered frame, not physical tap-to-display
+latency, delivered FPS, every Settings category, or every cold first-open frame.
+The 47.448 ms median largest frame still exceeds a 16.667 ms frame budget.
+The expired six-hour window remains expired; this result does not claim that
+all performance work or that deadline was completed.
+
+## Actual hardware
+
+Observed 2026-10-11 15:02:22 UTC through read-only Fleet requests. No hardware,
+Android or app configuration was changed during the hardware read.
+
+| Fact | Family Area observation |
 | --- | --- |
 | Model / device | Portal+ / cipher |
 | Android | API 29 |
 | Processor | Qualcomm QCS605, eight logical cores |
+| CPU topology | Six smaller cores (`0x803`), two faster cores (`0x802`) |
 | Maximum frequencies sampled | CPU 0 and 4: 1.7088 GHz; CPU 7: 2.5152 GHz |
-| CPU part counts | Six `0x803`; two `0x802` |
 | GPU | Adreno615v2 |
-| Kernel-visible physical memory | 2,782 MiB |
-| Available memory at this observation | 649.7 MiB |
+| Kernel-visible physical memory | 2,782 MiB, approximately 2.72 GiB |
+| Available memory at observation | 649.7 MiB |
 | Swap total / free | 1,536 / 577 MiB |
 | Fleet app process resident memory | 172.9 MiB |
-| Previously verified display size | 2160 × 1440 pixels |
+| Display | 2160 × 1440 pixels |
 | Settings FrameMetrics budget | 16.666666 ms |
 
-The device observation and Qualcomm's QCS605 documentation agree on the
-processor, Adreno 615, and approximately 2.5 GHz maximum CPU frequency.
-Qualcomm documents two faster cores and six smaller cores. Eight cores do not
-make Compose's main-thread critical path eight times faster.
+The device and Qualcomm documentation agree on the processor, GPU and
+approximately 2.5 GHz maximum CPU frequency. Eight cores do not make Compose's
+main-thread work eight times faster. Responsive Settings is a reasonable target;
+a universal 16.667 ms cold-frame guarantee has not been established.
 
-The memory figure is kernel-visible usable memory, not a claim about the
-physical DRAM package. Resident memory is RSS, not PSS or an exclusive app
-allocation. Swap occupancy alone does not establish active paging or explain
-the Settings stall; no memory bottleneck has been demonstrated by this read.
-This observation also does not establish thermal throttling.
+Memory is kernel-visible usable memory, not the physical DRAM package size.
+Process memory is RSS, not PSS or exclusive allocation. Swap occupancy alone
+is not evidence of active paging. The hardware read established neither a
+memory bottleneck nor thermal throttling.
 
-## Established guidance and the actual change
+## Implementation and scope
 
-Google's Compose performance guidance recommends ordinary `Row` / `Column`
-containers for small, bounded collections, avoiding lazy layout's composition,
-measurement, and prefetch machinery. Appearance projects at most five controls
-from the existing registry:
+Google recommends ordinary Row/Column containers for small, bounded lists.
+Appearance has at most five registry controls: `tileSize`, `showMiniPlayer`,
+`hideStatusBar`, `clockFormat` and `settingsTheme`.
 
-- `tileSize`
-- `showMiniPlayer`
-- `hideStatusBar`
-- `clockFormat`
-- `settingsTheme`
+`SettingsRows` emits that registry projection into the retained detail panel's
+existing scrolling Column, removing its nested lazy-list work. It reuses
+projection, grouping, controls, validation/apply, Advanced visibility, requested
+row handling and the hint. Persistence and the Fleet settings schema are
+unchanged. Longer lists retain the lazy renderer. Cascading columns remain a
+browser mock.
 
-`SettingsRows` emits that projection into the retained detail's existing
-scrolling Column. It reuses the existing projection, grouping, control renderer,
-validation/apply path, Advanced visibility, requested-row handling, and hint.
-No settings persistence or fleet schema was changed. Long lists retain the lazy
-renderer. Cascading columns remain a browser mock.
+`PORTAL_SETTINGS_DIRECT_APPEARANCE_ROWS` now defaults to true in ordinary and
+benchmark builds. Explicit benchmark
+`-PportalSettingsDirectAppearanceRows=false` retains the control path.
 
-The implementation is opt-in through
-`-PportalSettingsDirectAppearanceRows=true` for benchmark builds. The default
-value in ordinary builds is false. Thus the candidate has not been promoted to
-the installed accepted build.
+The diagnostic request's optional `sampleSettingsWork` defaults to true for
+compatibility. Explicit false skips Settings layout timing, pane-work allocation,
+search-preparation timing and entry tracing while retaining frame metrics.
+Regression coverage verifies no added modifier or timing-clock reads and
+preserves the real search index.
 
-## Completed verification
+## Functional and deployment verification
 
-- Debug and benchmark assemblies succeeded.
-- Full JVM gate: 1,719 tests in 198 suites; zero failures, errors, or skips.
-- Candidate packaged flags, package identity, and signing certificate checked.
-- Driver/analyzer helpers: 54 tests passed normally and with Python optimization.
-- Native Family Area run: 52 captures, 173 attempted and acknowledged inputs,
-  12 Back operations, zero uncertain inputs.
-- Navigation maintained one Settings window owner.
-- Frozen inputs, source, and capture hashes verified.
-- Accepted APK and SDK compilation profile restored and verified.
-- Configuration unchanged; Home restored; collector inactive.
-- Living Area operations: zero. Phone operations: zero.
+The final default build passed **1,728 tests in 198 suites**, with zero failures,
+errors or skips. Debug and benchmark assembly succeeded. The default benchmark
+APK has the same compiled flags and SHA-256 as the measured candidate.
 
-These checks establish the recorded navigation recipe, not complete picker,
-search, scroll, or settings-value behavior.
+Eight native Family Area checks passed:
 
-## Observations, not a controlled speed claim
+- Tile size, clock format and Appearance: open, dismiss, select and restore.
+- Mini-player: toggle round trip.
+- Advanced: hide, cancel consent, enable and reveal.
+- Hide status bar: toggle and restore.
+- Search to `immortal.settingsTheme` and `immortal.hideStatusBar`: requested row
+  committed and visible within the same Settings window.
 
-Both runs include functional and pane observers. They are attribution runs,
-not matched final performance comparisons. Each has one first Appearance
-selection and five returns to the same retained Appearance pane. “First” does
-not mean a fully cold process or a cold operating system.
+After the comparison, the previous accepted APK and exact SDK compilation were
+restored and verified. Promotion then installed the measured candidate and
+verified its APK hash and compilation. Configuration was unchanged, Home
+restored and the collector inactive. **Living Area operations: zero. Phone
+operations: zero.**
 
-| Observed quantity | Earlier attribution run | Direct-row candidate |
-| --- | ---: | ---: |
-| First Appearance child measurement span | 80.200 ms | 28.220 ms |
-| First Appearance detail composition span | 17.039 ms | 25.156 ms |
-| Largest Settings frame during first Appearance selection | 227.642 ms | 146.100 ms |
-| Median Appearance measurement span on five retained returns | 0.225 ms | 0.224 ms |
-| First unchanged Wallpaper measurement span | 34.567 ms | 27.013 ms |
-| Largest Settings frame during first unchanged Wallpaper selection | 172.044 ms | 119.251 ms |
-
-The unchanged Wallpaper path improved as well. Device state, compilation, and
-cache effects therefore prevent attributing the before/after frame difference
-solely to the Appearance change. The work also shifts between composition and
-measurement. These inclusive wall-time spans overlap and must not be added as
-CPU cost or treated as physical tap-to-display latency.
-
-The candidate's 42 measured selections recorded inactive outer-pane measurement
-spans of at most 0.234 ms. This does not rule out descendant-only work, but it
-does not justify rewriting retained panes as the next step.
-
-## Current acceptance status
-
-The original driver failures were resolved using device evidence, without
-changing the Settings UI to fit the test. Actual detail rows begin at pixel
-486 on the 2160-pixel display; the old 25% threshold discarded them. Compact
-buttons also require the real sidebar boundary rather than a midpoint rule.
-A picker closing is a pending observation, not an invalid Settings target.
-
-All **eight affected native checks passed** on the Family Area candidate:
-three pickers open/dismiss/select/restore, the mini-player toggle round trip,
-Advanced visibility/consent cancel/enable, the status-bar toggle/restore, and
-search navigation to the first and last requested rows. The requested row
-checks verified its committed route, visible bounds, and the same Settings
-window. The original configuration, accepted APK and exact SDK profile were
-restored, Home returned, and the collector was inactive. Living Area and the
-phone received zero operations.
-
-A header Home tap after the system status-bar test timed out in an earlier
-functional run. The cause has not been established. The completed run retained
-the successful initial header return and used the existing explicit remote
-Home command to reset after system-bar changes and search. Do not claim this
-proves that header edge case is fixed.
-
-The initial matched timing attempt correctly rejected its first measured
-sample: the older Settings UI work profiler activates during any capture,
-independently of the newer UI and pane BuildConfig flags. No clean performance
-comparison or production speedup was established by that attempt.
-
-The existing capture request now accepts optional `sampleSettingsWork`.
-It defaults to true for backwards compatibility. Explicit false skips Settings
-layout work, pane work allocation, search preparation timing and entry tracing;
-frame metrics remain available. Regression tests verify no added Settings
-modifier or timing clocks while preserving the real search index. The focused
-red/green test cycle passed, followed by the full **1,728-test / 198-suite** gate
-with zero failures, errors or skips, and a successful debug assembly.
-
-The direct-row renderer remains disabled by default. Its performance promotion
-still requires the same-source, same-compilation control/candidate/control
-comparison with the existing frame-budget and tail gates. The expired six-hour
-window remains expired. A reported frame duration is not physical tap latency
-or a guarantee for every cold first-open frame.
+An earlier header Home tap following a system status-bar change timed out.
+Its cause remains unproven. The completed functional run verified the initial
+header return and used the explicit remote Home command after system-bar
+changes and search. This improvement does not claim to fix that header edge
+case.
 
 ## Evidence
 
-Private local diagnostics are under
-`build/fleet/diagnostics/settings-appearance-direct-rows-2026-10-11/`:
-`hardware-facts.json`, `analysis.json`, `postflight.json`, `build-admission.json`,
-and the 52 capture files. They contain no committed registry credentials.
+Local diagnostics live under `~/portal-prime/build/fleet/diagnostics/`:
 
-The stopped acceptance cycle is recorded in local
-`build/fleet/diagnostics/settings-appearance-matched-window-ready-2026-10-11/postflight.json`.
-The reusable matched APKs and build admission are in
-`build/fleet/diagnostics/settings-appearance-matched-2026-10-11/`.
-Current matched app-source fingerprint:
-`1b44088e317f2fb8f88a134b476b29c122179d2e84cdc4dc714874d13dcbbee6`.
-The fingerprint below belongs to the earlier attribution run.
+- `settings-appearance-frame-only-build-2026-10-11/`: five matched APKs and build admission.
+- `settings-appearance-frame-only-functional-read-ready-2026-10-11/postflight.json`:
+  all eight native checks and verified restoration.
+- `settings-appearance-frame-only-perf-read-ready-2026-10-11/postflight.json`:
+  completed comparison, passed gates and verified restoration; 15 captures.
+- `settings-appearance-direct-rows-promoted-2026-10-11/postflight.json`:
+  completed promotion, installed hash, compilation and unchanged configuration.
+- `settings-appearance-direct-rows-promoted-2026-10-11/default-enabled-verification.json`:
+  full tests, assemblies and byte-identical default benchmark proof.
+- `settings-appearance-direct-rows-2026-10-11/hardware-facts.json`:
+  actual hardware read.
 
-- Candidate full app-source fingerprint:
-  `fe1e16b50a779b78996360fcf72b3a7787e1746caf4411f2d9fab5b86fdc5415`.
-- Candidate benchmark APK SHA-256:
-  `0106b2b4ebd46de336b7a0146a87b0d9ae93381a87ee5d778c69e521a382282c`.
-- Candidate analysis frozen manifest SHA-256:
-  `6116621f48421271b8db2473b1d43bb0ed25df2e28ab728eac83971a27ed9914`.
-- Earlier attribution manifest SHA-256:
-  `988eb8583c359505083b65586511f40ed5c9c5e2af3a9d7058ed8a8c3f62795e`.
+Measured and installed candidate APK SHA-256:
+`5c185e77a0e8708603bf285790343b503681ab6ea704a478414fb7600a256e86`.
+Functional postflight SHA-256:
+`541c3913b1494f5389ba24a8bce868507e8214540d1e727ca7677a932c8e6023`.
+Performance postflight SHA-256:
+`4b5d9c92cd589c9059960c8a81272c272ee875c7a19971bf99f77c7edee941d5`.
+No registry credentials or private setting values are committed.
+
+The earlier attribution results remain in Git history and their local
+`settings-appearance-direct-rows-2026-10-11/` evidence. They included work
+observers and are not the basis for the accepted speed claim.
 
 ## Sources
 
 - [Qualcomm QCS605](https://www.qualcomm.com/processors/application-processors/products/qcs605)
 - [Qualcomm platform specifications, QCS605 AI Box](https://www.qualcomm.com/content/dam/qcomm-martech/dm-assets/documents/QVIC-2024-HW-platforms.pdf)
-  (used for processor topology, not that reference board's RAM or display)
+  (processor topology, not the reference board's RAM or display)
 - [Google: Lazy layouts performance optimization, section 4](https://developer.android.com/agents/skills/jetpack-compose/jetpack-compose-performance/references/lazy-layouts)
 - [Google: Compose lists and nested scrolling](https://developer.android.com/develop/ui/compose/lists)
-
-## New native and diagnostic evidence
-
-- `build/fleet/diagnostics/settings-appearance-functional-final-2026-10-11/postflight.json`:
-  completed eight-check native run, exact accepted restoration, unchanged config.
-- Completed functional postflight SHA-256:
-  `f672a8ed6f800211d365abfc0c4ba7ab14f1de51efc168a811035df5ff9bf117`.
-- `build/fleet/diagnostics/settings-appearance-matched-bounds-2026-10-11/postflight.json`:
-  timing sample rejected for active Settings work instrumentation; rollback verified.
-- `build/fleet/diagnostics/settings-frame-only-full-gate-2026-10-11.log`:
-  full current tests and debug assembly for the capture opt-out.
-
-The eight-check native run used the earlier matched APK. The capture-request
-change has not yet been installed or timed on the device. Its Settings UI and
-persistence behavior are unchanged; the new native artifacts still need their
-runtime acceptance before promotion.
