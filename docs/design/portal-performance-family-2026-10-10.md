@@ -180,7 +180,7 @@ then completed. Neither stop is a product performance failure.
 | Filmstrip p95 | At least 20% lower than both fresh baselines | 53.25/50.50 to 14.50 ms; 71.3–72.8% lower | Passed and deployed |
 | Filmstrip p99 | At least 20% lower than both fresh baselines | 120.50/125.50 to 17.50 ms; 85.5–86.1% lower | Passed and deployed |
 | Filmstrip mean | No regression above 5% | 29.14/28.80 to 10.14 ms; 64.8–65.2% lower | Passed |
-| Home performance | Same p95/p99 gate | Shipped renderer: mean 13.99 ms, p95 45.75 ms, p99 58.00 ms; no accepted Home optimization | Established renderer retained; outlier unresolved |
+| Home performance | Same p95/p99 gate | Latest restored baseline: mean 14.23 ms, p95 46.00 ms, p99 61.75 ms; no accepted Home optimization | Established renderer retained; outlier unresolved |
 | Home controls | All seven fixed scenarios | 7/7 passed on exact final APK | Passed |
 | Image geometry/navigation | Mixed-size and one-photo cases | 2/2 cases, 14 generated-only screenshots | Passed |
 | Shuffle soak | 900 seconds; both handoff directions; app PSS at most 512 MiB and growth at most 256 MiB | 284 observations; 131.5–209.3 MiB app PSS; peak growth 43.4 MiB from start | Passed |
@@ -214,3 +214,48 @@ not a new paired comparison or evidence of an accepted Home improvement.
 Two extra setup attempts stopped before starting collectors. The corrected setup waits for
 the owned Home Window and uses each endpoint's actual acknowledgement schema: Home returns
 `dispatched`, while Apps returns `ok`/`action`. The final timed cadence stayed unchanged.
+
+
+## Home attribution and rejected stable-library experiment
+
+A separate sixty-second-cap Main sampler on the shipped APK completed ten Home/Apps cycles:
+1,650 samples, 105 outside native polling, 40 containing accessibility-delegate work, 26
+semantics work and nine recomposer work. Operation families overlap and are not CPU percentages.
+There were 2,368 skipped sampler ticks, four truncated stacks and a reached 256-symbol limit.
+Sampling adds overhead; these records are attribution evidence, not timing acceptance. The
+installed APK, settings, schema and sources stayed unchanged, with the collector stopped.
+
+Stable Compose UI 1.11.4 contains an upstream semantics optimization. Local binary inspection
+confirmed that its SemanticsNodeCopy constructor fetches replaced children once rather than twice.
+An optional BOM 2026.06.01 candidate compiled and passed all 1,569 Android tests. It kept the
+established Home renderer, animations and input behavior, with native Home still disabled.
+
+The fresh Family-only comparison completed three thirty-cycle blocks without Main sampling:
+
+| Home Window metric | Shipped 1.10.4 before | Candidate 1.11.4 | Shipped 1.10.4 after |
+| --- | ---: | ---: | ---: |
+| Frames | 785 | 782 | 781 |
+| Mean | 13.70 ms | 14.72 ms | 14.23 ms |
+| p95 | 38.25 ms | 48.25 ms | 46.00 ms |
+| p99 | 46.25 ms | 67.25 ms | 61.75 ms |
+| Above 16.67 ms budget | 16.18% | 16.50% | 16.39% |
+
+Both tail thresholds failed; mean also failed against the first baseline. Candidate p95 was
+4.9–26.1% worse and p99 8.9–45.4% worse than the two baselines. All 2,348 frames had zero
+callback drops, invalid samples and overflow samples. The exact accepted v10 APK was restored,
+with settings, schema and sources preserved, Home foreground and the collector inactive.
+Living Area had zero operations during this experiment.
+
+The dependency override was removed and the rejected APK/patch retained in private evidence.
+A restored default debug/benchmark build repeated the full 1,569-test gate and resolved UI 1.10.4.
+The source snapshot matches the accepted source exactly. The rebuilt benchmark is not byte-identical:
+classes3.dex and assets/dexopt/baseline.prof differ. It was not installed or promoted; both devices
+retain the exact physically accepted 19abed09… APK. No equivalence claim is made for those differing
+binary entries. Early source-hash checks used Path-part ordering; the corrected proof uses the
+original relative UTF-8 path-string order and matches 76b4079c… .
+
+Independent read-only review found additional offscreen accessibility traversal in 1.11.4,
+including scroll-ancestor geometry and region work. This supplies a specific next experiment:
+isolate the offscreen semantics change while preserving the current accessible controls and
+remote/pinned-app behavior. It is a mechanism hypothesis, not a causal explanation for the
+observed regression. There is still no accepted new Home performance gain.
