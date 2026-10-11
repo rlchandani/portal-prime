@@ -138,11 +138,13 @@ class ImmortalSettingsActivity : ComponentActivity() {
   override fun onResume() {
     entryReport?.record(SettingsEntryStage.RESUME_STARTED)
     super.onResume()
+    ApprovedSettingsRemoteBack.resumed(this)
     if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) SettingsUiDiagnostics.resumed(this)
     entryReport?.record(SettingsEntryStage.RESUME_FINISHED)
   }
 
   override fun onPause() {
+    ApprovedSettingsRemoteBack.unavailable(this)
     if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) SettingsUiDiagnostics.paused(this)
     super.onPause()
   }
@@ -179,6 +181,13 @@ class ImmortalSettingsActivity : ComponentActivity() {
   private fun backLocal() {
     history = history.back()
     syncRouteIntent()
+  }
+
+  /** Paired Back uses exactly the header's local history; an overview keeps platform Back. */
+  internal fun handleRemoteSettingsBack(): Boolean {
+    if (route.page == null) return false
+    backLocal()
+    return true
   }
 
   private fun syncRouteIntent() {

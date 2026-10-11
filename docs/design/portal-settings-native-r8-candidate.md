@@ -85,7 +85,7 @@ a mock. Living Area and phone operations are zero.
 
 ## Promotion and local evidence
 
-The exact candidate is installed on Family Area. Promotion verifies its own APK,
+At the original promotion, the exact candidate was installed on Family Area. Promotion verifies its own APK,
 dex metadata, complete reference profile, OAT170 output, unchanged configuration,
 Home and inactive collector. It completes in 53.67 s. Recovery was corrected to
 install the accepted bootstrap/APK without depending on candidate Home; eight
@@ -147,6 +147,13 @@ is not retained. Family Area is restored to this measured `a622…` artifact wit
 unchanged configuration and exact compilation-profile verification. No new
 frame measurements or speed improvement are claimed. See
 [the native coverage record](portal-settings-native-navigation-coverage.md).
+
+The subsequent [owned Settings Back revision](portal-settings-owned-back-validation.md)
+passes the 1,736-test gate and a fresh 31-check native navigation sweep. Its
+`c862…` APK is now retained on Family Area with native R8, unchanged UI assets
+and exact compilation-profile verification. The 27.779 ms measured result above
+belongs to the earlier `a622…` APK; this functional follow-up adds no new timing
+comparison or measured speed claim.
 
 ## Official guidance
 

@@ -82,3 +82,15 @@ The historical R8 gain remains the matched result documented in
 [the R8 comparison](portal-settings-native-r8-candidate.md); it must not be
 attributed to this inspector change. The six-hour deadline remains missed and
 the broader performance goal remains incomplete. Cascading columns remain a mock.
+
+## Completed follow-up on the remote-Back fix
+
+The original incomplete reports above remain unchanged. A subsequent functional
+revision routes paired Back through the existing local Settings history for a
+resumed, focused subpage. A fresh sweep on that revision passes all 31 checks:
+23 page/Back visits, seven normal category overviews and the already-enabled
+Advanced overview. It completes in 102 seconds and verifies final Home, unchanged
+configuration, inactive collector and exact APK/profile. The new `c862…` artifact
+is retained on Family Area. This establishes the planned navigation coverage,
+not all settings functionality or a new speed gain. See
+[the implementation and native record](portal-settings-owned-back-validation.md).

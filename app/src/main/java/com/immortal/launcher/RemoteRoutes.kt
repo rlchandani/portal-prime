@@ -277,8 +277,10 @@ class RemoteRoutes internal constructor(
     var legacyUnavailable = false
     val result = pinned.back {
       // The manager chooses dismissal or this action together on main.
-      legacyUnavailable = !RemoteInput.available()
-      !legacyUnavailable && RemoteInput.globalAction("back")
+      if (ApprovedSettingsRemoteBack.dispatch()) true else {
+        legacyUnavailable = !RemoteInput.available()
+        !legacyUnavailable && RemoteInput.globalAction("back")
+      }
     }
     if (legacyUnavailable) json(503, err("no_accessibility"))
     else json(if (result.optBoolean("ok")) 200 else 409,
