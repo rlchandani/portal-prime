@@ -78,9 +78,10 @@ fun <S> SettingsList(
     domain: SettingsDomain<S>,
     snapshot: S,
     exclude: Set<String> = emptySet(),
+    editsEnabled: Boolean = true,
     onApply: (key: String, value: Any) -> Unit,
 ) {
-    val model = prepareSettingsList(domain, snapshot, exclude, onApply)
+    val model = prepareSettingsList(domain, snapshot, exclude, editsEnabled, onApply)
     val scroll = rememberLazyListState()
     val requestedIndex = model.requested?.let { model.projection.controlIndices[it] }
     LaunchedEffect(model.requested, requestedIndex) {
@@ -100,7 +101,7 @@ internal fun <S> SettingsRows(
     exclude: Set<String> = emptySet(),
     onApply: (String, Any) -> Unit,
 ) {
-    val model = prepareSettingsList(domain, snapshot, exclude, onApply)
+    val model = prepareSettingsList(domain, snapshot, exclude, onApply = onApply)
     model.projection.items.forEach { item ->
         key(item.id) {
             SettingsProjectionItem(model, item)
@@ -121,6 +122,7 @@ internal data class PreparedSettingsList<S>(
     val requested: String?,
     val showAdvancedHint: Boolean,
     val onApply: (String, Any) -> Unit,
+    val editsEnabled: Boolean = true,
 ) {
     val itemCount: Int get() = projection.items.size + if (showAdvancedHint) 1 else 0
 }
@@ -130,6 +132,7 @@ internal fun <S> prepareSettingsList(
     domain: SettingsDomain<S>,
     snapshot: S,
     exclude: Set<String> = emptySet(),
+    editsEnabled: Boolean = true,
     onApply: (String, Any) -> Unit,
 ): PreparedSettingsList<S> {
     val context = LocalContext.current
@@ -140,7 +143,7 @@ internal fun <S> prepareSettingsList(
     val requested = LocalApprovedRequestedControl.current
         ?: (context as? Activity)?.intent?.getStringExtra(APPROVED_SETTINGS_CONTROL)
     return PreparedSettingsList(domain, snapshot, advanced, visibility.projection, requested,
-        visibility.showAdvancedHint, onApply)
+        visibility.showAdvancedHint, onApply, editsEnabled)
 }
 
 /** Emits rows into an existing scroll owner; creates no nested list or bounded viewport. */
@@ -169,7 +172,7 @@ private fun <S> SettingsProjectionItem(
         ApprovedSettingsLazyKind.CONTROL -> ApprovedSettingsLazyRow(
             item.id, item.firstRow, item.lastRow, model.requested,
         ) {
-            SettingControl(model.domain.id, item.value!!, model.snapshot, model.advanced, model.onApply)
+            SettingControl(model.domain.id, item.value!!, model.snapshot, model.advanced, model.editsEnabled, model.onApply)
         }
     }
 }
@@ -252,6 +255,7 @@ private fun <S> SettingControl(
     spec: SettingSpec<S>,
     snapshot: S,
     advanced: Boolean,
+    editsEnabled: Boolean,
     onApply: (String, Any) -> Unit,
 ) {
     val context = LocalContext.current
@@ -275,7 +279,7 @@ private fun <S> SettingControl(
         when (spec) {
             is BoolSpec<*> -> {
                 val s = spec as BoolSpec<S>
-                ToggleRow(s.title, s.get(snapshot)) { onApply(s.key, it) }
+                ToggleRow(s.title, s.get(snapshot), enabled = editsEnabled) { onApply(s.key, it) }
             }
             is EnumSpec<*> -> {
                 val s = spec as EnumSpec<S>

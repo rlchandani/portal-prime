@@ -424,7 +424,7 @@ private fun ApprovedNativeSettingsPage(page: String) {
         // Keep the retained detail's existing scroll owner; avoid a second list for these rows.
         SettingsRows(domain, immortal, exclude, onApply)
       } else {
-        SettingsList(domain, immortal, exclude, onApply)
+        SettingsList(domain, immortal, exclude, onApply = onApply)
       }
     }
     "weather" -> SettingsList(SettingsDomains.immortal, immortal,

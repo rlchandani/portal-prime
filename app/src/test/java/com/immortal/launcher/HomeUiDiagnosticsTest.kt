@@ -489,7 +489,7 @@ class HomeUiDiagnosticsTest {
   }
 
 
-  @Test fun onlyThePublicSystemTouchSoundSwitchExportsCheckedState() {
+  @Test fun unlistedSwitchesNeverExportCheckedState() {
     val rows = state(listOf(node("touchSounds").copy(systemToggleState = true),
         node("showMiniPlayer").copy(systemToggleState = true),
         node(null).copy(systemToggleState = true))).json().getJSONArray("nodes")
@@ -508,6 +508,29 @@ class HomeUiDiagnosticsTest {
     assertEquals("touchSounds", row.getString("key"))
     assertTrue(row.has("checked"))
     assertFalse(row.getBoolean("checked"))
+  }
+
+  @Test fun slideshowSaveSelectorsExposeNoValuesOrHomeInputEligibility() {
+    for ((label, key) in listOf("Slideshow settings ready" to "slideshowSaveReady",
+        "Slideshow save unavailable" to "slideshowSaveUnavailable",
+        "Shuffle" to "slideshowShuffle", "screensaver.shuffle" to "slideshowShuffle")) {
+      assertEquals(key, HomeUiDiagnostics.fixedKey(label))
+      val snapshot = state(listOf(node(key, left = 300, right = 900)))
+      assertFalse(snapshot.eligible())
+      assertFalse(snapshot.publicLongPressTarget(400.0, 120.0))
+      assertNull(HomeUiDiagnostics.fixedKey("$label: PRIVATE_VALUE"))
+    }
+  }
+
+  @Test fun shufflePublishesOnlyItsNonSecretBooleanFromTheActualSwitch() {
+    val parent = node(null, left = 300, right = 900, id = 10).copy(systemToggleState = true)
+    val label = node("slideshowShuffle", left = 330, right = 600, parent = 10, id = 11, clickable = false)
+    val row = state(listOf(parent, label)).json().getJSONArray("nodes").getJSONObject(0)
+    assertEquals("slideshowShuffle", row.getString("key"))
+    assertTrue(row.getBoolean("checked"))
+    val protectedRows = state(listOf(node("slideshowShuffle").copy(systemToggleState = true,
+      editable = true, password = true))).json().getJSONArray("nodes")
+    assertEquals(0, protectedRows.length())
   }
 
 }

@@ -59,6 +59,9 @@ internal object HomeUiDiagnostics {
       "Slideshow app choices ready" to "slideshowAppChoicesReady",
       "Choose an installed app" to "chooseInstalledApp",
       "Slideshow settings list" to "slideshowSettingsList",
+      "Slideshow settings ready" to "slideshowSaveReady",
+      "Slideshow save unavailable" to "slideshowSaveUnavailable",
+      "Shuffle" to "slideshowShuffle", "screensaver.shuffle" to "slideshowShuffle",
       "Slideshow destination ready" to "slideshowDestinationReady",
       "Slideshow destination unavailable" to "slideshowDestinationUnavailable", "Home Assistant dashboard" to "homeAssistantDashboard",
       "Settings Back" to "settingsBack", "Settings Forward" to "settingsForward",
@@ -239,7 +242,7 @@ internal object HomeUiDiagnostics {
         .put("bounds", node.bounds.json()).put("clickable", node.clickable)
         .put("longClickable", node.longClickable).put("focused", node.focused)
         .put("accessibilityFocused", node.accessibilityFocused).put("editable", node.editable)
-        .also { if (key == "touchSounds" && !node.editable && !node.password && node.systemToggleState != null)
+        .also { if ((key == "touchSounds" || key == "slideshowShuffle") && !node.editable && !node.password && node.systemToggleState != null)
           it.put("checked", node.systemToggleState) }
   }
 
