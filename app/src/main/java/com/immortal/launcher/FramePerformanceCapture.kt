@@ -301,12 +301,14 @@ internal object FramePerformanceCapture {
     // getStackTrace is public since API 1. The VM returns a transient array; aggregation inspects
     // at most 64 entries and retains only bounded class/method strings. Do not hold the session
     // monitor during the VM read: main-thread stop/snapshot/lifecycle work must remain unblocked.
+    val readStarted = SystemClock.elapsedRealtime()
     val stack = try { Looper.getMainLooper().thread.stackTrace } catch (_: RuntimeException) { null }
+    val readEnded = SystemClock.elapsedRealtime()
     synchronized(s) {
       val now = SystemClock.elapsedRealtime()
       val accept = current === s && s.closedAt == null && s.sampleMainActive && now < s.deadline
       if (stack == null) histogram.recordError()
-      else if (accept) histogram.record(stack)
+      else if (accept) histogram.record(stack, readStarted - s.began, readEnded - s.began)
       else histogram.recordDroppedSample()
       if (!accept) {
         if (current === s && s.closedAt == null && now >= s.deadline) requestExpiry(s)
@@ -367,7 +369,7 @@ internal object FramePerformanceCapture {
     val key = "$host@$budget"
     val histogram = synchronized(s) {
       s.histograms[key] ?: if (s.histograms.size < MAX_HOSTS) {
-        FramePerformanceHistogram(budget).also { s.histograms[key] = it }
+        FramePerformanceHistogram(budget, s.request.slowFrameThresholdNs).also { s.histograms[key] = it }
       } else { s.rejectedHosts++; null }
     } ?: return
     // One reusable buffer per active binding; paired detail copies only a new worst frame.

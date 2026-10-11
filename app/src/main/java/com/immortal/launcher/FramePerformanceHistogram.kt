@@ -10,7 +10,7 @@ import org.json.JSONObject
 import kotlin.math.ceil
 
 /** Caller serializes access. Bounded storage and primitive-only frame recording. */
-internal class FramePerformanceHistogram(private val budgetNs: Long) {
+internal class FramePerformanceHistogram(private val budgetNs: Long, slowFrameThresholdNs: Long = 100_000_000L) {
   private val bins = LongArray(2001)
   private val sums = LongArray(8)
   private val maxima = LongArray(8)
@@ -32,7 +32,7 @@ internal class FramePerformanceHistogram(private val budgetNs: Long) {
   private var worstElapsedMs = 0L
   private var worstFirstDraw = false
   private val worstComponents = LongArray(8)
-  private val slowFrames = FramePerformanceSlowFrames()
+  private val slowFrames = FramePerformanceSlowFrames(slowFrameThresholdNs)
 
   fun record(nanos: Long, dropped: Int, firstDraw: Boolean): Boolean {
     drops += dropped.coerceAtLeast(0)

@@ -10,7 +10,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /** Bounded, primitive-only same-callback tail records; caller serializes access. */
-internal class FramePerformanceSlowFrames {
+internal class FramePerformanceSlowFrames(private val minNanos: Long = 100_000_000L) {
+  init { require(minNanos in 1L..60_000_000_000L) }
   private class Sample {
     var nanos = 0L
     var elapsedMs = 0L
@@ -28,7 +29,7 @@ internal class FramePerformanceSlowFrames {
   /** true means eligible, including records omitted from the bounded top set. */
   fun record(nanos: Long, firstDraw: Boolean, elapsedMs: Long, components: LongArray): Boolean {
     require(components.size == 8)
-    if (nanos !in MIN_NANOS..60_000_000_000L || elapsedMs !in 0L..900_000L) return false
+    if (nanos !in minNanos..60_000_000_000L || elapsedMs !in 0L..900_000L) return false
     eligibleFrames++
     val sample = if (samples.size < MAX_RECORDS) Sample().also { samples.add(it) }
         else if (nanos > samples[smallest].nanos) samples[smallest] else return true
@@ -38,7 +39,7 @@ internal class FramePerformanceSlowFrames {
     return true
   }
 
-  fun snapshot(): JSONObject = JSONObject().put("maxRecords", MAX_RECORDS).put("minTotalMs", MIN_NANOS / 1e6)
+  fun snapshot(): JSONObject = JSONObject().put("maxRecords", MAX_RECORDS).put("minTotalMs", minNanos / 1e6)
       .put("eligibleFrames", eligibleFrames).put("omittedFrames", eligibleFrames - samples.size)
       .put("frames", JSONArray().apply {
         // Sort only on explicit reads. Recording reuses slots and never creates JSON objects.
@@ -51,7 +52,6 @@ internal class FramePerformanceSlowFrames {
       })
   companion object {
     const val MAX_RECORDS = 32
-    private const val MIN_NANOS = 100_000_000L
     private val names = arrayOf("queued", "input", "animation", "layout", "draw", "sync", "commands", "swap")
   }
 }

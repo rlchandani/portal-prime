@@ -11,6 +11,8 @@ import org.json.JSONObject
 /** Ephemeral diagnostic commands, never user preferences or unbounded recurring work. */
 internal data class FramePerformanceRequest(val action: String, val durationSec: Int, val phase: String,
     val sampleMain: Boolean = false) {
+  // Ordinary captures retain the established tail threshold; sampled attribution needs shorter frames.
+  internal val slowFrameThresholdNs: Long get() = if (sampleMain) 32_000_000L else 100_000_000L
   init {
     require((action == "stop" && durationSec == 0 && phase == "all" && !sampleMain) ||
         (action == "start" && durationSec in 10..900 && phase in phases && (!sampleMain || durationSec <= 60)))

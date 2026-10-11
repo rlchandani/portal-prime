@@ -434,4 +434,67 @@ therefore cannot establish ownership. It also disables JIT code-cache garbage co
 the remainder of the process, including sampling mode. No ART trace was started. The chosen
 next diagnostic is bounded chronological busy-stack records and read intervals in the existing
 explicit `sampleMain` path, with a lower retained slow-frame threshold only for sampled captures.
-That diagnostic is not implemented yet; normal timing comparisons must remain unprofiled.
+That diagnostic has now been implemented and verified on Family Area as described below; normal timing comparisons must remain unprofiled.
+
+
+## Bounded chronological Main observations — verified diagnostic
+
+The existing explicit `sampleMain` opt-in now retains the newest 128 busy-stack observations,
+with capture-relative stack-read start/end times, stable IDs in a separate 1,024-symbol pool,
+a maximum depth of 64 and bounded class/method identities. Native MessageQueue polling is
+excluded only from the chronological records; the existing aggregate counters remain intact.
+The read interval is bracketed before reacquiring the session lock. No filenames, line numbers,
+thread objects, Activity references, photo contents or user values are retained. The sampled
+slow-frame detail threshold is 32 ms with the existing 32-record cap; ordinary unprofiled
+captures retain their 100 ms detail threshold and allocate no main-thread sampler/timeline.
+
+Twenty-three new regression tests first produced 21 assertion failures, then passed with the
+implementation. The full debug/benchmark build passed all 1,592 Android tests across 189 suites,
+with zero failures, errors or skips. The frozen APK's compiled flags retain native Filmstrip
+and disable native Home. Independent read-only integration review found no blocker. The
+hardware runner passed 33 offline cases, including a real compiled-JVM snapshot and an HTTP202
+start receipt that must be observed through authoritative state rather than replayed. Four
+analysis tests cover unknown symbol IDs, interval matching, restoration requirements and detached
+input interpretation. These counts describe the new diagnostic source; the accepted deployed
+product remains the previously tested 1,569-test build.
+
+A Family-only explicit-sampling capture completed ten Home/Apps cycles at a minimum four-second
+cadence under a sixty-second expiry cap. No Home-UI reads were made during collection. The owned
+collector was stopped once, independently confirmed idle, and read once for full metrics.
+
+| Diagnostic observation | Result |
+| --- | ---: |
+| Recorded Window frames | 262 |
+| Main stack samples | 1,590 |
+| Outside native polling | 130 |
+| Native-poll samples excluded from timeline | 1,460 |
+| Busy chronological records retained / omitted | 128 / 2 |
+| Code identities retained | 624 / 1,024 maximum |
+| Stack-read cost: median / mean / maximum | 1 / 3.59 / 83 ms |
+| Skipped sampler ticks / truncated aggregate stacks | 2,424 / 4 |
+| Slow frames at or above 32 ms retained / omitted | 24 / 0 |
+| Callback drops / invalid samples / overflow samples | 0 / 0 / 0 |
+| Invalid timeline intervals / observations / masks | 0 / 0 / 0 |
+
+Retained observations included 52 accessibility-delegate, 32 semantics, 15 recomposer, 14
+composer, seven geometry and three layout-measure matches. Families overlap; these are counts
+of observed stacks, not CPU percentages. The sampled mean/p95/p99 were 13.92/44.75/67.25 ms,
+with a maximum of 78.70 ms. Profiling overhead, including an 83 ms stack-read interval, means
+these timings cannot establish a normal-runtime gain or regression.
+
+The maximum frame paired 64.76 ms animation work and 9.47 ms draw; a nearby snapshot contained
+accessibility semantics-copy maintenance. A 67.21 ms Apps frame had a nearby geometry-grouping
+stack through `SemanticsNode.getBoundsInWindow` and `NodeCoordinator.localBoundingBoxOf`.
+Two observations captured `UserLayout.deserialize` JSON/map construction during Apps changes,
+near 53.75 ms and 52.13 ms frames. One captured sunrise/sunset formatting during Home
+recomposition. A previous rejected experiment already covered the formatting memoization, so
+it is not being repeated. These are callback-receipt proximity observations, not causal matches
+or app CPU measurements. Remote pinned-status checks also appear in the stacks and can contribute
+observer work. The separately capped timeline and slow-frame collections leave coverage gaps.
+
+The parent independently restored the exact accepted 19abed09... APK (37,133,972 bytes), Home
+foreground, owned collector inactive, with full configuration, settings schema and source groups
+preserved. Living Area had zero operations. The diagnostic APK was not promoted as a speed
+improvement. Home remains unresolved. The next isolated product experiment tests one-most-recent-
+raw-value layout decoding caches while continuing to read current preferences; it will require
+fresh unprofiled comparisons before acceptance.

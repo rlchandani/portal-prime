@@ -79,6 +79,7 @@ internal class MainThreadSampleHistogram {
         })
   }
 
+  private val timeline = MainThreadSampleTimeline()
   private val leafHistogram = SelectedHistogram(MAX_LEAF_SYMBOLS)
   private val firstAppHistogram = SelectedHistogram(MAX_APP_SYMBOLS)
   private var noAppMatchSamples = 0L
@@ -112,7 +113,7 @@ internal class MainThreadSampleHistogram {
     return false
   }
 
-  fun record(stack: Array<StackTraceElement>) {
+  fun record(stack: Array<StackTraceElement>, startedMs: Long? = null, endedMs: Long? = null) {
     if (!beginTick()) return
     if (stack.isEmpty()) {
       emptySamples++
@@ -160,6 +161,9 @@ internal class MainThreadSampleHistogram {
           }
         }
       }
+    }
+    if (startedMs != null && endedMs != null) {
+      timeline.record(stack, startedMs, endedMs, waiting, matchedFamilies, samples)
     }
     val seen = HashSet<String>(depth)
     for (i in 0 until depth) {
@@ -243,6 +247,8 @@ internal class MainThreadSampleHistogram {
             .put("classPrefix", APP_CLASS_PREFIX).put("noMatchSamples", noAppMatchSamples)
             .put("depthLimitedNoMatchSamples", depthLimitedNoAppMatchSamples)
             .put("noMatchMeaning", "No exact prefix match within inspected depth; matches beyond that depth are unknown"))
+        .put("busyTimeline", timeline.snapshot()
+            .put("operationFamilyNames", JSONArray(operationRules.map { it.name })))
         .put("operationFamilyDepthLimit", MAX_DEPTH)
         .put("operationFamilyCounting", "Inclusive once per non-empty observation, before dynamic symbol admission; families may overlap")
         .put("operationFamilyZeroMeaning", "No matching frame observed within the inspected depth; absence between observations or beyond that depth is unknown")
