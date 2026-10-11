@@ -10,7 +10,7 @@ import org.json.JSONObject
 
 /** Ephemeral diagnostic commands, never user preferences or unbounded recurring work. */
 internal data class FramePerformanceRequest(val action: String, val durationSec: Int, val phase: String,
-    val sampleMain: Boolean = false) {
+    val sampleMain: Boolean = false, val sampleSettingsWork: Boolean = true) {
   // Ordinary captures retain the established tail threshold; sampled attribution needs shorter frames.
   internal val slowFrameThresholdNs: Long get() = if (sampleMain) 32_000_000L else 100_000_000L
   init {
@@ -24,15 +24,17 @@ internal data class FramePerformanceRequest(val action: String, val durationSec:
       val keys = body.keys().asSequence().toSet()
       if (action == "stop") return if (keys == setOf("action"))
         FramePerformanceRequest("stop", 0, "all") else null
-      if (action != "start" || !setOf("action", "durationSec", "phase", "sampleMain").containsAll(keys)) return null
+      if (action != "start" || !setOf("action", "durationSec", "phase", "sampleMain", "sampleSettingsWork").containsAll(keys)) return null
       val raw = if (body.has("durationSec")) body.opt("durationSec") else 60
       val duration = when (raw) { is Int -> raw.toLong(); is Long -> raw; else -> return null }
       if (duration !in 10L..900L) return null
       val sampleMain = if (body.has("sampleMain")) body.opt("sampleMain") as? Boolean ?: return null else false
       if (sampleMain && duration > 60) return null
+      val sampleSettingsWork = if (body.has("sampleSettingsWork"))
+        body.opt("sampleSettingsWork") as? Boolean ?: return null else true
       val phase = if (body.has("phase")) body.opt("phase") as? String ?: return null else "all"
       if (phase !in phases) return null
-      return FramePerformanceRequest(action, duration.toInt(), phase, sampleMain)
+      return FramePerformanceRequest(action, duration.toInt(), phase, sampleMain, sampleSettingsWork)
     }
   }
 }

@@ -33,7 +33,8 @@ class SettingsUiWorkCaptureTest {
         .getDeclaredConstructor(java.lang.Long.TYPE, FramePerformanceRequest::class.java)
         .apply { isAccessible = true }
     private var nextId = 0L
-    fun session(): Any = constructor.newInstance(++nextId, FramePerformanceRequest("start", 10, "settings"))
+    fun session(request: FramePerformanceRequest = FramePerformanceRequest("start", 10, "settings")): Any =
+        constructor.newInstance(++nextId, request)
     fun select(session: Any?) { current.set(FramePerformanceCapture, session) }
     fun close(session: Any) {
       session.javaClass.getDeclaredField("closedAt").apply { isAccessible = true }.set(session, elapsedMs)
@@ -68,6 +69,23 @@ class SettingsUiWorkCaptureTest {
         }
       }
     }
+  }
+
+  @Test fun frameOnlyCaptureAddsNoSettingsModifierOrWorkTiming() = withFixture { f ->
+    val request = FramePerformanceRequest.parse(org.json.JSONObject().put("action", "start")
+        .put("durationSec", 10).put("phase", "settings").put("sampleSettingsWork", false))
+    assertNotNull(request)
+    val s = f.session(request!!); f.select(s); f.resetCounters()
+    val original = object : Modifier.Element {}
+    assertFalse(FramePerformanceCapture.settingsUiWorkEnabled())
+    assertSame(original, original.settingsUiWorkMeasure(SettingsUiWorkStage.SHELL_MEASURE))
+    assertNull(FramePerformanceCapture.beginSettingsUiWork(SettingsUiWorkStage.DETAIL_MEASURE))
+    val entries = listOf("existing-search-index")
+    assertSame(entries, FramePerformanceCapture.measureSettingsSearchIndex { entries })
+    assertNull(FramePerformanceCapture.beginSettingsCreate(Mockito.mock(android.content.Intent::class.java)))
+    FramePerformanceCapture.markSettingsUiWork(SettingsUiWorkStage.VERSION_PUBLISHED)
+    assertEquals(0, f.elapsedReads); assertEquals(0, f.nanoReads)
+    assertEquals(0L, f.samples(s).getLong("records"))
   }
 
   @Test fun inactiveAndClosedModifierFactoryReturnsOriginalWithoutClocks() = withFixture { f ->

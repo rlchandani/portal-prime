@@ -1,9 +1,9 @@
 # Family Area Settings: hardware and direct-row candidate
 
-The Family Area hardware can support responsive Settings. The direct-row
-candidate remains disabled by default: its native acceptance cycle stopped
-before the affected controls or timing samples were reached. No production
-speed improvement is established, and no candidate was promoted.
+The Family Area hardware can support responsive Settings. All eight affected
+native Appearance checks now pass. The direct-row candidate remains disabled
+by default pending a clean controlled performance comparison; no candidate has
+been promoted and no production speedup is yet established.
 
 ## Hardware read from the actual device
 
@@ -103,46 +103,47 @@ The candidate's 42 measured selections recorded inactive outer-pane measurement
 spans of at most 0.234 ms. This does not rule out descendant-only work, but it
 does not justify rewriting retained panes as the next step.
 
-## Decision: do not promote this candidate
+## Current acceptance status
 
-The subsequent matched-build acceptance cycle did not reach an Appearance
-picker, toggle, search result, or timing sample. Stop this comparison attempt;
-do not repeat installs or add instrumentation merely to obtain a favorable
-number. Keep the candidate opt-in and the installed accepted APK unchanged.
+The original driver failures were resolved using device evidence, without
+changing the Settings UI to fit the test. Actual detail rows begin at pixel
+486 on the 2160-pixel display; the old 25% threshold discarded them. Compact
+buttons also require the real sidebar boundary rather than a midpoint rule.
+A picker closing is a pending observation, not an invalid Settings target.
 
-Five benchmark variants were built from one source fingerprint: control,
-candidate, their SDK-profile bootstrap builds, and a separate functional build.
-The timing variants disabled the Settings UI and pane observers. The full JVM
-suite passed **1,725 tests in 198 suites**, with zero failures, errors, or skips;
-this includes six new tests for the fixed public Appearance inspector keys.
-Seven file-only comparison assertions also passed. Those assertions do not
-establish the real Portal's clickable geometry or navigation behavior.
+All **eight affected native checks passed** on the Family Area candidate:
+three pickers open/dismiss/select/restore, the mini-player toggle round trip,
+Advanced visibility/consent cancel/enable, the status-bar toggle/restore, and
+search navigation to the first and last requested rows. The requested row
+checks verified its committed route, visible bounds, and the same Settings
+window. The original configuration, accepted APK and exact SDK profile were
+restored, Home returned, and the collector was inactive. Living Area and the
+phone received zero operations.
 
-The native driver exposed test-driver failures rather than proving a product
-regression or a rendering improvement. Its initial entry observation failed;
-a later attempt rejected a transient foreground surface; the last attempt
-verified the Home dock but timed out waiting for the expected Appearance
-navigation row. The final driver recorded **zero completed functional checks
-and zero timed blocks**. The exact cause of that last selector mismatch was
-not established. Do not label it a processor, RAM, animation, or product fault.
+A header Home tap after the system status-bar test timed out in an earlier
+functional run. The cause has not been established. The completed run retained
+the successful initial header return and used the existing explicit remote
+Home command to reset after system-bar changes and search. Do not claim this
+proves that header edge case is fixed.
 
-Final postflight evidence confirms:
+The initial matched timing attempt correctly rejected its first measured
+sample: the older Settings UI work profiler activates during any capture,
+independently of the newer UI and pane BuildConfig flags. No clean performance
+comparison or production speedup was established by that attempt.
 
-| Check | Result |
-| --- | --- |
-| Candidate accepted for deployment | No |
-| New proven performance gain | None |
-| Accepted APK restored | Yes, exact hash |
-| Accepted SDK compilation profile restored | Yes, exact profile sets |
-| Original configuration unchanged | Yes |
-| Home restored | Yes |
-| Performance collector inactive | Yes |
-| Living Area / phone operations | 0 / 0 |
+The existing capture request now accepts optional `sampleSettingsWork`.
+It defaults to true for backwards compatibility. Explicit false skips Settings
+layout work, pane work allocation, search preparation timing and entry tracing;
+frame metrics remain available. Regression tests verify no added Settings
+modifier or timing clocks while preserving the real search index. The focused
+red/green test cycle passed, followed by the full **1,728-test / 198-suite** gate
+with zero failures, errors or skips, and a successful debug assembly.
 
-The expired six-hour window remains expired. The 16.67 ms frame budget explains
-visible jank; it is not a guarantee for every first-open frame on this device.
-The earlier attribution numbers remain observations, not physical
-tap-to-display latency or a controlled speedup.
+The direct-row renderer remains disabled by default. Its performance promotion
+still requires the same-source, same-compilation control/candidate/control
+comparison with the existing frame-budget and tail gates. The expired six-hour
+window remains expired. A reported frame duration is not physical tap latency
+or a guarantee for every cold first-open frame.
 
 ## Evidence
 
@@ -175,3 +176,19 @@ The fingerprint below belongs to the earlier attribution run.
   (used for processor topology, not that reference board's RAM or display)
 - [Google: Lazy layouts performance optimization, section 4](https://developer.android.com/agents/skills/jetpack-compose/jetpack-compose-performance/references/lazy-layouts)
 - [Google: Compose lists and nested scrolling](https://developer.android.com/develop/ui/compose/lists)
+
+## New native and diagnostic evidence
+
+- `build/fleet/diagnostics/settings-appearance-functional-final-2026-10-11/postflight.json`:
+  completed eight-check native run, exact accepted restoration, unchanged config.
+- Completed functional postflight SHA-256:
+  `f672a8ed6f800211d365abfc0c4ba7ab14f1de51efc168a811035df5ff9bf117`.
+- `build/fleet/diagnostics/settings-appearance-matched-bounds-2026-10-11/postflight.json`:
+  timing sample rejected for active Settings work instrumentation; rollback verified.
+- `build/fleet/diagnostics/settings-frame-only-full-gate-2026-10-11.log`:
+  full current tests and debug assembly for the capture opt-out.
+
+The eight-check native run used the earlier matched APK. The capture-request
+change has not yet been installed or timed on the device. Its Settings UI and
+persistence behavior are unchanged; the new native artifacts still need their
+runtime acceptance before promotion.

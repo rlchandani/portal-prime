@@ -83,7 +83,8 @@ internal object FramePerformanceCapture {
     val histograms = LinkedHashMap<String, FramePerformanceHistogram>()
     val settingsSearchPreparation = SettingsSearchPreparationSamples()
     val settingsUiWork = SettingsUiWorkSamples()
-    val settingsPaneWork = if (BuildConfig.PORTAL_SETTINGS_PANE_DIAGNOSTICS) SettingsPaneWorkSamples() else null
+    val settingsPaneWork = if (BuildConfig.PORTAL_SETTINGS_PANE_DIAGNOSTICS && request.sampleSettingsWork)
+        SettingsPaneWorkSamples() else null
     val settingsEntryTimeline = SettingsEntryTimeline()
     val settingsEntryWindows = ArrayList<SettingsEntryWindow>() // Main-owned weak windows.
     val slideshowWork = SlideshowWorkSamples()
@@ -274,7 +275,7 @@ internal object FramePerformanceCapture {
   }
 
   private fun admitsSettingsEntry(s: Session): Boolean =
-      current === s && s.closedAt == null &&
+      current === s && s.request.sampleSettingsWork && s.closedAt == null &&
           (s.request.phase == "settings" || s.request.phase == "all" || s.request.phase == "launch") &&
           SystemClock.elapsedRealtime() < s.deadline
 
@@ -290,6 +291,7 @@ internal object FramePerformanceCapture {
 
   private fun beginSettingsLaunch(): SettingsEntryReport? = runCatching {
     val s = current ?: return@runCatching null
+    if (!s.request.sampleSettingsWork) return@runCatching null
     synchronized(s) {
       if (s.closedAt != null || s.request.phase !in setOf("settings", "all", "launch") ||
           Looper.myLooper() !== Looper.getMainLooper() || !admitsSettingsEntry(s)) return@runCatching null
@@ -301,6 +303,7 @@ internal object FramePerformanceCapture {
   /** An old intent/callback must never be adopted by a replacement diagnostic session. */
   fun beginSettingsCreate(intent: Intent): SettingsEntryReport? = runCatching {
     val s = current ?: return@runCatching null
+    if (!s.request.sampleSettingsWork) return@runCatching null
     synchronized(s) {
       if (s.closedAt != null || s.request.phase !in setOf("settings", "all", "launch") ||
           Looper.myLooper() !== Looper.getMainLooper() || !admitsSettingsEntry(s)) return@runCatching null
@@ -336,6 +339,7 @@ internal object FramePerformanceCapture {
 
   fun settingsUiWorkEnabled(): Boolean = runCatching {
     val s = current ?: return@runCatching false
+    if (!s.request.sampleSettingsWork) return@runCatching false
     synchronized(s) { current === s && s.closedAt == null && SystemClock.elapsedRealtime() < s.deadline }
   }.getOrDefault(false)
 
@@ -344,6 +348,7 @@ internal object FramePerformanceCapture {
 
   private fun settingsUiWorkMeasurement(stage: SettingsUiWorkStage): SettingsUiWorkMeasurement? {
     val s = current ?: return null
+    if (!s.request.sampleSettingsWork) return null
     synchronized(s) {
       if (current !== s || s.closedAt != null || SystemClock.elapsedRealtime() >= s.deadline) return null
     }
@@ -388,6 +393,7 @@ internal object FramePerformanceCapture {
 
   private fun settingsSearchPreparationMeasurement(): SettingsSearchPreparationMeasurement? {
     val s = current ?: return null
+    if (!s.request.sampleSettingsWork) return null
     synchronized(s) {
       if (current !== s || s.closedAt != null || SystemClock.elapsedRealtime() >= s.deadline) return null
     }
@@ -595,7 +601,8 @@ internal object FramePerformanceCapture {
     }
     if (s == null) {
       result.put("active", false).put("collectorRunning", false)
-          .put("sampleMain", false).put("sampleMainActive", false).put("activeListeners", 0)
+          .put("sampleMain", false).put("sampleMainActive", false)
+          .put("sampleSettingsWork", false).put("activeListeners", 0)
       if (includeMetrics) result.put("hosts", JSONObject())
       return result
     }
@@ -603,6 +610,7 @@ internal object FramePerformanceCapture {
       result.put("sessionId", s.id).put("phase", s.request.phase)
           .put("durationSec", s.request.durationSec)
           .put("sampleMain", s.request.sampleMain)
+          .put("sampleSettingsWork", s.request.sampleSettingsWork)
           .put("sampleMainActive", s.sampleMainActive && s.closedAt == null && now < s.deadline)
           .put("active", s.closedAt == null && now < s.deadline)
           .put("elapsedMs", (minOf(s.closedAt ?: now, s.deadline) - s.began).coerceAtLeast(0))

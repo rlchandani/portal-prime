@@ -68,4 +68,25 @@ class FramePerformanceRequestTest {
       }
     }
   }
+  @Test fun settingsWorkSamplingAcceptsOnlyExplicitBooleansAndKeepsLegacyDefault() {
+    val legacy = FramePerformanceRequest.parse(JSONObject().put("action", "start"))!!
+    val disabled = FramePerformanceRequest.parse(JSONObject().put("action", "start")
+        .put("sampleSettingsWork", false))
+    assertNotNull(disabled)
+    assertNotEquals(legacy, disabled)
+    assertEquals(legacy, FramePerformanceRequest.parse(JSONObject().put("action", "start")
+        .put("sampleSettingsWork", true)))
+  }
+
+  @Test fun settingsWorkSamplingRejectsCoercionAndStopConfiguration() {
+    for (value in listOf<Any>("true", "false", 1, 0, JSONObject.NULL, JSONObject())) {
+      assertNull(FramePerformanceRequest.parse(JSONObject().put("action", "start")
+          .put("sampleSettingsWork", value)))
+    }
+    for (value in listOf(false, true)) {
+      assertNull(FramePerformanceRequest.parse(JSONObject().put("action", "stop")
+          .put("sampleSettingsWork", value)))
+    }
+  }
+
 }
