@@ -155,7 +155,7 @@ it. No settings, persistence, route, layout or proposed cascading columns change
 Rich editors and other Activities retain their current policy.
 
 - [x] Validate debug/benchmark resource linkage and run the unit gate.
-- [ ] Freeze candidate/build inputs in a separate experiment directory.
+- [x] Freeze candidate/build inputs in a separate experiment directory.
 - [ ] Verify Settings/Home/search/back on Family Area, including first-draw handoff.
 - [ ] Compare fresh runtime evidence and accept only verified improvement with
       preserved behavior; otherwise restore the accepted APK and exact source.
@@ -181,3 +181,38 @@ may still animate. Native behavior and rendering regressions remain untested for
 this candidate. No acceptance or performance gain is claimed. Family remains on
 the restored accepted APK. A separate diagnostic-only native driver is being
 prepared; the original failed trial and completed header-path results stay immutable.
+
+## Null-animation native attempt: transport failure, accepted restored
+
+The reviewed driver passed its 102 offline contracts. Input manifest
+f8c2aaac38e6ca981aa245030f5d5f4d28e1620471e63b94cd1db0ec3d136c86
+was frozen before native operations. Native session 20000 exited 1; run
+67b465b79dde460394642f3a9d16cf98 verified six warmups/six owned stops and
+zero timed entries. Entry seven failed before START, during the inactive full APK
+hash read preceding settled_home's Home request. The exact Fleet Retryable arises
+from OSError/HTTPException at room-fleet.py:394 (connection interrupted). No timing
+sample or performance acceptance is admitted from this incomplete cohort. The
+failed files are immutable.
+
+Postflight SHA: 8ed682885c1a6851b0993764c651b1dbb14a0e786aa6c2ab24ac484d514e1171.
+Count-trace SHA: 3ee7945d3e9aa20ec936d392725a3e1c68321ebdb2f57f37a546493c943da3b9.
+Fresh final accepted SDK admission:
+cac6f8eb58148f7051473c681d638128098cacfdc73827610f511dc3c6049bb1.
+Accepted APK bc6af47b4184de27f81fc59c6502871bb8a796505c59c1e047ae859dd3f28298
+and SDK cache code 1 were restored. Main independently rechecked frozen inputs,
+app source and the complete actual reference/DM/structural OAT restoration proof.
+Configuration/schema/source groups, Home and inactive collectors passed; Living
+Area and the phone were untouched.
+
+Public Android 10 source follow-up confirms that getCachedAnimations returns null
+when LayoutParams.windowAnimations is zero; loadAnimationAttr subsequently returns
+null for an absent animation resource. This supports the compiled theme policy,
+without establishing compositor/display timing on Meta firmware. Source:
+https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-10.0.0_r1/services/core/java/com/android/server/wm/AppTransition.java#554
+
+Next action is a fresh sibling trial with the exact same candidate/boot/source
+pins. Only the driver will change: at most two full-hash attempts, transport
+Retryable only, inactive/session checks before either attempt and after success,
+bounded inactive-read time; no capture deadline expansion, active TAP/STOP retry,
+mutation retry or identity-mismatch retry. All existing artifact/SDK/OAT/ownership
+and restoration gates stay required. The failed trial remains failed.
