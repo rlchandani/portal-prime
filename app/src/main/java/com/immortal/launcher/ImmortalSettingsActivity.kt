@@ -503,24 +503,61 @@ private fun ApprovedNativeSettingsPage(page: String) {
 @Composable
 private fun ApprovedTouchSounds() {
   val context = LocalContext.current
-  var sounds by remember { mutableStateOf(SystemSounds.touchSoundsEnabled(context)) }
+  val writes = remember(context.applicationContext) { SystemSoundsWrites.queue(context) }
+  val completion = rememberCoroutineScope()
+  var snapshot by remember(context) { mutableStateOf<SystemTouchSoundsSnapshot?>(null) }
+  var failed by remember(context) { mutableStateOf(false) }
+  var applying by remember(context) { mutableStateOf(false) }
+  var editRevision by remember(context) { mutableStateOf(0) }
   val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val observer = LifecycleEventObserver { _, event ->
-      if (event == Lifecycle.Event.ON_RESUME) sounds = SystemSounds.touchSoundsEnabled(context)
+  val pageActive = LocalApprovedLauncherPageActive.current
+  suspend fun readSounds() = loadSystemTouchSounds {
+    SystemTouchSoundsSnapshot(SystemSounds.canWrite(context), SystemSounds.touchSoundsEnabled(context))
+  }
+  LaunchedEffect(context, lifecycleOwner, pageActive) {
+    if (!pageActive) return@LaunchedEffect
+    lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+      val revision = editRevision
+      writes.awaitIdle()
+      val loaded = readSounds()
+      if (revision == editRevision) {
+        failed = loaded == null
+        if (loaded != null) snapshot = loaded
+      }
     }
-    lifecycleOwner.lifecycle.addObserver(observer)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+  }
+  val current = snapshot
+  if (current == null) {
+    FooterNote(if (failed) "Touch sound change unavailable" else "Loading touch sound settings…")
+    return
   }
   SectionLabel("Options")
   Card {
-    ToggleRow("Touch sounds", sounds) { checked ->
-      if (SystemSounds.canWrite(context)) {
-        SystemSounds.setTouchSounds(context, checked)
-        sounds = SystemSounds.touchSoundsEnabled(context)
-      } else SystemSounds.requestWriteAccess(context)
+    if (!current.canWrite) {
+      NavRow("Allow touch sound control", value = "Grant") { SystemSounds.requestWriteAccess(context) }
+    } else {
+      ToggleRow("Touch sounds", current.enabled, enabled = !applying) { checked ->
+        if (!applying) {
+          applying = true
+          failed = false
+          editRevision++
+          snapshot = current.copy(enabled = checked)
+          writes.submit(checked)
+          completion.launch {
+            try {
+              writes.awaitIdle()
+              val loaded = readSounds()
+              failed = loaded == null || loaded.enabled != checked
+              // A failed read-back must not leave an optimistic value presented as real state.
+              snapshot = loaded
+            } finally { applying = false }
+          }
+        }
+      }
     }
   }
+  if (applying) FooterNote("Applying touch sound setting…")
+  if (failed) FooterNote("Touch sound change unavailable")
   FooterNote("Plays the system tap sound on touch. Android may ask you to allow modifying system settings.")
 }
 

@@ -228,7 +228,8 @@ object RemoteInput {
           nodes.add(HomeUiDiagnostics.Node(parent, bounds, key, node.isClickable, node.isLongClickable,
               node.isFocused, node.isAccessibilityFocused, editable, password,
               node.className?.toString() == "android.widget.EditText", searchHint,
-              if (editable && !password) node.text?.length ?: 0 else null, id = index))
+              if (editable && !password) node.text?.length ?: 0 else null, id = index,
+              systemToggleState = if (!editable && !password && node.isCheckable) node.isChecked else null))
         }
         val children = node.childCount
         if (depth >= HomeUiDiagnostics.MAX_DEPTH) { if (children > 0) truncated = true; return }

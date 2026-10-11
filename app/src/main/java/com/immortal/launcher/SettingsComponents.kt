@@ -292,13 +292,15 @@ internal fun ToggleRow(
     checked: Boolean,
     iconColor: Color = Color(0xFF636366),
     iconSymbol: String = "",
+    enabled: Boolean = true,
     onChange: (Boolean) -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = Sizes.rowMinHeight)
-            .tvFocusableRow(focusFill = IosFocusTint) { onChange(!checked) }
+            .then(if (enabled) Modifier.tvFocusableRow(focusFill = IosFocusTint) { onChange(!checked) }
+                else Modifier.semantics { disabled() })
             .semantics { role = Role.Switch; toggleableState = ToggleableState(checked) }
             .padding(horizontal = 28.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -309,7 +311,7 @@ internal fun ToggleRow(
         }
         ApprovedSettingsLabel(title, LocalApprovedSettingsHelp.current, Modifier.weight(1f))
         // Visual only — the row toggles it (so the remote's centre button works).
-        ApprovedSettingsSwitch(checked)
+        ApprovedSettingsSwitch(checked, enabled = enabled)
     }
 }
 

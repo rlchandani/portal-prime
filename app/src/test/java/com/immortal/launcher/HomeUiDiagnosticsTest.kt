@@ -475,4 +475,26 @@ class HomeUiDiagnosticsTest {
     }
   }
 
+
+  @Test fun onlyThePublicSystemTouchSoundSwitchExportsCheckedState() {
+    val rows = state(listOf(node("touchSounds").copy(systemToggleState = true),
+        node("showMiniPlayer").copy(systemToggleState = true),
+        node(null).copy(systemToggleState = true))).json().getJSONArray("nodes")
+    val sound = (0 until rows.length()).map { rows.getJSONObject(it) }.single { it.getString("key") == "touchSounds" }
+    assertTrue(sound.has("checked"))
+    assertTrue(sound.getBoolean("checked"))
+    assertFalse((0 until rows.length()).map { rows.getJSONObject(it) }
+        .single { it.getString("key") == "showMiniPlayer" }.has("checked"))
+    assertFalse(state(listOf(node("touchSounds").copy(systemToggleState = false))).eligible())
+  }
+
+  @Test fun soundSwitchStateSurvivesItsUnmergedPublicLabel() {
+    val parent = node(null, left = 300, right = 900, id = 10).copy(systemToggleState = false)
+    val label = node("touchSounds", left = 330, right = 600, parent = 10, id = 11, clickable = false)
+    val row = state(listOf(parent, label)).json().getJSONArray("nodes").getJSONObject(0)
+    assertEquals("touchSounds", row.getString("key"))
+    assertTrue(row.has("checked"))
+    assertFalse(row.getBoolean("checked"))
+  }
+
 }

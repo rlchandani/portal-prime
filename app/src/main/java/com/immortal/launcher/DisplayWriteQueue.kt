@@ -21,21 +21,23 @@ internal sealed interface DisplayEdit {
 }
 
 /** Process-owned writes finish after a pane leaves; only latest unsent values are retained. */
-internal class DisplayWriteQueue(
+internal class LatestSystemWrites<K, V>(
+    private val keyOf: (V) -> K,
     private val onFailure: (Exception) -> Unit = {},
-    private val apply: (DisplayEdit) -> Unit,
+    private val apply: (V) -> Unit,
 ) {
   private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
   private val lock = Any()
-  private val pending = LinkedHashMap<DisplayEdit.Control, DisplayEdit>()
+  private val pending = LinkedHashMap<K, V>()
   private var running = false
   private var idle = CompletableDeferred(Unit)
 
-  fun submit(edit: DisplayEdit) {
+  fun submit(edit: V) {
     synchronized(lock) {
       // Remove/reinsert so brightness/auto-brightness preserve the last user's event order.
-      pending.remove(edit.control)
-      pending[edit.control] = edit
+      val key = keyOf(edit)
+      pending.remove(key)
+      pending[key] = edit
       if (!running) {
         running = true
         idle = CompletableDeferred()
@@ -61,6 +63,12 @@ internal class DisplayWriteQueue(
       try { apply(edit) } catch (error: Exception) { runCatching { onFailure(error) } }
     }
   }
+}
+
+internal class DisplayWriteQueue(onFailure: (Exception) -> Unit = {}, apply: (DisplayEdit) -> Unit) {
+  private val writes = LatestSystemWrites(DisplayEdit::control, onFailure, apply)
+  fun submit(edit: DisplayEdit) = writes.submit(edit)
+  suspend fun awaitIdle() = writes.awaitIdle()
 }
 
 /** Share one ordering boundary across retained panes and Activity recreation; never retain an Activity. */

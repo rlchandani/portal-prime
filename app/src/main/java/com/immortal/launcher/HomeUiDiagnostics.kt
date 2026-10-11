@@ -16,7 +16,8 @@ import java.util.concurrent.TimeoutException
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** Explicit, authenticated functional probes. No polling, UI strings, pixels or preferences. */
+/** Explicit, authenticated functional probes. No polling, UI strings, pixels or app preferences.
+ * Only the public system Touch sounds switch exports checked state for exact restoration. */
 internal object HomeUiDiagnostics {
   const val MAX_NODES = 256
   const val MAX_DEPTH = 32
@@ -59,6 +60,7 @@ internal object HomeUiDiagnostics {
       "Photo clock faces" to "photoClockFaces", "Digital clock" to "digitalClock",
       "Photo sources" to "photoSources", "Weather" to "weather", "Calendar" to "calendar",
       "Alarm" to "alarm", "Quick buttons" to "quickButtons", "Touch sounds" to "touchSounds",
+      "Touch sound change unavailable" to "touchSoundsChangeUnavailable",
       "Sounds" to "sounds", "Welcome greeting" to "welcomeGreeting", "Sunrise & wake" to "sunriseWake",
       "Home dashboard" to "homeDashboard", "Intercom" to "intercom", "Device name" to "deviceName",
       "Sleep timer" to "sleepTimer", "About & device health" to "aboutDeviceHealth",
@@ -95,6 +97,7 @@ internal object HomeUiDiagnostics {
       val editable: Boolean, val password: Boolean, val editText: Boolean,
       val searchHint: String?, val textLength: Int?,
       val id: Int = -1,
+      val systemToggleState: Boolean? = null,
   )
   /** Compose can expose a label as a non-clickable child of its actual input row. IDs are
    * traversal IDs, not positions in the visible-node list. Unknown and editable nodes remain
@@ -228,6 +231,8 @@ internal object HomeUiDiagnostics {
         .put("bounds", node.bounds.json()).put("clickable", node.clickable)
         .put("longClickable", node.longClickable).put("focused", node.focused)
         .put("accessibilityFocused", node.accessibilityFocused).put("editable", node.editable)
+        .also { if (key == "touchSounds" && !node.editable && !node.password && node.systemToggleState != null)
+          it.put("checked", node.systemToggleState) }
   }
 
   internal data class Read(val state: State? = null, val error: String? = null)
