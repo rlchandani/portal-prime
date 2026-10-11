@@ -43,6 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -178,11 +180,12 @@ internal fun Divider() {
  * follows the mock spec per-row. When [iconRes] is supplied it draws that (white-tinted) vector
  * drawable; otherwise it falls back to the single-glyph [symbol]. Radius is per iOS spec.
  *
+ * An already parsed [imageVector] may be supplied by a bounded resource cache.
  * Vector drawables are preferred (crisp at any density, reliable on the Portal's Android 10 where
  * emoji coverage is patchy); [symbol] remains for rows without a dedicated icon yet.
  */
 @Composable
-internal fun IconBadge(color: Color, symbol: String, iconRes: Int? = null) {
+internal fun IconBadge(color: Color, symbol: String, iconRes: Int? = null, imageVector: ImageVector? = null) {
     Box(
         modifier = Modifier
             .size(Sizes.iconBadge)
@@ -190,9 +193,11 @@ internal fun IconBadge(color: Color, symbol: String, iconRes: Int? = null) {
             .background(color),
         contentAlignment = Alignment.Center,
     ) {
-        if (iconRes != null) {
+        if (imageVector != null || iconRes != null) {
+            val painter = if (imageVector != null) rememberVectorPainter(imageVector)
+                else androidx.compose.ui.res.painterResource(requireNotNull(iconRes))
             androidx.compose.material3.Icon(
-                painter = androidx.compose.ui.res.painterResource(iconRes),
+                painter = painter,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(26.dp),

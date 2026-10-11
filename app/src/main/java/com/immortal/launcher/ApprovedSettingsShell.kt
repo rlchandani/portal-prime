@@ -268,7 +268,7 @@ internal fun ApprovedSettingsShell(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(14.dp),
                                     ) {
-                                        IconBadge(Color(0xFF527AB0), "", item.icon)
+                                        IconBadge(Color(0xFF527AB0), "", imageVector = approvedSettingsSidebarVector(item.icon))
                                         Text(item.title, color = if (selected) IosBlue else IosLabel,
                                             fontSize = 22.sp, lineHeight = 30.sp,
                                             fontWeight = if (selected) FontWeight.Medium else FontWeight.Normal)
