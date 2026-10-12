@@ -39,6 +39,7 @@ import java.util.TimeZone
  */
 object CalendarFeed {
   private const val TAG = "ImmortalCalendar"
+  private val feedReader = CalendarFeedReader(::httpGet)
 
 
   /** A single calendar occurrence, already resolved to absolute wall-clock millis. */
@@ -125,8 +126,7 @@ object CalendarFeed {
       horizonDays: Int = 45,
   ): List<Event> =
       runCatching {
-            val ics = httpGet(normalizeUrl(url)) ?: return emptyList()
-            parse(ics, nowMillis, horizonDays)
+            feedReader.fetch(url, nowMillis, horizonDays)
           }
           .onFailure { Log.w(TAG, "calendar fetch/parse failed for ${url.take(60)}", it) }
           .getOrDefault(emptyList())

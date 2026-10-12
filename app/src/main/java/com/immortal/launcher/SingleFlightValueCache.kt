@@ -14,8 +14,9 @@ internal class SingleFlightValueCache<K : Any, V : Any>(
     private val ttlMillis: Long,
     private val maxEntries: Int,
     private val nowMillis: () -> Long = { System.nanoTime() / 1_000_000L },
+    private val retainValue: (V) -> Boolean = { true },
 ) {
-  private data class Cached<V>(val value: V, val completedAt: Long)
+  private data class Cached<V>(val value: V, val completedAt: Long, val retain: Boolean)
   private val lock = Any()
   private val completed = LinkedHashMap<K, Cached<V>>(16, .75f, true)
   private val loading = HashMap<K, FutureTask<Cached<V>>>()
@@ -29,7 +30,10 @@ internal class SingleFlightValueCache<K : Any, V : Any>(
         if (age >= 0 && age < ttlMillis) return entry.value
         completed.remove(key)
       }
-      loading.getOrPut(key) { FutureTask { Cached(loader(), nowMillis()) } }
+      loading.getOrPut(key) { FutureTask {
+        val value = loader()
+        Cached(value, nowMillis(), retainValue(value))
+      } }
     }
     // FutureTask claims execution once; other callers wait without holding the map lock.
     task.run()
@@ -46,8 +50,10 @@ internal class SingleFlightValueCache<K : Any, V : Any>(
       // clear() may have detached this task and allowed a new owner for the same key.
       if (loading[key] === task) {
         loading.remove(key)
-        completed[key] = entry
-        while (completed.size > maxEntries) completed.remove(completed.keys.first())
+        if (entry.retain) {
+          completed[key] = entry
+          while (completed.size > maxEntries) completed.remove(completed.keys.first())
+        }
       }
     }
     return entry.value
