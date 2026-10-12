@@ -24,6 +24,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,12 +34,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import org.json.JSONObject
 
 class ChimeSettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,16 +71,60 @@ private fun ChimeSettingsScreen() {
 @Composable
 internal fun ChimeSettingsContent() {
   val context = LocalContext.current
-  var settings by remember { mutableStateOf(ChimeConfig.load(context)) }
+  val application = context.applicationContext
+  val writes = remember(application) { ChimeSettingsWrites.queue(application) }
+  var settings by remember(application) { mutableStateOf(ChimeConfig.load(application)) }
+  var saveState by remember { mutableStateOf(ChimeSaveState()) }
+  val applying = saveState.saving
+  val failed = saveState.failed
+  val completion = rememberCoroutineScope()
+  val lifecycleOwner = LocalLifecycleOwner.current
+  val pageActive = LocalApprovedLauncherPageActive.current
+  suspend fun readSnapshot() = withContext(Dispatchers.IO) { ChimeConfig.load(application) }
+  suspend fun publishAfterSave(revision: Int) {
+    try {
+      writes.awaitIdle()
+      val loaded = readSnapshot()
+      if (revision == saveState.revision) {
+        settings = loaded
+        saveState = saveState.completeRead(revision, writes.failureCount)
+      }
+    } catch (cancelled: CancellationException) { throw cancelled }
+    catch (_: Exception) { saveState = saveState.readFailed(revision) }
+  }
+  LaunchedEffect(application, lifecycleOwner, pageActive) {
+    if (!pageActive) return@LaunchedEffect
+    lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+      saveState = saveState.beginRefresh()
+      publishAfterSave(saveState.revision)
+    }
+  }
+  fun apply(key: String, value: Any) {
+    if (saveState.saving) return
+    saveState = saveState.beginEdit(writes.failureCount)
+    val revision = saveState.revision
+    writes.submit(key, value)
+    completion.launch { publishAfterSave(revision) }
+  }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       // Scalar controls (toggles, volumes, quiet times, sunrise sound) render from the `chime`
       // registry domain - the same specs the phone remote uses. Apply routes through the domain so
       // its onApplied (ChimeScheduler.reschedule) fires here too, not just from the remote.
-      SettingsList(SettingsDomains.chime, settings) { k, v ->
-        SettingsDomains.chime.apply(context, JSONObject().put(k, v))
-        settings = ChimeConfig.load(context)
+      Column(Modifier.semantics { contentDescription = when {
+        applying -> "Saving Sounds settings"
+        failed -> "Sounds save unavailable"
+        else -> "Sounds settings ready"
+      } }) {
+        FooterNote(when {
+          applying -> "Saving changes…"
+          failed -> "Some changes couldn't be saved. Try again."
+          else -> "Sounds respect your quiet hours."
+        })
       }
+
+      // Keep save feedback visible above the independently scrolling scalar list.
+      SettingsList(SettingsDomains.chime, settings, editsEnabled = !applying, onApply = ::apply)
 
       // Bespoke: voice picker + test buttons the registry can't model (TTS voice enumeration is
       // on-device only; test buttons are actions, not settings).

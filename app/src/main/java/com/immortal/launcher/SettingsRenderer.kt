@@ -294,7 +294,7 @@ private fun <S> SettingControl(
             }
             is IntSpec<*> -> {
                 val s = spec as IntSpec<S>
-                ApprovedIntSetting(s, s.get(snapshot), help) { onApply(s.key, it) }
+                ApprovedIntSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
             }
             is StringSpec<*> -> {
                 val s = spec as StringSpec<S>
@@ -353,11 +353,11 @@ private fun <S> WorkerNavigationRow(domainId: String, spec: NavSpec<S>, snapshot
 
 /** Numeric choices open the approved dialog; bounds/wrapping come exclusively from the spec. */
 @Composable
-private fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?, onApply: (Int) -> Unit) {
+private fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?, enabled: Boolean, onApply: (Int) -> Unit) {
     var open by remember { mutableStateOf(false) }
     var draft by remember(open, value) { mutableStateOf(value.toString()) }
     var error by remember(open) { mutableStateOf<String?>(null) }
-    NavRow(spec.title, spec.format(value)) { open = true }
+    NavRow(spec.title, spec.format(value), enabled = enabled) { open = true }
     if (open) {
         ApprovedSettingsDialog(spec.title, onDismiss = { open = false }, help = help) {
             if (spec.asText) {
@@ -381,7 +381,7 @@ private fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?, 
             }
             error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub) }
             Row(Modifier.padding(top = 24.dp)) {
-                ActionPill("Save") {
+                ActionPill("Save", enabled = enabled) {
                     val number = draft.toIntOrNull()
                     if (number == null || (!spec.wrap && number !in spec.min..spec.max)) {
                         error = "Enter a value from ${spec.min} to ${spec.max}."

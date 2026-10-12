@@ -331,13 +331,15 @@ internal fun NavRow(
     iconColor: Color = Color(0xFF636366),
     iconSymbol: String = "",
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = Sizes.rowMinHeight)
-            .tvFocusableRow(focusFill = IosFocusTint) { onClick() }
+            .then(if (enabled) Modifier.tvFocusableRow(focusFill = IosFocusTint, onClick = onClick)
+                else Modifier.semantics { disabled() })
             .padding(horizontal = 28.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -724,8 +726,8 @@ internal fun CardPillButton(label: String, color: Color = IosBlue, onClick: () -
 
 /** Approved primary action: a 68 dp target, 16 dp radius and 24 sp medium label. */
 @Composable
-internal fun ActionPill(label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    SettingsActionSurface(label, modifier, onClick)
+internal fun ActionPill(label: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+    SettingsActionSurface(label, modifier, onClick, enabled)
 }
 
 /** One accessible action for the full row, including its visible 68 dp action button. */
