@@ -81,7 +81,9 @@ let renderedOperations = null,
   operationsView = null,
   mediaView = null,
   appIconInventory = null,
-  appListView = null;
+  appListView = null,
+  navigationView = null,
+  headerKey = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -330,6 +332,12 @@ function persistRoster() {
 }
 function updateHeader() {
   const active = room();
+  $('refresh-button').disabled = !active;
+  const key = JSON.stringify([
+    active?.base, active?.name, connected, connectionState, data.companion?.model,
+  ]);
+  if (headerKey === key) return;
+  headerKey = key;
   $('room-button').replaceChildren(
     el('span', { class: 'room-label', text: active?.name || 'Choose a Portal' }),
     el('span', { 'aria-hidden': true, text: '⌄' }),
@@ -360,7 +368,6 @@ function updateHeader() {
         connectionState === 'expired' ? 'Pair again' : 'Retry',
       ),
     );
-  $('refresh-button').disabled = !active;
 }
 const api = createClient({
   fetch: (...args) => fetch(...args),
@@ -846,20 +853,29 @@ function loadVisible(force = false) {
     loadSettings();
   }
 }
+function renderNavigation() {
+  if (!navigationView) {
+    // Navigation owns no room snapshot: each action uses the current session.
+    navigationView = ['home', 'remote', 'photos', 'apps', 'settings'].map((name) => ({
+      name,
+      node: el('button', { onClick: () => go(name) }, glyph(name),
+        name[0].toUpperCase() + name.slice(1)),
+    }));
+    $('navigation').replaceChildren(...navigationView.map(({ node }) => node));
+  }
+  for (const { name, node } of navigationView) {
+    if (tab === name) {
+      if (node.getAttribute('aria-current') !== 'page') node.setAttribute('aria-current', 'page');
+    } else if (node.getAttribute('aria-current') != null) {
+      node.removeAttribute('aria-current');
+    }
+  }
+}
 function render() {
   operationsView = null,
   mediaView = null;
   updateHeader();
-  $('navigation').replaceChildren(
-    ...['home', 'remote', 'photos', 'apps', 'settings'].map((name) =>
-      el(
-        'button',
-        { 'aria-current': tab === name ? 'page' : undefined, onClick: () => go(name) },
-        glyph(name),
-        name[0].toUpperCase() + name.slice(1),
-      ),
-    ),
-  );
+  renderNavigation();
   page.setAttribute('aria-busy', 'false');
   if (!room()) {
     page.replaceChildren(

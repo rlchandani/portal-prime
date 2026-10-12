@@ -58,6 +58,12 @@ class Element {
   getAttribute(key) {
     return this.attrs[key];
   }
+  removeAttribute(key) {
+    delete this.attrs[key];
+    if (key.startsWith('data-'))
+      delete this.dataset[key.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())];
+    if (key === 'type') delete this.type;
+  }
   append(...children) {
     for (let child of children) {
       if (!(child instanceof Element)) child = this.doc.createTextNode(child);
