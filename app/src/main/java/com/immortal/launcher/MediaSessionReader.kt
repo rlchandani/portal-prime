@@ -157,41 +157,55 @@ object MediaSessionReader {
    * track, but the MA app's session has working transport — our relay is the fallback
    * that fills in the *other* rooms, where it's the only source.
    */
-  private fun reselect(controllers: List<MediaController>) {
-    fun isOwnRelay(c: MediaController) = c.packageName == appContext.packageName
-    // Prefer a PLAYING session (a real app over our own relay), and remember it.
-    val playing =
-        controllers
-            .filter { it.playbackState?.state == MediaPlaybackState.STATE_PLAYING }
-            .let { inState -> inState.firstOrNull { !isOwnRelay(it) } ?: inState.firstOrNull() }
-    val chosen =
-        if (playing != null) {
-          lastPlayingToken = playing.sessionToken
-          playing
-        } else {
-          // No one's playing: keep showing ONLY the session we last saw playing, now
-          // paused — never a stale paused session we never saw play.
-          controllers.firstOrNull {
-            it.playbackState?.state == MediaPlaybackState.STATE_PAUSED &&
-                it.sessionToken == lastPlayingToken
-          }
+  internal data class SelectedSession(
+      val controller: MediaController,
+      val playbackState: MediaPlaybackState?,
+  )
+
+  /** Select the real player before our relay; only resume a previously playing paused session. */
+  internal fun selectSession(
+      controllers: List<MediaController>, ownPackage: String, previousToken: MediaSession.Token?,
+  ): SelectedSession? {
+    var firstPlaying: SelectedSession? = null
+    var firstExternalPlaying: SelectedSession? = null
+    var previousPaused: SelectedSession? = null
+    for (controller in controllers) {
+      // MediaController reads can cross Binder. Keep one fresh value for this refresh.
+      val playback = controller.playbackState
+      when (playback?.state) {
+        MediaPlaybackState.STATE_PLAYING -> {
+          if (firstPlaying == null) firstPlaying = SelectedSession(controller, playback)
+          if (firstExternalPlaying == null && controller.packageName != ownPackage)
+            firstExternalPlaying = if (firstPlaying.controller === controller) firstPlaying
+                else SelectedSession(controller, playback)
         }
-    active = chosen
-    Log.i(
-        TAG,
-        "sessions=${controllers.size} chosen=${chosen?.packageName} state=${chosen?.playbackState?.state}")
-    if (chosen != null) publishFrom(chosen) else NowPlayingHub.publish(null)
+        MediaPlaybackState.STATE_PAUSED -> {
+          if (previousPaused == null && previousToken != null && controller.sessionToken == previousToken)
+            previousPaused = SelectedSession(controller, playback)
+        }
+      }
+    }
+    return firstExternalPlaying ?: firstPlaying ?: previousPaused
   }
 
-  /** Map a controller's metadata + playback state into a [NowPlayingState] and publish. */
-  private fun publishFrom(c: MediaController) {
-    NowPlayingHub.publish(snapshotFrom(c))
+  private fun reselect(controllers: List<MediaController>) {
+    val selection = selectSession(controllers, appContext.packageName, lastPlayingToken)
+    val chosen = selection?.controller
+    if (selection?.playbackState?.state == MediaPlaybackState.STATE_PLAYING)
+      lastPlayingToken = chosen?.sessionToken
+    active = chosen
+    Log.i(TAG, "sessions=${controllers.size} chosen=${chosen?.packageName} state=${selection?.playbackState?.state}")
+    if (selection != null) NowPlayingHub.publish(snapshotFrom(selection)) else NowPlayingHub.publish(null)
   }
+
+  internal fun snapshotFrom(selection: SelectedSession): NowPlayingState =
+      snapshotFrom(selection.controller, selection.playbackState)
 
   /** Read an immutable snapshot without publishing or retaining the controller. */
-  internal fun snapshotFrom(c: MediaController): NowPlayingState {
+  internal fun snapshotFrom(c: MediaController): NowPlayingState = snapshotFrom(c, c.playbackState)
+
+  private fun snapshotFrom(c: MediaController, ps: MediaPlaybackState?): NowPlayingState {
     val md = c.metadata
-    val ps = c.playbackState
     val state =
         when (ps?.state) {
           MediaPlaybackState.STATE_PLAYING,
