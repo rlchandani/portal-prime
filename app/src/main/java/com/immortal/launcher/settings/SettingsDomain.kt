@@ -34,6 +34,8 @@ class SettingsDomain<S>(
     val defaults: (() -> S)? = null,
     /** When true, the on-device renderer batches edits behind an explicit Apply (e.g. MQTT). */
     val explicitApply: Boolean = false,
+    /** Opt-in request source; bind [load] to this source's load for identical native/remote reads. */
+    val schemaSnapshotSource: SettingsSnapshotSource<S>? = null,
     val onApplied: (Context, Set<String>) -> Unit = { _, _ -> },
 ) {
   /** The flat legacy wire payload — every spec's current value. Pure over the snapshot. */
@@ -46,8 +48,14 @@ class SettingsDomain<S>(
   fun flatJson(c: Context): JSONObject = flatJson(load(c))
 
   /** The self-describing schema (visible controls + their metadata/values) for a generic renderer. */
-  fun schemaJson(c: Context): JSONObject {
-    val s = load(c)
+  fun schemaJson(c: Context): JSONObject = schemaJson(c, load(c))
+
+  internal fun schemaJson(c: Context, request: SettingsSchemaRequest): JSONObject {
+    val source = schemaSnapshotSource
+    return schemaJson(c, if (source != null) request.load(source) else load(c))
+  }
+
+  private fun schemaJson(c: Context, s: S): JSONObject {
     val defJson = defaults?.let { flatJson(it()) }
     val controls = JSONArray()
     specs.forEach { spec ->
@@ -108,9 +116,12 @@ object SettingsRegistry {
   fun domain(id: String): SettingsDomain<*>? = domains.firstOrNull { it.id == id }
 
   /** Every domain's schema, for a client that renders all settings generically. */
-  fun schemaJson(c: Context): JSONObject {
+  fun schemaJson(c: Context): JSONObject = schemaJson(c, domains)
+
+  internal fun schemaJson(c: Context, domains: List<SettingsDomain<*>>): JSONObject {
+    val request = SettingsSchemaRequest(c)
     val arr = JSONArray()
-    domains.forEach { arr.put(it.schemaJson(c)) }
+    domains.forEach { arr.put(it.schemaJson(c, request)) }
     return JSONObject().put("domains", arr)
   }
 

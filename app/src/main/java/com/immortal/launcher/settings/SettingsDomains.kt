@@ -47,6 +47,8 @@ import org.json.JSONArray
  */
 object SettingsDomains {
 
+  private val screensaverSchemaSource = SettingsSnapshotSource(ScreensaverConfig::load)
+
   private val CAL_SIZE_LABELS = listOf("Small", "Medium", "Large")
 
   private fun rangeLabel(range: String): String =
@@ -70,7 +72,8 @@ object SettingsDomains {
       SettingsDomain(
           id = "calendar",
           title = "Calendar",
-          load = ScreensaverConfig::load,
+          load = screensaverSchemaSource::load,
+          schemaSnapshotSource = screensaverSchemaSource,
           specs =
               listOf(
                   BoolSpec(
@@ -180,7 +183,8 @@ object SettingsDomains {
       SettingsDomain(
           id = "screensaver",
           title = "Screensaver",
-          load = ScreensaverConfig::load,
+          load = screensaverSchemaSource::load,
+          schemaSnapshotSource = screensaverSchemaSource,
           specs =
               listOf(
                   BoolSpec(
