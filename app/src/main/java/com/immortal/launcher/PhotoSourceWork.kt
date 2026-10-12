@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.net.SocketFactory
 
@@ -49,6 +51,15 @@ internal object PhotoSourceWork {
             closers.toList().asReversed().forEach { runCatching { it() } }
             closers.clear()
         }
+    }
+
+    /** Only immutable in-memory snapshots may be checked outside the blocking photo worker. */
+    suspend fun <T> cachedOrLoad(cached: () -> T?, block: () -> T?): T? {
+        val caller = currentCoroutineContext()
+        caller.ensureActive()
+        val snapshot = cached()
+        caller.ensureActive()
+        return snapshot ?: load(block)
     }
 
     suspend fun <T> load(block: () -> T?): T? = suspendCancellableCoroutine { continuation ->

@@ -81,13 +81,13 @@ internal fun ApprovedHomePhoto(modifier: Modifier = Modifier, onEnterEdit: (() -
   val loadingContext = context.applicationContext
   // A source change gets its own image state; failed refreshes of that source retain its image.
   val photo by key(sourceSettings, owner) {
-    produceState<Bitmap?>(null) {
+    produceState<Bitmap?>(ApprovedHomePhotoCache.get(sourceSettings)?.bitmap) {
       owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
         if (sourceSettings.usesWebUrl) return@repeatOnLifecycle
         var failures = 0
         while (currentCoroutineContext().isActive) {
           // Cancellation is checked before the shared cache write as well as UI publication.
-          val result = PhotoSourceWork.load {
+          val result = PhotoSourceWork.cachedOrLoad({ ApprovedHomePhotoCache.get(sourceSettings) }) {
             PhotoSourceWork.checkpoint()
             ApprovedHomePhotoCache.get(sourceSettings) ?: loadApprovedHomePhoto(loadingContext, sourceSettings)?.let { bitmap ->
               PhotoSourceWork.checkpoint()
