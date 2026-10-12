@@ -49,6 +49,16 @@ a new issue clock and must not reopen an expired Alarm or Clock trial.
   count and H/S/P flag consistency checks through `compare_profiles.load_audit`.
 - The bundled and reference inventories must match in every resolved method row,
   class row, H/S/P flag and DEX checksum. Different frozen APKs cannot match.
+- SDK `load_audit` returns five fields: proof, DEX checksums, method rows, class rows,
+  and raw inventory-file hashes. Use `assert_profile_inventory_equivalent` for the
+  canonical pair comparison, including the admitted counts when the caller has them.
+  Do not compare `bundled[1:] == reference[1:]`: raw TSV hashes can differ because
+  Android names the primary DEX profile key `base.apk`, while the bundled input names
+  it `classes.dex`. The SDK normalizes that key; all other row metadata remains part
+  of equality. Both raw hash dictionaries are recorded as `rawInventorySha256` and
+  retain their own integrity role. A hash is never replaced with the other side's hash.
+  This native gate retains its existing nonempty DEX/method/class inventories and
+  positive hot application-method requirements; it is not a general method-only profile checker.
 - The legacy six-symbol Settings coverage checklist is retained and reported
   separately. Mapper exit 1 is accepted only when its complete audit is valid
   and the full pair comparison succeeds. `legacyCoverageGatePassed: false`
@@ -66,6 +76,34 @@ checks. Offline equality proves resolved methods/classes/flags, not raw profile
 or inline-cache equality, individual method compilation, execution, UI behaviour
 or performance. It cannot turn a parked source change into a shipped fix.
 
+## Native caller integration
+
+After a successful `validate_profiles` result, use the shared comparison instead of
+adding filename-sensitive raw-hash equality:
+
+```python
+counts = assert_profile_inventory_equivalent(
+    load_audit(output / "bundled"),
+    load_audit(output / "reference"),
+    admitted_apk_sha256,
+    admitted_profile_counts,
+)
+```
+
+The caller still pins both inventory files independently in its frozen evidence.
+Historical admissions and helpers remain immutable. A future driver must preserve
+its baseline's validator bytes in an immutable snapshot if the old admission pinned
+an earlier validator; it must not silently substitute the new script into that proof.
+
+The concrete false rejection was reproduced against the captured Photo Clock
+candidate and its accepted rollback: both had equal canonical inventories and only
+the `profile_key` column changed. The counts were 8,674 methods / 2,577 classes and
+8,667 methods / 2,576 classes respectively. Offline verification does not reopen
+that parked device trial or prove its unexecuted Settings checks.
+
+The filename rewrite is documented in AndroidX's
+[ProfileTranscoder implementation](https://android.googlesource.com/platform/frameworks/support/+/e32d7e45d2b7d50888276ac58767b362bc46c538%5E%21/).
+
 ## Tests and bounded verification
 
 ```bash
@@ -75,6 +113,11 @@ python3 -B -m unittest discover -s scripts -p 'test_*.py' -v
 The focused regressions cover private work-directory placement, unique runs,
 historical evidence preservation, invalid input hashes, exclusive v010 inputs,
 size boundaries, selective metadata relocation and process-group deadlines.
+The canonical-equivalence extension adds 28 tests, bringing the focused profile-tool
+suite to 44 tests. It covers filename-sensitive raw hashes, altered rows/flags/checksums,
+strict integer proofs, incorrect input identities, malformed method fields and expected counts.
+The final full-wrapper replay verifies both captured pairs with no device operations.
+
 The recorded local integration run also used the captured accepted APK and its
 own reference profile, rejected a reference captured from the different Clock
 APK, and revalidated both archives while the original private scratch directory

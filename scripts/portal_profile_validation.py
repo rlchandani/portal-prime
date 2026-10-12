@@ -140,6 +140,73 @@ def checked_audit(load_audit, folder, apk_sha256, kind, profile_sha256=None):
     return audit
 
 
+def assert_profile_inventory_equivalent(bundled, reference, apk_sha256, expected_counts=None):
+    """Compare validated SDK inventories; filename-sensitive raw hashes stay separate.
+
+    Inputs are the five-field results of SDK load_audit, which validates each binary
+    snapshot, DEX mapping, and inventory file. profile_key aliases are normalized by
+    that reader; canonical rows retain descriptors, flags, and namespace metadata.
+    """
+    require(isinstance(apk_sha256, str) and re.fullmatch("[a-f0-9]{64}", apk_sha256),
+            "Invalid expected APK SHA-256")
+    inventories = []
+    for audit, kind in ((bundled, "apk_bundled_profile"), (reference, "provided_art_profile")):
+        require(isinstance(audit, (tuple, list)) and len(audit) == 5,
+                "Expected the SDK five-field audit")
+        proof, crc, methods, classes, hashes = audit
+        require(isinstance(proof, dict) and proof.get("apkSha256") == apk_sha256 and
+                proof.get("decoder_status") == "ok" and proof.get("dex_mapping_status") == "validated",
+                "Audit APK or decoder/DEX proof mismatch")
+        identity = proof.get("profileInput")
+        require(isinstance(identity, dict) and identity.get("kind") == kind and identity.get("version") == "010",
+                "Audit input kind or version mismatch")
+        require(all(isinstance(value, dict) and value for value in (crc, methods, classes)),
+                "Empty or malformed canonical inventory")
+        require(all(isinstance(dex, str) and re.fullmatch(r"classes(?:[2-9]|[1-9][0-9]+)?\.dex", dex) and
+                    isinstance(row, tuple) and len(row) == 2 and isinstance(row[0], str) and
+                    re.fullmatch("[a-f0-9]{8}", row[0]) and type(row[1]) is int and 0 <= row[1] <= 65536
+                    for dex, row in crc.items()), "Malformed DEX checksum inventory")
+        require(all(isinstance(proof.get(key), dict) and set(proof[key]) == {"H", "S", "P"} and
+                    all(type(value) is int and value >= 0 for value in proof[key].values())
+                    for key in ("profileMethodFlagCounts", "appMethodFlagCounts")),
+                "Malformed profile flag-count proof")
+        require(isinstance(hashes, dict) and set(hashes) ==
+                {"all-profile-methods.tsv", "all-profile-classes.tsv"} and
+                all(isinstance(value, str) and re.fullmatch("[a-f0-9]{64}", value) for value in hashes.values()),
+                "Malformed raw inventory hashes")
+        require(all(isinstance(row, tuple) and len(row) == 7 and
+                    all(isinstance(value, str) and value for value in row[:3]) and
+                    type(row[3]) is int and 1 <= row[3] <= 7 and
+                    row[4] == "".join(flag for bit, flag in ((1, "H"), (2, "S"), (4, "P")) if row[3] & bit) and
+                    row[5] is True and type(row[6]) is bool for row in methods.values()) and
+                all(isinstance(row, tuple) and len(row) == 3 and isinstance(row[0], str) and row[0] and
+                    row[1] is True and type(row[2]) is bool for row in classes.values()),
+                "Undefined or malformed inventory row")
+        counts = dict(methods=len(methods), classes=len(classes),
+                      appMethods=sum(row[6] for row in methods.values()),
+                      appClasses=sum(row[2] for row in classes.values()))
+        require(type(proof.get("profile_method_entries")) is int and
+                proof["profile_method_entries"] == counts["methods"] and
+                type(proof.get("profile_class_entries")) is int and
+                proof["profile_class_entries"] == counts["classes"], "Profile entry counts differ")
+        for bit, flag in ((1, "H"), (2, "S"), (4, "P")):
+            require(proof.get("profileMethodFlagCounts", {}).get(flag) ==
+                    sum(bool(row[3] & bit) for row in methods.values()) and
+                    proof.get("appMethodFlagCounts", {}).get(flag) ==
+                    sum(bool(row[3] & bit) for row in methods.values() if row[6]),
+                    "Profile flag counts differ")
+        require(counts["appMethods"] > 0 and proof["appMethodFlagCounts"]["H"] == counts["appMethods"],
+                "Application hot-method proof missing")
+        inventories.append(counts)
+    require(bundled[1:4] == reference[1:4] and inventories[0] == inventories[1],
+            "Canonical profile inventories differ")
+    if expected_counts is not None:
+        require(isinstance(expected_counts, dict) and set(expected_counts) == set(inventories[0]) and
+                all(type(value) is int and value >= 0 for value in expected_counts.values()) and
+                expected_counts == inventories[0], "Expected profile counts differ")
+    return inventories[0]
+
+
 def validate_profiles(tool_root, apk, apk_sha256, reference_profile,
                       reference_sha256, output_dir, timeout_seconds=180):
     require(math.isfinite(timeout_seconds) and timeout_seconds > 0, "Deadline must be finite and positive")
@@ -183,6 +250,10 @@ def validate_profiles(tool_root, apk, apk_sha256, reference_profile,
         require(equality.get("apkSha256") == apk_sha256 and all(equality.get(key) is True for key in
                 ("setEquivalent", "dexChecksumSetsEquivalent", "methodRowSetEquivalent", "classRowSetEquivalent")),
                 "Full profile inventories or DEX checksums differ")
+        canonical_counts = assert_profile_inventory_equivalent(
+            audits["bundled"], audits["reference"], apk_sha256)
+        report["canonicalInventoryEquivalent"] = True
+        report["rawInventorySha256"] = {label: audits[label][4] for label in ("bundled", "reference")}
         for label in ("bundled", "reference"):
             time_left(deadline)
             report["archive"][label] = archive_audit(work / label, output / label, load_audit)
@@ -194,8 +265,8 @@ def validate_profiles(tool_root, apk, apk_sha256, reference_profile,
         time_left(deadline)
         report.update({"status": "VERIFIED", "exitCodes": codes,
                        "fullInventoryEquivalent": True,
-                       "profileMethods": len(audits["reference"][2]),
-                       "profileClasses": len(audits["reference"][3]),
+                       "profileMethods": canonical_counts["methods"],
+                       "profileClasses": canonical_counts["classes"],
                        "legacyCoverageGatePassed": {label: audits[label][0]["candidateCoverageGatePassed"]
                                                     for label in ("bundled", "reference")},
                        "limitation": equality["limitation"]})
