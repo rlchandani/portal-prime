@@ -32,19 +32,32 @@ object Weather {
   // datacenter city) or a relocated Portal self-corrects instead of being wrong forever.
   private const val LOCATION_TTL_MS = 7L * 24 * 60 * 60 * 1000 // 7 days
 
+  internal data class Conditions(val temp: Int, val code: Int)
+  // Independent header/card/frame readers share brief current conditions, never failures.
+  private val currentConditions = SingleFlightValueCache<String, Conditions>(30_000L, 4)
+
+  private fun conditions(context: Context): Conditions? {
+    val (lat, lon) = location(context) ?: return null
+    val url = currentUrl(lat, lon, ImmortalSettings.useFahrenheit(context))
+    return currentConditions.get(url) { parseCurrent(httpGet(url)) }
+  }
+
+  internal fun currentUrl(lat: Double, lon: Double, fahrenheit: Boolean): String {
+    val unit = if (fahrenheit) "fahrenheit" else "celsius"
+    return "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
+        "&current=temperature_2m,weather_code&temperature_unit=$unit"
+  }
+
+  internal fun parseCurrent(json: String): Conditions {
+    val current = JSONObject(json).getJSONObject("current")
+    return Conditions(current.getDouble("temperature_2m").roundToInt(), current.getInt("weather_code"))
+  }
+
   /** Returns e.g. "☀️ 72°", or "" if it can't be fetched (caller can retry). */
   fun fetch(context: Context): String =
       runCatching {
-            val (lat, lon) = location(context) ?: return ""
-            // °F or °C per the user's setting (default: follow the device locale).
-            val unit = if (ImmortalSettings.useFahrenheit(context)) "fahrenheit" else "celsius"
-            val w =
-                JSONObject(
-                    httpGet(
-                        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
-                            "&current=temperature_2m,weather_code&temperature_unit=$unit"))
-            val cur = w.getJSONObject("current")
-            "${emoji(cur.getInt("weather_code"))} ${cur.getDouble("temperature_2m").roundToInt()}°"
+            val current = conditions(context) ?: return ""
+            "${emoji(current.code)} ${current.temp}°"
           }
           .getOrDefault("")
 
@@ -99,6 +112,7 @@ object Weather {
   fun clearLocationCache(context: Context) {
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit().remove("lat").remove("lon").remove("city").remove("resolved_at").apply()
+    currentConditions.clear()
   }
 
   /** Today's sunrise/sunset as epoch millis (location-local, which on a fixed Portal
@@ -137,19 +151,8 @@ object Weather {
 
   fun fetchCurrent(context: Context): Current? =
       runCatching {
-            val (lat, lon) = location(context) ?: return null
-            val unit = if (ImmortalSettings.useFahrenheit(context)) "fahrenheit" else "celsius"
-            val w =
-                JSONObject(
-                    httpGet(
-                        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
-                            "&current=temperature_2m,weather_code&temperature_unit=$unit"))
-            val cur = w.getJSONObject("current")
-            Current(
-                city = cachedCity(context),
-                temp = cur.getDouble("temperature_2m").roundToInt(),
-                code = cur.getInt("weather_code"),
-            )
+            val current = conditions(context) ?: return null
+            Current(city = cachedCity(context), temp = current.temp, code = current.code)
           }
           .getOrNull()
 
