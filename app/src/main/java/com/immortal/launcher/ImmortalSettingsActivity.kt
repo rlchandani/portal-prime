@@ -370,14 +370,15 @@ private fun ApprovedNativeSettingsPage(page: String) {
   val context = LocalContext.current
   val navigate = rememberApprovedSettingsNavigator()
   val back = rememberApprovedSettingsBack()
-  var immortal by remember { mutableStateOf(ImmortalSettings.load(context)) }
-  var ss by remember { mutableStateOf(ScreensaverConfig.load(context)) }
+  val application = context.applicationContext
+  val immortal = remember(application) { DeferredSettingsSnapshot { ImmortalSettings.load(application) } }
+  val ss = remember(application) { DeferredSettingsSnapshot { ScreensaverConfig.load(application) } }
   val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
+  DisposableEffect(lifecycleOwner, immortal, ss) {
     val observer = LifecycleEventObserver { _, event ->
       if (event == Lifecycle.Event.ON_RESUME) {
-        immortal = ImmortalSettings.load(context)
-        ss = ScreensaverConfig.load(context)
+        immortal.refreshIfLoaded()
+        ss.refreshIfLoaded()
       }
     }
     lifecycleOwner.lifecycle.addObserver(observer)
@@ -385,7 +386,7 @@ private fun ApprovedNativeSettingsPage(page: String) {
   }
   fun applyImmortal(key: String, value: Any) {
     SettingsDomains.immortal.apply(context, JSONObject().put(key, value))
-    immortal = ImmortalSettings.load(context)
+    immortal.refreshIfLoaded()
   }
   when (page) {
     "display" -> DisplaySection()
@@ -422,18 +423,18 @@ private fun ApprovedNativeSettingsPage(page: String) {
       val onApply: (String, Any) -> Unit = { k, v -> applyImmortal(k, v) }
       if (BuildConfig.PORTAL_SETTINGS_DIRECT_APPEARANCE_ROWS) {
         // Keep the retained detail's existing scroll owner; avoid a second list for these rows.
-        SettingsRows(domain, immortal, exclude, onApply)
+        SettingsRows(domain, immortal.value, exclude, onApply)
       } else {
-        SettingsList(domain, immortal, exclude, onApply = onApply)
+        SettingsList(domain, immortal.value, exclude, onApply = onApply)
       }
     }
-    "weather" -> SettingsList(SettingsDomains.immortal, immortal,
+    "weather" -> SettingsList(SettingsDomains.immortal, immortal.value,
         exclude = SettingsDomains.immortal.specs.map { it.key }.toSet() -
             setOf("weatherUnit", "weatherWidget")) { k, v -> applyImmortal(k, v) }
     "wallpaper" -> WallpaperSection()
-    "calendar" -> SettingsList(SettingsDomains.calendar, ss) { k, v ->
+    "calendar" -> SettingsList(SettingsDomains.calendar, ss.value) { k, v ->
       SettingsDomains.calendar.apply(context, JSONObject().put(k, v))
-      ss = ScreensaverConfig.load(context)
+      ss.refreshIfLoaded()
     }
     "quickbar" -> QuickButtonsSection()
     "touch" -> ApprovedTouchSounds()
