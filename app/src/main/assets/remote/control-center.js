@@ -2250,6 +2250,7 @@ async function loadPhotos() {
     `/remote/photos?path=${encodeURIComponent(path)}${recursive ? '&recursive=1' : ''}`,
     (r) => {
       data.photos = photoListing(r, recursive);
+      data.photoMetadataRevision = (data.photoMetadataRevision || 0) + 1;
       if (data.photos.all) data.photoFolders = data.photos.folders;
       else if (data.photoFolders?.length) data.photos.folders = data.photoFolders;
       photoPageIndex = Math.min(
@@ -2269,8 +2270,23 @@ function freeSpace(bytes) {
     ? `${(bytes / 1073741824).toLocaleString(undefined, { maximumFractionDigits: 1 })} GB`
     : `${Math.floor(bytes / 1048576)} MB`;
 }
+function photoThumbnailKey(file, ticket) {
+  const versioned = Number.isFinite(file.size) && Number.isFinite(file.modified);
+  // Legacy listings without a complete version are safe only until the next
+  // accepted metadata read. Pairing tokens never form part of the cache identity.
+  return JSON.stringify([
+    ticket.room.base,
+    file.path,
+    file.size ?? null,
+    file.modified ?? null,
+    versioned ? null : data.photoMetadataRevision,
+  ]);
+}
 function photosPage() {
   const info = data.photos;
+  const files = info && !data.photosError ? photoPage(info.files, photoPageIndex) : [];
+  const ticket = session.capture();
+  thumbs.retain(files.map((file) => photoThumbnailKey(file, ticket)));
   const controls = group(
     segmented(
       photosAll ? 'all' : 'folder',
@@ -2414,9 +2430,6 @@ function photosPage() {
   else if (!info.files.length)
     gallery = empty('No photos here', 'Import photos or choose another folder.');
   else {
-    thumbs.clear();
-    const files = photoPage(info.files, photoPageIndex),
-      ticket = session.capture();
     gallery = sections(
       el(
         'div',
@@ -2485,7 +2498,7 @@ function photoTile(file, ticket) {
   );
   const load = () =>
     thumbs.add(
-      file.path,
+      photoThumbnailKey(file, ticket),
       (signal) =>
         api(ticket.room, `/remote/photo?path=${encodeURIComponent(file.path)}&thumbnail=1`, {
           blob: true,

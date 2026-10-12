@@ -238,16 +238,48 @@ export class ImagePool {
     return this.entries.size;
   }
   add(key, load, deliver, onError = () => {}) {
-    if (this.entries.has(key)) return this.entries.get(key).promise;
+    let entry = this.entries.get(key);
+    if (entry) {
+      // Rebuilt DOM nodes replace the consumer, including while a load is pending.
+      entry.consumer = { deliver, onError };
+      if (entry.url) this.notify(key, entry);
+      return entry.promise;
+    }
     if (this.entries.size >= this.limit) return Promise.resolve(false);
-    const entry = { epoch: this.epoch, controller: new AbortController(), url: null };
+    entry = {
+      epoch: this.epoch,
+      controller: new AbortController(),
+      url: null,
+      consumer: { deliver, onError },
+    };
     entry.promise = new Promise((resolve) => {
       entry.resolve = resolve;
     });
     this.entries.set(key, entry);
-    this.queue.push({ key, entry, load, deliver, onError });
+    this.queue.push({ key, entry, load });
     this.pump();
     return entry.promise;
+  }
+  owns(key, entry) {
+    return (
+      entry.epoch === this.epoch &&
+      this.entries.get(key) === entry &&
+      !entry.controller.signal.aborted
+    );
+  }
+  notify(key, entry, failed = false, error = null) {
+    // Rendering attaches the new node before this runs. Never capture a DOM callback
+    // here: only the latest consumer belongs to this entry, and release drops it.
+    queueMicrotask(() => {
+      if (!this.owns(key, entry)) return;
+      const consumer = entry.consumer;
+      entry.consumer = null;
+      if (failed) this.entries.delete(key);
+      if (consumer) {
+        if (failed) consumer.onError(error);
+        else consumer.deliver(entry.url);
+      }
+    });
   }
   pump() {
     while (this.live < this.concurrency && this.queue.length) {
@@ -256,40 +288,45 @@ export class ImagePool {
       this.run(task);
     }
   }
-  async run({ key, entry, load, deliver, onError }) {
+  async run({ key, entry, load }) {
     try {
       const blob = await load(entry.controller.signal);
       const url = this.create(blob);
-      if (
-        entry.epoch !== this.epoch ||
-        this.entries.get(key) !== entry ||
-        entry.controller.signal.aborted
-      )
-        this.revoke(url);
+      if (!this.owns(key, entry)) this.revoke(url);
       else {
         entry.url = url;
-        deliver(url);
+        this.notify(key, entry);
       }
     } catch (error) {
-      if (entry.epoch === this.epoch && !entry.controller.signal.aborted) {
-        this.entries.delete(key);
-        onError(error);
-      }
+      if (this.owns(key, entry)) this.notify(key, entry, true, error);
     } finally {
+      // Aborting a request does not free its slot until the loader settles.
       this.live--;
       entry.resolve(true);
       this.pump();
     }
   }
-  clear() {
-    this.epoch++;
-    for (const entry of this.entries.values()) {
+  retain(keys) {
+    const keep = new Set(keys);
+    for (const [key, entry] of this.entries) {
+      if (keep.has(key)) continue;
+      this.entries.delete(key);
+      entry.consumer = null;
       entry.controller.abort();
-      if (entry.url) this.revoke(entry.url);
+      if (entry.url) {
+        this.revoke(entry.url);
+        entry.url = null;
+      }
     }
-    for (const { entry } of this.queue) entry.resolve(false);
-    this.queue = [];
-    this.entries.clear();
+    this.queue = this.queue.filter(({ key, entry }) => {
+      if (this.owns(key, entry)) return true;
+      entry.resolve(false);
+      return false;
+    });
+  }
+  clear() {
+    this.retain([]);
+    this.epoch++;
   }
 }
 // Shared across every settings apply, independent of the active room or page.
