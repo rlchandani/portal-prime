@@ -196,17 +196,17 @@ object CalendarFeed {
 
   private fun evaluateDocument(document: PreparedDocument, nowMillis: Long, horizonDays: Int): List<Event> {
     val horizonEnd = nowMillis + horizonDays * 24L * 60 * 60 * 1000
-    val out = ArrayList<Event>()
+    val out = CalendarOccurrenceSelection<Event>(500)
     for (event in document.events) {
       val starts = if (event.rrule.isNullOrBlank()) listOf(event.start)
           else expandRecurrence(event.start, event.rrule, event.exdates, horizonEnd)
       for (start in starts) {
         val end = start + event.duration
         if (end < nowMillis || start > horizonEnd) continue
-        out.add(Event(start, end, event.title, event.allDay, event.location))
+        out.offer(start) { Event(start, end, event.title, event.allDay, event.location) }
       }
     }
-    return out.sortedBy { it.startMillis }.take(500)
+    return out.result()
   }
 
   /**
