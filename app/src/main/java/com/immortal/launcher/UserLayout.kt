@@ -26,12 +26,20 @@ object UserLayout {
   private const val KEY_GRID_ORDER = "grid_order"
   private const val KEY_GRID_SLOTS = "grid_slots"
 
+  private val assignmentSnapshot =
+      ParsedLayoutSnapshot<Map<String, String>>(emptyMap(), ::deserialize)
+  private val homeOrderSnapshot =
+      ParsedLayoutSnapshot<List<String>>(emptyList(), ::deserializeOrder)
+  private val gridOrderSnapshot =
+      ParsedLayoutSnapshot<List<String>>(emptyList(), ::deserializeOrder)
+  private val gridSlotsSnapshot =
+      ParsedLayoutSnapshot<List<String?>>(emptyList(), ::deserializeSlots)
+
   /** package id -> folder name (user override). */
   fun load(context: Context): Map<String, String> {
     val raw =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null)
-            ?: return emptyMap()
-    return deserialize(raw)
+    return assignmentSnapshot.read(raw)
   }
 
   fun save(context: Context, assignments: Map<String, String>) {
@@ -46,8 +54,7 @@ object UserLayout {
   fun loadOrder(context: Context): List<String> {
     val raw =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_ORDER, null)
-            ?: return emptyList()
-    return deserializeOrder(raw)
+    return homeOrderSnapshot.read(raw)
   }
 
   fun saveOrder(context: Context, order: List<String>) {
@@ -66,8 +73,7 @@ object UserLayout {
   fun loadGridOrder(context: Context): List<String> {
     val raw =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_GRID_ORDER, null)
-            ?: return emptyList()
-    return deserializeOrder(raw)
+    return gridOrderSnapshot.read(raw)
   }
 
   fun saveGridOrder(context: Context, order: List<String>) {
@@ -85,8 +91,7 @@ object UserLayout {
   fun loadGridSlots(context: Context): List<String?> {
     val raw =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_GRID_SLOTS, null)
-            ?: return emptyList()
-    return deserializeSlots(raw)
+    return gridSlotsSnapshot.read(raw)
   }
 
   fun saveGridSlots(context: Context, slots: List<String?>) {
