@@ -83,7 +83,8 @@ let renderedOperations = null,
   appIconInventory = null,
   appListView = null,
   navigationView = null,
-  headerKey = null;
+  headerKey = null,
+  searchComposition = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -211,6 +212,60 @@ function field(
     input,
     help ? text(help) : null,
   );
+}
+// Replacing a focused input discards the keyboard's unfinished composition.
+// Hold only the search render until commitment; page/room/expiry changes bypass it.
+function cancelSearchComposition() {
+  if (searchComposition?.timer != null) clearTimeout(searchComposition.timer);
+  searchComposition = null;
+}
+function searchField(label, value, onInput, options) {
+  const ticket = session.capture();
+  let input, unfocusedComposition = false;
+  const current = () => session.current(ticket) && input.isConnected &&
+    !document.hidden && connectionState !== 'expired';
+  const row = field(label, value, (next) => {
+    if (!current()) return;
+    onInput(next);
+    if (!unfocusedComposition || document.activeElement === input) render();
+  }, options);
+  input = row.querySelector('input');
+  const commit = () => {
+    const owner = searchComposition;
+    if (!owner || owner.input !== input || !current()) return;
+    onInput(input.value);
+    if (document.activeElement !== input) {
+      unfocusedComposition = true;
+      cancelSearchComposition();
+      return;
+    }
+    render();
+    if (searchComposition !== owner) return;
+    if (owner.timer != null) clearTimeout(owner.timer);
+    // compositionend may precede the final input event: coalesce both events.
+    owner.timer = setTimeout(() => {
+      if (searchComposition !== owner) return;
+      const shouldRender = owner.pending && current();
+      cancelSearchComposition();
+      if (shouldRender) render();
+    }, 0);
+  };
+  input.addEventListener('compositionstart', () => {
+    if (!current()) return;
+    const pending = searchComposition?.input === input && searchComposition.pending;
+    cancelSearchComposition();
+    searchComposition = { input, ticket, pending: !!pending, timer: null };
+  });
+  input.addEventListener('compositionend', commit);
+  input.addEventListener('blur', () => {
+    if (searchComposition?.input !== input) return;
+    // Keep a pending pointer activation connected; its own handler renders.
+    if (current()) onInput(input.value);
+    unfocusedComposition = true;
+    cancelSearchComposition();
+  });
+  input.addEventListener('focus', () => { unfocusedComposition = false; });
+  return row;
 }
 function checkbox(label, checked, onChange) {
   return el(
@@ -872,6 +927,16 @@ function renderNavigation() {
   }
 }
 function render() {
+  if (searchComposition) {
+    const owner = searchComposition;
+    if (session.current(owner.ticket) && owner.input.isConnected &&
+        document.activeElement === owner.input && !document.hidden &&
+        connectionState !== 'expired') {
+      owner.pending = true;
+      return;
+    }
+    cancelSearchComposition();
+  }
   operationsView = null,
   mediaView = null;
   updateHeader();
@@ -1462,12 +1527,11 @@ async function loadSettings() {
 function settingsPage() {
   const schema = data.settings;
   const filters = group(
-    field(
+    searchField(
       'Search settings',
       settingsQuery,
       (value) => {
         settingsQuery = value;
-        render();
       },
       { key: 'settings-search' },
     ),
@@ -2867,13 +2931,12 @@ function appsPage() {
   const body = sections(
     heading('Apps', 'Launch apps and manage the Immortal catalog.'),
     group(
-      field(
+      searchField(
         'Find an app',
         appQuery,
         (value) => {
           appQuery = value;
           appPage = 0;
-          render();
         },
         { key: 'apps-search' },
       ),
@@ -4434,6 +4497,7 @@ if (window.visualViewport) {
 }
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
+    cancelSearchComposition();
     stopPolling();
     abortReads();
     thumbs.clear();
@@ -4448,7 +4512,7 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 window.addEventListener('pagehide', () => {
-  stopPolling();
+  cancelSearchComposition();  stopPolling();
   abortReads();
   thumbs.clear();
   appListView = null;
