@@ -18,6 +18,11 @@ object HomeWidgetStore {
 
   private const val PREFS = "immortal_home_widgets"
   private const val KEY = "widgets"
+  // Home resumes still read the current preference; reuse only unchanged placement JSON.
+  // The shared list is read-only so an editor cannot mutate another consumer's snapshot.
+  private val placementSnapshot = ParsedLayoutSnapshot<List<HomeWidget>>(emptyList(), { raw ->
+    java.util.Collections.unmodifiableList(deserialize(raw))
+  })
 
   data class HomeWidget(
       val appWidgetId: Int = 0,
@@ -91,8 +96,7 @@ object HomeWidgetStore {
   fun load(context: Context): List<HomeWidget> {
     val raw =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null)
-            ?: return emptyList()
-    return deserialize(raw)
+    return placementSnapshot.read(raw)
   }
 
   fun save(context: Context, widgets: List<HomeWidget>) {
