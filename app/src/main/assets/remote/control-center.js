@@ -78,7 +78,8 @@ let tab = 'home',
   pairDiscoveryTimer = null;
 let renderedOperations = null,
   renderedOperationsError = null,
-  operationsView = null;
+  operationsView = null,
+  mediaView = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -444,9 +445,8 @@ async function mediaRead() {
         connectionState = data.statusError?.status === 404 ? 'legacy' : 'connected';
         updateHeader();
       }
-      renderMedia();
     },
-    { renderAfter: false },
+    { renderAfter: true, renderWith: renderMedia },
   );
 }
 function stopPolling() {
@@ -484,6 +484,7 @@ function go(next, sub = '') {
   stopPolling();
   thumbs.clear();
   artwork.clear();
+  mediaView = null;
   previewPool.clear();
   closeSheet();
   scopeResults = [];
@@ -842,7 +843,8 @@ function loadVisible(force = false) {
   }
 }
 function render() {
-  operationsView = null;
+  operationsView = null,
+  mediaView = null;
   updateHeader();
   $('navigation').replaceChildren(
     ...['home', 'remote', 'photos', 'apps', 'settings'].map((name) =>
@@ -1279,13 +1281,9 @@ function mediaButton(label, icon, onClick, primary = false) {
 function renderMedia() {
   const mount = $('media-panel');
   if (!mount) return;
-  if (
-    mount.contains(document.activeElement) &&
-    document.activeElement?.matches('input[type=range]')
-  )
-    return;
   const np = data.media;
   if (!np) {
+    mediaView = null;
     mount.replaceChildren(
       data.mediaError
         ? failure('Playback unavailable', data.mediaError, mediaRead)
@@ -1294,117 +1292,127 @@ function renderMedia() {
     return;
   }
   const ticket = session.capture();
-  const groupNode = group(el('h2', { text: 'Playback' }));
-  const art = el('img', { class: 'art', alt: '', hidden: !np.hasArt });
-  const title = el(
-    'div',
-    { class: 'media-title' },
-    el('strong', { text: np.active ? np.title || 'Playing on Portal' : 'Nothing playing' }),
-    text(
-      np.active
-        ? [np.artist, np.album].filter(Boolean).join(' · ')
-        : 'Volume controls are available independently.',
-    ),
-  );
-  groupNode.append(el('div', { class: 'media-header' }, np.hasArt ? art : glyph('volume'), title));
-  if (np.hasArt) {
-    const key = `${room().base}:${np.artVersion}`;
-    if (artwork.entries.has(key)) {
-      const url = artwork.entries.get(key).url;
-      if (url) art.src = url;
-      else
-        artwork.entries.get(key).promise.then(() => {
-          if (session.current(ticket) && art.isConnected) {
-            const ready = artwork.entries.get(key)?.url;
-            if (ready) art.src = ready;
-          }
-        });
-    } else {
-      artwork.clear();
-      artwork.add(
-        key,
-        (signal) =>
-          api(ticket.room, `/remote/art?v=${encodeURIComponent(np.artVersion)}`, {
-            blob: true,
-            signal,
-          }),
-        (url) => {
-          if (session.current(ticket) && art.isConnected) art.src = url;
-        },
-        () => {
-          art.hidden = true;
-        },
-      );
+  const key = JSON.stringify([
+    ticket.generation, ticket.pageGeneration, !!np.active,
+    !!np.active && np.durationMs > 0, Number.isInteger(np.volume?.max),
+  ]);
+  if (!mediaView || mediaView.mount !== mount || mediaView.key !== key) {
+    const view = { mount, key, artKey: null, playing: null };
+    const groupNode = group(el('h2', { text: 'Playback' }));
+    view.art = el('img', { class: 'art', alt: '', hidden: true });
+    view.fallback = el('span', { class: 'media-fallback', 'aria-hidden': 'true' }, glyph('volume'));
+    view.title = el('strong');
+    view.subtitle = text('');
+    groupNode.append(el('div', { class: 'media-header' }, view.art, view.fallback,
+      el('div', { class: 'media-title' }, view.title, view.subtitle)));
+    if (np.active) {
+      view.play = mediaButton('Pause', 'pause', () => mediaCommand('playpause'), true);
+      groupNode.append(el('div', { class: 'media-controls' },
+        mediaButton('Previous', 'prev', () => mediaCommand('prev')), view.play,
+        mediaButton('Next', 'next', () => mediaCommand('next'))));
+      if (np.durationMs > 0) {
+        view.seek = el('input', { type: 'range', min: 0, max: np.durationMs,
+          step: 1000, 'aria-label': 'Playback position' });
+        view.current = el('span');
+        view.duration = el('span');
+        view.seek.oninput = () => (view.current.textContent = formatTime(Number(view.seek.value)));
+        view.seek.onchange = () => mediaCommand('seek', Math.min(Number(view.seek.value), data.media.durationMs));
+        groupNode.append(view.seek, el('div', { class: 'timeline-labels' }, view.current, view.duration));
+      }
     }
-  } else artwork.clear();
-  if (np.active) {
-    groupNode.append(
-      el(
-        'div',
-        { class: 'media-controls' },
-        mediaButton('Previous', 'prev', () => mediaCommand('prev')),
-        mediaButton(
-          np.playing ? 'Pause' : 'Play',
-          np.playing ? 'pause' : 'play',
-          () => mediaCommand('playpause'),
-          true,
-        ),
-        mediaButton('Next', 'next', () => mediaCommand('next')),
-      ),
-    );
-    if (np.durationMs > 0) {
-      const seek = el('input', {
-        type: 'range',
-        min: 0,
-        max: np.durationMs,
-        step: 1000,
-        value: np.positionMs || 0,
-        'aria-label': 'Playback position',
-        disabled: np.canSeek !== true,
+    if (Number.isInteger(np.volume?.max)) {
+      view.volume = el('input', { type: 'range', min: 0, max: np.volume.max,
+        step: 1, 'aria-label': 'Portal music volume' });
+      view.level = el('output');
+      view.volume.oninput = () => (view.level.textContent = `${view.volume.value} / ${view.volume.getAttribute('max')}`);
+      view.volume.onchange = () => volumeCommand('set', Math.min(Number(view.volume.value), data.media.volume.max));
+      view.mute = button('Mute', () => volumeCommand('mute'));
+      view.down = button('Volume −', () => volumeCommand('down'));
+      view.up = button('Volume +', () => volumeCommand('up'));
+      view.fixed = text('This Portal reports fixed volume.');
+      groupNode.append(el('div', { class: 'volume-row' }, glyph('volume'), view.volume, view.level),
+        actions(view.mute, view.down, view.up), view.fixed);
+    }
+    view.error = text('', 'media-error error');
+    view.error.hidden = true;
+    groupNode.append(view.error);
+    mount.replaceChildren(groupNode);
+    mediaView = view;
+  }
+  const view = mediaView;
+  const setText = (node, value) => {
+    if (node.textContent !== value) node.textContent = value;
+  };
+  const setBool = (node, property, value) => {
+    if (node[property] !== value) node[property] = value;
+  };
+  const setMax = (node, value) => {
+    if (node.getAttribute('max') !== String(value)) node.setAttribute('max', String(value));
+  };
+  const setRangeValue = (node, value) => {
+    // Compare with the native range's clamped, step-aligned value.
+    const min = Number(node.getAttribute('min'));
+    const max = Number(node.getAttribute('max'));
+    const step = Number(node.getAttribute('step'));
+    const bounded = Math.max(min, Math.min(max, value));
+    const aligned = Math.min(min + Math.floor((max - min) / step) * step,
+      min + Math.round((bounded - min) / step) * step);
+    if (Number(node.value) !== aligned) node.value = aligned;
+  };
+  setText(view.title, np.active ? np.title || 'Playing on Portal' : 'Nothing playing');
+  setText(view.subtitle, np.active ? [np.artist, np.album].filter(Boolean).join(' · ')
+    : 'Volume controls are available independently.');
+  if (view.play && view.playing !== !!np.playing) {
+    view.playing = !!np.playing;
+    view.play.setAttribute('aria-label', view.playing ? 'Pause' : 'Play');
+    view.play.replaceChildren(glyph(view.playing ? 'pause' : 'play'));
+  }
+  if (view.seek) {
+    setBool(view.seek, 'disabled', np.canSeek !== true);
+    if (document.activeElement !== view.seek) {
+      setMax(view.seek, np.durationMs);
+      setRangeValue(view.seek, np.positionMs || 0);
+      setText(view.current, formatTime(np.positionMs));
+    }
+    setText(view.duration, formatTime(Number(view.seek.getAttribute('max'))));
+  }
+  if (view.volume) {
+    const vol = np.volume;
+    setBool(view.volume, 'disabled', vol.canSet !== true);
+    if (document.activeElement !== view.volume) {
+      setMax(view.volume, vol.max);
+      setRangeValue(view.volume, vol.level);
+      setText(view.level, `${vol.level} / ${vol.max}`);
+    }
+    setText(view.mute, vol.muted ? 'Unmute' : 'Mute');
+    for (const control of [view.mute, view.down, view.up]) setBool(control, 'disabled', !vol.canSet);
+    setBool(view.fixed, 'hidden', !!vol.canSet);
+  }
+  setText(view.error, data.mediaError ? message(data.mediaError) : '');
+  setBool(view.error, 'hidden', !data.mediaError);
+  const artKey = np.hasArt ? `${room().base}:${np.artVersion}` : null;
+  if (view.artKey !== artKey || (!artKey && artwork.size > 0)) {
+    view.artKey = artKey;
+    view.art.src = '';
+    setBool(view.art, 'hidden', !artKey);
+    setBool(view.fallback, 'hidden', !!artKey);
+    artwork.retain(artKey ? [artKey] : []);
+    if (artKey) artwork.add(artKey,
+      (signal) => api(ticket.room, `/remote/art?v=${encodeURIComponent(np.artVersion)}`, { blob: true, signal }),
+      (url) => {
+        if (mediaView === view && view.artKey === artKey && session.current(ticket) && view.art.isConnected)
+          view.art.src = url;
+      },
+      () => {
+        if (mediaView === view && view.artKey === artKey && session.current(ticket)) {
+          view.artKey = null;
+          setBool(view.art, 'hidden', true);
+          setBool(view.fallback, 'hidden', false);
+        }
       });
-      const current = el('span', { text: formatTime(np.positionMs) });
-      seek.oninput = () => (current.textContent = formatTime(Number(seek.value)));
-      seek.onchange = () => mediaCommand('seek', Number(seek.value));
-      groupNode.append(
-        seek,
-        el(
-          'div',
-          { class: 'timeline-labels' },
-          current,
-          el('span', { text: formatTime(np.durationMs) }),
-        ),
-      );
-    }
   }
-  const vol = np.volume;
-  if (vol && Number.isInteger(vol.max)) {
-    const slider = el('input', {
-      type: 'range',
-      min: 0,
-      max: vol.max,
-      step: 1,
-      value: vol.level,
-      'aria-label': 'Portal music volume',
-      disabled: vol.canSet !== true,
-    });
-    const level = el('output', { text: `${vol.level} / ${vol.max}` });
-    slider.oninput = () => (level.textContent = `${slider.value} / ${vol.max}`);
-    slider.onchange = () => volumeCommand('set', Number(slider.value));
-    groupNode.append(
-      el('div', { class: 'volume-row' }, glyph('volume'), slider, level),
-      actions(
-        button(vol.muted ? 'Unmute' : 'Mute', () => volumeCommand('mute'), {
-          disabled: !vol.canSet,
-        }),
-        button('Volume −', () => volumeCommand('down'), { disabled: !vol.canSet }),
-        button('Volume +', () => volumeCommand('up'), { disabled: !vol.canSet }),
-      ),
-    );
-    if (!vol.canSet) groupNode.append(text('This Portal reports fixed volume.'));
-  }
-  if (data.mediaError) groupNode.append(text(message(data.mediaError), 'media-error error'));
-  mount.replaceChildren(groupNode);
 }
+
 async function mediaCommand(action, positionMs) {
   await mutate(
     'media',
