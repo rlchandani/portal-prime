@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -35,10 +36,14 @@ class HomeDashboardActivity : ComponentActivity() {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             // The Portal browser already holds the user's session. A separate WebView would
             // require another login and duplicate its frontend, sockets and renderer memory.
-            if (context.packageManager.getLaunchIntentForPackage("org.chromium.chrome") != null)
-                intent.setPackage("org.chromium.chrome")
             return runCatching {
-                context.startActivity(intent)
+                try {
+                    context.startActivity(intent.setPackage("org.chromium.chrome"))
+                } catch (_: ActivityNotFoundException) {
+                    // URL handling, not a launcher activity, determines browser eligibility.
+                    // A rejected dispatch is safe to fall back; other failures are not retried.
+                    context.startActivity(intent.setPackage(null))
+                }
                 true
             }.getOrElse {
                 Toast.makeText(context, "Your dashboard couldn’t be opened.", Toast.LENGTH_LONG).show()
