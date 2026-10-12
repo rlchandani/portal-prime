@@ -80,7 +80,8 @@ let renderedOperations = null,
   renderedOperationsError = null,
   operationsView = null,
   mediaView = null,
-  appIconInventory = null;
+  appIconInventory = null,
+  appListView = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -485,6 +486,7 @@ function go(next, sub = '') {
   stopPolling();
   thumbs.clear();
   appIconInventory = null;
+  appListView = null;
   artwork.clear();
   mediaView = null;
   previewPool.clear();
@@ -2828,8 +2830,24 @@ function appsPage() {
     .filter(app => (appMode === 'installed' || app.installed === true) && app.packageName)
     .map(app => app.packageName));
   const ticket = session.capture();
-  const records = new Map();
-  let list = null;
+  let records = new Map(), list = null;
+  if (!error && entries && filtered.length) {
+    const key = JSON.stringify([
+      ticket.generation, ticket.pageGeneration, appMode, supported('operations'),
+    ]);
+    const cached = appListView;
+    if (cached && cached.key === key && cached.entries === entries &&
+        cached.visible.length === visibleApps.length &&
+        visibleApps.every((app, i) => cached.visible[i] === app)) {
+      list = cached.root;
+      records = cached.records;
+    } else {
+      list = el('div', { class: 'apps-list' },
+        visibleApps.map((app) => appCard(app, ticket, records)));
+      appListView = { key, entries, visible: visibleApps, root: list, records };
+    }
+    updateAppRecords(records);
+  } else appListView = null;
   const body = sections(
     heading('Apps', 'Launch apps and manage the Immortal catalog.'),
     group(
@@ -2874,11 +2892,7 @@ function appsPage() {
           )
         : !filtered.length
           ? empty('No apps to show', 'Refresh or adjust your search.')
-          : (list = el(
-              'div',
-              { class: 'apps-list' },
-              visibleApps.map((app) => appCard(app, ticket, records)),
-            )),
+          : list,
     filtered.length > 24
       ? el(
           'div',
@@ -2916,6 +2930,14 @@ function appsPage() {
       key: appMode === 'catalog' ? 'catalog' : 'apps', metadata: JSON.stringify(entries),
     };
   return body;
+}
+function updateAppRecords(records) {
+  const byPackage = new Map();
+  for (const operation of data.operations || []) {
+    const pkg = operation.target?.packageName;
+    if (!byPackage.has(pkg)) byPackage.set(pkg, operation);
+  }
+  for (const [pkg, update] of records) update(byPackage.get(pkg));
 }
 function appCard(app, ticket, records) {
   const pkg = app.packageName;
@@ -3281,14 +3303,8 @@ function renderOperations() {
   if (!view || !view.root.isConnected || !session.current(view.ticket)) return render();
   const active = document.activeElement;
   const left = window.scrollX, top = window.scrollY;
-  if (view.kind === 'apps') {
-    const byPackage = new Map();
-    for (const operation of data.operations || []) {
-      const pkg = operation.target?.packageName;
-      if (!byPackage.has(pkg)) byPackage.set(pkg, operation);
-    }
-    for (const [pkg, update] of view.records) update(byPackage.get(pkg));
-  } else updateActivity(view);
+  if (view.kind === 'apps') updateAppRecords(view.records);
+  else updateActivity(view);
   rememberOperations();
   // Reordering or replacing a changed operation's contents may detach its action temporarily.
   if (active?.isConnected && document.activeElement !== active) active.focus({ preventScroll: true });
@@ -4405,6 +4421,7 @@ document.addEventListener('visibilitychange', () => {
     stopPolling();
     abortReads();
     thumbs.clear();
+    appListView = null;
     artwork.clear();
     previewPool.clear();
     clearTimeout(pairDiscoveryTimer);
@@ -4418,6 +4435,7 @@ window.addEventListener('pagehide', () => {
   stopPolling();
   abortReads();
   thumbs.clear();
+  appListView = null;
   artwork.clear();
   previewPool.clear();
   cancelUpload(upload, 'page_closed');

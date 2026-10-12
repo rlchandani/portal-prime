@@ -72,10 +72,12 @@ test('pending icons bind to the latest search DOM without cancelling or duplicat
     await h.input('Find an app', 'Portal');
     assert.equal(reads(), before);
     assert.equal(jobs.every(j => !j.signal.aborted), true);
-    assert.notEqual(page.querySelector('.apps-list'), oldList);
+    assert.equal(page.querySelector('.apps-list') === oldList, true);
+    await h.input('Find an app', 'Portal 00');
+    assert.equal(page.querySelector('.apps-list') === oldList, false);
     jobs.forEach(j => j.resolve(image()));
     await h.settle();
-    assert.equal(icons().length, 4);
+    assert.equal(icons().length, 1);
     assert.equal(oldList.querySelectorAll('img').length, 0);
   } finally {
     h.eval('go("home")');
