@@ -7,12 +7,10 @@
 package com.immortal.launcher
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.util.LruCache
 import java.io.File
 import java.util.concurrent.Semaphore
-import kotlin.math.max
 
 private val approvedSourcesDecodeSlots = Semaphore(2)
 private val approvedSourcesPreviewCache = object : LruCache<String, Bitmap>(16 * 1024 * 1024) {
@@ -23,11 +21,17 @@ private val approvedSourcesPreviewCache = object : LruCache<String, Bitmap>(16 *
  * Source previews keep the media's aspect ratio for the approved 3:2 cells. The existing square
  * thumbnails cannot supply that crop. Bound decoded bytes and concurrency, and run only on IO.
  */
-internal fun approvedSourcesThumbnail(item: MediaItem, beforeDecode: () -> Unit = {}): Bitmap? {
+private fun approvedSourcesPreviewKey(item: MediaItem, target: ApprovedSourcePreviewSize?): String {
+    val file = File(item.path)
+    return "${item.path}:${file.lastModified()}:${file.length()}" +
+        if (target == null) "" else ":${target.width}x${target.height}"
+}
+
+internal fun approvedSourcesThumbnail(item: MediaItem, target: ApprovedSourcePreviewSize? = null,
+    beforeDecode: () -> Unit = {}): Bitmap? {
     var key = ""
     return approvedSourcesPreviewWithSlots(approvedSourcesDecodeSlots, cached = {
-        val file = File(item.path)
-        key = "${item.path}:${file.lastModified()}:${file.length()}"
+        key = approvedSourcesPreviewKey(item, target)
         approvedSourcesPreviewCache.get(key)
     }, decode = {
         beforeDecode()
@@ -38,15 +42,7 @@ internal fun approvedSourcesThumbnail(item: MediaItem, beforeDecode: () -> Unit 
                     retriever.setDataSource(item.path)
                     approvedVideoFrame(retriever)
                 } finally { runCatching { retriever.release() } }
-            } else {
-                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                BitmapFactory.decodeFile(item.path, bounds)
-                if (bounds.outWidth <= 0 || bounds.outHeight <= 0) null else {
-                    var sample = 1
-                    while (max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= 512) sample *= 2
-                    BitmapFactory.decodeFile(item.path, BitmapFactory.Options().apply { inSampleSize = sample })
-                }
-            }
+            } else approvedPhotoPreview(File(item.path), target)
         }.getOrNull()
         if (Thread.currentThread().isInterrupted) {
             bitmap?.recycle()
@@ -58,7 +54,5 @@ internal fun approvedSourcesThumbnail(item: MediaItem, beforeDecode: () -> Unit 
 }
 
 /** Removes only a caller-owned generated fixture; normal preview ownership is unchanged. */
-internal fun approvedSourcesDiscardPreview(item: MediaItem): Bitmap? {
-    val file = File(item.path)
-    return approvedSourcesPreviewCache.remove("${item.path}:${file.lastModified()}:${file.length()}")
-}
+internal fun approvedSourcesDiscardPreview(item: MediaItem, target: ApprovedSourcePreviewSize? = null): Bitmap? =
+    approvedSourcesPreviewCache.remove(approvedSourcesPreviewKey(item, target))

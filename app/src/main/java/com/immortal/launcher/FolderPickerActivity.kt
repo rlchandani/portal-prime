@@ -20,7 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.size
@@ -50,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -232,8 +233,15 @@ private fun FolderLinkRow(title: String, subtitle: String, onClick: () -> Unit) 
 @Composable
 private fun FolderThumb(item: MediaItem, modifier: Modifier) {
     val palette = LocalApprovedPalette.current
-    val bitmap by approvedSourcesIoState<Bitmap?>(null, item.path) { approvedSourcesThumbnail(item) }
-    Box(modifier.clip(RoundedCornerShape(20.dp)).background(palette.surface2), contentAlignment = Alignment.Center) {
+    val density = LocalDensity.current
+    BoxWithConstraints(modifier.clip(RoundedCornerShape(20.dp)).background(palette.surface2),
+        contentAlignment = Alignment.Center) {
+        val target = if (item.isVideo) null else with(density) {
+            ApprovedSourcePreviewSize(maxWidth.roundToPx().coerceAtLeast(1), maxHeight.roundToPx().coerceAtLeast(1))
+        }
+        val bitmap by approvedSourcesIoState<Bitmap?>(null, item.path, target) {
+            approvedSourcesThumbnail(item, target)
+        }
         bitmap?.let {
             Image(it.asImageBitmap(), contentDescription = if (item.isVideo) "Video preview" else "Photo preview",
                 contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
