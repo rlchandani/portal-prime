@@ -26,29 +26,36 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ImmortalSettings
 
-private val PrimeDarkColorScheme = darkColorScheme(
-    primary              = PrimeBlue,
-    onPrimary            = OnPrimeBlue,
-    primaryContainer     = PrimeBlueDim,
-    onPrimaryContainer   = PrimeBlueLight,
-    secondary            = ContentSecondary,
-    onSecondary          = ContentOnAccent,
-    secondaryContainer   = SurfaceVariant,
-    onSecondaryContainer = ContentPrimary,
-    tertiary             = AccentGlow,
-    onTertiary           = ContentOnAccent,
-    background           = BackgroundDark,
-    onBackground         = ContentPrimary,
-    surface              = SurfaceDark,
-    onSurface            = ContentPrimary,
-    surfaceVariant       = SurfaceVariant,
-    onSurfaceVariant     = ContentSecondary,
-    surfaceContainer     = SurfaceContainer,
-    outline              = ContentTertiary,
-    outlineVariant       = GlassBorder,
-    error                = Error,
-    onError              = ContentOnAccent,
-)
+// Bounded process-wide templates: no Context, settings snapshot or live values.
+private val ApprovedLightColorScheme = buildApprovedColorScheme(false)
+private val ApprovedDarkColorScheme = buildApprovedColorScheme(true)
+
+internal fun approvedColorScheme(useDark: Boolean): androidx.compose.material3.ColorScheme =
+    if (useDark) ApprovedDarkColorScheme else ApprovedLightColorScheme
+
+
+/** Exact approved templates; tests guard all Material colour roles. */
+private fun buildApprovedColorScheme(useDark: Boolean): androidx.compose.material3.ColorScheme {
+    val palette = if (useDark) ApprovedDarkPalette else ApprovedLightPalette
+    return when {
+        useDark -> darkColorScheme(
+            primary = palette.accent, onPrimary = palette.background,
+            primaryContainer = palette.selected, onPrimaryContainer = palette.text,
+            secondary = palette.secondary, background = palette.background,
+            onBackground = palette.text, surface = palette.surface, onSurface = palette.text,
+            surfaceVariant = palette.surface2, onSurfaceVariant = palette.secondary,
+            surfaceContainer = palette.surface, outline = palette.secondary,
+            outlineVariant = palette.divider, error = palette.error)
+        else -> lightColorScheme(
+            primary = palette.accent, onPrimary = palette.surface,
+            primaryContainer = palette.selected, onPrimaryContainer = palette.text,
+            secondary = palette.secondary, background = palette.background,
+            onBackground = palette.text, surface = palette.surface, onSurface = palette.text,
+            surfaceVariant = palette.surface2, onSurfaceVariant = palette.secondary,
+            surfaceContainer = palette.surface, outline = palette.secondary,
+            outlineVariant = palette.divider, error = palette.error)
+    }
+}
 
 @Composable
 fun PortalPrimeTheme(
@@ -75,22 +82,7 @@ fun PortalPrimeTheme(
             if (useDark) dynamicDarkColorScheme(context)
             else dynamicLightColorScheme(context)
         }
-        useDark -> darkColorScheme(
-            primary = palette.accent, onPrimary = palette.background,
-            primaryContainer = palette.selected, onPrimaryContainer = palette.text,
-            secondary = palette.secondary, background = palette.background,
-            onBackground = palette.text, surface = palette.surface, onSurface = palette.text,
-            surfaceVariant = palette.surface2, onSurfaceVariant = palette.secondary,
-            surfaceContainer = palette.surface, outline = palette.secondary,
-            outlineVariant = palette.divider, error = palette.error)
-        else -> lightColorScheme(
-            primary = palette.accent, onPrimary = palette.surface,
-            primaryContainer = palette.selected, onPrimaryContainer = palette.text,
-            secondary = palette.secondary, background = palette.background,
-            onBackground = palette.text, surface = palette.surface, onSurface = palette.text,
-            surfaceVariant = palette.surface2, onSurfaceVariant = palette.secondary,
-            surfaceContainer = palette.surface, outline = palette.secondary,
-            outlineVariant = palette.divider, error = palette.error)
+        else -> approvedColorScheme(useDark)
     }
     MaterialTheme(
         colorScheme = colorScheme,
