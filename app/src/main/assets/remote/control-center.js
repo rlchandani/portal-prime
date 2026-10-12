@@ -79,7 +79,8 @@ let tab = 'home',
 let renderedOperations = null,
   renderedOperationsError = null,
   operationsView = null,
-  mediaView = null;
+  mediaView = null,
+  appIconInventory = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -483,6 +484,7 @@ function go(next, sub = '') {
   session.enter(`${next}:${sub}`);
   stopPolling();
   thumbs.clear();
+  appIconInventory = null;
   artwork.clear();
   mediaView = null;
   previewPool.clear();
@@ -2816,7 +2818,15 @@ function appsPage() {
   );
   appPage = Math.min(appPage, Math.max(0, Math.ceil(filtered.length / 24) - 1));
   const error = appMode === 'catalog' ? data.catalogError : data.appsError;
-  thumbs.clear();
+  const visibleApps = filtered.slice(appPage * 24, (appPage + 1) * 24);
+  // Fresh server inventory invalidates artwork, including updates without version metadata.
+  if (appIconInventory !== entries) {
+    thumbs.clear();
+    appIconInventory = entries;
+  }
+  thumbs.retain((error ? [] : visibleApps)
+    .filter(app => (appMode === 'installed' || app.installed === true) && app.packageName)
+    .map(app => app.packageName));
   const ticket = session.capture();
   const records = new Map();
   let list = null;
@@ -2867,7 +2877,7 @@ function appsPage() {
           : (list = el(
               'div',
               { class: 'apps-list' },
-              filtered.slice(appPage * 24, (appPage + 1) * 24).map((app) => appCard(app, ticket, records)),
+              visibleApps.map((app) => appCard(app, ticket, records)),
             )),
     filtered.length > 24
       ? el(
