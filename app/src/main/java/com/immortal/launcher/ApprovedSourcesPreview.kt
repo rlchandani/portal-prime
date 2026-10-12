@@ -23,13 +23,14 @@ private val approvedSourcesPreviewCache = object : LruCache<String, Bitmap>(16 *
  * Source previews keep the media's aspect ratio for the approved 3:2 cells. The existing square
  * thumbnails cannot supply that crop. Bound decoded bytes and concurrency, and run only on IO.
  */
-internal fun approvedSourcesThumbnail(item: MediaItem): Bitmap? {
-    approvedSourcesDecodeSlots.acquire()
-    return try {
-        approvedSourcesCheckInterrupted()
+internal fun approvedSourcesThumbnail(item: MediaItem, beforeDecode: () -> Unit = {}): Bitmap? {
+    var key = ""
+    return approvedSourcesPreviewWithSlots(approvedSourcesDecodeSlots, cached = {
         val file = File(item.path)
-        val key = "${item.path}:${file.lastModified()}:${file.length()}"
-        approvedSourcesPreviewCache.get(key)?.let { return it }
+        key = "${item.path}:${file.lastModified()}:${file.length()}"
+        approvedSourcesPreviewCache.get(key)
+    }, decode = {
+        beforeDecode()
         val bitmap = runCatching {
             if (item.isVideo) {
                 val retriever = MediaMetadataRetriever()
@@ -53,9 +54,7 @@ internal fun approvedSourcesThumbnail(item: MediaItem): Bitmap? {
         }
         bitmap?.let { approvedSourcesPreviewCache.put(key, it) }
         bitmap
-    } finally {
-        approvedSourcesDecodeSlots.release()
-    }
+    })
 }
 
 /** Removes only a caller-owned generated fixture; normal preview ownership is unchanged. */
