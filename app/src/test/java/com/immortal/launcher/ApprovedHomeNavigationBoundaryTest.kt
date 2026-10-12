@@ -423,7 +423,7 @@ class ApprovedHomeNavigationBoundaryTest {
     init {
       // The JVM has no Activity runtime. Initialize only the real Compose state under test;
       // production gets these delegates from HomeActivity's ordinary constructor.
-      setDelegate("launcherTab", tab)
+      setDelegate("launcherTabState", tab)
       setDelegate("appsSearchOpenRequest", search)
       Mockito.doReturn(lifecycle).`when`(home).lifecycle
       Mockito.doReturn(true).`when`(home).hasWindowFocus()

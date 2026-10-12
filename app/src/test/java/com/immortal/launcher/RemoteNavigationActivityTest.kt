@@ -526,7 +526,7 @@ class RemoteNavigationActivityTest {
     var onAcquire: () -> Unit = {}
     val routes = RemoteRoutes(context)
     init {
-      setDelegate("launcherTab", tab)
+      setDelegate("launcherTabState", tab)
       setDelegate("appsSearchOpenRequest", search)
       Mockito.doReturn(lifecycle).`when`(home).lifecycle
       Mockito.doReturn(true).`when`(home).hasWindowFocus()

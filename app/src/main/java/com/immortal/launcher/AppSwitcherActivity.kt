@@ -233,7 +233,10 @@ private fun ApprovedAppsContent(
     (order.filter { it in knownIds } + installedIds + builtinIds).distinct().take(6)
   }
   fun folderOf(app: AppItem): String? = (assignments[app.component.packageName] ?: Curation.folderFor(app.component.packageName))?.takeIf { it.isNotBlank() }
-  fun launchApp(app: AppItem) { if (launchApprovedIntent(context, Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER).setComponent(app.component)) && !embedded) onExit() }
+  fun launchApp(app: AppItem) {
+    launchApprovedIntent(context, Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+        .setComponent(app.component)) { if (!embedded) onExit() }
+  }
   val folderNames = remember(installed, assignments) {
     installed.mapNotNull { folderOf(it) }.distinct()
   }
@@ -437,12 +440,13 @@ private fun AppsDialog(title: String, onDismiss: () -> Unit, content: @Composabl
   }
 }
 
-private fun launchApprovedIntent(context: Context, intent: Intent): Boolean = runCatching {
+private fun launchApprovedIntent(context: Context, intent: Intent, onLaunched: () -> Unit = {}): Boolean = runCatching {
   if (intent.component?.packageName == JarvisHandoff.PACKAGE) {
-    check(JarvisHandoff.launch(context))
+    return@runCatching JarvisHandoff.launch(context, onLaunched)
   } else if (intent.component == ComponentName(context, StoreActivity::class.java))
     context.startApprovedInternalActivity(intent)
   else context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+  onLaunched()
   true
 }.getOrElse { Toast.makeText(context, "This app couldn’t be opened.", Toast.LENGTH_LONG).show(); false }
 

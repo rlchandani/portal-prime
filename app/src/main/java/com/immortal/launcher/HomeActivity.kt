@@ -323,7 +323,13 @@ private val CALLS_COMPONENT = ComponentName("com.immortal.launcher", "__immortal
  */
 class HomeActivity : ComponentActivity() {
   private var widgetLibraryRequest by mutableStateOf(0)
-  private var launcherTab by mutableStateOf(ApprovedLauncherTab.HOME)
+  private var launcherTabState by mutableStateOf(ApprovedLauncherTab.HOME)
+  private var launcherTab: ApprovedLauncherTab
+    get() = launcherTabState
+    set(value) {
+      if (value != launcherTabState) JarvisHandoff.cancelPending(this)
+      launcherTabState = value
+    }
   private var appsSearchOpenRequest by mutableStateOf(0)
   private var pendingResumeIntent: Intent? = null
   private var cancelWebViewStartup: (() -> Unit)? = null

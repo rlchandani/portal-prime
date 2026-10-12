@@ -13,6 +13,7 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.PowerManager
 import android.util.Log
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Cooperates with the Portal build's presence-driven power policy.
@@ -41,6 +42,7 @@ object DreamPolicy {
   private const val KEY_BRIDGE_AT = "bridge_at"
   private const val KEY_IN_STOCK_HANDOFF = "in_stock_handoff"
   private const val KEY_PORTAL_HOME_HANDOFF = "portal_home_handoff"
+  private val bridgeRequests = AtomicLong()
 
   /** Set by [PhotoDreamService] just before finish() on a user tap. */
   @Volatile var userExitAt: Long = 0L
@@ -85,37 +87,53 @@ object DreamPolicy {
     if (inStockHandoff) Log.i(TAG, "restored bridge from prefs: bridgeAt=$bridgeAt inStockHandoff=true")
   }
 
-  /** Called by [HomeActivity.launchStockHome] — persists bridge so new processes see it. */
-  fun markBridge(context: Context, portalHome: Boolean = false) {
+  private fun beginBridge(portalHome: Boolean): Pair<Long, Long> {
+    val ticket = bridgeRequests.incrementAndGet()
     val now = System.currentTimeMillis()
     bridgeAt = now
     inStockHandoff = true
     portalHomeHandoff = portalHome
-    // commit() (synchronous), not apply(): the whole point of persisting the bridge is the case
-    // where Android kills our process during the stock-home handoff. apply() only schedules an
-    // async disk write, which QueuedWork is not guaranteed to flush before a low-memory kill — so
-    // the freshly-spawned process could read stale (zeroed) prefs and relaunch the frame over the
-    // call anyway. commit() flushes before we proceed to bring the stock home forward; the write is
-    // one timestamp and two booleans in a dedicated prefs file, fired at a deliberate handoff.
-    context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        .edit()
-        .putLong(KEY_BRIDGE_AT, now)
-        .putBoolean(KEY_IN_STOCK_HANDOFF, true)
-        .putBoolean(KEY_PORTAL_HOME_HANDOFF, portalHome)
-        .commit()
+    return ticket to now
   }
 
-  /** Called by [HomeActivity.onResume] when the user returns — clears persisted bridge. */
+  private fun persistBridge(context: Context, now: Long, portalHome: Boolean): Boolean =
+      context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+          .putLong(KEY_BRIDGE_AT, now).putBoolean(KEY_IN_STOCK_HANDOFF, true)
+          .putBoolean(KEY_PORTAL_HOME_HANDOFF, portalHome).commit()
+
+  /** Existing Meta handoffs flush before launch; every writer shares the same disk lane. */
+  fun markBridge(context: Context, portalHome: Boolean = false) {
+    val (_, now) = beginBridge(portalHome)
+    val app = context.applicationContext ?: context
+    DreamBridgePersistence.commit { persistBridge(app, now, portalHome) }
+  }
+
+  /** Jarvis taps stay responsive; completion runs on Main only after the durable commit. */
+  fun markBridgeAsync(context: Context, completed: (Long, Boolean) -> Unit): Long {
+    val (ticket, now) = beginBridge(false)
+    val app = context.applicationContext ?: context
+    DreamBridgePersistence.submit({ persistBridge(app, now, false) }) { completed(ticket, it) }
+    return ticket
+  }
+
+  fun isCurrentBridge(ticket: Long): Boolean = bridgeRequests.get() == ticket
+
+  /** A cancelled preparation cannot clear a newer intentional handoff. Main-owned admission. */
+  fun clearBridgeIfCurrent(context: Context, ticket: Long) {
+    if (isCurrentBridge(ticket)) clearBridge(context)
+  }
+
+  /** Clear visible state now; persist behind earlier marks without UI-thread disk work. */
   fun clearBridge(context: Context) {
+    bridgeRequests.incrementAndGet()
     inStockHandoff = false
     bridgeAt = 0L
     portalHomeHandoff = false
-    context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        .edit()
-        .remove(KEY_BRIDGE_AT)
-        .remove(KEY_IN_STOCK_HANDOFF)
-        .remove(KEY_PORTAL_HOME_HANDOFF)
-        .apply()
+    val app = context.applicationContext ?: context
+    DreamBridgePersistence.submit({
+      app.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+          .remove(KEY_BRIDGE_AT).remove(KEY_IN_STOCK_HANDOFF).remove(KEY_PORTAL_HOME_HANDOFF).commit()
+    })
   }
 
   fun hasBattery(context: Context): Boolean =

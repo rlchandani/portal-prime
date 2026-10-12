@@ -76,6 +76,7 @@ class FleetRoutes(private val context: Context) {
       "/perf/photo-thumbnail" -> PhotoThumbnailProbe.handle(context, req)
       "/perf/source-cache" -> SourceCacheProbe.handle(context, req)
       "/perf/source-photo-preview" -> SourcePhotoPreviewProbe.handle(context, req)
+      "/perf/bridge-write" -> BridgeWriteProbe.handle(context, req)
       "/perf/filmstrip-render" -> requireMethod("GET", req) { FilmstripScreenshot.render(context) }
       "/perf/state" -> requireMethod("GET", req) {
         resp(200, if (req.queryParam("readiness") == "1") FramePerformanceCapture.readinessSnapshot()

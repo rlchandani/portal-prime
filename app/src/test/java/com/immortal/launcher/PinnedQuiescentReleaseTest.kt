@@ -468,7 +468,7 @@ class PinnedQuiescentReleaseTest {
         scheduled.remove(runnable)
         null
       }.`when`(handler).removeCallbacks(Mockito.any(Runnable::class.java))
-      HomeActivity::class.java.getDeclaredField("launcherTab" + "$" + "delegate")
+      HomeActivity::class.java.getDeclaredField("launcherTabState" + "$" + "delegate")
           .apply { isAccessible = true }.set(home, tab)
       HomeActivity::class.java.getDeclaredField("appsSearchOpenRequest" + "$" + "delegate")
           .apply { isAccessible = true }.set(home, search)

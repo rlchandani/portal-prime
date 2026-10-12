@@ -37,55 +37,79 @@ internal object JarvisHandoff {
   private const val WAKE_ACTION = "com.portal.wake.action.WAKE"
   private const val WAKE_ID = "com.portal.wake.extra.ID"
   // UI-thread only. Rapid taps on the same launching Activity share its pending handoff.
-  private val pendingHosts = mutableSetOf<LifecycleOwner>()
+  private val pendingHosts = mutableMapOf<LifecycleOwner, () -> Unit>()
 
-  fun launch(context: Context): Boolean {
-    val owner = generateSequence(context) { current ->
-      (current as? ContextWrapper)?.baseContext?.takeUnless { it === current }
-    }.filterIsInstance<LifecycleOwner>().firstOrNull()
+  private fun host(context: Context): LifecycleOwner? = generateSequence(context) { current ->
+    (current as? ContextWrapper)?.baseContext?.takeUnless { it === current }
+  }.filterIsInstance<LifecycleOwner>().firstOrNull()
+
+  /** Tab changes retain their Activity, so they explicitly cancel pending preparation. */
+  fun cancelPending(context: Context) { host(context)?.let { pendingHosts[it]?.invoke() } }
+
+  /** True acknowledges preparation; onLaunched closes standalone callers after actual dispatch. */
+  fun launch(context: Context, onLaunched: () -> Unit = {}): Boolean {
+    val owner = host(context)
     val lifecycle = owner?.lifecycle
     // UI callers have a started Activity. A non-UI caller can open Jarvis, but must not start
     // a potentially background microphone without a foreground handoff to observe.
     val canObserve = lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) == true
-    if (canObserve && owner != null && !pendingHosts.add(owner)) return true
+    if (canObserve && owner != null && owner in pendingHosts) return true
     lateinit var observer: LifecycleEventObserver
-    val gate = JarvisForegroundWake {
+    var ticket = 0L
+    fun retire(clear: Boolean) {
       lifecycle?.removeObserver(observer)
       owner?.let { pendingHosts.remove(it) }
+      if (clear && ticket != 0L) DreamPolicy.clearBridgeIfCurrent(context, ticket)
+    }
+    val gate = JarvisForegroundWake {
+      retire(clear = false)
       runCatching {
-        context.sendBroadcast(
-            Intent(WAKE_ACTION)
-                .setClassName(PACKAGE, "$PACKAGE.wake.WakeHandoffReceiver")
-                .putExtra(WAKE_ID, "immortal-tap"))
+        context.sendBroadcast(Intent(WAKE_ACTION)
+            .setClassName(PACKAGE, "$PACKAGE.wake.WakeHandoffReceiver")
+            .putExtra(WAKE_ID, "immortal-tap"))
       }
     }
+    val request = JarvisPreparedLaunch(
+        current = { DreamPolicy.isCurrentBridge(ticket) &&
+            (!canObserve || lifecycle?.currentState == Lifecycle.State.RESUMED) },
+        dispatch = {
+          context.startActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+              .setClassName(PACKAGE, "$PACKAGE.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+          true
+        },
+        succeeded = { gate.onLaunched(); runCatching(onLaunched) },
+        failed = {
+          gate.cancel(); retire(clear = true)
+          android.widget.Toast.makeText(context, "Jarvis couldn’t be opened.",
+              android.widget.Toast.LENGTH_LONG).show()
+        },
+        superseded = { gate.cancel(); retire(clear = true) },
+    )
     observer = LifecycleEventObserver { _, event ->
       when (event) {
-        // Android resumes the covering Activity before stopping the previous one.
-        Lifecycle.Event.ON_STOP -> gate.onHostStopped()
+        Lifecycle.Event.ON_PAUSE -> if (!request.launched) {
+          request.cancel(); gate.cancel(); retire(clear = true)
+        }
+        Lifecycle.Event.ON_STOP -> if (request.launched) gate.onHostStopped()
         Lifecycle.Event.ON_DESTROY -> {
-          gate.cancel()
-          lifecycle?.removeObserver(observer)
-          owner?.let { pendingHosts.remove(it) }
+          request.cancel(); gate.cancel(); retire(clear = !request.launched)
         }
         else -> Unit
       }
     }
-    if (canObserve) lifecycle?.addObserver(observer) else gate.cancel()
+    if (canObserve && owner != null) {
+      pendingHosts[owner] = {
+        if (!request.launched) {
+          request.cancel(); gate.cancel(); retire(clear = true)
+        }
+      }
+      lifecycle?.addObserver(observer)
+    } else gate.cancel()
     return runCatching {
-      DreamPolicy.markBridge(context)
-      context.startActivity(
-          Intent(Intent.ACTION_MAIN)
-              .addCategory(Intent.CATEGORY_LAUNCHER)
-              .setClassName(PACKAGE, "$PACKAGE.MainActivity")
-              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-      gate.onLaunched()
+      ticket = DreamPolicy.markBridgeAsync(context) { _, committed -> request.prepared(committed) }
       true
     }.getOrElse {
-      gate.cancel()
-      lifecycle?.removeObserver(observer)
-      owner?.let { pendingHosts.remove(it) }
-      DreamPolicy.clearBridge(context)
+      request.cancel(); gate.cancel(); retire(clear = true)
       false
     }
   }
