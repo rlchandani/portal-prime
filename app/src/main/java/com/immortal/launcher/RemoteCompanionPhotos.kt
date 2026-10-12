@@ -93,6 +93,8 @@ internal class RemoteCompanionPhotoStream(file: File) : Closeable {
     input.channel.size().also { require(it in 1..RemoteCompanionPhotoPolicy.MAX_BYTES.toLong()) { "photo_size_limit" } }
   } catch (e: Exception) { input.close(); throw e }
   val isOpen: Boolean get() = input.channel.isOpen
+  /** Decode from this already opened inode; the caller still owns and closes the stream. */
+  fun <T> image(read: (FileInputStream) -> T): T = read(input)
   override fun close() = input.close()
   fun response(mime: String): FleetHttpServer.Response = FleetHttpServer.Response.stream(200, mime, length, onClose = ::close) { out ->
     input.use {
@@ -112,15 +114,17 @@ internal class RemoteCompanionPhotoStream(file: File) : Closeable {
 internal object RemoteCompanionPhotos {
   private val root get() = File("/sdcard")
   private val lock = Any()
-  private val thumbnails = LinkedHashMap<String, ByteArray>(32, .75f, true)
-  private var cachedBytes = 0
+  private val thumbnails = RemotePhotoThumbnailCache()
   fun available(): Boolean = root.isDirectory && root.canRead() && root.canWrite()
   fun allowedFolder(path: String): Boolean = RemoteCompanionPhotoPolicy.resolve(root, path, true) != null
 
-  fun handle(req: FleetHttpServer.Request, storageRoot: File = root): FleetHttpServer.Response {
+  fun handle(req: FleetHttpServer.Request, storageRoot: File = root,
+      beforeThumbnailDecode: () -> Unit = {}): FleetHttpServer.Response {
     // Discovery owns no mutation/thumbnail state: slow storage must not hold their lock.
     if (req.path == "/remote/photos") return RemoteCompanionPhotoIndex(storageRoot).handle(req)
     if (req.path == "/remote/photo-upload") return upload(req, storageRoot)
+    if (req.path == "/remote/photo" && req.method == "GET" && req.queryParam("thumbnail") == "1")
+      return handleThumbnail(req, storageRoot, beforeThumbnailDecode)
     return handlePhoto(req, storageRoot)
   }
   private fun handlePhoto(req: FleetHttpServer.Request, storageRoot: File): FleetHttpServer.Response = synchronized(lock) {
@@ -134,9 +138,6 @@ internal object RemoteCompanionPhotos {
       if (!file.delete()) return@synchronized error(403, "delete_failed")
       clearCache()
       json(200, JSONObject().put("ok", true).put("path", path))
-    } else if (req.queryParam("thumbnail") == "1") {
-      val thumb = thumbnail(file) ?: return@synchronized error(415, "thumbnail_unavailable")
-      FleetHttpServer.Response.stream(200, "image/jpeg", thumb.size.toLong()) { it.write(thumb) }
     } else {
       val mime = when (file.extension.lowercase(Locale.ROOT)) { "png" -> "image/png"; "webp" -> "image/webp"; "gif" -> "image/gif"; else -> "image/jpeg" }
       RemoteCompanionPhotoStream(file).response(mime)
@@ -171,26 +172,51 @@ internal object RemoteCompanionPhotos {
     BitmapFactory.decodeFile(file.path, bounds)
     return bounds.outWidth in 1..30000 && bounds.outHeight in 1..30000 && bounds.outWidth.toLong() * bounds.outHeight <= 100_000_000L
   }
-  private fun thumbnail(file: File): ByteArray? {
-    val key = "${file.path}:${file.length()}:${file.lastModified()}"
-    thumbnails[key]?.let { return it }
-    return runCatching {
-      val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-      BitmapFactory.decodeFile(file.path, options)
-      var sample = 1
-      while (options.outWidth / sample > 512 || options.outHeight / sample > 512) sample *= 2
-      options.inJustDecodeBounds = false; options.inSampleSize = sample; options.inPreferredConfig = Bitmap.Config.RGB_565
-      val bitmap = BitmapFactory.decodeFile(file.path, options) ?: return null
-      val bytes = try { ByteArrayOutputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 75, it); it.toByteArray() } } finally { bitmap.recycle() }
-      if (bytes.size > 512 * 1024) return null
-      thumbnails[key] = bytes; cachedBytes += bytes.size
-      while (cachedBytes > 4 * 1024 * 1024 || thumbnails.size > 32) {
-        val old = thumbnails.entries.iterator(); val entry = old.next(); cachedBytes -= entry.value.size; old.remove()
-      }
-      bytes
-    }.getOrNull()
+  private data class ThumbnailRead(val name: String, val stream: RemoteCompanionPhotoStream,
+      val ticket: RemotePhotoThumbnailCache.Ticket)
+  private fun thumbnailKey(file: File) = "${file.path}:${file.length()}:${file.lastModified()}"
+  private fun handleThumbnail(req: FleetHttpServer.Request, storageRoot: File,
+      beforeDecode: () -> Unit): FleetHttpServer.Response {
+    val read = synchronized(lock) {
+      val path = req.queryParam("path") ?: return error(400, "path_required")
+      val file = RemoteCompanionPhotoPolicy.resolve(storageRoot, path, false) ?: return error(400, "invalid_path")
+      if (!file.isFile || file.length() !in 1..RemoteCompanionPhotoPolicy.MAX_BYTES.toLong()) return error(404, "photo_not_found")
+      // Capture both the descriptor and cache generation before releasing the mutation lock.
+      val stream = runCatching { RemoteCompanionPhotoStream(file) }.getOrNull() ?: return error(404, "photo_not_found")
+      ThumbnailRead(file.name, stream, thumbnails.snapshot(thumbnailKey(file)))
+    }
+    var invalidImage = false
+    val bytes = read.stream.use { stream -> runCatching { stream.image { input ->
+      val bounds = validatedImageBounds(input, read.name) ?: run { invalidImage = true; return@image null }
+      thumbnails.load(read.ticket) { beforeDecode(); thumbnail(input, bounds) }
+    } }.getOrNull() } ?: return error(415, if (invalidImage) "invalid_image" else "thumbnail_unavailable")
+    return FleetHttpServer.Response.stream(200, "image/jpeg", bytes.size.toLong()) { it.write(bytes) }
   }
-  private fun clearCache() { thumbnails.clear(); cachedBytes = 0 }
+  private fun validatedImageBounds(input: FileInputStream, name: String): BitmapFactory.Options? {
+    input.channel.position(0)
+    val prefix = ByteArray(12)
+    val count = input.read(prefix)
+    if (count <= 0 || !RemoteCompanionPhotoPolicy.magicMatches(name, prefix.copyOf(count))) return null
+    input.channel.position(0)
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeFileDescriptor(input.fd, null, bounds)
+    return bounds.takeIf { it.outWidth in 1..30000 && it.outHeight in 1..30000 && it.outWidth.toLong() * it.outHeight <= 100_000_000L }
+  }
+  private fun thumbnail(input: FileInputStream, options: BitmapFactory.Options): ByteArray? {
+    var sample = 1
+    while (options.outWidth / sample > 512 || options.outHeight / sample > 512) sample *= 2
+    options.inJustDecodeBounds = false; options.inSampleSize = sample; options.inPreferredConfig = Bitmap.Config.RGB_565
+    input.channel.position(0)
+    val bitmap = BitmapFactory.decodeFileDescriptor(input.fd, null, options) ?: return null
+    return try {
+      ByteArrayOutputStream().use { out ->
+        if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 75, out)) null else out.toByteArray()
+      }
+    } finally { bitmap.recycle() }
+  }
+  /** Only for an inactive caller-owned generated fixture; normal deletes invalidate all tickets. */
+  fun discardThumbnail(file: File): Boolean = thumbnails.discard(thumbnailKey(file.canonicalFile))
+  private fun clearCache() { thumbnails.clear() }
   private fun error(status: Int, code: String) = json(status, JSONObject().put("ok", false).put("error", code))
   private fun json(status: Int, body: JSONObject) = FleetHttpServer.Response(status, body.toString())
 }
