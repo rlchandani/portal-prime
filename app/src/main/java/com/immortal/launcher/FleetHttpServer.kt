@@ -202,7 +202,7 @@ class FleetHttpServer(
         return
       }
       it.soTimeout = 30_000
-      val input = it.getInputStream()
+      val input = it.getInputStream().buffered(16 * 1024)
       val out = it.getOutputStream()
       val head = readHead(input)
       if (head == null) {
