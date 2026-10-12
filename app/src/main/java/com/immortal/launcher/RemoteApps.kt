@@ -7,11 +7,14 @@
 
 package com.immortal.launcher
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import java.io.ByteArrayOutputStream
 import java.util.Locale
@@ -26,6 +29,22 @@ import org.json.JSONObject
  * ([Curation], minus Immortal itself) so the two surfaces agree on what's an "app".
  */
 object RemoteApps {
+
+  private val iconCache = RemoteAppIconCache<Context>(subscribe = subscribe@ { context, invalidate ->
+    val app = context.applicationContext ?: return@subscribe false
+    val filter = IntentFilter().apply {
+      addAction(Intent.ACTION_PACKAGE_ADDED)
+      addAction(Intent.ACTION_PACKAGE_REMOVED)
+      addAction(Intent.ACTION_PACKAGE_CHANGED)
+      addAction(Intent.ACTION_PACKAGE_REPLACED)
+      addDataScheme("package")
+    }
+    val receiver = object : BroadcastReceiver() {
+      override fun onReceive(context: Context, intent: Intent) { invalidate() }
+    }
+    ContextCompat.registerReceiver(app, receiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+    true
+  })
 
   /** All launchable apps as `[{label, packageName}]`, alphabetised and curated. */
   fun listJson(context: Context): JSONArray {
@@ -56,12 +75,19 @@ object RemoteApps {
   /** A package's launcher icon as PNG bytes (square [sizePx]), or null if unavailable. */
   fun iconPng(context: Context, pkg: String, sizePx: Int = 144): ByteArray? =
       runCatching {
-            val drawable = context.packageManager.getApplicationIcon(pkg)
-            val bmp: Bitmap = drawable.toBitmap(sizePx, sizePx)
-            ByteArrayOutputStream().use {
-              bmp.compress(Bitmap.CompressFormat.PNG, 100, it)
-              it.toByteArray()
+            fun render(): ByteArray {
+              val drawable = context.packageManager.getApplicationIcon(pkg)
+              val bmp: Bitmap = drawable.toBitmap(sizePx, sizePx)
+              return ByteArrayOutputStream().use {
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, it)
+                it.toByteArray()
+              }
             }
+            val key = runCatching { RemoteAppIconKey(context.packageName, pkg, sizePx,
+                context.resources.configuration.toString()) }.getOrNull()
+            if (key == null) render() else iconCache.png(context, key,
+                canRetain = { context.resources.configuration.toString() == key.resources },
+                loader = ::render)
           }
           .getOrNull()
 
