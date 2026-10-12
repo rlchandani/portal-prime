@@ -84,7 +84,8 @@ let renderedOperations = null,
   appListView = null,
   navigationView = null,
   headerKey = null,
-  searchComposition = null;
+  searchComposition = null,
+  settingsRowView = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -549,6 +550,7 @@ function go(next, sub = '') {
   thumbs.clear();
   appIconInventory = null;
   appListView = null;
+  settingsRowView = null;
   artwork.clear();
   mediaView = null;
   previewPool.clear();
@@ -963,6 +965,7 @@ function render() {
     return;
   }
   if (connectionState === 'expired') {
+    settingsRowView = null;
     page.replaceChildren(
       sections(
         heading('Pair again', 'This Portal revoked or expired this browser pairing.'),
@@ -1526,6 +1529,12 @@ async function loadSettings() {
 }
 function settingsPage() {
   const schema = data.settings;
+  const ticket = session.capture();
+  const context = JSON.stringify([ticket.generation, ticket.pageGeneration]);
+  if (document.hidden || connectionState === 'expired') settingsRowView = null;
+  else if (settingsRowView?.context !== context)
+    settingsRowView = { context, entries: new Map(), seen: new Set() };
+  settingsRowView?.seen.clear();
   const filters = group(
     searchField(
       'Search settings',
@@ -1624,6 +1633,11 @@ function settingsPage() {
         ? null
         : empty('No matching settings', 'Try another term or include advanced settings.'),
     );
+  }
+  // Keep only rows shown in this render; hidden categories/drafts are not retained.
+  if (settingsRowView) {
+    for (const key of settingsRowView.entries.keys())
+      if (!settingsRowView.seen.has(key)) settingsRowView.entries.delete(key);
   }
   return sections(
     heading('Settings', 'Make each room feel right.'),
@@ -1800,6 +1814,41 @@ function renderSetting(domain, control) {
   const help = [activeOnly ? `Active Portal only: ${room().name}.` : '', baseHelp]
     .filter(Boolean)
     .join(' ');
+  const view = settingsRowView;
+  const key = JSON.stringify([domain, control.key]);
+  // Server responses are fresh objects. Compare all metadata, including limits/options.
+  // Secret and oversized controls still render normally without retaining extra copies.
+  const metadata = control.secret ? null : JSON.stringify(control);
+  const retain = view && metadata !== null && metadata.length <= 16 * 1024;
+  const presentation = JSON.stringify([advanced, isBusy, mixed, help]);
+  const draftField = control.type === 'string' || (control.type === 'int' && control.asText);
+  const expectedDraft = draftField && !control.secret
+    ? draft(`${id}:draft`, String(control.value ?? '')) : null;
+  const cached = retain ? view.entries.get(key) : null;
+  // A rejected/no-target change may have altered the live native control already.
+  const valueMatches = cached && (control.type === 'bool'
+    ? cached.input?.checked === (control.value === true) && cached.input.indeterminate === mixed
+    : control.type === 'enum'
+      ? cached.select?.value === String(mixed ? '' : (control.value ?? ''))
+      : !draftField || cached.input?.value === expectedDraft);
+  if (cached && cached.metadata === metadata && cached.presentation === presentation && valueMatches) {
+    view.seen.add(key);
+    return cached.root;
+  }
+  const ticket = session.capture();
+  let root;
+  const ownsRow = () => session.current(ticket) && root?.isConnected &&
+    !document.hidden && connectionState !== 'expired';
+  const apply = (values) => ownsRow() ? applyDomain(domain, values) : Promise.resolve(undefined);
+  const remember = (element) => {
+    root = element;
+    if (retain) {
+      view.entries.set(key, { root, metadata, presentation,
+        input: root.querySelector('input'), select: root.querySelector('select') });
+      view.seen.add(key);
+    }
+    return root;
+  };
   let ui;
   if (control.type === 'bool') {
     ui = el('input', {
@@ -1809,7 +1858,7 @@ function renderSetting(domain, control) {
       checked: control.value === true,
       disabled: control.readOnly || isBusy,
       'aria-label': control.title,
-      onChange: (e) => applyDomain(domain, { [control.key]: e.target.checked }),
+      onChange: (e) => apply({ [control.key]: e.target.checked }),
     });
     ui.indeterminate = mixed;
   } else if (control.type === 'enum') {
@@ -1820,7 +1869,7 @@ function renderSetting(domain, control) {
       mixed ? '' : control.value,
       [...(mixed ? [{ value: '', label: 'Mixed values' }] : []), ...options],
       (value) => {
-        if (value !== '') applyDomain(domain, { [control.key]: value });
+        if (value !== '') apply({ [control.key]: value });
       },
       control.title,
     );
@@ -1840,7 +1889,7 @@ function renderSetting(domain, control) {
           'aria-label': `Decrease ${control.title}`,
           disabled: control.readOnly || isBusy || (!wrap && value <= min),
           onClick: () =>
-            applyDomain(domain, {
+            apply({
               [control.key]: value - step < min && wrap ? max : Math.max(min, value - step),
             }),
         },
@@ -1853,7 +1902,7 @@ function renderSetting(domain, control) {
           'aria-label': `Increase ${control.title}`,
           disabled: control.readOnly || isBusy || (!wrap && value >= max),
           onClick: () =>
-            applyDomain(domain, {
+            apply({
               [control.key]: value + step > max && wrap ? min : Math.min(max, value + step),
             }),
         },
@@ -1882,13 +1931,14 @@ function renderSetting(domain, control) {
     const save = button(
       'Save',
       () => {
+        if (!ownsRow()) return;
         const value = control.type === 'int' ? Number(input.value) : input.value;
         if (!validateValue(control, value)) {
           toast(message(new ApiError('invalid_value')), true);
           return;
         }
-        applyDomain(domain, { [control.key]: value }).then((results) => {
-          if (results?.every((r) => r.ok)) {
+        apply({ [control.key]: value }).then((results) => {
+          if (session.current(ticket) && connectionState !== 'expired' && results?.every((r) => r.ok)) {
             drafts.delete(draftKey(key));
             render();
           }
@@ -1896,7 +1946,7 @@ function renderSetting(domain, control) {
       },
       { kind: 'outline', disabled: control.readOnly || isBusy },
     );
-    return el(
+    return remember(el(
       'div',
       { class: 'setting-row string-row' },
       el(
@@ -1909,7 +1959,7 @@ function renderSetting(domain, control) {
           : null,
       ),
       el('div', { class: 'setting-value' }, input, save),
-    );
+    ));
   } else
     ui = el('span', {
       class: 'detail',
@@ -1918,11 +1968,11 @@ function renderSetting(domain, control) {
           ? JSON.stringify(control.value)
           : String(control.value ?? ''),
     });
-  return row(
+  return remember(row(
     control.title,
     mixed ? `${help || ''} Values differ between selected rooms.` : help,
     ui,
-  );
+  ));
 }
 async function applyDomain(
   domain,
@@ -4502,6 +4552,7 @@ document.addEventListener('visibilitychange', () => {
     abortReads();
     thumbs.clear();
     appListView = null;
+    settingsRowView = null;
     artwork.clear();
     previewPool.clear();
     clearTimeout(pairDiscoveryTimer);
@@ -4516,6 +4567,7 @@ window.addEventListener('pagehide', () => {
   abortReads();
   thumbs.clear();
   appListView = null;
+  settingsRowView = null;
   artwork.clear();
   previewPool.clear();
   cancelUpload(upload, 'page_closed');
