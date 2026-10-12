@@ -287,6 +287,18 @@ class HomeUiDiagnosticsTest {
     assertFalse(snapshot.publicLongPressTarget(50.0, 120.0))
   }
 
+  @Test fun sunrisePublicChoicesRemainFiniteAndDoNotAuthorizeNavigationOrExportPrivateText() {
+    assertEquals("sunriseRamp", HomeUiDiagnostics.fixedKey("Ramp minutes"))
+    assertEquals("sunriseSaveReady", HomeUiDiagnostics.fixedKey("Sunrise settings ready"))
+    for (minutes in listOf(1, 20, 60)) {
+      assertEquals("sunriseRamp$minutes", HomeUiDiagnostics.fixedKey("$minutes min"))
+      val snapshot = state(listOf(node(HomeUiDiagnostics.fixedKey("$minutes min"))))
+      assertFalse(snapshot.eligible()); assertFalse(snapshot.publicLongPressTarget(50.0, 120.0))
+    }
+    for (text in listOf("0 min", "61 min", "PRIVATE_WAKE_TIME", "https://private.invalid/20 min"))
+      assertNull(HomeUiDiagnostics.fixedKey(text))
+  }
+
   @Test fun settingsExportStillExcludesUnknownEditablePasswordAndSearchDrafts() {
     val snapshot = state(listOf(
         node(HomeUiDiagnostics.fixedKey("App appearance")),

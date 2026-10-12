@@ -87,6 +87,9 @@ internal object HomeUiDiagnostics {
       "80%" to "chimeVolume80",
       "90%" to "chimeVolume90",
       "100%" to "chimeVolume100",
+      "Ramp minutes" to "sunriseRamp", "sunrise.rampMinutes" to "sunriseRamp",
+      "Saving Sunrise settings" to "sunriseSaving",
+      "Sunrise save unavailable" to "sunriseSaveUnavailable", "Sunrise settings ready" to "sunriseSaveReady",
       "Sounds" to "sounds", "Welcome greeting" to "welcomeGreeting", "Sunrise & wake" to "sunriseWake",
       "Home dashboard" to "homeDashboard", "Intercom" to "intercom", "Device name" to "deviceName",
       "Sleep timer" to "sleepTimer", "About & device health" to "aboutDeviceHealth",
@@ -94,7 +97,7 @@ internal object HomeUiDiagnostics {
       "Checking device permissions" to "deviceHealthChecking",
       "Device health checked" to "deviceHealthChecked",
       "Device health check unavailable" to "deviceHealthUnavailable",
-  )
+  ) + (1..60).associate { "$it min" to "sunriseRamp$it" }
   private val settingsKeys = settingsLabels.values.toSet()
 
   // Only these fixed source labels can become response keys. Never serialize a node label.

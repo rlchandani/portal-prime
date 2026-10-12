@@ -508,6 +508,7 @@ internal fun Stepper(
     widthMin: Dp = 64.dp,
     iconColor: Color = Color(0xFF636366),
     iconSymbol: String = "",
+    enabled: Boolean = true,
     onMinus: () -> Unit,
     onPlus: () -> Unit,
 ) {
@@ -518,13 +519,14 @@ internal fun Stepper(
             .fillMaxWidth()
             .defaultMinSize(minHeight = Sizes.rowMinHeight)
             .onKeyEvent { e ->
-                if (e.type == KeyEventType.KeyDown) when (e.key) {
+                if (enabled && e.type == KeyEventType.KeyDown) when (e.key) {
                     Key.DirectionLeft -> { onMinus(); true }
                     Key.DirectionRight -> { onPlus(); true }
                     else -> false
                 } else false
             }
-            .focusable(interactionSource = src)
+            .focusable(enabled = enabled, interactionSource = src)
+            .then(if (enabled) Modifier else Modifier.semantics { disabled() })
             .background(if (focused) IosFocusTint else Color.Transparent)
             .padding(horizontal = 28.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -540,7 +542,7 @@ internal fun Stepper(
             lineHeight = 34.sp,
             modifier = Modifier.weight(1f),
         )
-        StepperButton("-", focused) { onMinus() }
+        StepperButton("-", focused, enabled) { onMinus() }
         Text(
             text = valueText,
             color = IosLabel,
@@ -549,19 +551,19 @@ internal fun Stepper(
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(min = widthMin),
         )
-        StepperButton("+", focused) { onPlus() }
+        StepperButton("+", focused, enabled) { onPlus() }
     }
 }
 
 @Composable
-private fun StepperButton(glyph: String, rowFocused: Boolean, onClick: () -> Unit) {
+private fun StepperButton(glyph: String, rowFocused: Boolean, enabled: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(width = 68.dp, height = 68.dp)
             .clip(RoundedCornerShape(9.dp))
             .background(if (rowFocused) IosFocusTint else IosBackground)
             .focusProperties { canFocus = false }
-            .clickable(onClick = onClick),
+            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier.semantics { disabled() }),
         contentAlignment = Alignment.Center,
     ) {
         Text(

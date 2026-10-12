@@ -21,12 +21,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,16 +34,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import org.json.JSONObject
 import java.util.Calendar
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** Set the sunrise alarm: time, which days, ramp length, and the optional chime. */
 class SunriseSettingsActivity : ComponentActivity() {
@@ -74,90 +81,116 @@ private fun SunriseScreen() {
 @Composable
 internal fun SunriseContent() {
   val context = LocalContext.current
-  val initial = remember { SunriseConfig.load(context) }
-  var enabled by remember { mutableStateOf(initial.enabled) }
-  var hour by remember { mutableIntStateOf(initial.hour) }
-  var minute by remember { mutableIntStateOf(initial.minute) }
-  var ramp by remember { mutableIntStateOf(initial.rampMinutes) }
-  var chime by remember { mutableStateOf(initial.chime) }
-  var days by remember { mutableStateOf(initial.days) }
-
-  fun persist() {
-    // Set days first (bespoke — the registry models scalars, not sets), then route the scalar
-    // fields through the domain so its onApplied (SunriseScheduler.reschedule) fires once with
-    // the new days already in prefs.
-    SunriseConfig.setDays(context, days)
-    SettingsDomains.sunrise.apply(
-        context,
-        JSONObject()
-            .put("enabled", enabled)
-            .put("hour", hour)
-            .put("minute", minute)
-            .put("rampMinutes", ramp)
-            .put("chime", chime))
+  val application = context.applicationContext
+  val writes = remember(application) { SunriseSettingsWrites.queue(application) }
+  var settings by remember(application) { mutableStateOf(SunriseConfig.load(application)) }
+  var saveState by remember { mutableStateOf(SettingsSaveState()) }
+  val applying = saveState.saving
+  val completion = rememberCoroutineScope()
+  val lifecycleOwner = LocalLifecycleOwner.current
+  val pageActive = LocalApprovedLauncherPageActive.current
+  val rampSpec = remember {
+    SettingsDomains.sunrise.specs.filterIsInstance<com.immortal.launcher.settings.IntSpec<SunriseConfig.Config>>()
+        .single { it.key == "rampMinutes" }
   }
-
-    Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
-      Card {
-        ToggleRow("Enabled", enabled) { enabled = it; persist() }
+  suspend fun publishAfterSave(revision: Int) {
+    try {
+      writes.awaitIdle()
+      val loaded = withContext(Dispatchers.IO) { SunriseConfig.load(application) }
+      if (revision == saveState.revision) {
+        settings = loaded
+        saveState = saveState.completeRead(revision, writes.failureCount, writes.lastSaveFailed)
       }
+    } catch (cancelled: CancellationException) { throw cancelled }
+    catch (_: Exception) { saveState = saveState.readFailed(revision) }
+  }
+  LaunchedEffect(application, lifecycleOwner, pageActive) {
+    if (!pageActive) return@LaunchedEffect
+    lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+      saveState = saveState.beginRefresh()
+      publishAfterSave(saveState.revision)
+    }
+  }
+  fun submit(edit: () -> Unit) {
+    if (saveState.saving) return
+    saveState = saveState.beginEdit(writes.failureCount)
+    val revision = saveState.revision
+    edit()
+    completion.launch { publishAfterSave(revision) }
+  }
+  fun apply(key: String, value: Any) = submit { writes.submit(key, value) }
 
-      // Time pickers (stepper rows).
-      Card {
-        Stepper("Hour", hour, 0, 23) { hour = it; persist() }
-        Stepper("Minute", minute, 0, 59, step = 5) { minute = it; persist() }
-      }
-
-      SectionLabel("Wake on")
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        DAY_LABELS.forEach { (d, label) ->
-          val on = d in days
-          Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
-              modifier = Modifier.size(68.dp).semantics {
-                contentDescription = java.text.DateFormatSymbols().weekdays[d]
-              }.tvFocusable(CircleShape, focusScale = 1f) {
-                days = if (on) days - d else days + d; persist()
-              }) {
-            Text(label, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel, fontSize = 24.sp, fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center, modifier = Modifier.padding(14.dp))
-          }
+  Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+    Column(Modifier.semantics { contentDescription = when {
+      applying -> "Saving Sunrise settings"
+      saveState.failed -> "Sunrise save unavailable"
+      else -> "Sunrise settings ready"
+    } }) {
+      FooterNote(when {
+        applying -> "Saving changes…"
+        saveState.failed -> "Some changes couldn't be saved. Try again."
+        else -> "Choose your wake time and gradual light ramp."
+      })
+    }
+    Card {
+      ToggleRow("Enabled", settings.enabled, enabled = !applying) { apply("enabled", it) }
+    }
+    Card {
+      Stepper("Hour", settings.hour, 0, 23, enabled = !applying) { apply("hour", it) }
+      Stepper("Minute", settings.minute, 0, 59, step = 5, enabled = !applying) { apply("minute", it) }
+    }
+    SectionLabel("Wake on")
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      DAY_LABELS.forEach { (day, label) ->
+        val on = day in settings.days
+        Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
+            modifier = Modifier.size(68.dp).semantics {
+              contentDescription = java.text.DateFormatSymbols().weekdays[day]
+            }.then(if (applying) Modifier.semantics { disabled() } else
+                Modifier.tvFocusable(CircleShape, focusScale = 1f) {
+                  val days = if (on) settings.days - day else settings.days + day
+                  submit { writes.submitDays(days) }
+                })) {
+          Text(label, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel,
+              fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
+              modifier = Modifier.padding(14.dp))
         }
       }
-
-      Text("Ramp: $ramp min", color = IosLabel, fontSize = Sizes.rowTitle)
-      Slider(value = ramp.toFloat(), onValueChange = { ramp = it.toInt() },
-          valueRange = 1f..45f, onValueChangeFinished = { persist() })
-
-      Card {
-        ToggleRow("Chime at the end", chime) { chime = it; persist() }
-      }
-
-      val next = remember(enabled, hour, minute, days) {
-        SunriseConfig.nextTrigger(SunriseConfig.Config(enabled, hour, minute, ramp, chime, days))
-      }
-      Text(
-          if (next != null)
-              "Next: " + java.text.SimpleDateFormat("EEE d MMM, HH:mm", java.util.Locale.getDefault())
-                  .format(java.util.Date(next))
-          else "Alarm is off.",
-          color = IosBlue, fontSize = Sizes.rowValue)
-
-      Surface(color = IosBlue, shape = RoundedCornerShape(16.dp),
-          modifier = Modifier.fillMaxWidth().heightIn(min = 68.dp).tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
-            context.startActivity(
-                Intent(context, WakeLightActivity::class.java)
-                    .putExtra(WakeLightActivity.EXTRA_RAMP_MIN, 1)
-                    .putExtra(WakeLightActivity.EXTRA_CHIME, chime))
-          }) {
-        Text("Preview (1-min ramp)", color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary, fontSize = 24.sp, fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth())
+    }
+    // Use the same spec bounds and premium numeric picker as other Settings rows. The old
+    // custom slider was capped at 45 even though the shared/remote spec permits 60 minutes.
+    Card {
+      ApprovedIntSetting(rampSpec, settings.rampMinutes, rampSpec.help, !applying) {
+        apply("rampMinutes", it)
       }
     }
+    Card {
+      ToggleRow("Chime at the end", settings.chime, enabled = !applying) { apply("chime", it) }
+    }
+    val next = remember(settings) { SunriseConfig.nextTrigger(settings) }
+    Text(if (next != null)
+        "Next: " + java.text.SimpleDateFormat("EEE d MMM, HH:mm", java.util.Locale.getDefault())
+            .format(java.util.Date(next)) else "Alarm is off.",
+        color = IosBlue, fontSize = Sizes.rowValue)
+    Surface(color = IosBlue, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 68.dp)
+            .then(if (applying) Modifier.semantics { disabled() } else
+                Modifier.tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
+                  context.startActivity(Intent(context, WakeLightActivity::class.java)
+                      .putExtra(WakeLightActivity.EXTRA_RAMP_MIN, 1)
+                      .putExtra(WakeLightActivity.EXTRA_CHIME, settings.chime))
+                })) {
+      Text("Preview (1-min ramp)", color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
+          fontSize = 24.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center,
+          modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth())
+    }
+  }
 }
 
 @Composable
-private fun Stepper(label: String, value: Int, min: Int, max: Int, step: Int = 1, onChange: (Int) -> Unit) {
-  Stepper(label, "%02d".format(value),
+private fun Stepper(label: String, value: Int, min: Int, max: Int, step: Int = 1,
+    enabled: Boolean = true, onChange: (Int) -> Unit) {
+  Stepper(label, "%02d".format(value), enabled = enabled,
       onMinus = { onChange((value - step).coerceAtLeast(min)) },
       onPlus = { onChange((value + step).coerceAtMost(max)) })
 }

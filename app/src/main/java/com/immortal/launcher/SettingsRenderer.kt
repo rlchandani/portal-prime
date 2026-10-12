@@ -353,7 +353,7 @@ private fun <S> WorkerNavigationRow(domainId: String, spec: NavSpec<S>, snapshot
 
 /** Numeric choices open the approved dialog; bounds/wrapping come exclusively from the spec. */
 @Composable
-private fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?, enabled: Boolean, onApply: (Int) -> Unit) {
+internal fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?, enabled: Boolean, onApply: (Int) -> Unit) {
     var open by remember { mutableStateOf(false) }
     var draft by remember(open, value) { mutableStateOf(value.toString()) }
     var error by remember(open) { mutableStateOf<String?>(null) }
@@ -366,16 +366,12 @@ private fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?, 
                 Stepper(spec.title, draft.toIntOrNull()?.let(spec.format) ?: draft,
                     onMinus = {
                         draft.toIntOrNull()?.let { current ->
-                            val next = current - spec.step
-                            if (spec.wrap) draft = (Math.floorMod(next - spec.min, spec.max - spec.min + 1) + spec.min).toString()
-                            else if (next >= spec.min) draft = next.toString()
+                            draft = stepSettingNumber(current, -spec.step, spec.min, spec.max, spec.wrap).toString()
                         }
                     },
                     onPlus = {
                         draft.toIntOrNull()?.let { current ->
-                            val next = current + spec.step
-                            if (spec.wrap) draft = (Math.floorMod(next - spec.min, spec.max - spec.min + 1) + spec.min).toString()
-                            else if (next <= spec.max) draft = next.toString()
+                            draft = stepSettingNumber(current, spec.step, spec.min, spec.max, spec.wrap).toString()
                         }
                     })
             }

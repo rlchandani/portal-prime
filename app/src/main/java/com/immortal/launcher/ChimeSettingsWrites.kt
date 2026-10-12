@@ -35,7 +35,7 @@ internal object ChimeSettingsWrites {
 }
 
 /** Only completed reads may clear busy; a resume keeps the submitted edit's failure baseline. */
-internal data class ChimeSaveState(
+internal data class SettingsSaveState(
   val revision: Int = 0,
   val saving: Boolean = true,
   val failed: Boolean = false,
@@ -44,8 +44,12 @@ internal data class ChimeSaveState(
   fun beginRefresh() = copy(saving = true)
   fun beginEdit(failures: Long) = copy(revision = revision + 1, saving = true,
     failed = false, failureBaseline = failures)
-  fun completeRead(expectedRevision: Int, failures: Long) = if (expectedRevision != revision) this
-    else copy(saving = false, failed = failureBaseline?.let { it != failures } ?: false)
+  fun completeRead(expectedRevision: Int, failures: Long, lastSaveFailed: Boolean = false) =
+    if (expectedRevision != revision) this
+    else copy(saving = false, failed = failureBaseline?.let { it != failures } ?: lastSaveFailed)
   fun readFailed(expectedRevision: Int) = if (expectedRevision != revision) this
     else copy(saving = false, failed = true)
 }
+
+/** Retain the existing Sounds call sites while sharing the same save/readback state machine. */
+internal typealias ChimeSaveState = SettingsSaveState
