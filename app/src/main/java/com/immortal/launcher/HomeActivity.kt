@@ -4681,41 +4681,33 @@ private fun AppTile(
 private fun loadApps(context: Context): List<AppEntry> {
   val pm = context.packageManager
   val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-  return pm.queryIntentActivities(intent, 0)
-      .filter {
-        val pkg = it.activityInfo.packageName
-        pkg != context.packageName && !Curation.isHidden(pkg, "")
-      }
-      .mapNotNull { ri ->
-        runCatching {
-              val ai = ri.activityInfo
-              val rawLabel = ri.loadLabel(pm).toString()
-              // Check for icon override first, then use app's own icon
-              val drawable = Curation.iconOverride(ai.packageName)
-                  ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
-                  ?: ri.loadIcon(pm)
-              // Render with IconRenderer (adaptive composite + squircle mask)
-              val bmp: Bitmap = IconRenderer.renderAppIcon(context, drawable, 144)
-              // Uninstallable: not a system app OR is an updated system app
-              val appInfo = ai.applicationInfo
-              val isUninstallable = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0 ||
-                                    (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
-              AppEntry(
-                  label = Curation.displayLabel(ai.packageName, rawLabel),
-                  component = ComponentName(ai.packageName, ai.name),
-                  icon = bmp.asImageBitmap(),
-                  folder = Curation.folderFor(ai.packageName),
-                  uninstallable = isUninstallable,
-              ) to rawLabel
-            }
-            .getOrNull()
-      }
-      // Label-based hide (catches gated apps that share a package).
-      .filterNot { (_, raw) -> raw in Curation.hiddenLabels }
-      .map { it.first }
-      // One tile per package — some apps (e.g. Portal Settings) expose a second
-      // debug/launcher activity that would otherwise show as a duplicate.
-      .distinctBy { it.component.packageName }
+  val candidates = pm.queryIntentActivities(intent, 0).filter {
+    val pkg = it.activityInfo.packageName
+    pkg != context.packageName && !Curation.isHidden(pkg, "")
+  }
+  return prepareHomeAppIcons(
+          candidates,
+          packageName = { it.activityInfo.packageName },
+          rawLabel = { it.loadLabel(pm).toString() },
+          hiddenLabel = { it in Curation.hiddenLabels },
+          prepare = { ri, rawLabel ->
+            val ai = ri.activityInfo
+            val drawable = Curation.iconOverride(ai.packageName)
+                ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
+                ?: ri.loadIcon(pm)
+            val bmp: Bitmap = IconRenderer.renderAppIcon(context, drawable, 144)
+            val appInfo = ai.applicationInfo
+            val isUninstallable = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0 ||
+                                  (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+            AppEntry(
+                label = Curation.displayLabel(ai.packageName, rawLabel),
+                component = ComponentName(ai.packageName, ai.name),
+                icon = bmp.asImageBitmap(),
+                folder = Curation.folderFor(ai.packageName),
+                uninstallable = isUninstallable,
+            )
+          },
+      )
       .sortedBy { it.label.lowercase(Locale.getDefault()) }
       .let { apps ->
         // Inject our own iOS-style settings as a grid tile. Our app is excluded from the
