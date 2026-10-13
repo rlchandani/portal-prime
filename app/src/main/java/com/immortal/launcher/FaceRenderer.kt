@@ -7,6 +7,7 @@
 
 package com.immortal.launcher
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -108,6 +109,8 @@ class FaceRenderer(
   private var dateView: TextView? = null
   private var batteryView: TextView? = null
   private var batteryDivider: View? = null
+  private var batteryReceiver: BroadcastReceiver? = null
+  private var batteryStatus: Pair<Int, Boolean> = -1 to false
   private var weatherView: TextView? = null
   private var weatherDivider: View? = null
   private var weatherText: String = ""
@@ -176,6 +179,10 @@ class FaceRenderer(
   }
 
   private fun suspendHostWork() {
+    val oldBatteryReceiver = batteryReceiver
+    batteryReceiver = null
+    batteryStatus = -1 to false
+    if (oldBatteryReceiver != null) runCatching { context.unregisterReceiver(oldBatteryReceiver) }
     ui.removeCallbacksAndMessages(null)
     npListener?.let { NowPlayingHub.removeListener(it) }
     npListener = null
@@ -632,11 +639,13 @@ class FaceRenderer(
           if (face.clock.showDate)
               dateView?.text =
                   face.clock.dateFormat.format(now)
-          val (pct, charging) = batteryInfo()
-          val hasBattery = pct >= 0
-          batteryView?.text = if (hasBattery) (if (charging) "$pct% ⚡" else "$pct%") else ""
-          batteryView?.visibility = if (hasBattery) View.VISIBLE else View.GONE
-          batteryDivider?.visibility = if (hasBattery) View.VISIBLE else View.GONE
+          if (batteryView != null) {
+            val (pct, charging) = batteryInfo()
+            val hasBattery = pct >= 0
+            batteryView?.text = if (hasBattery) (if (charging) "$pct% ⚡" else "$pct%") else ""
+            batteryView?.visibility = if (hasBattery) View.VISIBLE else View.GONE
+            batteryDivider?.visibility = if (hasBattery) View.VISIBLE else View.GONE
+          }
           val hasWeather = weatherText.isNotBlank()
           weatherView?.text = weatherText
           weatherView?.visibility = if (hasWeather) View.VISIBLE else View.GONE
@@ -768,10 +777,32 @@ class FaceRenderer(
   // --- data -------------------------------------------------------------------
   /** Battery percent (-1 = no battery / mains-only Portal) and whether it's charging. */
   private fun batteryInfo(): Pair<Int, Boolean> {
-    val i =
-        context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-            ?: return -1 to false
-    if (!i.getBooleanExtra(BatteryManager.EXTRA_PRESENT, false)) return -1 to false
+    if (!work.isActive) return -1 to false
+    if (batteryReceiver == null) {
+      // The tick and receiver callbacks run on Main. A retained hidden renderer owns no listener.
+      val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+          if (batteryReceiver === this && work.isActive &&
+              intent?.action == Intent.ACTION_BATTERY_CHANGED) {
+            batteryStatus = readBatteryStatus(intent)
+          }
+        }
+      }
+      batteryReceiver = receiver
+      try {
+        batteryStatus = readBatteryStatus(
+            context.registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED)))
+      } catch (error: RuntimeException) {
+        batteryReceiver = null
+        batteryStatus = -1 to false
+        throw error
+      }
+    }
+    return batteryStatus
+  }
+
+  private fun readBatteryStatus(i: Intent?): Pair<Int, Boolean> {
+    if (i == null || !i.getBooleanExtra(BatteryManager.EXTRA_PRESENT, false)) return -1 to false
     val level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
     val scale = i.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
     val status = i.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
