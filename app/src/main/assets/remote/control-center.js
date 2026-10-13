@@ -74,6 +74,7 @@ let tab = 'home',
   connectionState = 'connecting',
   data = {},
   pollTimer = null,
+  pollGeneration = 0,
   noticeTimer = null,
   pairDiscoveryTimer = null;
 let renderedOperations = null,
@@ -515,6 +516,7 @@ async function mediaRead() {
   );
 }
 function stopPolling() {
+  pollGeneration++;
   clearTimeout(pollTimer);
   pollTimer = null;
 }
@@ -522,10 +524,15 @@ function startPolling() {
   stopPolling();
   if (!room() || document.hidden || connectionState === 'expired') return;
   const captured = session.capture();
+  const generation = pollGeneration;
+  // Aborted reads can settle after navigation, visibility changes or a same-page refresh.
+  const current = () => generation === pollGeneration && session.current(captured) &&
+    !document.hidden && connectionState !== 'expired';
   pollTimer = setTimeout(
     async () => {
-      if (!session.current(captured) || document.hidden) return;
+      if (!current()) return;
       if ((tab === 'home' && !detail) || tab === 'remote') await mediaRead();
+      if (!current()) return;
       if (detail === 'activity' || (tab === 'apps' && supported('operations')))
         await read('operations', '/remote/operations', acceptOperations, {
           renderAfter: !document.activeElement?.matches('input,textarea,select'),
@@ -535,8 +542,9 @@ function startPolling() {
             JSON.stringify(data.operations) !== renderedOperations ||
             JSON.stringify(data.operationsError) !== renderedOperationsError,
         });
+      if (!current()) return;
       if (connectionState === 'offline' || !data.companion) await status();
-      startPolling();
+      if (current()) startPolling();
     },
     connectionState === 'offline' ? 30000 : 4000,
   );
