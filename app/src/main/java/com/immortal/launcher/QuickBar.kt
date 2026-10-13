@@ -49,6 +49,17 @@ object QuickBar {
   private var pinAvailable = false
   private var pinned = false
   private var frameCovered = false
+  private val refreshLock = Any()
+  private var refreshQueued = false
+  private var refreshRequired = false
+  private val refreshRunnable = Runnable {
+    synchronized(refreshLock) {
+      if (!refreshQueued) return@Runnable
+      refreshQueued = false
+      refreshRequired = false
+    }
+    refresh()
+  }
 
   /** Main-thread diagnostics for our own control; never inspect another app's nodes/content. */
   fun pinControlStatus(): JSONObject {
@@ -74,8 +85,14 @@ object QuickBar {
   }
 
   fun setPinState(available: Boolean, selected: Boolean, covered: Boolean) {
-    pinAvailable = available; pinned = selected; frameCovered = covered
-    main.post { refresh() }
+    synchronized(refreshLock) {
+      val changed = pinAvailable != available || pinned != selected || frameCovered != covered
+      pinAvailable = available; pinned = selected; frameCovered = covered
+      if (changed || refreshRequired) {
+        refreshRequired = true
+        queueRefreshLocked()
+      }
+    }
   }
 
   /** Add the (initially evaluated) cluster overlay, hosted by the accessibility service. */
@@ -108,13 +125,20 @@ object QuickBar {
   }
 
   fun detach() {
-    main.post {
-      view?.let { v -> runCatching { wm?.removeView(v) } }
-      view = null
-      switcher = null; pinButton = null
-      pinAvailable = false; pinned = false; frameCovered = false
-      host = null
-      wm = null
+    synchronized(refreshLock) {
+      refreshQueued = false
+      refreshRequired = false
+      main.removeCallbacks(refreshRunnable)
+      main.post {
+        view?.let { v -> runCatching { wm?.removeView(v) } }
+        view = null
+        switcher = null; pinButton = null
+        synchronized(refreshLock) {
+          pinAvailable = false; pinned = false; frameCovered = false
+        }
+        host = null
+        wm = null
+      }
     }
   }
 
@@ -123,12 +147,28 @@ object QuickBar {
 
   /** Called by [BarWatchService] when the system top bar is revealed / hidden. */
   fun setBarVisible(visible: Boolean) {
-    barVisible = visible
-    main.post { refresh() }
+    synchronized(refreshLock) {
+      val changed = barVisible != visible
+      barVisible = visible
+      if (changed || refreshRequired) {
+        refreshRequired = true
+        queueRefreshLocked()
+      }
+    }
   }
 
   /** Re-evaluate visibility after a config change (e.g. the always-show toggle). */
-  fun applyConfig() = main.post { refresh() }
+  fun applyConfig(): Boolean = synchronized(refreshLock) {
+    refreshRequired = true
+    queueRefreshLocked()
+  }
+
+  /** Called under refreshLock. Failed posting keeps the desired state retryable. */
+  private fun queueRefreshLocked(): Boolean {
+    if (refreshQueued) return true
+    refreshQueued = true
+    return main.post(refreshRunnable).also { if (!it) refreshQueued = false }
+  }
 
   private fun refresh() {
     val v = view ?: return
