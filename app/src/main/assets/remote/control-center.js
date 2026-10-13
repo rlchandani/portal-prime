@@ -1328,6 +1328,7 @@ function setupPad(pad) {
     tracking = null;
     dx = dy = 0;
     clearTimeout(timer);
+    timer = null;
   });
   pad.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
