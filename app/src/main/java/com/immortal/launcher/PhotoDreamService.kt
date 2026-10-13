@@ -36,7 +36,11 @@ class PhotoDreamService : DreamService() {
     pinnedOrigin = PinnedAppScreensaver.hasPin()
     ImmortalDreamNavigation.attached(this)
     PinnedAppScreensaver.nativeDreamAttached()
-    Log.i(TAG, "attached: dream starting")
+    // DreamService installs Android's separate Dream window animation. It can keep a
+    // departing photo surface over the already-resumed Home. Reveal the retained task
+    // directly; slideshow motion remains owned by PhotoFrameController.
+    window?.setWindowAnimations(0)
+    Log.i(TAG, "attached: dream starting; windowAnimations=${window?.attributes?.windowAnimations}")
     // Interactive so we receive touch and can exit on tap (verified on device).
     // Fullscreen for an immersive frame — tap-to-exit is the way out.
     isInteractive = true
@@ -64,6 +68,7 @@ class PhotoDreamService : DreamService() {
             Log.i(TAG, "onExit (tap) -> finish()")
             DreamPolicy.userExitAt = System.currentTimeMillis()
             if (pinnedOrigin || PinnedAppScreensaver.hasPin()) SleepScheduler.onReturnedToApp(this)
+            pauseFrameIfReady()
             finish()
           },
       )
@@ -91,12 +96,14 @@ class PhotoDreamService : DreamService() {
 
   override fun onDreamingStopped() {
     Log.i(TAG, "onDreamingStopped")
+    pauseFrameIfReady()
     super.onDreamingStopped()
     DreamPolicy.onImmortalDreamingStopped(this, pinnedOrigin)
   }
 
   override fun onWakeUp() {
     Log.i(TAG, "onWakeUp (system or finish())")
+    pauseFrameIfReady()
     super.onWakeUp()
   }
 
@@ -118,6 +125,11 @@ class PhotoDreamService : DreamService() {
       openApprovedHomeTab(ApprovedLauncherTab.HOME)
     }, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
     stopFrameOnce()
+  }
+
+  /** Freeze the last photo until window removal; clearing bitmaps here would flash black. */
+  private fun pauseFrameIfReady() {
+    if (!frameStopped && this::frame.isInitialized) frame.setHostActive(false)
   }
 
   private fun stopFrameOnce() {
