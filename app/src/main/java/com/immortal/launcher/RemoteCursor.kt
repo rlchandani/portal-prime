@@ -41,6 +41,21 @@ object RemoteCursor {
   private var lp: WindowManager.LayoutParams? = null
   private var sizePx = 0
   private val hideRunnable = Runnable { setVisible(false) }
+  private val pendingLock = Any()
+  private var pendingX = 0
+  private var pendingY = 0
+  private var updateQueued = false
+  private val updateRunnable = Runnable {
+    val xPx: Int
+    val yPx: Int
+    synchronized(pendingLock) {
+      if (!updateQueued) return@Runnable
+      xPx = pendingX
+      yPx = pendingY
+      updateQueued = false
+    }
+    paintPosition(xPx, yPx)
+  }
 
   fun attach(service: AccessibilityService) {
     main.post {
@@ -52,55 +67,69 @@ object RemoteCursor {
   }
 
   fun detach() {
-    main.post {
-      main.removeCallbacks(hideRunnable)
-      view?.let { v -> runCatching { wm?.removeView(v) } }
-      view = null
-      lp = null
-      host = null
-      wm = null
+    synchronized(pendingLock) {
+      updateQueued = false
+      main.removeCallbacks(updateRunnable)
+      main.post {
+        main.removeCallbacks(hideRunnable)
+        view?.let { v -> runCatching { wm?.removeView(v) } }
+        view = null
+        lp = null
+        host = null
+        wm = null
+      }
     }
   }
 
   /** Show (or move) the pointer to the screen-pixel centre [xPx], [yPx] and arm the idle hide. */
   fun showAt(xPx: Int, yPx: Int) {
-    main.post {
-      val ctx = host ?: return@post
-      val wmgr = wm ?: return@post
-      if (view == null) {
-        val params =
-            WindowManager.LayoutParams(
-                    sizePx,
-                    sizePx,
-                    WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                    PixelFormat.TRANSLUCENT,
-                )
-                .apply { gravity = Gravity.TOP or Gravity.START }
-        val dot =
-            View(ctx).apply {
-              background =
-                  GradientDrawable().apply {
-                    shape = GradientDrawable.OVAL
-                    setColor(0xCCFFFFFF.toInt()) // mostly-opaque white fill
-                    setStroke((2 * ctx.resources.displayMetrics.density).toInt(), 0xFF2E6BE6.toInt())
-                  }
-            }
-        runCatching { wmgr.addView(dot, params); view = dot; lp = params }
-            .onFailure { Log.w(TAG, "cursor addView failed", it) }
+    synchronized(pendingLock) {
+      pendingX = xPx
+      pendingY = yPx
+      // Repaint the newest position once, rather than replaying stale movements on a busy UI.
+      if (!updateQueued) {
+        updateQueued = true
+        if (!main.post(updateRunnable)) updateQueued = false
       }
-      val params = lp ?: return@post
-      params.x = xPx - sizePx / 2
-      params.y = yPx - sizePx / 2
-      view?.let { v ->
-        v.visibility = View.VISIBLE
-        runCatching { wmgr.updateViewLayout(v, params) }
-      }
-      main.removeCallbacks(hideRunnable)
-      main.postDelayed(hideRunnable, IDLE_HIDE_MS)
     }
+  }
+
+  private fun paintPosition(xPx: Int, yPx: Int) {
+    val ctx = host ?: return
+    val wmgr = wm ?: return
+    if (view == null) {
+      val params =
+          WindowManager.LayoutParams(
+                  sizePx,
+                  sizePx,
+                  WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                  WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                      WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                  PixelFormat.TRANSLUCENT,
+              )
+              .apply { gravity = Gravity.TOP or Gravity.START }
+      val dot =
+          View(ctx).apply {
+            background =
+                GradientDrawable().apply {
+                  shape = GradientDrawable.OVAL
+                  setColor(0xCCFFFFFF.toInt()) // mostly-opaque white fill
+                  setStroke((2 * ctx.resources.displayMetrics.density).toInt(), 0xFF2E6BE6.toInt())
+                }
+          }
+      runCatching { wmgr.addView(dot, params); view = dot; lp = params }
+          .onFailure { Log.w(TAG, "cursor addView failed", it) }
+    }
+    val params = lp ?: return
+    params.x = xPx - sizePx / 2
+    params.y = yPx - sizePx / 2
+    view?.let { v ->
+      v.visibility = View.VISIBLE
+      runCatching { wmgr.updateViewLayout(v, params) }
+    }
+    main.removeCallbacks(hideRunnable)
+    main.postDelayed(hideRunnable, IDLE_HIDE_MS)
   }
 
   private fun setVisible(visible: Boolean) {
