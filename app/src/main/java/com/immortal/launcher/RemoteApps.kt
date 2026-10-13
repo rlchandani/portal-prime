@@ -46,30 +46,58 @@ object RemoteApps {
     true
   })
 
+  private val appListInventory = RemoteAppListInventory<Context>(subscribe = subscribe@ { context, invalidate ->
+    val app = context.applicationContext ?: return@subscribe false
+    val filter = IntentFilter().apply {
+      addAction(Intent.ACTION_PACKAGE_ADDED)
+      addAction(Intent.ACTION_PACKAGE_REMOVED)
+      addAction(Intent.ACTION_PACKAGE_CHANGED)
+      addAction(Intent.ACTION_PACKAGE_REPLACED)
+      addDataScheme("package")
+    }
+    val receiver = object : BroadcastReceiver() {
+      override fun onReceive(context: Context, intent: Intent) { invalidate() }
+    }
+    ContextCompat.registerReceiver(app, receiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+    true
+  })
+
   /** All launchable apps as `[{label, packageName}]`, alphabetised and curated. */
-  fun listJson(context: Context): JSONArray {
+  fun listJson(context: Context, deviceId: String? = null): JSONArray {
+    val locale = Locale.getDefault()
+    val key = runCatching { RemoteAppListKey(context.packageName,
+        context.resources.configuration.toString(), deviceId ?: android.os.Build.DEVICE.orEmpty(), locale.toLanguageTag()) }.getOrNull()
+    val loader = { scanApps(context, deviceId, locale) }
+    val entries = if (key == null) loader().entries else appListInventory.entries(context, key,
+        canRetain = { context.packageName == key.owner &&
+            context.resources.configuration.toString() == key.resources &&
+            Locale.getDefault().toLanguageTag() == key.locale }, loader = loader)
+    // Every caller owns fresh mutable JSON; only immutable copied primitives enter the cache.
+    return JSONArray().apply { entries.forEach { app ->
+      put(JSONObject().put("packageName", app.packageName).put("label", app.label))
+    } }
+  }
+
+  private fun scanApps(context: Context, deviceId: String?, locale: Locale): RemoteAppListScan {
     val pm = context.packageManager
     val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-    val arr = JSONArray()
-    pm.queryIntentActivities(intent, 0)
+    var complete = true
+    val entries = pm.queryIntentActivities(intent, 0)
         .asSequence()
         .map { it.activityInfo.packageName }
-        .filter { it != context.packageName && !Curation.isHidden(it, "") }
+        .filter { it != context.packageName && !Curation.isHidden(it, "", deviceId ?: android.os.Build.DEVICE) }
         .distinct()
         .mapNotNull { pkg ->
           runCatching {
-                val ai = pm.getApplicationInfo(pkg, 0)
-                val raw = pm.getApplicationLabel(ai).toString()
-                if (raw in Curation.hiddenLabels) null
-                else pkg to Curation.displayLabel(pkg, raw)
-              }
-              .getOrNull()
+            val ai = pm.getApplicationInfo(pkg, 0)
+            val raw = pm.getApplicationLabel(ai).toString()
+            if (raw in Curation.hiddenLabels) null
+            else RemoteAppListEntry(pkg, Curation.displayLabel(pkg, raw))
+          }.onFailure { complete = false }.getOrNull()
         }
-        .sortedBy { it.second.lowercase(Locale.getDefault()) }
-        .forEach { (pkg, label) ->
-          arr.put(JSONObject().put("packageName", pkg).put("label", label))
-        }
-    return arr
+        .sortedBy { it.label.lowercase(locale) }
+        .toList()
+    return RemoteAppListScan(entries, complete)
   }
 
   /** A package's launcher icon as PNG bytes (square [sizePx]), or null if unavailable. */
