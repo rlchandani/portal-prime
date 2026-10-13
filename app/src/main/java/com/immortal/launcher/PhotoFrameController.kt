@@ -276,6 +276,9 @@ class PhotoFrameController(
 
   /** Hosts forward their touch events here. */
   fun onTouch(ev: MotionEvent) {
+    // Meta can stop the Dream before ACTION_UP arrives. An in-progress touch is user
+    // interaction, so recovery must not reopen photos between finger-down and dismissal.
+    if (ev.actionMasked == MotionEvent.ACTION_DOWN) DreamPolicy.userExitAt = System.currentTimeMillis()
     // While the timer alarm is showing, the slide-to-stop owns the touch stream.
     if (faceRenderer.handleAlarmTouch(ev)) return
     when (ev.actionMasked) {
