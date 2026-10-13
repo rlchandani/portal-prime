@@ -285,18 +285,25 @@ internal fun approvedInstalledEntries(context: Context, inventory: List<AppEntry
 /** Reuse the same already-rendered shortcut artwork as Home; never decode from composition. */
 internal fun peekApprovedIconInventory(): List<AppEntry>? = ApprovedHomeInventory.apps.peek()
 
-internal fun approvedShortcutIcons(context: Context, inventory: List<AppEntry>): Map<String, ImageBitmap> =
-    inventory.mapNotNull { app ->
-      val key = when (app.component) {
-        ComponentName(context, StoreActivity::class.java) -> "store"
-        ComponentName(context, WebAppActivity::class.java) -> "music"
-        ComponentName(context, HomeDashboardActivity::class.java) -> "dashboard"
-        ComponentName(context, ImmortalSettingsActivity::class.java) -> "settings"
-        CALLS_COMPONENT -> "calls"
-        else -> null
-      }
-      key?.let { it to app.icon }
-    }.toMap()
+internal fun approvedShortcutIcons(context: Context, inventory: List<AppEntry>): Map<String, ImageBitmap> {
+  if (inventory.isEmpty()) return emptyMap()
+  // Warm Apps prepares this map from composition; build targets once for the whole inventory.
+  val store = ComponentName(context, StoreActivity::class.java)
+  val music = ComponentName(context, WebAppActivity::class.java)
+  val dashboard = ComponentName(context, HomeDashboardActivity::class.java)
+  val settings = ComponentName(context, ImmortalSettingsActivity::class.java)
+  return inventory.mapNotNull { app ->
+    val key = when (app.component) {
+      store -> "store"
+      music -> "music"
+      dashboard -> "dashboard"
+      settings -> "settings"
+      CALLS_COMPONENT -> "calls"
+      else -> null
+    }
+    key?.let { it to app.icon }
+  }.toMap()
+}
 
 /** Run on IO; cold Home and Apps requests share one package/icon scan. */
 internal fun loadApprovedIconInventory(context: Context): List<AppEntry> {
