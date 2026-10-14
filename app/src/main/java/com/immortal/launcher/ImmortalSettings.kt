@@ -157,9 +157,9 @@ object ImmortalSettings {
       listOf("America/New_York", "Europe/London", "Asia/Tokyo")
 
   fun worldClockZones(c: Context): List<String> {
-    val raw = prefs(c).getString("world_clock_zones", null)
-    val list = raw?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
-    return if (list.isNullOrEmpty()) DEFAULT_WORLD_CLOCK_ZONES else list
+    // Defaults apply only before a selection is saved; clearing every city is intentional.
+    val raw = prefs(c).getString("world_clock_zones", null) ?: return DEFAULT_WORLD_CLOCK_ZONES
+    return raw.split(",").map { it.trim() }.filter { it.isNotEmpty() }
   }
 
   fun setWorldClockZones(c: Context, zones: List<String>) =
