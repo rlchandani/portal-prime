@@ -12,21 +12,35 @@ internal class WebAppContentRevealGate {
     private var awaitingStart = false
     private var revealed = false
     private var destroyed = false
+    private var failed = false
+    private var targetDocument: String? = null
 
-    fun request(url: String, currentUrl: String?) {
-        if (destroyed || document(url) == document(currentUrl)) return
-        revision++; awaitingStart = true; revealed = false
+    fun request(url: String, currentUrl: String?, force: Boolean = false): Boolean {
+        if (destroyed || (!force && document(url) == document(currentUrl))) return false
+        revision++; awaitingStart = true; revealed = false; failed = false
+        targetDocument = document(url)
+        return true
     }
-    fun started() {
-        if (destroyed) return
+    fun started(url: String? = null): Boolean {
+        // Error-document callbacks cannot clear a failed attempt; retry/new entry must admit it.
+        if (destroyed || failed) return false
         revision++; awaitingStart = false; revealed = false
+        if (url != null) targetDocument = document(url)
+        return true
+    }
+    fun fail(url: String?, currentUrl: String?): Boolean {
+        if (destroyed || failed || revision == 0L || url == null) return false
+        val expected = targetDocument ?: document(currentUrl) ?: return false
+        if (document(url) != expected) return false
+        revision++; failed = true; revealed = false
+        return true
     }
     fun capture(url: String?, currentUrl: String?): Long? =
-        if (destroyed || awaitingStart || revealed || revision == 0L || url == null ||
+        if (destroyed || failed || awaitingStart || revealed || revision == 0L || url == null ||
             currentUrl == null || document(url) != document(currentUrl)) null else revision
 
     fun complete(requestId: Long): Boolean {
-        if (destroyed || awaitingStart || revealed || revision == 0L || requestId != revision) return false
+        if (destroyed || failed || awaitingStart || revealed || revision == 0L || requestId != revision) return false
         revealed = true
         return true
     }

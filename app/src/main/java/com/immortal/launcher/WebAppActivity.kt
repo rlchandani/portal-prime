@@ -14,14 +14,18 @@ import android.os.Build
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
 import android.view.ViewTreeObserver
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.view.ViewGroup
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -59,6 +63,11 @@ class WebAppActivity : ComponentActivity() {
   private val contentReveal = WebAppContentRevealGate()
   private lateinit var root: FrameLayout
   private lateinit var opening: LinearLayout
+  private lateinit var openingProgress: ProgressBar
+  private lateinit var openingTitle: TextView
+  private lateinit var errorMessage: TextView
+  private lateinit var errorActions: LinearLayout
+  private var failedUrl: String? = null
   private val openingGate = WebAppOpeningGate()
   private var frameCommit: Runnable? = null
   private var drawListener: ViewTreeObserver.OnDrawListener? = null
@@ -115,19 +124,38 @@ class WebAppActivity : ComponentActivity() {
       setBackgroundColor(Color.rgb(19, 20, 22))
       isClickable = true
       val size = (44 * resources.displayMetrics.density).toInt()
-      addView(ProgressBar(context).apply {
+      openingProgress = ProgressBar(context).apply {
         indeterminateTintList = ColorStateList.valueOf(Color.WHITE)
-      }, LinearLayout.LayoutParams(size, size))
-      addView(TextView(context).apply {
+      }
+      addView(openingProgress, LinearLayout.LayoutParams(size, size))
+      openingTitle = TextView(context).apply {
         text = if (entryUrl == URL_YT_MUSIC) "Opening Music…" else "Opening page…"
         textSize = 28f
         typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
         setTextColor(Color.WHITE)
         gravity = Gravity.CENTER
-      }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-        topMargin = (24 * resources.displayMetrics.density).toInt()
-      })
+      }
+      addView(openingTitle, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(24) })
+      errorMessage = TextView(context).apply {
+        text = "Check your connection, then try again."
+        textSize = 20f
+        setTextColor(Color.rgb(180, 183, 190))
+        gravity = Gravity.CENTER
+        visibility = View.GONE
+      }
+      addView(errorMessage, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(12) })
+      errorActions = LinearLayout(context).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER
+        visibility = View.GONE
+        addView(recoveryButton("Back") { finish() }, LinearLayout.LayoutParams(dp(160), dp(64)))
+        addView(recoveryButton("Try again") { retryFailedPage() },
+            LinearLayout.LayoutParams(dp(200), dp(64)).apply { leftMargin = dp(16) })
+      }
+      addView(errorActions, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(28) })
     }
     root.addView(opening, FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -161,7 +189,8 @@ class WebAppActivity : ComponentActivity() {
         object : OnBackPressedCallback(true) {
           override fun handleOnBackPressed() {
             val w = web
-            if (w != null && w.canGoBack()) w.goBack()
+            if (failedUrl != null) finish()
+            else if (w != null && w.canGoBack()) w.goBack()
             else {
               isEnabled = false
               onBackPressedDispatcher.onBackPressed()
@@ -196,7 +225,22 @@ class WebAppActivity : ComponentActivity() {
         override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
           super.onPageStarted(view, url, favicon)
           if (view !== web || isFinishing || isDestroyed) return
-          contentReveal.started()
+          if (contentReveal.started(url)) showLoading()
+        }
+        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+          super.onReceivedError(view, request, error)
+          if (view !== web || isFinishing || isDestroyed || !request.isForMainFrame) return
+          // Keep HTTP error bodies and failed subresources under the website's control.
+          if (!WebAppLoadErrorPolicy.shouldRecover(request.isForMainFrame, error.errorCode)) return
+          val failed = request.url.toString()
+          if (!contentReveal.fail(failed, view.url)) return
+          failedUrl = failed
+          openingProgress.visibility = View.GONE
+          openingTitle.text = if (error.errorCode == ERROR_UNKNOWN) "Couldn’t open page" else "Couldn’t connect"
+          errorMessage.text = if (error.errorCode == ERROR_UNKNOWN) "Try again, or go back."
+              else "Check your connection, then try again."
+          errorMessage.visibility = View.VISIBLE
+          errorActions.visibility = View.VISIBLE
           opening.visibility = View.VISIBLE
         }
         override fun onPageCommitVisible(view: WebView, url: String?) {
@@ -223,6 +267,41 @@ class WebAppActivity : ComponentActivity() {
     view.loadUrl(entryUrl)
   }
 
+  private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+
+  private fun recoveryButton(label: String, action: () -> Unit): Button = Button(this).apply {
+    text = label
+    isAllCaps = false
+    textSize = 22f
+    setTextColor(Color.WHITE)
+    background = GradientDrawable().apply {
+      setColor(Color.rgb(48, 50, 54))
+      cornerRadius = dp(20).toFloat()
+    }
+    setOnClickListener { action() }
+  }
+
+  private fun showLoading() {
+    failedUrl = null
+    openingProgress.visibility = View.VISIBLE
+    openingTitle.text = if (entryUrl == URL_YT_MUSIC) "Opening Music…" else "Opening page…"
+    errorMessage.visibility = View.GONE
+    errorActions.visibility = View.GONE
+    opening.visibility = View.VISIBLE
+  }
+
+  private fun retryFailedPage() {
+    val url = failedUrl ?: return
+    val view = web ?: return
+    if (isFinishing || isDestroyed) return
+    // Force a fresh readiness attempt even when Chromium retains the failed URL.
+    contentReveal.request(url, view.url, force = true)
+    showLoading() // Hide the buttons synchronously: repeated taps cannot enqueue retries.
+    loads++
+    WebAppOpeningDiagnostics.loadRequested()
+    view.loadUrl(url)
+  }
+
   private fun revealReadyContent(view: WebView, url: String?) {
     if (view !== web || isFinishing || isDestroyed) return
     val ticket = contentReveal.capture(url, view.url) ?: return
@@ -244,7 +323,7 @@ class WebAppActivity : ComponentActivity() {
       entryUrl = url
       web?.let {
         loads++
-        contentReveal.request(url, it.url)
+        if (contentReveal.request(url, it.url, force = failedUrl != null)) showLoading()
         WebAppOpeningDiagnostics.loadRequested()
         it.loadUrl(url)
       }

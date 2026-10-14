@@ -77,4 +77,68 @@ class WebAppContentRevealGateTest {
     val next = gate.capture("https://fixture/two", "https://fixture/two")!!
     assertTrue(gate.complete(next)); assertFalse(gate.complete(next))
   }
+  @Test fun failedDocumentInvalidatesQueuedVisualCompletionAndErrorPageReadiness() {
+    val gate = WebAppContentRevealGate()
+    gate.request("https://fixture/one", null); gate.started("https://fixture/one")
+    val old = gate.capture("https://fixture/one", "https://fixture/one")!!
+    assertTrue(gate.fail("https://fixture/one", "https://fixture/one"))
+    assertFalse(gate.complete(old))
+    assertNull(gate.capture("https://fixture/one", "https://fixture/one"))
+    assertFalse(gate.started("https://fixture/one"))
+    assertNull(gate.capture("https://fixture/one", "https://fixture/one"))
+  }
+  @Test fun forcedSameDocumentRetryRejectsOldCallbacksAndCanRevealNewContent() {
+    val gate = WebAppContentRevealGate()
+    gate.request("https://fixture/one", null); gate.started("https://fixture/one")
+    val old = gate.capture("https://fixture/one", "https://fixture/one")!!
+    assertTrue(gate.fail("https://fixture/one", "https://fixture/one"))
+    gate.request("https://fixture/one", "https://fixture/one", force = true)
+    assertFalse(gate.complete(old))
+    assertNull(gate.capture("https://fixture/one", "https://fixture/one"))
+    assertTrue(gate.started("https://fixture/one"))
+    assertTrue(gate.complete(gate.capture("https://fixture/one", "https://fixture/one")!!))
+  }
+  @Test fun supersededDocumentFailureCannotReplacePendingOrStartedNewDocument() {
+    val gate = WebAppContentRevealGate()
+    gate.request("https://fixture/one", null); gate.started("https://fixture/one")
+    gate.request("https://fixture/two", "https://fixture/one")
+    assertFalse(gate.fail("https://fixture/one", "https://fixture/one"))
+    gate.started("https://fixture/two")
+    assertFalse(gate.fail("https://fixture/one", "https://fixture/two"))
+    assertTrue(gate.complete(gate.capture("https://fixture/two", "https://fixture/two")!!))
+  }
+  @Test fun redirectFailureUsesRedirectTargetAndCanRetryIt() {
+    val gate = WebAppContentRevealGate()
+    gate.request("https://fixture/entry", null); gate.started("https://fixture/final")
+    assertTrue(gate.fail("https://fixture/final", "https://fixture/final"))
+    gate.request("https://fixture/final", "https://fixture/final", force = true)
+    assertTrue(gate.started("https://fixture/final"))
+    assertNotNull(gate.capture("https://fixture/final", "https://fixture/final"))
+  }
+  @Test fun destructionRejectsFailureAndRetry() {
+    val gate = WebAppContentRevealGate()
+    gate.request("https://fixture/one", null); gate.started("https://fixture/one")
+    gate.destroy()
+    assertFalse(gate.fail("https://fixture/one", "https://fixture/one"))
+    gate.request("https://fixture/one", "https://fixture/one", force = true)
+    assertFalse(gate.started("https://fixture/one"))
+    assertNull(gate.capture("https://fixture/one", "https://fixture/one"))
+  }
+  @Test fun nullAndDifferentQueryFailuresAreRejected() {
+    val gate = WebAppContentRevealGate()
+    gate.request("https://fixture/page?a=1", null); gate.started("https://fixture/page?a=1")
+    assertFalse(gate.fail(null, "https://fixture/page?a=1"))
+    assertFalse(gate.fail("https://fixture/page?a=2", "https://fixture/page?a=1"))
+    assertTrue(gate.fail("https://fixture/page?a=1#chapter", "https://fixture/page?a=1"))
+  }
+
+  @Test fun fragmentChangeDoesNotAskCallerToShowLoadingWithoutNewDocumentStart() {
+    val gate = WebAppContentRevealGate()
+    assertTrue(gate.request("https://fixture/page", null))
+    gate.started("https://fixture/page")
+    assertTrue(gate.complete(gate.capture("https://fixture/page", "https://fixture/page")!!))
+    assertFalse(gate.request("https://fixture/page#chapter", "https://fixture/page"))
+    assertTrue(gate.request("https://fixture/page", "https://fixture/page", force = true))
+  }
+
 }
