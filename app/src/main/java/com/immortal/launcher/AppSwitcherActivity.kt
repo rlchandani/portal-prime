@@ -120,6 +120,7 @@ private fun ApprovedAppsContent(
   var lastSuccessfulEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
   var lastRecentEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
   var recents by remember { mutableStateOf<List<AppItem>?>(null) }
+  val recentLabels = remember { RecentAppLabelCache() }
   var inventory by remember {
     mutableStateOf(peekApprovedIconInventory()?.let { appInventory(context, it) })
   }
@@ -211,7 +212,7 @@ private fun ApprovedAppsContent(
     try {
       val loaded = withContext(Dispatchers.IO) {
         val loadingContext = kotlinx.coroutines.currentCoroutineContext()
-        loadRecents(context) { loadingContext.ensureActive() }
+        loadRecents(context, recentLabels) { loadingContext.ensureActive() }
       }
       kotlinx.coroutines.currentCoroutineContext().ensureActive()
       recents = loaded; recentsFailure = null
@@ -497,15 +498,18 @@ private fun recentIcon(context: Context, pkg: String, inventory: Map<String, Ima
 }
 
 /** Recently-used apps, most-recent first, with usage time; launchable + curated, minus Immortal. */
-private fun loadRecents(context: Context, checkActive: () -> Unit): List<AppItem> {
+private fun loadRecents(context: Context, labelCache: RecentAppLabelCache, checkActive: () -> Unit): List<AppItem> {
   checkActive()
   val usm =
       context.getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager
           ?: return emptyList()
   val now = System.currentTimeMillis()
+  RecentAppPreparationDiagnostics.query()
   val stats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, now - 24L * 3600_000, now)
   if (stats.isNullOrEmpty()) return emptyList()
   val icons = loadApprovedInstalledApps(context).associate { it.component.packageName to it.icon }
+  val packageRevision = approvedIconInventoryRevision.value
+  val configuration = context.resources.configuration.toString()
   checkActive()
 
   val lastUsed = HashMap<String, Long>()
@@ -517,7 +521,7 @@ private fun loadRecents(context: Context, checkActive: () -> Unit): List<AppItem
   }
 
   val pm = context.packageManager
-  return lastUsed.entries
+  val result = lastUsed.entries
       .sortedByDescending { it.value }
       .asSequence()
       .mapNotNull { (pkg, last) ->
@@ -528,17 +532,22 @@ private fun loadRecents(context: Context, checkActive: () -> Unit): List<AppItem
         if (last <= 0L || now - last > 7L * 86400_000) return@mapNotNull null
         val component = pm.getLaunchIntentForPackage(pkg)?.component ?: return@mapNotNull null
         runCatching {
-              val ai = pm.getApplicationInfo(pkg, 0)
-              val raw = pm.getApplicationLabel(ai).toString()
+              val raw = labelCache.read(RecentAppLabelKey(pkg, packageRevision, configuration)) {
+                checkActive()
+                RecentAppPreparationDiagnostics.labelRead()
+                pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()
+              }
               val label = Curation.displayLabel(pkg, raw)
               if (raw in Curation.hiddenLabels || label in Curation.hiddenLabels) return@mapNotNull null
-              val bmp = recentIcon(context, pkg, icons) { pm.getApplicationIcon(ai) }
+              val bmp = recentIcon(context, pkg, icons) { pm.getApplicationIcon(pkg) }
               AppItem(label, component, bmp, last, fg[pkg] ?: 0)
             }
             .getOrNull()
       }
       .take(16)
       .toList()
+  RecentAppPreparationDiagnostics.completed(result.size)
+  return result
 }
 
 /** All installed launchable apps (for search / drawer), alphabetised, curated, minus Immortal. */
