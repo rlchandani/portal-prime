@@ -1190,7 +1190,7 @@ function remotePage() {
     el('strong', { text: 'Touchpad' }),
     text('Drag to move · Tap to click'),
   );
-  setupPad(pad);
+  const tap = setupPad(pad);
   const keyboard = group(
     el('h2', { text: 'Keyboard' }),
     text('Select a text field on the Portal, then send text.'),
@@ -1235,9 +1235,7 @@ function remotePage() {
             button('Scroll up', () =>
               mutate('scroll', '/remote/scroll', { dir: 'up' }, { success: '' }),
             ),
-            button('Tap', () =>
-              mutate('tap', '/remote/tap', undefined, { method: 'POST', success: '' }),
-            ),
+            button('Tap', tap),
             button('Scroll down', () =>
               mutate('scroll', '/remote/scroll', { dir: 'down' }, { success: '' }),
             ),
@@ -1273,33 +1271,50 @@ function setupPad(pad) {
     dx = 0,
     dy = 0,
     timer = null,
-    sending = false;
+    sending = null;
   const captured = session.capture();
-  const send = async () => {
+  const visibility = playbackVisibilityGeneration;
+  const current = () => pad.isConnected && session.current(captured) &&
+    visibility === playbackVisibilityGeneration && !document.hidden;
+  const send = () => {
+    clearTimeout(timer);
     timer = null;
-    if (sending || !session.current(captured) || document.hidden) {
+    if (!current()) {
       dx = dy = 0;
-      return;
+      return Promise.resolve(false);
     }
+    // Keep later deltas while the earlier request is still applying on the Portal.
+    if (sending) return sending;
     const x = dx,
       y = dy;
     dx = dy = 0;
-    if (!x && !y) return;
-    sending = true;
-    try {
-      await api(captured.room, '/remote/cursor', {
+    if (!x && !y) return Promise.resolve(true);
+    sending = api(captured.room, '/remote/cursor', {
         body: { dx: x * 1.9, dy: y * 1.9 },
         timeout: 2500,
+      }).then(() => true, (error) => {
+        if (current() && error.code !== 'aborted') toast(message(error), true);
+        return false;
+      }).finally(() => {
+        sending = null;
+        if (!current()) dx = dy = 0;
+        else if (dx || dy) timer = setTimeout(send, 35);
       });
-    } catch (error) {
-      if (session.current(captured) && error.code !== 'aborted') toast(message(error), true);
-    } finally {
-      sending = false;
-      if ((dx || dy) && session.current(captured)) timer = setTimeout(send, 35);
+    return sending;
+  };
+  const click = async () => {
+    clearTimeout(timer);
+    timer = null;
+    // A click must use the acknowledged final position, never overtake its move.
+    while (current() && (sending || dx || dy)) {
+      if (!await send()) return;
     }
+    if (current()) return mutate('tap', '/remote/tap', undefined, {
+      method: 'POST', ticket: captured, target: captured.room, success: '',
+    });
   };
   pad.addEventListener('pointerdown', (event) => {
-    if (event.button !== 0) return;
+    if (event.button !== 0 || !current()) return;
     pad.setPointerCapture(event.pointerId);
     tracking = {
       id: event.pointerId,
@@ -1312,7 +1327,7 @@ function setupPad(pad) {
     };
   });
   pad.addEventListener('pointermove', (event) => {
-    if (!tracking || tracking.id !== event.pointerId || !session.current(captured)) return;
+    if (!tracking || tracking.id !== event.pointerId || !current()) return;
     dx += event.clientX - tracking.x;
     dy += event.clientY - tracking.y;
     tracking.x = event.clientX;
@@ -1325,13 +1340,7 @@ function setupPad(pad) {
     if (!tracking || tracking.id !== event.pointerId) return;
     const tapped = !tracking.moved && Date.now() - tracking.at < 450;
     tracking = null;
-    if (tapped && session.current(captured))
-      mutate('tap', '/remote/tap', undefined, {
-        method: 'POST',
-        ticket: captured,
-        target: captured.room,
-        success: '',
-      });
+    if (tapped) click();
   });
   pad.addEventListener('pointercancel', () => {
     tracking = null;
@@ -1340,14 +1349,10 @@ function setupPad(pad) {
     timer = null;
   });
   pad.addEventListener('keydown', (event) => {
+    if (!current()) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      mutate('tap', '/remote/tap', undefined, {
-        method: 'POST',
-        ticket: captured,
-        target: captured.room,
-        success: '',
-      });
+      click();
     } else {
       const delta = {
         ArrowUp: [0, -25],
@@ -1363,6 +1368,7 @@ function setupPad(pad) {
       }
     }
   });
+  return click;
 }
 function mediaButton(label, icon, onClick, primary = false) {
   return el(
@@ -4578,6 +4584,8 @@ document.addEventListener('visibilitychange', () => {
     previewPool.clear();
     clearTimeout(pairDiscoveryTimer);
   } else {
+    // Retire old queued input; a fresh pad admits gestures after visibility resumes.
+    if (tab === 'remote' && !detail) render();
     loadVisible();
     if (connectionState === 'offline') status();
     startPolling();
