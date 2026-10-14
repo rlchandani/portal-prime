@@ -242,6 +242,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
         val navigate = remember { ::navigateLocal }
         val back = remember { ::backLocal }
         val forward = remember { ::forwardLocal }
+        val viewports = remember { ApprovedSettingsViewportMemory() }
         val advanced = rememberApprovedAdvanced()
         val previous = history.back { permittedHistoryRoute(it, advanced) }.takeIf { it != history }
         val next = history.forward { permittedHistoryRoute(it, advanced) }.takeIf { it != history }
@@ -257,6 +258,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
             LocalApprovedSettingsNavigate provides navigate,
             LocalApprovedSettingsBack provides back,
             LocalApprovedSettingsHistoryControls provides controls,
+            LocalApprovedSettingsViewportMemory provides viewports,
         ) {
           ImmortalSettingsScreen(route)
         }
@@ -308,7 +310,8 @@ private fun ImmortalSettingsScreen(route: ApprovedSettingsRoute) {
       subtitle = if (route.page == null) category.subtitle else "",
       onBack = if (route.page != null) backToCategory else null,
       page = route.page,
-      lazyDetail = if (route.page == "screensaver") screensaverSettingsDetail() else null,
+      lazyDetail = if (route.page == "screensaver")
+          screensaverSettingsDetail("${route.detailKey}/${route.control.orEmpty()}") else null,
       content = routeContent,
   )
   prerequisite?.let { message ->

@@ -480,7 +480,8 @@ private fun ApprovedSettingsDetailBody(
             ApprovedSettingsDetailHeading(detail.title, detail.subtitle, detail.onBack)
             if (detail.lazy == null) {
                 Column(
-                    Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())
+                    Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberApprovedSettingsScrollState(
+                        "${detail.routeKey}/${detail.requested.orEmpty()}"))
                         .padding(bottom = 80.dp),
                 ) {
                     if (detail.gated) ApprovedSettingsAdvancedGate(onAdvanced) else detail.content()

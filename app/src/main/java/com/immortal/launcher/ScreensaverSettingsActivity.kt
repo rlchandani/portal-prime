@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -79,7 +78,7 @@ private fun ScreensaverSettingsScreen() {
 
 /** One lazy list is reused by the main Settings pane and the direct Activity entry. */
 @Composable
-internal fun screensaverSettingsDetail(): ApprovedSettingsLazyDetail {
+internal fun screensaverSettingsDetail(viewportKey: String? = null): ApprovedSettingsLazyDetail {
   val context = LocalContext.current
   val activity = context as? Activity
   val editor = rememberScreensaverEditor()
@@ -95,7 +94,7 @@ internal fun screensaverSettingsDetail(): ApprovedSettingsLazyDetail {
   ) { key, value -> apply(SettingsDomains.calendar, key, value) } else null
   val requested = LocalApprovedRequestedControl.current
       ?: activity?.intent?.getStringExtra(APPROVED_SETTINGS_CONTROL)
-  val scroll = rememberLazyListState()
+  val scroll = rememberApprovedSettingsLazyScrollState(viewportKey)
   val index = approvedScreensaverControlIndex(
       requested, settings.enabled, screensaver?.projection?.controlIndices.orEmpty(),
       screensaver?.itemCount ?: 0, calendar?.projection?.controlIndices.orEmpty(),
