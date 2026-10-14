@@ -425,8 +425,10 @@ object ScreensaverConfig {
           .apply()
 
   /** Render an arbitrary web page as the screensaver (e.g. Immich Kiosk, a dashboard). */
-  fun setWebUrl(c: Context, url: String) =
-      prefs(c).edit().putString("web_url", url.trim()).putString("source", SOURCE_WEBURL).apply()
+  fun setWebUrl(c: Context, raw: String) {
+    val url = WebPageUrl.normalize(raw) ?: return
+    prefs(c).edit().putString("web_url", url).putString("source", SOURCE_WEBURL).apply()
+  }
 
   fun useDefault(c: Context) = prefs(c).edit().putString("source", SOURCE_DEFAULT).apply()
 

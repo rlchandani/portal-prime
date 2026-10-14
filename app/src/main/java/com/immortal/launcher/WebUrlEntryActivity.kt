@@ -12,7 +12,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
-/** Native web-frame form, preserving the existing literal http/https validation. */
+/** Native web-frame form using the same format validator as the source write boundaries. */
 class WebUrlEntryActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -24,10 +24,12 @@ class WebUrlEntryActivity : ComponentActivity() {
             advancedOnly = true,
             placeholder = "https://…",
             initial = ScreensaverConfig.load(this).webUrl.orEmpty(),
-            emptyHint = "Enter an address starting with http:// or https://.",
-            invalidHint = "Start the address with http:// or https://.",
+            emptyHint = "Enter a complete http:// or https:// web page address.",
+            invalidHint = "Enter a complete http:// or https:// address with a host.",
+            fieldHelp = "Use a web page or dashboard that this Portal can reach.",
+            validHint = { "Address format is valid. The Portal still needs to be able to load this page." },
             primaryLabel = "Use this page",
-            validate = { if (it.startsWith("http://") || it.startsWith("https://")) "" else null },
+            validate = { if (WebPageUrl.normalize(it) != null) "" else null },
             onSave = { url ->
               ScreensaverConfig.setWebUrl(this, url)
               approvedSourcesReturn(this)

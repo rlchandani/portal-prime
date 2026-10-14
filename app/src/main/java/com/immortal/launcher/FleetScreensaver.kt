@@ -181,8 +181,8 @@ object FleetScreensaver {
       }
     }
     run {
-      val url = body.optString("webUrl")
-      if (url.isNotBlank()) {
+      val url = (body.opt("webUrl") as? String)?.let(WebPageUrl::normalize)
+      if (url != null) {
         ScreensaverConfig.setWebUrl(context, url)
         applied.add("webUrl")
       }

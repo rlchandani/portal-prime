@@ -29,6 +29,12 @@ internal object RemoteCompanionSources {
       if (album !is String) return Prepared(error = "invalid_source_field")
       if (!RemoteAlbum.isSupported(album)) return Prepared(error = "invalid_album_link")
     }
+    if (out.has("webUrl")) {
+      val value = out.opt("webUrl")
+      if (value !is String) return Prepared(error = "invalid_source_field")
+      val url = WebPageUrl.normalize(value) ?: return Prepared(error = "invalid_web_url")
+      out.put("webUrl", url)
+    }
     val credentialFields = setOf("immichUrl", "immichKey", "immichAlbumId", "immichAlbumName", "smbHost", "smbShare", "smbPath", "smbUser", "smbPass", "davUrl", "davUser", "davPass")
     if (credentialFields.any { out.has(it) && out.opt(it) !is String }) return Prepared(error="invalid_source_field")
     if (out.fieldKeys().any { it in setOf("immichUrl", "immichKey", "immichAlbumId", "immichAlbumName") }) {

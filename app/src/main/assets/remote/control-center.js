@@ -365,6 +365,7 @@ function message(error) {
     aborted: 'Request cancelled.',
     invalid_value: 'This value does not match the Portal’s setting constraints.',
     invalid_album_link: 'Enter a complete public iCloud, Google Photos or Synology Photos album link.',
+    invalid_web_url: 'Enter a complete http:// or https:// address with a host.',
     invalid_source_field: 'Review the photo source fields and enter text values before saving.',
     partial_apply: 'Some values were rejected. Review the per-room results.',
     active_portal_only: 'This control applies to the active Portal only.',
@@ -2243,7 +2244,7 @@ const sourceFields = {
     ['davPass', 'Password', true],
   ],
   album: [['albumUrl', 'Album address']],
-  web: [['webUrl', 'Image address']],
+  web: [['webUrl', 'Web page address']],
   default: [],
 };
 function sourcesPage() {
@@ -2293,7 +2294,12 @@ function sourcesPage() {
           type: secret ? 'password' : 'text',
           key: `source:${key}`,
           placeholder: secret && s[`${key}Configured`] ? 'Keep saved credential' : '',
-          help: secret ? 'Leave blank to keep a credential for the same endpoint and account.' : '',
+          help:
+            key === 'webUrl'
+              ? 'Use a complete http:// or https:// URL with a host. A valid format does not guarantee the page will load.'
+              : secret
+                ? 'Leave blank to keep a credential for the same endpoint and account.'
+                : '',
         },
       ),
     ),
