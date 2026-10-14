@@ -71,6 +71,10 @@ class FleetRoutes(private val context: Context) {
       "/perf/home-ui" -> HomeUiDiagnostics.handle(context, req)
       "/perf/app-badges" -> AppBadgeProbe.handle(context, req)
       "/perf/store-work" -> StoreLoadingDiagnostics.handle(req)
+      "/perf/remote-input" -> requireMethod("GET", req) {
+        if (!BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) resp(403, err("diagnostics_disabled"))
+        else FleetHttpServer.Response(200, RemoteInput.gestureDiagnostics().toString())
+      }
       "/perf/settings-ui" -> SettingsUiDiagnostics.handle(context, req)
       "/perf/webapp" -> WebAppProbe.handle(context, req)
       "/perf/source-preview" -> SourcePreviewProbe.handle(context, req)

@@ -20,6 +20,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 import kotlin.concurrent.thread
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * The bridge from the fleet agent's HTTP thread ([RemoteRoutes]) to the accessibility
@@ -44,16 +45,23 @@ import kotlin.concurrent.thread
 object RemoteInput {
   private const val TAG = "ImmortalRemote"
 
-  @Volatile private var service: AccessibilityService? = null
+  private class Connection(val service: AccessibilityService) {
+    @Volatile var gestures: Boolean? = null
+  }
+  @Volatile private var connection: Connection? = null
+  private val service: AccessibilityService? get() = connection?.service
+  private val capabilityReads = AtomicLong()
+  private val cachedCapabilityReads = AtomicLong()
+  private val capabilityFailures = AtomicLong()
 
   /** Called by [BarWatchService.onServiceConnected]. */
   fun register(svc: AccessibilityService) {
-    service = svc
+    connection = Connection(svc)
   }
 
   /** Called by [BarWatchService.onUnbind] when the service goes away. */
   fun unregister() {
-    service = null
+    connection = null
   }
 
   /** True when an accessibility service is connected and can perform actions. */
@@ -261,9 +269,44 @@ object RemoteInput {
 
   /** True if the connected service was granted gesture dispatch (canPerformGestures). */
   fun gesturesAvailable(): Boolean {
-    val svc = service ?: return false
-    val caps = svc.serviceInfo?.capabilities ?: return false
-    return caps and AccessibilityServiceInfo.CAPABILITY_CAN_PERFORM_GESTURES != 0
+    val current = connection ?: return false
+    current.gestures?.let { known ->
+      if (BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) cachedCapabilityReads.incrementAndGet()
+      return connection === current && known
+    }
+    val supported = synchronized(current) {
+      if (connection !== current) return@synchronized null
+      current.gestures?.let { known ->
+        if (BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) cachedCapabilityReads.incrementAndGet()
+        return@synchronized known
+      }
+      // Capability is static metadata. Unknown/transient failures stay retryable.
+      val info = try {
+        if (BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) capabilityReads.incrementAndGet()
+        current.service.serviceInfo
+      } catch (_: Exception) {
+        if (BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) capabilityFailures.incrementAndGet()
+        null
+      } ?: return@synchronized null
+      val known = info.capabilities and AccessibilityServiceInfo.CAPABILITY_CAN_PERFORM_GESTURES != 0
+      if (connection === current) current.gestures = known
+      known
+    }
+    // A replaced/unbound connection cannot authorize a later command.
+    return connection === current && supported == true
+  }
+
+  /** Diagnostic-build aggregate counters and pointer coordinates; never reads serviceInfo. */
+  internal fun gestureDiagnostics(): org.json.JSONObject {
+    val current = connection
+    val dm = current?.service?.resources?.displayMetrics
+    return org.json.JSONObject().put("connected", current != null)
+        .put("capabilityKnown", current?.gestures != null)
+        .put("gestureSupported", current?.gestures ?: org.json.JSONObject.NULL)
+        .put("capabilityReads", capabilityReads.get()).put("cachedReads", cachedCapabilityReads.get())
+        .put("capabilityFailures", capabilityFailures.get())
+        .put("width", dm?.widthPixels ?: 0).put("height", dm?.heightPixels ?: 0)
+        .put("cursorX", curX).put("cursorY", curY)
   }
 
   /** Move the on-TV pointer by a relative delta (px), clamped to the screen. */
