@@ -39,7 +39,7 @@ class ImmichConnectActivity : ComponentActivity() {
     }
 }
 
-private data class VerifiedImmich(val url: String, val key: String, val albums: List<ImmichSource.Album>)
+private data class VerifiedImmich(val url: String, val key: String, val albumLoad: ImmichAlbumLoad)
 
 @Composable
 private fun ImmichConnectScreen(requestAlbums: Boolean, onCancel: () -> Unit) {
@@ -67,17 +67,28 @@ private fun ImmichConnectScreen(requestAlbums: Boolean, onCancel: () -> Unit) {
         work.start(work = {
             if (!ImmichSource.testConnection(address, apiKey)) error("connection")
             if (Thread.currentThread().isInterrupted) throw InterruptedException()
-            // An empty list is a valid library; null is an album request failure.
-            val albums = ImmichSource.listAlbums(address, apiKey) ?: error("albums")
-            VerifiedImmich(address, apiKey, albums)
+            // Album discovery is optional: whole-library search uses a separate endpoint.
+            val albums = runCatching { ImmichSource.listAlbums(address, apiKey) }
+            if (Thread.currentThread().isInterrupted) throw InterruptedException()
+            VerifiedImmich(address, apiKey, ImmichAlbumLoad().refreshed(albums))
         }) { result ->
             result.onSuccess {
                 activity?.intent?.putExtra(APPROVED_SETTINGS_PAGE, "albums")
                 verified = it
-                selectedId = existing.immichAlbumId.takeIf { id -> it.albums.any { album -> album.id == id } }
+                selectedId = it.albumLoad.selection(existing.immichAlbumId)
             }.onFailure {
-                status = "Couldn't load Immich albums. Check the address, API key and network, then try again."
+                status = "Couldn't connect to Immich. Check the server address, API key and network, then try again."
             }
+        }
+    }
+
+    fun retryAlbums() {
+        val connection = verified ?: return
+        if (work.busy) return
+        work.start(work = { ImmichSource.listAlbums(connection.url, connection.key) }) { result ->
+            val loaded = connection.albumLoad.refreshed(result)
+            verified = connection.copy(albumLoad = loaded)
+            selectedId = loaded.selection(selectedId)
         }
     }
 
@@ -108,21 +119,28 @@ private fun ImmichConnectScreen(requestAlbums: Boolean, onCancel: () -> Unit) {
                     item(key = "whole-library") {
                         SelectableRow("Whole library", "All your photos", selectedId == null) { selectedId = null }
                     }
-                    items(connection.albums, key = { "album:${it.id}" }) { album ->
+                    items(connection.albumLoad.albums, key = { "album:${it.id}" }) { album ->
                         Divider()
                         SelectableRow(album.name, "${album.count} photo${if (album.count == 1) "" else "s"}",
                             selectedId == album.id) { selectedId = album.id }
                     }
                 }
             }
-            if (connection.albums.isEmpty()) {
+            if (connection.albumLoad.failed) {
+                ApprovedSourcesStatus(
+                    "Connected to Immich, but albums couldn't be loaded. Choose Whole library or try loading albums again. " +
+                        "Your current source stays selected until you confirm.", error = false)
+                ApprovedSourcesButton(if (work.busy) "Loading albums…" else "Try albums again",
+                    enabled = !work.busy, primary = false, onClick = ::retryAlbums)
+            } else if (connection.albumLoad.albums.isEmpty()) {
                 ApprovedSourcesStatus("No albums found. You can use your whole library.", error = false)
             }
             Spacer(Modifier.height(30.dp))
-            ApprovedSourcesActions("Use this album", onConfirm = {
+            ApprovedSourcesActions(if (selectedId == null) "Use whole library" else "Use this album",
+                enabled = !work.busy, onConfirm = {
                 if (activity != null && !activity.isFinishing && !activity.isDestroyed) {
                     work.close()
-                    val album = connection.albums.firstOrNull { it.id == selectedId }
+                    val album = connection.albumLoad.albums.firstOrNull { it.id == selectedId }
                     // No writes occur during testing or selection. Save the confirmed group in one
                     // main-thread action, setting the active source last with the existing setters.
                     ScreensaverConfig.setImmichAlbum(context, album?.id, album?.name)
