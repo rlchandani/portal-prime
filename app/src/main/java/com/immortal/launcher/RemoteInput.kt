@@ -264,8 +264,9 @@ object RemoteInput {
   // the accessibility service (needs canPerformGestures) and draw the pointer with
   // [RemoteCursor]. The cursor is tracked in screen pixels; the phone sends relative deltas.
 
-  @Volatile private var curX = -1f
-  @Volatile private var curY = -1f
+  private val cursorLock = Any()
+  private var curX = -1f
+  private var curY = -1f
 
   /** True if the connected service was granted gesture dispatch (canPerformGestures). */
   fun gesturesAvailable(): Boolean {
@@ -300,23 +301,27 @@ object RemoteInput {
   internal fun gestureDiagnostics(): org.json.JSONObject {
     val current = connection
     val dm = current?.service?.resources?.displayMetrics
+    val (x, y) = synchronized(cursorLock) { curX to curY }
     return org.json.JSONObject().put("connected", current != null)
         .put("capabilityKnown", current?.gestures != null)
         .put("gestureSupported", current?.gestures ?: org.json.JSONObject.NULL)
         .put("capabilityReads", capabilityReads.get()).put("cachedReads", cachedCapabilityReads.get())
         .put("capabilityFailures", capabilityFailures.get())
         .put("width", dm?.widthPixels ?: 0).put("height", dm?.heightPixels ?: 0)
-        .put("cursorX", curX).put("cursorY", curY)
+        .put("cursorX", x).put("cursorY", y)
   }
 
   /** Move the on-TV pointer by a relative delta (px), clamped to the screen. */
   fun cursorMove(dx: Float, dy: Float): Boolean {
     val svc = service ?: return false
     val dm = svc.resources.displayMetrics
-    initCursor(dm.widthPixels, dm.heightPixels)
-    curX = (curX + dx).coerceIn(0f, dm.widthPixels - 1f)
-    curY = (curY + dy).coerceIn(0f, dm.heightPixels - 1f)
-    RemoteCursor.showAt(curX.toInt(), curY.toInt())
+    synchronized(cursorLock) {
+      initCursor(dm.widthPixels, dm.heightPixels)
+      curX = (curX + dx).coerceIn(0f, dm.widthPixels - 1f)
+      curY = (curY + dy).coerceIn(0f, dm.heightPixels - 1f)
+      // Publish in the same order as state updates; showAt only queues a coalesced paint.
+      RemoteCursor.showAt(curX.toInt(), curY.toInt())
+    }
     return true
   }
 
@@ -324,9 +329,13 @@ object RemoteInput {
   fun tap(): Boolean {
     val svc = service ?: return false
     val dm = svc.resources.displayMetrics
-    initCursor(dm.widthPixels, dm.heightPixels)
-    RemoteCursor.showAt(curX.toInt(), curY.toInt())
-    val path = Path().apply { moveTo(curX, curY) }
+    val (x, y) = synchronized(cursorLock) {
+      initCursor(dm.widthPixels, dm.heightPixels)
+      RemoteCursor.showAt(curX.toInt(), curY.toInt())
+      curX to curY
+    }
+    // Android path construction and gesture dispatch stay outside the state lock.
+    val path = Path().apply { moveTo(x, y) }
     return dispatch(svc, path, durationMs = 50)
   }
 
@@ -334,10 +343,13 @@ object RemoteInput {
   fun swipe(dx: Float, dy: Float): Boolean {
     val svc = service ?: return false
     val dm = svc.resources.displayMetrics
-    initCursor(dm.widthPixels, dm.heightPixels)
-    val x2 = (curX + dx).coerceIn(0f, dm.widthPixels - 1f)
-    val y2 = (curY + dy).coerceIn(0f, dm.heightPixels - 1f)
-    val path = Path().apply { moveTo(curX, curY); lineTo(x2, y2) }
+    val (x, y) = synchronized(cursorLock) {
+      initCursor(dm.widthPixels, dm.heightPixels)
+      curX to curY
+    }
+    val x2 = (x + dx).coerceIn(0f, dm.widthPixels - 1f)
+    val y2 = (y + dy).coerceIn(0f, dm.heightPixels - 1f)
+    val path = Path().apply { moveTo(x, y); lineTo(x2, y2) }
     return dispatch(svc, path, durationMs = 120)
   }
 
@@ -357,7 +369,7 @@ object RemoteInput {
     return dispatch(svc, path, durationMs = 250)
   }
 
-  /** Centre the pointer the first time we're used after a (re)connect. */
+  /** Centre the pointer on first use. All callers hold cursorLock. */
   private fun initCursor(w: Int, h: Int) {
     if (curX < 0f) {
       curX = w / 2f
