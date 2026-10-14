@@ -64,4 +64,42 @@ class DeviceHealthLoadTest {
     withTimeout(3000) { job.join() }
     assertFalse(published)
   }
+  @Test fun recheckRetainsCompletedPermissionSnapshot() {
+    val saved = snapshot()
+    val state = DeviceHealthStatus().received(DeviceHealthLoad.Ready(saved)).beginCheck()
+    assertSame(saved, state.snapshot)
+    assertTrue(state.checking)
+    assertFalse(state.failed)
+    assertFalse(state.canRemoveAdmin)
+  }
+
+  @Test fun failedRecheckRetainsResultsWithoutClaimingFreshPermissions() {
+    val saved = snapshot().copy(adminActive = true)
+    val state = DeviceHealthStatus().received(DeviceHealthLoad.Ready(saved)).beginCheck()
+        .received(DeviceHealthLoad.Unavailable)
+    assertSame(saved, state.snapshot)
+    assertFalse(state.checking)
+    assertTrue(state.failed)
+    assertFalse(state.canRemoveAdmin)
+  }
+
+  @Test fun successfulRetryReplacesStaleResultsAndClearsFailure() {
+    val previous = snapshot()
+    val latest = snapshot().copy(adminActive = true)
+    val state = DeviceHealthStatus().received(DeviceHealthLoad.Ready(previous))
+        .received(DeviceHealthLoad.Unavailable).beginCheck().received(DeviceHealthLoad.Ready(latest))
+    assertSame(latest, state.snapshot)
+    assertFalse(state.checking)
+    assertFalse(state.failed)
+    assertTrue(state.canRemoveAdmin)
+  }
+
+  @Test fun initialFailureHasNoPermissionSnapshot() {
+    val state = DeviceHealthStatus().received(DeviceHealthLoad.Unavailable)
+    assertNull(state.snapshot)
+    assertTrue(state.failed)
+    assertFalse(state.checking)
+    assertFalse(state.canRemoveAdmin)
+  }
+
 }

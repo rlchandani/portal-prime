@@ -75,6 +75,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -1490,32 +1491,37 @@ internal fun DeviceHealthContent() {
   var confirmingDisable by remember(advanced) { mutableStateOf(false) }
   var disablingAdmin by remember { mutableStateOf(false) }
   val scope = rememberCoroutineScope()
-  val health by produceState<DeviceHealthLoad>(DeviceHealthLoad.Checking, context, owner, refresh, advanced) {
+  var recheckRequested by remember { mutableStateOf(false) }
+  val health by produceState(DeviceHealthStatus(), context, owner, refresh, advanced) {
     owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
       confirmingDisable = false
-      value = DeviceHealthLoad.Checking
-      value = loadDeviceHealth { DevicePermissions.snapshot(context) }
-      // Query once per resume, with cancellation on departure and no idle polling.
+      value = value.beginCheck()
+      value = value.received(loadDeviceHealth { DevicePermissions.snapshot(context) })
+      recheckRequested = false
+      // Query on request/resume, cancel on departure, and retain completed rows while checking.
       awaitCancellation()
     }
   }
-  val snapshot = when (val result = health) {
-    is DeviceHealthLoad.Ready -> result.snapshot
-    else -> {
-      Card {
-        Column(Modifier.padding(28.dp).semantics {
-          contentDescription = if (result == DeviceHealthLoad.Checking)
-            "Checking device permissions" else "Device health check unavailable"
-        }) {
-          Text(if (result == DeviceHealthLoad.Checking) "Checking device permissions…"
-            else "Could not check device permissions.", color = IosSecondary, fontSize = Sizes.rowTitle)
-          if (result == DeviceHealthLoad.Unavailable) {
-            ApprovedSettingsTextButton("Try again") { refresh++ }
-          }
-        }
+  val checking = health.checking || recheckRequested
+  fun recheck() {
+    // Set synchronously so burst input cannot enqueue parallel permission queries.
+    if (health.checking || recheckRequested) return
+    recheckRequested = true
+    confirmingDisable = false
+    refresh++
+  }
+  val snapshot = health.snapshot
+  if (snapshot == null) {
+    Card {
+      Column(Modifier.padding(28.dp).semantics {
+        contentDescription = if (checking) "Checking device permissions" else "Device health check unavailable"
+      }) {
+        Text(if (checking) "Checking device permissions…" else "Could not check device permissions.",
+            color = IosSecondary, fontSize = Sizes.rowTitle)
+        if (!checking) ApprovedSettingsTextButton("Try again") { recheck() }
       }
-      return
     }
+    return
   }
   val checks = snapshot.checks
   val issues = checks.count { !it.granted }
@@ -1525,25 +1531,47 @@ internal fun DeviceHealthContent() {
       // Summary banner — green when healthy, amber when something needs attention.
       // Light semantic tints (dark green/amber would clash with the light background).
       Surface(
-          color = if (issues == 0) Color(0xFFE6F7EA) else Color(0xFFFDF1DD),
+          color = when {
+            checking -> IosCard
+            health.failed || issues > 0 -> Color(0xFFFDF1DD)
+            else -> Color(0xFFE6F7EA)
+          },
           shape = RoundedCornerShape(14.dp),
-          modifier = Modifier.fillMaxWidth().semantics { contentDescription = "Device health checked" },
+          modifier = Modifier.fillMaxWidth().semantics {
+            contentDescription = when {
+              checking -> "Checking device permissions"
+              health.failed -> "Device health check unavailable"
+              else -> "Device health checked"
+            }
+          },
       ) {
-        Text(
-            if (issues == 0) "✓  Everything's set up correctly."
-            else "!  $issues setting${if (issues == 1) " needs" else "s need"} attention — your Portal " +
-                "still works, but some features are limited.",
-            color = if (issues == 0) Color(0xFF1E7B34) else Color(0xFFB26A00),
-            fontSize = Sizes.rowTitle,
-            modifier = Modifier.padding(16.dp),
-        )
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+          Text(
+              when {
+                checking -> "Checking permissions…"
+                health.failed -> "Could not recheck permissions. Last results are shown."
+                issues == 0 -> "✓  Permissions ready."
+                else -> "!  $issues permission${if (issues == 1) " needs" else "s need"} attention."
+              },
+              color = when {
+                checking -> IosSecondary
+                health.failed || issues > 0 -> Color(0xFFB26A00)
+                else -> Color(0xFF1E7B34)
+              },
+              fontSize = Sizes.rowTitle,
+              modifier = Modifier.weight(1f),
+          )
+          ActionPill(if (checking) "Checking…" else if (health.failed) "Try again" else "Check again",
+              enabled = !checking, modifier = Modifier.semantics { if (checking) disabled() }) { recheck() }
+        }
       }
       Spacer(Modifier.size(20.dp))
 
       Card {
         checks.forEachIndexed { i, c ->
           if (i > 0) Divider()
-          HealthRow(c)
+          HealthRow(c, advanced)
         }
       }
 
@@ -1551,8 +1579,8 @@ internal fun DeviceHealthContent() {
         Spacer(Modifier.size(22.dp))
         SectionLabel("How to fix")
         Text(
-            "Reconnect your Portal to a computer and re-run Immortal setup — it re-grants all of " +
-                "these. (Advanced: re-run provision.sh / provision.ps1 from the provisioning kit.)",
+            "Connect this Portal to a computer over USB and run Immortal setup. When setup finishes, " +
+                "choose Check again to refresh these permission results.",
             color = IosSecondary,
             fontSize = Sizes.rowSub,
             lineHeight = 20.sp,
@@ -1583,13 +1611,13 @@ internal fun DeviceHealthContent() {
             if (disablingAdmin) "Removing screen-lock permission…"
             else if (confirmingDisable) "Tap again to confirm — automatic screen-off will stop"
             else "Remove screen-lock permission",
-            color = IosRed,
+            color = if (checking || health.failed) IosSecondary else IosRed,
             fontSize = Sizes.actionButton,
             fontWeight = if (confirmingDisable) FontWeight.SemiBold else FontWeight.Normal,
             modifier =
-                Modifier.tvFocusable(RoundedCornerShape(8.dp), enabled = !disablingAdmin) {
+                Modifier.tvFocusable(RoundedCornerShape(8.dp), enabled = !disablingAdmin && !checking && !health.failed) {
                       // Reject burst input immediately, before the disabled row can recompose.
-                      if (!advanced || disablingAdmin) return@tvFocusable
+                      if (!advanced || disablingAdmin || recheckRequested || !health.canRemoveAdmin) return@tvFocusable
                       // Two-tap arm: a single stray remote press shouldn't tear down device admin
                       // (which silently breaks screensaver sleep + the HA screen-off control).
                       if (confirmingDisable) {
@@ -1614,7 +1642,7 @@ internal fun DeviceHealthContent() {
 }
 
 @Composable
-private fun HealthRow(c: DevicePermissions.Check) {
+private fun HealthRow(c: DevicePermissions.Check, advanced: Boolean) {
   Row(
       modifier = Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 14.dp),
       verticalAlignment = Alignment.Top,
@@ -1645,11 +1673,17 @@ private fun HealthRow(c: DevicePermissions.Check) {
         )
         Text(
             c.fix,
-            color = IosBlue,
+            color = IosSecondary,
             fontSize = Sizes.rowSub,
             lineHeight = 28.sp,
             modifier = Modifier.padding(top = 4.dp),
         )
+        if (advanced && c.technicalFix.isNotBlank()) {
+          Text("Setup command: adb shell ${c.technicalFix}", color = IosSecondary,
+              fontSize = Sizes.rowSub, lineHeight = 28.sp,
+              fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+              modifier = Modifier.padding(top = 6.dp))
+        }
       }
     }
   }

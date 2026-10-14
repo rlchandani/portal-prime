@@ -27,3 +27,18 @@ internal suspend fun loadDeviceHealth(query: () -> DevicePermissions.Snapshot): 
         DeviceHealthLoad.Unavailable
       }
     }
+
+/** Last completed results remain visible while the next permission check runs or fails. */
+internal data class DeviceHealthStatus(
+    val snapshot: DevicePermissions.Snapshot? = null,
+    val checking: Boolean = true,
+    val failed: Boolean = false,
+) {
+  val canRemoveAdmin: Boolean get() = snapshot?.adminActive == true && !checking && !failed
+  fun beginCheck(): DeviceHealthStatus = copy(checking = true, failed = false)
+  fun received(result: DeviceHealthLoad): DeviceHealthStatus = when (result) {
+    DeviceHealthLoad.Checking -> beginCheck()
+    is DeviceHealthLoad.Ready -> DeviceHealthStatus(result.snapshot, checking = false)
+    DeviceHealthLoad.Unavailable -> copy(checking = false, failed = true)
+  }
+}

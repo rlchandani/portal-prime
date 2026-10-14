@@ -29,6 +29,7 @@ object DevicePermissions {
       val granted: Boolean,
       val degraded: String,
       val fix: String,
+      val technicalFix: String = "",
   )
 
   data class Snapshot(val checks: List<Check>, val adminActive: Boolean)
@@ -44,35 +45,40 @@ object DevicePermissions {
               enables = "Turning the screen off — idle timeout, overnight sleep, and the Home Assistant control.",
               granted = adminActive,
               degraded = "The screen can't be turned off automatically or from Home Assistant; it stays on.",
-              fix = "Re-run Immortal setup — it activates the screen-off device admin (dpm set-active-admin).",
+              fix = "Run Immortal setup to restore its screen-lock permission.",
+              technicalFix = "dpm set-active-admin ${context.packageName}/com.immortal.launcher.AdminReceiver",
           ),
           Check(
               title = "Now playing",
               enables = "Showing the current track and album art on the screensaver and home header.",
               granted = SettingsGuard.isMediaListenerEnabled(context),
               degraded = "What's playing won't appear on the screensaver or the home header.",
-              fix = "Re-run Immortal setup — it grants notification access (cmd notification allow_listener).",
+              fix = "Run Immortal setup to allow notification access.",
+              technicalFix = "cmd notification allow_listener ${context.packageName}/com.immortal.launcher.MediaNotificationListenerService",
           ),
           Check(
               title = "Install apps",
               enables = "Installing and updating apps from the Immortal App Store.",
               granted = canInstallApps(context),
               degraded = "The App Store can't install or update apps.",
-              fix = "Re-run Immortal setup — it allows installs (appops REQUEST_INSTALL_PACKAGES).",
+              fix = "Run Immortal setup to allow app installation.",
+              technicalFix = "appops set ${context.packageName} REQUEST_INSTALL_PACKAGES allow",
           ),
           Check(
               title = "Frame relaunch",
               enables = "Bringing the photo frame straight back when the system force-wakes the screensaver.",
               granted = Settings.canDrawOverlays(context),
               degraded = "The photo frame may not reappear promptly after the system force-wakes it.",
-              fix = "Re-run Immortal setup — it grants draw-over-other-apps (appops SYSTEM_ALERT_WINDOW).",
+              fix = "Run Immortal setup to allow the photo frame to appear over other apps.",
+              technicalFix = "appops set ${context.packageName} SYSTEM_ALERT_WINDOW allow",
           ),
           Check(
               title = "System settings",
               enables = "Keeping the screensaver, status bar, and WiFi-debug settings applied (and self-healing them).",
               granted = SettingsGuard.canWriteSecureSettings(context),
               degraded = "Immortal can't keep the screensaver/status-bar settings applied or repair them after changes.",
-              fix = "Re-run Immortal setup — it grants write-secure-settings (pm grant WRITE_SECURE_SETTINGS).",
+              fix = "Run Immortal setup to restore system-settings permission.",
+              technicalFix = "pm grant ${context.packageName} android.permission.WRITE_SECURE_SETTINGS",
           ),
       )
     return Snapshot(checks, adminActive)
