@@ -149,8 +149,8 @@ internal fun ToolsAlarmContent() {
 
   ToolsTwoPane(left = {
     EverydayPanel("Your next alarm") {
-      if (alarm == null) EverydayLoadStatus(load)
-      else {
+      EverydayLoadStatus(load)
+      if (alarm != null) {
         EverydayValue(
             String.format(Locale.ROOT, "%02d:%02d", alarm.hour, alarm.minute),
             size = 120, centered = true,
@@ -309,8 +309,8 @@ internal fun ToolsTimersContent() {
     }
   }, right = {
     EverydayPanel("Running timers") {
-      if (load.value == null) EverydayLoadStatus(load)
-      else {
+      EverydayLoadStatus(load)
+      if (load.value != null) {
         EverydayRunningTimers(timers, enabled = !operations.busy) { id ->
           operations.error = null
           cancelId = id
@@ -396,8 +396,9 @@ internal fun ToolsCountdownsContent() {
 
   EverydayCollectionPanes(left = {
     EverydayPanel("Dates to look forward to") {
+      EverydayLoadStatus(load)
       when {
-        load.value == null -> EverydayLoadStatus(load)
+        load.value == null -> Unit
         derivedEvents == null -> ToolsStatus("Preparing dates…")
         events.isEmpty() -> EverydayEmpty(
             "cal", "Make a date", "Birthdays, holidays, and the things that matter.")
@@ -862,17 +863,6 @@ private fun everydayFormatNumber(value: Double): String {
   }.format(value)
 }
 
-private class EverydayLoad<T> {
-  private var savedValue by mutableStateOf<T?>(null)
-  var generation = 0
-    private set
-  var value: T?
-    get() = savedValue
-    set(value) { savedValue = value; generation++ }
-  var error by mutableStateOf<String?>(null)
-  var retry by mutableIntStateOf(0)
-}
-
 @Composable
 private fun <T> rememberEverydayLoad(loader: () -> T): EverydayLoad<T> {
   val owner = LocalLifecycleOwner.current
@@ -880,18 +870,10 @@ private fun <T> rememberEverydayLoad(loader: () -> T): EverydayLoad<T> {
   val load = remember { EverydayLoad<T>() }
   LaunchedEffect(owner, load.retry) {
     owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-      try {
-        val generation = load.generation
-        val snapshot = withContext(Dispatchers.IO) {
+      load.refresh {
+        withContext(Dispatchers.IO) {
           EverydayStorageMutex.withLock { currentLoader() }
         }
-        // A slow refresh must not overwrite the result of an explicit save/start/remove.
-        if (load.generation == generation) load.value = snapshot
-        load.error = null
-      } catch (cancelled: CancellationException) {
-        throw cancelled
-      } catch (_: Exception) {
-        load.error = "Couldn’t load your saved data."
       }
     }
   }
@@ -900,10 +882,13 @@ private fun <T> rememberEverydayLoad(loader: () -> T): EverydayLoad<T> {
 
 @Composable
 private fun <T> EverydayLoadStatus(load: EverydayLoad<T>) {
-  if (load.error == null) ToolsStatus("Loading…")
-  else {
+  if (load.error == null) {
+    if (load.value == null) ToolsStatus("Loading…")
+  } else {
     EverydayError(load.error)
-    EverydayActions { ToolsButton("Try again") { load.retry++ } }
+    EverydayActions {
+      ToolsButton(if (load.loading) "Trying…" else "Try again", enabled = !load.loading) { load.retry++ }
+    }
   }
 }
 
