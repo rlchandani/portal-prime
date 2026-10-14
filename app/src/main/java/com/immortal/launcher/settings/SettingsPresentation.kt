@@ -29,6 +29,8 @@ object SettingsPresentation {
       "mqtt.validateCert", "digitalclock.style", "digitalclock.color", "digitalclock.font",
       "digitalclock.glow", "debug.enabled")
   private val shortHelp = mapOf(
+      "calendar.url" to "Home shows today and the next two days.",
+      "calendar.widgetOn" to "Does not hide the calendar widget on Home.",
       "screensaver.enabled" to "Show photos when your Portal is idle.",
       "screensaver.mode" to "Choose how your photos appear.",
       "screensaver.photo_motion" to "Let photos move gently between transitions.",

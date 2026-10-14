@@ -76,14 +76,6 @@ object SettingsDomains {
           schemaSnapshotSource = screensaverSchemaSource,
           specs =
               listOf(
-                  BoolSpec(
-                      key = "widgetOn",
-                      title = "Show calendar",
-                      get = { it.calendarEnabled },
-                      set = ScreensaverConfig::setCalendarEnabled,
-                      aliases = listOf("enabled"),
-                      visible = { _, s -> s.hasCalendarLink },
-                  ),
                   StringSpec(
                       key = "url",
                       title = "Calendar feed",
@@ -92,12 +84,21 @@ object SettingsDomains {
                       applyWhen = { it.isBlank() || CalendarFeed.isSupported(it) },
                       entry = Entry.Nav(CalendarUrlEntryActivity::class.java),
                       help =
-                          "A public iCalendar (.ics) link - a Google \"secret iCal\" address or an Apple " +
-                              "iCloud public-calendar link. Shows your upcoming events on the frame.",
+                          "One feed supplies Home and the screensaver. Use a public iCalendar (.ics) link, " +
+                              "a Google secret iCal address or an Apple iCloud public-calendar link.",
+                  ),
+                  BoolSpec(
+                      key = "widgetOn",
+                      title = "Show on screensaver",
+                      help = "Does not hide the calendar widget on Home.",
+                      get = { it.calendarEnabled },
+                      set = ScreensaverConfig::setCalendarEnabled,
+                      aliases = listOf("enabled"),
+                      visible = { _, s -> s.hasCalendarLink },
                   ),
                   EnumSpec(
                       key = "range",
-                      title = "Show",
+                      title = "Events to show",
                       get = { it.calendarRange },
                       set = ScreensaverConfig::setCalendarRange,
                       options = FleetCalendar.RANGES.map { it to rangeLabel(it) },
@@ -105,7 +106,7 @@ object SettingsDomains {
                   ),
                   IntSpec(
                       key = "size",
-                      title = "Size",
+                      title = "Widget size",
                       get = { it.calendarSize },
                       set = ScreensaverConfig::setCalendarSize,
                       min = 0,
@@ -116,7 +117,7 @@ object SettingsDomains {
                   ),
                   EnumSpec(
                       key = "side",
-                      title = "Side",
+                      title = "Position",
                       get = { it.calendarSide },
                       set = ScreensaverConfig::setCalendarSide,
                       options =
@@ -142,6 +143,12 @@ object SettingsDomains {
                       }),
                   DerivedSpec(key = "ranges", get = { JSONArray(FleetCalendar.RANGES) }),
               ),
+          sections = mapOf(
+              "url" to "Home & screensaver",
+              "widgetOn" to "Screensaver widget",
+              "range" to "Screensaver widget",
+              "size" to "Screensaver widget",
+              "side" to "Screensaver widget"),
           defaults = { ScreensaverConfig.Settings() },
       )
 

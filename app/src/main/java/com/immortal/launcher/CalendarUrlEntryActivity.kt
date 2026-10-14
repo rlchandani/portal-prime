@@ -39,8 +39,8 @@ class CalendarUrlEntryActivity : ComponentActivity() {
               SettingsRegistry.apply(this, "calendar", JSONObject().put("url", ""))
               approvedSourcesReturn(this, "calendar")
             },
-            fieldHelp = "A public iCalendar (.ics) link - a Google \"secret iCal\" address or an Apple " +
-                "iCloud public-calendar link. Shows your upcoming events on the frame.",
+            fieldHelp = "One feed supplies Home and the screensaver. Use a public iCalendar (.ics) link, " +
+                "a Google secret iCal address or an Apple iCloud public-calendar link.",
         )
       }
     }

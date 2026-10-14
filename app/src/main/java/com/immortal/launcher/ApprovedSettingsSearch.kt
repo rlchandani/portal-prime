@@ -133,7 +133,7 @@ internal fun approvedSettingsPrerequisite(context: Context, control: String): St
             else "Choose a shared album source to change its refresh interval."
     if (spec.visibleWhen(context, domain.load(context))) return null
     return when {
-        domainId == "calendar" -> "Add a calendar feed and turn on Show calendar to see these options."
+        domainId == "calendar" -> "Add a calendar feed and turn on Show on screensaver to see these options."
         domainId == "digitalclock" -> "Turn on the digital clock to see this setting."
         key == "cacheEnabled" -> "Connect an Immich or WebDAV photo source to see cache settings."
         key == "batterySaver" -> "This setting is unavailable on a Portal without a battery."
