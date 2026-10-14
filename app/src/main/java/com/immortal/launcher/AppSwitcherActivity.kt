@@ -169,8 +169,12 @@ private fun ApprovedAppsContent(
       onDispose { appContext.unregisterReceiver(receiver) }
     }
   }
+  fun toggleSearch() {
+    searching = !searching
+    if (!searching) query = ""
+  }
   LaunchedEffect(searchRequest) {
-    if (searchRequest > 0) searching = !searching
+    if (searchRequest > 0) toggleSearch()
   }
   LaunchedEffect(openSearchRequest) {
     if (openSearchRequest > 0) {
@@ -319,7 +323,7 @@ private fun ApprovedAppsContent(
       }
     }
   }
-  if (embedded) content() else ApprovedAppsShell("apps", onExit, onSearch = { searching = !searching }) { content() }
+  if (embedded) content() else ApprovedAppsShell("apps", onExit, onSearch = ::toggleSearch) { content() }
   menuFor?.let { app ->
     val isFavorite = app.component.flattenToString() in favoriteKeys
     AppsDialog(app.label, { menuFor = null }) {
