@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.app.Activity
+import android.graphics.Rect
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,6 +34,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -53,6 +56,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.CollectionInfo
@@ -71,11 +75,16 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
+import androidx.compose.ui.geometry.Rect as ComposeRect
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.settings.SettingsPresentation
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
@@ -140,6 +149,11 @@ internal fun ApprovedSettingsShell(
     val focus = LocalFocusManager.current
     val appliedAdvanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
     var query by remember { mutableStateOf("") }
+    val searchView = LocalView.current
+    val searchViewLocation = remember { IntArray(2) }
+    var searchAnchorBottom by remember { mutableStateOf(0) }
+    var searchBoundsInRoot by remember { mutableStateOf(ComposeRect.Zero) }
+    val searchPopupHeight = rememberApprovedSearchPopupHeight(searchAnchorBottom, query.isNotBlank())
     var pendingSearch by remember { mutableStateOf<ApprovedSettingsSearchResult?>(null) }
     var consent by remember { mutableStateOf(false) }
     var applyError by remember { mutableStateOf<String?>(null) }
@@ -187,7 +201,17 @@ internal fun ApprovedSettingsShell(
     CompositionLocalProvider(
         LocalApprovedEnableAdvanced provides { consent = true },
     ) {
-        Column(Modifier.settingsUiWorkMeasure(SettingsUiWorkStage.SHELL_MEASURE).fillMaxSize().background(IosBackground)) {
+        Column(Modifier.settingsUiWorkMeasure(SettingsUiWorkStage.SHELL_MEASURE).fillMaxSize()
+            .background(IosBackground).pointerInput(query.isNotBlank()) {
+                if (query.isBlank()) return@pointerInput
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        if (event.changes.any { it.pressed && !it.previousPressed &&
+                                !searchBoundsInRoot.contains(it.position) }) query = ""
+                    }
+                }
+            }) {
             Row(
                 Modifier.fillMaxWidth().height(Sizes.headerHeight - 1.dp).padding(horizontal = 56.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -215,20 +239,24 @@ internal fun ApprovedSettingsShell(
                         Text("Settings", color = IosLabel, fontSize = 40.sp, lineHeight = 52.sp,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.padding(start = 12.dp, bottom = 28.dp))
-                        Box {
+                        Box(Modifier.onGloballyPositioned { coordinates ->
+                            searchBoundsInRoot = coordinates.boundsInRoot()
+                            searchView.getLocationOnScreen(searchViewLocation)
+                            searchAnchorBottom = searchViewLocation[1] +
+                                (coordinates.positionInRoot().y + coordinates.size.height).toInt()
+                        }) {
                             ApprovedSettingsSearchField(query) { query = it }
                             if (query.isNotBlank()) {
                                 val y = with(LocalDensity.current) { 76.dp.roundToPx() }
                                 Popup(alignment = Alignment.TopStart, offset = IntOffset(0, y),
                                     onDismissRequest = { query = "" },
-                                    properties = PopupProperties(focusable = false)) {
+                                    properties = PopupProperties(focusable = false, dismissOnClickOutside = false)) {
                                     Surface(
                                         color = IosCard, shape = RoundedCornerShape(18.dp),
                                         border = BorderStroke(1.dp, IosDivider), shadowElevation = 16.dp,
                                         modifier = Modifier.width(720.dp),
                                     ) {
-                                        LazyColumn(Modifier.height(800.dp.coerceAtMost(
-                                            (results.size.coerceAtLeast(1) * 100).dp))) {
+                                        LazyColumn(Modifier.heightIn(max = searchPopupHeight)) {
                                             if (results.isEmpty()) {
                                                 item(key = "empty") {
                                                     Text("No settings found.", color = IosSecondary, fontSize = 23.sp,
@@ -476,6 +504,33 @@ private fun ApprovedSettingsDetailBody(
         }
     }
     composition?.finish()
+}
+
+/** Observe keyboard/window layout only while results are visible; never poll the window. */
+@Composable
+private fun rememberApprovedSearchPopupHeight(anchorBottomOnScreen: Int, active: Boolean): Dp {
+    val view = LocalView.current
+    val density = LocalDensity.current
+    var height by remember { mutableStateOf(800.dp) }
+    DisposableEffect(view, density, anchorBottomOnScreen, active) {
+        if (!active) return@DisposableEffect onDispose { }
+        val visibleFrame = Rect()
+        val bottomGap = with(density) { 20.dp.roundToPx() }
+        val observer = view.viewTreeObserver
+        val listener = android.view.ViewTreeObserver.OnGlobalLayoutListener {
+            view.getWindowVisibleDisplayFrame(visibleFrame)
+            height = with(density) {
+                (visibleFrame.bottom - anchorBottomOnScreen - bottomGap)
+                    .coerceAtLeast(1).toDp().coerceAtMost(800.dp)
+            }
+        }
+        observer.addOnGlobalLayoutListener(listener)
+        listener.onGlobalLayout()
+        onDispose {
+            if (observer.isAlive) observer.removeOnGlobalLayoutListener(listener)
+        }
+    }
+    return height
 }
 
 @Composable
