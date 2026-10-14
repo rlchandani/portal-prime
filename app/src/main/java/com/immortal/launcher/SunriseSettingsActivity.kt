@@ -93,6 +93,10 @@ internal fun SunriseContent() {
     SettingsDomains.sunrise.specs.filterIsInstance<com.immortal.launcher.settings.IntSpec<SunriseConfig.Config>>()
         .single { it.key == "rampMinutes" }
   }
+  // Use each registry predicate, keeping native and remote child availability in sync.
+  val visibleKeys = remember(context, settings) {
+    SettingsDomains.sunrise.specs.filter { it.visibleWhen(context, settings) }.map { it.key }.toSet()
+  }
   suspend fun publishAfterSave(revision: Int) {
     try {
       writes.awaitIdle()
@@ -129,43 +133,54 @@ internal fun SunriseContent() {
       FooterNote(when {
         applying -> "Saving changes…"
         saveState.failed -> "Some changes couldn't be saved. Try again."
+        !settings.enabled -> "Turn on Sunrise alarm to set your wake time, days and light ramp."
         else -> "Choose your wake time and gradual light ramp."
       })
     }
     Card {
       ToggleRow("Enabled", settings.enabled, enabled = !applying) { apply("enabled", it) }
     }
-    Card {
-      Stepper("Hour", settings.hour, 0, 23, enabled = !applying) { apply("hour", it) }
-      Stepper("Minute", settings.minute, 0, 59, step = 5, enabled = !applying) { apply("minute", it) }
-    }
-    SectionLabel("Wake on")
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      DAY_LABELS.forEach { (day, label) ->
-        val on = day in settings.days
-        Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
-            modifier = Modifier.size(68.dp).semantics {
-              contentDescription = java.text.DateFormatSymbols().weekdays[day]
-            }.then(if (applying) Modifier.semantics { disabled() } else
-                Modifier.tvFocusable(CircleShape, focusScale = 1f) {
-                  val days = if (on) settings.days - day else settings.days + day
-                  submit { writes.submitDays(days) }
-                })) {
-          Text(label, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel,
-              fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-              modifier = Modifier.padding(14.dp))
+    if ("hour" in visibleKeys || "minute" in visibleKeys) {
+      Card {
+        if ("hour" in visibleKeys) {
+          Stepper("Hour", settings.hour, 0, 23, enabled = !applying) { apply("hour", it) }
+        }
+        if ("minute" in visibleKeys) {
+          Stepper("Minute", settings.minute, 0, 59, step = 5, enabled = !applying) { apply("minute", it) }
+        }
+      }
+      // Weekdays are a bespoke set; follow the same parent gate as the wake time.
+      SectionLabel("Wake on")
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        DAY_LABELS.forEach { (day, label) ->
+          val on = day in settings.days
+          Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
+              modifier = Modifier.size(68.dp).semantics {
+                contentDescription = java.text.DateFormatSymbols().weekdays[day]
+              }.then(if (applying) Modifier.semantics { disabled() } else
+                  Modifier.tvFocusable(CircleShape, focusScale = 1f) {
+                    val days = if (on) settings.days - day else settings.days + day
+                    submit { writes.submitDays(days) }
+                  })) {
+            Text(label, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel,
+                fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
+                modifier = Modifier.padding(14.dp))
+          }
         }
       }
     }
-    // Use the same spec bounds and premium numeric picker as other Settings rows. The old
-    // custom slider was capped at 45 even though the shared/remote spec permits 60 minutes.
-    Card {
-      ApprovedIntSetting(rampSpec, settings.rampMinutes, rampSpec.help, !applying) {
-        apply("rampMinutes", it)
+    // Bounds, help and visibility come from the same spec as the remote numeric picker.
+    if ("rampMinutes" in visibleKeys) {
+      Card {
+        ApprovedIntSetting(rampSpec, settings.rampMinutes, rampSpec.help, !applying) {
+          apply("rampMinutes", it)
+        }
       }
     }
-    Card {
-      ToggleRow("Chime at the end", settings.chime, enabled = !applying) { apply("chime", it) }
+    if ("chime" in visibleKeys) {
+      Card {
+        ToggleRow("Chime at the end", settings.chime, enabled = !applying) { apply("chime", it) }
+      }
     }
     val next = remember(settings) { SunriseConfig.nextTrigger(settings) }
     Text(if (next != null)
