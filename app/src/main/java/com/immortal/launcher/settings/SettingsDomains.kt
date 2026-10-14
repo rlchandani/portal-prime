@@ -89,6 +89,7 @@ object SettingsDomains {
                       title = "Calendar feed",
                       get = { it.calendarUrl ?: "" },
                       set = ScreensaverConfig::setCalendarUrl,
+                      applyWhen = { it.isBlank() || CalendarFeed.isSupported(it) },
                       entry = Entry.Nav(CalendarUrlEntryActivity::class.java),
                       help =
                           "A public iCalendar (.ics) link - a Google \"secret iCal\" address or an Apple " +

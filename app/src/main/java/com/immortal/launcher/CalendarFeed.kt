@@ -9,6 +9,7 @@ package com.immortal.launcher
 
 import android.util.Log
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -71,37 +72,42 @@ object CalendarFeed {
 
   // --- URL handling -----------------------------------------------------------
 
-  /** True for a link we can actually fetch as an ICS feed. */
+  /** True for a structurally valid link with a supported calendar endpoint. */
   fun isSupported(url: String): Boolean {
-    val u = url.trim()
-    if (u.isEmpty()) return false
-    val lower = u.lowercase(Locale.US)
-    val schemeOk =
-        lower.startsWith("http://") ||
-            lower.startsWith("https://") ||
-            lower.startsWith("webcal://")
-    if (!schemeOk) return false
-    // Accept anything that looks like an ICS endpoint or a known calendar host —
-    // Google/Apple feeds don't always end in ".ics" (Google uses ".../basic.ics" but
-    // iCloud uses an opaque path), so we also recognise the provider hosts.
-    return lower.contains(".ics") ||
-        lower.startsWith("webcal://") ||
-        isGoogle(lower) ||
-        isApple(lower)
+    val uri = calendarUri(url) ?: return false
+    return uri.scheme.equals("webcal", ignoreCase = true) ||
+        uri.path.orEmpty().contains(".ics", ignoreCase = true) ||
+        uri.query.orEmpty().contains(".ics", ignoreCase = true) ||
+        isGoogle(uri) || isApple(uri)
   }
 
-  private fun isGoogle(lower: String): Boolean =
-      lower.contains("calendar.google.com") || lower.contains("google.com/calendar")
+  private fun calendarUri(url: String): URI? = runCatching {
+    val uri = URI(url.trim()).parseServerAuthority()
+    if (uri.isOpaque || uri.host.isNullOrBlank() ||
+        uri.scheme?.lowercase(Locale.US) !in setOf("http", "https", "webcal") ||
+        (uri.port != -1 && uri.port !in 1..65535)) return@runCatching null
+    uri
+  }.getOrNull()
 
-  private fun isApple(lower: String): Boolean =
-      lower.contains("icloud.com") || lower.contains("apple.com")
+  private fun URI.hasHost(domain: String): Boolean {
+    val hostname = host.lowercase(Locale.US).trimEnd('.')
+    return hostname == domain || hostname.endsWith(".$domain")
+  }
 
-  /** Human label for the settings screen. */
+  private fun isGoogle(uri: URI): Boolean =
+      uri.hasHost("calendar.google.com") ||
+          (uri.hasHost("google.com") &&
+              (uri.path == "/calendar" || uri.path.orEmpty().startsWith("/calendar/")))
+
+  private fun isApple(uri: URI): Boolean =
+      uri.hasHost("icloud.com") || uri.hasHost("apple.com")
+
+  /** Human label based on the calendar host, never on path or query text. */
   fun providerName(url: String): String {
-    val lower = url.trim().lowercase(Locale.US)
+    val uri = calendarUri(url) ?: return "Calendar feed"
     return when {
-      isGoogle(lower) -> "Google Calendar"
-      isApple(lower) -> "Apple iCloud"
+      isGoogle(uri) -> "Google Calendar"
+      isApple(uri) -> "Apple iCloud"
       else -> "Calendar feed"
     }
   }

@@ -26,7 +26,7 @@ class CalendarUrlEntryActivity : ComponentActivity() {
             placeholder = "https://…",
             initial = ScreensaverConfig.load(this).calendarUrl.orEmpty(),
             emptyHint = "Google secret address in iCal format or Apple iCloud public calendar.",
-            invalidHint = "That doesn’t look like a calendar (.ics) link yet.",
+            invalidHint = "Enter a complete calendar link, including the website name.",
             primaryLabel = "Use this calendar",
             validate = { if (CalendarFeed.isSupported(it)) CalendarFeed.providerName(it) else null },
             onSave = { url ->
