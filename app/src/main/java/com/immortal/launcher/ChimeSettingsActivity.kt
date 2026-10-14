@@ -12,14 +12,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -177,56 +174,51 @@ private fun TestButton(label: String, enabled: Boolean, onClick: () -> Unit) {
   }
 }
 
-/** Dropdown of the TTS engine's installed voices for the chosen locale. The empty
- *  name means "engine default". Voices are enumerated from a throwaway TextToSpeech. */
+/** Bounded chooser over the existing on-device engine. Empty identity means engine default. */
 @Composable
 private fun VoicePicker(current: String, enabled: Boolean, onPick: (String) -> Unit) {
   val context = LocalContext.current
-  // name -> friendly label; first entry is always the engine default.
-  var voices by remember { mutableStateOf<List<Pair<String, String>>>(listOf("" to "Default voice")) }
+  var voices by remember { mutableStateOf<List<InstalledVoiceChoice>>(emptyList()) }
+  var loading by remember { mutableStateOf(true) }
+  var loadFailed by remember { mutableStateOf(false) }
   var expanded by remember { mutableStateOf(false) }
   LaunchedEffect(enabled) { if (!enabled) expanded = false }
 
   DisposableEffect(Unit) {
+    var active = true
     var tts: android.speech.tts.TextToSpeech? = null
-    tts = android.speech.tts.TextToSpeech(context.applicationContext) { status ->
-      if (status == android.speech.tts.TextToSpeech.SUCCESS) {
-        val found = runCatching {
-          tts?.voices
-              ?.filter { !it.isNetworkConnectionRequired }
-              ?.sortedWith(TtsVoiceLabels.sort)
-              ?.map { it.name to TtsVoiceLabels.label(it) }
-              ?.distinctBy { it.first }
-              ?: emptyList()
-        }.getOrDefault(emptyList())
-        if (found.isNotEmpty()) voices = listOf("" to "Default voice") + found
+    try {
+      tts = android.speech.tts.TextToSpeech(context.applicationContext) { status ->
+        if (active) {
+          val found = runCatching {
+            if (status != android.speech.tts.TextToSpeech.SUCCESS) error("TTS initialization unavailable")
+            tts?.voices?.filter { !it.isNetworkConnectionRequired }?.sortedWith(TtsVoiceLabels.sort)
+                ?.map { InstalledVoiceChoice(it.name, TtsVoiceLabels.label(it), it.locale.getDisplayName(java.util.Locale.US)) }
+                ?.distinctBy { it.name } ?: emptyList()
+          }
+          voices = found.getOrDefault(emptyList())
+          loading = false
+          loadFailed = found.isFailure
+        }
       }
+    } catch (_: Exception) {
+      loading = false
+      loadFailed = true
     }
-    onDispose { runCatching { tts?.shutdown() } }
+    onDispose { active = false; runCatching { tts?.shutdown() } }
   }
 
-  val label = voices.firstOrNull { it.first == current }?.second ?: "Default voice"
-  Box {
-    Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .tvFocusableRow(enabled = enabled) { expanded = true }
-                .padding(start = 18.dp, end = 18.dp, top = 2.dp, bottom = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Text("Voice", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-      Text(label, color = IosSecondary, fontSize = Sizes.rowValue, fontWeight = FontWeight.SemiBold)
-      Text("  ▾", color = IosSecondary, fontSize = Sizes.rowValue)
-    }
-    DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
-      voices.forEach { (name, friendly) ->
-        DropdownMenuItem(
-            text = { Text(friendly) },
-            enabled = enabled,
-            onClick = { if (enabled) onPick(name); expanded = false })
-      }
-    }
+  val label = installedVoiceLabel(current, voices, loading)
+  Row(
+      modifier = Modifier.fillMaxWidth().tvFocusableRow(enabled = enabled) { expanded = true }
+          .semantics { contentDescription = "Spoken-time voice" }
+          .padding(start = 18.dp, end = 18.dp, top = 2.dp, bottom = 6.dp),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text("Voice", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
+    Text(label, color = IosSecondary, fontSize = Sizes.rowValue, fontWeight = FontWeight.SemiBold)
+    Text("  ▾", color = IosSecondary, fontSize = Sizes.rowValue)
   }
+  if (expanded && enabled) InstalledVoiceChoiceDialog(voices, current, loading, loadFailed, enabled,
+      onDismiss = { expanded = false }, onPick = { if (enabled) onPick(it) })
 }
-
-
