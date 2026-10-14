@@ -169,9 +169,17 @@ private fun ApprovedAppsContent(
       onDispose { appContext.unregisterReceiver(receiver) }
     }
   }
+  fun closeSearch() {
+    searching = false
+    query = ""
+  }
   fun toggleSearch() {
-    searching = !searching
-    if (!searching) query = ""
+    if (searching) closeSearch() else searching = true
+  }
+  fun openFolder(name: String) {
+    recent = false
+    folder = name
+    closeSearch()
   }
   LaunchedEffect(searchRequest) {
     if (searchRequest > 0) toggleSearch()
@@ -261,15 +269,23 @@ private fun ApprovedAppsContent(
   // Publish installed apps, folders and built-ins together, never a short grid
   // of built-ins that shifts when the asynchronous inventory arrives.
   val tiles = remember(shown, folderNames, allApps != null, recent, folder, query, shortcutIcons) {
-    val builtins = if (allApps != null && !recent && folder == null && query.isBlank())
-      listOf("store" to "App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") +
-          if ("dashboard" in shortcutIcons) listOf("dashboard" to "Home dashboard") else emptyList()
-      else emptyList()
-    val otherFolders = if (!recent && folder == null && query.isBlank()) folderNames.filterNot { it == "Settings" } else emptyList()
-    shown.map { app -> AppsTileEntry(app.label, app = app) } + otherFolders.map { AppsTileEntry(it, folder = it) } + builtins.map { AppsTileEntry(it.second, builtin = it.first) }
+    val hasQuery = query.isNotBlank()
+    val includeDestinations = hasQuery || (!recent && folder == null)
+    val builtins = if (allApps != null && includeDestinations) {
+      (listOf("store" to "App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") +
+          if ("dashboard" in shortcutIcons) listOf("dashboard" to "Home dashboard") else emptyList())
+          .filter { !hasQuery || it.second.contains(query.trim(), ignoreCase = true) }
+    } else emptyList()
+    val otherFolders = if (allApps != null && includeDestinations) {
+      folderNames.filter { name ->
+        if (hasQuery) "$name folder".contains(query.trim(), ignoreCase = true) else name != "Settings"
+      }.map { name -> AppsTileEntry(if (hasQuery) "$name folder" else name, folder = name) }
+    } else emptyList()
+    shown.map { app -> AppsTileEntry(app.label, app = app) } + otherFolders +
+        builtins.map { AppsTileEntry(it.second, builtin = it.first) }
   }
   BackHandler {
-    when { menuFor != null -> menuFor = null; folder != null -> folder = null; recent && !initiallyRecent -> recent = false; searching -> { searching = false; query = "" }; else -> onExit() }
+    when { menuFor != null -> menuFor = null; folder != null -> folder = null; recent && !initiallyRecent -> recent = false; searching -> closeSearch(); else -> onExit() }
   }
   val content: @Composable () -> Unit = {
     androidx.compose.foundation.lazy.grid.LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(6), horizontalArrangement = Arrangement.spacedBy(32.dp), verticalArrangement = Arrangement.spacedBy(32.dp), modifier = modifier.fillMaxSize().padding(horizontal = 56.dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp)) {
@@ -280,7 +296,7 @@ private fun ApprovedAppsContent(
           Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             if (folder == null && !recent) {
               ApprovedAppsButton("App Store", primary = true) { launchApprovedIntent(context, Intent(context, StoreActivity::class.java)) }
-              if ("Settings" in folderNames) ApprovedAppsButton("Settings folder") { folder = "Settings" }
+              if ("Settings" in folderNames) ApprovedAppsButton("Settings folder") { openFolder("Settings") }
               ApprovedAppsButton("Edit favorites") { editFavorites = true }
               ApprovedAppsButton("Recent apps") { recent = true }
             } else if (folder != null) {
@@ -289,14 +305,14 @@ private fun ApprovedAppsContent(
               ApprovedAppsButton("All apps") { folder = null }
             } else ApprovedAppsButton("All apps") { recent = false }
           }
-          if (searching) ApprovedAppsSearch(query, { query = it }, "Search installed apps", Modifier.padding(top = 24.dp))
+          if (searching) ApprovedAppsSearch(query, { query = it }, "Search apps and folders", Modifier.padding(top = 24.dp))
           if (failure != null) {
             Text(failure!!, color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 24.dp))
             ApprovedAppsButton("Try again", modifier = Modifier.padding(top = 20.dp)) { refresh++ }
           }
           if (failure == null && !displayReady) Text("Loading apps…", color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 32.dp))
           if (failure == null && displayReady &&
-              shown.isEmpty() && (query.isNotBlank() || recent || folder != null)) {
+              tiles.isEmpty() && (query.isNotBlank() || recent || folder != null)) {
             Text(if (query.isNotBlank()) "No apps match “${query.trim()}”." else if (recent && recentUsageAccess == false) "Enable usage access to see your recent apps." else if (recent) "No recent apps yet." else "This folder is empty.", color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 32.dp))
             if (recent && recentUsageAccess == false) ApprovedAppsButton("Open usage access", modifier = Modifier.padding(top = 20.dp)) {
               if (!RecentAppUsageAccess.open(context)) Toast.makeText(context, "Usage access settings aren’t available on this device.", Toast.LENGTH_LONG).show()
@@ -308,12 +324,12 @@ private fun ApprovedAppsContent(
       items(tiles.size, key = { index -> tiles[index].app?.component?.flattenToString() ?: "${tiles[index].builtin}:${tiles[index].folder}" }, contentType = { "app-tile" }) { index ->
         val entry = tiles[index]
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-          InstalledAppTile(entry, entry.app?.component?.packageName?.let { badges[it] } ?: 0, if (recent) entry.app?.let(::recencyLine) else null,
+          InstalledAppTile(entry, entry.app?.component?.packageName?.let { badges[it] } ?: 0, if (showingRecents) entry.app?.let(::recencyLine) else null,
               shortcutIcon = shortcutIcons[entry.builtin],
               onOpen = {
                 when {
                   entry.app != null -> launchApp(entry.app)
-                  entry.folder != null -> folder = entry.folder
+                  entry.folder != null -> openFolder(entry.folder)
                   embedded && entry.builtin == "tools" && onSelectTab != null -> onSelectTab("tools")
                   else -> launchApprovedBuiltin(context, entry.builtin!!)
                 }
