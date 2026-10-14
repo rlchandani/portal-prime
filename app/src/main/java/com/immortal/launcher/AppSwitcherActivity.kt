@@ -69,6 +69,7 @@ class AppSwitcherActivity : ComponentActivity() {
 }
 
 private data class AppItem(val label: String, val component: ComponentName, val icon: ImageBitmap, val lastUsedMs: Long = 0L, val fgMs: Long = 0L)
+private data class RecentAppsLoad(val apps: List<AppItem>, val usageAccess: Boolean)
 private data class ApprovedAppsInventory(val installed: List<AppItem>, val shortcuts: Map<String, ImageBitmap>)
 
 /** One captured Home snapshot owns both app entries and shortcut artwork. */
@@ -120,6 +121,7 @@ private fun ApprovedAppsContent(
   var lastSuccessfulEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
   var lastRecentEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
   var recents by remember { mutableStateOf<List<AppItem>?>(null) }
+  var recentUsageAccess by remember { mutableStateOf<Boolean?>(null) }
   val recentLabels = remember { RecentAppLabelCache() }
   var inventory by remember {
     mutableStateOf(peekApprovedIconInventory()?.let { appInventory(context, it) })
@@ -215,7 +217,7 @@ private fun ApprovedAppsContent(
         loadRecents(context, recentLabels) { loadingContext.ensureActive() }
       }
       kotlinx.coroutines.currentCoroutineContext().ensureActive()
-      recents = loaded; recentsFailure = null
+      recents = loaded.apps; recentUsageAccess = loaded.usageAccess; recentsFailure = null
       lastRecentEpoch = epoch
     } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
     catch (error: Exception) { recentsFailure = "Your recent apps couldn’t be loaded. Try again." }
@@ -291,8 +293,10 @@ private fun ApprovedAppsContent(
           if (failure == null && !displayReady) Text("Loading apps…", color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 32.dp))
           if (failure == null && displayReady &&
               shown.isEmpty() && (query.isNotBlank() || recent || folder != null)) {
-            Text(if (query.isNotBlank()) "No apps match “${query.trim()}”." else if (recent) "No recent apps yet. Usage access may need setup." else "This folder is empty.", color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 32.dp))
-            if (recent) ApprovedAppsButton("Usage access", modifier = Modifier.padding(top = 20.dp)) { launchApprovedIntent(context, Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)) }
+            Text(if (query.isNotBlank()) "No apps match “${query.trim()}”." else if (recent && recentUsageAccess == false) "Enable usage access to see your recent apps." else if (recent) "No recent apps yet." else "This folder is empty.", color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 32.dp))
+            if (recent && recentUsageAccess == false) ApprovedAppsButton("Open usage access", modifier = Modifier.padding(top = 20.dp)) {
+              if (!RecentAppUsageAccess.open(context)) Toast.makeText(context, "Usage access settings aren’t available on this device.", Toast.LENGTH_LONG).show()
+            }
           }
           Spacer(Modifier.height(36.dp))
         }
@@ -498,15 +502,16 @@ private fun recentIcon(context: Context, pkg: String, inventory: Map<String, Ima
 }
 
 /** Recently-used apps, most-recent first, with usage time; launchable + curated, minus Immortal. */
-private fun loadRecents(context: Context, labelCache: RecentAppLabelCache, checkActive: () -> Unit): List<AppItem> {
+private fun loadRecents(context: Context, labelCache: RecentAppLabelCache, checkActive: () -> Unit): RecentAppsLoad {
   checkActive()
+  if (!RecentAppUsageAccess.allowed(context)) return RecentAppsLoad(emptyList(), usageAccess = false)
   val usm =
       context.getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager
-          ?: return emptyList()
+          ?: return RecentAppsLoad(emptyList(), usageAccess = true)
   val now = System.currentTimeMillis()
   RecentAppPreparationDiagnostics.query()
   val stats = usm.queryUsageStats(UsageStatsManager.INTERVAL_BEST, now - 24L * 3600_000, now)
-  if (stats.isNullOrEmpty()) return emptyList()
+  if (stats.isNullOrEmpty()) return RecentAppsLoad(emptyList(), usageAccess = true)
   val icons = loadApprovedInstalledApps(context).associate { it.component.packageName to it.icon }
   val packageRevision = approvedIconInventoryRevision.value
   val configuration = context.resources.configuration.toString()
@@ -547,7 +552,7 @@ private fun loadRecents(context: Context, labelCache: RecentAppLabelCache, check
       .take(16)
       .toList()
   RecentAppPreparationDiagnostics.completed(result.size)
-  return result
+  return RecentAppsLoad(result, usageAccess = true)
 }
 
 /** All installed launchable apps (for search / drawer), alphabetised, curated, minus Immortal. */
