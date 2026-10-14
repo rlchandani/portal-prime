@@ -75,6 +75,10 @@ class FleetRoutes(private val context: Context) {
         if (!BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) resp(403, err("diagnostics_disabled"))
         else FleetHttpServer.Response(200, RecentAppPreparationDiagnostics.snapshot().toString())
       }
+      "/perf/tools-discovery" -> requireMethod("GET", req) {
+        if (!BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) resp(403, err("diagnostics_disabled"))
+        else FleetHttpServer.Response(200, ToolsDiscoveryDiagnostics.snapshot().toString())
+      }
       "/perf/remote-input" -> requireMethod("GET", req) {
         if (!BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) resp(403, err("diagnostics_disabled"))
         else FleetHttpServer.Response(200, RemoteInput.gestureDiagnostics().toString())

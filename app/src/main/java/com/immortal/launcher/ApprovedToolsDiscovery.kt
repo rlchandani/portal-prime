@@ -33,28 +33,36 @@ internal fun ToolsIssContent() {
     var loading by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     var revision by remember { mutableStateOf(0) }
+    val refreshGate = remember { ToolsRefreshGate() }
     LaunchedEffect(active, revision) {
         if (!active) return@LaunchedEffect
         foregroundAt = System.currentTimeMillis()
         val remaining = passes?.filter { it.endMillis > foregroundAt }
-        if (revision == 0 && !remaining.isNullOrEmpty() &&
-            foregroundAt - ToolsDiscoveryCache.passesAt < 30 * 60_000L) return@LaunchedEffect
+        if (!refreshGate.isPending(revision) && !remaining.isNullOrEmpty() &&
+            foregroundAt - ToolsDiscoveryCache.passesAt < 30 * 60_000L) {
+            ToolsDiscoveryDiagnostics.cacheHit("iss")
+            return@LaunchedEffect
+        }
         loading = true
         message = null
+        var usable = false
+        ToolsDiscoveryDiagnostics.started("iss")
         try {
             val result = ToolsWork.load { IssPasses.predict(context) }
                 .filter { it.endMillis > System.currentTimeMillis() }
             passes = result
+            usable = result.isNotEmpty()
             if (result.isEmpty()) message = "No passes are available. Check your connection and weather location, then try again."
             else {
                 ToolsDiscoveryCache.passes = result
                 ToolsDiscoveryCache.passesAt = System.currentTimeMillis()
+                refreshGate.completed(revision)
             }
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (_: Exception) {
             message = "Passes couldn’t be updated. Check your connection and try again."
-        } finally { loading = false }
+        } finally { ToolsDiscoveryDiagnostics.finished("iss", usable); loading = false }
     }
     val upcoming = passes.orEmpty().filter { it.endMillis > foregroundAt }
     val next = upcoming.firstOrNull { it.visible } ?: upcoming.firstOrNull()
@@ -96,22 +104,30 @@ internal fun ToolsAuroraContent() {
     var loading by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     var revision by remember { mutableStateOf(0) }
+    val refreshGate = remember { ToolsRefreshGate() }
     LaunchedEffect(active, revision) {
         if (!active) return@LaunchedEffect
-        if (revision == 0 && outlook != null && System.currentTimeMillis() - ToolsDiscoveryCache.auroraAt < 15 * 60_000L) return@LaunchedEffect
+        if (!refreshGate.isPending(revision) && outlook != null && System.currentTimeMillis() - ToolsDiscoveryCache.auroraAt < 15 * 60_000L) {
+            ToolsDiscoveryDiagnostics.cacheHit("aurora")
+            return@LaunchedEffect
+        }
         loading = true
         message = null
+        var usable = false
+        ToolsDiscoveryDiagnostics.started("aurora")
         try {
             val result = ToolsWork.load { Aurora.status(context) }
             if (result == null) message = "The outlook couldn’t be updated. Check your connection and weather location, then try again."
             else {
+                usable = true
                 outlook = result
                 ToolsDiscoveryCache.aurora = result
                 ToolsDiscoveryCache.auroraAt = System.currentTimeMillis()
+                refreshGate.completed(revision)
             }
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) { message = "The outlook couldn’t be updated. Please try again." }
-        finally { loading = false }
+        finally { ToolsDiscoveryDiagnostics.finished("aurora", usable); loading = false }
     }
     val current = outlook
     ToolsTwoPane(left = {
