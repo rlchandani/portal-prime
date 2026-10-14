@@ -309,7 +309,8 @@ internal fun ToggleRow(
             IconBadge(color = iconColor, symbol = iconSymbol)
             Spacer(Modifier.size(12.dp))
         }
-        ApprovedSettingsLabel(title, LocalApprovedSettingsHelp.current, Modifier.weight(1f))
+        ApprovedSettingsLabel(title, LocalApprovedSettingsHelp.current,
+            Modifier.weight(1f).padding(end = 24.dp))
         // Visual only — the row toggles it (so the remote's centre button works).
         ApprovedSettingsSwitch(checked, enabled = enabled)
     }
@@ -347,7 +348,7 @@ internal fun NavRow(
             IconBadge(color = iconColor, symbol = iconSymbol)
             Spacer(Modifier.size(12.dp))
         }
-        Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.weight(1f).padding(end = 24.dp)) {
             Text(
                 text = title,
                 color = IosLabel,
@@ -438,7 +439,7 @@ internal fun SelectableRow(title: String, subtitle: String, selected: Boolean, o
             .padding(horizontal = 28.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.weight(1f).padding(end = 24.dp)) {
             Text(text = title, color = IosLabel, fontSize = Sizes.rowTitle)
             if (subtitle.isNotEmpty()) {
                 Text(
@@ -540,7 +541,7 @@ internal fun Stepper(
             color = IosLabel,
             fontSize = Sizes.rowTitle,
             lineHeight = 34.sp,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).padding(end = 24.dp),
         )
         StepperButton("-", focused, enabled) { onMinus() }
         Text(
@@ -815,7 +816,7 @@ internal fun ToggleHeaderRow(
         modifier = Modifier.fillMaxWidth().padding(18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.weight(1f).padding(end = 24.dp)) {
             Text(title, color = IosLabel, fontSize = Sizes.rowTitle)
             Text(
                 subtitle,
