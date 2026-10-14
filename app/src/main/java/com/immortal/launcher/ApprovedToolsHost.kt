@@ -185,7 +185,12 @@ private fun ToolsRail(
 private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, onOpen: (ApprovedTool) -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
     var group by rememberSaveable { mutableStateOf("All tools") }
-    val entries = remember(advanced, group, query) { ApprovedToolsCatalog.visible(advanced, group, query) }
+    val selectedGroup = ApprovedToolsCatalog.resolveGroup(group, advanced)
+    // Render the valid category immediately; then keep saved state consistent with that frame.
+    SideEffect { if (group != selectedGroup) group = selectedGroup }
+    val entries = remember(advanced, selectedGroup, query) {
+        ApprovedToolsCatalog.visible(advanced, selectedGroup, query)
+    }
     val p = LocalApprovedPalette.current
     val context = LocalContext.current.applicationContext
     val active = LocalApprovedLauncherPageActive.current
@@ -222,8 +227,8 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, onOpen: (Approv
             item(key = "categories", span = { GridItemSpan(maxLineSpan) }) {
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(4.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    (listOf("All tools") + ApprovedToolsCatalog.groups.filter { advanced || it != "Advanced" }).forEach { category ->
-                        val selected = group == category
+                    ApprovedToolsCatalog.categories(advanced).forEach { category ->
+                        val selected = selectedGroup == category
                         val shape = RoundedCornerShape(16.dp)
                         Box(Modifier.heightIn(min = 68.dp).clip(shape)
                             .background(if (selected) p.surface2 else Color.Transparent)

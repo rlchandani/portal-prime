@@ -28,6 +28,14 @@ internal object ApprovedToolsCatalog {
     )
     val groups = listOf("Everyday", "Home & downtime", "Discover", "Advanced")
 
+    private val allCategories = listOf("All tools") + groups
+    private val basicCategories = allCategories.filter { it != "Advanced" }
+    fun categories(advanced: Boolean): List<String> = if (advanced) allCategories else basicCategories
+
+    /** A restored or hidden category must always have a visible selection in the library. */
+    fun resolveGroup(group: String, advanced: Boolean): String =
+        group.takeIf { it in categories(advanced) } ?: "All tools"
+
     fun visible(advanced: Boolean, group: String = "All tools", query: String = ""): List<ApprovedTool> {
         val term = query.trim()
         return all.filter {
