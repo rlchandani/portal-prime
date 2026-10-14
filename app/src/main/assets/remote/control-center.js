@@ -115,6 +115,7 @@ const drafts = new Map(),
 const thumbs = new ImagePool(),
   artwork = new ImagePool({ limit: 1 }),
   previewPool = new ImagePool({ limit: 1 });
+let photoObservation = null;
 const icons = {
   home: '<path d="M3 10 12 3l9 7M5 9v12h14V9M10 21v-7h4v7"/>',
   remote:
@@ -948,6 +949,7 @@ function render() {
     }
     cancelSearchComposition();
   }
+  stopPhotoObservation();
   operationsView = null,
   mediaView = null;
   updateHeader();
@@ -2643,6 +2645,40 @@ function photosPage() {
     ),
   );
 }
+// One observer owns only the currently mounted Photos tiles. ImagePool still owns
+// caching, cancellation and its four-request concurrency limit.
+function stopPhotoObservation() {
+  const owner = photoObservation;
+  photoObservation = null;
+  if (!owner) return;
+  owner.observer?.disconnect();
+  owner.pending.clear();
+}
+function observePhotoTile(tile, ticket, load) {
+  if (!photoObservation) {
+    const owner = { observer: null, pending: new Map() };
+    photoObservation = owner;
+    owner.admit = (target) => {
+      const job = owner.pending.get(target);
+      if (!job || photoObservation !== owner || document.hidden ||
+          connectionState === 'expired' || !target.isConnected || !session.current(job.ticket)) return;
+      owner.pending.delete(target);
+      owner.observer?.unobserve(target);
+      job.load();
+    };
+    if (typeof IntersectionObserver === 'function') {
+      try {
+        owner.observer = new IntersectionObserver((entries) => {
+          for (const entry of entries) if (entry.isIntersecting) owner.admit(entry.target);
+        }, { rootMargin: '200px 0px' });
+      } catch { /* Older browsers still load through the bounded image pool. */ }
+    }
+  }
+  const owner = photoObservation;
+  owner.pending.set(tile, { ticket, load });
+  if (owner.observer) owner.observer.observe(tile);
+  else queueMicrotask(() => owner.admit(tile)); // The render mounts tiles before admission.
+}
 function photoTile(file, ticket) {
   const image = el('img', { alt: '', loading: 'lazy', hidden: true });
   const hint = el('span', { class: 'detail', text: 'Loading…' });
@@ -2686,7 +2722,9 @@ function photoTile(file, ticket) {
         }
       },
     );
-  load();
+  // Already admitted work rebinds before layout; only new requests wait for visibility.
+  if (thumbs.entries.has(photoThumbnailKey(file, ticket))) load();
+  else observePhotoTile(tile, ticket, load);
   return tile;
 }
 function photoPreview(file, ticket) {
@@ -4577,6 +4615,7 @@ document.addEventListener('visibilitychange', () => {
     cancelSearchComposition();
     stopPolling();
     abortReads();
+    stopPhotoObservation();
     thumbs.clear();
     appListView = null;
     settingsRowView = null;
@@ -4585,7 +4624,7 @@ document.addEventListener('visibilitychange', () => {
     clearTimeout(pairDiscoveryTimer);
   } else {
     // Retire old queued input; a fresh pad admits gestures after visibility resumes.
-    if (tab === 'remote' && !detail) render();
+    if ((tab === 'remote' || tab === 'photos') && !detail) render();
     loadVisible();
     if (connectionState === 'offline') status();
     startPolling();
@@ -4595,6 +4634,7 @@ window.addEventListener('pagehide', () => {
   playbackVisibilityGeneration++;
   cancelSearchComposition();  stopPolling();
   abortReads();
+  stopPhotoObservation();
   thumbs.clear();
   appListView = null;
   settingsRowView = null;
