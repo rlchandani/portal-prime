@@ -56,7 +56,7 @@ class WebAppActivity : ComponentActivity() {
   private lateinit var entry: WebAppEntryState
   private var entryUrl: String = URL_YT_MUSIC
   private var loads = 0
-  private var pageRevision = 0L
+  private val contentReveal = WebAppContentRevealGate()
   private lateinit var root: FrameLayout
   private lateinit var opening: LinearLayout
   private val openingGate = WebAppOpeningGate()
@@ -195,20 +195,20 @@ class WebAppActivity : ComponentActivity() {
       webViewClient = object : WebViewClient() {
         override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
           super.onPageStarted(view, url, favicon)
-          pageRevision++
+          if (view !== web || isFinishing || isDestroyed) return
+          contentReveal.started()
           opening.visibility = View.VISIBLE
+        }
+        override fun onPageCommitVisible(view: WebView, url: String?) {
+          super.onPageCommitVisible(view, url)
+          revealReadyContent(view, url)
         }
         override fun onPageFinished(view: WebView, url: String?) {
           super.onPageFinished(view, url)
-          if (url != view.url) return
-          val readyRevision = pageRevision
-          view.postVisualStateCallback(readyRevision, object : WebView.VisualStateCallback() {
-            override fun onComplete(requestId: Long) {
-              if (requestId != pageRevision || view !== web || isFinishing || isDestroyed) return
-              opening.visibility = View.GONE
-              WebAppOpeningDiagnostics.pageFinished()
-            }
-          })
+          if (view !== web || isFinishing || isDestroyed || url?.substringBefore('#') != view.url?.substringBefore('#')) return
+          WebAppOpeningDiagnostics.pageFinished()
+          // Retain a readiness fallback for providers which omit commit-visible callbacks.
+          revealReadyContent(view, url)
         }
       }
       webChromeClient = WebChromeClient()
@@ -219,7 +219,20 @@ class WebAppActivity : ComponentActivity() {
     // An entry change arriving during first-frame admission uses the latest request.
     loads++
     WebAppOpeningDiagnostics.loadRequested()
+    contentReveal.request(entryUrl, view.url)
     view.loadUrl(entryUrl)
+  }
+
+  private fun revealReadyContent(view: WebView, url: String?) {
+    if (view !== web || isFinishing || isDestroyed) return
+    val ticket = contentReveal.capture(url, view.url) ?: return
+    view.postVisualStateCallback(ticket, object : WebView.VisualStateCallback() {
+      override fun onComplete(requestId: Long) {
+        if (view !== web || isFinishing || isDestroyed || !contentReveal.complete(requestId)) return
+        opening.visibility = View.GONE
+        WebAppOpeningDiagnostics.contentRevealed()
+      }
+    })
   }
 
   override fun onNewIntent(intent: Intent) {
@@ -231,7 +244,7 @@ class WebAppActivity : ComponentActivity() {
       entryUrl = url
       web?.let {
         loads++
-        pageRevision++
+        contentReveal.request(url, it.url)
         WebAppOpeningDiagnostics.loadRequested()
         it.loadUrl(url)
       }
@@ -252,7 +265,7 @@ class WebAppActivity : ComponentActivity() {
 
   override fun onDestroy() {
     openingGate.destroy()
-    pageRevision++
+    contentReveal.destroy()
     if (::root.isInitialized) {
       root.removeCallbacks(createWeb)
       if (Build.VERSION.SDK_INT >= 29) frameCommit?.let {

@@ -18,16 +18,17 @@ import org.json.JSONObject
 /** Opt-in functional fixture. Never reads or injects script into a user's website. */
 internal object WebAppProbe {
   private const val BASE = "file:///android_asset/webapp-retention-probe.html"
-  private val commands = setOf("start-probe", "seed-probe", "second-probe", "close-probe")
+  private const val LOADING = "http://127.0.0.1:17437/fixture/loading"
+  private val commands = setOf("start-probe", "seed-probe", "second-probe", "start-loading-probe", "close-probe")
   private val main by lazy { Handler(Looper.getMainLooper()) }
   private var current: WeakReference<WebAppActivity>? = null
 
-  internal fun isProbeUrl(url: String?): Boolean = url == "$BASE?page=one" || url == "$BASE?page=two"
+  internal fun isProbeUrl(url: String?): Boolean = url == "$BASE?page=one" || url == "$BASE?page=two" || url == LOADING
   internal fun command(body: JSONObject): String? = if (body.length() == 1)
       (body.opt("action") as? String)?.takeIf { it in commands } else null
 
   fun created(activity: WebAppActivity) {
-    if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) current = WeakReference(activity)
+    if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS || BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) current = WeakReference(activity)
   }
   fun destroyed(activity: WebAppActivity) {
     if (current?.get() === activity) current = null
@@ -36,7 +37,7 @@ internal object WebAppProbe {
   private fun error(status: Int, code: String) = response(status, JSONObject().put("ok", false).put("error", code))
   private fun ok() = JSONObject().put("ok", true)
   private fun guard(context: Context): FleetHttpServer.Response? = when {
-    !BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS -> error(403, "webapp_probe_disabled")
+    !BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS && !BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS -> error(403, "webapp_probe_disabled")
     !DevMode.isEnabled(context) -> error(403, "dev_mode_required")
     HomeUiDiagnostics.collectorBusy() -> error(409, "webapp_probe_perf_busy")
     else -> null
@@ -66,8 +67,8 @@ internal object WebAppProbe {
         } else if (activity != null && !activity.isGeneratedProbe()) {
           result.complete(error(409, "real_webapp_active"))
         } else when (action) {
-          "start-probe", "second-probe" -> {
-            val url = BASE + if (action == "start-probe") "?page=one" else "?page=two"
+          "start-probe", "second-probe", "start-loading-probe" -> {
+            val url = if (action == "start-loading-probe") LOADING else BASE + if (action == "start-probe") "?page=one" else "?page=two"
             context.startActivity(Intent(context, WebAppActivity::class.java)
                 .putExtra(WebAppActivity.EXTRA_URL, url).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             result.complete(response(200, ok().put("dispatched", true)))

@@ -14,12 +14,13 @@ class WebAppProbeTest {
   @Test fun onlyFixedGeneratedDocumentsAreProbePages() {
     assertTrue(WebAppProbe.isProbeUrl("file:///android_asset/webapp-retention-probe.html?page=one"))
     assertTrue(WebAppProbe.isProbeUrl("file:///android_asset/webapp-retention-probe.html?page=two"))
-    for (url in listOf(null, "https://music.youtube.com", "file:///android_asset/webapp-retention-probe.html", "file:///android_asset/webapp-retention-probe.html?page=one&url=https://private.invalid")) {
+    assertTrue(WebAppProbe.isProbeUrl("http://127.0.0.1:17437/fixture/loading"))
+    for (url in listOf(null, "http://127.0.0.1:17437/fixture/loading?url=https://private.invalid", "http://127.0.0.1:17437/fixture/private", "https://music.youtube.com", "file:///android_asset/webapp-retention-probe.html", "file:///android_asset/webapp-retention-probe.html?page=one&url=https://private.invalid")) {
       assertFalse(WebAppProbe.isProbeUrl(url))
     }
   }
   @Test fun commandsCannotCarryUrlsOrJavascript() {
-    for (action in listOf("start-probe", "seed-probe", "second-probe", "close-probe")) {
+    for (action in listOf("start-probe", "seed-probe", "second-probe", "start-loading-probe", "close-probe")) {
       assertEquals(action, WebAppProbe.command(JSONObject().put("action", action)))
       assertNull(WebAppProbe.command(JSONObject().put("action", action).put("url", "https://private.invalid")))
       assertNull(WebAppProbe.command(JSONObject().put("action", action).put("script", "alert(1)")))

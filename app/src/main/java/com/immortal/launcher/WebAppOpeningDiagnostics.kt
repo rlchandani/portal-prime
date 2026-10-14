@@ -17,6 +17,7 @@ internal object WebAppOpeningDiagnostics {
   private val earlyCreations = AtomicLong()
   private val loads = AtomicLong()
   private val finishes = AtomicLong()
+  private val reveals = AtomicLong()
   fun frameReady(hardware: Boolean) {
     if (BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS)
       (if (hardware) hardwareFrames else softwareFrames).incrementAndGet()
@@ -27,9 +28,10 @@ internal object WebAppOpeningDiagnostics {
       earlyCreations.incrementAndGet()
   }
   fun loadRequested() { if (BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) loads.incrementAndGet() }
+  fun contentRevealed() { if (BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) reveals.incrementAndGet() }
   fun pageFinished() { if (BuildConfig.PORTAL_HOME_UI_DIAGNOSTICS) finishes.incrementAndGet() }
   fun snapshot() = JSONObject().put("hardwareFirstFrames", hardwareFrames.get())
       .put("softwareFirstFrames", softwareFrames.get()).put("creationStarts", creations.get())
       .put("creationBeforeFirstFrame", earlyCreations.get()).put("urlLoads", loads.get())
-      .put("pageFinishes", finishes.get())
+      .put("pageFinishes", finishes.get()).put("contentReveals", reveals.get())
 }
