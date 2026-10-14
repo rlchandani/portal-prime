@@ -33,8 +33,10 @@ class BarWatchService : AccessibilityService() {
     RemoteCursor.attach(this) // host the remote touchpad's on-TV pointer overlay
     NotificationOverlay.attach(this) // host MQTT-notify toasts (see MqttPublisher.handleNotify)
     pinnedFrame = PinnedAppFrameHost(this).also { PinnedAppScreensaver.attach(it) }
-    updateBar()
-    PinnedAppScreensaver.windowsChanged()
+    // getWindows() can block for five seconds while Android is still creating Home's first
+    // window. Both observations query it, so doing them here delays that very window by ten
+    // seconds on Portal. TYPE_WINDOWS_CHANGED below supplies the initialized snapshot; keep
+    // this connection callback limited to attaching owners and remote input surfaces.
   }
 
   override fun onAccessibilityEvent(event: AccessibilityEvent?) {
