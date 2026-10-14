@@ -6,8 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.app.Notification
-import android.service.notification.StatusBarNotification
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -22,31 +20,31 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mockito
 
-/** Real badge retrieval/aggregation; doubles stop at Android's blocking notification getter. */
+/** Real IO dispatch/publication; doubles stop at the listener's cached badge snapshot. */
 class ApprovedAppBadgesTest {
-  @Test fun notificationRetrievalRunsOffCallerThreadAndReturnsToCaller() = withBoundListener { service ->
+  @Test fun cachedBadgeReadRunsOffCallerThreadAndReturnsToCaller() = withBoundListener { service ->
     val retrievalThread = AtomicReference<Thread>()
-    Mockito.`when`(service.activeNotifications).thenAnswer {
+    Mockito.`when`(service.badgeCounts()).thenAnswer {
       retrievalThread.set(Thread.currentThread())
-      arrayOf(notification("fixture.chat"))
+      mapOf("fixture.chat" to 1)
     }
     runBlocking {
       val caller = Thread.currentThread()
       assertEquals(mapOf("fixture.chat" to 1), loadApprovedAppBadges())
-      assertNotNull("The real notification getter must be read", retrievalThread.get())
-      assertNotSame("Notification retrieval must leave the caller thread", caller, retrievalThread.get())
+      assertNotNull("The bound listener cache must be read", retrievalThread.get())
+      assertNotSame("Cache retrieval must leave the caller thread", caller, retrievalThread.get())
       assertSame("Publication resumes on the caller", caller, Thread.currentThread())
     }
   }
 
-  @Test fun blockedNotificationRetrievalLeavesCallerAvailableForAnotherAction() = withBoundListener { service ->
+  @Test fun blockedCachedBadgeReadLeavesCallerAvailableForAnotherAction() = withBoundListener { service ->
     val entered = CountDownLatch(1)
     val release = CountDownLatch(1)
     val anotherAction = CountDownLatch(1)
-    Mockito.`when`(service.activeNotifications).thenAnswer {
+    Mockito.`when`(service.badgeCounts()).thenAnswer {
       entered.countDown()
       check(release.await(5, TimeUnit.SECONDS))
-      arrayOf(notification("fixture.chat"))
+      mapOf("fixture.chat" to 1)
     }
     Executors.newSingleThreadExecutor { Thread(it, "badge-test-caller") }
         .asCoroutineDispatcher().use { caller ->
@@ -54,7 +52,7 @@ class ApprovedAppBadgesTest {
             val read = launch(caller) { loadApprovedAppBadges() }
             var action: kotlinx.coroutines.Job? = null
             try {
-              assertTrue("Notification retrieval must enter", entered.await(5, TimeUnit.SECONDS))
+              assertTrue("Cache retrieval must enter", entered.await(5, TimeUnit.SECONDS))
               action = launch(caller) { anotherAction.countDown() }
               assertTrue("The caller must remain available during retrieval",
                   anotherAction.await(1, TimeUnit.SECONDS))
@@ -69,16 +67,16 @@ class ApprovedAppBadgesTest {
         }
   }
 
-  @Test fun cancelledBlockedRetrievalCannotPublishReturnedBadges() = withBoundListener { service ->
+  @Test fun cancelledBlockedCacheReadCannotPublishReturnedBadges() = withBoundListener { service ->
     val entered = CountDownLatch(1)
     val release = CountDownLatch(1)
     val retained = mapOf("fixture.retained" to 2)
     val published = AtomicReference<Map<String, Int>>(retained)
     val publications = AtomicInteger()
-    Mockito.`when`(service.activeNotifications).thenAnswer {
+    Mockito.`when`(service.badgeCounts()).thenAnswer {
       entered.countDown()
       check(release.await(5, TimeUnit.SECONDS))
-      arrayOf(notification("fixture.fresh"))
+      mapOf("fixture.fresh" to 1)
     }
     Executors.newSingleThreadExecutor { Thread(it, "badge-test-caller") }
         .asCoroutineDispatcher().use { caller ->
@@ -89,7 +87,7 @@ class ApprovedAppBadgesTest {
               publications.incrementAndGet()
             }
             try {
-              assertTrue("Notification retrieval must enter", entered.await(5, TimeUnit.SECONDS))
+              assertTrue("Cache retrieval must enter", entered.await(5, TimeUnit.SECONDS))
               read.cancel()
               assertSame(retained, published.get())
               release.countDown()
@@ -104,19 +102,13 @@ class ApprovedAppBadgesTest {
         }
   }
 
-  @Test fun eachReadUsesFreshNotificationsAndPreservesClearableSummaryFiltering() = withBoundListener { service ->
-    val initial = arrayOf(
-        notification("fixture.chat"),
-        notification("fixture.chat"),
-        notification("fixture.music"),
-        notification("fixture.chat", clearable = false, flags = Notification.FLAG_ONGOING_EVENT),
-        notification("fixture.music", flags = Notification.FLAG_GROUP_SUMMARY),
-    )
-    val updated = arrayOf(notification("fixture.download"))
-    Mockito.`when`(service.activeNotifications).thenReturn(initial, updated)
+  @Test fun eachReadUsesTheLatestCachedSnapshot() = withBoundListener { service ->
+    val initial = mapOf("fixture.chat" to 2, "fixture.music" to 1)
+    val updated = mapOf("fixture.download" to 1)
+    Mockito.`when`(service.badgeCounts()).thenReturn(initial, updated)
     runBlocking {
-      assertEquals(mapOf("fixture.chat" to 2, "fixture.music" to 1), loadApprovedAppBadges())
-      assertEquals(mapOf("fixture.download" to 1), loadApprovedAppBadges())
+      assertSame("Reads must preserve the published cache snapshot", initial, loadApprovedAppBadges())
+      assertSame("The next read must observe the latest snapshot", updated, loadApprovedAppBadges())
     }
   }
 
@@ -124,8 +116,8 @@ class ApprovedAppBadgesTest {
     runBlocking { assertEquals(emptyMap<String, Int>(), loadApprovedAppBadges()) }
   }
 
-  @Test fun unavailableNotificationsPreserveEmptyBadgeFallback() = withBoundListener { service ->
-    Mockito.`when`(service.activeNotifications).thenThrow(SecurityException("generated-test-access-unavailable"))
+  @Test fun unavailableCachePreservesEmptyBadgeFallback() = withBoundListener { service ->
+    Mockito.`when`(service.badgeCounts()).thenThrow(SecurityException("generated-test-access-unavailable"))
     runBlocking { assertEquals(emptyMap<String, Int>(), loadApprovedAppBadges()) }
   }
 
@@ -147,12 +139,4 @@ class ApprovedAppBadgesTest {
     }
   }
 
-  private fun notification(packageName: String, clearable: Boolean = true, flags: Int = 0): StatusBarNotification {
-    val notification = Mockito.mock(Notification::class.java).apply { this.flags = flags }
-    return Mockito.mock(StatusBarNotification::class.java).also {
-      Mockito.`when`(it.packageName).thenReturn(packageName)
-      Mockito.`when`(it.isClearable).thenReturn(clearable)
-      Mockito.`when`(it.notification).thenReturn(notification)
-    }
-  }
 }

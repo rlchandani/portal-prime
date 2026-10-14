@@ -69,6 +69,7 @@ class FleetRoutes(private val context: Context) {
       "/diag" -> requireMethod("GET", req) { resp(200, FleetDiag.snapshot()) }
       "/perf" -> performance(req)
       "/perf/home-ui" -> HomeUiDiagnostics.handle(context, req)
+      "/perf/app-badges" -> AppBadgeProbe.handle(context, req)
       "/perf/settings-ui" -> SettingsUiDiagnostics.handle(context, req)
       "/perf/webapp" -> WebAppProbe.handle(context, req)
       "/perf/source-preview" -> SourcePreviewProbe.handle(context, req)
