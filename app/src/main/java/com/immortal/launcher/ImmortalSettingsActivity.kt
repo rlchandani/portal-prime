@@ -490,9 +490,11 @@ private fun ApprovedNativeSettingsPage(page: String) {
     }
     "managed" -> ApprovedManagedSettingsPage()
     "debug" -> {
-      SectionLabel("Diagnostics")
-      Card { IosDebugRow(context) }
-      Card { NavRow("About & device health") { navigate(approvedSettingsRoute("health")) } }
+      Card {
+        IosDebugRow(context)
+        Divider()
+        NavRow("About & device health") { navigate(approvedSettingsRoute("health")) }
+      }
     }
     "speed" -> Card {
       NavRow("Speed test", subLabel = "Open Tools to measure your connection.") {
@@ -604,8 +606,6 @@ private fun IosDebugRow(context: android.content.Context) {
   ToggleRow(
       title = "Debug Mode",
       checked = debug,
-      iconColor = Color(0xFFFF453A),
-      iconSymbol = "D",
       onChange = {
         debug = it
         prefs.edit().putBoolean("debug_mode", it).apply()
