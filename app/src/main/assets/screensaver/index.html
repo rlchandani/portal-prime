@@ -10,9 +10,9 @@
   #hint { display: none; }
   #chrome-mode { display: none; } /* keep the mode label hidden on-device by default */
   #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,0.5); font: 300 22px -apple-system, "Segoe UI", sans-serif; background: #000; z-index: 30;
-    transition: opacity .8s ease; }
-  #loading.hide { opacity: 0; pointer-events: none; }
+    color: rgba(255,255,255,0.5); font: 300 22px -apple-system, "Segoe UI", sans-serif; background: #000; z-index: 30; }
+  /* Readiness already includes image decoding; reveal the prepared composition immediately. */
+  #loading.hide { display: none; }
 </style>
 </head>
 <body>
