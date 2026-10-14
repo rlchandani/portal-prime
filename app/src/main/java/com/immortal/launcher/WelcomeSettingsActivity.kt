@@ -31,6 +31,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -314,46 +316,40 @@ internal fun WelcomeSettingsContent() {
 
 @Composable
 private fun EditableTextRow(label: String, value: String, onChange: (String) -> Unit) {
+  val pageActive = LocalApprovedLauncherPageActive.current
   var editing by remember { mutableStateOf(false) }
-  var tempValue by remember(value) { mutableStateOf(value) }
-
-  Row(
-      modifier =
-          Modifier.fillMaxWidth().tvFocusableRow {
-                if (!editing) {
-                  editing = true
-                  tempValue = value
-                }
-              }
-              .padding(horizontal = 18.dp, vertical = 14.dp),
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-    if (editing) {
-      OutlinedTextField(
-          colors = iosTextFieldColors(),
-          value = tempValue,
-          onValueChange = { tempValue = it },
-          singleLine = true,
-          modifier = Modifier.width(200.dp),
-      )
-      Spacer(Modifier.width(8.dp))
-      TextButton(onClick = {
-        onChange(tempValue)
-        editing = false
-      }) {
-        Text("Save", color = IosBlue)
+  var draft by remember { mutableStateOf(value) }
+  LaunchedEffect(pageActive) {
+    if (!pageActive) {
+      editing = false
+      draft = value
+    }
+  }
+  fun dismiss() { editing = false; draft = value }
+  NavRow(label, value = value.ifBlank { "Not set" }) {
+    if (pageActive) {
+      draft = value
+      editing = true
+    }
+  }
+  if (editing && pageActive) ApprovedSettingsDialog(label, onDismiss = ::dismiss,
+      help = if (label == "Your name") "Shown after the greeting. Leave blank to omit your name."
+          else "The greeting shown at this time of day. Changes apply when you choose Save.") {
+    IosTextField(draft, { draft = it }, label, modifier = Modifier.semantics {
+      contentDescription = "$label text"
+    })
+    Row(Modifier.padding(top = 24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      ActionPill("Save") {
+        if (editing && pageActive) {
+          onChange(draft)
+          dismiss()
+        }
       }
-    } else {
-      Text(
-          value,
-          color = IosSecondary,
-          fontSize = Sizes.rowValue,
-          modifier = Modifier.padding(start = 8.dp),
-      )
+      ApprovedSettingsTextButton("Cancel", ::dismiss)
     }
   }
 }
+
 
 @Composable
 private fun DurationStepper(seconds: Int, onChange: (Int) -> Unit) {
