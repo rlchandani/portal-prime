@@ -18,6 +18,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -80,6 +81,29 @@ class ConverterCurrencyWorkTest {
       release.countDown()
       job.cancelAndJoin()
     }
+  }
+
+  @Test fun freshCacheSharesAllDestinationRates() {
+    val (context, prefs) = cachedContext()
+    Mockito.`when`(prefs.getString("rates_EUR", null)).thenReturn("""{"rates":{"USD":1.25,"GBP":0.85}}""")
+    assertEquals(1.25, Converter.freshExchangeRate(context, "EUR", "USD")!!, 0.0)
+    assertEquals(0.85, Converter.freshExchangeRate(context, "EUR", "GBP")!!, 0.0)
+    Mockito.verify(prefs, Mockito.never()).edit()
+  }
+
+  @Test fun expiredCacheCannotBypassNetworkDebounce() {
+    val (context, prefs) = cachedContext()
+    Mockito.`when`(prefs.getLong("rates_EUR_ts", 0L)).thenReturn(1L)
+    assertNull(Converter.freshExchangeRate(context, "EUR", "USD"))
+    Mockito.verify(prefs, Mockito.never()).getString("rates_EUR", null)
+  }
+
+  @Test fun malformedOrMissingDestinationIsACacheMiss() {
+    val (context, prefs) = cachedContext()
+    Mockito.`when`(prefs.getString("rates_EUR", null)).thenReturn("""{"rates":{"USD":1.25}}""")
+    assertNull(Converter.freshExchangeRate(context, "EUR", "GBP"))
+    Mockito.`when`(prefs.getString("rates_EUR", null)).thenReturn("not-json")
+    assertNull(Converter.freshExchangeRate(context, "EUR", "USD"))
   }
 
   private fun cachedContext(): Pair<Context, SharedPreferences> {

@@ -554,10 +554,10 @@ internal fun ToolsConverterContent() {
     owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
       rateLoading = true
       try {
-        delay(250L) // Coalesce quick picker changes before a network request.
-        rate = ToolsWork.load {
-          Converter.exchangeRate(context, from, to)?.takeIf { it.isFinite() }
-        }
+        rate = loadCurrencyRate(
+            cached = { ToolsWork.load { Converter.freshExchangeRate(context, from, to) } },
+            fetch = { ToolsWork.load { Converter.exchangeRate(context, from, to) } },
+        )?.takeIf { it.isFinite() }
       } catch (cancelled: CancellationException) {
         throw cancelled
       } catch (_: Exception) {

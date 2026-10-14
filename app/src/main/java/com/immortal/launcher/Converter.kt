@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.content.Context
+import android.content.SharedPreferences
 import org.json.JSONObject
 
 /**
@@ -90,21 +91,31 @@ object Converter {
     return rates[to]
   }
 
+  /** Worker-only cache check so saved rates need not wait for network debounce. */
+  internal fun freshExchangeRate(context: Context, from: String, to: String): Double? {
+    ToolsWork.checkpoint()
+    if (from == to) return 1.0
+    val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    return freshRates(prefs, from)?.get(to)
+  }
+
+  private fun freshRates(prefs: SharedPreferences, base: String): Map<String, Double>? {
+    ToolsWork.checkpoint()
+    val fresh = System.currentTimeMillis() - prefs.getLong("rates_${base}_ts", 0L) < 6L * 60 * 60 * 1000
+    ToolsWork.checkpoint()
+    if (!fresh) return null
+    val cached = prefs.getString("rates_$base", null)?.let(::parseRates)
+    ToolsWork.checkpoint()
+    return cached
+  }
+
   /** Rates with [base] = 1.0, fetched from Frankfurter and cached per base. */
   private fun rates(context: Context, base: String): Map<String, Double>? {
     ToolsWork.checkpoint()
     val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     val cacheKey = "rates_$base"
     val tsKey = "rates_${base}_ts"
-    val fresh = System.currentTimeMillis() - prefs.getLong(tsKey, 0L) < 6L * 60 * 60 * 1000
-    ToolsWork.checkpoint()
-    if (fresh) {
-      prefs.getString(cacheKey, null)?.let {
-        val cached = parseRates(it)
-        ToolsWork.checkpoint()
-        return cached
-      }
-    }
+    freshRates(prefs, base)?.let { return it }
     // Http tracks the socket in the current ToolsWork request and rethrows owned
     // cancellation. Do not swallow it into the ordinary stale-cache fallback.
     val fetched = Http.getString(
