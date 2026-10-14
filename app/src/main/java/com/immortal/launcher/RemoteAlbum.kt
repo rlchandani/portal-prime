@@ -1,8 +1,11 @@
 package com.immortal.launcher
 
 import java.net.HttpURLConnection
+import java.net.IDN
+import java.net.URI
 import java.net.URL
 import java.net.URLEncoder
+import java.util.Locale
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -43,19 +46,62 @@ object RemoteAlbum {
 
   fun isIcloud(url: String): Boolean = isIcloudLegacy(url) || isIcloudCloudKit(url)
 
-  /** Legacy "Shared Streams" links (pre iOS/macOS 26); token lives in the `#` fragment. */
-  internal fun isIcloudLegacy(url: String): Boolean =
-      url.contains("icloud.com/sharedalbum/", ignoreCase = true) ||
-          url.contains("icloud.com/photo-stream/", ignoreCase = true) ||
-          url.contains("icloud.com/photostream/", ignoreCase = true)
+  /** Parse only complete HTTP(S) share URLs; recognition never verifies album access. */
+  private fun shareUri(url: String): URI? = runCatching {
+    var uri = URI(url.trim())
+    if (uri.isOpaque || uri.scheme?.lowercase(Locale.ROOT) !in setOf("http", "https")) return null
+    // URI authority parsing accepts ASCII DNS names; public NAS links may use an IDN.
+    if (uri.host == null && uri.rawAuthority != null) {
+      val host = URL(url.trim()).host
+      val authority = uri.rawAuthority
+      if (host.any { it.code > 127 } && authority.startsWith(host)) {
+        val asciiAuthority = IDN.toASCII(host, IDN.USE_STD3_ASCII_RULES) + authority.substring(host.length)
+        uri = URI("${uri.scheme}://$asciiAuthority${uri.rawPath.orEmpty()}" +
+            uri.rawQuery?.let { "?$it" }.orEmpty() + uri.rawFragment?.let { "#$it" }.orEmpty())
+      }
+    }
+    uri = uri.parseServerAuthority()
+    if (uri.isOpaque || uri.host.isNullOrBlank() || uri.userInfo != null ||
+        uri.scheme?.lowercase(Locale.ROOT) !in setOf("http", "https") ||
+        (uri.port != -1 && uri.port !in 1..65535)) return null
+    uri
+  }.getOrNull()
 
-  /** Current CloudKit shared albums: `photos.icloud.com/shared/album/<shortGUID>`. */
-  internal fun isIcloudCloudKit(url: String): Boolean =
-      url.contains("icloud.com/shared/album/", ignoreCase = true)
+  private fun URI.isIcloudHost(): Boolean {
+    val host = host.lowercase(Locale.ROOT).trimEnd('.')
+    return host == "icloud.com" || host.endsWith(".icloud.com")
+  }
 
-  fun isGooglePhotos(url: String): Boolean =
-      url.contains("photos.app.goo.gl", ignoreCase = true) ||
-          url.contains("photos.google.com/share/", ignoreCase = true)
+  /** The first path segment after a provider route must contain an album token. */
+  private fun URI.hasTokenAfter(route: String): Boolean {
+    val path = rawPath.orEmpty()
+    return path.startsWith(route, ignoreCase = true) &&
+        path.substring(route.length).substringBefore('/').isNotBlank()
+  }
+
+  /** Legacy public albums use a nonempty fragment token, not a query parameter. */
+  internal fun isIcloudLegacy(url: String): Boolean {
+    val uri = shareUri(url) ?: return false
+    return uri.isIcloudHost() &&
+        listOf("/sharedalbum/", "/photo-stream/", "/photostream/").any {
+          uri.rawPath.equals(it, ignoreCase = true)
+        } && !icloudToken(url.trim()).isNullOrBlank()
+  }
+
+  /** Current CloudKit public albums put their token in the path. */
+  internal fun isIcloudCloudKit(url: String): Boolean {
+    val uri = shareUri(url) ?: return false
+    return uri.isIcloudHost() && uri.hasTokenAfter("/shared/album/")
+  }
+
+  fun isGooglePhotos(url: String): Boolean {
+    val uri = shareUri(url) ?: return false
+    return when (uri.host.lowercase(Locale.ROOT).trimEnd('.')) {
+      "photos.app.goo.gl" -> uri.hasTokenAfter("/")
+      "photos.google.com" -> uri.hasTokenAfter("/share/")
+      else -> false
+    }
+  }
 
   fun isSynologyPhotos(url: String): Boolean = synologyShare(url) != null
 
@@ -559,17 +605,17 @@ object RemoteAlbum {
   internal data class SynologyShare(val apiUrl: String, val passphrase: String)
 
   internal fun synologyShare(spec: String): SynologyShare? {
-    val parsed = runCatching { URL(spec.trim()) }.getOrNull() ?: return null
-    if (parsed.protocol != "http" && parsed.protocol != "https") return null
+    val parsed = shareUri(spec) ?: return null
     val marker = "/mo/sharing/"
-    val idx = parsed.path.indexOf(marker, ignoreCase = true)
+    val path = parsed.rawPath.orEmpty()
+    val idx = path.indexOf(marker, ignoreCase = true)
     if (idx < 0) return null
-    val token = parsed.path.substring(idx + marker.length).substringBefore('/').trim()
+    val token = path.substring(idx + marker.length).substringBefore('/')
     if (token.isEmpty()) return null
-    val basePath = parsed.path.substring(0, idx + marker.length)
+    val basePath = path.substring(0, idx + marker.length)
     val port = if (parsed.port >= 0) ":${parsed.port}" else ""
     return SynologyShare(
-        "${parsed.protocol}://${parsed.host}$port${basePath}webapi/entry.cgi",
+        "${parsed.scheme.lowercase(Locale.ROOT)}://${parsed.host}$port${basePath}webapi/entry.cgi",
         token,
     )
   }

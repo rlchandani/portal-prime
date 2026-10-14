@@ -142,8 +142,8 @@ object FleetScreensaver {
       }
     }
     if (body.has("albumUrl")) {
-      val u = body.optString("albumUrl")
-      if (u.isNotBlank()) {
+      val u = body.opt("albumUrl")
+      if (u is String && RemoteAlbum.isSupported(u)) {
         ScreensaverConfig.setAlbumUrl(context, u)
         applied.add("albumUrl")
       }

@@ -364,6 +364,8 @@ function message(error) {
       'Choose a public folder under /sdcard. Private Android folders and hidden paths cannot be used.',
     aborted: 'Request cancelled.',
     invalid_value: 'This value does not match the Portal’s setting constraints.',
+    invalid_album_link: 'Enter a complete public iCloud, Google Photos or Synology Photos album link.',
+    invalid_source_field: 'Review the photo source fields and enter text values before saving.',
     partial_apply: 'Some values were rejected. Review the per-room results.',
     active_portal_only: 'This control applies to the active Portal only.',
     connect_required: 'Choose or pair a Portal first.',

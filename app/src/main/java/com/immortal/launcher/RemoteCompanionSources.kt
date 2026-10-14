@@ -24,6 +24,11 @@ internal object RemoteCompanionSources {
 
   fun prepare(input: JSONObject, stored: ScreensaverConfig.Settings): Prepared {
     val out = JSONObject(input.toString())
+    if (out.has("albumUrl")) {
+      val album = out.opt("albumUrl")
+      if (album !is String) return Prepared(error = "invalid_source_field")
+      if (!RemoteAlbum.isSupported(album)) return Prepared(error = "invalid_album_link")
+    }
     val credentialFields = setOf("immichUrl", "immichKey", "immichAlbumId", "immichAlbumName", "smbHost", "smbShare", "smbPath", "smbUser", "smbPass", "davUrl", "davUser", "davPass")
     if (credentialFields.any { out.has(it) && out.opt(it) !is String }) return Prepared(error="invalid_source_field")
     if (out.fieldKeys().any { it in setOf("immichUrl", "immichKey", "immichAlbumId", "immichAlbumName") }) {

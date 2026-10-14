@@ -23,8 +23,10 @@ class AlbumUrlEntryActivity : ComponentActivity() {
             fieldLabel = "Shared album link",
             placeholder = "https://…",
             initial = ScreensaverConfig.load(this).albumUrl.orEmpty(),
-            emptyHint = "Examples: iCloud Shared Album, Google Photos shared album.",
-            invalidHint = "That doesn’t look like a supported share link yet.",
+            emptyHint = "Supported: public iCloud, Google Photos and Synology Photos albums.",
+            invalidHint = "Enter a complete public iCloud, Google Photos or Synology Photos album link.",
+            fieldHelp = "Copy the album’s public sharing link. It must open without signing in.",
+            validHint = { "Recognized $it link format. The album must allow viewing without signing in." },
             primaryLabel = "Use this album",
             validate = { if (RemoteAlbum.isSupported(it)) RemoteAlbum.providerName(it) else null },
             onSave = { url ->

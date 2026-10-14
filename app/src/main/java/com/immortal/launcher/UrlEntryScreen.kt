@@ -52,6 +52,7 @@ internal fun UrlEntryScreen(
     onRemove: (() -> Unit)? = null,
     fieldHelp: String? = null,
     advancedOnly: Boolean = false,
+    validHint: ((String) -> String)? = null,
 ) {
     val palette = LocalApprovedPalette.current
     val activity = LocalContext.current as? Activity
@@ -71,6 +72,7 @@ internal fun UrlEntryScreen(
                 when {
                     trimmed.isEmpty() -> emptyHint
                     provider == null -> invalidHint
+                    validHint != null -> validHint(provider)
                     provider.isEmpty() -> "Looks good."
                     else -> "Looks like a $provider link."
                 },
