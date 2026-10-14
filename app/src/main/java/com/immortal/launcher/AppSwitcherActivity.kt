@@ -308,7 +308,7 @@ private fun ApprovedAppsContent(
               shortcutIcon = shortcutIcons[entry.builtin],
               onOpen = {
                 when {
-                  entry.app != null -> if (recent) menuFor = entry.app else launchApp(entry.app)
+                  entry.app != null -> launchApp(entry.app)
                   entry.folder != null -> folder = entry.folder
                   embedded && entry.builtin == "tools" && onSelectTab != null -> onSelectTab("tools")
                   else -> launchApprovedBuiltin(context, entry.builtin!!)
