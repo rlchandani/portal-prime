@@ -143,6 +143,45 @@ export class Session {
     );
   }
 }
+// Serialize each control key while keeping unrelated controls independent.
+export class ControlCommandQueue {
+  constructor() {
+    this.states = new Map();
+  }
+  hasPending(key) {
+    return this.states.has(key);
+  }
+  enqueue(key, { coalesceKey = null, current = () => true, run }) {
+    let state = this.states.get(key);
+    if (!state) {
+      state = { running: false, pending: [] };
+      this.states.set(key, state);
+    }
+    const promise = new Promise((resolve, reject) => {
+      const tail = state.pending[state.pending.length - 1];
+      // The active command is already removed; relative actions form barriers.
+      if (coalesceKey !== null && tail?.coalesceKey === coalesceKey) {
+        state.pending.pop();
+        tail.resolve(null);
+      }
+      state.pending.push({ coalesceKey, current, run, resolve, reject });
+    });
+    if (!state.running) this.drain(key, state);
+    return promise;
+  }
+  async drain(key, state) {
+    state.running = true;
+    while (state.pending.length) {
+      const command = state.pending.shift();
+      try {
+        command.resolve(command.current() ? await command.run() : null);
+      } catch (error) {
+        command.reject(error);
+      }
+    }
+    this.states.delete(key);
+  }
+}
 export class ApiError extends Error {
   constructor(code, status = 0, data = null) {
     super(code);

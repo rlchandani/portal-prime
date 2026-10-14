@@ -16,6 +16,7 @@ import {
   ApiError,
   createClient,
   ImagePool,
+  ControlCommandQueue,
   applySettings,
   operationView,
   photoFolder,
@@ -1510,23 +1511,33 @@ function renderMedia() {
   }
 }
 
+const playbackCommands = new ControlCommandQueue();
+let playbackVisibilityGeneration = 0;
+async function playbackCommand(kind, path, body, coalesceKey, success) {
+  const target = room(), ticket = session.capture(), visibility = playbackVisibilityGeneration;
+  if (!target) return null;
+  const key = `${target.base}:${kind}`;
+  const response = await playbackCommands.enqueue(key, {
+    coalesceKey,
+    current: () => session.current(ticket) && visibility === playbackVisibilityGeneration &&
+      !document.hidden && connectionState !== 'expired',
+    run: () => mutate(kind, path, body, { target, ticket, success }),
+  });
+  // Read back after the stream drains; intermediate acknowledgements must not overwrite
+  // the final slider draft or add a poll for every superseded value.
+  if (response && session.current(ticket) && visibility === playbackVisibilityGeneration &&
+      !playbackCommands.hasPending(key)) mediaRead();
+  return response;
+}
 async function mediaCommand(action, positionMs) {
-  await mutate(
-    'media',
-    '/remote/media',
+  return playbackCommand('media', '/remote/media',
     { action, ...(positionMs !== undefined ? { positionMs } : {}) },
-    { success: 'Media command dispatched.' },
-  );
-  mediaRead();
+    action === 'seek' ? 'seek' : null, 'Media command dispatched.');
 }
 async function volumeCommand(dir, level) {
-  await mutate(
-    'volume',
-    '/remote/volume',
+  return playbackCommand('volume', '/remote/volume',
     { dir, ...(level !== undefined ? { level } : {}) },
-    { success: '' },
-  );
-  mediaRead();
+    dir === 'set' ? 'set' : null, '');
 }
 async function loadSettings() {
   return read('settings', '/remote/settings', (r) => {
@@ -4556,6 +4567,7 @@ if (window.visualViewport) {
 }
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
+    playbackVisibilityGeneration++;
     cancelSearchComposition();
     stopPolling();
     abortReads();
@@ -4572,6 +4584,7 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 window.addEventListener('pagehide', () => {
+  playbackVisibilityGeneration++;
   cancelSearchComposition();  stopPolling();
   abortReads();
   thumbs.clear();
