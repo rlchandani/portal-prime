@@ -76,26 +76,40 @@ internal fun WelcomeSettingsContent() {
   // Android TTS voice audition. A single engine is kept alive for the screen's life to
   // both enumerate installed voices and play test phrases. (Piper neural voices were
   // dropped here — their model download is unreliable on the Portal. See project notes.)
-  // voices: name -> friendly label; first entry is the engine default.
-  var androidVoices by remember { mutableStateOf<List<Pair<String, String>>>(listOf("" to "Default voice")) }
+  var androidVoices by remember { mutableStateOf<List<InstalledVoiceChoice>>(emptyList()) }
+  var voiceLoading by remember { mutableStateOf(true) }
+  var voiceLoadFailed by remember { mutableStateOf(false) }
+  var voiceChooserOpen by remember { mutableStateOf(false) }
   val ttsEngine = remember { mutableStateOf<android.speech.tts.TextToSpeech?>(null) }
+  LaunchedEffect(advanced, settings.enableTts) {
+    if (!advanced || !settings.enableTts) voiceChooserOpen = false
+  }
   if (advanced && settings.enableTts) DisposableEffect(Unit) {
     var active = true
     var engine: android.speech.tts.TextToSpeech? = null
-    engine = android.speech.tts.TextToSpeech(context.applicationContext) { status ->
-      if (active && status == android.speech.tts.TextToSpeech.SUCCESS) {
-        val found = runCatching {
-          engine?.voices
-              ?.filter { !it.isNetworkConnectionRequired }
-              ?.sortedWith(TtsVoiceLabels.sort)
-              ?.map { it.name to TtsVoiceLabels.label(it) }
-              ?.distinctBy { it.first }
-              ?: emptyList()
-        }.getOrDefault(emptyList())
-        if (found.isNotEmpty()) androidVoices = listOf("" to "Default voice") + found
+    androidVoices = emptyList()
+    voiceLoading = true
+    voiceLoadFailed = false
+    try {
+      engine = android.speech.tts.TextToSpeech(context.applicationContext) { status ->
+        if (active) {
+          val found = runCatching {
+            if (status != android.speech.tts.TextToSpeech.SUCCESS) error("TTS initialization unavailable")
+            engine?.voices?.filter { !it.isNetworkConnectionRequired }?.sortedWith(TtsVoiceLabels.sort)
+                ?.map { InstalledVoiceChoice(it.name, TtsVoiceLabels.label(it),
+                    it.locale.getDisplayName(java.util.Locale.US)) }
+                ?.distinctBy { it.name } ?: emptyList()
+          }
+          androidVoices = found.getOrDefault(emptyList())
+          voiceLoading = false
+          voiceLoadFailed = found.isFailure
+        }
       }
+      ttsEngine.value = engine
+    } catch (_: Exception) {
+      voiceLoading = false
+      voiceLoadFailed = true
     }
-    ttsEngine.value = engine
     onDispose {
       active = false
       ttsEngine.value = null
@@ -104,6 +118,7 @@ internal fun WelcomeSettingsContent() {
     }
   }
   fun testVoice(voiceName: String) {
+    if (!advanced || !settings.enableTts || voiceLoading || voiceLoadFailed) return
     val t = ttsEngine.value ?: return
     val selectedVoice =
         if (voiceName.isNotBlank()) t.voices?.firstOrNull { it.name == voiceName } else null
@@ -156,22 +171,30 @@ internal fun WelcomeSettingsContent() {
         if (advanced && settings.enableTts) {
         SectionLabel("Voice")
         Card {
-          androidVoices.forEachIndexed { i, (name, label) ->
-            if (i > 0) Divider()
-            AndroidVoiceRow(
-                label = label,
-                selected = settings.ttsVoice == name,
-                onSelect = {
-                  WelcomeConfig.setTtsVoice(context, name)
-                  settings = settings.copy(ttsVoice = name)
-                },
-                onTest = { testVoice(name) },
-            )
+          Row(Modifier.fillMaxWidth().tvFocusableRow { voiceChooserOpen = true }
+              .padding(horizontal = 18.dp, vertical = 16.dp),
+              verticalAlignment = Alignment.CenterVertically) {
+            Text("Greeting voice", color = IosLabel, fontSize = Sizes.rowTitle,
+                modifier = Modifier.weight(1f))
+            Text(installedVoiceLabel(settings.ttsVoice, androidVoices, voiceLoading),
+                color = IosSecondary, fontSize = Sizes.rowValue, fontWeight = FontWeight.SemiBold)
+            Text("  ▾", color = IosSecondary, fontSize = Sizes.rowValue)
           }
         }
-        FooterNote(
-            "Voice for the spoken greeting, from the voices installed on this device. " +
-                "Tap Test to hear it. (Enable \"Speak greeting\" above for it to play on wake.)",
+        FooterNote("Choose an offline voice for the spoken greeting. Test a voice before choosing; " +
+            "testing doesn't change your saved voice.")
+        if (voiceChooserOpen) InstalledVoiceChoiceDialog(
+            androidVoices, settings.ttsVoice, voiceLoading, voiceLoadFailed, enabled = true,
+            onDismiss = { voiceChooserOpen = false },
+            onPick = { name ->
+              if (advanced && settings.enableTts) {
+                WelcomeConfig.setTtsVoice(context, name)
+                settings = settings.copy(ttsVoice = name)
+              }
+            },
+            help = "Choose an offline voice for the welcome greeting. This doesn't change the spoken-time voice.",
+            onPreview = ::testVoice,
+            previewEnabled = !voiceLoading && !voiceLoadFailed && ttsEngine.value != null,
         )
 
         Spacer(Modifier.size(26.dp))
@@ -286,38 +309,6 @@ internal fun WelcomeSettingsContent() {
                 "Tap anywhere on the overlay to dismiss it early, or wait for it to auto-fade.",
         )
       }
-}
-
-
-@Composable
-private fun AndroidVoiceRow(
-    label: String,
-    selected: Boolean,
-    onSelect: () -> Unit,
-    onTest: () -> Unit,
-) {
-  Row(
-      modifier =
-          Modifier.fillMaxWidth().tvFocusableRow { onSelect() }
-              .padding(horizontal = 18.dp, vertical = 12.dp),
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    RadioButton(selected = selected, onClick = null)
-    Text(label, color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f).padding(start = 12.dp))
-    Surface(
-        color = IosBlue,
-        shape = RoundedCornerShape(10.dp),
-        modifier = Modifier.tvFocusable(RoundedCornerShape(10.dp), focusScale = 1f) { onTest() },
-    ) {
-      Text(
-          "Test",
-          color = Color.White,
-          fontSize = 15.sp,
-          textAlign = TextAlign.Center,
-          modifier = Modifier.widthIn(min = 64.dp).padding(horizontal = 16.dp, vertical = 9.dp),
-      )
-    }
-  }
 }
 
 

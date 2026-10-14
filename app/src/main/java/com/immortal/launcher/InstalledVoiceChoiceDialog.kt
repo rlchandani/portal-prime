@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,6 +46,8 @@ import androidx.compose.ui.unit.sp
 internal fun InstalledVoiceChoiceDialog(
     voices: List<InstalledVoiceChoice>, current: String, loading: Boolean, loadFailed: Boolean,
     enabled: Boolean, onDismiss: () -> Unit, onPick: (String) -> Unit,
+    help: String = "Choose an offline voice installed on this device. This changes spoken time only.",
+    onPreview: ((String) -> Unit)? = null, previewEnabled: Boolean = true,
 ) {
   var query by remember { mutableStateOf("") }
   val matches = remember(voices, query) { filterInstalledVoices(voices, query) }
@@ -53,13 +56,13 @@ internal fun InstalledVoiceChoiceDialog(
     if (matches.isNotEmpty()) scroll.scrollToItem(matches.indexOfFirst { it.name == current }.coerceAtLeast(0))
   }
   fun choose(name: String) { if (enabled) { onPick(name); onDismiss() } }
-  ApprovedSettingsDialog("Choose a voice", onDismiss,
-      help = "Choose an offline voice installed on this device. This changes spoken time only.") {
+  ApprovedSettingsDialog("Choose a voice", onDismiss, help = help) {
     IosTextField(query, { query = it }, "Search voices", modifier = Modifier.semantics {
       contentDescription = "Search installed voices"
     })
     VoiceChoiceRow("Default voice", "Use this device's default voice.", current.isBlank(), enabled,
-        Modifier.padding(top = 16.dp)) { choose("") }
+        Modifier.padding(top = 16.dp),
+        onPreview = onPreview?.let { preview -> { preview("") } }, previewEnabled = previewEnabled) { choose("") }
     if (current.isNotBlank() && !loading && voices.none { it.name == current }) {
       FooterNote("Your saved voice is unavailable. It stays selected until you choose another voice.")
     }
@@ -83,7 +86,9 @@ internal fun InstalledVoiceChoiceDialog(
         }
       } else {
         items(matches, key = { it.name }) { voice ->
-          VoiceChoiceRow(voice.label, voice.localeLabel, current == voice.name, enabled) { choose(voice.name) }
+          VoiceChoiceRow(voice.label, voice.localeLabel, current == voice.name, enabled,
+              onPreview = onPreview?.let { preview -> { preview(voice.name) } },
+              previewEnabled = previewEnabled) { choose(voice.name) }
         }
       }
     }
@@ -94,21 +99,29 @@ internal fun InstalledVoiceChoiceDialog(
 @Composable
 private fun VoiceChoiceRow(
     label: String, detail: String, isSelected: Boolean, enabled: Boolean,
-    modifier: Modifier = Modifier, onClick: () -> Unit,
+    modifier: Modifier = Modifier, onPreview: (() -> Unit)? = null,
+    previewEnabled: Boolean = true, onClick: () -> Unit,
 ) {
   val shape = RoundedCornerShape(16.dp)
-  Row(modifier.fillMaxWidth().defaultMinSize(minHeight = 68.dp)
-      .background(if (isSelected) IosFocusTint else Color.Transparent, shape)
-      .tvFocusable(shape, focusScale = 1f, ringColor = IosBlue, enabled = enabled, onClick = onClick)
-      .semantics(mergeDescendants = true) { selected = isSelected; role = Role.RadioButton }
-      .padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-    Column(Modifier.weight(1f)) {
-      Text(label, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp,
-          fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
-      if (detail.isNotBlank()) Text(detail, color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp,
-          maxLines = 1, overflow = TextOverflow.Ellipsis)
+  Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp),
+      verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.weight(1f).defaultMinSize(minHeight = 68.dp)
+        .background(if (isSelected) IosFocusTint else Color.Transparent, shape)
+        .tvFocusable(shape, focusScale = 1f, ringColor = IosBlue, enabled = enabled, onClick = onClick)
+        .semantics(mergeDescendants = true) { selected = isSelected; role = Role.RadioButton }
+        .padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+      Column(Modifier.weight(1f)) {
+        Text(label, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp,
+            fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        if (detail.isNotBlank()) Text(detail, color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp,
+            maxLines = 1, overflow = TextOverflow.Ellipsis)
+      }
+      Text(if (isSelected) "✓" else "", color = IosBlue, fontSize = 28.sp,
+          modifier = Modifier.width(36.dp).clearAndSetSemantics {})
     }
-    Text(if (isSelected) "✓" else "", color = IosBlue, fontSize = 28.sp,
-        modifier = Modifier.width(36.dp).clearAndSetSemantics {})
+    // Preview is a sibling control, so touch and D-pad activation cannot select the voice.
+    onPreview?.let { preview ->
+      ApprovedSourcesButton("Test", enabled = enabled && previewEnabled, primary = false) { preview() }
+    }
   }
 }
