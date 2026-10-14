@@ -10,12 +10,24 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import org.json.JSONObject
 import android.os.Bundle
+import android.os.Build
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.Typeface
+import android.view.Gravity
+import android.view.View
+import android.view.ViewTreeObserver
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.doOnAttach
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -44,6 +56,13 @@ class WebAppActivity : ComponentActivity() {
   private lateinit var entry: WebAppEntryState
   private var entryUrl: String = URL_YT_MUSIC
   private var loads = 0
+  private var pageRevision = 0L
+  private lateinit var root: FrameLayout
+  private lateinit var opening: LinearLayout
+  private val openingGate = WebAppOpeningGate()
+  private var frameCommit: Runnable? = null
+  private var drawListener: ViewTreeObserver.OnDrawListener? = null
+  private val createWeb = Runnable { createWebAfterFirstFrame() }
 
   internal fun isGeneratedProbe(): Boolean = WebAppProbe.isProbeUrl(entryUrl) &&
       WebAppProbe.isProbeUrl(web?.url?.substringBefore('#'))
@@ -89,27 +108,53 @@ class WebAppActivity : ComponentActivity() {
     val url = intent?.getStringExtra(EXTRA_URL) ?: URL_YT_MUSIC
     entryUrl = url
     entry = WebAppEntryState(url)
-    val view =
-        WebView(this).apply {
-          setBackgroundColor(android.graphics.Color.BLACK)
-          isVerticalScrollBarEnabled = false
-          isHorizontalScrollBarEnabled = false
-          settings.javaScriptEnabled = true
-          settings.domStorageEnabled = true
-          settings.mediaPlaybackRequiresUserGesture = false
-          settings.loadWithOverviewMode = true
-          settings.useWideViewPort = true
-          webViewClient = WebViewClient() // keep all navigation inside the kiosk
-          webChromeClient = WebChromeClient() // progress + JS dialogs
-          loads++
-          loadUrl(url)
-        }
-    web = view
+    root = FrameLayout(this).apply { setBackgroundColor(Color.rgb(19, 20, 22)) }
+    opening = LinearLayout(this).apply {
+      orientation = LinearLayout.VERTICAL
+      gravity = Gravity.CENTER
+      setBackgroundColor(Color.rgb(19, 20, 22))
+      isClickable = true
+      val size = (44 * resources.displayMetrics.density).toInt()
+      addView(ProgressBar(context).apply {
+        indeterminateTintList = ColorStateList.valueOf(Color.WHITE)
+      }, LinearLayout.LayoutParams(size, size))
+      addView(TextView(context).apply {
+        text = if (entryUrl == URL_YT_MUSIC) "Opening Music…" else "Opening page…"
+        textSize = 28f
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+        setTextColor(Color.WHITE)
+        gravity = Gravity.CENTER
+      }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+        topMargin = (24 * resources.displayMetrics.density).toInt()
+      })
+    }
+    root.addView(opening, FrameLayout.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+    setContentView(root)
     WebAppProbe.created(this)
-    setContentView(
-        view,
-        ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+    root.doOnAttach { view ->
+      if (Build.VERSION.SDK_INT >= 29 && view.isHardwareAccelerated) {
+        val callback = Runnable { root.post { firstFrameReady(true) } }
+        frameCommit = callback
+        view.viewTreeObserver.registerFrameCommitCallback(callback)
+      } else {
+        var drawn = false
+        val listener = ViewTreeObserver.OnDrawListener {
+          if (!drawn) {
+            drawn = true
+            root.post {
+              drawListener?.let { if (root.viewTreeObserver.isAlive)
+                root.viewTreeObserver.removeOnDrawListener(it) }
+              drawListener = null
+              firstFrameReady(false)
+            }
+          }
+        }
+        drawListener = listener
+        view.viewTreeObserver.addOnDrawListener(listener)
+      }
+    }
 
     onBackPressedDispatcher.addCallback(
         this,
@@ -125,6 +170,58 @@ class WebAppActivity : ComponentActivity() {
         })
   }
 
+  private fun firstFrameReady(hardware: Boolean) {
+    frameCommit = null
+    if (isFinishing || isDestroyed) return
+    WebAppOpeningDiagnostics.frameReady(hardware)
+    openingGate.frameCommitted()
+    root.post(createWeb)
+  }
+
+  @SuppressLint("SetJavaScriptEnabled")
+  private fun createWebAfterFirstFrame() {
+    val foreground = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)
+    if (isFinishing || isDestroyed || !openingGate.tryStart(foreground)) return
+    WebAppOpeningDiagnostics.creationStarting()
+    val view = WebView(this).apply {
+      setBackgroundColor(Color.BLACK)
+      isVerticalScrollBarEnabled = false
+      isHorizontalScrollBarEnabled = false
+      settings.javaScriptEnabled = true
+      settings.domStorageEnabled = true
+      settings.mediaPlaybackRequiresUserGesture = false
+      settings.loadWithOverviewMode = true
+      settings.useWideViewPort = true
+      webViewClient = object : WebViewClient() {
+        override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
+          super.onPageStarted(view, url, favicon)
+          pageRevision++
+          opening.visibility = View.VISIBLE
+        }
+        override fun onPageFinished(view: WebView, url: String?) {
+          super.onPageFinished(view, url)
+          if (url != view.url) return
+          val readyRevision = pageRevision
+          view.postVisualStateCallback(readyRevision, object : WebView.VisualStateCallback() {
+            override fun onComplete(requestId: Long) {
+              if (requestId != pageRevision || view !== web || isFinishing || isDestroyed) return
+              opening.visibility = View.GONE
+              WebAppOpeningDiagnostics.pageFinished()
+            }
+          })
+        }
+      }
+      webChromeClient = WebChromeClient()
+    }
+    web = view
+    root.addView(view, 0, FrameLayout.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+    // An entry change arriving during first-frame admission uses the latest request.
+    loads++
+    WebAppOpeningDiagnostics.loadRequested()
+    view.loadUrl(entryUrl)
+  }
+
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
@@ -132,14 +229,19 @@ class WebAppActivity : ComponentActivity() {
     // Compare the requested entry, not the current page after redirects/navigation.
     if (entry.request(url)) {
       entryUrl = url
-      loads++
-      web?.loadUrl(url)
+      web?.let {
+        loads++
+        pageRevision++
+        WebAppOpeningDiagnostics.loadRequested()
+        it.loadUrl(url)
+      }
     }
   }
 
   override fun onResume() {
     super.onResume()
     web?.onResume()
+    if (::root.isInitialized) root.post(createWeb)
   }
 
   override fun onPause() {
@@ -149,6 +251,18 @@ class WebAppActivity : ComponentActivity() {
   }
 
   override fun onDestroy() {
+    openingGate.destroy()
+    pageRevision++
+    if (::root.isInitialized) {
+      root.removeCallbacks(createWeb)
+      if (Build.VERSION.SDK_INT >= 29) frameCommit?.let {
+        if (root.viewTreeObserver.isAlive) root.viewTreeObserver.unregisterFrameCommitCallback(it)
+      }
+      drawListener?.let { if (root.viewTreeObserver.isAlive)
+        root.viewTreeObserver.removeOnDrawListener(it) }
+    }
+    frameCommit = null
+    drawListener = null
     WebAppProbe.destroyed(this)
     // Stop audio and free the renderer when the kiosk actually closes.
     web?.apply {
