@@ -110,4 +110,62 @@ class RemoteCompanionPhotoTest {
     }
   }
 
+
+  @Test fun thumbnailMetadataRewindsBeforeAndAfterReadingWithoutClosingStream() {
+    val file = Files.createTempFile("thumbnail-metadata", ".jpg").toFile().apply { writeText("original") }
+    try {
+      java.io.FileInputStream(file).use { input ->
+        input.channel.position(4)
+        assertEquals(6, thumbnailOrientation(input) {
+          assertEquals(0L, it.channel.position())
+          assertEquals('o'.code, it.read())
+          6
+        })
+        assertEquals(0L, input.channel.position())
+        assertTrue(input.channel.isOpen)
+      }
+    } finally { file.delete() }
+  }
+
+  @Test fun malformedThumbnailMetadataFallsBackAndLeavesDecoderAtStart() {
+    val file = Files.createTempFile("thumbnail-invalid-metadata", ".jpg").toFile().apply { writeText("original") }
+    try {
+      java.io.FileInputStream(file).use { input ->
+        assertEquals(1, thumbnailOrientation(input) {
+          it.read()
+          throw java.io.IOException("malformed EXIF")
+        })
+        assertEquals(0L, input.channel.position())
+        assertTrue(input.channel.isOpen)
+      }
+    } finally { file.delete() }
+  }
+
+  @Test fun thumbnailMetadataUsesCapturedInodeAfterDeleteAndReplacement() {
+    val folder = Files.createTempDirectory("thumbnail-inode").toFile()
+    try {
+      val file = File(folder, "image.jpg").apply { writeText("old") }
+      RemoteCompanionPhotoStream(file).use { stream ->
+        assertTrue(file.delete())
+        file.writeText("new replacement")
+        stream.image { input ->
+          input.channel.position(2)
+          assertEquals(8, thumbnailOrientation(input) { assertEquals("old", it.readBytes().toString(Charsets.UTF_8)); 8 })
+          assertEquals(0L, input.channel.position())
+          assertTrue(stream.isOpen)
+        }
+      }
+    } finally { folder.deleteRecursively() }
+  }
+
+  @Test fun unknownThumbnailOrientationUsesUntransformedFallback() {
+    val file = Files.createTempFile("thumbnail-unknown-metadata", ".jpg").toFile().apply { writeText("original") }
+    try {
+      java.io.FileInputStream(file).use { input ->
+        for (orientation in listOf(-1, 0, 9, 100)) assertEquals(1, thumbnailOrientation(input) { orientation })
+        assertTrue(input.channel.isOpen)
+      }
+    } finally { file.delete() }
+  }
+
 }

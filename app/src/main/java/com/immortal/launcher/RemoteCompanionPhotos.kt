@@ -8,6 +8,7 @@ package com.immortal.launcher
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.exifinterface.media.ExifInterface
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -84,6 +85,16 @@ internal object RemoteCompanionPhotoPolicy {
     finally { temp?.let { runCatching { if (it.parentFile?.canonicalPath == stagingParent) it.delete() } } }
   }
 
+}
+
+/** Metadata comes from the captured inode; the bitmap decoder retains stream ownership. */
+internal fun thumbnailOrientation(input: FileInputStream,
+    read: (FileInputStream) -> Int = { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, 1) }): Int {
+  return try {
+    input.channel.position(0)
+    read(input).takeIf { it in 1..8 } ?: 1
+  } catch (_: java.io.IOException) { 1 }
+  finally { input.channel.position(0) }
 }
 
 /** Open under the photo mutation lock; unlink/reupload cannot change this response's inode. */
@@ -203,16 +214,31 @@ internal object RemoteCompanionPhotos {
     return bounds.takeIf { it.outWidth in 1..30000 && it.outHeight in 1..30000 && it.outWidth.toLong() * it.outHeight <= 100_000_000L }
   }
   private fun thumbnail(input: FileInputStream, options: BitmapFactory.Options): ByteArray? {
-    var sample = 1
-    while (options.outWidth / sample > 512 || options.outHeight / sample > 512) sample *= 2
-    options.inJustDecodeBounds = false; options.inSampleSize = sample; options.inPreferredConfig = Bitmap.Config.RGB_565
+    val plan = SlideshowDecodeBudget.plan(options.outWidth, options.outHeight, 512, 512L * 512) ?: return null
+    val orientation = thumbnailOrientation(input)
+    options.inJustDecodeBounds = false; options.inSampleSize = plan.sampleSize
+    options.inPreferredConfig = Bitmap.Config.RGB_565; options.inScaled = false
     input.channel.position(0)
-    val bitmap = BitmapFactory.decodeFileDescriptor(input.fd, null, options) ?: return null
+    val sampled = BitmapFactory.decodeFileDescriptor(input.fd, null, options) ?: return null
+    var upright: Bitmap? = null
     return try {
-      ByteArrayOutputStream().use { out ->
-        if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 75, out)) null else out.toByteArray()
+      if (!SlideshowDecodeBudget.fits(sampled.width, sampled.height, 512, 512L * 512)) return null
+      // Transform only the bounded decode, using the same EXIF mapping as the slideshow.
+      val output = if (orientation == 1) sampled else {
+        val transform = SlideshowDecodeBudget.exifTransform(orientation)
+        val matrix = android.graphics.Matrix().apply { setValues(floatArrayOf(
+            transform.xx.toFloat(), transform.xy.toFloat(), 0f,
+            transform.yx.toFloat(), transform.yy.toFloat(), 0f, 0f, 0f, 1f)) }
+        Bitmap.createBitmap(sampled, 0, 0, sampled.width, sampled.height, matrix, false)
       }
-    } finally { bitmap.recycle() }
+      upright = output
+      ByteArrayOutputStream().use { out ->
+        if (!output.compress(Bitmap.CompressFormat.JPEG, 75, out)) null else out.toByteArray()
+      }
+    } finally {
+      upright?.takeIf { it !== sampled }?.recycle()
+      sampled.recycle()
+    }
   }
   /** Only for an inactive caller-owned generated fixture; normal deletes invalidate all tickets. */
   fun discardThumbnail(file: File): Boolean = thumbnails.discard(thumbnailKey(file.canonicalFile))
