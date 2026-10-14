@@ -1484,12 +1484,13 @@ internal fun DeviceHealthScreen(onBack: () -> Unit) {
 @Composable
 internal fun DeviceHealthContent() {
   val context = LocalContext.current.applicationContext
+  val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
   val owner = LocalLifecycleOwner.current
   var refresh by remember { mutableStateOf(0) }
-  var confirmingDisable by remember { mutableStateOf(false) }
+  var confirmingDisable by remember(advanced) { mutableStateOf(false) }
   var disablingAdmin by remember { mutableStateOf(false) }
   val scope = rememberCoroutineScope()
-  val health by produceState<DeviceHealthLoad>(DeviceHealthLoad.Checking, context, owner, refresh) {
+  val health by produceState<DeviceHealthLoad>(DeviceHealthLoad.Checking, context, owner, refresh, advanced) {
     owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
       confirmingDisable = false
       value = DeviceHealthLoad.Checking
@@ -1562,34 +1563,33 @@ internal fun DeviceHealthContent() {
       // Advanced: deactivating the screen-off admin is the clean path to uninstall Immortal
       // (the shell can't force-remove a non-test admin). Tucked away and clearly warned — it
       // turns off screen-off until re-provisioned.
-      if (adminActive) {
+      if (advanced && adminActive) {
         Spacer(Modifier.size(28.dp))
         Text(
-            "Allow uninstall",
+            "Prepare to uninstall Immortal",
             color = IosSecondary,
             fontSize = Sizes.rowSub,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
         )
         Text(
-            "Disabling the screen-off device admin lets Immortal be uninstalled, but it also stops " +
-                "automatic screen-off (screensaver sleep and the Home Assistant control) until you " +
-                "re-run setup. Only do this if you know what you're doing.",
+            "Remove Immortal’s screen-lock permission before uninstalling. This stops automatic " +
+                "and remote screen-off until Immortal setup restores the permission.",
             color = IosSecondary,
             fontSize = Sizes.rowSub,
             modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 10.dp),
         )
         Text(
-            if (disablingAdmin) "Disabling screen-off admin…"
-            else if (confirmingDisable) "Tap again to confirm — this stops automatic screen-off"
-            else "Disable screen-off admin",
+            if (disablingAdmin) "Removing screen-lock permission…"
+            else if (confirmingDisable) "Tap again to confirm — automatic screen-off will stop"
+            else "Remove screen-lock permission",
             color = IosRed,
             fontSize = Sizes.actionButton,
             fontWeight = if (confirmingDisable) FontWeight.SemiBold else FontWeight.Normal,
             modifier =
                 Modifier.tvFocusable(RoundedCornerShape(8.dp), enabled = !disablingAdmin) {
                       // Reject burst input immediately, before the disabled row can recompose.
-                      if (disablingAdmin) return@tvFocusable
+                      if (!advanced || disablingAdmin) return@tvFocusable
                       // Two-tap arm: a single stray remote press shouldn't tear down device admin
                       // (which silently breaks screensaver sleep + the HA screen-off control).
                       if (confirmingDisable) {
