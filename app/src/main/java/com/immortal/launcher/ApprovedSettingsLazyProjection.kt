@@ -23,7 +23,7 @@ internal data class ApprovedSettingsLazyProjection<T>(
     val controlIndices: Map<String, Int>,
 )
 
-/** Shell heading, master row, master footer, and 20 dp gap precede the screensaver projection. */
+/** The fixed shell heading is outside the list; master row, footer and gap precede its projection. */
 internal fun approvedScreensaverControlIndex(
     requested: String?,
     enabled: Boolean,
@@ -31,11 +31,11 @@ internal fun approvedScreensaverControlIndex(
     screensaverItemCount: Int,
     calendarIndices: Map<String, Int>,
 ): Int? {
-    if (requested == "screensaver.enabled") return 1
+    if (requested == "screensaver.enabled") return 0
     if (!enabled || requested == null) return null
-    screensaverIndices[requested]?.let { return 4 + it }
+    screensaverIndices[requested]?.let { return 3 + it }
     // Calendar heading is one additional item; screen count includes its Advanced hint.
-    return calendarIndices[requested]?.let { 5 + screensaverItemCount + it }
+    return calendarIndices[requested]?.let { 4 + screensaverItemCount + it }
 }
 
 /** Receives already-filtered groups; indices include headers and gaps, but never hidden controls. */

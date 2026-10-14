@@ -475,30 +475,30 @@ private fun ApprovedSettingsDetailBody(
         modifier.settingsUiDrawn(detail.routeKey, detail.requested) else modifier
     // Outgoing transition content retains its own request; the next route never inherits it.
     CompositionLocalProvider(LocalApprovedRequestedControl provides detail.requested) {
-        if (detail.lazy == null) {
-            Column(
-                observedModifier.verticalScroll(rememberScrollState())
-                    .padding(start = 48.dp, end = 48.dp, top = 40.dp, bottom = 80.dp).focusGroup(),
-            ) {
-                ApprovedSettingsDetailHeading(detail.title, detail.subtitle, detail.onBack)
-                if (detail.gated) ApprovedSettingsAdvancedGate(onAdvanced) else detail.content()
-            }
-        } else {
-            LazyColumn(
-                observedModifier.focusGroup().then(detail.lazy.accessibilityLabel?.let { label ->
-                    Modifier.semantics { contentDescription = label }
-                } ?: Modifier),
-                state = detail.lazy.state,
-                contentPadding = PaddingValues(start = 48.dp, end = 48.dp, top = 40.dp, bottom = 80.dp),
-            ) {
-                // The heading remains an ordinary scrolling item.
-                item(key = "settings:detail-heading", contentType = "detail-heading") {
-                    ApprovedSettingsDetailHeading(detail.title, detail.subtitle, detail.onBack)
+        // History stays available while either kind of detail content scrolls.
+        Column(observedModifier.padding(start = 48.dp, end = 48.dp, top = 40.dp).focusGroup()) {
+            ApprovedSettingsDetailHeading(detail.title, detail.subtitle, detail.onBack)
+            if (detail.lazy == null) {
+                Column(
+                    Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())
+                        .padding(bottom = 80.dp),
+                ) {
+                    if (detail.gated) ApprovedSettingsAdvancedGate(onAdvanced) else detail.content()
                 }
-                if (detail.gated) {
-                    item(key = "settings:advanced-gate") { ApprovedSettingsAdvancedGate(onAdvanced) }
-                } else {
-                    detail.lazy.body(this)
+            } else {
+                LazyColumn(
+                    Modifier.weight(1f).fillMaxWidth().focusGroup()
+                        .then(detail.lazy.accessibilityLabel?.let { label ->
+                            Modifier.semantics { contentDescription = label }
+                        } ?: Modifier),
+                    state = detail.lazy.state,
+                    contentPadding = PaddingValues(bottom = 80.dp),
+                ) {
+                    if (detail.gated) {
+                        item(key = "settings:advanced-gate") { ApprovedSettingsAdvancedGate(onAdvanced) }
+                    } else {
+                        detail.lazy.body(this)
+                    }
                 }
             }
         }

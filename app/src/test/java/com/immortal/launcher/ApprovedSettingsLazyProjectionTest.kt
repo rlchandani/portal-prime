@@ -10,26 +10,26 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ApprovedSettingsLazyProjectionTest {
-    @Test fun unifiedScreenOffsetsIncludeScrollingHeadingMasterFooterGapsAndAdvancedHint() {
+    @Test fun unifiedScreenOffsetsExcludeFixedHeadingAndIncludeMasterFooterGapsAndAdvancedHint() {
         val screen = approvedSettingsLazyProjection("screensaver",
             linkedMapOf("Photos" to listOf("shuffle", "fit"))) { it }
         val calendar = approvedSettingsLazyProjection("calendar",
             linkedMapOf<String?, List<String>>(null to listOf("widgetOn", "range"))) { it }
         // Screen projection: heading, shuffle, fit, gap. Advanced hint adds one item.
         val screenCount = screen.items.size + 1
-        assertEquals(1, approvedScreensaverControlIndex("screensaver.enabled", true,
+        assertEquals(0, approvedScreensaverControlIndex("screensaver.enabled", true,
             screen.controlIndices, screenCount, calendar.controlIndices))
-        assertEquals(5, approvedScreensaverControlIndex("screensaver.shuffle", true,
+        assertEquals(4, approvedScreensaverControlIndex("screensaver.shuffle", true,
             screen.controlIndices, screenCount, calendar.controlIndices))
-        assertEquals(6, approvedScreensaverControlIndex("screensaver.fit", true,
+        assertEquals(5, approvedScreensaverControlIndex("screensaver.fit", true,
             screen.controlIndices, screenCount, calendar.controlIndices))
-        assertEquals(10, approvedScreensaverControlIndex("calendar.widgetOn", true,
+        assertEquals(9, approvedScreensaverControlIndex("calendar.widgetOn", true,
             screen.controlIndices, screenCount, calendar.controlIndices))
-        assertEquals(11, approvedScreensaverControlIndex("calendar.range", true,
+        assertEquals(10, approvedScreensaverControlIndex("calendar.range", true,
             screen.controlIndices, screenCount, calendar.controlIndices))
         assertNull(approvedScreensaverControlIndex("calendar.range", false,
             screen.controlIndices, screenCount, calendar.controlIndices))
-        assertEquals(1, approvedScreensaverControlIndex("screensaver.enabled", false,
+        assertEquals(0, approvedScreensaverControlIndex("screensaver.enabled", false,
             emptyMap(), 0, emptyMap()))
         assertNull(approvedScreensaverControlIndex("missing", true,
             screen.controlIndices, screenCount, calendar.controlIndices))
