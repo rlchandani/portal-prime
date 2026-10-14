@@ -23,11 +23,14 @@ internal class SingleFlightValueCache<K : Any, V : Any>(
 
   init { require(ttlMillis > 0 && maxEntries > 0) }
 
-  fun get(key: K, loader: () -> V): V {
+  fun get(key: K, loader: () -> V): V = get(key, false, loader)
+
+  /** Explicit refresh skips a completed value, while still joining the active load. */
+  fun get(key: K, refresh: Boolean, loader: () -> V): V {
     val task = synchronized(lock) {
       completed[key]?.let { entry ->
         val age = nowMillis() - entry.completedAt
-        if (age >= 0 && age < ttlMillis) return entry.value
+        if (!refresh && age >= 0 && age < ttlMillis) return entry.value
         completed.remove(key)
       }
       loading.getOrPut(key) { FutureTask {

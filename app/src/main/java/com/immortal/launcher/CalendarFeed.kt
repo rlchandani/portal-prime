@@ -7,7 +7,6 @@
 
 package com.immortal.launcher
 
-import android.util.Log
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
@@ -35,11 +34,10 @@ import java.util.TimeZone
  * malformed recurrence falls back to showing the event once — the frame degrades
  * gracefully, like the rest of the screensaver.
  *
- * On any network/parse failure [fetch] returns an empty list and the widget simply
- * shows nothing.
+ * On a failed refresh [fetch] retains usable events from a bounded last-success cache.
+ * [read] also reports the failure so widgets can offer recovery without claiming an empty calendar.
  */
 object CalendarFeed {
-  private const val TAG = "ImmortalCalendar"
   private val feedReader = CalendarFeedReader(::httpGet)
   private val preparedFeed = CalendarPreparedFeed(::prepareDocument, ::evaluateDocument,
       retainPrepared = { it.events.size <= 2048 })
@@ -53,6 +51,9 @@ object CalendarFeed {
       val allDay: Boolean,
       val location: String? = null,
   )
+
+  /** A failed refresh can retain events from the last usable feed. */
+  data class Result(val events: List<Event>, val unavailable: Boolean = false)
 
   // Display windows for the screensaver widget. Stored verbatim in ScreensaverConfig.
   const val RANGE_DAY = "day" // today only
@@ -126,18 +127,20 @@ object CalendarFeed {
   /**
    * Fetch and parse the feed, returning every occurrence between [nowMillis] and
    * [nowMillis] + [horizonDays] (already filtered, sorted, and de-duplicated).
-   * Returns an empty list on any failure.
+   * Retains usable saved events on failure; returns empty when none remain.
    */
   fun fetch(
       url: String,
       nowMillis: Long = System.currentTimeMillis(),
       horizonDays: Int = 45,
-  ): List<Event> =
-      runCatching {
-            feedReader.fetch(url, nowMillis, horizonDays)
-          }
-          .onFailure { Log.w(TAG, "calendar fetch/parse failed for ${url.take(60)}", it) }
-          .getOrDefault(emptyList())
+  ): List<Event> = read(url, nowMillis, horizonDays).events
+
+  internal fun read(
+      url: String,
+      nowMillis: Long = System.currentTimeMillis(),
+      horizonDays: Int = 45,
+      forceRefresh: Boolean = false,
+  ): Result = feedReader.read(url, nowMillis, horizonDays, forceRefresh)
 
   // --- parsing (pure; unit-tested) --------------------------------------------
 
