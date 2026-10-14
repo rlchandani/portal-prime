@@ -100,8 +100,10 @@ fun Modifier.tvFocusable(
 @Composable
 fun Modifier.tvFocusableRow(
     focusFill: Color = Color(0x402E6BE6),
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ): Modifier {
+  if (!enabled) return semantics(mergeDescendants = true) { disabled() }
   val gate = LocalApprovedLauncherInputGate.current
   val clickEnabled = if (gate == null) LocalApprovedLauncherPageActive.current else true
   val source = remember { MutableInteractionSource() }

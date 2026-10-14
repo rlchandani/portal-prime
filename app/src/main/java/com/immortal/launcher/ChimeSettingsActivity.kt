@@ -99,6 +99,9 @@ internal fun ChimeSettingsContent() {
       publishAfterSave(saveState.revision)
     }
   }
+  fun audition(play: () -> Unit) {
+    if (!saveState.saving) play()
+  }
   fun apply(key: String, value: Any) {
     if (saveState.saving) return
     saveState = saveState.beginEdit(writes.failureCount)
@@ -131,37 +134,42 @@ internal fun ChimeSettingsContent() {
       if (settings.spokenTimeOn || settings.hourlyChimeOn || settings.goldenHourOn) {
         Card {
           if (settings.spokenTimeOn) {
-            VoicePicker(settings.spokenVoice) { name ->
-              ChimeConfig.setSpokenVoice(context, name)
-              settings = settings.copy(spokenVoice = name)
+            VoicePicker(settings.spokenVoice, enabled = !applying) { name ->
+              // A menu opened before a refresh must also respect the current save lock.
+              if (!saveState.saving) {
+                ChimeConfig.setSpokenVoice(context, name)
+                settings = settings.copy(spokenVoice = name)
+              }
             }
-            TestButton("Test voice") { ChimePlayer.testVoice(context, settings.spokenVoice) }
+            TestButton("Test voice", enabled = !applying) {
+              audition { ChimePlayer.testVoice(context, settings.spokenVoice) }
+            }
           }
           if (settings.hourlyChimeOn) {
-            TestButton("Play chime") { ChimePlayer.playChime(context) }
+            TestButton("Play chime", enabled = !applying) { audition { ChimePlayer.playChime(context) } }
           }
           if (settings.goldenHourOn) {
-            TestButton("Test sunrise") { ChimePlayer.playSunriseTone(context) }
-            TestButton("Test sunset") { ChimePlayer.playSunsetTone(context) }
+            TestButton("Test sunrise", enabled = !applying) { audition { ChimePlayer.playSunriseTone(context) } }
+            TestButton("Test sunset", enabled = !applying) { audition { ChimePlayer.playSunsetTone(context) } }
           }
-          TestButton("Play ping") { ChimePlayer.playPing(context, repeats = 1) }
+          TestButton("Play ping", enabled = !applying) { audition { ChimePlayer.playPing(context, repeats = 1) } }
         }
       }
     }
 }
 
 @Composable
-private fun TestButton(label: String, onClick: () -> Unit) {
+private fun TestButton(label: String, enabled: Boolean, onClick: () -> Unit) {
   Surface(
       color = IosFocusTint,
       shape = RoundedCornerShape(12.dp),
       modifier =
           Modifier.padding(horizontal = 18.dp, vertical = 2.dp)
-              .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f) { onClick() },
+              .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, enabled = enabled) { onClick() },
   ) {
     Text(
         "▶  $label",
-        color = IosBlue,
+        color = if (enabled) IosBlue else IosSecondary,
         fontSize = 24.sp,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp),
@@ -172,11 +180,12 @@ private fun TestButton(label: String, onClick: () -> Unit) {
 /** Dropdown of the TTS engine's installed voices for the chosen locale. The empty
  *  name means "engine default". Voices are enumerated from a throwaway TextToSpeech. */
 @Composable
-private fun VoicePicker(current: String, onPick: (String) -> Unit) {
+private fun VoicePicker(current: String, enabled: Boolean, onPick: (String) -> Unit) {
   val context = LocalContext.current
   // name -> friendly label; first entry is always the engine default.
   var voices by remember { mutableStateOf<List<Pair<String, String>>>(listOf("" to "Default voice")) }
   var expanded by remember { mutableStateOf(false) }
+  LaunchedEffect(enabled) { if (!enabled) expanded = false }
 
   DisposableEffect(Unit) {
     var tts: android.speech.tts.TextToSpeech? = null
@@ -201,7 +210,7 @@ private fun VoicePicker(current: String, onPick: (String) -> Unit) {
     Row(
         modifier =
             Modifier.fillMaxWidth()
-                .tvFocusableRow { expanded = true }
+                .tvFocusableRow(enabled = enabled) { expanded = true }
                 .padding(start = 18.dp, end = 18.dp, top = 2.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -209,11 +218,12 @@ private fun VoicePicker(current: String, onPick: (String) -> Unit) {
       Text(label, color = IosSecondary, fontSize = Sizes.rowValue, fontWeight = FontWeight.SemiBold)
       Text("  ▾", color = IosSecondary, fontSize = Sizes.rowValue)
     }
-    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+    DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
       voices.forEach { (name, friendly) ->
         DropdownMenuItem(
             text = { Text(friendly) },
-            onClick = { onPick(name); expanded = false })
+            enabled = enabled,
+            onClick = { if (enabled) onPick(name); expanded = false })
       }
     }
   }
