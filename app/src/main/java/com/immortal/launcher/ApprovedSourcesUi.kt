@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.setValue
@@ -284,7 +285,7 @@ internal fun ApprovedSourcesButton(
             .then(if (enabled) Modifier.tvFocusable(shape, focusScale = 1f, ringColor = palette.accent,
                 onClick = onClick)
                 else Modifier)) {
-        Text(label, color = if (primary) Color.White else palette.text,
+        Text(label, color = if (primary) MaterialTheme.colorScheme.onPrimary else palette.text,
             fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(horizontal = 26.dp, vertical = 18.dp))
     }
