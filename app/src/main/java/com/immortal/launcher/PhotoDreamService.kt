@@ -90,6 +90,8 @@ class PhotoDreamService : DreamService() {
   override fun onDreamingStarted() {
     super.onDreamingStarted()
     Log.i(TAG, "onDreamingStarted")
+    // The system broadcast may precede a cold process start; the owned callback is authoritative.
+    PresenceHub.onDreamStarted(this)
     // A screensaver session is running: start (or keep) the idle screen-off countdown.
     SleepScheduler.onScreensaverStarted(this)
   }

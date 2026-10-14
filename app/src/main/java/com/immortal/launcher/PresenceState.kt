@@ -155,6 +155,7 @@ object PresenceHub {
           addAction(Intent.ACTION_DREAMING_STARTED)
           addAction(Intent.ACTION_USER_PRESENT)
           addAction(Intent.ACTION_SCREEN_OFF)
+          addAction(Intent.ACTION_SCREEN_ON)
           addAction(Intent.ACTION_POWER_CONNECTED)
           addAction(Intent.ACTION_POWER_DISCONNECTED)
         }
@@ -168,13 +169,22 @@ object PresenceHub {
               Intent.ACTION_DREAMING_STARTED -> onDreamStarted(c)
               Intent.ACTION_USER_PRESENT -> onInteraction(c)
               Intent.ACTION_SCREEN_OFF -> onScreenOff(c)
+              Intent.ACTION_SCREEN_ON -> onScreenOn(c)
               Intent.ACTION_POWER_CONNECTED,
               Intent.ACTION_POWER_DISCONNECTED -> refreshConfidence(c)
             }
           }
         }
     context.applicationContext.registerReceiver(receiver, filter)
-    refreshConfidence(context)
+    // Screen broadcasts are not sticky: starting while Home is already awake would otherwise
+    // leave the default OFF snapshot until a later unlock/dream transition. Seed once; status
+    // consumers then read the event-maintained snapshot without PowerManager polling.
+    val interactive = runCatching {
+      context.getSystemService(PowerManager::class.java)?.isInteractive
+    }.getOrNull()
+    val confident = isConfident(context)
+    set(if (confident) current.presence else Presence.UNKNOWN,
+        initialPresenceScreen(interactive, current.screen), confident, context)
   }
 
   /** The dream came up: the Portal's presence service saw someone. */
@@ -207,6 +217,12 @@ object PresenceHub {
     val presence = if (present) Presence.PRESENT else Presence.ABSENT
     // Keep the screen state we already know; this signal says nothing about the display.
     set(presence, current.screen, confident = true, context = c)
+  }
+
+  /** Waking the display does not establish room occupancy or end an observed dream. */
+  private fun onScreenOn(c: Context) {
+    val next = presenceAfterScreenOn(current, isConfident(c))
+    set(next.presence, next.screen, next.confident, c)
   }
 
   /** Screen blanked outside the dream path (our own lockNow, power button). */
