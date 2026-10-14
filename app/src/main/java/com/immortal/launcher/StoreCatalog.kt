@@ -60,7 +60,7 @@ object StoreCatalog {
   private val catalogIo = Executors.newSingleThreadExecutor()
   private val catalogSnapshots = CatalogSnapshotDelivery<CatalogApp>()
   private val updateIo = Executors.newSingleThreadExecutor()
-  private val updateRequests = CatalogRequestDelivery<List<CatalogApp>, Pair<String, Long>>()
+  private val updateRequests = CatalogRequestDelivery<CatalogUpdateRequest, Pair<String, Long>>()
   // Lazy so touching the pure helpers (parse/resolveApkUrl) in a unit test doesn't
   // eagerly construct a main-looper Handler (unavailable off-device).
   private val main by lazy { Handler(Looper.getMainLooper()) }
@@ -180,23 +180,26 @@ object StoreCatalog {
    * package — the launcher has its own self-updater. Calls [onResult] on the main
    * thread with packageName -> latest versionCode.
    */
-  fun findUpdates(context: Context, apps: List<CatalogApp>, onResult: (Map<String, Long>) -> Unit): () -> Unit {
-    val requestKey = apps.toList()
+  fun findUpdates(
+      context: Context, apps: List<CatalogApp>, installedVersions: Map<String, Long>? = null,
+      onResult: (Map<String, Long>) -> Unit,
+  ): () -> Unit {
+    val requestKey = CatalogUpdateRequest(apps.toList(), installedVersions?.toMap())
     val interest = updateRequests.subscribe(requestKey) { onResult(it.toMap()) }
     if (!interest.startLoad) return interest.cancel
     val appContext = context.applicationContext
     updateIo.execute {
-      val updates = mutableListOf<Pair<String, Long>>()
+      var updates = emptyList<Pair<String, Long>>()
+      StoreLoadingDiagnostics.started(requestKey.installedVersions != null)
       try {
-        for (app in requestKey) {
-          if (app.packageName == appContext.packageName) continue
-          val installed = installedVersionCode(appContext, app.packageName) ?: continue
-          val latest = latestVersionCode(app) ?: continue
-          if (latest > installed) updates += app.packageName to latest
-        }
+        updates = catalogUpdates(requestKey, appContext.packageName, { pkg ->
+          StoreLoadingDiagnostics.updateRead()
+          installedVersionCode(appContext, pkg)
+        }, { latestVersionCode(it) })
       } catch (error: Throwable) {
         android.util.Log.w(TAG, "update scan failed", error)
       } finally {
+        StoreLoadingDiagnostics.completed()
         val ready = updates.toList()
         updateRequests.complete(requestKey).forEach { callback ->
           main.post { callback(ready) }

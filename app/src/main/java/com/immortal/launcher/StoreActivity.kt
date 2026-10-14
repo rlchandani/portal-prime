@@ -80,17 +80,23 @@ private fun StoreRoot() {
   var generation by remember { mutableStateOf(0) }
   var updateGeneration by remember { mutableIntStateOf(0) }
   var installedEpoch by remember { mutableIntStateOf(0) }
-  val installedVersions by produceState<Map<String, Long>?>(null, apps, resume, installedEpoch) {
+  val installedRequest = remember(apps, resume, installedEpoch) {
+    InstalledCatalogRequest(apps, resume, installedEpoch)
+  }
+  val installedSnapshot by produceState<InstalledCatalogSnapshot?>(null, installedRequest) {
     value = null
-    value = withContext(Dispatchers.IO) {
+    val versions = withContext(Dispatchers.IO) {
       val loadingContext = currentCoroutineContext()
       apps.mapNotNull { app ->
         loadingContext.ensureActive()
+        StoreLoadingDiagnostics.uiRead()
         StoreCatalog.installedVersionCode(context.applicationContext, app.packageName)
             ?.let { app.packageName to it }
       }.toMap()
     }
+    value = InstalledCatalogSnapshot(installedRequest, versions)
   }
+  val installedVersions = installedSnapshot?.versionsFor(installedRequest)
   val availableUpdates = remember(updates, installedVersions) {
     installedVersions?.let { versions ->
       updates.filter { (pkg, latest) -> versions[pkg]?.let { it < latest } == true }
@@ -115,12 +121,12 @@ private fun StoreRoot() {
       cancelCatalog()
     }
   }
-  DisposableEffect(apps, resume) {
+  DisposableEffect(apps, resume, installedEpoch, installedVersions) {
     var scanAlive = true
     val request = ++updateGeneration
     findingUpdates = apps.isNotEmpty()
-    val cancelUpdates = if (apps.isNotEmpty()) {
-      StoreCatalog.findUpdates(context.applicationContext, apps) {
+    val cancelUpdates = if (apps.isNotEmpty() && installedVersions != null) {
+      StoreCatalog.findUpdates(context.applicationContext, apps, installedVersions) {
         if (alive && scanAlive && updateGeneration == request) {
           updates = it
           findingUpdates = false

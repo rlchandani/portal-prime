@@ -70,6 +70,7 @@ class FleetRoutes(private val context: Context) {
       "/perf" -> performance(req)
       "/perf/home-ui" -> HomeUiDiagnostics.handle(context, req)
       "/perf/app-badges" -> AppBadgeProbe.handle(context, req)
+      "/perf/store-work" -> StoreLoadingDiagnostics.handle(req)
       "/perf/settings-ui" -> SettingsUiDiagnostics.handle(context, req)
       "/perf/webapp" -> WebAppProbe.handle(context, req)
       "/perf/source-preview" -> SourcePreviewProbe.handle(context, req)
