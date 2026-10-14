@@ -12,6 +12,32 @@ import java.util.Locale
 
 /** Validation at the Tools save boundary; the existing Config APIs remain the storage owners. */
 internal object ApprovedToolsEverydayValidation {
+  /** Keep incomplete/invalid text as a draft; only validated numbers cross the save boundary. */
+  fun number(value: String, min: Int, max: Int): Int? =
+      value.takeIf { it.isNotEmpty() && it.all { c -> c in '0'..'9' } }
+          ?.toIntOrNull()?.takeIf { it in min..max }
+
+  fun stepNumber(
+      value: String, fallback: Int, min: Int, max: Int, increase: Boolean, wrap: Boolean = false,
+  ): String {
+    val current = number(value, min, max) ?: fallback.coerceIn(min, max)
+    return (if (increase) {
+      if (current < max) current + 1 else if (wrap) min else max
+    } else {
+      if (current > min) current - 1 else if (wrap) max else min
+    }).toString()
+  }
+
+  fun countdownDraftError(
+      name: String, month: String, day: String, year: String, yearly: Boolean,
+  ): String? {
+    countdownError(name, 1, 1, 0)?.let { return it }
+    val m = number(month, 1, 12) ?: return "Enter a month from 1 to 12."
+    val d = number(day, 1, 31) ?: return "Enter a day from 1 to 31."
+    val y = if (yearly) 0 else number(year, 2000, 2100) ?: return "Enter a year from 2000 to 2100."
+    return countdownError(name, m, d, y)
+  }
+
   fun timerDurationMillis(hours: String, minutes: String, seconds: String): Long? {
     fun component(value: String, max: Int): Int? =
         value.takeIf { it.isNotEmpty() && it.all { c -> c in '0'..'9' } }

@@ -132,18 +132,19 @@ internal fun ToolsButton(
 @Composable
 internal fun ToolsField(
     label: String, value: String, onChange: (String) -> Unit, modifier: Modifier = Modifier,
-    numeric: Boolean = false, multiline: Boolean = false,
+    numeric: Boolean = false, multiline: Boolean = false, integer: Boolean = false,
+    enabled: Boolean = true,
 ) {
     val p = LocalApprovedPalette.current
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         ToolsText(label, secondary = true)
         Surface(color = p.background, shape = RoundedCornerShape(16.dp),
             border = BorderStroke(1.dp, p.divider)) {
-            BasicTextField(value, onChange, singleLine = !multiline,
+            BasicTextField(value, onChange, singleLine = !multiline, enabled = enabled,
                 textStyle = TextStyle(color = p.text, fontSize = 26.sp, lineHeight = 36.sp),
                 cursorBrush = SolidColor(p.accent),
                 keyboardOptions = KeyboardOptions(keyboardType =
-                    if (numeric) KeyboardType.Decimal else KeyboardType.Text),
+                    if (integer) KeyboardType.Number else if (numeric) KeyboardType.Decimal else KeyboardType.Text),
                 modifier = Modifier.fillMaxWidth()
                     .heightIn(min = if (multiline) 200.dp else 68.dp, max = if (multiline) 360.dp else 120.dp)
                     .semantics { contentDescription = label }

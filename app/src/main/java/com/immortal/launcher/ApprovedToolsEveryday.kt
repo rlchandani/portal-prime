@@ -47,6 +47,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -86,6 +87,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+
+/** Accept integer drafts saved by earlier APKs as well as current text drafts. */
+internal val EverydayNumberTextSaver = Saver<String, Any>(
+    save = { it },
+    restore = { saved -> when (saved) {
+      is String -> saved
+      is Int -> saved.toString()
+      else -> null
+    } },
+)
 
 private val EverydayInk: Color
   @Composable get() = LocalApprovedPalette.current.text
@@ -127,8 +138,8 @@ internal fun ToolsAlarmContent() {
   val paneActive = LocalApprovedLauncherPageActive.current
   var editing by rememberSaveable { mutableStateOf(false) }
   var draftStarted by rememberSaveable { mutableStateOf(false) }
-  var draftHour by rememberSaveable { mutableIntStateOf(7) }
-  var draftMinute by rememberSaveable { mutableIntStateOf(0) }
+  var draftHour by rememberSaveable(stateSaver = EverydayNumberTextSaver) { mutableStateOf("7") }
+  var draftMinute by rememberSaveable(stateSaver = EverydayNumberTextSaver) { mutableStateOf("0") }
   val alarm = load.value
 
   fun changeAlarm(change: (AlarmConfig.Config) -> AlarmConfig.Config, closeEditor: Boolean = false) {
@@ -165,8 +176,8 @@ internal fun ToolsAlarmContent() {
         EverydayActions {
           ToolsButton("Change time", primary = true, enabled = !operations.busy) {
             if (!draftStarted) {
-              draftHour = alarm.hour
-              draftMinute = alarm.minute
+              draftHour = alarm.hour.toString()
+              draftMinute = alarm.minute.toString()
               draftStarted = true
             }
             operations.error = null
@@ -224,6 +235,8 @@ internal fun ToolsAlarmContent() {
   })
 
   if (editing && alarm != null) {
+    val hour = ApprovedToolsEverydayValidation.number(draftHour, 0, 23)
+    val minute = ApprovedToolsEverydayValidation.number(draftMinute, 0, 59)
     EverydaySheet("Change alarm time", onDismiss = {
       // ToolsSheet also dismisses on lifecycle hiding. Preserve the valid draft until
       // explicit Cancel or a successful Save, so reopening cannot overwrite it.
@@ -233,24 +246,21 @@ internal fun ToolsAlarmContent() {
         editing = false
         draftStarted = false
       }
-      ToolsButton("Save", primary = true, enabled = !operations.busy) {
-        changeAlarm({ it.copy(hour = draftHour, minute = draftMinute) }, closeEditor = true)
+      ToolsButton("Save", primary = true, enabled = !operations.busy && hour != null && minute != null) {
+        if (hour != null && minute != null) {
+          changeAlarm({ it.copy(hour = hour, minute = minute) }, closeEditor = true)
+        }
       }
     }) {
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
         Column(Modifier.weight(1f)) {
-          EverydayNumberChoice("Hour", draftHour, 0, 23, wrap = true, padded = true) { draftHour = it }
+          EverydayNumberField("Hour", draftHour, 0, 23, alarm.hour, wrap = true,
+              enabled = !operations.busy) { draftHour = it }
         }
         Column(Modifier.weight(1f)) {
-          // Keep any previously saved minute offset; choosing a new minute follows the mock's
-          // five-minute choices, without silently rounding a user's existing time.
-          val minutes = remember(draftMinute) {
-            ((0..55 step 5).toList() + draftMinute).distinct().sorted()
-                .map { String.format(Locale.ROOT, "%02d", it) }
-          }
-          ToolsChoice("Minute", String.format(Locale.ROOT, "%02d", draftMinute), minutes) {
-            draftMinute = it.toInt()
-          }
+          // Exact minute offsets remain editable without rounding or a second sheet.
+          EverydayNumberField("Minute", draftMinute, 0, 59, alarm.minute, wrap = true,
+              enabled = !operations.busy) { draftMinute = it }
         }
       }
       EverydayError(operations.error)
@@ -369,14 +379,14 @@ internal fun ToolsCountdownsContent() {
   var adding by rememberSaveable { mutableStateOf(false) }
   var name by rememberSaveable { mutableStateOf("") }
   var emoji by rememberSaveable { mutableStateOf("🎂") }
-  var month by rememberSaveable { mutableIntStateOf(initialDate.get(Calendar.MONTH) + 1) }
-  var day by rememberSaveable { mutableIntStateOf(initialDate.get(Calendar.DAY_OF_MONTH)) }
-  var year by rememberSaveable { mutableIntStateOf(initialDate.get(Calendar.YEAR).coerceIn(2000, 2100)) }
+  var month by rememberSaveable(stateSaver = EverydayNumberTextSaver) { mutableStateOf((initialDate.get(Calendar.MONTH) + 1).toString()) }
+  var day by rememberSaveable(stateSaver = EverydayNumberTextSaver) { mutableStateOf(initialDate.get(Calendar.DAY_OF_MONTH).toString()) }
+  var year by rememberSaveable(stateSaver = EverydayNumberTextSaver) { mutableStateOf(initialDate.get(Calendar.YEAR).coerceIn(2000, 2100).toString()) }
   var yearly by rememberSaveable { mutableStateOf(true) }
   var removeId by rememberSaveable { mutableStateOf<Long?>(null) }
   var submitted by rememberSaveable { mutableStateOf(false) }
   val dateError = remember(name, month, day, year, yearly) {
-    ApprovedToolsEverydayValidation.countdownError(name, month, day, if (yearly) 0 else year)
+    ApprovedToolsEverydayValidation.countdownDraftError(name, month, day, year, yearly)
   }
   val resume = rememberApprovedResume()
   val today = remember(resume) { Calendar.getInstance() }
@@ -456,9 +466,9 @@ internal fun ToolsCountdownsContent() {
         if (dateError == null) {
           val savedName = name.trim()
           val savedEmoji = emoji
-          val savedMonth = month
-          val savedDay = day
-          val savedYear = if (yearly) 0 else year
+          val savedMonth = checkNotNull(ApprovedToolsEverydayValidation.number(month, 1, 12))
+          val savedDay = checkNotNull(ApprovedToolsEverydayValidation.number(day, 1, 31))
+          val savedYear = if (yearly) 0 else checkNotNull(ApprovedToolsEverydayValidation.number(year, 2000, 2100))
           operations.run("Couldn’t add the countdown. Try again.", task = {
             CountdownConfig.add(context, savedName, savedEmoji, savedMonth, savedDay, savedYear)
             CountdownConfig.load(context)
@@ -475,10 +485,12 @@ internal fun ToolsCountdownsContent() {
       Spacer(Modifier.height(24.dp))
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
         Column(Modifier.weight(1f)) {
-          EverydayNumberChoice("Month", month, 1, 12, wrap = true) { month = it }
+          EverydayNumberField("Month", month, 1, 12, initialDate.get(Calendar.MONTH) + 1,
+              wrap = true, enabled = !operations.busy) { month = it }
         }
         Column(Modifier.weight(1f)) {
-          EverydayNumberChoice("Day", day, 1, 31, wrap = true) { day = it }
+          EverydayNumberField("Day", day, 1, 31, initialDate.get(Calendar.DAY_OF_MONTH),
+              wrap = true, enabled = !operations.busy) { day = it }
         }
       }
       Spacer(Modifier.height(20.dp))
@@ -498,11 +510,13 @@ internal fun ToolsCountdownsContent() {
       }
       if (!yearly) {
         Spacer(Modifier.height(20.dp))
-        EverydayNumberChoice("Year", year, 2000, 2100) { year = it }
+        EverydayNumberField("Year", year, 2000, 2100, initialDate.get(Calendar.YEAR).coerceIn(2000, 2100),
+            enabled = !operations.busy) { year = it }
       }
       Spacer(Modifier.height(24.dp))
       ToolsChoice("Icon", emoji, EverydayIcons) { emoji = it }
-      if (month == 2 && day == 29 && yearly) {
+      if (ApprovedToolsEverydayValidation.number(month, 1, 12) == 2 &&
+          ApprovedToolsEverydayValidation.number(day, 1, 31) == 29 && yearly) {
         Spacer(Modifier.height(20.dp))
         ToolsText("February 29 repeats in leap years.", secondary = true)
       }
@@ -627,48 +641,30 @@ internal fun ToolsConverterContent() {
   })
 }
 
-/** Save/cancel is local to the nested sheet; the parent receives only a validated integer. */
+/** Numbers are draft fields in the parent sheet; only its final action persists changes. */
 @Composable
-private fun EverydayNumberChoice(
-    title: String, value: Int, min: Int, max: Int, wrap: Boolean = false,
-    padded: Boolean = false, onChange: (Int) -> Unit,
+private fun EverydayNumberField(
+    title: String, value: String, min: Int, max: Int, fallback: Int,
+    wrap: Boolean = false, enabled: Boolean = true, onChange: (String) -> Unit,
 ) {
-  var showing by rememberSaveable { mutableStateOf(false) }
-  var draft by rememberSaveable { mutableStateOf(value.toString()) }
-  val number = draft.takeIf { it.isNotEmpty() && it.all { c -> c in '0'..'9' } }
-      ?.toIntOrNull()?.takeIf { it in min..max }
-  ToolsText(title, secondary = true)
-  Spacer(Modifier.height(12.dp))
-  ToolsButton(
-      (if (padded) String.format(Locale.ROOT, "%02d", value) else value.toString()) + "  ⌄",
-      modifier = Modifier.fillMaxWidth().semantics { contentDescription = "$title, $value" },
-  ) { draft = value.toString(); showing = true }
-  if (showing) {
-    EverydaySheet(title, onDismiss = { showing = false }, actions = {
-      ToolsButton("Cancel") { showing = false }
-      ToolsButton("Save", primary = true, enabled = number != null) {
-        number?.let { onChange(it); showing = false }
-      }
-    }) {
-      ToolsField(title, draft, { draft = it }, numeric = true)
-      Spacer(Modifier.height(24.dp))
-      Row(
-          Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp),
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-        ToolsButton("−", modifier = Modifier.semantics { contentDescription = "Decrease $title" }) {
-          val current = number ?: value
-          draft = (if (current > min) current - 1 else if (wrap) max else min).toString()
-        }
-        ToolsText("$min–$max", secondary = true, modifier = Modifier.weight(1f))
-        ToolsButton("+", modifier = Modifier.semantics { contentDescription = "Increase $title" }) {
-          val current = number ?: value
-          draft = (if (current < max) current + 1 else if (wrap) min else max).toString()
-        }
-      }
-      EverydayError(if (number == null) "Enter a whole number from $min to $max." else null)
+  ToolsField(title, value, onChange, numeric = true, integer = true, enabled = enabled)
+  Spacer(Modifier.height(16.dp))
+  Row(
+      Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    ToolsButton("−", enabled = enabled,
+        modifier = Modifier.semantics { contentDescription = "Decrease $title" }) {
+      onChange(ApprovedToolsEverydayValidation.stepNumber(value, fallback, min, max, increase = false, wrap = wrap))
+    }
+    ToolsText("$min–$max", secondary = true, modifier = Modifier.weight(1f))
+    ToolsButton("+", enabled = enabled,
+        modifier = Modifier.semantics { contentDescription = "Increase $title" }) {
+      onChange(ApprovedToolsEverydayValidation.stepNumber(value, fallback, min, max, increase = true, wrap = wrap))
     }
   }
+  EverydayError(if (ApprovedToolsEverydayValidation.number(value, min, max) == null)
+      "Enter a whole number from $min to $max." else null)
 }
 
 @Composable
