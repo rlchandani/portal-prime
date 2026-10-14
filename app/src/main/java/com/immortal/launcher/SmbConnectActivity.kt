@@ -43,12 +43,14 @@ private fun SmbConnectScreen(onCancel: () -> Unit) {
     var user by remember { mutableStateOf(existing.smbUser.orEmpty()) }
     var pass by remember { mutableStateOf(existing.smbPass.orEmpty()) }
     var status by remember { mutableStateOf<String?>(null) }
+    var statusError by remember { mutableStateOf(true) }
     var connectedCount by remember { mutableStateOf<Int?>(null) }
     val cancel = { work.close(); onCancel() }
     BackHandler(onBack = cancel)
 
     fun connect() {
         if (work.busy) return
+        statusError = true
         if (host.isBlank() || share.isBlank()) { status = "Enter at least the server and share name."; return }
         val server = host.trim()
         val shareName = share.trim()
@@ -61,14 +63,20 @@ private fun SmbConnectScreen(onCancel: () -> Unit) {
             try {
                 if (!source.connect()) error("connection")
                 if (Thread.currentThread().isInterrupted) throw InterruptedException()
-                source.listImages().size
+                source.listImagesOrNull()?.size
             } finally { source.close() }
         }) { result ->
-            val count = result.getOrNull() ?: 0
-            if (count > 0) {
-                ScreensaverConfig.setSmb(context, server, shareName, folder, username, password)
-                connectedCount = count
-            } else status = "Couldn't read images from that share. Check the server, share name, folder and credentials."
+            when (val check = photoFolderCheck(result)) {
+                is PhotoFolderCheck.Photos -> {
+                    ScreensaverConfig.setSmb(context, server, shareName, folder, username, password)
+                    connectedCount = check.count
+                }
+                PhotoFolderCheck.Empty -> {
+                    status = EMPTY_PHOTO_FOLDER_MESSAGE
+                    statusError = false
+                }
+                PhotoFolderCheck.Unavailable -> status = "Couldn't read that folder. Check the server, share name, folder, access permissions and credentials, then try again. Your current photo source hasn't changed."
+            }
         }
     }
 
@@ -93,7 +101,7 @@ private fun SmbConnectScreen(onCancel: () -> Unit) {
                 ApprovedSourcesField("Folder in the share", path, { path = it }, "photos (optional)", enabled = !work.busy)
                 ApprovedSourcesField("Username", user, { user = it }, enabled = !work.busy)
                 ApprovedSourcesField("Password", pass, { pass = it }, secret = true, enabled = !work.busy)
-                ApprovedSourcesStatus(status)
+                ApprovedSourcesStatus(status, error = statusError)
                 ApprovedSourcesActions(if (work.busy) "Connecting…" else "Test & connect",
                     enabled = !work.busy && host.isNotBlank() && share.isNotBlank(),
                     onConfirm = ::connect, onCancel = cancel)

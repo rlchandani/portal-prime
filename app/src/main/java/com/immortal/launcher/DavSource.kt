@@ -87,14 +87,15 @@ object DavSource {
             val origin = origin(baseUrl) ?: return null
             val out = ArrayList<Media>()
             val stack = ArrayDeque<String>()
-            stack.addLast(dir(baseUrl))
+            val rootUrl = dir(baseUrl)
+            stack.addLast(rootUrl)
             val seen = HashSet<String>()
             while (stack.isNotEmpty() && out.size < cap) {
               PhotoSourceWork.checkpoint()
               val url = stack.removeLast()
               if (!seen.add(url)) continue
               val selfPath = URL(url).path
-              val body = propfind(url, headers, "1") ?: continue
+              val body = propfind(url, headers, "1") ?: if (url == rootUrl) return null else continue
               for ((href, isCollection) in parseEntries(body)) {
                 PhotoSourceWork.checkpoint()
                 if (out.size >= cap) break

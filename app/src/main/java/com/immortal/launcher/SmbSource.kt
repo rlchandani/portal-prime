@@ -68,15 +68,19 @@ class SmbSource(
           .getOrElse { close(); false }
 
   /** Recursively list image file paths (share-relative, backslash-separated), capped at [cap]. */
-  fun listImages(cap: Int = 1000): List<String> {
-    val sh = share ?: return emptyList()
+  fun listImages(cap: Int = 1000): List<String> = listImagesOrNull(cap).orEmpty()
+
+  /** Null when the starting folder is unreadable; child folders remain best-effort. */
+  fun listImagesOrNull(cap: Int = 1000): List<String>? {
+    val sh = share ?: return null
     val out = ArrayList<String>()
     val stack = ArrayDeque<String>()
-    stack.addLast(normalize(basePath))
+    val rootPath = normalize(basePath)
+    stack.addLast(rootPath)
     while (stack.isNotEmpty() && out.size < cap) {
       PhotoSourceWork.checkpoint()
       val dir = stack.removeLast()
-      val entries = runCatching { sh.list(dir) }.getOrNull() ?: continue
+      val entries = runCatching { sh.list(dir) }.getOrNull() ?: if (dir == rootPath) return null else continue
       for (e in entries) {
         PhotoSourceWork.checkpoint()
         if (out.size >= cap) break
