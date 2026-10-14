@@ -8,11 +8,9 @@ package com.immortal.launcher
 
 import android.app.ActivityManager
 import android.app.usage.UsageStatsManager
-import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -118,8 +116,9 @@ private fun ApprovedAppsContent(
   val pageActive = LocalApprovedLauncherPageActive.current
   var resumed by remember(owner) { mutableStateOf(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
   var refresh by remember { mutableStateOf(0) }
-  var lastSuccessfulEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
-  var lastRecentEpoch by remember(owner) { mutableStateOf<Pair<Int, Int>?>(null) }
+  val inventoryRevision by approvedIconInventoryRevision.collectAsState()
+  var lastSuccessfulEpoch by remember(owner) { mutableStateOf<Triple<Int, Int, Long>?>(null) }
+  var lastRecentEpoch by remember(owner) { mutableStateOf<Triple<Int, Int, Long>?>(null) }
   var recents by remember { mutableStateOf<List<AppItem>?>(null) }
   var recentUsageAccess by remember { mutableStateOf<Boolean?>(null) }
   val recentLabels = remember { RecentAppLabelCache() }
@@ -152,23 +151,8 @@ private fun ApprovedAppsContent(
     owner.lifecycle.addObserver(observer)
     onDispose { owner.lifecycle.removeObserver(observer) }
   }
-  // Keep invalidations while this retained page is hidden; host resume covers the stopped gap.
-  DisposableEffect(context, resumed) {
-    if (!resumed) onDispose { } else {
-      val appContext = context.applicationContext
-      val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) { refresh++ }
-      }
-      val filter = IntentFilter().apply {
-        addAction(Intent.ACTION_PACKAGE_ADDED)
-        addAction(Intent.ACTION_PACKAGE_REMOVED)
-        addAction(Intent.ACTION_PACKAGE_CHANGED)
-        addDataScheme("package")
-      }
-      appContext.registerReceiver(receiver, filter)
-      onDispose { appContext.unregisterReceiver(receiver) }
-    }
-  }
+  // The inventory owner invalidates before publishing its revision. This also covers
+  // shortcut configuration changes, and changes while this retained page is hidden.
   fun closeSearch() {
     searching = false
     query = ""
@@ -200,11 +184,11 @@ private fun ApprovedAppsContent(
       badges = loaded
     }
   }
-  LaunchedEffect(resume, refresh, pageActive, resumed) {
+  LaunchedEffect(resume, refresh, inventoryRevision, pageActive, resumed) {
     if (!pageActive || !resumed) return@LaunchedEffect
     assignments = UserLayout.load(context)
     order = UserLayout.loadOrder(context)
-    val epoch = resume to refresh
+    val epoch = Triple(resume, refresh, inventoryRevision)
     if (lastSuccessfulEpoch == epoch) return@LaunchedEffect
     try {
       val loaded = withContext(Dispatchers.IO) {
@@ -219,9 +203,9 @@ private fun ApprovedAppsContent(
     catch (error: Exception) { appsFailure = "Your apps couldn’t be loaded. Try again." }
   }
   // UsageStats and recent-app icon lookups are not on the All apps opening path.
-  LaunchedEffect(resume, refresh, pageActive, resumed, recent) {
+  LaunchedEffect(resume, refresh, inventoryRevision, pageActive, resumed, recent) {
     if (!recent || !pageActive || !resumed) return@LaunchedEffect
-    val epoch = resume to refresh
+    val epoch = Triple(resume, refresh, inventoryRevision)
     if (lastRecentEpoch == epoch) return@LaunchedEffect
     try {
       val loaded = withContext(Dispatchers.IO) {
