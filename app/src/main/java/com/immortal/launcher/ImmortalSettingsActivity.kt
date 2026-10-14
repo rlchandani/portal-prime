@@ -798,12 +798,14 @@ private fun DisplaySection() {
           label = "From",
           valueText = minuteLabel(ns.startMin),
           onMinus = {
-            DisplayControl.setNightShiftStart(context, ns.startMin - 30)
-            updateNightShift { it.copy(startMin = (ns.startMin - 30 + 1440) % 1440) }
+            val next = stepSettingNumber(ns.startMin, -30, 0, 1439, wrap = true)
+            DisplayControl.setNightShiftStart(context, next)
+            updateNightShift { it.copy(startMin = next) }
           },
           onPlus = {
-            DisplayControl.setNightShiftStart(context, ns.startMin + 30)
-            updateNightShift { it.copy(startMin = (ns.startMin + 30) % 1440) }
+            val next = stepSettingNumber(ns.startMin, 30, 0, 1439, wrap = true)
+            DisplayControl.setNightShiftStart(context, next)
+            updateNightShift { it.copy(startMin = next) }
           },
       )
       Divider()
@@ -811,12 +813,14 @@ private fun DisplaySection() {
           label = "Until",
           valueText = minuteLabel(ns.endMin),
           onMinus = {
-            DisplayControl.setNightShiftEnd(context, ns.endMin - 30)
-            updateNightShift { it.copy(endMin = (ns.endMin - 30 + 1440) % 1440) }
+            val next = stepSettingNumber(ns.endMin, -30, 0, 1439, wrap = true)
+            DisplayControl.setNightShiftEnd(context, next)
+            updateNightShift { it.copy(endMin = next) }
           },
           onPlus = {
-            DisplayControl.setNightShiftEnd(context, ns.endMin + 30)
-            updateNightShift { it.copy(endMin = (ns.endMin + 30) % 1440) }
+            val next = stepSettingNumber(ns.endMin, 30, 0, 1439, wrap = true)
+            DisplayControl.setNightShiftEnd(context, next)
+            updateNightShift { it.copy(endMin = next) }
           },
       )
       Divider()
