@@ -774,8 +774,9 @@ private fun SettingsActionSurface(
         color = if (enabled) IosBlue else IosDivider,
         shape = shape,
         modifier = modifier.heightIn(min = Sizes.primaryTarget)
-            .then(if (enabled && onClick != null)
-                Modifier.tvFocusable(shape, focusScale = 1f, ringColor = IosBlue, onClick = onClick)
+            .then(if (onClick != null)
+                Modifier.tvFocusable(shape, focusScale = 1f, ringColor = IosBlue,
+                    enabled = enabled, onClick = onClick)
                 else Modifier),
     ) {
         Text(

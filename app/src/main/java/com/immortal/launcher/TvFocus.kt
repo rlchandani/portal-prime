@@ -30,6 +30,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 /**
@@ -50,8 +52,9 @@ fun Modifier.tvFocusable(
     onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit,
 ): Modifier {
-  // Preserve the caller's existing disabled behavior (including Manage-mode badges).
-  if (!enabled) return this
+  // Keep disabled actions inert while exposing their label and state together.
+  // Independently clickable children (such as Manage-mode badges) keep their own nodes.
+  if (!enabled) return semantics(mergeDescendants = true) { disabled() }
   val gate = LocalApprovedLauncherInputGate.current
   // Legacy screens retain disabled semantics; retained tabs keep their click nodes
   // stable and reject inactive actions at invocation.

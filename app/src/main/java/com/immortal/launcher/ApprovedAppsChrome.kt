@@ -138,9 +138,9 @@ internal fun ApprovedAppsButton(label: String, primary: Boolean = false, enabled
   val shape = RoundedCornerShape(16.dp)
   Box(modifier.heightIn(min = 68.dp).clip(shape)
       .background(if (primary) IosBlue else LocalApprovedPalette.current.surface2)
-      .then(if (enabled) Modifier.tvFocusable(shape, focusScale = 1f,
+      .tvFocusable(shape, focusScale = 1f, enabled = enabled,
           ringColor = if (primary) MaterialTheme.colorScheme.onPrimary else LocalApprovedPalette.current.accent,
-          onClick = onClick) else Modifier)
+          onClick = onClick)
       .padding(horizontal = 26.dp, vertical = 18.dp), contentAlignment = Alignment.Center) {
     Text(label, color = (if (primary) MaterialTheme.colorScheme.onPrimary else IosLabel).copy(alpha = if (enabled) 1f else 0.5f), fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium)
   }

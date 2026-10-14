@@ -382,7 +382,8 @@ internal fun ApprovedHomeTextButton(
     onClick: () -> Unit,
 ) {
   Box(modifier.heightIn(min = 52.dp)
-      .tvFocusable(RoundedCornerShape(16.dp), ringColor = ApprovedHomePalette.Accent) { if (enabled) onClick() }
+      .tvFocusable(RoundedCornerShape(16.dp), ringColor = ApprovedHomePalette.Accent,
+           enabled = enabled, onClick = onClick)
       .padding(horizontal = 20.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
     Text(label, color = ApprovedHomePalette.Accent.copy(alpha = if (enabled) 1f else .4f),
         fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Medium)
