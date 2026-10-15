@@ -76,6 +76,7 @@ internal fun ToolsNotesContent() {
     var permissionRequest by remember { mutableStateOf<Long?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     var clearText by remember { mutableStateOf(false) }
+    var discardText by remember { mutableStateOf(false) }
     var deleteMemo by remember { mutableStateOf(false) }
 
     fun stopAudio() {
@@ -101,6 +102,7 @@ internal fun ToolsNotesContent() {
         playbackPreparing = false
         memoLoading = false
         clearText = false
+        discardText = false
         deleteMemo = false
     }
     val policy = rememberToolsAudioSessionPolicy { stopAudio() }
@@ -218,7 +220,13 @@ internal fun ToolsNotesContent() {
                         enabled = text.isNotEmpty() || savedText.isNotEmpty(),
                         modifier = Modifier.weight(1f)) { clearText = true }
                 }
-                if (text != savedText) ToolsStatus("Unsaved changes")
+                if (text != savedText) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                        ToolsStatus("Unsaved changes")
+                        ToolsButton("Discard changes") { discardText = true }
+                    }
+                }
                 else if (savedNotice) ToolsStatus("Saved", active = true)
             }
         },
@@ -284,6 +292,15 @@ internal fun ToolsNotesContent() {
             }
         },
     )
+    if (discardText && pageActive) {
+        ToolsConfirm("Discard changes?",
+            "Your unsaved edits will be discarded. The saved note will stay unchanged.",
+            "Discard changes", { discardText = false }) {
+            text = savedText
+            savedNotice = false
+            discardText = false
+        }
+    }
     if (clearText && pageActive) {
         ToolsConfirm("Clear this note?", "Clear the saved note and the message in this editor?",
             "Clear note", { clearText = false }) {
