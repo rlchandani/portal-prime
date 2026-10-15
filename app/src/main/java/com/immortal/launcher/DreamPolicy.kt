@@ -125,6 +125,7 @@ object DreamPolicy {
 
   /** Clear visible state now; persist behind earlier marks without UI-thread disk work. */
   fun clearBridge(context: Context) {
+    PortalHomeAmbientGuard.restore(context)
     bridgeRequests.incrementAndGet()
     inStockHandoff = false
     bridgeAt = 0L

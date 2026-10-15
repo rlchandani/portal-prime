@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -33,6 +34,18 @@ object PortalHomeBridge {
   /** Begin a deliberate handoff, rolling back suppression when no launch can be dispatched. */
   fun launch(context: Context): Boolean {
     DreamPolicy.markBridge(context, portalHome = true)
+    if (Build.DEVICE != PORTAL_TV_DEVICE) {
+      // Suppress Meta's ambient bootstrap before opening Home, including a retained ambient task.
+      if (!PortalHomeAmbientGuard.begin(context)) {
+        DreamPolicy.clearBridge(context)
+        Toast.makeText(context, "Calls couldn’t be opened. Please try again.", Toast.LENGTH_LONG).show()
+        return false
+      }
+      runCatching {
+        context.sendBroadcast(Intent("com.facebook.aloha.home.intent.action.DREAMING_STOP")
+            .setPackage(PORTAL_TOUCH_HOME_PACKAGE))
+      }
+    }
     if (reopenAfterBootstrap(context)) return true
 
     // System Back can surface ripleyhome on Portal TV; it is not a touchscreen-home launch.
@@ -51,7 +64,8 @@ object PortalHomeBridge {
           Intent(Intent.ACTION_MAIN)
               .addCategory(Intent.CATEGORY_LAUNCHER)
               .setComponent(ComponentName(stock.packageName, stock.name))
-              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION))
+      (context as? Activity)?.overridePendingTransition(0, 0)
       true
     }.getOrDefault(false)
     if (launched) return true
@@ -69,7 +83,8 @@ object PortalHomeBridge {
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("portal://launcher/home"))
         .setPackage(PORTAL_TOUCH_HOME_PACKAGE)
     if (context.packageManager.resolveActivity(intent, 0) == null) return@runCatching false
-    context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION))
+      (context as? Activity)?.overridePendingTransition(0, 0)
     true
   }.getOrDefault(false)
 }
