@@ -20,13 +20,12 @@ import android.util.Log
 class TimerReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action != TimerScheduler.ACTION_FIRE) return
-    val id = intent.getStringExtra(TimerScheduler.EXTRA_ID)
-    val label = intent.getStringExtra(TimerScheduler.EXTRA_LABEL)?.ifBlank { "Timer" } ?: "Timer"
-    Log.i(TAG, "timer fired: $label ($id)")
+    val timer = TimerConfig.consumeDue(context, intent.getStringExtra(TimerScheduler.EXTRA_ID)) ?: return
+    val label = timer.label.ifBlank { "Timer" }
+    Log.i(TAG, "timer fired: $label (${timer.id})")
     ChimePlayer.playTimerRing(context)
     Handler(Looper.getMainLooper())
         .postDelayed({ ChimePlayer.announce(context, "$label timer done") }, 3 * 1400L)
-    id?.let { TimerConfig.forget(context, it) }
   }
 
   private companion object {

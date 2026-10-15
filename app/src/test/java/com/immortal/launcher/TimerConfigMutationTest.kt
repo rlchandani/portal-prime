@@ -16,9 +16,11 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import org.json.JSONArray
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -67,6 +69,43 @@ class TimerConfigMutationTest {
         })
     assertTrue(TimerConfig.load(fixture.context).isEmpty())
     assertTrue("A removed timer must not remain scheduled", fixture.armed.isEmpty())
+  }
+
+  @Test fun expiryAtItsExactDeadlineClaimsOnlyThatTimer() {
+    val fixture = Fixture(THREE_TIMERS)
+    val completed = TimerConfig.consumeDue(fixture.context, "first", nowMillis = 1L)
+    assertEquals("First", completed?.label)
+    assertEquals(listOf("second", "keep"), TimerConfig.load(fixture.context).map { it.id })
+  }
+
+  @Test fun expiryBeforeItsDeadlineLeavesSavedTimersUntouched() {
+    val fixture = Fixture(THREE_TIMERS)
+    assertNull(TimerConfig.consumeDue(fixture.context, "first", nowMillis = 0L))
+    assertEquals(THREE_TIMERS, fixture.raw.get())
+  }
+
+  @Test fun concurrentDuplicateExpiryClaimsCompleteATimerOnlyOnce() {
+    val fixture = Fixture(THREE_TIMERS)
+    val completions = AtomicInteger()
+    val claim = {
+      if (TimerConfig.consumeDue(fixture.context, "first", nowMillis = 1L) != null) {
+        completions.incrementAndGet()
+      }
+      Unit
+    }
+    race(fixture, first = claim, second = claim)
+    assertEquals(1, completions.get())
+    assertEquals(listOf("second", "keep"), TimerConfig.load(fixture.context).map { it.id })
+  }
+
+  @Test fun timerStartedDuringExpiryIsNotLost() {
+    val fixture = Fixture(THREE_TIMERS)
+    race(fixture,
+        first = { TimerConfig.consumeDue(fixture.context, "first", nowMillis = 1L) },
+        second = { TimerConfig.add(fixture.context, "Fresh", 60_000L) })
+    assertEquals(listOf("Second", "Keep", "Fresh"),
+        TimerConfig.load(fixture.context).map { it.label })
+    assertEquals(1, fixture.armed.size)
   }
 
   /** Hold the first write or alarm registration while a competing public API call starts. */

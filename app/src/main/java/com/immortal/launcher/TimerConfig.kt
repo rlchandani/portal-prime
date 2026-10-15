@@ -82,6 +82,17 @@ object TimerConfig {
     save(context, existing.filterNot { it.id == id })
   }
 
+  /** Claim an existing due timer once, before scheduling audio. A completed cancellation wins. */
+  @Synchronized internal fun consumeDue(
+      context: Context, id: String?, nowMillis: Long = System.currentTimeMillis(),
+  ): Timer? {
+    if (id.isNullOrBlank()) return null
+    val timers = load(context)
+    val due = timers.firstOrNull { it.id == id && it.endAtMillis <= nowMillis } ?: return null
+    save(context, timers.filterNot { it.id == id })
+    return due
+  }
+
   /** Drop a fired/expired timer without touching its (already-spent) alarm. */
   @Synchronized fun forget(context: Context, id: String) {
     save(context, load(context).filterNot { it.id == id })
