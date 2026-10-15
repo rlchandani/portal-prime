@@ -22,8 +22,8 @@ import com.immortal.launcher.ApprovedSettingsSwitch as Switch
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,12 +31,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.util.Calendar
 
@@ -70,18 +73,47 @@ private fun AlarmScreen() {
 @Composable
 internal fun AlarmContent() {
   val context = LocalContext.current
-  val initial = remember { AlarmConfig.load(context) }
-  var enabled by remember { mutableStateOf(initial.enabled) }
-  var hour by remember { mutableIntStateOf(initial.hour) }
-  var minute by remember { mutableIntStateOf(initial.minute) }
-  var days by remember { mutableStateOf(initial.days) }
-
-  fun persist() {
-    AlarmConfig.save(
-        context, AlarmConfig.Config(enabled = enabled, hour = hour, minute = minute,
-            label = initial.label, days = days))
-    AlarmScheduler.reschedule(context)
+  val application = context.applicationContext
+  val owner = LocalLifecycleOwner.current
+  val pageActive = LocalApprovedLauncherPageActive.current
+  val editor = remember(application) { alarmSettingsEditor(application) }
+  var config by remember(editor) { mutableStateOf(editor.snapshot) }
+  DisposableEffect(application, owner, editor, pageActive) {
+    var active = false
+    var stopObserving: (() -> Unit)? = null
+    fun refresh() {
+      if (active) config = editor.refresh()
+    }
+    fun stop() {
+      active = false
+      stopObserving?.invoke()
+      stopObserving = null
+    }
+    fun start() {
+      if (active || !pageActive) return
+      active = true
+      // Subscribe before readback, including a one-shot that fired while this page was paused.
+      stopObserving = AlarmConfig.observeSnapshot(application, ::refresh)
+      refresh()
+    }
+    val observer = LifecycleEventObserver { _, event ->
+      when (event) {
+        Lifecycle.Event.ON_RESUME -> start()
+        Lifecycle.Event.ON_PAUSE, Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_DESTROY -> stop()
+        else -> Unit
+      }
+    }
+    owner.lifecycle.addObserver(observer)
+    if (owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) start()
+    onDispose {
+      owner.lifecycle.removeObserver(observer)
+      stop()
+    }
   }
+  val enabled = config.enabled
+  val hour = config.hour
+  val minute = config.minute
+  val days = config.days
 
   Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
       Card {
@@ -90,7 +122,7 @@ internal fun AlarmContent() {
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
         ) {
           Text("Enabled", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-          Switch(checked = enabled, onCheckedChange = { enabled = it; persist() }, colors = iosSwitchColors())
+          Switch(checked = enabled, onCheckedChange = { config = editor.setEnabled(it) }, colors = iosSwitchColors())
         }
       }
 
@@ -98,15 +130,15 @@ internal fun AlarmContent() {
         Stepper(
             label = "Hour",
             valueText = "%02d".format(hour),
-            onMinus = { hour = (hour + 23) % 24; persist() },
-            onPlus = { hour = (hour + 1) % 24; persist() },
+            onMinus = { config = editor.stepHour(-1) },
+            onPlus = { config = editor.stepHour(1) },
         )
         Divider()
         Stepper(
             label = "Minute",
             valueText = "%02d".format(minute),
-            onMinus = { minute = (minute + 55) % 60; persist() },
-            onPlus = { minute = (minute + 5) % 60; persist() },
+            onMinus = { config = editor.stepMinute(-5) },
+            onPlus = { config = editor.stepMinute(5) },
         )
       }
 
@@ -118,7 +150,7 @@ internal fun AlarmContent() {
               modifier = Modifier.size(68.dp).semantics {
                 contentDescription = java.text.DateFormatSymbols().weekdays[d]
               }.tvFocusable(CircleShape, focusScale = 1f) {
-                days = if (on) days - d else days + d; persist()
+                config = editor.toggleDay(d)
               }) {
             Text(label, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel, fontSize = 24.sp,
                 fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.padding(14.dp))
@@ -127,8 +159,8 @@ internal fun AlarmContent() {
       }
       FooterNote("No days selected rings once at the next occurrence of that time.")
 
-      val next = remember(enabled, hour, minute, days) {
-        AlarmConfig.nextTrigger(AlarmConfig.Config(enabled, hour, minute, initial.label, days))
+      val next = remember(config) {
+        AlarmConfig.nextTrigger(config)
       }
       Text(
           if (next != null)

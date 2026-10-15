@@ -71,6 +71,11 @@ object AlarmConfig {
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
+  /** Observe only this editor's saved fields; disposal retains and unregisters its listener. */
+  internal fun observeSnapshot(context: Context, changed: () -> Unit): () -> Unit =
+      observeSettingsPreferenceChanges(prefs(context),
+          setOf("enabled", "hour", "minute", "label", "days"), changed)
+
   /** Next fire time (epoch millis) at/after now for [c], or null if disabled. Pure +
    * testable: pass [from] to compute deterministically. */
   fun nextTrigger(c: Config, from: Calendar = Calendar.getInstance()): Long? {
