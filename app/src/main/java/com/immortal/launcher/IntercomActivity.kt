@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+import kotlinx.coroutines.delay
 
 /**
  * Portal-to-Portal LAN intercom / baby monitor (one-way audio). One Portal
@@ -107,15 +109,39 @@ internal fun IntercomContent() {
     }
   }
 
+  // Connection callbacks report startup only. Match Tools by checking the local engine
+  // only while this exact foreground session is running; stop/replacement cancels observation.
+  LaunchedEffect(owner, lan, mode, session, pageActive) {
+    val request = session
+    val wasBroadcast = mode == "broadcasting"
+    if (!isActive() || (!wasBroadcast && mode != "listening")) return@LaunchedEffect
+    while (isActive() && request == session) {
+      delay(500)
+      if (isActive() && request == session && !lan.isActive) {
+        stop()
+        status = if (wasBroadcast) "Broadcast ended. Start again when you're ready."
+        else "Connection ended. Check the other Portal and try Listen again."
+        break
+      }
+    }
+  }
+
   fun beginBroadcast() {
     if (!isActive()) return
     val request = ++session
+    mode = "idle"
     status = "Starting…"
     lan.startBroadcast { ok ->
       handler.post {
         if (isActive() && request == session) {
-          if (ok) { mode = "broadcasting"; status = "Broadcasting this room's audio" }
-          else { mode = "idle"; status = "Couldn't start — the broadcast port is in use" }
+          if (ok && lan.isActive) {
+            mode = "broadcasting"
+            status = "Broadcasting this room's audio"
+          } else {
+            mode = "idle"
+            status = if (ok) "Broadcast ended. Start again when you're ready."
+            else "Couldn't start — the broadcast port is in use"
+          }
         }
       }
     }
@@ -177,12 +203,18 @@ internal fun IntercomContent() {
             else if (host.isNotBlank() && isActive()) {
               val request = ++session
               val address = host.trim()
+              mode = "idle"
               status = "Connecting…"
               lan.startListening(address) { ok ->
                 handler.post {
                   if (isActive() && request == session) {
-                    status = if (ok) "Listening to $address" else "Couldn't connect to $address"
-                    mode = if (ok) "listening" else "idle"
+                    val connected = ok && lan.isActive
+                    status = when {
+                      connected -> "Listening to $address"
+                      ok -> "Connection ended. Check the other Portal and try Listen again."
+                      else -> "Couldn't connect to $address"
+                    }
+                    mode = if (connected) "listening" else "idle"
                   }
                 }
               }
