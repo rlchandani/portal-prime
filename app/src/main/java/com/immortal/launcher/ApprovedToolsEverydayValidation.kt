@@ -66,7 +66,7 @@ internal object ApprovedToolsEverydayValidation {
       CountdownDates.daysUntil(month, day, year, today)
 
   fun converterValue(input: String): Double? =
-      input.trim().toDoubleOrNull()?.takeIf { it.isFinite() }
+      parseConverterNumber(input)
 
   fun timerClock(remainingMillis: Long): String {
     val ms = remainingMillis.coerceAtLeast(0L)
