@@ -34,9 +34,11 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -400,13 +402,19 @@ internal fun <T> PickerRow(
     options: List<PickerOption<T>>,
     iconColor: Color = Color(0xFF636366),
     iconSymbol: String = "",
+    enabled: Boolean = true,
     onSelect: (T) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val enabledNow by rememberUpdatedState(enabled)
+    val selectNow by rememberUpdatedState(onSelect)
+    // Hide during this composition and discard the menu before editing can resume.
+    SideEffect { if (!enabled) expanded = false }
     val current = options.firstOrNull { it.value == selected }
     NavRow(title, current?.label ?: selected.toString(), iconColor = iconColor,
-        iconSymbol = iconSymbol, onClick = { expanded = true })
-    if (expanded) {
+        iconSymbol = iconSymbol, enabled = enabled,
+        onClick = { if (enabledNow) expanded = true })
+    if (expanded && enabled) {
         ApprovedSettingsDialog(title, onDismiss = { expanded = false }) {
             Card {
                 LazyColumn(Modifier.heightIn(max = (LocalConfiguration.current.screenHeightDp - 400)
@@ -415,7 +423,7 @@ internal fun <T> PickerRow(
                         if (index > 0) Divider()
                         SelectableRow(option.label, "", option.value == selected) {
                             expanded = false
-                            onSelect(option.value)
+                            if (enabledNow) selectNow(option.value)
                         }
                     }
                 }

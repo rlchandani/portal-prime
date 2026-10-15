@@ -288,7 +288,8 @@ private fun <S> SettingControl(
                 } else s.get(snapshot)
                 val options = SettingsPresentation.visibleEnumOptions(
                     domainId, s.key, s.options, selected, advanced)
-                PickerRow(s.title, selected, options.map { (value, label) -> PickerOption(value, label) }) {
+                PickerRow(s.title, selected, options.map { (value, label) -> PickerOption(value, label) },
+                    enabled = editsEnabled) {
                     onApply(s.key, it)
                 }
             }
