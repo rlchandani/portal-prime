@@ -46,7 +46,6 @@ import com.immortal.launcher.ui.theme.LocalAdvancedSettings
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 /** Saveable drafts plus a bounded local-pane cache; hidden producers have no active lifecycle. */
 @Composable
@@ -197,15 +196,7 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, onOpen: (Approv
     val resume = rememberApprovedResume()
     val summaries by produceState<Map<String, String>>(emptyMap(), active, resume) {
         if (active) value = withContext(Dispatchers.IO) {
-            val alarm = AlarmConfig.load(context)
-            val timers = TimerConfig.load(context).count { it.endAtMillis > System.currentTimeMillis() }
-            mapOf(
-                "alarm" to if (!alarm.enabled) "Off" else String.format(Locale.getDefault(), "%02d:%02d · %s",
-                    alarm.hour, alarm.minute, if (alarm.days.isEmpty()) "Once" else "Repeating"),
-                "timers" to if (timers == 0) "Ready when you are" else "$timers timer${if (timers == 1) "" else "s"} running",
-                "countdowns" to "${CountdownConfig.load(context).size} saved",
-                "camera" to "${CameraConfig.load(context).size} saved",
-                "notes" to if (NotesConfig.loadText(context).isBlank()) "Leave a message" else "A note is waiting")
+            ApprovedToolsSummaries.load(context)
         }
     }
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 96.dp).padding(top = 52.dp, bottom = 24.dp)) {
