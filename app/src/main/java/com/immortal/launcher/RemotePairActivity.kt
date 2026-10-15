@@ -51,15 +51,19 @@ private fun RemotePairScreen() {
 
   val lifecycleOwner = LocalLifecycleOwner.current
   DisposableEffect(lifecycleOwner) {
+    fun refresh() {
+      val (u, p) = enableRemoteAndMintPin(context)
+      url = u
+      pin = p
+    }
     val obs =
         LifecycleEventObserver { _, e ->
           if (e == Lifecycle.Event.ON_RESUME) {
-            val (u, p) = enableRemoteAndMintPin(context)
-            url = u
-            pin = p
+            refresh()
           }
         }
     lifecycleOwner.lifecycle.addObserver(obs)
+    if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) refresh()
     onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
 

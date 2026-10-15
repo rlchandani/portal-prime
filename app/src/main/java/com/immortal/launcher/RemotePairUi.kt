@@ -26,12 +26,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
 
 /**
@@ -74,6 +81,29 @@ fun enableRemoteAndMintPin(context: Context): Pair<String?, String?> {
 @Composable
 fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
   val context = LocalContext.current
+  val owner = LocalLifecycleOwner.current
+  var issued by remember(url, pin) { mutableStateOf(url to pin) }
+  val displayedUrl = issued.first
+  val displayedPin = issued.second
+  var livePin by remember(displayedPin) {
+    mutableStateOf(RemotePairing.displayPin(displayedPin)?.value)
+  }
+  LaunchedEffect(owner, displayedPin) {
+    owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+      try {
+        RemotePairing.pinChanges.collectLatest {
+          val active = RemotePairing.displayPin(displayedPin)
+          livePin = active?.value
+          if (active != null) {
+            delay((active.expiresAt - System.currentTimeMillis()).coerceAtLeast(0L))
+            livePin = null
+          }
+        }
+      } finally {
+        livePin = null
+      }
+    }
+  }
   fun photoAccessGranted() = listOf(Manifest.permission.READ_EXTERNAL_STORAGE,
       Manifest.permission.WRITE_EXTERNAL_STORAGE).all {
     context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED
@@ -83,18 +113,15 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
     photoAccess = photoAccessGranted()
   }
   Surface(color = IosCard, shape = RoundedCornerShape(24.dp), modifier = modifier.fillMaxWidth()) {
-    if (url == null) {
-      Text(
-          "Connect your Portal to Wi-Fi to use the remote.",
-          color = IosSecondary,
-          fontSize = 24.sp,
-          modifier = Modifier.padding(35.dp),
-      )
-    } else {
-      val pairUrl = remember(url, pin) { url + (pin?.let { "#pin=$it" } ?: "") }
-      val qr by produceState<android.graphics.Bitmap?>(null, pairUrl) {
-        value = withContext(Dispatchers.Default) { lanSetupQr(pairUrl, 400) }
+    if (displayedUrl == null) {
+      Column(Modifier.padding(35.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+        Text("Connect your Portal to Wi-Fi to use the remote.", color = IosSecondary, fontSize = 24.sp)
+        TextButton(onClick = { issued = enableRemoteAndMintPin(context) },
+            modifier = Modifier.heightIn(min = 68.dp)) {
+          Text("Check connection", color = IosBlue, fontSize = 22.sp)
+        }
       }
+    } else {
       Row(
           modifier = Modifier.fillMaxWidth().padding(35.dp),
           horizontalArrangement = Arrangement.spacedBy(50.dp),
@@ -105,9 +132,15 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
               fontWeight = FontWeight.Medium)
           Text("Scan with your phone camera, or open the address below on the same Wi-Fi.",
               color = IosSecondary, fontSize = 24.sp, lineHeight = 36.sp)
-          Text(url, color = IosBlue, fontSize = 24.sp, lineHeight = 36.sp)
-          Text("Enter the pairing code. It expires in a few minutes.",
-              color = IosSecondary, fontSize = 22.sp, lineHeight = 32.sp)
+          Text(displayedUrl, color = IosBlue, fontSize = 24.sp, lineHeight = 36.sp)
+          if (livePin != null) {
+            Text("This code works once and expires after 5 minutes.",
+                color = IosSecondary, fontSize = 22.sp, lineHeight = 32.sp)
+          }
+          TextButton(onClick = { issued = enableRemoteAndMintPin(context) },
+              modifier = Modifier.heightIn(min = 68.dp)) {
+            Text("Generate new code", color = IosBlue, fontSize = 22.sp)
+          }
           if (!photoAccess) {
             Text("To import photos from your phone, allow file access on this Portal.",
                 color = IosSecondary, fontSize = 20.sp, lineHeight = 28.sp)
@@ -118,24 +151,31 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
           }
         }
         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-        qr?.let { image ->
-          Surface(color = Color.White, shape = RoundedCornerShape(12.dp), modifier = Modifier.padding(top = 14.dp)) {
-            Image(
-                bitmap = image.asImageBitmap(),
-                contentDescription = "Remote pairing QR code",
-                modifier = Modifier.padding(12.dp).size(200.dp),
-            )
+          val current = livePin
+          if (current != null) {
+            val pairUrl = remember(displayedUrl, current) { "$displayedUrl#pin=$current" }
+            // A replaced code gets a fresh bitmap state; never show an old QR beside new digits.
+            key(pairUrl) {
+              val qr by produceState<android.graphics.Bitmap?>(null, pairUrl) {
+                value = withContext(Dispatchers.Default) { lanSetupQr(pairUrl, 400) }
+              }
+              qr?.let { image ->
+                Surface(color = Color.White, shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.padding(top = 14.dp)) {
+                  Image(bitmap = image.asImageBitmap(), contentDescription = "Remote pairing QR code",
+                      modifier = Modifier.padding(12.dp).size(200.dp))
+                }
+              }
+            }
+            Text(current, color = IosLabel, fontSize = 90.sp, lineHeight = 110.sp,
+                letterSpacing = 8.sp, fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(top = 18.dp))
+          } else {
+            Text("Code no longer valid", color = IosLabel, fontSize = 32.sp, lineHeight = 42.sp,
+                fontWeight = FontWeight.Medium)
+            Text("Generate a new code to connect a phone.", color = IosSecondary,
+                fontSize = 22.sp, lineHeight = 32.sp, modifier = Modifier.padding(top = 18.dp))
           }
-        }
-        Text(
-            pin ?: "------",
-            color = IosLabel,
-            fontSize = 90.sp,
-            lineHeight = 110.sp,
-            letterSpacing = 8.sp,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(top = 18.dp),
-        )
         }
       }
     }

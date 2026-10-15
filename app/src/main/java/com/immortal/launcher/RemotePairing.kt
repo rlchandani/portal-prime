@@ -9,6 +9,11 @@ package com.immortal.launcher
 
 import android.content.Context
 import java.security.SecureRandom
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+/** Immutable live code snapshot used only by the on-Portal pairing display. */
+internal data class PairingDisplayPin(val value: String, val expiresAt: Long)
 
 /**
  * Pairing + session auth for the phone remote ([RemoteRoutes]). The fleet bearer token
@@ -39,6 +44,16 @@ object RemotePairing {
   @Volatile private var pinExpiresAt = 0L
   @Volatile private var pinAttempts = 0
 
+  private val mutablePinChanges = MutableStateFlow(0L)
+  internal val pinChanges = mutablePinChanges.asStateFlow()
+
+  /** A card must never display a replaced, consumed, locked-out or expired code. */
+  @Synchronized
+  internal fun displayPin(candidate: String?, now: Long = System.currentTimeMillis()): PairingDisplayPin? =
+      currentPin(now)?.takeIf { it == candidate }?.let { PairingDisplayPin(it, pinExpiresAt) }
+
+  private fun publishPinChange() { mutablePinChanges.value += 1L }
+
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
   // --- opt-in -----------------------------------------------------------------
@@ -52,15 +67,18 @@ object RemotePairing {
   // --- PIN (in-memory, short-lived) -------------------------------------------
 
   /** Generate, store, and return a fresh 6-digit PIN to show on the Portal. */
+  @Synchronized
   fun newPin(now: Long = System.currentTimeMillis()): String {
     val fresh = randomDigits(6)
     pin = fresh
     pinExpiresAt = now + PIN_TTL_MS
     pinAttempts = 0 // fresh PIN → reset the lockout counter
+    publishPinChange()
     return fresh
   }
 
   /** The current PIN if still valid, else null (for the on-Portal display). */
+  @Synchronized
   fun currentPin(now: Long = System.currentTimeMillis()): String? =
       if (pinMatches(pin, pinExpiresAt, pin ?: "", now)) pin else null
 
@@ -68,6 +86,7 @@ object RemotePairing {
    * Redeem a candidate PIN. On a valid, unexpired match: clear the PIN (single use),
    * mint + persist a session token, and return it. Otherwise return null.
    */
+  @Synchronized
   fun redeem(c: Context, candidate: String, now: Long = System.currentTimeMillis()): String? {
     if (!pinMatches(pin, pinExpiresAt, candidate, now)) {
       // Count wrong guesses only while a live PIN exists (an expired/absent PIN already can't be
@@ -78,6 +97,7 @@ object RemotePairing {
         if (pinAttempts >= MAX_PIN_ATTEMPTS) {
           pin = null
           pinExpiresAt = 0L
+          publishPinChange()
         }
       }
       return null
@@ -88,6 +108,7 @@ object RemotePairing {
     val token = randomToken()
     val sessions = loadSessions(c).toMutableSet().apply { add(token) }
     prefs(c).edit().putString(KEY_SESSIONS, sessions.joinToString("\n")).apply()
+    publishPinChange()
     return token
   }
 
