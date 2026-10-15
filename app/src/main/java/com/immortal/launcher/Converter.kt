@@ -9,7 +9,12 @@ package com.immortal.launcher
 
 import android.content.Context
 import android.content.SharedPreferences
+import java.time.LocalDate
 import org.json.JSONObject
+
+/** A rate with its response's reference date. [saved] is true for either a fresh cache hit or
+ * a stale cache fallback, and false for a successful network response or same-currency identity. */
+internal data class CurrencyRate(val value: Double, val referenceDate: String?, val saved: Boolean)
 
 /**
  * Walk-up-and-use unit + currency converter. Units convert fully offline; currency
@@ -19,6 +24,7 @@ import org.json.JSONObject
 object Converter {
 
   private const val PREFS = "immortal_converter"
+  private val REFERENCE_DATE_SHAPE = Regex("[0-9]{4}-[0-9]{2}-[0-9]{2}")
 
   /** A measurement family. [units] map a display name to its factor relative to the
    * family's base unit; temperature is special-cased (affine, not a pure factor). */
@@ -83,34 +89,40 @@ object Converter {
   }
 
   /** Fetch one unit rate; ToolsWork callers own and can disconnect the underlying request. */
-  fun exchangeRate(context: Context, from: String, to: String): Double? {
+  fun exchangeRate(context: Context, from: String, to: String): Double? =
+      exchangeRateSnapshot(context, from, to)?.value
+
+  /** Worker-only cache check so saved rates need not wait for network debounce. */
+  internal fun freshExchangeRate(context: Context, from: String, to: String): Double? =
+      freshExchangeRateSnapshot(context, from, to)?.value
+
+  internal fun exchangeRateSnapshot(context: Context, from: String, to: String): CurrencyRate? {
     ToolsWork.checkpoint()
-    if (from == to) return 1.0
+    if (from == to) return CurrencyRate(1.0, referenceDate = null, saved = false)
     val rates = rates(context, from) ?: return null
     ToolsWork.checkpoint()
     return rates[to]
   }
 
-  /** Worker-only cache check so saved rates need not wait for network debounce. */
-  internal fun freshExchangeRate(context: Context, from: String, to: String): Double? {
+  internal fun freshExchangeRateSnapshot(context: Context, from: String, to: String): CurrencyRate? {
     ToolsWork.checkpoint()
-    if (from == to) return 1.0
+    if (from == to) return CurrencyRate(1.0, referenceDate = null, saved = false)
     val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     return freshRates(prefs, from)?.get(to)
   }
 
-  private fun freshRates(prefs: SharedPreferences, base: String): Map<String, Double>? {
+  private fun freshRates(prefs: SharedPreferences, base: String): Map<String, CurrencyRate>? {
     ToolsWork.checkpoint()
     val fresh = System.currentTimeMillis() - prefs.getLong("rates_${base}_ts", 0L) < 6L * 60 * 60 * 1000
     ToolsWork.checkpoint()
     if (!fresh) return null
-    val cached = prefs.getString("rates_$base", null)?.let(::parseRates)
+    val cached = prefs.getString("rates_$base", null)?.let { parseRates(it, saved = true) }
     ToolsWork.checkpoint()
     return cached
   }
 
   /** Rates with [base] = 1.0, fetched from Frankfurter and cached per base. */
-  private fun rates(context: Context, base: String): Map<String, Double>? {
+  private fun rates(context: Context, base: String): Map<String, CurrencyRate>? {
     ToolsWork.checkpoint()
     val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     val cacheKey = "rates_$base"
@@ -122,7 +134,7 @@ object Converter {
         "https://api.frankfurter.app/latest?from=$base&to=${CURRENCIES.filter { it != base }.joinToString(",")}",
         readTimeoutMs = 10000)
     ToolsWork.checkpoint()
-    val parsed = fetched?.let(::parseRates)
+    val parsed = fetched?.let { parseRates(it, saved = false) }
     if (parsed != null) {
       ToolsWork.checkpoint()
       prefs.edit().putString(cacheKey, fetched).putLong(tsKey, System.currentTimeMillis()).apply()
@@ -130,19 +142,27 @@ object Converter {
       return parsed
     }
     // Stale cache beats nothing.
-    val cached = prefs.getString(cacheKey, null)?.let(::parseRates)
+    val cached = prefs.getString(cacheKey, null)?.let { parseRates(it, saved = true) }
     ToolsWork.checkpoint()
     return cached
   }
 
-  private fun parseRates(json: String): Map<String, Double>? =
+  private fun parseRates(json: String, saved: Boolean): Map<String, CurrencyRate>? =
       runCatching {
-            val r = JSONObject(json).getJSONObject("rates")
+            val response = JSONObject(json)
+            val r = response.getJSONObject("rates")
+            val referenceDate = parseReferenceDate(response.opt("date") as? String)
             buildMap {
-              r.keys().forEach { k -> put(k, r.getDouble(k)) }
+              r.keys().forEach { k -> put(k, CurrencyRate(r.getDouble(k), referenceDate, saved)) }
             }
           }
           .getOrNull()
           ?.takeIf { it.isNotEmpty() }
+
+  /** A bad date only drops metadata; otherwise usable rates keep their original semantics. */
+  private fun parseReferenceDate(date: String?): String? {
+    if (date == null || !REFERENCE_DATE_SHAPE.matches(date)) return null
+    return runCatching { LocalDate.parse(date); date }.getOrNull()
+  }
 
 }

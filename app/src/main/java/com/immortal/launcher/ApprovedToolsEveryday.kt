@@ -558,7 +558,7 @@ internal fun ToolsConverterContent() {
     else Converter.UNIT_CATEGORIES.first { it.first == category }.second.keys.toList()
   }
   val amount = remember(input) { ApprovedToolsEverydayValidation.converterValue(input) }
-  var rate by remember(from, to) { mutableStateOf<Double?>(null) }
+  var rate by remember(from, to) { mutableStateOf<CurrencyRate?>(null) }
   var rateLoading by remember(from, to) { mutableStateOf(false) }
   var retry by remember { mutableIntStateOf(0) }
 
@@ -570,9 +570,9 @@ internal fun ToolsConverterContent() {
       rateLoading = true
       try {
         rate = loadCurrencyRate(
-            cached = { ToolsWork.load { Converter.freshExchangeRate(context, from, to) } },
-            fetch = { ToolsWork.load { Converter.exchangeRate(context, from, to) } },
-        )?.takeIf { it.isFinite() }
+            cached = { ToolsWork.load { Converter.freshExchangeRateSnapshot(context, from, to) } },
+            fetch = { ToolsWork.load { Converter.exchangeRateSnapshot(context, from, to) } },
+        )?.takeIf { it.value.isFinite() }
       } catch (cancelled: CancellationException) {
         throw cancelled
       } catch (_: Exception) {
@@ -587,7 +587,7 @@ internal fun ToolsConverterContent() {
       when {
         category != "Currency" -> Converter.convert(category, from, to, value)
         from == to -> value
-        else -> rate?.let { value * it }
+        else -> rate?.let { value * it.value }
       }?.takeIf { it.isFinite() }
     }
   }
@@ -631,11 +631,28 @@ internal fun ToolsConverterContent() {
         }
         else -> ToolsText("This value is too large to convert.")
       }
+      val resultRate = rate
+      if (category == "Currency" && from != to && result != null && resultRate != null) {
+        val locale = Locale.getDefault()
+        val referenceDate = remember(resultRate.referenceDate, locale) {
+          resultRate.referenceDate?.let {
+            java.time.LocalDate.parse(it).format(
+                java.time.format.DateTimeFormatter.ofLocalizedDate(
+                    java.time.format.FormatStyle.MEDIUM).withLocale(locale))
+          }
+        }
+        ToolsText(
+            "${if (resultRate.saved) "Saved ECB rate" else "ECB reference rate"} · " +
+                (referenceDate ?: "reference date unavailable"),
+            secondary = true)
+      }
       Spacer(Modifier.height(20.dp))
       ToolsText(
-          if (category == "Currency")
-            "Uses ECB reference rates. The device can reuse its last saved rates offline."
-          else "Calculated on the device. No internet needed.",
+          when {
+            category != "Currency" -> "Calculated on the device. No internet needed."
+            from == to -> "No exchange rate needed for the same currency."
+            else -> "Uses ECB reference rates. The device can reuse its last saved rates offline."
+          },
           secondary = true)
     }
   })

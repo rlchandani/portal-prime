@@ -9,11 +9,11 @@ package com.immortal.launcher
 import kotlinx.coroutines.delay
 
 /** Cache hits bypass the picker debounce; cancellation still owns both worker requests. */
-internal suspend fun loadCurrencyRate(
-    cached: suspend () -> Double?,
-    fetch: suspend () -> Double?,
+internal suspend fun <T> loadCurrencyRate(
+    cached: suspend () -> T?,
+    fetch: suspend () -> T?,
     debounce: suspend () -> Unit = { delay(250L) },
-): Double? {
+): T? {
   cached()?.let { return it }
   debounce()
   return fetch()
