@@ -62,6 +62,58 @@ class PortalHomeBridgePersistenceTest {
     Mockito.verify(f.editor).putBoolean("portal_home_handoff", true)
   }
 
+  @Test fun successfulCallsClosesOwnedDreamBeforeOpeningMetaHome() = fixture({ true }) { f ->
+    val dream = Mockito.mock(PhotoDreamService::class.java)
+    val exitAt = DreamPolicy.userExitAt
+    ImmortalDreamNavigation.attached(dream)
+    Mockito.doAnswer {
+      assertTrue(DreamPolicy.inStockHandoff)
+      assertTrue(DreamPolicy.portalHomeHandoff)
+      assertFalse(ImmortalDreamNavigation.hasOwnedSurface())
+      assertTrue(DreamPolicy.userExitAt > 0L)
+      null
+    }.`when`(dream).finish()
+    try {
+      assertTrue(PortalHomeBridge.launch(f.context))
+      Mockito.inOrder(dream, f.context).apply {
+        verify(dream).finish()
+        verify(f.context).startActivity(Mockito.any(Intent::class.java))
+      }
+      assertFalse(ImmortalDreamNavigation.hasOwnedSurface())
+    } finally {
+      ImmortalDreamNavigation.detached(dream)
+      DreamPolicy.userExitAt = exitAt
+    }
+  }
+
+  @Test fun successfulCallsClosesOwnedPreviewBeforeOpeningMetaHome() = fixture({ true }) { f ->
+    val preview = Mockito.mock(PhotoFramePreviewActivity::class.java)
+    val exitAt = DreamPolicy.userExitAt
+    ImmortalDreamNavigation.attached(preview)
+    try {
+      assertTrue(PortalHomeBridge.launch(f.context))
+      Mockito.inOrder(preview, f.context).apply {
+        verify(preview).finish()
+        verify(f.context).startActivity(Mockito.any(Intent::class.java))
+      }
+      assertFalse(ImmortalDreamNavigation.hasOwnedSurface())
+    } finally {
+      ImmortalDreamNavigation.detached(preview)
+      DreamPolicy.userExitAt = exitAt
+    }
+  }
+
+  @Test fun rejectedCallsDoesNotDismissTheRunningOwnedDream() = fixture({ false }) { f ->
+    val dream = Mockito.mock(PhotoDreamService::class.java)
+    ImmortalDreamNavigation.attached(dream)
+    try {
+      assertFalse(PortalHomeBridge.launch(f.context))
+      Mockito.verify(dream, Mockito.never()).finish()
+      assertTrue(ImmortalDreamNavigation.hasOwnedSurface())
+      f.assertNoNavigation()
+    } finally { ImmortalDreamNavigation.detached(dream) }
+  }
+
   @Test fun failedAttemptCanBeRetriedWithoutRetainingItsSuppression() {
     var succeeds = false
     fixture({ succeeds }) { f ->
