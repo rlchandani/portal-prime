@@ -90,18 +90,33 @@ object TodoStore {
   internal fun deserialize(raw: String): List<TodoItem> =
       runCatching {
             val arr = JSONArray(raw)
+            val rows = (0 until arr.length()).mapNotNull { index ->
+              arr.optJSONObject(index)?.takeIf { it.optString("text", "").isNotBlank() }
+                  ?.let { index to it }
+            }
+            // Reserve every valid saved ID, including one that occurs after a repaired row.
+            val reserved = rows.mapNotNull { (_, row) ->
+              (row.opt("id") as? String)?.takeIf { it.isNotBlank() }
+            }.toHashSet()
+            val used = hashSetOf<String>()
             buildList {
-              for (i in 0 until arr.length()) {
-                val o = arr.optJSONObject(i) ?: continue
+              for ((index, o) in rows) {
                 val text = o.optString("text", "")
-                if (text.isBlank()) continue
-                add(
-                    TodoItem(
-                        id = o.optString("id", UUID.randomUUID().toString()),
-                        text = text,
-                        done = o.optBoolean("done", false),
-                        createdMs = o.optLong("createdMs", 0L),
-                    ))
+                val createdMs = o.optLong("createdMs", 0L)
+                val savedId = (o.opt("id") as? String)?.takeIf { it.isNotBlank() }
+                val id = if (savedId != null && used.add(savedId)) savedId else {
+                  // Stable until a normal mutation saves these IDs into the existing JSON.
+                  var attempt = 0
+                  var repaired: String
+                  do {
+                    repaired = UUID.nameUUIDFromBytes(
+                        "immortal-todo:$index:$text:$createdMs:${attempt++}"
+                            .toByteArray(Charsets.UTF_8)).toString()
+                  } while (repaired in reserved || !used.add(repaired))
+                  repaired
+                }
+                add(TodoItem(id = id, text = text, done = o.optBoolean("done", false),
+                    createdMs = createdMs))
               }
             }
           }
