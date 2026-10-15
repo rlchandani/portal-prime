@@ -819,8 +819,9 @@ object SettingsDomains {
    * Gentle ambient audio cues — hourly chime, spoken time, golden-hour tone, "ping the other room"
    * volume, and quiet hours ([ChimeConfig]). All off by default; nothing plays inside the quiet
    * window. The TTS voice picker ([ChimeConfig.Settings.spokenVoice]) lives in the bespoke
-   * [ChimeSettingsActivity] (it enumerates on-device TTS voices the registry can't model), so it's
-   * accounted for in the tripwire's `managedElsewhere` rather than bound by a spec here.
+   * [ChimeSettingsActivity] because it enumerates installed engine voices. Its stored identity is
+   * registered here for the shared writer and validation; the generic UI must not render a raw
+   * voice-ID text field alongside that chooser.
    *
    * Scheduling side effects (re-arm the alarms) go in [onApplied], fired once per batch — not inline
    * per toggle — so the phone-remote path re-arms too, not just the on-device screen.
@@ -844,6 +845,13 @@ object SettingsDomains {
                       get = { it.spokenTimeOn },
                       set = ChimeConfig::setSpokenTime,
                       help = "Spoken time on the hour (\"It's three o'clock\"), via TTS."),
+                  StringSpec(
+                      "spokenVoice",
+                      "Spoken-time voice",
+                      get = { it.spokenVoice },
+                      set = ChimeConfig::setSpokenVoice,
+                      // Presentation belongs to the installed-voice chooser, not free-text entry.
+                      visible = { _, _ -> false }),
                   BoolSpec(
                       "goldenHourOn",
                       "Golden-hour tone",

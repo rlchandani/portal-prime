@@ -124,7 +124,8 @@ internal fun ChimeSettingsContent() {
       }
 
       // Keep save feedback visible above the independently scrolling scalar list.
-      SettingsList(SettingsDomains.chime, settings, editsEnabled = !applying, onApply = ::apply)
+      SettingsList(SettingsDomains.chime, settings, exclude = setOf("spokenVoice"),
+        editsEnabled = !applying, onApply = ::apply)
 
       // Bespoke: voice picker + test buttons the registry can't model (TTS voice enumeration is
       // on-device only; test buttons are actions, not settings).
@@ -132,11 +133,8 @@ internal fun ChimeSettingsContent() {
         Card {
           if (settings.spokenTimeOn) {
             VoicePicker(settings.spokenVoice, enabled = !applying) { name ->
-              // A menu opened before a refresh must also respect the current save lock.
-              if (!saveState.saving) {
-                ChimeConfig.setSpokenVoice(context, name)
-                settings = settings.copy(spokenVoice = name)
-              }
+              // Installed identities share the same save lock, worker and readback as other edits.
+              apply("spokenVoice", name)
             }
             TestButton("Test voice", enabled = !applying) {
               audition { ChimePlayer.testVoice(context, settings.spokenVoice) }
