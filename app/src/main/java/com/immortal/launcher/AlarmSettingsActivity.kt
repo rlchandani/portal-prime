@@ -36,12 +36,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+import java.text.DateFormatSymbols
 import java.util.Calendar
+import java.util.Locale
 
 /** Set the wake-up alarm: time, which days, and a label. Opened from Tools. */
 class AlarmSettingsActivity : ComponentActivity() {
@@ -114,6 +117,19 @@ internal fun AlarmContent() {
   val hour = config.hour
   val minute = config.minute
   val days = config.days
+  val locale = Locale.getDefault()
+  val weekdayNames = remember(locale) { DateFormatSymbols(locale).weekdays }
+  val repeatNote = remember(days, weekdayNames) {
+    when {
+      days.isEmpty() -> "No repeat days selected. Rings once when enabled."
+      ALARM_DAY_LABELS.all { it.first in days } -> "Repeats every day."
+      days == setOf(Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY,
+          Calendar.THURSDAY, Calendar.FRIDAY) -> "Repeats on weekdays."
+      days == setOf(Calendar.SATURDAY, Calendar.SUNDAY) -> "Repeats on weekends."
+      else -> "Repeats on " + ALARM_DAY_LABELS.filter { it.first in days }
+          .joinToString(", ") { weekdayNames[it.first] } + "."
+    }
+  }
 
   Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
       Card {
@@ -148,7 +164,8 @@ internal fun AlarmContent() {
           val on = d in days
           Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
               modifier = Modifier.size(68.dp).semantics {
-                contentDescription = java.text.DateFormatSymbols().weekdays[d]
+                contentDescription = weekdayNames[d]
+                selected = on
               }.tvFocusable(CircleShape, focusScale = 1f) {
                 config = editor.toggleDay(d)
               }) {
@@ -157,7 +174,7 @@ internal fun AlarmContent() {
           }
         }
       }
-      FooterNote("No days selected rings once at the next occurrence of that time.")
+      FooterNote(repeatNote)
 
       val next = remember(config) {
         AlarmConfig.nextTrigger(config)
