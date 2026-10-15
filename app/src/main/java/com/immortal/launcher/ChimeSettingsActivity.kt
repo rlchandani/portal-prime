@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -77,6 +78,18 @@ internal fun ChimeSettingsContent() {
   val completion = rememberCoroutineScope()
   val lifecycleOwner = LocalLifecycleOwner.current
   val pageActive = LocalApprovedLauncherPageActive.current
+  var previewState by remember { mutableStateOf(SoundPreviewState()) }
+  val previews = remember(application) { SoundPreviewSession { previewState = it } }
+  DisposableEffect(lifecycleOwner, pageActive, previews) {
+    fun refresh() = previews.setActive(pageActive &&
+        lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
+    val observer = LifecycleEventObserver { _, _ -> refresh() }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    refresh()
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer); previews.setActive(false) }
+  }
+  DisposableEffect(previews) { onDispose { previews.dispose() } }
+  LaunchedEffect(settings.volume) { if (settings.volume == 0) previews.stop() }
   suspend fun readSnapshot() = withContext(Dispatchers.IO) { ChimeConfig.load(application) }
   suspend fun publishAfterSave(revision: Int) {
     try {
@@ -96,8 +109,13 @@ internal fun ChimeSettingsContent() {
       publishAfterSave(saveState.revision)
     }
   }
-  fun audition(play: () -> Unit) {
-    if (!saveState.saving) play()
+  fun audition(label: String, resource: Int? = null) {
+    if (saveState.saving || settings.volume == 0) return
+    val volume = (settings.volume / 100f).coerceIn(0f, 1f)
+    previews.play(label) { playing, finished ->
+      if (resource == null) SoundPreviewPlayback.voice(application, settings.spokenVoice, volume, playing, finished)
+      else SoundPreviewPlayback.tone(application, resource, volume, playing, finished)
+    }
   }
   fun apply(key: String, value: Any) {
     if (saveState.saving) return
@@ -132,35 +150,49 @@ internal fun ChimeSettingsContent() {
       // Bespoke: voice picker + test buttons the registry can't model (TTS voice enumeration is
       // on-device only; test buttons are actions, not settings).
       SectionLabel("Preview sounds")
+      val previewEnabled = !applying && settings.volume > 0
       Card {
+        val previewMessage = when (previewState.phase) {
+          SoundPreviewPhase.STARTING -> "Preparing ${previewState.label}…"
+          SoundPreviewPhase.PLAYING -> "Playing ${previewState.label}"
+          SoundPreviewPhase.FAILED -> "${previewState.label} couldn't play. Try again."
+          SoundPreviewPhase.IDLE -> "Choose a sound to preview."
+        }
+        Text(previewMessage, color = if (previewState.phase == SoundPreviewPhase.FAILED) IosRed else IosSecondary,
+            fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp)
+                .semantics { contentDescription = "Sound preview: ${previewState.phase.name.lowercase()}" })
+        if (previewState.phase == SoundPreviewPhase.STARTING || previewState.phase == SoundPreviewPhase.PLAYING) {
+          TestButton("Stop preview", enabled = true, isStop = true) { previews.stop() }
+        }
+
         if (settings.spokenTimeOn) {
           VoicePicker(settings.spokenVoice, enabled = !applying) { name ->
             // Installed identities share the same save lock, worker and readback as other edits.
             apply("spokenVoice", name)
           }
-          TestButton("Test voice", enabled = !applying) {
-            audition { ChimePlayer.testVoice(context, settings.spokenVoice) }
-          }
+          TestButton("Test voice", enabled = previewEnabled) { audition("voice") }
         }
         if (settings.hourlyChimeOn) {
-          TestButton("Play chime", enabled = !applying) { audition { ChimePlayer.playChime(context) } }
+          TestButton("Play chime", enabled = previewEnabled) { audition("chime", R.raw.chime) }
         }
         if (settings.goldenHourOn) {
-          TestButton("Test sunrise", enabled = !applying) { audition { ChimePlayer.playSunriseTone(context) } }
-          TestButton("Test sunset", enabled = !applying) { audition { ChimePlayer.playSunsetTone(context) } }
+          TestButton("Test sunrise", enabled = previewEnabled) {
+            audition("sunrise", if (settings.sunriseVariant == 1) R.raw.golden_sunrise_2 else R.raw.golden_sunrise)
+          }
+          TestButton("Test sunset", enabled = previewEnabled) { audition("sunset", R.raw.golden_sunset) }
         }
-        TestButton("Play ping", enabled = !applying) { audition { ChimePlayer.playPing(context, repeats = 1) } }
+        TestButton("Play ping", enabled = previewEnabled) { audition("ping", R.raw.ping) }
       }
       FooterNote(if (settings.volume == 0) {
         "Preview volume is 0%. Raise Volume to hear the sounds."
       } else {
-        "Manual previews use your saved volume and can play during quiet hours."
+        "Previews use your saved volume, including during quiet hours. A new preview replaces the previous one; leaving Sounds stops it."
       })
     }
 }
 
 @Composable
-private fun TestButton(label: String, enabled: Boolean, onClick: () -> Unit) {
+private fun TestButton(label: String, enabled: Boolean, isStop: Boolean = false, onClick: () -> Unit) {
   Surface(
       color = IosFocusTint,
       shape = RoundedCornerShape(12.dp),
@@ -169,7 +201,7 @@ private fun TestButton(label: String, enabled: Boolean, onClick: () -> Unit) {
               .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, enabled = enabled) { onClick() },
   ) {
     Text(
-        "▶  $label",
+        if (isStop) label else "▶  $label",
         color = if (enabled) IosBlue else IosSecondary,
         fontSize = 24.sp,
         fontWeight = FontWeight.SemiBold,
