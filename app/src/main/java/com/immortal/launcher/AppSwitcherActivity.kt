@@ -160,6 +160,11 @@ private fun ApprovedAppsContent(
   fun toggleSearch() {
     if (searching) closeSearch() else searching = true
   }
+  fun showAllApps() {
+    recent = false
+    folder = null
+    closeSearch()
+  }
   fun openFolder(name: String) {
     recent = false
     folder = name
@@ -286,8 +291,8 @@ private fun ApprovedAppsContent(
             } else if (folder != null) {
               ApprovedAppsButton("Rename folder") { newFolderName = folder!!; renameFolder = true }
               ApprovedAppsButton("Edit folder contents") { editFolder = true }
-              ApprovedAppsButton("All apps") { folder = null }
-            } else ApprovedAppsButton("All apps") { recent = false }
+              ApprovedAppsButton("All apps", onClick = ::showAllApps)
+            } else ApprovedAppsButton("All apps", onClick = ::showAllApps)
           }
           if (searching) ApprovedAppsSearch(query, { query = it }, "Search apps and folders", Modifier.padding(top = 24.dp))
           if (failure != null) {
