@@ -19,22 +19,32 @@ internal object WallpaperPreviewBudget {
   const val MAX_DECODE_EDGE = WIDTH * 2
 }
 
-/** One worker bounds transient pixels; unpublished results are released on cancellation. */
+/** Reuse requested cache entries; one worker decodes misses and owns only new unpublished values. */
 internal suspend fun <K, V> loadWallpaperPreviews(
     keys: List<K>, decode: (K) -> V?, discard: (V) -> Unit,
+    existing: Map<K, V> = emptyMap(),
 ): Map<K, V> {
   val owned = LinkedHashMap<K, V>()
   var transferred = false
   try {
     val loaded = withContext(Dispatchers.IO) {
+      val requested = LinkedHashMap<K, V>()
       for (key in keys) {
         ensureActive()
+        if (requested.containsKey(key)) continue
+        if (existing.containsKey(key)) {
+          requested[key] = existing.getValue(key)
+          continue
+        }
         val next = try { decode(key) } catch (cancelled: CancellationException) { throw cancelled }
           catch (_: Exception) { null }
-        if (next != null) owned[key] = next
+        if (next != null) {
+          owned[key] = next
+          requested[key] = next
+        }
         ensureActive()
       }
-      owned.toMap()
+      requested.toMap()
     }
     transferred = true
     return loaded

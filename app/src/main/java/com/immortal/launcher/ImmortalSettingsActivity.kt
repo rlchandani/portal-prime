@@ -32,6 +32,8 @@ import kotlinx.coroutines.sync.withLock
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -80,6 +82,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.selected
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.draw.clip
@@ -109,11 +113,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
+import com.immortal.launcher.ui.components.OnResume
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.util.Locale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
@@ -1832,131 +1839,116 @@ internal fun BootAppsContent() {
   }
 }
 
+private val WallpaperChoices: List<Pair<String, String>> =
+    listOf(WallpaperConfig.DUSK_AURORA to "Dusk Aurora", WallpaperConfig.DARK to "Dark") +
+        WallpaperConfig.GRADIENTS.map { (id, _) ->
+          id to id.removePrefix("g_").replaceFirstChar { it.uppercase() }
+        } + WallpaperConfig.PHOTOS +
+        listOf(WallpaperConfig.SCREENSAVER to "Screensaver", WallpaperConfig.SKY to "Sky",
+            WallpaperConfig.STARFIELD to "Star field")
+
 @Composable
 private fun WallpaperSection() {
-  val context = LocalContext.current
-  var mode by remember { mutableStateOf(WallpaperConfig.load(context).mode) }
-  var grain by remember { mutableStateOf(WallpaperConfig.load(context).grain) }
-
-  val application = context.applicationContext
+  val application = LocalContext.current.applicationContext
+  var configuration by remember(application) { mutableStateOf(WallpaperConfig.load(application)) }
+  OnResume { configuration = WallpaperConfig.load(application) }
   val pageActive = LocalApprovedLauncherPageActive.current
-  val thumbnails by produceState<Map<String, ImageBitmap>?>(null, application, pageActive) {
-    if (!pageActive || value != null) return@produceState
-    val decoded = loadWallpaperPreviews(WallpaperConfig.PHOTOS.map { it.first },
-        decode = { decodeWallpaperPreview(application, it) }, discard = { it.recycle() })
-    value = decoded.mapValues { it.value.asImageBitmap() }
+  var previewRevision by remember { mutableStateOf(0) }
+  var previewsLoading by remember { mutableStateOf(true) }
+  val thumbnails by produceState<Map<String, android.graphics.Bitmap>?>(null, application, pageActive, previewRevision) {
+    if (!pageActive) return@produceState
+    if (value?.size == WallpaperConfig.PHOTOS.size) {
+      previewsLoading = false
+      return@produceState
+    }
+    previewsLoading = true
+    try {
+      value = loadWallpaperPreviews(WallpaperConfig.PHOTOS.map { it.first },
+          decode = { decodeWallpaperPreview(application, it) }, discard = { it.recycle() },
+          existing = value.orEmpty())
+    } finally {
+      if (currentCoroutineContext().isActive) previewsLoading = false
+    }
   }
-
-  ApprovedSettingsSectionLabel("Wallpaper")
+  val selectedLabel = WallpaperChoices.firstOrNull { it.first == configuration.mode }?.second ?: "Custom"
   Card {
-    Column(modifier = Modifier.padding(18.dp)) {
-      Text("Background", color = IosLabel, fontSize = Sizes.rowTitle)
-      Text(
-          "A gradient, a photo, or sync with your screensaver (shown blurred). Tap to choose.",
-          color = IosSecondary,
-          fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(top = 2.dp),
-      )
-      Spacer(Modifier.size(14.dp))
-      Row(
-          modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).semantics {
-            // Only signal ready after the complete bitmap batch has actually been published.
-            contentDescription = when {
-              thumbnails == null -> "Wallpaper previews loading"
-              thumbnails?.size == WallpaperConfig.PHOTOS.size -> "Wallpaper previews ready"
-              else -> "Wallpaper previews unavailable"
-            }
-          },
-          horizontalArrangement = Arrangement.spacedBy(12.dp),
-      ) {
-        WallpaperSwatch("Dusk Aurora", selected = mode == WallpaperConfig.DUSK_AURORA, onClick = {
-          mode = WallpaperConfig.DUSK_AURORA
-          WallpaperConfig.setMode(context, mode)
-        }) {
-          Spacer(
-              Modifier.fillMaxSize()
-                  .background(
-                      Brush.verticalGradient(
-                          listOf(
-                              Color(0xFF050810), Color(0xFF12234A),
-                              Color(0xFF27436E), Color(0xFFC98A5E)))))
-        }
-        WallpaperSwatch("Dark", selected = mode == WallpaperConfig.DARK, onClick = {
-          mode = WallpaperConfig.DARK
-          WallpaperConfig.setMode(context, mode)
-        }) {
-          Spacer(Modifier.fillMaxSize().background(com.immortal.launcher.ui.theme.ApprovedDarkPalette.background))
-        }
-        WallpaperConfig.GRADIENTS.forEach { (id, colors) ->
-          WallpaperSwatch(id.removePrefix("g_").replaceFirstChar { it.uppercase() }, selected = mode == id, onClick = {
-            mode = id
-            WallpaperConfig.setMode(context, id)
-          }) {
-            Spacer(Modifier.fillMaxSize().background(Brush.verticalGradient(colors.map { Color(it) })))
+    Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+      Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text("Background", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
+        Text(selectedLabel, color = IosSecondary, fontSize = Sizes.rowSub,
+            modifier = Modifier.semantics { contentDescription = "Current background: $selectedLabel" })
+      }
+      Text("Choose a color, photo, or a background that changes through the day.",
+          color = IosSecondary, fontSize = Sizes.rowSub)
+      BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val columns = (maxWidth / 180.dp).toInt().coerceIn(1, 6)
+        Column(Modifier.fillMaxWidth().selectableGroup().semantics {
+          contentDescription = when {
+            previewsLoading -> "Wallpaper previews loading"
+            thumbnails?.size == WallpaperConfig.PHOTOS.size -> "Wallpaper previews ready"
+            else -> "Wallpaper previews unavailable"
           }
-        }
-        WallpaperConfig.PHOTOS.forEach { (id, label) ->
-          val thumb = thumbnails?.get(id)
-          WallpaperSwatch(label, selected = mode == id, onClick = {
-            mode = id
-            WallpaperConfig.setMode(context, id)
-          }) {
-            thumb?.let { bitmap ->
-              Image(bitmap = bitmap, contentDescription = null, modifier = Modifier.fillMaxSize())
-            } ?: run {
-              Spacer(Modifier.fillMaxSize().background(Color(0xFF333740)))
+        }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+          WallpaperChoices.chunked(columns).forEach { choices ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+              choices.forEach { (id, label) ->
+                val isPhoto = id.startsWith(WallpaperConfig.PHOTO_PREFIX)
+                val thumb = thumbnails?.get(id)
+                WallpaperSwatch(label, selected = configuration.mode == id,
+                    enabled = !isPhoto || thumb != null, modifier = Modifier.weight(1f), onClick = {
+                      WallpaperConfig.setMode(application, id)
+                      configuration = WallpaperConfig.load(application)
+                    }) { WallpaperChoicePreview(id, thumb) }
+              }
+              repeat(columns - choices.size) { Spacer(Modifier.weight(1f)) }
             }
           }
         }
-        WallpaperSwatch("Screensaver", selected = mode == WallpaperConfig.SCREENSAVER, onClick = {
-          mode = WallpaperConfig.SCREENSAVER
-          WallpaperConfig.setMode(context, WallpaperConfig.SCREENSAVER)
-        }) {
-          Spacer(
-              Modifier.fillMaxSize()
-                  .background(Brush.verticalGradient(listOf(Color(0xFF2C3E50), Color(0xFF4CA1AF)))))
-        }
-        WallpaperSwatch("Sky", selected = mode == WallpaperConfig.SKY, onClick = {
-          mode = WallpaperConfig.SKY
-          WallpaperConfig.setMode(context, WallpaperConfig.SKY)
-        }) {
-          Spacer(
-              Modifier.fillMaxSize()
-                  .background(Brush.verticalGradient(listOf(Color(0xFF3A7BD5), Color(0xFF8FD3F4)))))
-        }
-        WallpaperSwatch("Star field", selected = mode == WallpaperConfig.STARFIELD, onClick = {
-          mode = WallpaperConfig.STARFIELD
-          WallpaperConfig.setMode(context, WallpaperConfig.STARFIELD)
-        }) {
-          Spacer(
-              Modifier.fillMaxSize()
-                  .background(Brush.verticalGradient(listOf(Color(0xFF05060F), Color(0xFF0C1430)))))
+      }
+      if (previewsLoading) {
+        Text("Loading photo previews…", color = IosSecondary, fontSize = Sizes.rowSub)
+      } else if (thumbnails?.size != WallpaperConfig.PHOTOS.size) {
+        Text("Some photo previews could not be loaded.", color = IosSecondary, fontSize = Sizes.rowSub)
+        ApprovedSettingsTextButton("Try again") {
+          if (!previewsLoading) {
+            previewsLoading = true
+            previewRevision++
+          }
         }
       }
       Divider()
-      Row(
-          modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Column(modifier = Modifier.weight(1f)) {
+      Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
           Text("Film grain", color = IosLabel, fontSize = Sizes.rowTitle)
-          Text(
-              "Adds a subtle grain texture over the wallpaper.",
-              color = IosSecondary,
-              fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(top = 2.dp),
-          )
+          Text("Adds a subtle grain texture over the wallpaper.", color = IosSecondary,
+              fontSize = Sizes.rowSub, modifier = Modifier.padding(top = 2.dp))
         }
-        ApprovedSettingsSwitch(
-            checked = grain,
-            onCheckedChange = {
-              grain = it
-              WallpaperConfig.setGrain(context, it)
-            },
-            modifier = Modifier.semantics { contentDescription = "Film grain" },
-        )
+        ApprovedSettingsSwitch(checked = configuration.grain, onCheckedChange = {
+          WallpaperConfig.setGrain(application, it)
+          configuration = WallpaperConfig.load(application)
+        }, modifier = Modifier.semantics { contentDescription = "Film grain" })
       }
     }
+  }
+}
+
+@Composable
+private fun WallpaperChoicePreview(id: String, thumbnail: android.graphics.Bitmap?) {
+  val colors = when (id) {
+    WallpaperConfig.DUSK_AURORA -> listOf(0xFF050810, 0xFF12234A, 0xFF27436E, 0xFFC98A5E)
+    WallpaperConfig.SCREENSAVER -> listOf(0xFF2C3E50, 0xFF4CA1AF)
+    WallpaperConfig.SKY -> listOf(0xFF3A7BD5, 0xFF8FD3F4)
+    WallpaperConfig.STARFIELD -> listOf(0xFF05060F, 0xFF0C1430)
+    else -> WallpaperConfig.gradientColors(id)
+  }
+  when {
+    thumbnail != null -> {
+      val image = remember(thumbnail) { thumbnail.asImageBitmap() }
+      Image(bitmap = image, contentDescription = null, modifier = Modifier.fillMaxSize())
+    }
+    colors != null -> Spacer(Modifier.fillMaxSize().background(Brush.verticalGradient(colors.map { Color(it) })))
+    id == WallpaperConfig.DARK -> Spacer(Modifier.fillMaxSize().background(com.immortal.launcher.ui.theme.ApprovedDarkPalette.background))
+    else -> Spacer(Modifier.fillMaxSize().background(Color(0xFF333740)))
   }
 }
 
@@ -1964,35 +1956,25 @@ private fun WallpaperSection() {
 private fun WallpaperSwatch(
     label: String,
     selected: Boolean,
+    enabled: Boolean,
+    modifier: Modifier,
     onClick: () -> Unit,
     preview: @Composable () -> Unit,
 ) {
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.tvFocusable(RoundedCornerShape(16.dp)) { onClick() },
-  ) {
-    androidx.compose.foundation.layout.Box(
-        modifier =
-            Modifier.size(width = 240.dp, height = 145.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .border(
-                    width = if (selected) 3.dp else 1.dp,
-                    color = if (selected) IosBlue else IosDivider,
-                    shape = RoundedCornerShape(16.dp),
-                ),
-    ) {
+  Column(horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = modifier.tvFocusable(RoundedCornerShape(16.dp), enabled = enabled) { onClick() }
+          .semantics {
+            role = Role.RadioButton
+            this.selected = selected
+            contentDescription = "Wallpaper $label"
+          }) {
+    Box(Modifier.fillMaxWidth().aspectRatio(240f / 145f).clip(RoundedCornerShape(16.dp))
+        .border(if (selected) 3.dp else 1.dp, if (selected) IosBlue else IosDivider, RoundedCornerShape(16.dp))) {
       preview()
     }
-    Text(
-        label,
-        // Light-theme colors: selected is the accent blue + bold; unselected is the standard grey.
-        // (Was Color.White for selected — invisible on the light settings background.)
-        color = if (selected) IosBlue else IosSecondary,
+    Text(label, color = (if (selected) IosBlue else IosSecondary).copy(alpha = if (enabled) 1f else .55f),
         fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-        fontSize = Sizes.rowSub,
-        maxLines = 1,
-        modifier = Modifier.padding(top = 6.dp),
-    )
+        fontSize = Sizes.rowSub, maxLines = 1, modifier = Modifier.padding(top = 6.dp))
   }
 }
 
