@@ -186,6 +186,13 @@ private fun StoreRoot() {
   }
   confirmApp?.let { app ->
     val installed = installedVersions?.containsKey(app.packageName)
+    val compatible = StoreCatalog.isCompatible(app)
+    val installLabel = when {
+      installed == true && app.packageName in availableUpdates -> "Update"
+      installed == true -> "Reinstall"
+      else -> "Install"
+    }
+    val canInstall = compatible && installed != null && !storeBusy(status[app.packageName])
     StoreDialog(when {
       installed == null -> "Checking ${app.name}…"
       installed == true && app.packageName in availableUpdates -> "Update ${app.name}?"
@@ -195,7 +202,9 @@ private fun StoreRoot() {
       Text("The app will be downloaded from ${if (app.source == "fdroid") "F-Droid" else "the catalog publisher"}. Android checks its package and signature before installation.", color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp)
       Row(Modifier.padding(top = 28.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         ApprovedAppsButton("Cancel", onClick = { confirmApp = null })
-        ApprovedAppsButton("Install", primary = true, enabled = installed != null) { confirmApp = null; install(app) }
+        ApprovedAppsButton(installLabel, primary = true, enabled = canInstall) {
+          if (canInstall) { confirmApp = null; install(app) }
+        }
       }
     }
   }
@@ -295,19 +304,31 @@ private fun storeBusy(status: String?): Boolean = status in setOf("Resolving…"
 @Composable
 private fun StoreAction(app: CatalogApp, status: String?, updates: Map<String, Long>, installed: Boolean?, onInstall: () -> Unit) {
   val context = LocalContext.current
-  val compatible = StoreCatalog.isCompatible(app)
-  val busy = storeBusy(status)
-  val label = when { !compatible -> StoreCatalog.incompatibleLabel(app.minSdk ?: 0); busy -> "Wait…"; installed == null -> "Checking…"; installed == true && app.packageName in updates -> "Update"; installed == true -> "Open"; else -> "Get" }
+  val action = storePrimaryAction(installed, StoreCatalog.isCompatible(app), app.packageName in updates, storeBusy(status))
+  val label = when (action) {
+    StorePrimaryAction.OPEN -> "Open"
+    StorePrimaryAction.UPDATE -> "Update"
+    StorePrimaryAction.GET -> "Get"
+    StorePrimaryAction.WAIT -> "Wait…"
+    StorePrimaryAction.CHECKING -> "Checking…"
+    StorePrimaryAction.INCOMPATIBLE -> StoreCatalog.incompatibleLabel(app.minSdk ?: 0)
+  }
   val shape = RoundedCornerShape(16.dp)
   Box(Modifier.widthIn(min = 126.dp).heightIn(min = 68.dp).clip(shape).background(LocalApprovedPalette.current.surface2)
-      .then(if (compatible && !busy && installed != null) Modifier.tvFocusable(shape, focusScale = 1f) {
-        if (installed == true && app.packageName !in updates) {
-          val launch = context.packageManager.getLaunchIntentForPackage(app.packageName)
-          if (launch != null) runCatching { context.startActivity(launch) }
-          else runCatching { context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${app.packageName}"))) }
-        } else onInstall()
-      } else Modifier).padding(horizontal = 26.dp, vertical = 18.dp), contentAlignment = Alignment.Center) {
-    Text(label, color = if (compatible && !busy) IosLabel else IosSecondary, fontSize = 23.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium)
+      .tvFocusable(shape, focusScale = 1f, enabled = action.enabled) {
+        if (action.enabled) {
+          when (action) {
+            StorePrimaryAction.OPEN -> {
+              val launch = context.packageManager.getLaunchIntentForPackage(app.packageName)
+              if (launch != null) runCatching { context.startActivity(launch) }
+              else runCatching { context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${app.packageName}"))) }
+            }
+            StorePrimaryAction.GET, StorePrimaryAction.UPDATE -> onInstall()
+            else -> Unit
+          }
+        }
+      }.padding(horizontal = 26.dp, vertical = 18.dp), contentAlignment = Alignment.Center) {
+    Text(label, color = if (action.enabled) IosLabel else IosSecondary, fontSize = 23.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium)
   }
 }
 
@@ -330,6 +351,7 @@ private fun StoreIcon(app: CatalogApp, size: Dp) {
 private fun StoreDetail(app: CatalogApp, status: String?, updates: Map<String, Long>, installed: Boolean?,
     onBack: () -> Unit, onInstall: () -> Unit) {
   val context = LocalContext.current
+  val compatible = StoreCatalog.isCompatible(app)
   LazyColumn(Modifier.fillMaxSize().padding(horizontal = 56.dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(26.dp)) {
     item { ApprovedAppsButton("‹  App Store", onClick = onBack) }
     item { ApprovedAppsHeading(app.name, app.description) }
@@ -338,10 +360,13 @@ private fun StoreDetail(app: CatalogApp, status: String?, updates: Map<String, L
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
           StoreIcon(app, 140.dp)
           StoreAction(app, status, updates, installed, onInstall)
-          if (installed == true && !storeBusy(status)) ApprovedAppsButton("Reinstall", onClick = onInstall)
+          if (installed == true && compatible && !storeBusy(status)) ApprovedAppsButton("Reinstall", onClick = onInstall)
         }
         if (status != null) Text(status, color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 20.dp))
-        if (!StoreCatalog.isCompatible(app)) Text("This app needs a newer Android version than this Portal has.", color = IosRed, fontSize = 24.sp, modifier = Modifier.padding(top = 20.dp))
+        if (!compatible) Text(
+            "The latest version needs a newer Android version than this Portal has." +
+                if (installed == true) " You can still open the version already installed." else "",
+            color = IosRed, fontSize = 24.sp, modifier = Modifier.padding(top = 20.dp))
       }
     }
     item {
