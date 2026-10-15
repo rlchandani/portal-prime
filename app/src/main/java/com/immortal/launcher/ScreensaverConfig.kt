@@ -289,6 +289,12 @@ object ScreensaverConfig {
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
+  /** Calendar rows share this snapshot without observing slideshow cache and playback writes. */
+  fun observeCalendarSnapshot(c: Context, changed: () -> Unit): () -> Unit =
+      observeSettingsPreferenceChanges(prefs(c), setOf(
+          "calendar_url", "calendar_enabled", "calendar_range", "calendar_size", "calendar_side",
+      ), changed)
+
   fun load(context: Context): Settings {
     val p = prefs(context)
     return Settings(

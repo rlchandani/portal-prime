@@ -386,15 +386,43 @@ private fun ApprovedNativeSettingsPage(page: String) {
   val immortal = remember(application) { DeferredSettingsSnapshot { ImmortalSettings.load(application) } }
   val ss = remember(application) { DeferredSettingsSnapshot { ScreensaverConfig.load(application) } }
   val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner, immortal, ss) {
+  DisposableEffect(application, page, lifecycleOwner, immortal, ss) {
+    var active = false
+    var stopObserving: (() -> Unit)? = null
+    fun stop() {
+      active = false
+      stopObserving?.invoke()
+      stopObserving = null
+    }
+    fun start() {
+      if (active) return
+      active = true
+      // Subscribe before readback so a remote write cannot fall between the two operations.
+      stopObserving = when (page) {
+        "appearance", "weather" -> ImmortalSettings.observeSnapshot(application) {
+          immortal.refreshIfLoaded()
+        }
+        "calendar" -> ScreensaverConfig.observeCalendarSnapshot(application) {
+          ss.refreshIfLoaded()
+        }
+        else -> null
+      }
+      immortal.refreshIfLoaded()
+      ss.refreshIfLoaded()
+    }
     val observer = LifecycleEventObserver { _, event ->
-      if (event == Lifecycle.Event.ON_RESUME) {
-        immortal.refreshIfLoaded()
-        ss.refreshIfLoaded()
+      when (event) {
+        Lifecycle.Event.ON_RESUME -> start()
+        Lifecycle.Event.ON_PAUSE, Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_DESTROY -> stop()
+        else -> Unit
       }
     }
     lifecycleOwner.lifecycle.addObserver(observer)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) start()
+    onDispose {
+      lifecycleOwner.lifecycle.removeObserver(observer)
+      stop()
+    }
   }
   fun applyImmortal(key: String, value: Any) {
     SettingsDomains.immortal.apply(context, JSONObject().put(key, value))

@@ -117,6 +117,13 @@ object ImmortalSettings {
     return { p.unregisterOnSharedPreferenceChangeListener(listener) }
   }
 
+  /** Saved scalar rows in App appearance and Weather; unrelated connection fields stay ignored. */
+  fun observeSnapshot(c: Context, changed: () -> Unit): () -> Unit =
+      observeSettingsPreferenceChanges(prefs(c), setOf(
+          "settings_theme", "weather_unit", "weather_widget", "tile_size",
+          "clock_format", "show_mini_player", "hide_status_bar",
+      ), changed)
+
   fun multiRoomEnabled(c: Context): Boolean = prefs(c).getBoolean("multiroom_enabled", false)
 
   fun snapcastHost(c: Context): String = prefs(c).getString("snapcast_host", "")?.trim() ?: ""
