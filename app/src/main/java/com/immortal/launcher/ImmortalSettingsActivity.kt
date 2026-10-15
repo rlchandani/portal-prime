@@ -938,11 +938,14 @@ internal fun MultiRoomScreen(onBack: () -> Unit) {
 @Composable
 internal fun MultiRoomContent() {
   val context = LocalContext.current
-  var enabled by remember { mutableStateOf(ImmortalSettings.multiRoomEnabled(context)) }
-  var host by remember { mutableStateOf(ImmortalSettings.snapcastHost(context)) }
-  var maPort by remember { mutableStateOf(ImmortalSettings.maPort(context).toString()) }
-  var maUser by remember { mutableStateOf(ImmortalSettings.maUser(context)) }
-  var maPass by remember { mutableStateOf(ImmortalSettings.maPass(context)) }
+  var baseline by remember(context) {
+    mutableStateOf(synchronized(SettingsDomains.immortal) { ImmortalSettings.load(context) })
+  }
+  var enabled by remember(context) { mutableStateOf(baseline.multiRoomEnabled) }
+  var host by remember(context) { mutableStateOf(baseline.snapcastHost) }
+  var maPort by remember(context) { mutableStateOf(baseline.maPort.toString()) }
+  var maUser by remember(context) { mutableStateOf(baseline.maUsername) }
+  var maPass by remember(context) { mutableStateOf(baseline.maPassword) }
   var error by remember { mutableStateOf<String?>(null) }
   fun applyConnection(): Boolean {
     val port = maPort.toIntOrNull()
@@ -952,9 +955,15 @@ internal fun MultiRoomContent() {
       error = "Enter a port from ${portSpec.min} to ${portSpec.max}."
       return false
     }
-    SettingsDomains.immortal.apply(context, JSONObject().put("snapcastHost", host)
-        .put("maPort", port).put("maUsername", maUser).put("maPassword", maPass))
-    val stored = ImmortalSettings.load(context)
+    val values = MultiRoomConnectionValues(baseline.snapcastHost, baseline.maPort,
+        baseline.maUsername, baseline.maPassword)
+    val changes = values.editedValues(host, port, maUser, maPass)
+    val stored = synchronized(SettingsDomains.immortal) {
+      if (changes.isNotEmpty()) SettingsDomains.immortal.apply(context, JSONObject(changes))
+      ImmortalSettings.load(context)
+    }
+    baseline = stored
+    enabled = stored.multiRoomEnabled
     host = stored.snapcastHost
     maPort = stored.maPort.toString()
     maUser = stored.maUsername
