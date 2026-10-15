@@ -10,6 +10,7 @@ package com.immortal.launcher
 import android.content.Context
 import android.content.Intent
 import java.io.File
+import java.io.IOException
 
 /**
  * Apps to (re)launch after a reboot so their background work resumes without a human.
@@ -24,28 +25,40 @@ import java.io.File
 object BootLaunch {
   private const val FILE = "boot_apps.txt"
 
-  fun packages(context: Context): List<String> =
-      runCatching {
-            File(context.getExternalFilesDir(null), FILE)
-                .takeIf { it.exists() }
-                ?.readLines()
-                ?.map { it.trim() }
-                ?.filter {
-                  it.isNotBlank() && !it.startsWith("#") && it !in Curation.retiredPackages
-                }
-                ?: emptyList()
-          }
-          .getOrDefault(emptyList())
+  private fun file(context: Context): File =
+      File(context.getExternalFilesDir(null) ?: throw IOException("Startup storage unavailable"), FILE)
 
-  /** Persist the list (from the settings UI). Same file provisioning writes, so the
-   *  two stay in sync — one source of truth, shell- and app-writable. */
-  fun setPackages(context: Context, packages: List<String>) {
-    runCatching {
-      val f = File(context.getExternalFilesDir(null), FILE)
-      f.parentFile?.mkdirs()
-      f.writeText(packages.joinToString("\n"))
+  /** Settings must distinguish an unreadable file from a genuinely empty selection. */
+  internal fun readPackages(context: Context): List<String> {
+    val file = file(context)
+    val parent = file.parentFile!!
+    if (!parent.isDirectory || !parent.canExecute()) throw IOException("Startup storage unavailable")
+    if (!file.exists()) return emptyList()
+    return file.readLines().map { it.trim() }.filter {
+      it.isNotBlank() && !it.startsWith("#") && it !in Curation.retiredPackages
     }
   }
+
+  /** A read failure must never stop the boot receiver from starting the launcher. */
+  fun packages(context: Context): List<String> =
+      runCatching { readPackages(context) }.getOrDefault(emptyList())
+
+  /** Commit a complete replacement without truncating the previous selection on failure. */
+  fun setPackages(context: Context, packages: List<String>): Boolean = runCatching {
+    val destination = file(context)
+    val parent = destination.parentFile!!
+    if (!parent.isDirectory && !parent.mkdirs()) throw IOException("Startup storage unavailable")
+    val temporary = File.createTempFile("boot_apps.", ".tmp", parent)
+    try {
+      temporary.outputStream().use { output ->
+        output.write(packages.joinToString("\n").toByteArray(Charsets.UTF_8))
+        output.fd.sync()
+      }
+      if (!temporary.renameTo(destination)) throw IOException("Startup choices could not be replaced")
+    } finally {
+      temporary.delete()
+    }
+  }.isSuccess
 
   /**
    * Launch each configured, installed app. Starting an activity from the background

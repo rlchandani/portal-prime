@@ -112,6 +112,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.util.Locale
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -1714,84 +1715,121 @@ internal fun BootAppsScreen(onBack: () -> Unit) {
  *  Activity used to hold it) so it's self-contained wherever it's rendered. */
 @Composable
 internal fun BootAppsContent() {
-  val context = LocalContext.current
-  var apps by remember { mutableStateOf<List<BootAppOption>?>(null) }
-  var selected by remember { mutableStateOf<Set<String>>(emptySet()) }
+  val context = LocalContext.current.applicationContext
+  val owner = LocalLifecycleOwner.current
+  val pageActive = LocalApprovedLauncherPageActive.current
+  var apps by remember(context) { mutableStateOf<List<BootAppOption>?>(null) }
+  var selected by remember(context) { mutableStateOf<Set<String>>(emptySet()) }
+  var loading by remember(context) { mutableStateOf(true) }
+  var applying by remember(context) { mutableStateOf(false) }
+  var problem by remember(context) { mutableStateOf<String?>(null) }
+  var refresh by remember(context) { mutableStateOf(0) }
   val scope = rememberCoroutineScope()
-  val writeLock = remember { Mutex() }
+  val writeLock = remember(context) { Mutex() }
+  LaunchedEffect(context, owner, pageActive, refresh) {
+    if (!pageActive) return@LaunchedEffect
+    owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+      loading = true
+      try {
+        val loaded = withContext(Dispatchers.IO) {
+          writeLock.withLock {
+            val saved = BootLaunch.readPackages(context).toSet()
+            loadLaunchableApps(context) to saved
+          }
+        }
+        apps = loaded.first
+        selected = loaded.second
+        problem = null
+      } catch (cancelled: CancellationException) {
+        throw cancelled
+      } catch (_: Exception) {
+        problem = "Could not load startup apps."
+      } finally {
+        loading = false
+      }
+      awaitCancellation()
+    }
+  }
+  val canEdit = apps != null && !loading && !applying && problem == null
   val onToggle: (String) -> Unit = { pkg ->
-    scope.launch {
-      writeLock.withLock {
-        selected = withContext(Dispatchers.IO) {
-          val saved = BootLaunch.packages(context).toSet()
-          val chosen = if (pkg in saved) saved - pkg else saved + pkg
-          BootLaunch.setPackages(context, chosen.toList())
-          BootLaunch.packages(context).toSet()
+    if (canEdit && !applying && !loading && problem == null) {
+      applying = true
+      scope.launch {
+        try {
+          val confirmed = withContext(Dispatchers.IO) {
+            writeLock.withLock {
+              val saved = BootLaunch.readPackages(context).toSet()
+              val chosen = if (pkg in saved) saved - pkg else saved + pkg
+              check(BootLaunch.setPackages(context, chosen.toList()))
+              BootLaunch.readPackages(context).toSet().also { check(it == chosen) }
+            }
+          }
+          selected = confirmed
+        } catch (cancelled: CancellationException) {
+          throw cancelled
+        } catch (_: Exception) {
+          // Keep the last confirmed values and require a fresh read before editing again.
+          problem = "Could not save your choice."
+        } finally {
+          applying = false
         }
       }
     }
   }
-  LaunchedEffect(context) {
-    val loaded = withContext(Dispatchers.IO) { loadLaunchableApps(context) to BootLaunch.packages(context).toSet() }
-    apps = loaded.first
-    selected = loaded.second
-  }
-
-  Column {
-      Card {
-        val list = apps
-        if (list == null) {
-          Text(
-              "Loading apps…",
-              color = IosSecondary,
-              fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(18.dp),
-          )
-        } else if (list.isEmpty()) {
-          Text(
-              "No other apps installed yet.",
-              color = IosSecondary,
-              fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(18.dp),
-          )
-        } else {
-          LazyColumn(Modifier.heightIn(max = (LocalConfiguration.current.screenHeightDp - 400).coerceAtLeast(400).dp)) {
+  Column(Modifier.semantics {
+    contentDescription = when {
+      applying -> "Saving startup apps"
+      loading -> "Startup apps loading"
+      problem != null -> "Startup apps unavailable"
+      else -> "Startup apps ready"
+    }
+  }) {
+    problem?.let { message ->
+      FooterNote(message)
+      if (apps != null) FooterNote("Last confirmed choices are shown.")
+      if (!loading && !applying) ApprovedSettingsTextButton("Try again") {
+        loading = true
+        refresh++
+      }
+    }
+    if (applying) FooterNote("Saving your choice…")
+    if (loading && apps != null) FooterNote("Refreshing startup apps…")
+    Card {
+      val list = apps
+      if (list == null) {
+        Text(if (loading) "Loading apps…" else "Try again to read your saved choices.",
+            color = IosSecondary, fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp))
+      } else if (list.isEmpty()) {
+        Text("No other apps installed yet.", color = IosSecondary,
+            fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp))
+      } else {
+        LazyColumn(Modifier.heightIn(max = (LocalConfiguration.current.screenHeightDp - 400).coerceAtLeast(400).dp)) {
           itemsIndexed(list, key = { _, app -> app.pkg }) { i, app ->
             if (i > 0) Divider()
             Row(
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .defaultMinSize(minHeight = Sizes.rowMinHeight)
-                        .tvFocusableRow(focusFill = IosFocusTint) { onToggle(app.pkg) }
-                        .semantics {
-                          role = Role.Switch
-                          toggleableState = ToggleableState(app.pkg in selected)
-                        }
-                        .padding(horizontal = 28.dp, vertical = 22.dp),
+                modifier = Modifier.fillMaxWidth()
+                    .defaultMinSize(minHeight = Sizes.rowMinHeight)
+                    .tvFocusableRow(focusFill = IosFocusTint, enabled = canEdit) { onToggle(app.pkg) }
+                    .semantics {
+                      role = Role.Switch
+                      toggleableState = ToggleableState(app.pkg in selected)
+                    }
+                    .padding(horizontal = 28.dp, vertical = 22.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
               Image(bitmap = app.icon, contentDescription = null, modifier = Modifier.size(42.dp))
-              Text(
-                  app.label,
-                  color = IosLabel,
-                  fontSize = Sizes.rowTitle,
-                  modifier = Modifier.weight(1f).padding(start = 14.dp),
-              )
-              // Visual only — the row toggles it (so the remote's center button works).
-              ApprovedSettingsSwitch(app.pkg in selected)
+              Text(app.label, color = IosLabel, fontSize = Sizes.rowTitle,
+                  modifier = Modifier.weight(1f).padding(start = 14.dp))
+              ApprovedSettingsSwitch(app.pkg in selected, enabled = canEdit)
             }
           }
         }
       }
-      }
-      Text(
-          "These apps relaunch automatically after a reboot — handy for players like Music " +
-              "Assistant that don't restart themselves.",
-          color = IosSecondary,
-          fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
-      )
     }
+    Text("These apps relaunch automatically after a reboot — handy for players like Music " +
+        "Assistant that don't restart themselves.", color = IosSecondary,
+        fontSize = Sizes.rowSub, modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp))
+  }
 }
 
 @Composable
