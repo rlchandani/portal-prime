@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
@@ -49,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -362,7 +364,8 @@ internal fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?,
     if (open) {
         ApprovedSettingsDialog(spec.title, onDismiss = { open = false }, help = help) {
             if (spec.asText) {
-                IosTextField(draft, { draft = it; error = null }, spec.title)
+                IosTextField(draft, { draft = it; error = null }, spec.title,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
             } else {
                 Stepper(spec.title, draft.toIntOrNull()?.let(spec.format) ?: draft,
                     onMinus = {

@@ -33,6 +33,7 @@ object SettingsPresentation {
       "calendar.widgetOn" to "Does not hide the calendar widget on Home.",
       "screensaver.enabled" to "Show photos when your Portal is idle.",
       "screensaver.mode" to "Choose how your photos appear.",
+      "screensaver.intervalSec" to "Seconds between photos, from 5 to 600.",
       "screensaver.photo_motion" to "Let photos move gently between transitions.",
       "screensaver.keep_people_in_frame" to "Keep detected faces visible as photos move.",
       "screensaver.clockFace" to "Choose how the time appears.",

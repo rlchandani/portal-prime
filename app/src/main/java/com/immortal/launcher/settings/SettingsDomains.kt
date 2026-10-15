@@ -301,7 +301,9 @@ object SettingsDomains {
                       min = 5,
                       max = 600,
                       step = 5,
+                      asText = true,
                       format = { "${it}s" },
+                      help = "Seconds between photos, from 5 to 600.",
                       visible = { _, s -> s.enabled }),
                   BoolSpec("shuffle", "Shuffle", get = { it.shuffle }, set = ScreensaverConfig::setShuffle),
                   BoolSpec(

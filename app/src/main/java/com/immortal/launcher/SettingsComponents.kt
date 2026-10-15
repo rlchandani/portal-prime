@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldDefaults
@@ -673,11 +674,13 @@ internal fun IosTextField(
     placeholder: String,
     password: Boolean = false,
     modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     androidx.compose.material3.OutlinedTextField(
         colors = iosTextFieldColors(),
         value = value,
         onValueChange = onChange,
+        keyboardOptions = keyboardOptions,
         placeholder = { Text(placeholder) },
         singleLine = true,
         textStyle = androidx.compose.ui.text.TextStyle(fontSize = 26.sp, color = IosLabel),
