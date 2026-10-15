@@ -81,4 +81,58 @@ class UserLayoutTest {
   fun applyOrder_knownThenRest() {
     assertEquals(listOf("c", "a", "b"), UserLayout.applyOrder(listOf("a", "b", "c"), listOf("c", "a")) { it })
   }
+  @org.junit.Test
+  fun folderRenameRejectsExistingNameWithoutMergingMembership() {
+    val saved = mapOf("one" to "Alpha", "two" to "Beta")
+    org.junit.Assert.assertNotNull(UserLayout.folderRenameError(saved, "Alpha", " Beta ", listOf("Alpha", "Beta")))
+    org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+      UserLayout.renamedFolderAssignments(saved, "Alpha", "Beta", listOf("one"), listOf("Alpha", "Beta"))
+    }
+    org.junit.Assert.assertEquals(mapOf("one" to "Alpha", "two" to "Beta"), saved)
+  }
+
+  @org.junit.Test
+  fun folderRenameRejectsBlankNameInsteadOfUngroupingApps() {
+    val saved = mapOf("one" to "Alpha")
+    org.junit.Assert.assertNotNull(UserLayout.folderRenameError(saved, "Alpha", "   ", listOf("Alpha")))
+    org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+      UserLayout.renamedFolderAssignments(saved, "Alpha", "", listOf("one"), listOf("Alpha"))
+    }
+  }
+
+  @org.junit.Test
+  fun folderRenameKeepsOfflineMembersAndUnrelatedOverrides() {
+    val saved = mapOf("one" to "Alpha", "offline" to "Alpha", "other" to "Beta", "ungrouped" to "")
+    val changed = UserLayout.renamedFolderAssignments(saved, "Alpha", "Renamed", listOf("one", "curated"), listOf("Alpha", "Beta"))
+    org.junit.Assert.assertEquals(mapOf("one" to "Renamed", "offline" to "Renamed", "curated" to "Renamed", "other" to "Beta", "ungrouped" to ""), changed)
+    org.junit.Assert.assertEquals("Alpha", saved["offline"])
+  }
+
+  @org.junit.Test
+  fun unchangedFolderNameDoesNotMaterializeCuratedOverrides() {
+    val saved = mapOf("other" to "Beta")
+    org.junit.Assert.assertSame(saved, UserLayout.renamedFolderAssignments(saved, "Settings", " Settings ", listOf("curated"), listOf("Settings", "Beta")))
+  }
+
+  @org.junit.Test
+  fun folderRenameReservesSavedNamesEvenWhenFolderIsNotInstalled() {
+    val saved = mapOf("offline" to "Offline")
+    org.junit.Assert.assertNotNull(UserLayout.folderRenameError(saved, "Alpha", "Offline", listOf("Alpha")))
+  }
+
+  @org.junit.Test
+  fun folderRenameTrimsDestinationAndPreservesExactCaseIdentity() {
+    val saved = mapOf("one" to "Alpha", "differentCase" to "alpha")
+    org.junit.Assert.assertEquals(mapOf("one" to "Renamed", "differentCase" to "alpha"),
+        UserLayout.renamedFolderAssignments(saved, "Alpha", "  Renamed  ", listOf("one"), listOf("Alpha", "alpha")))
+    org.junit.Assert.assertNull(UserLayout.folderRenameError(saved, "Alpha", "ALPHA", listOf("Alpha", "alpha")))
+  }
+
+  @org.junit.Test
+  fun folderRenameTreatsNoFolderAsARealNamedDestination() {
+    org.junit.Assert.assertNull(UserLayout.folderRenameError(emptyMap(), "Alpha", "No folder", listOf("Alpha")))
+    org.junit.Assert.assertEquals(mapOf("one" to "No folder"),
+        UserLayout.renamedFolderAssignments(emptyMap(), "Alpha", "No folder", listOf("one"), listOf("Alpha")))
+  }
+
 }

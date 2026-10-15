@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -40,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -350,8 +352,15 @@ private fun ApprovedAppsContent(
   }
   moveApp?.let { app ->
     AppsDialog("Move ${app.label}", { moveApp = null }) {
-      (listOf("No folder", "Settings") + folderNames).distinct().forEach { target ->
-        AppsMenuRow(target) { assignments = assignments + (app.component.packageName to if (target == "No folder") "" else target); UserLayout.save(context, assignments); moveApp = null }
+      AppsMenuRow("Remove from folder") {
+        assignments = assignments + (app.component.packageName to "")
+        UserLayout.save(context, assignments); moveApp = null
+      }
+      (listOf("Settings") + folderNames).distinct().forEach { target ->
+        AppsMenuRow("Move to “$target”") {
+          assignments = assignments + (app.component.packageName to target)
+          UserLayout.save(context, assignments); moveApp = null
+        }
       }
     }
   }
@@ -371,12 +380,30 @@ private fun ApprovedAppsContent(
     }
   }
   if (renameFolder && folder != null) AppsDialog("Rename folder", { renameFolder = false }) {
-    ApprovedAppsSearch(newFolderName, { newFolderName = it }, "Folder name")
-    ApprovedAppsButton("Save", primary = true, enabled = newFolderName.isNotBlank(), modifier = Modifier.padding(top = 24.dp)) {
-      val old = folder!!; val name = newFolderName.trim()
-      val members = installed.filter { folderOf(it) == old }
-      assignments = assignments + members.associate { it.component.packageName to name }; UserLayout.save(context, assignments)
-      folder = name; renameFolder = false
+    val current = folder!!
+    val renameError = UserLayout.folderRenameError(assignments, current, newFolderName, folderNames)
+    OutlinedTextField(value = newFolderName, onValueChange = { newFolderName = it },
+        label = { Text("Folder name", color = IosSecondary) }, singleLine = true,
+        textStyle = TextStyle(fontSize = 24.sp, color = IosLabel),
+        shape = RoundedCornerShape(16.dp), colors = iosTextFieldColors(),
+        isError = renameError != null, modifier = Modifier.fillMaxWidth().heightIn(min = 68.dp))
+    renameError?.let {
+      Text(it, color = IosRed, fontSize = 22.sp, lineHeight = 30.sp,
+          modifier = Modifier.padding(top = 16.dp))
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(top = 24.dp)) {
+      ApprovedAppsButton("Cancel") { renameFolder = false }
+      ApprovedAppsButton("Save", primary = true, enabled = renameError == null) {
+        if (UserLayout.folderRenameError(assignments, current, newFolderName, folderNames) == null) {
+          val name = newFolderName.trim()
+          if (name != current) {
+            val members = installed.filter { folderOf(it) == current }.map { it.component.packageName }
+            assignments = UserLayout.renamedFolderAssignments(assignments, current, name, members, folderNames)
+            UserLayout.save(context, assignments)
+          }
+          folder = name; renameFolder = false
+        }
+      }
     }
   }
   if (editFolder && folder != null) AppsDialog("Edit folder contents", { editFolder = false }) {

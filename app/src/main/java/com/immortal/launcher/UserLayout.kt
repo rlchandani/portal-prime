@@ -167,6 +167,32 @@ object UserLayout {
     return mutable
   }
 
+  /** Folder identity uses the same exact-case names as the app grid. */
+  internal fun folderRenameError(
+      assignments: Map<String, String>, current: String, draft: String,
+      existingNames: Collection<String>,
+  ): String? {
+    val name = draft.trim()
+    if (name.isBlank()) return "Enter a folder name."
+    if (name == current) return null
+    return if (name in existingNames || name in assignments.values) {
+      "A folder named “$name” already exists. Choose a different name."
+    } else null
+  }
+
+  /** Rename the whole saved membership; missing installed apps retain their folder on return. */
+  internal fun renamedFolderAssignments(
+      assignments: Map<String, String>, current: String, draft: String,
+      memberPackages: Collection<String>, existingNames: Collection<String>,
+  ): Map<String, String> {
+    val error = folderRenameError(assignments, current, draft, existingNames)
+    require(error == null) { error ?: "Invalid folder name" }
+    val name = draft.trim()
+    if (name == current) return assignments
+    return assignments.mapValues { (_, folder) -> if (folder == current) name else folder } +
+        memberPackages.associateWith { name }
+  }
+
   /** A folder name not already used by either the user map or the curated set. */
   fun nextFolderName(existing: Set<String>): String {
     if ("Folder" !in existing) return "Folder"
