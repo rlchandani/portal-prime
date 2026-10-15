@@ -11,6 +11,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import android.content.Context
+import android.content.SharedPreferences
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
+import org.mockito.ArgumentMatchers.anyString
+import java.util.concurrent.atomic.AtomicReference
 
 /** Pure list transforms + JSON round-trip for [TodoStore] (no Context/device needed). */
 class TodoStoreTest {
@@ -57,8 +63,7 @@ class TodoStoreTest {
   }
 
   @Test
-  fun `deserialize drops blank-text entries and tolerates garbage`() {
-    assertTrue(TodoStore.deserialize("not json").isEmpty())
+  fun `deserialize drops blank-text entries in a readable array`() {
     assertTrue(TodoStore.deserialize("""[{"text":""},{"done":true}]""").isEmpty())
     val ok = TodoStore.deserialize("""[{"text":"real","done":false,"id":"x","createdMs":5}]""")
     assertEquals(1, ok.size)
@@ -193,9 +198,6 @@ class TodoStoreTest {
 
   @Test
   fun `deserialize skips invalid nonobject and blank rows preserving survivors`() {
-    listOf("", "   ", "not json", "null", "{}", "[{").forEach { raw ->
-      assertTrue(TodoStore.deserialize(raw).isEmpty())
-    }
     val raw = """[
       null, 42, true, "not an object", [], {}, {"id":"unused","done":true},
       {"id":"blank","text":""}, {"id":"whitespace","text":" \t\n "},
@@ -207,5 +209,64 @@ class TodoStoreTest {
         TodoStore.TodoItem("keep-a", "first survivor", true, 9L),
         TodoStore.TodoItem("keep-b", "second survivor", false, 2L))
     assertEquals(expected, TodoStore.deserialize(raw))
+  }
+
+  @Test
+  fun `unreadable whole collection is a failure rather than an empty checklist`() {
+    listOf("", "   ", "not json", "null", "{}", "[{", "42", "true", "[] trailing garbage", "[] {}").forEach { raw ->
+      assertTrue("Unreadable input must not become an empty list", runCatching {
+        TodoStore.deserialize(raw)
+      }.isFailure)
+    }
+  }
+
+  private fun stored(raw: String?): Pair<Context, AtomicReference<String?>> {
+    val content = AtomicReference(raw)
+    val context = mock(Context::class.java)
+    val prefs = mock(SharedPreferences::class.java)
+    val editor = mock(SharedPreferences.Editor::class.java)
+    `when`(context.getSharedPreferences("immortal_todos", Context.MODE_PRIVATE)).thenReturn(prefs)
+    `when`(prefs.getString("items", null)).thenAnswer { content.get() }
+    `when`(prefs.edit()).thenReturn(editor)
+    var pending: String? = null
+    `when`(editor.putString(org.mockito.ArgumentMatchers.eq("items"), anyString())).thenAnswer {
+      pending = it.getArgument(1); editor
+    }
+    org.mockito.Mockito.doAnswer { content.set(pending); null }.`when`(editor).apply()
+    return context to content
+  }
+
+  private fun assertUnreadablePreserved(action: (Context) -> Unit) {
+    listOf("[{", "{}", "null", "[] trailing garbage", "[] {}").forEach { raw ->
+      val (context, content) = stored(raw)
+      val result = runCatching { action(context) }
+      assertTrue("An edit must reject unreadable data", result.isFailure)
+      assertEquals(raw, content.get())
+    }
+  }
+
+  @Test fun `add cannot replace an unreadable checklist`() =
+      assertUnreadablePreserved { TodoStore.add(it, "new task", 7L) }
+
+  @Test fun `toggle cannot replace an unreadable checklist`() =
+      assertUnreadablePreserved { TodoStore.toggle(it, "saved-id") }
+
+  @Test fun `remove cannot replace an unreadable checklist`() =
+      assertUnreadablePreserved { TodoStore.remove(it, "saved-id") }
+
+  @Test fun `clear completed cannot replace an unreadable checklist`() =
+      assertUnreadablePreserved { TodoStore.clearCompleted(it) }
+
+  @Test fun `absent and readable empty collections still support adding a task`() {
+    listOf(null, "[]").forEach { raw ->
+      val (context, content) = stored(raw)
+      assertTrue(TodoStore.load(context).isEmpty())
+      TodoStore.add(context, "  new task  ", 7L)
+      val saved = TodoStore.deserialize(content.get()!!)
+      assertEquals(1, saved.size)
+      assertEquals("new task", saved.single().text)
+      assertEquals(7L, saved.single().createdMs)
+      assertFalse(saved.single().done)
+    }
   }
 }

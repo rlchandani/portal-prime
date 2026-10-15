@@ -11,6 +11,7 @@ import android.content.Context
 import java.util.UUID
 import org.json.JSONArray
 import org.json.JSONObject
+import org.json.JSONTokener
 
 /**
  * A local checklist / to-do list for the home-screen widget — the shared "what do we need?" list
@@ -87,38 +88,39 @@ object TodoStore {
     return arr.toString()
   }
 
-  internal fun deserialize(raw: String): List<TodoItem> =
-      runCatching {
-            val arr = JSONArray(raw)
-            val rows = (0 until arr.length()).mapNotNull { index ->
-              arr.optJSONObject(index)?.takeIf { it.optString("text", "").isNotBlank() }
-                  ?.let { index to it }
-            }
-            // Reserve every valid saved ID, including one that occurs after a repaired row.
-            val reserved = rows.mapNotNull { (_, row) ->
-              (row.opt("id") as? String)?.takeIf { it.isNotBlank() }
-            }.toHashSet()
-            val used = hashSetOf<String>()
-            buildList {
-              for ((index, o) in rows) {
-                val text = o.optString("text", "")
-                val createdMs = o.optLong("createdMs", 0L)
-                val savedId = (o.opt("id") as? String)?.takeIf { it.isNotBlank() }
-                val id = if (savedId != null && used.add(savedId)) savedId else {
-                  // Stable until a normal mutation saves these IDs into the existing JSON.
-                  var attempt = 0
-                  var repaired: String
-                  do {
-                    repaired = UUID.nameUUIDFromBytes(
-                        "immortal-todo:$index:$text:$createdMs:${attempt++}"
-                            .toByteArray(Charsets.UTF_8)).toString()
-                  } while (repaired in reserved || !used.add(repaired))
-                  repaired
-                }
-                add(TodoItem(id = id, text = text, done = o.optBoolean("done", false),
-                    createdMs = createdMs))
-              }
-            }
-          }
-          .getOrDefault(emptyList())
+  /** A missing key is empty; unreadable saved collections must never become editable defaults. */
+  internal fun deserialize(raw: String): List<TodoItem> {
+    val input = JSONTokener(raw)
+    val arr = JSONArray(input)
+    require(input.nextClean() == '\u0000') { "Unreadable saved to-do list" }
+    val rows = (0 until arr.length()).mapNotNull { index ->
+      arr.optJSONObject(index)?.takeIf { it.optString("text", "").isNotBlank() }
+          ?.let { index to it }
+    }
+    // Reserve every valid saved ID, including one that occurs after a repaired row.
+    val reserved = rows.mapNotNull { (_, row) ->
+      (row.opt("id") as? String)?.takeIf { it.isNotBlank() }
+    }.toHashSet()
+    val used = hashSetOf<String>()
+    return buildList {
+      for ((index, o) in rows) {
+        val text = o.optString("text", "")
+        val createdMs = o.optLong("createdMs", 0L)
+        val savedId = (o.opt("id") as? String)?.takeIf { it.isNotBlank() }
+        val id = if (savedId != null && used.add(savedId)) savedId else {
+          // Stable until a normal mutation saves these IDs into the existing JSON.
+          var attempt = 0
+          var repaired: String
+          do {
+            repaired = UUID.nameUUIDFromBytes(
+                "immortal-todo:$index:$text:$createdMs:${attempt++}"
+                    .toByteArray(Charsets.UTF_8)).toString()
+          } while (repaired in reserved || !used.add(repaired))
+          repaired
+        }
+        add(TodoItem(id = id, text = text, done = o.optBoolean("done", false),
+            createdMs = createdMs))
+      }
+    }
+  }
 }

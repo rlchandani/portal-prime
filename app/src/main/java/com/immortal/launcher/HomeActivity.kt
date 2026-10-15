@@ -3711,43 +3711,57 @@ private fun formatUsd(v: Double): String =
 
 /**
  * Local checklist widget ([TodoStore]). Rows are tappable to toggle done (strikethrough + dimmed);
- * a footer shows the open count and a "+" opens the editor for adding items / clearing completed.
- * Purely local — no network. Re-reads on resume so edits made in the editor reflect here, and
- * toggles persist immediately (optimistic local state).
+ * a footer shows the open count and the shell opens the editor for adding items / clearing completed.
+ * Purely local — no network. Re-reads on the retained page's resume so editor changes reflect here;
+ * toggles persist immediately, then reload. Every read/action retains its Result: unreadable saved
+ * data shows a retryable error instead of an empty list, and never escapes into composition/lifecycle.
  */
 @Composable
 private fun ImmortalTodoWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
-  var items by remember { mutableStateOf(TodoStore.load(context)) }
+  var itemsResult by remember(context) { mutableStateOf(runCatching { TodoStore.load(context) }) }
   val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) items = TodoStore.load(context) }
+  DisposableEffect(lifecycleOwner, context) {
+    val obs = LifecycleEventObserver { _, e ->
+      if (e == Lifecycle.Event.ON_RESUME) itemsResult = runCatching { TodoStore.load(context) }
+    }
     lifecycleOwner.lifecycle.addObserver(obs)
     onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
   }
   val open: () -> Unit = { context.openApprovedHomeSettings("todo") }
-  val openCount = items.count { !it.done }
-  val visibleItems = remember(items, maxRows) { items.sortedBy { it.done }.take(maxRows) }
+  val items = itemsResult.getOrNull()
+  val openCount = items?.count { !it.done } ?: 0
+  val visibleItems = remember(items, maxRows) { items.orEmpty().sortedBy { it.done }.take(maxRows) }
   ImmortalWidgetShell(title = "To-do", openPage = "todo", modifier = modifier.tvFocusableRow { open() }) {
-    if (items.isEmpty()) {
-      ApprovedHomeWidgetMessage("No items — tap to add")
-    } else {
-      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        // Open items first, then completed — the actionable list stays on top.
-        visibleItems.forEach { item ->
-          key(item.id) { TodoRow(item) {
-            TodoStore.toggle(context, item.id)
-            items = TodoStore.load(context)
-          } }
+    when {
+      items == null -> {
+        ApprovedHomeWidgetMessage("To-do unavailable")
+        ApprovedHomeWidgetMessage("Saved items couldn't be loaded. Try again.")
+        ApprovedHomeTextButton("Try again") {
+          itemsResult = runCatching { TodoStore.load(context) }
         }
       }
-      Spacer(Modifier.size(16.dp))
-      Text(
-          if (openCount == 0) "All done 🎉" else "$openCount to do",
-          color = ApprovedHomePalette.Secondary,
-          fontSize = 22.sp,
-          lineHeight = 30.sp,
-      )
+      items.isEmpty() -> ApprovedHomeWidgetMessage("No items — tap to add")
+      else -> {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          // Open items first, then completed — the actionable list stays on top.
+          visibleItems.forEach { item ->
+            key(item.id) { TodoRow(item) {
+              itemsResult = runCatching {
+                TodoStore.toggle(context, item.id)
+                TodoStore.load(context)
+              }
+            } }
+          }
+        }
+        Spacer(Modifier.size(16.dp))
+        Text(
+            if (openCount == 0) "All done 🎉" else "$openCount to do",
+            color = ApprovedHomePalette.Secondary,
+            fontSize = 22.sp,
+            lineHeight = 30.sp,
+        )
+      }
     }
   }
 }
