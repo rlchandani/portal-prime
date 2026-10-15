@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import org.json.JSONObject
+import kotlin.math.roundToInt
 
 private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
 
@@ -391,7 +392,7 @@ private fun DurationStepper(seconds: Int, onChange: (Int) -> Unit) {
 private fun OpacityStepper(opacity: Float, onChange: (Float) -> Unit) {
   val src = remember { MutableInteractionSource() }
   val focused by src.collectIsFocusedAsState()
-  val percent = (opacity * 100).toInt()
+  val percent = (opacity * 100).roundToInt()
   Row(
       modifier =
           Modifier.fillMaxWidth()
