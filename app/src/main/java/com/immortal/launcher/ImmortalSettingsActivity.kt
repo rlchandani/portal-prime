@@ -516,15 +516,12 @@ private fun ApprovedNativeSettingsPage(page: String) {
         ).forEachIndexed { index, (title, action) ->
           if (index > 0) Divider()
           NavRow(title, subLabel = "Opens the existing system screen") {
-            runCatching { context.startActivity(Intent(action)) }
-                .onFailure { context.startActivity(Intent(Settings.ACTION_SETTINGS)) }
+            AndroidSettingsNavigation.open(context, title, action)
           }
         }
         Divider()
         NavRow("Portal Settings", subLabel = "Opens the existing Portal settings") {
-          val intent = context.packageManager.getLaunchIntentForPackage("com.facebook.alohaapps.settings")
-          if (intent != null) context.startActivity(intent)
-          else context.startActivity(Intent(Settings.ACTION_SETTINGS))
+          AndroidSettingsNavigation.openPortal(context)
         }
       }
     }
