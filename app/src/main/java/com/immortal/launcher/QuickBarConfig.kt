@@ -8,6 +8,8 @@
 package com.immortal.launcher
 
 import android.content.Context
+import android.content.SharedPreferences
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Config for the quick-button cluster ([QuickBar]) — a centered overlay button row at the top of
@@ -27,6 +29,20 @@ object QuickBarConfig {
 
   fun setAlwaysShow(c: Context, on: Boolean) =
       prefs(c).edit().putBoolean("always_show", on).apply()
+
+  /** Observe saved changes from any in-app writer; the caller owns this subscription's lifetime. */
+  fun observe(c: Context, changed: () -> Unit): () -> Unit {
+    val store = prefs(c)
+    val active = AtomicBoolean(true)
+    val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+      if (active.get() && (key == null || key == "enabled" || key == "always_show")) changed()
+    }
+    store.registerOnSharedPreferenceChangeListener(listener)
+    // The closure holds a strong reference and suppresses a notification queued before disposal.
+    return {
+      if (active.compareAndSet(true, false)) store.unregisterOnSharedPreferenceChangeListener(listener)
+    }
+  }
 
   /** Immutable snapshot, so the settings domain renders through the generic on-device list. */
   data class Settings(val enabled: Boolean = false, val alwaysShow: Boolean = false)

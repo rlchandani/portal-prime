@@ -1117,7 +1117,34 @@ internal fun MultiRoomContent() {
 @Composable
 private fun QuickButtonsSection() {
   val context = LocalContext.current
-  var settings by remember { mutableStateOf(QuickBarConfig.load(context)) }
+  var settings by remember(context) { mutableStateOf(QuickBarConfig.load(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(context, lifecycleOwner) {
+    var stopObserving: (() -> Unit)? = null
+    fun stop() {
+      stopObserving?.invoke()
+      stopObserving = null
+    }
+    fun start() {
+      if (stopObserving == null) {
+        stopObserving = QuickBarConfig.observe(context) { settings = QuickBarConfig.load(context) }
+        settings = QuickBarConfig.load(context)
+      }
+    }
+    val observer = LifecycleEventObserver { _, event ->
+      when (event) {
+        Lifecycle.Event.ON_RESUME -> start()
+        Lifecycle.Event.ON_PAUSE, Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_DESTROY -> stop()
+        else -> Unit
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) start()
+    onDispose {
+      lifecycleOwner.lifecycle.removeObserver(observer)
+      stop()
+    }
+  }
 
   ApprovedSettingsSectionLabel("Quick buttons")
   // Rendered from the `quickbar` registry domain (the same specs the phone remote uses), so the
@@ -1125,7 +1152,6 @@ private fun QuickButtonsSection() {
   // the domain so its onApplied (reconcile + overlay refresh) fires here too.
   SettingsList(SettingsDomains.quickbar, settings) { k, v ->
     SettingsDomains.quickbar.apply(context, JSONObject().put(k, v))
-    settings = QuickBarConfig.load(context)
   }
   Text(
       "Needs the accessibility-based top-bar watch enabled during setup. The switcher shows your " +
