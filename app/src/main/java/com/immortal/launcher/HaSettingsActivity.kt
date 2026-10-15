@@ -285,7 +285,7 @@ private fun HomeDashboardSettings(): Boolean {
         FooterNote("Your dashboard opens in the Portal browser and keeps its saved sign-in. " +
             "It runs when you open it, keeping Home lightweight.")
     }
-    return snapshot.url.isNotBlank() && !LocalAdvancedSettings.current
+    return !LocalAdvancedSettings.current
 }
 
 @Composable

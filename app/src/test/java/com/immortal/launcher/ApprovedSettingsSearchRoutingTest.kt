@@ -44,4 +44,20 @@ class ApprovedSettingsSearchRoutingTest {
                 ApprovedSettingsCategories.any { category -> category.id == it.page }
         })
     }
+    @Test fun nativeHomeAssistantSetupRequiresAdvancedWhileWebAddressStaysOrdinary() {
+        val index = approvedSettingsSearchIndex()
+        val web = approvedSettingsSearch(index, "Dashboard address")
+            .single { it.id == "home_dashboard.url" }
+        assertEquals("ha", web.page)
+        assertTrue(!web.advanced)
+        val server = approvedSettingsSearch(index, "Base URL").single { it.id == "ha.url" }
+        val token = approvedSettingsSearch(index, "Long-lived token").single { it.id == "ha.token" }
+        assertEquals("ha", server.page)
+        assertEquals("ha", token.page)
+        assertTrue(server.advanced)
+        assertTrue(token.advanced)
+        val entities = approvedSettingsSearch(index, "Choose Home Assistant entities")
+            .single { it.page == "ha-entities" && it.id.isBlank() }
+        assertTrue(entities.advanced)
+    }
 }

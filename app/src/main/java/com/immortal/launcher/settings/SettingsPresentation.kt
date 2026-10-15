@@ -12,7 +12,7 @@ import com.immortal.launcher.ScreensaverConfig
 object SettingsPresentation {
   private val advancedPages = setOf(
       "immich", "albums", "smb", "dav", "web", "multiroom", "mqtt", "boot",
-      "alpaca", "options", "speed", "apk", "managed", "debug")
+      "alpaca", "options", "speed", "apk", "managed", "debug", "ha-entities")
   private val advancedControls = setOf(
       "immortal.hideStatusBar", "sources.albumRefresh", "screensaver.cacheEnabled",
       "screensaver.batterySaver", "screensaver.presenceMode", "screensaver.idleSleepMin",
@@ -27,7 +27,7 @@ object SettingsPresentation {
       "options.type", "options.deltaMin", "options.deltaMax", "options.expiry", "options.symbol",
       "screensaver.albumRefreshMin", "screensaver.cacheBudgetGb", "screensaver.antiBurnIn",
       "mqtt.validateCert", "digitalclock.style", "digitalclock.color", "digitalclock.font",
-      "digitalclock.glow", "debug.enabled")
+      "digitalclock.glow", "debug.enabled", "ha.url", "ha.token")
   private val shortHelp = mapOf(
       "calendar.url" to "Home shows today and the next two days.",
       "calendar.widgetOn" to "Does not hide the calendar widget on Home.",
