@@ -119,7 +119,7 @@ internal fun ChimeSettingsContent() {
         FooterNote(when {
           applying -> "Saving changes…"
           failed -> "Some changes couldn't be saved. Try again."
-          else -> "Sounds respect your quiet hours."
+          else -> "Scheduled sounds respect your quiet hours."
         })
       }
 
@@ -129,27 +129,31 @@ internal fun ChimeSettingsContent() {
 
       // Bespoke: voice picker + test buttons the registry can't model (TTS voice enumeration is
       // on-device only; test buttons are actions, not settings).
-      if (settings.spokenTimeOn || settings.hourlyChimeOn || settings.goldenHourOn) {
-        Card {
-          if (settings.spokenTimeOn) {
-            VoicePicker(settings.spokenVoice, enabled = !applying) { name ->
-              // Installed identities share the same save lock, worker and readback as other edits.
-              apply("spokenVoice", name)
-            }
-            TestButton("Test voice", enabled = !applying) {
-              audition { ChimePlayer.testVoice(context, settings.spokenVoice) }
-            }
+      SectionLabel("Preview sounds")
+      Card {
+        if (settings.spokenTimeOn) {
+          VoicePicker(settings.spokenVoice, enabled = !applying) { name ->
+            // Installed identities share the same save lock, worker and readback as other edits.
+            apply("spokenVoice", name)
           }
-          if (settings.hourlyChimeOn) {
-            TestButton("Play chime", enabled = !applying) { audition { ChimePlayer.playChime(context) } }
+          TestButton("Test voice", enabled = !applying) {
+            audition { ChimePlayer.testVoice(context, settings.spokenVoice) }
           }
-          if (settings.goldenHourOn) {
-            TestButton("Test sunrise", enabled = !applying) { audition { ChimePlayer.playSunriseTone(context) } }
-            TestButton("Test sunset", enabled = !applying) { audition { ChimePlayer.playSunsetTone(context) } }
-          }
-          TestButton("Play ping", enabled = !applying) { audition { ChimePlayer.playPing(context, repeats = 1) } }
         }
+        if (settings.hourlyChimeOn) {
+          TestButton("Play chime", enabled = !applying) { audition { ChimePlayer.playChime(context) } }
+        }
+        if (settings.goldenHourOn) {
+          TestButton("Test sunrise", enabled = !applying) { audition { ChimePlayer.playSunriseTone(context) } }
+          TestButton("Test sunset", enabled = !applying) { audition { ChimePlayer.playSunsetTone(context) } }
+        }
+        TestButton("Play ping", enabled = !applying) { audition { ChimePlayer.playPing(context, repeats = 1) } }
       }
+      FooterNote(if (settings.volume == 0) {
+        "Preview volume is 0%. Raise Volume to hear the sounds."
+      } else {
+        "Manual previews use your saved volume and can play during quiet hours."
+      })
     }
 }
 
