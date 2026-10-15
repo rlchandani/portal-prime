@@ -45,7 +45,7 @@ object SettingsPresentation {
       "display.nightShift" to "Use warmer colors after dark.",
       "welcome.enableTts" to "Read the greeting aloud.",
       "welcome.userName" to "Personalize your greeting.",
-      "chime.quietHoursOn" to "Keep chimes quiet during these hours.")
+      "chime.quietHoursOn" to "Silence scheduled sounds. Matching times silence nothing.")
 
   fun isAdvanced(domainId: String, key: String): Boolean = "$domainId.$key" in advancedControls
   fun isAdvancedOption(domainId: String, key: String, value: String): Boolean =

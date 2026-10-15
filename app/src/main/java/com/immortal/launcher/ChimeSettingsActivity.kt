@@ -119,6 +119,8 @@ internal fun ChimeSettingsContent() {
         FooterNote(when {
           applying -> "Saving changes…"
           failed -> "Some changes couldn't be saved. Try again."
+          settings.quietHoursOn && settings.quietStartMin == settings.quietEndMin ->
+            "Quiet times match, so scheduled sounds aren’t silenced. Choose different times."
           else -> "Scheduled sounds respect your quiet hours."
         })
       }

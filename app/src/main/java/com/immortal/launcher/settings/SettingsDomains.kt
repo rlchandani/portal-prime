@@ -886,7 +886,8 @@ object SettingsDomains {
                       "Quiet hours",
                       get = { it.quietHoursOn },
                       set = ChimeConfig::setQuietHours,
-                      help = "Silence all cues inside a nightly window."),
+                      help = "Silence scheduled sounds within this window. If the start and end times match, " +
+                          "no sounds are silenced."),
                   IntSpec(
                       "quietStartMin",
                       "Quiet from",
