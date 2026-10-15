@@ -215,15 +215,16 @@ class RemoteRoutes internal constructor(
         validatedVolumeLevel(body.opt("level"), max) ?: return json(400, err("invalid_level"))
       } else null
       if (audio.isVolumeFixed || max <= 0) return json(409, err("volume_fixed"))
+      // The remote renders volume feedback. Meta's system UI intercepts full-screen touch.
       if (level != null) {
-        audio.setStreamVolume(AudioManager.STREAM_MUSIC, level, AudioManager.FLAG_SHOW_UI)
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, level, 0)
       } else {
         val adjust = when (dir) {
           "up" -> AudioManager.ADJUST_RAISE
           "down" -> AudioManager.ADJUST_LOWER
           else -> AudioManager.ADJUST_TOGGLE_MUTE
         }
-        audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, adjust, AudioManager.FLAG_SHOW_UI)
+        audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, adjust, 0)
       }
       json(200, ok().put("dir", dir))
     }.getOrElse { json(500, err("volume_failed")) }

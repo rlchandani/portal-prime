@@ -26,7 +26,7 @@ class RemoteVolumeTest {
       val json = response.json()
       assertTrue(json.getBoolean("ok"))
       assertEquals("set", json.getString("dir"))
-      Mockito.verify(fixture.audio).setStreamVolume(AudioManager.STREAM_MUSIC, level, AudioManager.FLAG_SHOW_UI)
+      Mockito.verify(fixture.audio).setStreamVolume(AudioManager.STREAM_MUSIC, level, 0)
       Mockito.verify(fixture.audio, Mockito.never()).adjustStreamVolume(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())
     }
   }
@@ -62,14 +62,14 @@ class RemoteVolumeTest {
     Mockito.verify(fixture.audio, Mockito.never()).setStreamVolume(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())
   }
 
-  @Test fun legacyDirectionsStillAdjustMusicAndShowTheSystemUi() {
+  @Test fun legacyDirectionsStillAdjustMusicSilentlyWithoutSystemUi() {
     for ((dir, adjustment) in listOf("up" to AudioManager.ADJUST_RAISE, "down" to AudioManager.ADJUST_LOWER, "mute" to AudioManager.ADJUST_TOGGLE_MUTE)) {
       val fixture = Fixture()
       val response = fixture.request("""{"dir":"$dir"}""")
       assertEquals(200, response.status)
       assertTrue(response.json().getBoolean("ok"))
       assertEquals(dir, response.json().getString("dir"))
-      Mockito.verify(fixture.audio).adjustStreamVolume(AudioManager.STREAM_MUSIC, adjustment, AudioManager.FLAG_SHOW_UI)
+      Mockito.verify(fixture.audio).adjustStreamVolume(AudioManager.STREAM_MUSIC, adjustment, 0)
       Mockito.verify(fixture.audio, Mockito.never()).setStreamVolume(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())
     }
   }
