@@ -103,12 +103,30 @@ internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> =
         entries.distinctBy { it.id.ifBlank { "page:${it.page}" } }
     }
 
+private const val SETTINGS_SEARCH_RESULT_LIMIT = 12
+private val SETTINGS_SEARCH_WHITESPACE = Regex("\\s+")
+
+/** Every word must match; bounded relevance buckets keep direct titles ahead of incidental text. */
 internal fun approvedSettingsSearch(index: List<ApprovedSettingsSearchResult>, query: String): List<ApprovedSettingsSearchResult> {
     if (query.isBlank()) return emptyList()
-    return index.asSequence().filter {
-        "${it.title} ${it.id} ${it.help} ${approvedSettingsPage(it.page)?.title.orEmpty()}"
-            .contains(query.trim(), ignoreCase = true)
-    }.take(12).toList()
+    val terms = query.trim().split(SETTINGS_SEARCH_WHITESPACE)
+    val phrase = terms.joinToString(" ")
+    val buckets = Array(4) { mutableListOf<ApprovedSettingsSearchResult>() }
+    for (result in index) {
+        val titleMatches = terms.all { result.title.contains(it, ignoreCase = true) }
+        if (!titleMatches) {
+            val text = "${result.title} ${result.id} ${result.help} ${approvedSettingsPage(result.page)?.title.orEmpty()}"
+            if (!terms.all { text.contains(it, ignoreCase = true) }) continue
+        }
+        val rank = when {
+            result.title.equals(phrase, ignoreCase = true) -> 0
+            result.title.startsWith(phrase, ignoreCase = true) -> 1
+            titleMatches -> 2
+            else -> 3
+        }
+        if (buckets[rank].size < SETTINGS_SEARCH_RESULT_LIMIT) buckets[rank] += result
+    }
+    return buckets.asSequence().flatMap { it.asSequence() }.take(SETTINGS_SEARCH_RESULT_LIMIT).toList()
 }
 
 internal val ApprovedManagedControls = setOf(
