@@ -141,6 +141,18 @@ private fun ApprovedAppsContent(
   var renameFolder by remember { mutableStateOf(false) }
   var newFolderName by remember { mutableStateOf("") }
   var moveApp by remember { mutableStateOf<AppItem?>(null) }
+  // Retain the page's place, but end temporary menus/edit sessions when it is hidden.
+  // AppsDialog already removes its window on this same visibility boundary.
+  LaunchedEffect(pageActive) {
+    if (!pageActive) {
+      menuFor = null
+      moveApp = null
+      editFavorites = false
+      editFolder = false
+      renameFolder = false
+      newFolderName = ""
+    }
+  }
   var appsFailure by remember { mutableStateOf<String?>(null) }
   var recentsFailure by remember { mutableStateOf<String?>(null) }
   val showingRecents = recent && query.isBlank()
