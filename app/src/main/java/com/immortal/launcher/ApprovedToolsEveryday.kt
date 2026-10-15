@@ -595,6 +595,7 @@ internal fun ToolsConverterContent() {
   ToolsTwoPane(left = {
     EverydayPanel("Convert") {
       ToolsChoice("Category", category, categories) { selected ->
+        if (selected == category) return@ToolsChoice
         category = selected
         val nextUnits = if (selected == "Currency") Converter.CURRENCIES
         else Converter.UNIT_CATEGORIES.first { it.first == selected }.second.keys.toList()
