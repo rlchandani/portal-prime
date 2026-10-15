@@ -42,6 +42,52 @@ class ConverterTest {
   }
 
   @Test
+  fun `factor unit identities preserve the finite double range`() {
+    for ((category, units) in Converter.UNIT_CATEGORIES.filter { it.first != "Temperature" }) {
+      for (unit in units.keys) {
+        for (value in listOf(Double.MAX_VALUE, -Double.MAX_VALUE, Double.MIN_VALUE, -0.0)) {
+          assertEquals("$category $unit identity for $value", value.toBits(),
+              Converter.convert(category, unit, unit, value).toBits())
+        }
+      }
+    }
+  }
+
+  @Test
+  fun `large scale down does not overflow through the base unit`() {
+    assertEquals(6.21371192237334e307,
+        Converter.convert("Length", "km", "mi", 1e308), 1e293)
+  }
+
+  @Test
+  fun `fahrenheit scale down keeps a representable result finite`() {
+    assertEquals(5.555555555555556e307,
+        Converter.convertTemp("°F", "°C", 1e308), 1e293)
+  }
+
+  @Test
+  fun `celsius scale up avoids a spurious intermediate overflow`() {
+    assertEquals(9e307,
+        Converter.convertTemp("°C", "°F", 5e307), 1e293)
+  }
+
+  @Test
+  fun `temperature identities preserve the finite double range`() {
+    for (unit in listOf("°C", "°F", "K")) {
+      for (value in listOf(Double.MAX_VALUE, -Double.MAX_VALUE, Double.MIN_VALUE, -0.0)) {
+        assertEquals("$unit identity for $value", value.toBits(),
+            Converter.convertTemp(unit, unit, value).toBits())
+      }
+    }
+  }
+
+  @Test
+  fun `a genuinely unrepresentable scaled result still overflows`() {
+    org.junit.Assert.assertTrue(
+        Converter.convert("Length", "km", "mm", 1e308).isInfinite())
+  }
+
+  @Test
   fun `same unit is identity`() {
     assertEquals(5.0, Converter.convert("Volume", "L", "L", 5.0), 1e-9)
   }

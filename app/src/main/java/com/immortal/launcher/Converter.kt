@@ -58,19 +58,20 @@ object Converter {
     val map = UNIT_CATEGORIES.firstOrNull { it.first == category }?.second ?: return value
     val f = map[from] ?: return value
     val t = map[to] ?: return value
-    return value * f / t // to base, then to target
+    return value * (f / t) // Scale once; a base-unit intermediate can overflow or underflow.
   }
 
   /** Affine temperature conversion across °C / °F / K. */
   fun convertTemp(from: String, to: String, value: Double): Double {
+    if (from == to) return value
     val celsius =
         when (from) {
-          "°F" -> (value - 32.0) * 5.0 / 9.0
+          "°F" -> (value - 32.0) * (5.0 / 9.0)
           "K" -> value - 273.15
           else -> value
         }
     return when (to) {
-      "°F" -> celsius * 9.0 / 5.0 + 32.0
+      "°F" -> celsius * (9.0 / 5.0) + 32.0
       "K" -> celsius + 273.15
       else -> celsius
     }
