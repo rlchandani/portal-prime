@@ -33,7 +33,10 @@ internal fun selectPortalHomePackage(packages: Iterable<String>, device: String)
 object PortalHomeBridge {
   /** Begin a deliberate handoff, rolling back suppression when no launch can be dispatched. */
   fun launch(context: Context): Boolean {
-    DreamPolicy.markBridge(context, portalHome = true)
+    if (!DreamPolicy.markBridge(context, portalHome = true)) {
+      Toast.makeText(context, "Calls couldn’t be opened. Please try again.", Toast.LENGTH_LONG).show()
+      return false
+    }
     if (Build.DEVICE != PORTAL_TV_DEVICE) {
       // Suppress Meta's ambient bootstrap before opening Home, including a retained ambient task.
       if (!PortalHomeAmbientGuard.begin(context)) {

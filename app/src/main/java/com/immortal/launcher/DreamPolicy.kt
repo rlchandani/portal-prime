@@ -101,11 +101,13 @@ object DreamPolicy {
           .putLong(KEY_BRIDGE_AT, now).putBoolean(KEY_IN_STOCK_HANDOFF, true)
           .putBoolean(KEY_PORTAL_HOME_HANDOFF, portalHome).commit()
 
-  /** Existing Meta handoffs flush before launch; every writer shares the same disk lane. */
-  fun markBridge(context: Context, portalHome: Boolean = false) {
-    val (_, now) = beginBridge(portalHome)
+  /** Calls may proceed only after durable suppression; failure clears only this request. */
+  fun markBridge(context: Context, portalHome: Boolean = false): Boolean {
+    val (ticket, now) = beginBridge(portalHome)
     val app = context.applicationContext ?: context
-    DreamBridgePersistence.commit { persistBridge(app, now, portalHome) }
+    val saved = DreamBridgePersistence.commit { persistBridge(app, now, portalHome) }
+    if (!saved) clearBridgeIfCurrent(context, ticket)
+    return saved
   }
 
   /** Jarvis taps stay responsive; completion runs on Main only after the durable commit. */
