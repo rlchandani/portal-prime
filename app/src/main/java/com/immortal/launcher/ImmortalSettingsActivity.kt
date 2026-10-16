@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -678,6 +679,12 @@ private fun SubScreenNavCard(
   }
 }
 
+private data class BrightnessSnapshot(
+    val canWrite: Boolean,
+    val brightness: Int,
+    val autoBrightness: Boolean,
+)
+
 private data class DisplaySnapshot(
     val canWrite: Boolean,
     val brightness: Int,
@@ -699,6 +706,12 @@ private fun DisplaySection() {
   var snapshot by remember(context) { mutableStateOf<DisplaySnapshot?>(null) }
   var loadFailed by remember(context) { mutableStateOf(false) }
   var editRevision by remember(context) { mutableStateOf(0) }
+  var brightnessRevision by remember(context) { mutableStateOf(0) }
+  var confirmedBrightness by remember(context) { mutableStateOf<BrightnessSnapshot?>(null) }
+  var brightnessError by remember(context) { mutableStateOf<String?>(null) }
+  var brightnessReadback by remember(context) { mutableStateOf<Job?>(null) }
+  var latestBrightnessEdit by remember(context) { mutableStateOf<DisplayEdit?>(null) }
+  val scope = rememberCoroutineScope()
   val lifecycleOwner = LocalLifecycleOwner.current
   val pageActive = LocalApprovedLauncherPageActive.current
   LaunchedEffect(context, lifecycleOwner, pageActive) {
@@ -724,7 +737,11 @@ private fun DisplaySection() {
       loadFailed = loaded == null
       // Keep real cached values during a refresh, but never replace a newer slider/toggle edit
       // with a system read that started before that edit.
-      if (loaded != null && revision == editRevision) snapshot = loaded
+      if (loaded != null && revision == editRevision) {
+        snapshot = loaded
+        confirmedBrightness = BrightnessSnapshot(loaded.canWrite, loaded.brightness, loaded.autoBrightness)
+        brightnessError = null
+      }
     }
   }
   val display = snapshot
@@ -737,6 +754,50 @@ private fun DisplaySection() {
   fun updateDisplay(update: (DisplaySnapshot) -> DisplaySnapshot) {
     snapshot = snapshot?.let(update)
     editRevision++
+  }
+  fun beginBrightnessEdit(edit: DisplayEdit) {
+    latestBrightnessEdit = edit
+    brightnessReadback?.cancel()
+    brightnessRevision++
+    brightnessError = null
+  }
+  fun reconcileBrightness(expected: DisplayEdit) {
+    brightnessReadback?.cancel()
+    val revision = brightnessRevision
+    brightnessReadback = scope.launch {
+      val actual = withContext(Dispatchers.IO) {
+        writes.awaitIdle()
+        runCatching {
+          BrightnessSnapshot(
+              DisplayControl.canWrite(context),
+              DisplayControl.brightnessPercent(context),
+              DisplayControl.autoBrightness(context),
+          )
+        }.getOrNull()
+      }
+      // A later brightness edit owns the UI; volume and tint edits must not invalidate this read.
+      if (revision != brightnessRevision) return@launch
+      val observed = actual ?: confirmedBrightness
+      if (observed != null) {
+        snapshot = snapshot?.copy(canWrite = observed.canWrite, brightness = observed.brightness,
+            autoBrightness = observed.autoBrightness)
+      }
+      if (actual == null) {
+        brightnessError = "Brightness change could not be verified."
+      } else {
+        confirmedBrightness = actual
+        val applied = actual.canWrite && when (expected) {
+          is DisplayEdit.Brightness -> {
+            // Android stores 0..255; match the same integer quantization as DisplayControl.
+            val raw = (expected.percent.coerceIn(1, 100) * 255 / 100).coerceIn(1, 255)
+            !actual.autoBrightness && actual.brightness == (raw * 100f / 255f).toInt()
+          }
+          is DisplayEdit.AutoBrightness -> actual.autoBrightness == expected.enabled
+          is DisplayEdit.Volume -> false
+        }
+        brightnessError = if (applied) null else "Brightness change could not be applied."
+      }
+    }
   }
   fun updateNightShift(update: (DisplayControl.NightShift) -> DisplayControl.NightShift) {
     updateDisplay { it.copy(nightShift = update(it.nightShift)) }
@@ -765,8 +826,14 @@ private fun DisplaySection() {
             onValueChange = {
               val percent = it.toInt()
               // A manual brightness write also turns adaptive brightness off.
+              beginBrightnessEdit(DisplayEdit.Brightness(percent))
               updateDisplay { current -> current.copy(brightness = percent, autoBrightness = false) }
               writes.submit(DisplayEdit.Brightness(percent))
+            },
+            onValueChangeFinished = {
+              // Finishing an older drag must not supersede a newer auto-brightness toggle.
+              val edit = latestBrightnessEdit
+              if (edit is DisplayEdit.Brightness) reconcileBrightness(edit)
             },
             valueRange = 1f..100f,
             colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = IosBlue,
@@ -781,11 +848,17 @@ private fun DisplaySection() {
           title = "Auto-brightness",
           checked = display.autoBrightness,
           onChange = { on ->
+            beginBrightnessEdit(DisplayEdit.AutoBrightness(on))
             updateDisplay { it.copy(autoBrightness = on) }
             writes.submit(DisplayEdit.AutoBrightness(on))
+            reconcileBrightness(DisplayEdit.AutoBrightness(on))
           },
       )
     }
+  }
+  brightnessError?.let {
+    Text(it, color = IosRed, fontSize = Sizes.rowSub,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
   }
   FooterNote("Adjust the screen brightness, or let it adapt to the room automatically.")
 
