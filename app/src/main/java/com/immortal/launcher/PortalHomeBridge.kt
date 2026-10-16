@@ -51,6 +51,7 @@ object PortalHomeBridge {
     }
     // Finish only our retained photo surfaces after durable suppression, before Meta can resume.
     ImmortalDreamNavigation.dismissForNavigation()
+    if (Build.DEVICE != PORTAL_TV_DEVICE) RemoteInput.preparePortalHomeDismissal()
     if (reopenAfterBootstrap(context)) return true
 
     // System Back can surface ripleyhome on Portal TV; it is not a touchscreen-home launch.

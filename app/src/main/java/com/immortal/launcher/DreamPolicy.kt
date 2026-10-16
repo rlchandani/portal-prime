@@ -120,6 +120,8 @@ object DreamPolicy {
 
   fun isCurrentBridge(ticket: Long): Boolean = bridgeRequests.get() == ticket
 
+  internal fun currentBridgeTicket(): Long = bridgeRequests.get()
+
   /** A cancelled preparation cannot clear a newer intentional handoff. Main-owned admission. */
   fun clearBridgeIfCurrent(context: Context, ticket: Long) {
     if (isCurrentBridge(ticket)) clearBridge(context)

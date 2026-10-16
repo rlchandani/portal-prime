@@ -16,6 +16,8 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
@@ -53,6 +55,68 @@ object RemoteInput {
   private val capabilityReads = AtomicLong()
   private val cachedCapabilityReads = AtomicLong()
   private val capabilityFailures = AtomicLong()
+
+  private val portalAmbientExit = PortalAmbientExitSession()
+  private val portalAmbientHandler by lazy { Handler(Looper.getMainLooper()) }
+  private val portalAmbientCallbackToken = Any()
+
+  /** Meta's stopped DreamService can leave its retained Home view in ambient mode. */
+  internal fun preparePortalHomeDismissal() {
+    if (service == null) return
+    val ticket = DreamPolicy.currentBridgeTicket()
+    val now = SystemClock.uptimeMillis()
+    portalAmbientExit.request(ticket, now)
+    portalAmbientHandler.removeCallbacksAndMessages(portalAmbientCallbackToken)
+    // Meta may publish its window before the ambient view is ready; bound this one user action.
+    for (delay in listOf(300L, 800L, 1_500L, 2_500L)) {
+      portalAmbientHandler.postAtTime({
+        if (DreamPolicy.isCurrentBridge(ticket)) portalHomeWindowChanged()
+      }, portalAmbientCallbackToken, now + delay)
+    }
+  }
+
+  /** Only an explicit, current Calls handoff may act on Meta's known ambient surface. */
+  internal fun portalHomeWindowChanged() {
+    if (!portalAmbientExit.pending) return
+    portalAmbientExit.attempt(
+        DreamPolicy.currentBridgeTicket(),
+        DreamPolicy.inStockHandoff && DreamPolicy.portalHomeHandoff,
+        SystemClock.uptimeMillis(),
+        ::clickPortalAmbientSurface,
+    )
+    if (!portalAmbientExit.pending) portalAmbientHandler.removeCallbacksAndMessages(portalAmbientCallbackToken)
+  }
+
+  private fun clickPortalAmbientSurface(): Boolean? {
+    val svc = service ?: return null
+    val root = runCatching { svc.rootInActiveWindow }.getOrNull() ?: return null
+    try {
+      if (root.packageName?.toString() != "com.facebook.alohaapps.launcher") return null
+      // These views have Meta's ambient-to-active click listener; contact/feed rows are excluded.
+      for (id in listOf("slideshow", "fullscreenClock")) {
+        val nodes = root.findAccessibilityNodeInfosByViewId("com.facebook.alohaapps.launcher:id/$id")
+        try {
+          for (node in nodes) {
+            if (!node.isVisibleToUser || !node.isClickable || !node.isEnabled) continue
+            if (service !== svc) return null
+            val clicked = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+            if (clicked) Log.i(TAG, "Requested Meta ambient Home dismissal")
+            return clicked
+          }
+        } finally {
+          @Suppress("DEPRECATION")
+          nodes.forEach { it.recycle() }
+        }
+      }
+      return null
+    } catch (_: Exception) {
+      return null
+    } finally {
+      @Suppress("DEPRECATION")
+      root.recycle()
+    }
+  }
+
 
   /** Called by [BarWatchService.onServiceConnected]. */
   fun register(svc: AccessibilityService) {

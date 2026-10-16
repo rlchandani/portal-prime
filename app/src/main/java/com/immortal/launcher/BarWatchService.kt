@@ -41,6 +41,7 @@ class BarWatchService : AccessibilityService() {
 
   override fun onAccessibilityEvent(event: AccessibilityEvent?) {
     if (event?.eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED) {
+      RemoteInput.portalHomeWindowChanged()
       updateBar()
       PinnedAppScreensaver.windowsChanged()
     }
