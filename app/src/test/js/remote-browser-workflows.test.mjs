@@ -1902,3 +1902,89 @@ test('preset save acknowledgment explains that newer edits remain unsaved', asyn
   const { h, finish }=await pendingPresetSave();try {await h.input('Preset name','Still working');} finally {await finish();}
   assert.match(h.document.body.textContent,/newer edits are still unsaved/i);
 });
+
+
+const reorderSteps = [
+  { type: 'wait', ms: 100 },
+  { type: 'config', target: 'screensaver', config: { nested: { retained: true } }, futureField: 'kept' },
+  { type: 'media', action: 'next' },
+];
+async function reorderHarness(active = 'preset', origin = 'home') {
+  const h = await browserHarness({ saved, routes: {
+    '/remote/scenes': ({ response }) => response({ ok: true, revision: 'current', scenes: [{ id: 'scene', name: 'Scene', steps: reorderSteps, schedule: { enabled: true, hour: 8, minute: 30, days: [1, 3] } }] }),
+    '/remote/presets': ({ response }) => response({ ok: true, presets: [{ id: 'preset', name: 'Preset', steps: reorderSteps }] }),
+  } });
+  const open = async (mode) => {
+    h.eval(`go('${mode === 'scene' ? 'home' : origin}','${mode === 'scene' ? 'scenes' : 'presets'}')`);
+    await h.settle(); h.click('Edit'); await h.settle();
+  };
+  await open(active === 'preset' ? 'scene' : 'preset'); await open(active);
+  return h;
+}
+const draftJson = (h, mode) => h.eval(`JSON.stringify(${mode}Draft)`);
+const stepTypes = (h, mode) => h.eval(`${mode}Draft.steps.map(s => s.step.type).join(',')`);
+const reorderButtons = (h, arrow) => h.document.body.querySelectorAll('button').filter(b => b.textContent === arrow);
+
+test('step reorder preset arrows work with a retained scene draft', async () => {
+  const h = await reorderHarness(), inactive = draftJson(h, 'scene');
+  reorderButtons(h, '↓')[0].click(); await h.settle();
+  assert.equal(stepTypes(h, 'preset'), 'config,wait,media'); assert.equal(draftJson(h, 'scene'), inactive);
+});
+
+test('step reorder colliding wrapper IDs cannot reorder the inactive scene', async () => {
+  const h = await reorderHarness(); h.eval('presetDraft.steps[0].id=sceneDraft.steps[0].id;render()');
+  const inactive = draftJson(h, 'scene'); reorderButtons(h, '↓')[0].click(); await h.settle();
+  assert.equal(stepTypes(h, 'preset'), 'config,wait,media'); assert.equal(draftJson(h, 'scene'), inactive);
+});
+
+test('step reorder scene arrows leave a retained preset untouched', async () => {
+  const h = await reorderHarness('scene'), inactive = draftJson(h, 'preset');
+  reorderButtons(h, '↑')[2].click(); await h.settle();
+  assert.equal(stepTypes(h, 'scene'), 'wait,media,config'); assert.equal(draftJson(h, 'preset'), inactive);
+});
+
+test('step reorder up and down retain wrapper identity rich fields and schedule', async () => {
+  const h = await reorderHarness('scene'), original = draftJson(h, 'scene');
+  reorderButtons(h, '↓')[0].click(); await h.settle(); reorderButtons(h, '↑')[1].click(); await h.settle();
+  assert.equal(draftJson(h, 'scene'), original);
+});
+
+test('step reorder a middle preset row moves exactly its own step', async () => {
+  const h = await reorderHarness(); reorderButtons(h, '↓')[1].click(); await h.settle();
+  assert.equal(stepTypes(h, 'preset'), 'wait,media,config');
+  assert.equal(h.eval('presetDraft.steps[2].step.config.nested.retained'), true);
+});
+
+test('step reorder first and last boundaries do not mutate either draft', async () => {
+  const h = await reorderHarness(), scene = draftJson(h, 'scene'), preset = draftJson(h, 'preset');
+  assert.equal(reorderButtons(h, '↑')[0].disabled, true); assert.equal(reorderButtons(h, '↓')[2].disabled, true);
+  h.eval('moveDraftStep(presetDraft.steps[0].id,-1,"preset");moveDraftStep(presetDraft.steps[2].id,1,"preset")'); await h.settle();
+  assert.equal(draftJson(h, 'scene'), scene); assert.equal(draftJson(h, 'preset'), preset);
+});
+
+test('step reorder an unknown step cannot fall back to the other editor', async () => {
+  const h = await reorderHarness(), scene = draftJson(h, 'scene'), preset = draftJson(h, 'preset');
+  h.eval('moveDraftStep(sceneDraft.steps[0].id,1,"preset")'); await h.settle();
+  assert.equal(draftJson(h, 'scene'), scene); assert.equal(draftJson(h, 'preset'), preset);
+  assert.equal(h.calls.some(c => c.opts.method === 'POST'), false);
+});
+
+test('step reorder unavailable drafts unknown mode and invalid movement are harmless', async () => {
+  const h = await browserHarness({ saved });
+  assert.doesNotThrow(() => h.eval('moveDraftStep("gone",1,"scene");moveDraftStep("gone",1,"preset");moveDraftStep("gone",1,"unknown")'));
+  const ready = await reorderHarness(), original = draftJson(ready, 'preset');
+  ready.eval('moveDraftStep(presetDraft.steps[0].id,2,"preset");moveDraftStep(presetDraft.steps[0].id,0.5,"preset");moveDraftStep(presetDraft.steps[0].id,NaN,"preset");moveDraftStep(presetDraft.steps[0].id,1,"unknown")');
+  assert.equal(draftJson(ready, 'preset'), original);
+});
+
+test('step reorder stale editor callbacks cannot edit drafts on another page', async () => {
+  const h = await reorderHarness(), scene = draftJson(h, 'scene'), preset = draftJson(h, 'preset');
+  h.eval('moveDraftStep(sceneDraft.steps[0].id,1,"scene");go("home");moveDraftStep(presetDraft.steps[0].id,1,"preset")'); await h.settle();
+  assert.equal(draftJson(h, 'scene'), scene); assert.equal(draftJson(h, 'preset'), preset);
+});
+
+test('step reorder preset arrows work from the Remote entry point', async () => {
+  const h = await reorderHarness('preset', 'remote'), inactive = draftJson(h, 'scene');
+  reorderButtons(h, '↑')[1].click(); await h.settle();
+  assert.equal(stepTypes(h, 'preset'), 'config,wait,media'); assert.equal(draftJson(h, 'scene'), inactive);
+});

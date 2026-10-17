@@ -4215,11 +4215,11 @@ function sceneEditor() {
               { class: 'reorder-row' },
               el('span', { class: 'label', text: `${index + 1}. ${stepSummary(entry.step)}` }),
               actions(
-                button('↑', () => moveDraftStep(entry.id, -1), {
+                button('↑', () => moveDraftStep(entry.id, -1, 'scene'), {
                   kind: 'outline',
                   disabled: !index,
                 }),
-                button('↓', () => moveDraftStep(entry.id, 1), {
+                button('↓', () => moveDraftStep(entry.id, 1, 'scene'), {
                   kind: 'outline',
                   disabled: index === d.steps.length - 1,
                 }),
@@ -4302,12 +4302,16 @@ function sceneEditor() {
     ),
   );
 }
-function moveDraftStep(id, delta) {
-  const draft = sceneDraft || presetDraft;
+function moveDraftStep(id, delta, mode) {
+  // Both editors retain drafts across navigation; only the active owner may reorder.
+  const draft = mode === 'scene' && tab === 'home' && detail === 'scenes' ? sceneDraft
+    : mode === 'preset' && (tab === 'home' || tab === 'remote') && detail === 'presets' ? presetDraft
+    : null;
+  if (!draft || !Number.isInteger(delta) || Math.abs(delta) !== 1) return;
   const index = draft.steps.findIndex((s) => s.id === id),
     to = index + delta;
-  if (index >= 0 && to >= 0 && to < draft.steps.length)
-    draft.steps.splice(to, 0, draft.steps.splice(index, 1)[0]);
+  if (index < 0 || to < 0 || to >= draft.steps.length) return;
+  draft.steps.splice(to, 0, draft.steps.splice(index, 1)[0]);
   render();
 }
 async function saveSceneDraft() {
@@ -4745,8 +4749,8 @@ function presetsPage() {
             { class: 'reorder-row' },
             el('span', { class: 'label', text: `${index + 1}. ${stepSummary(entry.step)}` }),
             actions(
-              button('↑', () => moveDraftStep(entry.id, -1), { kind: 'outline', disabled: !index }),
-              button('↓', () => moveDraftStep(entry.id, 1), {
+              button('↑', () => moveDraftStep(entry.id, -1, 'preset'), { kind: 'outline', disabled: !index }),
+              button('↓', () => moveDraftStep(entry.id, 1, 'preset'), {
                 kind: 'outline',
                 disabled: index === d.steps.length - 1,
               }),
