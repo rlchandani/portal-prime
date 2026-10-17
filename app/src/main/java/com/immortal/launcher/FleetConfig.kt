@@ -50,6 +50,14 @@ object FleetConfig {
   fun name(c: Context): String =
       prefs(c).getString("name", null)?.ifBlank { null } ?: (Build.MODEL ?: "Portal")
 
+  /** Immutable name readback shared by the native settings row and remote schema. */
+  data class NameSettings(val name: String)
+
+  fun loadName(c: Context): NameSettings = NameSettings(name(c))
+
+  fun observeName(c: Context, changed: () -> Unit): () -> Unit =
+      observeSettingsPreferenceChanges(prefs(c), setOf("name"), changed)
+
   fun setName(c: Context, name: String) {
     prefs(c).edit().putString("name", name).apply()
     writeManifest(c)

@@ -312,7 +312,10 @@ private fun <S> SettingControl(
                         open(entry.activity)
                     }
                 } else {
-                    ApprovedStringSetting(s, s.get(snapshot), help) { onApply(s.key, it) }
+                    ApprovedStringSetting(s, s.get(snapshot), help,
+                        preserveUneditedDraft = domainId == "fleet" && s.key == "name") {
+                        onApply(s.key, it)
+                    }
                 }
             }
             is NavSpec<*> -> {
@@ -406,9 +409,12 @@ internal fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?,
 
 /** Scalar strings use a dialog. Atomic credential forms still use their original Activities. */
 @Composable
-private fun <S> ApprovedStringSetting(spec: StringSpec<S>, value: String, help: String?, onApply: (String) -> Unit) {
+private fun <S> ApprovedStringSetting(spec: StringSpec<S>, value: String, help: String?,
+    preserveUneditedDraft: Boolean = false, onApply: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
-    var draft by remember(open, value) { mutableStateOf(if (spec.secret) "" else value) }
+    val openingValue = remember(open) { value }
+    // Only device-name drafts opt in; saved updates must not replace text being edited.
+    var draft by remember(open, if (preserveUneditedDraft) null else value) { mutableStateOf(if (spec.secret) "" else value) }
     var error by remember(open) { mutableStateOf<String?>(null) }
     NavRow(spec.title, if (spec.secret) { if (value.isBlank()) "Not set" else "Entered" } else value.ifBlank { "Not set" }) {
         open = true
@@ -425,7 +431,10 @@ private fun <S> ApprovedStringSetting(spec: StringSpec<S>, value: String, help: 
             error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub) }
             Row(Modifier.padding(top = 24.dp)) {
                 ActionPill("Save") {
-                    if ((spec.secret && draft.isBlank()) || spec.applyWhen(draft)) {
+                    if (preserveUneditedDraft && draft.trim() == openingValue.trim()) {
+                        // Saving an untouched dialog must not overwrite a newer companion rename.
+                        open = false
+                    } else if ((spec.secret && draft.isBlank()) || spec.applyWhen(draft)) {
                         // A blank secret is the registry's "keep existing" operation.
                         if (!spec.secret || draft.isNotBlank()) onApply(draft)
                         open = false

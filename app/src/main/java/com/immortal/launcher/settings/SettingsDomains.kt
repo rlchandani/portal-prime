@@ -798,17 +798,17 @@ object SettingsDomains {
    * off a separate stable device id ([MqttConfig.deviceId]), so renaming is cosmetic and safe.
    * Bound to [FleetConfig], whose setter also rewrites the shell-readable fleet manifest.
    */
-  val fleet: SettingsDomain<Context> =
+  val fleet: SettingsDomain<FleetConfig.NameSettings> =
       SettingsDomain(
           id = "fleet",
           title = "Device",
-          load = { it },
+          load = { FleetConfig.loadName(it) },
           specs =
               listOf(
                   StringSpec(
                       "name",
                       "Device name",
-                      get = { FleetConfig.name(it) },
+                      get = { it.name },
                       // Trim surrounding whitespace before storing. Any printable characters are
                       // allowed (HA device name and the mDNS service name tolerate them).
                       set = { c, v -> FleetConfig.setName(c, v.trim()) },

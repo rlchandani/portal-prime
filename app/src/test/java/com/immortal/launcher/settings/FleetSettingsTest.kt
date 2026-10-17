@@ -7,7 +7,7 @@
 
 package com.immortal.launcher.settings
 
-import android.content.Context
+import com.immortal.launcher.FleetConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -20,8 +20,8 @@ import org.junit.Test
  */
 class FleetSettingsTest {
 
-  private val nameSpec: StringSpec<Context> =
-      SettingsDomains.fleet.specs.first { it.key == "name" } as StringSpec<Context>
+  private val nameSpec: StringSpec<FleetConfig.NameSettings> =
+      SettingsDomains.fleet.specs.first { it.key == "name" } as StringSpec<FleetConfig.NameSettings>
 
   @Test
   fun fleetDomain_isRegistered_withNameSpec() {
@@ -49,4 +49,13 @@ class FleetSettingsTest {
     // Surrounding whitespace doesn't count: trims to 48, which is allowed.
     assertTrue(nameSpec.applyWhen("  " + "x".repeat(48) + "  "))
   }
+  @Test
+  fun name_usesImmutableReadbackInsteadOfReadingContextDuringRender() {
+    val opening = FleetConfig.NameSettings("Opening room")
+    val latest = FleetConfig.NameSettings("Companion room")
+    assertEquals("Opening room", nameSpec.get(opening))
+    assertEquals("Companion room", nameSpec.get(latest))
+    assertEquals("Companion room", SettingsDomains.fleet.flatJson(latest).getString("name"))
+  }
+
 }

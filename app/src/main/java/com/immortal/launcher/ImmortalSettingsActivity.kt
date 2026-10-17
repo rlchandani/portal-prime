@@ -957,20 +957,40 @@ private fun minuteLabel(min: Int): String {
   return "%d:%02d %s".format(h12, m, ampm)
 }
 
-/**
- * The "Device Name" detail: a single validated free-text field bound to [FleetConfig] (the same
- * name Home Assistant and the phone remote show). Rendered inline rather than via [SettingsList]
- * because the `fleet` domain's name spec is an `Entry.Inline` string, which the generic renderer
- * shows as a blank row. Writes trim + gate to 1..48 chars, matching the registry's `applyWhen`.
- */
+/** Device-name edits use the registry; saved readback stays current without replacing an open draft. */
 @Composable
 private fun DeviceNameSection() {
-  val context = LocalContext.current
-  var revision by remember { mutableStateOf(0) }
-  androidx.compose.runtime.key(revision) {
-    SettingsList(SettingsDomains.fleet, context) { key, value ->
-      if (key in SettingsDomains.fleet.apply(context, JSONObject().put(key, value))) revision++
+  val context = LocalContext.current.applicationContext
+  var settings by remember(context) { mutableStateOf(FleetConfig.loadName(context)) }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(context, lifecycleOwner) {
+    var stopObserving: (() -> Unit)? = null
+    fun stop() {
+      stopObserving?.invoke()
+      stopObserving = null
     }
+    fun start() {
+      if (stopObserving == null) {
+        stopObserving = FleetConfig.observeName(context) { settings = FleetConfig.loadName(context) }
+        settings = FleetConfig.loadName(context)
+      }
+    }
+    val observer = LifecycleEventObserver { _, event ->
+      when (event) {
+        Lifecycle.Event.ON_RESUME -> start()
+        Lifecycle.Event.ON_PAUSE, Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_DESTROY -> stop()
+        else -> Unit
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) start()
+    onDispose {
+      lifecycleOwner.lifecycle.removeObserver(observer)
+      stop()
+    }
+  }
+  SettingsList(SettingsDomains.fleet, settings) { key, value ->
+    SettingsDomains.fleet.apply(context, JSONObject().put(key, value))
   }
 }
 
