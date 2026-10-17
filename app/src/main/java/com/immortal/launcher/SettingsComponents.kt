@@ -394,7 +394,9 @@ internal data class PickerOption<T>(val value: T, val label: String)
  * A macOS/iPad-style "popup button" row: title on the left, the current value + a ⌄ affordance
  * on the right. Tapping the row opens a [DropdownMenu] of all [options] with a check on the
  * current one — rather than blind-cycling to the next value on each tap. [onSelect] is called
- * with the chosen option's value. The whole row is the click target so the TV remote works.
+ * when the chosen value changes, or when [applyCurrentSelection] allows a displayed fallback to
+ * be persisted. Choosing the current value always closes the menu. The whole row is the click
+ * target so the TV remote works.
  */
 @Composable
 internal fun <T> PickerRow(
@@ -404,10 +406,13 @@ internal fun <T> PickerRow(
     iconColor: Color = Color(0xFF636366),
     iconSymbol: String = "",
     enabled: Boolean = true,
+    applyCurrentSelection: Boolean = false,
     onSelect: (T) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val enabledNow by rememberUpdatedState(enabled)
+    val selectedNow by rememberUpdatedState(selected)
+    val applyCurrentSelectionNow by rememberUpdatedState(applyCurrentSelection)
     val selectNow by rememberUpdatedState(onSelect)
     // Hide during this composition and discard the menu before editing can resume.
     SideEffect { if (!enabled) expanded = false }
@@ -424,7 +429,9 @@ internal fun <T> PickerRow(
                         if (index > 0) Divider()
                         SelectableRow(option.label, "", option.value == selected) {
                             expanded = false
-                            if (enabledNow) selectNow(option.value)
+                            if (enabledNow && (applyCurrentSelectionNow || option.value != selectedNow)) {
+                                selectNow(option.value)
+                            }
                         }
                     }
                 }

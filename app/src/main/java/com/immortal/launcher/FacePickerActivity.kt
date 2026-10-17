@@ -81,7 +81,9 @@ internal fun FacePickerContent() {
             if (entry.sizes.isNotEmpty()) {
                 Divider()
                 PickerRow("Size", settings.faceSizeIndex.coerceIn(0, entry.sizes.lastIndex),
-                    FaceCatalog.SIZE_LABELS.mapIndexed { index, label -> PickerOption(index, label) }) { size ->
+                    FaceCatalog.SIZE_LABELS.mapIndexed { index, label -> PickerOption(index, label) },
+                    applyCurrentSelection = settings.faceSizeIndex !=
+                        settings.faceSizeIndex.coerceIn(0, entry.sizes.lastIndex)) { size ->
                     ScreensaverConfig.setFaceSizeIndex(context, size)
                     settings = ScreensaverConfig.load(context)
                 }
