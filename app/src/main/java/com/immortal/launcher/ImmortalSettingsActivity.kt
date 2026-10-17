@@ -1959,7 +1959,7 @@ internal fun BootAppsContent() {
     }
   }
   val canEdit = apps != null && !loading && !applying && problem == null
-  val onToggle: (String) -> Unit = { pkg ->
+  val onSelectionChange: (String, Boolean) -> Unit = { pkg, removeOnly ->
     if (canEdit && !applying && !loading && problem == null) {
       applying = true
       scope.launch {
@@ -1967,8 +1967,9 @@ internal fun BootAppsContent() {
           val confirmed = withContext(Dispatchers.IO) {
             writeLock.withLock {
               val saved = BootLaunch.readPackages(context).toSet()
-              val chosen = if (pkg in saved) saved - pkg else saved + pkg
-              check(BootLaunch.setPackages(context, chosen.toList()))
+              // Removing an unavailable entry must never re-add it after another writer removed it.
+              val chosen = if (removeOnly || pkg in saved) saved - pkg else saved + pkg
+              if (chosen != saved) check(BootLaunch.setPackages(context, chosen.toList()))
               BootLaunch.readPackages(context).toSet().also { check(it == chosen) }
             }
           }
@@ -1984,6 +1985,8 @@ internal fun BootAppsContent() {
       }
     }
   }
+  val listedPackages = remember(apps) { apps.orEmpty().map { it.pkg }.toSet() }
+  val unlisted = remember(selected, listedPackages) { selected.filterNot { it in listedPackages } }
   Column(Modifier.semantics {
     contentDescription = when {
       applying -> "Saving startup apps"
@@ -2017,7 +2020,7 @@ internal fun BootAppsContent() {
             Row(
                 modifier = Modifier.fillMaxWidth()
                     .defaultMinSize(minHeight = Sizes.rowMinHeight)
-                    .tvFocusableRow(focusFill = IosFocusTint, enabled = canEdit) { onToggle(app.pkg) }
+                    .tvFocusableRow(focusFill = IosFocusTint, enabled = canEdit) { onSelectionChange(app.pkg, false) }
                     .semantics {
                       role = Role.Switch
                       toggleableState = ToggleableState(app.pkg in selected)
@@ -2029,6 +2032,29 @@ internal fun BootAppsContent() {
               Text(app.label, color = IosLabel, fontSize = Sizes.rowTitle,
                   modifier = Modifier.weight(1f).padding(start = 14.dp))
               ApprovedSettingsSwitch(app.pkg in selected, enabled = canEdit)
+            }
+          }
+        }
+      }
+    }
+    if (apps != null && unlisted.isNotEmpty()) {
+      SectionLabel("Saved apps not listed")
+      FooterNote("These startup choices are saved, but their apps aren't shown above. " +
+          "Remove a choice to stop trying to start it after a reboot.")
+      Card {
+        LazyColumn(Modifier.heightIn(max = 280.dp)) {
+          itemsIndexed(unlisted, key = { _, pkg -> pkg }) { index, pkg ->
+            if (index > 0) Divider()
+            Row(Modifier.fillMaxWidth().padding(horizontal = 28.dp, vertical = 18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+              Text(pkg, color = IosLabel, fontSize = Sizes.rowSub,
+                  maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                  modifier = Modifier.weight(1f))
+              ActionPill("Remove", enabled = canEdit,
+                  modifier = Modifier.semantics { contentDescription = "Remove startup entry $pkg" }) {
+                onSelectionChange(pkg, true)
+              }
             }
           }
         }
