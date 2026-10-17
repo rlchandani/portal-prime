@@ -72,10 +72,27 @@ object CountdownConfig {
     val raw = prefs(context).getString(KEY, null) ?: return emptyList()
     return runCatching {
       val arr = JSONArray(raw)
-      (0 until arr.length()).map { i ->
-        val o = arr.getJSONObject(i)
+      val rows = (0 until arr.length()).map { arr.getJSONObject(it) }
+      // Two distinct fallbacks distinguish missing/invalid IDs while preserving optLong's
+      // existing coercion, including valid IDs at either Long extreme.
+      val savedIds = rows.map { row ->
+        val low = row.optLong("id", Long.MIN_VALUE)
+        val high = row.optLong("id", Long.MAX_VALUE)
+        if (low == high) low else null
+      }
+      // Reserve every saved ID before repairing earlier rows, so a later valid event wins
+      // over a generated repair. Preserve the first occurrence of a duplicate saved ID.
+      val reserved = savedIds.filterNotNull().toHashSet()
+      val used = HashSet<Long>()
+      var nextRepair = Long.MIN_VALUE
+      rows.mapIndexed { index, o ->
+        val saved = savedIds[index]
+        val id = if (saved != null && used.add(saved)) saved else {
+          while (nextRepair in reserved || nextRepair in used) nextRepair++
+          nextRepair.also { used.add(it); nextRepair++ }
+        }
         Event(
-            id = o.optLong("id", System.nanoTime()),
+            id = id,
             label = o.optString("label", "Event"),
             emoji = o.optString("emoji", "📅"),
             month = o.optInt("month", 1),
