@@ -653,6 +653,7 @@ async function syncRoster(targets = roster) {
     );
 }
 function openSheet(title, body, onClose = null) {
+  delete sheet.dataset.presetEditor;
   previewPool.clear();
   $('sheet-title').textContent = title;
   content.replaceChildren(body);
@@ -664,6 +665,7 @@ function openSheet(title, body, onClose = null) {
   else for (const primary of body.querySelectorAll('button.button.primary')) footer.append(primary);
   footer.hidden = footer.children.length === 0;
   sheet.onclose = () => {
+    delete sheet.dataset.presetEditor;
     previewPool.clear();
     clearTimeout(pairDiscoveryTimer);
     pairDiscoveryTimer = null;
@@ -913,7 +915,10 @@ function loadVisible(force = false) {
   else if (tab === 'home' && detail === 'snapshots')
     read('snapshot', '/remote/snapshot', (r) => (data.snapshot = r));
   else if (detail === 'presets') {
-    read('presets', '/remote/presets', (r) => (data.presets = r.presets || []));
+    read('presets', '/remote/presets', (r) => {
+      if (!Array.isArray(r.presets)) throw new ApiError('invalid_response');
+      data.presets = r.presets;
+    });
     read('apps', '/remote/apps', (r) => (data.apps = r.apps || []));
   } else if (tab === 'photos' && !detail) {
     loadPhotos();
@@ -4432,6 +4437,7 @@ function stepDialog(existing, mode) {
       button('Save step', save, { kind: 'primary' }),
     ),
   );
+  if (mode === 'preset' && presetDraft) sheet.dataset.presetEditor = presetDraft.id;
   function paint() {
     const nodes = [];
     if (type === 'key' || type === 'media') {
@@ -4675,6 +4681,50 @@ function stepDialog(existing, mode) {
   }
   paint();
 }
+function presetsSaving(target = room()) {
+  return busy.has(`${target?.base}:presets`);
+}
+function presetListReady() {
+  return Array.isArray(data.presets) && !data.presetsError;
+}
+async function savePresetDraft() {
+  if (presetsSaving() || !presetDraft) return;
+  if (!presetListReady()) {
+    toast('Load saved presets before saving. Your draft is kept.', true);
+    return;
+  }
+  const owner = presetDraft;
+  if (!owner.name.trim() || !owner.steps.length) {
+    toast('Enter a name and add a step.', true);
+    return;
+  }
+  const submitted = copy(owner), target = room(), ticket = session.capture();
+  const candidate = [
+    ...data.presets.filter((p) => p.id !== submitted.id),
+    { id: submitted.id, name: submitted.name.trim(), steps: submitted.steps.map((s) => copy(s.step)) },
+  ];
+  const response = await savePresets(candidate, { target, ticket, success: '', renderAfter: false });
+  if (response && session.current(ticket)) {
+    const newerEdits = presetDraft === owner && (
+      JSON.stringify(presetDraft) !== JSON.stringify(submitted) ||
+      (sheet.open && sheet.dataset.presetEditor === owner.id)
+    );
+    if (presetDraft === owner && !newerEdits) presetDraft = null;
+    toast(newerEdits
+      ? 'Submitted preset saved. Your newer edits are still unsaved.'
+      : 'Preset saved and confirmed.');
+  }
+  if (room()?.base === target?.base && detail === 'presets') render();
+}
+function discardPresetDraft() {
+  if (presetsSaving() || !presetDraft) return;
+  const owner = presetDraft;
+  return confirmAction('Discard preset changes?', 'Discard your unsaved edits to this preset.', () => {
+    if (presetsSaving() || presetDraft !== owner) return;
+    presetDraft = null;
+    render();
+  }, 'Discard');
+}
 function presetsPage() {
   if (presetDraft) {
     const d = presetDraft;
@@ -4684,6 +4734,10 @@ function presetsPage() {
         'Legacy presets retain app, navigation, keyboard, wait and configuration actions.',
       ),
       group(
+        presetsSaving() ? text('Saving preset… You can keep editing; newer changes will need another Save.', 'draft-label') : null,
+        !presetListReady() ? data.presetsError
+          ? failure('Saved presets unavailable. Your draft is kept.', data.presetsError, () => loadVisible())
+          : text('Loading saved presets before saving…') : null,
         field('Preset name', d.name, (value) => (d.name = value), { key: 'preset-name' }),
         ...d.steps.map((entry, index) =>
           el(
@@ -4710,39 +4764,15 @@ function presetsPage() {
         ),
         actions(
           button('Add step', () => stepDialog(null, 'preset'), { kind: 'outline' }),
-          button(
-            'Save preset',
-            async () => {
-              if (!d.name.trim() || !d.steps.length) {
-                toast('Enter a name and add a step.', true);
-                return;
-              }
-              const candidate = [
-                ...(data.presets || []).filter((p) => p.id !== d.id),
-                { id: d.id, name: d.name.trim(), steps: d.steps.map((s) => copy(s.step)) },
-              ];
-              const response = await savePresets(candidate);
-              if (response) {
-                presetDraft = null;
-                render();
-              }
-            },
-            { kind: 'primary' },
-          ),
-          button(
-            'Discard changes',
-            () => {
-              presetDraft = null;
-              render();
-            },
-            { kind: 'outline' },
-          ),
+          button('Save preset', savePresetDraft, { kind: 'primary', disabled: presetsSaving() || !presetListReady() }),
+          button('Discard changes', discardPresetDraft, { kind: 'outline', disabled: presetsSaving() }),
         ),
       ),
     );
   }
   return sections(
     heading('Saved presets', 'The macros from your previous remote, with a complete editor.'),
+    presetsSaving() ? text('Saving presets…', 'draft-label') : null,
     group(
       button(
         'New preset',
@@ -4750,7 +4780,7 @@ function presetsPage() {
           presetDraft = { id: uniqueId(), name: '', steps: [] };
           render();
         },
-        { kind: 'primary' },
+        { kind: 'primary', disabled: presetsSaving() },
       ),
     ),
     data.presetsError
@@ -4776,7 +4806,7 @@ function presetsPage() {
                           { id: preset.id },
                           { success: 'Preset started. Check the Portal to confirm each action.' },
                         ),
-                      { kind: 'primary' },
+                      { kind: 'primary', disabled: presetsSaving() },
                     ),
                     button(
                       'Edit',
@@ -4787,7 +4817,7 @@ function presetsPage() {
                         };
                         render();
                       },
-                      { kind: 'outline' },
+                      { kind: 'outline', disabled: presetsSaving() },
                     ),
                     button(
                       'Delete',
@@ -4798,7 +4828,7 @@ function presetsPage() {
                           () => savePresets((data.presets || []).filter((p) => p.id !== preset.id)),
                           'Delete',
                         ),
-                      { kind: 'danger' },
+                      { kind: 'danger', disabled: presetsSaving() },
                     ),
                   ),
                 ),
@@ -4806,14 +4836,27 @@ function presetsPage() {
             ),
   );
 }
-async function savePresets(presets) {
-  const response = await mutate('presets', '/remote/presets', { presets }, { success: '' });
-  if (response?.presets) {
-    data.presets = response.presets;
-    toast('Presets saved.');
-    render();
+async function savePresets(presets, {
+  target = room(), ticket = session.capture(), success = 'Presets saved.', renderAfter = true,
+} = {}) {
+  if (presetsSaving(target) || !session.current(ticket)) return null;
+  if (!presetListReady()) {
+    toast('Load saved presets before saving. Your draft is kept.', true);
+    return null;
   }
-  return response;
+  const pending = mutate('presets', '/remote/presets', { presets }, { target, ticket, success: '' });
+  render();
+  const response = await pending;
+  const confirmed = Array.isArray(response?.presets) && session.current(ticket);
+  if (confirmed) {
+    data.presets = response.presets;
+    data.presetsError = null;
+    if (success) toast(success);
+  } else if (response && session.current(ticket)) {
+    toast('The Portal did not confirm saved presets. Your draft is kept.', true);
+  }
+  if (renderAfter && room()?.base === target?.base && detail === 'presets') render();
+  return confirmed ? response : null;
 }
 function applyTheme() {
   const theme = storage.get(STORAGE.theme, 'system');

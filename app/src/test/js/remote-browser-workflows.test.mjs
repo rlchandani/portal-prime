@@ -1811,3 +1811,94 @@ test('layout acknowledgment explains that newer edits remain unsaved', async () 
   assert.match(h.document.body.textContent, /newer edits are still unsaved/i);
   assert.match(h.document.getElementById('page').textContent, /Unsaved changes/);
 });
+
+async function pendingPresetSave({ fail = false, origin = "home" } = {}) {
+  let release;
+  const h = await browserHarness({ saved, routes: {
+    '/remote/presets': ({ opts, response }) => opts.method === 'POST'
+      ? new Promise(resolve => {
+          const body = JSON.parse(opts.body);
+          release = () => resolve(fail ? response({ ok: false, error: 'invalid_value' }, 400)
+            : response({ ok: true, presets: body.presets }));
+        })
+      : response({ ok: true, presets: [{ id: 'existing', name: 'Submitted', steps: [{ type: 'wait', ms: 100 }] }] }),
+  } });
+  h.eval(`go('${origin}',"presets")`); await h.settle(); h.click('Edit'); await h.settle();
+  h.click('Save preset'); await h.settle();
+  return { h, finish: async () => { release(); await h.settle(); } };
+}
+const presetPosts = h => h.calls.filter(c => c.path === '/remote/presets' && c.opts.method === 'POST');
+
+test('preset save preserves a newer name instead of closing its editor', async () => {
+  const { h, finish } = await pendingPresetSave();
+  try { await h.input('Preset name', 'Newer name'); } finally { await finish(); }
+  assert.equal(h.eval('presetDraft?.name'), 'Newer name');
+  assert.equal(h.eval('data.presets[0].name'), 'Submitted');
+});
+
+test('preset save preserves rich step changes and an open step editor', async () => {
+  const { h, finish } = await pendingPresetSave();
+  try { h.eval('presetDraft.steps[0].step={type:"config",config:{nested:{kept:true}},futureField:"retained"};render()'); } finally { await finish(); }
+  assert.equal(h.eval('presetDraft?.steps[0].step.futureField'), 'retained');
+  assert.equal(h.eval('presetDraft?.steps[0].step.config.nested.kept'), true);
+  const pending=await pendingPresetSave();pending.h.click('Add step');await pending.h.settle();await pending.finish();
+  assert.notEqual(pending.h.eval('presetDraft'),null);
+  assert.equal(pending.h.document.getElementById('sheet').open,true);
+  pending.h.click('Save step');await pending.h.settle();
+  assert.equal(pending.h.eval('presetDraft.steps.length'),2);
+});
+
+test('preset save shows progress and leaves the name editable', async () => {
+  const { h, finish } = await pendingPresetSave();
+  try {
+    assert.match(h.document.getElementById('page').textContent, /Saving preset/);
+    assert.equal(layoutButton(h, 'Save preset').disabled, true);
+    assert.equal(layoutButton(h, 'Discard changes').disabled, true);
+    await h.input('Preset name', 'Editable');
+    assert.equal(h.eval('presetDraft.name'), 'Editable');
+  } finally { await finish(); }
+});
+
+test('preset save from Remote clears pending status and confirms the list', async () => {
+  const {h,finish}=await pendingPresetSave({origin:"remote"});
+  try {assert.equal(layoutButton(h,'Save preset').disabled,true);h.click('Save preset');await h.settle();assert.equal(presetPosts(h).length,1);} finally {await finish();}
+  assert.equal(h.eval('presetDraft'),null);assert.match(h.document.getElementById('page').textContent,/Saved presets/);assert.doesNotMatch(h.document.getElementById('page').textContent,/Saving preset/);
+});
+
+test('next preset save submits preserved edits under the same identity', async () => {
+  const { h, finish } = await pendingPresetSave();
+  try { await h.input('Preset name', 'Next'); } finally { await finish(); }
+  h.click('Save preset'); await h.settle();
+  try { const body=JSON.parse(presetPosts(h).at(-1).opts.body);assert.equal(body.presets.length,1);assert.equal(body.presets[0].id,'existing');assert.equal(body.presets[0].name,'Next'); }
+  finally { await finish(); }
+  assert.equal(h.eval('presetDraft'),null);
+});
+
+test('preset save cannot overwrite an unavailable saved-preset list', async () => {
+  const h=await browserHarness({saved,routes:{'/remote/presets':({opts,response})=>opts.method==='POST'?response({ok:true,presets:[]}):response({ok:false,error:'unavailable'},503)}});
+  h.eval('go("home","presets")');await h.settle();h.click('New preset');await h.input('Preset name','Keep me');h.eval('presetDraft.steps=[{id:"step",step:{type:"wait",ms:100}}];render()');
+  assert.equal(layoutButton(h,'Save preset').disabled,true);h.click('Save preset');await h.settle();assert.equal(presetPosts(h).length,0);assert.equal(h.eval('presetDraft.name'),'Keep me');
+});
+
+test('failed preset save retains newer draft and reenables its controls', async () => {
+  const { h, finish } = await pendingPresetSave({ fail:true });
+  try { await h.input('Preset name','Retry me'); } finally { await finish(); }
+  assert.equal(h.eval('presetDraft?.name'),'Retry me');assert.equal(layoutButton(h,'Save preset').disabled,false);assert.equal(layoutButton(h,'Discard changes').disabled,false);
+});
+
+test('preset discard cannot clear the draft during pending save', async () => {
+  const { h, finish } = await pendingPresetSave();
+  try { h.click('Discard changes'); await h.settle();assert.equal(h.eval('presetDraft?.name'),'Submitted');assert.equal(h.document.getElementById('sheet').open,false); }
+  finally { await finish(); }
+});
+
+test('preset discard requires confirmation and Cancel preserves the draft', async () => {
+  const h=await browserHarness({saved});h.eval('go("home","presets")');await h.settle();h.click('New preset');await h.input('Preset name','Keep me');
+  h.click('Discard changes');await h.settle();assert.equal(h.document.getElementById('sheet').open,true);h.click('Cancel');await h.settle();assert.equal(h.eval('presetDraft?.name'),'Keep me');
+  h.click('Discard changes');await h.settle();h.click('Discard');await h.settle();assert.equal(h.eval('presetDraft'),null);
+});
+
+test('preset save acknowledgment explains that newer edits remain unsaved', async () => {
+  const { h, finish }=await pendingPresetSave();try {await h.input('Preset name','Still working');} finally {await finish();}
+  assert.match(h.document.body.textContent,/newer edits are still unsaved/i);
+});
