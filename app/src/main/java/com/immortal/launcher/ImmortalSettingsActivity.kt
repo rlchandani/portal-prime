@@ -1463,7 +1463,7 @@ internal fun MqttContent() {
             Column(modifier = Modifier.weight(1f)) {
               Text("Use TLS / SSL", color = IosLabel, fontSize = Sizes.rowTitle)
               Text(
-                  "Encrypt the connection (e.g. a broker behind a reverse proxy on port 8883).",
+                  "Encrypt the connection. Default ports switch automatically; custom ports are kept.",
                   color = IosSecondary,
                   fontSize = Sizes.rowSub,
                   modifier = Modifier.padding(top = 2.dp),
@@ -1473,11 +1473,7 @@ internal fun MqttContent() {
                 checked = useTls,
                 onCheckedChange = { on ->
                   useTls = on
-                  // Hop to the matching default port if the field is still on the other default.
-                  if (on && port == MqttConfig.DEFAULT_PORT.toString())
-                      port = MqttConfig.DEFAULT_TLS_PORT.toString()
-                  else if (!on && port == MqttConfig.DEFAULT_TLS_PORT.toString())
-                      port = MqttConfig.DEFAULT_PORT.toString()
+                  // The registry selects defaults using the current saved port.
                   apply()
                 },
                 modifier = Modifier.semantics { contentDescription = "Use TLS / SSL" },
