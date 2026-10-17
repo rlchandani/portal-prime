@@ -86,7 +86,8 @@ class RemoteNavigationActivityTest {
     f.onAcquire = { assertEquals(1, f.launches.size) }
     assertSuccessful(f.key("dashboard"))
     val launch = f.intents.getValue(f.launches.single())
-    assertSame(f.dashboardUri, launch.target)
+    assertSame(f.normalizedDashboardUri, launch.target)
+    Mockito.verify(f.dashboardUri).normalizeScheme()
     assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK, launch.flags)
     assertIdlePulse(f)
   }
@@ -516,6 +517,7 @@ class RemoteNavigationActivityTest {
     val search = mutableStateOf(0)
     val appIntent = Mockito.mock(Intent::class.java, Mockito.RETURNS_SELF)
     val dashboardUri = Mockito.mock(Uri::class.java)
+    val normalizedDashboardUri = Mockito.mock(Uri::class.java)
     val intents = linkedMapOf<Intent, Launch>()
     val launches = CopyOnWriteArrayList<Intent>()
     val locks = CopyOnWriteArrayList<Lock>()
@@ -526,6 +528,7 @@ class RemoteNavigationActivityTest {
     var onAcquire: () -> Unit = {}
     val routes = RemoteRoutes(context)
     init {
+      `when`(dashboardUri.normalizeScheme()).thenReturn(normalizedDashboardUri)
       setDelegate("launcherTabState", tab)
       setDelegate("appsSearchOpenRequest", search)
       Mockito.doReturn(lifecycle).`when`(home).lifecycle

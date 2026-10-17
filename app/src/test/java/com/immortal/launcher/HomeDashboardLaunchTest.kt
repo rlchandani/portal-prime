@@ -19,9 +19,12 @@ import org.mockito.Mockito.`when`
 
 class HomeDashboardLaunchTest {
     private val address = "https://dashboard.invalid/view/?mode=touch#room"
+    private val schemeAddresses = listOf("http", "https", "HTTP", "HTTPS", "hTtP", "hTtPs")
+        .map { "$it://dashboard.invalid/view/?mode=touch#room" }
     private data class Attempt(val intent: Intent, val packageName: String?)
 
     private fun withGateway(failure: (Int) -> Exception? = { null },
+        address: String = this.address,
         check: (Boolean, List<Attempt>, PackageManager, List<Intent>, Int) -> Unit) {
         val prefs = HomeDashboardTestPrefs(address)
         val context = prefs.context
@@ -39,11 +42,15 @@ class HomeDashboardLaunchTest {
             toasts.`when`<Toast> { Toast.makeText(context, "Your dashboard couldn’t be opened.", Toast.LENGTH_LONG) }
                 .thenReturn(toast)
             Mockito.mockStatic(Uri::class.java).use { uris ->
-                val uri = Mockito.mock(Uri::class.java)
-                uris.`when`<Uri> { Uri.parse(address) }.thenReturn(uri)
+                // Distinct sentinels test our handoff, not Android's actual URI parser.
+                val rawUri = Mockito.mock(Uri::class.java, "rawUri")
+                val normalizedUri = Mockito.mock(Uri::class.java, "normalizedUri")
+                `when`(rawUri.normalizeScheme()).thenReturn(normalizedUri)
+                uris.`when`<Uri> { Uri.parse(address) }.thenReturn(rawUri)
+                val constructorArguments = mutableListOf<List<Any?>>()
                 Mockito.mockConstruction(Intent::class.java,
                     Mockito.withSettings().defaultAnswer(Mockito.RETURNS_SELF)) { intent, construction ->
-                    assertEquals(listOf(Intent.ACTION_VIEW, uri), construction.arguments())
+                    constructorArguments.add(construction.arguments().toList())
                     Mockito.doAnswer { call -> packageName = call.getArgument(0); intent }
                         .`when`(intent).setPackage(Mockito.nullable(String::class.java))
                 }.use { intents ->
@@ -55,6 +62,15 @@ class HomeDashboardLaunchTest {
                     val opened = HomeDashboardActivity.openDashboard(context)
                     assertEquals(0, prefs.writeCount)
                     uris.verify { Uri.parse(address) }
+                    assertEquals(1, constructorArguments.size)
+                    assertEquals(Intent.ACTION_VIEW, constructorArguments.single()[0])
+                    assertSame("Browser intent must receive the normalized URI", normalizedUri,
+                        constructorArguments.single()[1])
+                    Mockito.verify(rawUri).normalizeScheme()
+                    Mockito.verify(intents.constructed().single()).addCategory(Intent.CATEGORY_BROWSABLE)
+                    Mockito.verify(intents.constructed().single()).putExtra(
+                        Browser.EXTRA_APPLICATION_ID, "com.immortal.launcher")
+                    Mockito.verify(intents.constructed().single()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     check(opened, attempts, manager, intents.constructed(), notifications)
                 }
             }
@@ -62,25 +78,26 @@ class HomeDashboardLaunchTest {
     }
 
     @Test fun preferredBrowserLaunchSkipsPackageQueriesAndDispatchesOnce() {
-        withGateway { opened, attempts, manager, intents, notifications ->
-            assertTrue(opened); assertEquals(0, notifications)
-            assertEquals(listOf("org.chromium.chrome"), attempts.map { it.packageName })
-            assertEquals(1, intents.size)
-            Mockito.verifyNoInteractions(manager)
-            Mockito.verify(intents.single()).addCategory(Intent.CATEGORY_BROWSABLE)
-            Mockito.verify(intents.single()).putExtra(Browser.EXTRA_APPLICATION_ID, "com.immortal.launcher")
-            Mockito.verify(intents.single()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        schemeAddresses.forEach { address ->
+            withGateway(address = address) { opened, attempts, manager, intents, notifications ->
+                assertTrue(opened); assertEquals(0, notifications)
+                assertEquals(listOf("org.chromium.chrome"), attempts.map { it.packageName })
+                assertEquals(1, intents.size)
+                Mockito.verifyNoInteractions(manager)
+            }
         }
     }
 
     @Test fun missingPreferredHandlerFallsBackOnceWithTheSameUrlIntent() {
-        withGateway({ if (it == 1) ActivityNotFoundException("synthetic") else null }) {
-            opened, attempts, manager, intents, notifications ->
-            assertTrue(opened); assertEquals(0, notifications)
-            assertEquals(listOf("org.chromium.chrome", null), attempts.map { it.packageName })
-            assertEquals(1, intents.size)
-            assertSame(attempts[0].intent, attempts[1].intent)
-            Mockito.verifyNoInteractions(manager)
+        schemeAddresses.forEach { address ->
+            withGateway({ if (it == 1) ActivityNotFoundException("synthetic") else null }, address) {
+                opened, attempts, manager, intents, notifications ->
+                assertTrue(opened); assertEquals(0, notifications)
+                assertEquals(listOf("org.chromium.chrome", null), attempts.map { it.packageName })
+                assertEquals(1, intents.size)
+                assertSame(attempts[0].intent, attempts[1].intent)
+                Mockito.verifyNoInteractions(manager)
+            }
         }
     }
 

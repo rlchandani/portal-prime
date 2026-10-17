@@ -30,7 +30,7 @@ class HomeDashboardActivity : ComponentActivity() {
                 context.openApprovedHomeSettings("ha")
                 return false
             }
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url).normalizeScheme())
                 .addCategory(Intent.CATEGORY_BROWSABLE)
                 .putExtra(Browser.EXTRA_APPLICATION_ID, context.packageName)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
