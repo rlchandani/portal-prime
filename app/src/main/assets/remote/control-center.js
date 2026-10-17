@@ -1696,10 +1696,10 @@ function settingsPage() {
     ),
   );
 }
-function scopePanel() {
+function scopePanel(disabled = false) {
   if (roster.length < 2) return null;
   const targets = settingTargets();
-  return group(
+  const panel = group(
     el('h3', { text: 'Apply settings to' }),
     segmented(
       scope,
@@ -1741,6 +1741,8 @@ function scopePanel() {
         )
       : null,
   );
+  if (disabled) for (const control of [...panel.querySelectorAll('button'), ...panel.querySelectorAll('input')]) control.disabled = true;
+  return panel;
 }
 function settingTargets(domain, control) {
   const chosen = captureTargets(roster, scope, room()?.base, selectedTargets);
@@ -1765,14 +1767,14 @@ async function loadScopeSchemas() {
   }
   if (session.current(ticket)) render();
 }
-function resultPanel() {
-  if (!scopeResults.length) return null;
+function resultPanel(results = scopeResults) {
+  if (!results.length) return null;
   return group(
     el('h3', { text: 'Results by room' }),
     el(
       'div',
       { class: 'result-list' },
-      scopeResults.map((result) =>
+      results.map((result) =>
         el(
           'div',
           { class: result.ok ? 'success' : 'error' },
@@ -2134,6 +2136,25 @@ async function applyDomain(
   }
   return results;
 }
+let profileApplyState = null;
+function profileControlsLocked(ticket = session.capture()) {
+  return !!profileApplyState?.pending || busy.has(profileCaptureKey(ticket));
+}
+function profileApplyPanel() {
+  const state = profileApplyState;
+  if (!state) return null;
+  const title = state.pending ? `Applying “${state.name}”…`
+    : state.stopped ? 'Profile application stopped'
+    : state.error ? 'Profile could not finish'
+    : state.results.some((r) => !r.ok) ? 'Some profile changes need attention' : 'Profile applied';
+  return group(
+    el('h3', { text: title }),
+    text(`Profile “${state.name}” · ${state.targets.map((target) => target.name).join(', ') || 'No ordinary rooms selected'}`),
+    el('p', { class: 'detail', role: 'status', 'aria-live': 'polite', text: `${state.completed} of ${state.total} categories completed. ${state.results.filter((r) => r.ok).length} of ${state.results.length} room/category changes confirmed.` }),
+    state.stopped ? text('Navigation stopped the remaining categories. Earlier confirmed changes remain; review the results before applying again.') : null,
+    state.error ? text(state.error, 'error') : null,
+  );
+}
 function readProfiles() {
   let raw;
   try {
@@ -2153,6 +2174,7 @@ function readProfiles() {
   }
 }
 function deleteProfile(name) {
+  if (profileControlsLocked()) return;
   const current = readProfiles();
   if (!current.ok) {
     toast(`Profile not deleted. ${current.error}`, true);
@@ -2179,7 +2201,7 @@ function profileCaptureKey(ticket = session.capture()) {
 }
 async function saveCurrentProfile(name, ticket) {
   const key = profileCaptureKey(ticket);
-  if (!session.current(ticket) || busy.has(key)) return;
+  if (!session.current(ticket) || profileControlsLocked(ticket)) return;
   const opening = readProfiles();
   if (!opening.ok) {
     toast(`Profile not saved. ${opening.error}`, true);
@@ -2217,10 +2239,12 @@ async function saveCurrentProfile(name, ticket) {
   }
 }
 function profilesPage() {
+  const locked = profileControlsLocked();
   const current = readProfiles();
   if (!current.ok)
     return sections(
       heading('Settings profiles', 'Your profiles are saved in this browser.'),
+      profileApplyPanel(),
       group(
         el('h3', { text: 'Saved profiles unavailable' }),
         text(current.error),
@@ -2231,8 +2255,9 @@ function profilesPage() {
   const profiles = current.profiles;
   return sections(
     heading('Settings profiles', 'Your named profiles from the previous remote remain available.'),
-    scopePanel(),
-    resultPanel(),
+    scopePanel(locked),
+    profileApplyPanel(),
+    resultPanel(profileApplyState?.results ?? scopeResults),
     group(
       el('h3', { text: 'Saved in this browser' }),
       text(
@@ -2257,7 +2282,7 @@ function profilesPage() {
                   ticket,
                 );
               },
-              { kind: 'outline' },
+              { kind: 'outline', disabled: locked },
             ),
             button(
               'Delete',
@@ -2268,7 +2293,7 @@ function profilesPage() {
                   () => deleteProfile(name),
                   'Delete',
                 ),
-              { kind: 'danger' },
+              { kind: 'danger', disabled: locked },
             ),
           ),
         ),
@@ -2294,33 +2319,56 @@ function profilesPage() {
             );
           else save();
         },
-        { kind: 'primary', disabled: busy.has(profileCaptureKey()) },
+        { kind: 'primary', disabled: locked },
       ),
     ),
   );
 }
 async function applyProfile(name, profile, targets, ticket) {
-  const collected = [];
-  for (const [domain, values] of Object.entries(profile || {})) {
-    if (!session.current(ticket)) return;
+  if (!session.current(ticket) || profileControlsLocked(ticket)) return;
+  const jobs = [];
+  for (const [domain, values] of Object.entries(copy(profile || {}))) {
     if (!values || typeof values !== 'object' || Array.isArray(values)) continue;
     const safe = { ...values };
     const schemaDomain = data.settings?.domains?.find((d) => d.id === domain);
     for (const key of Object.keys(safe))
       if (schemaDomain?.controls?.find((c) => c.key === key)?.secret) delete safe[key];
-    if (!Object.keys(safe).length) continue;
-    const results = await applyDomain(domain, safe, targets, ticket);
-    for (const result of results || [])
-      collected.push({ ...result, name: `${result.name} · ${schemaDomain?.title || domain}` });
-    if (!session.current(ticket)) return;
+    if (Object.keys(safe).length) jobs.push({ domain, values: safe, title: schemaDomain?.title || domain });
   }
-  scopeResults = collected;
+  if (!jobs.length) {
+    toast('This profile has no applicable settings.', true);
+    return;
+  }
+  const state = { name, targets: targets.map((target) => Object.freeze({ ...target })), pending: true,
+    completed: 0, total: jobs.length, results: [], stopped: false, error: null };
+  profileApplyState = state;
+  scopeResults = [];
   render();
-  toast(
-    `Profile “${name}”: ${collected.filter((r) => r.ok).length} of ${collected.length} room/category changes confirmed.`,
-    collected.some((r) => !r.ok),
-  );
+  try {
+    for (const job of jobs) {
+      if (!session.current(ticket)) { state.stopped = true; break; }
+      const results = await applyDomain(job.domain, job.values, state.targets, ticket);
+      if (!Array.isArray(results) || !results.length) {
+        state.error = 'This category could not be applied. Review the selected rooms and retry after pending changes finish.';
+        break;
+      }
+      state.results.push(...results.map((result) => ({ ...result, name: `${result.name} · ${job.title}` })));
+      state.completed++;
+      if (session.current(ticket)) render();
+    }
+  } catch (error) {
+    state.error = message(error);
+  } finally {
+    state.pending = false;
+    if (session.current(ticket)) {
+      scopeResults = state.results;
+      render();
+      if (state.error) toast(`Profile “${name}” could not finish. ${state.error}`, true);
+      else toast(`Profile “${name}”: ${state.results.filter((r) => r.ok).length} of ${state.results.length} room/category changes confirmed.`, state.results.some((r) => !r.ok));
+    }
+  }
 }
+
 async function loadSources() {
   return read('sources', '/remote/sources', (r) => {
     const source = { ...(r.sources || {}) };

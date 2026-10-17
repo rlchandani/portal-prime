@@ -1436,3 +1436,150 @@ test('profile store literal prototype-like profile names delete only that own en
   h.click('Delete'); confirmProfileDelete(h); await h.settle();
   assert.deepEqual(storedProfiles(h), { constructor: { sunrise: { hour: 8 } } });
 });
+
+
+const applyProfileFixture = { domains: [
+  { id: 'screensaver', title: 'Photos', controls: [{ key: 'intervalSec', type: 'int', value: 30, min: 5, max: 600 }, { key: 'pin', type: 'string', secret: true, value: '' }] },
+  { id: 'calendar', title: 'Calendar', controls: [{ key: 'maxEvents', type: 'int', value: 3, min: 1, max: 20 }] },
+] };
+async function ownedProfileHarness({ failSecondRoom = false, holdCapture = false } = {}) {
+  const releases = []; let captureRelease;
+  const h = await browserHarness({ saved, routes: {
+    '/remote/settings': ({ url, opts, response }) => {
+      if (opts.method !== 'POST') return response({ ok: true, settings: applyProfileFixture });
+      const body = JSON.parse(opts.body), domain = applyProfileFixture.domains.find(d => d.id === body.domain);
+      const reply = () => failSecondRoom && body.domain === 'calendar' && url.includes('8878')
+        ? response({ ok: false, error: 'unreachable' }, 503)
+        : response({ ok: true, applied: Object.keys(body.values), domain: { ...domain, controls: domain.controls.map(c => ({ ...c, value: body.values[c.key] ?? c.value })) } });
+      return body.domain === 'screensaver' ? new Promise(resolve => releases.push(() => resolve(reply()))) : reply();
+    },
+    '/remote/settings/profile': ({ response }) => holdCapture
+      ? new Promise(resolve => { captureRelease = () => resolve(response({ ok: true, profileComplete: true, settings: applyProfileFixture })); })
+      : response({ ok: true, profileComplete: true, settings: applyProfileFixture }),
+  } });
+  h.eval('go("settings","profiles");localStorage.setItem(STORAGE.profiles,JSON.stringify({Morning:{screensaver:{intervalSec:45},calendar:{maxEvents:5}},Evening:{screensaver:{intervalSec:60},calendar:{maxEvents:8}}}));render()');
+  await h.settle();
+  return { h, releases, release: async () => { releases.splice(0).forEach(f => f()); await h.settle(); }, capture: async () => { captureRelease(); await h.settle(); } };
+}
+const confirmOwnedApply = h => h.document.getElementById('sheet-actions').querySelectorAll('button').find(b => b.textContent === 'Apply').click();
+const startOwnedProfile = h => h.eval('applyProfile("Morning",{screensaver:{intervalSec:45},calendar:{maxEvents:5}},settingTargets(),session.capture())');
+
+test('profile operation duplicate admission cannot apply the remaining category early', async () => {
+  const t = await ownedProfileHarness(), h = t.h; const first = startOwnedProfile(h); await h.settle();
+  const duplicate = startOwnedProfile(h); await h.settle();
+  try {
+    assert.equal(settingsPosts(h).length, 1);
+    assert.equal(settingsPosts(h).some(c => JSON.parse(c.opts.body).domain === 'calendar'), false);
+  } finally { await t.release(); await first; await duplicate; }
+  assert.equal(settingsPosts(h).length, 2);
+});
+
+test('profile operation a competing profile cannot mix categories into the running profile', async () => {
+  const t = await ownedProfileHarness(), h = t.h; const first = startOwnedProfile(h); await h.settle();
+  const competing = h.eval('applyProfile("Evening",{calendar:{maxEvents:8}},settingTargets(),session.capture())'); await h.settle();
+  try {
+    assert.equal(settingsPosts(h).length, 1);
+  } finally { await t.release(); await first; await competing; }
+  assert.deepEqual(settingsPosts(h).map(c => JSON.parse(c.opts.body).values), [{ intervalSec: 45 }, { maxEvents: 5 }]);
+});
+
+test('profile operation actual Apply confirmation locks mutation and scope controls with visible progress', async () => {
+  const t = await ownedProfileHarness(), h = t.h;
+  h.click('Apply'); confirmOwnedApply(h); await h.settle();
+  try {
+    const buttons = h.document.getElementById('page').querySelectorAll('button');
+    for (const label of ['Apply', 'Delete', 'Save current settings', 'This Portal', 'Selected rooms', 'All rooms'])
+      assert.equal(buttons.filter(b => b.textContent === label).every(b => b.disabled), true, label);
+    assert.match(h.document.getElementById('page').textContent, /Applying.*Morning/);
+    assert.match(h.document.getElementById('page').textContent, /0 of 2 categories/);
+  } finally { await t.release(); }
+  assert.equal(h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Apply').disabled, false);
+});
+
+test('profile operation freezes all category values before the first asynchronous write', async () => {
+  const t = await ownedProfileHarness(), h = t.h;
+  const applying = h.eval('globalThis.changingProfile={screensaver:{intervalSec:45},calendar:{maxEvents:5}};applyProfile("Morning",changingProfile,settingTargets(),session.capture())'); await h.settle();
+  h.eval('changingProfile.calendar.maxEvents=9'); await t.release(); await applying;
+  assert.equal(JSON.parse(settingsPosts(h)[1].opts.body).values.maxEvents, 5);
+});
+
+test('profile operation All rooms retains every category result and reports partial failure accurately', async () => {
+  const t = await ownedProfileHarness({ failSecondRoom: true }), h = t.h;
+  h.eval('scope="all"'); const applying = startOwnedProfile(h); await h.settle(); await t.release(); await applying;
+  assert.equal(settingsPosts(h).length, 4);
+  assert.equal(h.eval('profileApplyState.results.length'), 4);
+  assert.equal(h.eval('profileApplyState.results.filter(r=>r.ok).length'), 3);
+  assert.match(h.document.getElementById('notice').textContent, /3 of 4/);
+  assert.match(h.document.getElementById('page').textContent, /2 of 2 categories/);
+  assert.equal(h.eval('profileApplyState.pending'), false);
+});
+
+test('profile operation empty and secret-only profiles never announce zero-of-zero success', async () => {
+  const t = await ownedProfileHarness(), h = t.h;
+  for (const profile of [{}, { screensaver: { pin: 'public-fixture-secret' } }]) {
+    await h.eval(`applyProfile("Empty",${JSON.stringify(profile)},settingTargets(),session.capture())`);
+    assert.equal(settingsPosts(h).length, 0);
+    assert.match(h.document.getElementById('notice').textContent, /no applicable settings/i);
+    assert.doesNotMatch(h.document.getElementById('notice').textContent, /0 of 0/);
+  }
+});
+
+test('profile operation navigation stops future categories and retains confirmed partial outcome on return', async () => {
+  const t = await ownedProfileHarness(), h = t.h; const applying = startOwnedProfile(h); await h.settle();
+  h.eval('go("home")'); await h.settle(); await t.release(); await applying;
+  assert.equal(settingsPosts(h).length, 1);
+  assert.equal(h.eval('profileApplyState.stopped'), true);
+  assert.equal(h.eval('profileApplyState.results.length'), 1);
+  assert.equal(h.eval('tab'), 'home');
+  h.eval('go("settings","profiles")'); await h.settle();
+  assert.match(h.document.getElementById('page').textContent, /application stopped/i);
+  assert.match(h.document.getElementById('page').textContent, /confirmed.*remain/i);
+  assert.equal(h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Apply').disabled, false);
+});
+
+test('profile operation switching rooms cannot dispatch remaining categories to the new room', async () => {
+  const t = await ownedProfileHarness(), h = t.h; const applying = startOwnedProfile(h); await h.settle();
+  h.eval(`selectRoom('${saved[1].base}')`); await h.settle(); await t.release(); await applying;
+  assert.equal(settingsPosts(h).length, 1);
+  assert.ok(settingsPosts(h)[0].url.includes('8877'));
+  assert.equal(h.eval('profileApplyState.stopped'), true);
+  assert.equal(h.eval('profileApplyState.targets[0].base'), saved[0].base);
+});
+
+test('profile operation outstanding snapshot capture blocks Apply and Delete until it completes', async () => {
+  const t = await ownedProfileHarness({ holdCapture: true }), h = t.h;
+  h.eval('setDraft("profile-name","New snapshot");render()'); h.click('Save current settings'); await h.settle();
+  const applying = h.eval('applyProfile("Morning",{calendar:{maxEvents:8}},settingTargets(),session.capture())');
+  try {
+    h.eval('deleteProfile("Morning")');
+    assert.equal(settingsPosts(h).length, 0);
+    assert.ok(storedProfiles(h).Morning);
+    assert.equal(h.document.getElementById('page').querySelectorAll('button').filter(b=>b.textContent==='Apply').every(b=>b.disabled), true);
+  } finally { await t.capture(); await applying; }
+  assert.equal(settingsPosts(h).length, 0);
+});
+
+test('profile operation failure clears its pending guard and offers a truthful result', async () => {
+  const t = await ownedProfileHarness(), h = t.h;
+  h.eval('applyDomain=async()=>{throw new Error("public-fixture-error")}');
+  await startOwnedProfile(h);
+  assert.equal(h.eval('profileApplyState.pending'), false);
+  assert.match(h.document.getElementById('notice').textContent, /could not finish/i);
+  assert.equal(h.document.getElementById('page').querySelectorAll('button').find(b=>b.textContent==='Apply').disabled, false);
+});
+
+test('profile operation cancelled confirmation makes no writes and starts no operation', async () => {
+  const t = await ownedProfileHarness(), h = t.h;
+  h.click('Apply'); h.click('Cancel'); await h.settle();
+  assert.equal(settingsPosts(h).length, 0);
+  assert.equal(h.eval('profileApplyState?.pending ?? false'), false);
+});
+
+test('profile operation no selected ordinary rooms reports an unconfirmed category instead of success', async () => {
+  const t = await ownedProfileHarness(), h = t.h;
+  h.eval('scope="selected";selectedTargets.clear()');
+  await h.eval('applyProfile("Morning",{calendar:{maxEvents:5}},settingTargets(),session.capture())');
+  assert.equal(settingsPosts(h).length, 0);
+  assert.match(h.document.getElementById('notice').textContent, /could not finish/i);
+  assert.doesNotMatch(h.document.getElementById('notice').textContent, /0 of 0.*confirmed/);
+});
