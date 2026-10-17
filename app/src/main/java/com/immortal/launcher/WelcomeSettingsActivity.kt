@@ -71,6 +71,7 @@ private fun WelcomeSettingsScreen() {
 internal fun WelcomeSettingsContent() {
   val context = LocalContext.current
   val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
+  val pageActive by rememberUpdatedState(LocalApprovedLauncherPageActive.current)
   var settings by remember { mutableStateOf(WelcomeConfig.load(context)) }
 
   val firstFocus = remember { FocusRequester() }
@@ -238,11 +239,16 @@ internal fun WelcomeSettingsContent() {
         if (advanced) {
         SectionLabel("Timing")
         Card {
-          DurationStepper(settings.durationMs / 1000) { sec ->
-            val ms = WelcomeConfig.clampDuration(sec * 1000)
-            SettingsDomains.welcome.apply(context, JSONObject().put("durationMs", ms))
-            settings = WelcomeConfig.load(context)
+          val duration = remember { WelcomeDurationAdapter() }
+          fun adjustDuration(increase: Boolean) {
+            if (pageActive) settings = duration.adjust(settings, increase,
+                apply = { key, ms ->
+                  SettingsDomains.welcome.apply(context, JSONObject().put(key, ms))
+                },
+                reload = { SettingsDomains.welcome.load(context) })
           }
+          Stepper(duration.title, duration.label(settings), enabled = pageActive,
+              onMinus = { adjustDuration(false) }, onPlus = { adjustDuration(true) })
         }
         FooterNote(
             "How long the welcome overlay displays before auto-dismissing.",
@@ -348,42 +354,6 @@ private fun EditableTextRow(label: String, value: String, onChange: (String) -> 
       }
       ApprovedSettingsTextButton("Cancel", ::dismiss)
     }
-  }
-}
-
-
-@Composable
-private fun DurationStepper(seconds: Int, onChange: (Int) -> Unit) {
-  val src = remember { MutableInteractionSource() }
-  val focused by src.collectIsFocusedAsState()
-  Row(
-      modifier =
-          Modifier.fillMaxWidth()
-              .onKeyEvent { e ->
-                if (e.type == KeyEventType.KeyDown) {
-                  when (e.key) {
-                    Key.DirectionLeft -> { onChange(seconds - 1); true }
-                    Key.DirectionRight -> { onChange(seconds + 1); true }
-                    else -> false
-                  }
-                } else false
-              }
-              .focusable(interactionSource = src)
-              .background(if (focused) IosFocusTint else Color.Transparent)
-              .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text("Display duration", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-    ArrowButton("◀", focused) { onChange(seconds - 1) }
-    Text(
-        "${seconds}s",
-        color = if (focused) IosLabel else IosSecondary,
-        fontSize = 17.sp,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.widthIn(min = 52.dp),
-    )
-    ArrowButton("▶", focused) { onChange(seconds + 1) }
   }
 }
 
