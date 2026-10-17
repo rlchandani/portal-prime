@@ -3495,6 +3495,47 @@ function tileLabel(key) {
   }
   return key.replace(/^(app:|builtin:|folder:)/, '').replace(/^([a-z]+\.[a-z.]+)\//, '');
 }
+function layoutSaving() {
+  return busy.has(`${room()?.base}:layout`);
+}
+async function saveLayout() {
+  if (layoutSaving() || !layoutDraft) return;
+  const candidate = copy(layoutDraft),
+    revision = layoutRevision,
+    ticket = session.capture(),
+    target = room();
+  const pending = mutate(
+    'layout',
+    '/remote/layout',
+    { layout: candidate, expectedRevision: revision },
+    { ticket, target, success: '' },
+  );
+  render();
+  const response = await pending;
+  if (response?.layout && session.current(ticket)) {
+    const newerEdits = JSON.stringify(layoutDraft) !== JSON.stringify(candidate);
+    data.layout = response;
+    if (!newerEdits) layoutDraft = copy(response.layout);
+    layoutRevision = response.revision;
+    toast(newerEdits
+      ? 'Submitted layout saved. Your newer edits are still unsaved.'
+      : 'Layout saved and confirmed.');
+  }
+  if (room()?.base === target?.base && tab === 'home' && detail === 'layout') render();
+}
+function reloadLayout() {
+  if (layoutSaving()) return;
+  return confirmAction(
+    'Reload layout?',
+    'Discard unsaved edits and read the current Portal layout.',
+    () => {
+      if (layoutSaving()) return;
+      layoutDraft = null;
+      loadLayout();
+    },
+    'Reload',
+  );
+}
 function layoutPage() {
   if (!data.layout || !layoutDraft)
     return data.layoutError
@@ -3506,45 +3547,12 @@ function layoutPage() {
     text(
       'Move rows with the arrow buttons. Widget sizes use Portal grid cells. Existing bound Android widgets retain their identity.',
     ),
-    text(changed ? 'Unsaved changes' : 'Layout from Portal', 'draft-label'),
+    text(layoutSaving() ? 'Saving submitted layout…' : changed ? 'Unsaved changes' : 'Layout from Portal', 'draft-label'),
+    layoutSaving() ? text('You can keep editing. Newer changes will need another Save.', 'muted') : null,
     actions(
-      button(
-        'Save layout',
-        async () => {
-          const candidate = copy(layoutDraft),
-            revision = layoutRevision,
-            ticket = session.capture();
-          const response = await mutate(
-            'layout',
-            '/remote/layout',
-            { layout: candidate, expectedRevision: revision },
-            { ticket, success: '' },
-          );
-          if (response?.layout && session.current(ticket)) {
-            data.layout = response;
-            layoutDraft = copy(response.layout);
-            layoutRevision = response.revision;
-            toast('Layout saved and confirmed.');
-            render();
-          }
-        },
-        { kind: 'primary', disabled: !changed },
-      ),
+      button('Save layout', saveLayout, { kind: 'primary', disabled: !changed || layoutSaving() }),
       button('Preview on Portal', () => dispatchKey('home'), { kind: 'outline' }),
-      button(
-        'Reload layout',
-        () =>
-          confirmAction(
-            'Reload layout?',
-            'Discard unsaved edits and read the current Portal layout.',
-            () => {
-              layoutDraft = null;
-              loadLayout();
-            },
-            'Reload',
-          ),
-        { kind: 'outline' },
-      ),
+      button('Reload layout', reloadLayout, { kind: 'outline', disabled: layoutSaving() }),
     ),
     text(
       'Save first to preview your changes. Concurrent settings/layout changes are rejected by the Portal.',

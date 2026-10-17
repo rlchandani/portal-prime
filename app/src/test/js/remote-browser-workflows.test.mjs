@@ -1692,3 +1692,122 @@ test('photo collection a listing for a different returned folder is rejected wit
   assert.match(h.document.getElementById('page').textContent, /Photos unavailable/);
   assert.equal(collectionButton(h).disabled, true); assert.equal(collectionWrites(h).length, 0);
 });
+
+async function pendingLayoutSave({ fail = false, canonical = false } = {}) {
+  let release;
+  const initial = { assignments: { 'com.test.app': 'Room' }, homeOrder: ['com.test.app/.Main'], gridOrder: [], gridSlots: [], widgets: [] };
+  const h = await browserHarness({ saved, routes: {
+    '/remote/layout': ({ opts, response }) => opts.method === 'POST'
+      ? new Promise((resolve) => {
+          const body = JSON.parse(opts.body);
+          release = () => resolve(fail ? response({ ok: false, error: 'conflict' }, 409)
+            : response({ ok: true, revision: 'confirmed', widgetKinds: ['weather'], layout: {
+                ...body.layout, assignments: canonical ? { 'com.test.app': 'Canonical' } : body.layout.assignments,
+              } }));
+        })
+      : response({ ok: true, revision: 'current', widgetKinds: ['weather'], layout: initial }),
+  } });
+  h.eval('go("home","layout")');
+  await h.settle();
+  await h.input('com.test.app', 'Submitted');
+  h.click('Save layout');
+  await h.settle();
+  return { h, finish: async () => { release(); await h.settle(); } };
+}
+
+const layoutPosts = (h) => h.calls.filter((c) => c.path === '/remote/layout' && c.opts.method === 'POST');
+const layoutButton = (h, label) => h.document.body.querySelectorAll('button').find((b) => b.textContent === label);
+
+test('layout save retains a folder edit made after submission', async () => {
+  const { h, finish } = await pendingLayoutSave();
+  try { await h.input('com.test.app', 'Newer'); } finally { await finish(); }
+  assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'), 'Newer');
+  assert.equal(h.eval('data.layout.layout.assignments["com.test.app"]'), 'Submitted');
+  assert.equal(layoutButton(h, 'Save layout').disabled, false);
+});
+
+test('layout save retains widget additions made after submission', async () => {
+  const { h, finish } = await pendingLayoutSave();
+  try { h.eval('editLayout(l => addWidget(l,"weather","after-submit"))'); } finally { await finish(); }
+  assert.equal(h.eval('layoutDraft.widgets.length'), 1);
+  assert.equal(h.eval('data.layout.layout.widgets.length'), 0);
+});
+
+test('layout save shows pending status while keeping folder fields editable', async () => {
+  const { h, finish } = await pendingLayoutSave();
+  try {
+    assert.match(h.document.getElementById('page').textContent, /Saving submitted layout/);
+    assert.equal(layoutButton(h, 'Save layout').disabled, true);
+    assert.equal(layoutButton(h, 'Reload layout').disabled, true);
+    await h.input('com.test.app', 'Still editable');
+    assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'), 'Still editable');
+  } finally { await finish(); }
+});
+
+test('layout save dispatches only one mutation while pending', async () => {
+  const { h, finish } = await pendingLayoutSave();
+  try {
+    h.click('Save layout');
+    await h.settle();
+    assert.equal(layoutPosts(h).length, 1);
+    assert.equal(layoutButton(h, 'Save layout').disabled, true);
+  } finally { await finish(); }
+});
+
+test('next layout save uses the confirmed revision and preserved draft', async () => {
+  const { h, finish } = await pendingLayoutSave();
+  try { await h.input('com.test.app', 'Next save'); } finally { await finish(); }
+  h.click('Save layout');
+  await h.settle();
+  try {
+    const body = JSON.parse(layoutPosts(h).at(-1).opts.body);
+    assert.equal(body.layout.assignments['com.test.app'], 'Next save');
+    assert.equal(body.expectedRevision, 'confirmed');
+  } finally { await finish(); }
+});
+
+test('layout save adopts canonical response when no later edits exist', async () => {
+  const { h, finish } = await pendingLayoutSave({ canonical: true });
+  await finish();
+  assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'), 'Canonical');
+  assert.equal(layoutButton(h, 'Save layout').disabled, true);
+});
+
+test('failed layout save preserves newer draft and original revision', async () => {
+  const { h, finish } = await pendingLayoutSave({ fail: true });
+  try { await h.input('com.test.app', 'Retry me'); } finally { await finish(); }
+  assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'), 'Retry me');
+  assert.equal(h.eval('layoutRevision'), 'current');
+  assert.equal(layoutButton(h, 'Save layout').disabled, false);
+  assert.equal(layoutButton(h, 'Reload layout').disabled, false);
+});
+
+test('layout reload cannot discard a draft during its pending save', async () => {
+  const { h, finish } = await pendingLayoutSave();
+  try {
+    h.click('Reload layout');
+    await h.settle();
+    assert.equal(h.document.getElementById('sheet').open, false);
+    assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'), 'Submitted');
+  } finally { await finish(); }
+});
+
+test('late layout save never overwrites another room editor', async () => {
+  const { h, finish } = await pendingLayoutSave();
+  try {
+    h.eval(`selectRoom('${saved[1].base}')`);
+    await h.settle();
+    h.eval('go("home","layout")');
+    await h.settle();
+    await h.input('com.test.app', 'Other room');
+  } finally { await finish(); }
+  assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'), 'Other room');
+  assert.equal(h.eval('layoutRevision'), 'current');
+});
+
+test('layout acknowledgment explains that newer edits remain unsaved', async () => {
+  const { h, finish } = await pendingLayoutSave();
+  try { await h.input('com.test.app', 'Newer'); } finally { await finish(); }
+  assert.match(h.document.body.textContent, /newer edits are still unsaved/i);
+  assert.match(h.document.getElementById('page').textContent, /Unsaved changes/);
+});
