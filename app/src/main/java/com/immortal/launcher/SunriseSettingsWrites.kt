@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.content.Context
+import com.immortal.launcher.settings.IntSpec
 import com.immortal.launcher.settings.SettingsDomain
 import com.immortal.launcher.settings.SettingsDomains
 import java.util.concurrent.atomic.AtomicLong
@@ -15,6 +16,7 @@ import org.json.JSONObject
 
 internal sealed interface SunriseSettingEdit {
   data class Scalar(val key: String, val value: Any) : SunriseSettingEdit
+  data class Time(val hour: Int, val minute: Int) : SunriseSettingEdit
   data class Days(val values: Set<Int>) : SunriseSettingEdit
 }
 
@@ -25,6 +27,7 @@ internal class SunriseSettingsWriteQueue(apply: (SunriseSettingEdit) -> Boolean)
   private val writes = LatestSystemWrites(
     keyOf = { edit: SunriseSettingEdit -> when (edit) {
       is SunriseSettingEdit.Scalar -> "scalar:${edit.key}"
+      is SunriseSettingEdit.Time -> "time"
       is SunriseSettingEdit.Days -> "days"
     } },
     onFailure = { failures.incrementAndGet(); lastFailed.set(true) },
@@ -36,6 +39,7 @@ internal class SunriseSettingsWriteQueue(apply: (SunriseSettingEdit) -> Boolean)
   val failureCount: Long get() = failures.get()
   val lastSaveFailed: Boolean get() = lastFailed.get()
   fun submit(key: String, value: Any) = writes.submit(SunriseSettingEdit.Scalar(key, value))
+  fun submitTime(hour: Int, minute: Int) = writes.submit(SunriseSettingEdit.Time(hour, minute))
   fun submitDays(days: Set<Int>) = writes.submit(SunriseSettingEdit.Days(days.toSet()))
   suspend fun awaitIdle() = writes.awaitIdle()
 }
@@ -44,6 +48,17 @@ internal class SunriseSettingsWriteQueue(apply: (SunriseSettingEdit) -> Boolean)
 internal fun applySunriseSettingEdit(context: Context, edit: SunriseSettingEdit,
     domain: SettingsDomain<SunriseConfig.Config> = SettingsDomains.sunrise): Boolean = when (edit) {
   is SunriseSettingEdit.Scalar -> edit.key in domain.apply(context, JSONObject().put(edit.key, edit.value))
+  is SunriseSettingEdit.Time -> {
+    val hourSpec = domain.specs.firstOrNull { it.key == "hour" } as? IntSpec<SunriseConfig.Config>
+    val minuteSpec = domain.specs.firstOrNull { it.key == "minute" } as? IntSpec<SunriseConfig.Config>
+    // Domain validation is per-key; reject the entire time before either setter can write.
+    if (hourSpec == null || minuteSpec == null ||
+        edit.hour !in hourSpec.min..hourSpec.max || edit.minute !in minuteSpec.min..minuteSpec.max) false
+    else {
+      val applied = domain.apply(context, JSONObject().put("hour", edit.hour).put("minute", edit.minute))
+      "hour" in applied && "minute" in applied
+    }
+  }
   is SunriseSettingEdit.Days -> if (edit.values.any { it !in 1..7 }) false else synchronized(domain) {
     SunriseConfig.setDays(context, edit.values)
     // Days are a bespoke set, not a registry scalar. Reaffirm the existing enabled value to

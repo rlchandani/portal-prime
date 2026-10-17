@@ -39,6 +39,14 @@ import com.immortal.launcher.settings.IntSpec
 @Composable
 internal fun <S> ApprovedClockTimeSetting(
     spec: IntSpec<S>, value: Int, help: String?, enabled: Boolean, onApply: (Int) -> Unit,
+) = ApprovedClockTimeSetting(spec.title, value, spec.format(value), help, enabled, onApply)
+
+/** Composite hour/minute settings use the same editor without inventing a persisted scalar. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun ApprovedClockTimeSetting(
+    title: String, value: Int, valueLabel: String, help: String?, enabled: Boolean,
+    onApply: (Int) -> Unit,
 ) {
     var open by remember { mutableStateOf(false) }
     val pageActive = LocalApprovedLauncherPageActive.current
@@ -46,11 +54,11 @@ internal fun <S> ApprovedClockTimeSetting(
     val canEditNow by rememberUpdatedState(canEdit)
     val applyNow by rememberUpdatedState(onApply)
     SideEffect { if (!canEdit) open = false }
-    NavRow(spec.title, spec.format(value), enabled = canEdit) {
+    NavRow(title, valueLabel, enabled = canEdit) {
         if (canEditNow) open = true
     }
     if (open && canEdit) {
-        ApprovedSettingsDialog(spec.title, onDismiss = { open = false }, help = help) {
+        ApprovedSettingsDialog(title, onDismiss = { open = false }, help = help) {
             // Allocate the selector and draft only while the dialog is visible.
             val clock = rememberTimePickerState(value / 60, value % 60, is24Hour = true)
             var keyboard by remember { mutableStateOf(false) }

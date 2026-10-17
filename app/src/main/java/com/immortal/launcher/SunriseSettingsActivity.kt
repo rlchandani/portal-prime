@@ -142,11 +142,18 @@ internal fun SunriseContent() {
     }
     if ("hour" in visibleKeys || "minute" in visibleKeys) {
       Card {
-        if ("hour" in visibleKeys) {
-          Stepper("Hour", settings.hour, 0, 23, enabled = !applying) { apply("hour", it) }
-        }
-        if ("minute" in visibleKeys) {
-          Stepper("Minute", settings.minute, 0, 59, step = 5, enabled = !applying) { apply("minute", it) }
+        ApprovedClockTimeSetting(
+            title = "Wake time",
+            value = settings.hour * 60 + settings.minute,
+            valueLabel = "%02d:%02d".format(settings.hour, settings.minute),
+            help = "Choose your wake time with the clock or enter an exact hour and minute.",
+            enabled = !applying,
+        ) { minutes ->
+          val hour = minutes / 60
+          val minute = minutes % 60
+          if (hour != settings.hour || minute != settings.minute) {
+            submit { writes.submitTime(hour, minute) }
+          }
         }
       }
       // Weekdays are a bespoke set; follow the same parent gate as the wake time.
@@ -202,10 +209,3 @@ internal fun SunriseContent() {
   }
 }
 
-@Composable
-private fun Stepper(label: String, value: Int, min: Int, max: Int, step: Int = 1,
-    enabled: Boolean = true, onChange: (Int) -> Unit) {
-  Stepper(label, "%02d".format(value), enabled = enabled,
-      onMinus = { onChange((value - step).coerceAtLeast(min)) },
-      onPlus = { onChange((value + step).coerceAtMost(max)) })
-}
