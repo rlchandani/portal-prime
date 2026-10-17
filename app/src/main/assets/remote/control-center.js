@@ -32,6 +32,8 @@ import {
   visibleControls,
   validateValue,
   mixedValue,
+  timeOfDayMinutes,
+  timeOfDayValue,
   formatTime,
 } from './core.mjs';
 
@@ -1852,9 +1854,14 @@ function renderSetting(domain, control) {
   const metadata = control.secret ? null : JSON.stringify(control);
   const retain = view && metadata !== null && metadata.length <= 16 * 1024;
   const presentation = JSON.stringify([advanced, isBusy, mixed, help]);
-  const draftField = control.type === 'string' || (control.type === 'int' && control.asText);
-  const expectedDraft = draftField && !control.secret
-    ? draft(`${id}:draft`, String(control.value ?? '')) : null;
+  const timeOfDay = control.type === 'int' && control.timeOfDay === true;
+  const draftField = control.type === 'string' || (control.type === 'int' && (control.asText || timeOfDay));
+  // Do not seed a time draft from a single room: mixed scope stays blank until edited.
+  // Include time fields in the live-value guard so clearing a saved draft refreshes the input.
+  const expectedDraft = timeOfDay
+    ? drafts.get(draftKey(`${id}:draft`)) ?? (mixed ? '' : timeOfDayValue(control.value))
+    : draftField && !control.secret
+      ? draft(`${id}:draft`, String(control.value ?? '')) : null;
   const cached = retain ? view.entries.get(key) : null;
   // A rejected/no-target change may have altered the live native control already.
   const valueMatches = cached && (control.type === 'bool'
@@ -1905,7 +1912,7 @@ function renderSetting(domain, control) {
       control.title,
     );
     ui.disabled = control.readOnly || isBusy;
-  } else if (control.type === 'int' && !control.asText) {
+  } else if (control.type === 'int' && !control.asText && !timeOfDay) {
     const value = control.value;
     const wrap = control.wrap === true;
     const min = control.min,
@@ -1942,9 +1949,13 @@ function renderSetting(domain, control) {
     );
   } else if (control.type === 'string' || control.type === 'int') {
     const key = `${id}:draft`;
-    const current = draft(key, control.secret ? '' : String(control.value ?? ''));
+    const current = timeOfDay ? expectedDraft : draft(key, control.secret ? '' : String(control.value ?? ''));
+    const errorKey = `${id}:error`, errorId = `${id}:error`;
+    const error = timeOfDay ? el('p', { class: 'detail error', id: errorId,
+      role: 'alert', hidden: !drafts.get(draftKey(errorKey)),
+      text: drafts.get(draftKey(errorKey)) || '' }) : null;
     const input = el('input', {
-      type: control.secret ? 'password' : control.type === 'int' ? 'number' : 'text',
+      type: timeOfDay ? 'time' : control.secret ? 'password' : control.type === 'int' ? 'number' : 'text',
       value: current,
       placeholder:
         control.secret && control.hasValue ? 'Keep saved credential' : mixed ? 'Mixed values' : '',
@@ -1952,25 +1963,45 @@ function renderSetting(domain, control) {
       'data-focus': id,
       autocomplete: control.secret ? 'new-password' : 'off',
       disabled: control.readOnly || isBusy,
-      onInput: (e) => setDraft(key, e.target.value),
+      ...(timeOfDay ? { step: 60, 'aria-describedby': errorId,
+        'aria-invalid': error.hidden ? 'false' : 'true' } : {}),
+      onInput: (e) => {
+        if (timeOfDay && !ownsRow()) return;
+        setDraft(key, e.target.value);
+        if (timeOfDay) {
+          drafts.delete(draftKey(errorKey));
+          error.hidden = true;
+          error.textContent = '';
+          input.setAttribute('aria-invalid', 'false');
+        }
+      },
     });
-    if (control.type === 'int') {
+    if (control.type === 'int' && !timeOfDay) {
       input.min = control.min;
       input.max = control.max;
       input.step = control.step || 1;
     }
     const save = button(
-      'Save',
+      timeOfDay ? 'Apply' : 'Save',
       () => {
-        if (!ownsRow()) return;
-        const value = control.type === 'int' ? Number(input.value) : input.value;
+        if (!ownsRow() || (timeOfDay && (control.readOnly || isBusy))) return;
+        const value = timeOfDay ? timeOfDayMinutes(input.value)
+          : control.type === 'int' ? Number(input.value) : input.value;
         if (!validateValue(control, value)) {
-          toast(message(new ApiError('invalid_value')), true);
+          if (timeOfDay) {
+            const message = 'Choose a valid time (00:00–23:59) before applying.';
+            setDraft(key, input.value);
+            setDraft(errorKey, message);
+            error.textContent = message;
+            error.hidden = false;
+            input.setAttribute('aria-invalid', 'true');
+          } else toast(message(new ApiError('invalid_value')), true);
           return;
         }
         apply({ [control.key]: value }).then((results) => {
           if (session.current(ticket) && connectionState !== 'expired' && results?.every((r) => r.ok)) {
             drafts.delete(draftKey(key));
+            if (timeOfDay) drafts.delete(draftKey(errorKey));
             render();
           }
         });
@@ -1985,6 +2016,8 @@ function renderSetting(domain, control) {
         { class: 'setting-copy' },
         el('strong', { text: control.title }),
         help ? text(help) : null,
+        timeOfDay && mixed ? text('Values differ between selected rooms. Choose a time to apply to all.') : null,
+        error,
         control.secret && control.hasValue
           ? text('Leave blank to keep the saved credential.')
           : null,

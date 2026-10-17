@@ -407,6 +407,7 @@ object SettingsDomains {
                       max = 24 * 60 - 1,
                       step = 15,
                       wrap = true,
+                      timeOfDay = true,
                       format = ::hhmm,
                       visible = { _, s -> s.overnightEnabled }),
                   IntSpec(
@@ -418,6 +419,7 @@ object SettingsDomains {
                       max = 24 * 60 - 1,
                       step = 15,
                       wrap = true,
+                      timeOfDay = true,
                       format = ::hhmm,
                       visible = { _, s -> s.overnightEnabled }),
                   BoolSpec(
@@ -899,6 +901,7 @@ object SettingsDomains {
                       max = 24 * 60 - 1,
                       step = 30,
                       wrap = true,
+                      timeOfDay = true,
                       format = ::hhmm,
                       visible = { _, s -> s.quietHoursOn }),
                   IntSpec(
@@ -910,6 +913,7 @@ object SettingsDomains {
                       max = 24 * 60 - 1,
                       step = 30,
                       wrap = true,
+                      timeOfDay = true,
                       format = ::hhmm,
                       visible = { _, s -> s.quietHoursOn }),
               ),

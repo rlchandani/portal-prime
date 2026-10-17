@@ -297,7 +297,11 @@ private fun <S> SettingControl(
             }
             is IntSpec<*> -> {
                 val s = spec as IntSpec<S>
-                ApprovedIntSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
+                if (s.timeOfDay) {
+                    ApprovedClockTimeSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
+                } else {
+                    ApprovedIntSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
+                }
             }
             is StringSpec<*> -> {
                 val s = spec as StringSpec<S>

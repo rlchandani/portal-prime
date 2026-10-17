@@ -607,6 +607,16 @@ export function mixedValue(schemas, domain, key) {
   );
   return values.length > 1 && values.some((v) => JSON.stringify(v) !== JSON.stringify(values[0]));
 }
+// Time-of-day controls retain the integer-minute wire format.
+export function timeOfDayMinutes(value) {
+  if (typeof value !== 'string' || !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value) || value.length !== 5)
+    return null;
+  return Number(value.slice(0, 2)) * 60 + Number(value.slice(3));
+}
+export function timeOfDayValue(minutes) {
+  if (!Number.isInteger(minutes) || minutes < 0 || minutes > 1439) return '';
+  return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+}
 export const formatTime = (ms) => {
   const sec = Math.max(0, Math.floor((ms || 0) / 1000));
   return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;

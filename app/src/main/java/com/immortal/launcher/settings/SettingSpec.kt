@@ -127,6 +127,8 @@ class IntSpec<S>(
     val help: String? = null,
     val aliases: List<String> = emptyList(),
     val visible: (Context, S) -> Boolean = { _, _ -> true },
+    /** Declarative editor hint; does not change persistence or integer validation. */
+    val timeOfDay: Boolean = false,
 ) : SettingSpec<S> {
   override fun visibleWhen(c: Context, s: S) = visible(c, s)
 
@@ -147,6 +149,7 @@ class IntSpec<S>(
           .put("step", step)
           .put("wrap", wrap)
           .put("asText", asText)
+          .apply { if (timeOfDay) put("timeOfDay", true) }
 
   override fun applyFrom(c: Context, body: JSONObject): Boolean {
     val k = firstPresent(key, aliases, body) ?: return false
