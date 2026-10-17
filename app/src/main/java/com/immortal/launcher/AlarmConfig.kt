@@ -63,6 +63,13 @@ object AlarmConfig {
   fun setMinute(c: Context, m: Int) =
       prefs(c).edit().putInt("minute", m.coerceIn(0, 59)).apply()
 
+  /** Save the validated time pair together without replaying other alarm fields. */
+  fun setTime(c: Context, hour: Int, minute: Int) {
+    require(hour in 0..23) { "Hour must be between 0 and 23" }
+    require(minute in 0..59) { "Minute must be between 0 and 59" }
+    prefs(c).edit().putInt("hour", hour).putInt("minute", minute).apply()
+  }
+
   fun setLabel(c: Context, label: String) =
       prefs(c).edit().putString("label", label).apply()
 

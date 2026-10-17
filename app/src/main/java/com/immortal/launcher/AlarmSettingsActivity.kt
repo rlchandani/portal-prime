@@ -143,18 +143,13 @@ internal fun AlarmContent() {
       }
 
       Card {
-        Stepper(
-            label = "Hour",
-            valueText = "%02d".format(hour),
-            onMinus = { config = editor.stepHour(-1) },
-            onPlus = { config = editor.stepHour(1) },
-        )
-        Divider()
-        Stepper(
-            label = "Minute",
-            valueText = "%02d".format(minute),
-            onMinus = { config = editor.stepMinute(-5) },
-            onPlus = { config = editor.stepMinute(5) },
+        ApprovedClockTimeSetting(
+            title = "Alarm time",
+            value = hour * 60 + minute,
+            valueLabel = String.format(Locale.ROOT, "%02d:%02d", hour, minute),
+            help = "Choose the alarm time in 24-hour format.",
+            enabled = true,
+            onApply = { config = editor.setTime(it / 60, it % 60) },
         )
       }
 

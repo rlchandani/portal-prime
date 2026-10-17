@@ -13,6 +13,7 @@ internal interface AlarmSettingsEditorBackend {
   fun setEnabled(value: Boolean)
   fun setHour(value: Int)
   fun setMinute(value: Int)
+  fun setTime(hour: Int, minute: Int)
   fun setDays(value: Set<Int>)
   fun reschedule()
 }
@@ -29,6 +30,16 @@ internal class AlarmSettingsEditor(private val backend: AlarmSettingsEditorBacke
   }
   fun stepMinute(delta: Int) = edit {
     backend.setMinute((backend.read().minute + delta + 60) % 60)
+  }
+  fun setTime(hour: Int, minute: Int): AlarmConfig.Config {
+    require(hour in 0..23) { "Hour must be between 0 and 23" }
+    require(minute in 0..59) { "Minute must be between 0 and 59" }
+    val latest = backend.read()
+    if (latest.hour == hour && latest.minute == minute) {
+      snapshot = latest
+      return latest
+    }
+    return edit { backend.setTime(hour, minute) }
   }
   fun toggleDay(day: Int) = edit {
     val days = backend.read().days
@@ -48,6 +59,7 @@ internal fun alarmSettingsEditor(context: Context) =
       override fun setEnabled(value: Boolean) = AlarmConfig.setEnabled(context, value)
       override fun setHour(value: Int) = AlarmConfig.setHour(context, value)
       override fun setMinute(value: Int) = AlarmConfig.setMinute(context, value)
+      override fun setTime(hour: Int, minute: Int) = AlarmConfig.setTime(context, hour, minute)
       override fun setDays(value: Set<Int>) = AlarmConfig.setDays(context, value)
       override fun reschedule() = AlarmScheduler.reschedule(context)
     })
