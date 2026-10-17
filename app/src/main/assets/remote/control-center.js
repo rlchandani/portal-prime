@@ -104,7 +104,8 @@ let appMode = 'installed',
   advanced = false,
   photosAll = true,
   photoPath = '/sdcard',
-  photoPageIndex = 0;
+  photoPageIndex = 0,
+  photoLoadState = null;
 let layoutDraft = null,
   layoutRevision = null,
   sceneDraft = null,
@@ -2583,30 +2584,53 @@ async function saveSource(selected, s) {
     toast(message(error), true);
   }
 }
+function currentPhotoCollection() {
+  const info = data.photos;
+  const all = photosAll && supported('photoLibrary');
+  return info && info.all === all && info.path === (all ? '/sdcard' : photoPath) ? info : null;
+}
+function photosPending() {
+  return !!photoLoadState?.pending && session.current(photoLoadState.ticket);
+}
+function confirmedPhotoCollection() {
+  return !photosPending() && !data.photosError ? currentPhotoCollection() : null;
+}
 async function loadPhotos() {
-  if (!room()) return;
+  if (!room() || document.hidden || connectionState === 'expired') return;
   if (data.companion && !supported('photoLibrary') && !supported('photos')) return;
   if (data.companion && !supported('photoLibrary')) photosAll = false;
   const path = photosAll && supported('photoLibrary') ? '/sdcard' : photoPath;
   const recursive = photosAll && supported('photoLibrary');
-  const response = await read(
-    'photos',
-    `/remote/photos?path=${encodeURIComponent(path)}${recursive ? '&recursive=1' : ''}`,
-    (r) => {
-      data.photos = photoListing(r, recursive);
-      data.photoMetadataRevision = (data.photoMetadataRevision || 0) + 1;
-      if (data.photos.all) data.photoFolders = data.photos.folders;
-      else if (data.photoFolders?.length) data.photos.folders = data.photoFolders;
-      photoPageIndex = Math.min(
-        photoPageIndex,
-        Math.max(0, Math.ceil(data.photos.files.length / 24) - 1),
-      );
-    },
-  );
-  if (response && recursive && response.recursive !== true) {
-    photosAll = false;
-    photoPath = response.path;
-    render();
+  const owner = { ticket: session.capture(), pending: true };
+  photoLoadState = owner;
+  delete data.photosError;
+  render();
+  try {
+    return await read(
+      'photos',
+      `/remote/photos?path=${encodeURIComponent(path)}${recursive ? '&recursive=1' : ''}`,
+      (r) => {
+        if (r.path !== path) throw new ApiError('invalid_response');
+        const listing = photoListing(r, recursive);
+        // A legacy shallow response changes the selected mode before the one final render.
+        if (recursive && !listing.all) {
+          photosAll = false;
+          photoPath = listing.path;
+          setDraft('photo-folder', photoPath);
+        }
+        data.photos = listing;
+        data.photoMetadataRevision = (data.photoMetadataRevision || 0) + 1;
+        if (listing.all) data.photoFolders = listing.folders;
+        else if (data.photoFolders?.length) listing.folders = data.photoFolders;
+        photoPageIndex = Math.min(photoPageIndex, Math.max(0, Math.ceil(listing.files.length / 24) - 1));
+      },
+      { renderAfter: false },
+    );
+  } finally {
+    if (photoLoadState === owner && session.current(owner.ticket)) {
+      owner.pending = false;
+      render();
+    }
   }
 }
 function freeSpace(bytes) {
@@ -2627,7 +2651,10 @@ function photoThumbnailKey(file, ticket) {
   ]);
 }
 function photosPage() {
-  const info = data.photos;
+  const info = currentPhotoCollection();
+  const folders = data.photoFolders || info?.folders || [];
+  const pending = photosPending();
+  const loading = pending ? el('p', { role: 'status', 'aria-live': 'polite', class: 'detail', text: 'Loading photo metadata…' }) : null;
   const files = info && !data.photosError ? photoPage(info.files, photoPageIndex) : [];
   const ticket = session.capture();
   thumbs.retain(files.map((file) => photoThumbnailKey(file, ticket)));
@@ -2639,6 +2666,7 @@ function photosPage() {
         { value: 'folder', label: 'Folders' },
       ],
       (value) => {
+        if (value === (photosAll ? 'all' : 'folder')) return;
         if (value === 'all' && data.companion && !supported('photoLibrary')) {
           toast(
             'This Portal supports folder browsing. All-photo scanning requires an updated Portal.',
@@ -2683,12 +2711,12 @@ function photosPage() {
             },
             { kind: 'outline' },
           ),
-          info?.folders?.length
+          folders.length
             ? choice(
                 photoPath,
                 [
                   { value: photoPath, label: photoPath },
-                  ...info.folders
+                  ...folders
                     .filter((f) => f.path !== photoPath)
                     .map((f) => ({ value: f.path, label: `${f.path} (${f.count})` })),
                 ],
@@ -2718,13 +2746,19 @@ function photosPage() {
         button(
           'Use for slideshow',
           () => {
-            if (!info) return;
-            const targetPath = info.all ? '/sdcard' : info.path;
+            const selected = confirmedPhotoCollection();
+            if (!selected) return;
+            const targetPath = selected.all ? '/sdcard' : selected.path;
             const ticket = session.capture();
             confirmAction(
               'Use this collection?',
               `Set ${room().name}’s slideshow folder to ${targetPath}.`,
               async () => {
+                const current = confirmedPhotoCollection();
+                if (!current || current.path !== targetPath || current.all !== selected.all) {
+                  toast('The collection changed. Review it and choose Use for slideshow again.', true);
+                  return;
+                }
                 const r = await mutate(
                   'activate-collection',
                   '/remote/sources',
@@ -2739,7 +2773,7 @@ function photosPage() {
               ticket,
             );
           },
-          { kind: 'outline', disabled: !info },
+          { kind: 'outline', disabled: !confirmedPhotoCollection() },
         ),
         button('Preview on Portal', () => dispatchKey('screensaver'), { kind: 'outline' }),
       ),
@@ -2750,6 +2784,7 @@ function photosPage() {
         )
       : null,
     uploadPanel(),
+    info ? loading : null,
     info
       ? text(
           `${info.files.length} photos${typeof info.freeBytes === 'number' ? ` · ${freeSpace(info.freeBytes)} free` : ''}`,
@@ -2763,7 +2798,8 @@ function photosPage() {
       : null,
   );
   let gallery;
-  if (data.photosError) gallery = failure('Photos unavailable', data.photosError, loadPhotos);
+  if (!pending && data.photosError) gallery = failure('Photos unavailable', data.photosError, loadPhotos);
+  else if (!info && pending) gallery = group(el('h3', { text: 'Photo library' }), loading);
   else if (!info)
     gallery = empty(
       'Photo library',
@@ -2978,9 +3014,9 @@ function photoPreview(file, ticket) {
 }
 function chooseUpload() {
   const ticket = session.capture();
-  let destination = data.photos?.all
+  let destination = photosAll && supported('photoLibrary')
     ? '/sdcard/Pictures/Immortal'
-    : data.photos?.path || '/sdcard/Pictures/Immortal';
+    : photoPath;
   const input = el('input', {
     type: 'file',
     accept: '.jpg,.jpeg,.png,.webp,.gif',

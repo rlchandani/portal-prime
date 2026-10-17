@@ -1583,3 +1583,112 @@ test('profile operation no selected ordinary rooms reports an unconfirmed catego
   assert.match(h.document.getElementById('notice').textContent, /could not finish/i);
   assert.doesNotMatch(h.document.getElementById('notice').textContent, /0 of 0.*confirmed/);
 });
+
+
+const collectionA = '/sdcard/Pictures/Room A', collectionB = '/sdcard/Pictures/Room B';
+async function collectionContextHarness() {
+  const holds = [], modes = new Map();
+  const h = await browserHarness({ saved, routes: {
+    '/remote/photos': ({ url, response }) => {
+      const q = new URL(url).searchParams, path = q.get('path'), all = q.has('recursive');
+      const reply = () => modes.get(path) === 'fail' ? response({ ok: false, error: 'folder_not_found' }, 404)
+        : response({ ok: true, path: modes.get(path) === 'mismatch' ? collectionA : path, recursive: all,
+          files: [{ path: `${path}/fixture.jpg`, name: path === collectionB ? 'New folder photo' : 'Original folder photo' }],
+          folders: all ? [{ path: collectionA, count: 1 }, { path: collectionB, count: 1 }] : [] });
+      if (modes.get(path) === 'hold') return new Promise(resolve => holds.push({ path, release: () => resolve(reply()) }));
+      return reply();
+    },
+    '/remote/sources': ({ opts, response }) => response({ ok: true, sources: opts.body ? JSON.parse(opts.body) : {} }),
+  } });
+  h.eval('go("photos")'); await h.settle(); h.click('Folders'); await h.settle();
+  return { h, modes, holds, release: async () => { holds.splice(0).forEach(job => job.release()); await h.settle(); } };
+}
+async function openCollection(h, path) { await h.input('Folder on Portal', path); h.click('Open folder'); await h.settle(); }
+const collectionButton = h => h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Use for slideshow');
+const collectionWrites = h => h.calls.filter(c => c.path === '/remote/sources' && c.opts.method === 'POST');
+const confirmCollection = h => h.document.getElementById('sheet-actions').querySelectorAll('button').find(b => b.textContent === 'Use collection').click();
+
+test('photo collection switching hides the old gallery and disables slideshow activation while loading', async () => {
+  const t = await collectionContextHarness(), h = t.h; t.modes.set(collectionB, 'hold'); await openCollection(h, collectionB);
+  try {
+    assert.equal(h.document.getElementById('page').textContent.includes('Original folder photo'), false);
+    assert.match(h.document.getElementById('page').textContent, /Loading photo metadata/);
+    assert.equal(collectionButton(h).disabled, true);
+    collectionButton(h).click(); assert.equal(h.document.getElementById('sheet').open, false);
+  } finally { await t.release(); }
+});
+
+test('photo collection import defaults to the newly selected folder while its listing is pending', async () => {
+  const t = await collectionContextHarness(), h = t.h; t.modes.set(collectionB, 'hold'); await openCollection(h, collectionB);
+  try {
+    h.click('Import photos');
+    assert.equal(h.document.getElementById('sheet-content').querySelector('[data-focus="upload-folder"]').value, collectionB);
+  } finally { h.eval('closeSheet()'); await t.release(); }
+});
+
+test('photo collection failed switch cannot activate the old collection and Retry keeps the selected folder', async () => {
+  const t = await collectionContextHarness(), h = t.h; t.modes.set(collectionB, 'fail'); await openCollection(h, collectionB);
+  assert.match(h.document.getElementById('page').textContent, /Photos unavailable/);
+  assert.equal(collectionButton(h).disabled, true); assert.equal(collectionWrites(h).length, 0);
+  t.modes.delete(collectionB); h.click('Retry'); await h.settle();
+  assert.match(h.document.getElementById('page').textContent, /New folder photo/);
+  assert.equal(collectionButton(h).disabled, false);
+  assert.equal(new URL(h.calls.filter(c => c.path === '/remote/photos').at(-1).url).searchParams.get('path'), collectionB);
+});
+
+test('photo collection confirmed switch activates only the displayed selected folder', async () => {
+  const t = await collectionContextHarness(), h = t.h; await openCollection(h, collectionB);
+  h.click('Use for slideshow'); confirmCollection(h); await h.settle();
+  assert.deepEqual(collectionWrites(h).map(c => JSON.parse(c.opts.body)), [{ folderPath: collectionB }]);
+  assert.match(h.document.getElementById('notice').textContent, /Collection activated/);
+});
+
+test('photo collection a refresh retains matching cached photos but waits for confirmation before activation', async () => {
+  const t = await collectionContextHarness(), h = t.h; t.modes.set(collectionA, 'hold');
+  const refreshing = h.eval('loadPhotos()'); await h.settle();
+  try {
+    assert.match(h.document.getElementById('page').textContent, /Original folder photo/);
+    assert.equal(collectionButton(h).disabled, true);
+  } finally { await t.release(); await refreshing; }
+  assert.equal(collectionButton(h).disabled, false);
+});
+
+test('photo collection retry shows pending recovery rather than the previous failure', async () => {
+  const t = await collectionContextHarness(), h = t.h; t.modes.set(collectionB, 'fail'); await openCollection(h, collectionB);
+  t.modes.set(collectionB, 'hold'); h.click('Retry'); await h.settle();
+  try {
+    assert.match(h.document.getElementById('page').textContent, /Loading photo metadata/);
+    assert.equal(h.document.getElementById('page').textContent.includes('Photos unavailable'), false);
+    assert.equal(collectionButton(h).disabled, true);
+  } finally { await t.release(); }
+});
+
+test('photo collection superseded listing cannot restore an old folder or finish the newer pending state', async () => {
+  const t = await collectionContextHarness(), h = t.h; t.modes.set(collectionA, 'hold');
+  const old = h.eval('loadPhotos()'); await h.settle(); await openCollection(h, collectionB);
+  await t.release(); await old;
+  assert.match(h.document.getElementById('page').textContent, /New folder photo/);
+  assert.equal(h.document.getElementById('page').textContent.includes('Original folder photo'), false);
+  assert.equal(collectionButton(h).disabled, false);
+});
+
+test('photo collection delayed confirmation cannot apply a collection after the selection changes', async () => {
+  const t = await collectionContextHarness(), h = t.h; h.click('Use for slideshow');
+  await openCollection(h, collectionB); confirmCollection(h); await h.settle();
+  assert.equal(collectionWrites(h).length, 0);
+  assert.match(h.document.getElementById('notice').textContent, /collection changed/i);
+});
+
+test('photo collection reselecting the current Folders tab does not reset or rescan the chosen folder', async () => {
+  const t = await collectionContextHarness(), h = t.h; await openCollection(h, collectionB);
+  const reads = h.calls.filter(c => c.path === '/remote/photos').length;
+  h.click('Folders'); await h.settle();
+  assert.equal(h.calls.filter(c => c.path === '/remote/photos').length, reads);
+  assert.equal(h.eval('photoPath'), collectionB);
+});
+
+test('photo collection a listing for a different returned folder is rejected without enabling slideshow activation', async () => {
+  const t = await collectionContextHarness(), h = t.h; t.modes.set(collectionB, 'mismatch'); await openCollection(h, collectionB);
+  assert.match(h.document.getElementById('page').textContent, /Photos unavailable/);
+  assert.equal(collectionButton(h).disabled, true); assert.equal(collectionWrites(h).length, 0);
+});
