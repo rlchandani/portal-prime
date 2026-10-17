@@ -2134,12 +2134,58 @@ async function applyDomain(
   }
   return results;
 }
+function readProfiles() {
+  let raw;
+  try {
+    raw = localStorage.getItem(STORAGE.profiles);
+  } catch {
+    return { ok: false, error: 'Browser storage is unavailable. Your saved profiles have not been changed.' };
+  }
+  if (raw === null) return { ok: true, profiles: {} };
+  try {
+    const profiles = JSON.parse(raw);
+    if (!profiles || typeof profiles !== 'object' || Array.isArray(profiles) ||
+        Object.values(profiles).some((profile) => !profile || typeof profile !== 'object' || Array.isArray(profile)))
+      throw new Error('invalid profile collection');
+    return { ok: true, profiles };
+  } catch {
+    return { ok: false, error: 'Saved profiles could not be read. The original data has not been changed.' };
+  }
+}
+function deleteProfile(name) {
+  const current = readProfiles();
+  if (!current.ok) {
+    toast(`Profile not deleted. ${current.error}`, true);
+    render();
+    return;
+  }
+  if (!Object.hasOwn(current.profiles, name)) {
+    toast('This profile was already removed.');
+    render();
+    return;
+  }
+  const updated = { ...current.profiles };
+  delete updated[name];
+  if (!storage.set(STORAGE.profiles, JSON.stringify(updated))) {
+    toast('Profile not deleted. Browser storage is unavailable. Try again when storage is available.', true);
+    render();
+    return;
+  }
+  toast('Profile deleted from this browser.');
+  render();
+}
 function profileCaptureKey(ticket = session.capture()) {
   return `${ticket.room?.base}:profile-capture:${ticket.generation}:${ticket.pageGeneration}`;
 }
 async function saveCurrentProfile(name, ticket) {
   const key = profileCaptureKey(ticket);
   if (!session.current(ticket) || busy.has(key)) return;
+  const opening = readProfiles();
+  if (!opening.ok) {
+    toast(`Profile not saved. ${opening.error}`, true);
+    render();
+    return;
+  }
   busy.add(key);
   render();
   try {
@@ -2152,8 +2198,12 @@ async function saveCurrentProfile(name, ticket) {
         domains.some((d) => typeof d?.id !== 'string' || !d.id || !Array.isArray(d.controls)) ||
         new Set(domains.map((d) => d.id)).size !== domains.length)
       throw new ApiError('invalid_response');
-    const current = parse(storage.get(STORAGE.profiles, '{}'), {});
-    const updated = { ...current, [name]: captureProfile(response.settings) };
+    const current = readProfiles();
+    if (!current.ok) {
+      toast(`Profile not saved. ${current.error}`, true);
+      return;
+    }
+    const updated = { ...current.profiles, [name]: captureProfile(response.settings) };
     if (!storage.set(STORAGE.profiles, JSON.stringify(updated))) {
       toast('Profile not saved. Browser storage is unavailable. Try again when storage is available.', true);
       return;
@@ -2167,7 +2217,18 @@ async function saveCurrentProfile(name, ticket) {
   }
 }
 function profilesPage() {
-  const profiles = parse(storage.get(STORAGE.profiles, '{}'), {});
+  const current = readProfiles();
+  if (!current.ok)
+    return sections(
+      heading('Settings profiles', 'Your profiles are saved in this browser.'),
+      group(
+        el('h3', { text: 'Saved profiles unavailable' }),
+        text(current.error),
+        text('Retry when browser storage is available. No profiles will be replaced or removed while they cannot be read.'),
+        button('Retry', () => render(), { kind: 'primary' }),
+      ),
+    );
+  const profiles = current.profiles;
   return sections(
     heading('Settings profiles', 'Your named profiles from the previous remote remain available.'),
     scopePanel(),
@@ -2204,12 +2265,7 @@ function profilesPage() {
                 confirmAction(
                   `Delete “${name}”?`,
                   'Remove this profile from browser storage.',
-                  () => {
-                    const fresh = parse(storage.get(STORAGE.profiles, '{}'), {});
-                    delete fresh[name];
-                    storage.set(STORAGE.profiles, JSON.stringify(fresh));
-                    render();
-                  },
+                  () => deleteProfile(name),
                   'Delete',
                 ),
               { kind: 'danger' },

@@ -1296,3 +1296,143 @@ test('complete profile capture waits for an earlier settings write in the existi
   assert.equal(profileReads(h).length, 1);
   assert.deepEqual(storedProfiles(h).Queued, { sunrise: { enabled: true } });
 });
+
+
+const profileStoreRaw = h => h.eval('localStorage.getItem(STORAGE.profiles)');
+function putProfileStore(h, raw) {
+  h.eval(`localStorage.setItem(STORAGE.profiles, ${JSON.stringify(raw)});render()`);
+}
+function confirmProfileDelete(h) {
+  h.document.getElementById('sheet-actions').querySelectorAll('button').find(b => b.textContent === 'Delete').click();
+}
+
+test('profile store malformed JSON stays intact and offers Retry without Save or Apply', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, '{broken');
+  assert.match(h.document.getElementById('page').textContent, /profiles.*could not be read/i);
+  assert.equal(h.document.getElementById('page').querySelectorAll('button').some(b => b.textContent === 'Save current settings'), false);
+  assert.equal(profileStoreRaw(h), '{broken');
+  assert.equal(profileReads(h).length, 0);
+  assert.ok(h.document.getElementById('page').querySelectorAll('button').some(b => b.textContent === 'Retry'));
+});
+
+test('profile store blocked read offers a working Retry and performs no writes', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.eval('globalThis.originalProfileGet = localStorage.getItem;globalThis.profileWrites=0;globalThis.originalProfileSet=localStorage.setItem;localStorage.setItem=(key,value)=>{profileWrites++;return originalProfileSet(key,value)};localStorage.getItem=()=>{throw new Error("blocked")};render()');
+  assert.match(h.document.getElementById('page').textContent, /storage.*unavailable/i);
+  assert.equal(h.eval('profileWrites'), 0);
+  h.eval('localStorage.getItem=originalProfileGet');
+  h.click('Retry'); await h.settle();
+  assert.match(h.document.getElementById('page').textContent, /Wake/);
+  assert.equal(h.eval('profileWrites'), 0);
+});
+
+test('profile store rejects wrong collection roots without normalizing or deleting them', async () => {
+  const h = await profileCaptureHarness();
+  for (const raw of ['null', '[]', 'true', '7', '"saved"']) {
+    putProfileStore(h, raw);
+    assert.match(h.document.getElementById('page').textContent, /profiles.*could not be read/i);
+    assert.equal(profileStoreRaw(h), raw);
+  }
+});
+
+test('profile store rejects nonobject saved profiles without changing the original collection', async () => {
+  const h = await profileCaptureHarness();
+  for (const value of [null, [], true, 7, 'bad']) {
+    const raw = JSON.stringify({ Wake: { sunrise: { hour: 7 } }, Broken: value });
+    putProfileStore(h, raw);
+    assert.match(h.document.getElementById('page').textContent, /profiles.*could not be read/i);
+    assert.equal(profileStoreRaw(h), raw);
+  }
+});
+
+test('profile store Save refuses unreadable originals before any Portal capture request', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, '{broken');
+  await h.eval('saveCurrentProfile("New",session.capture())');
+  assert.equal(profileReads(h).length, 0);
+  assert.equal(profileStoreRaw(h), '{broken');
+  assert.match(h.document.getElementById('notice').textContent, /not saved/i);
+});
+
+test('profile store read failure during deferred capture cannot overwrite previous profiles', async () => {
+  let release;
+  const h = await profileCaptureHarness(({ response }) => new Promise(resolve => { release = () => resolve(response({ ok: true, profileComplete: true, settings: fullProfileFixture })); }));
+  putProfileStore(h, JSON.stringify({ Earlier: { sunrise: { hour: 7 } } }));
+  h.click('Save current settings'); await h.settle();
+  h.eval('globalThis.originalProfileGet=localStorage.getItem;globalThis.profileWrites=0;globalThis.originalProfileSet=localStorage.setItem;localStorage.setItem=(key,value)=>{profileWrites++;return originalProfileSet(key,value)};localStorage.getItem=()=>{throw new Error("blocked")}');
+  release(); await h.settle();
+  assert.equal(h.eval('profileWrites'), 0);
+  assert.match(h.document.getElementById('notice').textContent, /not saved/i);
+  h.eval('localStorage.getItem=originalProfileGet');
+  assert.deepEqual(storedProfiles(h), { Earlier: { sunrise: { hour: 7 } } });
+  assert.equal(h.eval('busy.has(profileCaptureKey())'), false);
+});
+
+test('profile store malformed originals arriving during capture remain byte exact', async () => {
+  let release;
+  const h = await profileCaptureHarness(({ response }) => new Promise(resolve => { release = () => resolve(response({ ok: true, profileComplete: true, settings: fullProfileFixture })); }));
+  h.click('Save current settings'); await h.settle();
+  putProfileStore(h, '{changed-and-broken');
+  release(); await h.settle();
+  assert.equal(profileStoreRaw(h), '{changed-and-broken');
+  assert.match(h.document.getElementById('notice').textContent, /not saved/i);
+});
+
+test('profile store failed Delete keeps the profile and reports that it was not deleted', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.eval('storage.set=()=>false');
+  h.click('Delete'); confirmProfileDelete(h); await h.settle();
+  assert.deepEqual(storedProfiles(h), { Wake: { sunrise: { hour: 7 } } });
+  assert.match(h.document.getElementById('notice').textContent, /not deleted/i);
+  assert.match(h.document.getElementById('page').textContent, /Wake/);
+});
+
+test('profile store confirmed Delete rereads and preserves newly added other profiles', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.click('Delete');
+  h.eval('localStorage.setItem(STORAGE.profiles,JSON.stringify({Wake:{sunrise:{hour:7}},Later:{sunrise:{hour:8}}}))');
+  confirmProfileDelete(h); await h.settle();
+  assert.deepEqual(storedProfiles(h), { Later: { sunrise: { hour: 8 } } });
+  assert.match(h.document.getElementById('notice').textContent, /Profile deleted/i);
+});
+
+test('profile store Delete preserves malformed data discovered after confirmation opens', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.click('Delete');
+  h.eval('localStorage.setItem(STORAGE.profiles,"{broken")');
+  confirmProfileDelete(h); await h.settle();
+  assert.equal(profileStoreRaw(h), '{broken');
+  assert.match(h.document.getElementById('notice').textContent, /not deleted/i);
+});
+
+test('profile store Cancel and stale-room Delete confirmation perform no writes', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.eval('globalThis.profileWrites=0;globalThis.originalProfileSet=localStorage.setItem;localStorage.setItem=(key,value)=>{profileWrites++;return originalProfileSet(key,value)}');
+  h.click('Delete'); h.click('Cancel'); await h.settle();
+  assert.equal(h.eval('profileWrites'), 0);
+  h.click('Delete'); h.eval('session.select(roster[1])'); confirmProfileDelete(h); await h.settle();
+  assert.equal(h.eval('profileWrites'), 0);
+});
+
+test('profile store already-removed Delete skips a redundant write', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.click('Delete');
+  h.eval('localStorage.setItem(STORAGE.profiles,JSON.stringify({Later:{sunrise:{hour:8}}}));globalThis.profileWrites=0;globalThis.originalProfileSet=localStorage.setItem;localStorage.setItem=(key,value)=>{profileWrites++;return originalProfileSet(key,value)}');
+  confirmProfileDelete(h); await h.settle();
+  assert.equal(h.eval('profileWrites'), 0);
+  assert.deepEqual(storedProfiles(h), { Later: { sunrise: { hour: 8 } } });
+});
+
+test('profile store literal prototype-like profile names delete only that own entry', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, '{"__proto__":{"sunrise":{"hour":7}},"constructor":{"sunrise":{"hour":8}}}');
+  h.click('Delete'); confirmProfileDelete(h); await h.settle();
+  assert.deepEqual(storedProfiles(h), { constructor: { sunrise: { hour: 8 } } });
+});
