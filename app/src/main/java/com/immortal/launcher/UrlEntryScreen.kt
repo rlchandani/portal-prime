@@ -53,6 +53,7 @@ internal fun UrlEntryScreen(
     fieldHelp: String? = null,
     advancedOnly: Boolean = false,
     validHint: ((String) -> String)? = null,
+    removeHelp: String = "The existing source remains available until you confirm.",
 ) {
     val palette = LocalApprovedPalette.current
     val activity = LocalContext.current as? Activity
@@ -109,11 +110,11 @@ internal fun UrlEntryScreen(
         }
     }
     if (remove && onRemove != null) {
-        ApprovedSettingsDialog("Remove connection?", onDismiss = { remove = false },
-            help = "The existing source remains available until you confirm.") {
+        ApprovedSettingsDialog("${removeLabel ?: "Remove connection"}?", onDismiss = { remove = false },
+            help = removeHelp) {
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 ApprovedEditorsButton("Cancel") { remove = false }
-                ApprovedEditorsButton("Remove", primary = true) {
+                ApprovedEditorsButton(removeLabel ?: "Remove", primary = true) {
                     remove = false
                     if (!complete && activity?.isFinishing != true && activity?.isDestroyed != true) {
                         complete = true

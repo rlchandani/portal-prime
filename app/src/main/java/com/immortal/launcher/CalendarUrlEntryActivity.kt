@@ -35,6 +35,8 @@ class CalendarUrlEntryActivity : ComponentActivity() {
             },
             onCancel = { finish() },
             removeLabel = "Remove calendar",
+            removeHelp = "Events from this feed will disappear from Home and the screensaver. " +
+                "Your original calendar won't be deleted.",
             onRemove = {
               SettingsRegistry.apply(this, "calendar", JSONObject().put("url", ""))
               approvedSourcesReturn(this, "calendar")
