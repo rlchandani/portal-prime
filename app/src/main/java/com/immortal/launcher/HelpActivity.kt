@@ -99,41 +99,41 @@ private val helpPages =
         HelpPage(
             title = "Finding your way around",
             body =
-                "Tap any tile to open it. Tiles that look like a little stack — like " +
-                    "Settings — are folders, so tap to see what's inside. From inside any app, " +
-                    "tap the round home button or the Immortal icon to come straight back here.",
+                "Use Home, Apps and Tools in the bottom dock. Open Settings with the gear " +
+                    "button at the top, then choose a category on the left and its controls on " +
+                    "the right. The Back and Forward arrows revisit settings pages. The Portal's " +
+                    "home button returns you to Immortal.",
         ),
         HelpPage(
             title = "Making video calls",
             body =
-                "Calling still works! Tap the Calls tile, then pick a person from the " +
-                    "Portal's original screen that appears. When you've finished your call, tap " +
-                    "the home button or the Immortal icon to return to Immortal.",
+                "Open Apps and choose Calls to reach the Portal's original home screen. " +
+                    "Choose the person and call type there. When you've finished, press the " +
+                    "Portal's home button to return to Immortal.",
         ),
         HelpPage(
             title = "Your personal photo frame",
             body =
-                "When you're not using it, your Portal becomes a gentle photo frame. To " +
-                    "show your own pictures, open Settings, choose Screensaver, and pick a " +
-                    "folder of your photos. On the Portal Go, it can quietly sleep when no one's " +
-                    "nearby to save battery — that's a setting there too.",
+                "Open Settings, choose Photos & screensaver, then Photo sources to choose " +
+                    "your pictures. Use My photos & videos for a folder on your Portal, Shared " +
+                    "album link for a supported online album, or Connect your phone for uploads. " +
+                    "The photo-frame button beside the device name starts the screensaver.",
         ),
         HelpPage(
             title = "Adding more apps",
             body =
-                "Tap App Store to add hand-picked apps — media players, a browser, " +
-                    "smart-home dashboards and more. Want something specific? Install Aurora " +
-                    "Store from there. It opens the door to most of the apps you'd expect on an " +
-                    "Android device, with no Google account required.",
+                "Open Apps and choose App Store to browse apps for your Portal, including " +
+                    "browsers and media players. Return to Apps to open your installed apps. " +
+                    "Press and hold an app there for its management options.",
         ),
         HelpPage(
-            title = "Installing apps after a restart",
+            title = "Checking your device",
             body =
-                "Adding new apps uses a clever helper that runs until your Portal is " +
-                    "switched off or restarted. Everything you've already installed keeps " +
-                    "working — but to install something NEW after a restart, reconnect your " +
-                    "Portal to your computer and run the Immortal setup again. It's quick, and " +
-                    "completely safe to repeat as often as you like.",
+                "Normal Immortal setup enables the permissions needed for app installation " +
+                    "and controls. If something stops working, open Settings, choose Device, " +
+                    "then About & device health. Use Reconnect controls when offered, then " +
+                    "Check again. If a system permission is missing, rerun Immortal setup from " +
+                    "a connected computer. A restart alone doesn't always require setup again.",
         ),
         HelpPage(
             title = "A few honest limits",
