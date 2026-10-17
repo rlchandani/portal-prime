@@ -217,7 +217,8 @@ class EnumSpec<S>(
 
   override fun applyFrom(c: Context, body: JSONObject): Boolean {
     val k = firstPresent(key, aliases, body) ?: return false
-    val v = coerce(body.optString(k)) ?: return false
+    val raw = body.opt(k) as? String ?: return false
+    val v = coerce(raw) ?: return false
     set(c, v)
     return true
   }
