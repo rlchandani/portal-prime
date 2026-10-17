@@ -40,6 +40,29 @@ object CalendarPacks {
           Pack(PRAYER, "Prayer times", "Daily Islamic prayer times for your location"),
       )
 
+  /** Immutable values shared by native settings and the remote schema. */
+  data class Settings(
+      val romanian: Boolean = false,
+      val irish: Boolean = false,
+      val prayer: Boolean = false,
+  ) {
+    fun isEnabled(id: String): Boolean = when (id) {
+      ROMANIAN -> romanian
+      IRISH -> irish
+      PRAYER -> prayer
+      else -> false
+    }
+  }
+
+  fun load(context: Context): Settings = Settings(
+      romanian = isEnabled(context, ROMANIAN),
+      irish = isEnabled(context, IRISH),
+      prayer = isEnabled(context, PRAYER),
+  )
+
+  internal fun observeSnapshot(context: Context, changed: () -> Unit): () -> Unit =
+      observeSettingsPreferenceChanges(prefs(context), AVAILABLE.map { it.id }.toSet(), changed)
+
   fun isEnabled(context: Context, id: String): Boolean =
       prefs(context).getBoolean(id, false)
 

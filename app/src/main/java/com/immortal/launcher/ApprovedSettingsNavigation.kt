@@ -103,7 +103,7 @@ internal val ApprovedSettingsCategories = listOf(
         approvedIconResource("info"), listOf("device", "sleep", "health", "help", "system")),
     ApprovedSettingsCategory("advanced", "Advanced", "Technical connections, automation and diagnostics.",
         approvedIconResource("tools"),
-        listOf("immich", "albums", "smb", "dav", "web", "multiroom", "mqtt", "boot",
+        listOf("almanac", "immich", "albums", "smb", "dav", "web", "multiroom", "mqtt", "boot",
             "alpaca", "options", "speed", "apk", "managed", "debug")),
 )
 
@@ -142,6 +142,7 @@ internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("cameras", "Cameras", "home", CameraViewerActivity::class.java),
     ApprovedSettingsPage("weather", "Weather", "home"),
     ApprovedSettingsPage("calendar", "Calendar", "home"),
+    ApprovedSettingsPage("almanac", "Almanac", "photos"),
     ApprovedSettingsPage("calendar-url", "Calendar feed", "home", CalendarUrlEntryActivity::class.java),
     ApprovedSettingsPage("world", "World clock", "home", standaloneActivity = WorldClockActivity::class.java),
     ApprovedSettingsPage("countdowns", "Countdowns", "home", standaloneActivity = CountdownSettingsActivity::class.java),

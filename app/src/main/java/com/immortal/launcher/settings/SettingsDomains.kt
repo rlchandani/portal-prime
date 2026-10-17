@@ -8,6 +8,7 @@
 package com.immortal.launcher.settings
 
 import android.content.Context
+import com.immortal.launcher.CalendarPacks
 import com.immortal.launcher.CalendarFeed
 import com.immortal.launcher.CalendarUrlEntryActivity
 import com.immortal.launcher.SunriseConfig
@@ -1260,7 +1261,22 @@ object SettingsDomains {
           onApplied = { _, _ -> invalidateApprovedDashboardInventory() },
       )
 
+  val calendarPacks: SettingsDomain<CalendarPacks.Settings> = SettingsDomain(
+      id = "calendarpacks",
+      title = "Almanac",
+      load = CalendarPacks::load,
+      specs = CalendarPacks.AVAILABLE.map { pack ->
+        BoolSpec(
+            key = pack.id, title = pack.title,
+            get = { settings: CalendarPacks.Settings -> settings.isEnabled(pack.id) },
+            set = { context, enabled -> CalendarPacks.setEnabled(context, pack.id, enabled) },
+            help = pack.blurb,
+        )
+      },
+      defaults = { CalendarPacks.Settings() },
+  )
+
   val all: List<SettingsDomain<*>> =
       listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime, digitalclock, welcome, sunrise,
-          homeDashboard)
+          homeDashboard, calendarPacks)
 }

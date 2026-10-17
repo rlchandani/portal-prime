@@ -51,6 +51,7 @@ internal fun approvedPageForControl(domain: String, key: String): String? = when
         else -> "screensaver"
     }
     "calendar" -> if (key == "url") "calendar-url" else "calendar"
+    "calendarpacks" -> "almanac"
     "digitalclock" -> "clock"
     "fleet" -> "device"
     "home_dashboard" -> "ha"

@@ -121,8 +121,10 @@ timing on the **Welcome** settings screen (`WelcomeSettingsActivity`).
 
 The photo frame's dashboard can carry an **ambient almanac** line — a quiet daily fact fed by
 installable, keyless, on-device **calendar packs** plus a quote of the day (`CalendarPacks`,
-rendered by `PhotoFrameController`). Switch packs on per household under **More features → Almanac**
-on the [Settings](launcher.md#settings) screen (all off by default):
+rendered by `PhotoFrameController`). Enable **Advanced settings**, then open **Advanced → Almanac**
+on the [Settings](launcher.md#settings) screen (all off by default). These lines appear in the
+**Classic** screensaver’s **Ambient dashboard**; the Almanac page links to Slideshow settings
+for those prerequisites. The same switches are available in the browser remote’s advanced settings:
 
 | Pack | Adds |
 | --- | --- |
@@ -131,4 +133,4 @@ on the [Settings](launcher.md#settings) screen (all off by default):
 | **Prayer times** | The next daily Islamic prayer time for your location. |
 
 Each pack contributes a line only when it has something for the day, and everything is computed
-on-device — no keys, no accounts.
+on-device — no keys, no accounts. Prayer times use the location resolved for weather.

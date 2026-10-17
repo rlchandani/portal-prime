@@ -11,9 +11,10 @@ import com.immortal.launcher.ScreensaverConfig
 /** Presentation policy shared by the native renderer and phone schema. Never mutates settings. */
 object SettingsPresentation {
   private val advancedPages = setOf(
-      "immich", "albums", "smb", "dav", "web", "multiroom", "mqtt", "boot",
+      "almanac", "immich", "albums", "smb", "dav", "web", "multiroom", "mqtt", "boot",
       "alpaca", "options", "speed", "apk", "managed", "debug", "ha-entities")
   private val advancedControls = setOf(
+      "calendarpacks.romanian", "calendarpacks.irish", "calendarpacks.prayer",
       "immortal.hideStatusBar", "sources.albumRefresh", "screensaver.cacheEnabled",
       "screensaver.batterySaver", "screensaver.presenceMode", "screensaver.idleSleepMin",
       "screensaver.closeAppOnSleep", "screensaver.ambientDashboard", "screensaver.gestureWave",
@@ -29,6 +30,9 @@ object SettingsPresentation {
       "mqtt.validateCert", "digitalclock.style", "digitalclock.color", "digitalclock.font",
       "digitalclock.glow", "debug.enabled", "ha.url", "ha.token")
   private val shortHelp = mapOf(
+      "calendarpacks.romanian" to "Today’s name-days and Orthodox feasts.",
+      "calendarpacks.irish" to "Bank holidays and saints’ days in Ireland.",
+      "calendarpacks.prayer" to "Daily Islamic prayer times using the weather location.",
       "calendar.url" to "Home shows today and the next two days.",
       "calendar.widgetOn" to "Does not hide the calendar widget on Home.",
       "screensaver.enabled" to "Show photos when your Portal is idle.",
