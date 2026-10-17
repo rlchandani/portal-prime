@@ -1112,3 +1112,62 @@ test('actual All-rooms Save handlers serialize deferred 45 then 60 per endpoint 
   assert.equal(settingsPosts(h).length, 4);
   assert.match(h.document.getElementById('notice').textContent, /Confirmed in 2 of 2/);
 });
+
+const profileSunriseValues = { enabled: true, hour: 23, minute: 59, rampMinutes: 15, chime: false };
+function profileSunriseRoute({ legacy = false } = {}) {
+  const rooms = new Map();
+  return ({ url, opts, response }) => {
+    const target = new URL(url);
+    const values = rooms.get(target.origin) || { enabled: false, hour: 7, minute: 0, rampMinutes: 20, chime: true };
+    const controls = Object.entries(values).map(([key, value]) => ({
+      key, title: key, value, type: typeof value === 'boolean' ? 'bool' : 'int',
+      ...(key === 'hour' ? { min: 0, max: 23 } : key === 'minute' ? { min: 0, max: 59 } : key === 'rampMinutes' ? { min: 1, max: 60 } : {}),
+    }));
+    const domain = { id: 'sunrise', title: 'Sunrise', controls };
+    if (opts.method === 'POST') {
+      const patch = JSON.parse(opts.body);
+      assert.equal(patch.domain, 'sunrise');
+      const updated = { ...values, ...patch.values };
+      rooms.set(target.origin, updated);
+      return response({ ok: true, applied: Object.keys(patch.values), domain: { ...domain,
+        controls: controls.filter(c => updated.enabled || c.key === 'enabled').map(c => ({ ...c, value: updated[c.key] })) } });
+    }
+    const scoped = !legacy && target.searchParams.get('domain') === 'sunrise' && target.searchParams.get('includeInactive') === '1';
+    return response({ ok: true, settings: { domains: [{ ...domain,
+      controls: controls.filter(c => scoped || values.enabled || c.key === 'enabled') }] } });
+  };
+}
+
+test('profile preflight enables a disabled parent and its hidden children in one batch per room', async () => {
+  const h = await browserHarness({ saved, routes: { '/remote/settings': profileSunriseRoute() } });
+  await allSettings(h);
+  const before = h.calls.length;
+  await h.eval(`applyProfile("Wake light",{sunrise:${JSON.stringify(profileSunriseValues)}},settingTargets(),session.capture())`);
+  const posts = settingsPosts(h);
+  assert.equal(posts.length, 2);
+  for (const post of posts) assert.deepEqual(JSON.parse(post.opts.body).values, profileSunriseValues);
+  const preflights = h.calls.slice(before).filter(c => c.path === '/remote/settings' && c.opts.method !== 'POST');
+  assert.equal(preflights.length, 2);
+  for (const read of preflights) {
+    assert.equal(new URL(read.url).searchParams.get('domain'), 'sunrise');
+    assert.equal(new URL(read.url).searchParams.get('includeInactive'), '1');
+  }
+  assert.equal(h.eval('scopeResults.every(result => result.ok)'), true);
+});
+
+test('profile preflight rejects an out-of-range hidden child without partially enabling its parent', async () => {
+  const h = await browserHarness({ saved, routes: { '/remote/settings': profileSunriseRoute() } });
+  await allSettings(h);
+  await h.eval('applyProfile("Invalid",{sunrise:{enabled:true,hour:24}},settingTargets(),session.capture())');
+  assert.equal(settingsPosts(h).length, 0);
+  assert.equal(h.eval('scopeResults.length'), 2);
+  assert.equal(h.eval('scopeResults.every(result => !result.ok && result.error === "unavailable_setting")'), true);
+});
+
+test('legacy peers that omit hidden child metadata fail safely with no partial profile write', async () => {
+  const h = await browserHarness({ saved, routes: { '/remote/settings': profileSunriseRoute({ legacy: true }) } });
+  await allSettings(h);
+  await h.eval('applyProfile("Legacy",{sunrise:{enabled:true,hour:23}},settingTargets(),session.capture())');
+  assert.equal(settingsPosts(h).length, 0);
+  assert.equal(h.eval('scopeResults.every(result => !result.ok)'), true);
+});

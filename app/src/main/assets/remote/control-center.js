@@ -2094,7 +2094,7 @@ async function applyDomain(
     (target) => patches.get(target.base).values,
     async (target, id, patch) => {
       // Run fresh schema preflight after prior writes to this endpoint settle.
-      const schema = (await api(target, '/remote/settings')).settings;
+      const schema = (await api(target, `/remote/settings?domain=${encodeURIComponent(id)}&includeInactive=1`)).settings;
       const controlDomain = schema?.domains?.find((d) => d.id === id);
       for (const [key, value] of Object.entries(patch)) {
         const control = controlDomain?.controls?.find((c) => c.key === key);

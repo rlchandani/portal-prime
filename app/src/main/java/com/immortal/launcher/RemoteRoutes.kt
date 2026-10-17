@@ -451,7 +451,21 @@ class RemoteRoutes internal constructor(
    */
   private fun settings(req: FleetHttpServer.Request): FleetHttpServer.Response =
       when (req.method) {
-        "GET" -> json(200, ok().put("settings", SettingsRegistry.schemaJson(context)))
+        "GET" -> {
+          val domainId = req.queryParam("domain")
+          val includeInactive = req.queryParam("includeInactive") == "1"
+          when {
+            domainId?.isBlank() == true || (includeInactive && domainId == null) ->
+                json(400, err("domain_required"))
+            domainId == null -> json(200, ok().put("settings", SettingsRegistry.schemaJson(context)))
+            else -> {
+              val domain = SettingsRegistry.domain(domainId)
+              if (domain == null) json(404, err("unknown_domain"))
+              else json(200, ok().put("settings",
+                  SettingsRegistry.schemaJson(context, listOf(domain), includeInactive)))
+            }
+          }
+        }
         "POST" -> {
           val body = parseJson(req.bodyText())
           val domainId = body?.optString("domain")?.ifBlank { null }

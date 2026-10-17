@@ -47,19 +47,21 @@ class SettingsDomain<S>(
 
   fun flatJson(c: Context): JSONObject = flatJson(load(c))
 
-  /** The self-describing schema (visible controls + their metadata/values) for a generic renderer. */
-  fun schemaJson(c: Context): JSONObject = schemaJson(c, load(c))
+  /** Hidden controls are included only for explicit validation, never ordinary UI rendering. */
+  fun schemaJson(c: Context, includeInactive: Boolean = false): JSONObject =
+      schemaJson(c, load(c), includeInactive)
 
-  internal fun schemaJson(c: Context, request: SettingsSchemaRequest): JSONObject {
+  internal fun schemaJson(c: Context, request: SettingsSchemaRequest,
+      includeInactive: Boolean = false): JSONObject {
     val source = schemaSnapshotSource
-    return schemaJson(c, if (source != null) request.load(source) else load(c))
+    return schemaJson(c, if (source != null) request.load(source) else load(c), includeInactive)
   }
 
-  private fun schemaJson(c: Context, s: S): JSONObject {
+  private fun schemaJson(c: Context, s: S, includeInactive: Boolean): JSONObject {
     val defJson = defaults?.let { flatJson(it()) }
     val controls = JSONArray()
     specs.forEach { spec ->
-      if (spec.visibleWhen(c, s))
+      if (includeInactive || spec.visibleWhen(c, s))
           spec.metaJson(c, s)?.let { meta ->
             meta.put("tier", if (SettingsPresentation.isAdvanced(id, spec.key)) "advanced" else "everyday")
             meta.put("shortHelp", SettingsPresentation.conciseHelp(id, spec.key, meta.optString("help")))
@@ -118,10 +120,11 @@ object SettingsRegistry {
   /** Every domain's schema, for a client that renders all settings generically. */
   fun schemaJson(c: Context): JSONObject = schemaJson(c, domains)
 
-  internal fun schemaJson(c: Context, domains: List<SettingsDomain<*>>): JSONObject {
+  internal fun schemaJson(c: Context, domains: List<SettingsDomain<*>>,
+      includeInactive: Boolean = false): JSONObject {
     val request = SettingsSchemaRequest(c)
     val arr = JSONArray()
-    domains.forEach { arr.put(it.schemaJson(c, request)) }
+    domains.forEach { arr.put(it.schemaJson(c, request, includeInactive)) }
     return JSONObject().put("domains", arr)
   }
 
