@@ -395,6 +395,12 @@ function queueSettings(endpoint, work) {
   queued.then(cleanup, cleanup);
   return queued;
 }
+// A complete profile read observes earlier writes in this browser's existing endpoint FIFO.
+export function readSettings(target, read) {
+  const captured = Object.freeze({ ...target });
+  return queueSettings(captured.base, () => read(captured));
+}
+
 export async function applySettings(targets, domain, values, send) {
   // Reserve FIFO positions for ALL targets now, including those beyond the first
   // four slots. Later applies cannot jump ahead of an older queued endpoint.

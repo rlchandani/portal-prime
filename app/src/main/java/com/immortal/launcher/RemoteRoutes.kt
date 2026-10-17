@@ -100,6 +100,12 @@ class RemoteRoutes internal constructor(
         "/remote/sources" -> authed(req) { sources(req) }
         "/remote/immich/albums" -> authed(req) { immichAlbums(req) }
         "/remote/settings" -> authed(req) { settings(req) }
+        "/remote/settings/profile" -> authed(req) {
+          requireMethod("GET", req) {
+            json(200, ok().put("profileComplete", true).put("settings",
+                SettingsRegistry.schemaJson(context, SettingsRegistry.domains, includeInactive = true)))
+          }
+        }
         else -> json(404, err("not_found"))
       }
 

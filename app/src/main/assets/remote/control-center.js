@@ -18,6 +18,7 @@ import {
   ImagePool,
   ControlCommandQueue,
   applySettings,
+  readSettings,
   operationView,
   photoFolder,
   photoPage,
@@ -2133,6 +2134,38 @@ async function applyDomain(
   }
   return results;
 }
+function profileCaptureKey(ticket = session.capture()) {
+  return `${ticket.room?.base}:profile-capture:${ticket.generation}:${ticket.pageGeneration}`;
+}
+async function saveCurrentProfile(name, ticket) {
+  const key = profileCaptureKey(ticket);
+  if (!session.current(ticket) || busy.has(key)) return;
+  busy.add(key);
+  render();
+  try {
+    const response = await readSettings(ticket.room, (target) =>
+      session.current(ticket) ? api(target, '/remote/settings/profile') : null,
+    );
+    if (!session.current(ticket)) return;
+    const domains = response?.settings?.domains;
+    if (response?.profileComplete !== true || !Array.isArray(domains) || !domains.length ||
+        domains.some((d) => typeof d?.id !== 'string' || !d.id || !Array.isArray(d.controls)) ||
+        new Set(domains.map((d) => d.id)).size !== domains.length)
+      throw new ApiError('invalid_response');
+    const current = parse(storage.get(STORAGE.profiles, '{}'), {});
+    const updated = { ...current, [name]: captureProfile(response.settings) };
+    if (!storage.set(STORAGE.profiles, JSON.stringify(updated))) {
+      toast('Profile not saved. Browser storage is unavailable. Try again when storage is available.', true);
+      return;
+    }
+    toast('Profile saved in this browser.');
+  } catch (error) {
+    if (session.current(ticket)) toast(`Profile not saved. ${message(error)}`, true);
+  } finally {
+    busy.delete(key);
+    if (session.current(ticket)) render();
+  }
+}
 function profilesPage() {
   const profiles = parse(storage.get(STORAGE.profiles, '{}'), {});
   return sections(
@@ -2193,23 +2226,19 @@ function profilesPage() {
             toast('Enter a name and load the settings first.', true);
             return;
           }
-          const save = () => {
-            const current = parse(storage.get(STORAGE.profiles, '{}'), {});
-            current[name] = captureProfile(data.settings);
-            storage.set(STORAGE.profiles, JSON.stringify(current));
-            toast('Profile saved in this browser.');
-            render();
-          };
+          const ticket = session.capture();
+          const save = () => saveCurrentProfile(name, ticket);
           if (Object.hasOwn(profiles, name))
             confirmAction(
               `Replace “${name}”?`,
               'Replace the existing browser profile with current Portal settings.',
               save,
               'Replace',
+              ticket,
             );
           else save();
         },
-        { kind: 'primary' },
+        { kind: 'primary', disabled: busy.has(profileCaptureKey()) },
       ),
     ),
   );

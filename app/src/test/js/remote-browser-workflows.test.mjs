@@ -1171,3 +1171,128 @@ test('legacy peers that omit hidden child metadata fail safely with no partial p
   assert.equal(settingsPosts(h).length, 0);
   assert.equal(h.eval('scopeResults.every(result => !result.ok)'), true);
 });
+
+const fullProfileFixture = {
+  domains: [{ id: 'sunrise', title: 'Sunrise', controls: [
+    { key: 'enabled', type: 'bool', value: false },
+    { key: 'hour', type: 'int', value: 23, min: 0, max: 23 },
+    { key: 'minute', type: 'int', value: 59, min: 0, max: 59 },
+  ] }, { id: 'fixture', title: 'Fixture', controls: [
+    { key: 'label', type: 'string', value: 'Fresh snapshot' },
+    { key: 'password', type: 'string', secret: true, value: 'fixture-secret' },
+    { key: 'status', type: 'string', readOnly: true, value: 'Connected' },
+    { key: 'address', type: 'string', value: 'https://user:password@example.test/' },
+  ] }],
+};
+const visibleProfileFixture = { domains: [{ ...fullProfileFixture.domains[0], controls: [fullProfileFixture.domains[0].controls[0]] }] };
+async function profileCaptureHarness(profileRoute) {
+  const h = await browserHarness({ saved, routes: {
+    '/remote/settings': ({ response }) => response({ ok: true, settings: visibleProfileFixture }),
+    '/remote/settings/profile': profileRoute || (({ response }) => response({ ok: true, profileComplete: true, settings: fullProfileFixture })),
+  } });
+  h.eval('go("settings","profiles");setDraft("profile-name","Wake")');
+  await h.settle();
+  return h;
+}
+const storedProfiles = h => JSON.parse(h.eval('storage.get(STORAGE.profiles,"{}")'));
+const profileReads = h => h.calls.filter(c => c.path === '/remote/settings/profile');
+
+test('saving a complete profile reads fresh hidden values once and supports literal prototype-like names', async () => {
+  const h = await profileCaptureHarness();
+  h.eval('setDraft("profile-name","__proto__");render()');
+  h.click('Save current settings'); await h.settle();
+  assert.equal(profileReads(h).length, 1);
+  assert.deepEqual(storedProfiles(h).__proto__.sunrise, { enabled: false, hour: 23, minute: 59 });
+  assert.equal(storedProfiles(h).__proto__.fixture.label, 'Fresh snapshot');
+  assert.equal(settingsPosts(h).length, 0);
+});
+
+test('complete profile capture omits credentials, credential-bearing addresses and read-only values', async () => {
+  const h = await profileCaptureHarness(); h.click('Save current settings'); await h.settle();
+  assert.deepEqual(storedProfiles(h).Wake.fixture, { label: 'Fresh snapshot' });
+  assert.equal(JSON.stringify(storedProfiles(h)).includes('fixture-secret'), false);
+});
+
+test('profile capture failure preserves existing profiles and never falls back to cached visible settings', async () => {
+  const h = await profileCaptureHarness(({ response }) => response({ error: 'not_found' }, 404));
+  h.eval('storage.set(STORAGE.profiles,JSON.stringify({Other:{fixture:{label:"Keep me"}}}));render()');
+  h.click('Save current settings'); await h.settle();
+  assert.deepEqual(storedProfiles(h), { Other: { fixture: { label: 'Keep me' } } });
+  assert.doesNotMatch(h.document.getElementById('notice').textContent, /Profile saved/);
+});
+
+test('partial profile schemas without the complete marker cannot be saved', async () => {
+  const h = await profileCaptureHarness(({ response }) => response({ ok: true, settings: visibleProfileFixture }));
+  h.click('Save current settings'); await h.settle();
+  assert.deepEqual(storedProfiles(h), {});
+  assert.match(h.document.getElementById('notice').textContent, /unreadable|complete/i);
+});
+
+test('burst profile saves share one pending capture and restore the enabled Save control', async () => {
+  let release;
+  const h = await profileCaptureHarness(({ response }) => new Promise(resolve => { release = () => resolve(response({ ok: true, profileComplete: true, settings: fullProfileFixture })); }));
+  const first = h.click('Save current settings'); first.click(); await h.settle();
+  assert.equal(profileReads(h).length, 1);
+  assert.deepEqual(storedProfiles(h), {});
+  release(); await h.settle();
+  assert.equal(Object.keys(storedProfiles(h)).length, 1);
+  assert.equal(h.document.body.querySelectorAll('button').find(b => b.textContent === 'Save current settings').disabled, false);
+});
+
+test('a late profile capture cannot save after the user changes Portal', async () => {
+  let release;
+  const h = await profileCaptureHarness(({ response }) => new Promise(resolve => { release = () => resolve(response({ ok: true, profileComplete: true, settings: fullProfileFixture })); }));
+  h.click('Save current settings'); await h.settle();
+  h.eval(`selectRoom('${saved[1].base}')`); await h.settle();
+  const page = h.document.getElementById('page').textContent;
+  assert.equal(typeof release, 'function');
+  release(); await h.settle();
+  assert.deepEqual(storedProfiles(h), {});
+  assert.equal(h.document.getElementById('page').textContent, page);
+});
+
+test('replacing a profile waits for confirmation and then captures current complete settings', async () => {
+  const h = await profileCaptureHarness();
+  h.eval('storage.set(STORAGE.profiles,JSON.stringify({Wake:{sunrise:{hour:7}}}));render()');
+  h.click('Save current settings'); await h.settle();
+  assert.equal(profileReads(h).length, 0);
+  h.document.getElementById('sheet-actions').querySelectorAll('button').find(b => b.textContent === 'Cancel').click(); await h.settle();
+  assert.deepEqual(storedProfiles(h).Wake, { sunrise: { hour: 7 } });
+  h.click('Save current settings'); await h.settle();
+  h.document.getElementById('sheet-actions').querySelectorAll('button').find(b => b.textContent === 'Replace').click(); await h.settle();
+  assert.equal(profileReads(h).length, 1);
+  assert.deepEqual(storedProfiles(h).Wake.sunrise, { enabled: false, hour: 23, minute: 59 });
+});
+
+test('browser storage rejection never announces that a complete profile was saved', async () => {
+  const h = await profileCaptureHarness();
+  h.eval('storage.set=()=>false');
+  h.click('Save current settings'); await h.settle();
+  assert.deepEqual(storedProfiles(h), {});
+  assert.doesNotMatch(h.document.getElementById('notice').textContent, /Profile saved/);
+  assert.match(h.document.getElementById('notice').textContent, /storage/i);
+});
+
+
+test('complete profile capture waits for an earlier settings write in the existing room FIFO', async () => {
+  let releaseWrite;
+  let enabled = false;
+  const h = await browserHarness({ saved, routes: {
+    '/remote/settings': ({ opts, response }) => opts.method === 'POST'
+      ? new Promise(resolve => { releaseWrite = () => {
+          enabled = true;
+          resolve(response({ ok: true, applied: ['enabled'], domain: { id: 'sunrise', controls: [{ key: 'enabled', value: true }] } }));
+        }; })
+      : response({ ok: true, settings: visibleProfileFixture }),
+    '/remote/settings/profile': ({ response }) => response({ ok: true, profileComplete: true,
+      settings: { domains: [{ id: 'sunrise', controls: [{ key: 'enabled', type: 'bool', value: enabled }] }] } }),
+  } });
+  h.eval('go("settings","profiles");setDraft("profile-name","Queued")'); await h.settle();
+  const writing = h.eval('applyDomain("sunrise",{enabled:true},settingTargets(),session.capture())');
+  await h.settle(); assert.equal(typeof releaseWrite, 'function');
+  h.click('Save current settings'); await h.settle();
+  assert.equal(profileReads(h).length, 0);
+  releaseWrite(); await writing; await h.settle();
+  assert.equal(profileReads(h).length, 1);
+  assert.deepEqual(storedProfiles(h).Queued, { sunrise: { enabled: true } });
+});
