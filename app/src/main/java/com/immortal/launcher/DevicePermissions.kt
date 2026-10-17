@@ -12,7 +12,8 @@ import android.os.Build
 import android.provider.Settings
 
 /**
- * Live status of the special permissions Immortal relies on — all granted by the
+ * Live status of the special permissions and controls connection Immortal relies on.
+ * Permissions are granted by the
  * provisioning kit (`provision.sh` / `provision.ps1`) over adb, none of them toggleable
  * from the Portal's own UI on Android 9/10. Surfaced as a "Device health" view so a
  * struggling user (or we, debugging) can see at a glance which capability is missing and
@@ -23,6 +24,8 @@ import android.provider.Settings
  */
 object DevicePermissions {
 
+  enum class Repair { RECONNECT_CONTROLS }
+
   data class Check(
       val title: String,
       val enables: String,
@@ -30,15 +33,28 @@ object DevicePermissions {
       val degraded: String,
       val fix: String,
       val technicalFix: String = "",
+      val repair: Repair? = null,
   )
 
   data class Snapshot(val checks: List<Check>, val adminActive: Boolean)
 
   fun all(context: Context): List<Check> = snapshot(context).checks
 
+  /** Permission permits recovery; only a connected service makes controls healthy. */
+  internal fun controlCheck(connected: Boolean, canRepair: Boolean): Check = Check(
+      title = "Calls & remote controls",
+      enables = "Opening Meta home for Calls, and using remote navigation and the touchpad.",
+      granted = connected,
+      degraded = "Calls can't reliably open Meta home; remote navigation and the touchpad are unavailable.",
+      fix = if (canRepair) "Use Reconnect controls, then choose Check again if necessary."
+          else "Run Immortal setup on a computer to restore the controls connection.",
+      repair = if (!connected && canRepair) Repair.RECONNECT_CONTROLS else null,
+  )
+
   /** One administrator query supplies both the health row and the uninstall control. */
   fun snapshot(context: Context): Snapshot {
     val adminActive = ScreenControl.isAdminActive(context)
+    val canWriteSecureSettings = SettingsGuard.canWriteSecureSettings(context)
     val checks = listOf(
           Check(
               title = "Screen off",
@@ -75,11 +91,12 @@ object DevicePermissions {
           Check(
               title = "System settings",
               enables = "Keeping the screensaver, status bar, and WiFi-debug settings applied (and self-healing them).",
-              granted = SettingsGuard.canWriteSecureSettings(context),
+              granted = canWriteSecureSettings,
               degraded = "Immortal can't keep the screensaver/status-bar settings applied or repair them after changes.",
               fix = "Run Immortal setup to restore system-settings permission.",
               technicalFix = "pm grant ${context.packageName} android.permission.WRITE_SECURE_SETTINGS",
           ),
+          controlCheck(connected = RemoteInput.available(), canRepair = canWriteSecureSettings),
       )
     return Snapshot(checks, adminActive)
   }

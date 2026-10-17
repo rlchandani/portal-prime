@@ -102,4 +102,54 @@ class DeviceHealthLoadTest {
     assertFalse(state.canRemoveAdmin)
   }
 
+  private fun controlsSnapshot(connected: Boolean = false, canRepair: Boolean = true) =
+      DevicePermissions.Snapshot(listOf(DevicePermissions.controlCheck(connected, canRepair)), false)
+
+  @Test fun completedDisconnectedControlsAllowReconnect() {
+    val state = DeviceHealthStatus().received(DeviceHealthLoad.Ready(controlsSnapshot()))
+    assertTrue(state.canReconnectControls)
+  }
+
+  @Test fun checkingRetainedControlsCannotAuthorizeReconnect() {
+    val saved = controlsSnapshot()
+    val state = DeviceHealthStatus().received(DeviceHealthLoad.Ready(saved))
+        .received(DeviceHealthLoad.Checking)
+    assertSame(saved, state.snapshot)
+    assertFalse(state.canReconnectControls)
+  }
+
+  @Test fun failedRetainedControlsCannotAuthorizeReconnect() {
+    val saved = controlsSnapshot()
+    val state = DeviceHealthStatus().received(DeviceHealthLoad.Ready(saved)).beginCheck()
+        .received(DeviceHealthLoad.Unavailable)
+    assertSame(saved, state.snapshot)
+    assertFalse(state.canReconnectControls)
+  }
+
+  @Test fun noCompletedSnapshotCannotAuthorizeReconnect() {
+    assertFalse(DeviceHealthStatus().canReconnectControls)
+    assertFalse(DeviceHealthStatus().received(DeviceHealthLoad.Unavailable).canReconnectControls)
+  }
+
+  @Test fun connectedOrUnrepairableControlsCannotAuthorizeReconnect() {
+    for (snapshot in listOf(controlsSnapshot(connected = true), controlsSnapshot(canRepair = false), snapshot())) {
+      assertFalse(DeviceHealthStatus().received(DeviceHealthLoad.Ready(snapshot)).canReconnectControls)
+    }
+  }
+
+  @Test fun repairMarkerOnGrantedCheckCannotAuthorizeReconnect() {
+    val check = DevicePermissions.controlCheck(connected = false, canRepair = true).copy(granted = true)
+    val snapshot = DevicePermissions.Snapshot(listOf(check), false)
+    assertFalse(DeviceHealthStatus().received(DeviceHealthLoad.Ready(snapshot)).canReconnectControls)
+  }
+
+  @Test fun retryRequiresFreshDisconnectedResultBeforeAllowingReconnect() {
+    val failed = DeviceHealthStatus().received(DeviceHealthLoad.Ready(controlsSnapshot()))
+        .received(DeviceHealthLoad.Unavailable)
+    val retrying = failed.beginCheck()
+    assertFalse(retrying.canReconnectControls)
+    assertTrue(retrying.received(DeviceHealthLoad.Ready(controlsSnapshot())).canReconnectControls)
+    assertFalse(retrying.received(DeviceHealthLoad.Ready(controlsSnapshot(connected = true))).canReconnectControls)
+  }
+
 }

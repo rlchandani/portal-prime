@@ -1620,7 +1620,7 @@ private fun loadLaunchableApps(context: Context): List<BootAppOption> {
 internal fun DeviceHealthScreen(onBack: () -> Unit) {
   SettingsScaffold(
       title = "Device health",
-      subtitle = "The permissions your Portal was set up with, and what each one powers.",
+      subtitle = "Check the permissions and control access your Portal needs.",
       onBack = onBack,
   ) { DeviceHealthContent() }
 }
@@ -1637,6 +1637,7 @@ internal fun DeviceHealthContent() {
   var disablingAdmin by remember { mutableStateOf(false) }
   val scope = rememberCoroutineScope()
   var recheckRequested by remember { mutableStateOf(false) }
+  var reconnectingControls by remember { mutableStateOf(false) }
   val health by produceState(DeviceHealthStatus(), context, owner, refresh, advanced) {
     owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
       confirmingDisable = false
@@ -1647,21 +1648,47 @@ internal fun DeviceHealthContent() {
       awaitCancellation()
     }
   }
-  val checking = health.checking || recheckRequested
+  val checking = health.checking || recheckRequested || reconnectingControls
   fun recheck() {
     // Set synchronously so burst input cannot enqueue parallel permission queries.
-    if (health.checking || recheckRequested) return
+    if (health.checking || recheckRequested || reconnectingControls) return
     recheckRequested = true
     confirmingDisable = false
     refresh++
+  }
+  fun reconnectControls() {
+    // Admit once from a fresh completed result; never repair while checking stale rows.
+    if (reconnectingControls || recheckRequested || !health.canReconnectControls) return
+    reconnectingControls = true
+    confirmingDisable = false
+    scope.launch {
+      try {
+        // Revalidate at the action boundary: permission or connection may have changed.
+        val requested = withContext(Dispatchers.IO) {
+          runCatching {
+            if (SettingsGuard.canWriteSecureSettings(context) && !RemoteInput.available()) {
+              SettingsGuard.ensureBarWatchConnected(context)
+              true
+            } else false
+          }.getOrDefault(false)
+        }
+        // The existing repair re-adds the service after 2 seconds. One delayed check,
+        // cancelled when this page leaves composition, avoids a polling loop.
+        if (requested) kotlinx.coroutines.delay(2400)
+        recheckRequested = true
+        refresh++
+      } finally {
+        reconnectingControls = false
+      }
+    }
   }
   val snapshot = health.snapshot
   if (snapshot == null) {
     Card {
       Column(Modifier.padding(28.dp).semantics {
-        contentDescription = if (checking) "Checking device permissions" else "Device health check unavailable"
+        contentDescription = if (checking) "Checking device health" else "Device health check unavailable"
       }) {
-        Text(if (checking) "Checking device permissions…" else "Could not check device permissions.",
+        Text(if (checking) "Checking device health…" else "Could not check device health.",
             color = IosSecondary, fontSize = Sizes.rowTitle)
         if (!checking) ApprovedSettingsTextButton("Try again") { recheck() }
       }
@@ -1684,7 +1711,7 @@ internal fun DeviceHealthContent() {
           shape = RoundedCornerShape(14.dp),
           modifier = Modifier.fillMaxWidth().semantics {
             contentDescription = when {
-              checking -> "Checking device permissions"
+              checking -> "Checking device health"
               health.failed -> "Device health check unavailable"
               else -> "Device health checked"
             }
@@ -1694,10 +1721,11 @@ internal fun DeviceHealthContent() {
             horizontalArrangement = Arrangement.spacedBy(16.dp)) {
           Text(
               when {
-                checking -> "Checking permissions…"
-                health.failed -> "Could not recheck permissions. Last results are shown."
-                issues == 0 -> "✓  Permissions ready."
-                else -> "!  $issues permission${if (issues == 1) " needs" else "s need"} attention."
+                reconnectingControls -> "Reconnecting controls…"
+                checking -> "Checking device health…"
+                health.failed -> "Could not recheck device health. Last results are shown."
+                issues == 0 -> "✓  Device checks ready."
+                else -> "!  $issues device check${if (issues == 1) " needs" else "s need"} attention."
               },
               color = when {
                 checking -> IosSecondary
@@ -1716,7 +1744,8 @@ internal fun DeviceHealthContent() {
       Card {
         checks.forEachIndexed { i, c ->
           if (i > 0) Divider()
-          HealthRow(c, advanced)
+          HealthRow(c, advanced, reconnectingControls,
+              repairEnabled = !checking && !health.failed, onReconnect = ::reconnectControls)
         }
       }
 
@@ -1724,8 +1753,11 @@ internal fun DeviceHealthContent() {
         Spacer(Modifier.size(22.dp))
         SectionLabel("How to fix")
         Text(
-            "Connect this Portal to a computer over USB and run Immortal setup. When setup finishes, " +
-                "choose Check again to refresh these permission results.",
+            if (checks.filter { !it.granted }.all { it.repair == DevicePermissions.Repair.RECONNECT_CONTROLS })
+              "Use Reconnect controls above. This page will check the connection after reconnecting."
+            else
+              "Run Immortal setup from a connected computer to restore missing system permissions, " +
+                  "then choose Check again. Any available Reconnect controls action can be used here.",
             color = IosSecondary,
             fontSize = Sizes.rowSub,
             lineHeight = 20.sp,
@@ -1762,7 +1794,7 @@ internal fun DeviceHealthContent() {
             modifier =
                 Modifier.tvFocusable(RoundedCornerShape(8.dp), enabled = !disablingAdmin && !checking && !health.failed) {
                       // Reject burst input immediately, before the disabled row can recompose.
-                      if (!advanced || disablingAdmin || recheckRequested || !health.canRemoveAdmin) return@tvFocusable
+                      if (!advanced || disablingAdmin || recheckRequested || reconnectingControls || !health.canRemoveAdmin) return@tvFocusable
                       // Two-tap arm: a single stray remote press shouldn't tear down device admin
                       // (which silently breaks screensaver sleep + the HA screen-off control).
                       if (confirmingDisable) {
@@ -1787,7 +1819,8 @@ internal fun DeviceHealthContent() {
 }
 
 @Composable
-private fun HealthRow(c: DevicePermissions.Check, advanced: Boolean) {
+private fun HealthRow(c: DevicePermissions.Check, advanced: Boolean,
+    reconnectingControls: Boolean, repairEnabled: Boolean, onReconnect: () -> Unit) {
   Row(
       modifier = Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 14.dp),
       verticalAlignment = Alignment.Top,
@@ -1823,6 +1856,11 @@ private fun HealthRow(c: DevicePermissions.Check, advanced: Boolean) {
             lineHeight = 28.sp,
             modifier = Modifier.padding(top = 4.dp),
         )
+        if (c.repair == DevicePermissions.Repair.RECONNECT_CONTROLS) {
+          Spacer(Modifier.height(10.dp))
+          ActionPill(if (reconnectingControls) "Reconnecting…" else "Reconnect controls",
+              enabled = repairEnabled, onClick = onReconnect)
+        }
         if (advanced && c.technicalFix.isNotBlank()) {
           Text("Setup command: adb shell ${c.technicalFix}", color = IosSecondary,
               fontSize = Sizes.rowSub, lineHeight = 28.sp,

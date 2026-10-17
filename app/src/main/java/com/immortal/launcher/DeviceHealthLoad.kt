@@ -35,6 +35,9 @@ internal data class DeviceHealthStatus(
     val failed: Boolean = false,
 ) {
   val canRemoveAdmin: Boolean get() = snapshot?.adminActive == true && !checking && !failed
+  val canReconnectControls: Boolean get() = !checking && !failed && snapshot?.checks?.any {
+    !it.granted && it.repair == DevicePermissions.Repair.RECONNECT_CONTROLS
+  } == true
   fun beginCheck(): DeviceHealthStatus = copy(checking = true, failed = false)
   fun received(result: DeviceHealthLoad): DeviceHealthStatus = when (result) {
     DeviceHealthLoad.Checking -> beginCheck()
