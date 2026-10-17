@@ -43,7 +43,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private data class LocalApk(val file: File, val label: String, val version: String, val pkg: String, val icon: ImageBitmap?)
+private data class LocalApk(val file: File, val label: String, val version: String?, val pkg: String?, val icon: ImageBitmap?) {
+  val metadataReadable: Boolean get() = !pkg.isNullOrBlank()
+}
 
 /** Local APKs retain the existing HeadlessInstaller daemon/signature/permission behavior. */
 class ApkBrowserActivity : ComponentActivity() {
@@ -107,13 +109,16 @@ private fun ApkBrowserScreen() {
         Surface(color = IosCard, shape = RoundedCornerShape(24.dp), border = BorderStroke(1.dp, IosDivider), modifier = Modifier.fillMaxWidth()) {
           Row(Modifier.heightIn(min = 158.dp).padding(26.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(25.dp)) {
             if (apk.icon != null) Image(apk.icon, null, Modifier.size(85.dp).clip(RoundedCornerShape(22.dp)))
-            else ApprovedAppsIcon(apk.pkg, apk.label, 85.dp)
+            else ApprovedAppsIcon(apk.pkg.orEmpty(), apk.label, 85.dp)
             Column(Modifier.weight(1f)) {
               Text(apk.label, color = IosLabel, fontSize = 28.sp, lineHeight = 38.sp, fontWeight = FontWeight.Medium)
-              Text("v${apk.version} · ${apk.file.name}", color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 7.dp))
+              Text(if (apk.metadataReadable) apk.version?.let { "v$it · ${apk.file.name}" } ?: apk.file.name else "Cannot read this APK", color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 7.dp))
+              if (!apk.metadataReadable) Text("Download this file again, then choose Refresh files.", color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 7.dp))
               status[apk.file.absolutePath]?.let { Text(it, color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 7.dp)) }
             }
-            ApprovedAppsButton(if (busy) "Installing…" else "Install", enabled = !busy && !InstallDaemon.installPaused(context)) { selected = apk }
+            ApprovedAppsButton(if (!apk.metadataReadable) "Unavailable" else if (busy) "Installing…" else "Install", enabled = apk.metadataReadable && !busy && !InstallDaemon.installPaused(context)) {
+              if (apk.metadataReadable && status[apk.file.absolutePath] != "Installing…" && !InstallDaemon.installPaused(context)) selected = apk
+            }
           }
         }
       }
@@ -127,15 +132,17 @@ private fun ApkBrowserScreen() {
           Text("${apk.file.name}\nAndroid verifies this APK’s compatibility and signing certificate before installing it.", color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 20.dp))
           Row(Modifier.padding(top = 28.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             ApprovedAppsButton("Cancel") { selected = null }
-            ApprovedAppsButton("Install", primary = true) {
-              selected = null
+            ApprovedAppsButton("Install", primary = true, enabled = apk.metadataReadable && status[apk.file.absolutePath] != "Installing…" && !InstallDaemon.installPaused(context)) {
+              val pkg = apk.pkg
               val key = apk.file.absolutePath
+              if (!apk.metadataReadable || pkg == null || status[key] == "Installing…") return@ApprovedAppsButton
+              selected = null
               if (InstallDaemon.installPaused(context)) status[key] = "Paused — connect to your computer to add apps"
               else {
                 status[key] = "Installing…"
                 scope.launch {
                   try {
-                    val ok = withContext(Dispatchers.IO) { HeadlessInstaller.install(context.applicationContext, apk.file, apk.pkg) }
+                    val ok = withContext(Dispatchers.IO) { HeadlessInstaller.install(context.applicationContext, apk.file, pkg) }
                     status[key] = if (ok) "Installed ✓" else "Install failed or was cancelled"
                   } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
                   catch (failure: Exception) { status[key] = "Install failed: ${failure.message ?: "unknown error"}" }
@@ -168,23 +175,29 @@ private fun scanApks(context: android.content.Context): List<LocalApk> {
       )
   val pm = context.packageManager
   return dirs
-      .flatMap { d -> runCatching { d.listFiles { f -> f.extension.equals("apk", true) }?.toList() }.getOrNull() ?: emptyList() }
+      .flatMap { d -> runCatching { d.listFiles { f -> f.isFile && f.extension.equals("apk", true) }?.toList() }.getOrNull() ?: emptyList() }
       .distinctBy { it.absolutePath }
-      .mapNotNull { f ->
+      .map { f ->
+        val unreadable = LocalApk(f, f.name, null, null, null)
         runCatching {
               val info = pm.getPackageArchiveInfo(f.absolutePath, 0)
               val ai = info?.applicationInfo
-              ai?.sourceDir = f.absolutePath
-              ai?.publicSourceDir = f.absolutePath
-              LocalApk(
-                  file = f,
-                  label = ai?.loadLabel(pm)?.toString() ?: f.name,
-                  version = info?.versionName ?: "?",
-                  pkg = info?.packageName ?: f.name,
-                  icon = ai?.loadIcon(pm)?.toBitmap(120, 120)?.asImageBitmap(),
-              )
+              val pkg = info?.packageName?.takeIf { it.isNotBlank() }
+              if (info == null || ai == null || pkg == null) unreadable
+              else {
+                ai.sourceDir = f.absolutePath
+                ai.publicSourceDir = f.absolutePath
+                LocalApk(
+                    file = f,
+                    label = runCatching { ai.loadLabel(pm)?.toString() }.getOrNull()
+                        ?.takeIf { it.isNotBlank() } ?: f.name,
+                    version = info.versionName?.takeIf { it.isNotBlank() },
+                    pkg = pkg,
+                    icon = runCatching { ai.loadIcon(pm)?.toBitmap(120, 120)?.asImageBitmap() }.getOrNull(),
+                )
+              }
             }
-            .getOrNull()
+            .getOrDefault(unreadable)
       }
       .sortedByDescending { it.file.lastModified() }
 }
