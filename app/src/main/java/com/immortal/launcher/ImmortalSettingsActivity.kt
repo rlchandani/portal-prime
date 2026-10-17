@@ -1292,11 +1292,14 @@ internal fun MqttScreen(onBack: () -> Unit) {
 internal fun MqttContent() {
   val context = LocalContext.current
   var enabled by remember { mutableStateOf(MqttConfig.isEnabled(context)) }
-  var host by remember { mutableStateOf(MqttConfig.host(context)) }
-  var port by remember { mutableStateOf(MqttConfig.port(context).toString()) }
-  var user by remember { mutableStateOf(MqttConfig.username(context)) }
-  var pass by remember { mutableStateOf(MqttConfig.password(context)) }
-  var useTls by remember { mutableStateOf(MqttConfig.useTls(context)) }
+  fun readConnection() = MqttConnectionValues(MqttConfig.host(context), MqttConfig.port(context),
+      MqttConfig.username(context), MqttConfig.password(context), MqttConfig.useTls(context))
+  var baseline by remember { mutableStateOf(synchronized(SettingsDomains.mqtt) { readConnection() }) }
+  var host by remember { mutableStateOf(baseline.host) }
+  var port by remember { mutableStateOf(baseline.port.toString()) }
+  var user by remember { mutableStateOf(baseline.username) }
+  var pass by remember { mutableStateOf(baseline.password) }
+  var useTls by remember { mutableStateOf(baseline.useTls) }
   var error by remember { mutableStateOf<String?>(null) }
   // MqttStatus is a plain holder updated off the main thread, so poll it for live
   // "Connecting… → Connected" feedback (Compose won't recompose on its writes).
@@ -1321,14 +1324,24 @@ internal fun MqttContent() {
       error = "Enter a port from ${portSpec.min} to ${portSpec.max}."
       return false
     }
-    // One registry apply keeps side effects once per batch and retains a masked blank secret.
-    SettingsDomains.mqtt.apply(context, JSONObject().put("host", host).put("port", chosenPort)
-        .put("username", user).put("password", pass).put("useTls", useTls))
-    host = MqttConfig.host(context)
-    port = MqttConfig.port(context).toString()
-    user = MqttConfig.username(context)
-    pass = MqttConfig.password(context)
-    useTls = MqttConfig.useTls(context)
+    val stored = synchronized(SettingsDomains.mqtt) {
+      // Submit only deliberate edits; untouched fields may have newer companion values.
+      val changes = baseline.editedValues(host, chosenPort, user, pass, useTls)
+      if (changes.isNotEmpty()) {
+        val body = JSONObject()
+        changes.forEach { (key, value) -> body.put(key, value) }
+        SettingsDomains.mqtt.apply(context, body)
+      }
+      readConnection()
+    }
+    // No-op Apply refreshes the form without writing or reconnecting the broker.
+    baseline = stored
+    host = stored.host
+    port = stored.port.toString()
+    user = stored.username
+    pass = stored.password
+    useTls = stored.useTls
+    enabled = MqttConfig.isEnabled(context)
     error = null
     return true
   }
