@@ -78,7 +78,7 @@ internal fun IntercomContent() {
   val pageActive by rememberUpdatedState(LocalApprovedLauncherPageActive.current)
   val lan = remember { LanAudio() }
 
-  var mode by remember { mutableStateOf("idle") } // idle | broadcasting | listening
+  var mode by remember { mutableStateOf(IntercomMode.IDLE) }
   var host by remember { mutableStateOf("") }
   var status by remember { mutableStateOf("") }
   var live by remember { mutableStateOf(true) }
@@ -92,7 +92,7 @@ internal fun IntercomContent() {
     session++
     permissionSession = null
     lan.stop()
-    mode = "idle"
+    mode = IntercomMode.IDLE
     status = ""
   }
   DisposableEffect(owner, lan) {
@@ -113,8 +113,8 @@ internal fun IntercomContent() {
   // only while this exact foreground session is running; stop/replacement cancels observation.
   LaunchedEffect(owner, lan, mode, session, pageActive) {
     val request = session
-    val wasBroadcast = mode == "broadcasting"
-    if (!isActive() || (!wasBroadcast && mode != "listening")) return@LaunchedEffect
+    val wasBroadcast = mode == IntercomMode.BROADCAST
+    if (!isActive() || (!wasBroadcast && mode != IntercomMode.LISTENING)) return@LaunchedEffect
     while (isActive() && request == session) {
       delay(500)
       if (isActive() && request == session && !lan.isActive) {
@@ -129,16 +129,16 @@ internal fun IntercomContent() {
   fun beginBroadcast() {
     if (!isActive()) return
     val request = ++session
-    mode = "idle"
+    mode = IntercomMode.STARTING_BROADCAST
     status = "Starting…"
     lan.startBroadcast { ok ->
       handler.post {
         if (isActive() && request == session) {
           if (ok && lan.isActive) {
-            mode = "broadcasting"
+            mode = IntercomMode.BROADCAST
             status = "Broadcasting this room's audio"
           } else {
-            mode = "idle"
+            mode = IntercomMode.IDLE
             status = if (ok) "Broadcast ended. Start again when you're ready."
             else "Couldn't start — the broadcast port is in use"
           }
@@ -153,7 +153,10 @@ internal fun IntercomContent() {
     permissionSession = null
     if (request != null && request == session && isActive()) {
       if (granted) beginBroadcast()
-      else status = "Microphone permission is needed to broadcast"
+      else {
+        mode = IntercomMode.IDLE
+        status = "Microphone permission is needed to broadcast"
+      }
     }
   }
 
@@ -163,10 +166,17 @@ internal fun IntercomContent() {
         context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
     if (granted) beginBroadcast()
     else {
+      // Permission waiting replaces any listener, just like the eventual broadcast.
+      stop()
       permissionSession = ++session
+      mode = IntercomMode.STARTING_BROADCAST
+      status = "Allow microphone access to broadcast"
       permLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
     }
   }
+
+  val broadcastBusy = mode == IntercomMode.BROADCAST || mode == IntercomMode.STARTING_BROADCAST
+  val listenBusy = mode == IntercomMode.LISTENING || mode == IntercomMode.CONNECTING
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       if (myIp.isNotBlank()) {
@@ -183,10 +193,14 @@ internal fun IntercomContent() {
 
       // Broadcast (baby monitor in the nursery): this device's mic → the network.
       ActionButton(
-          label = if (mode == "broadcasting") "■ Stop broadcasting" else "🔊 Broadcast this room",
-          primary = mode != "broadcasting",
+          label = when (mode) {
+            IntercomMode.BROADCAST -> "■ Stop broadcasting"
+            IntercomMode.STARTING_BROADCAST -> "Cancel broadcast"
+            else -> "🔊 Broadcast this room"
+          },
+          primary = !broadcastBusy,
       ) {
-        if (mode == "broadcasting") stop() else startBroadcast()
+        if (broadcastBusy) stop() else startBroadcast()
       }
 
       // Listen (kitchen Portal): connect to the broadcasting Portal's address.
@@ -196,14 +210,18 @@ internal fun IntercomContent() {
               label = { Text("Other Portal's address (e.g. 192.168.1.42)") },
               modifier = Modifier.fillMaxWidth())
           ActionButton(
-              label = if (mode == "listening") "■ Stop listening" else "👂 Listen",
-              primary = mode != "listening",
+              label = when (mode) {
+                IntercomMode.LISTENING -> "■ Stop listening"
+                IntercomMode.CONNECTING -> "Cancel connection"
+                else -> "👂 Listen"
+              },
+              primary = !listenBusy,
           ) {
-            if (mode == "listening") stop()
+            if (listenBusy) stop()
             else if (host.isNotBlank() && isActive()) {
               val request = ++session
               val address = host.trim()
-              mode = "idle"
+              mode = IntercomMode.CONNECTING
               status = "Connecting…"
               lan.startListening(address) { ok ->
                 handler.post {
@@ -214,7 +232,7 @@ internal fun IntercomContent() {
                       ok -> "Connection ended. Check the other Portal and try Listen again."
                       else -> "Couldn't connect to $address"
                     }
-                    mode = if (connected) "listening" else "idle"
+                    mode = if (connected) IntercomMode.LISTENING else IntercomMode.IDLE
                   }
                 }
               }

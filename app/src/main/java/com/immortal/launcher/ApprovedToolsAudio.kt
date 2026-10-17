@@ -333,7 +333,7 @@ internal fun ToolsNotesContent() {
     }
 }
 
-private enum class ToolsIntercomMode { IDLE, STARTING_BROADCAST, BROADCAST, CONNECTING, LISTENING }
+internal enum class IntercomMode { IDLE, STARTING_BROADCAST, BROADCAST, CONNECTING, LISTENING }
 
 /** Continuous one-way LAN audio; LanAudio owns all sockets/mics through LanAudioSessions. */
 @Composable
@@ -343,7 +343,7 @@ internal fun ToolsIntercomContent() {
     val lan = remember { LanAudio() }
     val handler = remember { Handler(Looper.getMainLooper()) }
     var host by rememberSaveable { mutableStateOf("") }
-    var mode by remember { mutableStateOf(ToolsIntercomMode.IDLE) }
+    var mode by remember { mutableStateOf(IntercomMode.IDLE) }
     var broadcastStatus by remember { mutableStateOf("Microphone idle") }
     var listenStatus by remember { mutableStateOf("Same-network connection") }
     var micGranted by remember { mutableStateOf(toolsMicrophoneGranted(context)) }
@@ -354,7 +354,7 @@ internal fun ToolsIntercomContent() {
     fun stop() {
         runningRequest = null
         lan.stop()
-        mode = ToolsIntercomMode.IDLE
+        mode = IntercomMode.IDLE
         broadcastStatus = "Microphone idle"
         listenStatus = "Same-network connection"
     }
@@ -369,17 +369,17 @@ internal fun ToolsIntercomContent() {
         val request = policy.begin() ?: return
         stop()
         runningRequest = request
-        mode = ToolsIntercomMode.STARTING_BROADCAST
+        mode = IntercomMode.STARTING_BROADCAST
         broadcastStatus = "Opening broadcast…"
         lan.startBroadcast { started ->
             handler.post {
                 if (policy.accepts(request)) {
                     if (started && lan.isActive) {
-                        mode = ToolsIntercomMode.BROADCAST
+                        mode = IntercomMode.BROADCAST
                         // A bound socket is ready for listeners; it does not verify mic delivery.
                         broadcastStatus = "Broadcast open · ready for listeners"
                     } else {
-                        mode = ToolsIntercomMode.IDLE
+                        mode = IntercomMode.IDLE
                         runningRequest = null
                         broadcastStatus = "Couldn't open the broadcast. Port ${lan.PORT} may be in use."
                     }
@@ -418,16 +418,16 @@ internal fun ToolsIntercomContent() {
         val request = policy.begin() ?: return
         stop()
         runningRequest = request
-        mode = ToolsIntercomMode.CONNECTING
+        mode = IntercomMode.CONNECTING
         listenStatus = "Connecting to $address…"
         lan.startListening(address) { connected ->
             handler.post {
                 if (policy.accepts(request)) {
                     if (connected && lan.isActive) {
-                        mode = ToolsIntercomMode.LISTENING
+                        mode = IntercomMode.LISTENING
                         listenStatus = "Connected to $address"
                     } else {
-                        mode = ToolsIntercomMode.IDLE
+                        mode = IntercomMode.IDLE
                         runningRequest = null
                         listenStatus = "Couldn't connect to $address. Check its broadcast and Wi-Fi."
                     }
@@ -440,8 +440,8 @@ internal fun ToolsIntercomContent() {
     // so a later disconnect cannot leave "Connected" displayed indefinitely.
     LaunchedEffect(mode, runningRequest, pageActive) {
         val request = runningRequest ?: return@LaunchedEffect
-        val wasBroadcast = mode == ToolsIntercomMode.BROADCAST
-        if (!wasBroadcast && mode != ToolsIntercomMode.LISTENING) return@LaunchedEffect
+        val wasBroadcast = mode == IntercomMode.BROADCAST
+        if (!wasBroadcast && mode != IntercomMode.LISTENING) return@LaunchedEffect
         while (policy.accepts(request)) {
             delay(500)
             if (policy.accepts(request) && !lan.isActive) {
@@ -454,11 +454,11 @@ internal fun ToolsIntercomContent() {
         }
     }
 
-    val broadcasting = mode == ToolsIntercomMode.BROADCAST
-    val broadcastBusy = broadcasting || mode == ToolsIntercomMode.STARTING_BROADCAST ||
+    val broadcasting = mode == IntercomMode.BROADCAST
+    val broadcastBusy = broadcasting || mode == IntercomMode.STARTING_BROADCAST ||
         permissionRequest != null
-    val listening = mode == ToolsIntercomMode.LISTENING
-    val listenBusy = listening || mode == ToolsIntercomMode.CONNECTING
+    val listening = mode == IntercomMode.LISTENING
+    val listenBusy = listening || mode == IntercomMode.CONNECTING
     ToolsTwoPane(
         left = {
             ToolsPanel("Broadcast this room") {
