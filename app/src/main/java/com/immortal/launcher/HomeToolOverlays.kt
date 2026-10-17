@@ -70,21 +70,43 @@ import kotlinx.coroutines.withContext
 internal fun IssOverlay(onDismiss: () -> Unit) {
   val context = LocalContext.current
   var passes by remember { mutableStateOf<List<IssPasses.Pass>?>(null) }
+  var foregroundAt by remember { mutableStateOf(System.currentTimeMillis()) }
+  var loading by remember { mutableStateOf(true) }
+  var message by remember { mutableStateOf<String?>(null) }
   var retry by remember { mutableStateOf(0) }
-  LaunchedEffect(retry) { passes = withContext(Dispatchers.IO) { IssPasses.predict(context) } }
+  LaunchedEffect(retry) {
+    loading = true
+    message = null
+    foregroundAt = System.currentTimeMillis()
+    passes = passes?.filter { it.endMillis > foregroundAt }
+    try {
+      val result = withContext(Dispatchers.IO) { IssPasses.predictStatus(context) }
+      foregroundAt = System.currentTimeMillis()
+      val predicted = result.passes.filter { it.endMillis > foregroundAt }
+      passes = passes?.filter { it.endMillis > foregroundAt }
+      if (result.problem == null) passes = predicted
+      message = issPredictionMessage(IssPasses.Prediction(predicted, result.problem))
+    } catch (cancelled: kotlinx.coroutines.CancellationException) {
+      throw cancelled
+    } catch (_: Exception) {
+      foregroundAt = System.currentTimeMillis()
+      passes = passes?.filter { it.endMillis > foregroundAt }
+      message = issPredictionMessage(IssPasses.Prediction(
+          emptyList(), IssPasses.PredictionProblem.CALCULATION))
+    } finally { loading = false }
+  }
 
   BackHandler { onDismiss() }
   Scrim(onDismiss) {
     ToolCard(onClose = onDismiss) {
       ToolTitle("ISS passes")
-      ApprovedAppsButton("Refresh passes") { passes = null; retry++ }
-      val p = passes
+      ApprovedAppsButton("Refresh passes") { retry++ }
+      val p = passes.orEmpty().filter { it.endMillis > foregroundAt }
       when {
-        p == null -> Text("Finding passes…", color = IosSecondary, fontSize = 24.sp)
         p.isEmpty() ->
             Text(
-                "No passes found. Check the device is online so it can fetch the latest orbit, " +
-                    "and that your location is set (it follows the weather tile).",
+                if (loading) "Finding passes…" else message ?: issPredictionMessage(
+                    IssPasses.Prediction(emptyList()))!!,
                 color = IosSecondary,
                 fontSize = 24.sp,
                 lineHeight = 34.sp,
@@ -133,6 +155,9 @@ internal fun IssOverlay(onDismiss: () -> Unit) {
               lineHeight = 30.sp,
           )
         }
+      }
+      if (p.isNotEmpty() && message != null) {
+        Text(message!!, color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp)
       }
     }
   }

@@ -70,17 +70,27 @@ object IssPasses {
    * @param horizonDeg ignore grazing passes whose peak is below this (10° default —
    *   anything lower is lost behind buildings/trees from an indoor Portal anyway).
    */
-  fun predict(context: Context, max: Int = 5, horizonDeg: Double = 10.0): List<Pass> {
+  enum class PredictionProblem { LOCATION, ORBIT, CALCULATION }
+
+  /** A successful empty scan is distinct from unavailable inputs or calculation failure. */
+  data class Prediction(val passes: List<Pass> = emptyList(), val problem: PredictionProblem? = null)
+
+  /** Compatibility list boundary used by the existing compact Home summary. */
+  fun predict(context: Context, max: Int = 5, horizonDeg: Double = 10.0): List<Pass> =
+      predictStatus(context, max, horizonDeg).passes
+
+  fun predictStatus(context: Context, max: Int = 5, horizonDeg: Double = 10.0): Prediction {
     ToolsWork.checkpoint()
     val coords = Weather.coordinates(context)
     ToolsWork.checkpoint()
-    val (lat, lon) = coords ?: return emptyList()
+    val (lat, lon) = coords ?: return Prediction(problem = PredictionProblem.LOCATION)
     val sat = loadSat(context)
     ToolsWork.checkpoint()
-    if (sat == null) return emptyList()
+    if (sat == null) return Prediction(problem = PredictionProblem.ORBIT)
     val passes = runCatching { scan(sat, lat, lon, max, horizonDeg) }
     ToolsWork.checkpoint()
-    return passes.getOrDefault(emptyList())
+    return if (passes.isSuccess) Prediction(passes.getOrThrow())
+        else Prediction(problem = PredictionProblem.CALCULATION)
   }
 
   /** The very next pass (or null), for the compact home tile subtitle. */
@@ -99,6 +109,7 @@ object IssPasses {
     val steps = (SPAN_H * 3600 / STEP_S).toInt()
 
     val passes = ArrayList<Pass>()
+    var usableSamples = 0
     var inPass = false
     var startMs = 0L
     var startAz = 0.0
@@ -113,6 +124,8 @@ object IssPasses {
       ToolsWork.checkpoint()
       val tMs = nowMs + (i * STEP_S * 1000).toLong()
       val look = lookAngle(sat, tMs, obs, latRad, lonRad) ?: continue
+      if (!look.first.isFinite() || !look.second.isFinite()) continue
+      usableSamples++
       val elDeg = look.first / DEG
       val azDeg = look.second / DEG
       if (elDeg >= 0.0) {
@@ -151,6 +164,7 @@ object IssPasses {
         }
       }
     }
+    check(usableSamples > 0) { "No usable orbital samples" }
     return passes
   }
 

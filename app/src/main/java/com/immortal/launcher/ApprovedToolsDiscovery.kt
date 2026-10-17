@@ -31,15 +31,21 @@ internal fun ToolsIssContent() {
     var passes by remember { mutableStateOf(ToolsDiscoveryCache.passes) }
     var foregroundAt by remember { mutableStateOf(System.currentTimeMillis()) }
     var loading by remember { mutableStateOf(false) }
-    var message by remember { mutableStateOf<String?>(null) }
+    var message by remember { mutableStateOf(ToolsDiscoveryCache.passes?.let {
+        issPredictionMessage(IssPasses.Prediction(it))
+    }) }
     var revision by remember { mutableStateOf(0) }
     val refreshGate = remember { ToolsRefreshGate() }
     LaunchedEffect(active, revision) {
         if (!active) return@LaunchedEffect
         foregroundAt = System.currentTimeMillis()
         val remaining = passes?.filter { it.endMillis > foregroundAt }
-        if (!refreshGate.isPending(revision) && !remaining.isNullOrEmpty() &&
+        passes = remaining
+        val cached = ToolsDiscoveryCache.passes
+        if (!refreshGate.isPending(revision) && cached != null &&
+            (cached.isEmpty() || !remaining.isNullOrEmpty()) &&
             foregroundAt - ToolsDiscoveryCache.passesAt < 30 * 60_000L) {
+            message = issPredictionMessage(IssPasses.Prediction(remaining.orEmpty()))
             ToolsDiscoveryDiagnostics.cacheHit("iss")
             return@LaunchedEffect
         }
@@ -48,20 +54,25 @@ internal fun ToolsIssContent() {
         var usable = false
         ToolsDiscoveryDiagnostics.started("iss")
         try {
-            val result = ToolsWork.load { IssPasses.predict(context) }
-                .filter { it.endMillis > System.currentTimeMillis() }
-            passes = result
-            usable = result.isNotEmpty()
-            if (result.isEmpty()) message = "No passes are available. Check your connection and weather location, then try again."
-            else {
-                ToolsDiscoveryCache.passes = result
-                ToolsDiscoveryCache.passesAt = System.currentTimeMillis()
+            val result = ToolsWork.load { IssPasses.predictStatus(context) }
+            foregroundAt = System.currentTimeMillis()
+            val predicted = result.passes.filter { it.endMillis > foregroundAt }
+            passes = passes?.filter { it.endMillis > foregroundAt }
+            message = issPredictionMessage(IssPasses.Prediction(predicted, result.problem))
+            if (result.problem == null) {
+                passes = predicted
+                usable = predicted.isNotEmpty()
+                ToolsDiscoveryCache.passes = predicted
+                ToolsDiscoveryCache.passesAt = foregroundAt
                 refreshGate.completed(revision)
             }
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (_: Exception) {
-            message = "Passes couldn’t be updated. Check your connection and try again."
+            foregroundAt = System.currentTimeMillis()
+            passes = passes?.filter { it.endMillis > foregroundAt }
+            message = issPredictionMessage(IssPasses.Prediction(
+                emptyList(), IssPasses.PredictionProblem.CALCULATION))
         } finally { ToolsDiscoveryDiagnostics.finished("iss", usable); loading = false }
     }
     val upcoming = passes.orEmpty().filter { it.endMillis > foregroundAt }
@@ -84,7 +95,7 @@ internal fun ToolsIssContent() {
         }
     }, right = {
         ToolsPanel("Upcoming passes") {
-            if (upcoming.isEmpty()) ToolsText(if (loading) "Finding passes…" else "Refresh to check upcoming passes.", true)
+            if (upcoming.isEmpty()) ToolsText(if (loading) "Finding passes…" else message ?: "No upcoming passes.", true)
             upcoming.forEach { pass ->
                 Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     ToolsText(IssPasses.timeLabel(pass.startMillis))
