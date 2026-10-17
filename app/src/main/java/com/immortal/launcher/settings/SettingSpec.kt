@@ -8,6 +8,7 @@
 package com.immortal.launcher.settings
 
 import android.content.Context
+import java.math.BigDecimal
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -68,7 +69,21 @@ private fun JSONObject.withHelp(help: String?): JSONObject = apply { help?.let {
  */
 private fun Any?.asIntOrNull(): Int? =
     when (this) {
-      is Number -> toInt()
+      is Int -> this
+      is Byte -> toInt()
+      is Short -> toInt()
+      is Long -> if (this >= Int.MIN_VALUE.toLong() && this <= Int.MAX_VALUE.toLong()) toInt() else null
+      is Float -> toDouble().asIntOrNull()
+      is Double -> if (isFinite() && this >= Int.MIN_VALUE.toDouble() &&
+          this <= Int.MAX_VALUE.toDouble() && this % 1.0 == 0.0) toInt() else null
+      is Number -> try {
+        // Preserve integral numeric forms, but reject fractions, nonfinite values and overflow.
+        BigDecimal(toString()).intValueExact()
+      } catch (_: NumberFormatException) {
+        null
+      } catch (_: ArithmeticException) {
+        null
+      }
       is String -> trim().toIntOrNull()
       else -> null
     }
