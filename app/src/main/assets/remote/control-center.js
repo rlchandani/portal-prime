@@ -404,6 +404,8 @@ function message(error) {
       'Transfer was interrupted. Refresh the library to check whether the photo arrived.',
     folder_not_found: 'That folder does not exist. Choose another public folder.',
     invalid_response: 'The Portal returned an unreadable response. Try refreshing.',
+    saved_presets_unavailable:
+      'Your saved presets could not be read. They are kept unchanged. Retry after restoring readable preset data on the Portal.',
     readback_failed: 'Jarvis did not confirm the requested settings. Your edits are kept.',
     unsupported_model: 'That model is no longer reported by Jarvis. Refresh and choose an available model.',
     configuration_rejected: 'Jarvis rejected these settings. Your edits are kept; check Jarvis on the Portal.',

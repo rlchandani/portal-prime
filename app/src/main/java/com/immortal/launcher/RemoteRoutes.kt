@@ -373,18 +373,22 @@ class RemoteRoutes internal constructor(
 
   /** List (GET) or replace (POST `{"presets":[…]}`) the user's saved preset macros. */
   private fun presets(req: FleetHttpServer.Request): FleetHttpServer.Response =
-      when (req.method) {
-        "GET" -> json(200, ok().put("presets", RemotePresets.listJson(context)))
-        "POST" -> {
-          val body = parseJson(req.bodyText())
-          val arr = body?.optJSONArray("presets")
-          if (arr == null) json(400, err("presets_required"))
-          else {
-            RemotePresets.save(context, arr)
-            json(200, ok().put("presets", RemotePresets.listJson(context)))
+      try {
+        when (req.method) {
+          "GET" -> json(200, ok().put("presets", RemotePresets.listJson(context)))
+          "POST" -> {
+            val body = parseJson(req.bodyText())
+            val arr = body?.optJSONArray("presets")
+            if (arr == null) json(400, err("presets_required"))
+            else {
+              RemotePresets.save(context, arr)
+              json(200, ok().put("presets", RemotePresets.listJson(context)))
+            }
           }
+          else -> json(405, err("method_not_allowed"))
         }
-        else -> json(405, err("method_not_allowed"))
+      } catch (_: IllegalStateException) {
+        json(503, err("saved_presets_unavailable"))
       }
 
   /**
@@ -527,7 +531,11 @@ class RemoteRoutes internal constructor(
   private fun runPreset(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val body = parseJson(req.bodyText()) ?: return json(400, err("bad_json"))
     val id = body.optString("id").ifBlank { null } ?: return json(400, err("id_required"))
-    val preset = RemotePresets.find(context, id) ?: return json(404, err("unknown_preset"))
+    val preset = try {
+      RemotePresets.find(context, id)
+    } catch (_: IllegalStateException) {
+      return json(503, err("saved_presets_unavailable"))
+    } ?: return json(404, err("unknown_preset"))
     val steps = preset.optJSONArray("steps") ?: JSONArray()
     thread(name = "remote-preset") { runSteps(steps) }
     return json(200, ok().put("running", id).put("steps", steps.length()))

@@ -8,8 +8,10 @@
 package com.immortal.launcher
 
 import android.content.Context
+import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONObject
+import org.json.JSONTokener
 
 /**
  * Storage for the phone-remote's user-defined **presets** — named macros the user builds
@@ -33,16 +35,40 @@ object RemotePresets {
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-  /** All presets as a JSON array (empty if none saved or the stored blob is corrupt). */
-  fun listJson(c: Context): JSONArray =
-      runCatching { JSONArray(prefs(c).getString(KEY, "[]")) }.getOrDefault(JSONArray())
+  /** Missing storage is empty; unreadable saved storage is unavailable, never an editable default. */
+  @Synchronized
+  fun listJson(c: Context): JSONArray = read(prefs(c))
+
+  private fun read(store: SharedPreferences): JSONArray {
+    try {
+      val raw = store.getString(KEY, null) ?: return JSONArray()
+      // JSONTokener conflates literal NUL with EOF on the JVM. Reject it before parsing.
+      require('\u0000' !in raw)
+      val input = JSONTokener(raw)
+      val arr = JSONArray(input)
+      // nextClean() accepts comments on Android; only JSON whitespace may follow the array.
+      var next = input.next()
+      while (next != '\u0000') {
+        require(next == ' ' || next == '\t' || next == '\r' || next == '\n')
+        next = input.next()
+      }
+      return arr
+    } catch (_: Exception) {
+      // Parser/type errors can include saved content, so never attach their message or cause.
+      throw IllegalStateException("Saved remote presets are unavailable")
+    }
+  }
 
   /** Replace the whole preset list (the editor saves the full set at once). */
+  @Synchronized
   fun save(c: Context, presets: JSONArray) {
-    prefs(c).edit().putString(KEY, presets.toString()).apply()
+    val store = prefs(c)
+    read(store)
+    store.edit().putString(KEY, presets.toString()).apply()
   }
 
   /** Find a preset by id, or null. */
+  @Synchronized
   fun find(c: Context, id: String): JSONObject? {
     val arr = listJson(c)
     for (i in 0 until arr.length()) {
