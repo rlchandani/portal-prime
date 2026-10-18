@@ -130,6 +130,11 @@ If you don't want to be asked at all, you can preset these in `config.env` (see
 
 ## Done — and how to check it worked
 
+After Immortal starts, setup verifies its Calls and remote-controls permission, accessibility
+enablement and service connection. If it reports that controls need attention, use
+**Settings > Device > About & device health > Reconnect controls**; if system-settings permission
+is missing, re-run setup from the connected computer.
+
 When you see **"Done."**, provisioning is complete. The Portal should switch to the **Immortal home
 screen**, and its screensaver becomes the Immortal photo frame.
 
@@ -226,6 +231,7 @@ On the first run the kit snapshots the device's real stock launcher and screensa
 ```bash
 ./provision.sh                 # full provision (default)
 ./provision.sh --status        # report current home / screensaver / install state
+./provision.sh --check-access  # read-only Calls / remote-controls access check
 ./provision.sh --restore       # undo everything
 ./provision.sh --overlay-fix   # apply just the Gen-1 dialog fix
 ./provision.sh --apps          # run only the "pre-install apps" step

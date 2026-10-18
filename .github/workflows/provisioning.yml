@@ -18,12 +18,16 @@ on:
       - "provisioning/provision.sh"
       - "provisioning/provision.ps1"
       - "provisioning/*.bat"
+      - "scripts/provision-access.test.mjs"
+      - "scripts/test-provision-access.ps1"
   push:
     branches: [main]
     paths:
       - "provisioning/provision.sh"
       - "provisioning/provision.ps1"
       - "provisioning/*.bat"
+      - "scripts/provision-access.test.mjs"
+      - "scripts/test-provision-access.ps1"
 
 jobs:
   lint:
@@ -34,6 +38,17 @@ jobs:
       - name: provision.sh — bash syntax
         run: bash -n provisioning/provision.sh
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Calls access behavior (Bash)
+        run: node --test scripts/provision-access.test.mjs
+
+      - name: Calls access behavior (PowerShell 7)
+        shell: pwsh
+        run: ./scripts/test-provision-access.ps1
+
       - name: Windows scripts must be pure ASCII (5.1 mis-decodes non-ASCII)
         run: |
           # Windows PowerShell 5.1 reads BOM-less files as ANSI, so any byte > 0x7F
@@ -41,7 +56,7 @@ jobs:
           # Windows-executed scripts 7-bit clean. provision.sh is exempt — it only
           # runs on macOS/Linux, where UTF-8 is read natively.
           fail=0
-          for f in provisioning/provision.ps1 provisioning/*.bat; do
+          for f in provisioning/provision.ps1 provisioning/*.bat scripts/test-provision-access.ps1; do
             [ -e "$f" ] || continue
             if LC_ALL=C grep -nP "[^\x00-\x7F]" "$f"; then
               echo "::error file=$f::Non-ASCII byte(s) above — Windows PowerShell 5.1 will mis-decode these. Use ASCII (e.g. '-' instead of '—')."
@@ -81,3 +96,7 @@ jobs:
             exit 1
           }
           Write-Host "provision.ps1 parses clean under Windows PowerShell 5.1"
+
+      - name: Calls access behavior (Windows PowerShell 5.1)
+        shell: powershell
+        run: ./scripts/test-provision-access.ps1

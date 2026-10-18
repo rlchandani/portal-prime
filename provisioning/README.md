@@ -20,7 +20,9 @@ Portal, and double-click.
    - macOS: `Provision-Portal.command`
    - Windows: `Provision-Portal.bat`
 4. When the Portal shows **"Allow USB debugging?"**, tap **Allow** (check "Always allow").
-5. Wait for "Done." To undo: double-click `Restore-Portal` (`.command` / `.bat`).
+5. Wait for "Done." Setup also verifies Calls and remote-control access after Immortal starts.
+   If it reports that controls need attention, follow the repair guidance below.
+   To undo: double-click `Restore-Portal` (`.command` / `.bat`).
 
 > macOS may warn that the file is from an unidentified developer. Right-click → Open the first
 > time, or remove the quarantine flag: `xattr -d com.apple.quarantine Provision-Portal.command`.
@@ -33,6 +35,26 @@ Portal, and double-click.
 
 No Android tools required — if `adb` isn't found, the script downloads Google's official
 platform-tools automatically into this folder.
+
+### Check Calls and remote controls later
+
+Setup checks system-settings permission, whether Immortal's accessibility service is enabled,
+and whether Android has connected that service. Merely being listed as enabled is insufficient.
+The check reports these controls only; **Settings > Device > About & device health** checks other
+capabilities such as screen-off, app installation and now-playing access.
+
+For a disconnected service, open **Settings > Device > About & device health > Reconnect controls**.
+If system-settings permission is missing, re-run setup from the connected computer.
+
+These commands repeat the access check without installing, launching, granting or changing settings:
+
+```bash
+./provision.sh --check-access              # macOS / Linux
+powershell -ExecutionPolicy Bypass -File provision.ps1 -CheckAccess   # Windows
+```
+
+The existing `--status` / `-Status` report includes the same check. A dedicated access check exits
+with code 0 when verified and code 1 when access is missing or could not be verified.
 
 ## What it does (and how to change it)
 

@@ -12,6 +12,7 @@
 #   ./provision.sh            provision the connected Portal
 #   ./provision.sh --restore  put the stock launcher/screensaver/verifier back
 #   ./provision.sh --status   show what's currently set
+#   ./provision.sh --check-access  verify Calls/remote access without changing it
 #   ./provision.sh --overlay-fix  fix the Gen-1 white-on-white installer dialog
 #   ./provision.sh --shizuku  start the Shizuku server (optional; for apps that
 #                             use the Shizuku API, e.g. Aurora's Shizuku mode)
@@ -339,7 +340,59 @@ grant_perms() {
   # also self-enables on launch (WRITE_SECURE_SETTINGS), so this is belt-and-braces.
   a shell cmd notification allow_listener \
     "$PKG/com.immortal.launcher.MediaNotificationListenerService" >/dev/null 2>&1 || true
-  ok "Permissions granted"
+  ok "Permission setup requested; controls are verified after launch."
+}
+
+
+# Read-only: enabled accessibility is not the same as a connected controls service.
+check_calls_access() {
+  local info master services state full short
+  full="$PKG/com.immortal.launcher.BarWatchService"
+  short="$PKG/.BarWatchService"
+  if ! info="$(a shell dumpsys package "$PKG" 2>/dev/null)"; then
+    warn "Couldn't verify system-settings permission. Check the device connection and run setup again."
+    return 1
+  fi
+  if ! printf '%s\n' "$info" | grep -Eq '^[[:space:]]*android\.permission\.WRITE_SECURE_SETTINGS:[[:space:]]*granted=true([^[:alnum:]_]|$)'; then
+    warn "System-settings permission is missing or could not be verified. Run Immortal setup again."
+    return 1
+  fi
+  if ! master="$(a shell settings get secure accessibility_enabled 2>/dev/null)" ||
+     ! services="$(a shell settings get secure enabled_accessibility_services 2>/dev/null)" ||
+     ! state="$(a shell dumpsys accessibility 2>/dev/null)"; then
+    warn "Couldn't verify Calls and remote controls. Check the device connection, then check Device health."
+    return 1
+  fi
+  master="$(printf '%s' "$master" | tr -d '\r\n')"
+  services="$(printf '%s' "$services" | tr -d '\r\n')"
+  if [ "$master" != "1" ]; then
+    warn "Controls accessibility is not enabled. In Settings > Device > About & device health, use Reconnect controls."
+    return 1
+  fi
+  case ":$services:" in
+    *":$full:"*|*":$short:"*) ;;
+    *) warn "Immortal controls are not enabled. In Settings > Device > About & device health, use Reconnect controls."; return 1 ;;
+  esac
+  if ! printf '%s\n' "$state" | awk -v full="$full" -v short="$short" '
+    function contains(s, c, p, before, after) {
+      while ((p=index(s,c)) > 0) {
+        before=p==1 ? "" : substr(s,p-1,1); after=substr(s,p+length(c),1)
+        if ((before=="" || before ~ /[[:space:]="{:,]/ || before=="[") &&
+            (after=="" || after ~ /[[:space:]",}\]]/)) return 1
+        s=substr(s,p+length(c))
+      }
+      return 0
+    }
+    /^[[:space:]]*Bound services:/ { bound=1; sub(/^.*Bound services:/,"") }
+    /^[[:space:]]*(Binding services:|Enabled services:|Installed services:)/ { bound=0 }
+    /boundServices:\{/ { segment=$0; sub(/^.*boundServices:\{/,"",segment); sub(/\}.*/,"",segment); if (contains(segment,full) || contains(segment,short)) found=1 }
+    bound && (contains($0,full) || contains($0,short)) { found=1 }
+    END { exit found ? 0 : 1 }
+  '; then
+    warn "Controls are enabled but not connected, or connection could not be verified. In Settings > Device > About & device health, use Reconnect controls."
+    return 1
+  fi
+  ok "Calls and remote controls access verified"
 }
 
 # Apps Immortal relaunches after a reboot (for ones with no boot receiver of their
@@ -867,7 +920,16 @@ do_provision() {
   configure_boot_apps
   maybe_restore_alexa
   a shell input keyevent KEYCODE_HOME >/dev/null 2>&1
-  printf "\n%s✓ Done. Your Portal is provisioned.%s\n" "$G$B" "$N"
+  local attempt
+  for attempt in 1 2; do
+    check_calls_access >/dev/null 2>&1 && break
+    sleep 0.5
+  done
+  if check_calls_access; then
+    printf "\n%s✓ Done. Your Portal is provisioned.%s\n" "$G$B" "$N"
+  else
+    warn "Setup finished, but Calls and remote controls need attention. Follow the access guidance above."
+  fi
   printf "%sTo undo everything: re-run and choose restore (./provision.sh --restore).%s\n" "$D" "$N"
 }
 
@@ -936,11 +998,13 @@ do_status() {
   printf "  installer dialog: %s\n" "$([ "$(a shell settings get global immortal_overlay_fix 2>/dev/null | tr -d '\r')" = "1" ] && echo 'fixed (overlay disabled)' || echo 'stock')"
   printf "  OS updates: %s\n" "$(a shell pm list packages -d 2>/dev/null | tr -d '\r' | grep -qE 'alohaotasetup|otaui' && echo disabled || echo enabled)"
   printf "  client:     %s\n" "$(a shell pm list packages "$PKG" 2>/dev/null | tr -d '\r' | grep -q . && echo installed || echo 'not installed')"
+  check_calls_access || true
 }
 
 case "${1:-}" in
   --restore|-r) do_restore ;;
   --status|-s)  do_status ;;
+  --check-access) resolve_adb; wait_for_device; check_calls_access; exit $? ;;
   --apps|-a)    resolve_adb; wait_for_device; install_apps ;;
   --overlay-fix) resolve_adb; wait_for_device; disable_installer_overlay ;;
   --shizuku|-z) resolve_adb; wait_for_device; start_shizuku ;;

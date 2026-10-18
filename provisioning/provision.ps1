@@ -10,11 +10,12 @@
     powershell -ExecutionPolicy Bypass -File provision.ps1            # provision
     powershell -ExecutionPolicy Bypass -File provision.ps1 -Restore   # undo
     powershell -ExecutionPolicy Bypass -File provision.ps1 -Status    # show state
+    powershell -ExecutionPolicy Bypass -File provision.ps1 -CheckAccess # verify Calls controls (read-only)
     powershell -ExecutionPolicy Bypass -File provision.ps1 -OverlayFix # fix Gen-1 installer dialog
     powershell -ExecutionPolicy Bypass -File provision.ps1 -Alexa      # restore the original Amazon Alexa app
     powershell -ExecutionPolicy Bypass -File provision.ps1 -UpdateHey  # refresh just the "hey" wake-word app (no ~115 MB falcon re-download)
 #>
-param([switch]$Restore, [switch]$Status, [switch]$Apps, [switch]$Shizuku, [switch]$OverlayFix, [switch]$Fleet, [switch]$WifiAdb, [switch]$Alexa, [switch]$UpdateHey)
+param([switch]$Restore, [switch]$Status, [switch]$CheckAccess, [switch]$Apps, [switch]$Shizuku, [switch]$OverlayFix, [switch]$Fleet, [switch]$WifiAdb, [switch]$Alexa, [switch]$UpdateHey)
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -270,8 +271,103 @@ function Grant-Perms {
   # Lets Immortal read the device's active media sessions (native now-playing) for
   # the screensaver card + header mini-player. Also self-enabled on app launch.
   A shell cmd notification allow_listener "$($cfg["PKG"])/com.immortal.launcher.MediaNotificationListenerService" | Out-Null
-  Ok "Permissions granted"
+  Ok "Permission setup requested; controls are verified after launch."
 }
+
+# Read diagnostics without exposing adb output or letting a failed read look ready.
+# An enabled service is only ready once Android has actually bound it.
+function Read-CallsAccess {
+  param([string[]]$Command)
+  try {
+    $global:LASTEXITCODE = 0
+    $output = @(A @Command 2>&1)
+    if ($LASTEXITCODE -ne 0) { return $null }
+    foreach ($line in $output) {
+      if ($line -is [System.Management.Automation.ErrorRecord]) { return $null }
+    }
+    $text = ($output -join "`n").Trim()
+    if (-not $text -or $text -match '(?im)^[ \t]*(?:adb:|error:|error[ \t]|(?:[a-z0-9_.]*exception):|permission denial|unable to find package:|can''t find service:)') {
+      return $null
+    }
+    return $text
+  } catch { return $null }
+}
+
+function Test-CallsAccessBoundService {
+  param([string]$Dump, [string[]]$Components)
+  $componentPattern = '(?<![A-Za-z0-9_.$/])(?:' +
+    (($Components | ForEach-Object { [regex]::Escape($_) }) -join '|') +
+    ')(?![A-Za-z0-9_.$/])'
+  $sections = [regex]::Matches($Dump, '(?ms)^[ \t]*Bound services:[ \t]*(.*?)(?=^[ \t]*(?:Binding services:|Enabled services:|Installed services:)|\z)')
+  foreach ($section in $sections) {
+    if ($section.Groups[1].Value -cmatch $componentPattern) { return $true }
+  }
+  # AOSP uses an inline boundServices:{...} block. Respect balanced braces so
+  # bindingServices / enabledServices and other dump sections cannot satisfy it.
+  $blocks = [regex]::Matches($Dump, '(?<![A-Za-z0-9_])boundServices[ \t]*:[ \t]*\{')
+  foreach ($block in $blocks) {
+    $start = $block.Index + $block.Length
+    $end = $start; $depth = 1
+    while ($end -lt $Dump.Length -and $depth -gt 0) {
+      if ($Dump[$end] -eq '{') { $depth++ }
+      elseif ($Dump[$end] -eq '}') { $depth-- }
+      $end++
+    }
+    if ($depth -ne 0) { return $null }
+    if ($Dump.Substring($start, $end - $start - 1) -cmatch $componentPattern) { return $true }
+  }
+  if ($sections.Count -eq 0 -and $blocks.Count -eq 0) { return $null }
+  return $false
+}
+
+function Check-CallsAccess {
+  Step "Checking Calls controls"
+  $pkg = $cfg['PKG']
+  $components = @("$pkg/com.immortal.launcher.BarWatchService", "$pkg/.BarWatchService")
+  $packageDump = Read-CallsAccess @('shell', 'dumpsys', 'package', $pkg)
+  $accessibilityEnabled = Read-CallsAccess @('shell', 'settings', 'get', 'secure', 'accessibility_enabled')
+  $enabledServices = Read-CallsAccess @('shell', 'settings', 'get', 'secure', 'enabled_accessibility_services')
+  $accessibilityDump = Read-CallsAccess @('shell', 'dumpsys', 'accessibility')
+
+  $permissionGranted = $false
+  if ($null -eq $packageDump) {
+    Warn "Secure-settings permission: cannot verify (device read failed)."
+  } elseif ($packageDump -cmatch '(?m)^[ \t]*android\.permission\.WRITE_SECURE_SETTINGS:[ \t]*granted=true(?:[ \t]*,[^\r\n]*)?[ \t]*\r?$') {
+    $permissionGranted = $true
+    Ok "Secure-settings permission: granted."
+  } else {
+    Warn "Secure-settings permission: missing. Re-run setup to restore it."
+  }
+
+  $configured = $false
+  if ($null -eq $accessibilityEnabled -or $null -eq $enabledServices) {
+    Warn "Calls accessibility: cannot verify configuration (device read failed)."
+  } else {
+    $listed = (($enabledServices -split ':') -ccontains $components[0]) -or
+      (($enabledServices -split ':') -ccontains $components[1])
+    $configured = $accessibilityEnabled -ceq '1' -and $listed
+    if ($configured) { Ok "Calls accessibility: enabled for Immortal." }
+    else { Warn "Calls accessibility: not enabled for Immortal." }
+  }
+
+  $bound = $null
+  if ($null -ne $accessibilityDump) {
+    $bound = Test-CallsAccessBoundService $accessibilityDump $components
+  }
+  if ($null -eq $bound) {
+    Warn "Calls controls: cannot verify connection (bound-services read unavailable)."
+  } elseif ($bound) {
+    Ok "Calls controls: connected."
+  } else {
+    Warn "Calls controls: not connected."
+  }
+  $ready = $permissionGranted -and $configured -and ($bound -eq $true)
+  if (-not $ready) {
+    Warn "In Settings > Device > About & device health, use Reconnect controls, then check again. If system-settings permission is missing, re-run Immortal setup."
+  }
+  return $ready
+}
+
 function Configure-BootApps {
   # Apps Immortal relaunches after a reboot (for ones with no boot receiver of their
   # own, e.g. the Music Assistant / Sendspin player). Also editable in-app under
@@ -717,6 +813,12 @@ function Enable-WifiAdbNow {
 }
 
 # ----- modes -----------------------------------------------------------------
+if ($CheckAccess) {
+  Wait-Device
+  if (Check-CallsAccess) { exit 0 }
+  exit 1
+}
+
 if ($Fleet) {
   Wait-Device
   Enable-Fleet
@@ -781,6 +883,7 @@ if ($Status) {
   Write-Host "  OS updates:  $(if ($ota) {'disabled'} else {'enabled'})"
   $client = "$(A shell pm list packages $cfg["PKG"])".Trim()
   Write-Host "  client:      $(if ($client) {'installed'} else {'not installed'})"
+  Check-CallsAccess | Out-Null
   exit 0
 }
 
@@ -858,5 +961,17 @@ Enable-Fleet
 Configure-BootApps
 Maybe-Restore-Alexa
 A shell input keyevent KEYCODE_HOME | Out-Null
-Write-Host "`n[ok] Done. Your Portal is provisioned." -ForegroundColor Green
+$controlsReady = $false
+for ($attempt = 0; $attempt -lt 3; $attempt++) {
+  if (Check-CallsAccess) { $controlsReady = $true; break }
+  if ($attempt -lt 2) { Start-Sleep -Milliseconds 500 }
+}
+if ($controlsReady) {
+  Write-Host "`n[ok] Done. Your Portal is provisioned." -ForegroundColor Green
+} else {
+  Warn "Setup complete, but Calls controls need attention."
+  Write-Host "On the Portal: Settings > Device > About & device health > Reconnect controls." -ForegroundColor Yellow
+  Write-Host "If the secure-settings permission is missing, re-run setup." -ForegroundColor Yellow
+  Write-Host "Then verify with: provision.ps1 -CheckAccess" -ForegroundColor DarkGray
+}
 Write-Host "To undo: run provision.ps1 -Restore" -ForegroundColor DarkGray
