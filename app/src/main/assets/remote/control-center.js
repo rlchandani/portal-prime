@@ -222,7 +222,7 @@ function field(
   );
 }
 // Replacing a focused input discards the keyboard's unfinished composition.
-// Hold only the search render until commitment; page/room/expiry changes bypass it.
+// Hold focused field renders until commitment; page/room/expiry changes bypass it.
 function cancelSearchComposition() {
   if (searchComposition?.timer != null) clearTimeout(searchComposition.timer);
   searchComposition = null;
@@ -235,7 +235,8 @@ function searchField(label, value, onInput, options) {
   const row = field(label, value, (next) => {
     if (!current()) return;
     onInput(next);
-    if (!unfocusedComposition || document.activeElement === input) render();
+    if (options?.renderOnInput !== false &&
+        (!unfocusedComposition || document.activeElement === input)) render();
   }, options);
   input = row.querySelector('input');
   const commit = () => {
@@ -2384,7 +2385,10 @@ function acceptSources(response, { calendar = true } = {}) {
     delete source[key];
   }
   data.sources = source;
-  if (calendar) data.calendar = response.calendar;
+  if (calendar) {
+    invalidateAlbumQuery();
+    data.calendar = response.calendar;
+  }
 }
 async function loadSources() {
   return read('sources', '/remote/sources', acceptSources);
@@ -2425,6 +2429,75 @@ const sourceFields = {
   web: [['webUrl', 'Web page address']],
   default: [],
 };
+function albumConnection() {
+  const sources = data.sources || {};
+  return { base: room()?.base, sources,
+    url: draft('source:immichUrl', sources.immichUrl || '').trim(),
+    key: draft('source:immichKey', '') };
+}
+function albumConnectionMatches(connection) {
+  if (!connection || draft('source:selected', data.sources?.source || 'default') !== 'immich') return false;
+  const current = albumConnection();
+  return connection.base === current.base && connection.sources === current.sources &&
+    connection.url === current.url && connection.key === current.key;
+}
+function albumQueryLoading() {
+  return busy.has(`${room()?.base}:albums`);
+}
+function invalidateAlbumQuery() {
+  const owner = data.albumState;
+  if (!owner) return false;
+  owner.controller?.abort();
+  delete data.albumState;
+  return true;
+}
+function sourceField(key, label, secret, source) {
+  return searchField(label, draft(`source:${key}`,
+    secret ? '' : source[key] || (key === 'folderPath' ? '/sdcard/Pictures/Immortal' : '')),
+    (value) => {
+      setDraft(`source:${key}`, value);
+      if (['immichUrl', 'immichKey'].includes(key) && data.albumState &&
+          !albumConnectionMatches(data.albumState.connection)) {
+        invalidateAlbumQuery();
+        render();
+      }
+    }, {
+      renderOnInput: false,
+      type: secret ? 'password' : 'text', key: `source:${key}`,
+      placeholder: secret && source[`${key}Configured`] ? 'Keep saved credential' : '',
+      help: key === 'webUrl'
+        ? 'Use a complete http:// or https:// URL with a host. A valid format does not guarantee the page will load.'
+        : secret ? 'Leave blank to keep a credential for the same endpoint and account.' : '',
+    });
+}
+
+function albumControls(source) {
+  const connection = albumConnection();
+  const state = albumConnectionMatches(data.albumState?.connection) ? data.albumState : null;
+  const loading = albumQueryLoading(), albums = state?.albums || [];
+  const selected = draft('source:immichAlbumId', source.immichAlbumId || '');
+  const name = draft('source:immichAlbumName', source.immichAlbumName || '');
+  const options = [{ value: '', label: 'Whole library' },
+    ...albums.map((album) => ({ value: album.id, label: `${album.name} (${album.count})` }))];
+  if (selected && !albums.some((album) => album.id === selected))
+    options.push({ value: selected, label: `Current album · ${name || selected}` });
+  const picker = choice(selected, options, (id) => {
+    if (albumQueryLoading() || !albumConnectionMatches(connection) ||
+        !options.some((option) => option.value === id)) return;
+    setDraft('source:immichAlbumId', id);
+    setDraft('source:immichAlbumName', id ? albums.find((album) => album.id === id)?.name || name : '');
+    render();
+  }, 'Immich album');
+  picker.disabled = loading;
+  return group(
+    actions(button(loading ? 'Loading albums…' : state?.error ? 'Try albums again' : 'Load albums',
+      loadAlbums, { kind: 'outline', disabled: loading || sourceSaving() }), picker),
+    loading ? el('p', { role: 'status', 'aria-live': 'polite', class: 'detail', text: 'Loading albums…' }) : null,
+    state?.error ? text(`Couldn't load albums. ${state.error}${albums.length ? ' Showing previously loaded albums.' : ''}`, 'error')
+      : state?.albums?.length === 0 ? text('No albums found. You can use Whole library.')
+      : !state?.albums ? text('Load albums to choose from this connection. Whole library is always available.') : null,
+  );
+}
 function sourcesPage() {
   const s = data.sources;
   if (!s)
@@ -2450,6 +2523,7 @@ function sourcesPage() {
         options,
         (value) => {
           setDraft('source:selected', value);
+          if (data.albumState && !albumConnectionMatches(data.albumState.connection)) invalidateAlbumQuery();
           render();
         },
         'Photo source',
@@ -2465,52 +2539,8 @@ function sourcesPage() {
         )
       : null,
     ...(hidden ? [] : sourceFields[selected] || []).map(([key, label, secret]) =>
-      field(
-        label,
-        draft(
-          `source:${key}`,
-          secret ? '' : s[key] || (key === 'folderPath' ? '/sdcard/Pictures/Immortal' : ''),
-        ),
-        (value) => setDraft(`source:${key}`, value),
-        {
-          type: secret ? 'password' : 'text',
-          key: `source:${key}`,
-          placeholder: secret && s[`${key}Configured`] ? 'Keep saved credential' : '',
-          help:
-            key === 'webUrl'
-              ? 'Use a complete http:// or https:// URL with a host. A valid format does not guarantee the page will load.'
-              : secret
-                ? 'Leave blank to keep a credential for the same endpoint and account.'
-                : '',
-        },
-      ),
-    ),
-    selected === 'immich' && !hidden
-      ? actions(
-          button('Load albums', loadAlbums, { kind: 'outline' }),
-          data.albums
-            ? choice(
-                draft('source:immichAlbumId', s.immichAlbumId || ''),
-                [
-                  { value: '', label: 'Whole library' },
-                  ...(data.albums || []).map((a) => ({
-                    value: a.id,
-                    label: `${a.name} (${a.count})`,
-                  })),
-                ],
-                (id) => {
-                  setDraft('source:immichAlbumId', id);
-                  setDraft(
-                    'source:immichAlbumName',
-                    data.albums.find((a) => a.id === id)?.name || '',
-                  );
-                  render();
-                },
-                'Immich album',
-              )
-            : null,
-        )
-      : null,
+      sourceField(key, label, secret, s)),
+    selected === 'immich' && !hidden ? albumControls(s) : null,
     actions(
       button(
         selected === 'folder' ? 'Use this folder' : 'Activate source',
@@ -2560,17 +2590,42 @@ function sourcesPage() {
   );
 }
 async function loadAlbums() {
-  const s = data.sources || {};
-  const body = { url: draft('source:immichUrl', s.immichUrl || '').trim() };
-  const key = draft('source:immichKey', '');
-  if (key) body.key = key;
-  const response = await mutate('albums', '/remote/immich/albums', body, { success: '' });
-  if (response) {
-    data.albums = response.albums || [];
-    toast(data.albums.length ? 'Albums loaded.' : 'The server returned no albums.');
-    render();
+  if (!room() || tab !== 'photos' || detail !== 'sources' || !advanced ||
+      draft('source:selected', data.sources?.source || 'default') !== 'immich' ||
+      albumQueryLoading() || sourceSaving()) return;
+  const target = room(), ticket = session.capture(), connection = albumConnection();
+  const previous = albumConnectionMatches(data.albumState?.connection) ? data.albumState.albums : undefined;
+  const controller = new AbortController();
+  const owner = { connection, controller, albums: previous, error: null };
+  const busyKey = `${target.base}:albums`, body = { url: connection.url };
+  if (connection.key) body.key = connection.key;
+  data.albumState = owner;
+  busy.add(busyKey);
+  pageReads.set('albums', controller);
+  render();
+  const current = () => data.albumState === owner && session.current(ticket) &&
+    albumConnectionMatches(owner.connection) && !document.hidden;
+  try {
+    const response = await api(target, '/remote/immich/albums', { body, signal: controller.signal });
+    if (!current()) return;
+    const albums = response.albums, ids = new Set();
+    if (!Array.isArray(albums) || albums.some((album) => {
+      if (!album || typeof album.id !== 'string' || !album.id || ids.has(album.id) ||
+          typeof album.name !== 'string' || !Number.isInteger(album.count) || album.count < 0) return true;
+      ids.add(album.id);
+      return false;
+    })) throw new ApiError('invalid_response');
+    owner.albums = albums.map((album) => ({ id: album.id, name: album.name, count: album.count }));
+  } catch (error) {
+    if (current() && error.code !== 'aborted') owner.error = message(error);
+  } finally {
+    busy.delete(busyKey);
+    if (pageReads.get('albums') === controller) pageReads.delete('albums');
+    owner.controller = null;
+    if (session.current(ticket) && detail === 'sources') render();
   }
 }
+
 async function saveSource(selected, s) {
   if (!room() || sourceSaving()) return;
   const target = room(), ticket = session.capture(), submitted = new Map();
@@ -2600,6 +2655,7 @@ async function saveSource(selected, s) {
     }
     const newer = drafts.get(selectedKey) !== submittedSelected ||
       [...submitted].some(([key, value]) => drafts.get(key) !== value);
+    const albumOwner = albumConnectionMatches(data.albumState?.connection) ? data.albumState : null;
     for (const [key, , secret] of sourceFields[selected] || []) {
       const ownerKey = `${target.base}:source:${key}`;
       if (secret && body[key] && drafts.get(ownerKey) === submitted.get(ownerKey))
@@ -2609,6 +2665,7 @@ async function saveSource(selected, s) {
     pageReads.get('sources')?.abort();
     session.read('sources');
     acceptSources(response, { calendar: false });
+    if (albumOwner && data.albumState === albumOwner) albumOwner.connection = albumConnection();
     delete data.sourcesError;
     toast(newer ? `${sourceNames[selected]} saved. Your newer edits are still unsaved.`
       : 'Source saved and confirmed.');

@@ -2179,3 +2179,77 @@ test('source save a late old-Portal response cannot clear another Portal credent
  const {h,finish}=await pendingSourceSave();try{h.eval(`selectRoom('${saved[1].base}')`);await h.settle();h.eval('advanced=true;go("photos","sources")');await h.settle();await h.input('API key','public-other-room-key');}finally{await finish();}
  assert.equal(h.eval('draft("source:immichKey")'),'public-other-room-key');assert.equal(h.eval('data.sources.immichUrl'),'https://old.example.invalid');
 });
+
+
+async function albumQueryHarness({ reply='normal', held=true }={}) {
+ let release, mode=reply;
+ const source={source:'immich',immichUrl:'https://albums.example.invalid',immichKey:'public-stored-key',immichAlbumId:'kept-id',immichAlbumName:'Kept album'};
+ const h=await browserHarness({saved,routes:{
+  '/remote/sources':({opts,response})=>response({ok:true,sources:{...source,...(opts.method==='POST'?JSON.parse(opts.body):{})},calendar:{url:''}}),
+  '/remote/immich/albums':({response})=>{
+   const send=()=>mode==='failure'?response({ok:false,error:'immich_unreachable'},502):response({ok:true,albums:mode==='empty'?[]:mode==='object'?{}:mode==='bad-row'?[{id:'first',name:'First album',count:2},{id:'first',name:'Duplicate',count:1}]:[{id:'first',name:'First album',count:2}]});
+   return held?new Promise(resolve=>release=()=>resolve(send())):send();
+  }
+ }});
+ h.eval('advanced=true;go("photos","sources")');await h.settle();await h.input('API key','public-query-key');
+ return {h,setReply:value=>mode=value,start:async()=>{
+   const pending=h.eval('loadAlbums()');pending.catch(()=>{});await h.settle();
+   return {finish:async()=>{release?.();await pending.catch(()=>{});await h.settle();}};
+ }};
+}
+const albumPicker=h=>h.document.getElementById('page').querySelectorAll('select').find(n=>n.attrs['aria-label']==='Immich album');
+const albumQueryPosts=h=>h.calls.filter(c=>c.path==='/remote/immich/albums');
+const chooseAlbum=async(h,picker,id)=>{assert.ok(picker,'Album selector missing');picker.value=id;for(const listener of picker.listeners.change||[])listener({target:picker});picker.onchange?.({target:picker});await h.settle();};
+
+test('album query ignores results for an edited server address',async()=>{
+ const {h,start}=await albumQueryHarness();const {finish}=await start();try{await h.input('Server address','https://new-server.example.invalid');}finally{await finish();}
+ assert.doesNotMatch(h.document.getElementById('page').textContent,/First album/);assert.equal(h.eval('draft("source:immichAlbumId")'),'kept-id');
+});
+test('album query ignores results for a replacement API key',async()=>{
+ const {h,start}=await albumQueryHarness();const {finish}=await start();try{await h.input('API key','public-new-key');}finally{await finish();}
+ assert.doesNotMatch(h.document.getElementById('page').textContent,/First album/);assert.equal(h.eval('draft("source:immichKey")'),'public-new-key');
+});
+test('album query cannot return an old provider list after provider navigation',async()=>{
+ const {h,start}=await albumQueryHarness();const {finish}=await start();try{h.eval('setDraft("source:selected","smb");render()');}finally{await finish();}
+ h.eval('setDraft("source:selected","immich");render()');assert.doesNotMatch(h.document.getElementById('page').textContent,/First album/);
+});
+test('album query cannot populate another Portal after a late response',async()=>{
+ const {h,start}=await albumQueryHarness();const {finish}=await start();try{h.eval(`selectRoom('${saved[1].base}')`);await h.settle();h.eval('advanced=true;go("photos","sources")');await h.settle();}finally{await finish();}
+ assert.doesNotMatch(h.document.getElementById('page').textContent,/First album/);
+});
+test('album query shows loading and prevents duplicate reads and selection while pending',async()=>{
+ const {h,start}=await albumQueryHarness();const {finish}=await start();let input;try{
+  assert.match(h.document.getElementById('page').textContent,/Loading albums/);assert.equal(layoutButton(h,'Loading albums…').disabled,true);assert.equal(albumPicker(h).disabled,true);h.click('Loading albums…');await h.settle();assert.equal(albumQueryPosts(h).length,1);
+  input=h.document.getElementById('page').querySelectorAll('input').find(n=>n.attrs['aria-label']==='Album name (optional)');input.focus();for(const f of input.listeners.compositionstart||[])f();await h.input('Album name (optional)','Composed album name');
+ }finally{await finish();}
+ assert.equal(h.document.getElementById('page').querySelectorAll('input').find(n=>n.attrs['aria-label']==='Album name (optional)')===input,true);for(const f of input.listeners.compositionend||[])f();await h.tick(0);assert.equal(h.eval('draft("source:immichAlbumName")'),'Composed album name');assert.equal(layoutButton(h,'Load albums').disabled,false);
+});
+test('album query preserves a selected album omitted from the returned list',async()=>{
+ const {h,start}=await albumQueryHarness();await (await start()).finish();const picker=albumPicker(h);
+ assert.ok(picker.children.some(o=>o.value==='kept-id'||o.attrs.value==='kept-id'));assert.match(picker.textContent,/Kept album/);assert.equal(h.eval('draft("source:immichAlbumId")'),'kept-id');
+});
+test('album query distinguishes an empty library and still offers Whole library',async()=>{
+ const {h,start}=await albumQueryHarness({reply:'empty'});await (await start()).finish();assert.match(h.document.getElementById('page').textContent,/No albums found/);assert.match(albumPicker(h).textContent,/Whole library/);
+ await chooseAlbum(h,albumPicker(h),'');assert.equal(h.eval('draft("source:immichAlbumId")'),'');assert.equal(h.eval('draft("source:immichAlbumName")'),'');
+});
+test('album query failure keeps the selection and offers Whole library and retry',async()=>{
+ const {h,start}=await albumQueryHarness({reply:'failure'});await (await start()).finish();assert.equal(h.eval('draft("source:immichAlbumId")'),'kept-id');assert.match(albumPicker(h).textContent,/Whole library/);assert.equal(layoutButton(h,'Try albums again').disabled,false);
+});
+test('album query failed refresh retains matching previous albums with truthful feedback',async()=>{
+ const {h,start,setReply}=await albumQueryHarness({held:false});await (await start()).finish();setReply('failure');await (await start()).finish();assert.match(albumPicker(h).textContent,/First album/);assert.match(h.document.getElementById('page').textContent,/previously loaded albums/);
+});
+test('album query rejects a non-array response without poisoning the editor',async()=>{
+ const {h,start}=await albumQueryHarness({reply:'object'});await (await start()).finish();assert.equal(layoutButton(h,'Try albums again').disabled,false);assert.equal(h.eval('draft("source:immichAlbumId")'),'kept-id');assert.match(albumPicker(h).textContent,/Whole library/);
+});
+test('album query rejects duplicate album identities and preserves the draft',async()=>{
+ const {h,start}=await albumQueryHarness({reply:'bad-row'});await (await start()).finish();assert.equal(layoutButton(h,'Try albums again').disabled,false);assert.doesNotMatch(albumPicker(h).textContent,/Duplicate/);assert.equal(h.eval('draft("source:immichAlbumId")'),'kept-id');
+});
+test('album query an obsolete selector cannot overwrite the current connection draft',async()=>{
+ const {h,start}=await albumQueryHarness({held:false});await (await start()).finish();const old=albumPicker(h),input=h.document.getElementById('page').querySelectorAll('input').find(n=>n.attrs['aria-label']==='Server address');input.focus();for(const f of input.listeners.compositionstart||[])f();await h.input('Server address','https://changed.example.invalid');assert.equal(h.document.getElementById('page').querySelectorAll('input').find(n=>n.attrs['aria-label']==='Server address')===input,true);for(const f of input.listeners.compositionend||[])f();await h.tick(0);await chooseAlbum(h,old,'first');assert.equal(h.eval('draft("source:immichAlbumId")'),'kept-id');assert.doesNotMatch(h.document.getElementById('page').textContent,/First album/);
+});
+test('album query confirmed source Save retains the verified list after submitted key clearing',async()=>{
+ const {h,start}=await albumQueryHarness({held:false});await (await start()).finish();await h.eval('saveSource("immich",data.sources)');await h.settle();assert.equal(h.eval('draft("source:immichKey")'),'');assert.match(albumPicker(h).textContent,/First album/);assert.equal(albumQueryPosts(h).length,1);
+});
+test('album query explicit source refresh invalidates stored-credential album context',async()=>{
+ const {h,start}=await albumQueryHarness({held:false});await (await start()).finish();await h.eval('loadSources()');await h.settle();assert.doesNotMatch(h.document.getElementById('page').textContent,/First album/);assert.equal(albumQueryPosts(h).length,1);assert.equal(h.eval('draft("source:immichAlbumId")'),'kept-id');
+});
