@@ -3319,18 +3319,40 @@ function renderUpload() {
 }
 async function loadApps({ changedOnly = false } = {}) {
   const key = appMode === 'catalog' ? 'catalog' : 'apps';
-  if (key === 'catalog' && data.companion && !supported('catalog')) return;
-  return read(key, `/remote/${key}`, (r) => (data[key] = r.apps || []), {
-    // Completion still reads fresh metadata; manual refresh always renders.
-    renderWhen: changedOnly
-      ? () =>
-          !operationsView ||
-          operationsView.kind !== 'apps' ||
-          operationsView.key !== key ||
-          JSON.stringify(data[key]) !== operationsView.metadata ||
-          !!data[`${key}Error`]
-      : null,
-  });
+  if (!room() || document.hidden || connectionState === 'expired' ||
+      (key === 'catalog' && data.companion && !supported('catalog'))) return;
+  // A retry joins the active read; explicit Refresh still cancels and replaces it.
+  if (!changedOnly && pageReads.get(key) && !pageReads.get(key).signal.aborted) return;
+  const ticket = session.capture(), snapshot = data,
+    hadVisibleProgress = !!data[`${key}Loading`];
+  delete snapshot[`${key}Error`];
+  const pending = read(key, `/remote/${key}`, (response) => {
+    if (!Array.isArray(response.apps) || response.apps.some(app => !app || typeof app !== 'object'))
+      throw new ApiError('invalid_response');
+    // Quiet completion with identical metadata keeps the retained card/action snapshot.
+    // Manual refresh still replaces inventory and invalidates artwork as before.
+    if (!changedOnly || JSON.stringify(snapshot[key]) !== JSON.stringify(response.apps))
+      snapshot[key] = response.apps;
+  }, { renderAfter: false });
+  const owner = pageReads.get(key);
+  snapshot[`${key}Loading`] = owner;
+  if (!changedOnly) render();
+  else if (operationsView?.kind === 'apps') updateAppRecords(operationsView.records);
+  try { return await pending; }
+  finally {
+    if (snapshot[`${key}Loading`] === owner) delete snapshot[`${key}Loading`];
+    if (!session.current(ticket) || document.hidden ||
+        (appMode === 'catalog' ? 'catalog' : 'apps') !== key) return;
+    // Automatic completion reads retain the existing metadata-based rendering policy.
+    if (!changedOnly || hadVisibleProgress || !operationsView || operationsView.kind !== 'apps' ||
+        operationsView.key !== key || JSON.stringify(data[key]) !== operationsView.metadata ||
+        data[`${key}Error`]) render();
+    else updateAppRecords(operationsView.records);
+  }
+}
+function catalogActionAvailable(app, ticket) {
+  return session.current(ticket) && appMode === 'catalog' &&
+    !data.catalogLoading && !data.catalogError && data.catalog?.includes(app);
 }
 function appsPage() {
   const entries = appMode === 'catalog' ? data.catalog : data.apps;
@@ -3343,19 +3365,20 @@ function appsPage() {
     ),
   );
   appPage = Math.min(appPage, Math.max(0, Math.ceil(filtered.length / 24) - 1));
-  const error = appMode === 'catalog' ? data.catalogError : data.appsError;
+  const key = appMode === 'catalog' ? 'catalog' : 'apps';
+  const error = data[`${key}Error`], loading = !!data[`${key}Loading`];
   const visibleApps = filtered.slice(appPage * 24, (appPage + 1) * 24);
   // Fresh server inventory invalidates artwork, including updates without version metadata.
   if (appIconInventory !== entries) {
     thumbs.clear();
     appIconInventory = entries;
   }
-  thumbs.retain((error ? [] : visibleApps)
+  thumbs.retain(visibleApps
     .filter(app => (appMode === 'installed' || app.installed === true) && app.packageName)
     .map(app => app.packageName));
   const ticket = session.capture();
   let records = new Map(), list = null;
-  if (!error && entries && filtered.length) {
+  if (entries && filtered.length) {
     const key = JSON.stringify([
       ticket.generation, ticket.pageGeneration, appMode, supported('operations'),
     ]);
@@ -3391,6 +3414,7 @@ function appsPage() {
           { value: 'catalog', label: 'Catalog' },
         ],
         (value) => {
+          if (value === appMode) return;
           appMode = value;
           appPage = 0;
           render();
@@ -3404,8 +3428,17 @@ function appsPage() {
           )
         : null,
     ),
-    error
-      ? failure('Apps unavailable', error, loadApps)
+    entries && loading
+      ? group(el('p', { class: 'detail', role: 'status', text: 'Refreshing apps…' }),
+          appMode === 'catalog' ? text('Refresh the catalog before installing or updating.') : null)
+      : entries && error
+        ? group(el('h3', { text: 'Apps unavailable from Portal' }), text(message(error), 'error'),
+            text('Showing the last confirmed list.'),
+            appMode === 'catalog' ? text('Refresh the catalog before installing or updating.') : null,
+            button('Retry', () => loadApps(), { kind: 'outline', disabled: loading }))
+        : null,
+    !entries && error
+      ? failure('Apps unavailable', error, () => loadApps())
       : !entries
         ? empty(
             appMode === 'catalog' ? 'Catalog' : 'Installed apps',
@@ -3530,7 +3563,13 @@ function appCard(app, ticket, records) {
                   ? 'Update'
                   : 'Check update'
                 : 'Install',
-          () => beginOperation({ type: action, packageName: pkg }, ticket),
+          () => {
+            if (!catalogActionAvailable(app, ticket)) {
+              if (session.current(ticket)) toast('Refresh the catalog before installing or updating.', true);
+              return;
+            }
+            return beginOperation({ type: action, packageName: pkg }, ticket);
+          },
           {
             kind: 'primary',
             disabled: installDisabled || pending,
@@ -3543,7 +3582,8 @@ function appCard(app, ticket, records) {
   const update = (operation) => {
     if (installButton) {
       const disabled =
-        installDisabled || operation?.state === 'running' || operation?.installUncertain === true;
+        installDisabled || !catalogActionAvailable(app, ticket) ||
+        operation?.state === 'running' || operation?.installUncertain === true;
       if (installButton.disabled !== disabled) installButton.disabled = disabled;
     }
     const view = operation ? operationView(operation) : null;

@@ -2327,3 +2327,175 @@ test('calendar feed editor async Save completion preserves focused composing URL
  await t.finish();assert.equal(calendarInput(t.h)===input,true);assert.equal(t.h.document.activeElement===input,true);input.listeners.compositionend?.forEach(fn=>fn());await t.h.tick(0);
  assert.equal(calendarInput(t.h).value,'https://calendar.example.invalid/composing.ics');
 });
+
+// Public inventory fixtures cover recovery without installing or launching private apps.
+const refreshApps = Array.from({ length: 30 }, (_, i) => ({
+  packageName: `com.fixture.app${i}`, name: `Fixture app ${i}`, compatible: true,
+  installed: true, updateAvailable: true,
+}));
+async function appRefreshHarness(mode = 'installed', route) {
+  const h = await browserHarness({ saved, routes: {
+    '/remote/apps': route || (({ response }) => response({ ok: true, apps: refreshApps })),
+    '/remote/catalog': route || (({ response }) => response({ ok: true, apps: refreshApps })),
+  } });
+  h.eval(`appMode=${JSON.stringify(mode)};go("apps")`);
+  await h.settle();
+  return h;
+}
+const inventoryCalls = (h, key = 'apps') => h.calls.filter(c => c.path === `/remote/${key}`).length;
+const inventoryList = h => h.document.getElementById('page').querySelector('.apps-list');
+const pageText = h => h.document.getElementById('page').textContent;
+
+test('Apps refresh failure retains confirmed inventory DOM and usable launch controls', async () => {
+  let fail = false;
+  const h = await appRefreshHarness('installed', ({ response }) => {
+    if (fail) throw new Error('offline');
+    return response({ ok: true, apps: refreshApps });
+  });
+  const list = inventoryList(h); fail = true;
+  h.eval('loadApps()'); await h.settle();
+  assert.equal(inventoryList(h) === list, true);
+  assert.match(pageText(h), /last confirmed/i);
+  assert.equal(h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Open').disabled, false);
+});
+
+test('Apps pending refresh retains inventory and coalesces duplicate retries', async () => {
+  let release, pending = false;
+  const h = await appRefreshHarness('installed', ({ response }) => pending
+    ? new Promise(resolve => { release = () => resolve(response({ ok: true, apps: refreshApps })); })
+    : response({ ok: true, apps: refreshApps }));
+  const list = inventoryList(h); pending = true; const before = inventoryCalls(h);
+  try {
+    h.eval('loadApps();loadApps()'); await h.settle();
+    assert.equal(inventoryCalls(h), before + 1);
+    assert.equal(inventoryList(h) === list, true);
+    assert.match(pageText(h), /Refreshing apps/);
+  } finally { release?.(); await h.settle(); }
+});
+
+test('Catalog pending refresh blocks retained update actions at dispatch boundary', async () => {
+  let release, pending = false;
+  const h = await appRefreshHarness('catalog', ({ response }) => pending
+    ? new Promise(resolve => { release = () => resolve(response({ ok: true, apps: refreshApps })); })
+    : response({ ok: true, apps: refreshApps }));
+  const update = h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Update');
+  pending = true;
+  try {
+    h.eval('loadApps()'); await h.settle();
+    assert.equal(update.disabled, true);
+    update.listeners.click[0]({}); await h.settle();
+    assert.equal(h.calls.filter(c => c.path === '/remote/operation').length, 0);
+  } finally { release?.(); await h.settle(); }
+});
+
+test('Catalog failed refresh keeps cards while blocking stale install or update', async () => {
+  let fail = false;
+  const h = await appRefreshHarness('catalog', ({ response }) => {
+    if (fail) throw new Error('offline'); return response({ ok: true, apps: refreshApps });
+  });
+  const list = inventoryList(h); fail = true;
+  h.eval('loadApps()'); await h.settle();
+  assert.equal(inventoryList(h) === list, true);
+  assert.equal(h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Update').disabled, true);
+  assert.match(pageText(h), /Refresh the catalog before installing or updating/);
+});
+
+test('Catalog successful Retry replaces confirmed inventory and restores valid actions', async () => {
+  let fail = false;
+  const h = await appRefreshHarness('catalog', ({ response }) => {
+    if (fail) throw new Error('offline'); return response({ ok: true, apps: refreshApps });
+  });
+  fail = true; h.eval('loadApps()'); await h.settle(); fail = false;
+  h.click('Retry'); await h.settle();
+  assert.equal(h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Update').disabled, false);
+  assert.equal(/last confirmed/i.test(pageText(h)), false);
+  // Quiet installer completion may report identical metadata; actions must recover too.
+  h.eval('loadApps({changedOnly:true})'); await h.settle();
+  assert.equal(h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Update').disabled, false);
+});
+
+test('malformed Apps response cannot replace a previously confirmed inventory', async () => {
+  let malformed = false;
+  const h = await appRefreshHarness('installed', ({ response }) => response({ ok: true, apps: malformed ? {} : refreshApps }));
+  const list = inventoryList(h); malformed = true;
+  h.eval('loadApps()'); await h.settle();
+  assert.equal(inventoryList(h) === list, true);
+  assert.match(pageText(h), /last confirmed/i);
+});
+
+test('initial Apps failure offers Retry and never represents it as an empty inventory', async () => {
+  let fail = true;
+  const h = await appRefreshHarness('installed', ({ response }) => {
+    if (fail) throw new Error('offline'); return response({ ok: true, apps: [] });
+  });
+  assert.match(pageText(h), /Apps unavailable/);
+  assert.equal(/No apps to show/.test(pageText(h)), false);
+  fail = false; h.click('Retry'); await h.settle();
+  assert.match(pageText(h), /No apps to show/);
+});
+
+test('reselecting Installed preserves pagination and sends no inventory request', async () => {
+  const h = await appRefreshHarness(); h.click('Next');
+  const before = inventoryCalls(h); const list = inventoryList(h);
+  h.click('Installed'); await h.settle();
+  assert.equal(inventoryCalls(h), before);
+  assert.equal(h.eval('appPage'), 1);
+  assert.equal(inventoryList(h) === list, true);
+});
+
+test('reselecting Catalog preserves the search and sends no inventory request', async () => {
+  const h = await appRefreshHarness('catalog'); await h.input('Find an app', 'Fixture');
+  const before = inventoryCalls(h, 'catalog'); h.click('Catalog'); await h.settle();
+  assert.equal(inventoryCalls(h, 'catalog'), before);
+  assert.equal(h.eval('appQuery'), 'Fixture');
+});
+
+test('late inventory refresh from another room cannot replace current apps', async () => {
+  let release, pending = false;
+  const h = await appRefreshHarness('installed', ({ url, response }) => pending && url.includes('8877')
+    ? new Promise(resolve => { release = () => resolve(response({ ok: true, apps: [{ name: 'Old room only' }] })); })
+    : response({ ok: true, apps: refreshApps }));
+  pending = true;
+  try {
+    h.eval('loadApps()'); await h.settle(); h.eval(`selectRoom('${saved[1].base}')`); await h.settle();
+    release(); await h.settle(); assert.equal(pageText(h).includes('Old room only'), false);
+    assert.equal(/Refreshing apps/.test(pageText(h)), false);
+  } finally { release?.(); await h.settle(); }
+});
+
+test('late Installed refresh cannot change the active Catalog collection', async () => {
+  let release, pending = false;
+  const h = await appRefreshHarness('installed', ({ url, response }) => pending && url.includes('/apps')
+    ? new Promise(resolve => { release = () => resolve(response({ ok: true, apps: [{ name: 'Installed late' }] })); })
+    : response({ ok: true, apps: refreshApps }));
+  pending = true;
+  try {
+    h.eval('loadApps()'); await h.settle(); h.click('Catalog'); await h.settle();
+    release(); await h.settle(); assert.equal(pageText(h).includes('Installed late'), false);
+    assert.equal(/Refreshing apps/.test(pageText(h)), false);
+  } finally { release?.(); await h.settle(); }
+});
+
+test('cancelled older Apps read cannot clear a newer refresh progress owner', async () => {
+  let releases = [], pending = false;
+  const h = await appRefreshHarness('installed', ({ response }) => pending
+    ? new Promise(resolve => {
+        const older = releases.length === 0;
+        releases.push(() => resolve(response({ ok: true,
+          apps: older ? [{ ...refreshApps[0], name: 'Pre-completion inventory', versionName: 'old' }] : refreshApps,
+        })));
+      })
+    : response({ ok: true, apps: refreshApps }));
+  pending = true;
+  try {
+    h.eval('data.operations=[{id:"public-completion",type:"update",target:{packageName:"com.fixture.app0"},state:"running"}]');
+    h.eval('loadApps()'); await h.settle();
+    // A completed installer requires a new post-completion inventory, not the older read.
+    h.eval('acceptOperations({ok:true,operations:[{id:"public-completion",type:"update",target:{packageName:"com.fixture.app0"},state:"succeeded",results:[{ok:true,result:"installed"}]}]})');
+    await h.settle(); assert.equal(releases.length, 2);
+    releases[0](); await h.settle(); assert.match(pageText(h), /Refreshing apps/);
+    assert.equal(pageText(h).includes('Pre-completion inventory'), false);
+    releases[1](); await h.settle(); assert.equal(/Refreshing apps/.test(pageText(h)), false);
+    assert.equal(h.eval('data.apps[0].name'), 'Fixture app 0');
+  } finally { releases.forEach(release => release()); await h.settle(); }
+});
