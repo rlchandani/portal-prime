@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // Public solar fixtures and counter-only work checks never acquire UiAutomation.
+        if (options.getString("command") == "goldenHour") {
+            val goldenHour = GoldenHourDeviceChecks.run()
+            finish(if (goldenHour.getBoolean("goldenHourCompleted")) 0 else 1, goldenHour)
+            return
+        }
         // Pure public parser checks need no UiAutomation session. UI paths below retain
         // FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES; this branch collects no UI/private files.
         if (options.getString("command") == "weatherTime") {

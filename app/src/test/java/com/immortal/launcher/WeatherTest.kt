@@ -188,4 +188,28 @@ class WeatherTest {
     val c = Weather.forecastUrl(1.5, -2.25, fahrenheit = false)
     assertTrue(c.contains("temperature_unit=celsius"))
   }
+  @Test fun `solar horizon carries both actual days using one response offset`() {
+    val json = """{"utc_offset_seconds":-25200,"daily":{"sunrise":["2026-06-07T06:30","2026-06-08T06:32"],"sunset":["2026-06-07T20:30","2026-06-08T20:29"]}}"""
+    val days = Weather.parseSunDays(json)
+    assertEquals(2, days.size)
+    assertEquals(utc("2026-06-08T13:32"), days[1].sunriseMillis)
+    assertEquals(utc("2026-06-09T03:29"), days[1].sunsetMillis)
+    assertEquals(days.first(), Weather.parseSunTimes(json))
+  }
+
+  @Test fun `empty solar horizon has no predicted events`() {
+    assertTrue(Weather.parseSunDays("""{"utc_offset_seconds":0,"daily":{"sunrise":[],"sunset":[]}}""").isEmpty())
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun `incomplete solar pair is rejected`() {
+    Weather.parseSunDays("""{"utc_offset_seconds":0,"daily":{"sunrise":["2026-06-07T06:30"],"sunset":[]}}""")
+  }
+
+  @Test fun `solar horizon request expands days without another query or changing display fetch`() {
+    assertTrue(Weather.sunTimesUrl(1.5, -2.25).endsWith("forecast_days=1"))
+    assertTrue(Weather.sunTimesUrl(1.5, -2.25, 2).endsWith("forecast_days=2"))
+    assertEquals(Weather.sunTimesUrl(1.5, -2.25), Weather.sunTimesUrl(1.5, -2.25, 2).replace("forecast_days=2", "forecast_days=1"))
+  }
+
 }

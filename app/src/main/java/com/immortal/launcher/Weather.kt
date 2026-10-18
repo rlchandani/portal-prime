@@ -9,6 +9,7 @@ package com.immortal.launcher
 
 import android.content.Context
 import java.text.SimpleDateFormat
+import java.util.concurrent.atomic.AtomicLong
 import java.util.Calendar
 import java.util.SimpleTimeZone
 import java.util.TimeZone
@@ -31,6 +32,8 @@ import org.json.JSONObject
 object Weather {
 
   private const val PREFS = "immortal_weather"
+  private val solarLocationRevision = AtomicLong()
+  private val solarDays = GoldenHourSolarCache()
   // Re-resolve the IP geolocation after this long, so a bad first fix (IP geo can land on the ISP's
   // datacenter city) or a relocated Portal self-corrects instead of being wrong forever.
   private const val LOCATION_TTL_MS = 7L * 24 * 60 * 60 * 1000 // 7 days
@@ -113,6 +116,8 @@ object Weather {
 
   /** Clear the cached geolocation so the next call re-resolves (for a "re-detect location" action). */
   fun clearLocationCache(context: Context) {
+    solarLocationRevision.incrementAndGet()
+    solarDays.clear()
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit().remove("lat").remove("lon").remove("city").remove("resolved_at").apply()
     currentConditions.clear()
@@ -142,20 +147,42 @@ object Weather {
   /** Today's sunrise + sunset from Open-Meteo (keyless). Null on fetch/parse failure. */
   fun fetchSunTimes(context: Context): SunTimes? = runCatching {
     val (lat, lon) = location(context) ?: return null
-    parseSunTimes(httpGet(
-        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
-            "&daily=sunrise,sunset&timezone=auto&forecast_days=1"))
+    parseSunTimes(httpGet(sunTimesUrl(lat, lon)))
   }.getOrNull()
 
-  internal fun parseSunTimes(json: String): SunTimes {
+  /** Two solar days in one request: enough to select the next sunrise and sunset. */
+  internal fun fetchSunDays(context: Context): List<SunTimes>? {
+    val revision = solarLocationRevision.get()
+    val result = solarDays.get(revision) {
+      val (lat, lon) = location(context) ?: return@get null
+      parseSunDays(httpGet(sunTimesUrl(lat, lon, days = 2)))
+    }
+    // A re-detect during lookup invalidates this location's result as well as its cached entry.
+    return result.takeIf { revision == solarLocationRevision.get() }
+  }
+
+  internal fun sunTimesUrl(lat: Double, lon: Double, days: Int = 1): String {
+    require(days in 1..2)
+    return "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
+        "&daily=sunrise,sunset&timezone=auto&forecast_days=$days"
+  }
+
+  internal fun parseSunTimes(json: String): SunTimes = parseSunDays(json).first()
+
+  internal fun parseSunDays(json: String): List<SunTimes> {
     val root = JSONObject(json)
     val zone = responseZone(root)
     val daily = root.getJSONObject("daily")
+    val sunrises = daily.getJSONArray("sunrise")
+    val sunsets = daily.getJSONArray("sunset")
+    require(sunrises.length() == sunsets.length()) { "Incomplete solar forecast" }
     val iso = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
         .apply { timeZone = zone; isLenient = false }
-    val sunrise = iso.parse(daily.getJSONArray("sunrise").getString(0))!!.time
-    val sunset = iso.parse(daily.getJSONArray("sunset").getString(0))!!.time
-    return SunTimes(sunrise, sunset, zone.getOffset(sunrise) / 1000)
+    return (0 until sunrises.length()).map { index ->
+      val sunrise = iso.parse(sunrises.getString(index))!!.time
+      val sunset = iso.parse(sunsets.getString(index))!!.time
+      SunTimes(sunrise, sunset, zone.getOffset(sunrise) / 1000)
+    }
   }
 
   /** Open-Meteo ISO timestamps use this fixed offset throughout a response, even over DST. */

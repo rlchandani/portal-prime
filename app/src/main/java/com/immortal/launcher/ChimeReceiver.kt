@@ -46,13 +46,9 @@ class ChimeReceiver : BroadcastReceiver() {
           else ChimePlayer.playSunsetTone(context)
           Log.i(TAG, "golden-hour tone fired (${intent.action})")
         }
-        // Re-arm both for tomorrow off the freshly-fetched sun times — network,
-        // so do it off the main thread and keep the receiver alive meanwhile.
+        // Share the scheduler's one worker and keep this receiver alive until its job finishes.
         val pending = goAsync()
-        Thread {
-          runCatching { ChimeScheduler.scheduleGoldenHour(context) }
-          pending.finish()
-        }.start()
+        ChimeScheduler.requestGoldenHour(context) { pending.finish() }
       }
     }
   }

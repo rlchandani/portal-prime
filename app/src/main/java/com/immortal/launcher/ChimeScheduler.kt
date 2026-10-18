@@ -13,6 +13,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import java.util.Calendar
+import java.util.concurrent.Executors
 
 /**
  * Schedules the ambient audio cues via AlarmManager:
@@ -26,6 +27,12 @@ import java.util.Calendar
  */
 object ChimeScheduler {
   private const val TAG = "ImmortalChime"
+  private val goldenWork = GoldenHourWork()
+  private val goldenExecutor by lazy {
+    Executors.newSingleThreadExecutor { task ->
+      Thread(task, "ImmortalSolarChime").apply { isDaemon = true }
+    }
+  }
 
   const val ACTION_HOURLY = "com.immortal.launcher.CHIME_HOURLY"
   const val ACTION_GOLDEN_SUNRISE = "com.immortal.launcher.CHIME_SUNRISE"
@@ -68,11 +75,13 @@ object ChimeScheduler {
     }
 
     if (cfg.goldenHourOn) {
-      // fetchSunTimes hits the network — never on the caller's (often main) thread.
-      Thread { runCatching { scheduleGoldenHour(context) } }.start()
+      // Allocate the ticket before queueing; obsolete work skips its network request.
+      requestGoldenHour(context)
     } else {
-      cancel(context, ACTION_GOLDEN_SUNRISE, RC_SUNRISE)
-      cancel(context, ACTION_GOLDEN_SUNSET, RC_SUNSET)
+      goldenWork.cancel {
+        cancel(context, ACTION_GOLDEN_SUNRISE, RC_SUNRISE)
+        cancel(context, ACTION_GOLDEN_SUNSET, RC_SUNSET)
+      }
     }
   }
 
@@ -84,19 +93,43 @@ object ChimeScheduler {
     }
   }
 
-  /** Arm sunrise/sunset alarms from the cached Open-Meteo times. If a time has
-   * already passed today, arm it 24h out so it fires tomorrow. */
-  fun scheduleGoldenHour(context: Context) {
-    val sun = Weather.fetchSunTimes(context) ?: return
-    val now = System.currentTimeMillis()
-    val sr = if (sun.sunriseMillis > now) sun.sunriseMillis else sun.sunriseMillis + DAY_MS
-    val ss = if (sun.sunsetMillis > now) sun.sunsetMillis else sun.sunsetMillis + DAY_MS
-    setAlarm(context, sr, ACTION_GOLDEN_SUNRISE, RC_SUNRISE)
-    setAlarm(context, ss, ACTION_GOLDEN_SUNSET, RC_SUNSET)
-    Log.i(TAG, "golden-hour armed sunrise=$sr sunset=$ss")
+  /** Fetch once off the main thread; always release a receiver's pending result. */
+  fun requestGoldenHour(context: Context, onFinished: () -> Unit = {}) {
+    val app = context.applicationContext ?: context
+    val token = goldenWork.begin { ChimeConfig.load(app).goldenHourOn }
+    if (token == null) { onFinished(); return }
+    goldenExecutor.execute {
+      try {
+        if (goldenWork.isCurrent(token) && ChimeConfig.load(app).goldenHourOn) {
+          scheduleGoldenHour(app, token)
+        }
+      } catch (error: Exception) {
+        Log.w(TAG, "Solar chime scheduling unavailable: ${error.javaClass.simpleName}")
+      } finally {
+        onFinished()
+      }
+    }
   }
 
-  private const val DAY_MS = 24L * 60 * 60 * 1000
+  private fun scheduleGoldenHour(context: Context, token: Long) {
+    val days = Weather.fetchSunDays(context) ?: return // Retain already-armed times on fetch failure.
+    val next = nextGoldenHourTimes(days, System.currentTimeMillis())
+    goldenWork.commit(token, { ChimeConfig.load(context).goldenHourOn }) {
+      next.sunriseMillis?.let { setAlarm(context, it, ACTION_GOLDEN_SUNRISE, RC_SUNRISE) }
+          ?: cancel(context, ACTION_GOLDEN_SUNRISE, RC_SUNRISE)
+      next.sunsetMillis?.let { setAlarm(context, it, ACTION_GOLDEN_SUNSET, RC_SUNSET) }
+          ?: cancel(context, ACTION_GOLDEN_SUNSET, RC_SUNSET)
+      Log.i(TAG, "Next solar chimes armed")
+    }
+  }
+
+  internal data class GoldenHourTimes(val sunriseMillis: Long?, val sunsetMillis: Long?)
+
+  internal fun nextGoldenHourTimes(days: List<Weather.SunTimes>, now: Long): GoldenHourTimes =
+      GoldenHourTimes(
+          days.map { it.sunriseMillis }.filter { it > now }.minOrNull(),
+          days.map { it.sunsetMillis }.filter { it > now }.minOrNull(),
+      )
 
   private fun nextTopOfHour(): Long {
     val c = Calendar.getInstance()
