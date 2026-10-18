@@ -28,6 +28,7 @@ internal data class ApprovedSettingsSearchResult(
     val help: String = "",
     val automatic: Boolean = false,
     val section: String = "",
+    val keywords: String = "",
 ) {
     val id: String get() = if (domain.isEmpty()) "" else "$domain.$key"
     val advanced: Boolean get() = SettingsPresentation.isAdvancedPage(page) ||
@@ -82,6 +83,8 @@ internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> =
             @Suppress("UNCHECKED_CAST")
             val domain = raw as SettingsDomain<Any>
             domain.specs.forEach { spec ->
+                // One native Wake time row edits both persisted scalars.
+                if (domain.id == "sunrise" && spec.key == "minute") return@forEach
                 val title: String
                 val help: String?
                 when (spec) {
@@ -97,8 +100,10 @@ internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> =
                 val managed = "${domain.id}.${spec.key}" in ApprovedManagedControls
                 val page = (if (managed) "managed" else approvedPageForSpec(domain.id, spec))
                     ?: return@forEach
-                entries += ApprovedSettingsSearchResult(title, page,
-                    domain.id, spec.key, help.orEmpty(), managed, domain.sections[spec.key].orEmpty())
+                val wakeTime = domain.id == "sunrise" && spec.key == "hour"
+                entries += ApprovedSettingsSearchResult(if (wakeTime) "Wake time" else title, page,
+                    domain.id, spec.key, help.orEmpty(), managed, domain.sections[spec.key].orEmpty(),
+                    keywords = if (wakeTime) "hour minute sunrise.minute" else "")
             }
         }
         entries += ApprovedNativeSettingsFields
@@ -120,18 +125,22 @@ internal fun approvedSettingsSearch(index: List<ApprovedSettingsSearchResult>, q
     if (query.isBlank()) return emptyList()
     val terms = query.trim().split(SETTINGS_SEARCH_WHITESPACE)
     val phrase = terms.joinToString(" ")
-    val buckets = Array(4) { mutableListOf<ApprovedSettingsSearchResult>() }
+    val buckets = Array(5) { mutableListOf<ApprovedSettingsSearchResult>() }
     for (result in index) {
         val titleMatches = terms.all { result.title.contains(it, ignoreCase = true) }
-        if (!titleMatches) {
-            val text = "${result.title} ${result.id} ${result.help} ${result.section} ${approvedSettingsPage(result.page)?.title.orEmpty()}"
+        val aliasText = if (result.keywords.isBlank()) null
+            else "${result.title} ${result.id} ${result.keywords}"
+        val aliasMatches = aliasText != null && terms.all { aliasText.contains(it, ignoreCase = true) }
+        if (!titleMatches && !aliasMatches) {
+            val text = "${result.title} ${result.id} ${result.help} ${result.section} ${result.keywords} ${approvedSettingsPage(result.page)?.title.orEmpty()}"
             if (!terms.all { text.contains(it, ignoreCase = true) }) continue
         }
         val rank = when {
             result.title.equals(phrase, ignoreCase = true) -> 0
             result.title.startsWith(phrase, ignoreCase = true) -> 1
             titleMatches -> 2
-            else -> 3
+            aliasMatches -> 3
+            else -> 4
         }
         if (buckets[rank].size < SETTINGS_SEARCH_RESULT_LIMIT) buckets[rank] += result
     }
@@ -175,8 +184,9 @@ internal fun approvedSettingsPrerequisite(context: Context, control: String): St
     }
 }
 
-private fun nativeField(id: String, title: String, page: String) =
-    ApprovedSettingsSearchResult(title, page, id.substringBefore('.'), id.substringAfter('.'))
+private fun nativeField(id: String, title: String, page: String, keywords: String = "") =
+    ApprovedSettingsSearchResult(title, page, id.substringBefore('.'), id.substringAfter('.'),
+        keywords = keywords)
 
 /** Supplemental searchable names for atomic forms and native-only editors. */
 private val ApprovedNativeSettingsFields = listOf(
@@ -223,8 +233,7 @@ private val ApprovedNativeSettingsFields = listOf(
     nativeField("chime.voice", "Spoken-time voice", "chime"),
     nativeField("sunrise.days", "Repeat on", "sunrise"),
     nativeField("alarm.enabled", "Enabled", "alarm"),
-    nativeField("alarm.hour", "Hour", "alarm"),
-    nativeField("alarm.minute", "Minute", "alarm"),
+    nativeField("alarm.hour", "Alarm time", "alarm", keywords = "hour minute alarm.minute"),
     nativeField("alarm.days", "Repeat on", "alarm"),
     nativeField("countdowns.name", "Name", "countdowns"),
     nativeField("countdowns.year", "Year", "countdowns"),
