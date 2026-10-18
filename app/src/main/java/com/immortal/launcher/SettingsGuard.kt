@@ -208,13 +208,12 @@ object SettingsGuard {
       val comp = ComponentName(context, BarWatchService::class.java).flattenToString()
       val cr = context.contentResolver
       val cur = Settings.Secure.getString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: ""
-      val parts = cur.split(':').filter { it.isNotBlank() && !it.equals(comp, ignoreCase = true) }
-      val next = (if (on) parts + comp else parts).joinToString(":")
+      val next = BarWatchServiceList.updated(cur, comp, on)
       // Assert the master accessibility flag even when the service list is unchanged — the list
       // can survive a reboot with the master flag off, which would leave the service inactive.
-      // (This doesn't cause a rebind; only rewriting the service list does.)
+      // Keep the enabled-service list separate from this master flag.
       if (on) Settings.Secure.putInt(cr, Settings.Secure.ACCESSIBILITY_ENABLED, 1)
-      if (next == cur) return // service list already correct — don't rewrite it (avoids a rebind)
+      if (next == cur) return // preserve an already-correct service list and component order
       Settings.Secure.putString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, next)
       android.util.Log.i("ImmortalQuickBar", "BarWatch a11y ${if (on) "enabled" else "disabled"}")
     }

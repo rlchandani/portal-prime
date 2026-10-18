@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // These gated list fixtures never acquire UiAutomation or enter private diagnostics.
+        if (options.getString("command") == "barWatchServiceList") {
+            val barWatch = BarWatchServiceListDeviceChecks.run(targetContext)
+            finish(if (barWatch.getBoolean("barWatchServiceListPassed")) 0 else 1, barWatch)
+            return
+        }
         // Public elapsed counters and read-only clock samples never enter private diagnostics.
         if (options.getString("command") == "sleepElapsedTiming") {
             val timing = SleepElapsedTimingDeviceChecks.run()
