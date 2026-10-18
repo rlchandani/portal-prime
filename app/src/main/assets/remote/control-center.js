@@ -807,7 +807,7 @@ async function confirmAction(
   let resolve, settled = false;
   const answer = new Promise((r) => (resolve = r));
   const body = sections(
-    text(description),
+    description instanceof Node ? description : text(description),
     el('div', { class: 'dialog-actions' },
       button('Cancel', () => decide(false), { kind: 'outline' }),
       button(label, () => decide(true), { kind: 'primary' }),
@@ -2044,13 +2044,26 @@ function renderDomain(domain) {
       el('h2', { text: domain.title }),
       reset.length
         ? button(
-            'Reset',
+            'Reset shown settings',
             () => {
               const targets = settingTargets(domain.id),
                 ticket = session.capture();
+              // Describe the exact filtered payload, using the transport's existing room policy.
+              const active = reset.filter(c => activeOnlySetting(domain.id, c.key, c));
+              const shared = reset.filter(c => !activeOnlySetting(domain.id, c.key, c));
+              const list = fields => el('ul', { class: 'detail' },
+                fields.map(c => el('li', { text: c.title || c.key })));
+              const review = sections(
+                text(`${reset.length} ${reset.length === 1 ? 'setting' : 'settings'} will return to default values.`),
+                shared.length ? group(
+                  text(targets.length ? `Selected rooms: ${targets.map(r => r.name).join(', ')}`
+                    : 'No rooms selected. Select a room to reset these settings.'),
+                  list(shared)) : null,
+                active.length ? group(text(`Active Portal only: ${ticket.room.name}`), list(active)) : null,
+              );
               confirmAction(
-                `Reset ${domain.title}?`,
-                `Apply ordinary defaults to ${targets.map((r) => r.name).join(', ')}. Active Portal only: ${ticket.room.name} for name and connection controls.`,
+                `Reset shown settings in ${domain.title}?`,
+                review,
                 () =>
                   applyDomain(
                     domain.id,
@@ -2058,7 +2071,7 @@ function renderDomain(domain) {
                     targets,
                     ticket,
                   ),
-                'Reset',
+                'Reset settings',
                 ticket,
               );
             },

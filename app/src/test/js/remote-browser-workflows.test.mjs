@@ -603,11 +603,11 @@ test('reset partitions connection defaults at transport while preserving ordinar
   const h = await browserHarness({ saved, routes: { '/remote/settings': guardedSettings } });
   await allSettings(h);
   h.eval('category="mqtt";render()');
-  h.click('Reset');
+  h.click('Reset shown settings');
   h.document
     .getElementById('sheet-actions')
     .querySelectorAll('button')
-    .find((b) => b.textContent === 'Reset')
+    .find((b) => b.textContent === 'Reset settings')
     .click();
   await h.settle();
   const posts = settingsPosts(h);
@@ -4219,10 +4219,10 @@ test('Scope readiness departed callbacks cannot publish failures or issue retry 
 
 test('Scope readiness locks shared resets and profiles without adding reads on unchanged renders', async () => {
   const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
-  assert.equal(settingsRefreshButton(h, 'Reset').disabled, true);
+  assert.equal(settingsRefreshButton(h, 'Reset shown settings').disabled, true);
   assert.equal(h.eval('profileControlsLocked()'), true);
   state.held[0].finish(); await h.settle();
-  assert.equal(settingsRefreshButton(h, 'Reset').disabled, false);
+  assert.equal(settingsRefreshButton(h, 'Reset shown settings').disabled, false);
   assert.equal(h.eval('profileControlsLocked()'), false);
   const input = scopeReadyInput(h), before = h.calls.length;
   h.eval('render();render()'); await h.settle();

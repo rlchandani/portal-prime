@@ -110,7 +110,7 @@ test('narrowing keeps common rows, prunes hidden rows and resets only visible de
     const first=switches(h)[0];await h.input('Search settings','Portal 00');
     assert.equal(switches(h).length,1);assert.equal(switches(h)[0]===first,true);
     assert.equal(h.eval('settingsRowView.entries.size'),1);
-    h.click('Reset');h.document.getElementById('sheet-actions').querySelectorAll('button').find(n=>n.textContent==='Reset').click();
+    h.click('Reset shown settings');h.document.getElementById('sheet-actions').querySelectorAll('button').find(n=>n.textContent==='Reset settings').click();
     await h.settle();assert.equal(posts(h).length,1);assert.deepEqual(Object.keys(JSON.parse(posts(h)[0].opts.body).values),['flag00']);
     await h.input('Search settings','missing');assert.equal(h.eval('settingsRowView.entries.size'),0);
   } finally {h.hide();}
