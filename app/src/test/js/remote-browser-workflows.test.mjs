@@ -2969,3 +2969,107 @@ test('Confirmation replacement clears Snapshot review progress and permits retry
   assert.equal(snapshotPosts(h).length,0);h.eval('closeSheet()');h.click('Review restore');await h.settle();
   assert.equal(h.document.getElementById('sheet-title').textContent,'Restore to Preview room?');
 });
+
+
+const historyOperation = (id='history-one', extras={}) => ({id,type:'scene',state:'failed',
+ target:{name:'Fixture routine'},results:[{ok:false,result:'fixture_failure'}],retrySupported:true,cancelSupported:true,...extras});
+async function activityRecoveryFixture({initialFailure=false}={}) {
+ const state={mode:initialFailure?'fail':'ok',operations:[historyOperation()],reads:[],posts:[]};
+ const h=await browserHarness({saved,routes:{
+  '/remote/operations':c=>{state.reads.push(c);if(state.mode==='fail')throw new Error('fixture offline');
+   if(state.mode==='hold')return new Promise((resolve,reject)=>state.finish=(fail=false)=>fail?reject(new Error('late fixture failure')):resolve(c.response({ok:true,operations:state.operations})));
+   if(state.mode==='malformed')return c.response(state.malformed);
+   return c.response({ok:true,operations:state.operations});},
+  '/remote/operation':c=>{state.posts.push(JSON.parse(c.opts.body));return c.response({ok:true,
+   operation:historyOperation('accepted-request',{state:'running',retrySupported:false,cancelSupported:false})});},
+ }});
+ h.eval('go("home","activity")');await h.settle();return{h,state,page:h.document.getElementById('page')};
+}
+const historyButton = (h,label) => h.document.getElementById('page').querySelector('.history-list')
+ ?.querySelectorAll('button').find(button=>button.textContent===label);
+const historyRefreshRetry = h=>h.document.getElementById('page').querySelectorAll('button')
+ .find(button=>button.textContent==='Retry'&&!h.document.getElementById('page').querySelector('.history-list')?.contains(button));
+const operationPosts = h=>h.calls.filter(c=>c.path==='/remote/operation'&&c.opts.method==='POST');
+
+test('Activity refresh failure retains the confirmed list and card alongside recovery guidance',async()=>{
+ const{h,state,page}=await activityRecoveryFixture(),list=page.querySelector('.history-list'),card=list.children[0];
+ state.mode='fail';await h.tick(4000);
+ assert.equal(page.querySelector('.history-list'),list);assert.equal(list.children[0],card);
+ assert.match(page.textContent,/Last confirmed/);assert.match(page.textContent,/Activity unavailable/);
+ h.document.getElementById('refresh-button').click();await h.settle();
+ assert.equal(page.querySelector('.history-list'),list);assert.equal(list.children[0],card);
+ assert.match(page.textContent,/Last confirmed/);
+});
+test('Activity refresh failure disables and guards the retained Retry and Cancel callbacks',async()=>{
+ const{h,state}=await activityRecoveryFixture(),retry=historyButton(h,'Retry'),cancel=historyButton(h,'Cancel operation');
+ state.mode='fail';await h.tick(4000);
+ assert.equal(historyButton(h,'Retry').disabled,true);assert.equal(historyButton(h,'Cancel operation').disabled,true);
+ rawClick(retry);rawClick(cancel);await h.settle();assert.equal(operationPosts(h).length,0);
+ assert.equal(h.document.getElementById('sheet').open,false);
+});
+test('Activity refresh Retry keeps cards visible and reports one pending read without unrelated requests',async()=>{
+ const{h,state,page}=await activityRecoveryFixture();state.mode='fail';await h.tick(4000);state.mode='hold';
+ const before=h.calls.length;historyRefreshRetry(h).click();await h.settle();
+ assert.match(page.textContent,/Refreshing activity/);assert.equal(historyButton(h,'Retry').disabled,true);
+ assert.equal(page.querySelector('.history-list').children.length,1);
+ assert.deepEqual(h.calls.slice(before).map(c=>c.path),['/remote/operations']);state.finish();await h.settle();
+});
+test('Activity refresh successful retry restores eligible current actions and removes failure guidance',async()=>{
+ const{h,state,page}=await activityRecoveryFixture();state.mode='fail';await h.tick(4000);state.mode='ok';
+ historyRefreshRetry(h).click();await h.settle();assert.equal(historyButton(h,'Retry').disabled,false);
+ assert.equal(page.textContent.includes('Activity unavailable'),false);historyButton(h,'Retry').click();await h.settle();
+ assert.deepEqual(state.posts,[{type:'retry',id:'history-one'}]);
+});
+test('Activity refresh initial failure remains unavailable rather than becoming successful empty history',async()=>{
+ const{h,state,page}=await activityRecoveryFixture({initialFailure:true});
+ assert.match(page.textContent,/Activity unavailable/);assert.equal(page.textContent.includes('No recent operations'),false);
+ state.mode='hold';historyRefreshRetry(h).click();await h.settle();assert.match(page.textContent,/Loading operations/);
+ state.finish();await h.settle();assert.equal(page.querySelector('.history-list').children.length,1);
+});
+test('Activity refresh successful empty history clears preceding confirmed cards',async()=>{
+ const{h,state,page}=await activityRecoveryFixture();state.operations=[];await h.tick(4000);
+ assert.match(page.textContent,/No recent operations/);assert.equal(page.textContent.includes('Fixture routine'),false);
+});
+test('Activity refresh missing and wrong typed arrays are rejected before replacing confirmed history',async()=>{
+ for(const malformed of [{ok:true},{ok:true,operations:{}},{ok:true,operations:null}]){
+  const{h,state,page}=await activityRecoveryFixture();state.mode='malformed';state.malformed=malformed;
+  await h.tick(4000);assert.match(page.textContent,/Last confirmed/);assert.equal(page.querySelector('.history-list').children.length,1);
+  assert.equal(historyButton(h,'Retry').disabled,true);
+ }
+});
+test('Activity refresh invalid identities or result collections cannot replace a confirmed list',async()=>{
+ for(const operations of [[null],[{id:''}],[historyOperation(),historyOperation()],[historyOperation('bad',{results:{}})],[historyOperation('bad',{results:[null]})]]){
+  const{h,state,page}=await activityRecoveryFixture();state.mode='malformed';state.malformed={ok:true,operations};
+  await h.tick(4000);assert.match(page.textContent,/Last confirmed/);assert.equal(h.eval('data.operations[0].id'),'history-one');
+  assert.equal(historyButton(h,'Retry').disabled,true);
+ }
+});
+test('Activity refresh page and Portal changes retire previously captured operation actions',async()=>{
+ for(const next of ['go("home")',`selectRoom('${saved[1].base}')`]){
+  const{h}=await activityRecoveryFixture(),retry=historyButton(h,'Retry'),cancel=historyButton(h,'Cancel operation');
+  h.eval(next);await h.settle();rawClick(retry);rawClick(cancel);await h.settle();
+  assert.equal(operationPosts(h).length,0);assert.equal(h.document.getElementById('sheet').open,false);
+ }
+});
+test('Activity refresh Cancel confirmation rechecks current reported eligibility before dispatch',async()=>{
+ const{h,state}=await activityRecoveryFixture();historyButton(h,'Cancel operation').click();await h.settle();
+ state.operations=[historyOperation('history-one',{state:'succeeded',retrySupported:false,cancelSupported:false})];
+ await h.tick(4000);h.document.getElementById('sheet-actions').querySelectorAll('button').find(b=>b.textContent==='Cancel operation').click();
+ await h.settle();assert.equal(operationPosts(h).length,0);
+});
+test('Activity refresh stale read failure cannot hide or invalidate a newer Portal history',async()=>{
+ const{h,state,page}=await activityRecoveryFixture();
+ state.mode='hold';h.eval('loadVisible()');await h.settle();
+ const old=state.reads.at(-1);state.mode='ok';h.eval(`selectRoom('${saved[1].base}')`);await h.settle();
+ h.eval('go("home","activity")');await h.settle();
+ state.finish(true);await h.settle();assert.equal(old.opts.signal.aborted,true);
+ assert.equal(page.textContent.includes('Activity unavailable'),false);assert.equal(historyButton(h,'Retry').disabled,false);
+});
+test('Activity refresh repeated Retry activation coalesces its pending metadata read',async()=>{
+ const{h,state,page}=await activityRecoveryFixture();state.mode='fail';await h.tick(4000);
+ const retry=historyRefreshRetry(h);state.mode='hold';const before=state.reads.length;
+ rawClick(retry);rawClick(retry);await h.settle();assert.equal(state.reads.length,before+1);
+ const tick=h.tick(4000);await h.settle();assert.equal(state.reads.length,before+1);
+ state.finish();await tick;await h.settle();assert.equal(page.textContent.includes('Refreshing activity'),false);
+ assert.equal(historyButton(h,'Retry').disabled,false);
+});

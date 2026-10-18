@@ -516,7 +516,11 @@ async function status() {
         queueMicrotask(() => loadVisible());
       }
     },
-    { renderAfter: true },
+    { renderAfter: true, renderWith: () => {
+      if (tab === 'home' && detail === 'activity' && supported('operations') &&
+          operationsView?.kind === 'activity') renderOperations();
+      else render();
+    } },
   );
 }
 async function mediaRead() {
@@ -553,7 +557,8 @@ function startPolling() {
       if ((tab === 'home' && !detail) || tab === 'remote') await mediaRead();
       if (!current()) return;
       if (detail === 'activity' || (tab === 'apps' && supported('operations')))
-        await read('operations', '/remote/operations', acceptOperations, {
+        await (detail === 'activity' ? loadOperations : read.bind(null, 'operations', '/remote/operations', acceptOperations))({
+          showProgress: false,
           renderAfter: !document.activeElement?.matches('input,textarea,select'),
           renderWith: renderOperations,
           // Use rendered state so changes deferred by focused input are still shown.
@@ -943,7 +948,7 @@ function loadVisible(force = false) {
   else if (tab === 'home' && detail === 'jarvis')
     loadJarvis();
   else if (tab === 'home' && detail === 'activity')
-    read('operations', '/remote/operations', acceptOperations);
+    loadOperations();
   else if (tab === 'home' && detail === 'snapshots')
     read('snapshot', '/remote/snapshot', (r) => (data.snapshot = r));
   else if (detail === 'presets') {
@@ -3879,9 +3884,52 @@ function moveOrder(field, key, delta) {
     return candidate;
   });
 }
+function operationsRefreshing() {
+  const owner = data.operationsLoad;
+  return !!owner?.showProgress && session.current(owner.ticket);
+}
+function loadOperations({ showProgress = true, ...options } = {}) {
+  if (!room() || document.hidden || connectionState === 'expired' || !supported('operations')) return;
+  const previous = data.operationsLoad, pending = pageReads.get('operations');
+  if (previous?.showProgress && session.current(previous.ticket) &&
+      pending && !pending.signal.aborted) return previous.promise;
+  const owner = { ticket: session.capture(), showProgress, promise: null };
+  data.operationsLoad = owner;
+  if (showProgress) {
+    delete data.operationsError;
+    renderOperations();
+  }
+  owner.promise = read('operations', '/remote/operations', acceptOperations, { renderAfter: false })
+    .finally(() => {
+      if (data.operationsLoad !== owner) return;
+      data.operationsLoad = null;
+      if (!session.current(owner.ticket) || document.hidden || options.renderAfter === false) return;
+      if (showProgress || !options.renderWhen || options.renderWhen())
+        (options.renderWith || renderOperations)();
+    });
+  return owner.promise;
+}
+function operationActionAvailable(id, kind, ticket) {
+  if (!['retry', 'cancel'].includes(kind) || !session.current(ticket) || !supported('operations') ||
+      data.operationsError || operationsRefreshing() || !Array.isArray(data.operations)) return false;
+  return data.operations.find(operation => operation.id === id)?.[`${kind}Supported`] === true;
+}
+function operationAction(id, kind, ticket) {
+  if (!operationActionAvailable(id, kind, ticket)) return;
+  return beginOperation({ type: kind, id }, ticket);
+}
 function acceptOperations(response) {
+  if (!Array.isArray(response.operations)) throw new ApiError('invalid_response');
+  const ids = new Set();
+  for (const operation of response.operations) {
+    if (!operation || typeof operation.id !== 'string' || !operation.id.trim() || ids.has(operation.id) ||
+        (operation.results !== undefined && (!Array.isArray(operation.results) ||
+          operation.results.some(result => !result || typeof result !== 'object' || Array.isArray(result)))))
+      throw new ApiError('invalid_response');
+    ids.add(operation.id);
+  }
   const previous = new Map((data.operations || []).map((operation) => [operation.id, operation]));
-  data.operations = response.operations || [];
+  data.operations = response.operations;
   const completedInstall = data.operations.some(
     (operation) =>
       ['install', 'update'].includes(operation.type) &&
@@ -3912,30 +3960,32 @@ function renderOperations() {
 function activityPage() {
   const view = {
     kind: 'activity', ticket: session.capture(), root: el('div'),
-    list: el('div', { class: 'history-list' }), records: new Map(), state: null,
+    list: el('div', { class: 'history-list' }), notice: el('div'), records: new Map(), state: null, noticeKey: null,
   };
   updateActivity(view);
   operationsView = view;
   return sections(heading('Activity', 'Progress and results retained on the Portal.'), view.root);
 }
 function updateActivity(view) {
-  const operations = data.operations;
-  const state = data.operationsError
-    ? `error:${JSON.stringify(data.operationsError)}`
-    : !operations ? 'loading' : !operations.length ? 'empty' : 'list';
+  const operations = data.operations, confirmed = Array.isArray(operations);
+  const state = confirmed ? !operations.length ? 'empty' : 'list'
+    : data.operationsError ? `error:${JSON.stringify(data.operationsError)}` : 'loading';
   if (state !== 'list') {
-    if (state !== view.state)
+    const uncertainEmpty = state === 'empty' && (data.operationsError || operationsRefreshing());
+    const key = `${state}:${!!uncertainEmpty}`;
+    if (key !== view.state)
       view.root.replaceChildren(
-        data.operationsError
-          ? failure('Activity unavailable', data.operationsError, () => loadVisible())
-          : !operations
-            ? empty('Activity', 'Loading operations…')
-            : empty('No recent operations', 'Catalog installs and scenes will appear here.'),
+        !confirmed && data.operationsError
+          ? failure('Activity unavailable', data.operationsError, () => loadOperations())
+          : !confirmed ? empty('Activity', 'Loading operations…')
+          : uncertainEmpty ? empty('Last confirmed history was empty', 'Refresh to check for newer operations.')
+          : empty('No recent operations', 'Catalog installs and scenes will appear here.'),
       );
     if (state === 'empty') {
       view.records.clear();
       view.list.replaceChildren();
     }
+    view.state = key;
   } else {
     const ids = new Set(), nodes = [];
     for (const operation of operations) {
@@ -3943,9 +3993,11 @@ function updateActivity(view) {
       const key = JSON.stringify(operation);
       const actionsKey = JSON.stringify([
         operation.retrySupported === true, operation.cancelSupported === true,
+        operationActionAvailable(operation.id, 'retry', view.ticket),
+        operationActionAvailable(operation.id, 'cancel', view.ticket),
       ]);
       let record = view.records.get(operation.id);
-      if (!record || record.key !== key) {
+      if (!record || record.key !== key || record.actionsKey !== actionsKey) {
         const node = operationCard(
           operation, record?.actionsKey === actionsKey ? record.actions : null,
         );
@@ -3962,11 +4014,26 @@ function updateActivity(view) {
     if (view.list.children.length !== nodes.length ||
         nodes.some((node, i) => view.list.children[i] !== node))
       view.list.replaceChildren(...nodes);
-    if (view.root.firstChild !== view.list) view.root.replaceChildren(view.list);
+    if (view.root.children[0] !== view.notice || view.root.children[1] !== view.list)
+      view.root.replaceChildren(view.notice, view.list);
+    view.state = state;
   }
-  view.state = state;
+  if (confirmed) {
+    const noticeKey = data.operationsError ? `error:${JSON.stringify(data.operationsError)}`
+      : operationsRefreshing() ? 'refreshing' : 'none';
+    if (noticeKey !== view.noticeKey) {
+      view.notice.replaceChildren(...(data.operationsError
+        ? [failure('Activity unavailable', data.operationsError, () => loadOperations()),
+          text('Last confirmed results are shown. Refresh before retrying or cancelling an operation.')]
+        : operationsRefreshing() ? [el('p', { role: 'status', 'aria-live': 'polite', text: 'Refreshing activity… Last confirmed results are kept below.' })] : []));
+      view.noticeKey = noticeKey;
+    }
+    if (state === 'empty' && noticeKey !== 'none' && view.root.firstChild !== view.notice)
+      view.root.replaceChildren(view.notice, ...view.root.children);
+  }
 }
 function operationCard(op, retainedActions = null) {
+  const ticket = session.capture();
   const view = operationView(op);
   const name =
     op.target?.name || op.target?.packageName || op.target?.id || op.target?.action || op.type;
@@ -4003,19 +4070,22 @@ function operationCard(op, retainedActions = null) {
       : null,
     retainedActions || actions(
       op.retrySupported === true
-        ? button('Retry', () => beginOperation({ type: 'retry', id: op.id }), { kind: 'outline' })
+        ? button('Retry', () => operationAction(op.id, 'retry', ticket),
+          { kind: 'outline', disabled: !operationActionAvailable(op.id, 'retry', ticket) })
         : null,
       op.cancelSupported === true
         ? button(
             'Cancel operation',
-            () =>
-              confirmAction(
+            () => {
+              if (!operationActionAvailable(op.id, 'cancel', ticket)) return;
+              return confirmAction(
                 'Cancel this operation?',
                 'Ask the Portal to cancel this specific operation.',
-                () => beginOperation({ type: 'cancel', id: op.id }),
-                'Cancel operation',
-              ),
-            { kind: 'danger' },
+                () => operationAction(op.id, 'cancel', ticket),
+                'Cancel operation', ticket,
+              );
+            },
+            { kind: 'danger', disabled: !operationActionAvailable(op.id, 'cancel', ticket) },
           )
         : null,
     ),
