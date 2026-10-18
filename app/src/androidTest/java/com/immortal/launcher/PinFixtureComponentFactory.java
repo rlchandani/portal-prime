@@ -14,7 +14,8 @@ import android.content.Intent;
 public final class PinFixtureComponentFactory extends AppComponentFactory {
     @Override public Activity instantiateActivity(ClassLoader original, String name, Intent intent)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-        if (name.equals("com.immortal.launcher.PinFixtureActivity")) {
+        if (name.equals("com.immortal.launcher.PinFixtureActivity") ||
+                name.equals("com.immortal.launcher.TodayCalendarFixtureActivity")) {
             return (Activity) PinFixtureBridgeProvider.loader().loadClass(name).newInstance();
         }
         return super.instantiateActivity(original, name, intent);

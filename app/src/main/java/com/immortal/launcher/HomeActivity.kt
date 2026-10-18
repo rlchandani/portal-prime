@@ -3009,19 +3009,32 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
       }
   var calendarUrl by remember { mutableStateOf(ScreensaverConfig.load(context).calendarUrl) }
   OnResume { calendarUrl = ScreensaverConfig.load(context).calendarUrl }
-  val nextCalendarRefresh = remember(calendarUrl) { longArrayOf(0L) }
-  val nextEvent by produceHomeState<CalendarFeed.Event?>(initialValue = null, calendarUrl) {
+  val calendarRefresh = remember { TodayCalendarRefreshGate() }
+  val nextCalendarRefresh = remember(calendarUrl, use24, calendarRefresh.revision) { longArrayOf(0L) }
+  val calendarState by produceHomeState(TodayCalendarState(), calendarUrl, use24, calendarRefresh.revision) {
+    val sourceUrl = calendarUrl
+    val clock24 = use24
+    if (sourceUrl.isNullOrBlank()) {
+      value = TodayCalendarState(sourceUrl)
+      calendarRefresh.consume(sourceUrl)
+      return@produceHomeState
+    }
     while (true) {
       val remaining = nextCalendarRefresh[0] - android.os.SystemClock.elapsedRealtime()
       if (remaining > 0) delay(remaining)
-      val url = calendarUrl
-      value = if (url.isNullOrBlank()) null else withContext(Dispatchers.IO) {
+      value = value.forSource(sourceUrl).copy(refreshing = true)
+      val forceRefresh = calendarRefresh.consume(sourceUrl)
+      value = withContext(Dispatchers.IO) {
         val now = System.currentTimeMillis()
-        CalendarFeed.fetch(url).filter { it.endMillis >= now }.minByOrNull { it.startMillis }
+        prepareTodayCalendarState(sourceUrl,
+            CalendarFeed.read(sourceUrl, now, forceRefresh = forceRefresh), now, clock24)
       }
       nextCalendarRefresh[0] = android.os.SystemClock.elapsedRealtime() + 30L * 60 * 1000
     }
   }
+  val currentCalendar = calendarState.forSource(calendarUrl)
+  val calendarBusy = currentCalendar.refreshing || calendarRefresh.pending(calendarUrl)
+
 
 
   // Nearest upcoming countdown (birthday/trip) from Settings > Countdown, plus the next alarm and
@@ -3052,27 +3065,12 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
   val today = forecast?.days?.firstOrNull()
   val (_, moonName) = remember { moonPhase(System.currentTimeMillis()) }
   val sunPair = sun?.formatted(use24)
-  val endFormat = remember(use24) { SimpleDateFormat(if (use24) "HH:mm" else "h:mm a", Locale.getDefault()) }
   ImmortalWidgetShell(title = "Today", openPage = "calendar", modifier = modifier) {
-    nextEvent?.let { event ->
-      Text(calendarEventTime(event, use24), color = ApprovedHomePalette.Secondary,
-          fontSize = 18.sp, lineHeight = 24.sp)
-      Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-        Box(Modifier.width(4.dp).height(67.dp).clip(RoundedCornerShape(2.dp)).background(ApprovedHomePalette.Accent))
-        Column {
-          Text(event.title, color = ApprovedHomePalette.Text, fontSize = 24.sp, lineHeight = 32.sp,
-              fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
-          Text(if (event.allDay) "All-day" else "Until ${endFormat.format(Date(event.endMillis))}",
-              color = ApprovedHomePalette.Secondary, fontSize = 21.sp, lineHeight = 29.sp,
-              modifier = Modifier.padding(top = 6.dp))
-        }
+    TodayCalendarSection(currentCalendar.copy(refreshing = calendarBusy), onRetry = {
+      if (calendarRefresh.request(currentCalendar.copy(refreshing = calendarBusy), calendarUrl)) {
+        nextCalendarRefresh[0] = 0L
       }
-    } ?: if (calendarUrl.isNullOrBlank()) {
-      Text("Add your calendar", color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 34.sp)
-      Text("See your upcoming events here.", color = ApprovedHomePalette.Secondary,
-          fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 12.dp))
-      ApprovedHomeTextButton("Add calendar") { context.openApprovedHomeSettings("calendar-url") }
-    } else Text("No upcoming events", color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp)
+    }, onAdd = { context.openApprovedHomeSettings("calendar-url") })
     Spacer(Modifier.height(20.dp))
     Text(buildString {
       append(current?.let { "Feels like ${it.temp}°" } ?: "Weather unavailable")
