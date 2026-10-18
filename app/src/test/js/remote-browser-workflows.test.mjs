@@ -3175,3 +3175,70 @@ test('Scenes refresh global Refresh supersedes an aborted pending read without e
  state.scenes=[recoveryScene('scene-latest',{name:'Fresh evening'})];finishNew();await h.settle();
  assert.match(page.textContent,/Fresh evening/);assert.equal(page.textContent.includes('Refreshing routines'),false);assert.equal(scenePageButton(h,'Run').disabled,false);
 });
+
+
+const orderingLayout = value => ({assignments:{'com.test.app':value},homeOrder:['com.test.app/.Main'],gridOrder:[],gridSlots:[],widgets:[]});
+const orderingItem = value => ({id:'ordering-one',name:value,steps:[{type:'key',action:'home'}],schedule:null});
+async function orderingFixture(kind) {
+ const path=`/remote/${kind}`,state={name:'Before',revision:'a'.repeat(64),holdRead:false,holdSave:false,saveMode:'ok',reads:[],heldReads:[],posts:[],settingsReads:[]};
+ const payload=(name=state.name,revision=state.revision)=>kind==='layout'?{ok:true,layout:orderingLayout(name),revision,widgetKinds:[]}:
+  kind==='scenes'?{ok:true,scenes:[orderingItem(name)],revision}:{ok:true,presets:[orderingItem(name)]};
+ const h=await browserHarness({saved,routes:{
+  [path]:c=>{
+   if(c.opts.method==='POST'){
+    const body=JSON.parse(c.opts.body);state.posts.push(body);
+    const finish=()=>{
+     if(state.saveMode==='fail')return c.response({ok:false,error:'fixture_failure'},500);
+     if(state.saveMode==='unconfirmed')return c.response({ok:true});
+     state.name=kind==='layout'?body.layout.assignments['com.test.app']:body[kind][0].name;state.revision='b'.repeat(64);return c.response(payload());
+    };
+    if(state.holdSave)return new Promise(resolve=>state.finishSave=()=>resolve(finish()));
+    return finish();
+   }
+   state.reads.push(c);const snapshot=payload();
+   if(state.holdRead)return new Promise((resolve,reject)=>state.heldReads.push({context:c,finish:(fail=false,name)=>fail?reject(new Error('late fixture read failure')):resolve(c.response(name?payload(name,'c'.repeat(64)):snapshot))}));
+   return c.response(snapshot);
+  },
+  '/remote/settings':c=>{
+   if(state.holdSettings)return new Promise(resolve=>state.settingsReads.push({context:c,finish:()=>resolve(c.response({ok:true,settings:{domains:[]}}))}));
+   return c.response({ok:true,settings:{domains:[]}});
+  },
+ }});
+ h.eval(`go("home","${kind}")`);await h.settle();if(kind!=='layout'){h.click('Edit');await h.settle();}
+ const label=kind==='layout'?'com.test.app':kind==='scenes'?'Scene name':'Preset name';
+ const saveLabel=kind==='layout'?'Save layout':kind==='scenes'?'Save scene':'Save preset';
+ const current=()=>h.eval(kind==='layout'?'data.layout.layout.assignments["com.test.app"]':`data.${kind}[0].name`);
+ const draftValue=()=>h.eval(kind==='layout'?'layoutDraft.assignments["com.test.app"]':kind==='scenes'?'sceneDraft?.name':'presetDraft?.name');
+ await h.input(label,'Saved');return{h,state,path,label,saveLabel,current,draftValue};
+}
+for(const kind of ['layout','scenes','presets']){
+ test(`Editor Save/read ${kind}: confirmed save retires old successful reads without extra GETs or cancelling settings`,async()=>{
+  const f=await orderingFixture(kind),{h,state}=f;state.holdRead=true;h.eval('loadVisible()');await h.settle();const old=state.heldReads[0];
+  state.holdSettings=true;h.eval('loadSettings()');await h.settle();const other=state.settingsReads[0],before=state.reads.length;
+  h.click(f.saveLabel);await h.settle();assert.equal(f.current(),'Saved');assert.equal(state.reads.length,before);
+  assert.equal(old.context.opts.signal.aborted,true);assert.equal(other.context.opts.signal.aborted,false);
+  old.finish();other.finish();await h.settle();assert.equal(f.current(),'Saved');
+  if(kind==='layout')assert.equal(h.eval('layoutRevision'),'b'.repeat(64));
+  if(kind==='scenes'){assert.equal(h.eval('data.scenesRevision'),'b'.repeat(64));assert.equal(h.eval('scenesPending()'),false);}
+ });
+ test(`Editor Save/read ${kind}: late failed read cannot poison a confirmed save`,async()=>{
+  const f=await orderingFixture(kind),{h,state}=f;state.holdRead=true;h.eval('loadVisible()');await h.settle();const old=state.heldReads[0];
+  h.click(f.saveLabel);await h.settle();old.finish(true);await h.settle();assert.equal(f.current(),'Saved');
+  assert.equal(h.eval(`Boolean(data.${kind}Error)`),false);
+  if(kind==='scenes')assert.equal(scenePageButton(h,'Run').disabled,false);
+ });
+ test(`Editor Save/read ${kind}: newer drafts and confirmed baseline survive a preceding refresh`,async()=>{
+  const f=await orderingFixture(kind),{h,state}=f;state.holdRead=true;state.holdSave=true;h.eval('loadVisible()');await h.settle();const old=state.heldReads[0];
+  h.click(f.saveLabel);await h.settle();await h.input(f.label,'Newer');state.finishSave();await h.settle();old.finish();await h.settle();
+  assert.equal(f.current(),'Saved');assert.equal(f.draftValue(),'Newer');
+  if(kind==='scenes')assert.equal(h.eval('sceneDraft.expectedRevision'),'b'.repeat(64));
+  if(kind==='layout')assert.equal(h.eval('layoutRevision'),'b'.repeat(64));
+ });
+ test(`Editor Save/read ${kind}: failed or unconfirmed saves leave valid reads active`,async()=>{
+  for(const mode of ['fail','unconfirmed']){
+   const f=await orderingFixture(kind),{h,state}=f;state.holdRead=true;state.saveMode=mode;h.eval('loadVisible()');await h.settle();const old=state.heldReads[0];
+   h.click(f.saveLabel);await h.settle();assert.equal(old.context.opts.signal.aborted,false);old.finish(false,'External');await h.settle();
+   assert.equal(f.current(),'External');assert.equal(f.draftValue(),'Saved');
+  }
+ });
+}

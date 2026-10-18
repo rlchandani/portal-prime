@@ -459,6 +459,11 @@ const api = createClient({
     }
   },
 });
+function retireRead(key) {
+  pageReads.get(key)?.abort();
+  pageReads.delete(key);
+  session.read(key);
+}
 function abortReads() {
   cancelSnapshotRestoreReview();
   for (const controller of pageReads.values()) controller.abort();
@@ -3706,6 +3711,8 @@ async function saveLayout() {
   render();
   const response = await pending;
   if (response?.layout && session.current(ticket)) {
+    retireRead('layout');
+    delete data.layoutError;
     const newerEdits = JSON.stringify(layoutDraft) !== JSON.stringify(candidate);
     data.layout = response;
     if (!newerEdits) layoutDraft = copy(response.layout);
@@ -4777,6 +4784,9 @@ async function saveScenes(
   const response = await pending;
   const confirmed = Array.isArray(response?.scenes) && validSceneRevision(response.revision) && session.current(ticket);
   if (confirmed) {
+    retireRead('scenes');
+    scenesLoadState = null;
+    delete data.scenesError;
     acceptScenes(response);
     data.sceneConflict = false;
     if (success) toast(success);
@@ -5251,6 +5261,7 @@ async function savePresets(presets, {
   const response = await pending;
   const confirmed = Array.isArray(response?.presets) && session.current(ticket);
   if (confirmed) {
+    retireRead('presets');
     data.presets = response.presets;
     data.presetsError = null;
     if (success) toast(success);
