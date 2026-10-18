@@ -4063,3 +4063,164 @@ test('Mixed toggles unchanged rerenders reuse the native row without extra reads
   h.eval('render();render()'); await h.settle();
   assert.equal(mixedToggle(h), input); assert.equal(h.calls.length, before);
 });
+
+const scopeReadySchema = index => ({ domains: [
+  { id: 'screensaver', title: 'Photos', controls: [
+    { key: 'shuffle', title: 'Shuffle photos', type: 'bool', value: index === 0, default: false },
+    { key: 'fit', title: 'Photo fit', type: 'enum', value: 'fill', default: 'fit',
+      options: [{ value: 'fill', label: 'Fill' }, { value: 'fit', label: 'Fit' }] },
+    { key: 'interval', title: 'Interval', type: 'int', value: 30, min: 5, max: 600, step: 5 },
+    { key: 'caption', title: 'Caption', type: 'string', value: 'Public fixture' },
+  ] },
+  { id: 'fleet', title: 'Room', controls: [
+    { key: 'name', title: 'Room name', type: 'string', value: `Public room ${index}` },
+  ] },
+] });
+async function scopeReadyFixture() {
+  const state = { held: [], reads: 0, posts: [], schemas: [scopeReadySchema(0), scopeReadySchema(1)] };
+  const h = await browserHarness({ saved, routes: {
+    '/remote/settings': ({ url, opts, response }) => {
+      const index = url.includes('8878') ? 1 : 0;
+      if (opts.body) {
+        const body = JSON.parse(opts.body); state.posts.push({ index, body });
+        const domain = state.schemas[index].domains.find(d => d.id === body.domain);
+        const confirmed = { ...domain, controls: domain.controls.map(c =>
+          Object.hasOwn(body.values, c.key) ? { ...c, value: body.values[c.key] } : c) };
+        state.schemas[index] = { domains: state.schemas[index].domains.map(d =>
+          d.id === confirmed.id ? confirmed : d) };
+        return response({ ok: true, applied: Object.keys(body.values), domain: confirmed });
+      }
+      if (new URL(url).search || index === 0) return response({ ok: true, settings: state.schemas[index] });
+      state.reads++;
+      const snapshot = structuredClone(state.schemas[index]);
+      return new Promise(resolve => state.held.push({
+        signal: opts.signal,
+        finish(mode = '') {
+          resolve(mode === 'fail' ? response({ ok: false, error: 'unreachable' }, 503)
+            : mode === 'malformed' ? response({ ok: true, settings: { domains: {} } })
+            : response({ ok: true, settings: snapshot }));
+        },
+      }));
+    },
+  } });
+  h.eval('go("settings");category="screensaver"'); await h.settle();
+  return { h, state };
+}
+const scopeReadyInput = (h, title = 'Shuffle photos') => h.document.body.querySelectorAll('input')
+  .find(n => n.attrs['aria-label'] === title);
+async function startScopeReady(h) {
+  h.click('All rooms'); await h.settle();
+}
+
+test('Scope readiness shows peer loading and disables every shared control type', async () => {
+  const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
+  assert.match(h.document.body.textContent, /Loading room settings/);
+  assert.equal(scopeReadyInput(h).disabled, true);
+  assert.equal(h.document.body.querySelectorAll('select').find(n => n.attrs['aria-label'] === 'Photo fit').disabled, true);
+  assert.equal(h.document.body.querySelectorAll('button').find(n => n.attrs['aria-label'] === 'Increase Interval').disabled, true);
+  assert.equal(scopeReadyInput(h, 'Caption').disabled, true);
+  assert.equal(settingsRefreshButton(h, 'Save').disabled, true);
+  state.held[0].finish(); await h.settle();
+  assert.equal(scopeReadyInput(h).disabled, false);
+  assert.doesNotMatch(h.document.body.textContent, /Loading room settings/);
+});
+
+test('Scope readiness prevents premature native taps retained handlers and shared dispatch', async () => {
+  const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
+  const input = scopeReadyInput(h); input.click();
+  input.checked = false; input.listeners.change[0]({ target: input });
+  h.eval('applyDomain("screensaver",{shuffle:false})'); await h.settle();
+  assert.equal(state.posts.length, 0);
+  state.held[0].finish(); await h.settle();
+  mixedLabel(h).click(); await h.settle();
+  assert.deepEqual(state.posts.map(p => p.body.values.shuffle), [true, true]);
+});
+
+test('Scope readiness keeps active Portal connection controls usable during peer loading', async () => {
+  const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
+  h.eval('category="fleet";render()'); await h.settle();
+  assert.equal(scopeReadyInput(h, 'Room name').disabled, false);
+  await h.input('Room name', 'Public renamed room');
+  await h.click('Save'); await h.settle();
+  assert.equal(state.posts.length, 1); assert.equal(state.posts[0].index, 0);
+  assert.deepEqual(state.posts[0].body.values, { name: 'Public renamed room' });
+  assert.equal(state.reads, 1);
+  state.held[0].finish(); await h.settle();
+});
+
+test('Scope readiness coalesces duplicate reads and aborts a superseded scope request', async () => {
+  const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
+  h.eval('loadScopeSchemas();loadScopeSchemas()'); await h.settle();
+  assert.equal(state.reads, 1);
+  h.eval('scope="this";loadScopeSchemas()'); await h.settle();
+  assert.equal(state.held[0].signal.aborted, true);
+  assert.equal(scopeReadyInput(h).disabled, false);
+  state.held[0].finish(); await h.settle();
+  assert.equal(scopeReadyInput(h).indeterminate, false);
+});
+
+test('Scope readiness ignores an old completion while a replacement scope is still pending', async () => {
+  const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
+  h.eval('scope="this";loadScopeSchemas()'); await h.settle();
+  await startScopeReady(h);
+  assert.equal(state.reads, 2); assert.equal(state.held[0].signal.aborted, true);
+  state.held[0].finish(); await h.settle();
+  assert.equal(scopeReadyInput(h).disabled, true);
+  state.held[1].finish(); await h.settle();
+  assert.equal(scopeReadyInput(h).disabled, false); assert.equal(scopeReadyInput(h).indeterminate, true);
+});
+
+test('Scope readiness failed peer reads unlock controls and offer an owned retry', async () => {
+  for (const mode of ['fail', 'malformed']) {
+  const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
+  state.held[0].finish(mode); await h.settle();
+  assert.equal(scopeReadyInput(h).disabled, false);
+  assert.match(h.document.body.textContent, /Could not read Preview B/);
+  const retry = settingsRefreshButton(h, 'Retry room settings'); assert.ok(retry);
+  retry.click(); await h.settle();
+  assert.equal(scopeReadyInput(h).disabled, true); assert.equal(state.reads, 2);
+  state.held[1].finish(); await h.settle();
+  assert.equal(scopeReadyInput(h).indeterminate, true);
+  assert.doesNotMatch(h.document.body.textContent, /Could not read Preview B/);
+  assert.equal(state.posts.length, 0);
+  }
+});
+
+test('Scope readiness departed callbacks cannot publish failures or issue retry reads', async () => {
+  for (const departure of ['page', 'room', 'hidden', 'expired']) {
+    const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
+    state.held[0].finish('fail'); await h.settle();
+    const retry = settingsRefreshButton(h, 'Retry room settings');
+    if (departure === 'page') h.eval('go("home")');
+    else if (departure === 'room') h.eval(`selectRoom(${JSON.stringify(saved[1].base)})`);
+    else if (departure === 'hidden') h.hide();
+    else h.eval('connectionState="expired";render()');
+    await h.settle(); const before = h.calls.length;
+    retry?.listeners.click[0]({ target: retry }); await h.settle();
+    assert.equal(h.calls.length, before, departure); assert.equal(state.posts.length, 0, departure);
+  }
+  for (const departure of ['page', 'hidden', 'refresh']) {
+    const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
+    state.held[0].finish('fail'); await h.settle();
+    if (departure === 'page') h.eval('go("home");go("settings")');
+    else if (departure === 'hidden') { h.hide(); h.show(); }
+    else h.eval('refresh()');
+    await h.settle();
+    assert.equal(state.reads, 2, departure);
+    assert.equal(scopeReadyInput(h).disabled, true, departure);
+    state.held[1].finish(); await h.settle();
+    assert.equal(scopeReadyInput(h).indeterminate, true, departure);
+  }
+});
+
+test('Scope readiness locks shared resets and profiles without adding reads on unchanged renders', async () => {
+  const { h, state } = await scopeReadyFixture(); await startScopeReady(h);
+  assert.equal(settingsRefreshButton(h, 'Reset').disabled, true);
+  assert.equal(h.eval('profileControlsLocked()'), true);
+  state.held[0].finish(); await h.settle();
+  assert.equal(settingsRefreshButton(h, 'Reset').disabled, false);
+  assert.equal(h.eval('profileControlsLocked()'), false);
+  const input = scopeReadyInput(h), before = h.calls.length;
+  h.eval('render();render()'); await h.settle();
+  assert.equal(scopeReadyInput(h), input); assert.equal(h.calls.length, before);
+});

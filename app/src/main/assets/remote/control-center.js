@@ -97,7 +97,8 @@ let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
   scopeErrors = [],
-  scopeResults = [];
+  scopeResults = [],
+  scopeLoadState = null;
 let appMode = 'installed',
   appQuery = '',
   appPage = 0,
@@ -473,6 +474,8 @@ function retireRead(key) {
 function abortReads() {
   cancelSnapshotExport();
   cancelSnapshotRestoreReview();
+  // Retire completed failure notices as well as pending transport reads.
+  scopeLoadState?.controller.abort();
   for (const controller of pageReads.values()) controller.abort();
   pageReads.clear();
 }
@@ -976,6 +979,9 @@ function loadVisible(force = false) {
     loadApps();
     if (supported('operations')) read('operations', '/remote/operations', acceptOperations);
   } else if (tab === 'settings') {
+    // Resume a scope read interrupted by navigation, hiding or explicit Refresh.
+    if (settingTargets().some(target => target.base !== room().base && !scopeSchemas.has(target.base)) &&
+        !scopePending() && (force || !scopeOwnerCurrent(scopeLoadState) || !scopeErrors.length)) loadScopeSchemas();
     loadSettings();
   }
 }
@@ -1810,6 +1816,7 @@ function settingsPage() {
         { class: 'settings-primary' },
         sections(
           refreshNotice,
+          scopeReadNotice(),
           filters,
           roster.length > 1
             ? text(
@@ -1862,12 +1869,6 @@ function scopePanel(disabled = false) {
     text(
       `${targets.length} ${targets.length === 1 ? 'room' : 'rooms'} selected. Changes report a result for each room.`,
     ),
-    scopeErrors.length
-      ? text(
-          `Could not read ${scopeErrors.join(', ')}. Those rooms will report their own errors on apply.`,
-          'error',
-        )
-      : null,
   );
   if (disabled) for (const control of [...panel.querySelectorAll('button'), ...panel.querySelectorAll('input')]) control.disabled = true;
   return panel;
@@ -1878,23 +1879,58 @@ function settingTargets(domain, control) {
     ? captureTargets(roster, 'this', room()?.base)
     : chosen;
 }
+function scopeReadKey() {
+  return JSON.stringify([scope, settingTargets().map(target => target.base)]);
+}
+function scopeOwnerCurrent(owner) {
+  return owner && scopeLoadState === owner && session.current(owner.ticket) &&
+    owner.key === scopeReadKey() && !owner.controller.signal.aborted &&
+    !document.hidden && connectionState !== 'expired';
+}
+function scopePending() {
+  return !!scopeLoadState?.pending && scopeOwnerCurrent(scopeLoadState);
+}
+function scopeReadNotice() {
+  const owner = scopeLoadState;
+  if (!scopeOwnerCurrent(owner)) return null;
+  if (owner.pending) return group(el('p', { role: 'status', 'aria-live': 'polite',
+    class: 'detail', text: 'Loading room settings… Shared controls will be ready when the values arrive.' }));
+  if (!scopeErrors.length) return null;
+  return group(text(`Could not read ${scopeErrors.join(', ')}. Those rooms will report their own errors on apply.`, 'error'),
+    button('Retry room settings', () => {
+      if (scopeOwnerCurrent(owner)) loadScopeSchemas();
+    }, { kind: 'outline' }));
+}
 async function loadScopeSchemas() {
-  const ticket = session.read('scope');
+  if (!room() || tab !== 'settings' || document.hidden || connectionState === 'expired' || scopePending()) return;
+  pageReads.get('scope')?.abort();
+  const targets = settingTargets(), peers = targets.filter(target => target.base !== room().base);
+  const owner = { ticket: session.read('scope'), key: scopeReadKey(),
+    controller: new AbortController(), pending: peers.length > 0 };
+  scopeLoadState = owner;
+  pageReads.set('scope', owner.controller);
   scopeSchemas = new Map(data.settings ? [[room().base, data.settings]] : []);
   scopeErrors = [];
-  for (const target of settingTargets()) {
-    if (target.base === room().base) continue;
-    try {
-      const r = await api(target, '/remote/settings');
-      if (!session.current(ticket)) return;
-      scopeSchemas.set(target.base, r.settings);
-    } catch (error) {
-      if (!session.current(ticket)) return;
-      scopeErrors.push(target.name);
+  if (owner.pending) render();
+  try {
+    for (const target of peers) {
+      if (!scopeOwnerCurrent(owner)) break;
+      try {
+        const r = await api(target, '/remote/settings', { signal: owner.controller.signal });
+        if (!scopeOwnerCurrent(owner)) return;
+        scopeSchemas.set(target.base, validateSettingsResponse(r));
+      } catch (error) {
+        if (!scopeOwnerCurrent(owner)) return;
+        if (error.code !== 'aborted') scopeErrors.push(target.name);
+      }
     }
+  } finally {
+    owner.pending = false;
+    if (pageReads.get('scope') === owner.controller) pageReads.delete('scope');
+    if (scopeOwnerCurrent(owner)) render();
   }
-  if (session.current(ticket)) render();
 }
+
 function resultPanel(results = scopeResults) {
   if (!results.length) return null;
   return group(
@@ -1949,7 +1985,7 @@ function renderDomain(domain) {
                 ticket,
               );
             },
-            { kind: 'outline' },
+            { kind: 'outline', disabled: scopePending() && reset.some(c => !activeOnlySetting(domain.id, c.key, c)) },
           )
         : null,
     ),
@@ -1962,9 +1998,9 @@ function renderDomain(domain) {
   );
 }
 function renderSetting(domain, control) {
-  const id = `setting:${domain}:${control.key}`,
-    isBusy = busy.has(`${room()?.base}:${id}`);
+  const id = `setting:${domain}:${control.key}`;
   const activeOnly = activeOnlySetting(domain, control.key, control);
+  const isBusy = busy.has(`${room()?.base}:${id}`) || (!activeOnly && scopePending());
   const availableSchemas = settingTargets(domain, control)
     .map((r) => scopeSchemas.get(r.base))
     .filter(Boolean);
@@ -2212,6 +2248,7 @@ async function applyDomain(
   }
   // Build each target's patch before sending. Explicit target arrays, profiles and resets
   // cannot bypass the active-only policy or accidentally broadcast a mixed patch.
+  if (scopePending() && Object.keys(groupValues).length) return;
   const patches = new Map();
   if (Object.keys(groupValues).length) {
     for (const target of targets)
@@ -2289,7 +2326,7 @@ async function applyDomain(
 }
 let profileApplyState = null;
 function profileControlsLocked(ticket = session.capture()) {
-  return !!profileApplyState?.pending || busy.has(profileCaptureKey(ticket));
+  return !!profileApplyState?.pending || busy.has(profileCaptureKey(ticket)) || scopePending();
 }
 function profileApplyPanel() {
   const state = profileApplyState;
@@ -2406,7 +2443,8 @@ function profilesPage() {
   const profiles = current.profiles;
   return sections(
     heading('Settings profiles', 'Your named profiles from the previous remote remain available.'),
-    scopePanel(locked),
+    scopePanel(!!profileApplyState?.pending || busy.has(profileCaptureKey())),
+    scopeReadNotice(),
     profileApplyPanel(),
     resultPanel(profileApplyState?.results ?? scopeResults),
     group(
