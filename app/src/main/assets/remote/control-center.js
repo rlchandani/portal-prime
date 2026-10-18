@@ -292,7 +292,7 @@ function checkbox(label, checked, onChange) {
     label,
   );
 }
-function row(title, help, control) {
+function row(title, help, control, helpId = null) {
   // A native label forwards padding taps to the checkbox once, respecting disabled.
   if (control?.matches?.('input.switch')) control = el('label', { class: 'switch-hit' }, control);
   return el(
@@ -302,7 +302,7 @@ function row(title, help, control) {
       'div',
       { class: 'setting-copy' },
       el('strong', { text: title }),
-      help ? el('span', { class: 'detail', text: help }) : null,
+      help ? el('span', { class: 'detail', id: helpId, text: help }) : null,
     ),
     el('div', { class: 'setting-value' }, control),
   );
@@ -1975,7 +1975,10 @@ function renderSetting(domain, control) {
       : advanced
         ? control.help
         : control.shortHelp || control.help;
-  const help = [activeOnly ? `Active Portal only: ${room().name}.` : '', baseHelp]
+  const mixedBoolean = control.type === 'bool' && mixed;
+  const mixedHelpId = mixedBoolean ? `${id}:mixed` : null;
+  const help = [activeOnly ? `Active Portal only: ${room().name}.` : '', baseHelp,
+    mixedBoolean ? 'Mixed values. Tap to turn on for all selected rooms.' : '']
     .filter(Boolean)
     .join(' ');
   const view = settingsRowView;
@@ -1998,7 +2001,7 @@ function renderSetting(domain, control) {
   const cached = retain ? view.entries.get(key) : null;
   // A rejected/no-target change may have altered the live native control already.
   const valueMatches = cached && (control.type === 'bool'
-    ? cached.input?.checked === (control.value === true) && cached.input.indeterminate === mixed
+    ? cached.input?.checked === (!mixed && control.value === true) && cached.input.indeterminate === mixed
     : control.type === 'enum'
       ? cached.select?.value === String(mixed ? '' : (control.value ?? ''))
       : !draftField || cached.input?.value === expectedDraft);
@@ -2025,8 +2028,9 @@ function renderSetting(domain, control) {
     ui = el('input', {
       class: 'switch',
       type: 'checkbox',
-      role: 'switch',
-      checked: control.value === true,
+      role: mixedBoolean ? 'checkbox' : 'switch',
+      checked: !mixed && control.value === true,
+      'aria-describedby': mixedHelpId,
       disabled: control.readOnly || isBusy,
       'aria-label': control.title,
       onChange: (e) => apply({ [control.key]: e.target.checked }),
@@ -2176,8 +2180,9 @@ function renderSetting(domain, control) {
     });
   return remember(row(
     control.title,
-    mixed ? `${help || ''} Values differ between selected rooms.` : help,
+    mixed && !mixedBoolean ? `${help || ''} Values differ between selected rooms.` : help,
     ui,
+    mixedHelpId,
   ));
 }
 async function applyDomain(

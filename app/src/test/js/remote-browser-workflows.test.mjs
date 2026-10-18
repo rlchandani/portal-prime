@@ -3955,3 +3955,111 @@ test('Numeric input read-only row cannot dispatch even through its retained hand
   assert.equal(save.disabled, true); save.listeners.click[0]({}); await h.settle();
   assert.equal(state.posts.length, 0); assert.equal(h.calls.length, before);
 });
+
+// A multi-room boolean has no meaningful active-room on/off state until chosen.
+async function mixedToggleFixture({ values = [true, false], readOnly = false } = {}) {
+  const state = { values: [...values], posts: [], rejectPeer: false, hold: false, held: [] };
+  const schemas = index => ({ domains: [{ id: 'screensaver', title: 'Photos', controls: [
+    { key: 'shuffle', title: 'Shuffle photos', type: 'bool', value: state.values[index], readOnly },
+  ] }] });
+  const h = await browserHarness({ saved: values.length === 1 ? [saved[0]] : saved, routes: {
+    '/remote/settings': ({ url, opts, response }) => {
+      const index = url.includes('8878') ? 1 : 0;
+      if (!opts.body) return response({ ok: true, settings: schemas(index) });
+      const body = JSON.parse(opts.body); state.posts.push({ index, body });
+      const finish = () => {
+        if (state.rejectPeer && index === 1) return response({ ok: false, error: 'unreachable' }, 503);
+        state.values[index] = body.values.shuffle;
+        return response({ ok: true, applied: ['shuffle'], domain: schemas(index).domains[0] });
+      };
+      if (!state.hold) return finish();
+      return new Promise(resolve => state.held.push(() => resolve(finish())));
+    },
+  } });
+  h.eval('go("settings")'); await h.settle();
+  if (values.length > 1) {
+    h.eval(`scope="all";scopeSchemas.set(${JSON.stringify(saved[1].base)},${JSON.stringify(schemas(1))});render()`);
+    await h.settle();
+  }
+  return { h, state };
+}
+const mixedToggle = h => h.document.body.querySelectorAll('input').find(n => n.attrs['aria-label'] === 'Shuffle photos');
+const mixedLabel = h => h.document.body.querySelector('label.switch-hit');
+
+test('Mixed toggles expose a linked partial state rather than the active room on/off value', async () => {
+  const { h } = await mixedToggleFixture(); const input = mixedToggle(h);
+  assert.equal(input.checked, false); assert.equal(input.indeterminate, true);
+  assert.equal(input.attrs.role, 'checkbox');
+  const description = h.document.getElementById(input.attrs['aria-describedby']);
+  assert.ok(description); assert.match(description.textContent, /Mixed values.*turn on.*selected rooms/i);
+  assert.equal(input.attrs['aria-label'], 'Shuffle photos');
+});
+
+test('Mixed toggles first native activation turns both rooms on regardless of active value', async () => {
+  for (const values of [[true, false], [false, true]]) for (const hit of ['label', 'track']) {
+    const { h, state } = await mixedToggleFixture({ values });
+    (hit === 'label' ? mixedLabel(h) : mixedToggle(h)).click(); await h.settle();
+    assert.deepEqual(state.posts.map(p => p.body.values.shuffle), [true, true], `${values} ${hit}`);
+    assert.deepEqual(state.values, [true, true]);
+    assert.equal(mixedToggle(h).attrs.role, 'switch'); assert.equal(mixedToggle(h).indeterminate, false);
+    assert.doesNotMatch(h.document.body.textContent, /Mixed values/);
+    mixedLabel(h).click(); await h.settle();
+    assert.deepEqual(state.posts.slice(2).map(p => p.body.values.shuffle), [false, false]);
+  }
+});
+
+test('Mixed toggles keep ordinary single-room and equal-room on/off behavior', async () => {
+  for (const values of [[true], [false], [true, true], [false, false]]) {
+    const { h, state } = await mixedToggleFixture({ values });
+    assert.equal(mixedToggle(h).attrs.role, 'switch'); assert.equal(mixedToggle(h).indeterminate, false);
+    assert.doesNotMatch(h.document.body.textContent, /Mixed values/);
+    mixedLabel(h).click(); await h.settle();
+    assert.equal(state.posts.length, values.length);
+    assert.ok(state.posts.every(p => p.body.values.shuffle === !values[0]));
+  }
+});
+
+test('Mixed toggles rejected peer saves retain an honest partial state without retrying', async () => {
+  const { h, state } = await mixedToggleFixture(); state.rejectPeer = true;
+  mixedLabel(h).click(); await h.settle();
+  assert.equal(state.posts.length, 2); assert.deepEqual(state.values, [true, false]);
+  assert.equal(mixedToggle(h).checked, false); assert.equal(mixedToggle(h).indeterminate, true);
+  assert.equal(mixedToggle(h).attrs.role, 'checkbox'); assert.match(h.document.body.textContent, /Mixed values/);
+  const before = h.calls.length; h.eval('render()'); await h.settle(); assert.equal(h.calls.length, before);
+});
+
+test('Mixed toggles pending save disables native duplicate activation until acknowledgement', async () => {
+  const { h, state } = await mixedToggleFixture(); state.hold = true;
+  mixedLabel(h).click(); await h.settle();
+  assert.equal(mixedToggle(h).disabled, true);
+  const before = state.posts.length; mixedLabel(h).click(); mixedToggle(h).click(); await h.settle();
+  assert.equal(state.posts.length, before);
+  state.hold = false; for (const finish of state.held) finish(); await h.settle();
+  assert.equal(state.posts.length, 2); assert.equal(mixedToggle(h).disabled, false);
+  assert.deepEqual(state.values, [true, true]);
+});
+
+test('Mixed toggles read-only native label and track activation cannot write', async () => {
+  const { h, state } = await mixedToggleFixture({ readOnly: true }); const before = h.calls.length;
+  assert.equal(mixedToggle(h).disabled, true); mixedLabel(h).click(); mixedToggle(h).click(); await h.settle();
+  assert.equal(state.posts.length, 0); assert.equal(h.calls.length, before); assert.equal(mixedToggle(h).indeterminate, true);
+});
+
+test('Mixed toggles retired page Portal and hidden callbacks cannot dispatch', async () => {
+  for (const departure of ['page', 'room', 'hidden', 'expired']) {
+    const { h, state } = await mixedToggleFixture(); const old = mixedToggle(h);
+    if (departure === 'page') h.eval('go("home")');
+    else if (departure === 'room') h.eval(`selectRoom(${JSON.stringify(saved[1].base)})`);
+    else if (departure === 'hidden') h.hide();
+    else h.eval('connectionState="expired";render()');
+    await h.settle(); const before = h.calls.length;
+    old.checked = true; old.listeners.change[0]({ target: old }); await h.settle();
+    assert.equal(state.posts.length, 0, departure); assert.equal(h.calls.length, before, departure);
+  }
+});
+
+test('Mixed toggles unchanged rerenders reuse the native row without extra reads', async () => {
+  const { h } = await mixedToggleFixture(); const input = mixedToggle(h); const before = h.calls.length;
+  h.eval('render();render()'); await h.settle();
+  assert.equal(mixedToggle(h), input); assert.equal(h.calls.length, before);
+});
