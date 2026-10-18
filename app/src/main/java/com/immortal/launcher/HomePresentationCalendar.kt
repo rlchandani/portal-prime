@@ -41,9 +41,11 @@ internal object HomePresentationCalendar {
     }
     val weekday = SimpleDateFormat("EEEE", locale).apply { this.timeZone = timeZone }
     val duplicates = HashMap<String, Int>()
-    // Filter before sorting so a long feed does not allocate/sort groups for unrelated days.
+    // Keep active earlier-date occurrences, with exclusive DTEND; filter before sorting
+    // so a long feed does not allocate/sort groups for unrelated days.
     return events.asSequence()
-        .filter { it.startMillis >= starts[0] && it.startMillis < starts[3] }
+        .filter { it.startMillis < starts[3] &&
+            (it.startMillis >= starts[0] || it.endMillis > nowMillis) }
         .sortedBy { it.startMillis }
         .map { event ->
           val label = when {
@@ -51,7 +53,11 @@ internal object HomePresentationCalendar {
             event.startMillis < starts[2] -> "Tomorrow"
             else -> weekday.format(Date(event.startMillis))
           }
-          val eventTime = if (event.allDay) "All-day" else time.format(Date(event.startMillis))
+          val eventTime = when {
+            event.allDay -> "All-day"
+            event.startMillis < starts[0] -> "In progress"
+            else -> time.format(Date(event.startMillis))
+          }
           // Length-prefix fields to distinguish titles/locations containing separators;
           // ordinal also retains exact duplicate occurrences without colliding lazy keys.
           val identity = listOf(event.startMillis.toString(), event.endMillis.toString(),

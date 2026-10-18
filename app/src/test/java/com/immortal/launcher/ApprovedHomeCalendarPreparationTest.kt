@@ -23,7 +23,7 @@ class ApprovedHomeCalendarPreparationTest {
     val visible = (0..499).map { event(start + it * 60_000L, "Event $it") }
     val outside = (1..10000).map { event(start + 3 * 86_400_000L + it, "Later") }
     val prepared = HomePresentationCalendar.prepare(
-        (outside + visible + event(start - 1)).reversed(), start, true, utc, Locale.US)
+        (outside + visible + event(start - 3_600_000L)).reversed(), start, true, utc, Locale.US)
     assertEquals(visible.map { it.title }, prepared.map { it.title })
     assertEquals(500, prepared.map { it.key }.toSet().size)
     assertEquals("Today · 00:00", prepared.first().kicker)
