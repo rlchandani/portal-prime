@@ -19,7 +19,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 /** Legacy callers retain their frame; the Tools host owns its single workspace heading. */
 @Composable
@@ -43,6 +42,8 @@ internal fun ToolsSpeedContent() {
     var result by rememberSaveable(stateSaver = speedResultSaver) { mutableStateOf(SpeedTest.Result()) }
     var started by rememberSaveable { mutableStateOf(false) }
     var completed by rememberSaveable { mutableStateOf(false) }
+    var incompleteMask by rememberSaveable { mutableIntStateOf(0) }
+    var stopped by rememberSaveable { mutableStateOf(false) }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     var phase by remember { mutableStateOf(SpeedTest.Phase.DONE) }
     var job by remember { mutableStateOf<Job?>(null) }
@@ -52,6 +53,7 @@ internal fun ToolsSpeedContent() {
         if (job?.isActive == true) {
             error = "The test was stopped. Run it again when you’re ready."
             completed = false
+            stopped = true
             generation++
             job?.cancel()
             job = null
@@ -68,7 +70,7 @@ internal fun ToolsSpeedContent() {
         if (!active || !owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) || job?.isActive == true) return
         val next = SpeedTest.Result()
         val request = ++generation
-        result = next; started = true; completed = false; error = null; phase = SpeedTest.Phase.PING
+        result = next; started = true; completed = false; stopped = false; incompleteMask = 0; error = null; phase = SpeedTest.Phase.PING
         job = scope.launch {
             try {
                 val missing = ApprovedToolsSpeedRunner.run(next) { nextPhase ->
@@ -78,13 +80,20 @@ internal fun ToolsSpeedContent() {
                     }
                 }
                 if (request != generation) return@launch
-                completed = missing.isEmpty() && next.pingMs > 0 && next.downMbps > 0 && next.upMbps > 0
-                if (!completed) error = "The test couldn’t finish every measurement. Check your connection and try again."
+                incompleteMask = SpeedTestPresentation.effectiveMissingMask(missing, next.speedValues())
+                completed = incompleteMask == 0
+                if (!completed) error = SpeedTestPresentation.failureText(incompleteMask)
             } catch (cancelled: CancellationException) {
-                if (request == generation) error = "The test was stopped. Run it again when you’re ready."
+                if (request == generation) {
+                    stopped = true
+                    error = "The test was stopped. Run it again when you’re ready."
+                }
                 throw cancelled
             } catch (_: Exception) {
-                if (request == generation) error = "The test couldn’t reach its server. Check your connection and try again."
+                if (request == generation) {
+                    incompleteMask = SpeedTestPresentation.ALL
+                    error = "The test couldn’t reach its server. Check your connection and try again."
+                }
             } finally {
                 if (request == generation) { phase = SpeedTest.Phase.DONE; job = null }
             }
@@ -108,14 +117,26 @@ internal fun ToolsSpeedContent() {
             ToolsText("The test downloads and uploads data to Cloudflare. It runs only when you start it.", true)
         }
     }, right = {
-        ToolsPanel("Results") {
-            ToolsMetric("Ping", speedMetric(result.pingMs, "ms"))
-            ToolsMetric("Jitter", if (result.pingMs > 0) String.format(Locale.getDefault(), "%.1f ms", result.jitterMs) else "—")
-            ToolsMetric("Download", speedMetric(result.downMbps, "Mbps"))
-            ToolsMetric("Upload", speedMetric(result.upMbps, "Mbps"))
+        val outcome = when {
+            running -> SpeedTestDisplayStatus.RUNNING
+            !started -> SpeedTestDisplayStatus.READY
+            completed -> SpeedTestDisplayStatus.COMPLETE
+            stopped || error == null -> SpeedTestDisplayStatus.STOPPED
+            else -> SpeedTestDisplayStatus.INCOMPLETE
         }
+        ToolsSpeedResults(result.speedValues(), outcome, incompleteMask)
     })
 }
 
-private fun speedMetric(value: Double, unit: String): String =
-    if (value > 0) String.format(Locale.getDefault(), "%.1f %s", value, unit) else "—"
+private fun SpeedTest.Result.speedValues() = SpeedTestValues(pingMs, jitterMs, downMbps, upMbps)
+
+/** The same production result panel is used by the actual tool and public UI fixtures. */
+@Composable
+internal fun ToolsSpeedResults(values: SpeedTestValues, outcome: SpeedTestDisplayStatus, missingMask: Int) {
+    ToolsPanel("Results") {
+        SpeedTestPresentation.caption(outcome)?.let { ToolsText(it, true) }
+        SpeedTestPresentation.rows(values, outcome, missingMask).forEach { row ->
+            ToolsMetric(row.label, row.value)
+        }
+    }
+}

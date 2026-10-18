@@ -6,7 +6,7 @@
  */
 package com.immortal.launcher
 
-import android.app.Activity
+import androidx.activity.ComponentActivity
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
@@ -23,13 +23,20 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 
 /** An actual external app window, retained in the test APK's separate :pin_fixture process. */
-class PinFixtureActivity : Activity() {
+class PinFixtureActivity : ComponentActivity() {
+    private var speedResultsFixture: SpeedResultsFixtureHost? = null
     private var session: PinFixtureSession? = null
     private var web: WebView? = null
     private var dreamButton: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.hasExtra(SpeedResultsFixtures.NONCE)) {
+            val nonce = intent.getStringExtra(SpeedResultsFixtures.NONCE).orEmpty()
+            if (!Regex("[a-f0-9]{32}").matches(nonce)) { finish(); return }
+            speedResultsFixture = SpeedResultsFixtureHost(this, nonce).also { it.show(intent) }
+            return
+        }
         // Instrumentation supplies a provider-admitted nonce. Fleet's ordinary launcher intent
         // gets its own fresh test-only session; it cannot take over another admitted run.
         val requestedNonce = intent.getStringExtra(EXTRA_NONCE)
@@ -125,6 +132,7 @@ class PinFixtureActivity : Activity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        speedResultsFixture?.let { it.apply(intent); return }
         session?.let { synchronized(it) { it.newIntents++ } }
         // Deliberately do not reload: any second launch still fails the lifecycle assertion.
     }
@@ -153,6 +161,7 @@ class PinFixtureActivity : Activity() {
         session?.let { PinFixtureSessions.destroyed(it, this) }
         web?.destroy()
         web = null
+        speedResultsFixture = null
         dreamButton = null
         super.onDestroy()
     }

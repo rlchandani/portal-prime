@@ -82,6 +82,12 @@ class PortalUxInstrumentation : Instrumentation() {
             finish(if (calendar.getBoolean("todayCalendarUiCompleted")) 0 else 1, calendar)
             return
         }
+        // Collect all public native assertions before returning a failure; no private diagnostics.
+        if (options.getString("command") == "speedResults") {
+            val speed = SpeedResultsUiDeviceChecks.run(this)
+            finish(if (speed.getBoolean("speedResultsPassed")) 0 else 1, speed)
+            return
+        }
         try {
             if (options.getString("command") == "retainedPreview") {
                 val retained = RetainedPreviewDeviceChecks.run(this)
