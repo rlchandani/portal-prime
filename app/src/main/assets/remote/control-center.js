@@ -109,6 +109,7 @@ let appMode = 'installed',
   photoLoadState = null;
 let layoutDraft = null,
   layoutRevision = null,
+  layoutLoadState = null,
   sceneDraft = null,
   scenesLoadState = null,
   presetDraft = null,
@@ -3669,14 +3670,63 @@ function uniqueId() {
     `web-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
   );
 }
-async function loadLayout() {
-  return read('layout', '/remote/layout', (response) => {
+function layoutPending() {
+  return !!layoutLoadState?.pending && session.current(layoutLoadState.ticket);
+}
+function layoutSaveReadBlocked() {
+  return layoutPending() && (layoutLoadState.replacing || layoutLoadState.recovering);
+}
+function layoutViewCurrent(ticket, confirmed, owner) {
+  return session.current(ticket) && tab === 'home' && detail === 'layout' && !document.hidden &&
+    connectionState !== 'expired' && data.layout === confirmed && layoutLoadState === owner;
+}
+function validateLayoutResponse(response) {
+  const object = value => value && typeof value === 'object' && !Array.isArray(value);
+  const layout = response?.layout;
+  if (!object(response) || typeof response.revision !== 'string' || !response.revision.trim() ||
+      !object(layout) || !object(layout.assignments) ||
+      Object.values(layout.assignments).some(value => typeof value !== 'string') ||
+      ['homeOrder', 'gridOrder'].some(key => !Array.isArray(layout[key]) ||
+        layout[key].some(value => typeof value !== 'string')) ||
+      !Array.isArray(layout.gridSlots) || layout.gridSlots.some(value => value !== null && typeof value !== 'string') ||
+      !Array.isArray(layout.widgets) || layout.widgets.some(widget => !object(widget) ||
+        typeof widget.kind !== 'string' || !widget.kind.trim() ||
+        !Number.isInteger(widget.spanX) || !Number.isInteger(widget.spanY) ||
+        (widget.kind === 'appwidget'
+          ? !Number.isInteger(widget.id) || typeof widget.package !== 'string' || typeof widget.class !== 'string'
+          : typeof widget.customId !== 'string' || !widget.customId)) ||
+      (response.widgetKinds !== undefined && (!Array.isArray(response.widgetKinds) ||
+        response.widgetKinds.some(kind => typeof kind !== 'string' || !kind.trim()))))
+    throw new ApiError('invalid_response');
+  const keys = layout.widgets.map(widgetKey);
+  if (new Set(keys).size !== keys.length) throw new ApiError('invalid_response');
+}
+function loadLayout({ replaceDraft = null } = {}) {
+  if (!room() || document.hidden || connectionState === 'expired') return;
+  if (layoutPending() && pageReads.get('layout') && !pageReads.get('layout').signal.aborted)
+    return layoutLoadState.promise;
+  const owner = { ticket: session.capture(), pending: true, replacing: !!replaceDraft,
+    recovering: !!data.layoutError };
+  layoutLoadState = owner;
+  delete data.layoutError;
+  render();
+  owner.promise = read('layout', '/remote/layout', response => {
+    validateLayoutResponse(response);
     data.layout = response;
-    if (!layoutDraft) {
+    if (!layoutDraft || (replaceDraft && JSON.stringify(layoutDraft) === replaceDraft.value &&
+        layoutRevision === replaceDraft.revision)) {
       layoutDraft = copy(response.layout);
       layoutRevision = response.revision;
+    } else if (replaceDraft) {
+      toast('Current layout loaded. Your newer edits are still unsaved.');
+    }
+  }, { renderAfter: false }).finally(() => {
+    if (layoutLoadState === owner && session.current(owner.ticket)) {
+      owner.pending = false;
+      render();
     }
   });
+  return owner.promise;
 }
 function editLayout(fn) {
   try {
@@ -3697,11 +3747,12 @@ function tileLabel(key) {
 function layoutSaving() {
   return busy.has(`${room()?.base}:layout`);
 }
-async function saveLayout() {
-  if (layoutSaving() || !layoutDraft) return;
+async function saveLayout(ticket = session.capture(), confirmed = data.layout,
+    owner = layoutLoadState, draftValue = JSON.stringify(layoutDraft)) {
+  if (!layoutViewCurrent(ticket, confirmed, owner) || layoutSaveReadBlocked() || data.layoutError ||
+      layoutSaving() || !layoutDraft || JSON.stringify(layoutDraft) !== draftValue) return;
   const candidate = copy(layoutDraft),
     revision = layoutRevision,
-    ticket = session.capture(),
     target = room();
   const pending = mutate(
     'layout',
@@ -3724,24 +3775,37 @@ async function saveLayout() {
   }
   if (room()?.base === target?.base && tab === 'home' && detail === 'layout') render();
 }
-function reloadLayout() {
-  if (layoutSaving()) return;
+function reloadLayout(ticket = session.capture(), confirmed = data.layout,
+    owner = layoutLoadState, draftValue = JSON.stringify(layoutDraft)) {
+  const revision = layoutRevision;
+  const current = () => layoutViewCurrent(ticket, confirmed, owner) && !layoutSaving() &&
+    !layoutPending() && !!layoutDraft && JSON.stringify(layoutDraft) === draftValue &&
+    layoutRevision === revision;
+  if (!current()) return;
   return confirmAction(
     'Reload layout?',
-    'Discard unsaved edits and read the current Portal layout.',
+    'Replace unsaved edits after the current Portal layout loads successfully.',
     () => {
-      if (layoutSaving()) return;
-      layoutDraft = null;
-      loadLayout();
+      if (!current()) return;
+      loadLayout({ replaceDraft: { value: draftValue, revision } });
     },
     'Reload',
+    ticket,
   );
 }
 function layoutPage() {
+  const ticket = session.capture(), confirmed = data.layout, owner = layoutLoadState,
+    draftValue = JSON.stringify(layoutDraft), pending = layoutPending();
+  const retry = () => {
+    if (layoutViewCurrent(ticket, confirmed, owner) && !layoutPending() && !layoutSaving()) loadLayout();
+  };
+  const readState = pending
+    ? el('p', { role: 'status', 'aria-live': 'polite', text: confirmed ? 'Refreshing layout…' : 'Loading current layout…' })
+    : data.layoutError ? group(text('Could not load the current layout'), text(message(data.layoutError)),
+      button('Retry layout', retry, { kind: 'outline' })) : null;
   if (!data.layout || !layoutDraft)
-    return data.layoutError
-      ? failure('Layout unavailable', data.layoutError, loadLayout)
-      : empty('Home layout', 'Loading the current layout…');
+    return sections(heading('Home layout', 'Arrange apps and widgets on your Portal.'), readState);
+  // Keep a confirmed layout and local edits usable even when the replacement read fails.
   const changed = JSON.stringify(layoutDraft) !== JSON.stringify(data.layout.layout);
   const controls = group(
     el('h3', { text: 'Arrange your home' }),
@@ -3751,9 +3815,11 @@ function layoutPage() {
     text(layoutSaving() ? 'Saving submitted layout…' : changed ? 'Unsaved changes' : 'Layout from Portal', 'draft-label'),
     layoutSaving() ? text('You can keep editing. Newer changes will need another Save.', 'muted') : null,
     actions(
-      button('Save layout', saveLayout, { kind: 'primary', disabled: !changed || layoutSaving() }),
+      button('Save layout', () => saveLayout(ticket, confirmed, owner, draftValue),
+        { kind: 'primary', disabled: !changed || layoutSaving() || layoutSaveReadBlocked() || !!data.layoutError }),
       button('Preview on Portal', () => dispatchKey('home'), { kind: 'outline' }),
-      button('Reload layout', reloadLayout, { kind: 'outline', disabled: layoutSaving() }),
+      button('Reload layout', () => reloadLayout(ticket, confirmed, owner, draftValue),
+        { kind: 'outline', disabled: layoutSaving() || pending }),
     ),
     text(
       'Save first to preview your changes. Concurrent settings/layout changes are rejected by the Portal.',
@@ -3874,6 +3940,7 @@ function layoutPage() {
   );
   return sections(
     heading('Home layout', 'Arrange apps and widgets on your Portal.'),
+    readState,
     controls,
     el(
       'div',

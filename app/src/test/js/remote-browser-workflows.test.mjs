@@ -3531,3 +3531,87 @@ test('Snapshot export supports confirmed empty backups without prior metadata an
   assert.equal(h.eval('connectionState'), 'expired'); assert.equal(exportDownloads(h).length, 1);
   assert.match(h.document.getElementById('page').textContent, /Pair again/);
 });
+
+const layoutRefreshValue = (name = 'Portal', extra = {}) => ({ ok: true, revision: name,
+  widgetKinds: ['weather'], layout: { assignments: { 'com.test.app': name }, homeOrder: ['com.test.app/.Main'],
+    gridOrder: [], gridSlots: [], widgets: [] }, ...extra });
+async function layoutRefreshFixture({ initialPending = false } = {}) {
+  const queue = []; let initial = true;
+  const h = await browserHarness({ saved, routes: { '/remote/layout': c => {
+    if (c.opts.method === 'POST') return c.response({ ...JSON.parse(c.opts.body), ok: true, revision: 'Saved', widgetKinds: [] });
+    if (queue.length) return queue.shift()(c);
+    if (initialPending && initial) { initial = false; return new Promise(resolve => { h.initialRelease = value => resolve(c.response(value)); }); }
+    return c.response(layoutRefreshValue());
+  } } });
+  const pending = () => { let resolve, request; queue.push(c => { request = c; return new Promise(r => { resolve = r; }); });
+    return { finish: async (value = layoutRefreshValue('New')) => { resolve(request.response(value)); await h.settle(); }, get signal() { return request?.opts.signal; } }; };
+  const fail = () => queue.push(c => c.response({ ok: false, error: 'timeout' }, 504));
+  h.eval('go("home","layout")'); await h.settle(); return { h, pending, fail, queue };
+}
+const layoutRefreshGets = h => h.calls.filter(c => c.path === '/remote/layout' && c.opts.method !== 'POST');
+const layoutRefreshAction = (h, label) => h.document.body.querySelectorAll('button').find(b => b.textContent === label);
+const retainedLayoutClick = b => () => b.listeners.click[0]({});
+
+test('Layout refresh initial pending is visible and duplicate reads coalesce', async () => {
+ const {h}=await layoutRefreshFixture({initialPending:true}); assert.match(h.document.getElementById('page').textContent,/Loading current layout/);
+ const count=layoutRefreshGets(h).length;h.eval('loadLayout();loadLayout()');await h.settle();assert.equal(layoutRefreshGets(h).length,count);
+ h.initialRelease(layoutRefreshValue());await h.settle();assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Portal');
+});
+test('Layout refresh failure retains confirmed layout and editable draft with inline Retry', async () => {
+ const {h,fail}=await layoutRefreshFixture();await h.input('com.test.app','Keep edits');fail();h.eval('loadLayout()');await h.settle();
+ assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Keep edits');assert.equal(h.eval('data.layout.revision'),'Portal');
+ assert.ok(layoutRefreshAction(h,'Retry layout'));assert.equal(layoutRefreshAction(h,'Save layout').disabled,true);
+ await h.input('com.test.app','Still editable');assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Still editable');
+});
+test('Layout refresh Retry shows owned progress clears failure and restores Save', async () => {
+ const {h,fail,pending}=await layoutRefreshFixture();await h.input('com.test.app','Draft');fail();h.eval('loadLayout()');await h.settle();
+ const read=pending();h.click('Retry layout');await h.settle();assert.match(h.document.getElementById('page').textContent,/Refreshing layout/);
+ assert.equal(h.eval('Boolean(data.layoutError)'),false);assert.equal(layoutRefreshAction(h,'Save layout').disabled,true);
+ await read.finish();assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Draft');assert.equal(layoutRefreshAction(h,'Save layout').disabled,false);
+});
+test('Layout refresh rejects malformed shapes without replacing confirmed metadata or draft', async () => {
+ const {h,queue}=await layoutRefreshFixture();await h.input('com.test.app','Draft');
+ for(const bad of [null,{},layoutRefreshValue('Bad',{revision:42}),layoutRefreshValue('Bad',{layout:[]}),
+   layoutRefreshValue('Bad',{layout:{...layoutRefreshValue().layout,assignments:[]}}),layoutRefreshValue('Bad',{layout:{...layoutRefreshValue().layout,homeOrder:[{}]}}),
+   layoutRefreshValue('Bad',{layout:{...layoutRefreshValue().layout,gridSlots:[42]}}),layoutRefreshValue('Bad',{layout:{...layoutRefreshValue().layout,widgets:[null]}}),layoutRefreshValue('Bad',{widgetKinds:[{}]})]) {
+   queue.push(c=>c.response(bad));h.eval('loadLayout()');await h.settle();assert.equal(h.eval('data.layout.revision'),'Portal');
+   assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Draft');assert.ok(layoutRefreshAction(h,'Retry layout'));
+ }
+});
+test('Layout refresh accepts empty layouts slots and valid unknown fields', async () => {
+ const {h,queue}=await layoutRefreshFixture();queue.push(c=>c.response(layoutRefreshValue('Future',{futureField:{kept:true},layout:{assignments:{},homeOrder:[],gridOrder:[],gridSlots:[null,''],widgets:[],futureLayoutField:true}})));
+ h.eval('loadLayout()');await h.settle();assert.equal(h.eval('data.layout.futureField.kept'),true);assert.equal(h.eval('data.layout.layout.futureLayoutField'),true);assert.equal(h.eval('Boolean(data.layoutError)'),false);
+});
+test('Layout refresh failed confirmed Reload keeps unsaved draft and original revision', async () => {
+ const {h,fail}=await layoutRefreshFixture();await h.input('com.test.app','Keep me');fail();h.click('Reload layout');h.click('Reload');await h.settle();
+ assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Keep me');assert.equal(h.eval('layoutRevision'),'Portal');assert.ok(layoutRefreshAction(h,'Retry layout'));
+});
+test('Layout refresh successful confirmed Reload replaces only its unchanged reviewed draft', async () => {
+ const {h,pending}=await layoutRefreshFixture();await h.input('com.test.app','Old draft');const read=pending();h.click('Reload layout');h.click('Reload');await h.settle();
+ assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Old draft');assert.equal(layoutRefreshAction(h,'Reload layout').disabled,true);
+ await read.finish(layoutRefreshValue('Reloaded'));assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Reloaded');assert.equal(h.eval('layoutRevision'),'Reloaded');
+});
+test('Layout refresh keeps newer edits during a pending Reload', async () => {
+ const {h,pending}=await layoutRefreshFixture();await h.input('com.test.app','Reviewed');const read=pending();h.click('Reload layout');h.click('Reload');await h.settle();
+ await h.input('com.test.app','Newer');await read.finish(layoutRefreshValue('Remote'));assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Newer');assert.equal(h.eval('data.layout.revision'),'Remote');assert.equal(h.eval('layoutRevision'),'Portal');
+});
+test('Layout refresh Reload confirmation rejects changed drafts and Cancel makes no GET', async () => {
+ const {h}=await layoutRefreshFixture();await h.input('com.test.app','Reviewed');let count=layoutRefreshGets(h).length;
+ h.click('Reload layout');h.click('Cancel');await h.settle();assert.equal(layoutRefreshGets(h).length,count);
+ h.click('Reload layout');await h.input('com.test.app','Changed while confirming');h.click('Reload');await h.settle();assert.equal(layoutRefreshGets(h).length,count);assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'Changed while confirming');
+});
+test('Layout refresh retained Save Reload Retry and confirmation cannot act on departed pages', async () => {
+ const {h,fail}=await layoutRefreshFixture();await h.input('com.test.app','Draft');const save=retainedLayoutClick(layoutRefreshAction(h,'Save layout')),
+ reload=retainedLayoutClick(layoutRefreshAction(h,'Reload layout'));fail();h.eval('loadLayout()');await h.settle();const retry=retainedLayoutClick(layoutRefreshAction(h,'Retry layout'));
+ h.eval('go("remote")');const count=h.calls.length;save();reload();retry();await h.settle();assert.equal(h.calls.length,count);assert.equal(h.document.getElementById('sheet').open,false);
+});
+test('Layout refresh pending prevents retained Save but permits edits and global supersession', async () => {
+ const {h,pending}=await layoutRefreshFixture();await h.input('com.test.app','Draft');const save=retainedLayoutClick(layoutRefreshAction(h,'Save layout'));const old=pending();h.eval('loadLayout()');await h.settle();
+ save();await h.settle();assert.equal(layoutPosts(h).length,0);await h.input('com.test.app','New draft');h.eval('refresh()');await h.settle();assert.equal(old.signal.aborted,true);
+ await old.finish(layoutRefreshValue('Obsolete'));assert.equal(h.eval('data.layout.revision'),'Portal');assert.equal(h.eval('layoutDraft.assignments["com.test.app"]'),'New draft');
+});
+test('Layout refresh late reads do not replace a new Portal page or hidden expired view', async () => {
+ for(const depart of ['go("remote")',`selectRoom('${saved[1].base}');go("home","layout")`,'document.hidden=true;abortReads();session.enter("hidden")','connectionState="expired";abortReads();session.enter("expired")']) {
+ const {h,pending}=await layoutRefreshFixture();const read=pending();h.eval('loadLayout()');await h.settle();h.eval(depart);await h.settle();await read.finish(layoutRefreshValue('Stale'));assert.notEqual(h.eval('data.layout?.revision'),'Stale');
+ }
+});
