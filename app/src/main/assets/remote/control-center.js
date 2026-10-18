@@ -5033,6 +5033,19 @@ function openScene(scene) {
   read('apps', '/remote/apps', (r) => (data.apps = r.apps || []));
   render();
 }
+const keyboardActions = {
+  set: { label: 'Replace text', pickerLabel: 'Replace', help: 'Replaces all text in the focused field on the Portal. Leave the text empty to clear it.' },
+  append: { label: 'Append text', pickerLabel: 'Append', help: 'Adds text to the end of the focused field on the Portal.' },
+  backspace: { label: 'Backspace', help: 'Deletes from the end of the focused field on the Portal. No text value is needed.' },
+  clear: { label: 'Clear field', help: 'Clears all text in the focused field on the Portal. No text value is needed.' },
+};
+function keyboardAction(mode) {
+  // Match Kotlin Char.isWhitespace: browser trim also removes BOM, which the Portal does not.
+  const value = String(mode || 'set').toLowerCase().replace(
+    /^[\t-\r\u001c-\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+|[\t-\r\u001c-\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+$/g, '',
+  );
+  return Object.hasOwn(keyboardActions, value) ? value : 'set';
+}
 function stepSummary(step) {
   if (step.type === 'launch') return `Open ${step.packageName}`;
   if (step.type === 'key' || step.type === 'media') return `${step.type}: ${step.action}`;
@@ -5041,7 +5054,7 @@ function stepSummary(step) {
     return `Settings · ${step.domain} · ${Object.keys(step.values || {}).join(', ')}`;
   if (step.type === 'source')
     return `Photo source · ${step.values?.folderPath || step.values?.source}`;
-  if (step.type === 'text') return `Keyboard · ${step.mode}`;
+  if (step.type === 'text') return `Keyboard · ${keyboardActions[keyboardAction(step.mode)].label}`;
   if (step.type === 'config') return `Configuration · ${step.target || 'screensaver'}`;
   return step.type || 'Action';
 }
@@ -5384,19 +5397,22 @@ function stepDialog(existing, mode) {
     } else if (type === 'text') {
       state.mode = state.mode || 'set';
       state.text = state.text || '';
+      const action = keyboardAction(state.mode);
       nodes.push(
         row(
-          'Mode',
+          'Action',
           '',
           choice(
-            state.mode,
-            ['set', 'append', 'backspace', 'clear'].map((value) => ({ value, label: value })),
-            (value) => (state.mode = value),
-            'Keyboard mode',
+            action,
+            Object.entries(keyboardActions).map(([value, item]) => ({ value, label: item.pickerLabel || item.label })),
+            (value) => { state.mode = value; paint(); },
+            'Keyboard action',
           ),
         ),
-        field('Text', state.text, (value) => (state.text = value)),
+        text(keyboardActions[action].help),
       );
+      if (action === 'set' || action === 'append')
+        nodes.push(field('Text', state.text, (value) => (state.text = value)));
     } else if (type === 'source') {
       state.values = state.values || { source: 'default' };
       const chosen = state.values.folderPath ? 'folder' : state.values.source || 'default';

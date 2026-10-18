@@ -59,4 +59,12 @@ class RemoteInputTest {
     assertEquals("", RemoteInput.nextText("abc", "ignored", "clear"))
     assertEquals("x", RemoteInput.nextText("anything", "x", "weird")) // unknown mode == set
   }
+
+  @Test
+  fun nextText_modeWhitespaceMatchesPresetPresentation() {
+    assertEquals("basetyped", RemoteInput.nextText("base", "typed", "\u001cAPPEND\u001f"))
+    assertEquals("", RemoteInput.nextText("base", "typed", "\u00a0clear\u2007"))
+    assertEquals("typed", RemoteInput.nextText("base", "typed", "\ufeffappend\ufeff"))
+    assertEquals("typed", RemoteInput.nextText("base", "typed", "\u0085append"))
+  }
 }
