@@ -110,11 +110,20 @@ internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> =
         entries.distinctBy { it.id.ifBlank { "page:${it.page}" } }
     }
 
-/** Preserve section scope in results without repeating a page's own name. */
+/** Page results show their parent; individual controls keep their page and section context. */
 internal fun approvedSettingsSearchBreadcrumb(result: ApprovedSettingsSearchResult): String {
-    val pageTitle = approvedSettingsPage(result.page)?.title.orEmpty()
-    return listOf(pageTitle, result.section.takeUnless { it.equals(pageTitle, ignoreCase = true) }.orEmpty())
-        .filter { it.isNotBlank() }.joinToString(" · ")
+    val page = approvedSettingsPage(result.page)
+    val pageTitle = page?.title.orEmpty()
+    val context = if (page != null && !result.title.equals(pageTitle, ignoreCase = true)) {
+        pageTitle
+    } else {
+        val category = page?.let { approvedSettingsCategory(it.id) } ?: result.page
+        ApprovedSettingsCategories.firstOrNull { it.id == category }?.title.orEmpty()
+    }
+    val section = result.section.takeUnless {
+        it.equals(pageTitle, ignoreCase = true) || it.equals(context, ignoreCase = true)
+    }.orEmpty()
+    return listOf(context, section).filter { it.isNotBlank() }.joinToString(" · ")
 }
 
 private const val SETTINGS_SEARCH_RESULT_LIMIT = 12
