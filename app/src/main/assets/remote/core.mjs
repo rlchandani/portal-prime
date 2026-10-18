@@ -583,17 +583,16 @@ export function captureProfile(schema) {
   return profile;
 }
 export function visibleControls(domain, advanced, query = '') {
-  const q = query.toLowerCase();
-  return (domain.controls || []).filter(
-    (c) =>
-      (advanced || c.tier !== 'advanced') &&
-      (!q ||
-        [domain.title, c.title, c.help, c.key].some((t) =>
-          String(t || '')
-            .toLowerCase()
-            .includes(q),
-        )),
-  );
+  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return (domain.controls || []).filter((c) => {
+    if (!advanced && c.tier === 'advanced') return false;
+    if (!terms.length) return true;
+    const text = [domain.title, c.title, c.help, c.shortHelp, c.key, c.section]
+      .map((t) => String(t || ''))
+      .join(' ')
+      .toLowerCase();
+    return terms.every((term) => text.includes(term));
+  });
 }
 export function validateValue(control, value) {
   if (control.readOnly) return false;

@@ -13,6 +13,43 @@ class ApprovedSettingsSearchMatchingTest {
     private fun result(title: String, key: String = title, help: String = "", page: String = "display") =
         ApprovedSettingsSearchResult(title, page, "test", key, help)
 
+    @Test fun registrySectionAndTitleCanBeCombinedInAQuery() {
+        assertEquals("calendar.side", approvedSettingsSearch(approvedSettingsSearchIndex(),
+            "screensaver widget position").single().id)
+    }
+    @Test fun sectionSearchFindsAllCalendarWidgetControlsWithoutTheSharedFeed() {
+        val ids = approvedSettingsSearch(approvedSettingsSearchIndex(), "screensaver widget")
+            .map { it.id }
+        assertTrue(ids.containsAll(listOf("calendar.widgetOn", "calendar.range", "calendar.size", "calendar.side")))
+        assertFalse(ids.contains("calendar.url"))
+    }
+    @Test fun sectionTermsRemainCaseInsensitiveAndWhitespaceIndependent() {
+        val field = ApprovedSettingsSearchResult("Position", "calendar", "calendar", "side",
+            section = "Screensaver widget")
+        assertEquals(listOf(field), approvedSettingsSearch(listOf(field), "  POSITION \t widget  screensaver "))
+    }
+    @Test fun directTitlesStayAheadOfSectionContextMatches() {
+        val contextual = ApprovedSettingsSearchResult("Position", "calendar", section = "Screensaver widget")
+        val direct = result("Screensaver widget")
+        assertEquals(listOf(direct, contextual), approvedSettingsSearch(listOf(contextual, direct), "screensaver widget"))
+    }
+    @Test fun sectionContextDoesNotIgnoreAnUnmatchedTerm() {
+        val field = ApprovedSettingsSearchResult("Position", "calendar", section = "Screensaver widget")
+        assertTrue(approvedSettingsSearch(listOf(field), "screensaver nonexistent").isEmpty())
+    }
+    @Test fun calendarResultExplainsItsScreensaverScopeWithoutChangingTheRoute() {
+        val field = approvedSettingsSearchIndex().single { it.id == "calendar.side" }
+        assertEquals("Calendar · Screensaver widget", approvedSettingsSearchBreadcrumb(field))
+        assertEquals("calendar", field.page)
+        assertFalse(field.advanced)
+    }
+    @Test fun breadcrumbDoesNotRepeatThePageNameWithDifferentCase() {
+        val field = ApprovedSettingsSearchResult("Position", "calendar", section = "calendar")
+        assertEquals("Calendar", approvedSettingsSearchBreadcrumb(field))
+    }
+    @Test fun resultsWithoutSectionsKeepTheirExistingPageContext() {
+        assertEquals("Display", approvedSettingsSearchBreadcrumb(result("Brightness")))
+    }
     @Test fun reversedWordsFindTheSameSetting() {
         val voice = result("Greeting voice")
         assertEquals(listOf(voice), approvedSettingsSearch(listOf(voice), "voice greeting"))

@@ -275,7 +275,7 @@ internal fun ApprovedSettingsShell(
                                                 ) {
                                                     Column(Modifier.weight(1f)) {
                                                         Text(result.title, color = IosLabel, fontSize = 24.sp)
-                                                        Text(approvedSettingsPage(result.page)?.title.orEmpty() +
+                                                        Text(approvedSettingsSearchBreadcrumb(result) +
                                                             if (result.automatic) " · Automatic" else "",
                                                             color = IosSecondary, fontSize = 19.sp,
                                                             modifier = Modifier.padding(top = 6.dp))

@@ -27,6 +27,7 @@ internal data class ApprovedSettingsSearchResult(
     val key: String = "",
     val help: String = "",
     val automatic: Boolean = false,
+    val section: String = "",
 ) {
     val id: String get() = if (domain.isEmpty()) "" else "$domain.$key"
     val advanced: Boolean get() = SettingsPresentation.isAdvancedPage(page) ||
@@ -97,12 +98,19 @@ internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> =
                 val page = (if (managed) "managed" else approvedPageForSpec(domain.id, spec))
                     ?: return@forEach
                 entries += ApprovedSettingsSearchResult(title, page,
-                    domain.id, spec.key, help.orEmpty(), managed)
+                    domain.id, spec.key, help.orEmpty(), managed, domain.sections[spec.key].orEmpty())
             }
         }
         entries += ApprovedNativeSettingsFields
         entries.distinctBy { it.id.ifBlank { "page:${it.page}" } }
     }
+
+/** Preserve section scope in results without repeating a page's own name. */
+internal fun approvedSettingsSearchBreadcrumb(result: ApprovedSettingsSearchResult): String {
+    val pageTitle = approvedSettingsPage(result.page)?.title.orEmpty()
+    return listOf(pageTitle, result.section.takeUnless { it.equals(pageTitle, ignoreCase = true) }.orEmpty())
+        .filter { it.isNotBlank() }.joinToString(" · ")
+}
 
 private const val SETTINGS_SEARCH_RESULT_LIMIT = 12
 private val SETTINGS_SEARCH_WHITESPACE = Regex("\\s+")
@@ -116,7 +124,7 @@ internal fun approvedSettingsSearch(index: List<ApprovedSettingsSearchResult>, q
     for (result in index) {
         val titleMatches = terms.all { result.title.contains(it, ignoreCase = true) }
         if (!titleMatches) {
-            val text = "${result.title} ${result.id} ${result.help} ${approvedSettingsPage(result.page)?.title.orEmpty()}"
+            val text = "${result.title} ${result.id} ${result.help} ${result.section} ${approvedSettingsPage(result.page)?.title.orEmpty()}"
             if (!terms.all { text.contains(it, ignoreCase = true) }) continue
         }
         val rank = when {
