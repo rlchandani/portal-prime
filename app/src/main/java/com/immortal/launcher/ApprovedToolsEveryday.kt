@@ -7,6 +7,7 @@
 
 package com.immortal.launcher
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -142,13 +143,10 @@ internal fun ToolsAlarmContent() {
   var draftMinute by rememberSaveable(stateSaver = EverydayNumberTextSaver) { mutableStateOf("0") }
   val alarm = load.value
 
-  fun changeAlarm(change: (AlarmConfig.Config) -> AlarmConfig.Config, closeEditor: Boolean = false) {
+  fun changeAlarm(change: (Context) -> AlarmConfig.Config, closeEditor: Boolean = false) {
     operations.run("Couldn’t save the alarm. Try again.", task = {
-      // Preserve the label and any changes made through another surface since this body loaded.
-      val next = change(AlarmConfig.load(appContext))
-      AlarmConfig.save(appContext, next)
-      AlarmScheduler.reschedule(appContext)
-      next
+      // The shared editor writes only the requested field and reads back after scheduling.
+      change(appContext)
     }) { saved ->
       load.value = saved
       if (closeEditor) {
@@ -184,7 +182,7 @@ internal fun ToolsAlarmContent() {
             editing = true
           }
           ToolsButton(if (alarm.enabled) "Turn off" else "Turn on", enabled = !operations.busy) {
-            changeAlarm({ it.copy(enabled = !it.enabled) })
+            changeAlarm({ ToolsAlarmEdits.setEnabled(it, !alarm.enabled) })
           }
         }
         Spacer(Modifier.height(20.dp))
@@ -204,9 +202,7 @@ internal fun ToolsAlarmContent() {
           val fullDay = DateFormatSymbols(Locale.getDefault()).weekdays[day]
           Surface(
               onClick = {
-                changeAlarm({ current ->
-                  current.copy(days = if (day in current.days) current.days - day else current.days + day)
-                })
+                changeAlarm({ ToolsAlarmEdits.toggleDay(it, day) })
               },
               enabled = alarm != null && !operations.busy,
               shape = RoundedCornerShape(16.dp),
@@ -248,7 +244,7 @@ internal fun ToolsAlarmContent() {
       }
       ToolsButton("Save", primary = true, enabled = !operations.busy && hour != null && minute != null) {
         if (hour != null && minute != null) {
-          changeAlarm({ it.copy(hour = hour, minute = minute) }, closeEditor = true)
+          changeAlarm({ ToolsAlarmEdits.setTime(it, hour, minute) }, closeEditor = true)
         }
       }
     }) {

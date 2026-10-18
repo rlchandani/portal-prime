@@ -53,7 +53,9 @@ internal class AlarmSettingsEditor(private val backend: AlarmSettingsEditorBacke
   }
 }
 
-internal fun alarmSettingsEditor(context: Context) =
+internal fun alarmSettingsEditor(
+    context: Context, onReschedule: () -> Unit = { AlarmScheduler.reschedule(context) },
+) =
     AlarmSettingsEditor(object : AlarmSettingsEditorBackend {
       override fun read() = AlarmConfig.load(context)
       override fun setEnabled(value: Boolean) = AlarmConfig.setEnabled(context, value)
@@ -61,5 +63,5 @@ internal fun alarmSettingsEditor(context: Context) =
       override fun setMinute(value: Int) = AlarmConfig.setMinute(context, value)
       override fun setTime(hour: Int, minute: Int) = AlarmConfig.setTime(context, hour, minute)
       override fun setDays(value: Set<Int>) = AlarmConfig.setDays(context, value)
-      override fun reschedule() = AlarmScheduler.reschedule(context)
+      override fun reschedule() = onReschedule()
     })

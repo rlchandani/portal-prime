@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // Public alarm edit fixtures use RAM preferences and an injected counter scheduler.
+        if (options.getString("command") == "toolsAlarmEdits") {
+            val edits = ToolsAlarmEditsDeviceChecks.run()
+            finish(if (edits.getBoolean("toolsAlarmEditsPassed")) 0 else 1, edits)
+            return
+        }
         // Public currency fixtures use only in-memory preferences, before UiAutomation.
         if (options.getString("command") == "currencyIntegrity") {
             val currency = CurrencyRateIntegrityDeviceChecks.run()
