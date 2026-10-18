@@ -48,5 +48,16 @@
             android:process=":pin_fixture"
             android:exported="true"
             android:grantUriPermissions="false" />
+        <service
+            android:name="com.immortal.launcher.OneShotSpeechFixtureService"
+            android:process=":one_shot_speech_fixture"
+            android:exported="true"
+            android:label="Silent public speech fixture">
+            <intent-filter>
+                <action android:name="android.intent.action.TTS_SERVICE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.speech.tts" android:resource="@xml/one_shot_speech_engine" />
+        </service>
     </application>
 </manifest>

@@ -187,51 +187,57 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
           else automatic.playbackSettings() ?: return
       val vol = (volumeOverride ?: (cfg.volume / 100f)).coerceIn(0f, 1f)
       if (vol <= 0f) return
-      var tts: TextToSpeech? = null
-      tts = TextToSpeech(context.applicationContext) { status ->
-        if (status == TextToSpeech.SUCCESS) {
-          val t = tts ?: return@TextToSpeech
-          fun deliver(playback: ChimeConfig.Settings) {
-            val playbackVolume = (volumeOverride ?: (playback.volume / 100f)).coerceIn(0f, 1f)
-            val voiceName = voiceNameOverride ?: playback.spokenVoice
-            // Apply the chosen voice; if none chosen, pick the highest-quality voice the
-            // device has so spoken time sounds as good as possible by default.
-            runCatching {
-              val lang = Locale.getDefault().language
-              val v =
-                  if (voiceName.isNotBlank()) t.voices?.firstOrNull { it.name == voiceName }
-                  else t.voices
-                      ?.filter { it.locale.language == lang && !it.isNetworkConnectionRequired }
-                      ?.maxByOrNull { it.quality }
-              if (v != null) {
-                t.language = v.locale
-                t.voice = v
-              } else {
-                t.language = Locale.getDefault()
+      lateinit var owner: OneShotSpeechOwner<TextToSpeech>
+      owner = OneShotSpeechOwner(
+          ready = { t ->
+            fun deliver(playback: ChimeConfig.Settings) {
+              val playbackVolume = (volumeOverride ?: (playback.volume / 100f)).coerceIn(0f, 1f)
+              val voiceName = voiceNameOverride ?: playback.spokenVoice
+              // Apply the chosen voice; otherwise keep the existing offline quality fallback.
+              runCatching {
+                val lang = Locale.getDefault().language
+                val v =
+                    if (voiceName.isNotBlank()) t.voices?.firstOrNull { it.name == voiceName }
+                    else t.voices
+                        ?.filter { it.locale.language == lang && !it.isNetworkConnectionRequired }
+                        ?.maxByOrNull { it.quality }
+                if (v != null) {
+                  t.language = v.locale
+                  t.voice = v
+                } else {
+                  t.language = Locale.getDefault()
+                }
               }
+              val listening = t.setOnUtteranceProgressListener(
+                  object : android.speech.tts.UtteranceProgressListener() {
+                    override fun onStart(id: String?) {}
+                    override fun onError(id: String?) { owner.finish() }
+                    override fun onError(id: String?, errorCode: Int) { owner.finish() }
+                    override fun onDone(id: String?) { owner.finish() }
+                    override fun onStop(id: String?, interrupted: Boolean) { owner.finish() }
+                  })
+              if (listening == TextToSpeech.ERROR) {
+                owner.finish()
+                return
+              }
+              val params = android.os.Bundle().apply {
+                putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, playbackVolume)
+                if (voiceName.isNotBlank()) putString(SHERPA_VOICE_PARAM, voiceName)
+              }
+              owner.submitted(t.speak(text, TextToSpeech.QUEUE_FLUSH, params, "chime_time") == TextToSpeech.SUCCESS)
             }
-            t.setOnUtteranceProgressListener(
-                object : android.speech.tts.UtteranceProgressListener() {
-                  override fun onStart(id: String?) {}
-                  override fun onError(id: String?) {
-                    Handler(Looper.getMainLooper()).postDelayed({ runCatching { t.shutdown() } }, 100)
-                  }
-                  override fun onDone(id: String?) {
-                    Handler(Looper.getMainLooper()).postDelayed({ runCatching { t.shutdown() } }, 100)
-                  }
-                })
-            val params = android.os.Bundle().apply {
-              putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, playbackVolume)
-              if (voiceName.isNotBlank()) putString(SHERPA_VOICE_PARAM, voiceName)
-            }
-            t.speak(text, TextToSpeech.QUEUE_FLUSH, params, "chime_time")
-          }
-          if (automatic == null) deliver(cfg)
-          else automatic.deliverOrCancel(cancel = { runCatching { t.shutdown() } }, deliver = ::deliver)
-        } else {
-          runCatching { tts?.shutdown() }
-        }
+            if (automatic == null) deliver(cfg)
+            else automatic.deliverOrCancel(cancel = owner::finish, deliver = ::deliver)
+          },
+          release = { t ->
+            // Avoid shutdown inside a binder progress callback; retain the existing grace period.
+            Handler(Looper.getMainLooper()).postDelayed({ runCatching { t.shutdown() } }, 100)
+          },
+      )
+      val engine = TextToSpeech(context.applicationContext) { status ->
+        owner.initialized(status == TextToSpeech.SUCCESS)
       }
+      owner.created(engine)
     }.onFailure { Log.w(TAG, "spoken time failed", it) }
   }
 }

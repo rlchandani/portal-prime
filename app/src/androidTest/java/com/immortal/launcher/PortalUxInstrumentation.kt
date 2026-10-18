@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // Public owner contracts and real silent test-APK TTS clients need no UiAutomation.
+        if (options.getString("command") == "oneShotSpeech") {
+            val speech = OneShotSpeechDeviceChecks.run(this)
+            finish(if (speech.getBoolean("oneShotSpeechCompleted")) 0 else 1, speech)
+            return
+        }
         // Public settings and counter-only readiness checks never acquire UiAutomation.
         if (options.getString("command") == "automaticTimeSpeech") {
             val speech = AutomaticTimeSpeechDeviceChecks.run()

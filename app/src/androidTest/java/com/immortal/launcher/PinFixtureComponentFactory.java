@@ -8,10 +8,20 @@ package com.immortal.launcher;
 
 import android.app.Activity;
 import android.app.AppComponentFactory;
+import android.app.Service;
 import android.content.Intent;
 
 /** The provider initializes the isolated fixture loader before Android creates this Activity. */
 public final class PinFixtureComponentFactory extends AppComponentFactory {
+    @Override public Service instantiateService(ClassLoader original, String name, Intent intent)
+            throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+        if (name.equals("com.immortal.launcher.OneShotSpeechFixtureService")) {
+            // Java-only fixture works in its own process without the Activity dependency loader.
+            return new OneShotSpeechFixtureService();
+        }
+        return super.instantiateService(original, name, intent);
+    }
+
     @Override public Activity instantiateActivity(ClassLoader original, String name, Intent intent)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         if (name.equals("com.immortal.launcher.PinFixtureActivity") ||
