@@ -3242,3 +3242,101 @@ for(const kind of ['layout','scenes','presets']){
   }
  });
 }
+
+const recoveredPreset = (id='preset-one',extra={}) => ({id,name:'Fixture preset',steps:[{type:'key',action:'home'}],...extra});
+async function presetRecoveryFixture({holdInitial=false,initialFailure=false}={}) {
+ const state={mode:initialFailure?'fail':holdInitial?'hold':'ok',presets:[recoveredPreset()],reads:[],posts:[]};
+ const h=await browserHarness({saved,routes:{
+  '/remote/presets':c=>{
+   if(c.opts.method==='POST'){const body=JSON.parse(c.opts.body);state.posts.push(body);state.presets=body.presets;return c.response({ok:true,presets:state.presets});}
+   state.reads.push(c);if(state.mode==='fail')throw new Error('fixture preset offline');
+   if(state.mode==='hold')return new Promise((resolve,reject)=>state.finish=(fail=false)=>fail?reject(new Error('late preset failure')):resolve(c.response({ok:true,presets:state.presets})));
+   if(state.mode==='malformed')return c.response(state.malformed);
+   return c.response({ok:true,presets:state.presets});
+  },
+  '/remote/preset':c=>{state.posts.push(JSON.parse(c.opts.body));return c.response({ok:true});},
+ }});
+ h.eval('go("home","presets")');await h.settle();return{h,state,page:h.document.getElementById('page')};
+}
+const presetRecoveryButton=(h,label)=>h.document.getElementById('page').querySelectorAll('button').find(b=>b.textContent===label);
+const presetRecoveryPosts=h=>h.calls.filter(c=>['/remote/presets','/remote/preset'].includes(c.path)&&c.opts.method==='POST');
+
+test('Presets refresh initial pending state identifies loading and preserves offline draft creation',async()=>{
+ const{h,state,page}=await presetRecoveryFixture({holdInitial:true});assert.match(page.textContent,/Loading.*presets/i);assert.equal(presetRecoveryButton(h,'New preset').disabled,false);
+ presetRecoveryButton(h,'New preset').click();await h.settle();await h.input('Preset name','Offline draft');assert.equal(presetRecoveryButton(h,'Save preset').disabled,true);
+ state.finish();await h.settle();assert.equal(h.eval('presetDraft.name'),'Offline draft');
+});
+test('Presets refresh failure retains confirmed macros with recovery guidance and unavailable actions',async()=>{
+ const{h,state,page}=await presetRecoveryFixture();state.mode='fail';h.eval('loadVisible()');await h.settle();
+ assert.match(page.textContent,/Fixture preset/);assert.match(page.textContent,/Last confirmed/);assert.match(page.textContent,/Presets unavailable/);
+ for(const label of ['Run','Edit','Delete'])assert.equal(presetRecoveryButton(h,label).disabled,true);
+ assert.equal(presetRecoveryButton(h,'New preset').disabled,false);
+});
+test('Presets refresh pending Retry retains confirmed macros and coalesces duplicate activation',async()=>{
+ const{h,state,page}=await presetRecoveryFixture();state.mode='fail';h.eval('loadVisible()');await h.settle();const retry=presetRecoveryButton(h,'Retry');
+ state.mode='hold';const before=state.reads.length;rawClick(retry);rawClick(retry);await h.settle();assert.equal(state.reads.length,before+1);
+ assert.match(page.textContent,/Refreshing.*presets/i);assert.match(page.textContent,/Fixture preset/);assert.equal(presetRecoveryButton(h,'Run').disabled,true);state.finish();await h.settle();
+});
+test('Presets refresh successful Retry restores actions and runs exactly the confirmed identity',async()=>{
+ const{h,state,page}=await presetRecoveryFixture();state.mode='fail';h.eval('loadVisible()');await h.settle();state.mode='ok';
+ presetRecoveryButton(h,'Retry').click();await h.settle();assert.equal(page.textContent.includes('Presets unavailable'),false);assert.equal(presetRecoveryButton(h,'Run').disabled,false);
+ presetRecoveryButton(h,'Run').click();await h.settle();assert.deepEqual(state.posts,[{id:'preset-one'}]);
+});
+test('Presets refresh initial failure is unavailable rather than a successful empty collection',async()=>{
+ const{h,state,page}=await presetRecoveryFixture({initialFailure:true});assert.match(page.textContent,/Presets unavailable/);assert.equal(page.textContent.includes('No presets yet'),false);
+ assert.equal(presetRecoveryButton(h,'New preset').disabled,false);state.mode='ok';presetRecoveryButton(h,'Retry').click();await h.settle();assert.match(page.textContent,/Fixture preset/);
+});
+test('Presets refresh confirmed empty collection clears old macros and enables creation',async()=>{
+ const{h,state,page}=await presetRecoveryFixture();state.presets=[];h.eval('loadVisible()');await h.settle();assert.match(page.textContent,/No presets yet/);
+ assert.equal(page.textContent.includes('Fixture preset'),false);assert.equal(presetRecoveryButton(h,'New preset').disabled,false);
+});
+test('Presets refresh missing and wrong typed arrays cannot replace confirmed macros',async()=>{
+ for(const malformed of [{ok:true},{ok:true,presets:null},{ok:true,presets:{}}]){
+  const{h,state,page}=await presetRecoveryFixture();state.mode='malformed';state.malformed=malformed;h.eval('loadVisible()');await h.settle();
+  assert.match(page.textContent,/Last confirmed/);assert.match(page.textContent,/Fixture preset/);assert.equal(h.eval('data.presets[0].id'),'preset-one');
+ }
+});
+test('Presets refresh rejects unsafe identities names and step shapes before admitting the collection',async()=>{
+ for(const presets of [[null],[recoveredPreset('')],[recoveredPreset(),recoveredPreset()],[recoveredPreset('bad',{name:null})],[recoveredPreset('bad',{steps:{}})],[recoveredPreset('bad',{steps:[null]})],[recoveredPreset('bad',{steps:[[]]})]]){
+  const{h,state,page}=await presetRecoveryFixture();state.mode='malformed';state.malformed={ok:true,presets};h.eval('loadVisible()');await h.settle();
+  assert.match(page.textContent,/Last confirmed/);assert.equal(h.eval('data.presets[0].id'),'preset-one');assert.equal(presetRecoveryButton(h,'Run').disabled,true);
+ }
+});
+test('Presets refresh preserves blank legacy names and open ended step object fields',async()=>{
+ const{h,state,page}=await presetRecoveryFixture();const step={type:'future-action',custom:{retained:true}};state.presets=[recoveredPreset('legacy',{name:'',steps:[step]})];h.eval('loadVisible()');await h.settle();
+ assert.match(page.textContent,/Unnamed preset/);presetRecoveryButton(h,'Edit').click();await h.settle();await h.input('Preset name','Renamed legacy');h.click('Save preset');await h.settle();
+ assert.deepEqual(state.posts[0].presets,[{id:'legacy',name:'Renamed legacy',steps:[step]}]);
+});
+test('Presets refresh failed metadata retires captured Run Edit New and Delete actions',async()=>{
+ const{h,state}=await presetRecoveryFixture(),old=['Run','Edit','New preset','Delete'].map(label=>presetRecoveryButton(h,label));
+ state.mode='fail';h.eval('loadVisible()');await h.settle();for(const action of old)rawClick(action);await h.settle();
+ assert.equal(presetRecoveryPosts(h).length,0);assert.equal(h.eval('presetDraft'),null);assert.equal(h.document.getElementById('sheet').open,false);
+});
+test('Presets refresh Delete confirmation rejects pending failed or changed reviewed collections',async()=>{
+ for(const mode of ['hold','fail','changed']){
+  const{h,state}=await presetRecoveryFixture();presetRecoveryButton(h,'Delete').click();await h.settle();
+  state.mode=mode==='changed'?'ok':mode;if(mode==='changed')state.presets=[recoveredPreset('replacement',{name:'Replacement macro'})];h.eval('loadVisible()');await h.settle();
+  h.document.getElementById('sheet-actions').querySelectorAll('button').find(b=>b.textContent==='Delete').click();await h.settle();assert.equal(presetRecoveryPosts(h).length,0);
+  if(mode==='changed')assert.match(h.document.getElementById('notice').textContent,/changed.*Review/i);
+  if(mode==='hold'){state.finish();await h.settle();}
+ }
+});
+test('Presets refresh page and Portal changes retire captured actions across both entry tabs',async()=>{
+ for(const entry of ['home','remote'])for(const next of ['go("home")',`selectRoom('${saved[1].base}')`]){
+  const{h}=await presetRecoveryFixture();if(entry==='remote'){h.eval('go("remote","presets")');await h.settle();}
+  const old=['Run','Edit','New preset','Delete'].map(label=>presetRecoveryButton(h,label));h.eval(next);await h.settle();for(const action of old)rawClick(action);await h.settle();
+  assert.equal(presetRecoveryPosts(h).length,0);assert.equal(h.eval('presetDraft'),null);assert.equal(h.document.getElementById('sheet').open,false);
+ }
+});
+test('Presets refresh late previous Portal failure cannot poison current macros or replace an editor draft',async()=>{
+ const{h,state,page}=await presetRecoveryFixture();state.mode='hold';h.eval('loadVisible()');await h.settle();const old=state.reads.at(-1),finish=state.finish;
+ state.mode='ok';h.eval(`selectRoom('${saved[1].base}')`);await h.settle();h.eval('go("home","presets")');await h.settle();finish(true);await h.settle();
+ assert.equal(old.opts.signal.aborted,true);assert.equal(page.textContent.includes('Presets unavailable'),false);assert.equal(presetRecoveryButton(h,'Run').disabled,false);
+ presetRecoveryButton(h,'Edit').click();await h.settle();await h.input('Preset name','Kept draft');state.mode='fail';h.eval('loadVisible()');await h.settle();assert.equal(h.eval('presetDraft.name'),'Kept draft');
+});
+test('Presets refresh global Refresh supersedes aborted pending reads without enabling stale actions',async()=>{
+ const{h,state,page}=await presetRecoveryFixture();state.mode='hold';h.eval('loadVisible()');await h.settle();const old=state.reads.at(-1),finishOld=state.finish,before=state.reads.length;
+ h.document.getElementById('refresh-button').click();await h.settle();const finishNew=state.finish;assert.equal(old.opts.signal.aborted,true);assert.equal(state.reads.length,before+1);assert.notEqual(finishOld,finishNew);
+ finishOld();await h.settle();assert.match(page.textContent,/Refreshing.*presets/i);assert.equal(presetRecoveryButton(h,'Run').disabled,true);
+ state.presets=[recoveredPreset('latest',{name:'Fresh macro'})];finishNew();await h.settle();assert.match(page.textContent,/Fresh macro/);assert.equal(page.textContent.includes('Refreshing saved presets'),false);assert.equal(presetRecoveryButton(h,'Run').disabled,false);
+});

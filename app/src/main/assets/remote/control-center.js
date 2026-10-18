@@ -112,6 +112,7 @@ let layoutDraft = null,
   sceneDraft = null,
   scenesLoadState = null,
   presetDraft = null,
+  presetsLoadState = null,
   upload = null;
 const drafts = new Map(),
   busy = new Set(),
@@ -958,10 +959,7 @@ function loadVisible(force = false) {
   else if (tab === 'home' && detail === 'snapshots')
     read('snapshot', '/remote/snapshot', (r) => (data.snapshot = r));
   else if (detail === 'presets') {
-    read('presets', '/remote/presets', (r) => {
-      if (!Array.isArray(r.presets)) throw new ApiError('invalid_response');
-      data.presets = r.presets;
-    });
+    loadPresets();
     read('apps', '/remote/apps', (r) => (data.apps = r.apps || []));
   } else if (tab === 'photos' && !detail) {
     loadPhotos();
@@ -5093,6 +5091,50 @@ function stepDialog(existing, mode) {
   }
   paint();
 }
+function presetsPending() {
+  return !!presetsLoadState?.pending && session.current(presetsLoadState.ticket);
+}
+function presetsReady() {
+  return presetListReady() && !presetsPending();
+}
+function presetListCurrent(ticket, presets) {
+  return session.current(ticket) && (tab === 'home' || tab === 'remote') &&
+    detail === 'presets' && !document.hidden && connectionState !== 'expired' &&
+    presetsReady() && !presetsSaving() && !presetDraft && data.presets === presets;
+}
+function validatePresetList(response) {
+  const presets = response?.presets, ids = new Set();
+  if (!Array.isArray(presets)) throw new ApiError('invalid_response');
+  for (const preset of presets) {
+    if (!preset || typeof preset !== 'object' || Array.isArray(preset) ||
+        typeof preset.id !== 'string' || !preset.id.trim() || ids.has(preset.id) ||
+        typeof preset.name !== 'string' ||
+        (preset.steps != null && (!Array.isArray(preset.steps) || preset.steps.some(step =>
+          !step || typeof step !== 'object' || Array.isArray(step) ||
+          (step.type != null && typeof step.type !== 'string')))))
+      throw new ApiError('invalid_response');
+    ids.add(preset.id);
+  }
+}
+function loadPresets() {
+  if (!room() || document.hidden || connectionState === 'expired') return;
+  if (presetsPending() && pageReads.get('presets') && !pageReads.get('presets').signal.aborted)
+    return presetsLoadState.promise;
+  const owner = { ticket: session.capture(), pending: true };
+  presetsLoadState = owner;
+  delete data.presetsError;
+  render();
+  owner.promise = read('presets', '/remote/presets', response => {
+    validatePresetList(response);
+    data.presets = response.presets;
+  }, { renderAfter: false }).finally(() => {
+    if (presetsLoadState === owner && session.current(owner.ticket)) {
+      owner.pending = false;
+      render();
+    }
+  });
+  return owner.promise;
+}
 function presetsSaving(target = room()) {
   return busy.has(`${target?.base}:presets`);
 }
@@ -5146,6 +5188,7 @@ function presetsPage() {
         'Legacy presets retain app, navigation, keyboard, wait and configuration actions.',
       ),
       group(
+        presetsPending() ? text('Refreshing saved presets… Your draft is kept.', 'detail') : null,
         presetsSaving() ? text('Saving preset… You can keep editing; newer changes will need another Save.', 'draft-label') : null,
         !presetListReady() ? data.presetsError
           ? failure('Saved presets unavailable. Your draft is kept.', data.presetsError, () => loadVisible())
@@ -5182,70 +5225,59 @@ function presetsPage() {
       ),
     );
   }
+  const presets = data.presets, ticket = session.capture(), owner = presetsLoadState,
+    ready = presetsReady(), pending = presetsPending();
+  const current = () => presetListCurrent(ticket, presets);
+  const newCurrent = () => session.current(ticket) && (tab === 'home' || tab === 'remote') &&
+    detail === 'presets' && !document.hidden && connectionState !== 'expired' &&
+    !presetsSaving() && !presetDraft && data.presets === presets && presetsLoadState === owner;
   return sections(
     heading('Saved presets', 'The macros from your previous remote, with a complete editor.'),
     presetsSaving() ? text('Saving presets…', 'draft-label') : null,
-    group(
-      button(
-        'New preset',
-        () => {
-          presetDraft = { id: uniqueId(), name: '', steps: [] };
-          render();
-        },
-        { kind: 'primary', disabled: presetsSaving() },
-      ),
-    ),
-    data.presetsError
-      ? failure('Presets unavailable', data.presetsError, () => loadVisible())
-      : !data.presets
-        ? empty('Presets', 'Loading your saved macros…')
-        : !data.presets.length
-          ? empty('No presets yet', 'Create a sequence of app, keyboard and navigation actions.')
-          : sections(
-              ...data.presets.map((preset) =>
-                group(
-                  el('h3', { text: preset.name || 'Unnamed preset' }),
-                  text(
-                    `${preset.steps?.length || 0} steps · Legacy presets do not report completion`,
-                  ),
-                  actions(
-                    button(
-                      'Run',
-                      () =>
-                        mutate(
-                          `preset:${preset.id}`,
-                          '/remote/preset',
-                          { id: preset.id },
-                          { success: 'Preset started. Check the Portal to confirm each action.' },
-                        ),
-                      { kind: 'primary', disabled: presetsSaving() },
-                    ),
-                    button(
-                      'Edit',
-                      () => {
-                        presetDraft = {
-                          ...copy(preset),
-                          steps: (preset.steps || []).map((step) => ({ id: uniqueId(), step })),
-                        };
-                        render();
-                      },
-                      { kind: 'outline', disabled: presetsSaving() },
-                    ),
-                    button(
-                      'Delete',
-                      () =>
-                        confirmAction(
-                          `Delete “${preset.name}”?`,
-                          'Remove this macro from the selected Portal.',
-                          () => savePresets((data.presets || []).filter((p) => p.id !== preset.id)),
-                          'Delete',
-                        ),
-                      { kind: 'danger', disabled: presetsSaving() },
-                    ),
-                  ),
-                ),
-              ),
+    pending ? el('p', { role: 'status', 'aria-live': 'polite', class: 'detail',
+      text: presets ? 'Refreshing saved presets…' : 'Loading your saved presets…' }) : null,
+    data.presetsError ? failure('Presets unavailable', data.presetsError, loadPresets) : null,
+    presets && (pending || data.presetsError)
+      ? text('Last confirmed presets are shown. Refresh successfully before using these actions.', 'detail') : null,
+    group(button('New preset', () => {
+      if (!newCurrent()) return;
+      presetDraft = { id: uniqueId(), name: '', steps: [] };
+      render();
+    }, { kind: 'primary', disabled: presetsSaving() })),
+    !presets
+      ? !pending && !data.presetsError ? empty('Presets', 'Loading your saved presets…') : null
+      : !presets.length
+        ? empty('No presets yet', 'Create a sequence of app, keyboard and navigation actions.')
+        : sections(...presets.map(preset => group(
+            el('h3', { text: preset.name || 'Unnamed preset' }),
+            text(`${preset.steps?.length || 0} steps · Legacy presets do not report completion`),
+            actions(
+              button('Run', () => {
+                if (!current()) return;
+                return mutate(`preset:${preset.id}`, '/remote/preset', { id: preset.id },
+                  { ticket, success: 'Preset started. Check the Portal to confirm each action.' });
+              }, { kind: 'primary', disabled: !ready || presetsSaving() }),
+              button('Edit', () => {
+                if (!current()) return;
+                presetDraft = { ...copy(preset),
+                  steps: (preset.steps || []).map(step => ({ id: uniqueId(), step })) };
+                render();
+              }, { kind: 'outline', disabled: !ready || presetsSaving() }),
+              button('Delete', () => {
+                if (!current()) return;
+                return confirmAction(`Delete “${preset.name || 'Unnamed preset'}”?`,
+                  'Remove this macro from the selected Portal.', () => {
+                    if (!current()) {
+                      if (session.current(ticket) && presetsReady() && !presetsSaving() &&
+                          !presetDraft && (tab === 'home' || tab === 'remote') && detail === 'presets')
+                        toast('Presets changed. Review them before deleting.', true);
+                      return;
+                    }
+                    return savePresets(presets.filter(p => p.id !== preset.id), { ticket });
+                  }, 'Delete', ticket);
+              }, { kind: 'danger', disabled: !ready || presetsSaving() }),
             ),
+          ))),
   );
 }
 async function savePresets(presets, {
@@ -5262,6 +5294,7 @@ async function savePresets(presets, {
   const confirmed = Array.isArray(response?.presets) && session.current(ticket);
   if (confirmed) {
     retireRead('presets');
+    presetsLoadState = null;
     data.presets = response.presets;
     data.presetsError = null;
     if (success) toast(success);
