@@ -119,7 +119,8 @@ const drafts = new Map(),
 const thumbs = new ImagePool(),
   artwork = new ImagePool({ limit: 1 }),
   previewPool = new ImagePool({ limit: 1 });
-let photoObservation = null;
+let photoObservation = null,
+  snapshotRestoreDraft = null;
 const icons = {
   home: '<path d="M3 10 12 3l9 7M5 9v12h14V9M10 21v-7h4v7"/>',
   remote:
@@ -457,6 +458,7 @@ const api = createClient({
   },
 });
 function abortReads() {
+  cancelSnapshotRestoreReview();
   for (const controller of pageReads.values()) controller.abort();
   pageReads.clear();
 }
@@ -566,6 +568,7 @@ function startPolling() {
   );
 }
 function go(next, sub = '') {
+  cancelSnapshotRestoreReview(true);
   tab = next;
   detail = sub;
   abortReads();
@@ -4007,67 +4010,95 @@ function downloadJson(name, value) {
   anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+function cancelSnapshotRestoreReview(clearSelection = false) {
+  const confirming = snapshotRestoreDraft?.review?.confirming;
+  snapshotRestoreDraft?.review?.controller.abort();
+  if (clearSelection) snapshotRestoreDraft = null;
+  else if (snapshotRestoreDraft) snapshotRestoreDraft.review = null;
+  if (confirming) closeSheet();
+}
+function chooseSnapshotRestoreFile(file) {
+  const confirming = snapshotRestoreDraft?.review?.confirming;
+  cancelSnapshotRestoreReview(true);
+  if (file) snapshotRestoreDraft = { file, review: null, error: '' };
+  if (confirming) closeSheet();
+  render();
+}
+function snapshotReviewCurrent(owner, review) {
+  return snapshotRestoreDraft === owner && owner.review === review &&
+    session.current(review.ticket) && tab === 'home' && detail === 'snapshots' &&
+    !document.hidden && connectionState !== 'expired';
+}
+async function reviewSnapshotRestore() {
+  const owner = snapshotRestoreDraft;
+  if (!owner?.file) { toast('Choose a snapshot JSON file.', true); return; }
+  if (owner.review || busy.has(`${room()?.base}:restore`)) return;
+  const ticket = session.capture(), file = owner.file;
+  const review = { ticket, controller: new AbortController(), phase: 'Reading snapshot file…' };
+  owner.review = review;
+  owner.error = '';
+  render();
+  try {
+    if (file.size > 240 * 1024) throw new ApiError('body_too_large');
+    const candidate = JSON.parse(await file.text());
+    if (!snapshotReviewCurrent(owner, review)) return;
+    const record = value => value && typeof value === 'object' && !Array.isArray(value);
+    if (!record(candidate) || candidate.schemaVersion !== 1 || !record(candidate.layout) ||
+        !record(candidate.domains) || typeof candidate.revision !== 'string')
+      throw new ApiError('unsupported_schema');
+    if (candidate.deviceId !== data.companion?.deviceId) throw new ApiError('wrong_device');
+    review.phase = 'Reading the current device revision…';
+    render();
+    const fresh = await api(ticket.room, '/remote/snapshot', { signal: review.controller.signal });
+    if (!snapshotReviewCurrent(owner, review)) return;
+    const revision = fresh.snapshot?.revision;
+    if (typeof revision !== 'string' || !revision) throw new ApiError('invalid_response');
+    review.phase = 'Review ready. Confirm or cancel before restoring.';
+    review.confirming = true;
+    render();
+    const domainCount = Object.keys(candidate.domains).length;
+    await confirmAction(
+      `Restore to ${ticket.room.name}?`,
+      `Restore ${domainCount} settings categories and the layout from ${file.name}. This snapshot belongs to this Portal. Any further Portal changes will stop this restore. Credentials, photos and private app data stay on the Portal.`,
+      async () => {
+        if (!snapshotReviewCurrent(owner, review)) return;
+        review.phase = 'Restoring snapshot…';
+        const pending = mutate('restore', '/remote/snapshot',
+          { snapshot: candidate, expectedRevision: revision }, { ticket, success: '' });
+        render();
+        const response = await pending;
+        if (response?.snapshot && session.current(ticket)) {
+          data.snapshot = response;
+          data.layout = null;
+          layoutDraft = null;
+          toast('Snapshot settings and layout restored and confirmed.');
+          render();
+        } else if (scopeResults.length) render();
+      }, 'Restore snapshot', ticket,
+    );
+  } catch (error) {
+    if (snapshotReviewCurrent(owner, review) && error.code !== 'aborted')
+      owner.error = error instanceof SyntaxError ? 'This file is not valid snapshot JSON.'
+        : error.code === 'unsupported_schema' ? 'This file is not a supported Immortal snapshot. Choose a snapshot exported by this Portal.'
+        : error.code === 'body_too_large' ? 'Snapshot JSON must be 240 KiB or smaller.' : message(error);
+  } finally {
+    if (owner.review === review) owner.review = null;
+    if (snapshotRestoreDraft === owner && session.current(ticket) && tab === 'home' && detail === 'snapshots') render();
+  }
+}
 function snapshotsPage() {
-  const current = data.snapshot?.snapshot;
+  const current = data.snapshot?.snapshot, selected = snapshotRestoreDraft;
+  const restoring = busy.has(`${room()?.base}:restore`);
   const importInput = el('input', {
-    type: 'file',
-    accept: '.json,application/json',
-    'aria-label': 'Choose snapshot JSON',
+    type: 'file', hidden: true, accept: '.json,application/json',
+    'aria-label': 'Choose snapshot JSON', disabled: restoring,
+    onChange: event => chooseSnapshotRestoreFile(event.target.files?.[0] || null),
   });
-  const status = text('');
-  const restore = async () => {
-    const file = importInput.files[0],
-      ticket = session.capture();
-    if (!file) {
-      toast('Choose a snapshot JSON file.', true);
-      return;
-    }
-    try {
-      if (file.size > 240 * 1024) throw new ApiError('body_too_large');
-      const candidate = JSON.parse(await file.text());
-      if (!session.current(ticket)) return;
-      if (
-        candidate.schemaVersion !== 1 ||
-        !candidate.layout ||
-        !candidate.domains ||
-        typeof candidate.revision !== 'string'
-      )
-        throw new ApiError('unsupported_schema');
-      if (candidate.deviceId !== data.companion?.deviceId) throw new ApiError('wrong_device');
-      status.textContent = 'Reading the current device revision…';
-      const fresh = await api(ticket.room, '/remote/snapshot');
-      if (!session.current(ticket)) return;
-      const revision = fresh.snapshot?.revision;
-      if (typeof revision !== 'string') throw new ApiError('invalid_response');
-      status.textContent = '';
-      const domainCount = Object.keys(candidate.domains).length;
-      confirmAction(
-        `Restore to ${ticket.room.name}?`,
-        `Restore ${domainCount} settings categories and the layout from ${file.name}. This snapshot belongs to this Portal. Any further Portal changes will stop this restore. Credentials, photos and private app data stay on the Portal.`,
-        async () => {
-          const response = await mutate(
-            'restore',
-            '/remote/snapshot',
-            { snapshot: candidate, expectedRevision: revision },
-            { ticket, success: '' },
-          );
-          if (response?.snapshot) {
-            data.snapshot = response;
-            data.layout = null;
-            layoutDraft = null;
-            toast('Snapshot settings and layout restored and confirmed.');
-            render();
-          } else if (scopeResults.length) render();
-        },
-        'Restore snapshot',
-        ticket,
-      );
-    } catch (error) {
-      status.className = 'error';
-      status.textContent =
-        error instanceof SyntaxError ? 'This file is not valid snapshot JSON.' : message(error);
-    }
-  };
+  const status = el('p', { role: 'status', 'aria-live': 'polite',
+    class: selected?.error ? 'error' : 'detail',
+    text: selected?.error || selected?.review?.phase ||
+      (selected?.file ? 'Selected file is kept in this page until you leave.' : 'Choose a snapshot JSON file to review.'),
+  });
   return sections(
     heading('Snapshots', 'Save and restore supported settings and your home layout.'),
     el(
@@ -4108,8 +4139,11 @@ function snapshotsPage() {
           'Choose a snapshot exported by this Portal. Review the target before applying. Side-effect failures can leave a partial restore; the Portal returns the affected domains.',
         ),
         importInput,
+        button('Choose snapshot JSON', () => importInput.click(), { kind: 'outline', disabled: restoring }),
+        selected?.file ? text(`Selected: ${selected.file.name}`) : null,
         status,
-        button('Review restore', restore, { kind: 'outline' }),
+        button('Review restore', reviewSnapshotRestore, { kind: 'outline',
+          disabled: !selected?.file || !!selected.review || restoring }),
       ),
     ),
     resultPanel(),

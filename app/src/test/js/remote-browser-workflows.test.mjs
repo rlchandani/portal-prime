@@ -308,6 +308,7 @@ test('snapshot restore confirmation is dismissed by room switching and cannot po
   const file = new Blob([JSON.stringify(current)], { type: 'application/json' });
   file.name = 'fixture-snapshot.json';
   input.files = [file];
+  for (const listener of input.listeners.change || []) listener({ target: input });
   h.click('Review restore');
   await h.settle();
   assert.equal(h.document.getElementById('sheet').open, true);
@@ -2655,4 +2656,146 @@ test('Jarvis missing model list preserves current model and allows supported wak
   jarvisWake(h).click(); h.click('Save Jarvis settings'); await h.settle();
   assert.deepEqual(JSON.parse(jarvisPosts(h)[0].opts.body), { wakeEnabled: true });
   assert.equal(h.eval('data.jarvis.wakeEnabled'), true);
+});
+
+
+const restoreSnapshotFixture = () => ({ schemaVersion: 1, deviceId: 'fixture-device',
+  revision: 'exported-revision', domains: {},
+  layout: { assignments: {}, homeOrder: [], gridOrder: [], gridSlots: [], widgets: [] } });
+async function restoreReviewHarness() {
+  const state = { read: null, post: null }, snapshot = restoreSnapshotFixture();
+  const h = await browserHarness({ saved, routes: { '/remote/snapshot': context => {
+    if (context.opts.method === 'POST') return state.post ? state.post(context)
+      : context.response({ ok: true, snapshot });
+    return state.read ? state.read(context) : context.response({ ok: true,
+      snapshot: { ...snapshot, revision: 'fresh-revision' } });
+  } } });
+  h.eval('go("home","snapshots")'); await h.settle();
+  return { h, state, snapshot };
+}
+const restoreReviewButton = h => h.document.body.querySelectorAll('button')
+  .find(node => node.textContent === 'Review restore');
+const restoreFileInput = h => h.document.body.querySelectorAll('input')
+  .find(node => node.attrs['aria-label'] === 'Choose snapshot JSON');
+function chooseRestoreFile(h, file) {
+  const input = restoreFileInput(h); input.files = file ? [file] : [];
+  for (const listener of input.listeners.change || []) listener({ target: input });
+}
+const restoreFile = (name = 'first.json', contents = restoreSnapshotFixture()) => ({
+  name, size: 256, text: async () => JSON.stringify(contents),
+});
+const snapshotGets = h => h.calls.filter(c => c.path === '/remote/snapshot' && c.opts.method !== 'POST');
+const snapshotPosts = h => h.calls.filter(c => c.path === '/remote/snapshot' && c.opts.method === 'POST');
+const forceRestoreReview = h => restoreReviewButton(h).listeners.click[0]();
+
+test('Snapshot review needs a file and sends no request for a stale raw activation', async () => {
+  const { h } = await restoreReviewHarness(), before = snapshotGets(h).length;
+  assert.equal(restoreReviewButton(h).disabled, true);
+  forceRestoreReview(h); await h.settle();
+  assert.equal(snapshotGets(h).length, before); assert.equal(snapshotPosts(h).length, 0);
+});
+test('Snapshot review file progress blocks duplicate file reads', async () => {
+  const { h } = await restoreReviewHarness(); let reads = 0; const releases = [];
+  chooseRestoreFile(h, { name: 'first.json', size: 256, text: () => { reads++;
+    return new Promise(resolve => releases.push(resolve)); } });
+  h.click('Review restore'); forceRestoreReview(h); await h.settle();
+  const observed = { reads, disabled: restoreReviewButton(h).disabled,
+    progress: h.document.body.textContent.includes('Reading snapshot file') };
+  for (const resolve of releases) resolve(JSON.stringify(restoreSnapshotFixture())); await h.settle();
+  assert.deepEqual(observed, { reads: 1, disabled: true, progress: true });
+});
+test('Snapshot review revision progress coalesces duplicate preflight requests', async () => {
+  const { h, state } = await restoreReviewHarness(), releases = [], before = snapshotGets(h).length;
+  state.read = c => new Promise(resolve => releases.push(() => resolve(c.response({ ok: true,
+    snapshot: { revision: 'fresh-revision' } }))));
+  chooseRestoreFile(h, restoreFile()); h.click('Review restore'); await h.settle(); forceRestoreReview(h);
+  await h.settle(); const observed = { gets: snapshotGets(h).length - before,
+    disabled: restoreReviewButton(h).disabled,
+    progress: h.document.body.textContent.includes('Reading the current device revision') };
+  for (const resolve of releases) resolve(); await h.settle();
+  assert.deepEqual(observed, { gets: 1, disabled: true, progress: true });
+});
+test('Snapshot review changing file while parsing suppresses the old confirmation', async () => {
+  const { h } = await restoreReviewHarness(); let release;
+  chooseRestoreFile(h, { name: 'old.json', size: 256, text: () => new Promise(resolve => release = resolve) });
+  const before = snapshotGets(h).length; h.click('Review restore'); await h.settle();
+  chooseRestoreFile(h, restoreFile('new.json')); release(JSON.stringify(restoreSnapshotFixture())); await h.settle();
+  assert.equal(snapshotGets(h).length, before); assert.equal(h.document.getElementById('sheet').open, false);
+  h.click('Review restore'); await h.settle(); assert.match(h.document.getElementById('sheet-content').textContent, /new\.json/);
+});
+test('Snapshot review changing file aborts the old revision read and owns only the new confirmation', async () => {
+  const { h, state } = await restoreReviewHarness(); let release, signal;
+  state.read = c => { signal = c.opts.signal; return new Promise(resolve => release = () => resolve(c.response({ ok: true,
+    snapshot: { revision: 'old-revision' } }))); };
+  chooseRestoreFile(h, restoreFile('old.json')); h.click('Review restore'); await h.settle();
+  chooseRestoreFile(h, restoreFile('new.json')); const aborted = signal.aborted; state.read = null;
+  h.click('Review restore'); await h.settle(); release(); await h.settle();
+  assert.equal(aborted, true); assert.match(h.document.getElementById('sheet-content').textContent, /new\.json/);
+  assert.equal(h.document.getElementById('sheet-content').textContent.includes('old.json'), false);
+});
+test('Snapshot review an old parse error cannot replace a newer selected file status', async () => {
+  const { h } = await restoreReviewHarness(); let reject;
+  chooseRestoreFile(h, { name: 'old.json', size: 256, text: () => new Promise((_, r) => reject = r) });
+  h.click('Review restore'); await h.settle(); chooseRestoreFile(h, restoreFile('new.json'));
+  reject(new SyntaxError('fixture')); await h.settle();
+  assert.equal(h.document.body.textContent.includes('not valid snapshot JSON'), false);
+  assert.equal(h.document.body.textContent.includes('new.json'), true);
+});
+test('Snapshot review ordinary page redraw keeps the selected file and current progress', async () => {
+  const { h } = await restoreReviewHarness(); let release;
+  chooseRestoreFile(h, { name: 'selected.json', size: 256, text: () => new Promise(resolve => release = resolve) });
+  h.click('Review restore'); await h.settle(); h.eval('render()');
+  const observed = { name: h.document.body.textContent.includes('selected.json'),
+    progress: h.document.body.textContent.includes('Reading snapshot file'), disabled: restoreReviewButton(h).disabled };
+  release(JSON.stringify(restoreSnapshotFixture())); await h.settle();
+  assert.deepEqual(observed, { name: true, progress: true, disabled: true });
+});
+test('Snapshot review malformed JSON keeps the selection and supports a clean retry', async () => {
+  const { h } = await restoreReviewHarness(); let invalid = true;
+  chooseRestoreFile(h, { name: 'retry.json', size: 256, text: async () => invalid ? '{bad' : JSON.stringify(restoreSnapshotFixture()) });
+  h.click('Review restore'); await h.settle(); assert.match(h.document.body.textContent, /not valid snapshot JSON/);
+  h.eval('render()'); assert.equal(h.document.body.textContent.includes('retry.json'), true);
+  invalid = false; h.click('Review restore'); await h.settle();
+  assert.equal(h.document.getElementById('sheet').open, true); assert.equal(h.document.body.textContent.includes('not valid snapshot JSON'), false);
+});
+test('Snapshot review invalid snapshot shapes are rejected before a device revision request', async () => {
+  for (const candidate of [null, [], { ...restoreSnapshotFixture(), domains: [] }, { ...restoreSnapshotFixture(), layout: [] }]) {
+    const { h } = await restoreReviewHarness(), before = snapshotGets(h).length;
+    chooseRestoreFile(h, restoreFile('invalid.json', candidate)); h.click('Review restore'); await h.settle();
+    assert.equal(snapshotGets(h).length, before); assert.equal(h.document.getElementById('sheet').open, false);
+    assert.equal(restoreReviewButton(h).disabled, false);
+    assert.equal(h.document.body.textContent.includes('invalid.json'), true);
+    assert.equal(h.document.body.textContent.includes('supported Immortal snapshot'), true);
+  }
+  const { h } = await restoreReviewHarness(), before = snapshotGets(h).length;
+  chooseRestoreFile(h, { ...restoreFile('large.json'), size: 240 * 1024 + 1 });
+  h.click('Review restore'); await h.settle();
+  assert.equal(snapshotGets(h).length, before);
+  assert.equal(h.document.body.textContent.includes('240 KiB or smaller'), true);
+});
+test('Snapshot review failed revision read keeps the selected file for retry', async () => {
+  const { h, state } = await restoreReviewHarness(); state.read = c => c.response({ ok: false, error: 'ipc_failed' }, 503);
+  chooseRestoreFile(h, restoreFile('retry.json')); h.click('Review restore'); await h.settle(); h.eval('render()');
+  assert.equal(h.document.body.textContent.includes('retry.json'), true); assert.equal(restoreReviewButton(h).disabled, false);
+  state.read = null; h.click('Review restore'); await h.settle();
+  assert.equal(h.document.getElementById('sheet').open, true); assert.equal(snapshotPosts(h).length, 0);
+});
+test('Snapshot review file changes invalidate its existing confirmation before any restore POST', async () => {
+  const { h } = await restoreReviewHarness(); chooseRestoreFile(h, restoreFile('old.json'));
+  h.click('Review restore'); await h.settle();
+  const staleRestore = h.document.getElementById('sheet-actions').querySelectorAll('button')
+    .find(node => node.textContent === 'Restore snapshot');
+  chooseRestoreFile(h, restoreFile('new.json')); staleRestore.listeners.click[0](); await h.settle();
+  assert.equal(snapshotPosts(h).length, 0); assert.equal(h.document.body.textContent.includes('new.json'), true);
+});
+test('Snapshot review navigation clears selection and drops late revision success and errors', async () => {
+  for (const destination of ['go("home")', `selectRoom('${saved[1].base}')`]) {
+    const { h, state } = await restoreReviewHarness(); let reject, signal;
+    state.read = c => { signal = c.opts.signal; return new Promise((_, r) => reject = r); };
+    chooseRestoreFile(h, restoreFile()); h.click('Review restore'); await h.settle(); h.eval(destination);
+    reject(new Error('old revision failure')); await h.settle(); assert.equal(signal.aborted, true);
+    state.read = null; h.eval('go("home","snapshots")'); await h.settle();
+    assert.equal(restoreReviewButton(h).disabled, true); assert.equal(h.document.getElementById('sheet').open, false);
+    assert.equal(h.document.body.textContent.includes('old revision failure'), false); assert.equal(snapshotPosts(h).length, 0);
+  }
 });
