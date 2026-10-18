@@ -320,6 +320,64 @@ function Test-CallsAccessBoundService {
   return $false
 }
 
+# OEM accessibility dumps can omit component IDs. ActivityManager's binding
+# records retain them. Accept only one exact u0 service and one complete binding.
+function Test-CallsAccessActivityService {
+  param([string]$Dump, [string[]]$Components)
+  $componentPattern = '(?:' +
+    (($Components | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
+  $lines = $Dump -split '\r?\n'
+  $blockEnd = {
+    param([int]$Start, [int]$Indent, [int]$Limit)
+    for ($index = $Start + 1; $index -lt $Limit; $index++) {
+      if (-not $lines[$index].Trim()) { continue }
+      $padding = [regex]::Match($lines[$index], '^[ \t]*').Length
+      if ($padding -le $Indent) { return $index }
+    }
+    return $Limit
+  }
+  $servicePattern = '^(?<indent>[ \t]*)\*[ \t]+ServiceRecord\{[0-9a-fA-F]+[ \t]+u0[ \t]+' + $componentPattern + '\}[ \t]*$'
+  $intentPattern = '^(?<indent>[ \t]*)\*[ \t]+IntentBindRecord\{[^{}]+\}:[ \t]*$'
+  $clientPattern = '^(?<indent>[ \t]*)\*[ \t]+Client[ \t]+AppBindRecord\{[0-9a-fA-F]+[ \t]+ProcessRecord\{[0-9a-fA-F]+[ \t]+[0-9]+:system/1000\}\}[ \t]*$'
+  for ($serviceIndex = 0; $serviceIndex -lt $lines.Count; $serviceIndex++) {
+    if ($lines[$serviceIndex] -cnotmatch $servicePattern) { continue }
+    $serviceEnd = & $blockEnd $serviceIndex $Matches['indent'].Length $lines.Count
+    if ($serviceEnd -le $serviceIndex + 1) { continue }
+    $serviceRecord = $lines[($serviceIndex + 1)..($serviceEnd - 1)] -join "`n"
+    $permissions = [regex]::Matches($serviceRecord, '(?m)^[ \t]*permission=([^\r\n]*)$')
+    if ($permissions.Count -ne 1 -or
+        $permissions[0].Groups[1].Value.Trim() -cne 'android.permission.BIND_ACCESSIBILITY_SERVICE') { continue }
+    for ($intentIndex = $serviceIndex + 1; $intentIndex -lt $serviceEnd; $intentIndex++) {
+      if ($lines[$intentIndex] -cnotmatch $intentPattern) { continue }
+      $intentEnd = & $blockEnd $intentIndex $Matches['indent'].Length $serviceEnd
+      $binding = $lines[($intentIndex + 1)..($intentEnd - 1)] -join "`n"
+      $intents = [regex]::Matches($binding, '(?m)^[ \t]*intent=\{([^{}\r\n]*)\}[ \t]*$')
+      if ($intents.Count -ne 1) { continue }
+      $intent = $intents[0].Groups[1].Value
+      if ($intent -cnotmatch ('(?:^|[ \t])cmp=' + $componentPattern + '(?:[ \t]|$)')) { continue }
+      # API 29 may bind with only cmp. An explicit action must still identify
+      # accessibility; the service permission above establishes its role.
+      $actions = [regex]::Matches($intent, '(?:^|[ \t])act=([^ \t]*)')
+      if ($actions.Count -gt 1 -or ($actions.Count -eq 1 -and
+          $actions[0].Groups[1].Value -cne 'android.accessibilityservice.AccessibilityService')) { continue }
+      if ($binding -cnotmatch '(?m)^[ \t]*binder=android\.os\.BinderProxy@[0-9a-fA-F]+[ \t]*$' -or
+          $binding -cnotmatch '(?m)^[ \t]*requested=true[ \t]+received=true[ \t]+hasBound=true(?:[ \t]+doRebind=(?:true|false))?[ \t]*$') { continue }
+      for ($clientIndex = $intentIndex + 1; $clientIndex -lt $intentEnd; $clientIndex++) {
+        if ($lines[$clientIndex] -cnotmatch $clientPattern) { continue }
+        $clientEnd = & $blockEnd $clientIndex $Matches['indent'].Length $intentEnd
+        for ($connectionIndex = $clientIndex + 1; $connectionIndex -lt $clientEnd; $connectionIndex++) {
+          if ($lines[$connectionIndex] -cnotmatch '^[ \t]*ConnectionRecord\{([^{}]+)\}[ \t]*$') { continue }
+          $connection = $Matches[1]
+          if ($connection -cmatch '(?:^|[ \t])DEAD(?:[ \t]|$)') { continue }
+          $connectionPattern = '^[0-9a-fA-F]+[ \t]+u0(?:[ \t]+[A-Z_]+)*[ \t]+' + $componentPattern + ':@[0-9a-fA-F]+$'
+          if ($connection -cmatch $connectionPattern) { return $true }
+        }
+      }
+    }
+  }
+  return $false
+}
+
 function Check-CallsAccess {
   Step "Checking Calls controls"
   $pkg = $cfg['PKG']
@@ -353,13 +411,18 @@ function Check-CallsAccess {
   $bound = $null
   if ($null -ne $accessibilityDump) {
     $bound = Test-CallsAccessBoundService $accessibilityDump $components
+    if ($bound -ne $true) {
+      $activityDump = Read-CallsAccess @('shell', 'dumpsys', 'activity', 'services', $components[0])
+      $bound = $false
+      if ($null -ne $activityDump) {
+        $bound = Test-CallsAccessActivityService $activityDump $components
+      }
+    }
   }
-  if ($null -eq $bound) {
-    Warn "Calls controls: cannot verify connection (bound-services read unavailable)."
-  } elseif ($bound) {
+  if ($bound -eq $true) {
     Ok "Calls controls: connected."
   } else {
-    Warn "Calls controls: not connected."
+    Warn "Calls controls: connection could not be verified."
   }
   $ready = $permissionGranted -and $configured -and ($bound -eq $true)
   if (-not $ready) {

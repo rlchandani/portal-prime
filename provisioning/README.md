@@ -43,7 +43,9 @@ and whether Android has connected that service. Merely being listed as enabled i
 The check reports these controls only; **Settings > Device > About & device health** checks other
 capabilities such as screen-off, app installation and now-playing access.
 
-For a disconnected service, open **Settings > Device > About & device health > Reconnect controls**.
+If a connection cannot be verified, check **Settings > Device > About & device health**.
+Use **Reconnect controls** when that page offers it. Some Meta firmware omits service IDs from its
+accessibility diagnostic; setup then checks the exact Immortal service's received system binding.
 If system-settings permission is missing, re-run setup from the connected computer.
 
 These commands repeat the access check without installing, launching, granting or changing settings:

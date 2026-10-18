@@ -344,9 +344,51 @@ grant_perms() {
 }
 
 
+# Meta's accessibility dump omits IDs from connected-service descriptions.
+# Scope the fallback to one exact service and one received system binding.
+calls_activity_bound() {
+  awk -v full="$PKG/com.immortal.launcher.BarWatchService" -v short="$PKG/.BarWatchService" '
+    function contains(s, c, p, before, after) {
+      while ((p=index(s,c)) > 0) {
+        before=p==1 ? "" : substr(s,p-1,1); after=substr(s,p+length(c),1)
+        if ((before=="" || before ~ /[[:space:]="{:,]/ || before=="[") &&
+            (after=="" || after ~ /[[:space:]",}\]]/ || after==":")) return 1
+        s=substr(s,p+length(c))
+      }
+      return 0
+    }
+    function reset() { binding=identity=binder=flags=client=connection=0 }
+    function finish() { if (selected && servicePermission && binding && identity && binder && flags && connection) found=1 }
+    /^[[:space:]]*\*[[:space:]]*ServiceRecord\{/ {
+      finish(); reset(); servicePermission=0
+      header=$0
+      sub(/^[[:space:]]*\*[[:space:]]*ServiceRecord\{[[:xdigit:]]+[[:space:]]+u0[[:space:]]+/,"",header)
+      sub(/\}[[:space:]]*$/,"",header)
+      selected=(header==full || header==short)
+      next
+    }
+    selected && /^[[:space:]]*permission=android\.permission\.BIND_ACCESSIBILITY_SERVICE[[:space:]]*$/ { servicePermission=1; next }
+    selected && /^[[:space:]]*\*[[:space:]]*IntentBindRecord\{/ { finish(); reset(); binding=1; next }
+    selected && binding {
+      if ($0 ~ /^[[:space:]]*intent=\{/ &&
+          ($0 !~ /[[:space:]{]act=/ || $0 ~ /[[:space:]{]act=android\.accessibilityservice\.AccessibilityService([[:space:]}]|$)/) &&
+          (contains($0,"cmp=" full) || contains($0,"cmp=" short))) identity=1
+      if ($0 ~ /^[[:space:]]*binder=android\.os\.BinderProxy@[[:xdigit:]]+[[:space:]]*$/) binder=1
+      if ($0 ~ /(^|[[:space:]])requested=true([[:space:]]|$)/ &&
+          $0 ~ /(^|[[:space:]])received=true([[:space:]]|$)/ &&
+          $0 ~ /(^|[[:space:]])hasBound=true([[:space:]]|$)/) flags=1
+      if ($0 ~ /Client AppBindRecord\{/) client=($0 ~ /[[:space:]:]system\/1000[[:space:]}]/)
+      if ($0 ~ /^[[:space:]]*All Connections:/) client=0
+      if (client && $0 ~ /ConnectionRecord\{[[:xdigit:]]+[[:space:]]+u0[[:space:]]/ && (contains($0,full) || contains($0,short)) &&
+          $0 !~ /(^|[[:space:]])DEAD([[:space:]}]|$)/ && tolower($0) !~ /dead=true/) connection=1
+    }
+    END { finish(); exit found ? 0 : 1 }
+  '
+}
+
 # Read-only: enabled accessibility is not the same as a connected controls service.
 check_calls_access() {
-  local info master services state full short
+  local info master services state activity full short
   full="$PKG/com.immortal.launcher.BarWatchService"
   short="$PKG/.BarWatchService"
   if ! info="$(a shell dumpsys package "$PKG" 2>/dev/null)"; then
@@ -389,8 +431,11 @@ check_calls_access() {
     bound && (contains($0,full) || contains($0,short)) { found=1 }
     END { exit found ? 0 : 1 }
   '; then
-    warn "Controls are enabled but not connected, or connection could not be verified. In Settings > Device > About & device health, use Reconnect controls."
-    return 1
+    if ! activity="$(a shell dumpsys activity services "$full" 2>/dev/null)" ||
+       ! printf '%s\n' "$activity" | calls_activity_bound; then
+      warn "Controls connection could not be verified. Check Settings > Device > About & device health; use Reconnect controls if offered."
+      return 1
+    fi
   fi
   ok "Calls and remote controls access verified"
 }

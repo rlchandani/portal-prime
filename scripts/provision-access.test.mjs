@@ -24,7 +24,9 @@ function run(values={},failed=''){
   'shell settings get secure accessibility_enabled') printf '%s\\n' ${quote(v.master)}; ${failed==='master'?'return 1':'return 0'};;
   'shell settings get secure enabled_accessibility_services') printf '%s\\n' ${quote(v.enabled)}; ${failed==='enabled'?'return 1':'return 0'};;
   'shell dumpsys accessibility') printf '%s\\n' ${quote(v.bound)}; ${failed==='bound'?'return 1':'return 0'};;
+  'shell dumpsys activity services ${component}') printf '%s\\n' ${quote(v.activity??'No services match')}; ${failed==='activity'?'return 1':'return 0'};;
   *) return 91;; esac; }
+${source.includes('calls_activity_bound() {')?fn('calls_activity_bound'):''}
 ${fn('check_calls_access')}
 check_calls_access
 `;
@@ -58,3 +60,43 @@ for (const ready of [true,false]) test('check-access dispatch is read-only and p
  const r=spawnSync('bash',['-c',body,'access-test','--check-access'],{encoding:'utf8',timeout:5000});
  assert.equal(r.status,ready?0:1,r.stdout+r.stderr);assert.equal(r.stdout.trim(),'CHECKED');
 });
+
+const anonymousBound='Bound services:\n Service[label=Public controls, feedbackType[FEEDBACK_GENERIC]]\nBinding services:\nEnabled services:'+component;
+const activityBound=`ACTIVITY MANAGER SERVICES (dumpsys activity services)
+ User 0 active services:
+ * ServiceRecord{1a2b u0 ${component}}
+   permission=android.permission.BIND_ACCESSIBILITY_SERVICE
+   intent={act=android.accessibilityservice.AccessibilityService cmp=${component}}
+   app=ProcessRecord{1a2b 123:${pkg}/10001}
+   Bindings:
+   * IntentBindRecord{1a2b CREATE}:
+     intent={act=android.accessibilityservice.AccessibilityService cmp=${component}}
+     binder=android.os.BinderProxy@1a2b
+     requested=true received=true hasBound=true doRebind=false
+     * Client AppBindRecord{1a2b ProcessRecord{1a2b 456:system/1000}}
+       Per-process Connections:
+         ConnectionRecord{1a2b u0 CR ${component}:@1a2b}
+`;
+test('anonymous Meta bound descriptions use the exact received live service binding',()=>{const r=run({bound:anonymousBound,activity:activityBound});assert.equal(r.status,0,r.stdout+r.stderr);assert.ok(r.commands.includes('COMMAND:shell dumpsys activity services '+component));assert.doesNotMatch(r.stdout,/ServiceRecord|BinderProxy|ProcessRecord/)});
+for(const [name,activity] of [
+ ['wrong component',activityBound.replaceAll(component,'com.public.other/.Service')],
+ ['other user',activityBound.replaceAll(' u0 ',' u10 ')],
+ ['binder not received',activityBound.replace('received=true','received=false')],
+ ['not bound',activityBound.replace('hasBound=true','hasBound=false')],
+ ['null binder',activityBound.replace('binder=android.os.BinderProxy@1a2b','binder=null')],
+ ['wrong binding action',activityBound.replaceAll('android.accessibilityservice.AccessibilityService','com.public.other.ACTION')],
+ ['dead connection',activityBound.replace(' u0 CR ',' u0 DEAD CR ')],
+ ['non-system client',activityBound.replace('system/1000','com.public.other/10002')],
+ ['live non-system connection cannot complete a dead system client',activityBound.replace(' u0 CR ',' u0 DEAD CR ')+`     * Client AppBindRecord{3a4b ProcessRecord{3a4b 789:com.public.other/10002}}\n       ConnectionRecord{3a4b u0 CR ${component}:@3a4b}\n`],
+ ['other-user connection',activityBound.replace(' u0 CR ',' u10 CR ')],
+ ['component in unrelated intent field',activityBound.replaceAll('cmp='+component,'cmp=com.public.other/.Service extra='+component)],
+ ['mixed binding records',activityBound.replace('     requested=true','   * IntentBindRecord{3a4b CREATE}:\n     requested=true')],
+ ['mixed service records',activityBound.replace('     requested=true',` * ServiceRecord{3a4b u0 ${component}}\n     requested=true`)],
+])test('anonymous service fallback rejects '+name,()=>{const r=run({bound:anonymousBound,activity});assert.equal(r.status,1,r.stdout+r.stderr);assert.doesNotMatch(r.stdout,/access verified|controls ready/i)});
+test('failed activity binding read cannot use a healthy-looking body',()=>{const r=run({bound:anonymousBound,activity:activityBound},'activity');assert.equal(r.status,1,r.stdout+r.stderr)});
+
+test('Android 9 and 10 component-only accessibility binding is verified',()=>{const r=run({bound:anonymousBound,activity:activityBound.replaceAll('act=android.accessibilityservice.AccessibilityService ','')});assert.equal(r.status,0,r.stdout+r.stderr)});
+for(const [name,activity] of [
+ ['missing binding permission',activityBound.replace('   permission=android.permission.BIND_ACCESSIBILITY_SERVICE\n','')],
+ ['wrong binding permission',activityBound.replace('permission=android.permission.BIND_ACCESSIBILITY_SERVICE','permission=com.public.other.PERMISSION')],
+])test('component-bound fallback rejects '+name,()=>{const r=run({bound:anonymousBound,activity});assert.equal(r.status,1,r.stdout+r.stderr)});
