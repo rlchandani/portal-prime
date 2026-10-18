@@ -387,6 +387,13 @@ function message(error) {
     invalid_album_link: 'Enter a complete public iCloud, Google Photos or Synology Photos album link.',
     invalid_web_url: 'Enter a complete http:// or https:// address with a host.',
     invalid_source_field: 'Review the photo source fields and enter text values before saving.',
+    invalid_immich_endpoint: 'Enter a complete http:// or https:// Immich server address.',
+    immichKey_required: 'Enter an Immich API key for this server.',
+    smb_endpoint_required: 'Enter both the NAS address and share name.',
+    smbPass_required: 'Enter the password for this NAS account.',
+    invalid_dav_endpoint: 'Enter a complete http:// or https:// WebDAV folder address, including the server name.',
+    davPass_required: 'Enter the password for this WebDAV account.',
+    source_not_activated: 'The source was not activated. Check the required fields.',
     partial_apply: 'Some values were rejected. Review the per-room results.',
     active_portal_only: 'This control applies to the active Portal only.',
     connect_required: 'Choose or pair a Portal first.',
@@ -1177,6 +1184,7 @@ async function mutate(
     method,
     timeout,
     onError,
+    errorToast = true,
   } = {},
 ) {
   const busyKey = `${target?.base}:${key}`;
@@ -1193,7 +1201,7 @@ async function mutate(
   } catch (error) {
     if (session.current(ticket)) {
       onError?.(error);
-      toast(message(error), true);
+      if (errorToast) toast(message(error), true);
       if (error.data?.applied)
         scopeResults = (error.data.applied || []).map((a) => ({
           name: a.domain,
@@ -2722,11 +2730,27 @@ function invalidateAlbumQuery() {
   delete data.albumState;
   return true;
 }
+const sourceErrorFields = {
+  invalid_immich_endpoint: ['immichUrl'], immichKey_required: ['immichKey'],
+  smb_endpoint_required: ['smbHost', 'smbShare'], smbPass_required: ['smbPass'],
+  invalid_dav_endpoint: ['davUrl'], davPass_required: ['davPass'],
+  invalid_path: ['folderPath'], invalid_album_link: ['albumUrl'], invalid_web_url: ['webUrl'],
+};
+function clearSourceError() {
+  if (!data.sourceSaveError) return;
+  delete data.sourceSaveError;
+  const view = $('page').querySelector('[data-source-error]');
+  if (view) { view.hidden = true; view.textContent = ''; }
+  for (const input of $('page').querySelectorAll('[aria-describedby="photo-source-error"]')) {
+    input.removeAttribute('aria-invalid'); input.removeAttribute('aria-describedby');
+  }
+}
 function sourceField(key, label, secret, source) {
-  return searchField(label, draft(`source:${key}`,
+  const field = searchField(label, draft(`source:${key}`,
     secret ? '' : source[key] || (key === 'folderPath' ? '/sdcard/Pictures/Immortal' : '')),
     (value) => {
       setDraft(`source:${key}`, value);
+      clearSourceError();
       if (['immichUrl', 'immichKey'].includes(key) && data.albumState &&
           !albumConnectionMatches(data.albumState.connection)) {
         invalidateAlbumQuery();
@@ -2740,6 +2764,12 @@ function sourceField(key, label, secret, source) {
         ? 'Use a complete http:// or https:// URL with a host. A valid format does not guarantee the page will load.'
         : secret ? 'Leave blank to keep a credential for the same endpoint and account.' : '',
     });
+  if (sourceErrorFields[data.sourceSaveError?.code]?.includes(key)) {
+    const input = field.querySelector('input');
+    input.setAttribute('aria-invalid', 'true');
+    input.setAttribute('aria-describedby', 'photo-source-error');
+  }
+  return field;
 }
 
 function albumControls(source) {
@@ -2794,6 +2824,7 @@ function sourcesPage() {
         options,
         (value) => {
           setDraft('source:selected', value);
+          clearSourceError();
           if (data.albumState && !albumConnectionMatches(data.albumState.connection)) invalidateAlbumQuery();
           render();
         },
@@ -2812,6 +2843,9 @@ function sourcesPage() {
     ...(hidden ? [] : sourceFields[selected] || []).map(([key, label, secret]) =>
       sourceField(key, label, secret, s)),
     selected === 'immich' && !hidden ? albumControls(s) : null,
+    el('p', { id: 'photo-source-error', 'data-source-error': '', role: 'alert',
+      class: 'error', hidden: !data.sourceSaveError || data.sourceSaveError.selected !== selected,
+      text: data.sourceSaveError?.selected === selected ? data.sourceSaveError.message : '' }),
     actions(
       button(
         selected === 'folder' ? 'Use this folder' : 'Activate source',
@@ -2929,6 +2963,12 @@ async function saveSource(selected, s) {
   const target = room(), ticket = session.capture(), submitted = new Map();
   const selectedKey = draftKey('source:selected');
   const submittedSelected = draft('source:selected', selected);
+  clearSourceError();
+  const reportError = (error) => {
+    if (!session.current(ticket) || draft('source:selected', selected) !== submittedSelected ||
+        [...submitted].some(([key, value]) => drafts.has(key) && drafts.get(key) !== value)) return;
+    data.sourceSaveError = { selected, code: error.code, message: message(error) };
+  };
   try {
     const body = {};
     if (selected === 'default') body.source = 'default';
@@ -2942,13 +2982,14 @@ async function saveSource(selected, s) {
         if (value) body[key] = value;
       } else body[key] = key === 'folderPath' ? photoFolder(value) : value.trim();
     }
-    const pending = mutate('source', '/remote/sources', body, { target, ticket, success: '' });
+    const pending = mutate('source', '/remote/sources', body, { target, ticket, success: '',
+      onError: reportError, errorToast: false });
     render();
     const response = await pending;
     if (!response) return;
     const actual = response.sources?.source;
     if (actual !== selected && !(selected === 'folder' && actual === 'local')) {
-      toast('The source was not activated. Check the required fields.', true);
+      reportError(new ApiError('source_not_activated'));
       return;
     }
     const newer = drafts.get(selectedKey) !== submittedSelected ||
@@ -2968,7 +3009,7 @@ async function saveSource(selected, s) {
     toast(newer ? `${sourceNames[selected]} saved. Your newer edits are still unsaved.`
       : 'Source saved and confirmed.');
   } catch (error) {
-    if (session.current(ticket)) toast(message(error), true);
+    reportError(error);
   } finally {
     if (room()?.base === target.base && detail === 'sources') render();
   }

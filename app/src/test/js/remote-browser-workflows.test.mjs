@@ -184,16 +184,21 @@ test('a late mutation response never overwrites another room’s source or prese
 });
 
 test('folder source validation fails visibly without sending an invalid path', async () => {
-  const h = await browserHarness({ saved });
-  h.eval(
-    'data.sources={source:"folder",folderPath:"/sdcard/Pictures"};setDraft("source:folderPath","/sdcard/../secret")',
-  );
+  const h = await browserHarness({ saved, routes: {
+    '/remote/sources': ({ response }) => response({ ok: true,
+      sources: { source: 'folder', folderPath: '/sdcard/Pictures' }, calendar: { url: '' } }),
+  } });
+  h.eval('go("photos", "sources")');
+  await h.settle();
+  await h.input('Folder on Portal', '/sdcard/../secret');
   await assert.doesNotReject(h.eval('saveSource("folder",data.sources)'));
   assert.equal(
     h.calls.some((c) => c.path === '/remote/sources' && c.opts.method === 'POST'),
     false,
   );
-  assert.match(h.document.getElementById('notice').textContent, /public folder/i);
+  const error = h.document.getElementById('page').querySelector('[data-source-error]');
+  assert.equal(error.hidden, false);
+  assert.match(error.textContent, /public folder/i);
 });
 
 test('group setting partial rejection remains visible and renaming never broadcasts', async () => {
