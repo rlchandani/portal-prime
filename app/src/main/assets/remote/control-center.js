@@ -110,6 +110,7 @@ let appMode = 'installed',
 let layoutDraft = null,
   layoutRevision = null,
   sceneDraft = null,
+  scenesLoadState = null,
   presetDraft = null,
   upload = null;
 const drafts = new Map(),
@@ -4419,8 +4420,55 @@ function acceptScenes(response) {
   data.scenesRevision = validSceneRevision(response.revision) ? response.revision : null;
   // Incoming lists never replace a draft's captured list or reviewed revision.
 }
+function scenesPending() {
+  return !!scenesLoadState?.pending && session.current(scenesLoadState.ticket);
+}
+function scenesReady() {
+  return Array.isArray(data.scenes) && !data.scenesError && !scenesPending();
+}
+function sceneListCurrent(ticket, scenes, revision) {
+  return session.current(ticket) && tab === 'home' && detail === 'scenes' &&
+    !document.hidden && connectionState !== 'expired' && scenesReady() &&
+    !scenesSaving() && data.scenes === scenes && data.scenesRevision === revision;
+}
+function validateSceneList(response) {
+  const scenes = response?.scenes, ids = new Set();
+  if (!Array.isArray(scenes)) throw new ApiError('invalid_response');
+  for (const scene of scenes) {
+    if (!scene || typeof scene !== 'object' || typeof scene.id !== 'string' ||
+        !scene.id.trim() || ids.has(scene.id) || typeof scene.name !== 'string' ||
+        !scene.name.trim() || !Array.isArray(scene.steps) || scene.steps.some(step =>
+          !step || typeof step !== 'object' || typeof step.type !== 'string' || !step.type.trim()))
+      throw new ApiError('invalid_response');
+    ids.add(scene.id);
+    const schedule = scene.schedule;
+    if (schedule != null && (typeof schedule !== 'object' || typeof schedule.enabled !== 'boolean' ||
+        !Number.isInteger(schedule.hour) || schedule.hour < 0 || schedule.hour > 23 ||
+        !Number.isInteger(schedule.minute) || schedule.minute < 0 || schedule.minute > 59 ||
+        !Array.isArray(schedule.days) || schedule.days.length < 1 || schedule.days.length > 7 ||
+        new Set(schedule.days).size !== schedule.days.length ||
+        schedule.days.some(day => !Number.isInteger(day) || day < 1 || day > 7)))
+      throw new ApiError('invalid_response');
+  }
+}
 function loadScenes() {
-  return read('scenes', '/remote/scenes', acceptScenes);
+  if (!room() || document.hidden || connectionState === 'expired') return;
+  if (scenesPending() && pageReads.get('scenes') && !pageReads.get('scenes').signal.aborted)
+    return scenesLoadState.promise;
+  const owner = { ticket: session.capture(), pending: true };
+  scenesLoadState = owner;
+  delete data.scenesError;
+  render();
+  owner.promise = read('scenes', '/remote/scenes', response => {
+    validateSceneList(response);
+    acceptScenes(response);
+  }, { renderAfter: false }).finally(() => {
+    if (scenesLoadState === owner && session.current(owner.ticket)) {
+      owner.pending = false;
+      render();
+    }
+  });
+  return owner.promise;
 }
 function sceneProtectionPanel(expectedRevision = data.scenesRevision) {
   if (!validSceneRevision(expectedRevision))
@@ -4446,57 +4494,50 @@ function sceneProtectionPanel(expectedRevision = data.scenesRevision) {
   );
 }
 function scenesPage() {
-  const scenes = data.scenes,
-    revision = data.scenesRevision;
+  const scenes = data.scenes, revision = data.scenesRevision,
+    ticket = session.capture(), ready = scenesReady(), pending = scenesPending();
   if (sceneDraft) return sceneEditor();
+  const current = () => sceneListCurrent(ticket, scenes, revision) && !sceneDraft;
   return sections(
     heading('Scenes', 'Everyday routines and schedules.'),
     sceneProtectionPanel(),
     scenesSaving() ? text('Saving scenes…', 'draft-label') : null,
+    pending ? el('p', { role: 'status', 'aria-live': 'polite', class: 'detail',
+      text: scenes ? 'Refreshing routines…' : 'Loading your routines…' }) : null,
+    data.scenesError ? failure('Scenes unavailable', data.scenesError, loadScenes) : null,
+    scenes && (pending || data.scenesError)
+      ? text('Last confirmed routines are shown. Refresh successfully before using these actions.', 'detail') : null,
     group(
-      text(
-        'Scenes run ordered actions on this Portal. Schedules use its local clock and are inexact on Android.',
-      ),
-      button('New scene', () => openScene(null), { kind: 'primary', icon: 'scenes', disabled: scenesSaving() }),
+      text('Scenes run ordered actions on this Portal. Schedules use its local clock and are inexact on Android.'),
+      button('New scene', () => { if (current()) openScene(null); },
+        { kind: 'primary', icon: 'scenes', disabled: !ready || scenesSaving() }),
     ),
-    data.scenesError
-      ? failure('Scenes unavailable', data.scenesError, () => loadVisible())
-      : !scenes
-        ? empty('Scenes', 'Loading your routines…')
-        : !scenes.length
-          ? empty(
-              'No scenes yet',
-              'Create a routine with navigation, app launch, media, settings, sources and waits.',
-            )
-          : sections(
-              ...scenes.map((scene) =>
-                group(
-                  el('h3', { text: scene.name }),
-                  text(
-                    `${scene.steps?.length || 0} steps${scene.schedule?.enabled ? ` · ${String(scene.schedule.hour).padStart(2, '0')}:${String(scene.schedule.minute).padStart(2, '0')} local · ${scene.schedule.days.length} days` : ''}`,
-                  ),
-                  actions(
-                    button('Run', () => runScene(scene.id), { kind: 'primary', disabled: scenesSaving() }),
-                    button('Edit', () => openScene(scene), { kind: 'outline', disabled: scenesSaving() }),
-                    button(
-                      'Delete',
-                      () => {
-                        const ticket = session.capture();
-                        const candidate = copy(scenes.filter((s) => s.id !== scene.id));
-                        confirmAction(
-                          `Delete “${scene.name}”?`,
-                          'Remove the scene and its local schedule from this Portal.',
-                          () => saveScenes(candidate, ticket, revision),
-                          'Delete',
-                          ticket,
-                        );
-                      },
-                      { kind: 'danger', disabled: scenesSaving() || !validSceneRevision(revision) },
-                    ),
-                  ),
-                ),
-              ),
+    !scenes
+      ? !pending && !data.scenesError ? empty('Scenes', 'Loading your routines…') : null
+      : !scenes.length
+        ? empty('No scenes yet', 'Create a routine with navigation, app launch, media, settings, sources and waits.')
+        : sections(...scenes.map(scene => group(
+            el('h3', { text: scene.name }),
+            text(`${scene.steps?.length || 0} steps${scene.schedule?.enabled ? ` · ${String(scene.schedule.hour).padStart(2, '0')}:${String(scene.schedule.minute).padStart(2, '0')} local · ${scene.schedule.days.length} days` : ''}`),
+            actions(
+              button('Run', () => { if (current()) runScene(scene.id, ticket); },
+                { kind: 'primary', disabled: !ready || scenesSaving() }),
+              button('Edit', () => { if (current()) openScene(scene); },
+                { kind: 'outline', disabled: !ready || scenesSaving() }),
+              button('Delete', () => {
+                if (!current() || !validSceneRevision(revision)) return;
+                const candidate = copy(scenes.filter(s => s.id !== scene.id));
+                confirmAction(`Delete “${scene.name}”?`,
+                  'Remove the scene and its local schedule from this Portal.',
+                  () => {
+                    if (session.current(ticket) && scenesReady() && !scenesSaving() && !sceneDraft &&
+                        tab === 'home' && detail === 'scenes' && !document.hidden && connectionState !== 'expired')
+                      return saveScenes(candidate, ticket, revision);
+                  },
+                  'Delete', ticket);
+              }, { kind: 'danger', disabled: !ready || scenesSaving() || !validSceneRevision(revision) }),
             ),
+          ))),
   );
 }
 function openScene(scene) {
@@ -4745,9 +4786,10 @@ async function saveScenes(
   if (renderAfter && room()?.base === target?.base && tab === 'home' && detail === 'scenes') render();
   return confirmed ? response : null;
 }
-async function runScene(id) {
-  const response = await mutate(`scene:${id}`, '/remote/scene', { id }, { success: '' });
-  if (response?.operation) {
+async function runScene(id, ticket = session.capture()) {
+  if (!sceneListCurrent(ticket, data.scenes, data.scenesRevision) || !data.scenes.some(scene => scene.id === id)) return;
+  const response = await mutate(`scene:${id}`, '/remote/scene', { id }, { ticket, success: '' });
+  if (response?.operation && session.current(ticket)) {
     data.operations = [response.operation, ...(data.operations || [])];
     go('home', 'activity');
     toast('Scene accepted. Activity reports each step’s result.');

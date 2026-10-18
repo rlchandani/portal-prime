@@ -3073,3 +3073,105 @@ test('Activity refresh repeated Retry activation coalesces its pending metadata 
  state.finish();await tick;await h.settle();assert.equal(page.textContent.includes('Refreshing activity'),false);
  assert.equal(historyButton(h,'Retry').disabled,false);
 });
+
+
+const recoveryScene = (id='scene-one', extras={}) => ({id,name:'Fixture evening',steps:[{type:'key',action:'home'}],schedule:null,...extras});
+async function scenesRecoveryFixture({initialFailure=false,holdInitial=false}={}) {
+ const state={mode:initialFailure?'fail':holdInitial?'hold':'ok',scenes:[recoveryScene()],revision:'a'.repeat(64),reads:[],posts:[]};
+ const h=await browserHarness({saved,routes:{
+  '/remote/scenes':c=>{if(c.opts.method==='POST'){state.posts.push(JSON.parse(c.opts.body));return c.response({ok:true,scenes:state.scenes,revision:state.revision});}
+   state.reads.push(c);if(state.mode==='fail')throw new Error('fixture offline');
+   if(state.mode==='hold')return new Promise((resolve,reject)=>state.finish=(fail=false)=>fail?reject(new Error('late fixture failure')):resolve(c.response({ok:true,scenes:state.scenes,revision:state.revision})));
+   if(state.mode==='malformed')return c.response(state.malformed);
+   return c.response({ok:true,scenes:state.scenes,revision:state.revision});},
+  '/remote/scene':c=>{state.posts.push(JSON.parse(c.opts.body));return c.response({ok:true,operation:{id:'fixture-run',state:'running',results:[]}});},
+ }});
+ h.eval('go("home","scenes")');await h.settle();return{h,state,page:h.document.getElementById('page')};
+}
+const scenePageButton=(h,label)=>h.document.getElementById('page').querySelectorAll('button').find(b=>b.textContent===label);
+const sceneRecoveryPosts=h=>h.calls.filter(c=>['/remote/scenes','/remote/scene'].includes(c.path)&&c.opts.method==='POST');
+
+test('Scenes refresh initial pending state identifies loading and disables creation',async()=>{
+ const{h,state,page}=await scenesRecoveryFixture({holdInitial:true});assert.match(page.textContent,/Loading.*routines/i);
+ assert.equal(scenePageButton(h,'New scene').disabled,true);state.finish();await h.settle();assert.equal(scenePageButton(h,'New scene').disabled,false);
+});
+test('Scenes refresh failure retains confirmed routines with recovery guidance and unavailable actions',async()=>{
+ const{h,state,page}=await scenesRecoveryFixture();state.mode='fail';h.eval('loadVisible()');await h.settle();
+ assert.match(page.textContent,/Fixture evening/);assert.match(page.textContent,/Last confirmed/);assert.match(page.textContent,/Scenes unavailable/);
+ for(const label of ['New scene','Run','Edit','Delete'])assert.equal(scenePageButton(h,label).disabled,true);
+});
+test('Scenes refresh pending Retry retains confirmed routines and coalesces duplicate activation',async()=>{
+ const{h,state,page}=await scenesRecoveryFixture();state.mode='fail';h.eval('loadVisible()');await h.settle();
+ const retry=scenePageButton(h,'Retry');state.mode='hold';const before=h.calls.length;rawClick(retry);rawClick(retry);await h.settle();
+ assert.deepEqual(h.calls.slice(before).map(c=>c.path),['/remote/scenes']);assert.match(page.textContent,/Refreshing routines/);
+ assert.match(page.textContent,/Fixture evening/);assert.equal(scenePageButton(h,'Run').disabled,true);state.finish();await h.settle();
+});
+test('Scenes refresh successful Retry restores current actions and runs exactly the confirmed identity',async()=>{
+ const{h,state,page}=await scenesRecoveryFixture();state.mode='fail';h.eval('loadVisible()');await h.settle();state.mode='ok';
+ scenePageButton(h,'Retry').click();await h.settle();assert.equal(page.textContent.includes('Scenes unavailable'),false);
+ assert.equal(scenePageButton(h,'Run').disabled,false);scenePageButton(h,'Run').click();await h.settle();assert.deepEqual(state.posts,[{id:'scene-one'}]);
+});
+test('Scenes refresh initial failure is unavailable rather than a successful empty list',async()=>{
+ const{h,state,page}=await scenesRecoveryFixture({initialFailure:true});assert.match(page.textContent,/Scenes unavailable/);
+ assert.equal(page.textContent.includes('No scenes yet'),false);assert.equal(scenePageButton(h,'New scene').disabled,true);
+ state.mode='ok';scenePageButton(h,'Retry').click();await h.settle();assert.match(page.textContent,/Fixture evening/);
+});
+test('Scenes refresh confirmed empty result clears preceding routines and enables creation',async()=>{
+ const{h,state,page}=await scenesRecoveryFixture();state.scenes=[];h.eval('loadVisible()');await h.settle();
+ assert.match(page.textContent,/No scenes yet/);assert.equal(page.textContent.includes('Fixture evening'),false);assert.equal(scenePageButton(h,'New scene').disabled,false);
+});
+test('Scenes refresh missing and wrong typed arrays cannot replace the confirmed list',async()=>{
+ for(const malformed of [{ok:true},{ok:true,scenes:null},{ok:true,scenes:{}}]){
+  const{h,state,page}=await scenesRecoveryFixture();state.mode='malformed';state.malformed=malformed;h.eval('loadVisible()');await h.settle();
+  assert.match(page.textContent,/Last confirmed/);assert.match(page.textContent,/Fixture evening/);assert.equal(h.eval('data.scenes[0].id'),'scene-one');
+ }
+});
+test('Scenes refresh rejects malformed scene identities names steps and schedules before admission',async()=>{
+ for(const scenes of [[null],[recoveryScene('',{})],[recoveryScene(),recoveryScene()],[recoveryScene('bad',{name:null})],[recoveryScene('bad',{steps:{}})],[recoveryScene('bad',{steps:[null]})],[recoveryScene('bad',{schedule:{enabled:true,hour:8,minute:0,days:null}})]]){
+  const{h,state,page}=await scenesRecoveryFixture();state.mode='malformed';state.malformed={ok:true,scenes,revision:state.revision};h.eval('loadVisible()');await h.settle();
+  assert.match(page.textContent,/Last confirmed/);assert.equal(h.eval('data.scenes[0].id'),'scene-one');assert.equal(scenePageButton(h,'Run').disabled,true);
+ }
+});
+test('Scenes refresh failed metadata retires captured Run Edit New and Delete actions',async()=>{
+ const{h,state}=await scenesRecoveryFixture(),old=['Run','Edit','New scene','Delete'].map(label=>scenePageButton(h,label));
+ state.mode='fail';h.eval('loadVisible()');await h.settle();for(const action of old)rawClick(action);await h.settle();
+ assert.equal(sceneRecoveryPosts(h).length,0);assert.equal(h.eval('sceneDraft'),null);assert.equal(h.document.getElementById('sheet').open,false);
+});
+test('Scenes refresh Delete confirmation rejects unavailable metadata and preserves reviewed revision after a successful refresh',async()=>{
+ {
+  const{h,state}=await scenesRecoveryFixture();scenePageButton(h,'Delete').click();await h.settle();
+  state.mode='fail';h.eval('loadVisible()');await h.settle();
+  h.document.getElementById('sheet-actions').querySelectorAll('button').find(b=>b.textContent==='Delete').click();await h.settle();assert.equal(sceneRecoveryPosts(h).length,0);
+ }
+ {
+  const{h,state}=await scenesRecoveryFixture();scenePageButton(h,'Delete').click();await h.settle();
+  state.scenes=[recoveryScene('scene-other',{name:'Replacement evening'})];state.revision='b'.repeat(64);h.eval('loadVisible()');await h.settle();
+  h.document.getElementById('sheet-actions').querySelectorAll('button').find(b=>b.textContent==='Delete').click();await h.settle();
+  assert.deepEqual(state.posts,[{scenes:[],expectedRevision:'a'.repeat(64)}]);
+ }
+});
+test('Scenes refresh page and Portal changes retire captured actions',async()=>{
+ for(const next of ['go("home")',`selectRoom('${saved[1].base}')`]){
+  const{h}=await scenesRecoveryFixture(),old=['Run','Edit','New scene','Delete'].map(label=>scenePageButton(h,label));
+  h.eval(next);await h.settle();for(const action of old)rawClick(action);await h.settle();assert.equal(sceneRecoveryPosts(h).length,0);
+  assert.equal(h.eval('sceneDraft'),null);assert.equal(h.document.getElementById('sheet').open,false);
+ }
+});
+test('Scenes refresh late previous-Portal failure cannot invalidate current routines or replace an editor draft',async()=>{
+ const{h,state,page}=await scenesRecoveryFixture();state.mode='hold';h.eval('loadVisible()');await h.settle();const old=state.reads.at(-1),finish=state.finish;
+ state.mode='ok';h.eval(`selectRoom('${saved[1].base}')`);await h.settle();h.eval('go("home","scenes")');await h.settle();finish(true);await h.settle();
+ assert.equal(old.opts.signal.aborted,true);assert.equal(page.textContent.includes('Scenes unavailable'),false);assert.equal(scenePageButton(h,'Run').disabled,false);
+ scenePageButton(h,'Edit').click();await h.settle();await h.input('Scene name','Draft evening');state.mode='fail';h.eval('loadScenes()');await h.settle();
+ assert.equal(h.eval('sceneDraft.name'),'Draft evening');
+});
+
+
+test('Scenes refresh global Refresh supersedes an aborted pending read without enabling stale actions',async()=>{
+ const{h,state,page}=await scenesRecoveryFixture();state.mode='hold';h.eval('loadScenes()');await h.settle();
+ const old=state.reads.at(-1),finishOld=state.finish,before=state.reads.length;
+ h.document.getElementById('refresh-button').click();await h.settle();const finishNew=state.finish;
+ assert.equal(old.opts.signal.aborted,true);assert.equal(state.reads.length,before+1);assert.notEqual(finishOld,finishNew);
+ finishOld();await h.settle();assert.match(page.textContent,/Refreshing routines/);assert.equal(scenePageButton(h,'Run').disabled,true);
+ state.scenes=[recoveryScene('scene-latest',{name:'Fresh evening'})];finishNew();await h.settle();
+ assert.match(page.textContent,/Fresh evening/);assert.equal(page.textContent.includes('Refreshing routines'),false);assert.equal(scenePageButton(h,'Run').disabled,false);
+});
