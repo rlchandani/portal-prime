@@ -22,7 +22,7 @@ import org.junit.Test
  *
  * Timezone and locale are pinned so the day/hour labels and the "drop past hours"
  * cutoff are deterministic: the response carries local times (`timezone=auto`), which
- * the parser reads in the default zone, and the labels are locale-formatted.
+ * the parser reads using the response offset when present, and the labels are locale-formatted.
  */
 class WeatherTest {
 
@@ -121,6 +121,59 @@ class WeatherTest {
   fun `hourly is empty when every hour is in the past`() {
     val hours = Weather.parseForecast(sample, utc("2030-01-01T00:00")).hours
     assertTrue(hours.isEmpty())
+  }
+
+  @Test
+  fun `hourly current selection follows weather offset rather than device zone`() {
+    val pacific = sample.replace("\"daily\": {", "\"utc_offset_seconds\": -25200, \"daily\": {")
+    val hours = Weather.parseForecast(pacific, utc("2026-06-07T20:30")).hours
+    assertEquals(60, hours.first().temp) // 13:00 Pacific, not 20:00 UTC.
+    assertEquals("2 PM", hours[1].label)
+  }
+
+  private fun solar(offset: Int, sunrise: String, sunset: String) =
+      """{"utc_offset_seconds":$offset,"daily":{"sunrise":["$sunrise"],"sunset":["$sunset"]}}"""
+
+  @Test
+  fun `solar instants use location offset and labels retain the location clock`() {
+    val sun = Weather.parseSunTimes(solar(-25200, "2026-06-07T06:30", "2026-06-07T20:30"))
+    assertEquals(utc("2026-06-07T13:30"), sun.sunriseMillis)
+    assertEquals(utc("2026-06-08T03:30"), sun.sunsetMillis)
+    assertEquals("6:30 AM" to "8:30 PM", sun.formatted(false))
+    assertEquals("06:30" to "20:30", sun.formatted(true))
+    assertEquals(810, sun.minuteOfDay(utc("2026-06-07T20:30")))
+    assertEquals(1230, sun.minuteOfDay(sun.sunsetMillis))
+  }
+
+  @Test
+  fun `quarter hour offset crosses UTC date without changing solar labels`() {
+    val sun = Weather.parseSunTimes(solar(20700, "2026-06-07T05:30", "2026-06-07T19:30"))
+    assertEquals(utc("2026-06-06T23:45"), sun.sunriseMillis)
+    assertEquals(utc("2026-06-07T13:45"), sun.sunsetMillis)
+    assertEquals("05:30" to "19:30", sun.formatted(true))
+    assertEquals(15, sun.minuteOfDay(utc("2026-06-06T18:30")))
+  }
+
+  @Test
+  fun `parsed solar times remain stable when device timezone changes`() {
+    val sun = Weather.parseSunTimes(solar(-25200, "2026-06-07T06:30", "2026-06-07T20:30"))
+    TimeZone.setDefault(TimeZone.getTimeZone("Asia/Tokyo"))
+    assertEquals("06:30" to "20:30", sun.formatted(true))
+    assertEquals(810, sun.minuteOfDay(utc("2026-06-07T20:30")))
+  }
+
+  @Test
+  fun `hourly offset is fixed across response DST boundaries`() {
+    val pacific = sample.replace("\"daily\": {", "\"utc_offset_seconds\": -28800, \"timezone\": \"America/Los_Angeles\", \"daily\": {")
+    // In June the IANA zone is -7; this response explicitly states -8.
+    val hours = Weather.parseForecast(pacific, utc("2026-06-07T21:30"), true).hours
+    assertEquals(60, hours.first().temp)
+    assertEquals("14", hours[1].label)
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun `out of range provider offset is rejected`() {
+    Weather.parseSunTimes(solar(1000000, "2026-06-07T06:30", "2026-06-07T20:30"))
   }
 
   @Test

@@ -27,14 +27,15 @@ import kotlinx.coroutines.delay
 internal fun ApprovedHomeSky() {
   val context = LocalContext.current
   val sun by pollingState(refreshMs = 30 * 60_000L, retryMs = 60_000L) { Weather.fetchSunTimes(context) }
-  val nowMin by produceState(minuteOfDay(System.currentTimeMillis())) {
+  val now by produceState(System.currentTimeMillis()) {
     while (true) {
       delay(60_000L - System.currentTimeMillis() % 60_000L)
-      value = minuteOfDay(System.currentTimeMillis())
+      value = System.currentTimeMillis()
     }
   }
-  val sunrise = sun?.let { minuteOfDay(it.sunriseMillis) } ?: 6 * 60
-  val sunset = sun?.let { minuteOfDay(it.sunsetMillis) } ?: 20 * 60
+  val nowMin = sun?.minuteOfDay(now) ?: minuteOfDay(now)
+  val sunrise = sun?.let { it.minuteOfDay(it.sunriseMillis) } ?: 6 * 60
+  val sunset = sun?.let { it.minuteOfDay(it.sunsetMillis) } ?: 20 * 60
   val (top, bottom) = remember(nowMin, sunrise, sunset) { SkyColors.gradientFor(nowMin, sunrise, sunset) }
   val isDay = nowMin in sunrise..sunset
   Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(top, bottom)))) {

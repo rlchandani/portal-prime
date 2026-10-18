@@ -40,6 +40,13 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // Pure public parser checks need no UiAutomation session. UI paths below retain
+        // FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES; this branch collects no UI/private files.
+        if (options.getString("command") == "weatherTime") {
+            val weather = WeatherTimeDeviceChecks.run()
+            finish(if (weather.getBoolean("weatherTimeCompleted")) 0 else 1, weather)
+            return
+        }
         // This public fixture path never enters the generic private-cache diagnostics catch.
         if (options.getString("command") == "issPassUi") {
             val iss = IssPassUiDeviceChecks.run(this, options)

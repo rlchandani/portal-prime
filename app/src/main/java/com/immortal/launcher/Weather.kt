@@ -9,6 +9,9 @@ package com.immortal.launcher
 
 import android.content.Context
 import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.SimpleTimeZone
+import java.util.TimeZone
 import java.util.Locale
 import kotlin.math.roundToInt
 import org.json.JSONObject
@@ -115,32 +118,53 @@ object Weather {
     currentConditions.clear()
   }
 
-  /** Today's sunrise/sunset as epoch millis (location-local, which on a fixed Portal
-   * equals the device zone). [formatted] gives "HH:mm" / "h:mm a" per the clock setting. */
-  data class SunTimes(val sunriseMillis: Long, val sunsetMillis: Long) {
+  /** Absolute solar instants, displayed using the weather response's location offset. */
+  data class SunTimes(
+      val sunriseMillis: Long,
+      val sunsetMillis: Long,
+      val utcOffsetSeconds: Int = TimeZone.getDefault().getOffset(sunriseMillis) / 1000,
+  ) {
+    private val locationZone = SimpleTimeZone(utcOffsetSeconds * 1000, "Weather location")
+
     fun formatted(use24Hour: Boolean): Pair<String, String> {
       val fmt = SimpleDateFormat(if (use24Hour) "HH:mm" else "h:mm a", Locale.getDefault())
+          .apply { timeZone = locationZone }
       return fmt.format(java.util.Date(sunriseMillis)) to fmt.format(java.util.Date(sunsetMillis))
+    }
+
+    /** Sky phase and its solar boundaries must use the same location clock. */
+    fun minuteOfDay(millis: Long): Int = Calendar.getInstance(locationZone).run {
+      timeInMillis = millis
+      get(Calendar.HOUR_OF_DAY) * 60 + get(Calendar.MINUTE)
     }
   }
 
-  /** Today's sunrise + sunset from Open-Meteo (keyless). `timezone=auto` returns the
-   * location's local times, parsed in the device's default zone. Null on failure. */
-  fun fetchSunTimes(context: Context): SunTimes? =
-      runCatching {
-            val (lat, lon) = location(context) ?: return null
-            val daily =
-                JSONObject(
-                        httpGet(
-                            "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
-                                "&daily=sunrise,sunset&timezone=auto&forecast_days=1"))
-                    .getJSONObject("daily")
-            val iso = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
-            val sr = iso.parse(daily.getJSONArray("sunrise").getString(0))!!.time
-            val ss = iso.parse(daily.getJSONArray("sunset").getString(0))!!.time
-            SunTimes(sr, ss)
-          }
-          .getOrNull()
+  /** Today's sunrise + sunset from Open-Meteo (keyless). Null on fetch/parse failure. */
+  fun fetchSunTimes(context: Context): SunTimes? = runCatching {
+    val (lat, lon) = location(context) ?: return null
+    parseSunTimes(httpGet(
+        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
+            "&daily=sunrise,sunset&timezone=auto&forecast_days=1"))
+  }.getOrNull()
+
+  internal fun parseSunTimes(json: String): SunTimes {
+    val root = JSONObject(json)
+    val zone = responseZone(root)
+    val daily = root.getJSONObject("daily")
+    val iso = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
+        .apply { timeZone = zone; isLenient = false }
+    val sunrise = iso.parse(daily.getJSONArray("sunrise").getString(0))!!.time
+    val sunset = iso.parse(daily.getJSONArray("sunset").getString(0))!!.time
+    return SunTimes(sunrise, sunset, zone.getOffset(sunrise) / 1000)
+  }
+
+  /** Open-Meteo ISO timestamps use this fixed offset throughout a response, even over DST. */
+  private fun responseZone(root: JSONObject): TimeZone {
+    if (!root.has("utc_offset_seconds")) return TimeZone.getDefault()
+    val offset = root.getInt("utc_offset_seconds")
+    require(offset in -18 * 3600..18 * 3600) { "Invalid weather UTC offset" }
+    return SimpleTimeZone(offset * 1000, "Weather location")
+  }
 
   /** Last known city name (empty until geolocation has succeeded once). */
   fun cachedCity(context: Context): String =
@@ -170,7 +194,7 @@ object Weather {
    * Fetches a 7-day daily forecast and the next ~12 hours of hourly forecast from
    * Open-Meteo (keyless), for the home-screen weather widget. Returns null if it
    * can't be fetched (caller can retry). `timezone=auto` makes Open-Meteo return
-   * local times, which we parse in the device's default zone.
+   * local times, which we parse using the response's fixed UTC offset.
    */
   fun fetchForecast(context: Context): Forecast? =
       runCatching {
@@ -183,7 +207,7 @@ object Weather {
 
   /** The Open-Meteo request for [fetchForecast]; split out so the unit choice can be
    * verified in tests. `timezone=auto` makes the response use the location's local
-   * times, which [parseForecast] reads in the device's default zone. */
+   * times, which [parseForecast] reads using the response's fixed UTC offset. */
   internal fun forecastUrl(lat: Double, lon: Double, fahrenheit: Boolean): String {
     val unit = if (fahrenheit) "fahrenheit" else "celsius"
     return "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
@@ -229,9 +253,12 @@ object Weather {
     val time = h.getJSONArray("time")
     val code = h.getJSONArray("weather_code")
     val temp = h.getJSONArray("temperature_2m")
+    val zone = responseZone(root)
     val isoHour = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
+        .apply { timeZone = zone; isLenient = false }
     // 24-hour: a bare hour ("13", "00"); 12-hour: "1 PM".
     val hourFmt = SimpleDateFormat(if (use24Hour) "HH" else "h a", Locale.getDefault())
+        .apply { timeZone = zone }
     // Show the current hour onward; everything before "now" is in the past.
     val cutoff = nowMillis - 60L * 60 * 1000
     val out = ArrayList<HourForecast>(12)
@@ -241,7 +268,7 @@ object Weather {
       if (t < cutoff) continue
       out.add(
           HourForecast(
-              label = if (first) "Now" else hourFmt.format(time.getString(i).let { isoHour.parse(it)!! }),
+              label = if (first) "Now" else hourFmt.format(java.util.Date(t)),
               code = code.getInt(i),
               temp = temp.getDouble(i).roundToInt()))
       first = false

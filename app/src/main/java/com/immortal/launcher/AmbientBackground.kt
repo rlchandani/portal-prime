@@ -60,10 +60,10 @@ internal fun SkyBackground() {
       produceState<Weather.SunTimes?>(initialValue = null) {
         value = withContext(Dispatchers.IO) { Weather.fetchSunTimes(context) }
       }
-  var nowMin by remember { mutableStateOf(ambientMinuteOfDay()) }
+  var now by remember { mutableStateOf(System.currentTimeMillis()) }
   LaunchedEffect(Unit) {
     while (true) {
-      nowMin = ambientMinuteOfDay()
+      now = System.currentTimeMillis()
       delay(5L * 60 * 1000)
     }
   }
@@ -74,8 +74,9 @@ internal fun SkyBackground() {
       animationSpec = infiniteRepeatable(tween(180_000, easing = LinearEasing), RepeatMode.Restart),
       label = "driftX",
   )
-  val sr = sun?.let { ambientMinuteOfDay(it.sunriseMillis) } ?: 6 * 60
-  val ss = sun?.let { ambientMinuteOfDay(it.sunsetMillis) } ?: 20 * 60
+  val nowMin = sun?.minuteOfDay(now) ?: ambientMinuteOfDay(now)
+  val sr = sun?.let { it.minuteOfDay(it.sunriseMillis) } ?: 6 * 60
+  val ss = sun?.let { it.minuteOfDay(it.sunsetMillis) } ?: 20 * 60
   val (top, bottom) = SkyColors.gradientFor(nowMin, sr, ss)
   val isDay = nowMin in sr..ss
 
@@ -138,15 +139,16 @@ internal fun DayProgressBar(modifier: Modifier = Modifier) {
       produceState<Weather.SunTimes?>(initialValue = null) {
         value = withContext(Dispatchers.IO) { Weather.fetchSunTimes(context) }
       }
-  var nowMin by remember { mutableStateOf(ambientMinuteOfDay()) }
+  var now by remember { mutableStateOf(System.currentTimeMillis()) }
   LaunchedEffect(Unit) {
     while (true) {
-      nowMin = ambientMinuteOfDay()
+      now = System.currentTimeMillis()
       delay(60L * 1000)
     }
   }
-  val sr = sun?.let { ambientMinuteOfDay(it.sunriseMillis) } ?: 6 * 60
-  val ss = sun?.let { ambientMinuteOfDay(it.sunsetMillis) } ?: 20 * 60
+  val nowMin = sun?.minuteOfDay(now) ?: ambientMinuteOfDay(now)
+  val sr = sun?.let { it.minuteOfDay(it.sunriseMillis) } ?: 6 * 60
+  val ss = sun?.let { it.minuteOfDay(it.sunsetMillis) } ?: 20 * 60
   val fill = SkyColors.gradientFor(nowMin, sr, ss).second
   val progress = (nowMin / 1440f).coerceIn(0f, 1f)
   Box(modifier = modifier.fillMaxWidth().height(4.dp).background(fill.copy(alpha = 0.18f))) {
