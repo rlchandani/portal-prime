@@ -2111,3 +2111,71 @@ test('scene editor a late Save cannot change another Portal draft or confirmed r
   assert.equal(h.eval('sceneDraft?.name'),'Other Portal');assert.equal(h.eval('sceneDraft?.expectedRevision'),sceneV1);
   assert.equal(h.eval('data.scenesRevision'),sceneV1);
 });
+
+
+async function pendingSourceSave({ kind='immich', fail=false, wrong=false, blank=false, holdRefresh=false }={}) {
+  let release, releaseRead, reads=0;
+  let sources={source:kind,immichUrl:'https://old.example.invalid',immichKey:'public-server-key',immichAlbumId:'',immichAlbumName:'',smbHost:'public-server',smbShare:'Photos',smbPath:'',smbUser:'fixture',smbPass:'public-server-pass',davUrl:'https://old.example.invalid/photos/',davUser:'fixture',davPass:'public-server-pass'};
+  const h=await browserHarness({saved,routes:{'/remote/sources':({opts,response})=>{
+    if(opts.method==='POST')return new Promise(resolve=>{const body=JSON.parse(opts.body);release=()=>{
+      if(fail)return resolve(response({ok:false,error:'invalid_value'},400));
+      sources={...sources,...body,source:wrong?'default':kind};resolve(response({ok:true,sources,calendar:{url:'old-calendar'}}));
+    };});
+    reads++;const snapshot=JSON.parse(JSON.stringify(sources));
+    if(holdRefresh&&reads===2)return new Promise(resolve=>releaseRead=()=>resolve(response({ok:true,sources:snapshot,calendar:{url:'old-calendar'}})));
+    return response({ok:true,sources:snapshot,calendar:{url:'old-calendar'}});
+  }}});
+  h.eval('advanced=true;go("photos","sources")');await h.settle();
+  if(kind==='immich')await h.input('Server address','https://submitted.example.invalid');
+  await h.input(kind==='immich'?'API key':'Password',blank?'':'public-submitted-credential');h.click('Activate source');await h.settle();
+  return {h,finish:async()=>{release();await h.settle();},finishRead:async()=>{releaseRead();await h.settle();}};
+}
+const sourcePosts=h=>h.calls.filter(c=>c.path==='/remote/sources'&&c.opts.method==='POST');
+
+test('source save preserves a newer Immich key entered while pending',async()=>{
+ const {h,finish}=await pendingSourceSave();try{await h.input('API key','public-newer-key');}finally{await finish();}
+ assert.equal(h.eval('draft("source:immichKey")'),'public-newer-key');assert.equal(JSON.parse(sourcePosts(h)[0].opts.body).immichKey,'public-submitted-credential');
+});
+test('source save preserves a newer network-folder password entered while pending',async()=>{
+ const {h,finish}=await pendingSourceSave({kind:'smb'});try{await h.input('Password','public-newer-password');}finally{await finish();}
+ assert.equal(h.eval('draft("source:smbPass")'),'public-newer-password');
+});
+test('source save preserves a newer WebDAV password entered while pending',async()=>{
+ const {h,finish}=await pendingSourceSave({kind:'dav'});try{await h.input('Password','public-newer-password');}finally{await finish();}
+ assert.equal(h.eval('draft("source:davPass")'),'public-newer-password');
+});
+test('source save retains newer endpoint edits and explains that they are unsaved',async()=>{
+ const {h,finish}=await pendingSourceSave();try{await h.input('Server address','https://newer.example.invalid');}finally{await finish();}
+ assert.equal(h.eval('draft("source:immichUrl")'),'https://newer.example.invalid');assert.equal(h.eval('data.sources.immichUrl'),'https://submitted.example.invalid');assert.match(h.document.body.textContent,/newer edits.*unsaved/i);
+});
+test('source save retains a different selected provider and its credential draft',async()=>{
+ const {h,finish}=await pendingSourceSave();try{h.eval('setDraft("source:selected","smb");render()');await h.input('Password','public-next-provider-password');}finally{await finish();}
+ assert.equal(h.eval('draft("source:selected")'),'smb');assert.equal(h.eval('draft("source:smbPass")'),'public-next-provider-password');assert.equal(h.eval('data.sources.source'),'immich');assert.match(h.document.body.textContent,/Active on Portal: Immich/);
+});
+test('source save clears only confirmed unchanged submitted credentials and strips server secrets',async()=>{
+ const {h,finish}=await pendingSourceSave();await finish();assert.equal(h.eval('draft("source:immichKey")'),'');
+ assert.equal(h.eval('data.sources.immichKeyConfigured'),true);assert.equal(h.eval('["immichKey","smbPass","davPass"].some(k=>Object.hasOwn(data.sources,k))'),false);
+});
+test('source save shows progress and prevents duplicate activation and pending preview',async()=>{
+ const {h,finish}=await pendingSourceSave();try{assert.match(h.document.getElementById('page').textContent,/Saving source/);assert.equal(layoutButton(h,'Activate source').disabled,true);assert.equal(layoutButton(h,'Preview active source').disabled,true);h.click('Activate source');await h.settle();assert.equal(sourcePosts(h).length,1);}finally{await finish();}
+ assert.equal(layoutButton(h,'Activate source').disabled,false);
+});
+test('source save failures keep newer credentials and allow a retry',async()=>{
+ const {h,finish}=await pendingSourceSave({fail:true});try{await h.input('API key','public-retry-key');}finally{await finish();}
+ assert.equal(h.eval('draft("source:immichKey")'),'public-retry-key');assert.equal(h.eval('data.sources.immichUrl'),'https://old.example.invalid');assert.equal(layoutButton(h,'Activate source').disabled,false);
+});
+test('source save an unconfirmed activation keeps the credential draft',async()=>{
+ const {h,finish}=await pendingSourceSave({wrong:true});await finish();assert.equal(h.eval('draft("source:immichKey")'),'public-submitted-credential');assert.match(h.document.body.textContent,/not activated/i);assert.equal(h.eval('data.sources.source'),'immich');
+});
+test('source save uses its confirmed snapshot without another GET and rejects an older refresh',async()=>{
+ const {h,finish,finishRead}=await pendingSourceSave({holdRefresh:true});const refresh=h.eval('loadSources()');await h.settle();h.eval('data.calendar={url:"newer-calendar"}');
+ await finish();await finishRead();await refresh;
+ assert.equal(h.calls.filter(c=>c.path==='/remote/sources'&&c.opts.method!=='POST').length,2);assert.equal(h.eval('data.sources.immichUrl'),'https://submitted.example.invalid');assert.equal(h.eval('data.calendar.url'),'newer-calendar');
+});
+test('source save keeps blank-secret retention semantics and sends no saved credential',async()=>{
+ const {h,finish}=await pendingSourceSave({blank:true});await finish();assert.equal(Object.hasOwn(JSON.parse(sourcePosts(h)[0].opts.body),'immichKey'),false);assert.equal(h.eval('data.sources.immichKeyConfigured'),true);
+});
+test('source save a late old-Portal response cannot clear another Portal credential',async()=>{
+ const {h,finish}=await pendingSourceSave();try{h.eval(`selectRoom('${saved[1].base}')`);await h.settle();h.eval('advanced=true;go("photos","sources")');await h.settle();await h.input('API key','public-other-room-key');}finally{await finish();}
+ assert.equal(h.eval('draft("source:immichKey")'),'public-other-room-key');assert.equal(h.eval('data.sources.immichUrl'),'https://old.example.invalid');
+});

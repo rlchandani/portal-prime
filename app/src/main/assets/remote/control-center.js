@@ -2377,16 +2377,20 @@ async function applyProfile(name, profile, targets, ticket) {
   }
 }
 
+function acceptSources(response, { calendar = true } = {}) {
+  const source = { ...(response.sources || {}) };
+  for (const key of ['immichKey', 'smbPass', 'davPass']) {
+    source[`${key}Configured`] = source[`${key}Configured`] === true || !!source[key];
+    delete source[key];
+  }
+  data.sources = source;
+  if (calendar) data.calendar = response.calendar;
+}
 async function loadSources() {
-  return read('sources', '/remote/sources', (r) => {
-    const source = { ...(r.sources || {}) };
-    for (const key of ['immichKey', 'smbPass', 'davPass']) {
-      source[`${key}Configured`] = source[`${key}Configured`] === true || !!source[key];
-      delete source[key];
-    }
-    data.sources = source;
-    data.calendar = r.calendar;
-  });
+  return read('sources', '/remote/sources', acceptSources);
+}
+function sourceSaving(target = room()) {
+  return busy.has(`${target?.base}:source`);
 }
 const sourceNames = {
   folder: 'Photos on this Portal',
@@ -2433,7 +2437,11 @@ function sourcesPage() {
     .filter(([id]) => advanced || !tech.includes(id) || id === selected)
     .map(([value, label]) => ({ value, label }));
   const hidden = tech.includes(selected) && !advanced;
+  const saving = sourceSaving();
   const editor = group(
+    text(`Active on Portal: ${sourceNames[s.source === 'local' ? 'folder' : s.source] || 'Unknown source'}`),
+    saving ? el('p', { role: 'status', 'aria-live': 'polite', class: 'detail',
+      text: 'Saving source… Any newer edits will need another activation.' }) : null,
     row(
       'Source',
       'Choose what your Portal displays.',
@@ -2507,9 +2515,11 @@ function sourcesPage() {
       button(
         selected === 'folder' ? 'Use this folder' : 'Activate source',
         () => saveSource(selected, s),
-        { kind: 'primary', disabled: hidden },
+        { kind: 'primary', disabled: hidden || saving },
       ),
-      button('Preview on Portal', () => dispatchKey('screensaver'), { kind: 'outline' }),
+      button('Preview active source', () => dispatchKey('screensaver'), {
+        kind: 'outline', disabled: saving,
+      }),
     ),
     text('Connections apply to the selected Portal. Credentials are not copied to other rooms.'),
   );
@@ -2562,6 +2572,10 @@ async function loadAlbums() {
   }
 }
 async function saveSource(selected, s) {
+  if (!room() || sourceSaving()) return;
+  const target = room(), ticket = session.capture(), submitted = new Map();
+  const selectedKey = draftKey('source:selected');
+  const submittedSelected = draft('source:selected', selected);
   try {
     const body = {};
     if (selected === 'default') body.source = 'default';
@@ -2570,25 +2584,38 @@ async function saveSource(selected, s) {
         `source:${key}`,
         secret ? '' : s[key] || (key === 'folderPath' ? '/sdcard/Pictures/Immortal' : ''),
       );
+      submitted.set(draftKey(`source:${key}`), value);
       if (secret) {
         if (value) body[key] = value;
       } else body[key] = key === 'folderPath' ? photoFolder(value) : value.trim();
     }
-    const response = await mutate('source', '/remote/sources', body, { success: '' });
-    if (response) {
-      const actual = response.sources?.source;
-      const expected = selected;
-      if (actual !== expected && !(expected === 'folder' && actual === 'local')) {
-        toast('The source was not activated. Check the required fields.', true);
-        return;
-      }
-      toast('Source saved and confirmed.');
-      for (const [key, , secret] of sourceFields[selected] || [])
-        if (secret) drafts.delete(draftKey(`source:${key}`));
-      await loadSources();
+    const pending = mutate('source', '/remote/sources', body, { target, ticket, success: '' });
+    render();
+    const response = await pending;
+    if (!response) return;
+    const actual = response.sources?.source;
+    if (actual !== selected && !(selected === 'folder' && actual === 'local')) {
+      toast('The source was not activated. Check the required fields.', true);
+      return;
     }
+    const newer = drafts.get(selectedKey) !== submittedSelected ||
+      [...submitted].some(([key, value]) => drafts.get(key) !== value);
+    for (const [key, , secret] of sourceFields[selected] || []) {
+      const ownerKey = `${target.base}:source:${key}`;
+      if (secret && body[key] && drafts.get(ownerKey) === submitted.get(ownerKey))
+        drafts.delete(ownerKey);
+    }
+    // The mutation already returns its saved snapshot. Invalidate any older source read.
+    pageReads.get('sources')?.abort();
+    session.read('sources');
+    acceptSources(response, { calendar: false });
+    delete data.sourcesError;
+    toast(newer ? `${sourceNames[selected]} saved. Your newer edits are still unsaved.`
+      : 'Source saved and confirmed.');
   } catch (error) {
-    toast(message(error), true);
+    if (session.current(ticket)) toast(message(error), true);
+  } finally {
+    if (room()?.base === target.base && detail === 'sources') render();
   }
 }
 function currentPhotoCollection() {
