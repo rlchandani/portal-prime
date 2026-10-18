@@ -671,7 +671,14 @@ function cancelPairDialog() {
   clearTimeout(pairDiscoveryTimer);
   pairDiscoveryTimer = null;
 }
+let sheetCloseHandler = null;
+function finishSheetClose() {
+  const onClose = sheetCloseHandler;
+  sheetCloseHandler = null;
+  if (onClose) onClose();
+}
 function openSheet(title, body, onClose = null) {
+  finishSheetClose();
   cancelPairDialog();
   delete sheet.dataset.presetEditor;
   delete sheet.dataset.sceneEditor;
@@ -685,6 +692,7 @@ function openSheet(title, body, onClose = null) {
   if (joined) footer.append(joined);
   else for (const primary of body.querySelectorAll('button.button.primary')) footer.append(primary);
   footer.hidden = footer.children.length === 0;
+  sheetCloseHandler = onClose;
   sheet.onclose = () => {
     // A queued close event can arrive after a replacement dialog has opened.
     if (sheet.open) return;
@@ -694,11 +702,12 @@ function openSheet(title, body, onClose = null) {
     previewPool.clear();
     clearTimeout(pairDiscoveryTimer);
     pairDiscoveryTimer = null;
-    if (onClose) onClose();
+    finishSheetClose();
   };
   if (!sheet.open) sheet.showModal();
 }
 function closeSheet() {
+  finishSheetClose();
   cancelPairDialog();
   if (sheet.open) sheet.close();
 }
@@ -722,35 +731,26 @@ async function confirmAction(
   label = 'Confirm',
   ticket = session.capture(),
 ) {
-  let resolve;
+  let resolve, settled = false;
   const answer = new Promise((r) => (resolve = r));
-  openSheet(
-    title,
-    sections(
-      text(description),
-      el(
-        'div',
-        { class: 'dialog-actions' },
-        button(
-          'Cancel',
-          () => {
-            resolve(false);
-            closeSheet();
-          },
-          { kind: 'outline' },
-        ),
-        button(
-          label,
-          () => {
-            resolve(true);
-            closeSheet();
-          },
-          { kind: 'primary' },
-        ),
-      ),
+  const body = sections(
+    text(description),
+    el('div', { class: 'dialog-actions' },
+      button('Cancel', () => decide(false), { kind: 'outline' }),
+      button(label, () => decide(true), { kind: 'primary' }),
     ),
-    () => resolve(false),
   );
+  function decide(confirmed) {
+    if (settled || !sheet.open || content.firstChild !== body || !session.current(ticket)) return;
+    settled = true;
+    resolve(confirmed);
+    closeSheet();
+  }
+  openSheet(title, body, () => {
+    if (settled) return;
+    settled = true;
+    resolve(false);
+  });
   if ((await answer) && session.current(ticket)) return action(ticket);
 }
 function roomsDialog() {

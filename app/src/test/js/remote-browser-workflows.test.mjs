@@ -2901,3 +2901,71 @@ test('Pair dialog stale pairing failure cannot remove a new dialog PIN or restar
   assert.equal(pairInputs(h)[1].value, '654321'); assert.equal(pairSubmit(h).disabled, false);
   assert.equal(h.document.getElementById('sheet-content').textContent.includes('PIN'), true);
 });
+
+
+// Shared confirmation callers must finish when their specific prompt goes away.
+const confirmationButton = (h, label) => h.document.getElementById('sheet-actions')
+  .querySelectorAll('button').find(button => button.textContent === label);
+function startConfirmation(h) {
+  h.eval('globalThis.confirmedCount=0;globalThis.confirmationSettled=false;globalThis.confirmationResult=confirmAction("Old action?","Public fixture",()=>{confirmedCount++},"Do it").then(()=>{confirmationSettled=true})');
+}
+const rawClick = button => { for (const handler of button.listeners.click || []) handler({target:button}); };
+
+test('Confirmation replacement settles the old caller without dispatching its action', async () => {
+  const h=await browserHarness({saved});startConfirmation(h);h.eval('roomsDialog()');await h.settle();
+  assert.equal(h.eval('confirmationSettled'),true);assert.equal(h.eval('confirmedCount'),0);
+  assert.equal(h.document.getElementById('sheet-title').textContent,'Your Portals');
+});
+test('Confirmation close settles before the asynchronous browser close event', async () => {
+  const h=await browserHarness({saved});startConfirmation(h);
+  h.eval('sheet.close=function(){this.open=false};closeSheet()');await h.settle();
+  assert.equal(h.eval('confirmationSettled'),true);assert.equal(h.eval('confirmedCount'),0);
+});
+test('Confirmation stale confirm callback cannot dispatch or close a replacement', async () => {
+  const h=await browserHarness({saved});startConfirmation(h);const old=confirmationButton(h,'Do it');
+  h.eval('roomsDialog()');rawClick(old);await h.settle();
+  assert.equal(h.eval('confirmedCount'),0);assert.equal(h.document.getElementById('sheet').open,true);
+  assert.equal(h.document.getElementById('sheet-title').textContent,'Your Portals');
+});
+test('Confirmation stale cancel callback cannot dismiss another live prompt', async () => {
+  const h=await browserHarness({saved});startConfirmation(h);const old=confirmationButton(h,'Cancel');
+  h.eval('confirmAction("New action?","Public fixture",()=>{confirmedCount++},"New action")');rawClick(old);await h.settle();
+  assert.equal(h.document.getElementById('sheet').open,true);assert.equal(h.eval('confirmedCount'),0);
+  h.click('New action');await h.settle();assert.equal(h.eval('confirmedCount'),1);
+});
+test('Confirmation accepted action dispatches once and its replacement survives duplicate activation', async () => {
+  const h=await browserHarness({saved});h.eval('globalThis.confirmedCount=0;confirmAction("Open rooms?","Public fixture",()=>{confirmedCount++;roomsDialog()},"Do it")');
+  const old=confirmationButton(h,'Do it');h.click('Do it');await h.settle();rawClick(old);await h.settle();
+  assert.equal(h.eval('confirmedCount'),1);assert.equal(h.document.getElementById('sheet').open,true);
+  assert.equal(h.document.getElementById('sheet-title').textContent,'Your Portals');
+});
+test('Confirmation native dismissal settles and a retired callback cannot close a new dialog', async () => {
+  const h=await browserHarness({saved});startConfirmation(h);const old=confirmationButton(h,'Do it');
+  h.eval('sheet.close();roomsDialog()');rawClick(old);await h.settle();
+  assert.equal(h.eval('confirmationSettled'),true);assert.equal(h.eval('confirmedCount'),0);
+  assert.equal(h.document.getElementById('sheet').open,true);
+});
+test('Confirmation explicit Cancel settles without dispatch and permits a fresh confirmation', async () => {
+  const h=await browserHarness({saved});startConfirmation(h);h.click('Cancel');await h.settle();
+  assert.equal(h.eval('confirmationSettled'),true);assert.equal(h.eval('confirmedCount'),0);
+  startConfirmation(h);h.click('Do it');await h.settle();assert.equal(h.eval('confirmedCount'),1);
+});
+test('Confirmation page change retires captured callbacks without affecting a new prompt', async () => {
+  const h=await browserHarness({saved});startConfirmation(h);const old=confirmationButton(h,'Do it');
+  h.eval('go("apps");roomsDialog()');rawClick(old);await h.settle();
+  assert.equal(h.eval('confirmedCount'),0);assert.equal(h.eval('confirmationSettled'),true);
+  assert.equal(h.document.getElementById('sheet').open,true);
+});
+test('Confirmation Portal change retires captured callbacks without affecting a new prompt', async () => {
+  const h=await browserHarness({saved});startConfirmation(h);const old=confirmationButton(h,'Do it');
+  h.eval(`selectRoom('${saved[1].base}');roomsDialog()`);rawClick(old);await h.settle();
+  assert.equal(h.eval('confirmedCount'),0);assert.equal(h.eval('confirmationSettled'),true);
+  assert.equal(h.document.getElementById('sheet').open,true);
+});
+test('Confirmation replacement clears Snapshot review progress and permits retry with its selected file', async () => {
+  const {h}=await restoreReviewHarness();chooseRestoreFile(h,restoreFile());h.click('Review restore');await h.settle();
+  assert.equal(restoreReviewButton(h).disabled,true);h.eval('roomsDialog()');await h.settle();
+  assert.equal(restoreReviewButton(h).disabled,false);assert.match(h.document.getElementById('page').textContent,/first.json/);
+  assert.equal(snapshotPosts(h).length,0);h.eval('closeSheet()');h.click('Review restore');await h.settle();
+  assert.equal(h.document.getElementById('sheet-title').textContent,'Restore to Preview room?');
+});
