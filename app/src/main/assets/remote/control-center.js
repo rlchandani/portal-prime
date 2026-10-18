@@ -1987,10 +1987,12 @@ function renderSetting(domain, control) {
   const presentation = JSON.stringify([advanced, isBusy, mixed, help]);
   const timeOfDay = control.type === 'int' && control.timeOfDay === true;
   const draftField = control.type === 'string' || (control.type === 'int' && (control.asText || timeOfDay));
-  // Do not seed a time draft from a single room: mixed scope stays blank until edited.
-  // Include time fields in the live-value guard so clearing a saved draft refreshes the input.
-  const expectedDraft = timeOfDay
-    ? drafts.get(draftKey(`${id}:draft`)) ?? (mixed ? '' : timeOfDayValue(control.value))
+  const numericDraft = control.type === 'int' && control.asText && !timeOfDay;
+  // Mixed numeric/time fields stay blank until edited; do not seed one room's value.
+  // Include both in the live-value guard so a confirmed Save refreshes the input.
+  const expectedDraft = timeOfDay || numericDraft
+    ? drafts.get(draftKey(`${id}:draft`)) ??
+      (mixed ? '' : timeOfDay ? timeOfDayValue(control.value) : String(control.value ?? ''))
     : draftField && !control.secret
       ? draft(`${id}:draft`, String(control.value ?? '')) : null;
   const cached = retain ? view.entries.get(key) : null;
@@ -2080,9 +2082,12 @@ function renderSetting(domain, control) {
     );
   } else if (control.type === 'string' || control.type === 'int') {
     const key = `${id}:draft`;
-    const current = timeOfDay ? expectedDraft : draft(key, control.secret ? '' : String(control.value ?? ''));
+    const current = timeOfDay || numericDraft ? expectedDraft : draft(key, control.secret ? '' : String(control.value ?? ''));
+    const numericText = control.type === 'int' && !timeOfDay;
+    const hasValidation = timeOfDay || numericText;
     const errorKey = `${id}:error`, errorId = `${id}:error`;
-    const error = timeOfDay ? el('p', { class: 'detail error', id: errorId,
+    const boundsId = `${id}:bounds`;
+    const error = hasValidation ? el('p', { class: 'detail error', id: errorId,
       role: 'alert', hidden: !drafts.get(draftKey(errorKey)),
       text: drafts.get(draftKey(errorKey)) || '' }) : null;
     const input = el('input', {
@@ -2094,13 +2099,14 @@ function renderSetting(domain, control) {
       'data-focus': id,
       autocomplete: control.secret ? 'new-password' : 'off',
       disabled: control.readOnly || isBusy,
-      ...(timeOfDay ? { step: 60, 'aria-describedby': errorId,
+      ...(hasValidation ? { 'aria-describedby': numericText ? `${boundsId} ${errorId}` : errorId,
         'aria-invalid': error.hidden ? 'false' : 'true' } : {}),
+      ...(timeOfDay ? { step: 60 } : {}),
       onInput: (e) => {
         if (!ownsRow()) return;
         setDraft(key, e.target.value);
         if (!timeOfDay && !control.secret) settingsEditedDrafts.add(draftKey(key));
-        if (timeOfDay) {
+        if (hasValidation) {
           drafts.delete(draftKey(errorKey));
           error.hidden = true;
           error.textContent = '';
@@ -2116,12 +2122,13 @@ function renderSetting(domain, control) {
     const save = button(
       timeOfDay ? 'Apply' : 'Save',
       () => {
-        if (!ownsRow() || (timeOfDay && (control.readOnly || isBusy))) return;
+        if (!ownsRow() || control.readOnly || isBusy) return;
         const value = timeOfDay ? timeOfDayMinutes(input.value)
           : control.type === 'int' ? Number(input.value) : input.value;
-        if (!validateValue(control, value)) {
-          if (timeOfDay) {
-            const message = 'Choose a valid time (00:00–23:59) before applying.';
+        if ((numericText && !input.value.trim()) || !validateValue(control, value)) {
+          if (hasValidation) {
+            const message = timeOfDay ? 'Choose a valid time (00:00–23:59) before applying.'
+              : `Enter a whole number from ${control.min} to ${control.max}.`;
             setDraft(key, input.value);
             setDraft(errorKey, message);
             error.textContent = message;
@@ -2134,7 +2141,7 @@ function renderSetting(domain, control) {
           if (session.current(ticket) && connectionState !== 'expired' && results?.every((r) => r.ok)) {
             drafts.delete(draftKey(key));
             settingsEditedDrafts.delete(draftKey(key));
-            if (timeOfDay) drafts.delete(draftKey(errorKey));
+            if (hasValidation) drafts.delete(draftKey(errorKey));
             render();
           }
         });
@@ -2150,6 +2157,8 @@ function renderSetting(domain, control) {
         el('strong', { text: control.title }),
         help ? text(help) : null,
         timeOfDay && mixed ? text('Values differ between selected rooms. Choose a time to apply to all.') : null,
+        numericText ? el('p', { class: 'detail', id: boundsId,
+          text: `Allowed: ${control.min}–${control.max}.` }) : null,
         error,
         control.secret && control.hasValue
           ? text('Leave blank to keep the saved credential.')

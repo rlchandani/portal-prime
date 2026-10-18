@@ -3855,3 +3855,103 @@ test('Settings refresh preserves row identity filters and scope without unrelate
   assert.equal(h.calls.some(c => ['/remote/photos', '/remote/apps', '/remote/catalog',
     '/remote/layout', '/remote/scenes', '/remote/jarvis'].includes(c.path)), false);
 });
+
+
+// Numeric drafts must be validated before an empty browser value can become zero.
+async function numericInputFixture({ rooms = [saved[0]], value = 42, min = 0, max = 100, readOnly = false } = {}) {
+  const schema = { domains: [{ id: 'numeric', title: 'Numeric', controls: [
+    { key: 'amount', title: 'Amount', type: 'int', asText: true, value, min, max, step: 1, readOnly },
+  ] }] };
+  return settingsRefreshFixture({ rooms, schema });
+}
+const numericField = h => h.document.body.querySelectorAll('input').find(n => n.attrs['aria-label'] === 'Amount');
+const numericError = h => h.document.getElementById('setting:numeric:amount:error');
+
+test('Numeric input clearing a zero-minimum field cannot silently save zero', async () => {
+  const { h, state } = await numericInputFixture();
+  const before = h.calls.length;
+  await h.input('Amount', ''); h.click('Save'); await h.settle();
+  assert.equal(state.posts.length, 0);
+  assert.equal(h.calls.length, before);
+  assert.equal(numericField(h).value, '');
+  assert.equal(numericField(h).attrs['aria-invalid'], 'true');
+  assert.equal(numericError(h).hidden, false);
+  assert.match(numericError(h).textContent, /whole number.*0.*100/);
+});
+
+test('Numeric input whitespace nonfinite fractions and range errors stay inline without requests', async () => {
+  for (const value of [' ', 'NaN', 'Infinity', '1.5', '-1', '101']) {
+    const { h, state } = await numericInputFixture();
+    const before = h.calls.length;
+    await h.input('Amount', value); h.click('Save'); await h.settle();
+    assert.equal(state.posts.length, 0, value); assert.equal(h.calls.length, before, value);
+    assert.equal(numericField(h).value, value);
+    assert.equal(numericField(h).attrs['aria-invalid'], 'true');
+    assert.equal(numericError(h).hidden, false);
+  }
+});
+
+test('Numeric input errors link to the field and editing clears them without saving', async () => {
+  const { h, state } = await numericInputFixture();
+  await h.input('Amount', ''); h.click('Save'); await h.settle();
+  assert.ok(numericField(h).attrs['aria-describedby'].split(' ').includes(numericError(h).attrs.id));
+  const before = h.calls.length;
+  await h.input('Amount', '16');
+  assert.equal(numericField(h).attrs['aria-invalid'], 'false');
+  assert.equal(numericError(h).hidden, true);
+  assert.equal(state.posts.length, 0); assert.equal(h.calls.length, before);
+});
+
+test('Numeric input explicitly entered zero and signed integers use the existing confirmed Save', async () => {
+  for (const [value, min, max] of [['0', 0, 100], ['-12', -20, 20], ['20', -20, 20]]) {
+    const { h, state } = await numericInputFixture({ min, max });
+    await h.input('Amount', value); h.click('Save'); await h.settle();
+    assert.equal(state.posts.length, 1);
+    assert.equal(state.posts[0].values.amount, Number(value));
+    assert.equal(numericField(h).attrs['aria-invalid'], 'false');
+    assert.equal(numericError(h).hidden, true);
+    assert.equal(h.eval('data.settings.domains[0].controls[0].value'), Number(value));
+  }
+});
+
+test('Numeric input blank mixed-room draft cannot fan out a zero write', async () => {
+  const { h, state } = await numericInputFixture({ rooms: saved });
+  const peer = structuredClone(state.schema); peer.domains[0].controls[0].value = 77;
+  h.eval(`scope="all";scopeSchemas.set(${JSON.stringify(saved[1].base)},${JSON.stringify(peer)});render()`);
+  assert.equal(numericField(h).value, '');
+  assert.equal(numericField(h).attrs.placeholder, 'Mixed values');
+  const before = h.calls.length; h.click('Save'); await h.settle();
+  assert.equal(state.posts.length, 0); assert.equal(h.calls.length, before);
+  assert.equal(numericField(h).attrs['aria-invalid'], 'true');
+  await h.input('Amount', '0'); h.click('Save'); await h.settle();
+  assert.equal(state.posts.length, 2);
+  assert.ok(state.posts.every(post => post.values.amount === 0));
+});
+
+test('Numeric input rejected Save keeps a valid draft and local validation stays clear', async () => {
+  const { h, state } = await numericInputFixture(); state.saveMode = 'fail';
+  await h.input('Amount', '18'); h.click('Save'); await h.settle();
+  assert.equal(state.posts.length, 1); assert.equal(numericField(h).value, '18');
+  assert.equal(numericField(h).attrs['aria-invalid'], 'false');
+  assert.equal(numericError(h).hidden, true);
+});
+
+test('Numeric input retained controls cannot write after navigation hiding or room retirement', async () => {
+  for (const departure of ['page', 'hidden', 'room']) {
+    const { h, state } = await numericInputFixture({ rooms: saved });
+    await h.input('Amount', '18'); const save = settingsRefreshButton(h, 'Save');
+    if (departure === 'page') h.eval('go("home")');
+    else if (departure === 'hidden') h.hide();
+    else h.eval(`selectRoom(${JSON.stringify(saved[1].base)})`);
+    await h.settle(); const before = h.calls.length;
+    save.listeners.click[0]({}); await h.settle();
+    assert.equal(state.posts.length, 0); assert.equal(h.calls.length, before);
+  }
+});
+
+test('Numeric input read-only row cannot dispatch even through its retained handler', async () => {
+  const { h, state } = await numericInputFixture({ readOnly: true });
+  const before = h.calls.length; const save = settingsRefreshButton(h, 'Save');
+  assert.equal(save.disabled, true); save.listeners.click[0]({}); await h.settle();
+  assert.equal(state.posts.length, 0); assert.equal(h.calls.length, before);
+});
