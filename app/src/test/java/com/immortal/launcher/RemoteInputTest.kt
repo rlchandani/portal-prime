@@ -67,4 +67,77 @@ class RemoteInputTest {
     assertEquals("typed", RemoteInput.nextText("base", "typed", "\ufeffappend\ufeff"))
     assertEquals("typed", RemoteInput.nextText("base", "typed", "\u0085append"))
   }
+
+  @Test
+  fun nextText_backspaceRemovesWholeSupplementaryCharacter() {
+    assertEquals("prefix", RemoteInput.nextText("prefix😀", "ignored", "backspace"))
+    assertEquals("", RemoteInput.nextText("😀", "", "backspace"))
+  }
+
+  @Test
+  fun nextText_backspaceRemovesCombiningSequenceWithoutChangingPrefix() {
+    assertEquals("prefix", RemoteInput.nextText("prefixe\u0301", "", "backspace"))
+    assertEquals("prefix", RemoteInput.nextText("prefixa\u0301\u0308", "", "backspace"))
+    assertEquals("e\u0301", RemoteInput.nextText("e\u0301x", "", "backspace"))
+  }
+
+  @Test
+  fun nextText_backspaceRemovesEmojiModifierVariationAndKeycap() {
+    for (tail in listOf("👍🏽", "✈️", "1️⃣")) {
+      assertEquals("prefix", RemoteInput.nextText("prefix" + tail, "", "backspace"))
+    }
+  }
+
+  @Test
+  fun nextText_backspaceRemovesJoinedEmoji() {
+    for (tail in listOf("👩‍💻", "👨‍👩‍👧‍👦", "🏳️‍🌈")) {
+      assertEquals("prefix", RemoteInput.nextText("prefix" + tail, "", "backspace"))
+    }
+  }
+
+  @Test
+  fun nextText_backspaceKeepsRegionalIndicatorPairsIntact() {
+    assertEquals("prefix", RemoteInput.nextText("prefix🇺🇸", "", "backspace"))
+    assertEquals("x🇺🇸", RemoteInput.nextText("x🇺🇸🇨🇦", "", "backspace"))
+    assertEquals("x🇺🇸", RemoteInput.nextText("x🇺🇸🇨", "", "backspace"))
+  }
+
+  @Test
+  fun nextText_backspaceHandlesEmptyAsciiLineEndingHangulAndIsolatedSurrogate() {
+    assertEquals("", RemoteInput.nextText("", "ignored", " BACKSPACE "))
+    assertEquals("ab", RemoteInput.nextText("abc", "", "backspace"))
+    assertEquals("prefix", RemoteInput.nextText("prefix\r\n", "", "backspace"))
+    assertEquals("prefix", RemoteInput.nextText("prefix\u1100\u1161\u11a8", "", "backspace"))
+    assertEquals("prefix", RemoteInput.nextText("prefix\ud800", "", "backspace"))
+  }
+
+  @Test
+  fun nextText_backspaceRepeatedlyPreservesEarlierClustersAndLongInput() {
+    var current = "x😀e\u0301👩‍💻"
+    for (expected in listOf("x😀e\u0301", "x😀", "x", "", "")) {
+      current = RemoteInput.nextText(current, "", "backspace")
+      assertEquals(expected, current)
+    }
+    val prefix = "a".repeat(8_192)
+    assertEquals(prefix, RemoteInput.nextText(prefix + "👩‍💻", "", "backspace"))
+  }
+
+  @Test
+  fun nextText_concurrentBackspacesDoNotShareIteratorState() {
+    val pool = java.util.concurrent.Executors.newFixedThreadPool(4)
+    try {
+      val jobs = (0 until 40).map { index ->
+        pool.submit<String> {
+          var text = "caller$index😀e\u0301👩‍💻"
+          repeat(3) { text = RemoteInput.nextText(text, "", "backspace") }
+          text
+        }
+      }
+      jobs.forEachIndexed { index, job ->
+        assertEquals("caller$index", job.get(5, java.util.concurrent.TimeUnit.SECONDS))
+      }
+    } finally {
+      pool.shutdownNow()
+    }
+  }
 }

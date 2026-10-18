@@ -23,6 +23,8 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 import kotlin.concurrent.thread
 import java.util.concurrent.atomic.AtomicLong
+import java.text.BreakIterator
+import java.util.Locale
 
 /**
  * The bridge from the fleet agent's HTTP thread ([RemoteRoutes]) to the accessibility
@@ -188,7 +190,7 @@ object RemoteInput {
 
   /**
    * Edit the currently focused editable field on the device. [mode] is "set" (replace
-   * with [text]), "append", "backspace" (drop last char), or "clear". Returns true only
+   * with [text]), "append", "backspace" (remove the trailing grapheme), or "clear". Returns true only
    * if a service is connected, an editable field has input focus, and the platform
    * accepted the edit. No IME swap needed — we set the node's text directly.
    */
@@ -455,8 +457,18 @@ object RemoteInput {
   internal fun nextText(current: String, text: String, mode: String): String =
       when (mode.lowercase().trim()) {
         "append" -> current + text
-        "backspace" -> if (current.isNotEmpty()) current.dropLast(1) else ""
+        "backspace" -> dropLastGrapheme(current)
         "clear" -> ""
         else -> text // "set"
       }
+
+  /** Use platform Unicode boundaries: surrogate pairs, marks and joined emoji stay intact. */
+  private fun dropLastGrapheme(current: String): String {
+    if (current.isEmpty()) return current
+    // Android delegates character boundaries to ICU; each edit owns its mutable iterator.
+    val boundaries = BreakIterator.getCharacterInstance(Locale.ROOT)
+    boundaries.setText(current)
+    boundaries.last()
+    return current.substring(0, boundaries.previous())
+  }
 }
