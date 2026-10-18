@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // Public currency fixtures use only in-memory preferences, before UiAutomation.
+        if (options.getString("command") == "currencyIntegrity") {
+            val currency = CurrencyRateIntegrityDeviceChecks.run()
+            finish(if (currency.getBoolean("currencyIntegrityPassed")) 0 else 1, currency)
+            return
+        }
         // Public owner contracts and real silent test-APK TTS clients need no UiAutomation.
         if (options.getString("command") == "oneShotSpeech") {
             val speech = OneShotSpeechDeviceChecks.run(this)

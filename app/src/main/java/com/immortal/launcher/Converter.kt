@@ -9,8 +9,6 @@ package com.immortal.launcher
 
 import android.content.Context
 import android.content.SharedPreferences
-import java.time.LocalDate
-import org.json.JSONObject
 
 /** A rate with its response's reference date. [saved] is true for either a fresh cache hit or
  * a stale cache fallback, and false for a successful network response or same-currency identity. */
@@ -24,7 +22,6 @@ internal data class CurrencyRate(val value: Double, val referenceDate: String?, 
 object Converter {
 
   private const val PREFS = "immortal_converter"
-  private val REFERENCE_DATE_SHAPE = Regex("[0-9]{4}-[0-9]{2}-[0-9]{2}")
 
   /** A measurement family. [units] map a display name to its factor relative to the
    * family's base unit; temperature is special-cased (affine, not a pure factor). */
@@ -117,7 +114,7 @@ object Converter {
     val fresh = System.currentTimeMillis() - prefs.getLong("rates_${base}_ts", 0L) < 6L * 60 * 60 * 1000
     ToolsWork.checkpoint()
     if (!fresh) return null
-    val cached = prefs.getString("rates_$base", null)?.let { parseRates(it, saved = true) }
+    val cached = prefs.getString("rates_$base", null)?.let { CurrencyRateCodec.decode(it, base, saved = true) }
     ToolsWork.checkpoint()
     return cached
   }
@@ -135,7 +132,7 @@ object Converter {
         "https://api.frankfurter.app/latest?from=$base&to=${CURRENCIES.filter { it != base }.joinToString(",")}",
         readTimeoutMs = 10000)
     ToolsWork.checkpoint()
-    val parsed = fetched?.let { parseRates(it, saved = false) }
+    val parsed = fetched?.let { CurrencyRateCodec.decode(it, base, saved = false) }
     if (parsed != null) {
       ToolsWork.checkpoint()
       prefs.edit().putString(cacheKey, fetched).putLong(tsKey, System.currentTimeMillis()).apply()
@@ -143,27 +140,9 @@ object Converter {
       return parsed
     }
     // Stale cache beats nothing.
-    val cached = prefs.getString(cacheKey, null)?.let { parseRates(it, saved = true) }
+    val cached = prefs.getString(cacheKey, null)?.let { CurrencyRateCodec.decode(it, base, saved = true) }
     ToolsWork.checkpoint()
     return cached
-  }
-
-  private fun parseRates(json: String, saved: Boolean): Map<String, CurrencyRate>? =
-      runCatching {
-            val response = JSONObject(json)
-            val r = response.getJSONObject("rates")
-            val referenceDate = parseReferenceDate(response.opt("date") as? String)
-            buildMap {
-              r.keys().forEach { k -> put(k, CurrencyRate(r.getDouble(k), referenceDate, saved)) }
-            }
-          }
-          .getOrNull()
-          ?.takeIf { it.isNotEmpty() }
-
-  /** A bad date only drops metadata; otherwise usable rates keep their original semantics. */
-  private fun parseReferenceDate(date: String?): String? {
-    if (date == null || !REFERENCE_DATE_SHAPE.matches(date)) return null
-    return runCatching { LocalDate.parse(date); date }.getOrNull()
   }
 
 }
