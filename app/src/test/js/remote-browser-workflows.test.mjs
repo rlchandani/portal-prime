@@ -3340,3 +3340,194 @@ test('Presets refresh global Refresh supersedes aborted pending reads without en
  finishOld();await h.settle();assert.match(page.textContent,/Refreshing.*presets/i);assert.equal(presetRecoveryButton(h,'Run').disabled,true);
  state.presets=[recoveredPreset('latest',{name:'Fresh macro'})];finishNew();await h.settle();assert.match(page.textContent,/Fresh macro/);assert.equal(page.textContent.includes('Refreshing saved presets'),false);assert.equal(presetRecoveryButton(h,'Run').disabled,false);
 });
+
+function exportSnapshotValue(revision = 'export-current', extra = {}) {
+  return { schemaVersion: 1, deviceId: 'fixture-device', revision,
+    domains: {}, layout: {}, ...extra };
+}
+async function snapshotExportFixture() {
+  let mode = 'ok', value = exportSnapshotValue('metadata-confirmed');
+  const held = [];
+  const h = await browserHarness({ saved, routes: {
+    '/remote/snapshot': ({ response, opts }) => {
+      if (mode === 'hold') return new Promise(resolve => held.push({
+        signal: opts.signal, finish: (snapshot = value, status = 200) =>
+          resolve(response(status === 200 ? { ok: true, snapshot } : { ok: false, error: 'unauthorized' }, status)),
+      }));
+      if (mode === 'transport') throw new Error('offline');
+      if (mode === 'http') return response({ ok: false, error: 'unavailable' }, 503);
+      if (mode === 'timeout') return response({ ok: false, error: 'timeout' }, 504);
+      return response({ ok: true, snapshot: value });
+    },
+  } });
+  h.eval('globalThis.originalDownloadJson = downloadJson; globalThis.exportDownloads = []; downloadJson = (name, value) => exportDownloads.push({name, value});');
+  h.eval('go("home", "snapshots")'); await h.settle();
+  return { h, held, mode: next => { mode = next; }, value: next => { value = next; } };
+}
+function snapshotExportButton(h, label) {
+  const found = h.document.body.querySelectorAll('button').find(b => b.textContent === label);
+  assert.ok(found, `Missing ${label}: ${h.document.body.textContent}`); return found;
+}
+function exportRequestCount(h) { return h.calls.filter(c => c.path === '/remote/snapshot').length; }
+function exportDownloads(h) { return JSON.parse(h.eval('JSON.stringify(exportDownloads)')); }
+
+test('Snapshot export progress identifies pending work and coalesces repeated activation', async () => {
+  const f = await snapshotExportFixture(), { h } = f; f.mode('hold');
+  const old = snapshotExportButton(h, 'Export snapshot'), before = exportRequestCount(h);
+  old.click(); await h.settle();
+  assert.match(h.document.getElementById('page').textContent, /Preparing snapshot/);
+  assert.equal(snapshotExportButton(h, 'Export snapshot').disabled, true);
+  snapshotExportButton(h, 'Cancel export'); old.listeners.click[0]({}); await h.settle();
+  assert.equal(exportRequestCount(h), before + 1); assert.equal(f.held.length, 1);
+  f.held[0].finish(exportSnapshotValue()); await h.settle();
+  assert.equal(exportDownloads(h).length, 1);
+});
+
+test('Snapshot export Cancel aborts its request and a fresh attempt ignores late old success', async () => {
+  const f = await snapshotExportFixture(), { h } = f; f.mode('hold'); h.click('Export snapshot'); await h.settle();
+  h.click('Cancel export'); await h.settle();
+  assert.equal(f.held[0].signal.aborted, true);
+  assert.equal(snapshotExportButton(h, 'Export snapshot').disabled, false);
+  h.click('Export snapshot'); await h.settle();
+  f.held[0].finish(exportSnapshotValue('retired')); await h.settle();
+  assert.equal(exportDownloads(h).length, 0);
+  assert.match(h.document.getElementById('page').textContent, /Preparing snapshot/);
+  f.held[1].finish(exportSnapshotValue('fresh')); await h.settle();
+  assert.equal(exportDownloads(h)[0].value.revision, 'fresh');
+  assert.doesNotMatch(h.document.getElementById('page').textContent, /Preparing snapshot/);
+});
+
+test('Snapshot export transport HTTP and timeout failures retain metadata and restore selection with Retry', async () => {
+  for (const mode of ['transport', 'http', 'timeout']) {
+    const f = await snapshotExportFixture(), { h } = f;
+    h.eval('snapshotRestoreDraft={file:{name:"Kept.json"},review:null,error:""};render()');
+    f.mode(mode); h.click('Export snapshot'); await h.settle();
+    snapshotExportButton(h, 'Retry export');
+    assert.equal(exportDownloads(h).length, 0);
+    assert.equal(h.eval('data.snapshot.snapshot.revision'), 'metadata-confirmed');
+    assert.equal(h.eval('snapshotRestoreDraft.file.name'), 'Kept.json');
+    assert.equal(snapshotExportButton(h, 'Review restore').disabled, false);
+    assert.doesNotMatch(h.document.getElementById('notice').textContent, /Snapshot exported/);
+  }
+});
+
+test('Snapshot export Retry clears the failure and downloads only its confirmed current response', async () => {
+  const f = await snapshotExportFixture(), { h } = f; f.mode('http'); h.click('Export snapshot'); await h.settle();
+  f.mode('hold'); h.click('Retry export'); await h.settle();
+  assert.match(h.document.getElementById('page').textContent, /Preparing snapshot/);
+  f.held[0].finish(exportSnapshotValue('retried')); await h.settle();
+  assert.equal(exportDownloads(h).length, 1);
+  assert.equal(exportDownloads(h)[0].name, 'immortal-snapshot.json');
+  assert.equal(exportDownloads(h)[0].value.revision, 'retried');
+  assert.doesNotMatch(h.document.getElementById('page').textContent, /Retry export|Preparing snapshot/);
+  assert.match(h.document.getElementById('notice').textContent, /Snapshot exported/);
+});
+
+test('Snapshot export rejects malformed backup shapes without download or confirmed metadata replacement', async () => {
+  const malformed = [null, true, 'snapshot', [], {}, exportSnapshotValue('', {}),
+    exportSnapshotValue('v', { schemaVersion: 2 }), exportSnapshotValue('v', { schemaVersion: '1' }),
+    exportSnapshotValue('v', { domains: [] }), exportSnapshotValue('v', { domains: null }),
+    exportSnapshotValue('v', { layout: [] }), exportSnapshotValue('v', { revision: 42 }),
+    exportSnapshotValue('v', { deviceId: null })];
+  for (const value of malformed) {
+    const f = await snapshotExportFixture(), { h } = f; f.value(value); h.click('Export snapshot'); await h.settle();
+    assert.equal(exportDownloads(h).length, 0); snapshotExportButton(h, 'Retry export');
+    assert.equal(h.eval('data.snapshot.snapshot.revision'), 'metadata-confirmed');
+    assert.doesNotMatch(h.document.getElementById('notice').textContent, /Snapshot exported/);
+  }
+});
+
+test('Snapshot export refuses a backup belonging to another Portal with actionable recovery', async () => {
+  const f = await snapshotExportFixture(), { h } = f;
+  f.value(exportSnapshotValue('wrong', { deviceId: 'another-device' })); h.click('Export snapshot'); await h.settle();
+  assert.equal(exportDownloads(h).length, 0); snapshotExportButton(h, 'Retry export');
+  assert.match(h.document.getElementById('page').textContent, /another Portal/i);
+  assert.equal(h.eval('data.snapshot.snapshot.revision'), 'metadata-confirmed');
+});
+
+test('Snapshot export download failure has inline recovery and never reports a completed export', async () => {
+  const f = await snapshotExportFixture(), { h } = f;
+  h.eval('globalThis.nativeCreate = document.createElement; globalThis.nativeRevoke = URL.revokeObjectURL; globalThis.revokedExportUrls = 0; URL.revokeObjectURL = url => { revokedExportUrls++; nativeRevoke(url); }; document.createElement = tag => { const node = nativeCreate(tag); if (tag === "a") node.click = () => { throw new Error("download denied"); }; return node; }; downloadJson=originalDownloadJson;');
+  h.click('Export snapshot'); await h.settle();
+  snapshotExportButton(h, 'Retry export');
+  assert.match(h.document.getElementById('page').textContent, /could not be downloaded/i);
+  assert.doesNotMatch(h.document.getElementById('notice').textContent, /Snapshot exported/);
+  assert.equal(h.eval('data.snapshot.snapshot.revision'), 'metadata-confirmed');
+  assert.equal(h.document.body.querySelectorAll('a').length, 0);
+  await h.tick(1000); assert.equal(h.eval('revokedExportUrls'), 1);
+  h.eval('URL.revokeObjectURL=nativeRevoke;document.createElement=nativeCreate;downloadJson=(name,value)=>exportDownloads.push({name,value});');
+  h.click('Retry export'); await h.settle(); assert.equal(exportDownloads(h).length, 1);
+});
+
+test('Snapshot export page Portal hidden and global Refresh retire late download and notice callbacks', async () => {
+  for (const retire of ['page', 'portal', 'hidden', 'refresh']) {
+    const f = await snapshotExportFixture(), { h } = f; f.mode('hold'); h.click('Export snapshot'); await h.settle();
+    const pending = f.held[0];
+    if (retire === 'page') h.eval('go("apps")');
+    if (retire === 'portal') h.eval(`selectRoom('${saved[1].base}')`);
+    if (retire === 'hidden') h.hide();
+    if (retire === 'refresh') { f.mode('ok'); h.eval('refresh()'); }
+    await h.settle(); assert.equal(pending.signal.aborted, true);
+    pending.finish(exportSnapshotValue('late')); await h.settle();
+    assert.equal(exportDownloads(h).length, 0);
+    assert.doesNotMatch(h.document.getElementById('notice').textContent, /Snapshot exported/);
+  }
+});
+
+test('Snapshot export retained Export and Retry controls cannot act on a changed page Portal or owner', async () => {
+  for (const retire of ['page', 'portal', 'hidden']) {
+    const f = await snapshotExportFixture(), { h } = f, old = snapshotExportButton(h, 'Export snapshot');
+    if (retire === 'page') h.eval('go("apps")');
+    if (retire === 'portal') h.eval(`selectRoom('${saved[1].base}')`);
+    if (retire === 'hidden') h.hide();
+    await h.settle(); const before = exportRequestCount(h); old.listeners.click[0]({}); await h.settle();
+    assert.equal(exportRequestCount(h), before); assert.equal(exportDownloads(h).length, 0);
+  }
+  const f = await snapshotExportFixture(), { h } = f; f.mode('http'); h.click('Export snapshot'); await h.settle();
+  const retry = snapshotExportButton(h, 'Retry export'); f.mode('hold'); retry.click(); await h.settle();
+  h.click('Cancel export'); await h.settle(); const before = exportRequestCount(h); retry.listeners.click[0]({}); await h.settle();
+  assert.equal(exportRequestCount(h), before); f.held[0].finish(); await h.settle();
+});
+
+test('Snapshot export and restore review do not overlap and preserve the selected file', async () => {
+  const f = await snapshotExportFixture(), { h } = f;
+  h.eval('snapshotRestoreDraft={file:{name:"Kept.json",size:1,text:async()=>"{}"},review:null,error:""};render()');
+  const oldReview = snapshotExportButton(h, 'Review restore'); f.mode('hold'); h.click('Export snapshot'); await h.settle();
+  assert.equal(snapshotExportButton(h, 'Choose snapshot JSON').disabled, true);
+  assert.equal(snapshotExportButton(h, 'Review restore').disabled, true);
+  oldReview.listeners.click[0]({}); await h.settle(); assert.equal(f.held.length, 1);
+  assert.equal(h.eval('snapshotRestoreDraft.review'), null);
+  h.click('Cancel export'); await h.settle(); f.held[0].finish(); await h.settle();
+  assert.equal(h.eval('snapshotRestoreDraft.file.name'), 'Kept.json');
+  const oldExport = snapshotExportButton(h, 'Export snapshot');
+  h.eval('snapshotRestoreDraft.review={controller:new AbortController(),phase:"Reading snapshot file…"};render()');
+  assert.equal(snapshotExportButton(h, 'Export snapshot').disabled, true);
+  const before = exportRequestCount(h); oldExport.listeners.click[0]({}); await h.settle(); assert.equal(exportRequestCount(h), before);
+});
+
+test('Snapshot export confirmed download retires older metadata while a failed export keeps that read active', async () => {
+  for (const success of [true, false]) {
+    const f = await snapshotExportFixture(), { h } = f; f.mode('hold'); h.eval('loadVisible()'); await h.settle();
+    const metadata = f.held[0]; h.eval('data.snapshotError={code:"network"};render()');
+    if (success) { h.click('Export snapshot'); await h.settle(); f.held[1].finish(exportSnapshotValue('export-new')); }
+    else { f.mode('http'); h.click('Export snapshot'); }
+    await h.settle(); assert.equal(metadata.signal.aborted, success);
+    if (success) assert.equal(h.eval('data.snapshotError'), undefined);
+    metadata.finish(exportSnapshotValue('older-metadata')); await h.settle();
+    assert.equal(h.eval('data.snapshot.snapshot.revision'), success ? 'export-new' : 'older-metadata');
+    assert.equal(exportDownloads(h).length, success ? 1 : 0);
+  }
+});
+
+test('Snapshot export supports confirmed empty backups without prior metadata and pairing expiry stops download', async () => {
+  const f = await snapshotExportFixture(), { h } = f;
+  h.eval('data.snapshot=null;data.snapshotError={code:"network"};render()');
+  f.value(exportSnapshotValue('empty', { futureField: { preserved: true } })); h.click('Export snapshot'); await h.settle();
+  assert.equal(exportDownloads(h).length, 1);
+  assert.deepEqual(exportDownloads(h)[0].value.futureField, { preserved: true });
+  assert.deepEqual(exportDownloads(h)[0].value.domains, {});
+  assert.equal(h.eval('data.snapshotError'), undefined);
+  f.mode('hold'); h.click('Export snapshot'); await h.settle(); f.held[0].finish(null, 401); await h.settle();
+  assert.equal(h.eval('connectionState'), 'expired'); assert.equal(exportDownloads(h).length, 1);
+  assert.match(h.document.getElementById('page').textContent, /Pair again/);
+});

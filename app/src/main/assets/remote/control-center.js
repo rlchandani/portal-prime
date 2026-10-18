@@ -124,6 +124,7 @@ const thumbs = new ImagePool(),
   previewPool = new ImagePool({ limit: 1 });
 let photoObservation = null,
   snapshotRestoreDraft = null;
+let snapshotExport = null;
 const icons = {
   home: '<path d="M3 10 12 3l9 7M5 9v12h14V9M10 21v-7h4v7"/>',
   remote:
@@ -365,6 +366,7 @@ function message(error) {
     stale_revision:
       'The Portal changed since this was loaded. Reload and review before saving again.',
     wrong_device: 'This snapshot belongs to another Portal. Choose the Portal that exported it.',
+    download_failed: 'Snapshot export could not be downloaded. Try again.',
     busy: 'Another operation is running on this Portal. Check Activity before retrying.',
     install_state_uncertain:
       'An installer may still be working. Check Activity for confirmed device evidence.',
@@ -466,6 +468,7 @@ function retireRead(key) {
   session.read(key);
 }
 function abortReads() {
+  cancelSnapshotExport();
   cancelSnapshotRestoreReview();
   for (const controller of pageReads.values()) controller.abort();
   pageReads.clear();
@@ -4102,9 +4105,11 @@ function downloadJson(name, value) {
     url = URL.createObjectURL(blob);
   const anchor = el('a', { href: url, download: name });
   document.body.append(anchor);
-  anchor.click();
-  anchor.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  try { anchor.click(); }
+  finally {
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
 }
 function cancelSnapshotRestoreReview(clearSelection = false) {
   const confirming = snapshotRestoreDraft?.review?.confirming;
@@ -4126,6 +4131,7 @@ function snapshotReviewCurrent(owner, review) {
     !document.hidden && connectionState !== 'expired';
 }
 async function reviewSnapshotRestore() {
+  if (snapshotExport?.pending) return;
   const owner = snapshotRestoreDraft;
   if (!owner?.file) { toast('Choose a snapshot JSON file.', true); return; }
   if (owner.review || busy.has(`${room()?.base}:restore`)) return;
@@ -4182,12 +4188,67 @@ async function reviewSnapshotRestore() {
     if (snapshotRestoreDraft === owner && session.current(ticket) && tab === 'home' && detail === 'snapshots') render();
   }
 }
+function cancelSnapshotExport() {
+  snapshotExport?.controller.abort();
+  snapshotExport = null;
+}
+function canExportSnapshot(ticket, owner) {
+  return session.current(ticket) && tab === 'home' && detail === 'snapshots' &&
+    !document.hidden && connectionState !== 'expired' && snapshotExport === owner &&
+    !owner?.pending && !busy.has(`${room()?.base}:restore`) && !snapshotRestoreDraft?.review &&
+    typeof data.companion?.deviceId === 'string' && !!data.companion.deviceId;
+}
+function snapshotExportCurrent(owner) {
+  return snapshotExport === owner && session.current(owner.ticket) &&
+    tab === 'home' && detail === 'snapshots' && !document.hidden &&
+    connectionState !== 'expired' && data.companion?.deviceId === owner.deviceId &&
+    !busy.has(`${room()?.base}:restore`) && !snapshotRestoreDraft?.review;
+}
+function validateSnapshotExport(response, deviceId) {
+  const record = value => value && typeof value === 'object' && !Array.isArray(value);
+  const snapshot = response?.snapshot;
+  if (!record(snapshot) || snapshot.schemaVersion !== 1 ||
+      typeof snapshot.deviceId !== 'string' || !snapshot.deviceId ||
+      typeof snapshot.revision !== 'string' || !snapshot.revision.trim() ||
+      !record(snapshot.domains) || !record(snapshot.layout)) throw new ApiError('invalid_response');
+  if (snapshot.deviceId !== deviceId) throw new ApiError('wrong_device');
+}
+async function exportSnapshot(ticket, previousOwner) {
+  if (!canExportSnapshot(ticket, previousOwner)) return;
+  const owner = { ticket, deviceId: data.companion.deviceId,
+    controller: new AbortController(), pending: true, error: '' };
+  snapshotExport = owner;
+  render();
+  try {
+    const response = await api(ticket.room, '/remote/snapshot',
+      { signal: owner.controller.signal, timeout: 12000 });
+    if (!snapshotExportCurrent(owner)) return;
+    validateSnapshotExport(response, owner.deviceId);
+    try { downloadJson('immortal-snapshot.json', response.snapshot); }
+    catch { throw new ApiError('download_failed'); }
+    if (!snapshotExportCurrent(owner)) return;
+    retireRead('snapshot');
+    data.snapshot = response;
+    delete data.snapshotError;
+    toast('Snapshot exported.');
+  } catch (error) {
+    if (snapshotExportCurrent(owner) && error.code !== 'aborted') owner.error = message(error);
+  } finally {
+    if (snapshotExport === owner) {
+      owner.pending = false;
+      if (session.current(ticket) && tab === 'home' && detail === 'snapshots' && !document.hidden) render();
+    }
+  }
+}
 function snapshotsPage() {
-  const current = data.snapshot?.snapshot, selected = snapshotRestoreDraft;
-  const restoring = busy.has(`${room()?.base}:restore`);
+  const current = data.snapshot?.snapshot, selected = snapshotRestoreDraft,
+    exportOwner = snapshotExport, exportTicket = session.capture();
+  const restoring = busy.has(`${room()?.base}:restore`),
+    exporting = !!exportOwner?.pending && session.current(exportOwner.ticket),
+    restoreBlocked = restoring || exporting;
   const importInput = el('input', {
     type: 'file', hidden: true, accept: '.json,application/json',
-    'aria-label': 'Choose snapshot JSON', disabled: restoring,
+    'aria-label': 'Choose snapshot JSON', disabled: restoreBlocked,
     onChange: event => chooseSnapshotRestoreFile(event.target.files?.[0] || null),
   });
   const status = el('p', { role: 'status', 'aria-live': 'polite',
@@ -4211,22 +4272,18 @@ function snapshotsPage() {
             )
           : text('Loading snapshot…'),
         data.snapshotError ? text(message(data.snapshotError), 'error') : null,
-        button(
-          'Export snapshot',
-          async () => {
-            const ticket = session.capture();
-            const response = await mutate('export-snapshot', '/remote/snapshot', undefined, {
-              ticket,
-              method: 'GET',
-              success: '',
-            });
-            if (response?.snapshot && session.current(ticket)) {
-              data.snapshot = response;
-              downloadJson('immortal-snapshot.json', response.snapshot);
-              toast('Snapshot exported.');
-            }
-          },
-          { kind: 'primary', icon: 'backup' },
+        exporting || exportOwner?.error ? el('p', { role: 'status', 'aria-live': 'polite',
+          class: exportOwner.error ? 'error' : 'detail',
+          text: exporting ? 'Preparing snapshot…' : exportOwner.error }) : null,
+        actions(
+          button(exportOwner?.error ? 'Retry export' : 'Export snapshot',
+            () => exportSnapshot(exportTicket, exportOwner),
+            { kind: 'primary', icon: 'backup', disabled: !canExportSnapshot(exportTicket, exportOwner) }),
+          exporting ? button('Cancel export', () => {
+            if (snapshotExport !== exportOwner || !session.current(exportTicket)) return;
+            cancelSnapshotExport();
+            render();
+          }, { kind: 'outline' }) : null,
         ),
       ),
       group(
@@ -4235,11 +4292,11 @@ function snapshotsPage() {
           'Choose a snapshot exported by this Portal. Review the target before applying. Side-effect failures can leave a partial restore; the Portal returns the affected domains.',
         ),
         importInput,
-        button('Choose snapshot JSON', () => importInput.click(), { kind: 'outline', disabled: restoring }),
+        button('Choose snapshot JSON', () => importInput.click(), { kind: 'outline', disabled: restoreBlocked }),
         selected?.file ? text(`Selected: ${selected.file.name}`) : null,
         status,
         button('Review restore', reviewSnapshotRestore, { kind: 'outline',
-          disabled: !selected?.file || !!selected.review || restoring }),
+          disabled: !selected?.file || !!selected.review || restoreBlocked }),
       ),
     ),
     resultPanel(),
