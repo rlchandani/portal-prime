@@ -2499,3 +2499,160 @@ test('cancelled older Apps read cannot clear a newer refresh progress owner', as
     assert.equal(h.eval('data.apps[0].name'), 'Fixture app 0');
   } finally { releases.forEach(release => release()); await h.settle(); }
 });
+
+const jarvisFixture = () => ({ supported: true, installed: true, model: 'model-a',
+  availableModels: ['model-a', 'model-b', 'model-c'], wakeSupported: true,
+  wakeEnabled: false, microphoneGranted: true, wakeListening: false, status: 'idle' });
+async function jarvisSaveHarness(route) {
+  const status = jarvisFixture();
+  const h = await browserHarness({ saved, routes: {
+    '/remote/jarvis': route || (({ response }) => response({ ok: true, jarvis: status })),
+  } });
+  h.eval('go("home","jarvis")'); await h.settle(); return h;
+}
+function jarvisModel(h, value) {
+  const select = h.document.body.querySelectorAll('select').find(n => n.attrs['aria-label'] === 'Conversation model');
+  assert.ok(select); select.value = value;
+  for (const handler of select.listeners.change || []) handler({ target: select });
+}
+const jarvisSaveButton = h => h.document.body.querySelectorAll('button').find(b => b.textContent === 'Save Jarvis settings');
+const jarvisPosts = h => h.calls.filter(c => c.path === '/remote/jarvis' && c.opts.method === 'POST');
+const jarvisWake = h => h.document.body.querySelectorAll('input').find(n => n.attrs['aria-label'] === 'Allow background wake');
+
+test('Jarvis unchanged settings reject a stale Save activation with zero POSTs', async () => {
+  const h = await jarvisSaveHarness(); jarvisSaveButton(h).listeners.click[0]({}); await h.settle();
+  assert.equal(jarvisPosts(h).length, 0);
+});
+
+test('Jarvis confirmed model Save submits only the changed reported model', async () => {
+  let status = jarvisFixture();
+  const h = await jarvisSaveHarness(({ opts, response }) => {
+    if (opts.method === 'POST') status = { ...status, ...JSON.parse(opts.body) };
+    return response({ ok: true, jarvis: status });
+  });
+  jarvisModel(h, 'model-b'); h.click('Save Jarvis settings'); await h.settle();
+  assert.deepEqual(JSON.parse(jarvisPosts(h)[0].opts.body), { model: 'model-b' });
+  assert.equal(h.eval('data.jarvis.model'), 'model-b');
+  assert.equal(jarvisSaveButton(h).disabled, true);
+  assert.match(h.document.getElementById('notice').textContent, /confirmed/);
+});
+
+test('Jarvis pending Save shows progress and prevents duplicate submissions', async () => {
+  let release;
+  const h = await jarvisSaveHarness(({ opts, response }) => opts.method === 'POST'
+    ? new Promise(resolve => { release = () => resolve(response({ ok: true, jarvis: { ...jarvisFixture(), model: 'model-b' } })); })
+    : response({ ok: true, jarvis: jarvisFixture() }));
+  try {
+    jarvisModel(h, 'model-b'); h.click('Save Jarvis settings'); await h.settle();
+    assert.match(pageText(h), /Saving submitted Jarvis settings/);
+    assert.equal(jarvisSaveButton(h).disabled, true);
+    jarvisSaveButton(h).listeners.click[0]({}); await h.settle(); assert.equal(jarvisPosts(h).length, 1);
+  } finally { release?.(); await h.settle(); }
+});
+
+test('Jarvis model edits made during Save survive confirmed readback', async () => {
+  let release;
+  const h = await jarvisSaveHarness(({ opts, response }) => opts.method === 'POST'
+    ? new Promise(resolve => { release = () => resolve(response({ ok: true, jarvis: { ...jarvisFixture(), model: 'model-b' } })); })
+    : response({ ok: true, jarvis: jarvisFixture() }));
+  try {
+    jarvisModel(h, 'model-b'); h.click('Save Jarvis settings'); await h.settle();
+    jarvisModel(h, 'model-c'); release(); await h.settle();
+    assert.equal(h.eval('draft("jarvis:model",data.jarvis.model)'), 'model-c');
+    assert.equal(h.eval('data.jarvis.model'), 'model-b'); assert.equal(jarvisSaveButton(h).disabled, false);
+    assert.match(h.document.getElementById('notice').textContent, /newer edits.*unsaved/);
+  } finally { release?.(); await h.settle(); }
+});
+
+test('Jarvis newer wake edit survives a model-only Save while confirmed model draft retires', async () => {
+  let release;
+  const h = await jarvisSaveHarness(({ opts, response }) => opts.method === 'POST'
+    ? new Promise(resolve => { release = () => resolve(response({ ok: true, jarvis: { ...jarvisFixture(), model: 'model-b' } })); })
+    : response({ ok: true, jarvis: jarvisFixture() }));
+  try {
+    jarvisModel(h, 'model-b'); h.click('Save Jarvis settings'); await h.settle(); jarvisWake(h).click();
+    release(); await h.settle();
+    assert.equal(h.eval('draft("jarvis:wake",data.jarvis.wakeEnabled)'), true);
+    assert.equal(h.eval('draft("jarvis:model",data.jarvis.model)'), 'model-b');
+    assert.equal(jarvisSaveButton(h).disabled, false);
+  } finally { release?.(); await h.settle(); }
+});
+
+test('Jarvis mismatched model acknowledgement cannot claim confirmation or discard draft', async () => {
+  const h = await jarvisSaveHarness(({ response }) => response({ ok: true, jarvis: jarvisFixture() }));
+  jarvisModel(h, 'model-b'); h.click('Save Jarvis settings'); await h.settle();
+  assert.equal(h.eval('draft("jarvis:model",data.jarvis.model)'), 'model-b');
+  assert.equal(h.eval('data.jarvis.model'), 'model-a'); assert.equal(jarvisSaveButton(h).disabled, false);
+  assert.match(pageText(h), /did not confirm/);
+});
+
+test('Jarvis unsupported or incomplete acknowledgement preserves all submitted edits', async () => {
+  const h = await jarvisSaveHarness(({ opts, response }) => response({ ok: true,
+    jarvis: opts.method === 'POST' ? { supported: false, model: 'model-b' } : jarvisFixture() }));
+  jarvisModel(h, 'model-b'); jarvisWake(h).click(); h.click('Save Jarvis settings'); await h.settle();
+  assert.equal(h.eval('data.jarvis.supported'), true);
+  assert.equal(h.eval('draft("jarvis:model",data.jarvis.model)'), 'model-b');
+  assert.equal(h.eval('draft("jarvis:wake",data.jarvis.wakeEnabled)'), true);
+  assert.match(pageText(h), /did not confirm/);
+});
+
+test('Jarvis transport failure keeps input and a later Save can confirm it', async () => {
+  let fail = true;
+  const h = await jarvisSaveHarness(({ opts, response }) => {
+    if (opts.method === 'POST' && fail) throw new Error('offline');
+    return response({ ok: true, jarvis: { ...jarvisFixture(), ...(opts.method === 'POST' ? JSON.parse(opts.body) : {}) } });
+  });
+  jarvisModel(h, 'model-b'); h.click('Save Jarvis settings'); await h.settle();
+  assert.equal(h.eval('draft("jarvis:model",data.jarvis.model)'), 'model-b'); assert.equal(jarvisSaveButton(h).disabled, false);
+  assert.match(pageText(h), /edits are kept/);
+  fail = false; h.click('Save Jarvis settings'); await h.settle(); assert.equal(h.eval('data.jarvis.model'), 'model-b');
+});
+
+test('Jarvis older status GET cannot overwrite a successful Save readback', async () => {
+  let release, defer = false;
+  const h = await jarvisSaveHarness(({ opts, response }) => opts.method === 'POST'
+    ? response({ ok: true, jarvis: { ...jarvisFixture(), model: 'model-b' } })
+    : defer ? new Promise(resolve => { release = () => resolve(response({ ok: true, jarvis: jarvisFixture() })); })
+      : response({ ok: true, jarvis: jarvisFixture() }));
+  try {
+    jarvisModel(h, 'model-b'); defer = true; h.eval('loadVisible()'); await h.settle();
+    h.click('Save Jarvis settings'); await h.settle(); release(); await h.settle();
+    assert.equal(h.eval('data.jarvis.model'), 'model-b');
+  } finally { release?.(); await h.settle(); }
+});
+
+test('Jarvis late Save cannot clear another room draft or replace its status', async () => {
+  let release;
+  const h = await jarvisSaveHarness(({ url, opts, response }) => opts.method === 'POST'
+    ? new Promise(resolve => { release = () => resolve(response({ ok: true, jarvis: { ...jarvisFixture(), model: 'model-b' } })); })
+    : response({ ok: true, jarvis: { ...jarvisFixture(), model: url.includes('8878') ? 'model-c' : 'model-a' } }));
+  try {
+    jarvisModel(h, 'model-b'); h.click('Save Jarvis settings'); await h.settle();
+    h.eval(`selectRoom('${saved[1].base}')`); await h.settle(); h.eval('go("home","jarvis")'); await h.settle(); jarvisModel(h, 'model-a');
+    release(); await h.settle(); assert.equal(h.eval('data.jarvis.model'), 'model-c');
+    assert.equal(h.eval('draft("jarvis:model",data.jarvis.model)'), 'model-a');
+  } finally { release?.(); await h.settle(); }
+});
+
+test('Jarvis unavailable edited model stays visible and cannot submit an empty request', async () => {
+  let status = jarvisFixture();
+  const h = await jarvisSaveHarness(({ response }) => response({ ok: true, jarvis: status }));
+  jarvisModel(h, 'model-b'); status = { ...status, availableModels: ['model-a'] };
+  h.eval('loadVisible()'); await h.settle();
+  const select = h.document.body.querySelectorAll('select').find(n => n.attrs['aria-label'] === 'Conversation model');
+  assert.equal(select.querySelectorAll('option').some(n => n.value === 'model-b'), true);
+  assert.equal(jarvisSaveButton(h).disabled, true);
+  jarvisSaveButton(h).listeners.click[0]({}); await h.settle(); assert.equal(jarvisPosts(h).length, 0);
+});
+
+test('Jarvis missing model list preserves current model and allows supported wake-only Save', async () => {
+  let status = { ...jarvisFixture(), availableModels: {}, models: null };
+  const h = await jarvisSaveHarness(({ opts, response }) => {
+    if (opts.method === 'POST') status = { ...status, ...JSON.parse(opts.body) };
+    return response({ ok: true, jarvis: status });
+  });
+  assert.match(pageText(h), /model-a/);
+  jarvisWake(h).click(); h.click('Save Jarvis settings'); await h.settle();
+  assert.deepEqual(JSON.parse(jarvisPosts(h)[0].opts.body), { wakeEnabled: true });
+  assert.equal(h.eval('data.jarvis.wakeEnabled'), true);
+});

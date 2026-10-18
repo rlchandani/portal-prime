@@ -384,6 +384,10 @@ function message(error) {
       'Transfer was interrupted. Refresh the library to check whether the photo arrived.',
     folder_not_found: 'That folder does not exist. Choose another public folder.',
     invalid_response: 'The Portal returned an unreadable response. Try refreshing.',
+    readback_failed: 'Jarvis did not confirm the requested settings. Your edits are kept.',
+    unsupported_model: 'That model is no longer reported by Jarvis. Refresh and choose an available model.',
+    configuration_rejected: 'Jarvis rejected these settings. Your edits are kept; check Jarvis on the Portal.',
+    ipc_failed: 'Jarvis did not respond. Your edits are kept; check Jarvis on the Portal before retrying.',
     invalid_address: 'Enter a Portal address or its pairing link, without a username or password.',
   };
   return (
@@ -914,7 +918,7 @@ function loadVisible(force = false) {
   if (tab === 'home' && detail === 'layout') loadLayout();
   else if (tab === 'home' && detail === 'scenes') loadScenes();
   else if (tab === 'home' && detail === 'jarvis')
-    read('jarvis', '/remote/jarvis', (r) => (data.jarvis = r.jarvis));
+    loadJarvis();
   else if (tab === 'home' && detail === 'activity')
     read('operations', '/remote/operations', acceptOperations);
   else if (tab === 'home' && detail === 'snapshots')
@@ -4111,17 +4115,78 @@ function snapshotsPage() {
     resultPanel(),
   );
 }
+function loadJarvis() {
+  return read('jarvis', '/remote/jarvis', (response) => {
+    if (!response.jarvis || typeof response.jarvis !== 'object' || Array.isArray(response.jarvis))
+      throw new ApiError('invalid_response');
+    data.jarvis = response.jarvis;
+  });
+}
+function jarvisSaving() {
+  return busy.has(`${room()?.base}:jarvis`);
+}
+function jarvisEditState(status = data.jarvis) {
+  const currentModel = typeof status?.model === 'string' ? status.model : '';
+  const model = draft('jarvis:model', currentModel), wake = draft('jarvis:wake', status?.wakeEnabled);
+  const reported = Array.isArray(status?.availableModels) ? status.availableModels
+    : Array.isArray(status?.models) ? status.models : [];
+  const models = [...new Set(reported.filter(value =>
+    typeof value === 'string' && /^[A-Za-z0-9._-]{1,100}$/.test(value)))].slice(0, 32);
+  const modelChanged = model !== currentModel;
+  const wakeEditable = status?.wakeSupported === true && typeof status.wakeEnabled === 'boolean';
+  const wakeChanged = wakeEditable && wake !== status.wakeEnabled;
+  const invalid = (modelChanged && !models.includes(model)) || (wakeChanged && typeof wake !== 'boolean');
+  const changes = {};
+  if (modelChanged && models.includes(model)) changes.model = model;
+  if (wakeChanged && typeof wake === 'boolean') changes.wakeEnabled = wake;
+  return { model, wake, models, changes, invalid, changed: modelChanged || wakeChanged };
+}
+async function saveJarvisSettings() {
+  if (jarvisSaving() || !supported('jarvis') || data.jarvis?.supported !== true) return;
+  const submitted = jarvisEditState(), target = room(), ticket = session.capture();
+  if (submitted.invalid || !Object.keys(submitted.changes).length) return;
+  delete data.jarvisSaveError;
+  const pending = mutate('jarvis', '/remote/jarvis', submitted.changes, {
+    target, ticket, success: '', onError: error => { data.jarvisSaveError = error; },
+  });
+  render();
+  const response = await pending;
+  if (response && session.current(ticket)) {
+    const confirmed = response.jarvis;
+    if (confirmed?.supported === true && Object.entries(submitted.changes)
+        .every(([key, value]) => confirmed[key] === value)) {
+      // Retire older status reads before accepting the provider's exact configuration readback.
+      pageReads.get('jarvis')?.abort();
+      session.read('jarvis');
+      const current = jarvisEditState();
+      for (const [field, value] of [['model', submitted.model], ['wake', submitted.wake]])
+        if (current[field] === value) drafts.delete(draftKey(`jarvis:${field}`));
+      data.jarvis = confirmed;
+      delete data.jarvisError;
+      toast(jarvisEditState().changed
+        ? 'Submitted Jarvis settings confirmed. Your newer edits are still unsaved.'
+        : 'Jarvis settings saved and confirmed.');
+    } else {
+      data.jarvisSaveError = new ApiError('readback_failed');
+      toast(message(data.jarvisSaveError), true);
+    }
+  }
+  if (room()?.base === target?.base && tab === 'home' && detail === 'jarvis') render();
+}
 function jarvisPage() {
   const status = data.jarvis;
   if (!status)
     return data.jarvisError
       ? failure('Jarvis unavailable', data.jarvisError, () => loadVisible())
       : empty('Jarvis', 'Loading readiness and microphone status…');
-  const models = (status.availableModels || status.models || [])
-    .filter((m) => typeof m === 'string' && /^[A-Za-z0-9._-]{1,100}$/.test(m))
-    .slice(0, 32);
-  const model = draft('jarvis:model', status.model),
-    wake = draft('jarvis:wake', status.wakeEnabled);
+  const edit = jarvisEditState(status), { model, wake, models } = edit;
+  const modelOptions = models.map(value => ({ value, label: value }));
+  if (!models.includes(model)) modelOptions.unshift({ value: model,
+    label: model ? `${model} (${model === status.model ? 'Current' : 'Unavailable'})` : 'Model not reported' });
+  const modelChoice = choice(model, modelOptions, value => {
+    setDraft('jarvis:model', value); delete data.jarvisSaveError; render();
+  }, 'Conversation model');
+  modelChoice.disabled = !models.length;
   const ready = status.supported === true;
   const mic =
     status.microphoneMuted === true
@@ -4147,7 +4212,7 @@ function jarvisPage() {
                 '',
                 text(status.wakeSupported === true ? 'Supported' : 'Unavailable on this Portal'),
               ),
-              status.wakeSupported
+              status.wakeSupported === true
                 ? row(
                     'Wake listener',
                     '',
@@ -4188,17 +4253,9 @@ function jarvisPage() {
               models.length
                 ? 'Choices reported by Jarvis.'
                 : 'Jarvis has not reported an available model list.',
-              choice(
-                model,
-                models.map((value) => ({ value, label: value })),
-                (value) => {
-                  setDraft('jarvis:model', value);
-                  render();
-                },
-                'Conversation model',
-              ),
+              modelChoice,
             ),
-            status.wakeSupported
+            status.wakeSupported === true
               ? row(
                   'Allow background wake',
                   'Opt in to local wake-word listening in the background.',
@@ -4211,29 +4268,22 @@ function jarvisPage() {
                     disabled: typeof status.wakeEnabled !== 'boolean',
                     onChange: (event) => {
                       setDraft('jarvis:wake', event.target.checked);
-                      render();
+                      delete data.jarvisSaveError; render();
                     },
                   }),
                 )
               : null,
             text('Microphone permission and competing audio can pause the listener.'),
-            button(
-              'Save Jarvis settings',
-              async () => {
-                const changes = {};
-                if (model !== status.model && models.includes(model)) changes.model = model;
-                if (status.wakeSupported && wake !== status.wakeEnabled) changes.wakeEnabled = wake;
-                const response = await mutate('jarvis', '/remote/jarvis', changes, { success: '' });
-                if (response?.jarvis) {
-                  data.jarvis = response.jarvis;
-                  drafts.delete(draftKey('jarvis:model'));
-                  drafts.delete(draftKey('jarvis:wake'));
-                  toast('Jarvis configuration verified.');
-                  render();
-                }
-              },
-              { kind: 'primary', disabled: model === status.model && wake === status.wakeEnabled },
-            ),
+            el('p', { role: 'status', class: 'draft-label', text: jarvisSaving()
+              ? 'Saving submitted Jarvis settings…'
+              : edit.changed ? 'Unsaved changes' : 'Settings reported by Jarvis' }),
+            jarvisSaving() ? text('You can keep editing. Newer changes will need another Save.') : null,
+            edit.invalid ? text('The selected model is no longer available. Choose a reported model before saving.', 'error') : null,
+            data.jarvisSaveError ? sections(text(message(data.jarvisSaveError), 'error'),
+              text('Your edits are kept. Retry Save or refresh the reported status.')) : null,
+            button('Save Jarvis settings', saveJarvisSettings, {
+              kind: 'primary', disabled: jarvisSaving() || edit.invalid || !Object.keys(edit.changes).length,
+            }),
           )
         : null,
     ),
