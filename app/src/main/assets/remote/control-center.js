@@ -654,6 +654,7 @@ async function syncRoster(targets = roster) {
 }
 function openSheet(title, body, onClose = null) {
   delete sheet.dataset.presetEditor;
+  delete sheet.dataset.sceneEditor;
   previewPool.clear();
   $('sheet-title').textContent = title;
   content.replaceChildren(body);
@@ -666,6 +667,7 @@ function openSheet(title, body, onClose = null) {
   footer.hidden = footer.children.length === 0;
   sheet.onclose = () => {
     delete sheet.dataset.presetEditor;
+    delete sheet.dataset.sceneEditor;
     previewPool.clear();
     clearTimeout(pairDiscoveryTimer);
     pairDiscoveryTimer = null;
@@ -4123,11 +4125,12 @@ function scenesPage() {
   return sections(
     heading('Scenes', 'Everyday routines and schedules.'),
     sceneProtectionPanel(),
+    scenesSaving() ? text('Saving scenes…', 'draft-label') : null,
     group(
       text(
         'Scenes run ordered actions on this Portal. Schedules use its local clock and are inexact on Android.',
       ),
-      button('New scene', () => openScene(null), { kind: 'primary', icon: 'scenes' }),
+      button('New scene', () => openScene(null), { kind: 'primary', icon: 'scenes', disabled: scenesSaving() }),
     ),
     data.scenesError
       ? failure('Scenes unavailable', data.scenesError, () => loadVisible())
@@ -4146,8 +4149,8 @@ function scenesPage() {
                     `${scene.steps?.length || 0} steps${scene.schedule?.enabled ? ` · ${String(scene.schedule.hour).padStart(2, '0')}:${String(scene.schedule.minute).padStart(2, '0')} local · ${scene.schedule.days.length} days` : ''}`,
                   ),
                   actions(
-                    button('Run', () => runScene(scene.id), { kind: 'primary' }),
-                    button('Edit', () => openScene(scene), { kind: 'outline' }),
+                    button('Run', () => runScene(scene.id), { kind: 'primary', disabled: scenesSaving() }),
+                    button('Edit', () => openScene(scene), { kind: 'outline', disabled: scenesSaving() }),
                     button(
                       'Delete',
                       () => {
@@ -4161,7 +4164,7 @@ function scenesPage() {
                           ticket,
                         );
                       },
-                      { kind: 'danger', disabled: !validSceneRevision(revision) },
+                      { kind: 'danger', disabled: scenesSaving() || !validSceneRevision(revision) },
                     ),
                   ),
                 ),
@@ -4202,6 +4205,7 @@ function sceneEditor() {
   return sections(
     heading(d.name || 'New scene', 'Actions run in order on the selected Portal.'),
     sceneProtectionPanel(d.expectedRevision),
+    scenesSaving() ? text('Saving scene… You can keep editing; newer changes will need another Save.', 'draft-label') : null,
     el(
       'div',
       { class: 'columns' },
@@ -4245,17 +4249,9 @@ function sceneEditor() {
           actions(
             button('Save scene', () => saveSceneDraft(), {
               kind: 'primary',
-              disabled: !validSceneRevision(d.expectedRevision) || d.conflict,
+              disabled: scenesSaving() || !validSceneRevision(d.expectedRevision) || d.conflict,
             }),
-            button(
-              'Discard changes',
-              () => {
-                sceneDraft = null;
-                data.sceneConflict = false;
-                render();
-              },
-              { kind: 'outline' },
-            ),
+            button('Discard changes', discardSceneDraft, { kind: 'outline', disabled: scenesSaving() }),
           ),
         ),
       ),
@@ -4314,29 +4310,43 @@ function moveDraftStep(id, delta, mode) {
   draft.steps.splice(to, 0, draft.steps.splice(index, 1)[0]);
   render();
 }
+function scenesSaving(target = room()) {
+  return busy.has(`${target?.base}:scenes`);
+}
+function discardSceneDraft() {
+  if (scenesSaving() || !sceneDraft) return;
+  const owner = sceneDraft;
+  return confirmAction('Discard scene changes?', 'Discard your unsaved edits to this scene.', () => {
+    if (scenesSaving() || sceneDraft !== owner) return;
+    sceneDraft = null;
+    data.sceneConflict = false;
+    render();
+  }, 'Discard');
+}
 async function saveSceneDraft() {
-  const d = sceneDraft;
-  if (!d?.name.trim() || !d.steps.length) {
+  if (scenesSaving() || !sceneDraft) return;
+  const owner = sceneDraft, submitted = copy(owner), target = room(), ticket = session.capture();
+  if (!submitted.name.trim() || !submitted.steps.length) {
     toast('Enter a scene name and add at least one step.', true);
     return;
   }
-  if (d.steps.reduce((sum, s) => sum + (s.step.type === 'wait' ? s.step.ms : 0), 0) > 5000) {
+  if (submitted.steps.reduce((sum, s) => sum + (s.step.type === 'wait' ? s.step.ms : 0), 0) > 5000) {
     toast('Total scene wait time must be 5 seconds or less.', true);
     return;
   }
   const scene = {
-    id: d.id,
-    name: d.name.trim(),
-    steps: d.steps.map((s) => copy(s.step)),
-    schedule: d.schedule ? copy(d.schedule) : null,
+    id: submitted.id,
+    name: submitted.name.trim(),
+    steps: submitted.steps.map((s) => copy(s.step)),
+    schedule: submitted.schedule ? copy(submitted.schedule) : null,
   };
   if (scene.schedule?.enabled && !scene.schedule.days.length) {
     toast('Choose at least one weekday.', true);
     return;
   }
-  if (!validSceneRevision(d.expectedRevision) || d.conflict) {
+  if (!validSceneRevision(submitted.expectedRevision) || submitted.conflict) {
     toast(
-      d.conflict
+      submitted.conflict
         ? 'Scene conflict: refresh to review before discarding and reopening your draft.'
         : 'Conflict protection is unavailable. Update Immortal before saving scenes.',
       true,
@@ -4344,19 +4354,31 @@ async function saveSceneDraft() {
     render();
     return;
   }
-  const candidate = [...d.baseScenes.filter((s) => s.id !== d.id), scene];
-  const response = await saveScenes(candidate, session.capture(), d.expectedRevision);
-  if (response && sceneDraft === d) {
-    sceneDraft = null;
-    render();
+  const candidate = [...submitted.baseScenes.filter((s) => s.id !== submitted.id), scene];
+  const response = await saveScenes(candidate, ticket, submitted.expectedRevision, {
+    target, success: '', renderAfter: false,
+  });
+  if (response && session.current(ticket) && sceneDraft === owner) {
+    const newerEdits = JSON.stringify(owner) !== JSON.stringify(submitted) ||
+      (sheet.open && sheet.dataset.sceneEditor === owner.id);
+    if (newerEdits) {
+      owner.baseScenes = copy(response.scenes);
+      owner.expectedRevision = response.revision;
+      owner.conflict = false;
+    } else sceneDraft = null;
+    toast(newerEdits
+      ? 'Submitted scene saved. Your newer edits are still unsaved.'
+      : 'Scene saved and confirmed.');
   }
+  if (room()?.base === target?.base && tab === 'home' && detail === 'scenes') render();
 }
 async function saveScenes(
   scenes,
   ticket = session.capture(),
   expectedRevision = data.scenesRevision,
+  { target = room(), success = 'Scenes saved and confirmed.', renderAfter = true } = {},
 ) {
-  if (!session.current(ticket)) return null;
+  if (!session.current(ticket) || scenesSaving(target)) return null;
   if (!validSceneRevision(expectedRevision)) {
     toast(
       'Conflict protection is unavailable. Update Immortal before saving or deleting scenes.',
@@ -4366,11 +4388,12 @@ async function saveScenes(
     return null;
   }
   const editor = sceneDraft;
-  const response = await mutate(
+  const pending = mutate(
     'scenes',
     '/remote/scenes',
     { scenes, expectedRevision },
     {
+      target,
       ticket,
       success: '',
       onError: (error) => {
@@ -4382,13 +4405,18 @@ async function saveScenes(
       },
     },
   );
-  if (response?.scenes && session.current(ticket)) {
+  render();
+  const response = await pending;
+  const confirmed = Array.isArray(response?.scenes) && validSceneRevision(response.revision) && session.current(ticket);
+  if (confirmed) {
     acceptScenes(response);
     data.sceneConflict = false;
-    toast('Scenes saved and confirmed.');
-    render();
+    if (success) toast(success);
+  } else if (response && session.current(ticket)) {
+    toast('The Portal did not confirm saved scenes. Your draft is kept.', true);
   }
-  return response;
+  if (renderAfter && room()?.base === target?.base && tab === 'home' && detail === 'scenes') render();
+  return confirmed ? response : null;
 }
 async function runScene(id) {
   const response = await mutate(`scene:${id}`, '/remote/scene', { id }, { success: '' });
@@ -4442,6 +4470,7 @@ function stepDialog(existing, mode) {
     ),
   );
   if (mode === 'preset' && presetDraft) sheet.dataset.presetEditor = presetDraft.id;
+  if (mode === 'scene' && sceneDraft) sheet.dataset.sceneEditor = sceneDraft.id;
   function paint() {
     const nodes = [];
     if (type === 'key' || type === 'media') {

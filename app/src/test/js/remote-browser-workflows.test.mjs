@@ -1988,3 +1988,126 @@ test('step reorder preset arrows work from the Remote entry point', async () => 
   reorderButtons(h, '↑')[1].click(); await h.settle();
   assert.equal(stepTypes(h, 'preset'), 'config,wait,media'); assert.equal(draftJson(h, 'scene'), inactive);
 });
+
+
+async function pendingSceneSave({ fail = false, unconfirmed = false } = {}) {
+  let release, revision = sceneV1;
+  let scenes = [scheduledScene(8), { id: 'other', name: 'Other scene', steps: [{ type: 'wait', ms: 100 }], schedule: null }];
+  const h = await browserHarness({ saved, routes: {
+    '/remote/scenes': ({ opts, response }) => opts.method === 'POST'
+      ? new Promise(resolve => {
+          const body = JSON.parse(opts.body);
+          release = () => {
+            if (fail) return resolve(response({ ok: false, error: 'stale_revision' }, 409));
+            if (unconfirmed) return resolve(response({ ok: true, scenes: body.scenes }));
+            scenes = body.scenes; revision = revision === sceneV1 ? sceneV2 : sceneV3;
+            resolve(response({ ok: true, scenes, revision }));
+          };
+        })
+      : response({ ok: true, scenes, revision }),
+  } });
+  h.eval('go("home","scenes")'); await h.settle(); h.click('Edit'); await h.settle();
+  h.click('Save scene'); await h.settle();
+  return { h, finish: async () => { release(); await h.settle(); } };
+}
+const scenePosts = h => h.calls.filter(c => c.path === '/remote/scenes' && c.opts.method === 'POST');
+
+test('scene editor save retains a name changed after submission', async () => {
+  const { h, finish } = await pendingSceneSave();
+  try { await h.input('Scene name', 'Newer name'); } finally { await finish(); }
+  assert.equal(h.eval('sceneDraft?.name'), 'Newer name');
+  assert.equal(h.eval('data.scenes.find(s=>s.id==="routine").name'), 'Morning');
+});
+
+test('scene editor save retains later schedule time and weekday edits', async () => {
+  const { h, finish } = await pendingSceneSave();
+  try { await h.input('Time on Portal', '10:45'); h.eval('sceneDraft.schedule.days=[2,6];render()'); } finally { await finish(); }
+  assert.equal(h.eval('sceneDraft?.schedule.hour'), 10); assert.equal(h.eval('sceneDraft?.schedule.minute'), 45);
+  assert.equal(h.eval('sceneDraft?.schedule.days.join(",")'), '2,6');
+  assert.equal(h.eval('data.scenes.find(s=>s.id==="routine").schedule.hour'), 8);
+});
+
+test('scene editor save captures submitted rich steps and retains newer steps', async () => {
+  const { h, finish } = await pendingSceneSave();
+  try { h.eval('sceneDraft.steps.push({id:"newer-step",step:{type:"settings",domain:"immortal",values:{themeMode:"dark"},futureField:{kept:true}}});render()'); } finally { await finish(); }
+  assert.equal(h.eval('sceneDraft?.steps[1].id'), 'newer-step');
+  assert.equal(h.eval('sceneDraft?.steps[1].step.futureField.kept'), true);
+  assert.equal(JSON.parse(scenePosts(h)[0].opts.body).scenes.find(s=>s.id==='routine').steps.length, 1);
+});
+
+test('scene editor save keeps an unfinished step popup and its parent until Save step', async () => {
+  const { h, finish } = await pendingSceneSave();
+  h.click('Add step'); await h.settle(); await finish();
+  assert.notEqual(h.eval('sceneDraft'), null); assert.equal(h.document.getElementById('sheet').open, true);
+  h.click('Save step'); await h.settle(); assert.equal(h.eval('sceneDraft.steps.length'), 2);
+  assert.equal(h.eval('sceneDraft.expectedRevision'), sceneV2);
+});
+
+test('scene editor save shows progress and blocks duplicate Save and pending Discard', async () => {
+  const { h, finish } = await pendingSceneSave();
+  try {
+    assert.match(h.document.getElementById('page').textContent, /Saving scene/);
+    assert.equal(layoutButton(h, 'Save scene').disabled, true); assert.equal(layoutButton(h, 'Discard changes').disabled, true);
+    h.click('Save scene'); h.click('Discard changes'); await h.settle();
+    assert.equal(scenePosts(h).length, 1); assert.notEqual(h.eval('sceneDraft'), null);
+    assert.equal(h.document.getElementById('sheet').open, false);
+  } finally { await finish(); }
+});
+
+test('scene editor next Save uses the confirmed revision base list and preserved edits', async () => {
+  const { h, finish } = await pendingSceneSave();
+  try { await h.input('Scene name', 'Next version'); } finally { await finish(); }
+  assert.equal(h.eval('sceneDraft?.expectedRevision'), sceneV2);
+  h.click('Save scene'); await h.settle();
+  try {
+    const body=JSON.parse(scenePosts(h).at(-1).opts.body);
+    assert.equal(body.expectedRevision, sceneV2); assert.equal(body.scenes.find(s=>s.id==='routine').name, 'Next version');
+    assert.equal(body.scenes.find(s=>s.id==='other').name, 'Other scene');
+  } finally { await finish(); }
+  assert.equal(h.eval('sceneDraft'), null); assert.equal(h.eval('data.scenesRevision'), sceneV3);
+});
+
+test('scene editor unchanged confirmed submission closes the draft', async () => {
+  const { h, finish } = await pendingSceneSave(); await finish();
+  assert.equal(h.eval('sceneDraft'), null); assert.equal(h.eval('data.scenesRevision'), sceneV2);
+  assert.match(h.document.getElementById('page').textContent, /Scenes/);
+});
+
+test('scene editor failed Save keeps newer edits and re-enables Discard', async () => {
+  const { h, finish } = await pendingSceneSave({ fail:true });
+  try { await h.input('Scene name', 'Keep this'); } finally { await finish(); }
+  assert.equal(h.eval('sceneDraft?.name'), 'Keep this'); assert.equal(h.eval('sceneDraft?.expectedRevision'), sceneV1);
+  assert.equal(h.eval('sceneDraft?.conflict'), true); assert.equal(layoutButton(h,'Discard changes').disabled, false);
+  assert.equal(layoutButton(h,'Save scene').disabled, true);
+});
+
+test('scene editor unconfirmed Save cannot close or rebase the retained draft', async () => {
+  const { h, finish } = await pendingSceneSave({ unconfirmed:true }); await finish();
+  assert.notEqual(h.eval('sceneDraft'), null); assert.equal(h.eval('sceneDraft.expectedRevision'), sceneV1);
+  assert.equal(h.eval('data.scenesRevision'), sceneV1); assert.match(h.document.body.textContent, /did not confirm/i);
+});
+
+test('scene editor malformed confirmation is rejected without changing the last confirmed list', async () => {
+  const h=await browserHarness({saved,routes:{'/remote/scenes':({opts,response})=>opts.method==='POST'
+    ? response({ok:true,scenes:{invalid:true},revision:sceneV2}) : response({ok:true,scenes:[scheduledScene(8)],revision:sceneV1})}});
+  h.eval('go("home","scenes")');await h.settle();h.click('Edit');await h.settle();
+  await h.eval('saveSceneDraft()');await h.settle();
+  assert.notEqual(h.eval('sceneDraft'), null); assert.equal(h.eval('data.scenesRevision'), sceneV1);
+  assert.equal(h.eval('Array.isArray(data.scenes)'), true);
+});
+
+test('scene editor Discard asks for confirmation and Cancel retains every edit', async () => {
+  const h=await browserHarness({saved,routes:{'/remote/scenes':({response})=>response({ok:true,scenes:[scheduledScene(8)],revision:sceneV1})}});
+  h.eval('go("home","scenes")');await h.settle();h.click('Edit');await h.input('Scene name','Keep edits');
+  const before=h.eval('JSON.stringify(sceneDraft)');h.click('Discard changes');await h.settle();
+  assert.equal(h.document.getElementById('sheet').open,true);h.click('Cancel');await h.settle();assert.equal(h.eval('JSON.stringify(sceneDraft)'),before);
+  h.click('Discard changes');await h.settle();h.click('Discard');await h.settle();assert.equal(h.eval('sceneDraft'),null);assert.equal(scenePosts(h).length,0);
+});
+
+test('scene editor a late Save cannot change another Portal draft or confirmed revision', async () => {
+  const {h,finish}=await pendingSceneSave();
+  try {h.eval(`selectRoom('${saved[1].base}')`);await h.settle();h.eval('go("home","scenes")');await h.settle();h.click('Edit');await h.input('Scene name','Other Portal');}
+  finally {await finish();}
+  assert.equal(h.eval('sceneDraft?.name'),'Other Portal');assert.equal(h.eval('sceneDraft?.expectedRevision'),sceneV1);
+  assert.equal(h.eval('data.scenesRevision'),sceneV1);
+});
