@@ -340,6 +340,8 @@ function draft(key, fallback = '') {
 }
 const setDraft = (key, value) => drafts.set(draftKey(key), value);
 function toast(message, isError = false) {
+  // A passive status message must not intercept retry or navigation taps.
+  $('notice').setAttribute('style', 'pointer-events: none');
   $('notice').textContent = message;
   $('notice').dataset.error = String(isError);
   $('notice').hidden = false;
@@ -2555,39 +2557,66 @@ function sourcesPage() {
   );
   const calendar = group(
     el('h3', { text: 'Calendar feed' }),
-    field(
+    text(data.calendar?.url ? 'A calendar feed is saved on this Portal.' : 'No calendar feed is saved.'),
+    calendarSaving() ? el('p', { role: 'status', 'aria-live': 'polite', class: 'detail',
+      text: 'Saving calendar feed… Any newer edits will need another save.' }) : null,
+    searchField(
       'Calendar feed URL',
       draft('calendar-url', data.calendar?.url || ''),
       (v) => setDraft('calendar-url', v),
-      { key: 'calendar-url', help: 'Use an iCalendar feed. Clear the address to remove the feed.' },
+      { key: 'calendar-url', renderOnInput: false,
+        help: 'Use an iCalendar feed. Clear the address and save to remove the feed after confirmation.' },
     ),
-    button(
-      'Save calendar feed',
-      async () => {
-        const response = await mutate(
-          'calendar',
-          '/remote/sources',
-          { calendarUrl: draft('calendar-url').trim() },
-          { success: '' },
-        );
-        if (response) {
-          data.calendar = response.calendar;
-          if (
-            (response.applied || []).includes('url') ||
-            response.calendar?.url === draft('calendar-url').trim()
-          )
-            toast('Calendar feed saved.');
-          else toast('Calendar feed was not confirmed. Refresh and review it.', true);
-          render();
-        }
-      },
-      { kind: 'primary' },
-    ),
+    button('Save calendar feed', () => saveCalendarFeed(),
+      { kind: 'primary', disabled: calendarSaving() }),
   );
   return sections(
     heading('Photo sources', 'Connect a collection and preview it on your Portal.'),
     el('div', { class: 'columns' }, sections(editor), sections(calendar)),
   );
+}
+function calendarSaving(target = room()) {
+  return busy.has(`${target?.base}:calendar`);
+}
+async function saveCalendarFeed({ confirmedRemoval = false } = {}) {
+  if (!room() || calendarSaving()) return;
+  const target = room(), ticket = session.capture(), key = draftKey('calendar-url');
+  const raw = draft('calendar-url', data.calendar?.url || '');
+  const submitted = raw.trim(), previous = data.calendar?.url || '';
+  if (submitted === previous) {
+    toast('Calendar feed already saved.');
+    return;
+  }
+  if (!submitted && previous && !confirmedRemoval) {
+    return confirmAction('Remove calendar feed?',
+      `Remove the saved calendar feed from ${target.name}? Calendar events from this feed will no longer appear.`,
+      () => {
+        if (drafts.get(key) !== raw || data.calendar?.url !== previous) {
+          toast('The calendar feed changed. Review it before removing.', true);
+          return;
+        }
+        return saveCalendarFeed({ confirmedRemoval: true });
+      }, 'Remove feed', ticket);
+  }
+  try {
+    const pending = mutate('calendar', '/remote/sources', { calendarUrl: submitted },
+      { target, ticket, success: '' });
+    render();
+    const response = await pending;
+    if (!response) return;
+    if (response.calendar?.url !== submitted) {
+      toast('Calendar feed was not confirmed. Refresh and review it.', true);
+      return;
+    }
+    const newer = drafts.get(key) !== raw;
+    // Accept this Calendar snapshot only; a source save owns its separate snapshot.
+    pageReads.get('sources')?.abort();
+    session.read('sources');
+    data.calendar = response.calendar;
+    toast(`${submitted ? 'Calendar feed saved' : 'Calendar feed removed'} and confirmed.${newer ? ' Your newer edits are still unsaved.' : ''}`);
+  } finally {
+    if (room()?.base === target.base && tab === 'photos' && detail === 'sources') render();
+  }
 }
 async function loadAlbums() {
   if (!room() || tab !== 'photos' || detail !== 'sources' || !advanced ||

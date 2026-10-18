@@ -2253,3 +2253,77 @@ test('album query confirmed source Save retains the verified list after submitte
 test('album query explicit source refresh invalidates stored-credential album context',async()=>{
  const {h,start}=await albumQueryHarness({held:false});await (await start()).finish();await h.eval('loadSources()');await h.settle();assert.doesNotMatch(h.document.getElementById('page').textContent,/First album/);assert.equal(albumQueryPosts(h).length,1);assert.equal(h.eval('draft("source:immichAlbumId")'),'kept-id');
 });
+
+
+async function calendarEditor({ fail=false, wrong=false, holdRefresh=false, empty=false }={}) {
+ let release,releaseRead,reads=0,failed=fail;
+ const initial=empty?'':'https://calendar.example.invalid/old.ics';
+ const h=await browserHarness({saved,routes:{'/remote/sources':({opts,response})=>{
+  if(opts.method==='POST')return new Promise(resolve=>{const body=JSON.parse(opts.body);release=()=>{
+   if(failed){failed=false;return resolve(response({ok:false,error:'invalid_value'},400));}
+   resolve(response({ok:true,applied:['url'],calendar:{url:wrong?initial:body.calendarUrl,range:'week'},sources:{source:'default'}}));
+  };});
+  reads++;if(holdRefresh&&reads===2)return new Promise(resolve=>releaseRead=()=>resolve(response({ok:true,calendar:{url:initial},sources:{source:'default'}})));
+  return response({ok:true,calendar:{url:initial,range:'week'},sources:{source:'default'}});
+ }}});
+ h.eval('go("photos","sources")');await h.settle();
+ return {h,initial,start:async(value='https://calendar.example.invalid/submitted.ics')=>{await h.input('Calendar feed URL',value);h.click('Save calendar feed');await h.settle();},finish:async()=>{release?.();await h.settle();},finishRead:async()=>{releaseRead?.();await h.settle();}};
+}
+const calendarPosts=h=>sourcePosts(h).filter(c=>Object.hasOwn(JSON.parse(c.opts.body),'calendarUrl'));
+const calendarInput=h=>h.document.body.querySelectorAll('input').find(n=>n.attrs['aria-label']==='Calendar feed URL');
+
+test('calendar feed editor pending Save shows progress and blocks duplicate requests',async()=>{
+ const t=await calendarEditor();await t.start();try{
+  assert.match(t.h.document.getElementById('page').textContent,/Saving calendar feed/);
+  assert.equal(layoutButton(t.h,'Save calendar feed').disabled,true);t.h.click('Save calendar feed');assert.equal(calendarPosts(t.h).length,1);
+ }finally{await t.finish();}
+});
+test('calendar feed editor confirmed Save preserves newer URL and explains unsaved edits',async()=>{
+ const t=await calendarEditor();await t.start();try{await t.h.input('Calendar feed URL','https://calendar.example.invalid/newer.ics');}finally{await t.finish();}
+ assert.equal(calendarInput(t.h).value,'https://calendar.example.invalid/newer.ics');assert.match(t.h.document.getElementById('notice').textContent,/newer edits.*unsaved/i);
+ assert.equal(t.h.eval('data.calendar.url'),'https://calendar.example.invalid/submitted.ics');
+});
+test('calendar feed editor Save does not overwrite independent photo-source state',async()=>{
+ const t=await calendarEditor();await t.start();t.h.eval('data.sources={source:"immich",immichUrl:"https://new.example.invalid"};data.sourcesError={code:"unreachable"}');await t.finish();
+ assert.equal(t.h.eval('data.sources.source'),'immich');assert.equal(t.h.eval('data.sources.immichUrl'),'https://new.example.invalid');assert.equal(t.h.eval('data.sourcesError.code'),'unreachable');
+});
+test('calendar feed editor confirmed Save invalidates older source read without extra GET',async()=>{
+ const t=await calendarEditor({holdRefresh:true});t.h.eval('loadSources()');await t.h.settle();await t.start();await t.finish();await t.finishRead();
+ assert.equal(t.h.eval('data.calendar.url'),'https://calendar.example.invalid/submitted.ics');assert.equal(t.h.calls.filter(c=>c.path==='/remote/sources'&&c.opts.method!=='POST').length,2);
+});
+test('calendar feed editor applied flag alone cannot confirm a different returned address',async()=>{
+ const t=await calendarEditor({wrong:true});await t.start();await t.finish();assert.match(t.h.document.getElementById('notice').textContent,/not confirmed/i);
+ assert.equal(t.h.eval('data.calendar.url'),t.initial);assert.equal(calendarInput(t.h).value,'https://calendar.example.invalid/submitted.ics');
+});
+test('calendar feed editor failed Save keeps newer draft and makes retry available',async()=>{
+ const t=await calendarEditor({fail:true});await t.start();await t.h.input('Calendar feed URL','https://calendar.example.invalid/retry.ics');await t.finish();
+ assert.equal(calendarInput(t.h).value,'https://calendar.example.invalid/retry.ics');assert.equal(layoutButton(t.h,'Save calendar feed').disabled,false);
+ t.h.click('Save calendar feed');await t.h.settle();await t.finish();assert.equal(t.h.eval('data.calendar.url'),'https://calendar.example.invalid/retry.ics');
+});
+test('calendar feed editor late old-room Save cannot change another room calendar',async()=>{
+ const t=await calendarEditor();await t.start();try{t.h.eval(`selectRoom('${saved[1].base}')`);await t.h.settle();t.h.eval('go("photos","sources")');await t.h.settle();await t.h.input('Calendar feed URL','https://calendar.example.invalid/other.ics');}finally{await t.finish();}
+ assert.equal(calendarInput(t.h).value,'https://calendar.example.invalid/other.ics');assert.equal(t.h.eval('data.calendar.url'),t.initial);
+});
+test('calendar feed editor clearing saved feed requires confirmation and Cancel preserves it',async()=>{
+ const t=await calendarEditor();await t.start('');try{
+  assert.equal(t.h.document.getElementById('sheet').open,true);assert.equal(calendarPosts(t.h).length,0);assert.equal(t.h.document.getElementById('sheet-content').textContent.includes(t.h.eval('room().name')),true);
+  t.h.click('Cancel');await t.h.settle();assert.equal(t.h.eval('data.calendar.url'),t.initial);assert.equal(calendarInput(t.h).value,'');
+ }finally{await t.finish();}
+});
+test('calendar feed editor removal confirmation cannot remove a newly edited address',async()=>{
+ const t=await calendarEditor();await t.start('');try{
+  await t.h.input('Calendar feed URL','https://calendar.example.invalid/keep.ics');t.h.click('Remove feed');await t.h.settle();assert.equal(calendarPosts(t.h).length,0);assert.match(t.h.document.getElementById('notice').textContent,/changed.*review/i);
+ }finally{await t.finish();}
+});
+test('calendar feed editor confirmed removal posts one blank URL and confirms returned removal',async()=>{
+ const t=await calendarEditor();await t.start('');try{t.h.click('Remove feed');await t.h.settle();assert.equal(calendarPosts(t.h).length,1);}finally{await t.finish();}
+ assert.equal(JSON.parse(calendarPosts(t.h)[0].opts.body).calendarUrl,'');assert.equal(t.h.eval('data.calendar.url'),'');assert.match(t.h.document.getElementById('notice').textContent,/removed.*confirmed/i);
+});
+test('calendar feed editor unchanged saved URL and empty feed need no POST or confirmation',async()=>{
+ for(const empty of [false,true]){const t=await calendarEditor({empty});await t.start(t.initial);try{assert.equal(calendarPosts(t.h).length,0);assert.equal(t.h.document.getElementById('sheet').open,false);assert.match(t.h.document.getElementById('notice').textContent,/already saved/i);}finally{await t.finish();}}
+});
+test('calendar feed editor async Save completion preserves focused composing URL',async()=>{
+ const t=await calendarEditor();await t.start();const input=calendarInput(t.h);input.focus();input.listeners.compositionstart?.forEach(fn=>fn());input.value='https://calendar.example.invalid/composing.ics';
+ await t.finish();assert.equal(calendarInput(t.h)===input,true);assert.equal(t.h.document.activeElement===input,true);input.listeners.compositionend?.forEach(fn=>fn());await t.h.tick(0);
+ assert.equal(calendarInput(t.h).value,'https://calendar.example.invalid/composing.ics');
+});
