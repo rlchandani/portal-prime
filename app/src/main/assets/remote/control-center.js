@@ -92,7 +92,8 @@ let renderedOperations = null,
   headerKey = null,
   searchComposition = null,
   settingsRowView = null,
-  settingsLoadState = null;
+  settingsLoadState = null,
+  jarvisLoadState = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -4575,12 +4576,50 @@ function snapshotsPage() {
     resultPanel(),
   );
 }
+function jarvisReadCurrent(owner) {
+  return !!owner && jarvisLoadState === owner && session.current(owner.ticket) &&
+    tab === 'home' && detail === 'jarvis' && !document.hidden &&
+    connectionState !== 'expired' && !owner.controller?.signal.aborted;
+}
+function jarvisPending() {
+  return !!jarvisLoadState?.pending && jarvisReadCurrent(jarvisLoadState);
+}
+function jarvisReady() {
+  return !!data.jarvis && !data.jarvisError && !jarvisPending();
+}
+function jarvisStatusCurrent(status, ticket, owner = jarvisLoadState) {
+  return session.current(ticket) && tab === 'home' && detail === 'jarvis' &&
+    !document.hidden && connectionState !== 'expired' && supported('jarvis') &&
+    jarvisLoadState === owner && jarvisReady() && data.jarvis === status;
+}
+function validateJarvisStatus(status) {
+  const bools = ['installed', 'supported', 'microphoneGranted', 'microphoneMuted',
+    'wakeEnabled', 'wakeSupported', 'running', 'foreground', 'serviceRunning', 'wakeListening'];
+  if (!status || typeof status !== 'object' || Array.isArray(status) ||
+      typeof status.installed !== 'boolean' || typeof status.supported !== 'boolean' ||
+      (status.supported && !status.installed) ||
+      bools.some(key => status[key] != null && typeof status[key] !== 'boolean') ||
+      ['status', 'model', 'reason'].some(key => status[key] != null && typeof status[key] !== 'string'))
+    throw new ApiError('invalid_response');
+  // Optional model lists are filtered by jarvisEditState; older providers may omit them.
+}
 function loadJarvis() {
-  return read('jarvis', '/remote/jarvis', (response) => {
-    if (!response.jarvis || typeof response.jarvis !== 'object' || Array.isArray(response.jarvis))
-      throw new ApiError('invalid_response');
+  if (!room() || document.hidden || connectionState === 'expired' ||
+      tab !== 'home' || detail !== 'jarvis' || !supported('jarvis')) return;
+  if (jarvisPending()) return jarvisLoadState.promise;
+  const owner = { ticket: session.capture(), pending: true };
+  jarvisLoadState = owner;
+  delete data.jarvisError;
+  owner.promise = read('jarvis', '/remote/jarvis', (response) => {
+    if (!jarvisReadCurrent(owner)) return;
+    validateJarvisStatus(response.jarvis);
     data.jarvis = response.jarvis;
+  }, { renderAfter: false }).finally(() => {
+    if (jarvisReadCurrent(owner)) { owner.pending = false; render(); }
   });
+  owner.controller = pageReads.get('jarvis');
+  render();
+  return owner.promise;
 }
 function jarvisSaving() {
   return busy.has(`${room()?.base}:jarvis`);
@@ -4601,8 +4640,10 @@ function jarvisEditState(status = data.jarvis) {
   if (wakeChanged && typeof wake === 'boolean') changes.wakeEnabled = wake;
   return { model, wake, models, changes, invalid, changed: modelChanged || wakeChanged };
 }
-async function saveJarvisSettings() {
-  if (jarvisSaving() || !supported('jarvis') || data.jarvis?.supported !== true) return;
+async function saveJarvisSettings(expectedStatus = data.jarvis, expectedTicket = session.capture(),
+    expectedOwner = jarvisLoadState) {
+  if (jarvisSaving() || !jarvisStatusCurrent(expectedStatus, expectedTicket, expectedOwner) ||
+      expectedStatus?.supported !== true) return;
   const submitted = jarvisEditState(), target = room(), ticket = session.capture();
   if (submitted.invalid || !Object.keys(submitted.changes).length) return;
   delete data.jarvisSaveError;
@@ -4634,11 +4675,24 @@ async function saveJarvisSettings() {
   if (room()?.base === target?.base && tab === 'home' && detail === 'jarvis') render();
 }
 function jarvisPage() {
-  const status = data.jarvis;
+  const status = data.jarvis, owner = jarvisLoadState, ticket = session.capture();
+  const pending = jarvisPending();
+  const retry = () => {
+    if (session.current(ticket) && tab === 'home' && detail === 'jarvis' &&
+        !document.hidden && connectionState !== 'expired' && supported('jarvis') &&
+        jarvisLoadState === owner && data.jarvis === status) loadJarvis();
+  };
+  const loading = pending ? el('p', { role: 'status', 'aria-live': 'polite', class: 'detail',
+    text: status ? 'Refreshing Jarvis status…' : 'Loading Jarvis status…' }) : null;
   if (!status)
     return data.jarvisError
-      ? failure('Jarvis unavailable', data.jarvisError, () => loadVisible())
-      : empty('Jarvis', 'Loading readiness and microphone status…');
+      ? failure('Jarvis unavailable', data.jarvisError, retry)
+      : empty('Jarvis', 'Loading Jarvis status…');
+  const refreshNotice = !pending && data.jarvisError ? group(
+    el('strong', { text: 'Jarvis status refresh failed' }), text(message(data.jarvisError)),
+    text('Last reported status is shown. Your edits are kept. Retry to confirm readiness before saving or opening Jarvis.'),
+    button('Retry Jarvis status', retry, { kind: 'outline' })) : null;
+  const canUseStatus = () => jarvisStatusCurrent(status, ticket, owner);
   const edit = jarvisEditState(status), { model, wake, models } = edit;
   const modelOptions = models.map(value => ({ value, label: value }));
   if (!models.includes(model)) modelOptions.unshift({ value: model,
@@ -4658,6 +4712,9 @@ function jarvisPage() {
           : 'Status unavailable';
   return sections(
     heading('Jarvis', 'Model and local wake settings.'),
+    loading,
+    refreshNotice,
+    pending ? text('Last reported status is shown while refreshing. Your edits are kept.') : null,
     el(
       'div',
       { class: 'columns' },
@@ -4695,14 +4752,13 @@ function jarvisPage() {
             ),
         button(
           'Open Jarvis on Portal',
-          () =>
-            mutate(
-              'jarvis-launch',
-              '/remote/launch',
+          () => {
+            if (!canUseStatus() || status.installed !== true) return;
+            return mutate('jarvis-launch', '/remote/launch',
               { packageName: 'com.portal.assistant' },
-              { success: 'Launch command dispatched. Check the Portal screen.' },
-            ),
-          { kind: 'outline', disabled: !status.installed },
+              { ticket, target: ticket.room, success: 'Launch command dispatched. Check the Portal screen.' });
+          },
+          { kind: 'outline', disabled: !canUseStatus() || status.installed !== true },
         ),
         text('Account credentials and microphone permission are managed in Jarvis on the Portal.'),
       ),
@@ -4741,8 +4797,8 @@ function jarvisPage() {
             edit.invalid ? text('The selected model is no longer available. Choose a reported model before saving.', 'error') : null,
             data.jarvisSaveError ? sections(text(message(data.jarvisSaveError), 'error'),
               text('Your edits are kept. Retry Save or refresh the reported status.')) : null,
-            button('Save Jarvis settings', saveJarvisSettings, {
-              kind: 'primary', disabled: jarvisSaving() || edit.invalid || !Object.keys(edit.changes).length,
+            button('Save Jarvis settings', () => saveJarvisSettings(status, ticket, owner), {
+              kind: 'primary', disabled: !canUseStatus() || jarvisSaving() || edit.invalid || !Object.keys(edit.changes).length,
             }),
           )
         : null,

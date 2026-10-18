@@ -2610,16 +2610,20 @@ test('Jarvis transport failure keeps input and a later Save can confirm it', asy
 });
 
 test('Jarvis older status GET cannot overwrite a successful Save readback', async () => {
-  let release, defer = false;
+  let release, confirm, defer = false;
   const h = await jarvisSaveHarness(({ opts, response }) => opts.method === 'POST'
-    ? response({ ok: true, jarvis: { ...jarvisFixture(), model: 'model-b' } })
+    ? new Promise(resolve => { confirm = () => resolve(response({ ok: true,
+        jarvis: { ...jarvisFixture(), model: 'model-b' } })); })
     : defer ? new Promise(resolve => { release = () => resolve(response({ ok: true, jarvis: jarvisFixture() })); })
       : response({ ok: true, jarvis: jarvisFixture() }));
   try {
-    jarvisModel(h, 'model-b'); defer = true; h.eval('loadVisible()'); await h.settle();
-    h.click('Save Jarvis settings'); await h.settle(); release(); await h.settle();
+    // Save begins from confirmed readiness; a refresh can still start while it is in flight.
+    jarvisModel(h, 'model-b'); h.click('Save Jarvis settings'); await h.settle();
+    defer = true; h.eval('loadVisible()'); await h.settle();
+    confirm(); await h.settle(); release(); await h.settle();
+    assert.equal(jarvisPosts(h).length, 1);
     assert.equal(h.eval('data.jarvis.model'), 'model-b');
-  } finally { release?.(); await h.settle(); }
+  } finally { confirm?.(); release?.(); await h.settle(); }
 });
 
 test('Jarvis late Save cannot clear another room draft or replace its status', async () => {
@@ -4336,4 +4340,133 @@ test('photo refresh stale Retry and delete handlers are inert after page room hi
     t.modes.set('/sdcard', 'fail'); await h.eval('loadPhotos()'); await h.settle(); const retry = h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Retry photos');
     h.eval(retire); await h.settle(); const before = photoReads(h).length; retry.click(); remove.click(); await h.settle(); assert.equal(photoReads(h).length, before); assert.equal(photoDeletes(h).length, 0);
   }
+});
+
+
+async function jarvisRefreshHarness(initial = 'normal') {
+  const state = { mode: initial, jobs: [], status: jarvisFixture() };
+  const h = await browserHarness({ saved, routes: {
+    '/remote/jarvis': ({ opts, response, url }) => {
+      if (opts.method === 'POST') {
+        state.status = { ...state.status, ...JSON.parse(opts.body) };
+        return response({ ok: true, jarvis: state.status });
+      }
+      const reply = () => state.mode === 'failure' ? response({ error: 'offline' }, 503)
+        : response({ ok: true, jarvis: state.mode === 'malformed' ? { ...state.status, supported: 'yes' }
+          : state.mode === 'badWake' ? { ...state.status, wakeEnabled: 'false' }
+          : state.mode === 'badMic' ? { ...state.status, microphoneGranted: 'yes' }
+          : { ...state.status, model: url.includes('8878') ? 'model-c' : state.status.model } });
+      return state.mode === 'hold' ? new Promise(resolve => state.jobs.push({ signal: opts.signal,
+        finish: value => resolve(response({ ok: true, jarvis: value || state.status })) })) : reply();
+    },
+    '/remote/launch': ({ response }) => response({ ok: true }),
+  } });
+  h.eval('go("home","jarvis")'); await h.settle();
+  return { h, state, refresh: async mode => { state.mode = mode; h.eval('loadJarvis()'); await h.settle(); },
+    release: async () => { state.jobs.splice(0).forEach(job => job.finish()); await h.settle(); } };
+}
+const jarvisGets = h => h.calls.filter(c => c.path === '/remote/jarvis' && c.opts.method !== 'POST');
+const jarvisLaunches = h => h.calls.filter(c => c.path === '/remote/launch');
+const jarvisRefreshButton = h => h.document.body.querySelectorAll('button').find(b => b.textContent === 'Retry Jarvis status');
+const jarvisLaunchButton = h => h.document.body.querySelectorAll('button').find(b => b.textContent === 'Open Jarvis on Portal');
+
+test('Jarvis refresh failure retains last status and unsaved edits with visible recovery', async () => {
+  const { h, refresh } = await jarvisRefreshHarness(); jarvisModel(h, 'model-b'); jarvisWake(h).click();
+  await refresh('failure');
+  assert.match(pageText(h), /Jarvis status refresh failed/); assert.match(pageText(h), /Last reported/);
+  assert.equal(h.eval('data.jarvis.model'), 'model-a');
+  assert.equal(h.eval('draft("jarvis:model", data.jarvis.model)'), 'model-b');
+  assert.equal(h.eval('draft("jarvis:wake", data.jarvis.wakeEnabled)'), true);
+  assert.equal(jarvisSaveButton(h).disabled, true); assert.ok(jarvisRefreshButton(h)); h.hide();
+});
+test('Jarvis refresh pending retains edits shows progress and blocks stale Save activation', async () => {
+  const { h, state, refresh, release } = await jarvisRefreshHarness(); jarvisModel(h, 'model-b');
+  const stale = jarvisSaveButton(h).listeners.click[0];
+  try { await refresh('hold'); assert.match(pageText(h), /Refreshing Jarvis status/);
+    assert.equal(jarvisSaveButton(h).disabled, true); stale({}); await h.settle();
+    assert.equal(jarvisPosts(h).length, 0); assert.equal(state.jobs.length, 1);
+  } finally { await release(); h.hide(); }
+});
+test('Jarvis refresh coalesces duplicate current status reads without aborting', async () => {
+  const { h, state, refresh, release } = await jarvisRefreshHarness();
+  try { await refresh('hold'); const reads = jarvisGets(h).length;
+    h.eval('loadJarvis();loadVisible();loadJarvis()'); await h.settle();
+    assert.equal(jarvisGets(h).length, reads); assert.equal(state.jobs.length, 1); assert.equal(state.jobs[0].signal.aborted, false);
+  } finally { await release(); h.hide(); }
+});
+test('Jarvis refresh owned Retry preserves drafts and restores confirmed Save readiness', async () => {
+  const { h, state, refresh, release } = await jarvisRefreshHarness(); jarvisModel(h, 'model-b'); await refresh('failure');
+  const retry = jarvisRefreshButton(h); assert.ok(retry);
+  try { state.mode = 'hold'; retry.click(); retry.listeners.click[0]({}); await h.settle();
+    assert.match(pageText(h), /Refreshing Jarvis status/); assert.equal(state.jobs.length, 1);
+    await release(); assert.equal(jarvisSaveButton(h).disabled, false);
+    assert.equal(h.eval('draft("jarvis:model",data.jarvis.model)'), 'model-b'); assert.doesNotMatch(pageText(h), /status refresh failed/);
+  } finally { await release(); h.hide(); }
+});
+test('Jarvis refresh malformed readiness cannot replace a confirmed snapshot or enable Save', async () => {
+  const { h, refresh } = await jarvisRefreshHarness(); jarvisModel(h, 'model-b');
+  for (const mode of ['malformed', 'badWake', 'badMic']) { await refresh(mode);
+    assert.equal(h.eval('data.jarvis.supported'), true); assert.equal(h.eval('data.jarvis.microphoneGranted'), true);
+    assert.match(pageText(h), /Jarvis status refresh failed/); assert.equal(jarvisSaveButton(h).disabled, true);
+  } h.hide();
+});
+test('Jarvis refresh initial failure has no fabricated status and initial Retry recovers', async () => {
+  const { h, state } = await jarvisRefreshHarness('failure'); assert.match(pageText(h), /Jarvis unavailable/);
+  assert.equal(h.eval('data.jarvis'), undefined); assert.equal(jarvisSaveButton(h), undefined);
+  state.mode = 'normal'; h.click('Retry'); await h.settle(); assert.equal(h.eval('data.jarvis.model'), 'model-a'); h.hide();
+});
+test('Jarvis refresh confirmed unsupported and uninstalled states replace stale supported controls', async () => {
+  const { h, state, refresh } = await jarvisRefreshHarness();
+  state.status = { supported: false, installed: true, reason: 'olderJarvis' }; await refresh('normal');
+  assert.match(pageText(h), /does not expose companion controls/); assert.equal(jarvisSaveButton(h), undefined);
+  assert.equal(jarvisLaunchButton(h).disabled, false);
+  state.status = { supported: false, installed: false, reason: 'notInstalled' }; await refresh('normal');
+  assert.match(pageText(h), /not installed/); assert.equal(jarvisLaunchButton(h).disabled, true); h.hide();
+});
+test('Jarvis refresh old room response cannot publish or finish replacement pending state', async () => {
+  const { h, state, refresh, release } = await jarvisRefreshHarness();
+  try { await refresh('hold'); const old = state.jobs[0]; h.eval(`selectRoom('${saved[1].base}')`); await h.settle();
+    h.eval('go("home","jarvis")'); await h.settle(); const latest = state.jobs.at(-1); assert.notEqual(latest, old); assert.equal(old.signal.aborted, true);
+    old.finish({ ...jarvisFixture(), model: 'model-b' }); await h.settle();
+    assert.equal(h.eval('data.jarvis'), undefined); assert.match(pageText(h), /Loading Jarvis status/);
+    latest.finish({ ...jarvisFixture(), model: 'model-c' }); await h.settle(); assert.equal(h.eval('data.jarvis.model'), 'model-c');
+    assert.doesNotMatch(pageText(h), /Loading Jarvis status/);
+  } finally { await release(); h.hide(); }
+});
+test('Jarvis refresh failed readiness rejects model and wake Save handlers at dispatch', async () => {
+  const { h, refresh } = await jarvisRefreshHarness(); jarvisModel(h, 'model-b'); jarvisWake(h).click();
+  const stale = jarvisSaveButton(h).listeners.click[0]; await refresh('failure'); stale({}); h.eval('saveJarvisSettings()'); await h.settle();
+  assert.equal(jarvisPosts(h).length, 0); h.hide();
+});
+test('Jarvis refresh missing optional model and wake capabilities remains honest and usable', async () => {
+  const { h, state, refresh } = await jarvisRefreshHarness();
+  state.status = { ...jarvisFixture(), availableModels: {}, models: null }; await refresh('normal'); jarvisWake(h).click();
+  assert.equal(jarvisSaveButton(h).disabled, false); h.click('Save Jarvis settings'); await h.settle();
+  assert.deepEqual(JSON.parse(jarvisPosts(h)[0].opts.body), { wakeEnabled: true });
+  state.status = { ...state.status, wakeSupported: false }; await refresh('normal');
+  assert.equal(jarvisWake(h), undefined); assert.match(pageText(h), /Unavailable on this Portal/); h.hide();
+});
+test('Jarvis refresh stale Retry Save and launch handlers retire with page room hidden or expired state', async () => {
+  for (const depart of ['go("remote")', `selectRoom('${saved[1].base}')`, 'document.hidden=true;abortReads()', 'connectionState="expired";abortReads()']) {
+    const { h, state, refresh } = await jarvisRefreshHarness(); const launch = jarvisLaunchButton(h).listeners.click[0];
+    jarvisModel(h, 'model-b'); const save = jarvisSaveButton(h).listeners.click[0];
+    await refresh('failure'); const retry = jarvisRefreshButton(h); assert.ok(retry);
+    if (depart.startsWith('selectRoom')) state.mode = 'normal';
+    h.eval(depart); await h.settle();
+    if (depart.startsWith('selectRoom')) {
+      h.eval('go("home","jarvis")'); await h.settle();
+      jarvisModel(h, 'model-b'); // A real editable peer draft makes misdirected Save observable.
+    }
+    const reads = jarvisGets(h).length; retry.listeners.click[0]({}); launch({}); save({}); await h.settle();
+    assert.equal(jarvisGets(h).length, reads); assert.equal(jarvisLaunches(h).length, 0);
+    assert.equal(jarvisPosts(h).length, 0, 'Retired Save must not apply the peer room draft'); h.hide();
+  }
+});
+test('Jarvis refresh launch uses only current confirmed installed status and original room', async () => {
+  const { h, refresh, release } = await jarvisRefreshHarness(); const old = jarvisLaunchButton(h).listeners.click[0];
+  try { await refresh('hold'); assert.equal(jarvisLaunchButton(h).disabled, true); old({}); await h.settle(); assert.equal(jarvisLaunches(h).length, 0);
+    await release(); old({}); await h.settle(); assert.equal(jarvisLaunches(h).length, 0);
+    h.click('Open Jarvis on Portal'); await h.settle(); assert.equal(jarvisLaunches(h).length, 1);
+    assert.equal(new URL(jarvisLaunches(h)[0].url).port, '8877');
+  } finally { await release(); h.hide(); }
 });
