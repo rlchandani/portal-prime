@@ -2799,3 +2799,105 @@ test('Snapshot review navigation clears selection and drops late revision succes
     assert.equal(h.document.body.textContent.includes('old revision failure'), false); assert.equal(snapshotPosts(h).length, 0);
   }
 });
+
+
+// Pair requests and discovery belong to the visible form, not merely an open shared sheet.
+async function pairingFixture({ discovery = false, fail = false } = {}) {
+  const pairs = [], discoveries = [];
+  const h = await browserHarness({ saved, routes: {
+    '/remote/pair': ({ opts, response }) => new Promise(resolve => pairs.push({ opts,
+      finish: () => resolve(fail ? response({ ok: false, error: 'bad_pin' }, 400)
+        : response({ ok: true, token: 'new-public-fixture-token', name: 'New fixture Portal' })) })),
+    '/remote/devices': ({ opts, response }) => discovery
+      ? new Promise(resolve => discoveries.push({ opts, finish: () => resolve(response({ ok: true,
+        devices: [{ host: '127.0.0.1', port: 8899, name: 'Discovered fixture' }] })) }))
+      : response({ ok: true, devices: [] }),
+  } });
+  h.eval('pairDialog("http://127.0.0.1:8890", "123456")'); await h.settle();
+  return { h, pairs, discoveries };
+}
+const pairInputs = h => h.document.getElementById('sheet-content').querySelectorAll('input');
+const pairSubmit = h => h.document.getElementById('sheet-actions').querySelectorAll('button')
+  .find(b => /Pair Portal|Pairing/.test(b.textContent));
+
+test('Pair dialog closing aborts its pending request and cannot pair after reopening', async () => {
+  const { h, pairs } = await pairingFixture(); h.click('Pair Portal'); await h.settle();
+  h.eval('closeSheet();pairDialog("http://127.0.0.1:8891", "654321")'); await h.settle();
+  assert.equal(pairs[0].opts.signal.aborted, true); pairs[0].finish(); await h.settle();
+  assert.equal(h.eval('roster.some(r=>r.base==="http://127.0.0.1:8890")'), false);
+  assert.equal(h.document.getElementById('sheet').open, true);
+  assert.equal(pairInputs(h)[0].value, 'http://127.0.0.1:8891');
+});
+test('Pair dialog replacement aborts its pending request without closing the replacement', async () => {
+  const { h, pairs } = await pairingFixture(); h.click('Pair Portal'); await h.settle();
+  h.eval('roomsDialog()'); await h.settle(); assert.equal(pairs[0].opts.signal.aborted, true);
+  pairs[0].finish(); await h.settle(); assert.equal(h.document.getElementById('sheet-title').textContent, 'Your Portals');
+  assert.equal(h.eval('roster.length'), 2);
+});
+test('Pair dialog progress disables submission and both inputs while retaining the address', async () => {
+  const { h } = await pairingFixture(); h.click('Pair Portal'); await h.settle();
+  assert.equal(pairSubmit(h).disabled, true); assert.match(pairSubmit(h).textContent, /Pairing/);
+  assert.equal(pairInputs(h).every(input => input.disabled), true);
+  assert.equal(pairInputs(h)[0].value, 'http://127.0.0.1:8890');
+});
+test('Pair dialog raw form resubmission shares one pending pairing request', async () => {
+  const { h, pairs } = await pairingFixture(); h.click('Pair Portal'); await h.settle();
+  const form = h.document.getElementById('sheet-content').querySelector('form');
+  for (const fn of form.listeners.submit) fn({ preventDefault() {} }); await h.settle();
+  assert.equal(pairs.length, 1); assert.equal(pairSubmit(h).disabled, true);
+});
+test('Pair dialog failure restores editable controls and retains address for retry', async () => {
+  const { h, pairs } = await pairingFixture({ fail: true }); h.click('Pair Portal'); await h.settle();
+  pairs[0].finish(); await h.settle(); assert.equal(pairSubmit(h).disabled, false);
+  assert.equal(pairSubmit(h).textContent, 'Pair Portal'); assert.equal(pairInputs(h).every(input => !input.disabled), true);
+  assert.equal(pairInputs(h)[0].value, 'http://127.0.0.1:8890'); assert.equal(pairInputs(h)[1].value, '');
+  await h.input('Six-digit PIN', '654321'); h.click('Pair Portal'); await h.settle();
+  assert.equal(pairs.length, 2); assert.equal(pairSubmit(h).disabled, true);
+  assert.equal(JSON.parse(pairs[1].opts.body).pin, '654321');
+});
+test('Pair dialog discovery is aborted when the form closes', async () => {
+  const { h, discoveries } = await pairingFixture({ discovery: true }); h.eval('closeSheet()');
+  assert.equal(discoveries[0].opts.signal.aborted, true);
+});
+test('Pair dialog replacement drops old discovery and leaves only its own refresh timer', async () => {
+  const { h, discoveries } = await pairingFixture({ discovery: true });
+  h.eval('pairDialog("http://127.0.0.1:8891", "654321")'); await h.settle();
+  assert.equal(discoveries[0].opts.signal.aborted, true); discoveries[0].finish(); await h.settle();
+  assert.equal(h.eval('pairDiscoveryTimer'), null);
+  discoveries[1].finish(); await h.settle(); assert.notEqual(h.eval('pairDiscoveryTimer'), null);
+  const tick = h.tick(10000); await h.settle(); assert.equal(discoveries.length, 3);
+  discoveries[2].finish(); await tick;
+});
+test('Pair dialog beginning Pair aborts discovery so late peers cannot edit the pending address', async () => {
+  const { h, discoveries } = await pairingFixture({ discovery: true }); h.click('Pair Portal'); await h.settle();
+  assert.equal(discoveries[0].opts.signal.aborted, true); discoveries[0].finish(); await h.settle();
+  assert.equal(h.document.getElementById('sheet-content').textContent.includes('Discovered fixture'), false);
+  assert.equal(pairInputs(h)[0].disabled, true);
+});
+test('Pair dialog already discovered peers are disabled while pairing is pending', async () => {
+  const { h, discoveries } = await pairingFixture({ discovery: true }); discoveries[0].finish(); await h.settle();
+  const peer = h.document.getElementById('sheet-content').querySelectorAll('button')
+    .find(b => b.textContent === 'Discovered fixture');
+  h.click('Pair Portal'); await h.settle(); assert.equal(peer.disabled, true);
+  for (const handler of peer.listeners.click) handler({ target: peer });
+  assert.equal(pairInputs(h)[0].value, 'http://127.0.0.1:8890');
+});
+test('Pair dialog page exit aborts pairing and a late success cannot change the roster', async () => {
+  const { h, pairs } = await pairingFixture(); h.click('Pair Portal'); await h.settle();
+  h.eval('go("apps")'); await h.settle(); assert.equal(pairs[0].opts.signal.aborted, true);
+  pairs[0].finish(); await h.settle(); assert.equal(h.eval('roster.length'), 2);
+});
+test('Pair dialog a current successful request pairs only the captured address once', async () => {
+  const { h, pairs } = await pairingFixture(); h.click('Pair Portal'); await h.settle();
+  assert.equal(pairSubmit(h).disabled, true); pairs[0].finish(); await h.settle();
+  assert.equal(h.eval('roster.filter(r=>r.base==="http://127.0.0.1:8890").length'), 1);
+  assert.equal(h.eval('room().base'), 'http://127.0.0.1:8890');
+  assert.equal(h.document.getElementById('sheet').open, false);
+});
+test('Pair dialog stale pairing failure cannot remove a new dialog PIN or restart old discovery', async () => {
+  const { h, pairs } = await pairingFixture({ fail: true }); h.click('Pair Portal'); await h.settle();
+  h.eval('pairDialog("http://127.0.0.1:8891", "654321")'); await h.settle();
+  assert.equal(pairs[0].opts.signal.aborted, true); pairs[0].finish(); await h.settle();
+  assert.equal(pairInputs(h)[1].value, '654321'); assert.equal(pairSubmit(h).disabled, false);
+  assert.equal(h.document.getElementById('sheet-content').textContent.includes('PIN'), true);
+});

@@ -80,7 +80,8 @@ let tab = 'home',
   pollTimer = null,
   pollGeneration = 0,
   noticeTimer = null,
-  pairDiscoveryTimer = null;
+  pairDiscoveryTimer = null,
+  pairDialogOwner = null;
 let renderedOperations = null,
   renderedOperationsError = null,
   operationsView = null,
@@ -662,7 +663,16 @@ async function syncRoster(targets = roster) {
       true,
     );
 }
+function cancelPairDialog() {
+  const owner = pairDialogOwner;
+  pairDialogOwner = null;
+  owner?.pairController?.abort();
+  owner?.discoveryController?.abort();
+  clearTimeout(pairDiscoveryTimer);
+  pairDiscoveryTimer = null;
+}
 function openSheet(title, body, onClose = null) {
+  cancelPairDialog();
   delete sheet.dataset.presetEditor;
   delete sheet.dataset.sceneEditor;
   previewPool.clear();
@@ -676,6 +686,9 @@ function openSheet(title, body, onClose = null) {
   else for (const primary of body.querySelectorAll('button.button.primary')) footer.append(primary);
   footer.hidden = footer.children.length === 0;
   sheet.onclose = () => {
+    // A queued close event can arrive after a replacement dialog has opened.
+    if (sheet.open) return;
+    cancelPairDialog();
     delete sheet.dataset.presetEditor;
     delete sheet.dataset.sceneEditor;
     previewPool.clear();
@@ -686,6 +699,7 @@ function openSheet(title, body, onClose = null) {
   if (!sheet.open) sheet.showModal();
 }
 function closeSheet() {
+  cancelPairDialog();
   if (sheet.open) sheet.close();
 }
 $('sheet-close').onclick = closeSheet;
@@ -798,72 +812,73 @@ function forgetRoom(target) {
   );
 }
 function pairDialog(address = location.origin, pinValue = '') {
-  let addressDraft = address,
-    pin = pinValue,
-    pairing = false;
-  const error = text('');
-  const peers = el('div', { class: 'sections' });
-  const form = el(
-    'form',
-    {},
-    field('Portal address or pairing link', addressDraft, (v) => (addressDraft = v), {
-      type: 'text',
-      key: 'pair-address',
-      help: 'Local addresses default to port 8723. Use the same network or your existing VPN.',
-    }),
-    field(
-      'Six-digit PIN',
-      pin,
-      (v) => {
-        pin = v.replace(/\D/g, '').slice(0, 6);
-      },
-      {
-        type: 'password',
-        key: 'pair-pin',
-        help: 'In Immortal, open Control from your phone and show a fresh PIN.',
-      },
-    ),
-    error,
-    button('Pair Portal', submit, { kind: 'primary' }),
-    peers,
-  );
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    submit();
-  });
-  openSheet('Pair a Portal', form);
+  let addressDraft = address, pin = pinValue, pairing = false;
+  const owner = { pairController: null, discoveryController: null };
   const originTicket = session.capture();
+  const error = el('p', { role: 'status', 'aria-live': 'polite' });
+  const peers = el('div', { class: 'sections' });
+  const submitButton = button('Pair Portal', submit, { kind: 'primary' });
+  const form = el(
+    'form', {},
+    field('Portal address or pairing link', addressDraft,
+      value => { if (current() && !pairing) addressDraft = value; }, {
+        type: 'text', key: 'pair-address',
+        help: 'Local addresses default to port 8723. Use the same network or your existing VPN.',
+      }),
+    field('Six-digit PIN', pin,
+      value => { if (current() && !pairing) pin = value.replace(/\D/g, '').slice(0, 6); }, {
+        type: 'password', key: 'pair-pin',
+        help: 'In Immortal, open Control from your phone and show a fresh PIN.',
+      }),
+    error, submitButton, peers,
+  );
+  form.addEventListener('submit', event => { event.preventDefault(); submit(); });
+  openSheet('Pair a Portal', form);
+  pairDialogOwner = owner;
+  function current() {
+    return pairDialogOwner === owner && sheet.open && content.firstChild === form &&
+      session.current(originTicket);
+  }
+  function pending(on) {
+    pairing = on;
+    submitButton.disabled = on;
+    submitButton.textContent = on ? 'Pairing…' : 'Pair Portal';
+    for (const input of form.querySelectorAll('input')) input.disabled = on;
+    for (const peer of peers.querySelectorAll('button')) peer.disabled = on;
+  }
   async function discover() {
-    if (!sheet.open || pairing || !room() || !session.current(originTicket)) return;
+    if (!current() || pairing || !room() || owner.discoveryController) return;
+    const controller = new AbortController();
+    owner.discoveryController = controller;
     try {
-      const response = await api(originTicket.room, '/remote/devices');
-      if (!sheet.open || !session.current(originTicket)) return;
+      const response = await api(originTicket.room, '/remote/devices', { signal: controller.signal });
+      if (!current() || pairing || owner.discoveryController !== controller) return;
+      if (!Array.isArray(response.devices)) return;
       peers.replaceChildren(
         text('Discovered on your network'),
-        ...(response.devices || []).map((peer) =>
-          button(
-            peer.name || 'Portal',
-            () => {
-              try {
-                const host = peer.host.includes(':') ? `[${peer.host}]` : peer.host;
-                addressDraft = normalizeBase(`http://${host}:${peer.port || 8723}`);
-                form.querySelector('[data-focus="pair-address"]').value = addressDraft;
-              } catch {
-                error.textContent = message(new ApiError('invalid_address'));
-              }
-            },
-            { kind: 'outline' },
-          ),
+        ...response.devices.filter(peer => typeof peer?.host === 'string').map(peer =>
+          button(peer.name || 'Portal', () => {
+            if (!current() || pairing) return;
+            try {
+              const host = peer.host.includes(':') ? `[${peer.host}]` : peer.host;
+              addressDraft = normalizeBase(`http://${host}:${peer.port || 8723}`);
+              form.querySelector('[data-focus="pair-address"]').value = addressDraft;
+            } catch { error.textContent = message(new ApiError('invalid_address')); }
+          }, { kind: 'outline' }),
         ),
       );
-    } catch {
-      /* Discovery is optional; manual pairing remains available. */
+    } catch { /* Discovery is optional; manual pairing remains available. */ }
+    finally {
+      if (owner.discoveryController === controller) {
+        owner.discoveryController = null;
+        if (current() && !pairing) pairDiscoveryTimer = setTimeout(discover, 10000);
+      }
     }
-    if (sheet.open) pairDiscoveryTimer = setTimeout(discover, 10000);
   }
   discover();
   async function submit() {
-    if (pairing) return;
+    if (!current() || pairing) return;
+    let controller = null;
     try {
       const candidate = new URL(
         /^https?:\/\//i.test(addressDraft) ? addressDraft : 'http://' + addressDraft,
@@ -872,28 +887,33 @@ function pairDialog(address = location.origin, pinValue = '') {
       if (match && !pin) pin = match[1];
       const base = normalizeBase(addressDraft);
       if (!/^\d{6}$/.test(pin)) throw new ApiError('bad_pin');
-      pairing = true;
-      error.textContent = 'Pairing…';
-      const response = await api({ base }, '/remote/pair', { body: { pin } });
-      if (typeof response.token !== 'string' || !response.token)
-        throw new ApiError('invalid_response');
-      if (!sheet.open || !session.current(originTicket)) return;
+      pending(true);
+      clearTimeout(pairDiscoveryTimer); pairDiscoveryTimer = null;
+      owner.discoveryController?.abort(); owner.discoveryController = null;
+      controller = new AbortController(); owner.pairController = controller;
+      error.className = 'detail'; error.textContent = 'Pairing…';
+      const response = await api({ base }, '/remote/pair', { body: { pin }, signal: controller.signal });
+      if (!current() || owner.pairController !== controller) return;
+      if (typeof response.token !== 'string' || !response.token) throw new ApiError('invalid_response');
       const paired = { base, token: response.token, name: response.name || 'Portal' };
-      roster = sanitizeRoster([paired, ...roster.filter((r) => r.base !== base)]);
+      roster = sanitizeRoster([paired, ...roster.filter(target => target.base !== base)]);
       expired.delete(base);
-      closeSheet();
-      selectRoom(base);
-      await pullRoster(session.capture());
+      closeSheet(); selectRoom(base);
+      const pairedTicket = session.capture();
+      await pullRoster(pairedTicket);
+      if (!session.current(pairedTicket, { page: false })) return;
       await syncRoster();
-      toast('Portal paired.');
+      if (session.current(pairedTicket, { page: false })) toast('Portal paired.');
     } catch (err) {
-      error.className = 'error';
-      error.textContent = message(err);
+      if (!current()) return;
+      error.className = 'error'; error.textContent = message(err);
     } finally {
-      pairing = false;
-      pin = '';
-      const input = form.querySelector('[data-focus="pair-pin"]');
-      if (input) input.value = '';
+      if (current()) {
+        owner.pairController = null;
+        pending(false); pin = '';
+        form.querySelector('[data-focus="pair-pin"]').value = '';
+        discover();
+      }
     }
   }
 }
