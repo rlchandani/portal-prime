@@ -11,7 +11,6 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import com.immortal.launcher.settings.SettingsRegistry
-import kotlin.concurrent.thread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -94,7 +93,7 @@ class RemoteRoutes internal constructor(
         "/remote/swipe" -> authed(req) { swipe(req) }
         "/remote/scroll" -> authed(req) { scroll(req) }
         "/remote/presets" -> authed(req) { presets(req) }
-        "/remote/preset" -> authed(req) { runPreset(req) }
+        "/remote/preset" -> authed(req) { requireMethod("POST", req) { runPreset(req) } }
         "/remote/devices" -> authed(req) { devices() }
         "/remote/roster" -> authed(req) { roster(req) }
         "/remote/sources" -> authed(req) { sources(req) }
@@ -536,31 +535,38 @@ class RemoteRoutes internal constructor(
     } catch (_: IllegalStateException) {
       return json(503, err("saved_presets_unavailable"))
     } ?: return json(404, err("unknown_preset"))
-    val steps = preset.optJSONArray("steps") ?: JSONArray()
-    thread(name = "remote-preset") { runSteps(steps) }
-    return json(200, ok().put("running", id).put("steps", steps.length()))
+    val steps = JSONArray((preset.optJSONArray("steps") ?: JSONArray()).toString())
+    val operations = RemoteCompanionOperations.get(context)
+    val target = JSONObject().put("id", id).put("name", preset.opt("name") as? String ?: "")
+    val operation = operations.start("preset", target) { operationId ->
+      RemotePresetExecution.run(steps, { operations.history.cancellationRequested(operationId) }, ::presetStep)
+    } ?: return json(409, err("busy"))
+    return json(202, ok().put("running", id).put("steps", steps.length()).put("operation", operation))
   }
 
-  /** Execute a preset's steps in order. Each maps to an action the remote already performs. */
-  private fun runSteps(steps: JSONArray) {
-    for (i in 0 until steps.length()) {
-      val s = steps.optJSONObject(i) ?: continue
-      when (s.optString("type")) {
-        "launch" -> pinnedResponse("launch", 404) { pinned.launchApp(context, s.optString("packageName")) }
-        "key" -> when (s.optString("action")) {
-          // Legacy "recents" steps share the Apps button's retained Home page.
-          "apps", "recents" -> startAppsTab()
-          "home" -> context.openApprovedHomeTab(ApprovedLauncherTab.HOME)
-          "screensaver" -> openScreensaver()
-          "dashboard" -> openDashboard()
-          "back" -> back()
-          else -> RemoteInput.globalAction(s.optString("action"))
-        }
-        "text" -> RemoteInput.typeText(s.optString("text"), s.optString("mode").ifBlank { "set" })
-        "wait" -> runCatching { Thread.sleep(clampWaitMs(s.optLong("ms", 300))) }
-        "config" -> applyConfig(s.optString("target").ifBlank { "screensaver" }, s.optJSONObject("body"))
+  /** Kept as the synchronous navigation boundary used by existing route regressions. */
+  private fun runSteps(steps: JSONArray): JSONArray =
+      RemotePresetExecution.run(steps, { false }, ::presetStep)
+
+  private fun presetStep(step: JSONObject): JSONObject {
+    fun dispatched(ok: Boolean) = RemoteCompanionOperations.result(ok, if (ok) "dispatched" else "not_dispatched")
+    fun response(value: FleetHttpServer.Response) = JSONObject(String(requireNotNull(value.jsonBytes), Charsets.UTF_8))
+    val result = when (step.optString("type")) {
+      "launch" -> pinned.launchApp(context, step.optString("packageName"))
+      "key" -> when (step.optString("action")) {
+        "apps", "recents" -> pinned.navigation { context.dispatchApprovedHomeTab(ApprovedLauncherTab.APPS) }
+        "home" -> pinned.navigation { context.dispatchApprovedHomeTab(ApprovedLauncherTab.HOME) }
+        "screensaver" -> response(openScreensaver())
+        "dashboard" -> response(openDashboard())
+        "back" -> response(back())
+        else -> dispatched(RemoteInput.globalAction(step.optString("action")))
       }
+      "text" -> dispatched(RemoteInput.typeText(step.optString("text"), step.optString("mode").ifBlank { "set" }))
+      "config" -> applyConfig(step.optString("target").ifBlank { "screensaver" }, step.optJSONObject("body"))
+      else -> RemoteCompanionOperations.result(false, "unsupported_step")
     }
+    if (!result.has("result")) result.put("result", if (result.optBoolean("ok")) "dispatched" else "not_dispatched")
+    return result
   }
 
   /**
@@ -569,15 +575,14 @@ class RemoteRoutes internal constructor(
    * one-tap preset can both drive input and reconfigure the Portal (e.g. set the screensaver
    * source then go Home). Mirrors the `/screensaver` route's post-apply reaffirm/reschedule.
    */
-  private fun applyConfig(target: String, body: JSONObject?) {
-    val b = body ?: return
-    when (target) {
-      "screensaver" -> {
-        val applied = FleetScreensaver.apply(context, b)
-        SettingsGuard.afterScreensaverApply(context, applied)
-      }
+  private fun applyConfig(target: String, body: JSONObject?): JSONObject {
+    val b = body ?: return RemoteCompanionOperations.result(false, "configuration_required")
+    val applied = when (target) {
+      "screensaver" -> FleetScreensaver.apply(context, b).also { SettingsGuard.afterScreensaverApply(context, it) }
       "calendar" -> FleetCalendar.apply(context, b)
+      else -> return RemoteCompanionOperations.result(false, "unsupported_configuration")
     }
+    return RemoteCompanionOperations.result(applied.isNotEmpty(), if (applied.isNotEmpty()) "configuration_applied" else "configuration_not_applied")
   }
 
   /** Page-scroll the foreground content: `{"dir":"up"|"down"}` (one big center swipe). */

@@ -64,7 +64,7 @@ internal class RemoteCompanionHistory(saved: JSONArray = JSONArray(), private va
     }
     save()
   }
-  private fun retryable(e: JSONObject) = e.optString("state") in setOf("failed", "interrupted") &&
+  private fun retryable(e: JSONObject) = e.optString("type") != "preset" && e.optString("state") in setOf("failed", "interrupted") &&
       !e.optBoolean("backendMayContinue") && !e.optBoolean("installConfirmed")
   private fun save() { persist(JSONArray(entries)) }
   private fun append(e: JSONObject) {
@@ -79,7 +79,7 @@ internal class RemoteCompanionHistory(saved: JSONArray = JSONArray(), private va
   private fun entry(type: String, target: JSONObject): JSONObject {
     val now = System.currentTimeMillis()
     return JSONObject().put("id", UUID.randomUUID().toString()).put("type", type).put("target", JSONObject(target.toString()))
-        .put("state", "running").put("createdAt", now).put("updatedAt", now).put("cancelSupported", false)
+        .put("state", "running").put("createdAt", now).put("updatedAt", now).put("cancelSupported", type == "preset")
         .put("retrySupported", false).put("backendMayContinue", false).put("installUncertain", false).put("results", JSONArray())
         .apply { if (type in setOf("install", "update")) put("installPhase", "preparing") }
   }
@@ -137,12 +137,32 @@ internal class RemoteCompanionHistory(saved: JSONArray = JSONArray(), private va
     e.put("state", if (succeeded) "succeeded" else "failed").put("results", JSONArray().put(result))
     e.remove("error")
   }
+  /** Requests stopping remaining macro steps; admission stays busy until the worker stops. */
+  @Synchronized fun cancelPreset(id: String): JSONObject? {
+    val e = entries.firstOrNull { it.optString("id") == id } ?: return null
+    if (e.optString("type") != "preset" || e.optString("state") != "running") return null
+    if (!e.optBoolean("cancelRequested")) {
+      if (!e.optBoolean("cancelSupported")) return null
+      e.put("cancelRequested", true).put("cancelSupported", false).put("updatedAt", System.currentTimeMillis())
+      save()
+    }
+    return JSONObject(e.toString())
+  }
+  @Synchronized fun cancellationRequested(id: String): Boolean {
+    val e = entries.firstOrNull { it.optString("id") == id } ?: return true
+    return e.optBoolean("cancelRequested") || e.optString("state") != "running"
+  }
   @Synchronized fun finish(id: String, results: JSONArray) {
     val e = entries.firstOrNull { it.optString("id") == id } ?: return
     if (e.optString("state") != "running") return
-    val success = !e.optBoolean("installUncertain") && results.length() > 0 && (0 until results.length()).all { results.optJSONObject(it)?.opt("ok") == true }
     val continuing = e.optBoolean("installUncertain") || (0 until results.length()).any { results.optJSONObject(it)?.optBoolean("backendMayContinue") == true }
-    e.put("backendMayContinue", continuing).put("results", results).put("state", if (success) "succeeded" else "failed")
+    val success = !e.optBoolean("installUncertain") && !(e.optString("type") == "preset" && continuing) &&
+        results.length() > 0 && (0 until results.length()).all { results.optJSONObject(it)?.opt("ok") == true }
+    val cancelled = e.optString("type") == "preset" && (0 until results.length()).any {
+      results.optJSONObject(it)?.optString("result") == "cancelled"
+    }
+    e.put("backendMayContinue", continuing).put("results", results).put("cancelSupported", false)
+        .put("state", if (cancelled) "cancelled" else if (success) "succeeded" else "failed")
         .put("updatedAt", System.currentTimeMillis()).put("retrySupported", retryable(e))
     save()
   }

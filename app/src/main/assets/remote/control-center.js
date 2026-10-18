@@ -4393,7 +4393,7 @@ function updateActivity(view) {
           ? failure('Activity unavailable', data.operationsError, () => loadOperations())
           : !confirmed ? empty('Activity', 'Loading operations…')
           : uncertainEmpty ? empty('Last confirmed history was empty', 'Refresh to check for newer operations.')
-          : empty('No recent operations', 'Catalog installs and scenes will appear here.'),
+          : empty('No recent operations', 'Catalog installs, scenes and presets will appear here.'),
       );
     if (state === 'empty') {
       view.records.clear();
@@ -4494,7 +4494,9 @@ function operationCard(op, retainedActions = null) {
               if (!operationActionAvailable(op.id, 'cancel', ticket)) return;
               return confirmAction(
                 'Cancel this operation?',
-                'Ask the Portal to cancel this specific operation.',
+                op.type === 'preset'
+                  ? 'Stop the remaining steps. Earlier actions will not be undone.'
+                  : 'Ask the Portal to cancel this specific operation.',
                 () => operationAction(op.id, 'cancel', ticket),
                 'Cancel operation', ticket,
               );
@@ -5635,6 +5637,29 @@ function presetListCurrent(ticket, presets) {
     detail === 'presets' && !document.hidden && connectionState !== 'expired' &&
     presetsReady() && !presetsSaving() && !presetDraft && data.presets === presets;
 }
+async function runPreset(id, ticket = session.capture(), presets = data.presets) {
+  if (!presetListCurrent(ticket, presets) || !presets.some(preset => preset.id === id)) return;
+  const response = await mutate(`preset:${id}`, '/remote/preset', { id },
+    { target: ticket.room, ticket, success: '' });
+  if (!response || !presetListCurrent(ticket, presets)) return;
+  const op = response.operation;
+  if (response.ok === true && op && typeof op === 'object' && !Array.isArray(op) &&
+      typeof op.id === 'string' && op.id.trim() && op.type === 'preset' &&
+      op.target && typeof op.target === 'object' && !Array.isArray(op.target) &&
+      op.target.id === id && typeof op.target.name === 'string' &&
+      ['running', 'succeeded', 'failed', 'interrupted', 'cancelled'].includes(op.state) &&
+      (op.results === undefined || (Array.isArray(op.results) && op.results.every(result =>
+        result && typeof result === 'object' && !Array.isArray(result))))) {
+    data.operations = [op, ...(data.operations || []).filter(operation => operation.id !== op.id)];
+    go('home', 'activity');
+    toast('Preset accepted. Activity reports each step’s result.');
+  } else if (op === undefined && response.ok === true && response.running === id &&
+      Number.isInteger(response.steps) && response.steps >= 0) {
+    toast('Preset started. This Portal does not report completion; check the Portal to confirm each action.');
+  } else {
+    toast('The Portal did not confirm preset acceptance. Check the Portal before running it again.', true);
+  }
+}
 function validatePresetList(response) {
   const presets = response?.presets, ids = new Set();
   if (!Array.isArray(presets)) throw new ApiError('invalid_response');
@@ -5783,12 +5808,11 @@ function presetsPage() {
         ? empty('No presets yet', 'Create a sequence of app, keyboard and navigation actions.')
         : sections(...presets.map(preset => group(
             el('h3', { text: preset.name || 'Unnamed preset' }),
-            text(`${preset.steps?.length || 0} steps · Legacy presets do not report completion`),
+            text(`${preset.steps?.length || 0} steps · Updated Portals report each step in Activity; older Portals do not report completion`),
             actions(
               button('Run', () => {
                 if (!current()) return;
-                return mutate(`preset:${preset.id}`, '/remote/preset', { id: preset.id },
-                  { ticket, success: 'Preset started. Check the Portal to confirm each action.' });
+                return runPreset(preset.id, ticket, presets);
               }, { kind: 'primary', disabled: !ready || presetsSaving() }),
               button('Edit', () => {
                 if (!current()) return;

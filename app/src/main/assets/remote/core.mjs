@@ -444,6 +444,15 @@ export async function applySettings(targets, domain, values, send) {
 }
 export function operationView(op) {
   const results = Array.isArray(op.results) ? op.results : [];
+  if (op.type === 'preset' && op.state === 'cancelled')
+    return { label: 'Stopped', tone: 'neutral',
+      detail: 'Remaining steps stopped. Earlier actions were not undone.', results };
+  if (op.type === 'preset' && op.state === 'running' && op.cancelRequested === true)
+    return { label: 'Stopping', tone: 'neutral',
+      detail: 'Waiting for the current action to stop before stopping remaining steps. Earlier actions will not be undone.', results };
+  if (op.type === 'preset' && op.backendMayContinue === true)
+    return { label: 'Completion unconfirmed', tone: 'neutral',
+      detail: 'The current action may continue. Remaining steps were not run. Check the Portal before running this preset again.', results };
   const partial = results.some((r) => r.ok === false);
   const uncertain = op.installUncertain === true || op.backendMayContinue === true;
   const labels = {

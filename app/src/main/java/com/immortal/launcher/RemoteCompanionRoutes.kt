@@ -130,21 +130,29 @@ internal class RemoteCompanionRoutes(private val context: Context) {
     return json(200, ok().put("apps", apps))
   }
   private fun operation(body: JSONObject): FleetHttpServer.Response {
-    val validation = RemoteCompanionOperationPolicy.validate(body, catalog(), Build.VERSION.SDK_INT, operations.deviceKind())
+    val validation = RemoteCompanionOperationPolicy.validate(body,
+        if (body.optString("type") in setOf("install", "update")) catalog() else emptyList(),
+        Build.VERSION.SDK_INT, operations.deviceKind())
     if (!validation.valid) return invalid(validation)
     var target = body
     if (body.getString("type") in setOf("retry", "cancel")) {
       val old = operations.history.find(body.getString("id")) ?: return json(404, error("unknown_operation"))
-      if (body.getString("type") == "cancel") return json(409, error("cancellation_unsupported").put("operation", old).put("cancelSupported", false))
+      if (body.getString("type") == "cancel") {
+        val stopping = operations.history.cancelPreset(body.getString("id"))
+          ?: return json(409, error("cancellation_unsupported").put("operation", old).put("cancelSupported", false))
+        return json(202, ok().put("operation", stopping))
+      }
       if (!old.optBoolean("retrySupported")) return json(409, error("retry_unsupported").put("operation", old))
       if (old.getString("type") == "scene") return scene(old.getJSONObject("target"))
       target = old.getJSONObject("target")
-      val retry = RemoteCompanionOperationPolicy.validate(target, catalog(), Build.VERSION.SDK_INT, operations.deviceKind())
+      val retry = RemoteCompanionOperationPolicy.validate(target,
+          if (target.optString("type") in setOf("install", "update")) catalog() else emptyList(),
+          Build.VERSION.SDK_INT, operations.deviceKind())
       if (!retry.valid) return invalid(retry)
     }
     val immutable = JSONObject(target.toString())
     val type = immutable.getString("type")
-    val app = catalog().firstOrNull { it.packageName == immutable.optString("packageName") }
+    val app = if (type in setOf("install", "update")) catalog().firstOrNull { it.packageName == immutable.optString("packageName") } else null
     val op = operations.start(type, immutable) { id ->
       JSONArray().put(if (type == "action") operations.action(immutable) {
         ScreenControl.noteRemoteNavigation(context)
