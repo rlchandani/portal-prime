@@ -1851,9 +1851,10 @@ function settingsPage() {
     const domains = (schema.domains || []).filter(
       (d) => visibleControls(d, advanced, settingsQuery).length,
     );
+    const searching = settingsQuery.trim().length > 0;
     const visibleCategory = domains.some((d) => d.id === category) ? category : domains[0]?.id;
     controls = sections(
-      !settingsQuery && domains.length
+      !searching && domains.length
         ? group(
             row(
               'Category',
@@ -1871,7 +1872,7 @@ function settingsPage() {
           )
         : null,
       ...domains
-        .filter((d) => settingsQuery || d.id === visibleCategory)
+        .filter((d) => searching || d.id === visibleCategory)
         .map((domain) => renderDomain(domain)),
       domains.length
         ? null
@@ -3690,7 +3691,7 @@ function catalogActionAvailable(app, ticket) {
 }
 function appsPage() {
   const entries = appMode === 'catalog' ? data.catalog : data.apps;
-  const q = appQuery.toLowerCase();
+  const q = appQuery.trim().toLowerCase();
   const filtered = (entries || []).filter((app) =>
     [app.name, app.label, app.packageName, app.description].some((v) =>
       String(v || '')
