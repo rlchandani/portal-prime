@@ -127,6 +127,7 @@ const thumbs = new ImagePool(),
   artwork = new ImagePool({ limit: 1 }),
   previewPool = new ImagePool({ limit: 1 });
 let photoObservation = null,
+  photoPreviewState = null,
   snapshotRestoreDraft = null;
 let snapshotExport = null;
 const icons = {
@@ -1014,6 +1015,7 @@ function render() {
     }
     cancelSearchComposition();
   }
+  updatePhotoPreview();
   stopPhotoObservation();
   operationsView = null,
   mediaView = null;
@@ -2887,8 +2889,37 @@ function currentPhotoCollection() {
   const all = photosAll && supported('photoLibrary');
   return info && info.all === all && info.path === (all ? '/sdcard' : photoPath) ? info : null;
 }
+function photoReadCurrent(owner) {
+  const all = photosAll && supported('photoLibrary');
+  return !!owner && photoLoadState === owner && session.current(owner.ticket) &&
+    !document.hidden && connectionState !== 'expired' && !owner.controller?.signal.aborted &&
+    owner.path === (all ? '/sdcard' : photoPath) && owner.recursive === all;
+}
 function photosPending() {
-  return !!photoLoadState?.pending && session.current(photoLoadState.ticket);
+  return !!photoLoadState?.pending && photoReadCurrent(photoLoadState);
+}
+function photoActionCurrent(file, ticket, collection) {
+  return session.current(ticket) && tab === 'photos' && !detail && !document.hidden &&
+    connectionState !== 'expired' && supported('photos') && !!collection &&
+    confirmedPhotoCollection() === collection && collection.files.includes(file);
+}
+function validatePhotoResponse(response, path) {
+  const object = value => value && typeof value === 'object' && !Array.isArray(value);
+  const named = value => typeof value === 'string' && value.trim().length > 0;
+  const number = value => typeof value === 'number' && Number.isFinite(value) && value >= 0;
+  if (!object(response) || response.path !== path || !Array.isArray(response.files) ||
+      (response.folders != null && !Array.isArray(response.folders)) ||
+      ['recursive', 'truncated'].some(key => response[key] != null && typeof response[key] !== 'boolean') ||
+      (response.freeBytes != null && !number(response.freeBytes))) throw new ApiError('invalid_response');
+  for (const [rows, numeric] of [[response.files, ['size', 'modified']], [response.folders || [], ['count']]]) {
+    const seen = new Set();
+    for (const item of rows) {
+      if (!object(item) || !named(item.path) || seen.has(item.path) ||
+          (item.name != null && typeof item.name !== 'string') ||
+          numeric.some(key => item[key] != null && !number(item[key]))) throw new ApiError('invalid_response');
+      seen.add(item.path);
+    }
+  }
 }
 function confirmedPhotoCollection() {
   return !photosPending() && !data.photosError ? currentPhotoCollection() : null;
@@ -2899,22 +2930,24 @@ async function loadPhotos() {
   if (data.companion && !supported('photoLibrary')) photosAll = false;
   const path = photosAll && supported('photoLibrary') ? '/sdcard' : photoPath;
   const recursive = photosAll && supported('photoLibrary');
-  const owner = { ticket: session.capture(), pending: true };
+  if (photosPending()) return photoLoadState.promise;
+  const owner = { ticket: session.capture(), path, recursive, pending: true };
   photoLoadState = owner;
   delete data.photosError;
-  render();
-  try {
-    return await read(
+  owner.promise = read(
       'photos',
       `/remote/photos?path=${encodeURIComponent(path)}${recursive ? '&recursive=1' : ''}`,
       (r) => {
-        if (r.path !== path) throw new ApiError('invalid_response');
+        if (!photoReadCurrent(owner)) return;
+        validatePhotoResponse(r, path);
         const listing = photoListing(r, recursive);
         // A legacy shallow response changes the selected mode before the one final render.
         if (recursive && !listing.all) {
           photosAll = false;
           photoPath = listing.path;
           setDraft('photo-folder', photoPath);
+          owner.path = listing.path;
+          owner.recursive = listing.all;
         }
         data.photos = listing;
         data.photoMetadataRevision = (data.photoMetadataRevision || 0) + 1;
@@ -2923,13 +2956,12 @@ async function loadPhotos() {
         photoPageIndex = Math.min(photoPageIndex, Math.max(0, Math.ceil(listing.files.length / 24) - 1));
       },
       { renderAfter: false },
-    );
-  } finally {
-    if (photoLoadState === owner && session.current(owner.ticket)) {
-      owner.pending = false;
-      render();
-    }
-  }
+    ).finally(() => {
+      if (photoReadCurrent(owner)) { owner.pending = false; render(); }
+    });
+  owner.controller = pageReads.get('photos');
+  render();
+  return owner.promise;
 }
 function freeSpace(bytes) {
   return bytes >= 1073741824
@@ -2952,8 +2984,9 @@ function photosPage() {
   const info = currentPhotoCollection();
   const folders = data.photoFolders || info?.folders || [];
   const pending = photosPending();
-  const loading = pending ? el('p', { role: 'status', 'aria-live': 'polite', class: 'detail', text: 'Loading photo metadata…' }) : null;
-  const files = info && !data.photosError ? photoPage(info.files, photoPageIndex) : [];
+  const loading = pending ? el('p', { role: 'status', 'aria-live': 'polite', class: 'detail', text: info ? 'Refreshing photos…' : 'Loading photo metadata…' }) : null;
+  const files = info ? photoPage(info.files, photoPageIndex) : [];
+  const owner = photoLoadState;
   const ticket = session.capture();
   thumbs.retain(files.map((file) => photoThumbnailKey(file, ticket)));
   const controls = group(
@@ -3095,8 +3128,17 @@ function photosPage() {
         )
       : null,
   );
+  const retry = () => {
+    if (session.current(ticket) && tab === 'photos' && !detail && !document.hidden &&
+        connectionState !== 'expired' && photoLoadState === owner && currentPhotoCollection() === info)
+      loadPhotos();
+  };
+  const refreshNotice = !pending && info && data.photosError ? group(
+    el('strong', { text: 'Photo refresh failed' }), text(message(data.photosError)),
+    text('Last confirmed photos are shown. Refresh and review the photo list before deleting or changing the slideshow collection.'),
+    button('Retry photos', retry, { kind: 'outline' })) : null;
   let gallery;
-  if (!pending && data.photosError) gallery = failure('Photos unavailable', data.photosError, loadPhotos);
+  if (!pending && !info && data.photosError) gallery = failure('Photos unavailable', data.photosError, retry);
   else if (!info && pending) gallery = group(el('h3', { text: 'Photo library' }), loading);
   else if (!info)
     gallery = empty(
@@ -3142,6 +3184,7 @@ function photosPage() {
   return sections(
     heading('Photos', 'A collection that stays on your Portal.'),
     controls,
+    refreshNotice,
     gallery,
     group(
       actionRow(
@@ -3208,9 +3251,14 @@ function photoTile(file, ticket) {
       }),
     ),
   );
-  const load = () =>
-    thumbs.add(
-      photoThumbnailKey(file, ticket),
+  const load = () => {
+    const key = photoThumbnailKey(file, ticket);
+    // Viewing retained metadata is safe while refresh is pending or failed; deletion
+    // separately requires confirmedPhotoCollection(). Visibility resume clears the
+    // image pool, so known photos must still be allowed back through viewport admission.
+    if (!currentPhotoCollection()?.files.includes(file)) return;
+    return thumbs.add(
+      key,
       (signal) =>
         api(ticket.room, `/remote/photo?path=${encodeURIComponent(file.path)}&thumbnail=1`, {
           blob: true,
@@ -3230,13 +3278,26 @@ function photoTile(file, ticket) {
         }
       },
     );
+  };
   // Already admitted work rebinds before layout; only new requests wait for visibility.
   if (thumbs.entries.has(photoThumbnailKey(file, ticket))) load();
   else observePhotoTile(tile, ticket, load);
   return tile;
 }
+function updatePhotoPreview() {
+  const owner = photoPreviewState;
+  if (!owner || !sheet.open || !owner.remove?.isConnected) return;
+  const allowed = photoActionCurrent(owner.file, owner.ticket, owner.collection);
+  owner.remove.disabled = !allowed;
+  owner.hint.hidden = allowed;
+}
 function photoPreview(file, ticket) {
-  if (!session.current(ticket)) return;
+  if (!session.current(ticket) || tab !== 'photos' || detail || document.hidden ||
+      connectionState === 'expired' || !currentPhotoCollection()?.files.includes(file)) return;
+  const collection = confirmedPhotoCollection();
+  const canDelete = () => photoActionCurrent(file, ticket, collection);
+  const reviewAgain = () => toast('Refresh the photo list and review this photo before deleting.', true);
+  const refreshHint = text('Refresh the photo list and open this photo again before deleting.', 'detail');
   const image = el('img', {
     class: 'preview-image',
     alt: file.name || 'Photo preview',
@@ -3245,6 +3306,30 @@ function photoPreview(file, ticket) {
   const status = text('Loading preview…');
   const retry = button('Retry preview', () => load(), { kind: 'outline' });
   retry.hidden = true;
+  const remove = button(
+  'Delete photo',
+  () => {
+    if (!canDelete()) { reviewAgain(); return; }
+    closeSheet();
+    confirmAction(
+      `Delete ${file.name || 'this photo'}?`,
+      `Permanently remove this photo from ${ticket.room.name}.`,
+      async () => {
+        if (!canDelete()) { reviewAgain(); return; }
+        const response = await mutate(
+          'delete-photo',
+          `/remote/photo?path=${encodeURIComponent(file.path)}`,
+          undefined,
+          { method: 'DELETE', ticket, success: 'Photo deleted.' },
+        );
+        if (response) loadPhotos();
+      },
+      'Delete',
+      ticket,
+    );
+  },
+  { kind: 'danger', disabled: !canDelete() },
+);
   openSheet(
     file.name || 'Photo preview',
     sections(
@@ -3252,34 +3337,17 @@ function photoPreview(file, ticket) {
       status,
       retry,
       text(file.path),
+      refreshHint,
       el(
         'div',
         { class: 'dialog-actions' },
-        button(
-          'Delete photo',
-          () => {
-            closeSheet();
-            confirmAction(
-              `Delete ${file.name || 'this photo'}?`,
-              `Permanently remove this photo from ${ticket.room.name}.`,
-              async () => {
-                const response = await mutate(
-                  'delete-photo',
-                  `/remote/photo?path=${encodeURIComponent(file.path)}`,
-                  undefined,
-                  { method: 'DELETE', ticket, success: 'Photo deleted.' },
-                );
-                if (response) loadPhotos();
-              },
-              'Delete',
-              ticket,
-            );
-          },
-          { kind: 'danger', disabled: !supported('photos') },
-        ),
+        remove,
       ),
     ),
+    () => { photoPreviewState = null; },
   );
+  photoPreviewState = { file, ticket, collection, hint: refreshHint, remove };
+  updatePhotoPreview();
   async function load() {
     previewPool.clear();
     status.textContent = 'Loading preview…';

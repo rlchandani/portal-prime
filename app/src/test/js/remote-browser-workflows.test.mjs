@@ -4224,3 +4224,116 @@ test('Scope readiness locks shared resets and profiles without adding reads on u
   h.eval('render();render()'); await h.settle();
   assert.equal(scopeReadyInput(h), input); assert.equal(h.calls.length, before);
 });
+
+
+async function photoRefreshHarness({ initial = 'ok', count = 25, recursive = true } = {}) {
+  const modes = new Map([['/sdcard', initial]]), holds = [];
+  let version = 1;
+  const h = await browserHarness({ saved, routes: {
+    '/remote/photos': ({ url, response }) => {
+      const path = new URL(url).searchParams.get('path'), mode = modes.get(path) || 'ok';
+      const files = Array.from({ length: mode === 'empty' ? 0 : count }, (_, i) => ({ path: `${path}/photo-${i}.jpg`, name: `Photo ${i}`, size: 1024, modified: version }));
+      const body = { ok: true, path, recursive: recursive && new URL(url).searchParams.has('recursive'), files, folders: [{ path: '/sdcard/Pictures', count }] };
+      if (mode === 'malformed') body.files = {};
+      if (mode === 'duplicate') body.files.push(body.files[0]);
+      if (mode === 'badName') body.files[0].name = {};
+      if (mode === 'fail') return response({ ok: false, error: 'folder_not_found' }, 404);
+      if (mode === 'hold') return new Promise(resolve => holds.push({ release: () => resolve(response(body)) }));
+      return response(body);
+    },
+    '/remote/photo': ({ opts, response }) => opts.method === 'DELETE' ? response({ ok: true }) : new Response(new Blob(['public-thumbnail'], { type: 'image/png' })),
+  } });
+  h.eval('go("photos")'); await h.settle();
+  return { h, modes, holds, version: n => { version = n; }, release: async () => { holds.splice(0).forEach(job => job.release()); await h.settle(); } };
+}
+const photoReads = h => h.calls.filter(c => c.path === '/remote/photos');
+const photoDeletes = h => h.calls.filter(c => c.path === '/remote/photo' && c.opts.method === 'DELETE');
+const firstPhoto = h => h.document.getElementById('page').querySelectorAll('button').find(b => b.attrs['aria-label']?.startsWith('Preview Photo'));
+const deletePhotoButton = h => h.document.getElementById('sheet').querySelectorAll('button').find(b => b.textContent === 'Delete photo');
+const photoConfirmation = h => h.document.getElementById('sheet-actions').querySelectorAll('button').find(b => b.textContent === 'Delete');
+
+test('photo refresh failure retains current gallery page and admitted thumbnails with recovery', async () => {
+  const t = await photoRefreshHarness(), h = t.h; h.click('Next'); await h.settle();
+  const key = h.eval('[...thumbs.entries.keys()][0]'), image = h.eval('thumbs.entries.get([...thumbs.entries.keys()][0])?.url');
+  assert.ok(image); t.modes.set('/sdcard', 'fail'); await h.eval('loadPhotos()'); await h.settle();
+  assert.match(h.document.getElementById('page').textContent, /Photo 24/);
+  assert.match(h.document.getElementById('page').textContent, /refresh failed/i);
+  assert.match(h.document.getElementById('page').textContent, /Last confirmed photos/i);
+  assert.equal(h.eval('photoPageIndex'), 1); assert.equal(h.eval(`thumbs.entries.get(${JSON.stringify(key)})?.url`), image);
+  assert.equal(collectionButton(h).disabled, true);
+});
+
+test('photo refresh pending keeps cached gallery but disables deletion from a preview', async () => {
+  const t = await photoRefreshHarness({ count: 1 }), h = t.h; firstPhoto(h).click(); await h.settle(); const openedDelete = deletePhotoButton(h); assert.equal(openedDelete.disabled, false);
+  t.modes.set('/sdcard', 'hold'); const pending = h.eval('loadPhotos()'); await h.settle();
+  try { assert.equal(openedDelete.disabled, true); h.eval('closeSheet()'); firstPhoto(h).click(); await h.settle(); assert.equal(deletePhotoButton(h).disabled, true); deletePhotoButton(h).click(); assert.equal(photoDeletes(h).length, 0); }
+  finally { h.eval('closeSheet()'); await t.release(); await pending; }
+});
+
+test('photo refresh coalesces duplicate reads of the same current collection without aborting', async () => {
+  const t = await photoRefreshHarness({ count: 1 }), h = t.h; t.modes.set('/sdcard', 'hold'); const before = photoReads(h).length;
+  const one = h.eval('loadPhotos()'), two = h.eval('loadPhotos()'); await h.settle();
+  try { assert.equal(photoReads(h).length, before + 1); assert.equal(photoReads(h).at(-1).opts.signal.aborted, false); }
+  finally { await t.release(); await Promise.all([one, two]); }
+});
+
+test('photo refresh owned Retry retains gallery while pending and restores actions once confirmed', async () => {
+  const t = await photoRefreshHarness({ count: 1 }), h = t.h; t.modes.set('/sdcard', 'fail'); await h.eval('loadPhotos()'); await h.settle();
+  t.modes.set('/sdcard', 'hold'); h.click('Retry photos'); await h.settle();
+  try { assert.match(h.document.getElementById('page').textContent, /Photo 0/); assert.match(h.document.getElementById('page').textContent, /Refreshing photos/); assert.equal(collectionButton(h).disabled, true); }
+  finally { await t.release(); }
+  assert.equal(collectionButton(h).disabled, false); assert.doesNotMatch(h.document.getElementById('page').textContent, /refresh failed/i);
+});
+
+test('photo refresh malformed and duplicate metadata retains prior confirmed list and blocks actions', async () => {
+  const t = await photoRefreshHarness({ count: 1 }), h = t.h;
+  for (const mode of ['malformed', 'duplicate', 'badName']) { t.modes.set('/sdcard', mode); await h.eval('loadPhotos()'); await h.settle();
+    assert.match(h.document.getElementById('page').textContent, /Photo 0/); assert.match(h.document.getElementById('page').textContent, /refresh failed/i); assert.equal(collectionButton(h).disabled, true); }
+  assert.equal(photoDeletes(h).length, 0);
+});
+
+test('photo refresh initial failure is unavailable rather than empty and Retry can recover', async () => {
+  const t = await photoRefreshHarness({ initial: 'fail', count: 1 }), h = t.h;
+  assert.match(h.document.getElementById('page').textContent, /Photos unavailable/); assert.doesNotMatch(h.document.getElementById('page').textContent, /No photos here/);
+  t.modes.set('/sdcard', 'ok'); h.click('Retry'); await h.settle(); assert.match(h.document.getElementById('page').textContent, /Photo 0/);
+});
+
+test('photo refresh successful empty result clears old gallery and its thumbnail cache', async () => {
+  const t = await photoRefreshHarness({ count: 1 }), h = t.h; assert.ok(h.eval('thumbs.size'));
+  t.modes.set('/sdcard', 'empty'); await h.eval('loadPhotos()'); await h.settle();
+  assert.match(h.document.getElementById('page').textContent, /No photos here/); assert.doesNotMatch(h.document.getElementById('page').textContent, /Photo 0/); assert.equal(h.eval('thumbs.size'), 0);
+});
+
+test('photo refresh failure in a newly selected folder never borrows the old gallery', async () => {
+  const t = await photoRefreshHarness({ count: 1 }), h = t.h; t.modes.set('/sdcard/Pictures', 'fail'); h.click('Folders'); await h.settle();
+  assert.match(h.document.getElementById('page').textContent, /Photos unavailable/); assert.doesNotMatch(h.document.getElementById('page').textContent, /Photo 0/);
+});
+
+test('photo refresh obsolete response cannot finish a newer folder read', async () => {
+  const t = await photoRefreshHarness({ count: 1 }), h = t.h; t.modes.set('/sdcard', 'hold'); const one = h.eval('loadPhotos()'); await h.settle();
+  t.modes.set('/sdcard/Pictures', 'hold'); h.click('Folders'); await h.settle();
+  try { assert.equal(photoReads(h).at(-2).opts.signal.aborted, true); t.holds.shift().release(); await h.settle(); assert.equal(h.eval('photosPending()'), true); assert.equal(collectionButton(h).disabled, true); }
+  finally { await t.release(); await one; }
+});
+
+test('photo refresh deletion confirmation cannot dispatch during pending or failed metadata', async () => {
+  for (const mode of ['hold', 'fail']) { const t = await photoRefreshHarness({ count: 1 }), h = t.h; firstPhoto(h).click(); await h.settle(); h.click('Delete photo'); const confirm = photoConfirmation(h);
+    t.modes.set('/sdcard', mode); const read = h.eval('loadPhotos()'); await h.settle();
+    try { confirm.click(); await h.settle(); assert.equal(photoDeletes(h).length, 0); assert.match(h.document.getElementById('notice').textContent, /photo.*review|review.*photo/i); }
+    finally { await t.release(); await read; }
+  }
+});
+
+test('photo refresh deletion confirmation rejects replacement metadata but current confirmed delete works', async () => {
+  const t = await photoRefreshHarness({ count: 1 }), h = t.h; firstPhoto(h).click(); await h.settle(); h.click('Delete photo'); const confirm = photoConfirmation(h);
+  t.version(2); await h.eval('loadPhotos()'); await h.settle(); confirm.click(); await h.settle(); assert.equal(photoDeletes(h).length, 0);
+  firstPhoto(h).click(); await h.settle(); h.click('Delete photo'); photoConfirmation(h).click(); await h.settle(); assert.equal(photoDeletes(h).length, 1);
+});
+
+test('photo refresh stale Retry and delete handlers are inert after page room hidden or expired retirement', async () => {
+  for (const retire of ['go("home")', `selectRoom('${saved[1].base}')`, 'document.hidden=true;document.listeners.visibilitychange()', 'connectionState="expired";render()']) {
+    const t = await photoRefreshHarness({ count: 1 }), h = t.h; firstPhoto(h).click(); await h.settle(); const remove = deletePhotoButton(h);
+    t.modes.set('/sdcard', 'fail'); await h.eval('loadPhotos()'); await h.settle(); const retry = h.document.getElementById('page').querySelectorAll('button').find(b => b.textContent === 'Retry photos');
+    h.eval(retire); await h.settle(); const before = photoReads(h).length; retry.click(); remove.click(); await h.settle(); assert.equal(photoReads(h).length, before); assert.equal(photoDeletes(h).length, 0);
+  }
+});
