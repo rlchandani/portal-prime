@@ -3060,13 +3060,14 @@ function validatePhotoResponse(response, path) {
 function confirmedPhotoCollection() {
   return !photosPending() && !data.photosError ? currentPhotoCollection() : null;
 }
-async function loadPhotos() {
+async function loadPhotos({ force = false } = {}) {
   if (!room() || document.hidden || connectionState === 'expired') return;
   if (data.companion && !supported('photoLibrary') && !supported('photos')) return;
   if (data.companion && !supported('photoLibrary')) photosAll = false;
   const path = photosAll && supported('photoLibrary') ? '/sdcard' : photoPath;
   const recursive = photosAll && supported('photoLibrary');
-  if (photosPending()) return photoLoadState.promise;
+  // A completed mutation invalidates listings begun before it; ordinary refreshes coalesce.
+  if (!force && photosPending()) return photoLoadState.promise;
   const owner = { ticket: session.capture(), path, recursive, pending: true };
   photoLoadState = owner;
   delete data.photosError;
@@ -3458,7 +3459,7 @@ function photoPreview(file, ticket) {
           undefined,
           { method: 'DELETE', ticket, success: 'Photo deleted.' },
         );
-        if (response) loadPhotos();
+        if (response) loadPhotos({ force: true });
       },
       'Delete',
       ticket,
@@ -3642,7 +3643,7 @@ async function startUpload(files, path, ticket) {
   if (!session.current(ticket, { page: false }) || upload !== transfer) return;
   if (transfer.completed && tab === 'photos' && !detail && !document.hidden) {
     const refreshTicket = session.capture();
-    await loadPhotos();
+    await loadPhotos({ force: true });
     if (
       !session.current(refreshTicket) ||
       !session.current(ticket, { page: false }) ||
