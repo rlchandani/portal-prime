@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // Public settings and counter-only readiness checks never acquire UiAutomation.
+        if (options.getString("command") == "automaticTimeSpeech") {
+            val speech = AutomaticTimeSpeechDeviceChecks.run()
+            finish(if (speech.getBoolean("automaticTimeSpeechCompleted")) 0 else 1, speech)
+            return
+        }
         // Public solar fixtures and counter-only work checks never acquire UiAutomation.
         if (options.getString("command") == "goldenHour") {
             val goldenHour = GoldenHourDeviceChecks.run()
