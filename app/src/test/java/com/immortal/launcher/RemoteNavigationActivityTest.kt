@@ -21,7 +21,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.Lifecycle
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileNotFoundException
+import java.io.FileInputStream
+import java.nio.file.Files
 import java.io.FileOutputStream
 import java.lang.ref.WeakReference
 import java.util.concurrent.CopyOnWriteArrayList
@@ -470,9 +471,11 @@ class RemoteNavigationActivityTest {
 
   private fun withOperations(f: Fixture, block: (RemoteCompanionOperations) -> Unit) {
     // Keep real action execution and history; replace only storage, worker and deadline boundaries.
+    val fixtureFile = Files.createTempFile("public-navigation-store", ".json").toFile().apply { writeText("{}") }
+    try {
     val stream = Mockito.mock(FileOutputStream::class.java)
     Mockito.mockConstruction(AtomicFile::class.java) { file, _ ->
-      `when`(file.openRead()).thenThrow(FileNotFoundException("Synthetic empty companion store"))
+      `when`(file.openRead()).thenAnswer { FileInputStream(fixtureFile) }
       `when`(file.startWrite()).thenReturn(stream)
     }.use {
       val worker = Mockito.mock(ExecutorService::class.java)
@@ -499,6 +502,7 @@ class RemoteNavigationActivityTest {
         }
       }
     }
+    } finally { fixtureFile.delete() }
   }
 
   private data class Launch(val target: Any?, var flags: Int = 0,

@@ -15,7 +15,8 @@ import android.net.Uri
 import android.util.AtomicFile
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileNotFoundException
+import java.io.FileInputStream
+import java.nio.file.Files
 import java.io.FileOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -284,10 +285,12 @@ class PinnedNavigationRoutesTest {
   }
 
   private fun withStoreAndWorker(block: () -> Unit) {
-    // No files, network, real worker threads or deadlines are used by these boundary tests.
+    // A public empty JSON fixture isolates storage from navigation, workers and deadlines.
+    val fixtureFile = Files.createTempFile("public-navigation-store", ".json").toFile().apply { writeText("{}") }
+    try {
     val stream = Mockito.mock(FileOutputStream::class.java)
     Mockito.mockConstruction(AtomicFile::class.java) { file, _ ->
-      `when`(file.openRead()).thenThrow(FileNotFoundException("Synthetic empty store"))
+      `when`(file.openRead()).thenAnswer { FileInputStream(fixtureFile) }
       `when`(file.startWrite()).thenReturn(stream)
     }.use {
       val worker = Mockito.mock(ExecutorService::class.java)
@@ -304,6 +307,7 @@ class PinnedNavigationRoutesTest {
         }.use { block() }
       }
     }
+    } finally { fixtureFile.delete() }
   }
 
   private fun withFixture(block: (Fixture) -> Unit) {

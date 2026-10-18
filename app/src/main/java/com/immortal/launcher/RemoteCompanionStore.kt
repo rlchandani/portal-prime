@@ -9,15 +9,58 @@ package com.immortal.launcher
 import android.content.Context
 import android.util.AtomicFile
 import java.io.File
+import java.io.FileNotFoundException
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
 import java.util.UUID
 import org.json.JSONArray
 import org.json.JSONObject
+import org.json.JSONTokener
 
 /** Companion-owned metadata only. Device settings stay in their native registry/stores. */
 internal object RemoteCompanionStore {
   val mutationLock = Any()
-  private fun file(c: Context) = AtomicFile(File(c.noBackupFilesDir, "remote-companion.json"))
-  private fun read(c: Context): JSONObject = runCatching { JSONObject(file(c).openRead().use { it.readBytes().toString(Charsets.UTF_8) }) }.getOrDefault(JSONObject())
+  private fun path(c: Context) = File(c.noBackupFilesDir, "remote-companion.json")
+  private fun file(c: Context) = AtomicFile(path(c))
+  private fun read(c: Context): JSONObject {
+    val atomic = file(c)
+    val bytes = try {
+      atomic.openRead().use { it.readBytes() }
+    } catch (_: FileNotFoundException) {
+      // AtomicFile may recover its backup during openRead. Only a genuinely absent store
+      // initializes empty; an inaccessible primary/backup/in-progress file must be retained.
+      val base = path(c)
+      if (base.parentFile?.isDirectory != true || !base.parentFile.canRead() || !base.parentFile.canExecute())
+        throw RemoteCompanionStoreUnavailable()
+      if (!base.exists() && !File(base.path + ".bak").exists() && !File(base.path + ".new").exists())
+        return JSONObject()
+      throw RemoteCompanionStoreUnavailable()
+    } catch (_: Exception) {
+      throw RemoteCompanionStoreUnavailable()
+    }
+    return try {
+      val raw = Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+          .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString()
+      require('\u0000' !in raw)
+      val input = JSONTokener(raw)
+      val data = JSONObject(input)
+      var next = input.next()
+      while (next != '\u0000') {
+        require(next == ' ' || next == '\t' || next == '\r' || next == '\n')
+        next = input.next()
+      }
+      for (key in listOf("scenes", "operations")) if (data.has(key)) {
+        val collection = data.opt(key) as? JSONArray ?: throw RemoteCompanionStoreUnavailable()
+        require((0 until collection.length()).all { collection.opt(it) is JSONObject })
+      }
+      data
+    } catch (_: Exception) {
+      // JSON/file failures can contain saved content. Return only a stable, cause-free type.
+      throw RemoteCompanionStoreUnavailable()
+    }
+  }
+  /** Cached history cannot bypass the same disk-integrity gate used by mutations. */
+  fun requireReadable(c: Context) = synchronized(mutationLock) { read(c); Unit }
   fun id(c: Context): String = synchronized(mutationLock) {
     val saved = read(c).optString("deviceId")
     if (runCatching { UUID.fromString(saved).toString() == saved }.getOrDefault(false)) saved
@@ -33,6 +76,8 @@ internal object RemoteCompanionStore {
     catch (e: Exception) { f.failWrite(stream); throw e }
   }
 }
+
+internal class RemoteCompanionStoreUnavailable : IllegalStateException("Saved companion metadata is unavailable")
 
 /** Persistent, bounded results. Installer uncertainty survives process death and history pruning. */
 internal class RemoteCompanionHistory(saved: JSONArray = JSONArray(), private val persist: (JSONArray) -> Unit = {}) {

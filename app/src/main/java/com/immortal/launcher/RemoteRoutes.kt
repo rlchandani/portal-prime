@@ -57,7 +57,7 @@ class RemoteRoutes internal constructor(
   // One provider-owned read cache. Static requests never reopen assets after the first read.
   private val remoteAssets = mutableMapOf<String, ByteArray>()
 
-  fun handle(req: FleetHttpServer.Request): FleetHttpServer.Response =
+  fun handle(req: FleetHttpServer.Request): FleetHttpServer.Response = try {
       when (req.path) {
         "/remote/companion", "/remote/layout", "/remote/snapshot", "/remote/catalog",
         "/remote/operation", "/remote/operations", "/remote/jarvis", "/remote/scenes",
@@ -107,6 +107,9 @@ class RemoteRoutes internal constructor(
         }
         else -> json(404, err("not_found"))
       }
+    } catch (_: RemoteCompanionStoreUnavailable) {
+      json(503, err("companion_storage_unavailable"))
+    }
 
   // --- endpoints --------------------------------------------------------------
 
@@ -536,6 +539,7 @@ class RemoteRoutes internal constructor(
       return json(503, err("saved_presets_unavailable"))
     } ?: return json(404, err("unknown_preset"))
     val steps = JSONArray((preset.optJSONArray("steps") ?: JSONArray()).toString())
+    RemoteCompanionStore.requireReadable(context)
     val operations = RemoteCompanionOperations.get(context)
     val target = JSONObject().put("id", id).put("name", preset.opt("name") as? String ?: "")
     val operation = operations.start("preset", target) { operationId ->

@@ -42,7 +42,10 @@ internal class RemoteCompanionRoutes(private val context: Context) {
       if (text.toByteArray(Charsets.UTF_8).size != req.contentLength) return json(400, error("incomplete_body"))
       runCatching { JSONObject(text) }.getOrNull() ?: return json(400, error("bad_json"))
     } else JSONObject()
-    return when (req.path) {
+    return try {
+      if (req.path in setOf("/remote/operation", "/remote/operations"))
+        RemoteCompanionStore.requireReadable(context)
+      when (req.path) {
       "/remote/companion" -> companion()
       "/remote/layout" -> layout(req.method, body)
       "/remote/snapshot" -> snapshot(req.method, body)
@@ -53,16 +56,20 @@ internal class RemoteCompanionRoutes(private val context: Context) {
       "/remote/scene" -> scene(body)
       "/remote/jarvis" -> if (req.method == "GET") json(200, ok().put("jarvis", RemoteCompanionJarvis.status(context))) else RemoteCompanionJarvis.configure(context, body).let { json(if (it.optBoolean("ok")) 200 else 409, it) }
       else -> json(404, error("not_found"))
+      }
+    } catch (_: RemoteCompanionStoreUnavailable) {
+      json(503, error("companion_storage_unavailable"))
     }
   }
 
   private fun companion(): FleetHttpServer.Response {
+    val deviceId = RemoteCompanionStore.id(context)
     val presence = PresenceHub.current
     val plan = InstallDaemon.installPlan(context)
     val jarvis = RemoteCompanionJarvis.status(context)
     val pi = context.packageManager.getPackageInfo(context.packageName, 0)
     val code = if (Build.VERSION.SDK_INT >= 28) pi.longVersionCode else @Suppress("DEPRECATION") pi.versionCode.toLong()
-    return json(200, ok().put("protocolVersion", 1).put("deviceId", RemoteCompanionStore.id(context))
+    return json(200, ok().put("protocolVersion", 1).put("deviceId", deviceId)
         .put("name", FleetConfig.name(context)).put("model", Build.MODEL).put("apiLevel", Build.VERSION.SDK_INT)
         .put("app", JSONObject().put("versionCode", code).put("versionName", pi.versionName))
         .put("capabilities", JSONObject().put("layout", true).put("snapshot", true).put("catalog", catalog().isNotEmpty()).put("operations", true).put("scenes", true).put("sceneRevisions", true).put("photos", RemoteCompanionPhotos.available()).put("photoLibrary", true).put("jarvis", jarvis.optBoolean("supported")))

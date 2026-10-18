@@ -84,8 +84,8 @@ internal object RemoteScenes {
       PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
   fun replace(c: Context, scenes: JSONArray) = synchronized(RemoteCompanionStore.mutationLock) {
-    val alarm = c.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val old = RemoteCompanionStore.scenes(c)
+    val alarm = c.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     for (i in 0 until old.length()) alarm.cancel(pending(c, old.getJSONObject(i).getString("id")))
     RemoteCompanionStore.update(c, "scenes", scenes)
     rearm(c)
@@ -123,7 +123,8 @@ class RemoteSceneReceiver : BroadcastReceiver() {
     }
     if (intent.action != "com.immortal.launcher.REMOTE_SCENE") return
     val id = intent.getStringExtra("id") ?: return
-    val scenes = RemoteCompanionStore.scenes(context)
+    val scenes = try { RemoteCompanionStore.scenes(context) }
+        catch (_: RemoteCompanionStoreUnavailable) { return }
     val scene = (0 until scenes.length()).mapNotNull { scenes.optJSONObject(it) }.firstOrNull { it.optString("id") == id } ?: return
     if (!scene.optJSONObject("schedule")?.optBoolean("enabled").let { it == true }) return
     runCatching { RemoteScenes.rearm(context); RemoteScenes.start(context, scene, scheduled = true) }

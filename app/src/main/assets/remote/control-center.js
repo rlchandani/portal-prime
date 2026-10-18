@@ -404,6 +404,8 @@ function message(error) {
       'Transfer was interrupted. Refresh the library to check whether the photo arrived.',
     folder_not_found: 'That folder does not exist. Choose another public folder.',
     invalid_response: 'The Portal returned an unreadable response. Try refreshing.',
+    companion_storage_unavailable:
+      'Saved scenes and Activity metadata are unavailable. They are kept unchanged. Retry after restoring readable metadata on the Portal.',
     saved_presets_unavailable:
       'Your saved presets could not be read. They are kept unchanged. Retry after restoring readable preset data on the Portal.',
     readback_failed: 'Jarvis did not confirm the requested settings. Your edits are kept.',
@@ -1302,7 +1304,9 @@ function homePage() {
       ),
       sections(
         el('div', { id: 'media-panel' }),
-        !data.companion
+        data.statusError?.code === 'companion_storage_unavailable'
+          ? failure('Management metadata unavailable', data.statusError, refresh)
+          : !data.companion
           ? empty(
               'Management controls',
               data.statusError?.status === 404
@@ -5110,6 +5114,8 @@ function sceneEditor() {
   return sections(
     heading(d.name || 'New scene', 'Actions run in order on the selected Portal.'),
     sceneProtectionPanel(d.expectedRevision),
+    scenesPending() ? text('Refreshing routines… Your draft is kept.', 'detail') : null,
+    data.scenesError ? failure('Scenes unavailable. Your draft is kept.', data.scenesError, loadScenes) : null,
     scenesSaving() ? text('Saving scene… You can keep editing; newer changes will need another Save.', 'draft-label') : null,
     el(
       'div',
@@ -5305,6 +5311,9 @@ async function saveScenes(
         if (error.status === 409 && error.code === 'stale_revision') {
           data.sceneConflict = true;
           if (editor && sceneDraft === editor) editor.conflict = true;
+          render();
+        } else if (error.code === 'companion_storage_unavailable') {
+          data.scenesError = error;
           render();
         }
       },
