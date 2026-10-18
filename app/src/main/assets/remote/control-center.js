@@ -91,7 +91,8 @@ let renderedOperations = null,
   navigationView = null,
   headerKey = null,
   searchComposition = null,
-  settingsRowView = null;
+  settingsRowView = null,
+  settingsLoadState = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -116,6 +117,7 @@ let layoutDraft = null,
   presetsLoadState = null,
   upload = null;
 const drafts = new Map(),
+  settingsEditedDrafts = new Set(),
   busy = new Set(),
   pageReads = new Map(),
   expired = new Map(),
@@ -1604,13 +1606,76 @@ async function volumeCommand(dir, level) {
     { dir, ...(level !== undefined ? { level } : {}) },
     dir === 'set' ? 'set' : null, '');
 }
-async function loadSettings() {
-  return read('settings', '/remote/settings', (r) => {
-    data.settings = r.settings;
-    scopeSchemas.set(room().base, r.settings);
-    if (!category)
-      category = r.settings?.domains?.find((d) => visibleControls(d, advanced).length)?.id || '';
-  });
+function settingsReadCurrent(owner) {
+  return owner === settingsLoadState && session.current(owner.ticket) &&
+    pageReads.get('settings') === owner.controller && !owner.controller.signal.aborted &&
+    !document.hidden && connectionState !== 'expired';
+}
+function settingsPending() {
+  return !!settingsLoadState?.pending && settingsReadCurrent(settingsLoadState);
+}
+function validateSettingsResponse(response) {
+  const object = value => value && typeof value === 'object' && !Array.isArray(value);
+  const named = value => typeof value === 'string' && value.trim().length > 0;
+  const schema = response?.settings;
+  if (!object(schema) || !Array.isArray(schema.domains)) throw new ApiError('invalid_response');
+  const domains = new Set();
+  for (const domain of schema.domains) {
+    if (!object(domain) || !named(domain.id) || domains.has(domain.id) ||
+        (domain.title !== undefined && !named(domain.title)) || !Array.isArray(domain.controls))
+      throw new ApiError('invalid_response');
+    domains.add(domain.id);
+    const controls = new Set();
+    for (const control of domain.controls) {
+      if (!object(control) || !named(control.key) || controls.has(control.key) ||
+          (control.title !== undefined && !named(control.title)) || !named(control.type))
+        throw new ApiError('invalid_response');
+      controls.add(control.key);
+      if (control.type === 'enum' && control.options != null &&
+          (!Array.isArray(control.options) || control.options.some(option => !object(option) ||
+            !['string', 'number', 'boolean'].includes(typeof option.value) ||
+            (option.label !== undefined && typeof option.label !== 'string'))))
+        throw new ApiError('invalid_response');
+    }
+  }
+  return schema;
+}
+function loadSettings() {
+  if (!room() || document.hidden || connectionState === 'expired') return;
+  if (settingsPending()) return settingsLoadState.promise;
+  pageReads.get('settings')?.abort();
+  const owner = { ticket: session.read('settings'), controller: new AbortController(), pending: true };
+  settingsLoadState = owner;
+  pageReads.set('settings', owner.controller);
+  delete data.settingsError;
+  owner.promise = (async () => {
+    try {
+      const response = await api(owner.ticket.room, '/remote/settings', { signal: owner.controller.signal });
+      if (!settingsReadCurrent(owner)) return;
+      const schema = validateSettingsResponse(response);
+      // Rendered scalar fallbacks are seeded as drafts. Only actual edits should mask
+      // a newer confirmed value; matching the previous value is not an unsaved edit.
+      for (const domain of data.settings?.domains || []) for (const control of domain.controls || []) {
+        if (control.secret || control.timeOfDay || !(control.type === 'string' ||
+            (control.type === 'int' && control.asText))) continue;
+        const key = draftKey(`setting:${domain.id}:${control.key}:draft`);
+        const previous = String(control.value ?? '');
+        if (!settingsEditedDrafts.has(key) && drafts.get(key) === previous) drafts.delete(key);
+      }
+      data.settings = schema;
+      scopeSchemas.set(owner.ticket.room.base, schema);
+      if (!category) category = schema.domains.find(d => visibleControls(d, advanced).length)?.id || '';
+      return response;
+    } catch (error) {
+      if (settingsReadCurrent(owner) && error.code !== 'aborted') data.settingsError = error;
+    } finally {
+      const current = settingsReadCurrent(owner);
+      if (pageReads.get('settings') === owner.controller) pageReads.delete('settings');
+      if (current) { owner.pending = false; render(); }
+    }
+  })();
+  render();
+  return owner.promise;
 }
 function settingsPage() {
   const schema = data.settings;
@@ -1683,11 +1748,22 @@ function settingsPage() {
       ),
     ),
   );
+  const owner = settingsLoadState;
+  const retry = () => {
+    if (session.current(ticket) && tab === 'settings' && !detail && !document.hidden &&
+        connectionState !== 'expired' && data.settings === schema && settingsLoadState === owner)
+      loadSettings();
+  };
+  const refreshNotice = settingsPending()
+    ? group(text(schema ? 'Refreshing settings…' : 'Loading current settings…'))
+    : data.settingsError ? group(
+      el('strong', { text: schema ? 'Settings refresh failed' : 'Settings unavailable' }),
+      text(message(data.settingsError)),
+      schema ? text('Last confirmed settings are shown. Your unsaved edits are kept.') : null,
+      button('Retry settings', retry, { kind: 'outline' })) : null;
   let controls;
   if (!schema)
-    controls = data.settingsError
-      ? failure('Settings unavailable', data.settingsError, loadSettings)
-      : empty('Settings', 'Loading the Portal’s settings registry…');
+    controls = refreshNotice ? null : empty('Settings', 'Loading the Portal’s settings registry…');
   else {
     const domains = (schema.domains || []).filter(
       (d) => visibleControls(d, advanced, settingsQuery).length,
@@ -1733,6 +1809,7 @@ function settingsPage() {
         'div',
         { class: 'settings-primary' },
         sections(
+          refreshNotice,
           filters,
           roster.length > 1
             ? text(
@@ -2020,8 +2097,9 @@ function renderSetting(domain, control) {
       ...(timeOfDay ? { step: 60, 'aria-describedby': errorId,
         'aria-invalid': error.hidden ? 'false' : 'true' } : {}),
       onInput: (e) => {
-        if (timeOfDay && !ownsRow()) return;
+        if (!ownsRow()) return;
         setDraft(key, e.target.value);
+        if (!timeOfDay && !control.secret) settingsEditedDrafts.add(draftKey(key));
         if (timeOfDay) {
           drafts.delete(draftKey(errorKey));
           error.hidden = true;
@@ -2055,6 +2133,7 @@ function renderSetting(domain, control) {
         apply({ [control.key]: value }).then((results) => {
           if (session.current(ticket) && connectionState !== 'expired' && results?.every((r) => r.ok)) {
             drafts.delete(draftKey(key));
+            settingsEditedDrafts.delete(draftKey(key));
             if (timeOfDay) drafts.delete(draftKey(errorKey));
             render();
           }
@@ -2164,6 +2243,13 @@ async function applyDomain(
   ids.forEach((id) => busy.delete(id));
   if (session.current(ticket)) {
     scopeResults = results;
+    // A confirmed active-domain write is newer than any preceding registry refresh.
+    // Rejected/unconfirmed responses must leave that read eligible to recover the view.
+    if (results.some(result => result.ok && result.base === ticket.room.base &&
+        result.response?.domain?.id === domain && Array.isArray(result.response.domain.controls))) {
+      retireRead('settings');
+      settingsLoadState = null;
+    }
     for (const result of results) {
       if (result.response?.domain) {
         const current = scopeSchemas.get(result.base);

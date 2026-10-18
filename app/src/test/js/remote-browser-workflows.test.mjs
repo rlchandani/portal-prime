@@ -3615,3 +3615,243 @@ test('Layout refresh late reads do not replace a new Portal page or hidden expir
  const {h,pending}=await layoutRefreshFixture();const read=pending();h.eval('loadLayout()');await h.settle();h.eval(depart);await h.settle();await read.finish(layoutRefreshValue('Stale'));assert.notEqual(h.eval('data.layout?.revision'),'Stale');
  }
 });
+
+// Public settings fixtures exercise the shipped controls and request boundary.
+const settingsRefreshSchema = (name = 'Original') => ({
+  domains: [{ id: 'immortal', title: 'Device', controls: [
+    { key: 'deviceName', title: 'Device name', type: 'string', value: name, default: 'Portal' },
+    { key: 'enabled', title: 'Enabled', type: 'bool', value: false, default: false },
+    { key: 'advanced', title: 'Expert control', type: 'bool', value: false, tier: 'advanced' },
+  ] }, { id: 'other', title: 'Other', controls: [
+    { key: 'note', title: 'Note', type: 'string', value: 'Kept' },
+  ] }], futureMetadata: { kept: true },
+});
+async function settingsRefreshFixture({ initialHold = false, rooms = [saved[0]], schema = null } = {}) {
+  const state = { schema: schema || settingsRefreshSchema(), held: [], hold: initialHold, readMode: '',
+    saveMode: '', posts: [], reads: 0 };
+  const h = await browserHarness({ saved: rooms, routes: {
+    '/remote/settings': ({ url, opts, response }) => {
+      if (opts.body) {
+        const body = JSON.parse(opts.body); state.posts.push(body);
+        if (state.saveMode === 'fail') return response({ ok: false, error: 'conflict' }, 409);
+        if (state.saveMode === 'unconfirmed') return response({ ok: true, applied: Object.keys(body.values) });
+        const domain = state.schema.domains.find(d => d.id === body.domain);
+        const confirmed = { ...domain, controls: domain.controls.map(c =>
+          Object.hasOwn(body.values, c.key) ? { ...c, value: body.values[c.key] } : c) };
+        state.schema = { ...state.schema, domains: state.schema.domains.map(d =>
+          d.id === confirmed.id ? confirmed : d) };
+        return response({ ok: true, applied: Object.keys(body.values), domain: confirmed });
+      }
+      if (new URL(url).search) return response({ ok: true, settings: state.schema });
+      state.reads++;
+      const snapshot = structuredClone(state.schema);
+      const result = (mode = state.readMode, schema = snapshot) => {
+        if (mode === 'transport') throw new Error('fixture offline');
+        if (mode === 'http') return response({ ok: false, error: 'unreachable' }, 503);
+        if (mode === 'timeout') return response({ ok: false, error: 'timeout' }, 408);
+        if (mode === 'malformed') return response({ ok: true, settings: { domains: {} } });
+        return response({ ok: true, settings: schema });
+      };
+      if (!state.hold) return result();
+      return new Promise((resolve, reject) => state.held.push({
+        signal: opts.signal,
+        finish(mode = '', schema = snapshot) {
+          try { resolve(result(mode, schema)); } catch (error) { reject(error); }
+        },
+      }));
+    },
+  } });
+  h.eval('go("settings")'); await h.settle();
+  return { h, state };
+}
+const settingsRefreshButton = (h, label) => h.document.body.querySelectorAll('button')
+  .find(b => b.textContent === label);
+const settingsRefreshInput = h => h.document.body.querySelectorAll('input')
+  .find(n => n.attrs['aria-label'] === 'Device name');
+
+test('Settings refresh initial read shows owned progress and coalesces duplicate reads', async () => {
+  const { h, state } = await settingsRefreshFixture({ initialHold: true });
+  assert.match(h.document.body.textContent, /Loading current settings…/);
+  h.eval('loadSettings();loadSettings()'); await h.settle();
+  assert.equal(state.reads, 1);
+  state.held[0].finish(); await h.settle();
+  assert.doesNotMatch(h.document.body.textContent, /Loading current settings…/);
+  assert.equal(settingsRefreshInput(h).value, 'Original');
+});
+
+test('Settings refresh background failures keep confirmed controls and show recoverable errors', async () => {
+  for (const mode of ['transport', 'http', 'timeout', 'malformed']) {
+    const { h, state } = await settingsRefreshFixture();
+    const schema = h.eval('data.settings');
+    await h.input('Device name', 'Unsaved');
+    state.readMode = mode; h.eval('loadSettings()'); await h.settle();
+    assert.equal(h.eval('data.settings'), schema, mode);
+    assert.equal(settingsRefreshInput(h).value, 'Unsaved', mode);
+    assert.match(h.document.body.textContent, /Settings refresh failed/);
+    assert.ok(settingsRefreshButton(h, 'Retry settings'));
+    assert.equal(settingsRefreshInput(h).disabled, false);
+  }
+});
+
+test('Settings refresh Retry clears old error, retains drafts and coalesces pending attempts', async () => {
+  const { h, state } = await settingsRefreshFixture();
+  await h.input('Device name', 'Unsaved');
+  state.readMode = 'http'; h.eval('loadSettings()'); await h.settle();
+  state.hold = true; const before = state.reads;
+  h.click('Retry settings'); await h.settle();
+  assert.equal(h.eval('Boolean(data.settingsError)'), false);
+  assert.match(h.document.body.textContent, /Refreshing settings…/);
+  h.eval('loadSettings()'); await h.settle(); assert.equal(state.reads, before + 1);
+  state.held.at(-1).finish(); await h.settle();
+  assert.equal(settingsRefreshInput(h).value, 'Unsaved');
+  assert.doesNotMatch(h.document.body.textContent, /Settings refresh failed|Refreshing settings…/);
+});
+
+test('Settings refresh rejects malformed registry domain and control shapes without replacing metadata', async () => {
+  const { h, state } = await settingsRefreshFixture();
+  const original = h.eval('data.settings'), scopeSchema = h.eval('scopeSchemas.get(room().base)');
+  for (const schema of [null, [], {}, { domains: [null] },
+    { domains: [{ id: 'x', title: 'X', controls: {} }] },
+    { domains: [{ id: 'x', title: 'X', controls: [null] }] },
+    { domains: [{ id: 'x', title: 'X', controls: [{ key: 'x', title: 'X' }] }] },
+    { domains: [{ id: '', title: 'X', controls: [] }] },
+    { domains: [{ id: 'x', controls: [] }, { id: 'x', controls: [] }] },
+    { domains: [{ id: 'x', controls: [{ key: 'a', type: 'bool' }, { key: 'a', type: 'bool' }] }] },
+    { domains: [{ id: 'x', controls: [{ key: 'a', type: 'enum', options: {} }] }] },
+    { domains: [{ id: 'x', controls: [{ key: 'a', type: 'enum', options: [null] }] }] },
+    { domains: [{ id: 'x', controls: [{ key: 'a', type: 'enum', options: [{ value: {}, label: 'X' }] }] }] }]) {
+    state.hold = true; h.eval('loadSettings()'); await h.settle();
+    state.held.at(-1).finish('', schema); await h.settle();
+    assert.equal(h.eval('data.settings'), original);
+    assert.equal(h.eval('scopeSchemas.get(room().base)'), scopeSchema);
+    assert.match(h.document.body.textContent, /Settings refresh failed/);
+  }
+});
+
+test('Settings refresh accepts empty registries and preserves unknown display metadata', async () => {
+  const { h, state } = await settingsRefreshFixture();
+  state.hold = true; h.eval('loadSettings()'); await h.settle();
+  state.held.at(-1).finish('', { domains: [], futureMetadata: { kept: true } }); await h.settle();
+  assert.equal(h.eval('data.settings.domains.length'), 0);
+  assert.equal(h.eval('data.settings.futureMetadata.kept'), true);
+  assert.match(h.document.body.textContent, /No matching settings/);
+  assert.equal(h.eval('Boolean(data.settingsError)'), false);
+});
+
+test('Settings refresh confirmed active writes retire older successful and failed reads', async () => {
+  for (const lateMode of ['', 'http']) {
+    const { h, state } = await settingsRefreshFixture();
+    state.hold = true; h.eval('loadSettings()'); await h.settle(); const old = state.held.at(-1);
+    await h.input('Device name', 'Confirmed'); h.click('Save'); await h.settle();
+    assert.equal(state.posts.length, 1);
+    assert.equal(old.signal.aborted, true);
+    old.finish(lateMode); await h.settle();
+    assert.equal(h.eval('data.settings.domains[0].controls[0].value'), 'Confirmed');
+    assert.equal(h.eval('scopeSchemas.get(room().base).domains[0].controls[0].value'), 'Confirmed');
+    assert.equal(h.eval('Boolean(data.settingsError)'), false);
+    assert.doesNotMatch(h.document.body.textContent, /Refreshing settings…/);
+    assert.equal(state.reads, 2);
+    assert.equal(h.eval('data.settings.domains[1].controls[0].value'), 'Kept');
+  }
+});
+
+test('Settings refresh failed or unconfirmed writes leave pending reads eligible', async () => {
+  for (const mode of ['fail', 'unconfirmed']) {
+    const { h, state } = await settingsRefreshFixture();
+    state.hold = true; state.saveMode = mode; h.eval('loadSettings()'); await h.settle();
+    const old = state.held.at(-1);
+    await h.input('Device name', 'Draft'); h.click('Save'); await h.settle();
+    assert.equal(old.signal.aborted, false);
+    old.finish('', settingsRefreshSchema('External')); await h.settle();
+    assert.equal(h.eval('data.settings.domains[0].controls[0].value'), 'External');
+  }
+});
+
+test('Settings refresh preserves inputs edited before and during a current successful refresh', async () => {
+  const { h, state } = await settingsRefreshFixture();
+  await h.input('Device name', 'Before');
+  state.hold = true; h.eval('loadSettings()'); await h.settle();
+  await h.input('Device name', 'Newer');
+  state.held.at(-1).finish('', settingsRefreshSchema('External')); await h.settle();
+  assert.equal(settingsRefreshInput(h).value, 'Newer');
+  assert.equal(h.eval('data.settings.domains[0].controls[0].value'), 'External');
+  assert.equal(settingsRefreshButton(h, 'Save').disabled, false);
+  const timeSchema = settingsRefreshSchema();
+  timeSchema.domains[0].controls.push({ key: 'wakeMinute', title: 'Wake time', type: 'int',
+    value: 540, timeOfDay: true, min: 0, max: 1439 });
+  const mixed = await settingsRefreshFixture({ rooms: saved, schema: timeSchema });
+  const peer = structuredClone(timeSchema); peer.domains[0].controls.at(-1).value = 600;
+  mixed.h.eval(`scope="all";scopeSchemas.set(${JSON.stringify(saved[1].base)},${JSON.stringify(peer)});render()`);
+  const timeInput = () => mixed.h.document.body.querySelectorAll('input')
+    .find(n => n.attrs['aria-label'] === 'Wake time');
+  assert.equal(timeInput().value, '');
+  await mixed.h.input('Wake time', '09:00');
+  mixed.state.hold = true; mixed.h.eval('loadSettings()'); await mixed.h.settle();
+  mixed.state.held.at(-1).finish(); await mixed.h.settle();
+  assert.equal(timeInput().value, '09:00');
+  const explicit = await settingsRefreshFixture();
+  await explicit.h.input('Device name', 'Original');
+  explicit.state.hold = true; explicit.h.eval('loadSettings()'); await explicit.h.settle();
+  explicit.state.held.at(-1).finish('', settingsRefreshSchema('External')); await explicit.h.settle();
+  assert.equal(settingsRefreshInput(explicit.h).value, 'Original');
+  assert.equal(explicit.h.eval('data.settings.domains[0].controls[0].value'), 'External');
+});
+
+test('Settings refresh retained Retry cannot dispatch after navigation hiding expiry or room change', async () => {
+  for (const depart of ['page', 'hidden', 'expired', 'room']) {
+    const { h, state } = await settingsRefreshFixture({ rooms: saved });
+    state.readMode = 'http'; h.eval('loadSettings()'); await h.settle();
+    const retry = settingsRefreshButton(h, 'Retry settings'); assert.ok(retry);
+    if (depart === 'page') h.eval('go("home")');
+    if (depart === 'hidden') h.hide();
+    if (depart === 'expired') h.eval('connectionState="expired";render()');
+    if (depart === 'room') h.eval(`selectRoom(${JSON.stringify(saved[1].base)})`);
+    await h.settle(); const before = state.reads;
+    retry.click(); await h.settle(); assert.equal(state.reads, before, depart);
+  }
+});
+
+test('Settings refresh global Refresh replaces an aborted read and admits only its replacement', async () => {
+  const { h, state } = await settingsRefreshFixture();
+  state.hold = true; h.eval('loadSettings()'); await h.settle(); const old = state.held.at(-1);
+  h.document.getElementById('refresh-button').click(); await h.settle();
+  const replacement = state.held.at(-1); assert.notEqual(old, replacement);
+  assert.equal(old.signal.aborted, true);
+  old.finish('http'); await h.settle();
+  assert.match(h.document.body.textContent, /Refreshing settings…/);
+  assert.equal(h.eval('Boolean(data.settingsError)'), false);
+  replacement.finish('', settingsRefreshSchema('Fresh')); await h.settle();
+  assert.equal(settingsRefreshInput(h).value, 'Fresh');
+  assert.doesNotMatch(h.document.body.textContent, /Refreshing settings…/);
+});
+
+test('Settings refresh departed late responses cannot publish errors or replace another context', async () => {
+  for (const depart of ['page', 'hidden', 'expired', 'room']) {
+    const { h, state } = await settingsRefreshFixture({ rooms: saved });
+    state.hold = true; h.eval('loadSettings()'); await h.settle(); const old = state.held.at(-1);
+    if (depart === 'page') h.eval('go("home")');
+    if (depart === 'hidden') h.hide();
+    if (depart === 'expired') h.eval('connectionState="expired";render()');
+    if (depart === 'room') h.eval(`selectRoom(${JSON.stringify(saved[1].base)})`);
+    await h.settle(); old.finish('http'); await h.settle();
+    assert.equal(h.eval('Boolean(data.settingsError)'), false, depart);
+    assert.doesNotMatch(h.document.body.textContent, /Settings refresh failed/);
+    for (const pending of state.held) if (pending !== old) pending.finish();
+    await h.settle();
+  }
+});
+
+test('Settings refresh preserves row identity filters and scope without unrelated management reads', async () => {
+  const { h, state } = await settingsRefreshFixture({ rooms: saved });
+  const input = settingsRefreshInput(h); state.hold = true;
+  h.eval('loadSettings()'); await h.settle();
+  assert.equal(settingsRefreshInput(h), input);
+  state.held.at(-1).finish(); await h.settle();
+  assert.equal(settingsRefreshInput(h), input);
+  await h.input('Search settings', 'Expert');
+  h.eval('advanced=true;render()'); await h.settle();
+  assert.match(h.document.body.textContent, /Expert control/);
+  assert.equal(h.eval('scope'), 'this');
+  assert.equal(h.calls.some(c => ['/remote/photos', '/remote/apps', '/remote/catalog',
+    '/remote/layout', '/remote/scenes', '/remote/jarvis'].includes(c.path)), false);
+});
