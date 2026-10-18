@@ -4470,3 +4470,168 @@ test('Jarvis refresh launch uses only current confirmed installed status and ori
     assert.equal(new URL(jarvisLaunches(h)[0].url).port, '8877');
   } finally { await release(); h.hide(); }
 });
+
+
+async function playbackRecovery() {
+  const fixture = { mode: 'normal', waiting: [], np: {
+    active: true, playing: true, title: 'Last valid track', artist: 'Fixture artist',
+    album: 'Fixture album', durationMs: 180000, positionMs: 10000, canSeek: true,
+    hasArt: false, volume: { level: 4, max: 15, muted: false, canSet: true },
+  } };
+  const h = await browserHarness({ saved, routes: {
+    '/remote/nowplaying': ({ response, opts }) => {
+      if (fixture.mode === 'fail') throw new Error('fixture offline');
+      if (fixture.mode === 'hold') return new Promise(resolve => fixture.waiting.push({
+        signal: opts.signal, finish: (np = fixture.np) => resolve(response({ ok: true, np })),
+      }));
+      return response({ ok: true, np: fixture.mode === 'malformed' ? fixture.bad : fixture.np });
+    },
+    '/remote/media': ({ response }) => response({ ok: true }),
+    '/remote/volume': ({ response }) => response({ ok: true }),
+  } });
+  const mount = () => h.document.getElementById('media-panel');
+  const control = label => mount().querySelector(`[aria-label="${label}"]`);
+  const reads = () => h.calls.filter(c => c.path === '/remote/nowplaying').length;
+  const commands = () => h.calls.filter(c => ['/remote/media','/remote/volume'].includes(c.path));
+  return { h, fixture, mount, control, reads, commands };
+}
+
+test('Playback recovery: explicit pending refresh keeps the card and focused slider draft', async () => {
+  const { h, fixture, mount, control } = await playbackRecovery();
+  const card = mount().firstChild, volume = control('Portal music volume');
+  volume.focus(); volume.value = 11; volume.oninput();
+  fixture.mode = 'hold'; h.eval('mediaRead({showProgress:true})'); await h.settle();
+  assert.match(mount().textContent, /Refreshing playback/i);
+  assert.match(mount().textContent, /last reported/i);
+  assert.equal(mount().firstChild, card); assert.equal(control('Portal music volume'), volume);
+  assert.equal(Number(volume.value), 11); assert.match(mount().textContent, /Last valid track/);
+  h.eval('refresh()'); await h.settle();
+  assert.equal(mount().firstChild === card, true, 'Toolbar refresh must retain the same playback card');
+  assert.equal(control('Portal music volume'), volume);
+  assert.equal(Number(volume.value), 11); assert.equal(h.document.activeElement, volume);
+  fixture.waiting.at(-1).finish(); await h.settle(); h.hide();
+});
+
+test('Playback recovery: failed cached refresh offers Retry without discarding playback or controls', async () => {
+  const { h, fixture, mount, control } = await playbackRecovery();
+  const pause = control('Pause'); fixture.mode = 'fail';
+  await h.eval('mediaRead()'); await h.settle();
+  assert.match(mount().textContent, /last reported/i); assert.match(mount().textContent, /reach|connect/i);
+  assert.equal(control('Pause'), pause);
+  const retry = mount().querySelectorAll('button').find(b => /Retry playback/.test(b.textContent));
+  assert.ok(retry); assert.equal(retry.hidden, false); h.hide();
+});
+
+test('Playback recovery: owned Retry clears failure and shows the newly confirmed track', async () => {
+  const { h, fixture, mount } = await playbackRecovery();
+  fixture.mode = 'fail'; await h.eval('mediaRead()'); await h.settle();
+  fixture.mode = 'normal'; fixture.np.title = 'Recovered track';
+  h.click('Retry playback'); await h.settle();
+  assert.match(mount().textContent, /Recovered track/);
+  assert.equal(mount().querySelector('.media-error').hidden, true);
+  assert.equal(mount().querySelectorAll('button').find(b => b.textContent === 'Retry playback').hidden, true);
+  h.hide();
+});
+
+test('Playback recovery: concurrent ordinary reads coalesce into one request', async () => {
+  const { h, fixture, reads } = await playbackRecovery();
+  fixture.mode = 'hold'; const before = reads();
+  h.eval('mediaRead();mediaRead();mediaRead()'); await h.settle();
+  assert.equal(reads()-before, 1); fixture.waiting[0].finish(); await h.settle(); h.hide();
+});
+
+test('Playback recovery: retired read cannot publish or complete its replacement', async () => {
+  const { h, fixture, mount } = await playbackRecovery();
+  fixture.mode = 'hold'; h.eval('mediaRead({showProgress:true})'); await h.settle();
+  h.eval('mediaRead({replacePending:true,showProgress:true})'); await h.settle();
+  assert.equal(fixture.waiting[0].signal.aborted, true);
+  fixture.waiting[0].finish({ ...fixture.np, title: 'Obsolete track' }); await h.settle();
+  assert.match(mount().textContent, /Refreshing playback/i);
+  assert.equal(mount().textContent.includes('Obsolete track'), false);
+  fixture.waiting[1].finish({ ...fixture.np, title: 'Replacement track' }); await h.settle();
+  assert.match(mount().textContent, /Replacement track/); h.hide();
+});
+
+test('Playback recovery: malformed responses retain the valid track and volume', async () => {
+  const { h, fixture, mount, control } = await playbackRecovery();
+  const volume = control('Portal music volume'); fixture.mode = 'malformed';
+  for (const bad of [[], {}, { active:'false' }, { ...fixture.np, playing:'yes' },
+    { ...fixture.np, durationMs:'180000' }, { ...fixture.np, title: [] },
+    { ...fixture.np, volume: { level:20,max:15,canSet:true } },
+    { ...fixture.np, volume: { level:4,max:-1,canSet:true } }]) {
+    fixture.bad=bad; await h.eval('mediaRead()'); await h.settle();
+    assert.match(mount().textContent, /Last valid track/);
+    assert.equal(control('Portal music volume'), volume);
+    assert.equal(Number(volume.value), 4); assert.equal(h.eval('!!data.mediaError'), true);
+  }
+  h.hide();
+});
+
+test('Playback recovery: initial failure can retry into a valid inactive volume card', async () => {
+  let fail = true;
+  const h = await browserHarness({ saved, routes: { '/remote/nowplaying': ({ response }) => {
+    if (fail) throw new Error('fixture offline');
+    return response({ ok:true,np:{ active:false,volume:{ level:4,max:15,canSet:true } } });
+  } } });
+  assert.match(h.document.getElementById('media-panel').textContent, /unavailable/i);
+  const retry = h.document.getElementById('media-panel').querySelector('button');
+  fail=false; retry.click(); await h.settle();
+  assert.ok(h.document.getElementById('media-panel').querySelector('[aria-label="Portal music volume"]'));
+  h.hide();
+});
+
+test('Playback recovery: inactive fixed volume remains a valid state without media transport', async () => {
+  const { h, fixture, mount, control } = await playbackRecovery();
+  fixture.np={ active:false,canSeek:false,volume:{level:0,max:0,muted:false,canSet:false} };
+  await h.eval('mediaRead()'); await h.settle();
+  assert.match(mount().textContent, /Nothing playing/); assert.equal(control('Pause'),null);
+  assert.equal(control('Portal music volume').disabled,true); assert.equal(h.eval('!!data.mediaError'),false);
+  h.hide();
+});
+
+test('Playback recovery: older media metadata without optional volume remains supported', async () => {
+  const { h, fixture, mount, control } = await playbackRecovery();
+  fixture.np={active:true,title:'Legacy track',playing:false};
+  await h.eval('mediaRead()'); await h.settle();
+  assert.match(mount().textContent,/Legacy track/); assert.ok(control('Play'));
+  assert.equal(control('Portal music volume'),null); assert.equal(h.eval('!!data.mediaError'),false); h.hide();
+});
+
+test('Playback recovery: a failed card Retry retires on room change, hiding, navigation and recovery', async () => {
+  for (const retire of ['selectRoom(roster[1].base)','go("apps")','hidden','recovered','expired']) {
+    const { h, fixture, mount, reads } = await playbackRecovery();
+    fixture.mode='fail'; await h.eval('mediaRead()'); await h.settle();
+    const retry=mount().querySelectorAll('button').find(b=>b.textContent==='Retry playback'); assert.ok(retry);
+    fixture.mode='normal';
+    if (retire==='hidden') h.hide();
+    else if (retire==='recovered') { await h.eval('mediaRead()'); await h.settle(); }
+    else if (retire==='expired') h.eval('connectionState="expired";abortReads();render()');
+    else { h.eval(retire); await h.settle(); }
+    const before=reads(); retry.click(); await h.settle(); assert.equal(reads(),before); h.hide();
+  }
+});
+
+test('Playback recovery: retired playback and slider callbacks cannot command another room', async () => {
+  const { h, control, commands } = await playbackRecovery();
+  const old=[control('Pause'),control('Previous'),control('Next')];
+  const volume=control('Portal music volume'), seek=control('Playback position');
+  const mute=h.document.getElementById('media-panel').querySelectorAll('button').find(b=>b.textContent==='Mute');
+  h.eval('selectRoom(roster[1].base)'); await h.settle();
+  for (const button of [...old,mute]) button.click();
+  volume.value=10; seek.value=50000;
+  assert.doesNotThrow(()=>{volume.onchange();seek.onchange();}); await h.settle();
+  assert.equal(commands().length,0);
+  control('Pause').click(); await h.settle(); assert.equal(commands().length,1);
+  assert.equal(new URL(commands()[0].url).port,'8878'); h.hide();
+});
+
+test('Playback recovery: command readback retires a pre-command pending GET', async () => {
+  const { h, fixture, control, commands, mount } = await playbackRecovery();
+  fixture.mode='hold'; h.eval('mediaRead()'); await h.settle();
+  control('Pause').click(); await h.settle();
+  assert.equal(commands().length,1); assert.equal(fixture.waiting.length,2);
+  assert.equal(fixture.waiting[0].signal.aborted,true);
+  fixture.waiting[1].finish({...fixture.np,title:'After command',playing:false}); await h.settle();
+  fixture.waiting[0].finish({...fixture.np,title:'Before command',playing:true}); await h.settle();
+  assert.match(mount().textContent,/After command/); assert.ok(control('Play')); h.hide();
+});

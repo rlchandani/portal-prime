@@ -93,7 +93,8 @@ let renderedOperations = null,
   searchComposition = null,
   settingsRowView = null,
   settingsLoadState = null,
-  jarvisLoadState = null;
+  jarvisLoadState = null,
+  mediaLoadState = null;
 let scope = 'this',
   selectedTargets = new Set(),
   scopeSchemas = new Map(),
@@ -541,20 +542,69 @@ async function status() {
     } },
   );
 }
-async function mediaRead() {
-  return read(
-    'media',
-    '/remote/nowplaying',
-    (response) => {
-      data.media = response.np;
-      if (connectionState !== 'expired' && !data.companion) {
-        connected = true;
-        connectionState = data.statusError?.status === 404 ? 'legacy' : 'connected';
-        updateHeader();
-      }
-    },
-    { renderAfter: true, renderWith: renderMedia },
-  );
+function mediaPageCurrent(ticket) {
+  return session.current(ticket) && !detail && (tab === 'home' || tab === 'remote') &&
+    !document.hidden && connectionState !== 'expired';
+}
+function mediaReadCurrent(owner) {
+  return !!owner && mediaLoadState === owner && mediaPageCurrent(owner.ticket) &&
+    !owner.controller?.signal.aborted;
+}
+function validateMediaResponse(response) {
+  const np = response?.np;
+  if (!np || typeof np !== 'object' || Array.isArray(np) || typeof np.active !== 'boolean')
+    throw new ApiError('invalid_response');
+  for (const key of ['playing', 'canSeek', 'hasArt'])
+    if (np[key] != null && typeof np[key] !== 'boolean') throw new ApiError('invalid_response');
+  for (const key of ['title', 'artist', 'album', 'source'])
+    if (np[key] != null && typeof np[key] !== 'string') throw new ApiError('invalid_response');
+  // Negative duration/position can mean unknown in older media sessions.
+  for (const key of ['durationMs', 'positionMs'])
+    if (np[key] != null && (typeof np[key] !== 'number' || !Number.isFinite(np[key])))
+      throw new ApiError('invalid_response');
+  if (np.artVersion != null && typeof np.artVersion !== 'string' &&
+      !(typeof np.artVersion === 'number' && Number.isFinite(np.artVersion)))
+    throw new ApiError('invalid_response');
+  if (np.volume !== undefined) {
+    const volume = np.volume;
+    if (!volume || typeof volume !== 'object' || Array.isArray(volume) ||
+        !Number.isInteger(volume.max) || volume.max < 0 ||
+        !Number.isInteger(volume.level) || volume.level < 0 || volume.level > volume.max)
+      throw new ApiError('invalid_response');
+    for (const key of ['muted', 'canSet'])
+      if (volume[key] != null && typeof volume[key] !== 'boolean') throw new ApiError('invalid_response');
+  }
+  return np;
+}
+function retryMedia(owner, error, view = null) {
+  if (!mediaReadCurrent(owner) || !error || data.mediaError !== error ||
+      (view && mediaView !== view)) return;
+  return mediaRead({ showProgress: true });
+}
+function mediaRead({ showProgress = false, replacePending = false } = {}) {
+  if (!room() || !mediaPageCurrent(session.capture())) return;
+  if (mediaReadCurrent(mediaLoadState) && mediaLoadState.pending && !replacePending)
+    return mediaLoadState.promise;
+  mediaLoadState?.controller?.abort();
+  const owner = { ticket: session.capture(), pending: true, showProgress, controller: null };
+  mediaLoadState = owner;
+  const work = read('media', '/remote/nowplaying', response => {
+    if (!mediaReadCurrent(owner)) throw new ApiError('aborted');
+    data.media = validateMediaResponse(response);
+    if (connectionState !== 'expired' && !data.companion) {
+      connected = true;
+      connectionState = data.statusError?.status === 404 ? 'legacy' : 'connected';
+      updateHeader();
+    }
+  }, { renderAfter: false });
+  owner.controller = pageReads.get('media');
+  owner.promise = work.finally(() => {
+    if (!mediaReadCurrent(owner)) return;
+    owner.pending = false;
+    renderMedia();
+  });
+  if (showProgress || !data.media) renderMedia();
+  return owner.promise;
 }
 function stopPolling() {
   pollGeneration++;
@@ -960,7 +1010,7 @@ const detailCapabilities = {
 function loadVisible(force = false) {
   if (!room() || document.hidden || connectionState === 'expired') return;
   if (detailCapabilities[detail] && !supported(detailCapabilities[detail])) return;
-  if (!detail && (tab === 'home' || tab === 'remote')) mediaRead();
+  if (!detail && (tab === 'home' || tab === 'remote')) mediaRead({ showProgress: force });
   if (tab === 'home' && detail === 'layout') loadLayout();
   else if (tab === 'home' && detail === 'scenes') loadScenes();
   else if (tab === 'home' && detail === 'jarvis')
@@ -1018,8 +1068,10 @@ function render() {
   }
   updatePhotoPreview();
   stopPhotoObservation();
-  operationsView = null,
-  mediaView = null;
+  const retainedMedia = mediaView?.ticket && mediaPageCurrent(mediaView.ticket) &&
+    mediaView.mount.isConnected ? mediaView : null;
+  operationsView = null;
+  mediaView = retainedMedia;
   updateHeader();
   renderNavigation();
   page.setAttribute('aria-busy', 'false');
@@ -1090,6 +1142,9 @@ function render() {
   else if (tab === 'photos') body = photosPage();
   else if (tab === 'apps') body = appsPage();
   else body = settingsPage();
+  // Status refreshes rebuild surrounding chrome, but keep the current playback card
+  // and its in-progress slider value. Navigation/room changes retire this view first.
+  if (retainedMedia) body.querySelector('[id="media-panel"]')?.replaceWith(retainedMedia.mount);
   page.replaceChildren(...[back, body].filter(Boolean));
   if (tab === 'apps' || detail === 'activity') {
     rememberOperations();
@@ -1106,6 +1161,8 @@ function render() {
         } catch {}
     }
   }
+  if (retainedMedia && active?.isConnected && retainedMedia.mount.contains(active))
+    active.focus({ preventScroll: true });
   if ((tab === 'home' && !detail) || tab === 'remote') renderMedia();
 }
 async function mutate(
@@ -1459,8 +1516,10 @@ function renderMedia() {
   if (!np) {
     mediaView = null;
     mount.replaceChildren(
-      data.mediaError
-        ? failure('Playback unavailable', data.mediaError, mediaRead)
+      data.mediaError && !(mediaReadCurrent(mediaLoadState) && mediaLoadState.pending)
+        ? failure('Playback unavailable', data.mediaError,
+            (() => { const owner = mediaLoadState, error = data.mediaError;
+              return () => retryMedia(owner, error); })())
         : empty('Playback', 'Loading media and volume…'),
     );
     return;
@@ -1471,7 +1530,10 @@ function renderMedia() {
     !!np.active && np.durationMs > 0, Number.isInteger(np.volume?.max),
   ]);
   if (!mediaView || mediaView.mount !== mount || mediaView.key !== key) {
-    const view = { mount, key, artKey: null, playing: null };
+    const view = { mount, key, ticket, artKey: null, playing: null };
+    const owned = fn => () => {
+      if (mediaView === view && mediaPageCurrent(ticket) && mount.isConnected) return fn();
+    };
     const groupNode = group(el('h2', { text: 'Playback' }));
     view.art = el('img', { class: 'art', alt: '', hidden: true });
     view.fallback = el('span', { class: 'media-fallback', 'aria-hidden': 'true' }, glyph('volume'));
@@ -1480,17 +1542,17 @@ function renderMedia() {
     groupNode.append(el('div', { class: 'media-header' }, view.art, view.fallback,
       el('div', { class: 'media-title' }, view.title, view.subtitle)));
     if (np.active) {
-      view.play = mediaButton('Pause', 'pause', () => mediaCommand('playpause'), true);
+      view.play = mediaButton('Pause', 'pause', owned(() => mediaCommand('playpause')), true);
       groupNode.append(el('div', { class: 'media-controls' },
-        mediaButton('Previous', 'prev', () => mediaCommand('prev')), view.play,
-        mediaButton('Next', 'next', () => mediaCommand('next'))));
+        mediaButton('Previous', 'prev', owned(() => mediaCommand('prev'))), view.play,
+        mediaButton('Next', 'next', owned(() => mediaCommand('next')))));
       if (np.durationMs > 0) {
         view.seek = el('input', { type: 'range', min: 0, max: np.durationMs,
           step: 1000, 'aria-label': 'Playback position' });
         view.current = el('span');
         view.duration = el('span');
         view.seek.oninput = () => (view.current.textContent = formatTime(Number(view.seek.value)));
-        view.seek.onchange = () => mediaCommand('seek', Math.min(Number(view.seek.value), data.media.durationMs));
+        view.seek.onchange = owned(() => mediaCommand('seek', Math.min(Number(view.seek.value), data.media.durationMs)));
         groupNode.append(view.seek, el('div', { class: 'timeline-labels' }, view.current, view.duration));
       }
     }
@@ -1499,17 +1561,22 @@ function renderMedia() {
         step: 1, 'aria-label': 'Portal music volume' });
       view.level = el('output');
       view.volume.oninput = () => (view.level.textContent = `${view.volume.value} / ${view.volume.getAttribute('max')}`);
-      view.volume.onchange = () => volumeCommand('set', Math.min(Number(view.volume.value), data.media.volume.max));
-      view.mute = button('Mute', () => volumeCommand('mute'));
-      view.down = button('Volume −', () => volumeCommand('down'));
-      view.up = button('Volume +', () => volumeCommand('up'));
+      view.volume.onchange = owned(() => volumeCommand('set', Math.min(Number(view.volume.value), data.media.volume.max)));
+      view.mute = button('Mute', owned(() => volumeCommand('mute')));
+      view.down = button('Volume −', owned(() => volumeCommand('down')));
+      view.up = button('Volume +', owned(() => volumeCommand('up')));
       view.fixed = text('This Portal reports fixed volume.');
       groupNode.append(el('div', { class: 'volume-row' }, glyph('volume'), view.volume, view.level),
         actions(view.mute, view.down, view.up), view.fixed);
     }
     view.error = text('', 'media-error error');
     view.error.hidden = true;
-    groupNode.append(view.error);
+    view.progress = text('', 'media-refresh');
+    view.progress.setAttribute('role', 'status');
+    view.progress.hidden = true;
+    view.retry = button('Retry playback', () => {}, { kind: 'outline' });
+    view.retry.hidden = true;
+    groupNode.append(view.progress, view.error, view.retry);
     mount.replaceChildren(groupNode);
     mediaView = view;
   }
@@ -1562,8 +1629,15 @@ function renderMedia() {
     for (const control of [view.mute, view.down, view.up]) setBool(control, 'disabled', !vol.canSet);
     setBool(view.fixed, 'hidden', !!vol.canSet);
   }
-  setText(view.error, data.mediaError ? message(data.mediaError) : '');
-  setBool(view.error, 'hidden', !data.mediaError);
+  const owner = mediaLoadState, error = data.mediaError;
+  const pending = mediaReadCurrent(owner) && owner.pending;
+  const refreshing = pending && owner.showProgress;
+  setText(view.progress, refreshing ? 'Refreshing playback… Last reported track and volume are shown.' : '');
+  setBool(view.progress, 'hidden', !refreshing);
+  setText(view.error, error ? `Last reported playback. ${message(error)}` : '');
+  setBool(view.error, 'hidden', !error || refreshing);
+  setBool(view.retry, 'hidden', !error || pending);
+  view.retry.onclick = () => retryMedia(owner, error, view);
   const artKey = np.hasArt ? `${room().base}:${np.artVersion}` : null;
   if (view.artKey !== artKey || (!artKey && artwork.size > 0)) {
     view.artKey = artKey;
@@ -1602,7 +1676,7 @@ async function playbackCommand(kind, path, body, coalesceKey, success) {
   // Read back after the stream drains; intermediate acknowledgements must not overwrite
   // the final slider draft or add a poll for every superseded value.
   if (response && session.current(ticket) && visibility === playbackVisibilityGeneration &&
-      !playbackCommands.hasPending(key)) mediaRead();
+      !playbackCommands.hasPending(key)) mediaRead({ replacePending: true });
   return response;
 }
 async function mediaCommand(action, positionMs) {
