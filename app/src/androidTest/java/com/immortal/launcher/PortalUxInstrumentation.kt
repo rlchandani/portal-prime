@@ -41,6 +41,11 @@ class PortalUxInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = Bundle()
         // This public fixture path never enters the generic private-cache diagnostics catch.
+        if (options.getString("command") == "issPassUi") {
+            val iss = IssPassUiDeviceChecks.run(this, options)
+            finish(if (iss.getBoolean("issPassUiCompleted")) 0 else 1, iss)
+            return
+        }
         if (options.getString("command") == "todayCalendarUi") {
             val calendar = TodayCalendarUiDeviceChecks.run(this)
             finish(if (calendar.getBoolean("todayCalendarUiCompleted")) 0 else 1, calendar)

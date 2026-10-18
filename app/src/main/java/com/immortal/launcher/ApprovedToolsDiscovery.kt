@@ -11,10 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 
 /** Revisit is a memory lookup; explicit refresh still uses each source's native cache policy. */
 private object ToolsDiscoveryCache {
@@ -75,18 +79,49 @@ internal fun ToolsIssContent() {
                 emptyList(), IssPasses.PredictionProblem.CALCULATION))
         } finally { ToolsDiscoveryDiagnostics.finished("iss", usable); loading = false }
     }
-    val upcoming = passes.orEmpty().filter { it.endMillis > foregroundAt }
+    ToolsIssPanel(passes, foregroundAt, loading, message) { revision++ }
+}
+
+@Composable
+internal fun ToolsIssPanel(
+    passes: List<IssPasses.Pass>?,
+    foregroundAt: Long,
+    loading: Boolean,
+    message: String?,
+    onRefresh: () -> Unit,
+) {
+    val owner = LocalLifecycleOwner.current
+    val active = LocalApprovedLauncherPageActive.current
+    var presentedAt by remember { mutableStateOf(foregroundAt) }
+    // Advance display time at pass ends, never by rerunning the orbital prediction.
+    LaunchedEffect(owner, active, passes, foregroundAt) {
+        if (!active) return@LaunchedEffect
+        owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) {
+                val now = System.currentTimeMillis()
+                presentedAt = now
+                val deadline = passes.orEmpty().asSequence().map { it.endMillis }
+                    .filter { it > now }.minOrNull() ?: return@repeatOnLifecycle
+                delay((deadline - now).coerceAtLeast(1L))
+            }
+        }
+    }
+    val upcoming = passes.orEmpty().filter { it.endMillis > presentedAt }
+    val emptyMessage = if (loading) "Finding passes…" else message ?:
+        if (!passes.isNullOrEmpty())
+            "These predictions have ended. Refresh passes for the next viewing times."
+        else "No upcoming passes."
     val next = upcoming.firstOrNull { it.visible } ?: upcoming.firstOrNull()
     ToolsTwoPane(left = {
         ToolsPanel(if (next?.visible == true) "Next visible pass" else "Next pass") {
-            if (next == null) ToolsText(if (loading) "Finding passes…" else message ?: "No upcoming passes.", true)
+            if (next == null) ToolsText(emptyMessage, true)
             else {
                 Text(IssPasses.timeLabel(next.startMillis), color = IosLabel, fontSize = 52.sp,
                     lineHeight = 64.sp, fontWeight = FontWeight.Medium)
                 ToolsText("Rises ${next.startDir} · peak ${next.maxElevationDeg}° to ${next.peakDir} · sets ${next.endDir}", true)
                 ToolsStatus(if (next.visible) "Should be visible to the naked eye" else "Above the horizon; may not be visible", next.visible)
             }
-            ToolsButton(if (loading) "Finding passes…" else "Refresh passes", enabled = !loading) { revision++ }
+            ToolsButton(if (loading) "Finding passes…" else "Refresh passes", enabled = !loading) { onRefresh() }
             if (next != null && message != null) ToolsText(message!!, true)
         }
         ToolsPanel("Before you head outside") {
@@ -95,7 +130,7 @@ internal fun ToolsIssContent() {
         }
     }, right = {
         ToolsPanel("Upcoming passes") {
-            if (upcoming.isEmpty()) ToolsText(if (loading) "Finding passes…" else message ?: "No upcoming passes.", true)
+            if (upcoming.isEmpty()) ToolsText(emptyMessage, true)
             upcoming.forEach { pass ->
                 Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     ToolsText(IssPasses.timeLabel(pass.startMillis))

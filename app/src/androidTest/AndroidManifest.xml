@@ -33,6 +33,15 @@
             android:taskAffinity="com.immortal.launcher.debug.test.today_calendar_fixture"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+        <activity
+            android:name="com.immortal.launcher.IssPassFixtureActivity"
+            android:process=":pin_fixture"
+            android:exported="true"
+            android:label="Public ISS pass fixture"
+            android:excludeFromRecents="true"
+            android:taskAffinity="com.immortal.launcher.debug.test.iss_pass_fixture"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
         <provider
             android:name="com.immortal.launcher.PinFixtureBridgeProvider"
             android:authorities="com.immortal.launcher.debug.test.pin-fixture"
