@@ -58,7 +58,6 @@ import kotlinx.coroutines.delay
 class AlarmRingActivity : ComponentActivity() {
   companion object {
     const val EXTRA_LABEL = "alarm_label"
-    private const val SNOOZE_MIN = 9
   }
   private var preview = false
 
@@ -107,15 +106,16 @@ class AlarmRingActivity : ComponentActivity() {
     if (preview) { finish(); return }
     AlarmSound.stop(this)
     AlarmReceiver.clearNotification(this)
-    val at = System.currentTimeMillis() + SNOOZE_MIN * 60_000L
     val intent = Intent(this, AlarmReceiver::class.java).setAction(AlarmScheduler.ACTION_SNOOZE)
     val pi =
         PendingIntent.getBroadcast(
             this, AlarmScheduler.SNOOZE_RC, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     val am = getSystemService(AlarmManager::class.java)
-    runCatching { am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi) }
-        .onFailure { runCatching { am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi) } }
+    AlarmSnooze.schedule(
+        exact = { type, at -> am.setExactAndAllowWhileIdle(type, at, pi) },
+        fallback = { type, at -> am.setAndAllowWhileIdle(type, at, pi) },
+    )
     finish()
   }
 
@@ -164,7 +164,7 @@ private fun AlarmRingScreen(label: String, preview: Boolean, previewTime: String
       Spacer(Modifier.height(40.dp))
       androidx.compose.foundation.layout.Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         ToolsButton("Dismiss", primary = true, onClick = onDismiss)
-        ToolsButton("Snooze 9 minutes", onClick = onSnooze)
+        ToolsButton("Snooze ${AlarmSnooze.MINUTES} minutes", onClick = onSnooze)
       }
     }
     }

@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // Public snooze counter fixtures never acquire UiAutomation or enter private diagnostics.
+        if (options.getString("command") == "alarmSnooze") {
+            val snooze = AlarmSnoozeDeviceChecks.run()
+            finish(if (snooze.getBoolean("alarmSnoozePassed")) 0 else 1, snooze)
+            return
+        }
         // Public clock-change fixtures never acquire UiAutomation or enter private diagnostics.
         if (options.getString("command") == "clockChangeAlarms") {
             val clock = ClockChangeAlarmsDeviceChecks.run(targetContext)
