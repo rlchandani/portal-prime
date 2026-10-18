@@ -87,15 +87,15 @@ object AlarmConfig {
    * testable: pass [from] to compute deterministically. */
   fun nextTrigger(c: Config, from: Calendar = Calendar.getInstance()): Long? {
     if (!c.enabled) return null
-    val cal = from.clone() as Calendar
-    cal.set(Calendar.SECOND, 0)
-    cal.set(Calendar.MILLISECOND, 0)
-    cal.set(Calendar.HOUR_OF_DAY, c.hour)
-    cal.set(Calendar.MINUTE, c.minute)
     // Search up to 8 days out for the next matching day-of-week (or one-shot).
     for (i in 0..7) {
-      val candidate = cal.clone() as Calendar
+      val candidate = from.clone() as Calendar
       candidate.add(Calendar.DAY_OF_YEAR, i)
+      // Resolve the chosen time on each date: today's DST gap must not shift later days.
+      candidate.set(Calendar.HOUR_OF_DAY, c.hour)
+      candidate.set(Calendar.MINUTE, c.minute)
+      candidate.set(Calendar.SECOND, 0)
+      candidate.set(Calendar.MILLISECOND, 0)
       if (candidate.timeInMillis <= from.timeInMillis) continue
       val dow = candidate.get(Calendar.DAY_OF_WEEK)
       if (c.days.isEmpty() || dow in c.days) return candidate.timeInMillis
