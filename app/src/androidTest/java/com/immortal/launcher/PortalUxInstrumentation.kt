@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // Public clock-change fixtures never acquire UiAutomation or enter private diagnostics.
+        if (options.getString("command") == "clockChangeAlarms") {
+            val clock = ClockChangeAlarmsDeviceChecks.run(targetContext)
+            finish(if (clock.getBoolean("clockChangeAlarmsPassed")) 0 else 1, clock)
+            return
+        }
         // Public alarm edit fixtures use RAM preferences and an injected counter scheduler.
         if (options.getString("command") == "toolsAlarmEdits") {
             val edits = ToolsAlarmEditsDeviceChecks.run()

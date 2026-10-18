@@ -171,7 +171,7 @@ internal fun AlarmContent() {
       }
       FooterNote(repeatNote)
 
-      val next = remember(config) {
+      val next = remember(config, ClockChangeAlarms.revision) {
         AlarmConfig.nextTrigger(config)
       }
       Text(

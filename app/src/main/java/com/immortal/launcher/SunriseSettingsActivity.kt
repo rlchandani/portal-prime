@@ -189,7 +189,7 @@ internal fun SunriseContent() {
         ToggleRow("Chime at the end", settings.chime, enabled = !applying) { apply("chime", it) }
       }
     }
-    val next = remember(settings) { SunriseConfig.nextTrigger(settings) }
+    val next = remember(settings, ClockChangeAlarms.revision) { SunriseConfig.nextTrigger(settings) }
     Text(if (next != null)
         "Next: " + java.text.SimpleDateFormat("EEE d MMM, HH:mm", java.util.Locale.getDefault())
             .format(java.util.Date(next)) else "Alarm is off.",

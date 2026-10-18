@@ -164,7 +164,7 @@ internal fun ToolsAlarmContent() {
             String.format(Locale.ROOT, "%02d:%02d", alarm.hour, alarm.minute),
             size = 120, centered = true,
             modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp))
-        val next = remember(alarm, paneActive) {
+        val next = remember(alarm, paneActive, ClockChangeAlarms.revision) {
           if (paneActive) AlarmConfig.nextTrigger(alarm) else null
         }
         ToolsText(
