@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         val result = Bundle()
+        // Public elapsed counters and read-only clock samples never enter private diagnostics.
+        if (options.getString("command") == "sleepElapsedTiming") {
+            val timing = SleepElapsedTimingDeviceChecks.run()
+            finish(if (timing.getBoolean("sleepElapsedTimingPassed")) 0 else 1, timing)
+            return
+        }
         // Public snooze counter fixtures never acquire UiAutomation or enter private diagnostics.
         if (options.getString("command") == "alarmSnooze") {
             val snooze = AlarmSnoozeDeviceChecks.run()

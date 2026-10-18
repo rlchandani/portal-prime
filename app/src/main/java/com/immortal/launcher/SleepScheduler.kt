@@ -60,7 +60,6 @@ object SleepScheduler {
   // How recently a real user wake (USER_PRESENT / a touch) must have happened for a redream landing
   // inside the dark window to be read as "the user woke the device" rather than a stray dream cycle
   // (issue #138). Covers the brief race where the dream-stop broadcast beats USER_PRESENT.
-  private const val USER_WAKE_GRACE_MS = 4000L
 
   // The renewable overnight "you have the device" session, owned here (was HomeActivity's Handler).
   // Lazy so loading this object (e.g. for the pure inWindow tests) doesn't touch the main Looper.
@@ -94,12 +93,12 @@ object SleepScheduler {
         c, rc, Intent(c, SleepReceiver::class.java).setAction(action), flags)
   }
 
-  private fun setAlarm(c: Context, atMs: Long, action: String, rc: Int) {
+  private fun setAlarm(c: Context, atMs: Long, action: String, rc: Int, alarmType: Int = AlarmManager.RTC_WAKEUP) {
     val p = pi(c, action, rc, create = true) ?: return
-    runCatching { alarms(c).setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atMs, p) }
+    runCatching { alarms(c).setExactAndAllowWhileIdle(alarmType, atMs, p) }
         .onFailure {
           // No exact-alarm permission: an inexact alarm is fine for these features.
-          runCatching { alarms(c).setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atMs, p) }
+          runCatching { alarms(c).setAndAllowWhileIdle(alarmType, atMs, p) }
         }
   }
 
@@ -114,8 +113,8 @@ object SleepScheduler {
     val cfg = ScreensaverConfig.load(context)
     if (!cfg.enabled || !cfg.idleSleepOn) return
     if (pi(context, ACTION_IDLE, RC_IDLE, create = false) != null) return // already counting
-    val at = System.currentTimeMillis() + cfg.idleSleepMin * 60_000L
-    setAlarm(context, at, ACTION_IDLE, RC_IDLE)
+    val at = SleepElapsedTiming.idleDeadline(cfg.idleSleepMin)
+    setAlarm(context, at, ACTION_IDLE, RC_IDLE, SleepElapsedTiming.IDLE_ALARM_TYPE)
     Log.i(TAG, "idle sleep armed for ${cfg.idleSleepMin} min")
   }
 
@@ -143,7 +142,7 @@ object SleepScheduler {
    * whose USER_PRESENT lands just after the dream-stop.
    */
   fun onInteraction(context: Context) {
-    lastUserWakeAt = System.currentTimeMillis()
+    lastUserWakeAt = SleepElapsedTiming.clockTime()
     if (nightSessionActive) {
       main.removeCallbacks(nightSessionElapsed)
       main.postDelayed(nightSessionElapsed, overnightSessionMs(context))
@@ -237,7 +236,7 @@ object SleepScheduler {
    *  - A *deliberate* dark-window wake must NOT be reblanked (issue #138). Every redream that
    *    reaches here is already `interactive` (that is what makes the verdict REDREAM), so
    *    interactivity alone can't tell a real wake from a stray cycle. [userWokeRecently] — a real
-   *    USER_PRESENT/touch within [USER_WAKE_GRACE_MS] — is the signal that distinguishes them, and
+   *    USER_PRESENT/touch within [SleepElapsedTiming.USER_WAKE_GRACE_MS] — is the signal that distinguishes them, and
    *    it means [LEAVE] (the caller then starts the renewable session).
    */
   internal fun classifyOvernightRedream(
@@ -277,8 +276,7 @@ object SleepScheduler {
    * relaunch (outside the window, or night-clock mode where the relaunch renders the clock).
    */
   fun handleRedreamDuringOvernight(context: Context): Boolean {
-    val userWokeRecently =
-        lastUserWakeAt > 0L && System.currentTimeMillis() - lastUserWakeAt in 0..USER_WAKE_GRACE_MS
+    val userWokeRecently = SleepElapsedTiming.recentlyWoken(lastUserWakeAt)
     val decision =
         classifyOvernightRedream(
             inWindow = isOvernightNow(context),
