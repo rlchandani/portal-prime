@@ -24,6 +24,15 @@ sealed interface MusicConfirmation {
         snapshot.track?.id?.let { it.isNotBlank() && it != previousId } == true
   }
 
+  /** Previous commonly restarts the same track after five seconds, without changing its ID. */
+  data class TrackOrRestart(val previousId: String, val priorPositionMs: Long) : MusicConfirmation {
+    override fun matches(snapshot: MusicPlayerSnapshot): Boolean {
+      val track = snapshot.track ?: return false
+      return track.id.isNotBlank() && (track.id != previousId ||
+          (priorPositionMs >= 5_000 && snapshot.positionMs in 0..2_000))
+    }
+  }
+
   data class TrackSelected(val id: String) : MusicConfirmation {
     override fun matches(snapshot: MusicPlayerSnapshot) = snapshot.track?.id == id
   }
@@ -37,8 +46,12 @@ sealed interface MusicConfirmation {
 
   data class Group(val groupId: String, val memberIds: Set<String>) : MusicConfirmation {
     init { require(groupId.isNotBlank() && memberIds.isNotEmpty()) }
-    override fun matches(snapshot: MusicPlayerSnapshot) =
-        snapshot.rooms.filter { it.groupId == groupId }.map { it.id }.toSet() == memberIds
+    override fun matches(snapshot: MusicPlayerSnapshot): Boolean {
+      val leader = snapshot.rooms.firstOrNull { it.id == groupId } ?: return false
+      if (leader.groupId != null && leader.groupId != groupId) return false
+      return snapshot.rooms.filter { it.id == groupId || it.groupId == groupId }
+          .map { it.id }.toSet() == memberIds
+    }
   }
 
   data class Volume(val roomId: String, val percent: Int) : MusicConfirmation {
@@ -59,12 +72,12 @@ class MusicPlayerStore {
   private var generation = 0L
   private var confirmation: MusicConfirmation? = null
 
-  @Synchronized fun selectSource(sourceId: String): Long {
+  @Synchronized fun selectSource(sourceId: String, presentationRevision: Long = 0): Long {
     generation += 1
     confirmation = null
     mutableState.value = MusicPlayerSnapshot(
         connection = if (sourceId.isBlank()) MusicConnection.NOT_CONFIGURED else MusicConnection.CONNECTING,
-        sourceId = sourceId)
+        sourceId = sourceId, presentationRevision = presentationRevision)
     return generation
   }
 

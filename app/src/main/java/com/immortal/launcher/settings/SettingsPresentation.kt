@@ -23,13 +23,16 @@ object SettingsPresentation {
       "immich.url", "immich.key", "immich.album", "smb.host", "smb.share", "smb.path",
       "smb.username", "smb.password", "dav.url", "dav.username", "dav.password", "web.url",
       "immortal.multiRoomEnabled", "immortal.snapcastHost", "immortal.maPort",
-      "immortal.maUsername", "immortal.maPassword", "mqtt.enabled", "mqtt.host", "mqtt.port",
+      "immortal.maUsername", "immortal.maPassword", "immortal.maApiToken", "immortal.maPlayerId",
+      "mqtt.enabled", "mqtt.host", "mqtt.port",
       "mqtt.username", "mqtt.password", "mqtt.useTls", "alpaca.key", "alpaca.secret",
       "options.type", "options.deltaMin", "options.deltaMax", "options.expiry", "options.symbol",
       "screensaver.albumRefreshMin", "screensaver.cacheBudgetGb", "screensaver.antiBurnIn",
       "mqtt.validateCert", "digitalclock.style", "digitalclock.color", "digitalclock.font",
       "digitalclock.glow", "debug.enabled", "ha.url", "ha.token")
   private val shortHelp = mapOf(
+      "immortal.maApiToken" to "API token preferred. Blank keeps the saved token; provider credentials stay on the server.",
+      "immortal.maPlayerId" to "Raw Music Assistant player_id, up to 256 printable characters; blank leaves selection unset.",
       "calendarpacks.romanian" to "Today’s name-days and Orthodox feasts.",
       "calendarpacks.irish" to "Bank holidays and saints’ days in Ireland.",
       "calendarpacks.prayer" to "Daily Islamic prayer times using the weather location.",

@@ -294,12 +294,16 @@ object MaMusicProtocol {
         volume = list.any { it.canSetVolume },
     )
     val rooms = list.map { p ->
-      val groupId = p.syncedTo?.takeIf { it != p.playerId }
+      val groupId = control.playerId.takeIf {
+        p.playerId != control.playerId && p.playerId in control.groupMembers
+      } ?: p.syncedTo?.takeIf { it != p.playerId }
           ?: p.activeGroup?.takeIf { it != p.playerId }
           ?: p.playerId.takeIf { p.groupMembers.any { member -> member != p.playerId } }
       MusicRoom("ma:${p.playerId}", p.name, p.available, p.volume, p.muted,
           groupId?.let { "ma:$it" }, p.canGroupWith.filter { it in byId }
-              .map { "ma:$it" }.toSet(), volumeControllable = p.canSetVolume)
+              .map { "ma:$it" }.toSet(), volumeControllable = p.canSetVolume,
+          removableFromGroup = p.playerId != control.playerId &&
+              p.playerId in control.groupMembers && p.playerId !in control.staticGroupMembers)
     }
     val state = if (queueOwnsPlayback) q!!.playback else control.playback
     val reportedPosition = if (queueOwnsPlayback) q!!.elapsedMs else control.elapsedMs
@@ -317,6 +321,7 @@ object MaMusicProtocol {
           else entry.item
         } ?: emptyList() else emptyList(),
         rooms = rooms,
+        controlPlayerId = "ma:${control.playerId}",
     )
     return Selection(snapshot, q?.queueId, control, list,
         if (queueOwnsPlayback) page?.items?.filter { it.available }?.map { it.item.id }?.toSet()
@@ -505,7 +510,7 @@ object MaMusicProtocol {
     image?.text("proxy_id", MAX_ID)
     val remote = image?.boolean("remotely_accessible", false) == true
     val art = if (remote) safeUrl(path) else ""
-    return QueueEntry(queueId, MusicQueueItem(id, title, artists, duration, art), available, type, album)
+    return QueueEntry(queueId, MusicQueueItem(id, title, artists, duration, art, available = available), available, type, album)
   }
 
   private fun playback(value: String): PlaybackState = when (value) {

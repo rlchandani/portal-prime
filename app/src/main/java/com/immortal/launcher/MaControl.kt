@@ -20,18 +20,18 @@ import org.json.JSONObject
  * [MultiRoomService]) because MA's Snapcast stream is `canPlay=false` — the snapserver
  * can't drive playback, only MA's own API can.
  *
- * Authentication is optional — MA only requires it when its "users" feature is turned on. When
- * a username/password are set we `auth/login` to get a token, then `auth {token}` to authorize
- * the socket, then `players/cmd/<cmd>`; the token is cached in memory and we re-login on failure.
- * With no credentials we leave the socket unauthenticated, which a stock MA server accepts. The
- * player to target is resolved from `players/all` by matching our Snapcast client id/name, then
- * routed to its sync group if it's part of one. The MA API port is configurable
- * ([ImmortalSettings.maPort], default 8095).
+ * Every socket requires the configured Music Assistant API token and an explicit correlated
+ * authenticated:true reply. Legacy username/password login is unsupported until its pinned
+ * response contract is verified; no minted token or auth-success cache crosses endpoints.
+ * Provider credentials (including Google cookies) remain on Music Assistant. The raw LAN
+ * WebSocket transport requires a trusted network and rejects HTTPS/WSS URLs.
+ * The player is still resolved from players/all by Snapcast client id/name and routed to its
+ * sync group. The MA API port is configurable ([ImmortalSettings.maPort], default 8095).
  */
 object MaControl {
   private const val TAG = "ImmortalNowPlaying"
 
-  @Volatile private var token: String? = null
+  private val authentication = MaLegacyAuth()
   @Volatile private var cachedPlayerId: String? = null
   private val exec = Executors.newSingleThreadExecutor()
   private val main = Handler(Looper.getMainLooper())
@@ -39,42 +39,38 @@ object MaControl {
   private fun authStatus(s: String) = main.post { MultiRoomStatus.maAuth = s }
 
   /**
-   * Test the MA connection and report the result to the settings screen. With credentials it tests
-   * the login; with none it just confirms MA is reachable (a stock server needs no login).
+   * Test the configured API token. Reachability or a login-shaped reply alone cannot start
+   * the relay; authorization must explicitly confirm authenticated:true.
    */
   fun testLogin(context: Context) {
     val host = ImmortalSettings.snapcastHost(context)
     val port = ImmortalSettings.maPort(context)
+    val apiToken = ImmortalSettings.maApiToken(context)
     val user = ImmortalSettings.maUser(context)
     val pass = ImmortalSettings.maPass(context)
     if (host.isBlank()) {
       authStatus("Set the server address first")
       return
     }
-    authStatus(if (user.isBlank() || pass.isBlank()) "Connecting…" else "Signing in…")
+    authentication.configurationFailure(apiToken, user, pass)?.let {
+      authStatus(it.problem)
+      return
+    }
+    authStatus("Authenticating…")
     exec.execute {
       val ws = MaWebSocket(host, port)
-      if (!runCatching { ws.connect() }.getOrDefault(false)) {
-        authStatus("Can't reach Music Assistant at $host:$port")
-        return@execute
-      }
       try {
-        ws.readText()
-        val ok =
-            if (user.isBlank() || pass.isBlank()) {
-              // No credentials: confirm reachability only — MA's login is optional.
-              authStatus("Connected to Music Assistant — no login needed ✓")
-              true
-            } else {
-              token = null // force a fresh login so we actually test the typed credentials
-              val signedIn = authorize(ws, user, pass)
-              authStatus(if (signedIn) "Signed in to Music Assistant ✓" else "Invalid username or password")
-              signedIn
-            }
-        // A successful test is the last piece of setup, so kick the relay now that the config is
-        // complete — same as the Apply button. Without this the service stays as it was (often
-        // stuck "Connecting…") until the app is restarted.
-        if (ok) main.post { MultiRoomService.sync(context.applicationContext) }
+        if (!ws.connect()) {
+          authStatus("Can't reach Music Assistant")
+          return@execute
+        }
+        ws.readText() // server hello is not authorization
+        if (authorize(ws, apiToken, user, pass)) {
+          authStatus("Authenticated with Music Assistant ✓")
+          main.post { MultiRoomService.sync(context.applicationContext) }
+        }
+      } catch (_: Exception) {
+        authStatus("Can't reach Music Assistant")
       } finally {
         ws.close()
       }
@@ -98,17 +94,22 @@ object MaControl {
     val port = ImmortalSettings.maPort(context)
     val user = ImmortalSettings.maUser(context)
     val pass = ImmortalSettings.maPass(context)
+    val apiToken = ImmortalSettings.maApiToken(context)
     if (host.isBlank()) return idle
+    authentication.configurationFailure(apiToken, user, pass)?.let {
+      authStatus(it.problem)
+      return idle
+    }
     val ws = MaWebSocket(host, port)
     if (!runCatching { ws.connect() }.getOrDefault(false)) return idle
     return try {
       ws.readText() // server hello
-      if (!authorize(ws, user, pass)) return idle
+      if (!authorize(ws, apiToken, user, pass)) return idle
       send(ws, "players/all", null)
       val r = await(ws, "players/all") ?: return idle
       parseNowPlaying(r, clientId, clientName)
-    } catch (t: Throwable) {
-      Log.w(TAG, "MA now-playing failed: ${t.message}")
+    } catch (_: Exception) {
+      Log.w(TAG, "MA now-playing failed")
       idle
     } finally {
       ws.close()
@@ -164,19 +165,25 @@ object MaControl {
     val port = ImmortalSettings.maPort(context)
     val user = ImmortalSettings.maUser(context)
     val pass = ImmortalSettings.maPass(context)
+    val apiToken = ImmortalSettings.maApiToken(context)
     if (host.isBlank()) {
       Log.w(TAG, "MA control: not configured (need a server address)")
       return
     }
+    authentication.configurationFailure(apiToken, user, pass)?.let {
+      authStatus(it.problem)
+      return
+    }
     exec.execute {
-      runCatching { send(host, port, user, pass, cmd, clientId, clientName) }
-          .onFailure { Log.w(TAG, "MA command '$cmd' failed: ${it.message}") }
+      runCatching { send(host, port, apiToken, user, pass, cmd, clientId, clientName) }
+          .onFailure { Log.w(TAG, "MA command failed") }
     }
   }
 
   private fun send(
       host: String,
       port: Int,
+      apiToken: String,
       user: String,
       pass: String,
       cmd: String,
@@ -185,64 +192,36 @@ object MaControl {
   ) {
     val ws = MaWebSocket(host, port)
     if (!ws.connect()) {
-      Log.w(TAG, "MA WS connect failed ($host:$port)")
+      Log.w(TAG, "MA WS connect failed")
       return
     }
     try {
       ws.readText() // server hello
-      if (!authorize(ws, user, pass)) return
+      if (!authorize(ws, apiToken, user, pass)) return
       val target = resolvePlayer(ws, clientId, clientName) ?: return
       send(ws, "players/cmd/$cmd", JSONObject().put("player_id", target))
       val ack = await(ws, "players/cmd/$cmd")
-      Log.i(TAG, "MA '$cmd' → player=$target ack=${ack?.take(160)}")
+      val acknowledged = ack?.let {
+        MaMusicProtocol.parseCommandReply(it, "players/cmd/$cmd") is MaMusicProtocol.Reply.Success
+      } == true
+      Log.i(TAG, if (acknowledged) "MA transport acknowledged" else "MA transport not acknowledged")
     } finally {
       ws.close()
     }
   }
 
-  /**
-   * Authorize the socket: reuse a cached token, else log in to mint one. With no credentials this
-   * is a no-op success — MA's login is optional, and a stock server accepts an unauthenticated
-   * socket.
-   */
-  private fun authorize(ws: MaWebSocket, user: String, pass: String): Boolean {
-    if (user.isBlank() || pass.isBlank()) return true
-    token?.let { t ->
-      send(ws, "auth", JSONObject().put("token", t).put("device_name", DEVICE))
-      val r = await(ws, "auth")
-      if (r != null && !r.contains("error_code")) return true
-      Log.i(TAG, "MA token rejected, re-logging in")
-      token = null
+  /** Authorize this socket using the configured API token and the strict pure auth helper. */
+  private fun authorize(ws: MaWebSocket, apiToken: String, user: String, pass: String): Boolean {
+    return when (val reply = authentication.authorize(apiToken, user, pass) { request ->
+      ws.sendText(request.toString())
+      await(ws, request.getString("message_id"))
+    }) {
+      is MaMusicProtocol.Reply.Success -> true
+      is MaMusicProtocol.Reply.Failure -> {
+        authStatus(reply.problem)
+        false
+      }
     }
-    send(ws, "auth/login", JSONObject().put("username", user).put("password", pass).put("device_name", DEVICE))
-    val r = await(ws, "auth/login")
-    if (r == null) {
-      Log.w(TAG, "MA login: no response")
-      return false
-    }
-    val result = JSONObject(r).optJSONObject("result")
-    if (result?.optBoolean("success", false) != true) {
-      val err = result?.optString("error").orEmpty()
-      Log.w(TAG, "MA login rejected: ${r.take(200)}")
-      authStatus(err.ifBlank { "Invalid username or password" })
-      return false
-    }
-    // The server returns the JWT as `access_token` (older builds used `token`).
-    val tok =
-        result.optString("access_token").takeIf { it.isNotBlank() }
-            ?: result.optString("token").takeIf { it.isNotBlank() }
-    if (tok == null) {
-      Log.w(TAG, "MA login ok but no token field: ${r.take(120)}")
-      authStatus("Signed in, but no token received")
-      return false
-    }
-    token = tok
-    // The app follows login with an explicit authorize; mirror it so the socket is live.
-    send(ws, "auth", JSONObject().put("token", tok).put("device_name", DEVICE))
-    await(ws, "auth")
-    Log.i(TAG, "MA authorized")
-    authStatus("Signed in to Music Assistant ✓")
-    return true
   }
 
   /** Find our player via players/all and return the id to command (its group if synced). */
@@ -255,13 +234,10 @@ object MaControl {
       val p = arr.getJSONObject(i)
       val pid = p.optString("player_id")
       val name = p.optString("display_name")
-      Log.i(
-          TAG,
-          "MA player: id=$pid name='$name' prov=${p.optString("provider")} state=${p.optString("state")} synced_to=${p.optString("synced_to")} active_group=${p.optString("active_group")}")
       if ((clientId != null && pid == clientId) || (clientName != null && name == clientName)) ours = p
     }
     if (ours == null) {
-      Log.w(TAG, "MA: no player matched our snapclient (id=$clientId name=$clientName)")
+      Log.w(TAG, "MA: no player matched our snapclient")
       return null
     }
     // Command the sync group / leader if this player is part of one, else itself.
@@ -279,7 +255,7 @@ object MaControl {
     ws.sendText(o.toString())
   }
 
-  /** Read messages until one matches [messageId] (our message_ids equal the command). */
+  /** Correlate the reply: auth uses unique IDs; legacy player requests use the command name. */
   private fun await(ws: MaWebSocket, messageId: String): String? {
     repeat(60) {
       val t = ws.readText() ?: return null
@@ -287,6 +263,4 @@ object MaControl {
     }
     return null
   }
-
-  private const val DEVICE = "Immortal"
 }

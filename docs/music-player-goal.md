@@ -14,7 +14,7 @@ The initial goal registration was rejected because the older UX goal was unfinis
 
 One native Immortal music experience: full player, compact player and photos beside music; real queue selection, optional lyrics and source-qualified room controls; settings and phone/browser management parity. Preserve the existing audio and photo foundations and accepted navigation behavior.
 
-Music Assistant is not installed. The user chose YouTube Music as the provider and requested help choosing the server host. Synology is the first recommendation, conditional on model, Container Manager support and spare RAM. Premium/account eligibility and the Home Assistant host have been requested. YouTube Music is a server-side provider: Google cookie/token material must not enter the Portal app or chat. Suitable server/provider setup and real Family Area playback remain dependencies.
+YouTube Music Premium and Home Assistant on Synology are confirmed. The existing host was inspected through its signed-in UI: Home Assistant OS 18.3, Core/Supervisor 2026.10.2. Stable Music Assistant 2.10.7 is installed and its app reports Running. The host choice is the existing Home Assistant OS app system. YouTube Music cookie/PO-token setup, player setup and actual playback remain pending; Google cookie/token material stays server-side and must not enter the Portal app or chat.
 
 ## Completion gates
 
@@ -22,14 +22,14 @@ Music Assistant is not installed. The user chose YouTube Music as the provider a
 |---|---|---|
 | Clean baseline | Debug unit tests pass | 2,969 tests, 0 failures/errors/skips across 318 suites |
 | Native functionality | Real play/pause/skip/seek, queue selection and supported room changes; radio/local unsupported controls absent | Pending |
-| Lifecycle | 30 full/compact/photo-return cycles preserve player/track and do not create duplicate audio sessions or listeners | Pending |
+| Lifecycle | 30 full/compact/photo-return cycles preserve player/track and do not create duplicate audio sessions or listeners | Setup-only 30 cycles passed; 43 → 43 threads. Live session/socket gate pending |
 | Interruptions | Meta Calls/voice release audio correctly; user-paused playback never resumes automatically | Pending |
 | Input response | p95 visible feedback ≤100 ms over at least 30 commands | Target; unmeasured |
 | Server response | p95 server-confirmed command ≤500 ms on a healthy LAN; failures reported separately | Target; unmeasured |
-| Frame quality | Record frame timing/jank for repeated warm open/minimize/photo-return; target janky frames ≤5%, no blank flashes or theme jumps | Target; unmeasured |
+| Frame quality | Record frame timing/jank for repeated warm open/minimize/photo-return; target janky frames ≤5%, no blank flashes or theme jumps | Failed: baseline 14.25% / p95 57 ms; candidate 20.47% / p95 73 ms. Investigation parked at 30-minute limit |
 | Memory | Artwork network reads bounded at 8 MiB; sampled decode; bitmap cache ≤16 MiB; no listener/connection growth across reconnects | Pending |
 | UI quality | Compare with approved mock at Portal dimensions, light/dark, setup/idle/offline/busy/radio/no-lyrics and long metadata; controls clear the dock | Pending |
-| Settings/remote | Registry-backed scalar settings, no direct preference writes from UI/routes; phone/browser parity | Pending |
+| Settings/remote | Registry-backed scalar settings, no direct preference writes from UI/routes; phone/browser parity | Registry/native/PWA implemented and tested; separate Android companion exposure pending |
 | Verification | Relevant JVM tests, debug assembly, real Family Area playback, reconnect and interruption evidence; independent branch review | Pending |
 | Rollout | Signed accepted artifact; Family first, Living after final validation; rollback retained | Pending |
 
@@ -42,7 +42,7 @@ Each unresolved investigation/fix is limited to 30 minutes including cleanup. Re
 - Isolated workspace created; new branch based on accepted source.
 - Baseline `:app:testDebugUnitTest --no-daemon`: BUILD SUCCESSFUL, 2,969/2,969 tests passed.
 - Prior device-test PIDs no longer exist; exact earlier preference restoration remains unverified. This does not prove earlier preference restoration; subsequent music UI installation is recorded below.
-- Server host question pending; no server/account/provider installation performed.
+- Initial checkpoint: server host was unresolved; no installation had been performed at that point. The current host/setup outcome is recorded below.
 
 - Task 1 state contract: 10 new tests RED → GREEN, 0 failures; no native/UI/playback verification implied.
 - Task 2 artwork: 38 JVM cases observed RED for the missing policy; implementation delegated with disjoint writes.
@@ -71,3 +71,34 @@ Each unresolved investigation/fix is limited to 30 minutes including cleanup. Re
 - Native command latency, jank, playback, two-room audio, authenticated reconnection and 30 live layout cycles remain unmeasured. Bounded artwork tests do not prove runtime memory growth. Larger cached-cover reuse is deferred unless a measured issue warrants it.
 - Authenticated persistent MA client and registry/native connection fields are now being implemented in disjoint worker scopes.
 - Current authoritative YouTube provider page: https://www.music-assistant.io/music-providers/youtube-music/ — Premium required, cookie/PO-token setup, no lyrics from this provider, unofficial/best-effort integration. Validate the PO-token version against the actual deployed MA release; do not blindly use a stale documentation version.
+
+### Integrated connection/browser checkpoint (October 18, late evening)
+
+- Persistent MA client, configured API token/selected player, registry-backed fields and native connection UI compile. Legacy MA transport now also requires authenticated token replies. Username/password token minting is unsupported. The later token-only presentation checkpoint below removes these legacy fields from the active UI without erasing saved values.
+- One retained music controller is shared across native layouts and authenticated browser reads. UI owners and a renewable remote lease govern its connection; reads capture immutable state on Main and serialize JSON on the HTTP worker.
+- `/remote/music` and `/remote/music/command` use the existing paired/fleet auth boundary. Explicit command key/type validation binds source revision, track and group leader. A 202 response means admitted, not confirmed; timed-out mutations report unknown admission and require readback without automatic replay.
+- Two scoped independent review findings were fixed and rechecked: settings/source reconciliation at command admission, and uncertain timeout semantics.
+- Latest complete JVM gate: **3,199 tests / 335 suites, 0 failures/errors/skips**; debug assembly succeeded. Permanent browser command tests cover 15 meaningful scenarios. Parent full JavaScript/browser results and final artifact are recorded at the next checkpoint.
+- Actual Family HTTP check: unauthenticated GET 401; authenticated GET 200 (16.05 ms for one setup-state read); intentionally stale command 409; malformed command 400. Both writes were rejected. This is not command latency, authenticated MA playback or queue/group proof.
+- Family installed artifact for the performance repeat: SHA-256 `ac35391ca7096e567d2e1bfeabb0a8d708ad429229ec2b5ca451e1c0913e7f30`. This is a development checkpoint, not a passed final performance release.
+- Thirty setup-only full/compact/photos cycles completed in 103.84 s with actual local photos. Candidate: 928 frames, 190 janky (20.47%), p95 73 ms, p99 121 ms; threads 43 → 43, PSS 271,841 → 210,031 KiB. Earlier baseline: 1,326 frames, 189 janky (14.25%), p95 57 ms, p99 109 ms; threads 38 → 37. Multiple integrated runtime changes differ between builds, so this does not isolate retention as a cause. **No frame improvement is claimed.** No MA/audio session was active.
+- Photo retention is functionally checked but not accepted as a performance improvement. The issue's 30-minute limit included cleanup; returned to Home and verified the secure screensaver component matched the precheck. No further investigation was performed in that issue window.
+- Private local receipts/screenshots live under `/private/tmp/portal-music-native-check/`; private photos and account material are not committed.
+- Remaining: source/provider authentication, actual Portal speaker connection/playback, server-confirmed commands/reconnects, Calls/voice behavior, full independent branch review, performance targets, native companion exposure where required, and Living rollout. Goal remains active.
+
+### Current code and server checkpoint (October 18, 23:20 Pacific)
+
+- Complete Android gate: **3,209 tests / 336 suites, 0 failures/errors/skips**, `assembleDebug` passed. Full JavaScript gate: **733 passed / 736 total, 0 failed, 3 opt-in fixtures skipped**. The opt-in music Chrome fixture was separately run and passed at 360/402/600 px in light/dark. It uses synthetic state; it is not audible playback proof. Packaged remote JS/CSS exactly match checked source.
+- Two native review findings repaired: callbacks capture an ordinary immutable rendered snapshot and its connection revision, so stale taps cannot silently retarget a new track/session/leader or turn shown Pause into Play; keyed AndroidView ownership recreates the photo view when its controller changes. Ten new native observation tests pass. Independent scoped source recheck: no remaining actionable findings in these repairs, token-only settings or MQTT focus chaining. A full live interruption/branch acceptance review is still pending.
+- Active connection UI requires an API token; old username/password values remain persisted but their inactive rows are hidden. No Google-provider credential enters Immortal. One compile failure caught an accidental MQTT focus-declaration removal; declarations were restored and the complete gate passed.
+- Existing NAS-hosted HAOS inspected without requiring its model. Stable MA **2.10.7 / schema 65** runs on the confirmed LAN host. Built-in Snapserver **0.34.0** runs with initial FLAC/default buffering and 25% client volume.
+- Family Area stock Snapcast client installed, configured and started. Real JSON-RPC status reports **one connected Portal+ client** at the Family LAN address and 25% volume. No track was played. This is transport connectivity proof only.
+- A named `Family-Area-Immortal` MA integration token was created through the existing signed-in UI and transferred in memory directly to Family's authenticated registry with host/port/master audio switch. The token was not printed or written to an agent file. Google cookies were not obtained. Provider authentication remains pending; the authoritative Family MA player was subsequently selected and its connection verified.
+- Closed only the three research Chrome tabs; the user's original two tabs remain. Returned Family to Home; screensaver component matches the precheck. Server setup ended at its bounded checkpoint rather than expanding into source-login investigation.
+- Verified development APK: SHA-256 **97966df1a7ab99c7da5ea9d985aad293bca71617ea39b3f495bf580196ee10be**. Installation evidence is in the private local receipt; this does not signify final performance acceptance. Rollback APK remains retained.
+- Open gates: YouTube Music cookie/PO-token source setup, live queue/command API behavior and audible playback, real queue/group actions, reconnect/Calls/voice behavior, runtime artwork/socket bounds, latency and the failed frame-quality target, Android companion exposure and Living rollout. Goal remains active; no final release or Living installation is claimed.
+
+
+### Live MA API checkpoint
+
+The actual saved integration token authenticated successfully with MA. `players/all` returned available players; the unique Snapcast player matching Family's connected client ID/IP was selected through the existing registry. Immortal's real `/remote/music` state changed **connecting → ready**, with **0 queue entries / 10 discovered rooms / no problem**. Native connected-idle inspection is recorded in private local artifacts. No play/queue/group mutation was sent; this does not establish YouTube authorization, audible output or latency/performance acceptance. Initial standalone probe used numeric IDs and received no correlated reply; switching it to the string IDs already used by the production client produced the verified response. No production protocol change or token output was required.

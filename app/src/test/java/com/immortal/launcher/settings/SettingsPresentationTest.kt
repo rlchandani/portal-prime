@@ -22,6 +22,8 @@ class SettingsPresentationTest {
   @Test fun technicalControlsAreClassifiedWithoutHidingEverydayPermissions() {
     assertTrue(SettingsPresentation.isAdvanced("screensaver", "cacheEnabled"))
     assertTrue(SettingsPresentation.isAdvanced("immortal", "maPassword"))
+    assertTrue(SettingsPresentation.isAdvanced("immortal", "maApiToken"))
+    assertTrue(SettingsPresentation.isAdvanced("immortal", "maPlayerId"))
     assertTrue(SettingsPresentation.isAdvancedPage("smb"))
     assertFalse(SettingsPresentation.isAdvancedPage("system"))
     assertFalse(SettingsPresentation.isAdvanced("screensaver", "pauseAudioOnSleep"))
@@ -31,12 +33,15 @@ class SettingsPresentationTest {
   @Test fun hidingAdvancedDoesNotChangeStoredConfiguration() {
     val configured = ImmortalSettings.Settings(
         advancedSettings = true, multiRoomEnabled = true, snapcastHost = "test.local",
-        maUsername = "test", maPassword = "test-password")
+        maUsername = "test", maPassword = "test-password",
+        maApiToken = "test-api-token", maPlayerId = "snapcast:raw-player")
     val simple = configured.copy(advancedSettings = false)
     assertTrue(simple.multiRoomEnabled)
     assertEquals(configured.snapcastHost, simple.snapcastHost)
     assertEquals(configured.maUsername, simple.maUsername)
     assertEquals(configured.maPassword, simple.maPassword)
+    assertEquals(configured.maApiToken, simple.maApiToken)
+    assertEquals(configured.maPlayerId, simple.maPlayerId)
     assertEquals(SettingsDomains.immortal.flatJson(configured).get("maPassword"),
         SettingsDomains.immortal.flatJson(simple).get("maPassword"))
   }

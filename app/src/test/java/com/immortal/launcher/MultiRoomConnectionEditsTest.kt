@@ -10,12 +10,14 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class MultiRoomConnectionEditsTest {
-    private val baseline = MultiRoomConnectionValues("server", 8095, "user", "secret")
+    private val baseline = MultiRoomConnectionValues("server", 8095, "user", "secret",
+        "test-api-token", "snapcast:raw-player")
     private fun values(v: MultiRoomConnectionValues): Map<String, Any> = mapOf(
         "snapcastHost" to v.host, "maPort" to v.port,
-        "maUsername" to v.username, "maPassword" to v.password)
+        "maUsername" to v.username, "maPassword" to v.password,
+        "maApiToken" to v.apiToken, "maPlayerId" to v.playerId)
     private fun edits(draft: MultiRoomConnectionValues) = baseline.editedValues(
-        draft.host, draft.port, draft.username, draft.password)
+        draft.host, draft.port, draft.username, draft.password, draft.apiToken, draft.playerId)
 
     @Test fun hostEditPreservesNewerCompanionPortAndCredentials() {
         val current = baseline.copy(port = 9095, username = "remote", password = "remote-secret")
@@ -45,8 +47,25 @@ class MultiRoomConnectionEditsTest {
         assertEquals(mapOf("maPassword" to " secret "), edits(baseline.copy(password = " secret ")))
     }
     @Test fun explicitEditsCanChangeAllConnectionFieldsWithoutOtherSettings() {
-        val draft = MultiRoomConnectionValues("new-server", 1, "new-user", "new-secret")
+        val draft = MultiRoomConnectionValues("new-server", 1, "new-user", "new-secret",
+            "new-test-token", "snapcast:new-player")
         assertEquals(values(draft), edits(draft))
+    }
+    @Test fun blankSecretDraftsDoNotSubmitClearsOrStaleSecrets() {
+        assertEquals(mapOf("snapcastHost" to "new-server"),
+            edits(baseline.copy(host = "new-server", password = "", apiToken = "")))
+        assertTrue(edits(baseline.copy(password = "   ", apiToken = "\t")).isEmpty())
+    }
+    @Test fun tokenEditPreservesNewerRemotePlayerAndLegacyCredentials() {
+        val current = baseline.copy(playerId = "snapcast:remote-player", username = "remote",
+            password = "remote-secret")
+        val saved = values(current) + edits(baseline.copy(apiToken = "new-test-token"))
+        assertEquals(values(current.copy(apiToken = "new-test-token")), saved)
+    }
+    @Test fun rawPlayerIdIsNotNormalizedAndCanBeExplicitlyCleared() {
+        assertEquals(mapOf("maPlayerId" to "snapcast:Case-Sensitive/Raw_ID"),
+            edits(baseline.copy(playerId = "snapcast:Case-Sensitive/Raw_ID")))
+        assertEquals(mapOf("maPlayerId" to ""), edits(baseline.copy(playerId = "")))
     }
     @Test fun readbackBaselinePreventsTheNextApplyFromResubmittingEarlierEdits() {
         val saved = baseline.copy(host = "new-server", port = 9095, password = "remote-secret")

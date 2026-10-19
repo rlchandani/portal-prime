@@ -746,6 +746,82 @@ input[type='checkbox'] {
   font-size: 13px;
   margin-top: 10px;
 }
+.music-sheet {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.music-sheet .media-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--variant);
+}
+.music-sheet .media-controls .music-transport {
+  min-width: 48px;
+  min-height: 54px;
+  padding: 12px;
+  border-radius: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+}
+.music-sheet .media-controls .music-transport:last-child {
+  border-right: 0;
+}
+.music-sheet .segmented button,
+.music-sheet input[type='range'],
+.music-sheet .music-queue-row {
+  min-height: 48px;
+}
+.music-sheet .segmented {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.music-status {
+  margin: 0;
+}
+.music-list {
+  min-width: 0;
+}
+.music-queue-row {
+  gap: 12px;
+}
+.music-queue-row > .detail {
+  flex: none;
+}
+.music-player-row {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.music-player-row:first-child {
+  padding-top: 0;
+}
+.music-player-row:last-child {
+  border-bottom: 0;
+}
+.music-player-row > .detail {
+  margin: 4px 0 12px;
+}
+.music-player-row .actions {
+  gap: 8px;
+}
+.music-player-row .button {
+  flex: 1 1 auto;
+}
+.music-player-row .volume-row output {
+  min-width: 4ch;
+  text-align: end;
+}
+.music-lyric {
+  margin: 0;
+  padding: 8px 0;
+  white-space: pre-wrap;
+}
 .photo-actions {
   display: grid;
   gap: 10px;

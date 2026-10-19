@@ -41,7 +41,8 @@ internal fun approvedPageForControl(domain: String, key: String): String? = when
         "advancedSettings" -> "advanced"
         "settingsTheme", "tileSize", "showMiniPlayer", "hideStatusBar", "clockFormat" -> "appearance"
         "weatherUnit", "weatherWidget" -> "weather"
-        "multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword" -> "multiroom"
+        "multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword",
+        "maApiToken", "maPlayerId" -> "multiroom"
         else -> null
     }
     "screensaver" -> when (key) {
@@ -178,6 +179,8 @@ internal fun approvedSettingsPrerequisite(context: Context, control: String): St
             else "Choose a shared album source to change its refresh interval."
     if (spec.visibleWhen(context, domain.load(context))) return null
     return when {
+        domainId == "immortal" && key in setOf("snapcastHost", "maPort", "maUsername", "maPassword",
+            "maApiToken", "maPlayerId") -> "Turn on multi-room audio to edit the Music Assistant connection."
         domainId == "calendar" -> "Add a calendar feed and turn on Show on screensaver to see these options."
         domainId == "digitalclock" -> "Turn on the digital clock to see this setting."
         key == "cacheEnabled" -> "Connect an Immich or WebDAV photo source to see cache settings."

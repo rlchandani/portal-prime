@@ -641,13 +641,34 @@ object SettingsDomains {
                       "Music Assistant user",
                       get = { it.maUsername },
                       set = ImmortalSettings::setMaUsername,
-                      visible = { _, s -> s.multiRoomEnabled }),
+                      visible = { _, _ -> false }),
                   StringSpec(
                       "maPassword",
                       "Music Assistant password",
                       get = { it.maPassword },
                       set = ImmortalSettings::setMaPassword,
                       secret = true,
+                      visible = { _, _ -> false }),
+                  StringSpec(
+                      "maApiToken",
+                      "Music Assistant API token",
+                      get = { it.maApiToken },
+                      set = ImmortalSettings::setMaApiToken,
+                      secret = true,
+                      applyWhen = { it.length <= 4096 && it.isNotEmpty() && it.all { ch -> ch in '!'..'~' } },
+                      help = "API tokens are required for this Music Assistant connection. Enter up to " +
+                          "4096 printable ASCII characters without spaces. Leave blank to keep the saved token. " +
+                          "YouTube and other music-provider credentials stay on your Music Assistant server.",
+                      visible = { _, s -> s.multiRoomEnabled }),
+                  StringSpec(
+                      "maPlayerId",
+                      "Music Assistant player ID",
+                      get = { it.maPlayerId },
+                      set = ImmortalSettings::setMaPlayerId,
+                      applyWhen = { it.isEmpty() || (it.length <= 256 && it.isNotBlank() &&
+                          it.all { ch -> ch in ' '..'~' }) },
+                      help = "Use the raw Music Assistant player_id, not its display name. Enter up to " +
+                          "256 printable ASCII characters, or leave blank for no explicit player selection.",
                       visible = { _, s -> s.multiRoomEnabled }),
               ),
           sections =
@@ -662,11 +683,14 @@ object SettingsDomains {
                   "snapcastHost" to "Audio",
                   "maPort" to "Audio",
                   "maUsername" to "Audio",
-                  "maPassword" to "Audio"),
+                  "maPassword" to "Audio",
+                  "maApiToken" to "Audio",
+                  "maPlayerId" to "Audio"),
           defaults = { ImmortalSettings.Settings() },
           onApplied = { c, keys ->
             if ("hideStatusBar" in keys) SettingsGuard.applyStatusBar(c)
-            if (keys.any { it in setOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword") })
+            if (keys.any { it in setOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword",
+                    "maApiToken", "maPlayerId") })
                 MultiRoomService.sync(c)
           },
       )

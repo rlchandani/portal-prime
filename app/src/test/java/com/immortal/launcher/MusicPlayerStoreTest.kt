@@ -59,6 +59,15 @@ class MusicPlayerStoreTest {
     assertNull(store.current.pending)
   }
 
+  @Test fun removingLastFollowerConfirmsTheRemainingStandaloneLeader() {
+    val confirmation = MusicConfirmation.Group("ma:family", setOf("ma:family"))
+    assertTrue(confirmation.matches(ready().copy(rooms = listOf(
+        MusicRoom("ma:family", "Family", true), MusicRoom("ma:living", "Living", true)))))
+    assertFalse(confirmation.matches(ready().copy(rooms = listOf(
+        MusicRoom("ma:family", "Family", true, groupId = "ma:other")))))
+    assertFalse(confirmation.matches(ready().copy(rooms = emptyList())))
+  }
+
   @Test fun pendingChangeRejectsDuplicateCommandsAndStaleFailures() {
     val store = MusicPlayerStore()
     val generation = store.selectSource("ma:family")

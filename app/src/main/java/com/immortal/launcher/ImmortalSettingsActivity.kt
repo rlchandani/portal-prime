@@ -1009,17 +1009,14 @@ private fun screensaverSourcePath(s: ScreensaverConfig.Settings): String = when 
 }
 
 /**
- * The Multi-room audio subpage: surface the Snapcast
- * group's track on the now-playing card and device media controls, with play/pause/skip
- * forwarded to Music Assistant. The in-launcher relay reads the snapserver for metadata;
- * the MA login is needed only to send transport. Back returns to the main settings page.
+ * Music Assistant connection and the Snapcast now-playing relay. Credentials and the raw player
+ * identity are applied through the same registry as the phone remote. Back returns to settings.
  */
-/** A numbered step in the multi-room setup guide. */
 @Composable
 internal fun MultiRoomScreen(onBack: () -> Unit) {
   SettingsScaffold(
       title = "Multi-room audio",
-      subtitle = "Show the Snapcast group's track on the now-playing card, with play/pause/skip.",
+      subtitle = "Connect the native music player and Snapcast now-playing to Music Assistant.",
       onBack = onBack,
   ) { MultiRoomContent() }
 }
@@ -1035,8 +1032,9 @@ internal fun MultiRoomContent() {
   var enabled by remember(context) { mutableStateOf(baseline.multiRoomEnabled) }
   var host by remember(context) { mutableStateOf(baseline.snapcastHost) }
   var maPort by remember(context) { mutableStateOf(baseline.maPort.toString()) }
-  var maUser by remember(context) { mutableStateOf(baseline.maUsername) }
-  var maPass by remember(context) { mutableStateOf(baseline.maPassword) }
+  // Saved tokens are never copied into the editable field; blank means keep the saved secret.
+  var maToken by remember(context) { mutableStateOf("") }
+  var maPlayer by remember(context) { mutableStateOf(baseline.maPlayerId) }
   var error by remember { mutableStateOf<String?>(null) }
   fun applyConnection(): Boolean {
     val port = maPort.toIntOrNull()
@@ -1047,8 +1045,18 @@ internal fun MultiRoomContent() {
       return false
     }
     val values = MultiRoomConnectionValues(baseline.snapcastHost, baseline.maPort,
-        baseline.maUsername, baseline.maPassword)
-    val changes = values.editedValues(host, port, maUser, maPass)
+        baseline.maUsername, baseline.maPassword, baseline.maApiToken, baseline.maPlayerId)
+    val changes = values.editedValues(host, port, baseline.maUsername, baseline.maPassword, maToken, maPlayer)
+    // Use the registry's validators before writing any field in the native Apply batch.
+    listOf("maApiToken", "maPlayerId").forEach { key ->
+      val value = changes[key] as? String ?: return@forEach
+      val spec = SettingsDomains.immortal.specs.first { it.key == key }
+          as com.immortal.launcher.settings.StringSpec<*>
+      if (!spec.applyWhen(value)) {
+        error = spec.help
+        return false
+      }
+    }
     val stored = synchronized(SettingsDomains.immortal) {
       if (changes.isNotEmpty()) SettingsDomains.immortal.apply(context, JSONObject(changes))
       ImmortalSettings.load(context)
@@ -1057,25 +1065,25 @@ internal fun MultiRoomContent() {
     enabled = stored.multiRoomEnabled
     host = stored.snapcastHost
     maPort = stored.maPort.toString()
-    maUser = stored.maUsername
-    maPass = stored.maPassword
+    maToken = ""
+    maPlayer = stored.maPlayerId
     error = null
     return true
   }
 
   // Chain the text fields so the keyboard's "Next" jumps to the following field instead of
-  // closing — the IP field focuses the username, which focuses the password.
+  // closing. The current adapters use API tokens; legacy credentials remain stored only.
   val focusManager = LocalFocusManager.current
   val portFocus = remember { FocusRequester() }
-  val userFocus = remember { FocusRequester() }
-  val passFocus = remember { FocusRequester() }
+  val tokenFocus = remember { FocusRequester() }
+  val playerFocus = remember { FocusRequester() }
 
   Column {
       Card {
         Column(modifier = Modifier.padding(18.dp)) {
           Text("Setting it up", color = IosLabel, fontSize = Sizes.rowTitle)
           Text(
-              "Group your Portals into one perfectly in-sync speaker system:",
+              "Connect Music Assistant for browsing and playback; use Snapcast for multi-room audio:",
               color = IosSecondary,
               fontSize = Sizes.rowSub,
               modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
@@ -1089,7 +1097,8 @@ internal fun MultiRoomContent() {
               "Install Snapcast from the Immortal App Store, and point it at your Music Assistant " +
                   "server.")
           SetupStep(
-              "3", "Turn on the toggle below, then enter your Music Assistant server's address.")
+              "3", "Turn on the toggle below, then apply your server address, API token and raw " +
+                  "Music Assistant player ID.")
         }
       }
       Spacer(Modifier.size(26.dp))
@@ -1101,8 +1110,8 @@ internal fun MultiRoomContent() {
           Column(modifier = Modifier.weight(1f)) {
             Text("Show what the group is playing", color = IosLabel, fontSize = Sizes.rowTitle)
             Text(
-                "Surfaces the Snapcast group's track on the now-playing card — even when the " +
-                    "Music Assistant app isn't open on this Portal.",
+                "Enables the native Music Assistant connection and shows the Snapcast group's track " +
+                    "on the now-playing card.",
                 color = IosSecondary,
                 fontSize = Sizes.rowSub,
                 modifier = Modifier.padding(top = 2.dp),
@@ -1149,55 +1158,60 @@ internal fun MultiRoomContent() {
               singleLine = true,
               keyboardOptions =
                   KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-              keyboardActions = KeyboardActions(onNext = { userFocus.requestFocus() }),
+              keyboardActions = KeyboardActions(onNext = { tokenFocus.requestFocus() }),
               label = { Text("Music Assistant port (default 8095)") },
               modifier =
                   Modifier.fillMaxWidth()
                       .padding(start = 18.dp, end = 18.dp, top = 4.dp)
                       .focusRequester(portFocus),
           )
-          // Music Assistant login — only used to forward play/pause/skip to MA, and only when MA's
-          // optional authentication is enabled. Leave blank for a stock server.
           OutlinedTextField(
               colors = iosTextFieldColors(),
-              value = maUser,
-              onValueChange = {
-                maUser = it
-              },
-              singleLine = true,
-              // No auto-capitalize: a lowercase MA username must stay lowercase.
-              keyboardOptions =
-                  KeyboardOptions(
-                      capitalization = KeyboardCapitalization.None, imeAction = ImeAction.Next),
-              keyboardActions = KeyboardActions(onNext = { passFocus.requestFocus() }),
-              label = { Text("Music Assistant username") },
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .padding(start = 18.dp, end = 18.dp, top = 4.dp)
-                      .focusRequester(userFocus),
-          )
-          OutlinedTextField(
-              colors = iosTextFieldColors(),
-              value = maPass,
-              onValueChange = {
-                maPass = it
-              },
+              value = maToken,
+              onValueChange = { maToken = it },
               singleLine = true,
               visualTransformation = PasswordVisualTransformation(),
               keyboardOptions =
-                  KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-              keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-              label = { Text("Music Assistant password") },
+                  KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+              keyboardActions = KeyboardActions(onNext = { playerFocus.requestFocus() }),
+              label = { Text("Music Assistant API token") },
+              placeholder = {
+                Text(if (baseline.maApiToken.isNotBlank()) "Saved token — leave blank to keep" else "API token")
+              },
               modifier =
                   Modifier.fillMaxWidth()
                       .padding(start = 18.dp, end = 18.dp, top = 8.dp)
-                      .focusRequester(passFocus),
+                      .focusRequester(tokenFocus),
+          )
+          OutlinedTextField(
+              colors = iosTextFieldColors(),
+              value = maPlayer,
+              onValueChange = { maPlayer = it },
+              singleLine = true,
+              keyboardOptions =
+                  KeyboardOptions(capitalization = KeyboardCapitalization.None, imeAction = ImeAction.Done),
+              keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+              label = { Text("Music Assistant player ID") },
+              placeholder = { Text("Raw player_id; blank leaves selection unset") },
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(start = 18.dp, end = 18.dp, top = 8.dp)
+                      .focusRequester(playerFocus),
+          )
+          Text(
+              "API tokens are required for this Music Assistant connection. Leave the token blank " +
+                  "to keep it saved. Use the raw player_id, not a display name (up to 256 printable " +
+                  "characters). YouTube and other music-provider credentials stay on your Music " +
+                  "Assistant server.",
+              color = IosSecondary,
+              fontSize = Sizes.rowSub,
+              modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 8.dp),
           )
           Row(
               modifier = Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 10.dp),
               verticalAlignment = Alignment.CenterVertically,
           ) {
-            ActionPill("Sign in") { if (applyConnection()) MaControl.testLogin(context) }
+            ActionPill("Test connection") { if (applyConnection()) MaControl.testLogin(context) }
             val auth = MultiRoomStatus.maAuth
             if (auth.isNotBlank()) {
               Text(
@@ -1208,15 +1222,6 @@ internal fun MultiRoomContent() {
               )
             }
           }
-          Text(
-              "Sends play/pause/skip to Music Assistant, and shows now-playing for AirPlay " +
-                  "sources (which don't carry it over Snapcast). Library/radio now-playing works " +
-                  "without it.",
-              color = IosSecondary,
-              fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 8.dp),
-          )
-
           // Live relay status — gives Apply visible feedback (Connecting… → Connected).
           error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp)) }
           Text(
@@ -1229,7 +1234,8 @@ internal fun MultiRoomContent() {
       }
       Text(
           "Join this Portal to the same Snapcast group as your other rooms, then point it " +
-              "at your Music Assistant server. The synced audio is played by the Snapcast app.",
+              "at your Music Assistant server. Audio is played by the Snapcast app; timing depends " +
+              "on the server, network and speaker setup.",
           color = IosSecondary,
           fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),

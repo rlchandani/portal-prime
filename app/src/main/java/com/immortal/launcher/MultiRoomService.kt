@@ -56,7 +56,8 @@ class MultiRoomService : Service() {
   @Volatile private var maState: NowPlayingState? = null
   @Volatile private var lastEffectiveKey: String? = null
   @Volatile private var polling = false
-  private var maPoller: Thread? = null
+  @Volatile private var maPoller: Thread? = null
+  @Volatile private var maPollGeneration = 0L
 
   override fun onCreate() {
     super.onCreate()
@@ -111,7 +112,9 @@ class MultiRoomService : Service() {
 
   private fun onSnapState(s: NowPlayingState) = main.post { snapState = s; applyEffective() }
 
-  private fun onMaState(s: NowPlayingState) = main.post { maState = s; applyEffective() }
+  private fun onMaState(s: NowPlayingState, generation: Long) = main.post {
+    if (polling && generation == maPollGeneration) { maState = s; applyEffective() }
+  }
 
   /**
    * Merge the two sources and push the result to the session, skipping no-op repeats (the MA
@@ -132,18 +135,20 @@ class MultiRoomService : Service() {
   private fun startMaPoller() {
     stopMaPoller()
     polling = true
+    val generation = maPollGeneration
     maPoller =
         Thread(
                 {
-                  while (polling) {
+                  while (polling && generation == maPollGeneration) {
                     val s =
                         runCatching {
                               MaControl.nowPlaying(
                                   applicationContext, client?.ourClientId, client?.ourClientName)
                             }
                             .getOrDefault(NowPlayingState(PlaybackState.IDLE))
-                    if (polling) onMaState(s)
-                    runCatching { Thread.sleep(POLL_MA_MS) }
+                    if (!polling || generation != maPollGeneration) break
+                    onMaState(s, generation)
+                    try { Thread.sleep(POLL_MA_MS) } catch (_: InterruptedException) { break }
                   }
                 },
                 "ma-nowplaying")
@@ -155,7 +160,10 @@ class MultiRoomService : Service() {
 
   private fun stopMaPoller() {
     polling = false
+    maPollGeneration += 1
+    val prior = maPoller
     maPoller = null
+    prior?.interrupt()
   }
 
   /** Fetch art off the control thread, then mirror the track into the session on main. */

@@ -69,11 +69,14 @@ object ImmortalSettings {
       // Port of Music Assistant's WebSocket API on [snapcastHost]. MA's web server defaults to
       // 8095 (it rolls to the next free port if that's taken), so this is configurable.
       val maPort: Int = DEFAULT_MA_PORT,
-      // Music Assistant login — needed only when MA's optional authentication is enabled, and only
-      // to send transport (play/pause/next) to its authenticated API; the now-playing metadata
-      // itself needs no credentials. Leave blank for a stock server with auth disabled.
+      // Retain the existing Music Assistant username/password flow. Current servers prefer an
+      // API token; provider credentials (including YouTube) belong on the MA server.
       val maUsername: String = "",
       val maPassword: String = "",
+      // Appended defaults preserve existing positional construction and saved configuration.
+      val maApiToken: String = "",
+      // Canonical raw MA player_id, never a display name; blank leaves player selection unset.
+      val maPlayerId: String = "",
   )
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -95,6 +98,8 @@ object ImmortalSettings {
         maPort = p.getInt("ma_port", DEFAULT_MA_PORT),
         maUsername = p.getString("ma_username", "") ?: "",
         maPassword = p.getString("ma_password", "") ?: "",
+        maApiToken = p.getString("ma_api_token", "") ?: "",
+        maPlayerId = p.getString("ma_player_id", "") ?: "",
     )
   }
 
@@ -124,6 +129,15 @@ object ImmortalSettings {
           "clock_format", "show_mini_player", "hide_status_bar",
       ), changed)
 
+  /** Connection subscription owned by config; dispose when the player controller stops observing.
+   *  Notifications can cover multiple keys in a registry batch: reload the immutable snapshot.
+   *  Registering never writes preferences or starts a service. */
+  fun observeMusicConnection(c: Context, changed: () -> Unit): () -> Unit =
+      observeSettingsPreferenceChanges(prefs(c), setOf(
+          "multiroom_enabled", "snapcast_host", "ma_port", "ma_username", "ma_password",
+          "ma_api_token", "ma_player_id",
+      ), changed)
+
   fun multiRoomEnabled(c: Context): Boolean = prefs(c).getBoolean("multiroom_enabled", false)
 
   fun snapcastHost(c: Context): String = prefs(c).getString("snapcast_host", "")?.trim() ?: ""
@@ -133,6 +147,10 @@ object ImmortalSettings {
   fun maUser(c: Context): String = prefs(c).getString("ma_username", "")?.trim() ?: ""
 
   fun maPass(c: Context): String = prefs(c).getString("ma_password", "") ?: ""
+
+  fun maApiToken(c: Context): String = prefs(c).getString("ma_api_token", "") ?: ""
+
+  fun maPlayerId(c: Context): String = prefs(c).getString("ma_player_id", "") ?: ""
 
   fun setMultiRoomEnabled(c: Context, on: Boolean) =
       prefs(c).edit().putBoolean("multiroom_enabled", on).apply()
@@ -147,6 +165,11 @@ object ImmortalSettings {
       prefs(c).edit().putString("ma_username", v.trim()).apply()
 
   fun setMaPassword(c: Context, v: String) = prefs(c).edit().putString("ma_password", v).apply()
+
+  // Exact writes: registry specs validate input; token and player identity are never normalized.
+  fun setMaApiToken(c: Context, v: String) = prefs(c).edit().putString("ma_api_token", v).apply()
+
+  fun setMaPlayerId(c: Context, v: String) = prefs(c).edit().putString("ma_player_id", v).apply()
 
   fun setWeatherUnit(c: Context, unit: String) =
       prefs(c).edit().putString("weather_unit", unit).apply()

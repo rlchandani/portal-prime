@@ -53,6 +53,7 @@ class RemoteRoutes internal constructor(
   constructor(context: Context) : this(context, PinnedNavigationDispatch())
 
   private val companion by lazy { RemoteCompanionRoutes(context) }
+  private val music by lazy { RemoteMusicRoutes(context) }
 
   // One provider-owned read cache. Static requests never reopen assets after the first read.
   private val remoteAssets = mutableMapOf<String, ByteArray>()
@@ -82,6 +83,7 @@ class RemoteRoutes internal constructor(
         // Authenticated: anything that reads the app list or drives input.
         "/remote/apps" -> authed(req) { apps() }
         "/remote/nowplaying" -> authed(req) { requireMethod("GET", req) { nowplaying() } }
+        "/remote/music", "/remote/music/command" -> authed(req) { music.handle(req) }
         "/remote/media" -> authed(req) { media(req) }
         "/remote/volume" -> authed(req) { requireMethod("POST", req) { volume(req) } }
         "/remote/pin" -> authed(req) { pin(req) }

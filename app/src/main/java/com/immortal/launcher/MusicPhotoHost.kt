@@ -6,9 +6,7 @@
  */
 package com.immortal.launcher
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -16,33 +14,62 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 
-/** The real photo engine, hosted in-page without dream navigation or ambient audio. */
+/** Own photos at the Music host, not at a conditional layout mount. Creation stays lazy. */
 @Composable
-internal fun MusicPhotoHost(modifier: Modifier) {
+internal fun rememberMusicPhotos(visible: Boolean): MusicPhotoRetention<PhotoFrameController> {
   val context = LocalContext.current
   val owner = LocalLifecycleOwner.current
-  val frame = remember(context) {
-    PhotoFrameController(context, interactivePreview = true, photosOnly = true)
+  val currentVisible by rememberUpdatedState(visible)
+  var resumeEpoch by remember(owner) { mutableIntStateOf(0) }
+  DisposableEffect(owner) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_RESUME) resumeEpoch++
+    }
+    owner.lifecycle.addObserver(observer)
+    onDispose { owner.lifecycle.removeObserver(observer) }
   }
-  AndroidView(modifier = modifier, factory = {
-    frame.view.apply {
-      setOnTouchListener { _, event ->
-        if (!frame.dispatchViewerControls(event)) frame.onTouch(event)
-        true
-      }
-    }
-  })
-  DisposableEffect(frame, owner) {
-    frame.start()
-    fun applyVisibility() {
-      frame.setHostActive(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
-    }
+  // Typed settings refresh only on a layout/resume boundary, never on progress ticks.
+  val saved = remember(context, visible, resumeEpoch) {
+    musicPhotoSettings(ScreensaverConfig.load(context))
+  }
+  val retained = remember(context, owner, saved) {
+    MusicPhotoRetention(
+        create = { PhotoFrameController(context, interactivePreview = true, photosOnly = true) },
+        start = { it.start() }, setActive = { frame, active -> frame.setHostActive(active) },
+        stop = { it.stop() })
+  }
+  fun applyVisibility() {
+    retained.setVisible(currentVisible && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
+  }
+  DisposableEffect(retained, owner) {
     val observer = LifecycleEventObserver { _, _ -> applyVisibility() }
     owner.lifecycle.addObserver(observer)
     applyVisibility()
     onDispose {
       owner.lifecycle.removeObserver(observer)
-      frame.stop()
+      retained.close()
+    }
+  }
+  SideEffect { applyVisibility() }
+  return retained
+}
+
+/** Remount the retained real photo view without restarting its source/decode pipeline. */
+@Composable
+internal fun MusicPhotoHost(retained: MusicPhotoRetention<PhotoFrameController>, modifier: Modifier) {
+  key(retained) {
+    val frame = remember(retained) { retained.frame() }
+    AndroidView(modifier = modifier, factory = {
+      frame.view.apply {
+        setOnTouchListener { _, event ->
+          if (!frame.dispatchViewerControls(event)) frame.onTouch(event)
+          true
+        }
+      }
+    })
+    DisposableEffect(retained) {
+      retained.start()
+      onDispose { retained.setVisible(false) }
     }
   }
 }

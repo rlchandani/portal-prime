@@ -83,6 +83,7 @@ class MaMusicProtocolTest {
     assertEquals(MusicConnection.READY, s.connection)
     assertEquals("ma:family", s.sourceId)
     assertEquals("queue-shared", selected.queueId)
+    assertEquals("ma:family", s.controlPlayerId)
     assertEquals("item-1", s.track?.id)
     assertEquals("ma:family", s.track?.sourceId)
     assertEquals("Song", s.track?.title)
@@ -349,6 +350,9 @@ class MaMusicProtocolTest {
     val selected = selection(listOf(leader, player("living"), player("bedroom"),
         player("fixed"), player("incompatible")))
     assertTrue(selected.snapshot.can(MusicCommand.CHANGE_ROOMS))
+    assertTrue(selected.snapshot.rooms.first { it.id == "ma:bedroom" }.removableFromGroup)
+    assertFalse(selected.snapshot.rooms.first { it.id == "ma:fixed" }.removableFromGroup)
+    assertFalse(selected.snapshot.rooms.first { it.id == "ma:family" }.removableFromGroup)
     assertEquals(setOf("ma:living", "ma:bedroom"),
         selected.snapshot.rooms.first { it.id == "ma:family" }.canGroupWith)
     val group = MaMusicProtocol.groupCommand("40", selected,

@@ -384,7 +384,8 @@ class SettingsDomainTest {
             SettingsDomains.screensaver to setOf("enabled"),
             SettingsDomains.calendar to emptySet(),
             SettingsDomains.immortal to
-                setOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword"),
+                setOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword",
+                    "maApiToken", "maPlayerId"),
             SettingsDomains.chime to setOf("spokenVoice"),
             SettingsDomains.digitalclock to emptySet(),
             SettingsDomains.welcome to emptySet(),

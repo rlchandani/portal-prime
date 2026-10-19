@@ -55,9 +55,9 @@ Files: create `MusicPlayerController.kt`, `MaMusicClient.kt`, `MaMusicProtocol.k
 
 Interfaces: controller observes immutable snapshots and dispatches capability-checked typed commands; MA client publishes version/auth/connection and correlated replies/events.
 
-- [ ] Test correlation, source replacement, stale events, command acknowledgement and reconnect cleanup.
-- [ ] Reuse media-session transport; expose real local state with supported capabilities.
-- [ ] Add bounded MA player/queue/group/lyrics mapping with stable IDs and explicit failure states.
+- [x] Test correlation, source replacement, stale events, command acknowledgement and reconnect cleanup.
+- [x] Reuse media-session transport; expose real local state with supported capabilities.
+- [x] Add bounded MA player/queue/group/lyrics mapping with stable IDs and explicit failure states.
 - [ ] Prove current MA API against server once setup exists; never guess unsupported contracts.
 
 ### Task 4: Native player in Home
@@ -66,22 +66,22 @@ Files: create `MusicPlayerUi.kt`, `MusicPlayerPhotoPanel.kt`; modify `HomeActivi
 
 Interfaces: full/compact/photos presentations consume the controller; presentation changes never instantiate playback.
 
-- [ ] Open within existing HomeActivity; preserve dock/navigation, palette and settings return.
-- [ ] Add queue/lyrics/player selection, clear unsupported/error states and bounded lists.
-- [ ] Isolate progress updates and shared sampled artwork.
+- [x] Open within existing HomeActivity; preserve dock/navigation, palette and settings return.
+- [x] Add queue/lyrics/player selection, clear unsupported/error states and bounded lists.
+- [x] Isolate progress updates and shared sampled artwork.
 - [ ] Build debug and compare all approved mock states on Portal dimensions.
 
 ### Task 5: Settings and remote parity
 
 Files: existing settings domain/spec infrastructure, `RemoteHtml`/Fleet routes, narrowly scoped music configuration; separate companion branch later.
 
-- [ ] Add registry-backed preferences and validated rich connection/player actions.
-- [ ] Test apply/schema completeness, typed command validation and authenticated remote controls.
+- [x] Add registry-backed preferences and validated rich connection/player actions.
+- [x] Test apply/schema completeness, typed command validation and authenticated remote controls.
 - [ ] Verify mobile layout and Android companion parity without touching frozen companion work.
 
 ### Task 6: Server setup and Family proof
 
-- [ ] Resolve Music Assistant host and safe deployment access.
+- [x] Resolve Music Assistant host and safe deployment access.
 - [ ] Configure compatible MA/server/player/provider path; validate actual audible output.
 - [ ] Run real queue/transport/group/reconnect/call tests and 30 lifecycle cycles.
 - [ ] Measure p95 input/confirmation latency, frame timing, memory/cache bounds and listener growth.
@@ -96,4 +96,6 @@ Files: existing settings domain/spec infrastructure, `RemoteHtml`/Fleet routes, 
 
 ## Progress
 
-Baseline: 2,969 JVM tests passed, 0 failures/errors/skips. Latest native checkpoint: 3,085 JVM tests passed, 0 failures/errors/skips; debug assembly green. Full/compact/real-photo setup-state UI verified on Family. Authenticated MA playback, performance, settings/remote integration and rollout remain incomplete.
+Baseline: 2,969 JVM tests passed, 0 failures/errors/skips. Latest code checkpoint: 3,209 JVM tests / 336 suites passed, 0 failures/errors/skips; debug assembly green. Full Node gate 733 passed/736 total, 0 failed, 3 opt-in skips; the separate synthetic music Chrome fixture passed. Registry/native/PWA connection and remote music controls implemented. MA 2.10.7 installed/running on existing HAOS; Snapcast 0.34.0 reports one connected Family Portal+. Family integration token configured safely. Audible playback, live queue/command API behavior, YouTube authorization/PO helper, full interruption/live lifecycle and performance gates, companion exposure and Living rollout remain incomplete. Frame issue failed its target and was parked at the 30-minute limit; no performance improvement is claimed. See the goal ledger for measured numbers and development APK evidence.
+
+Live API checkpoint: authenticated `players/all` matched and selected Family by Snapcast client ID/IP. Immortal reports ready, 0 queue entries and 10 discovered rooms, no problem. Playback and live mutations remain unverified.

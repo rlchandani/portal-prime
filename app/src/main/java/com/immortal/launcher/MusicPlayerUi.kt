@@ -475,7 +475,7 @@ private fun MusicQueue(
       val current = musicCoherentTrack(snapshot)?.id == item.id && item.id.isNotBlank()
       Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
           .background(if (current) palette.surface else Color.Transparent)
-          .clickable(enabled = item.id.isNotBlank() &&
+          .clickable(enabled = item.id.isNotBlank() && item.available &&
               musicCanSend(snapshot, MusicCommand.SELECT_QUEUE_ITEM), role = Role.Button) {
             onAction(MusicPlayerUiAction.SelectQueueItem(item.id))
           }.semantics { selected = current }.heightIn(min = 72.dp).padding(12.dp),
@@ -530,9 +530,6 @@ private fun MusicRooms(
     MusicPanelMessage("No players available", "Choose or connect a player in Music settings.", modifier)
     return
   }
-  // MA sources include the raw player ID. Never infer a leader from list order or names.
-  val playerId = musicMaPlayerId(snapshot)
-  val anchor = snapshot.rooms.firstOrNull { it.id == playerId }
   LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(12.dp),
       contentPadding = PaddingValues(bottom = 12.dp)) {
     item {
@@ -540,13 +537,8 @@ private fun MusicRooms(
           muted = true, size = 16, maxLines = 3)
     }
     itemsIndexed(snapshot.rooms, key = { index, room -> room.id.ifBlank { "room:$index" } }) { _, room ->
-      val sameGroup = anchor?.groupId?.takeIf { it.isNotBlank() }?.let {
-        it == room.groupId
-      } == true
-      val compatible = anchor != null && room.id != anchor.id &&
-          room.id in anchor.canGroupWith
-      val canChange = room.available && room.id.isNotBlank() &&
-          musicCanSend(snapshot, MusicCommand.CHANGE_ROOMS)
+      val actions = musicRoomActions(snapshot, room)
+      val sameGroup = actions.inCurrentGroup
       Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
           .background(LocalApprovedPalette.current.surface).padding(16.dp),
           verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -558,12 +550,11 @@ private fun MusicRooms(
           else -> "Available"
         }, muted = true, size = 15)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          MusicButton("Use player", Modifier.weight(1f), enabled = canChange) {
+          MusicButton("Use player", Modifier.weight(1f), enabled = actions.canSelect) {
             onAction(MusicPlayerUiAction.SelectPlayer(room.id))
           }
           MusicButton(if (sameGroup) "Remove" else "Join group", Modifier.weight(1f),
-              enabled = canChange && anchor != null && room.id != anchor.id &&
-                  (sameGroup || compatible)) {
+              enabled = if (sameGroup) actions.canRemove else actions.canJoin) {
             onAction(MusicPlayerUiAction.ToggleRoom(room.id))
           }
         }

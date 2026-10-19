@@ -9,13 +9,22 @@ package com.immortal.launcher
 /** The form's loaded baseline; writes are expressed in registry keys. */
 internal data class MultiRoomConnectionValues(
     val host: String, val port: Int, val username: String, val password: String,
+    val apiToken: String = "", val playerId: String = "",
 ) {
-    fun editedValues(host: String, port: Int, username: String, password: String): Map<String, Any> =
+    fun editedValues(
+        host: String, port: Int, username: String, password: String,
+        apiToken: String = this.apiToken, playerId: String = this.playerId,
+    ): Map<String, Any> =
         buildMap {
             // Match the existing host/user setters; passwords retain exact text.
             if (host.trim() != this@MultiRoomConnectionValues.host.trim()) put("snapcastHost", host)
             if (port != this@MultiRoomConnectionValues.port) put("maPort", port)
             if (username.trim() != this@MultiRoomConnectionValues.username.trim()) put("maUsername", username)
-            if (password != this@MultiRoomConnectionValues.password) put("maPassword", password)
+            if (password.isNotBlank() && password != this@MultiRoomConnectionValues.password)
+                put("maPassword", password)
+            // Masked secret drafts start blank. Omit them so Apply never clears or restores a stale secret.
+            if (apiToken.isNotBlank() && apiToken != this@MultiRoomConnectionValues.apiToken)
+                put("maApiToken", apiToken)
+            if (playerId != this@MultiRoomConnectionValues.playerId) put("maPlayerId", playerId)
         }
 }

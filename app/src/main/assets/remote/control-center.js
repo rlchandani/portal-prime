@@ -486,6 +486,7 @@ function retireRead(key) {
   session.read(key);
 }
 function abortReads() {
+  suspendMusicSheet();
   cancelSnapshotExport();
   cancelSnapshotRestoreReview();
   // Retire completed failure notices as well as pending transport reads.
@@ -1010,6 +1011,7 @@ function refresh() {
   status();
   loadVisible(true);
   startPolling();
+  readMusicSheet(musicSheet);
 }
 const detailCapabilities = {
   layout: 'layout',
@@ -1536,6 +1538,11 @@ function renderMedia() {
               return () => retryMedia(owner, error); })())
         : empty('Playback', 'Loading media and volume…'),
     );
+    const ticket = session.capture();
+    const music = button('Queue & players', () => {
+      if (music.isConnected && mediaPageCurrent(ticket)) openMusicSheet();
+    }, { kind: 'outline', icon: 'volume' });
+    mount.append(music);
     return;
   }
   const ticket = session.capture();
@@ -1590,7 +1597,8 @@ function renderMedia() {
     view.progress.hidden = true;
     view.retry = button('Retry playback', () => {}, { kind: 'outline' });
     view.retry.hidden = true;
-    groupNode.append(view.progress, view.error, view.retry);
+    groupNode.append(view.progress, view.error, view.retry,
+      button('Queue & players', owned(openMusicSheet), { kind: 'outline', icon: 'volume' }));
     mount.replaceChildren(groupNode);
     mediaView = view;
   }
@@ -1672,6 +1680,348 @@ function renderMedia() {
           setBool(view.fallback, 'hidden', false);
         }
       });
+  }
+}
+
+// This dialog owns its reads and commands; the main PWA owns pairing and Portal selection.
+let musicSheet = null;
+const musicTrackCommands = new Set(['play', 'pause', 'next', 'previous', 'seek', 'queue-item']);
+function musicSheetCurrent(owner) {
+  return !!owner && musicSheet === owner && sheet.open && content.firstChild === owner.root &&
+    session.current(owner.ticket) && !document.hidden && connectionState !== 'expired';
+}
+function suspendMusicSheet(owner = musicSheet) {
+  if (!owner) return;
+  owner.epoch++;
+  clearTimeout(owner.timer);
+  owner.timer = null;
+  owner.readController?.abort();
+  owner.commandController?.abort();
+  if (owner.sending) {
+    owner.uncertain = true;
+    owner.feedback = 'Request interrupted. Read the latest state before trying again.';
+    owner.feedbackAfterRead = 'Latest state from the Portal. The interrupted command was not confirmed.';
+  }
+  owner.readController = owner.commandController = null;
+  owner.sending = false;
+  owner.fresh = false;
+}
+function closeMusicSheet(owner) {
+  suspendMusicSheet(owner);
+  if (musicSheet === owner) musicSheet = null;
+}
+function openMusicSheet() {
+  if (!room() || document.hidden || connectionState === 'expired') return;
+  const owner = {
+    ticket: session.capture(), root: el('div', { class: 'music-sheet' }),
+    epoch: 0, timer: null, readController: null, commandController: null,
+    lastReadAt: -Infinity, state: null, fresh: false, sending: false, admitted: false, uncertain: false,
+    unsupported: false, error: null, feedback: '', feedbackAfterRead: null, panel: 'queue', view: null,
+  };
+  openSheet('Music', owner.root, () => closeMusicSheet(owner));
+  musicSheet = owner;
+  renderMusicSheet(owner);
+  readMusicSheet(owner);
+}
+function scheduleMusicRead(owner, delay = 1000) {
+  if (!musicSheetCurrent(owner) || owner.unsupported) return;
+  clearTimeout(owner.timer);
+  owner.timer = setTimeout(() => {
+    owner.timer = null;
+    readMusicSheet(owner);
+  }, Math.max(0, delay));
+}
+function validateMusicState(response) {
+  const s = response?.music;
+  const object = value => value && typeof value === 'object' && !Array.isArray(value);
+  const id = value => typeof value === 'string' && value.length <= 4096;
+  if (!object(s) || s.schemaVersion !== 1) throw new ApiError('music_unsupported');
+  if (!Number.isSafeInteger(s.sourceRevision) || s.sourceRevision < 0 || !id(s.sourceId) ||
+      !['not_configured', 'connecting', 'ready', 'offline', 'auth_required', 'incompatible'].includes(s.connection) ||
+      !['playing', 'paused', 'stopped', 'idle'].includes(s.playback) ||
+      typeof s.audioOwnedByOther !== 'boolean' || !object(s.capabilities) ||
+      (s.controlPlayerId !== null && !id(s.controlPlayerId)) ||
+      (s.pending !== null && (!object(s.pending) || typeof s.pending.command !== 'string')) ||
+      (s.track !== null && (!object(s.track) || !id(s.track.id) ||
+        !['title', 'artist', 'album'].every(key => typeof s.track[key] === 'string') ||
+        typeof s.track.isLive !== 'boolean'))) throw new ApiError('invalid_response');
+  for (const key of ['play', 'pause', 'next', 'previous', 'seek', 'queue', 'lyrics', 'rooms', 'volume', 'selectPlayer'])
+    if (typeof s.capabilities[key] !== 'boolean') throw new ApiError('invalid_response');
+  for (const key of ['queue', 'rooms', 'lyrics'])
+    if (!Array.isArray(s[key])) throw new ApiError('invalid_response');
+  for (const item of s.queue.slice(0, 500))
+    if (!object(item) || !id(item.id) || typeof item.title !== 'string' ||
+        typeof item.artist !== 'string' || typeof item.available !== 'boolean' ||
+        typeof item.canSelect !== 'boolean') throw new ApiError('invalid_response');
+  for (const player of s.rooms.slice(0, 64)) {
+    if (!object(player) || !id(player.id) || typeof player.name !== 'string' ||
+        !['available', 'inCurrentGroup', 'canSelect', 'canJoin', 'canRemove', 'canSetVolume']
+          .every(key => typeof player[key] === 'boolean') ||
+        (player.volume !== null && (!Number.isInteger(player.volume) || player.volume < 0 || player.volume > 100)))
+      throw new ApiError('invalid_response');
+  }
+  for (const line of s.lyrics.slice(0, 1000))
+    if (!object(line) || typeof line.text !== 'string') throw new ApiError('invalid_response');
+  return s;
+}
+async function readMusicSheet(owner) {
+  if (!musicSheetCurrent(owner) || owner.unsupported || owner.readController || owner.sending) return;
+  // Polls, command readback and refresh taps share the same one-second admission gate.
+  const wait = 1000 - (Date.now() - owner.lastReadAt);
+  if (wait > 0) { scheduleMusicRead(owner, wait); return; }
+  clearTimeout(owner.timer);
+  owner.timer = null;
+  const controller = new AbortController(), epoch = owner.epoch;
+  owner.readController = controller;
+  owner.lastReadAt = Date.now();
+  try {
+    const response = await api(owner.ticket.room, '/remote/music', { signal: controller.signal });
+    if (!musicSheetCurrent(owner) || epoch !== owner.epoch) return;
+    owner.state = validateMusicState(response);
+    owner.fresh = true;
+    owner.error = null;
+    if (owner.state.pending === null) {
+      owner.admitted = false;
+      owner.uncertain = false;
+      if (owner.feedbackAfterRead !== null) owner.feedback = owner.feedbackAfterRead;
+      owner.feedbackAfterRead = null;
+    }
+    renderMusicSheet(owner);
+  } catch (error) {
+    if (!musicSheetCurrent(owner) || epoch !== owner.epoch || error.code === 'aborted') return;
+    owner.fresh = false;
+    owner.error = error;
+    owner.unsupported = [404, 405, 501].includes(error.status) || error.code === 'music_unsupported';
+    renderMusicSheet(owner);
+  } finally {
+    if (epoch !== owner.epoch) return;
+    if (owner.readController === controller) owner.readController = null;
+    scheduleMusicRead(owner);
+  }
+}
+function musicMutable(owner, s = owner.state) {
+  return musicSheetCurrent(owner) && owner.fresh && !owner.sending && !owner.admitted && !owner.uncertain &&
+    s?.connection === 'ready' && !s.pending && !s.audioOwnedByOther;
+}
+function musicCommandAllowed(s, command, extra) {
+  const caps = s.capabilities;
+  if (musicTrackCommands.has(command) && !s.track?.id) return false;
+  if (['play', 'pause', 'next', 'previous'].includes(command)) return caps[command] === true;
+  if (command === 'seek') return caps.seek && !s.track.isLive &&
+    Number.isSafeInteger(s.track.durationMs) && s.track.durationMs > 0 &&
+    Number.isSafeInteger(extra.positionMs) && extra.positionMs >= 0 && extra.positionMs <= s.track.durationMs;
+  if (command === 'queue-item') return caps.queue &&
+    s.queue.slice(0, 500).some(item => item.id === extra.queueItemId && item.available && item.canSelect);
+  const player = s.rooms.slice(0, 64).find(item => item.id === extra.roomId);
+  if (!player?.available) return false;
+  if (command === 'select-player') return caps.selectPlayer && player.canSelect;
+  if (command === 'toggle-room') return caps.rooms && !!s.controlPlayerId &&
+    (player.canJoin || player.canRemove);
+  if (command === 'volume') return caps.volume && player.canSetVolume &&
+    Number.isInteger(extra.percent) && extra.percent >= 0 && extra.percent <= 100;
+  return false;
+}
+async function sendMusicCommand(owner, observed, command, extra = {}) {
+  if (!musicMutable(owner)) return;
+  const latest = owner.state;
+  const same = latest.sourceRevision === observed.sourceRevision && latest.sourceId === observed.sourceId &&
+    (!musicTrackCommands.has(command) || latest.track?.id === observed.track?.id) &&
+    (command !== 'toggle-room' || latest.controlPlayerId === observed.controlPlayerId);
+  if (!same || !musicCommandAllowed(latest, command, extra)) {
+    owner.feedback = 'Music changed. Review the latest controls before trying again.';
+    owner.fresh = false;
+    renderMusicSheet(owner);
+    readMusicSheet(owner);
+    return;
+  }
+  const body = { command, sourceRevision: observed.sourceRevision, sourceId: observed.sourceId, ...extra };
+  if (musicTrackCommands.has(command)) body.trackId = observed.track.id;
+  if (command === 'toggle-room') body.leaderId = observed.controlPlayerId;
+  // Retire a pre-command GET: its late result cannot clear pending admission.
+  owner.epoch++;
+  owner.readController?.abort();
+  owner.readController = null;
+  clearTimeout(owner.timer);
+  owner.timer = null;
+  const controller = new AbortController(), epoch = owner.epoch;
+  owner.commandController = controller;
+  owner.sending = true;
+  owner.feedback = '';
+  owner.feedbackAfterRead = '';
+  owner.error = null;
+  renderMusicSheet(owner);
+  try {
+    const response = await api(owner.ticket.room, '/remote/music/command',
+      { method: 'POST', body, signal: controller.signal });
+    if (!musicSheetCurrent(owner) || epoch !== owner.epoch) return;
+    if (response.admitted === true && response.status === 'admitted') {
+      owner.admitted = true;
+      owner.uncertain = false;
+      owner.feedback = 'Command admitted. Waiting for the latest state…';
+    } else if (response.status === 'already_applied') {
+      owner.feedback = 'Already in that playback state. Reading the latest state…';
+    } else throw new ApiError('invalid_response');
+  } catch (error) {
+    if (!musicSheetCurrent(owner) || epoch !== owner.epoch || error.code === 'aborted') return;
+    owner.unsupported = [404, 405, 501].includes(error.status);
+    owner.uncertain = (error.data?.admitted === null && error.data?.refreshRequired === true) ||
+      error.code === 'music_request_timeout' || ['timeout', 'unreachable', 'invalid_response'].includes(error.code) ||
+      (error.status >= 500 && !owner.unsupported);
+    owner.feedback = ['stale', 'player_changed', 'stale_revision'].includes(error.code)
+      ? 'Music changed. Refreshing state; review the controls before trying again.'
+      : error.code === 'unavailable'
+        ? 'That control is unavailable. Reading the latest state…'
+        : 'The command was not confirmed. Reading the latest state before another request.';
+    if (owner.uncertain) owner.feedback = 'Command outcome unknown. Reading the latest state…';
+    owner.feedbackAfterRead = ['stale', 'player_changed', 'stale_revision'].includes(error.code)
+      ? 'Music changed. Review the latest controls before trying again.'
+      : error.code === 'unavailable'
+        ? 'That control is unavailable in the latest state.'
+        : 'Latest state from the Portal. The previous command was not confirmed.';
+    owner.error = error;
+  } finally {
+    if (epoch !== owner.epoch) return;
+    owner.commandController = null;
+    owner.sending = false;
+    owner.fresh = false;
+    renderMusicSheet(owner);
+    // A read is safe after a denial or uncertain reply. Never retry a mutation.
+    readMusicSheet(owner);
+  }
+}
+function renderMusicSheet(owner) {
+  if (!musicSheetCurrent(owner)) return;
+  if (owner.unsupported) {
+    owner.root.replaceChildren(text(
+      'Queue and player controls are unavailable on this Portal version. Existing playback controls still work.'));
+    return;
+  }
+  const s = owner.state;
+  if (!s) {
+    owner.root.replaceChildren(text(owner.error ? message(owner.error) : 'Loading music…'),
+      owner.error ? button('Refresh music', () => readMusicSheet(owner), { kind: 'outline' }) : null);
+    return;
+  }
+  const usable = musicMutable(owner, s);
+  const statusText = owner.sending ? 'Sending command…'
+    : owner.uncertain ? 'Command outcome unknown. Reading the latest state…'
+    : owner.admitted || s.pending ? 'Command pending. Waiting for the latest state…'
+    : owner.error ? `${owner.feedback || 'Last reported music.'} ${message(owner.error)}`
+    : owner.feedback || (s.audioOwnedByOther ? 'Audio is in use on the Portal.' : ({
+      not_configured: 'Music is not configured on this Portal.',
+      connecting: 'Connecting to music…', ready: 'Latest state from the Portal.',
+      offline: 'Music is offline.', auth_required: 'Music sign-in is required on the Portal.',
+      incompatible: 'This music source is not compatible.',
+    })[s.connection]);
+  // Keep a dragged range and its observed source/track binding; do not replace it on each tick.
+  const focusedRange = owner.root.contains(document.activeElement) &&
+    document.activeElement?.matches('input[type="range"],input[type="number"]');
+  const identity = JSON.stringify([s.sourceRevision, s.sourceId, s.track?.id, s.controlPlayerId]);
+  const key = JSON.stringify([identity, s.connection, s.playback, s.track, s.capabilities,
+    s.queue.slice(0, 500), s.rooms.slice(0, 64), owner.panel,
+    s.capabilities.lyrics ? s.lyrics.slice(0, 1000) : null]);
+  if (!owner.view || (owner.view.key !== key && (!focusedRange || owner.view.identity !== identity))) {
+    const view = { key, identity, controls: [] };
+    const bind = (node, command, extra = {}) => {
+      view.controls.push({ node, command, extra });
+      return node;
+    };
+    const control = (label, command, extra = {}, options = {}) =>
+      bind(button(label, () => sendMusicCommand(owner, s, command, extra), options), command, extra);
+    const title = el('div', { class: 'media-title' },
+      el('strong', { text: s.track?.title || 'Nothing playing' }),
+      text([s.track?.artist, s.track?.album].filter(Boolean).join(' · ')));
+    view.status = text('', 'detail music-status');
+    view.status.setAttribute('role', 'status');
+    const nodes = [title, view.status];
+    if (s.track) {
+      const playing = s.playback === 'playing';
+      const transport = (label, command, icon) => {
+        const node = control(label, command, {}, { icon });
+        node.className += ' music-transport';
+        node.setAttribute('aria-label', label);
+        node.replaceChildren(glyph(icon));
+        return node;
+      };
+      nodes.push(el('div', { class: 'media-controls', role: 'group', 'aria-label': 'Music playback' },
+        transport('Previous', 'previous', 'prev'),
+        transport(playing ? 'Pause' : 'Play', playing ? 'pause' : 'play', playing ? 'pause' : 'play'),
+        transport('Next', 'next', 'next')));
+      if (s.capabilities.seek && !s.track.isLive && Number.isSafeInteger(s.track.durationMs) &&
+          s.track.durationMs > 0 && Number.isSafeInteger(s.positionMs)) {
+        view.seek = el('input', { type: 'range', min: 0, max: s.track.durationMs, step: 1,
+          value: s.positionMs, 'aria-label': 'Music playback position' });
+        view.position = el('span', { text: formatTime(s.positionMs) });
+        view.seek.oninput = () => { view.position.textContent = formatTime(Number(view.seek.value)); };
+        view.seek.onchange = () => sendMusicCommand(owner, s, 'seek', { positionMs: Number(view.seek.value) });
+        bind(view.seek, 'seek', { positionMs: 0 });
+        nodes.push(view.seek, el('div', { class: 'timeline-labels' },
+          view.position, el('span', { text: formatTime(s.track.durationMs) })));
+      }
+    }
+    const panels = [{ value: 'queue', label: 'Queue' }, { value: 'players', label: 'Players' }];
+    if (s.capabilities.lyrics && s.lyrics.length) panels.push({ value: 'lyrics', label: 'Lyrics' });
+    if (!panels.some(panel => panel.value === owner.panel)) owner.panel = 'queue';
+    nodes.push(segmented(owner.panel, panels, panel => {
+      if (!musicSheetCurrent(owner)) return;
+      owner.panel = panel;
+      owner.view = null;
+      renderMusicSheet(owner);
+    }, 'Music views'));
+    const list = el('div', { class: 'music-list' });
+    if (owner.panel === 'queue') {
+      for (const item of s.queue.slice(0, 500)) {
+        const row = el('button', { class: 'action-row music-queue-row', type: 'button',
+          onClick: () => sendMusicCommand(owner, s, 'queue-item', { queueItemId: item.id }) },
+          el('span', { class: 'action-copy' }, el('strong', { text: item.title }),
+            el('span', { class: 'detail', text: item.artist })),
+          item.available ? null : el('span', { class: 'detail', text: 'Unavailable' }));
+        list.append(bind(row, 'queue-item', { queueItemId: item.id }));
+      }
+      if (!s.queue.length) list.append(text('No queue is reported for this source.'));
+    } else if (owner.panel === 'players') {
+      for (const player of s.rooms.slice(0, 64)) {
+        const controls = actions(control(player.id === s.sourceId ? 'Selected' : 'Use player',
+          'select-player', { roomId: player.id }));
+        if (player.canJoin || player.canRemove) controls.append(control(
+          player.canRemove ? 'Remove from group' : 'Join group', 'toggle-room', { roomId: player.id }));
+        const row = el('section', { class: 'music-player-row' },
+          el('strong', { text: player.name }),
+          text(!player.available ? 'Offline' : player.id === s.sourceId ? 'Selected player'
+            : player.inCurrentGroup ? 'In the current group' : 'Available player'), controls);
+        if (player.canSetVolume) {
+          const known = Number.isInteger(player.volume);
+          const range = el('input', { type: known ? 'range' : 'number', min: 0, max: 100, step: 1,
+            value: known ? player.volume : '', placeholder: '0–100',
+            'aria-label': `${player.name} volume` });
+          const value = el('output', { text: known ? `${player.volume}%` : 'Volume not reported' });
+          range.oninput = () => { value.textContent = range.value === '' ? 'Volume not reported' : `${range.value}%`; };
+          const submit = () => {
+            if (range.value !== '') sendMusicCommand(owner, s, 'volume',
+              { roomId: player.id, percent: Number(range.value) });
+          };
+          range.onchange = known ? submit : null;
+          bind(range, 'volume', { roomId: player.id, percent: 0 });
+          row.append(el('div', { class: 'volume-row' }, range, value));
+          if (!known) row.append(bind(button('Set volume', submit), 'volume', { roomId: player.id, percent: 0 }));
+        } else if (Number.isInteger(player.volume)) row.append(text(`Volume ${player.volume}%`));
+        list.append(row);
+      }
+      if (!s.rooms.length) list.append(text('No players are reported for this source.'));
+    } else {
+      for (const line of s.lyrics.slice(0, 1000)) list.append(text(line.text, 'music-lyric'));
+    }
+    nodes.push(list);
+    owner.root.replaceChildren(...nodes);
+    owner.view = view;
+  }
+  const view = owner.view;
+  view.status.textContent = statusText;
+  for (const { node, command, extra } of view.controls)
+    node.disabled = !usable || !musicCommandAllowed(s, command, extra);
+  if (view.seek && document.activeElement !== view.seek && Number.isSafeInteger(s.positionMs)) {
+    view.seek.value = s.positionMs;
+    view.position.textContent = formatTime(s.positionMs);
   }
 }
 
@@ -5902,6 +6252,10 @@ document.addEventListener('visibilitychange', () => {
     loadVisible();
     if (connectionState === 'offline') status();
     startPolling();
+    if (musicSheetCurrent(musicSheet)) {
+      renderMusicSheet(musicSheet);
+      readMusicSheet(musicSheet);
+    }
   }
 });
 window.addEventListener('pagehide', () => {

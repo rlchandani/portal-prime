@@ -26,12 +26,22 @@ class ApprovedSettingsSearchRoutingTest {
     @Test fun atomicFeedAndAudioSettingsReachTheirEditors() {
         assertEquals("calendar-url", approvedPageForControl("calendar", "url"))
         assertEquals("sources", approvedPageForControl("screensaver", "albumRefreshMin"))
-        listOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword")
+        listOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword",
+            "maApiToken", "maPlayerId")
             .forEach { assertEquals("multiroom", approvedPageForControl("immortal", it)) }
         assertEquals("appearance", approvedPageForControl("immortal", "hideStatusBar"))
         assertNull(approvedPageForControl("immortal", "unrecognized-field"))
     }
 
+    @Test fun musicConnectionFieldsAreSearchableInTheirNativeEditor() {
+        val index = approvedSettingsSearchIndex()
+        listOf("Music Assistant API token" to "maApiToken", "Music Assistant player ID" to "maPlayerId")
+            .forEach { (title, key) ->
+                val result = approvedSettingsSearch(index, title).single { it.id == "immortal.$key" }
+                assertEquals("multiroom", result.page)
+                assertTrue(result.advanced)
+            }
+    }
     @Test fun registryNavigationUsesItsDeclaredActivity() {
         val index = approvedSettingsSearchIndex()
         assertEquals("calendar-url", index.single { it.id == "calendar.url" }.page)

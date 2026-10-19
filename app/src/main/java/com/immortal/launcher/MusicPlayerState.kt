@@ -53,6 +53,7 @@ data class MusicQueueItem(
     val artist: String = "",
     val durationMs: Long? = null,
     val artUrl: String = "",
+    val available: Boolean = true,
 )
 
 /** Adapters normalize these into ascending time order before publication. */
@@ -67,6 +68,8 @@ data class MusicRoom(
     val groupId: String? = null,
     val canGroupWith: Set<String> = emptySet(),
     val volumeControllable: Boolean = false,
+    /** Removable membership in the currently selected server-confirmed group. */
+    val removableFromGroup: Boolean = false,
 )
 
 data class PendingMusicCommand(
@@ -100,6 +103,10 @@ data class MusicPlayerSnapshot(
     /** Shared session artwork is read-only here; the player does not recycle it. */
     val artBitmap: android.graphics.Bitmap? = null,
     val localSessionToken: android.media.session.MediaSession.Token? = null,
+    /** Canonical MA leader ID supplied by the adapter, never guessed from room order. */
+    val controlPlayerId: String? = null,
+    /** Connection identity carried atomically with the immutable rendered observation. */
+    val presentationRevision: Long = 0,
 ) {
   fun can(command: MusicCommand): Boolean {
     if (connection != MusicConnection.READY || audioOwnedByOther || sourceId.isBlank()) return false
