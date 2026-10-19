@@ -208,6 +208,59 @@ class MusicReceiverProtocolTest {
     assertNull(session.observation)
   }
 
+
+  @Test fun freshCapturedStartSurvivesAnUnchangedPollingReplyWithoutRebindingItsEpoch() {
+    val session = observedSession()
+    val captured = session.observation!!
+    val refresh = session.issue(query, 10_500)!!
+    accept(session, refresh, state(id = refresh.requestId, at = 10_510))
+    val start = session.issue(MusicReceiverProtocol.Action.UserStart(captured, "server"), 10_520)
+    assertNotNull("An unchanged fresh poll must not invalidate the captured user gesture", start)
+    assertEquals(captured.epoch, start!!.data["epoch"])
+    assertEquals(captured.instance, start.data["instance"])
+  }
+
+  @Test fun capturedStartMustBeARealFreshReceiptFromTheCurrentBindingAndUnchangedState() {
+    fun refreshed(): Pair<MusicReceiverProtocol.Session, MusicReceiverProtocol.Observation> {
+      val session = observedSession()
+      val captured = session.observation!!
+      val refresh = session.issue(query, 10_500)!!
+      accept(session, refresh, state(id = refresh.requestId, at = 10_510))
+      return session to captured
+    }
+    val (forged, captured) = refreshed()
+    assertNull(forged.issue(MusicReceiverProtocol.Action.UserStart(
+        captured.copy(requestId = 99), "server"), 10_520))
+    val (expired, old) = refreshed()
+    val fresh = expired.issue(query, 10_900)!!
+    accept(expired, fresh, state(id = fresh.requestId, at = 10_910))
+    assertNull(expired.issue(MusicReceiverProtocol.Action.UserStart(old, "server"), 11_000))
+    val (changed, previous) = refreshed()
+    val change = changed.issue(query, 10_550)!!
+    accept(changed, change, state(id = change.requestId, at = 10_560).plus("reason" to "user_stopped"))
+    assertNull(changed.issue(MusicReceiverProtocol.Action.UserStart(previous, "server"), 10_570))
+    val (rebound, detached) = refreshed()
+    rebound.disconnect(); rebound.connect()
+    val newBinding = rebound.issue(query, 10_550)!!
+    accept(rebound, newBinding, state(id = newBinding.requestId, at = 10_560))
+    assertNull(rebound.issue(MusicReceiverProtocol.Action.UserStart(detached, "server"), 10_570))
+  }
+
+
+  @Test fun acceptedReceiptHistoryIsBoundedEvenIfPollingIsFasterThanProduction() {
+    val session = observedSession()
+    val first = session.observation!!
+    var recent = first
+    repeat(12) { index ->
+      val at = 10_010L + index * 10
+      val refresh = session.issue(query, at)!!
+      accept(session, refresh, state(id = refresh.requestId, at = at + 1))
+      if (index == 10) recent = session.observation!!
+    }
+    assertNull(session.issue(MusicReceiverProtocol.Action.UserStart(first, "server"), 10_130))
+    assertNotNull(session.issue(MusicReceiverProtocol.Action.UserStart(recent, "server"), 10_130))
+  }
+
   private fun observedSession(): MusicReceiverProtocol.Session = MusicReceiverProtocol.Session().also {
     it.connect()
     val request = it.issue(query, 10_000)!!

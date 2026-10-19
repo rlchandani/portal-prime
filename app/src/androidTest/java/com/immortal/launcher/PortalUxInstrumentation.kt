@@ -39,7 +39,8 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
-        // Explicit signed receiver Query only; never starts audio or enters private diagnostics.
+        // Signed receiver checks: non-starting Query/client probes, or explicitly opted-in local native fixture.
+        // None enter generic private diagnostics or read credentials.
         if (options.getString("command") == "musicReceiverQuery") {
             val receiver = MusicReceiverDeviceChecks.run(this, options)
             finish(if (receiver.getBoolean("musicReceiverQueryPassed")) 0 else 1, receiver)

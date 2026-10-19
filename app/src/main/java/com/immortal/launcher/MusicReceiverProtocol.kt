@@ -114,19 +114,27 @@ internal object MusicReceiverProtocol {
     private var clientId: String? = null
     private var epoch = -1L
     private var observedAt = -1L
+    // Real receipts only, current binding only; normal 500 ms polling needs at most three.
+    private val recentObservations = ArrayDeque<Observation>()
+
+    private fun sameReportedState(a: Observation, b: Observation): Boolean =
+        a.copy(requestId = b.requestId, observedAtElapsedMs = b.observedAtElapsedMs) == b
 
     fun connect() { reset(); connected = true }
     fun disconnect() { reset(); connected = false }
     private fun reset() {
       generation++
       observation = null; pending = null; instance = null; clientId = null; epoch = -1; observedAt = -1
+      recentObservations.clear()
     }
 
     fun issue(action: Action, nowElapsedMs: Long): Request? {
       if (!connected || nowElapsedMs < 0 || nextId == Long.MAX_VALUE) return null
       expireObservation(nowElapsedMs)
       if (action == Action.Query && pending != null) return null
-      if (action is Action.UserStart && (observation == null || observation != action.observed ||
+      if (action is Action.UserStart && (observation == null || action.observed !in recentObservations ||
+          !sameReportedState(action.observed, observation!!) || nowElapsedMs < action.observed.observedAtElapsedMs ||
+          nowElapsedMs - action.observed.observedAtElapsedMs >= FRESH_MS ||
           !endpoint(action.host, action.port))) return null
       val id = ++nextId
       val data = linkedMapOf<String, Any>("requestId" to id)
@@ -142,7 +150,10 @@ internal object MusicReceiverProtocol {
           3
         }
       }
-      if (action != Action.Query) observation = null
+      if (action != Action.Query) {
+        observation = null
+        recentObservations.clear()
+      }
       return Request(what, id, data.toMap(), generation, nowElapsedMs).also { pending = it }
     }
 
@@ -154,7 +165,7 @@ internal object MusicReceiverProtocol {
       val id = fields["requestId"]
       if (id is Long && id != request.requestId) return Acceptance.Ignored
       fun reject(reason: Rejection): Acceptance {
-        pending = null; observation = null
+        pending = null; observation = null; recentObservations.clear()
         return Acceptance.Rejected(reason)
       }
       val reply = try { parse(what, fields) } catch (_: IllegalArgumentException) {
@@ -171,8 +182,20 @@ internal object MusicReceiverProtocol {
             s.observedAtElapsedMs > nowElapsedMs ||
             nowElapsedMs - s.observedAtElapsedMs >= FRESH_MS) return reject(Rejection.STALE_TIME)
         instance = s.instance; clientId = s.clientId; epoch = s.epoch; observedAt = s.observedAtElapsedMs
+        if (observation == null || !sameReportedState(observation!!, s) || reply.error != null)
+          recentObservations.clear()
         observation = s.takeIf { reply.error == null }
-      } else observation = null
+        if (observation != null) {
+          while (recentObservations.isNotEmpty() &&
+              nowElapsedMs - recentObservations.first().observedAtElapsedMs >= FRESH_MS)
+            recentObservations.removeFirst()
+          if (recentObservations.size == 4) recentObservations.removeFirst()
+          recentObservations.addLast(s)
+        }
+      } else {
+        observation = null
+        recentObservations.clear()
+      }
       pending = null
       return Acceptance.Accepted(reply)
     }
@@ -181,7 +204,7 @@ internal object MusicReceiverProtocol {
       val request = pending ?: return false
       if (nowElapsedMs >= request.sentAtElapsedMs &&
           nowElapsedMs - request.sentAtElapsedMs < replyTimeoutMs) return false
-      pending = null; observation = null
+      pending = null; observation = null; recentObservations.clear()
       return true
     }
 
@@ -189,7 +212,7 @@ internal object MusicReceiverProtocol {
       val s = observation ?: return false
       if (nowElapsedMs >= s.observedAtElapsedMs && nowElapsedMs - s.observedAtElapsedMs < FRESH_MS)
         return false
-      observation = null
+      observation = null; recentObservations.clear()
       return true
     }
   }
