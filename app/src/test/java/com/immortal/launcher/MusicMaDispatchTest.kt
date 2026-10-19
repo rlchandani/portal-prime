@@ -26,7 +26,8 @@ class MusicMaDispatchTest {
   @Test fun toggleUsesExplicitPauseAndObservedPlaybackConfirmation() {
     val dispatch = musicMaDispatch(state(), MusicPlayerUiAction.TogglePlayback)!!
     assertEquals(MusicCommand.PAUSE, dispatch.command)
-    assertEquals(MaMusicClient.Action.Transport(MusicCommand.PAUSE), dispatch.action)
+    assertEquals(MaMusicClient.Action.Transport(MusicCommand.PAUSE,
+        MaMusicClient.PlaybackTarget("ma:family", "shared")), dispatch.action)
     assertFalse(dispatch.confirmation.matches(state()))
     assertTrue(dispatch.confirmation.matches(state().copy(playback = PlaybackState.PAUSED)))
   }
@@ -54,7 +55,8 @@ class MusicMaDispatchTest {
   @Test fun idleQueueDispatchBindsItsQueueAndConfirmation() {
     val idle = state().copy(track = null, playback = PlaybackState.IDLE)
     val dispatch = musicMaDispatch(idle, MusicPlayerUiAction.SelectQueueItem("two"))!!
-    assertEquals(MaMusicClient.Action.QueueItem("two", "shared"), dispatch.action)
+    assertEquals(MaMusicClient.Action.QueueItem("two", "shared",
+        MaMusicClient.PlaybackTarget("ma:family", "shared")), dispatch.action)
     val playing = idle.copy(track = MusicTrack("two", idle.sourceId, "Two"))
     assertTrue(dispatch.confirmation.matches(playing))
     assertFalse(dispatch.confirmation.matches(playing.copy(queueId = "other")))
@@ -79,7 +81,8 @@ class MusicMaDispatchTest {
     val s = state().copy(audioOwnedByOther = true)
     val pause = musicMaDispatch(s, MusicPlayerUiAction.TogglePlayback)!!
     assertEquals(MusicCommand.PAUSE, pause.command)
-    assertEquals(MaMusicClient.Action.Transport(MusicCommand.PAUSE), pause.action)
+    assertEquals(MaMusicClient.Action.Transport(MusicCommand.PAUSE,
+        MaMusicClient.PlaybackTarget("ma:family", "shared")), pause.action)
     val volume = musicMaDispatch(s, MusicPlayerUiAction.SetRoomVolume("ma:living", 35))!!
     assertEquals(MaMusicClient.Action.Volume("ma:living", 35), volume.action)
     for (action in listOf(MusicPlayerUiAction.Next, MusicPlayerUiAction.Previous,
@@ -96,6 +99,26 @@ class MusicMaDispatchTest {
     assertEquals(MaMusicClient.Action.Group(remove = setOf("ma:living"), expectedLeaderId = "ma:family"),
         removal.action)
     assertNull(musicMaDispatch(s, MusicPlayerUiAction.ToggleRoom("ma:kitchen")))
+  }
+
+  @Test fun playbackConfirmationsRequireTheRenderedSourceLeaderAndQueue() {
+    val s = state()
+    for ((action, confirmed) in listOf(
+        MusicPlayerUiAction.TogglePlayback to s.copy(playback = PlaybackState.PAUSED),
+        MusicPlayerUiAction.Next to s.copy(track = s.track!!.copy(id = "two")),
+        MusicPlayerUiAction.Previous to s.copy(positionMs = 0),
+        MusicPlayerUiAction.Seek(25_000) to s.copy(positionMs = 25_000),
+        MusicPlayerUiAction.SelectQueueItem("two") to s.copy(track = s.track!!.copy(id = "two")),
+    )) {
+      val dispatch = musicMaDispatch(s, action)!!
+      assertTrue(action.toString(), dispatch.confirmation.matches(confirmed))
+      assertFalse("Another leader cannot confirm $action",
+          dispatch.confirmation.matches(confirmed.copy(controlPlayerId = "ma:kitchen")))
+      assertFalse("Another queue cannot confirm $action",
+          dispatch.confirmation.matches(confirmed.copy(queueId = "replacement")))
+      assertFalse("Another selected source cannot confirm $action",
+          dispatch.confirmation.matches(confirmed.copy(sourceId = "ma:kitchen")))
+    }
   }
 
   @Test fun offlinePendingAndLocalStateCannotDispatchMaTransport() {

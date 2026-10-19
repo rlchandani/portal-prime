@@ -76,10 +76,17 @@ class MaMusicClient(
     }
   }
 
+  /** Playback identity captured by the rendered UI, or at admission for legacy callers. */
+  data class PlaybackTarget(val controlPlayerId: String, val queueId: String?)
+
   sealed interface Action {
-    data class Transport(val command: MusicCommand) : Action
-    data class Seek(val positionMs: Long) : Action
-    data class QueueItem(val id: String, val expectedQueueId: String? = null) : Action
+    val expectedTarget: PlaybackTarget? get() = null
+    data class Transport(val command: MusicCommand, override val expectedTarget: PlaybackTarget? = null) : Action
+    data class Seek(val positionMs: Long, override val expectedTarget: PlaybackTarget? = null) : Action
+    data class QueueItem(
+        val id: String, val expectedQueueId: String? = null,
+        override val expectedTarget: PlaybackTarget? = null,
+    ) : Action
     data class Volume(val roomId: String, val percent: Int) : Action
     /** Canonical ma:<leader-id>; null captures the currently published leader at admission. */
     data class Group(
@@ -104,6 +111,7 @@ class MaMusicClient(
   private data class Epoch(val generation: Long, val config: Config)
   private data class Queued(
       val epoch: Epoch, val action: Action, val expectedTrackId: String?,
+      val target: PlaybackTarget,
       val expiresAt: Long, val callback: (CommandResult) -> Unit,
   )
   private enum class Kind { AUTH, PLAYERS, QUEUE, ITEMS, COMMAND, LIVENESS }
@@ -222,7 +230,13 @@ class MaMusicClient(
       action.copy(expectedQueueId = queueId)
     } else action
     if (!bounded(ownedAction)) return@synchronized false
-    val accepted = commands.offer(Queued(e, ownedAction, expectedTrackId, elapsedMs() + limits.requestTimeoutMs * 4L, callback))
+    // A track ID can survive regrouping or queue transfer. Capture the admitted
+    // playback target under the READY publication lock so queued work cannot retarget it.
+    val observed = publishedSelection?.snapshot ?: return@synchronized false
+    val target = ownedAction.expectedTarget ?: PlaybackTarget(
+        observed.controlPlayerId ?: return@synchronized false, observed.queueId)
+    val accepted = commands.offer(Queued(e, ownedAction, expectedTrackId,
+        target, elapsedMs() + limits.requestTimeoutMs * 4L, callback))
     if (accepted) gate.notifyAll()
     accepted
   }
@@ -420,6 +434,11 @@ class MaMusicClient(
     val id = nextId()
     val trackBound = command.action is Action.Transport || command.action is Action.Seek ||
         command.action is Action.QueueItem
+    if (trackBound && (selected?.snapshot?.controlPlayerId != command.target.controlPlayerId ||
+        selected?.snapshot?.queueId != command.target.queueId)) {
+      result(command, Outcome.REJECTED, id, problem = "Music Assistant playback target changed before the action")
+      return
+    }
     if (trackBound && command.expectedTrackId != null &&
         selected?.snapshot?.track?.id != command.expectedTrackId) {
       result(command, Outcome.REJECTED, id, problem = "Music Assistant track changed before the action")
@@ -686,7 +705,10 @@ class MaMusicClient(
 
   private fun waitForWork(ms: Long) = synchronized(gate) { if (!closed) gate.wait(ms) }
 
-  private fun bounded(action: Action): Boolean = when (action) {
+  private fun bounded(action: Action): Boolean = (action.expectedTarget?.let { target ->
+    MaMusicProtocol.activeQueueCommand("validate", target.controlPlayerId) != null &&
+        (target.queueId == null || MaMusicProtocol.queueStateCommand("validate", target.queueId) != null)
+  } != false) && when (action) {
     is Action.QueueItem -> action.id.isNotBlank() && action.id.length in 1..256 &&
         (action.expectedQueueId == null ||
           (action.expectedQueueId.isNotBlank() && action.expectedQueueId.length in 1..256))

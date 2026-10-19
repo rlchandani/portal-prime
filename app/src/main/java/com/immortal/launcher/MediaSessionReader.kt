@@ -116,12 +116,13 @@ object MediaSessionReader {
       command: MusicCommand, positionMs: Long = 0, onResult: (Boolean) -> Unit) {
     val worker = handler
     if (worker == null || expectedToken == null) { onResult(false); return }
-    worker.post {
+    val queued = worker.post {
       val ok = runCatching {
         active?.let { executeMusicCommand(it, expectedPackage, command, positionMs, expectedToken, expectedTrackId) } == true
       }.getOrDefault(false)
       onResult(ok)
     }
+    if (!queued) onResult(false)
   }
 
   internal fun executeMusicCommand(c: MediaController, expectedPackage: String,

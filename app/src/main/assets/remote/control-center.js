@@ -473,6 +473,7 @@ const api = createClient({
     if (room()?.base === target.base && room()?.token === target.token) {
       connected = false;
       connectionState = 'expired';
+      if (musicSheet) closeSheet();
       abortReads();
       updateHeader();
       stopPolling();
@@ -1784,7 +1785,10 @@ async function readMusicSheet(owner) {
   try {
     const response = await api(owner.ticket.room, '/remote/music', { signal: controller.signal });
     if (!musicSheetCurrent(owner) || epoch !== owner.epoch) return;
-    owner.state = validateMusicState(response);
+    const next = validateMusicState(response);
+    if (owner.state && (owner.state.sourceRevision !== next.sourceRevision ||
+        owner.state.sourceId !== next.sourceId)) owner.feedback = '';
+    owner.state = next;
     owner.fresh = true;
     owner.error = null;
     if (owner.state.pending === null) {
@@ -1933,16 +1937,19 @@ function renderMusicSheet(owner) {
     return;
   }
   const usable = musicMutable(owner, s);
-  const statusText = owner.sending ? 'Sending command…'
+  const feedback = owner.sending ? 'Sending command…'
     : owner.uncertain ? 'Command outcome unknown. Reading the latest state…'
     : owner.admitted || s.pending ? 'Command pending. Waiting for the latest state…'
     : owner.error ? `${owner.feedback || 'Last reported music.'} ${message(owner.error)}`
-    : owner.feedback || (s.audioOwnedByOther ? 'Audio is in use on the Portal.' : ({
-      not_configured: 'Music is not configured on this Portal.',
-      connecting: 'Connecting to music…', ready: 'Latest state from the Portal.',
-      offline: 'Music is offline.', auth_required: 'Music sign-in is required on the Portal.',
-      incompatible: 'This music source is not compatible.',
-    })[s.connection]);
+    : owner.feedback;
+  // A command outcome never replaces the current connection or interruption notice.
+  const statusText = [feedback, ({
+    not_configured: 'Music is not configured on this Portal.',
+    connecting: 'Connecting to music…', ready: '',
+    offline: 'Music is offline.', auth_required: 'Music sign-in is required on the Portal.',
+    incompatible: 'This music source is not compatible.',
+  })[s.connection], s.audioOwnedByOther ? 'Audio is in use on the Portal.' : '']
+    .filter(Boolean).join(' ') || 'Latest state from the Portal.';
   // Keep a dragged range and its observed source/track binding; do not replace it on each tick.
   const focusedRange = owner.root.contains(document.activeElement) &&
     document.activeElement?.matches('input[type="range"],input[type="number"]');

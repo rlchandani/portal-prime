@@ -585,6 +585,122 @@ class MaMusicClientTest {
     }
   }
 
+  @Test fun queuedPlaybackRejectsReplacementLeaderEvenWhenQueueAndTrackRemainTheSame() {
+    for (action in listOf<MaMusicClient.Action>(
+        MaMusicClient.Action.Transport(MusicCommand.PAUSE),
+        MaMusicClient.Action.Transport(MusicCommand.NEXT), MaMusicClient.Action.Seek(12_000),
+        MaMusicClient.Action.QueueItem("two"))) {
+      val fake = Fake(); val seen = Seen(); val client = client(fake, seen)
+      try {
+        val generation = client.config(config()); auth(fake); groupRefresh(fake, "leader-a")
+        val original = seen.ready().second.snapshot
+        assertEquals("one", original.track?.id)
+        assertEquals("shared", original.queueId)
+        fake.received.add("""{"event":"player_updated","object_id":"family"}""")
+        val players = fake.next("players/all")
+        assertTrue(client.command(action, generation, expectedTrackId = "one") { seen.results.add(it) })
+        groupRefresh(fake, "leader-b", players)
+        val replaced = seen.ready().second.snapshot
+        assertEquals("ma:leader-b", replaced.controlPlayerId)
+        assertEquals("one", replaced.track?.id)
+        assertEquals("shared", replaced.queueId)
+        fake.cycle()
+        assertNull("Playback must not retarget the replacement leader", fake.sent.poll(30, TimeUnit.MILLISECONDS))
+        assertEquals(MaMusicClient.Outcome.REJECTED, seen.results.poll(2, TimeUnit.SECONDS)!!.outcome)
+      } finally { client.close() }
+    }
+  }
+
+  @Test fun queuedTransportAndSeekRejectReplacementQueueEvenWhenTrackAndLeaderRemainTheSame() {
+    for (action in listOf<MaMusicClient.Action>(
+        MaMusicClient.Action.Transport(MusicCommand.PAUSE), MaMusicClient.Action.Seek(12_000))) {
+      val fake = Fake(); val seen = Seen(); val client = client(fake, seen)
+      try {
+        val generation = client.config(config()); auth(fake); refresh(fake); seen.ready()
+        assertTrue(client.refresh())
+        val players = fake.next("players/all")
+        assertTrue(client.command(action, generation, expectedTrackId = "one") { seen.results.add(it) })
+        fake.reply(players, JSONArray().put(player().put("active_source", "replacement")))
+        fake.reply(fake.next("player_queues/get_active_queue"), queue().put("queue_id", "replacement")
+            .put("current_item", item().put("queue_id", "replacement"))
+            .put("next_item", item("two").put("queue_id", "replacement")))
+        fake.reply(fake.next("player_queues/items"), JSONArray()
+            .put(item().put("queue_id", "replacement")).put(item("two").put("queue_id", "replacement")))
+        val replaced = seen.ready().second.snapshot
+        assertEquals("ma:family", replaced.controlPlayerId)
+        assertEquals("one", replaced.track?.id)
+        assertEquals("replacement", replaced.queueId)
+        fake.cycle()
+        assertNull("Playback must not target a replacement queue", fake.sent.poll(30, TimeUnit.MILLISECONDS))
+        assertEquals(MaMusicClient.Outcome.REJECTED, seen.results.poll(2, TimeUnit.SECONDS)!!.outcome)
+      } finally { client.close() }
+    }
+  }
+
+  @Test fun renderedPlaybackCannotAdoptANewerLeaderAtCommandAdmission() {
+    for (action in listOf(MusicPlayerUiAction.TogglePlayback, MusicPlayerUiAction.Next,
+        MusicPlayerUiAction.Seek(12_000),
+        MusicPlayerUiAction.SelectQueueItem("two"))) {
+      val fake = Fake(); val seen = Seen(); val client = client(fake, seen)
+      try {
+        val generation = client.config(config()); auth(fake); groupRefresh(fake, "leader-a")
+        val rendered = seen.ready().second.snapshot
+        val dispatch = musicMaDispatch(rendered, action)!!
+        assertTrue(client.refresh())
+        groupRefresh(fake, "leader-b")
+        assertEquals("ma:leader-b", seen.ready().second.snapshot.controlPlayerId)
+        // The backend can publish ahead of the Main-thread store that rendered this action.
+        assertTrue(client.command(dispatch.action, generation, expectedTrackId = rendered.track!!.id) {
+          seen.results.add(it)
+        })
+        fake.cycle()
+        assertNull("A rendered action must keep its original leader", fake.sent.poll(30, TimeUnit.MILLISECONDS))
+        assertEquals(MaMusicClient.Outcome.REJECTED, seen.results.poll(2, TimeUnit.SECONDS)!!.outcome)
+      } finally { client.close() }
+    }
+  }
+
+  @Test fun renderedSeekCannotAdoptANewerQueueAtCommandAdmission() {
+    val fake = Fake(); val seen = Seen(); val client = client(fake, seen)
+    try {
+      val generation = client.config(config()); auth(fake); refresh(fake)
+      val rendered = seen.ready().second.snapshot
+      val dispatch = musicMaDispatch(rendered, MusicPlayerUiAction.Seek(12_000))!!
+      assertTrue(client.refresh())
+      fake.reply(fake.next("players/all"), JSONArray().put(player().put("active_source", "replacement")))
+      fake.reply(fake.next("player_queues/get_active_queue"), queue().put("queue_id", "replacement")
+          .put("current_item", item().put("queue_id", "replacement"))
+          .put("next_item", item("two").put("queue_id", "replacement")))
+      fake.reply(fake.next("player_queues/items"), JSONArray()
+          .put(item().put("queue_id", "replacement")).put(item("two").put("queue_id", "replacement")))
+      assertEquals("replacement", seen.ready().second.snapshot.queueId)
+      assertTrue(client.command(dispatch.action, generation, expectedTrackId = rendered.track!!.id) {
+        seen.results.add(it)
+      })
+      fake.cycle()
+      assertNull("A rendered seek must keep its original queue", fake.sent.poll(30, TimeUnit.MILLISECONDS))
+      assertEquals(MaMusicClient.Outcome.REJECTED, seen.results.poll(2, TimeUnit.SECONDS)!!.outcome)
+    } finally { client.close() }
+  }
+
+  @Test fun queuedPlaybackStillRunsAfterAnUnchangedTargetRefresh() {
+    val fake = Fake(); val seen = Seen(); val client = client(fake, seen)
+    try {
+      val generation = client.config(config()); auth(fake); groupRefresh(fake, "leader-a")
+      val rendered = seen.ready().second.snapshot
+      val dispatch = musicMaDispatch(rendered, MusicPlayerUiAction.Seek(12_000))!!
+      assertTrue(client.refresh())
+      val players = fake.next("players/all")
+      assertTrue(client.command(dispatch.action, generation, expectedTrackId = "one") { seen.results.add(it) })
+      groupRefresh(fake, "leader-a", players); seen.ready()
+      val seek = fake.next("player_queues/seek")
+      assertEquals("shared", seek.getJSONObject("args").getString("queue_id"))
+      assertEquals(12, seek.getJSONObject("args").getInt("position"))
+      fake.reply(seek, JSONObject.NULL)
+      assertEquals(MaMusicClient.Outcome.ACKNOWLEDGED, seen.results.poll(2, TimeUnit.SECONDS)!!.outcome)
+    } finally { client.close() }
+  }
+
   @Test fun groupLeaderBindingAcceptsMatchingCanonicalLeaderAndBoundsExplicitIds() {
     for (expectedLeader in listOf(null, "ma:leader-a")) {
       val fake = Fake(); val seen = Seen(); val client = client(fake, seen)

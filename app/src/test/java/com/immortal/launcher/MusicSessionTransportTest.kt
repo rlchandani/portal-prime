@@ -90,4 +90,24 @@ class MusicSessionTransportTest {
         expectedTrackId = "old-track"))
     verifyNoInteractions(controls)
   }
+
+  @Test fun rejectedWorkerEnqueueReportsFailureInsteadOfWaitingForConfirmationTimeout() {
+    val worker = mock(android.os.Handler::class.java)
+    val token = mock(android.media.session.MediaSession.Token::class.java)
+    val handlerField = MediaSessionReader::class.java.getDeclaredField("handler").apply {
+      isAccessible = true
+    }
+    val previousWorker = handlerField.get(MediaSessionReader)
+    val results = mutableListOf<Boolean>()
+    try {
+      handlerField.set(MediaSessionReader, worker)
+      `when`(worker.post(any(Runnable::class.java))).thenReturn(false)
+      MediaSessionReader.musicCommand("com.player", token, "track", MusicCommand.PAUSE,
+          onResult = results::add)
+      assertEquals(listOf(false), results)
+      verify(worker).post(any(Runnable::class.java))
+    } finally {
+      handlerField.set(MediaSessionReader, previousWorker)
+    }
+  }
 }

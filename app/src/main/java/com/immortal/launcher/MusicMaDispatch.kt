@@ -11,11 +11,37 @@ internal data class MusicMaDispatch(
     val action: MaMusicClient.Action,
 )
 
+/** Matching playback on a replacement leader or queue cannot confirm the original command. */
+private data class MaPlaybackConfirmation(
+    val sourceId: String, val target: MaMusicClient.PlaybackTarget,
+    val observedChange: MusicConfirmation,
+) : MusicConfirmation {
+  override fun matches(snapshot: MusicPlayerSnapshot): Boolean =
+      snapshot.sourceId == sourceId && snapshot.controlPlayerId == target.controlPlayerId &&
+          snapshot.queueId == target.queueId && observedChange.matches(snapshot)
+}
+
 /** Validate the UI's current selection before queueing work; the client validates again on its worker. */
 internal fun musicMaDispatch(s: MusicPlayerSnapshot, action: MusicPlayerUiAction): MusicMaDispatch? {
   if (!s.sourceId.startsWith("ma:") || s.pending != null) return null
-  fun dispatch(command: MusicCommand, confirmation: MusicConfirmation, request: MaMusicClient.Action) =
-      MusicMaDispatch(command, confirmation, request).takeIf { s.can(command) }
+  fun dispatch(
+      command: MusicCommand, confirmation: MusicConfirmation, request: MaMusicClient.Action,
+  ): MusicMaDispatch? {
+    if (!s.can(command)) return null
+    val playback = request is MaMusicClient.Action.Transport || request is MaMusicClient.Action.Seek ||
+        request is MaMusicClient.Action.QueueItem
+    val target = if (playback) MaMusicClient.PlaybackTarget(
+        s.controlPlayerId ?: return null, s.queueId) else null
+    val ownedRequest = when (request) {
+      is MaMusicClient.Action.Transport -> request.copy(expectedTarget = target)
+      is MaMusicClient.Action.Seek -> request.copy(expectedTarget = target)
+      is MaMusicClient.Action.QueueItem -> request.copy(expectedTarget = target)
+      else -> request
+    }
+    return MusicMaDispatch(command,
+        if (target != null) MaPlaybackConfirmation(s.sourceId, target, confirmation) else confirmation,
+        ownedRequest)
+  }
   return when (action) {
     MusicPlayerUiAction.TogglePlayback -> {
       val playing = s.playback == PlaybackState.PLAYING

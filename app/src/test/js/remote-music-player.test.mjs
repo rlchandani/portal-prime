@@ -735,3 +735,74 @@ test('audio ownership permitted controls cannot reuse stale source, revision or 
     h.hide();
   }
 });
+
+test('command feedback cannot hide later connection or audio ownership restrictions', async t => {
+  const notices = {
+    offline: 'Music is offline.',
+    auth_required: 'Music sign-in is required on the Portal.',
+    incompatible: 'This music source is not compatible.',
+    connecting: 'Connecting to music…',
+    not_configured: 'Music is not configured on this Portal.',
+    interrupted: 'Audio is in use on the Portal.',
+  };
+  for (const [connection, notice] of Object.entries(notices)) {
+    const { h, f, root, open, advance } = await fixture(t, { commandResult: true });
+    f.music.playback = 'playing';
+    await open();
+    h.click('Pause');
+    await h.settle();
+    f.music.playback = 'paused';
+    f.music.lastCommand = { requestId: 101, command: 'pause', outcome: 'confirmed' };
+    await advance();
+    assert.match(root().querySelector('.music-status').textContent, /Change confirmed/);
+    if (connection === 'interrupted') f.music.audioOwnedByOther = true;
+    else f.music.connection = connection;
+    await advance();
+    assert.ok(root().querySelector('.music-status').textContent.includes(notice), connection);
+    assert.equal(f.posts, 1, 'A changed state must never replay the command.');
+  }
+});
+
+test('a confirmed command notice is retired when its source observation is replaced', async t => {
+  for (const changed of ['source', 'revision']) {
+    const { h, f, root, open, advance } = await fixture(t, { commandResult: true });
+    f.music.playback = 'playing';
+    await open();
+    h.click('Pause');
+    await h.settle();
+    f.music.playback = 'paused';
+    f.music.lastCommand = { requestId: 101, command: 'pause', outcome: 'confirmed' };
+    await advance();
+    assert.match(root().querySelector('.music-status').textContent, /Change confirmed/);
+    if (changed === 'source') f.music.sourceId = 'ma:replacement';
+    else f.music.sourceRevision++;
+    f.music.lastCommand = null;
+    await advance();
+    assert.doesNotMatch(root().querySelector('.music-status').textContent, /Change confirmed/, changed);
+    assert.equal(f.posts, 1);
+  }
+});
+
+
+test('pairing expiry dismisses the music sheet and retires its cached controls and polling', async t => {
+  for (const initial of [false, true]) {
+    const options = initial ? { getStatus: 401 } : {};
+    const { h, f, open, advance, control } = await fixture(t, options);
+    await open();
+    const oldPlay = initial ? null : control('Play');
+    if (!initial) {
+      options.getStatus = 401;
+      await advance();
+    }
+    assert.equal(h.document.getElementById('sheet').open, false,
+      'The music modal must not obscure the existing Pair again recovery.');
+    assert.equal(h.eval('musicSheet'), null);
+    assert.match(h.document.getElementById('connection').textContent, /Pair again/);
+    oldPlay?.click();
+    await h.settle();
+    const reads = f.gets;
+    await advance();
+    assert.equal(f.gets, reads);
+    assert.equal(f.posts, 0);
+  }
+});

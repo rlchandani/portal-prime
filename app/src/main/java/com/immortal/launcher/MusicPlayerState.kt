@@ -122,7 +122,7 @@ data class MusicPlayerSnapshot(
     val localSessionToken: android.media.session.MediaSession.Token? = null,
     /** Canonical MA leader ID supplied by the adapter, never guessed from room order. */
     val controlPlayerId: String? = null,
-    /** Connection identity carried atomically with the immutable rendered observation. */
+    /** Source/session/playback-target binding carried with the immutable rendered observation. */
     val presentationRevision: Long = 0,
     /** Authoritative MA queue identity, independent of the current track. */
     val queueId: String? = null,

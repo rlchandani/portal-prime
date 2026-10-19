@@ -1,5 +1,16 @@
 # Music receiver preview.2 and companion parity — October 19, 2026
 
+## Latest integrated control preview — October 19, 11:08 UTC
+
+Current installed Family launcher SHA-256: `6fde3c6ab184339c006667263a46a40cc1a2a690d15a1503589d0626d544e6ad`; paired Pixel companion: `c2933b966edad3f1793641bf105e1a33292543132774beeaacc79318d8fcbbd3`. Both installed hashes and existing signers verified. In-place updates preserved recorded Family preferences/saver/stock native PIDs/music state, the phone's **two pairings** and selected targets; actual prior APKs retained. Family readback is **Ready / Idle / empty queue / no track / 13 discovered rooms**. Living untouched; no music-server write or managed-receiver/audio probe ran.
+
+Changes close stale Android session, MA group-leader/queue and queued-command retargeting windows; report local enqueue rejection promptly; handle the companion's synchronous player-selection response truthfully; retire expired PWA sheets and preserve connection notices. Existing sockets are not restarted merely because the observation binding changes. Scoped independent reviews found no remaining actionable defects in these fixes. The [goal ledger](music-player-goal.md#integrated-control-safety-and-preview-rollout--october-19-1108-utc) records RED → GREEN cases and limits.
+
+Verification: **3,341 Immortal JVM / 343 suites** and **540 companion JVM / 72 suites**, zero failures/errors/skips; both debug/test APK builds passed. **745/749 Node passed**, four optional skips, zero failures. **2/2 isolated Chrome UI checks passed**, zero page errors/outside requests; these use synthetic state. OS foreground checks identified both apps; only current Family Home was visually inspected. Subsequent screenshot attempts did not prove player/phone focus and supply no further visual verdict.
+
+YouTube source authorization remains pending directly in the server. Live production audio ownership remains unwired; receiver PCM/focus/Calls/Jarvis, actual audible music, remaining command/room/playing-lifecycle acceptance, parked unmet performance gates and final Living rollout are not passed. The historical native failures below remain parked; this preview neither reruns nor converts them into acceptance. Filtered deployment/build receipts and rollback artifacts are private under `/private/tmp/portal-music-recovery/`.
+
+
 ## Parked PCM follow-up — after Android reply-boundary fix
 
 After the actual Android 12-field limit was corrected for the 13/14-field v2 envelope, a fresh Family PCM probe **failed at `start_user_stop`**. It reported **1 explicit Start**, **1 observed native candidate process**, **0 confirmed local stops**, **0 continued-drain checks** and **0 no-automatic-resume checks**; `suppressionAcknowledged=true`, `elapsedMs=1484`, `audiblePlaybackProven=false` and `serverWriteCommandsSent=false`. This is **PARKED**: no actual PCM, focus, audio or continuity pass, no performance acceptance and no further physical rerun. The earlier `initial_stopped` / 0-Start failure below remains historical evidence. Filtered follow-up evidence is in `/private/tmp/portal-music-backend-check/pcm-device.log` and `pcm-device-receipt.json`.

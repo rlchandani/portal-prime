@@ -76,8 +76,19 @@ internal class MusicPlayerController(context: Context) {
   }
 
   private fun publishLocal() {
-    val next = musicSessionSnapshot(NowPlayingHub.current, SystemClock.elapsedRealtime())
-    if (source != next.sourceId) {
+    publishSnapshot(musicSessionSnapshot(NowPlayingHub.current, SystemClock.elapsedRealtime()))
+  }
+
+  private fun publishSnapshot(next: MusicPlayerSnapshot) {
+    val previous = store.current
+    val bindingChanged = when {
+      next.sourceId.startsWith("local:") -> previous.localSessionToken != next.localSessionToken
+      next.sourceId.startsWith("ma:") -> previous.controlPlayerId != next.controlPlayerId ||
+          previous.queueId != next.queueId
+      else -> false
+    }
+    if (source != next.sourceId || bindingChanged) {
+      // Replace the observation binding, without restarting the source connection.
       selectSource(next.sourceId)
     }
     store.publish(generation, next.copy(presentationRevision = sourceRevision))
@@ -101,13 +112,13 @@ internal class MusicPlayerController(context: Context) {
       client = MaMusicClient(onSelection = { epoch, selected ->
         main.post {
           if (attached && ma === client && epoch == maGeneration)
-            store.publish(generation, selected.snapshot.copy(presentationRevision = sourceRevision))
+            publishSnapshot(selected.snapshot)
         }
       }, onConnection = { epoch, connection ->
         main.post {
           if (attached && ma === client && epoch == maGeneration && connection != MusicConnection.READY) {
             // READY always arrives with a fresh Selection; never confirm from a stale copy.
-            store.publish(generation, store.current.copy(connection = connection, presentationRevision = sourceRevision))
+            publishSnapshot(store.current.copy(connection = connection))
           }
         }
       })
@@ -170,7 +181,7 @@ internal class MusicPlayerController(context: Context) {
           if (attached && ma === client && token == generation) {
             when (result.outcome) {
               MaMusicClient.Outcome.ACKNOWLEDGED -> store.acknowledge(token, id)
-              MaMusicClient.Outcome.REFRESHED -> result.selection?.let { store.publish(token, it.snapshot.copy(presentationRevision = sourceRevision)) }
+              MaMusicClient.Outcome.REFRESHED -> result.selection?.let { publishSnapshot(it.snapshot) }
               MaMusicClient.Outcome.REJECTED, MaMusicClient.Outcome.FAILED ->
                 store.reject(token, id, result.problem ?: "The player could not apply the change.")
             }
