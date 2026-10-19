@@ -71,10 +71,11 @@ internal val ApprovedHomeTabPalette = ApprovedDarkPalette
 internal fun ApprovedHomeTabs(
     selected: ApprovedLauncherTab,
     modifier: Modifier = Modifier,
+    contentActive: Boolean = true,
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
   if (!BuildConfig.PORTAL_NATIVE_HOME_TABS) {
-    ApprovedLauncherTabs(selected, modifier, content)
+    ApprovedLauncherTabs(selected, modifier, contentActive, content)
     return
   }
   val hostOwner = LocalLifecycleOwner.current
@@ -131,7 +132,7 @@ internal fun ApprovedHomeTabs(
             page
           }
         },
-        update = { it.select(selected) },
+        update = { it.setContentActive(contentActive); it.select(selected) },
         onRelease = { it.release() },
     )
   }
@@ -177,6 +178,13 @@ private class ApprovedHomeTabViews(
   private var pending: ApprovedHomeTabTransition.Plan? = null
   private var released = false
   private var attached = false
+  private var contentActive = true
+  fun setContentActive(value: Boolean) {
+    if (contentActive == value || released) return
+    contentActive = value
+    updatePages()
+    synchronizeAnimation()
+  }
   private val lifecycleObserver = LifecycleEventObserver { _, event ->
     if (!released) {
       if (event == Lifecycle.Event.ON_DESTROY) release()
@@ -222,9 +230,9 @@ private class ApprovedHomeTabViews(
 
   private fun updatePages() {
     pages.forEach { (tab, page) ->
-      page.activate(tab == transition.selected)
+      page.activate(contentActive && tab == transition.selected)
       // INVISIBLE keeps measurement and composition; no offscreen page display list is drawn.
-      page.layer.visibility = if (tab in transition.visible) View.VISIBLE else View.INVISIBLE
+      page.layer.visibility = if (contentActive && tab in transition.visible) View.VISIBLE else View.INVISIBLE
     }
   }
 
@@ -232,7 +240,7 @@ private class ApprovedHomeTabViews(
     pages.forEach { (tab, page) -> page.layer.translationX = transition.offset(tab) * width }
   }
 
-  private fun canRunPageMotion(): Boolean = !released && attached &&
+  private fun canRunPageMotion(): Boolean = contentActive && !released && attached &&
       host.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
 
   private fun synchronizeAnimation(afterLayout: Boolean = false) {

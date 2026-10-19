@@ -94,9 +94,10 @@ internal fun ApprovedAppsScreen(
     searchRequest: Int = 0,
     openSearchRequest: Int = 0,
     onSelectTab: ((String) -> Unit)? = null,
+    onOpenMusic: (() -> Unit)? = null,
 ) {
   val content: @Composable () -> Unit = {
-    ApprovedAppsContent(onExit, modifier, embedded, initiallyRecent, initiallySearching, searchRequest, openSearchRequest, onSelectTab)
+    ApprovedAppsContent(onExit, modifier, embedded, initiallyRecent, initiallySearching, searchRequest, openSearchRequest, onSelectTab, onOpenMusic)
   }
   if (embedded) content() else PortalPrimeTheme(darkTheme = false) { content() }
 }
@@ -111,6 +112,7 @@ private fun ApprovedAppsContent(
     searchRequest: Int,
     openSearchRequest: Int,
     onSelectTab: ((String) -> Unit)?,
+    onOpenMusic: (() -> Unit)?,
 ) {
   val context = LocalContext.current
   val owner = (if (embedded) LocalApprovedLauncherHostOwner.current else null) ?: LocalLifecycleOwner.current
@@ -333,6 +335,7 @@ private fun ApprovedAppsContent(
                 when {
                   entry.app != null -> launchApp(entry.app)
                   entry.folder != null -> openFolder(entry.folder)
+                  embedded && entry.builtin == "music" && onOpenMusic != null -> onOpenMusic()
                   embedded && entry.builtin == "tools" && onSelectTab != null -> onSelectTab("tools")
                   else -> launchApprovedBuiltin(context, entry.builtin!!)
                 }
@@ -510,7 +513,8 @@ private fun launchApprovedBuiltin(context: Context, id: String) {
     "store" -> launchApprovedIntent(context, Intent(context, StoreActivity::class.java))
     "tools" -> context.openApprovedHomeTab(ApprovedLauncherTab.TOOLS)
     "settings" -> launchApprovedIntent(context, Intent(context, ImmortalSettingsActivity::class.java))
-    "music" -> launchApprovedIntent(context, Intent(context, WebAppActivity::class.java).putExtra(WebAppActivity.EXTRA_URL, WebAppActivity.URL_YT_MUSIC))
+    "music" -> launchApprovedIntent(context, Intent(context, HomeActivity::class.java)
+        .putExtra(APPROVED_HOME_MUSIC, true))
     "dashboard" -> HomeDashboardActivity.openDashboard(context)
     "calls" -> PortalHomeBridge.launch(context)
   }

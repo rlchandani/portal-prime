@@ -316,6 +316,7 @@ internal fun loadApprovedInstalledApps(context: Context): List<AppEntry> =
 
 private const val HOME_APP_WIDGET_HOST_ID = 0x4611
 private const val SAVED_LAUNCHER_TAB = "approved_saved_launcher_tab"
+internal const val APPROVED_HOME_MUSIC = "approved_home_music"
 
 // Sentinel component for the injected "Calls" grid tile — no real Activity backs it; onLaunch
 // recognizes this and bridges to the stock Portal calling surface via launchStockHome().
@@ -338,6 +339,7 @@ class HomeActivity : ComponentActivity() {
       launcherTabState = value
     }
   private var appsSearchOpenRequest by mutableStateOf(0)
+  private var musicOpenRequest by mutableStateOf(0)
   private var pendingResumeIntent: Intent? = null
   private var cancelWebViewStartup: (() -> Unit)? = null
 
@@ -365,6 +367,8 @@ class HomeActivity : ComponentActivity() {
         LauncherScreen(
             widgetLibraryRequest = widgetLibraryRequest,
             appsSearchOpenRequest = appsSearchOpenRequest,
+            musicOpenRequest = musicOpenRequest,
+            onOpenMusic = { musicOpenRequest++ },
             selectedTab = launcherTab,
             onSelectTab = { launcherTab = it },
             onLaunch = { cn ->
@@ -394,11 +398,8 @@ class HomeActivity : ComponentActivity() {
                   HomeDashboardActivity.openDashboard(this@HomeActivity)
                 } else if (cn.packageName == packageName &&
                     cn.className == WebAppActivity::class.java.name) {
-                  // The Music tile: YouTube Music's PWA in the kiosk WebView (no GMS client).
-                  startActivity(
-                      Intent(this@HomeActivity, WebAppActivity::class.java)
-                          .putExtra(WebAppActivity.EXTRA_URL, WebAppActivity.URL_YT_MUSIC)
-                          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                  // Music stays inside the retained Home host; no separate Activity/theme.
+                  musicOpenRequest++
                 } else {
                   startActivity(
                       Intent(Intent.ACTION_MAIN)
@@ -462,6 +463,11 @@ class HomeActivity : ComponentActivity() {
     } else if (search) selectApprovedHomeTab(ApprovedLauncherTab.APPS, true)
     incoming.removeExtra(APPROVED_HOME_TAB)
     incoming.removeExtra(APPROVED_HOME_SEARCH)
+    if (incoming.getBooleanExtra(APPROVED_HOME_MUSIC, false)) {
+      ImmortalDreamNavigation.dismissForNavigation()
+      musicOpenRequest++
+    }
+    incoming.removeExtra(APPROVED_HOME_MUSIC)
   }
 
   /** Settings can open the same library without taking ownership of AppWidgetHost callbacks. */
@@ -1051,6 +1057,8 @@ private fun ApprovedHomePagedWidgets(
 private fun LauncherScreen(
     widgetLibraryRequest: Int,
     appsSearchOpenRequest: Int,
+    musicOpenRequest: Int,
+    onOpenMusic: () -> Unit,
     selectedTab: ApprovedLauncherTab,
     onSelectTab: (ApprovedLauncherTab) -> Unit,
     onLaunch: (ComponentName) -> Unit,
@@ -1085,6 +1093,14 @@ private fun LauncherScreen(
 
   var editMode by remember { mutableStateOf(false) }
   var showLibrary by rememberSaveable { mutableStateOf(false) }
+  var musicLayout by rememberSaveable { mutableStateOf<MusicPlayerLayout?>(null) }
+  LaunchedEffect(musicOpenRequest) {
+    if (musicOpenRequest > 0) {
+      musicLayout = MusicPlayerLayout.FULL
+      editMode = false
+      showLibrary = false
+    }
+  }
   LaunchedEffect(widgetLibraryRequest) {
     if (widgetLibraryRequest > 0) showLibrary = true
   }
@@ -1197,6 +1213,7 @@ private fun LauncherScreen(
   }
   BackHandler(enabled = editMode) { editMode = false }
   BackHandler(enabled = selectedTab != ApprovedLauncherTab.HOME) { onSelectTab(ApprovedLauncherTab.HOME) }
+  BackHandler(enabled = musicLayout != null) { musicLayout = null }
   CompositionLocalProvider(
       com.immortal.launcher.ui.theme.LocalApprovedPalette provides
           if (com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark) ApprovedHomeTabPalette
@@ -1218,7 +1235,7 @@ private fun LauncherScreen(
           Spacer(Modifier.weight(1f))
           ApprovedHomeIcon("wifi", Modifier.size(22.dp))
           Text(when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" }, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
-          if (selectedTab == ApprovedLauncherTab.HOME)
+          if (selectedTab == ApprovedLauncherTab.HOME && musicLayout == null)
             ApprovedHomeTextButton(if (editMode) "Done" else "Customize") { editMode = !editMode }
           ApprovedHeaderButton("remote", "Connect your phone") {
             val (url, pin) = enableRemoteAndMintPin(context)
@@ -1233,7 +1250,8 @@ private fun LauncherScreen(
                 .tvFocusable(CircleShape, onLongClick = { openHeyPicker(context, pkg) }) { fireHey(context, pkg) },
                 contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
           }
-          if (settings.showMiniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(300.dp))
+          ApprovedHeaderButton("music", "Open music player", onOpenMusic)
+          if (settings.showMiniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(300.dp), onOpenMusic)
           ApprovedHeaderButton("search", "Search apps and settings") {
             if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
           }
@@ -1245,7 +1263,10 @@ private fun LauncherScreen(
             }
           }
         }
-        ApprovedHomeTabs(selectedTab, Modifier.weight(1f).fillMaxWidth()) { tab ->
+        Box(Modifier.weight(1f).fillMaxWidth()) {
+        ApprovedHomeTabs(selectedTab, Modifier.fillMaxSize().padding(
+            bottom = if (musicLayout == MusicPlayerLayout.COMPACT) 210.dp else 0.dp),
+            contentActive = musicLayout == null || musicLayout == MusicPlayerLayout.COMPACT) { tab ->
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
@@ -1281,15 +1302,26 @@ private fun LauncherScreen(
               onExit = { onSelectTab(ApprovedLauncherTab.HOME) }, embedded = true,
               searchRequest = appsSearchRequest,
               openSearchRequest = appsSearchOpenRequest,
+              onOpenMusic = onOpenMusic,
               onSelectTab = { id -> ApprovedLauncherTab.fromId(id)?.let(onSelectTab) })
           ApprovedLauncherTab.TOOLS -> ApprovedToolsScreen(
               onExit = { onSelectTab(ApprovedLauncherTab.HOME) }, embedded = true,
               libraryRequest = toolsLibraryRequest)
           }
         }
+        musicLayout?.let { layout ->
+          MusicPlayerHost(layout,
+              modifier = if (layout == MusicPlayerLayout.COMPACT)
+                Modifier.align(Alignment.BottomCenter).widthIn(max = 720.dp).fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+              else Modifier.fillMaxSize().padding(horizontal = 32.dp),
+              onDismiss = { musicLayout = null }, onLayoutChange = { musicLayout = it })
+        }
+        }
         Spacer(Modifier.height(24.dp))
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
           ApprovedHomeDock(selectedTab.id) { destination ->
+            musicLayout = null
             when (destination) {
               "apps" -> { editMode = false; onSelectTab(ApprovedLauncherTab.APPS) }
               "tools" -> {
@@ -1893,7 +1925,9 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
     val np = nowPlaying
     if (showMiniPlayer && np != null && np.active) {
       Spacer(Modifier.size(16.dp))
-      MiniPlayer(np, modifier = Modifier.weight(1f).padding(end = 16.dp))
+      MiniPlayer(np, modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+        context.startActivity(Intent(context, HomeActivity::class.java).putExtra(APPROVED_HOME_MUSIC, true))
+      }
     } else {
       Spacer(Modifier.weight(1f))
     }
@@ -2024,7 +2058,7 @@ private fun NowPlayingCard(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ApprovedHomeHeaderPlayer(modifier: Modifier = Modifier) {
+private fun ApprovedHomeHeaderPlayer(modifier: Modifier = Modifier, onOpenMusic: () -> Unit) {
   // Playback/position notifications invalidate only the player, not the widget dashboard.
   var state by remember { mutableStateOf(NowPlayingHub.current) }
   val mainHandler = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
@@ -2033,12 +2067,12 @@ private fun ApprovedHomeHeaderPlayer(modifier: Modifier = Modifier) {
     NowPlayingHub.addListener(listener)
     onDispose { NowPlayingHub.removeListener(listener) }
   }
-  state?.takeIf { it.active }?.let { MiniPlayer(it, modifier) }
+  state?.takeIf { it.active }?.let { MiniPlayer(it, modifier, onOpenMusic) }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MiniPlayer(state: NowPlayingState, modifier: Modifier = Modifier) {
+private fun MiniPlayer(state: NowPlayingState, modifier: Modifier = Modifier, onOpenMusic: () -> Unit) {
   val context = androidx.compose.ui.platform.LocalContext.current
   // Some media apps hand cover art as a URI rather than an embedded bitmap. Resolve it off the
   // main thread (content:// or http) so the header shows the cover too — the screensaver and the
@@ -2089,7 +2123,8 @@ private fun MiniPlayer(state: NowPlayingState, modifier: Modifier = Modifier) {
       }
     }
     Spacer(Modifier.size(12.dp))
-    Column(modifier = Modifier.weight(1f)) {
+    Column(modifier = Modifier.weight(1f).semantics { contentDescription = "Open music player" }
+        .tvFocusable { onOpenMusic() }) {
       Text(
           state.title,
           color = ApprovedHomePalette.Text,

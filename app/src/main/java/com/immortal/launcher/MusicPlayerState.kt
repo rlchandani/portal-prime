@@ -66,6 +66,7 @@ data class MusicRoom(
     val muted: Boolean? = null,
     val groupId: String? = null,
     val canGroupWith: Set<String> = emptySet(),
+    val volumeControllable: Boolean = false,
 )
 
 data class PendingMusicCommand(
@@ -96,6 +97,9 @@ data class MusicPlayerSnapshot(
     val pending: PendingMusicCommand? = null,
     val audioOwnedByOther: Boolean = false,
     val problem: String? = null,
+    /** Shared session artwork is read-only here; the player does not recycle it. */
+    val artBitmap: android.graphics.Bitmap? = null,
+    val localSessionToken: android.media.session.MediaSession.Token? = null,
 ) {
   fun can(command: MusicCommand): Boolean {
     if (connection != MusicConnection.READY || audioOwnedByOther || sourceId.isBlank()) return false

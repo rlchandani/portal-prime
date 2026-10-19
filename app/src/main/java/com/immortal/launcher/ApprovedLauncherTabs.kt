@@ -138,6 +138,7 @@ internal enum class ApprovedLauncherTab(val id: String) {
 internal fun ApprovedLauncherTabs(
     selected: ApprovedLauncherTab,
     modifier: Modifier = Modifier,
+    contentActive: Boolean = true,
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
   val hostOwner = LocalLifecycleOwner.current
@@ -172,8 +173,8 @@ internal fun ApprovedLauncherTabs(
     val widthPx = with(LocalDensity.current) { maxWidth.toPx() }
     ApprovedLauncherTab.entries.filter { it in visited }.forEach { tab ->
       key(tab) {
-      val active = tab == selected
-      val drawing = tab in visible
+      val active = contentActive && tab == selected
+      val drawing = contentActive && tab in visible
       val input = remember(hostOwner) { LauncherPageInputGate() }
       Box(Modifier.fillMaxSize()
           // Placement keeps descendant geometry on cached integer offsets rather than

@@ -40,6 +40,12 @@ data class NowPlayingState(
     val artBitmap: Bitmap? = null,
     /** Whether the active media session advertises seek transport. */
     val canSeek: Boolean = false,
+    /** Advertised actions and monotonic clock for the native music player. */
+    val mediaActions: Long = 0,
+    val positionUpdatedElapsedMs: Long = 0,
+    val mediaId: String = "",
+    /** In-process binding; never serialized to the remote. */
+    val sessionToken: android.media.session.MediaSession.Token? = null,
 ) {
   /** True when there's an actual track to show (playing or paused, with a title). */
   val active: Boolean

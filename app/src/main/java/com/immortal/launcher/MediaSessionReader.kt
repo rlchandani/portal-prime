@@ -111,6 +111,59 @@ object MediaSessionReader {
 
   fun seek(positionMs: Long) = active?.transportControls?.seekTo(positionMs) ?: Unit
 
+  /** Native music commands use the reader's worker, with a fresh source/action check. */
+  fun musicCommand(expectedPackage: String, expectedToken: MediaSession.Token?, expectedTrackId: String,
+      command: MusicCommand, positionMs: Long = 0, onResult: (Boolean) -> Unit) {
+    val worker = handler
+    if (worker == null || expectedToken == null) { onResult(false); return }
+    worker.post {
+      val ok = runCatching {
+        active?.let { executeMusicCommand(it, expectedPackage, command, positionMs, expectedToken, expectedTrackId) } == true
+      }.getOrDefault(false)
+      onResult(ok)
+    }
+  }
+
+  internal fun executeMusicCommand(c: MediaController, expectedPackage: String,
+      command: MusicCommand, positionMs: Long = 0, expectedToken: MediaSession.Token? = null,
+      expectedTrackId: String? = null): Boolean {
+    if (expectedPackage.isBlank() || c.packageName != expectedPackage) return false
+    if (expectedToken != null && c.sessionToken != expectedToken) return false
+    if (expectedTrackId != null) {
+      val md = c.metadata ?: return false
+      fun text(key: String) = md.getString(key)?.takeIf { it.isNotBlank() }
+      val actualId = musicSessionTrackId(text(MediaMetadata.METADATA_KEY_MEDIA_ID).orEmpty(),
+          (text(MediaMetadata.METADATA_KEY_TITLE) ?: text(MediaMetadata.METADATA_KEY_DISPLAY_TITLE)).orEmpty(),
+          (text(MediaMetadata.METADATA_KEY_ARTIST) ?: text(MediaMetadata.METADATA_KEY_ALBUM_ARTIST)
+              ?: text(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE)).orEmpty(),
+          text(MediaMetadata.METADATA_KEY_ALBUM).orEmpty(), md.getLong(MediaMetadata.METADATA_KEY_DURATION))
+      if (actualId != expectedTrackId) return false
+    }
+    val playback = c.playbackState ?: return false
+    val required = when (command) {
+      MusicCommand.PLAY -> MediaPlaybackState.ACTION_PLAY or MediaPlaybackState.ACTION_PLAY_PAUSE
+      MusicCommand.PAUSE -> MediaPlaybackState.ACTION_PAUSE or MediaPlaybackState.ACTION_PLAY_PAUSE
+      MusicCommand.NEXT -> MediaPlaybackState.ACTION_SKIP_TO_NEXT
+      MusicCommand.PREVIOUS -> MediaPlaybackState.ACTION_SKIP_TO_PREVIOUS
+      MusicCommand.SEEK -> MediaPlaybackState.ACTION_SEEK_TO
+      else -> return false
+    }
+    if (playback.actions and required == 0L) return false
+    if (command == MusicCommand.SEEK) {
+      val duration = c.metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0
+      if (duration <= 0 || positionMs < 0 || positionMs > duration) return false
+    }
+    when (command) {
+      MusicCommand.PLAY -> c.transportControls.play()
+      MusicCommand.PAUSE -> c.transportControls.pause()
+      MusicCommand.NEXT -> c.transportControls.skipToNext()
+      MusicCommand.PREVIOUS -> c.transportControls.skipToPrevious()
+      MusicCommand.SEEK -> c.transportControls.seekTo(positionMs)
+      else -> return false
+    }
+    return true
+  }
+
   // --- session plumbing (all on the handler thread) ---------------------------
 
   private fun attach() {
@@ -245,7 +298,11 @@ object MediaSessionReader {
         positionMs = ps?.position ?: 0L,
         source = c.packageName,
         artBitmap = artBitmap,
-        canSeek = ((ps?.actions ?: 0L) and MediaPlaybackState.ACTION_SEEK_TO) != 0L)
+        canSeek = ((ps?.actions ?: 0L) and MediaPlaybackState.ACTION_SEEK_TO) != 0L,
+        mediaActions = ps?.actions ?: 0L,
+        positionUpdatedElapsedMs = ps?.lastPositionUpdateTime ?: 0L,
+        mediaId = str(MediaMetadata.METADATA_KEY_MEDIA_ID).orEmpty(),
+        sessionToken = c.sessionToken)
   }
 
   /** Scale album art down to [ART_MAX_EDGE] into a new bitmap; never recycle the

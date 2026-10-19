@@ -45,9 +45,9 @@ Files: modify `MultiRoomArt.kt`; create `MusicArtworkPolicy.kt`, `MusicArtworkPo
 
 Interfaces: `MusicArtworkPolicy.readBounded(InputStream, Int): ByteArray`, sampling calculation; preserve `MultiRoomArt.fetch(String): Bitmap?`.
 
-- [ ] Test oversized/unknown-length/chunked/truncated responses and extreme dimensions before implementing.
-- [ ] Enforce caps during reads, bounded header/frame parsing and sampled decode; preserve existing card behavior.
-- [ ] Run focused policy tests and integrate without main-thread I/O.
+- [x] Test oversized/unknown-length/chunked/truncated responses and extreme dimensions before implementing.
+- [x] Enforce caps during reads, bounded header/frame parsing and sampled decode; preserve existing card behavior.
+- [x] 39 artwork policy tests passed; HTTP/local loading remains off main. Native memory proof is a separate pending gate.
 
 ### Task 3: Native source controller and MA adapter
 
@@ -96,4 +96,4 @@ Files: existing settings domain/spec infrastructure, `RemoteHtml`/Fleet routes, 
 
 ## Progress
 
-Baseline: 2,969 JVM tests passed, 0 failures/errors/skips. Product implementation tasks remain incomplete.
+Baseline: 2,969 JVM tests passed, 0 failures/errors/skips. Latest native checkpoint: 3,085 JVM tests passed, 0 failures/errors/skips; debug assembly green. Full/compact/real-photo setup-state UI verified on Family. Authenticated MA playback, performance, settings/remote integration and rollout remain incomplete.

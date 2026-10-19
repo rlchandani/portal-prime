@@ -78,6 +78,8 @@ class PhotoFrameController(
     private val calendarRefreshMs: Long = 30 * 60_000L,
     /** Deliberate Photos viewer; Dream/continuation retains tap-to-dismiss. */
     var interactivePreview: Boolean = false,
+    /** In-page music photos: no clock/calendar/voice/soundscape or dream handoff. */
+    private val photosOnly: Boolean = false,
 ) {
   private val io = Executors.newSingleThreadExecutor()
   // Decode-once screen-sized copies of local photos for the engine (see [EngineScaledCache]).
@@ -278,7 +280,7 @@ class PhotoFrameController(
   fun onTouch(ev: MotionEvent) {
     // Meta can stop the Dream before ACTION_UP arrives. An in-progress touch is user
     // interaction, so recovery must not reopen photos between finger-down and dismissal.
-    if (ev.actionMasked == MotionEvent.ACTION_DOWN) DreamPolicy.userExitAt = System.currentTimeMillis()
+    if (!photosOnly && ev.actionMasked == MotionEvent.ACTION_DOWN) DreamPolicy.userExitAt = System.currentTimeMillis()
     // While the timer alarm is showing, the slide-to-stop owns the touch stream.
     if (faceRenderer.handleAlarmTouch(ev)) return
     when (ev.actionMasked) {
@@ -319,9 +321,11 @@ class PhotoFrameController(
 
   private fun startFrame() {
     stopped = false
-    settings = ScreensaverConfig.load(context)
+    settings = ScreensaverConfig.load(context).let {
+      if (photosOnly) musicPhotoSettings(it) else it
+    }
     val root = view as FrameLayout
-    val source = PhotoFrameSource.from(settings, allowWebPage = faceOverride == null)
+    val source = PhotoFrameSource.from(settings, allowWebPage = !photosOnly && faceOverride == null)
     nativePhotoMode = ScreensaverConfig.isNativeStage(settings.mode) && source !is PhotoFrameSource.WebPage
     if (nativePhotoMode) {
       nativeStarting = true
@@ -345,17 +349,19 @@ class PhotoFrameController(
       if (!stopped && !ScreensaverConfig.load(context).cacheEnabled) MediaCache.purge(context)
     }.apply { name = "slideshow-cache-housekeeping"; start() }
     applyFit()
-    refreshCalendar.run()
-    calendarTick.run()
+    if (!photosOnly) {
+      refreshCalendar.run()
+      calendarTick.run()
+    }
     // Build + drive the overlay from the user's selected face ([FaceCatalog]); faceOverride lets
     // the debug preview harness (and the overnight night clock) render a specific face instead.
-    faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
+    if (!photosOnly) faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
 
     // --- fork features layered on top of the Face overlay ---
     // Only spin up TTS when the welcome overlay will actually speak. The greeting uses the
     // Android TTS service selected on the device, keeping any neural engine out-of-process.
     val welcomeCfg = WelcomeConfig.load(context)
-    val ttsEnabled = showWelcome && settings.welcomeEnabled && welcomeCfg.enableTts
+    val ttsEnabled = !photosOnly && showWelcome && settings.welcomeEnabled && welcomeCfg.enableTts
     if (ttsEnabled) {
       tts = TextToSpeech(context) { status ->
         if (status == TextToSpeech.SUCCESS && !ttsReady) {
@@ -386,11 +392,11 @@ class PhotoFrameController(
     }
 
     // Start the ambient soundscape (no-op when set to Off).
-    runCatching { soundscape.start(settings.soundscape, settings.soundscapeVolume) }
+    if (!photosOnly) runCatching { soundscape.start(settings.soundscape, settings.soundscapeVolume) }
 
     // Optional "wave to advance" — wholly guarded; any failure just disables it so the
     // always-on dream process is never put at risk.
-    if (settings.gestureWave) {
+    if (!photosOnly && settings.gestureWave) {
       runCatching {
         gestureCamera = GestureCamera(context) {
           if (hostActive && !stopped) ui.post { if (hostActive && !stopped) runCatching { next() } }
@@ -404,10 +410,10 @@ class PhotoFrameController(
     // already shows a clock overlay, and the dashboard would render behind the opaque WebView), so
     // it's disabled whenever an engine mode is active — the user never asked for that overlay.
     val engineMode = ScreensaverConfig.usesEngine(settings.mode)
-    refreshWeather.run()
-    if (settings.ambientDashboard && !engineMode) ui.postDelayed(dashboardCycle, 45_000L)
+    if (!photosOnly) refreshWeather.run()
+    if (!photosOnly && settings.ambientDashboard && !engineMode) ui.postDelayed(dashboardCycle, 45_000L)
 
-    if (showWelcome && settings.welcomeEnabled && !engineMode) showWelcomeOverlay()
+    if (!photosOnly && showWelcome && settings.welcomeEnabled && !engineMode) showWelcomeOverlay()
     when (source) {
       is PhotoFrameSource.WebPage -> {
         // Web-page source takes over the whole frame — no photo feed, no Immortal overlay.
@@ -1130,8 +1136,10 @@ class PhotoFrameController(
     }
     root.addView(nativeStage, FrameLayout.LayoutParams(MATCH, MATCH))
 
-    root.addView(faceRenderer.view)
-    buildCalendar(root)
+    if (!photosOnly) {
+      root.addView(faceRenderer.view)
+      buildCalendar(root)
+    }
 
     // Ambient dashboard panel — full-screen glanceable card, hidden until cycled in.
     dashboardPanel = buildDashboardPanel().also {
@@ -1167,6 +1175,7 @@ class PhotoFrameController(
   /** Read EXIF date/GPS for a local file off [metaIo], reverse-geocode the place, then publish
    *  the caption — guarded by [gen] so a slow lookup for a superseded photo is dropped. */
   private fun loadCaptionForLocal(path: String, g: Int) {
+    if (photosOnly) return
     metaIo.execute {
       val meta = runCatching { PhotoCaption.read(ExifInterface(path)) }.getOrNull()
       publishCaption(meta, g)
@@ -1175,6 +1184,7 @@ class PhotoFrameController(
 
   /** Same as [loadCaptionForLocal] but for an SMB file: a fresh read stream feeds EXIF. */
   private fun loadCaptionForSmb(path: String, g: Int) {
+    if (photosOnly) return
     val src = smbSource ?: return
     metaIo.execute {
       val meta =
@@ -1698,8 +1708,8 @@ class PhotoFrameController(
     nativeStage.visibility = View.VISIBLE
     photo.visibility = View.GONE
     photoBack.visibility = View.GONE
-    val occupied = faceRenderer.photoOcclusions().toMutableList()
-    if (calendarPanel.visibility == View.VISIBLE && calendarPanel.width > 0) {
+    val occupied = if (photosOnly) mutableListOf<Rect>() else faceRenderer.photoOcclusions().toMutableList()
+    if (this::calendarPanel.isInitialized && calendarPanel.visibility == View.VISIBLE && calendarPanel.width > 0) {
       occupied.add(Rect(calendarPanel.left - dp(20), calendarPanel.top - dp(20),
           calendarPanel.right + dp(20), calendarPanel.bottom + dp(20)))
     }
