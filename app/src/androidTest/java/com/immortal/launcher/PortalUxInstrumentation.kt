@@ -39,6 +39,19 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Synthetic native artwork only: no UiAutomation or generic private diagnostics.
+        if (options.getString("command") == "musicArtwork") {
+            val artwork = try {
+                MusicArtworkDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("musicArtworkCompleted", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (artwork.getBoolean("musicArtworkCompleted")) 0 else 1, artwork)
+            return
+        }
         val result = Bundle()
         // These gated list fixtures never acquire UiAutomation or enter private diagnostics.
         if (options.getString("command") == "barWatchServiceList") {

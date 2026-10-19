@@ -28,8 +28,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -188,9 +186,8 @@ class FaceRenderer(
     npListener = null
     weatherRequest?.cancel(true)
     weatherRequest = null
-    // A discarded download must be retried on resume even if the track's URL did not change.
-    if (artRequest != null) lastArtUrl = null
-    cancelArtRequest()
+    // Retain the overlay views, but release hidden pixels and invalidate pending completions.
+    clearNowPlayingArtwork()
     clockFace?.setHostActive(false)
     timerThumb?.animate()?.cancel()
   }
@@ -507,10 +504,8 @@ class FaceRenderer(
     val token = work.token() ?: return
     val card = nowPlayingCard ?: return
     if (s == null || !s.active) {
-      cancelArtRequest()
+      clearNowPlayingArtwork()
       card.visibility = View.GONE
-      lastArtUrl = null
-      lastArtBitmap = null
       return
     }
     card.visibility = View.VISIBLE
@@ -538,7 +533,7 @@ class FaceRenderer(
         val requestId = artRequestId
         artRequest = io.submit {
           if (!work.isCurrent(token) || Thread.currentThread().isInterrupted) return@submit
-          val bmp = runCatching { downloadBitmap(want) }.getOrNull()
+          val bmp = MediaArt.resolveUri(context, want)
           if (!work.isCurrent(token) || Thread.currentThread().isInterrupted) return@submit
           ui.post {
             if (work.isCurrent(token) && artRequestId == requestId && lastArtUrl == want) {
@@ -555,6 +550,15 @@ class FaceRenderer(
     artRequestId++
     artRequest?.cancel(true)
     artRequest = null
+  }
+
+  /** ImageView holds its drawable even when hidden. Shared session/cache bitmaps are borrowed. */
+  private fun clearNowPlayingArtwork() {
+    cancelArtRequest()
+    npArt?.setImageDrawable(null)
+    npArt?.visibility = View.GONE
+    lastArtUrl = null
+    lastArtBitmap = null
   }
 
   /**
@@ -811,15 +815,6 @@ class FaceRenderer(
             status == BatteryManager.BATTERY_STATUS_FULL
     val pct = if (level >= 0 && scale > 0) level * 100 / scale else -1
     return pct to charging
-  }
-
-  private fun downloadBitmap(spec: String): Bitmap? {
-    val c = URL(spec).openConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 12000
-    c.instanceFollowRedirects = true
-    c.setRequestProperty("User-Agent", "PortalPhotoFrame/1.0")
-    return c.inputStream.use { android.graphics.BitmapFactory.decodeStream(it) }
   }
 
   private val MATCH = FrameLayout.LayoutParams.MATCH_PARENT

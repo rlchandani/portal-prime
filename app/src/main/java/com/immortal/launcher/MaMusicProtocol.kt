@@ -161,8 +161,9 @@ object MaMusicProtocol {
           val currentIndex = q.integer("current_index")
           require(currentIndex == null || currentIndex in 0 until count)
           val current = q.obj("current_item")?.let { readEntry(it, id) }
-          val next = q.obj("next_item")?.let { readEntry(it, id) }
-          require(count > 0 || (current == null && next == null))
+          // MA may retain a validated prefetch after clear; it is no longer queued.
+          val next = q.obj("next_item")?.let { readEntry(it, id) }.takeIf { count > 0 }
+          require(count > 0 || current == null)
           val repeat = if (q.has("repeat_mode")) q.requiredText("repeat_mode") else "off"
           require(repeat in setOf("off", "one", "all"))
           Queue(id, q.boolean("available"), q.boolean("active"), count,
@@ -315,7 +316,7 @@ object MaMusicProtocol {
         playback = state,
         positionMs = if (finite) position.coerceAtMost(track!!.durationMs!!) else position,
         positionAtElapsedMs = observedAtElapsedMs.coerceAtLeast(0), capabilities = caps,
-        queue = if (queueOwnsPlayback) page?.items?.map { entry ->
+        queue = if (queueOwnsPlayback && q!!.itemCount > 0) page?.items?.map { entry ->
           if (entry.item.id == current?.item?.id && entry.item.artUrl.isBlank() &&
               confirmedPlayerArt.isNotBlank()) entry.item.copy(artUrl = confirmedPlayerArt)
           else entry.item
@@ -325,7 +326,7 @@ object MaMusicProtocol {
         queueId = q?.queueId.takeIf { queueOwnsPlayback },
     )
     return Selection(snapshot, q?.queueId, control, list,
-        if (queueOwnsPlayback) page?.items?.filter { it.available }?.map { it.item.id }?.toSet()
+        if (queueOwnsPlayback && q!!.itemCount > 0) page?.items?.filter { it.available }?.map { it.item.id }?.toSet()
             ?: emptySet() else emptySet(), queueTransport)
   }
 

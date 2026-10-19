@@ -9,49 +9,34 @@ package com.immortal.launcher
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
-import java.net.URL
 
 /**
- * Resolve album art that a media session hands over as a **URI** rather than an embedded bitmap.
- * Shared by everything that shows now-playing cover art — the screensaver card, the home-header
- * mini-player, and the phone remote — so they all behave the same: prefer the in-memory bitmap,
- * and otherwise resolve the URI (a device-local `content://`/`file://` only this app can read, or
- * an `http(s)://` URL). Best-effort, off the main thread; any failure returns null (placeholder).
+ * Shared URI artwork facade for the screensaver, home-header mini-player and phone remote.
+ * Reuses the bounded network/local readers and sampled decoders; only MultiRoomArt owns a cache.
+ * Blocking — call off-main. Returned bitmaps may be shared, so callers must not recycle them.
  */
 object MediaArt {
-  /** Cap on the re-decoded edge — enough for a header thumb or a frame card, cheap to decode. */
   private const val MAX_EDGE = 384
 
-  /** Load and downscale the art at [url]. Returns null for a blank URL or any read/decode failure. */
-  fun resolveUri(context: Context, url: String): Bitmap? {
+  /** Resolve supported artwork URIs; failed reads/decodes leave the regular placeholder. */
+  fun resolveUri(context: Context, url: String): Bitmap? = resolveUri(
+      url,
+      network = { spec, edge -> MultiRoomArt.fetch(spec, edge) },
+      local = { spec, edge -> MusicLocalArtwork.fetch(context.contentResolver, spec, edge) })
+
+  /** Admit the URI before invoking either transport, including access to a local resolver. */
+  internal fun resolveUri(
+      url: String,
+      network: (String, Int) -> Bitmap?,
+      local: (String, Int) -> Bitmap?,
+  ): Bitmap? {
     if (url.isBlank()) return null
     return runCatching {
-          val bytes =
-              if (url.startsWith("http://") || url.startsWith("https://")) {
-                val conn = URL(url).openConnection()
-                conn.connectTimeout = 4000
-                conn.readTimeout = 4000
-                conn.getInputStream().use { it.readBytes() }
-              } else {
-                // content://, file://, android.resource:// — device-local, only this app can read it.
-                context.contentResolver.openInputStream(Uri.parse(url))?.use { it.readBytes() }
-              }
-          bytes?.let { decodeDownscaled(it) }
-        }
-        .getOrNull()
-  }
-
-  /** Decode [bytes] with an inSampleSize that keeps the longest edge near [MAX_EDGE]. */
-  private fun decodeDownscaled(bytes: ByteArray): Bitmap? {
-    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
-    val longest = maxOf(bounds.outWidth, bounds.outHeight)
-    val opts =
-        BitmapFactory.Options().apply {
-          inSampleSize = if (longest > MAX_EDGE) Integer.highestOneBit(longest / MAX_EDGE) else 1
-        }
-    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
+      when (MusicLocalArtwork.routeFor(url)) {
+        MusicArtworkRoute.NETWORK -> network(url, MAX_EDGE)
+        MusicArtworkRoute.LOCAL -> local(url, MAX_EDGE)
+        MusicArtworkRoute.UNSUPPORTED -> null
+      }
+    }.getOrNull()
   }
 }

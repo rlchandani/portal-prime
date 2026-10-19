@@ -39,6 +39,8 @@ class MultiRoomService : Service() {
   private var client: SnapcastControlClient? = null
   private val art = java.util.concurrent.Executors.newSingleThreadExecutor()
   private val main = Handler(Looper.getMainLooper())
+  private val artworkLifecycle = ServiceArtworkLifecycle(
+      art, { main.post(it) }, { main.removeCallbacksAndMessages(null) })
   private var session: MediaSession? = null
 
   // The last track we saw playing, kept so we can hold the card as "paused" after the
@@ -47,6 +49,7 @@ class MultiRoomService : Service() {
   @Volatile private var lastPlaying: NowPlayingState? = null
   @Volatile private var lastCover: Bitmap? = null
   @Volatile private var userPaused = false
+  private var latestState: NowPlayingState? = null // main-thread metadata, independent of artwork
 
   // Two now-playing sources, merged by [MultiRoomNowPlaying]: Snapcast carries metadata for MA's
   // own library/radio streams (via control.py); MA's API fills in for streams that don't — an
@@ -72,6 +75,7 @@ class MultiRoomService : Service() {
   }
 
   private fun connect() {
+    val generation = artworkLifecycle.nextGeneration() ?: return
     val host = ImmortalSettings.snapcastHost(this)
     if (host.isBlank()) {
       MultiRoomStatus.text = "No server set"
@@ -80,19 +84,22 @@ class MultiRoomService : Service() {
     }
     MultiRoomStatus.text = "Connecting to $host…"
     client?.stop()
+    snapState = null
+    maState = null
+    lastEffectiveKey = null
     client =
         SnapcastControlClient(
                 host,
                 PORT,
                 { localIp() },
                 { connected ->
-                  main.post {
+                  artworkLifecycle.post(generation) {
                     MultiRoomStatus.text =
                         if (connected) "Connected to $host" else "Connecting to $host…"
                   }
-                }) { s -> onSnapState(s) }
+                }) { s -> onSnapState(s, generation) }
             .also { it.start() }
-    startMaPoller()
+    startMaPoller(generation)
     updateStatus("Linked to $host")
   }
 
@@ -110,11 +117,13 @@ class MultiRoomService : Service() {
       }
           .getOrNull()
 
-  private fun onSnapState(s: NowPlayingState) = main.post { snapState = s; applyEffective() }
+  private fun onSnapState(s: NowPlayingState, generation: Long) =
+      artworkLifecycle.post(generation) { snapState = s; applyEffective() }
 
-  private fun onMaState(s: NowPlayingState, generation: Long) = main.post {
-    if (polling && generation == maPollGeneration) { maState = s; applyEffective() }
-  }
+  private fun onMaState(s: NowPlayingState, generation: Long, connection: Long) =
+      artworkLifecycle.post(connection) {
+        if (polling && generation == maPollGeneration) { maState = s; applyEffective() }
+      }
 
   /**
    * Merge the two sources and push the result to the session, skipping no-op repeats (the MA
@@ -132,7 +141,7 @@ class MultiRoomService : Service() {
    *  is connected: [MaControl.nowPlaying] returns IDLE with no network when MA creds aren't set,
    *  so Snapcast-only Portals are unaffected — and creds entered later are picked up on the next
    *  poll without needing the service (or app) to restart. */
-  private fun startMaPoller() {
+  private fun startMaPoller(connection: Long) {
     stopMaPoller()
     polling = true
     val generation = maPollGeneration
@@ -147,7 +156,7 @@ class MultiRoomService : Service() {
                             }
                             .getOrDefault(NowPlayingState(PlaybackState.IDLE))
                     if (!polling || generation != maPollGeneration) break
-                    onMaState(s, generation)
+                    onMaState(s, generation, connection)
                     try { Thread.sleep(POLL_MA_MS) } catch (_: InterruptedException) { break }
                   }
                 },
@@ -166,12 +175,30 @@ class MultiRoomService : Service() {
     prior?.interrupt()
   }
 
-  /** Fetch art off the control thread, then mirror the track into the session on main. */
+  /** Publish playback immediately; a slow cover must never hold back the pause-hold track. */
   private fun onState(s: NowPlayingState) {
-    art.execute {
-      val cover = if (s.artUrl.isNotBlank()) MultiRoomArt.fetch(s.artUrl) else null
-      main.post { updateSession(s, cover) }
-    }
+    if (session == null) return
+    latestState = s
+    val cover = s.artBitmap ?: if (sameArtwork(lastPlaying, s)) lastCover else null
+    updateSession(s, cover)
+    artworkLifecycle.submit(
+        { s.artBitmap ?: if (s.artUrl.isNotBlank()) MultiRoomArt.fetch(s.artUrl) else null },
+        { fetched -> updateArtwork(s, fetched) })
+  }
+
+  private fun sameArtwork(previous: NowPlayingState?, next: NowPlayingState): Boolean =
+      previous != null && previous.title == next.title && previous.artist == next.artist &&
+          previous.album == next.album && previous.artUrl == next.artUrl &&
+          previous.source == next.source && previous.mediaId == next.mediaId &&
+          previous.durationMs == next.durationMs
+
+  /** A completion enriches the current track; it cannot change metadata or the user's pause. */
+  private fun updateArtwork(s: NowPlayingState, cover: Bitmap?) {
+    val sess = session ?: return
+    if (latestState !== s ||
+        (s.state != PlaybackState.PLAYING && s.state != PlaybackState.PAUSED)) return
+    lastCover = cover
+    present(sess, s, cover, playing = s.state == PlaybackState.PLAYING && !userPaused)
   }
 
   // --- media session: the surface the launcher (and the OS) read ---------------
@@ -194,6 +221,7 @@ class MultiRoomService : Service() {
    * MA's own API can.
    */
   private fun onTransport(cmd: String) {
+    if (session == null) return
     Log.i(TAG, "transport '$cmd' → Music Assistant")
     when (cmd) {
       // Pausing from our own card: hold it as paused so the control flips to "resume"
@@ -201,7 +229,9 @@ class MultiRoomService : Service() {
       // immediately for a snappy UI; the MA command follows.
       "pause" -> {
         userPaused = true
-        lastPlaying?.let { p -> main.post { session?.let { present(it, p, lastCover, playing = false) } } }
+        lastPlaying?.let { p ->
+          session?.let { present(it, p, lastCover, playing = false) }
+        }
       }
       "play" -> userPaused = false
     }
@@ -217,7 +247,11 @@ class MultiRoomService : Service() {
         userPaused = false
         present(sess, s, cover, playing = true)
       }
-      PlaybackState.PAUSED -> present(sess, s, cover, playing = false)
+      PlaybackState.PAUSED -> {
+        lastPlaying = s
+        lastCover = cover
+        present(sess, s, cover, playing = false)
+      }
       else -> {
         // Snapserver idle. If WE paused from here, keep the card up as paused so the user
         // can resume; otherwise the group genuinely stopped → drop the card.
@@ -263,14 +297,24 @@ class MultiRoomService : Service() {
   }
 
   override fun onDestroy() {
+    // Invalidate producers and completions before releasing their main-thread state.
+    artworkLifecycle.close()
     MultiRoomStatus.text = "Off"
     stopMaPoller()
-    client?.stop()
-    art.shutdownNow()
-    runCatching {
-      session?.isActive = false
-      session?.release()
-    }
+    val priorClient = client
+    client = null
+    priorClient?.stop()
+    val priorSession = session
+    session = null
+    lastPlaying = null
+    latestState = null
+    lastCover = null // Shared cache/UI bitmap: drop our reference, never recycle it.
+    snapState = null
+    maState = null
+    lastEffectiveKey = null
+    userPaused = false
+    runCatching { priorSession?.isActive = false }
+    runCatching { priorSession?.release() }
     super.onDestroy()
   }
 

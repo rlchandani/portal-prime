@@ -77,6 +77,42 @@ class MaMusicProtocolTest {
     return result as MaMusicProtocol.Reply.Failure
   }
 
+  @Test fun clearedQueueIgnoresRetainedPrefetchedNextItem() {
+    // Observed on MA 2.10.7 after stop/clear: items=0, current=null, next still prefetched.
+    val cleared = queue().put("items", 0).put("state", "idle")
+        .put("current_index", JSONObject.NULL).put("current_item", JSONObject.NULL)
+    val decoded = success(MaMusicProtocol.parseQueue(reply(cleared)))!!
+    assertNull(decoded.current)
+    assertNull(decoded.next)
+    val observed = selection(players = listOf(player(state = "idle")), q = cleared, entries = emptyList())
+    assertEquals(MusicConnection.READY, observed.snapshot.connection)
+    assertNull(observed.snapshot.track)
+    assertTrue(observed.snapshot.queue.isEmpty())
+    assertFalse(observed.snapshot.can(MusicCommand.NEXT))
+    assertFalse(musicRenderedActionIsCurrent(observed.snapshot, observed.snapshot,
+        observed.snapshot.presentationRevision, MusicPlayerUiAction.SelectQueueItem("item-2")))
+  }
+
+  @Test fun emptyQueueStillRejectsAnActiveCurrentItemOrMalformedPrefetchedItem() {
+    val current = queue().put("items", 0).put("current_index", JSONObject.NULL)
+    failed(MaMusicProtocol.parseQueue(reply(current)))
+    val malformed = queue().put("items", 0).put("current_index", JSONObject.NULL)
+        .put("current_item", JSONObject.NULL).put("next_item", item().put("queue_item_id", 9))
+    failed(MaMusicProtocol.parseQueue(reply(malformed)))
+  }
+
+  @Test fun clearedQueueDropsStaleCachedPageAndSelectableItemIds() {
+    val cleared = queue().put("items", 0).put("state", "idle")
+        .put("current_index", JSONObject.NULL).put("current_item", JSONObject.NULL)
+    // Keep the valid retained next item and the helper's nonempty same-queue page.
+    val observed = selection(players = listOf(player(state = "idle")), q = cleared)
+    assertEquals(MusicConnection.READY, observed.snapshot.connection)
+    assertEquals("queue-shared", observed.snapshot.queueId)
+    assertTrue(observed.snapshot.queue.isEmpty())
+    assertTrue(observed.selectableItems.isEmpty())
+    assertNull(MaMusicProtocol.queueItemCommand("choose", observed, "item-2"))
+  }
+
   @Test fun mapsReleasedPlayerAndQueueFieldsWithoutEquatingPlayerAndQueueIds() {
     val selected = selection()
     val s = selected.snapshot
