@@ -1,5 +1,7 @@
 # Receiver audio-focus candidate for parent review
 
+**Historical source-only checkpoint.** [The built preview.2 and actual Family query record](music-receiver-preview-validation.md) supersede the original build/signing/query status. Correction: the original source checked package names from the Messenger UID without a shared-signature check; preview.2 adds and tests that check. No earlier source-only evidence establishes hardware audio handoff.
+
 Prepared 2026-10-19 as a bounded sidecar. **Reviewable source candidate; no APK build, installation, or Family playback proof.** Family API 29, no GMS/root, installed `de.badaix.snapcast` 0.29.0.2, actual Snapserver 0.34.0 and MA 2.10.7 are supplied context, not newly inspected device facts.
 
 The candidate stops the **local native renderer**, rather than setting a launcher flag or pausing an MA group. It deliberately requires another explicit user Start after every focus loss, including transient loss/ducking. It also removes legacy automatic Start and boot autostart. This is a behavioral tradeoff for review.

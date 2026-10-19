@@ -109,3 +109,131 @@ test('mobile music sheet renders capability-safe queue and players without overf
       pageErrors: f.errors, outsideRequests: f.outsideRequests }));
   } finally { await browser.close(); }
 });
+
+test('real Chrome keeps known lyrics readable only for the same pending source and track', {
+  skip: enabled ? false : 'Set IMMORTAL_REMOTE_CHROME=1 for isolated synthetic Chrome.',
+  timeout: 30000,
+}, async t => {
+  const { chromium } = createRequire(import.meta.url)('playwright');
+  const html = read('app/src/main/java/com/immortal/launcher/RemoteHtml.kt').match(/"""([\s\S]*?)"""/)[1].trim();
+  const assets = Object.fromEntries(['control-center.js', 'core.mjs', 'control-center.css'].map(name => [
+    `/remote/assets/${name}`, read(`app/src/main/assets/remote/${name}`)]));
+  const music = {
+    schemaVersion: 1, sourceRevision: 7, sourceId: 'ma:family', connection: 'ready',
+    queueId: 'queue-fixture', playback: 'paused', pending: null, lastCommand: null,
+    audioOwnedByOther: false, controlPlayerId: 'ma:family', positionMs: 1000,
+    track: { id: 'track-one', title: 'Synthetic track', artist: 'Fixture artist', album: '',
+      durationMs: 180000, isLive: false },
+    capabilities: { play: true, pause: true, next: true, previous: true, seek: true,
+      queue: true, lyrics: true, rooms: true, volume: true, selectPlayer: true },
+    queue: [{ id: 'item-one', title: 'Fixture queue item', artist: 'Fixture artist',
+      available: true, canSelect: true }],
+    rooms: [{ id: 'ma:family', name: 'Fixture player', available: true, volume: 25,
+      inCurrentGroup: true, canSelect: true, canJoin: false, canRemove: false, canSetVolume: true }],
+    lyrics: [{ timeMs: 0, text: 'Initial browser lyric' }],
+  };
+  const f = { errors: [], outsideRequests: 0, reads: 0, posts: 0 };
+  const browser = await chromium.launch({ headless: true,
+    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    args: ['--disable-background-networking', '--disable-component-update', '--no-proxy-server',
+      '--host-resolver-rules=MAP * ~NOTFOUND'] });
+  try {
+    const context = await browser.newContext({ viewport: { width: 402, height: 874 },
+      isMobile: true, hasTouch: true, serviceWorkers: 'block', reducedMotion: 'reduce' });
+    await context.routeWebSocket('**/*', socket => socket.close());
+    await context.route('**/*', async route => {
+      const url = new URL(route.request().url());
+      const json = body => route.fulfill({ contentType: 'application/json', body: JSON.stringify(body) });
+      if (url.origin !== origin) { f.outsideRequests++; return route.abort(); }
+      if (url.pathname === '/remote/ui') return route.fulfill({ contentType: 'text/html', body: html });
+      if (assets[url.pathname]) return route.fulfill({ contentType: url.pathname.endsWith('.css')
+        ? 'text/css' : 'text/javascript', body: assets[url.pathname] });
+      if (url.pathname === '/remote/music') { f.reads++; return json({ ok: true, music }); }
+      if (url.pathname === '/remote/music/command') { f.posts++; return json({ ok: false, error: 'unavailable' }); }
+      if (url.pathname === '/remote/companion') return json({ ok: true, protocolVersion: 1,
+        deviceId: 'synthetic-pending-device', name: 'Fixture', model: 'Synthetic Portal', capabilities: {} });
+      if (url.pathname === '/remote/nowplaying') return json({ ok: true, np: { active: false } });
+      if (url.pathname === '/remote/roster') return json({ ok: true, roster: [] });
+      return json({ ok: true });
+    });
+    await context.addInitScript(origin => {
+      localStorage.setItem('immortal_remote_devices', JSON.stringify([
+        { base: origin, name: 'Fixture', token: 'synthetic-fixture-only' }]));
+      localStorage.setItem('immortal_remote_active', '0');
+    }, origin);
+    const page = await context.newPage(); page.setDefaultTimeout(4000);
+    page.on('pageerror', error => f.errors.push(error.message));
+    await page.goto(`${origin}/remote/ui`);
+    await page.getByRole('button', { name: 'Queue & players', exact: true }).click();
+    const sheet = page.locator('#sheet');
+    await sheet.getByRole('button', { name: 'Lyrics', exact: true }).click();
+    await sheet.getByText('Initial browser lyric', { exact: true }).waitFor();
+    const retiredPlay = await sheet.getByRole('button', { name: 'Play', exact: true }).elementHandle();
+    music.pending = { requestId: 101, command: 'pause', startedAtElapsedMs: 10 };
+    for (const key of Object.keys(music.capabilities)) music.capabilities[key] = false;
+    music.queue[0].canSelect = false;
+    for (const key of ['canSelect', 'canJoin', 'canRemove', 'canSetVolume']) music.rooms[0][key] = false;
+    music.lyrics[0].text = 'Pending browser lyric';
+    await sheet.locator('.music-status').filter({ hasText: 'Command pending' }).waitFor();
+    assert.equal(await sheet.getByText('Pending browser lyric', { exact: true }).isVisible(), true,
+      'Production DOM must retain the current lyric through executable-capability withdrawal.');
+    assert.equal(await sheet.getByRole('button', { name: 'Lyrics', exact: true }).count(), 1);
+    assert.equal(await sheet.getByRole('button', { name: 'Play', exact: true }).isDisabled(), true);
+    await retiredPlay.evaluate(node => node.click());
+    assert.equal(f.posts, 0, 'A detached old control must not send during pending.');
+    music.lyrics[0].text = 'Updated pending browser lyric';
+    await sheet.getByText('Updated pending browser lyric', { exact: true }).waitFor();
+    music.track.id = 'track-two';
+    await sheet.getByRole('button', { name: 'Fixture queue item Fixture artist', exact: true }).waitFor();
+    assert.equal(await sheet.locator('.music-lyric').count(), 0);
+    assert.equal(await sheet.getByRole('button', { name: 'Lyrics', exact: true }).count(), 0);
+    music.pending = null; music.capabilities.lyrics = true;
+    music.lyrics[0].text = 'Supported second track';
+    await sheet.getByRole('button', { name: 'Lyrics', exact: true }).click();
+    await sheet.getByText('Supported second track', { exact: true }).waitFor();
+    music.pending = { requestId: 102, command: 'pause', startedAtElapsedMs: 20 };
+    music.capabilities.lyrics = false;
+    music.lyrics[0].text = 'Second pending track';
+    await sheet.getByText('Second pending track', { exact: true }).waitFor();
+    music.sourceId = 'ma:replacement'; music.sourceRevision++;
+    await sheet.getByRole('button', { name: 'Fixture queue item Fixture artist', exact: true }).waitFor();
+    assert.equal(await sheet.getByRole('button', { name: 'Lyrics', exact: true }).count(), 0);
+    music.pending = null; music.capabilities.lyrics = true;
+    music.lyrics[0].text = 'Supported replacement source';
+    await sheet.getByRole('button', { name: 'Lyrics', exact: true }).click();
+    await sheet.getByText('Supported replacement source', { exact: true }).waitFor();
+    music.pending = { requestId: 103, command: 'pause', startedAtElapsedMs: 30 };
+    music.capabilities.lyrics = false;
+    music.lyrics[0].text = 'Replacement pending lyric';
+    await sheet.getByText('Replacement pending lyric', { exact: true }).waitFor();
+    music.pending = null;
+    await sheet.getByRole('button', { name: 'Fixture queue item Fixture artist', exact: true }).waitFor();
+    assert.equal(await sheet.getByRole('button', { name: 'Lyrics', exact: true }).count(), 0);
+    music.pending = { requestId: 104, command: 'pause', startedAtElapsedMs: 40 };
+    await page.waitForFunction(() => document.querySelector('.music-status')?.textContent.includes('Command pending'));
+    assert.equal(await sheet.locator('.music-lyric').count(), 0);
+    assert.equal(await sheet.getByRole('button', { name: 'Lyrics', exact: true }).count(), 0);
+    assert.equal(f.posts, 0);
+    music.pending = null; music.capabilities.lyrics = true; music.capabilities.seek = true;
+    music.lyrics[0].text = 'Focused terminal browser lyric';
+    await sheet.getByRole('button', { name: 'Lyrics', exact: true }).click();
+    await sheet.getByText('Focused terminal browser lyric', { exact: true }).waitFor();
+    await sheet.getByRole('slider', { name: 'Music playback position', exact: true }).focus();
+    music.capabilities.lyrics = false;
+    await sheet.getByRole('button', { name: 'Fixture queue item Fixture artist', exact: true }).waitFor();
+    assert.equal(await sheet.locator('.music-lyric').count(), 0);
+    assert.equal(await sheet.getByRole('button', { name: 'Lyrics', exact: true }).count(), 0);
+    assert.equal(f.posts, 0);
+    await sheet.getByRole('button', { name: 'Close dialog', exact: true }).click();
+    const stoppedAt = f.reads;
+    await page.waitForTimeout(1250);
+    assert.equal(f.reads, stoppedAt);
+    assert.deepEqual(f.errors, []);
+    assert.equal(f.outsideRequests, 0);
+    t.diagnostic(JSON.stringify({ genuineDom: true, pendingLyricsPreserved: true,
+      pendingLyricsUpdated: true, trackReplacementClosedLyrics: true, sourceReplacementClosedLyrics: true,
+      terminalWithdrawalClosedLyrics: true, focusedDraftWithdrawalClosedLyrics: true,
+      unsupportedLyricsAbsent: true, commandPosts: f.posts, outsideRequests: f.outsideRequests,
+      noClosedSheetPolling: true }));
+  } finally { await browser.close(); }
+});

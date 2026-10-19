@@ -1945,11 +1945,19 @@ function renderMusicSheet(owner) {
   const focusedRange = owner.root.contains(document.activeElement) &&
     document.activeElement?.matches('input[type="range"],input[type="number"]');
   const identity = JSON.stringify([s.sourceRevision, s.sourceId, s.track?.id, s.controlPlayerId, s.queueId]);
+  if (owner.view && owner.view.identity !== identity && owner.panel === 'lyrics') owner.panel = 'queue';
+  // Executable capabilities disappear during pending readback. Retain only lyrics that
+  // were readable for this exact source/track binding; never retain command admission.
+  const lyricsReadable = !!s.track?.id && s.connection === 'ready' && !s.audioOwnedByOther &&
+    s.lyrics.length > 0 && (s.capabilities.lyrics ||
+      (!!s.pending && owner.lyricsIdentity === identity));
+  owner.lyricsIdentity = lyricsReadable ? identity : null;
   const key = JSON.stringify([identity, s.connection, s.playback, s.track, s.capabilities,
     s.queue.slice(0, 500), s.rooms.slice(0, 64), owner.panel,
-    s.capabilities.lyrics ? s.lyrics.slice(0, 1000) : null]);
-  if (!owner.view || (owner.view.key !== key && (!focusedRange || owner.view.identity !== identity))) {
-    const view = { key, identity, controls: [] };
+    lyricsReadable ? s.lyrics.slice(0, 1000) : null]);
+  if (!owner.view || (owner.view.key !== key && (!focusedRange || owner.view.identity !== identity ||
+      owner.view.lyricsReadable !== lyricsReadable))) {
+    const view = { key, identity, lyricsReadable, controls: [] };
     const bind = (node, command, extra = {}) => {
       view.controls.push({ node, command, extra });
       return node;
@@ -1988,7 +1996,7 @@ function renderMusicSheet(owner) {
       }
     }
     const panels = [{ value: 'queue', label: 'Queue' }, { value: 'players', label: 'Players' }];
-    if (s.capabilities.lyrics && s.lyrics.length) panels.push({ value: 'lyrics', label: 'Lyrics' });
+    if (lyricsReadable) panels.push({ value: 'lyrics', label: 'Lyrics' });
     if (!panels.some(panel => panel.value === owner.panel)) owner.panel = 'queue';
     nodes.push(segmented(owner.panel, panels, panel => {
       if (!musicSheetCurrent(owner)) return;

@@ -1,0 +1,18 @@
+PASS stock stop cancels queued native restart
+PASS stale reader cannot mark stopped playback running
+PASS legacy automatic START cannot produce local output
+PASS focus result 0 cannot start child or gain-resume
+PASS focus result 2 cannot start child or gain-resume
+PASS focus loss -1 kills real child; gain stays stopped
+PASS focus loss -2 kills real child; gain stays stopped
+PASS focus loss -3 kills real child; gain stays stopped
+PASS user stop survives delayed gain and pending restart
+PASS legacy STOP kills child even while receiver remains bound
+PASS old focus loss cannot kill a new explicit user session
+PASS loss before PID admission cannot release pending GO
+PASS unconfirmed teardown is reported and prevents second renderer
+PASS IPC denies foreign UID and stale instance/epoch; suppress is local
+PASS allowlisted package with wrong signer cannot query or change active output
+PASS authenticated emergency Stop and Suppress need no fresh observation
+PASS authenticated query does not launch renderer or request audio focus
+RESULT 17 passed; 0 failed. Host service logic only; Android audio not tested.

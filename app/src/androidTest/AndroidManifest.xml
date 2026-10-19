@@ -5,6 +5,7 @@
     <queries>
         <package android:name="com.immortal.launcher.debug" />
         <package android:name="com.android.systemui" />
+        <package android:name="com.immortal.musicreceiver" />
     </queries>
     <application android:usesCleartextTraffic="true"
         android:appComponentFactory="com.immortal.launcher.PinFixtureComponentFactory"

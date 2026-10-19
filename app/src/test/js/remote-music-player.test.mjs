@@ -494,3 +494,123 @@ test('an old queue row cannot start an item in a replacement queue', async t => 
   assert.equal(f.posts, 0);
   assert.match(root().textContent, /Music changed/);
 });
+
+function pendingLyrics(music) {
+  music.pending = { requestId: 101, command: 'pause', startedAtElapsedMs: 10 };
+  for (const key of Object.keys(music.capabilities)) music.capabilities[key] = false;
+  for (const item of music.queue) item.canSelect = false;
+  for (const player of music.rooms)
+    for (const key of ['canSelect', 'canJoin', 'canRemove', 'canSetVolume']) player[key] = false;
+}
+
+test('production lyrics DOM remains readable through pending masks and updates without enabling writes', async t => {
+  const { h, f, root, open, advance } = await fixture(t);
+  f.music.capabilities.lyrics = true;
+  f.music.lyrics = [{ timeMs: 0, text: 'Original lyric' }];
+  await open();
+  h.click('Lyrics');
+  assert.equal(root().querySelector('.music-lyric').textContent, 'Original lyric');
+  const previousPlay = root().querySelector('[aria-label="Play"]');
+  pendingLyrics(f.music);
+  f.music.lyrics = [{ timeMs: 0, text: 'Pending lyric' }];
+  await advance();
+  assert.equal(h.eval('musicSheet.panel'), 'lyrics');
+  assert.equal(root().querySelector('.music-lyric')?.textContent, 'Pending lyric');
+  assert.match(root().textContent, /pending/i);
+  assert.equal(root().querySelector('[aria-label="Play"]').disabled, true);
+  previousPlay.click();
+  h.click('Play');
+  await h.settle();
+  assert.equal(f.posts, 0, 'Neither old nor current transport may write during pending readback.');
+  f.music.lyrics = [{ timeMs: 0, text: 'Updated pending lyric' }];
+  await advance();
+  assert.equal(root().querySelector('.music-lyric')?.textContent, 'Updated pending lyric');
+  assert.equal(f.posts, 0);
+});
+
+test('pending lyrics permission is retired by source revision, source id or track replacement', async t => {
+  for (const changed of ['revision', 'source', 'track']) {
+    const { h, f, root, open, advance } = await fixture(t);
+    f.music.capabilities.lyrics = true;
+    f.music.lyrics = [{ timeMs: 0, text: 'Retired lyric' }];
+    await open();
+    h.click('Lyrics');
+    pendingLyrics(f.music);
+    await advance();
+    assert.equal(root().querySelector('.music-lyric')?.textContent, 'Retired lyric');
+    if (changed === 'revision') f.music.sourceRevision++;
+    if (changed === 'source') f.music.sourceId = 'ma:replacement';
+    if (changed === 'track') f.music.track.id = 'replacement-track';
+    await advance();
+    assert.equal(h.eval('musicSheet.panel'), 'queue', changed);
+    assert.equal(root().querySelector('.music-lyric'), null, changed);
+    assert.equal(root().querySelectorAll('button').some(node => node.textContent === 'Lyrics'), false, changed);
+    assert.equal(f.posts, 0);
+    h.hide();
+  }
+});
+
+test('terminal withdrawal closes a pending lyrics panel instead of keeping unsupported data open', async t => {
+  const { h, f, root, open, advance } = await fixture(t);
+  f.music.capabilities.lyrics = true;
+  f.music.lyrics = [{ timeMs: 0, text: 'Terminal lyric' }];
+  await open();
+  h.click('Lyrics');
+  pendingLyrics(f.music);
+  await advance();
+  assert.equal(root().querySelector('.music-lyric')?.textContent, 'Terminal lyric');
+  f.music.pending = null;
+  await advance();
+  assert.equal(h.eval('musicSheet.panel'), 'queue');
+  assert.equal(root().querySelector('.music-lyric'), null);
+  assert.equal(root().querySelectorAll('button').some(node => node.textContent === 'Lyrics'), false);
+  assert.equal(f.posts, 0);
+});
+
+test('lyrics never appear for permanently unsupported data even when a command is pending', async t => {
+  const { h, f, root, open, advance } = await fixture(t);
+  f.music.lyrics = [{ timeMs: 0, text: 'Unpermitted lyric' }];
+  pendingLyrics(f.music);
+  await open();
+  await advance();
+  assert.equal(root().querySelector('.music-lyric'), null);
+  assert.equal(root().querySelectorAll('button').some(node => node.textContent === 'Lyrics'), false);
+  assert.equal(h.eval('musicSheet.panel'), 'queue');
+  assert.equal(f.posts, 0);
+});
+
+test('source or track replacement closes displayed lyrics even if the new source supports lyrics', async t => {
+  for (const changed of ['revision', 'source', 'track']) {
+    const { h, f, root, open, advance } = await fixture(t);
+    f.music.capabilities.lyrics = true;
+    f.music.lyrics = [{ timeMs: 0, text: 'Old binding lyric' }];
+    await open();
+    h.click('Lyrics');
+    if (changed === 'revision') f.music.sourceRevision++;
+    if (changed === 'source') f.music.sourceId = 'ma:new-source';
+    if (changed === 'track') f.music.track.id = 'new-track';
+    await advance();
+    assert.equal(h.eval('musicSheet.panel'), 'queue', changed);
+    assert.equal(root().querySelector('.music-lyric'), null, changed);
+    assert.equal(f.posts, 0);
+    h.hide();
+  }
+});
+
+test('terminal lyrics withdrawal replaces a focused seek draft without sending it', async t => {
+  const { h, f, root, open, advance, control } = await fixture(t);
+  f.music.capabilities.lyrics = true;
+  f.music.lyrics = [{ timeMs: 0, text: 'Retired focused lyric' }];
+  await open();
+  h.click('Lyrics');
+  const seek = control('Music playback position');
+  seek.focus();
+  seek.value = 50000;
+  seek.oninput();
+  f.music.capabilities.lyrics = false;
+  await advance();
+  assert.equal(h.eval('musicSheet.panel'), 'queue');
+  assert.equal(root().querySelector('.music-lyric'), null);
+  assert.equal(root().querySelectorAll('button').some(node => node.textContent === 'Lyrics'), false);
+  assert.equal(f.posts, 0, 'Retiring a draft must not dispatch it.');
+});

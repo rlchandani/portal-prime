@@ -39,6 +39,12 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Explicit signed receiver Query only; never starts audio or enters private diagnostics.
+        if (options.getString("command") == "musicReceiverQuery") {
+            val receiver = MusicReceiverDeviceChecks.run(this, options)
+            finish(if (receiver.getBoolean("musicReceiverQueryPassed")) 0 else 1, receiver)
+            return
+        }
         // Synthetic native artwork only: no UiAutomation or generic private diagnostics.
         if (options.getString("command") == "musicArtwork") {
             val artwork = try {
