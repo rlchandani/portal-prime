@@ -190,3 +190,10 @@ The actual saved integration token authenticated successfully with MA. `players/
 - New physical PCM check failed before Start at initial_stopped, 0 native candidate processes. No audio/continuity verdict. Parked at the original 30-minute deadline, no repeated audio probe.
 - Candidate removed; prior launcher/test APKs restored; stock receiver running; all recorded settings and saver unchanged; Living untouched. Final music readback remains offline with 0 rooms and must be recovered/verified separately; local restoration is not a server-binding recovery claim.
 - Goal remains incomplete; no new latency/jank acceptance or YouTube/Calls/Jarvis success claimed.
+
+### Verified Android reply-boundary fix — October 19
+
+- Existing Music Assistant login and exact connected Family Snapcast binding revalidated without music writes. Music readback recovered to ready, idle, correct player, empty queue and 11 rooms; the transient recovery cause is not asserted.
+- Actual Android transport still capped Bundles at 12 while v2 requires 13/14 fields. The guard now derives the bound from the strict protocol schema; regression observed RED → GREEN. Full 3,328-test / 342-suite JVM gate and both APK builds pass. Independent scoped wire recheck found no additional mismatch.
+- Real production client: 30 bind/query/unbind cycles, 30 default-denied Starts, 0 Start transmissions/native candidate audio processes, 7,123 ms whole fixture. All recorded settings, saver, stock native PIDs, source/control/queue/track/playback and room volumes/groups unchanged.
+- Family installed launcher verified SHA-256 `73eb41429f48ab5bddb503d3730468383ce83ba6156e0a45f8b8bf0afc6d9c0a`; candidate removed, prior test APK restored, Living untouched. Audio/performance acceptance remains open.

@@ -56,5 +56,22 @@
         "offline"
       ]
     }
+  },
+  "followupAndroidBoundary": {
+    "launcherJvmTests": 3328,
+    "jvmSuites": 342,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "debugAndTestAssembly": "pass",
+    "regressionRedBeforeFix": true,
+    "deviceQueryCycles": 30,
+    "defaultStartsDenied": 30,
+    "startsSent": 0,
+    "candidateNativeProcesses": 0,
+    "wholeFixtureElapsedMs": 7123,
+    "installedLauncherSha256": "73eb41429f48ab5bddb503d3730468383ce83ba6156e0a45f8b8bf0afc6d9c0a",
+    "musicReadbackRestored": true,
+    "audioProbeStillUnverified": true
   }
 }

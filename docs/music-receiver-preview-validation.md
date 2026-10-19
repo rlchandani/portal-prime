@@ -1,5 +1,15 @@
 # Music receiver preview.2 and companion parity — October 19, 2026
 
+## Current Family checkpoint — Android reply bound fixed
+
+Family now runs signed launcher APK `73eb41429f48ab5bddb503d3730468383ce83ba6156e0a45f8b8bf0afc6d9c0a`, verified by pulling the installed APK. The saved server and exact Family Snapcast binding are authenticated/available; `/remote/music` recovered to **ready / correct source and control / idle / empty queue / 11 rooms**, with no pending action. No server configuration or playback command was needed to establish that recovery; its precise transient cause is not claimed.
+
+A concrete Android transport bug explained the previous receiver producer-state rejection: v2 has **13 state fields**, or **14 with an error**, but `AndroidTransport` still limited incoming Bundles to 12. The guard now derives its maximum from the protocol state-key set. Exact key/type/version/correlation/signature/UID validation remains intact; extra fields are not accepted by the parser. The focused regression failed before the fix and passed after it. Full gate: **3,328 JVM tests / 342 suites / zero failures, errors or skips**, debug and test APK assembly passed. Independent review found no additional adjacent wire mismatch.
+
+The fixed production Android client passed **30 real bind/query/unbind cycles**, **30 default-denied Starts**, **0 Start transmissions**, **0 candidate native audio processes**, in **7,123 ms for the entire fixture**. This is not a command-latency or playback measurement. The candidate was removed, the prior test APK restored, the new launcher preview retained, Home requested, and every recorded setting/screensaver component unchanged. The stock native receiver PID set was unchanged; exact source/control/queue/track/playback and room volumes/groups match the before state. Living remains untouched. The failed PCM-audio probe remains historical evidence and is not converted into a pass by this query check.
+
+Private receipts and rollback APKs are under `/private/tmp/portal-music-recovery/`. Actual PCM/audio, YouTube cookie authorization, Calls/Jarvis handoff, playing group continuity and unmet performance gates remain required.
+
 ## PCM preview.3 checkpoint — October 19, 10:04 UTC
 
 A separate native PCM connection and Android AudioTrack output replace kill-on-focus in the isolated receiver source. The launcher v2 contract reports decoder lifetime, unreleased output and monotonic drained frames separately. Local stopped confirmation waits for actual output teardown. Start remains denied by default in production; no automatic focus/reconnect/boot resume or production receiver mapping/hook was activated.

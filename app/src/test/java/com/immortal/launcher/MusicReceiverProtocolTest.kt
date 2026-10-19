@@ -62,6 +62,29 @@ class MusicReceiverProtocolTest {
     rejects { MusicReceiverProtocol.parse(9, state()) }
   }
 
+  @Test fun androidBundleBoundAcceptsCurrentStateAndStateErrorReplies() {
+    for (fields in listOf(state(), state().plus("error" to "stale"),
+        state().plus("error" to "invalid_endpoint"), state().plus("error" to "unsupported"))) {
+      assertTrue("Real Android decoding must admit the complete current schema.",
+          MusicReceiverProtocol.acceptsReplyFieldCount(fields.size))
+      assertTrue(MusicReceiverProtocol.parse(1, fields) is MusicReceiverProtocol.Reply.State)
+    }
+    for (error in listOf("not_ready", "forbidden")) {
+      val fields = mapOf("requestId" to 1L, "error" to error)
+      assertTrue(MusicReceiverProtocol.acceptsReplyFieldCount(fields.size))
+      assertTrue(MusicReceiverProtocol.parse(1, fields) is MusicReceiverProtocol.Reply.Error)
+    }
+  }
+
+  @Test fun androidBundleBoundRejectsEmptyNegativeAndOversizedReplies() {
+    for (count in listOf(-1, 0, state().size + 2, Int.MAX_VALUE)) {
+      assertFalse(MusicReceiverProtocol.acceptsReplyFieldCount(count))
+    }
+    // Size admission never authorizes unknown keys that fit under the allocation guard.
+    val unknown = state().plus("unknown" to false)
+    rejects { MusicReceiverProtocol.parse(1, unknown) }
+  }
+
   @Test fun minimalErrorsAreUnknownNotStoppedOrPermissionToStart() {
     for (error in listOf("not_ready", "forbidden")) {
       val reply = MusicReceiverProtocol.parse(1, mapOf("requestId" to 1L, "error" to error))

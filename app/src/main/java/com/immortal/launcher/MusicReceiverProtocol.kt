@@ -62,6 +62,9 @@ internal object MusicReceiverProtocol {
       "service_destroyed", "renderer_gate_failed", "renderer_exited", "pcm_output_failed", "focus_denied",
       "start_failed", "termination_unconfirmed", "restart_failed", "focus_loss_-1", "focus_loss_-2", "focus_loss_-3")
 
+  /** Bound Android Bundle decoding before reading values; parse still checks exact keys and types. */
+  fun acceptsReplyFieldCount(count: Int): Boolean = count in 1..(stateKeys.size + 1)
+
   /** Bundle values must retain their actual runtime types; coercing getters are not used. */
   fun parse(what: Int, fields: Map<String, Any?>): Reply {
     require(what in 1..4) { "Unsupported receiver command." }

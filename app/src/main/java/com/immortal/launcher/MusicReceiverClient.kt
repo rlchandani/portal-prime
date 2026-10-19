@@ -414,7 +414,7 @@ private class AndroidTransport(private val context: Context) : MusicReceiverClie
         val fields: Map<String, Any?> = try {
           val data = message.data
           data.classLoader = javaClass.classLoader
-          if (data.size() > 12) emptyMap()
+          if (!MusicReceiverProtocol.acceptsReplyFieldCount(data.size())) emptyMap()
           else data.keySet().associateWith { data.get(it) }
         } catch (_: RuntimeException) { emptyMap() }
         callbacks.received(message.what, fields)
