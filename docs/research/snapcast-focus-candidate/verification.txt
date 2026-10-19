@@ -1,0 +1,55 @@
+Receiver patch apply: exit 0
+patching file LICENSE-MIT
+patching file 'Snapcast/src/main/AndroidManifest.xml'
+patching file 'Snapcast/src/main/java/de/badaix/snapcast/BroadcastReceiver.java'
+patching file 'Snapcast/src/main/java/de/badaix/snapcast/FocusControlService.java'
+patching file 'Snapcast/src/main/java/de/badaix/snapcast/MainActivity.java'
+patching file 'Snapcast/src/main/java/de/badaix/snapcast/SnapclientService.java'
+patching file 'Snapcast/src/main/res/layout/dialog_server.xml'
+
+Applied receiver patch exactly matches all seven prepared changed paths.
+
+Optional native build overlay apply: exit 0
+patching file 'Snapcast/build.gradle'
+
+FAIL stock stop cancels queued native restart: java.lang.AssertionError: stop must cancel restart callback
+FAIL stale reader cannot mark stopped playback running: java.lang.AssertionError: old reader must not report player start
+FAIL legacy automatic START cannot produce local output: java.lang.AssertionError: automatic Start must not launch child
+BASELINE 0 passed; 3 failed. Three stock service regressions only.
+java.io.IOException: Stream closed
+	at java.base/java.io.BufferedInputStream.ensureOpen(BufferedInputStream.java:206)
+	at java.base/java.io.BufferedInputStream.implRead(BufferedInputStream.java:411)
+	at java.base/java.io.BufferedInputStream.read(BufferedInputStream.java:405)
+	at java.base/sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:350)
+	at java.base/sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:393)
+	at java.base/sun.nio.cs.StreamDecoder.lockedRead(StreamDecoder.java:217)
+	at java.base/sun.nio.cs.StreamDecoder.read(StreamDecoder.java:171)
+	at java.base/java.io.InputStreamReader.read(InputStreamReader.java:188)
+	at java.base/java.io.BufferedReader.fill(BufferedReader.java:160)
+	at java.base/java.io.BufferedReader.implReadLine(BufferedReader.java:370)
+	at java.base/java.io.BufferedReader.readLine(BufferedReader.java:347)
+	at java.base/java.io.BufferedReader.readLine(BufferedReader.java:436)
+	at de.badaix.snapcast.SnapclientService$1.run(SnapclientService.java:261)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+PASS stock stop cancels queued native restart
+PASS stale reader cannot mark stopped playback running
+PASS legacy automatic START cannot produce local output
+PASS focus result 0 cannot start child or gain-resume
+PASS focus result 2 cannot start child or gain-resume
+PASS focus loss -1 kills real child; gain stays stopped
+PASS focus loss -2 kills real child; gain stays stopped
+PASS focus loss -3 kills real child; gain stays stopped
+PASS user stop survives delayed gain and pending restart
+PASS legacy STOP kills child even while receiver remains bound
+PASS old focus loss cannot kill a new explicit user session
+PASS loss before PID admission cannot release pending GO
+PASS unconfirmed teardown is reported and prevents second renderer
+PASS IPC denies foreign UID and stale instance/epoch; suppress is local
+RESULT 14 passed; 0 failed. Host service logic only; Android audio not tested.
+
+Official API 35 javac check: 0
+Note: /private/tmp/portal-music-receiver-focus/patched/Snapcast/src/main/java/de/badaix/snapcast/SnapclientService.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+Changed manifest/layout XML parse: passed

@@ -1,0 +1,10 @@
+{
+  "apk_sha256": "cd835c12ae3bf084ef06064333599040559a871fee48e83f3539e89224b40010",
+  "arm64_libs": [
+    {
+      "path": "lib/arm64-v8a/libsnapclient.so",
+      "size": 1851392,
+      "sha256": "a62a8589c502acf302dadaf778ff90b45b2341bf4dcc496a8497d33c917ccda1"
+    }
+  ]
+}
