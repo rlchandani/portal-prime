@@ -163,7 +163,7 @@ internal class MusicPlayerController(context: Context) {
       armPendingTimeout()
       val trackId = snapshot.track?.id.takeIf {
         dispatch.command in setOf(MusicCommand.PLAY, MusicCommand.PAUSE, MusicCommand.NEXT,
-            MusicCommand.PREVIOUS, MusicCommand.SEEK, MusicCommand.SELECT_QUEUE_ITEM)
+            MusicCommand.PREVIOUS, MusicCommand.SEEK)
       }
       val accepted = client.command(dispatch.action, maGeneration, expectedTrackId = trackId) { result ->
         main.post {

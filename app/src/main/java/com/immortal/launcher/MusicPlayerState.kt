@@ -117,6 +117,8 @@ data class MusicPlayerSnapshot(
     val controlPlayerId: String? = null,
     /** Connection identity carried atomically with the immutable rendered observation. */
     val presentationRevision: Long = 0,
+    /** Authoritative MA queue identity, independent of the current track. */
+    val queueId: String? = null,
 ) {
   fun can(command: MusicCommand): Boolean {
     if (connection != MusicConnection.READY || audioOwnedByOther || sourceId.isBlank()) return false
@@ -128,7 +130,8 @@ data class MusicPlayerSnapshot(
       MusicCommand.NEXT -> capabilities.next && !live
       MusicCommand.PREVIOUS -> capabilities.previous && !live
       MusicCommand.SEEK -> capabilities.seek && !live && (track?.durationMs ?: 0) > 0
-      MusicCommand.OPEN_QUEUE, MusicCommand.SELECT_QUEUE_ITEM -> capabilities.queue
+      MusicCommand.OPEN_QUEUE -> capabilities.queue
+      MusicCommand.SELECT_QUEUE_ITEM -> capabilities.queue && !queueId.isNullOrBlank()
       MusicCommand.OPEN_LYRICS -> capabilities.lyrics
       MusicCommand.CHANGE_ROOMS -> capabilities.rooms
       MusicCommand.SET_VOLUME -> capabilities.volume

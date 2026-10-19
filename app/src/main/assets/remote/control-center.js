@@ -1685,7 +1685,7 @@ function renderMedia() {
 
 // This dialog owns its reads and commands; the main PWA owns pairing and Portal selection.
 let musicSheet = null;
-const musicTrackCommands = new Set(['play', 'pause', 'next', 'previous', 'seek', 'queue-item']);
+const musicTrackCommands = new Set(['play', 'pause', 'next', 'previous', 'seek']);
 function musicSheetCurrent(owner) {
   return !!owner && musicSheet === owner && sheet.open && content.firstChild === owner.root &&
     session.current(owner.ticket) && !document.hidden && connectionState !== 'expired';
@@ -1742,6 +1742,7 @@ function validateMusicState(response) {
       !['playing', 'paused', 'stopped', 'idle'].includes(s.playback) ||
       typeof s.audioOwnedByOther !== 'boolean' || !object(s.capabilities) ||
       (s.controlPlayerId !== null && !id(s.controlPlayerId)) ||
+      (s.queueId != null && !id(s.queueId)) ||
       (s.pending !== null && (!object(s.pending) || typeof s.pending.command !== 'string')) ||
       (s.pending?.requestId !== undefined && (!Number.isSafeInteger(s.pending.requestId) || s.pending.requestId < 1)) ||
       (s.lastCommand != null && (!object(s.lastCommand) ||
@@ -1828,7 +1829,7 @@ function musicCommandAllowed(s, command, extra) {
   if (command === 'seek') return caps.seek && !s.track.isLive &&
     Number.isSafeInteger(s.track.durationMs) && s.track.durationMs > 0 &&
     Number.isSafeInteger(extra.positionMs) && extra.positionMs >= 0 && extra.positionMs <= s.track.durationMs;
-  if (command === 'queue-item') return caps.queue &&
+  if (command === 'queue-item') return caps.queue && !!s.queueId?.trim() &&
     s.queue.slice(0, 500).some(item => item.id === extra.queueItemId && item.available && item.canSelect);
   const player = s.rooms.slice(0, 64).find(item => item.id === extra.roomId);
   if (!player?.available) return false;
@@ -1845,6 +1846,7 @@ async function sendMusicCommand(owner, observed, command, extra = {}) {
   const latest = owner.state;
   const same = latest.sourceRevision === observed.sourceRevision && latest.sourceId === observed.sourceId &&
     (!musicTrackCommands.has(command) || latest.track?.id === observed.track?.id) &&
+    (command !== 'queue-item' || latest.queueId === observed.queueId) &&
     (command !== 'toggle-room' || (latest.controlPlayerId === observed.controlPlayerId &&
       latest.rooms.find(player => player.id === extra.roomId)?.inCurrentGroup === extra.wasInGroup));
   if (!same || !musicCommandAllowed(latest, command, extra)) {
@@ -1856,6 +1858,7 @@ async function sendMusicCommand(owner, observed, command, extra = {}) {
   }
   const body = { command, sourceRevision: observed.sourceRevision, sourceId: observed.sourceId, ...extra };
   if (musicTrackCommands.has(command)) body.trackId = observed.track.id;
+  if (command === 'queue-item') body.queueId = observed.queueId;
   if (command === 'toggle-room') body.leaderId = observed.controlPlayerId;
   // Retire a pre-command GET: its late result cannot clear pending admission.
   owner.epoch++;
@@ -1941,7 +1944,7 @@ function renderMusicSheet(owner) {
   // Keep a dragged range and its observed source/track binding; do not replace it on each tick.
   const focusedRange = owner.root.contains(document.activeElement) &&
     document.activeElement?.matches('input[type="range"],input[type="number"]');
-  const identity = JSON.stringify([s.sourceRevision, s.sourceId, s.track?.id, s.controlPlayerId]);
+  const identity = JSON.stringify([s.sourceRevision, s.sourceId, s.track?.id, s.controlPlayerId, s.queueId]);
   const key = JSON.stringify([identity, s.connection, s.playback, s.track, s.capabilities,
     s.queue.slice(0, 500), s.rooms.slice(0, 64), owner.panel,
     s.capabilities.lyrics ? s.lyrics.slice(0, 1000) : null]);

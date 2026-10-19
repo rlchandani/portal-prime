@@ -505,6 +505,47 @@ class MaMusicClientTest {
     } finally { client.close() }
   }
 
+  @Test fun idleQueueSelectionUsesTheAdmittedQueueWithoutRequiringACurrentTrack() {
+    val fake = Fake(); val seen = Seen(); val client = client(fake, seen)
+    try {
+      val generation = client.config(config()); auth(fake)
+      fake.reply(fake.next("players/all"), JSONArray().put(player().put("playback_state", "idle")))
+      fake.reply(fake.next("player_queues/get_active_queue"), queue("idle").put("active", false)
+          .put("current_item", JSONObject.NULL).put("next_item", JSONObject.NULL)
+          .put("current_index", JSONObject.NULL))
+      fake.reply(fake.next("player_queues/items"), JSONArray().put(item()).put(item("two")))
+      val selected = seen.ready().second.snapshot
+      assertNull(selected.track)
+      assertEquals("shared", selected.queueId)
+      assertTrue(client.command(MaMusicClient.Action.QueueItem("two"), generation) { seen.results.add(it) })
+      val play = fake.next("player_queues/play_index")
+      assertEquals("shared", play.getJSONObject("args").getString("queue_id"))
+      assertEquals("two", play.getJSONObject("args").getString("index"))
+      fake.reply(play, JSONObject.NULL)
+      assertEquals(MaMusicClient.Outcome.ACKNOWLEDGED, seen.results.poll(2, TimeUnit.SECONDS)!!.outcome)
+    } finally { client.close() }
+  }
+
+  @Test fun queuedSelectionCannotTargetReplacementQueueWithTheSameItemId() {
+    val fake = Fake(); val seen = Seen(); val client = client(fake, seen)
+    try {
+      val generation = client.config(config()); auth(fake); refresh(fake); seen.ready()
+      assertTrue(client.refresh())
+      val players = fake.next("players/all")
+      assertTrue(client.command(MaMusicClient.Action.QueueItem("two"), generation) { seen.results.add(it) })
+      fake.reply(players, JSONArray().put(player().put("active_source", "replacement")))
+      val q = queue().put("queue_id", "replacement")
+          .put("current_item", item().put("queue_id", "replacement"))
+          .put("next_item", item("two").put("queue_id", "replacement"))
+      fake.reply(fake.next("player_queues/get_active_queue"), q)
+      fake.reply(fake.next("player_queues/items"), JSONArray()
+          .put(item().put("queue_id", "replacement")).put(item("two").put("queue_id", "replacement")))
+      assertEquals("replacement", seen.ready().second.snapshot.queueId)
+      assertEquals(MaMusicClient.Outcome.REJECTED, seen.results.poll(2, TimeUnit.SECONDS)!!.outcome)
+      assertNull("No play command may target the replacement queue", fake.sent.poll(30, TimeUnit.MILLISECONDS))
+    } finally { client.close() }
+  }
+
 
   private fun groupedPlayers(leader: String): JSONArray = JSONArray()
       .put(player().put("synced_to", leader))

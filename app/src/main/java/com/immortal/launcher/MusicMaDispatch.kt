@@ -41,9 +41,10 @@ internal fun musicMaDispatch(s: MusicPlayerSnapshot, action: MusicPlayerUiAction
           MaMusicClient.Action.Seek(action.positionMs))
     }
     is MusicPlayerUiAction.SelectQueueItem -> {
+      val queueId = s.queueId?.takeIf { it.isNotBlank() } ?: return null
       if (s.queue.none { it.id == action.id && it.available }) return null
-      dispatch(MusicCommand.SELECT_QUEUE_ITEM, MusicConfirmation.TrackSelected(action.id),
-          MaMusicClient.Action.QueueItem(action.id))
+      dispatch(MusicCommand.SELECT_QUEUE_ITEM, MusicConfirmation.TrackSelected(action.id, queueId),
+          MaMusicClient.Action.QueueItem(action.id, expectedQueueId = queueId))
     }
     is MusicPlayerUiAction.SetRoomVolume -> {
       if (action.percent !in 0..100 || s.rooms.none {

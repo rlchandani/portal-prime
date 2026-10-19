@@ -442,6 +442,18 @@ class MaMusicProtocolTest {
     assertEquals(MusicConnection.READY, selected.snapshot.connection)
     assertFalse(selected.snapshot.can(MusicCommand.PLAY))
   }
+  @Test fun populatedInactiveIdleQueueRetainsIdentityAndCanSelectItsItem() {
+    val selected = selection(players = listOf(player(state = "idle")),
+        q = queue().put("active", false).put("state", "idle")
+            .put("current_index", JSONObject.NULL).put("current_item", JSONObject.NULL)
+            .put("next_item", JSONObject.NULL))
+    assertNull(selected.snapshot.track)
+    assertEquals("queue-shared", selected.snapshot.queueId)
+    assertTrue(selected.snapshot.can(MusicCommand.SELECT_QUEUE_ITEM))
+    val request = MaMusicProtocol.queueItemCommand("choose", selected, "item-2")!!
+    assertEquals("queue-shared", request.getJSONObject("args").getString("queue_id"))
+    assertEquals("item-2", request.getJSONObject("args").getString("index"))
+  }
 
   @Test fun queuePauseNeedsActualPauseSupportInsteadOfAdvertisingAStopFallback() {
     val selected = selection(listOf(player(features = emptyList())))

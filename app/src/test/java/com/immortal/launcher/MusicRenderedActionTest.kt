@@ -13,6 +13,7 @@ import org.mockito.Mockito.mock
 class MusicRenderedActionTest {
   private fun ready() = MusicPlayerSnapshot(
       connection = MusicConnection.READY, sourceId = "ma:family", presentationRevision = 7,
+      queueId = "shared", queue = listOf(MusicQueueItem("queue-2", "Two")),
       track = MusicTrack("track-1", "ma:family", "Song", durationMs = 120_000),
       playback = PlaybackState.PLAYING, controlPlayerId = "ma:family",
       capabilities = MusicCapabilities(play = true, pause = true, seek = true, rooms = true),
@@ -34,8 +35,19 @@ class MusicRenderedActionTest {
     val old = ready()
     val now = old.copy(track = old.track!!.copy(id = "track-2"))
     listOf(MusicPlayerUiAction.TogglePlayback, MusicPlayerUiAction.Next,
-        MusicPlayerUiAction.Previous, MusicPlayerUiAction.Seek(5_000),
-        MusicPlayerUiAction.SelectQueueItem("queue-2")).forEach { assertFalse(allowed(old, now, it)) }
+        MusicPlayerUiAction.Previous, MusicPlayerUiAction.Seek(5_000))
+        .forEach { assertFalse(allowed(old, now, it)) }
+    assertTrue(allowed(old, now, MusicPlayerUiAction.SelectQueueItem("queue-2")))
+  }
+  @Test fun idleQueueSelectionRequiresTheObservedQueueAndAvailableItem() {
+    val idle = ready().copy(track = null, playback = PlaybackState.IDLE)
+    val action = MusicPlayerUiAction.SelectQueueItem("queue-2")
+    assertTrue(allowed(idle, idle, action))
+    assertFalse(allowed(idle, idle.copy(queueId = "other"), action))
+    assertFalse(allowed(idle.copy(queueId = null), idle, action))
+    assertFalse(allowed(idle, idle.copy(queue = emptyList()), action))
+    assertFalse(allowed(idle, idle.copy(queue = listOf(
+        MusicQueueItem("queue-2", "Two", available = false))), action))
   }
   @Test fun displayedPauseCannotBecomePlay() {
     val old = ready()

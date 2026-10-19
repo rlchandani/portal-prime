@@ -21,11 +21,15 @@ internal fun musicRenderedActionIsCurrent(
       rendered.localSessionToken != current.localSessionToken) return false
   val trackBound = when (action) {
     MusicPlayerUiAction.TogglePlayback, MusicPlayerUiAction.Next, MusicPlayerUiAction.Previous,
-    is MusicPlayerUiAction.Seek, is MusicPlayerUiAction.SelectQueueItem -> true
+    is MusicPlayerUiAction.Seek -> true
     else -> false
   }
   if (trackBound && (rendered.track?.id.isNullOrBlank() ||
       rendered.track?.id != current.track?.id)) return false
+  if (action is MusicPlayerUiAction.SelectQueueItem &&
+      (rendered.queueId.isNullOrBlank() || rendered.queueId != current.queueId ||
+        rendered.queue.none { it.id == action.id && it.available } ||
+        current.queue.none { it.id == action.id && it.available })) return false
   // A displayed Pause must never become Play after an external playback-state update.
   if (action == MusicPlayerUiAction.TogglePlayback && rendered.playback != current.playback)
     return false

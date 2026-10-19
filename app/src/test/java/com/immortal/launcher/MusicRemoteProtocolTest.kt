@@ -18,7 +18,7 @@ class MusicRemoteProtocolTest {
       groupId = "ma:family", removableFromGroup = true)
   private val kitchen = MusicRoom("ma:kitchen", "Kitchen", true)
   private fun snapshot() = MusicPlayerSnapshot(connection = MusicConnection.READY,
-      sourceId = "ma:living", controlPlayerId = "ma:family",
+      sourceId = "ma:living", controlPlayerId = "ma:family", queueId = "queue-shared",
       track = MusicTrack("track-1", "ma:living", "Song", "Artist", "Album",
           artUrl = "https://private/art?token=secret", durationMs = 120_000),
       playback = PlaybackState.PAUSED, positionMs = 1_000, positionAtElapsedMs = 10_000,
@@ -32,7 +32,8 @@ class MusicRemoteProtocolTest {
       .put("command", command).put("sourceRevision", 7L).put("sourceId", "ma:living")
       .apply {
         if (command == "toggle-room") put("wasInGroup", false)
-        if (command in setOf("play", "pause", "next", "previous", "seek", "queue-item"))
+        if (command == "queue-item") put("queueId", "queue-shared")
+        if (command in setOf("play", "pause", "next", "previous", "seek"))
           put("trackId", "track-1")
       }
   private fun decode(body: JSONObject, s: MusicPlayerSnapshot = snapshot()) =
@@ -273,12 +274,26 @@ class MusicRemoteProtocolTest {
 
   @Test fun everyTrackBearingCommandRequiresCurrentTrackIdentity() {
     val requests = listOf(body("play"), body("pause"), body("next"), body("previous"),
-        body("seek").put("positionMs", 0), body("queue-item").put("queueItemId", "queue-1"))
+        body("seek").put("positionMs", 0))
     for (request in requests) {
       rejected(409, "stale", request.put("trackId", "other"))
       rejected(409, "unavailable", request.put("trackId", "track-1"),
           snapshot().copy(track = null))
     }
+  }
+
+  @Test fun idleQueueSelectsAnItemWithoutACurrentTrackButRejectsReplacementQueue() {
+    val request = body("queue-item").put("queueItemId", "queue-1")
+    val idle = snapshot().copy(track = null, playback = PlaybackState.IDLE)
+    accepted(MusicPlayerUiAction.SelectQueueItem("queue-1"), request, idle)
+    val wire = MusicRemoteProtocol.state(idle, 7, 0)
+    assertTrue(wire.getJSONObject("capabilities").getBoolean("queue"))
+    assertTrue(wire.getJSONArray("queue").getJSONObject(0).getBoolean("canSelect"))
+    assertEquals("queue-shared", wire.getString("queueId"))
+    rejected(409, "stale", request, idle.copy(queueId = "other"))
+    rejected(409, "stale", request, idle.copy(queueId = null))
+    rejected(400, "bad_request", JSONObject(request.toString()).put("trackId", "track-1"), idle)
+    rejected(400, "bad_request", JSONObject(request.toString()).put("queueId", JSONObject.NULL), idle)
   }
 
   @Test fun trackFromAnotherSourceCannotEnableCommandsOrMetadata() {

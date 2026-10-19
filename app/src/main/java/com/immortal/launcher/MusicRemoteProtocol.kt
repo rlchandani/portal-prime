@@ -25,7 +25,7 @@ internal object MusicRemoteProtocol {
   private const val MAX_QUEUE = 500
   private const val MAX_ROOMS = 64
   private const val MAX_LYRICS = 1000
-  private val trackCommands = setOf("play", "pause", "next", "previous", "seek", "queue-item")
+  private val trackCommands = setOf("play", "pause", "next", "previous", "seek")
   private val baseKeys = setOf("command", "sourceRevision", "sourceId")
 
   /**
@@ -42,7 +42,7 @@ internal object MusicRemoteProtocol {
       queue.put(JSONObject().put("id", text(item.id)).put("title", text(item.title))
           .put("artist", text(item.artist)).put("durationMs", nullable(duration(item.durationMs)))
           .put("available", item.available)
-          .put("canSelect", can(s, MusicCommand.SELECT_QUEUE_ITEM) &&
+          .put("canSelect", can(s, MusicCommand.SELECT_QUEUE_ITEM, false) && validId(s.queueId) &&
               item.available && validId(item.id)))
     }
     val rooms = JSONArray()
@@ -78,7 +78,7 @@ internal object MusicRemoteProtocol {
             (s.playback == PlaybackState.PLAYING || s.playback == PlaybackState.PAUSED))
         .put("next", can(s, MusicCommand.NEXT)).put("previous", can(s, MusicCommand.PREVIOUS))
         .put("seek", can(s, MusicCommand.SEEK))
-        .put("queue", can(s, MusicCommand.SELECT_QUEUE_ITEM) &&
+        .put("queue", can(s, MusicCommand.SELECT_QUEUE_ITEM, false) && validId(s.queueId) &&
             s.queue.take(MAX_QUEUE).any { it.available && validId(it.id) })
         .put("lyrics", can(s, MusicCommand.OPEN_LYRICS) && s.lyrics.isNotEmpty())
         .put("rooms", groupable).put("volume", volumeControllable)
@@ -103,6 +103,7 @@ internal object MusicRemoteProtocol {
         .put("lastCommand", nullable(lastCommand))
         .put("audioOwnedByOther", s.audioOwnedByOther)
         .put("controlPlayerId", nullable(s.controlPlayerId?.let(::text)))
+        .put("queueId", nullable(s.queueId?.let(::text)))
         .put("track", nullable(metadata))
         .put("positionMs", nullable(if (track == null) null else s.visiblePositionMs(elapsedMs)))
         .put("capabilities", caps).put("queue", queue).put("rooms", rooms).put("lyrics", lyrics)
@@ -118,7 +119,7 @@ internal object MusicRemoteProtocol {
     val extra = when (command) {
       "play", "pause", "next", "previous" -> setOf("trackId")
       "seek" -> setOf("trackId", "positionMs")
-      "queue-item" -> setOf("trackId", "queueItemId")
+      "queue-item" -> setOf("queueId", "queueItemId")
       "volume" -> setOf("roomId", "percent")
       "toggle-room" -> setOf("roomId", "leaderId", "wasInGroup")
       "select-player" -> setOf("roomId")
@@ -134,6 +135,7 @@ internal object MusicRemoteProtocol {
     val wasInGroup = if ("wasInGroup" in extra)
       body.opt("wasInGroup") as? Boolean ?: return bad() else null
     val queueItemId = if ("queueItemId" in extra) string(body, "queueItemId") ?: return bad() else null
+    val queueId = if ("queueId" in extra) string(body, "queueId") ?: return bad() else null
     val position = if ("positionMs" in extra)
       integer(body, "positionMs")?.takeIf { it >= 0 } ?: return bad() else null
     val percent = if ("percent" in extra)
@@ -166,8 +168,9 @@ internal object MusicRemoteProtocol {
         else accept(MusicPlayerUiAction.Seek(position), MusicCommand.SEEK)
       }
       "queue-item" -> {
+        if (queueId != s.queueId) return stale()
         if (s.queue.take(MAX_QUEUE).none { it.id == queueItemId && it.available }) unavailable()
-        else accept(MusicPlayerUiAction.SelectQueueItem(queueItemId!!), MusicCommand.SELECT_QUEUE_ITEM)
+        else accept(MusicPlayerUiAction.SelectQueueItem(queueItemId!!), MusicCommand.SELECT_QUEUE_ITEM, false)
       }
       "volume" -> {
         val room = s.rooms.take(MAX_ROOMS).firstOrNull { it.id == roomId } ?: return unavailable()

@@ -16,7 +16,7 @@ class MusicMaDispatchTest {
       groupId = "ma:family", removableFromGroup = true, volume = 20, volumeControllable = true)
   private val kitchen = MusicRoom("ma:kitchen", "Kitchen", true)
   private fun state() = MusicPlayerSnapshot(connection = MusicConnection.READY,
-      sourceId = "ma:living", controlPlayerId = "ma:family",
+      sourceId = "ma:living", controlPlayerId = "ma:family", queueId = "shared",
       track = MusicTrack("one", "ma:living", "Song", durationMs = 100_000),
       playback = PlaybackState.PLAYING, positionMs = 20_000,
       capabilities = MusicCapabilities(play = true, pause = true, next = true, previous = true,
@@ -50,6 +50,15 @@ class MusicMaDispatchTest {
     assertNotNull(musicMaDispatch(state(), MusicPlayerUiAction.SetRoomVolume("ma:living", 35)))
     assertNull(musicMaDispatch(state(), MusicPlayerUiAction.SetRoomVolume("ma:living", 101)))
     assertNull(musicMaDispatch(state(), MusicPlayerUiAction.SetRoomVolume("ma:kitchen", 35)))
+  }
+  @Test fun idleQueueDispatchBindsItsQueueAndConfirmation() {
+    val idle = state().copy(track = null, playback = PlaybackState.IDLE)
+    val dispatch = musicMaDispatch(idle, MusicPlayerUiAction.SelectQueueItem("two"))!!
+    assertEquals(MaMusicClient.Action.QueueItem("two", "shared"), dispatch.action)
+    val playing = idle.copy(track = MusicTrack("two", idle.sourceId, "Two"))
+    assertTrue(dispatch.confirmation.matches(playing))
+    assertFalse(dispatch.confirmation.matches(playing.copy(queueId = "other")))
+    assertNull(musicMaDispatch(idle.copy(queueId = null), MusicPlayerUiAction.SelectQueueItem("two")))
   }
   @Test fun followerJoinUsesLeaderAndConfirmsWholeGroup() {
     val dispatch = musicMaDispatch(state(), MusicPlayerUiAction.ToggleRoom("ma:kitchen"))!!

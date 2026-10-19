@@ -79,7 +79,7 @@ class MaMusicClient(
   sealed interface Action {
     data class Transport(val command: MusicCommand) : Action
     data class Seek(val positionMs: Long) : Action
-    data class QueueItem(val id: String) : Action
+    data class QueueItem(val id: String, val expectedQueueId: String? = null) : Action
     data class Volume(val roomId: String, val percent: Int) : Action
     /** Canonical ma:<leader-id>; null captures the currently published leader at admission. */
     data class Group(
@@ -216,6 +216,10 @@ class MaMusicClient(
       val leader = action.expectedLeaderId ?: publishedSelection?.snapshot?.controlPlayerId
           ?: return@synchronized false
       action.copy(add = action.add.toSet(), remove = action.remove.toSet(), expectedLeaderId = leader)
+    } else if (action is Action.QueueItem) {
+      val queueId = action.expectedQueueId ?: publishedSelection?.queueId
+          ?: return@synchronized false
+      action.copy(expectedQueueId = queueId)
     } else action
     if (!bounded(ownedAction)) return@synchronized false
     val accepted = commands.offer(Queued(e, ownedAction, expectedTrackId, elapsedMs() + limits.requestTimeoutMs * 4L, callback))
@@ -419,6 +423,12 @@ class MaMusicClient(
     if (trackBound && command.expectedTrackId != null &&
         selected?.snapshot?.track?.id != command.expectedTrackId) {
       result(command, Outcome.REJECTED, id, problem = "Music Assistant track changed before the action")
+      return
+    }
+    val queueItem = command.action as? Action.QueueItem
+    if (queueItem != null && (queueItem.expectedQueueId == null ||
+        queueItem.expectedQueueId != selected?.queueId)) {
+      result(command, Outcome.REJECTED, id, problem = "Music Assistant queue changed before the action")
       return
     }
     val group = command.action as? Action.Group
@@ -677,7 +687,9 @@ class MaMusicClient(
   private fun waitForWork(ms: Long) = synchronized(gate) { if (!closed) gate.wait(ms) }
 
   private fun bounded(action: Action): Boolean = when (action) {
-    is Action.QueueItem -> action.id.length in 1..256
+    is Action.QueueItem -> action.id.isNotBlank() && action.id.length in 1..256 &&
+        (action.expectedQueueId == null ||
+          (action.expectedQueueId.isNotBlank() && action.expectedQueueId.length in 1..256))
     is Action.Volume -> action.roomId.length in 1..259
     is Action.Group -> action.add.size + action.remove.size <= 64 &&
         (action.add + action.remove).all { it.length in 1..259 } &&

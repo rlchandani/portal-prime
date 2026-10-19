@@ -322,6 +322,7 @@ object MaMusicProtocol {
         } ?: emptyList() else emptyList(),
         rooms = rooms,
         controlPlayerId = "ma:${control.playerId}",
+        queueId = q?.queueId.takeIf { queueOwnsPlayback },
     )
     return Selection(snapshot, q?.queueId, control, list,
         if (queueOwnsPlayback) page?.items?.filter { it.available }?.map { it.item.id }?.toSet()

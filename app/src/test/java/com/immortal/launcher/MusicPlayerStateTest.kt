@@ -42,6 +42,12 @@ class MusicPlayerStateTest {
     assertTrue(s.can(MusicCommand.PAUSE))
     assertNull(s.visiblePositionMs(2_000))
   }
+  @Test fun selectingQueueItemsRequiresQueueIdentityButOpeningItsListDoesNot() {
+    val idle = ready().copy(track = null, playback = PlaybackState.IDLE)
+    assertTrue(idle.can(MusicCommand.OPEN_QUEUE))
+    assertFalse(idle.can(MusicCommand.SELECT_QUEUE_ITEM))
+    assertTrue(idle.copy(queueId = "shared").can(MusicCommand.SELECT_QUEUE_ITEM))
+  }
 
   @Test fun localSessionDoesNotAcquireMusicAssistantCapabilities() {
     val s = ready(capabilities = MusicCapabilities(play = true, pause = true, seek = true))

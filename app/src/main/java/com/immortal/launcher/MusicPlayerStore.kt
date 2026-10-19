@@ -33,8 +33,9 @@ sealed interface MusicConfirmation {
     }
   }
 
-  data class TrackSelected(val id: String) : MusicConfirmation {
-    override fun matches(snapshot: MusicPlayerSnapshot) = snapshot.track?.id == id
+  data class TrackSelected(val id: String, val queueId: String) : MusicConfirmation {
+    override fun matches(snapshot: MusicPlayerSnapshot) =
+        snapshot.queueId == queueId && snapshot.track?.id == id
   }
 
   data class Seek(val trackId: String, val positionMs: Long) : MusicConfirmation {

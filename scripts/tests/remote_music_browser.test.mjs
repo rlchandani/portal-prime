@@ -23,7 +23,7 @@ test('mobile music sheet renders capability-safe queue and players without overf
     `/remote/assets/${name}`, read(`app/src/main/assets/remote/${name}`)]));
   const f = { errors: [], reads: 0, outsideRequests: 0 };
   const music = {
-    schemaVersion: 1, sourceRevision: 7, sourceId: 'ma:family', connection: 'ready',
+    schemaVersion: 1, sourceRevision: 7, sourceId: 'ma:family', connection: 'ready', queueId: 'queue-shared',
     playback: 'paused', pending: null, audioOwnedByOther: false, controlPlayerId: 'ma:family',
     track: { id: 'track-1', title: 'A long title with words that must fit on a phone screen',
       artist: 'A very long artist name with multiple collaborators', album: 'Album',

@@ -12,6 +12,7 @@ const state = () => ({
   schemaVersion: 1,
   sourceRevision: 7,
   sourceId: 'ma:living',
+  queueId: 'queue-shared',
   connection: 'ready',
   playback: 'paused',
   pending: null,
@@ -177,7 +178,7 @@ test('pause, seek, queue, volume, grouping and selection send exact bound comman
   root().querySelectorAll('.music-queue-row')[0].click();
   await h.settle();
   assert.deepEqual(lastCommand(), {
-    ...base, command: 'queue-item', queueItemId: 'queue-1', trackId: 'track-1',
+    ...base, command: 'queue-item', queueItemId: 'queue-1', queueId: 'queue-shared',
   });
   await advance();
   h.click('Players');
@@ -465,4 +466,31 @@ test('a different command result cannot confirm the browser request', async t =>
   await advance();
   assert.match(root().textContent, /previous command was not confirmed/i);
   assert.equal(f.posts, 1);
+});
+
+test('a populated idle queue can start its selected item without a current track', async t => {
+  const { h, f, root, open, lastCommand } = await fixture(t);
+  f.music.track = null;
+  f.music.playback = 'idle';
+  await open();
+  const first = root().querySelectorAll('.music-queue-row')[0];
+  assert.equal(first.disabled, false);
+  first.click();
+  await h.settle();
+  assert.deepEqual(lastCommand(), {
+    command: 'queue-item', sourceRevision: 7, sourceId: 'ma:living',
+    queueId: 'queue-shared', queueItemId: 'queue-1',
+  });
+});
+
+test('an old queue row cannot start an item in a replacement queue', async t => {
+  const { h, f, root, open, advance } = await fixture(t);
+  await open();
+  const first = root().querySelectorAll('.music-queue-row')[0];
+  f.music.queueId = 'replacement';
+  await advance();
+  first.click();
+  await h.settle();
+  assert.equal(f.posts, 0);
+  assert.match(root().textContent, /Music changed/);
 });
