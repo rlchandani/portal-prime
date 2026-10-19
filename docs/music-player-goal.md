@@ -182,3 +182,11 @@ The actual saved integration token authenticated successfully with MA. `players/
 - Family signed preview `6014fdf65fb10567fbe45bbda1851c71a89c833498aebc6c52689561851b2dff` installed; all recorded settings/saver unchanged, Home resumed, correct source recovered Ready/Idle with 11 rooms. Rollback APK preserved. Living untouched.
 - Physical companion UI fixture failed before obtaining a Compose hierarchy; one awake-device repeat had the same failure. It is parked, provides no UI verdict, and phone main/test APKs were restored without clearing pairing/data. Companion changes are source/build verified only at this checkpoint. Details: [current validation](music-receiver-preview-validation.md).
 - Goal remains active and incomplete. Real YouTube authorization/playback, receiver activation/mapping/migration and Calls/Jarvis handoff, remaining transport/group controls, playing retention, parked unmet frame/latency targets, the physical UI harness and final accepted Living rollout remain open.
+
+### Bounded PCM connection/output checkpoint — October 19, 09:35–10:05 UTC
+
+- Prepared isolated receiver preview.3 with persistent raw-PCM native connection and explicit Android output ownership; v2 typed launcher contract and monotonic counters. Production activation remains inactive.
+- Three service wiring races found by review were fixed; 3,326 launcher JVM tests and 11 receiver tests pass, both app/test and receiver APKs build. Source/licensing snapshots preserved under `docs/research/snapcast-focus-candidate/preview.3/`.
+- New physical PCM check failed before Start at initial_stopped, 0 native candidate processes. No audio/continuity verdict. Parked at the original 30-minute deadline, no repeated audio probe.
+- Candidate removed; prior launcher/test APKs restored; stock receiver running; all recorded settings and saver unchanged; Living untouched. Final music readback remains offline with 0 rooms and must be recovered/verified separately; local restoration is not a server-binding recovery claim.
+- Goal remains incomplete; no new latency/jank acceptance or YouTube/Calls/Jarvis success claimed.

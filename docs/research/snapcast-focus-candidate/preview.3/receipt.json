@@ -1,0 +1,60 @@
+{
+  "counts": {
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sha256": "14226769e90a2339b9b368ac6d3c1c16b71cfd3c9dca5ffa1531e9417d96ce19",
+  "familySignerMatches": true,
+  "scopedReview": "no_remaining_blockers",
+  "nativeRebuilt": false,
+  "nativeSha256": "a62a8589c502acf302dadaf778ff90b45b2341bf4dcc496a8497d33c917ccda1",
+  "nativeBytes": 1851392,
+  "launcherJvm": {
+    "tests": 3326,
+    "suites": 342,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "debugAndTestBuild": "pass",
+  "newDeviceProbeBuild": "pass",
+  "deviceResult": {
+    "passed": false,
+    "failedStage": "initial_stopped",
+    "explicitStarts": 0,
+    "candidateNativeProcessesObserved": 0,
+    "cleanup": {
+      "candidate_removed": true,
+      "main_apk_restored": true,
+      "test_apk_restored": true,
+      "stock_restart_requested": true,
+      "home_requested": true,
+      "stock_native_restored": true,
+      "candidate_absent": true,
+      "candidate_native_absent": true,
+      "screensaver_unchanged": true,
+      "all_recorded_settings_unchanged": true,
+      "final_state_checked": false
+    },
+    "postRestoreMusic": {
+      "connection": "offline",
+      "idle": true,
+      "trackAbsent": true,
+      "queueEmpty": true,
+      "sourceRestored": true,
+      "controlRestored": false,
+      "roomCount": 0,
+      "pendingAbsent": true,
+      "problemAbsent": true,
+      "observedConnectionStates": [
+        "offline",
+        "offline",
+        "offline",
+        "offline",
+        "offline"
+      ]
+    }
+  }
+}

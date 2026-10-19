@@ -22,7 +22,7 @@ class MusicReceiverProtocolTest {
   }
 
   @Test fun wireTypesAreCheckedWithoutBundleOrNumberCoercion() {
-    for (key in listOf("requestId", "epoch", "observedAtElapsedMs")) {
+    for (key in listOf("requestId", "epoch", "observedAtElapsedMs", "pcmFramesDrained")) {
       for (bad in listOf<Any>("1", 1, 1.0, true)) rejects {
         MusicReceiverProtocol.parse(1, state().plus(key to bad))
       }
@@ -30,7 +30,7 @@ class MusicReceiverProtocolTest {
     for (bad in listOf<Any>("1", 1L, 1.0, true)) rejects {
       MusicReceiverProtocol.parse(1, state().plus("protocol" to bad))
     }
-    for (key in listOf("processAlive", "focusHeld", "playbackRequested")) {
+    for (key in listOf("processAlive", "rendererActive", "focusHeld", "playbackRequested")) {
       for (bad in listOf<Any>("false", 0, 0L)) rejects {
         MusicReceiverProtocol.parse(1, state().plus(key to bad))
       }
@@ -51,11 +51,11 @@ class MusicReceiverProtocolTest {
     for (key in listOf("instance", "clientId")) rejects {
       MusicReceiverProtocol.parse(1, state().plus(key to " \t"))
     }
-    for (key in listOf("requestId", "epoch", "observedAtElapsedMs")) rejects {
+    for (key in listOf("requestId", "epoch", "observedAtElapsedMs", "pcmFramesDrained")) rejects {
       MusicReceiverProtocol.parse(1, state().plus(key to -1L))
     }
     rejects { MusicReceiverProtocol.parse(1, state().plus("requestId" to 0L)) }
-    rejects { MusicReceiverProtocol.parse(1, state().plus("protocol" to 2)) }
+    rejects { MusicReceiverProtocol.parse(1, state().plus("protocol" to 1)) }
     rejects { MusicReceiverProtocol.parse(1, state().plus("outputState" to "audible")) }
     rejects { MusicReceiverProtocol.parse(1, state().plus("reason" to "raw private error")) }
     rejects { MusicReceiverProtocol.parse(1, state().plus("token" to "not a wire field")) }
@@ -72,7 +72,7 @@ class MusicReceiverProtocolTest {
   }
 
   @Test fun stoppedObservationRequiresAllReceiverFlagsAndDoesNotClaimAudibility() {
-    for (key in listOf("processAlive", "focusHeld", "playbackRequested")) {
+    for (key in listOf("rendererActive", "focusHeld", "playbackRequested")) {
       val reply = MusicReceiverProtocol.parse(1, state().plus(key to true)) as MusicReceiverProtocol.Reply.State
       assertFalse(reply.observation.stoppedConfirmed)
     }
@@ -261,6 +261,127 @@ class MusicReceiverProtocolTest {
     assertNotNull(session.issue(MusicReceiverProtocol.Action.UserStart(recent, "server"), 10_130))
   }
 
+  @Test fun connectionOnlyStateConfirmsLocalStopWithoutClaimingDecoderTermination() {
+    val fields = state().plus(mapOf("outputState" to "connection_running_unverified",
+        "processAlive" to true, "rendererActive" to false, "pcmFramesDrained" to Long.MAX_VALUE,
+        "reason" to "pcm_output_failed"))
+    val observed = (MusicReceiverProtocol.parse(1, fields) as MusicReceiverProtocol.Reply.State).observation
+    assertTrue(observed.processAlive)
+    assertFalse(observed.rendererActive)
+    assertEquals(Long.MAX_VALUE, observed.pcmFramesDrained)
+    assertTrue(observed.stoppedConfirmed)
+    for (key in listOf("focusHeld", "playbackRequested")) {
+      val busy = (MusicReceiverProtocol.parse(1, fields.plus(key to true))
+          as MusicReceiverProtocol.Reply.State).observation
+      assertFalse(busy.stoppedConfirmed)
+    }
+  }
+
+  @Test fun connectionOnlyOutputRequiresALiveDecoderAndInactiveLocalRenderer() {
+    val fields = state().plus(mapOf("outputState" to "connection_running_unverified", "processAlive" to true))
+    rejects { MusicReceiverProtocol.parse(1, fields.plus("processAlive" to false)) }
+    rejects { MusicReceiverProtocol.parse(1, fields.plus("rendererActive" to true)) }
+  }
+
+  @Test fun protocolOneIsRejectedWithEitherOldOrNewStateFields() {
+    rejects { MusicReceiverProtocol.parse(1, state().plus("protocol" to 1)) }
+    rejects { MusicReceiverProtocol.parse(1, state().minus("rendererActive").minus("pcmFramesDrained")
+        .plus("protocol" to 1)) }
+  }
+
+  @Test fun directObservationBuildersKeepCompatibleRendererAndCounterDefaults() {
+    val alive = MusicReceiverProtocol.Observation(1, "instance", 0, 10_000, "client",
+        "process_running_unverified", "user_start", true, true, true)
+    assertTrue(alive.rendererActive)
+    assertEquals(0L, alive.pcmFramesDrained)
+    assertFalse(alive.stoppedConfirmed)
+    val stopped = MusicReceiverProtocol.Observation(1, "instance", 0, 10_000, "client",
+        "stopped_confirmed", "idle", false, false, false)
+    assertFalse(stopped.rendererActive)
+    assertTrue(stopped.stoppedConfirmed)
+  }
+
+  @Test fun continuouslyDrainedFramesDoNotInvalidateARealFreshCapturedStart() {
+    val session = observedSession()
+    val captured = session.observation!!
+    val refresh = session.issue(query, 10_500)!!
+    accept(session, refresh, state(id = refresh.requestId, at = 10_510).plus("pcmFramesDrained" to 480L))
+    assertEquals(480L, session.observation!!.pcmFramesDrained)
+    assertNotNull(session.issue(MusicReceiverProtocol.Action.UserStart(captured, "server"), 10_520))
+  }
+
+  @Test fun counterNormalizationNeverTurnsAForgedObservationIntoAnAcceptedReceipt() {
+    val session = observedSession()
+    val captured = session.observation!!
+    val refresh = session.issue(query, 10_500)!!
+    accept(session, refresh, state(id = refresh.requestId, at = 10_510).plus("pcmFramesDrained" to 480L))
+    assertNull(session.issue(MusicReceiverProtocol.Action.UserStart(
+        captured.copy(pcmFramesDrained = 480L), "server"), 10_520))
+    assertNull(session.issue(MusicReceiverProtocol.Action.UserStart(
+        session.observation!!.copy(pcmFramesDrained = 481L), "server"), 10_520))
+    assertNotNull(session.issue(MusicReceiverProtocol.Action.UserStart(captured, "server"), 10_520))
+  }
+
+  @Test fun frameCounterCannotRegressWithinAnInstanceEvenAfterAnEpochChangeOrRejection() {
+    for (nextEpoch in listOf(3L, 4L)) {
+      val session = observedSession()
+      val advance = session.issue(query, 10_010)!!
+      accept(session, advance, state(id = advance.requestId, at = 10_020).plus("pcmFramesDrained" to 100L))
+      val regression = session.issue(query, 10_030)!!
+      assertEquals(MusicReceiverProtocol.Acceptance.Rejected(MusicReceiverProtocol.Rejection.COUNTER_REGRESSED),
+          session.accept(regression.generation, 1,
+              state(id = regression.requestId, epoch = nextEpoch, at = 10_040)
+                  .plus("pcmFramesDrained" to 99L), 10_040))
+      assertNull(session.observation)
+      val retry = session.issue(query, 10_050)!!
+      assertEquals(MusicReceiverProtocol.Acceptance.Rejected(MusicReceiverProtocol.Rejection.COUNTER_REGRESSED),
+          session.accept(retry.generation, 1, state(id = retry.requestId, at = 10_060), 10_060))
+    }
+  }
+
+  @Test fun newBindingCanReportANewInstanceWithAResetFrameCounter() {
+    val session = observedSession()
+    val advance = session.issue(query, 10_010)!!
+    accept(session, advance, state(id = advance.requestId, at = 10_020).plus("pcmFramesDrained" to 100L))
+    session.disconnect(); session.connect()
+    val rebound = session.issue(query, 10_030)!!
+    accept(session, rebound, state(id = rebound.requestId, instance = "instance-b", at = 10_040))
+    assertEquals(0L, session.observation!!.pcmFramesDrained)
+  }
+
+  @Test fun sameServiceInstanceCannotResetItsFrameCounterOnRebind() {
+    val session = observedSession()
+    val advance = session.issue(query, 10_010)!!
+    accept(session, advance, state(id = advance.requestId, at = 10_020).plus("pcmFramesDrained" to 100L))
+    session.disconnect(); session.connect()
+    val rebound = session.issue(query, 10_030)!!
+    assertEquals(MusicReceiverProtocol.Acceptance.Rejected(MusicReceiverProtocol.Rejection.COUNTER_REGRESSED),
+        session.accept(rebound.generation, 1, state(id = rebound.requestId, at = 10_040), 10_040))
+    assertNull(session.observation)
+  }
+
+  @Test fun counterProgressCannotHideAnActualRendererFocusPlaybackOrEpochChangeFromStart() {
+    for (patch in listOf(mapOf<String, Any?>("rendererActive" to true), mapOf("focusHeld" to true),
+        mapOf("playbackRequested" to true), mapOf("processAlive" to true), mapOf("epoch" to 4L),
+        mapOf("outputState" to "starting_unverified"), mapOf("reason" to "user_stopped"))) {
+      val session = observedSession()
+      val captured = session.observation!!
+      val refresh = session.issue(query, 10_500)!!
+      accept(session, refresh, state(id = refresh.requestId, at = 10_510)
+          .plus("pcmFramesDrained" to 480L).plus(patch))
+      assertNull(session.issue(MusicReceiverProtocol.Action.UserStart(captured, "server"), 10_520))
+    }
+  }
+
+  @Test fun drainProgressNeverExtendsTheCapturedReceiptsOwnFreshness() {
+    val session = observedSession()
+    val captured = session.observation!!
+    val refresh = session.issue(query, 10_900)!!
+    accept(session, refresh, state(id = refresh.requestId, at = 10_910).plus("pcmFramesDrained" to 480L))
+    assertNull(session.issue(MusicReceiverProtocol.Action.UserStart(captured, "server"), 11_000))
+    assertNotNull(session.issue(MusicReceiverProtocol.Action.UserStart(session.observation!!, "server"), 11_000))
+  }
+
   private fun observedSession(): MusicReceiverProtocol.Session = MusicReceiverProtocol.Session().also {
     it.connect()
     val request = it.issue(query, 10_000)!!
@@ -276,9 +397,10 @@ class MusicReceiverProtocolTest {
 
   private fun state(id: Long = 1, instance: String = "instance-a", epoch: Long = 3,
       at: Long = 10_000): Map<String, Any?> = mapOf(
-      "protocol" to 1, "requestId" to id, "instance" to instance, "epoch" to epoch,
+      "protocol" to 2, "requestId" to id, "instance" to instance, "epoch" to epoch,
       "observedAtElapsedMs" to at, "clientId" to "receiver-client", "outputState" to "stopped_confirmed",
-      "reason" to "idle", "processAlive" to false, "focusHeld" to false, "playbackRequested" to false)
+      "reason" to "idle", "processAlive" to false, "focusHeld" to false, "playbackRequested" to false,
+      "rendererActive" to false, "pcmFramesDrained" to 0L)
 
   private fun rejects(block: () -> Unit) {
     try { block(); fail("Malformed receiver fields must be rejected") }

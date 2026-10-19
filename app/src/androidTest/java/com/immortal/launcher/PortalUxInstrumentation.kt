@@ -39,6 +39,12 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Explicitly gated real PCM connection probe; never mutates MA playback or queue.
+        if (options.getString("command") == "musicPcmContinuity") {
+            val receiver = MusicPcmContinuityDeviceChecks.run(this, options)
+            finish(if (receiver.getBoolean("musicPcmContinuityPassed")) 0 else 1, receiver)
+            return
+        }
         // Signed receiver checks: non-starting Query/client probes, or explicitly opted-in local native fixture.
         // None enter generic private diagnostics or read credentials.
         if (options.getString("command") == "musicReceiverQuery") {

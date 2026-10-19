@@ -291,6 +291,89 @@ class MusicReceiverClientTest {
     assertNull(MusicReceiverClient.trustedReceiverUid(signature.context, signature.component, 777))
   }
 
+  @Test fun continuouslyDrainedFramesKeepARealFreshUserStartReceiptUsable() {
+    val f = Fixture()
+    f.connect(); f.reply(); f.admitStart = true
+    val captured = f.client.view.observation!!
+    f.clock.advance(500)
+    val query = f.transport.sent.last()
+    f.transport.callbacks!!.received(1, f.fields(query.requestId).plus("pcmFramesDrained" to 480L))
+    f.clock.runCurrent()
+    assertEquals(480L, f.client.view.observation!!.pcmFramesDrained)
+    f.client.execute(MusicReceiverProtocol.Action.UserStart(captured, "server")) { f.results += it }
+    f.clock.runCurrent()
+    assertEquals(listOf(1, 1, 3), f.transport.sent.map { it.what })
+    assertEquals(captured.epoch, f.transport.sent.last().data["epoch"])
+  }
+
+  @Test fun forgedFrameCounterReceiptCannotSendStartEvenWithCallerAdmission() {
+    val f = Fixture()
+    f.connect(); f.reply(); f.admitStart = true
+    val captured = f.client.view.observation!!
+    f.clock.advance(500)
+    val query = f.transport.sent.last()
+    f.transport.callbacks!!.received(1, f.fields(query.requestId).plus("pcmFramesDrained" to 480L))
+    f.clock.runCurrent()
+    f.client.execute(MusicReceiverProtocol.Action.UserStart(captured.copy(pcmFramesDrained = 480L), "server")) {
+      f.results += it
+    }
+    f.clock.runCurrent()
+    assertEquals(0, f.transport.sent.count { it.what == 3 })
+    assertEquals(MusicReceiverClient.Result.Failed(MusicReceiverClient.Failure.UNAVAILABLE), f.results.single())
+  }
+
+  @Test fun regressingFrameCounterInvalidatesBindingAndReconnectsWithQueryOnly() {
+    val f = Fixture()
+    f.connect()
+    val first = f.transport.sent.last()
+    f.transport.callbacks!!.received(1, f.fields(first.requestId).plus("pcmFramesDrained" to 100L))
+    f.clock.runCurrent(); f.clock.advance(500)
+    val next = f.transport.sent.last()
+    f.transport.callbacks!!.received(1, f.fields(next.requestId, epoch = 4).plus("pcmFramesDrained" to 99L))
+    f.clock.runCurrent()
+    assertEquals(MusicReceiverClient.Failure.INVALID_REPLY, f.client.view.failure)
+    assertNull(f.client.view.observation)
+    assertTrue(f.transport.unbinds > 0)
+    f.clock.advance(500); f.transport.callbacks!!.connected(); f.clock.runCurrent()
+    assertTrue(f.transport.sent.all { it.what == 1 })
+    val rebound = f.transport.sent.last()
+    f.transport.callbacks!!.received(1, f.fields(rebound.requestId).plus("pcmFramesDrained" to 100L))
+    f.clock.runCurrent()
+    assertNotNull(f.client.view.observation)
+  }
+
+  @Test fun connectionOnlyDecoderStateIsPassiveAndStartStillDefaultsToDenied() {
+    val f = Fixture()
+    f.connect()
+    val query = f.transport.sent.last()
+    f.transport.callbacks!!.received(1, f.fields(query.requestId).plus(mapOf(
+        "outputState" to "connection_running_unverified", "processAlive" to true,
+        "rendererActive" to false, "pcmFramesDrained" to 480L)))
+    f.clock.runCurrent()
+    val observed = f.client.view.observation!!
+    assertTrue(observed.stoppedConfirmed)
+    assertTrue(observed.processAlive)
+    assertFalse(observed.rendererActive)
+    f.client.execute(MusicReceiverProtocol.Action.UserStart(observed, "server")) { f.results += it }
+    f.clock.runCurrent()
+    assertEquals(MusicReceiverClient.Result.Failed(MusicReceiverClient.Failure.NOT_ADMITTED), f.results.single())
+    assertEquals(listOf(1), f.transport.sent.map { it.what })
+  }
+
+  @Test fun protocolOneOrUntypedPcmMetadataFailsClosedWithoutStarting() {
+    for (patch in listOf(mapOf<String, Any?>("protocol" to 1), mapOf("rendererActive" to "false"),
+        mapOf("pcmFramesDrained" to 1), mapOf("pcmFramesDrained" to -1L))) {
+      val f = Fixture()
+      f.connect()
+      val query = f.transport.sent.last()
+      f.transport.callbacks!!.received(1, f.fields(query.requestId).plus(patch))
+      f.clock.runCurrent()
+      assertEquals(MusicReceiverClient.Failure.INVALID_REPLY, f.client.view.failure)
+      assertNull(f.client.view.observation)
+      assertEquals(0, f.transport.sent.count { it.what == 3 })
+    }
+  }
+
   private class TrustFixture {
     val context = Mockito.mock(Context::class.java)
     val component = Mockito.mock(ComponentName::class.java)
@@ -336,10 +419,11 @@ class MusicReceiverClientTest {
       clock.runCurrent()
     }
     fun fields(id: Long, epoch: Long = 3): Map<String, Any?> = mapOf(
-        "protocol" to 1, "requestId" to id, "instance" to "instance-a", "epoch" to epoch,
+        "protocol" to 2, "requestId" to id, "instance" to "instance-a", "epoch" to epoch,
         "observedAtElapsedMs" to clock.nowElapsedMs, "clientId" to "receiver-client",
         "outputState" to "stopped_confirmed", "reason" to "idle", "processAlive" to false,
-        "focusHeld" to false, "playbackRequested" to false)
+        "focusHeld" to false, "playbackRequested" to false,
+        "rendererActive" to false, "pcmFramesDrained" to 0L)
   }
 
   private class FakeTransport : MusicReceiverClient.Transport {

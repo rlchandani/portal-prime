@@ -26,10 +26,12 @@ internal object MusicReceiverProtocol {
       val requestId: Long, val instance: String, val epoch: Long, val observedAtElapsedMs: Long,
       val clientId: String, val outputState: String, val reason: String, val processAlive: Boolean,
       val focusHeld: Boolean, val playbackRequested: Boolean,
+      val rendererActive: Boolean = processAlive, val pcmFramesDrained: Long = 0,
   ) {
-    /** Confirms only reported renderer termination, not speaker silence or another app's focus. */
-    val stoppedConfirmed: Boolean get() = outputState == "stopped_confirmed" &&
-        !processAlive && !focusHeld && !playbackRequested
+    /** Confirms only reported local output stop, not decoder termination or speaker silence. */
+    val stoppedConfirmed: Boolean get() = !rendererActive && !focusHeld && !playbackRequested &&
+        (outputState == "stopped_confirmed" ||
+          (outputState == "connection_running_unverified" && processAlive))
   }
 
   sealed interface Reply {
@@ -43,7 +45,8 @@ internal object MusicReceiverProtocol {
   data class Request(val what: Int, val requestId: Long, val data: Map<String, Any>,
       val generation: Long, val sentAtElapsedMs: Long)
 
-  enum class Rejection { MALFORMED, INSTANCE_CHANGED, SOURCE_CHANGED, EPOCH_REGRESSED, STALE_TIME }
+  enum class Rejection { MALFORMED, INSTANCE_CHANGED, SOURCE_CHANGED, EPOCH_REGRESSED,
+    COUNTER_REGRESSED, STALE_TIME }
   sealed interface Acceptance {
     data object Ignored : Acceptance
     data class Rejected(val reason: Rejection) : Acceptance
@@ -51,12 +54,13 @@ internal object MusicReceiverProtocol {
   }
 
   private val stateKeys = setOf("protocol", "requestId", "instance", "epoch", "observedAtElapsedMs",
-      "clientId", "outputState", "reason", "processAlive", "focusHeld", "playbackRequested")
+      "clientId", "outputState", "reason", "processAlive", "focusHeld", "playbackRequested",
+      "rendererActive", "pcmFramesDrained")
   private val outputs = setOf("stopped_confirmed", "starting_unverified",
-      "process_running_unverified", "termination_unconfirmed")
+      "process_running_unverified", "connection_running_unverified", "termination_unconfirmed")
   private val reasons = setOf("idle", "launcher_suppressed", "user_stopped", "user_start",
-      "service_destroyed", "renderer_gate_failed", "renderer_exited", "focus_denied", "start_failed",
-      "termination_unconfirmed", "restart_failed", "focus_loss_-1", "focus_loss_-2", "focus_loss_-3")
+      "service_destroyed", "renderer_gate_failed", "renderer_exited", "pcm_output_failed", "focus_denied",
+      "start_failed", "termination_unconfirmed", "restart_failed", "focus_loss_-1", "focus_loss_-2", "focus_loss_-3")
 
   /** Bundle values must retain their actual runtime types; coercing getters are not used. */
   fun parse(what: Int, fields: Map<String, Any?>): Reply {
@@ -71,16 +75,22 @@ internal object MusicReceiverProtocol {
     require(fields.keys == stateKeys + (if (error == null) emptySet() else setOf("error"))) {
       "Invalid receiver fields."
     }
-    require(fields["protocol"] is Int && fields["protocol"] == 1) { "Unsupported receiver protocol." }
+    require(fields["protocol"] is Int && fields["protocol"] == 2) { "Unsupported receiver protocol." }
     require(error == null || error in setOf("stale", "invalid_endpoint", "unsupported")) {
       "Invalid receiver error."
     }
     val output = text(fields, "outputState")
     val reason = text(fields, "reason")
     require(output in outputs && reason in reasons) { "Invalid receiver state." }
+    val processAlive = bool(fields, "processAlive")
+    val rendererActive = bool(fields, "rendererActive")
+    require(output != "connection_running_unverified" || (processAlive && !rendererActive)) {
+      "Invalid connection-only receiver state."
+    }
     return Reply.State(Observation(id, text(fields, "instance"), long(fields, "epoch", 0),
         long(fields, "observedAtElapsedMs", 0), text(fields, "clientId"), output, reason,
-        bool(fields, "processAlive"), bool(fields, "focusHeld"), bool(fields, "playbackRequested")), error)
+        processAlive, bool(fields, "focusHeld"), bool(fields, "playbackRequested"),
+        rendererActive, long(fields, "pcmFramesDrained", 0)), error)
   }
 
   private fun text(fields: Map<String, Any?>, key: String): String {
@@ -114,11 +124,17 @@ internal object MusicReceiverProtocol {
     private var clientId: String? = null
     private var epoch = -1L
     private var observedAt = -1L
+    // A live service keeps draining across bindings; only a new service instance resets its counter.
+    private var frameInstance: String? = null
+    private var framesDrained = -1L
     // Real receipts only, current binding only; normal 500 ms polling needs at most three.
     private val recentObservations = ArrayDeque<Observation>()
 
+    // Drain progress is telemetry, not a new user-visible state or Start admission epoch.
+    // Receipt membership below still compares the complete, unmodified Observation.
     private fun sameReportedState(a: Observation, b: Observation): Boolean =
-        a.copy(requestId = b.requestId, observedAtElapsedMs = b.observedAtElapsedMs) == b
+        a.copy(requestId = b.requestId, observedAtElapsedMs = b.observedAtElapsedMs,
+            pcmFramesDrained = b.pcmFramesDrained) == b
 
     fun connect() { reset(); connected = true }
     fun disconnect() { reset(); connected = false }
@@ -178,10 +194,13 @@ internal object MusicReceiverProtocol {
         if (instance != null && instance != s.instance) return reject(Rejection.INSTANCE_CHANGED)
         if (clientId != null && clientId != s.clientId) return reject(Rejection.SOURCE_CHANGED)
         if (s.epoch < epoch) return reject(Rejection.EPOCH_REGRESSED)
+        if (frameInstance == s.instance && s.pcmFramesDrained < framesDrained)
+          return reject(Rejection.COUNTER_REGRESSED)
         if (s.observedAtElapsedMs < observedAt || s.observedAtElapsedMs < request.sentAtElapsedMs ||
             s.observedAtElapsedMs > nowElapsedMs ||
             nowElapsedMs - s.observedAtElapsedMs >= FRESH_MS) return reject(Rejection.STALE_TIME)
         instance = s.instance; clientId = s.clientId; epoch = s.epoch; observedAt = s.observedAtElapsedMs
+        frameInstance = s.instance; framesDrained = s.pcmFramesDrained
         if (observation == null || !sameReportedState(observation!!, s) || reply.error != null)
           recentObservations.clear()
         observation = s.takeIf { reply.error == null }

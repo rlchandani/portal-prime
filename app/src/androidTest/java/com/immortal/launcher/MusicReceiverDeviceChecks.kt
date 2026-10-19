@@ -42,6 +42,8 @@ internal object MusicReceiverDeviceChecks {
     var cycles = 0
     var requests = 0L
     var previousClient: String? = null
+    var previousInstance: String? = null
+    var previousFramesDrained = -1L
     var stage = "opt_in"
     try {
       check(requested) { "Opt-in required." }
@@ -108,13 +110,16 @@ internal object MusicReceiverDeviceChecks {
           stage = "stopped_state"
           val data = requireNotNull(observed)
           check(!data.containsKey("error")) { "Receiver rejected query." }
-          check(data.get("protocol") == 1 && data.get("epoch") is Long &&
-              (data.get("epoch") as Long) >= 0 && data.get("observedAtElapsedMs") is Long)
-          check(data.get("instance") is String && data.getString("instance")!!.isNotBlank())
-          check(data.get("outputState") == "stopped_confirmed" &&
-              data.get("processAlive") == false && data.get("focusHeld") == false &&
-              data.get("playbackRequested") == false) { "Query must not start output." }
-          val client = requireNotNull(data.get("clientId") as? String)
+          val reply = MusicReceiverProtocol.parse(1, data.keySet().associateWith { data.get(it) })
+              as MusicReceiverProtocol.Reply.State
+          val state = reply.observation
+          check(reply.error == null && state.stoppedConfirmed) { "Query must not start local output." }
+          check(previousInstance != state.instance || state.pcmFramesDrained >= previousFramesDrained) {
+            "Drain counter regressed in the same receiver instance."
+          }
+          previousInstance = state.instance
+          previousFramesDrained = state.pcmFramesDrained
+          val client = state.clientId
           check(client.isNotBlank() && (previousClient == null || previousClient == client))
           previousClient = client
           cycles++

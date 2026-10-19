@@ -1,5 +1,17 @@
 # Music receiver preview.2 and companion parity — October 19, 2026
 
+## PCM preview.3 checkpoint — October 19, 10:04 UTC
+
+A separate native PCM connection and Android AudioTrack output replace kill-on-focus in the isolated receiver source. The launcher v2 contract reports decoder lifetime, unreleased output and monotonic drained frames separately. Local stopped confirmation waits for actual output teardown. Start remains denied by default in production; no automatic focus/reconnect/boot resume or production receiver mapping/hook was activated.
+
+Source review caught and fixed old-reader delivery into a replacement output, delayed failure targeting a newer output epoch, and a child-death race that could reuse a connection generation. Failure callbacks carry the original output epoch; PCM reads use a dedicated serialized reader lock with per-connection fencing; unexpected death of an existing child fails closed. A local callback interface retains API-21 compatibility. The scoped final recheck found no remaining blockers for a bounded probe.
+
+Validation: **3,326 launcher JVM tests / 342 suites / zero failures/errors/skips**, debug/test assembly passed; **11 receiver JVM regressions / zero failures/errors/skips**, receiver debug assembly passed; the new dedicated device probe compiled. The signed receiver SHA-256 is `14226769e90a2339b9b368ac6d3c1c16b71cfd3c9dca5ffa1531e9417d96ce19`; it uses the existing Family-compatible debug signer and unchanged pinned public native bytes. This is not a native rebuild. [Preserved source and filtered receipt](research/snapcast-focus-candidate/preview.3/) include the exact source/license snapshots.
+
+The physical Family PCM probe **failed at initial_stopped before any accepted Start**: 0 Starts, 0 native candidate processes, no PCM/output/continuity verdict. An initial preflight formatting mismatch was corrected by read-only verification of the exact source-qualified MA ID. The actual probe was attempted once; this initial-observation issue is parked at the original 30-minute window rather than retried or claimed passed.
+
+Cleanup proved candidate removal, original main/test APK restoration, stock native receiver running, Home requested, screensaver component unchanged and every recorded Immortal setting unchanged. Living was untouched. However, post-restoration `/remote/music` reports **offline / 0 rooms**, with saved source retained; full music readback restoration is **unverified and requires follow-up**. Do not treat local APK restoration as recovery of the server binding. No audio, queue, group or volume command was sent to MA; YouTube authorization, actual audio and Calls/Jarvis handoff remain open. No performance acceptance improvement is claimed.
+
 ## Latest scoped checkpoint — October 19
 
 Family now runs signed preview `6014fdf65fb10567fbe45bbda1851c71a89c833498aebc6c52689561851b2dff`. Installation preserved every recorded Immortal setting and the screensaver component, resumed Home, and recovered `/remote/music` to **ready / correct Family source / idle / 0 queue items / 11 rooms / no problem**. Living remains untouched. The managed receiver remains uninstalled and inactive.
