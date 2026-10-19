@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
 /** Explicit test-only PCM continuity probe. No server playback, queue, volume or group commands. */
 internal object MusicPcmContinuityDeviceChecks {
@@ -30,20 +31,25 @@ internal object MusicPcmContinuityDeviceChecks {
     var drainChecks = 0
     var noResumeChecks = 0
     var cleaned = false
+    val diagnostics = Diagnostics()
     val began = SystemClock.elapsedRealtime()
     try {
       check(options.getString("pcmContinuity") == "1")
       val host = requireNotNull(options.getString("host"))
       check(host == "192.168.0.111") { "Unapproved test endpoint." }
       check(audio.mode == AudioManager.MODE_NORMAL && !audio.isMusicActive)
-      val control = MusicReceiverClient(context, onChanged = {}, canStart = {
+      val control = MusicReceiverClient(context, onChanged = diagnostics::recordView, canStart = {
         it.stoppedConfirmed && audio.mode == AudioManager.MODE_NORMAL && !audio.isMusicActive
       })
       client = control
       fun command(action: MusicReceiverProtocol.Action): MusicReceiverProtocol.Observation {
         val latch = CountDownLatch(1)
         var response: MusicReceiverClient.Result? = null
-        control.execute(action) { response = it; latch.countDown() }
+        control.execute(action) {
+          diagnostics.recordResult(it)
+          response = it
+          latch.countDown()
+        }
         check(latch.await(2, TimeUnit.SECONDS)) { "Command deadline." }
         val reply = (response as? MusicReceiverClient.Result.Received)?.reply
             as? MusicReceiverProtocol.Reply.State
@@ -107,18 +113,28 @@ internal object MusicPcmContinuityDeviceChecks {
         noResumeChecks++
       }
       result.putBoolean("musicPcmContinuityPassed", true)
-    } catch (_: Throwable) {
+    } catch (failure: Throwable) {
       result.putBoolean("musicPcmContinuityPassed", false)
       result.putString("failedStage", stage)
+      // Never include exception messages: they can contain endpoint or credential material.
+      result.putString("failureClass", failure.javaClass.simpleName)
     } finally {
+      // Capture the failing state before cleanup intentionally changes receiver ownership.
+      diagnostics.writeTo(result, SystemClock.elapsedRealtime())
       focus?.let { audio.abandonAudioFocusRequest(it) }
       val control = client
       if (control != null) {
         val done = CountDownLatch(1)
-        control.execute(MusicReceiverProtocol.Action.Suppress) { done.countDown() }
-        cleaned = done.await(2, TimeUnit.SECONDS)
+        val cleanupReply = AtomicReference<MusicReceiverClient.Result?>(null)
+        control.execute(MusicReceiverProtocol.Action.Suppress) {
+          cleanupReply.set(it)
+          done.countDown()
+        }
+        cleaned = done.await(2, TimeUnit.SECONDS) &&
+            ((cleanupReply.get() as? MusicReceiverClient.Result.Received)?.reply
+                as? MusicReceiverProtocol.Reply.State)?.let { it.error == null } == true
         control.detach()
-      } else cleaned = true
+      } else cleaned = false
       result.putBoolean("suppressionAcknowledged", cleaned)
       result.putInt("explicitStarts", starts)
       result.putInt("confirmedLocalStops", confirmedStops)
@@ -129,5 +145,57 @@ internal object MusicPcmContinuityDeviceChecks {
       result.putLong("elapsedMs", SystemClock.elapsedRealtime() - began)
     }
     return result
+  }
+
+  /** Keeps only typed, protocol-validated evidence; never emits identities or raw Binder data. */
+  private class Diagnostics {
+    private val lastView = AtomicReference<MusicReceiverClient.View?>(null)
+    private val lastState = AtomicReference<MusicReceiverProtocol.Observation?>(null)
+    private val lastClientFailure = AtomicReference<MusicReceiverClient.Failure?>(null)
+    private val lastCommandFailure = AtomicReference<MusicReceiverClient.Failure?>(null)
+    private val lastReceiverError = AtomicReference<String?>(null)
+
+    fun recordView(view: MusicReceiverClient.View) {
+      lastView.set(view)
+      view.observation?.let(lastState::set)
+      view.failure?.let(lastClientFailure::set)
+    }
+
+    fun recordResult(result: MusicReceiverClient.Result) {
+      when (result) {
+        is MusicReceiverClient.Result.Failed -> lastCommandFailure.set(result.failure)
+        is MusicReceiverClient.Result.Received -> when (val reply = result.reply) {
+          is MusicReceiverProtocol.Reply.State -> {
+            lastState.set(reply.observation)
+            reply.error?.let(lastReceiverError::set)
+          }
+          is MusicReceiverProtocol.Reply.Error -> lastReceiverError.set(reply.error)
+        }
+      }
+    }
+
+    fun writeTo(result: Bundle, nowElapsedMs: Long) {
+      lastView.get()?.let { view ->
+        result.putString("receiverConnection", view.connection.name)
+        view.pendingWhat?.let { result.putInt("receiverPendingWhat", it) }
+      }
+      lastClientFailure.get()?.let { result.putString("lastClientFailure", it.name) }
+      lastCommandFailure.get()?.let { result.putString("lastCommandFailure", it.name) }
+      lastReceiverError.get()?.let { result.putString("lastReceiverError", it) }
+      val state = lastState.get()
+      result.putBoolean("lastValidatedStateAvailable", state != null)
+      state?.let {
+        result.putString("lastValidatedOutputState", it.outputState)
+        result.putString("lastValidatedReason", it.reason)
+        result.putLong("lastValidatedEpoch", it.epoch)
+        result.putLong("lastValidatedStateAgeMs", (nowElapsedMs - it.observedAtElapsedMs).coerceAtLeast(0))
+        result.putLong("lastValidatedPcmFramesDrained", it.pcmFramesDrained)
+        result.putBoolean("lastValidatedProcessAlive", it.processAlive)
+        result.putBoolean("lastValidatedRendererActive", it.rendererActive)
+        result.putBoolean("lastValidatedFocusHeld", it.focusHeld)
+        result.putBoolean("lastValidatedPlaybackRequested", it.playbackRequested)
+        result.putBoolean("lastValidatedStoppedConfirmed", it.stoppedConfirmed)
+      }
+    }
   }
 }

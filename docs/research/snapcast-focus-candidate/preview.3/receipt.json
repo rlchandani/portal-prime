@@ -73,5 +73,87 @@
     "installedLauncherSha256": "73eb41429f48ab5bddb503d3730468383ce83ba6156e0a45f8b8bf0afc6d9c0a",
     "musicReadbackRestored": true,
     "audioProbeStillUnverified": true
+  },
+  "followupPcmProbeAfterAndroidBoundaryFix": {
+    "status": "PARKED",
+    "passed": false,
+    "failedStage": "start_user_stop",
+    "explicitStarts": 1,
+    "candidateNativeProcessesObserved": 1,
+    "confirmedLocalStops": 0,
+    "continuedDrainChecks": 0,
+    "noAutomaticResumeChecks": 0,
+    "suppressionAcknowledged": true,
+    "suppressionAcknowledgmentEvidence": "Historical reported field; does not retroactively establish an accepted reply or acoustic stop. Physical removal/restoration independently verified.",
+    "elapsedMs": 1484,
+    "audiblePlaybackProven": false,
+    "serverWriteCommandsSent": false,
+    "actualPcmFocusAudioPass": false,
+    "furtherPhysicalRerun": false,
+    "installedLauncherSha256": "73eb41429f48ab5bddb503d3730468383ce83ba6156e0a45f8b8bf0afc6d9c0a",
+    "productionMainUnchanged": true,
+    "candidateAndTestTemporaryOnly": true,
+    "livingTouched": false,
+    "evidence": {
+      "log": "/private/tmp/portal-music-backend-check/pcm-device.log",
+      "receipt": "/private/tmp/portal-music-backend-check/pcm-device-receipt.json"
+    },
+    "cleanup": {
+      "allRecordedSettingsUnchanged": true,
+      "screensaverUnchanged": true,
+      "sourceAndControlUnchanged": true,
+      "queueTrackPlaybackUnchanged": true,
+      "roomVolumeGroupsUnchanged": true,
+      "candidateAbsent": true,
+      "candidateNativeAbsent": true,
+      "stockReceiverRestored": true,
+      "priorTestRestored": true,
+      "homeRequested": true
+    },
+    "familyBinding": {
+      "connection": "ready",
+      "playback": "idle",
+      "roomCount": 11
+    }
+  },
+  "currentServerAndYouTubeStatus": {
+    "musicAssistantVersion": "2.10.7",
+    "musicAssistantRunning": true,
+    "youtubeHelperVersion": "2.0.1",
+    "youtubeHelperRunning": true,
+    "sourceFormPrepared": true,
+    "sourceFormSaved": false,
+    "defaultPoUrl": "127.0.0.1:4416",
+    "usernameEmpty": true,
+    "cookieEmpty": true,
+    "humanAuthorization": "pending_directly_in_server",
+    "googleCookieAcquiredOrExportedByAgent": false,
+    "sourceSavedByAgent": false
+  },
+  "followupInstrumentationDiagnostics": {
+    "scope": "MusicPcmContinuityDeviceChecks reporting only: diagnostics and future acknowledgment classification",
+    "futureSuppressionAcknowledgmentRequires": "In every path: Received Reply.State with error == null",
+    "resolvedReportingEdge": "No-client cleanup branch now sets cleaned=false; no acknowledgment without a received error-free State",
+    "capturedBeforeCleanup": [
+      "last classified client/command error",
+      "protocol-validated output/focus/drained-counter state"
+    ],
+    "excluded": [
+      "identities",
+      "endpoints",
+      "exception messages",
+      "raw Bundles"
+    ],
+    "buildCommand": ":app:assembleDebugAndroidTest --no-daemon --offline",
+    "buildResult": "BUILD SUCCESSFUL",
+    "buildSeconds": 7,
+    "buildExitCode": 0,
+    "buildAppliesTo": "All instrumentation changes, including diagnostics capture, acknowledgment-reporting correction and no-client cleaned=false fix",
+    "buildSuccessLogLine": 64,
+    "finalBuildLogReplacesIntermediate": true,
+    "buildLog": "/private/tmp/portal-music-recovery/pcm-diagnostics-build.log",
+    "physicalProbeRerun": false,
+    "installedAppChanged": false,
+    "audioDefectFixedClaimed": false
   }
 }
