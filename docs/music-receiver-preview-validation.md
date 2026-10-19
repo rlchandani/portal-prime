@@ -20,7 +20,11 @@ The unsigned receiver was re-signed with the existing Family launcher debug key,
 
 The first attempt did not run because Gradle packaged only the configured instrumentation runner. Routing through the existing PortalUxInstrumentation fixed the harness. The real API-29 Family probe passed **30 bind/query/unbind cycles, 59 Query requests, 2,647 ms**, with candidate state stopped-confirmed, no process/focus/playback intent, stable candidate-local UUID and **zero Start requests**. It exercised raw Android Messenger from the actual trusted launcher UID; it did not execute the new production client or test a wrong signer/foreign UID on hardware. Host/JVM tests cover those contract cases.
 
-The owned candidate was removed, prior test APK restored, Home requested and screensaver component unchanged. The current launcher and stock receiver were never replaced by this probe. Actual baseline launcher APK remains `1a2618c640451ec4c52d6edb90f41eae7bb131b200915729b35b45482d7db34b`. Private rollback copies/receipts are in `/private/tmp/portal-music-receiver-query-check/`; no credentials, account cookies or signing key are committed.
+The owned candidate was removed, prior test APK restored, Home requested and screensaver component unchanged. The current launcher and stock receiver were never replaced by this probe. The baseline launcher APK during the query probe was `1a2618c640451ec4c52d6edb90f41eae7bb131b200915729b35b45482d7db34b`. Private rollback copies/receipts are in `/private/tmp/portal-music-receiver-query-check/`; no credentials, account cookies or signing key are committed.
+
+## Family browser parity deployment
+
+After the query probe and complete build gates, checked launcher APK SHA-256 `58bc66fa68645c7eb8636b84936265c6151a20eec3361ba5d5808bc17c3c4ab6` was installed into Family Area's existing debug package using in-place update. Data was not cleared; Home launch was confirmed and the screensaver component stayed unchanged. The packaged PWA Lyrics fix is now deployed. The temporary managed receiver remains absent; this update does not activate receiver output or establish production IPC/playback. Living Area was not touched. The actual preceding launcher APK is retained at `/private/tmp/portal-music-receiver-query-check/current-immortal.apk`; installation receipt/log are in that private folder.
 
 ## Required next gates
 
