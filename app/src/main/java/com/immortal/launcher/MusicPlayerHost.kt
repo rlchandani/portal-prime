@@ -267,8 +267,7 @@ private fun Context.openMusicSettings() {
 
 /** Library/provider setup stays in MA's owned UI. No token/cookie is put in a URL or WebView. */
 private fun Context.openMusicLibrary(snapshot: MusicPlayerSnapshot) {
-  if (snapshot.connection != MusicConnection.READY || !snapshot.sourceId.startsWith("ma:") ||
-      snapshot.audioOwnedByOther) return
+  if (snapshot.connection != MusicConnection.READY || !snapshot.sourceId.startsWith("ma:")) return
   val saved = ImmortalSettings.load(this)
   val host = saved.snapcastHost
   if (host.isBlank() || host.any { it.isWhitespace() || it in "/?#@" } || "://" in host) return

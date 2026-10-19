@@ -19,12 +19,42 @@ class MusicPlayerStateTest {
       track = track, playback = state, positionMs = 30_000, positionAtElapsedMs = 1_000,
       capabilities = capabilities)
 
-  @Test fun disconnectedAndBusySourcesRejectEveryCommand() {
+  @Test fun disconnectedSourcesRejectEveryCommand() {
     val s = ready()
     for (connection in MusicConnection.entries.filter { it != MusicConnection.READY }) {
       for (command in MusicCommand.entries) assertFalse(s.copy(connection = connection).can(command))
     }
-    for (command in MusicCommand.entries) assertFalse(s.copy(audioOwnedByOther = true).can(command))
+  }
+
+  @Test fun interruptionKeepsPauseVolumeAndPassivePanelsButBlocksStartingOrRepositioning() {
+    val s = ready(capabilities = MusicCapabilities(play = true, pause = true, next = true,
+        previous = true, seek = true, queue = true, lyrics = true, rooms = true,
+        volume = true)).copy(audioOwnedByOther = true, queueId = "shared")
+    for (command in listOf(MusicCommand.PAUSE, MusicCommand.SET_VOLUME,
+        MusicCommand.OPEN_QUEUE, MusicCommand.OPEN_LYRICS)) assertTrue(command.name, s.can(command))
+    for (command in listOf(MusicCommand.PLAY, MusicCommand.NEXT, MusicCommand.PREVIOUS,
+        MusicCommand.SEEK, MusicCommand.SELECT_QUEUE_ITEM)) assertFalse(command.name, s.can(command))
+    val unsupported = s.copy(capabilities = MusicCapabilities())
+    for (command in MusicCommand.entries) assertFalse(command.name, unsupported.can(command))
+    assertFalse(s.copy(sourceId = "ma:other").can(MusicCommand.PAUSE))
+  }
+
+  @Test fun interruptedAuthoritativeMaTimelineContinuesWhileLocalTimelineFreezes() {
+    val ma = ready().copy(audioOwnedByOther = true)
+    assertEquals(32_000L, ma.visiblePositionMs(3_000))
+    assertEquals(240_000L, ma.visiblePositionMs(Long.MAX_VALUE))
+    assertEquals(30_000L, ma.copy(playback = PlaybackState.PAUSED).visiblePositionMs(3_000))
+    assertEquals(30_000L, ma.copy(connection = MusicConnection.OFFLINE).visiblePositionMs(3_000))
+    val local = ma.copy(sourceId = "local:player", track = ma.track!!.copy(sourceId = "local:player"))
+    assertEquals(30_000L, local.visiblePositionMs(3_000))
+    assertEquals(32_000L, local.copy(audioOwnedByOther = false).visiblePositionMs(3_000))
+  }
+
+  @Test fun interruptedIdleQueueRemainsReadableButCannotStartAnItem() {
+    val idle = ready().copy(audioOwnedByOther = true, track = null, playback = PlaybackState.IDLE,
+        queueId = "shared", queue = listOf(MusicQueueItem("two", "Two")))
+    assertTrue(idle.can(MusicCommand.OPEN_QUEUE))
+    assertFalse(idle.can(MusicCommand.SELECT_QUEUE_ITEM))
   }
 
   @Test fun liveRadioNeverExposesSeekOrTrackSkippingEvenWhenReported() {

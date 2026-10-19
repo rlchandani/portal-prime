@@ -16,13 +16,14 @@ internal fun musicRoomActions(snapshot: MusicPlayerSnapshot, room: MusicRoom): M
   fun canonical(id: String) = id.startsWith("ma:") && id.length > 3
   val mutable = snapshot.connection == MusicConnection.READY &&
       canonical(snapshot.sourceId) && canonical(room.id) && room.available &&
-      !snapshot.audioOwnedByOther && snapshot.pending == null
+      snapshot.pending == null
   val anchorId = snapshot.controlPlayerId ?: snapshot.sourceId
   val anchor = snapshot.rooms.firstOrNull { it.id == anchorId }
   val grouped = anchor != null && (room.id == anchor.id || room.groupId == anchor.id)
   val groupMutable = mutable && snapshot.can(MusicCommand.CHANGE_ROOMS) && anchor != null &&
       anchor.available && room.id != anchor.id
   return MusicRoomActions(canSelect = mutable, inCurrentGroup = grouped,
-      canJoin = groupMutable && !grouped && room.id in anchor!!.canGroupWith,
+      // Joining can start a room's output; removal and source selection do not start playback.
+      canJoin = groupMutable && !snapshot.audioOwnedByOther && !grouped && room.id in anchor!!.canGroupWith,
       canRemove = groupMutable && grouped && room.removableFromGroup)
 }

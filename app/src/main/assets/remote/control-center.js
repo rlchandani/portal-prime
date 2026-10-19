@@ -1820,10 +1820,12 @@ async function readMusicSheet(owner) {
 }
 function musicMutable(owner, s = owner.state) {
   return musicSheetCurrent(owner) && owner.fresh && !owner.sending && !owner.admitted && !owner.uncertain &&
-    s?.connection === 'ready' && !s.pending && !s.audioOwnedByOther;
+    s?.connection === 'ready' && !s.pending;
 }
 function musicCommandAllowed(s, command, extra) {
   const caps = s.capabilities;
+  // Other audio blocks starting or repositioning music, while supported safe controls remain usable.
+  if (s.audioOwnedByOther && ['play', 'next', 'previous', 'seek', 'queue-item'].includes(command)) return false;
   if (musicTrackCommands.has(command) && !s.track?.id) return false;
   if (['play', 'pause', 'next', 'previous'].includes(command)) return caps[command] === true;
   if (command === 'seek') return caps.seek && !s.track.isLive &&
@@ -1836,7 +1838,7 @@ function musicCommandAllowed(s, command, extra) {
   if (command === 'select-player') return caps.selectPlayer && player.canSelect;
   if (command === 'toggle-room') return caps.rooms && !!s.controlPlayerId &&
     typeof extra.wasInGroup === 'boolean' && extra.wasInGroup === player.inCurrentGroup &&
-    (player.canJoin || player.canRemove);
+    (player.inCurrentGroup ? player.canRemove : !s.audioOwnedByOther && player.canJoin);
   if (command === 'volume') return caps.volume && player.canSetVolume &&
     Number.isInteger(extra.percent) && extra.percent >= 0 && extra.percent <= 100;
   return false;
@@ -1948,7 +1950,7 @@ function renderMusicSheet(owner) {
   if (owner.view && owner.view.identity !== identity && owner.panel === 'lyrics') owner.panel = 'queue';
   // Executable capabilities disappear during pending readback. Retain only lyrics that
   // were readable for this exact source/track binding; never retain command admission.
-  const lyricsReadable = !!s.track?.id && s.connection === 'ready' && !s.audioOwnedByOther &&
+  const lyricsReadable = !!s.track?.id && s.connection === 'ready' &&
     s.lyrics.length > 0 && (s.capabilities.lyrics ||
       (!!s.pending && owner.lyricsIdentity === identity));
   owner.lyricsIdentity = lyricsReadable ? identity : null;

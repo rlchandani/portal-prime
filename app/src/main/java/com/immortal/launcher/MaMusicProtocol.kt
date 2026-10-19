@@ -86,6 +86,7 @@ object MaMusicProtocol {
       val elapsedMs: Long,
       val media: Media?,
       val elapsedUpdatedUnixMs: Long?,
+      val providerId: String? = null,
   ) {
     internal val canSetVolume: Boolean
       get() = available && "volume_set" in features && volumeControl != "none"
@@ -274,7 +275,7 @@ object MaMusicProtocol {
     val finite = track != null && !track.isLive && (track.durationMs ?: 0) > 0
     val canGroup = "set_members" in control.features && list.any {
       it.available && it.playerId != control.playerId &&
-          (it.playerId in control.canGroupWith ||
+          (control.acceptsGroupMember(it) ||
               (it.playerId in control.groupMembers && it.playerId !in control.staticGroupMembers))
     }
     val caps = MusicCapabilities(
@@ -301,8 +302,9 @@ object MaMusicProtocol {
           ?: p.activeGroup?.takeIf { it != p.playerId }
           ?: p.playerId.takeIf { p.groupMembers.any { member -> member != p.playerId } }
       MusicRoom("ma:${p.playerId}", p.name, p.available, p.volume, p.muted,
-          groupId?.let { "ma:$it" }, p.canGroupWith.filter { it in byId }
-              .map { "ma:$it" }.toSet(), volumeControllable = p.canSetVolume,
+          groupId?.let { "ma:$it" }, list.asSequence()
+              .filter { it.available && it.playerId != p.playerId && p.acceptsGroupMember(it) }
+              .map { "ma:${it.playerId}" }.toSet(), volumeControllable = p.canSetVolume,
           removableFromGroup = p.playerId != control.playerId &&
               p.playerId in control.groupMembers && p.playerId !in control.staticGroupMembers)
     }
@@ -398,14 +400,17 @@ object MaMusicProtocol {
       add: Set<String> = emptySet(),
       remove: Set<String> = emptySet(),
   ): JSONObject? {
-    if (!selection.snapshot.can(MusicCommand.CHANGE_ROOMS) ||
+    if ((selection.snapshot.audioOwnedByOther && add.isNotEmpty()) ||
+        !selection.snapshot.can(MusicCommand.CHANGE_ROOMS) ||
         add.size + remove.size !in 1..MAX_ROOMS || add.any { it in remove }) return null
     val target = selection.controlPlayer ?: return null
     if ("set_members" !in target.features) return null
     val additions = add.map { rawPlayerId(it) ?: return null }
     val removals = remove.map { rawPlayerId(it) ?: return null }
-    val available = selection.players.filter { it.available }.map { it.playerId }.toSet()
-    if (additions.any { it == target.playerId || it !in available || it !in target.canGroupWith } ||
+    val availablePlayers = selection.players.filter { it.available }.associateBy { it.playerId }
+    val available = availablePlayers.keys
+    if (additions.any { id -> id == target.playerId ||
+          availablePlayers[id]?.let { target.acceptsGroupMember(it) } != true } ||
         removals.any { it == target.playerId || it !in available ||
           it !in target.groupMembers || it in target.staticGroupMembers }) return null
     return command(messageId, "players/cmd/set_members", JSONObject()
@@ -413,6 +418,11 @@ object MaMusicProtocol {
         .put("player_ids_to_add", JSONArray(additions))
         .put("player_ids_to_remove", JSONArray(removals)))
   }
+
+  /** MA advertises exact player IDs or provider-instance IDs; never infer by display name. */
+  private fun Player.acceptsGroupMember(candidate: Player): Boolean =
+      candidate.playerId in canGroupWith ||
+          (candidate.providerId != null && candidate.providerId in canGroupWith)
 
   private fun playbackCommand(
       messageId: String,
@@ -443,7 +453,7 @@ object MaMusicProtocol {
     val private = p.boolean("private", false)
     val hidden = hiddenInUi || private
     val elapsedUpdated = p.timestampMs("elapsed_time_last_updated")
-    if (p.has("provider")) p.requiredText("provider")
+    val providerId = if (p.has("provider")) p.requiredId("provider") else null
     if (p.has("type")) p.requiredText("type")
     val features = p.strings("supported_features", MAX_ROOMS)
     return Player(id, name, p.boolean("available") && enabled && !hidden,
@@ -468,7 +478,8 @@ object MaMusicProtocol {
         p.integer("volume_level")?.also { require(it in 0..100) },
         p.optionalBoolean("volume_muted"),
         if (p.has("volume_control")) p.requiredText("volume_control") else "none",
-        p.secondsMs("elapsed_time") ?: 0, p.obj("current_media")?.let(::readMedia), elapsedUpdated)
+        p.secondsMs("elapsed_time") ?: 0, p.obj("current_media")?.let(::readMedia),
+        elapsedUpdated, providerId)
   }
 
   private fun readMedia(m: JSONObject): Media? {

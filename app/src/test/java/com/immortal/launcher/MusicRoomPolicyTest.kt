@@ -38,9 +38,9 @@ class MusicRoomPolicyTest {
     assertFalse(musicRoomActions(state(), follower.copy(removableFromGroup = false)).canRemove)
     assertFalse(musicRoomActions(state(), leader.copy(removableFromGroup = true)).canRemove)
   }
-  @Test fun offlineBusyAndPendingStatesDisableEveryMutation() {
+  @Test fun offlineAndPendingStatesDisableEveryMutation() {
     val states = listOf(state().copy(connection = MusicConnection.OFFLINE),
-        state().copy(audioOwnedByOther = true), state().copy(pending = PendingMusicCommand(
+        state().copy(pending = PendingMusicCommand(
             1, "ma:living", MusicCommand.PAUSE, 0)))
     for (s in states) {
       val result = musicRoomActions(s, kitchen)
@@ -48,6 +48,26 @@ class MusicRoomPolicyTest {
     }
     assertFalse(musicRoomActions(state(), kitchen.copy(available = false)).canSelect)
   }
+  @Test fun interruptedRoomSelectionAndRemovalRemainAvailableButJoiningCannotStartAnotherRoom() {
+    val s = state().copy(audioOwnedByOther = true)
+    val other = musicRoomActions(s, kitchen)
+    assertTrue(other.canSelect)
+    assertFalse(other.canJoin)
+    val member = musicRoomActions(s, follower)
+    assertTrue(member.inCurrentGroup)
+    assertTrue(member.canSelect)
+    assertTrue(member.canRemove)
+    assertFalse(member.canJoin)
+    assertFalse(musicRoomActions(s, leader.copy(removableFromGroup = true)).canRemove)
+    for (blocked in listOf(s.copy(connection = MusicConnection.OFFLINE),
+        s.copy(pending = PendingMusicCommand(1, s.sourceId, MusicCommand.PAUSE, 0)))) {
+      val policy = musicRoomActions(blocked, follower)
+      assertFalse(policy.canSelect); assertFalse(policy.canRemove); assertFalse(policy.canJoin)
+    }
+    assertFalse(musicRoomActions(s, kitchen.copy(available = false)).canSelect)
+    assertFalse(musicRoomActions(s.copy(capabilities = MusicCapabilities()), follower).canRemove)
+  }
+
   @Test fun unknownLeaderNeverInventsJoinSupport() {
     val result = musicRoomActions(state().copy(controlPlayerId = "ma:missing"), kitchen)
     assertTrue(result.canSelect)

@@ -614,3 +614,124 @@ test('terminal lyrics withdrawal replaces a focused seek draft without sending i
   assert.equal(root().querySelectorAll('button').some(node => node.textContent === 'Lyrics'), false);
   assert.equal(f.posts, 0, 'Retiring a draft must not dispatch it.');
 });
+
+
+test('audio ownership permits supported pause, volume, player selection and group removal with exact bindings', async t => {
+  for (const command of ['pause', 'volume', 'select-player', 'toggle-room']) {
+    const { h, f, root, open, control, lastCommand } = await fixture(t);
+    f.music.audioOwnedByOther = true;
+    f.music.playback = 'playing';
+    f.music.rooms[1].inCurrentGroup = true;
+    f.music.rooms[1].canJoin = false;
+    f.music.rooms[1].canRemove = true;
+    await open();
+    let node, extra;
+    if (command === 'pause') {
+      node = control('Pause');
+      extra = { trackId: 'track-1' };
+    } else {
+      h.click('Players');
+      if (command === 'volume') {
+        node = control('Family volume');
+        node.value = 55;
+        extra = { roomId: 'ma:family', percent: 55 };
+      } else {
+        node = root().querySelectorAll('.music-player-row')[1].querySelectorAll('button')
+          .find(button => button.textContent === (command === 'select-player' ? 'Use player' : 'Remove from group'));
+        extra = command === 'select-player' ? { roomId: 'ma:kitchen' }
+          : { roomId: 'ma:kitchen', wasInGroup: true, leaderId: 'ma:family' };
+      }
+    }
+    assert.equal(node.disabled, false, command);
+    if (command === 'volume') node.onchange(); else node.click();
+    await h.settle();
+    assert.equal(f.posts, 1, command);
+    assert.deepEqual(lastCommand(), { command, sourceRevision: 7, sourceId: 'ma:living', ...extra });
+    h.hide();
+  }
+});
+
+test('audio ownership still blocks play, next, previous, seek, queue selection and group join even with unmasked caps', async t => {
+  for (const command of ['play', 'next', 'previous', 'seek', 'queue-item', 'toggle-room']) {
+    const { h, f, root, open, control } = await fixture(t);
+    f.music.audioOwnedByOther = true;
+    await open();
+    let node;
+    if (command === 'seek') node = control('Music playback position');
+    else if (command === 'queue-item') node = root().querySelector('.music-queue-row');
+    else if (command === 'toggle-room') {
+      h.click('Players');
+      node = root().querySelectorAll('button').find(button => button.textContent === 'Join group');
+    } else node = control(command[0].toUpperCase() + command.slice(1));
+    assert.equal(node.disabled, true, command);
+    if (command === 'seek') { node.value = 25000; node.onchange(); }
+    else {
+      node.onclick?.({ target: node });
+      for (const listener of node.listeners.click || []) listener({ target: node });
+    }
+    await h.settle();
+    assert.equal(f.posts, 0, command);
+    h.hide();
+  }
+});
+
+test('audio ownership keeps passive queue and supported lyrics readable including pending masks', async t => {
+  const { h, f, root, open, advance } = await fixture(t);
+  f.music.audioOwnedByOther = true;
+  f.music.capabilities.lyrics = true;
+  f.music.lyrics = [{ timeMs: 0, text: 'Passive owned lyric' }];
+  await open();
+  assert.equal(root().querySelectorAll('.music-queue-row').length, 2);
+  assert.equal(root().querySelector('.music-queue-row').disabled, true);
+  h.click('Lyrics');
+  assert.equal(root().querySelector('.music-lyric')?.textContent, 'Passive owned lyric');
+  pendingLyrics(f.music);
+  await advance();
+  assert.equal(root().querySelector('.music-lyric')?.textContent, 'Passive owned lyric');
+  assert.equal(f.posts, 0);
+});
+
+test('audio ownership permitted pause still obeys pending, freshness, capabilities and sheet lifecycle guards', async t => {
+  for (const guard of ['pending', 'fresh', 'sending', 'admitted', 'uncertain', 'capability', 'hidden', 'closed']) {
+    const { h, f, open, control } = await fixture(t);
+    f.music.audioOwnedByOther = true;
+    f.music.playback = 'playing';
+    await open();
+    const pause = control('Pause');
+    assert.equal(pause.disabled, false, guard);
+    if (guard === 'pending') h.eval("musicSheet.state.pending = { command: 'pause', requestId: 101 }");
+    else if (guard === 'capability') h.eval('musicSheet.state.capabilities.pause = false');
+    else if (guard === 'hidden') h.hide();
+    else if (guard === 'closed') h.eval('closeSheet()');
+    else h.eval(`musicSheet.${guard} = ${guard === 'fresh' ? 'false' : 'true'}`);
+    pause.click();
+    await h.settle();
+    assert.equal(f.posts, 0, guard);
+    h.hide();
+  }
+});
+
+test('audio ownership permitted controls cannot reuse stale source, revision or group bindings', async t => {
+  for (const changed of ['source', 'revision', 'leader', 'membership']) {
+    const { h, f, root, open, advance, control } = await fixture(t);
+    f.music.audioOwnedByOther = true;
+    f.music.playback = 'playing';
+    f.music.rooms[1].inCurrentGroup = true;
+    f.music.rooms[1].canJoin = false;
+    f.music.rooms[1].canRemove = true;
+    await open();
+    if (changed === 'leader' || changed === 'membership') h.click('Players');
+    const oldControl = changed === 'source' || changed === 'revision' ? control('Pause')
+      : root().querySelectorAll('button').find(button => button.textContent === 'Remove from group');
+    assert.equal(oldControl.disabled, false, changed);
+    if (changed === 'source') f.music.sourceId = 'ma:replacement';
+    if (changed === 'revision') f.music.sourceRevision++;
+    if (changed === 'leader') f.music.controlPlayerId = 'ma:replacement-leader';
+    if (changed === 'membership') f.music.rooms[1].inCurrentGroup = false;
+    await advance();
+    oldControl.click();
+    await h.settle();
+    assert.equal(f.posts, 0, changed);
+    h.hide();
+  }
+});

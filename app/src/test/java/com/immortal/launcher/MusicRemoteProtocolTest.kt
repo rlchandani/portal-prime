@@ -103,10 +103,9 @@ class MusicRemoteProtocolTest {
     assertTrue(caps.getBoolean("selectPlayer"))
   }
 
-  @Test fun stateDisablesControlsWhilePendingOfflineOrAudioIsOwnedElsewhere() {
+  @Test fun stateDisablesControlsWhilePendingOrOffline() {
     val pending = PendingMusicCommand(99, "ma:living", MusicCommand.PAUSE, 10)
     for (s in listOf(snapshot().copy(pending = pending),
-        snapshot().copy(audioOwnedByOther = true),
         snapshot().copy(connection = MusicConnection.OFFLINE))) {
       val json = MusicRemoteProtocol.state(s, 7, 0)
       val caps = json.getJSONObject("capabilities")
@@ -122,6 +121,79 @@ class MusicRemoteProtocolTest {
     val json = MusicRemoteProtocol.state(snapshot().copy(pending = pending), 7, 0)
     assertEquals("pause", json.getJSONObject("pending").getString("command"))
     assertEquals(99L, json.getJSONObject("pending").getLong("requestId"))
+  }
+
+  @Test fun interruptedWireKeepsSafeControlsAndPassiveDataWithoutAdvertisingPlayback() {
+    val s = snapshot().copy(audioOwnedByOther = true, playback = PlaybackState.PLAYING)
+    val wire = MusicRemoteProtocol.state(s, 7, 12_000)
+    val caps = wire.getJSONObject("capabilities")
+    for (key in listOf("pause", "volume", "selectPlayer", "queue", "lyrics"))
+      assertTrue(key, caps.getBoolean(key))
+    for (key in listOf("play", "next", "previous", "seek")) assertFalse(key, caps.getBoolean(key))
+    assertTrue(wire.getBoolean("audioOwnedByOther"))
+    assertEquals(3_000L, wire.getLong("positionMs"))
+    assertEquals("Next song", wire.getJSONArray("queue").getJSONObject(0).getString("title"))
+    assertFalse(wire.getJSONArray("queue").getJSONObject(0).getBoolean("canSelect"))
+    assertEquals("First line", wire.getJSONArray("lyrics").getJSONObject(0).getString("text"))
+    assertTrue(wire.getJSONArray("rooms").getJSONObject(0).getBoolean("canSetVolume"))
+    assertTrue(wire.getJSONArray("rooms").getJSONObject(2).getBoolean("canSelect"))
+  }
+
+  @Test fun interruptedRemoteAllowsPauseVolumeAndPlayerSelectionButRejectsAudioStartingCommands() {
+    val s = snapshot().copy(audioOwnedByOther = true, playback = PlaybackState.PLAYING)
+    accepted(MusicPlayerUiAction.TogglePlayback, body("pause"), s)
+    accepted(MusicPlayerUiAction.SetRoomVolume("ma:family", 25),
+        body("volume").put("roomId", "ma:family").put("percent", 25), s)
+    accepted(MusicPlayerUiAction.SelectPlayer("ma:kitchen"),
+        body("select-player").put("roomId", "ma:kitchen"), s)
+    val paused = s.copy(playback = PlaybackState.PAUSED)
+    rejected(409, "unavailable", body("play"), paused)
+    for (request in listOf(body("next"), body("previous"), body("seek").put("positionMs", 2_000),
+        body("queue-item").put("queueItemId", "queue-1"))) rejected(409, "unavailable", request, s)
+    assertEquals(MusicRemoteProtocol.Decoded.AlreadyApplied, decode(body("pause"), paused))
+  }
+
+  @Test fun interruptedSafeCommandsStillRequireCurrentSourceTrackPendingAndRoomBindings() {
+    val s = snapshot().copy(audioOwnedByOther = true, playback = PlaybackState.PLAYING)
+    rejected(409, "stale", body("pause").put("trackId", "old"), s)
+    rejected(409, "stale", body("volume").put("roomId", "ma:family").put("percent", 25)
+        .put("sourceRevision", 6), s)
+    rejected(409, "stale", body("select-player").put("roomId", "ma:kitchen")
+        .put("sourceId", "ma:other"), s)
+    for (blocked in listOf(s.copy(connection = MusicConnection.OFFLINE),
+        s.copy(pending = PendingMusicCommand(1, s.sourceId, MusicCommand.PAUSE, 0)))) {
+      rejected(409, "unavailable", body("pause"), blocked)
+      rejected(409, "unavailable", body("volume").put("roomId", "ma:family").put("percent", 25), blocked)
+      rejected(409, "unavailable", body("select-player").put("roomId", "ma:kitchen"), blocked)
+    }
+    rejected(409, "unavailable", body("volume").put("roomId", "ma:kitchen").put("percent", 25), s)
+    rejected(409, "unavailable", body("select-player").put("roomId", "ma:kitchen"),
+        s.copy(rooms = listOf(kitchen.copy(available = false))))
+  }
+
+  @Test fun interruptedRemoteAllowsObservedRemovalButNotJoiningAndStillChecksLeaderMembership() {
+    val s = snapshot().copy(audioOwnedByOther = true)
+    val remove = body("toggle-room").put("roomId", "ma:living").put("leaderId", "ma:family")
+        .put("wasInGroup", true)
+    accepted(MusicPlayerUiAction.ToggleRoom("ma:living"), remove, s)
+    rejected(409, "unavailable", body("toggle-room").put("roomId", "ma:kitchen")
+        .put("leaderId", "ma:family"), s)
+    rejected(409, "stale", JSONObject(remove.toString()).put("leaderId", "ma:other"), s)
+    rejected(409, "stale", remove, s.copy(rooms = listOf(leader, follower.copy(
+        groupId = null, removableFromGroup = false), kitchen)))
+    val rooms = MusicRemoteProtocol.state(s, 7, 12_000).getJSONArray("rooms")
+    assertTrue(rooms.getJSONObject(1).getBoolean("canRemove"))
+    assertFalse(rooms.getJSONObject(2).getBoolean("canJoin"))
+  }
+
+  @Test fun interruptedIdleWireKeepsQueueRowsReadableWithAllSelectionDisabled() {
+    val idle = snapshot().copy(audioOwnedByOther = true, track = null, playback = PlaybackState.IDLE)
+    val wire = MusicRemoteProtocol.state(idle, 7, 12_000)
+    assertTrue(wire.getJSONObject("capabilities").getBoolean("queue"))
+    assertTrue(wire.isNull("track"))
+    assertTrue(wire.isNull("positionMs"))
+    assertFalse(wire.getJSONArray("queue").getJSONObject(0).getBoolean("canSelect"))
+    rejected(409, "unavailable", body("queue-item").put("queueItemId", "queue-1"), idle)
   }
 
   @Test fun stateRoomControlsUseAuthoritativeLeaderAndRoomPolicy() {
@@ -304,14 +376,13 @@ class MusicRemoteProtocolTest {
     assertFalse(json.getJSONObject("capabilities").getBoolean("play"))
   }
 
-  @Test fun pendingAudioOwnershipAndDisconnectedStatesRejectEveryMutation() {
+  @Test fun pendingAndDisconnectedStatesRejectEveryMutation() {
     val requests = listOf(body("pause"), body("play"), body("next"),
         body("seek").put("positionMs", 0), body("queue-item").put("queueItemId", "queue-1"),
         body("volume").put("roomId", "ma:family").put("percent", 10),
         body("toggle-room").put("roomId", "ma:kitchen").put("leaderId", "ma:family"),
         body("select-player").put("roomId", "ma:kitchen"))
-    val states = listOf(snapshot().copy(audioOwnedByOther = true),
-        snapshot().copy(pending = PendingMusicCommand(1, "ma:living", MusicCommand.PLAY, 0))) +
+    val states = listOf(snapshot().copy(pending = PendingMusicCommand(1, "ma:living", MusicCommand.PLAY, 0))) +
         MusicConnection.entries.filter { it != MusicConnection.READY }.map {
           snapshot().copy(connection = it)
         }

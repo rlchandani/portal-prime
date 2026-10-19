@@ -77,6 +77,51 @@ class MaMusicProtocolTest {
     return result as MaMusicProtocol.Reply.Failure
   }
 
+  @Test fun snapcastProviderSelectorsResolveOnlyToPlayersOfThatExactProviderInstance() {
+    // MA 2.10.7 SnapCastPlayer.setup advertises provider.instance_id, not individual room IDs.
+    val family = player().put("provider", "snapcast--home").put("synced_to", "leader")
+    val leader = player("leader").put("provider", "snapcast--home")
+        .put("group_members", JSONArray(listOf("leader", "family")))
+        .put("can_group_with", JSONArray(listOf("snapcast--home")))
+    val bedroom = player("bedroom").put("provider", "snapcast--home")
+    val foreign = player("foreign").put("provider", "snapcast--other")
+    val unavailable = player("offline").put("provider", "snapcast--home").put("available", false)
+    val selected = selection(listOf(family, leader, bedroom, foreign, unavailable))
+    assertTrue(selected.snapshot.can(MusicCommand.CHANGE_ROOMS))
+    val normalizedLeader = selected.snapshot.rooms.first { it.id == "ma:leader" }
+    assertTrue("ma:bedroom" in normalizedLeader.canGroupWith)
+    assertFalse("ma:foreign" in normalizedLeader.canGroupWith)
+    assertNotNull(MaMusicProtocol.groupCommand("join", selected, add = setOf("ma:bedroom")))
+    assertNull(MaMusicProtocol.groupCommand("foreign", selected, add = setOf("ma:foreign")))
+    assertNull(MaMusicProtocol.groupCommand("offline", selected, add = setOf("ma:offline")))
+  }
+
+  @Test fun missingProviderDoesNotGuessGroupingFromNameOrAProviderLikePlayerId() {
+    val leader = player().put("provider", "snapcast--home")
+        .put("can_group_with", JSONArray(listOf("snapcast--home")))
+    val unknown = player("unknown").put("name", "snapcast--home").also { it.remove("provider") }
+    val selected = selection(listOf(leader, unknown))
+    assertFalse(selected.snapshot.can(MusicCommand.CHANGE_ROOMS))
+    assertNull(MaMusicProtocol.groupCommand("join", selected, add = setOf("ma:unknown")))
+  }
+
+  @Test fun matchingProviderWithoutAdvertisedSelectorDoesNotPermitGrouping() {
+    val family = player().put("provider", "snapcast--home")
+    val bedroom = player("bedroom").put("provider", "snapcast--home")
+    val selected = selection(listOf(family, bedroom))
+    assertFalse(selected.snapshot.can(MusicCommand.CHANGE_ROOMS))
+    assertTrue(selected.snapshot.rooms.first { it.id == "ma:family" }.canGroupWith.isEmpty())
+    assertNull(MaMusicProtocol.groupCommand("join", selected, add = setOf("ma:bedroom")))
+  }
+
+  @Test fun providerSelectorsMustBeCanonicalBoundedIds() {
+    for (value in listOf<Any>(" snapcast--home", "snapcast--home ", "snapcast\n", "x".repeat(257), 42)) {
+      failed(MaMusicProtocol.parsePlayers(reply(JSONArray().put(player().put("provider", value)))))
+    }
+    val parsed = success(MaMusicProtocol.parsePlayers(reply(JSONArray().put(player()))))
+    assertEquals("snapcast", parsed.single().providerId)
+  }
+
   @Test fun clearedQueueIgnoresRetainedPrefetchedNextItem() {
     // Observed on MA 2.10.7 after stop/clear: items=0, current=null, next still prefetched.
     val cleared = queue().put("items", 0).put("state", "idle")
@@ -408,6 +453,24 @@ class MaMusicProtocolTest {
     assertNull(MaMusicProtocol.groupCommand("45", selected))
     val unsupported = selection(listOf(leader.put("supported_features", JSONArray()), player("living")))
     assertNull(MaMusicProtocol.groupCommand("46", unsupported, add = setOf("ma:living")))
+  }
+
+  @Test fun interruptedGroupWireBuilderAllowsRemovalButCannotAddAnAudioTarget() {
+    val leader = player().put("provider", "snapcast--home")
+        .put("group_members", JSONArray(listOf("family", "bedroom")))
+        .put("can_group_with", JSONArray(listOf("snapcast--home")))
+    val observed = selection(listOf(leader,
+        player("bedroom").put("provider", "snapcast--home"),
+        player("living").put("provider", "snapcast--home")))
+    val interrupted = MaMusicProtocol.Selection(
+        observed.snapshot.copy(audioOwnedByOther = true), observed.queueId,
+        observed.controlPlayer, observed.players, observed.selectableItems, observed.queueTransport)
+    assertNull(MaMusicProtocol.groupCommand("join", interrupted, add = setOf("ma:living")))
+    assertNull(MaMusicProtocol.groupCommand("mixed", interrupted,
+        add = setOf("ma:living"), remove = setOf("ma:bedroom")))
+    val removal = MaMusicProtocol.groupCommand("remove", interrupted, remove = setOf("ma:bedroom"))!!
+    assertEquals(0, removal.getJSONObject("args").getJSONArray("player_ids_to_add").length())
+    assertEquals("bedroom", removal.getJSONObject("args").getJSONArray("player_ids_to_remove").getString(0))
   }
 
   @Test fun queueReadCommandsAreBoundedAndNeverPrefixRawQueueId() {

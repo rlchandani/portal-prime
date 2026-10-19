@@ -78,8 +78,8 @@ internal object MusicRemoteProtocol {
             (s.playback == PlaybackState.PLAYING || s.playback == PlaybackState.PAUSED))
         .put("next", can(s, MusicCommand.NEXT)).put("previous", can(s, MusicCommand.PREVIOUS))
         .put("seek", can(s, MusicCommand.SEEK))
-        .put("queue", can(s, MusicCommand.SELECT_QUEUE_ITEM, false) && validId(s.queueId) &&
-            s.queue.take(MAX_QUEUE).any { it.available && validId(it.id) })
+        // Queue visibility is passive; each row separately advertises playback admission.
+        .put("queue", can(s, MusicCommand.OPEN_QUEUE, false))
         .put("lyrics", can(s, MusicCommand.OPEN_LYRICS) && s.lyrics.isNotEmpty())
         .put("rooms", groupable).put("volume", volumeControllable)
         .put("selectPlayer", selectable)
@@ -196,7 +196,7 @@ internal object MusicRemoteProtocol {
   }
 
   private fun mutable(s: MusicPlayerSnapshot) = s.connection == MusicConnection.READY &&
-      validId(s.sourceId) && s.pending == null && !s.audioOwnedByOther
+      validId(s.sourceId) && s.pending == null
   private fun currentTrack(s: MusicPlayerSnapshot) =
       s.track?.takeIf { validId(it.id) && it.matches(s.sourceId, it.id) }
   private fun can(s: MusicPlayerSnapshot, command: MusicCommand, trackBound: Boolean = true) =

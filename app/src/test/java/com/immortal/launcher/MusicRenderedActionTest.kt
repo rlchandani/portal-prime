@@ -31,6 +31,41 @@ class MusicRenderedActionTest {
         MusicPlayerUiAction.Previous, MusicPlayerUiAction.Seek(5_000),
         MusicPlayerUiAction.SelectQueueItem("queue-2")).forEach { assertTrue(allowed(old, now, it)) }
   }
+  @Test fun anInterruptionRejectsPreviouslyRenderedStartSeekSkipAndQueuePlayback() {
+    val old = ready()
+    val interrupted = old.copy(audioOwnedByOther = true)
+    for (action in listOf(MusicPlayerUiAction.Next, MusicPlayerUiAction.Previous,
+        MusicPlayerUiAction.Seek(5_000), MusicPlayerUiAction.SelectQueueItem("queue-2")))
+      assertFalse(action.toString(), allowed(old, interrupted, action))
+    val paused = old.copy(playback = PlaybackState.PAUSED)
+    assertFalse(allowed(paused, paused.copy(audioOwnedByOther = true), MusicPlayerUiAction.TogglePlayback))
+    assertTrue(allowed(old, interrupted, MusicPlayerUiAction.TogglePlayback))
+  }
+
+  @Test fun interruptedRenderedPauseVolumeSelectionAndReadOnlyBrowsingStaySourceBound() {
+    val old = ready()
+    val interrupted = old.copy(audioOwnedByOther = true)
+    for (action in listOf(MusicPlayerUiAction.TogglePlayback,
+        MusicPlayerUiAction.SetRoomVolume("ma:living", 20),
+        MusicPlayerUiAction.SelectPlayer("ma:living"), MusicPlayerUiAction.BrowseLibrary)) {
+      assertTrue(action.toString(), allowed(old, interrupted, action))
+      assertFalse(action.toString(), allowed(old, interrupted.copy(sourceId = "ma:other"), action))
+      assertFalse(action.toString(), allowed(old, interrupted.copy(presentationRevision = 8), action, 8))
+    }
+    assertFalse(allowed(old, interrupted.copy(playback = PlaybackState.PAUSED),
+        MusicPlayerUiAction.TogglePlayback))
+  }
+
+  @Test fun interruptedRenderedGroupActionCanRemoveButCannotJoinOrChangeItsLeader() {
+    val s = ready().copy(audioOwnedByOther = true, rooms = ready().rooms.map {
+      if (it.id == "ma:living") it.copy(groupId = "ma:family", removableFromGroup = true) else it
+    })
+    assertTrue(allowed(s, s, MusicPlayerUiAction.ToggleRoom("ma:living")))
+    assertFalse(allowed(s, s.copy(controlPlayerId = "ma:other"), MusicPlayerUiAction.ToggleRoom("ma:living")))
+    val standalone = ready().copy(audioOwnedByOther = true)
+    assertFalse(allowed(standalone, standalone, MusicPlayerUiAction.ToggleRoom("ma:living")))
+  }
+
   @Test fun aReplacementTrackRejectsEveryTrackBoundAction() {
     val old = ready()
     val now = old.copy(track = old.track!!.copy(id = "track-2"))

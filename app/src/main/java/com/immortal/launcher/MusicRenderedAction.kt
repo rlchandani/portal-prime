@@ -14,6 +14,16 @@ internal fun musicRenderedActionIsCurrent(
     action: MusicPlayerUiAction,
 ): Boolean {
   if (action == MusicPlayerUiAction.OpenSettings) return true
+  val command = when (action) {
+    MusicPlayerUiAction.TogglePlayback ->
+      if (current.playback == PlaybackState.PLAYING) MusicCommand.PAUSE else MusicCommand.PLAY
+    MusicPlayerUiAction.Next -> MusicCommand.NEXT
+    MusicPlayerUiAction.Previous -> MusicCommand.PREVIOUS
+    is MusicPlayerUiAction.Seek -> MusicCommand.SEEK
+    is MusicPlayerUiAction.SelectQueueItem -> MusicCommand.SELECT_QUEUE_ITEM
+    else -> null
+  }
+  if (current.audioOwnedByOther && command?.requiresAudioStartOrReposition() == true) return false
   if (rendered.presentationRevision != revision ||
       current.presentationRevision != revision ||
       rendered.sourceId.isBlank() || rendered.sourceId != current.sourceId) return false
@@ -39,6 +49,7 @@ internal fun musicRenderedActionIsCurrent(
     val after = current.rooms.firstOrNull { it.id == action.roomId } ?: return false
     val oldPolicy = musicRoomActions(rendered, before)
     val newPolicy = musicRoomActions(current, after)
+    if (current.audioOwnedByOther && !newPolicy.canRemove) return false
     if (oldPolicy.canJoin != newPolicy.canJoin || oldPolicy.canRemove != newPolicy.canRemove)
       return false
   }

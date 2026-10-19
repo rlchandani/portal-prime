@@ -83,15 +83,33 @@ class MusicPlayerStoreTest {
     assertEquals("Player rejected command", store.current.problem)
   }
 
-  @Test fun offlineOrBusyStateCannotStartACommand() {
+  @Test fun offlineStateCannotAdmitPauseOrVolume() {
     val store = MusicPlayerStore()
     val generation = store.selectSource("ma:family")
-    for (s in listOf(ready().copy(connection = MusicConnection.OFFLINE),
-        ready().copy(audioOwnedByOther = true))) {
-      store.publish(generation, s)
-      assertFalse(store.beginCommand(7, MusicCommand.PAUSE, 1_000,
-          MusicConfirmation.Playback(PlaybackState.PAUSED)))
-    }
+    store.publish(generation, ready().copy(connection = MusicConnection.OFFLINE))
+    assertFalse(store.beginCommand(7, MusicCommand.PAUSE, 1_000,
+        MusicConfirmation.Playback(PlaybackState.PAUSED)))
+    assertFalse(store.beginCommand(8, MusicCommand.SET_VOLUME, 1_000,
+        MusicConfirmation.Volume("ma:family", 25)))
+  }
+
+  @Test fun interruptedStateAdmitsPauseButStillRequiresConfirmationAndRejectsPlay() {
+    val store = MusicPlayerStore()
+    val generation = store.selectSource("ma:family")
+    store.publish(generation, ready().copy(audioOwnedByOther = true))
+    assertFalse(store.beginCommand(7, MusicCommand.PLAY, 1_000,
+        MusicConfirmation.Playback(PlaybackState.PLAYING)))
+    assertTrue(store.beginCommand(8, MusicCommand.PAUSE, 1_000,
+        MusicConfirmation.Playback(PlaybackState.PAUSED)))
+    assertNotNull(store.current.pending)
+    assertEquals(PlaybackState.PLAYING, store.current.playback)
+    assertFalse(store.beginCommand(9, MusicCommand.SET_VOLUME, 1_001,
+        MusicConfirmation.Volume("ma:family", 25)))
+    assertTrue(store.acknowledge(generation, 8))
+    assertNotNull(store.current.pending)
+    store.publish(generation, ready().copy(audioOwnedByOther = true, playback = PlaybackState.PAUSED))
+    assertNull(store.current.pending)
+    assertEquals(PlaybackState.PAUSED, store.current.playback)
   }
 
   @Test fun volumeConfirmationValidatesRangeAndCorrectRoom() {

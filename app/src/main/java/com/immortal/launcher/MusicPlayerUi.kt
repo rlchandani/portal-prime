@@ -305,7 +305,8 @@ private fun MusicCurrent(
       MusicProgress(snapshot, Modifier.fillMaxWidth(), onAction)
       if (!snapshot.can(MusicCommand.NEXT) && !snapshot.can(MusicCommand.PREVIOUS) &&
           !track.isLive && snapshot.connection == MusicConnection.READY) {
-        MusicText("Track skipping is unavailable from this player.", muted = true, size = 14,
+        MusicText(if (snapshot.audioOwnedByOther) "Track skipping is unavailable during this interruption."
+          else "Track skipping is unavailable from this player.", muted = true, size = 14,
             maxLines = 2, textAlign = TextAlign.Center)
       }
     }
@@ -347,8 +348,7 @@ private fun rememberMusicVisiblePosition(snapshot: MusicPlayerSnapshot): State<L
   val position = remember { derivedStateOf { latest.value.visiblePositionMs(now.longValue) } }
   val track = musicCoherentTrack(snapshot)
   val duration = track?.durationMs?.takeIf { it > 0 }
-  val ticking = pageActive && snapshot.connection == MusicConnection.READY &&
-      snapshot.playback == PlaybackState.PLAYING && !snapshot.audioOwnedByOther &&
+  val ticking = pageActive && snapshot.advancesVisiblePosition &&
       track != null && !track.isLive && duration != null
   LaunchedEffect(lifecycle, ticking, snapshot.sourceId, track?.id, duration,
       snapshot.positionMs, snapshot.positionAtElapsedMs) {
@@ -617,8 +617,9 @@ private fun MusicNotice(snapshot: MusicPlayerSnapshot) {
 }
 
 private fun musicNoticeText(snapshot: MusicPlayerSnapshot): Pair<String, String>? = when {
-  snapshot.audioOwnedByOther -> "Audio is in use" to
-      "A call or another app owns the speaker. Music controls will return when it releases audio."
+  snapshot.audioOwnedByOther -> "Playback restricted" to
+      "Starting or repositioning music is unavailable during this interruption. " +
+          "Pause, volume, player selection and browsing remain available where supported."
   snapshot.connection == MusicConnection.NOT_CONFIGURED -> "Music is not configured" to
       "Connect Music Assistant or start music in a supported media app."
   snapshot.connection == MusicConnection.CONNECTING -> "Connecting to your player" to
@@ -655,8 +656,7 @@ private fun musicCanSend(snapshot: MusicPlayerSnapshot, command: MusicCommand): 
     snapshot.can(command) && snapshot.pending == null
 
 private fun musicCanBrowse(snapshot: MusicPlayerSnapshot): Boolean =
-    musicMaPlayerId(snapshot) != null && snapshot.connection == MusicConnection.READY &&
-        !snapshot.audioOwnedByOther
+    musicMaPlayerId(snapshot) != null && snapshot.connection == MusicConnection.READY
 
 private fun musicMaPlayerId(snapshot: MusicPlayerSnapshot): String? =
     snapshot.sourceId.takeIf { it.startsWith("ma:") }?.removePrefix("ma:")?.takeIf { it.isNotBlank() }
@@ -670,7 +670,7 @@ private fun musicSourceLabel(snapshot: MusicPlayerSnapshot): String = when {
 }
 
 private fun musicPlaybackLabel(snapshot: MusicPlayerSnapshot): String = when {
-  snapshot.audioOwnedByOther -> "Audio in use"
+  snapshot.audioOwnedByOther && musicMaPlayerId(snapshot) == null -> "Playback restricted"
   snapshot.connection == MusicConnection.OFFLINE -> "Last known track"
   snapshot.pending != null -> "Change pending"
   else -> when (snapshot.playback) {

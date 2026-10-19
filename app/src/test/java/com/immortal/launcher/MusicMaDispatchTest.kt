@@ -75,9 +75,32 @@ class MusicMaDispatchTest {
     assertNull(musicMaDispatch(state().copy(rooms = listOf(leader,
         follower.copy(removableFromGroup = false))), MusicPlayerUiAction.ToggleRoom("ma:living")))
   }
-  @Test fun offlineBusyPendingAndLocalStateCannotDispatchMaTransport() {
+  @Test fun interruptedMaDispatchAllowsExplicitPauseAndVolumeWithoutStartingOrRepositioning() {
+    val s = state().copy(audioOwnedByOther = true)
+    val pause = musicMaDispatch(s, MusicPlayerUiAction.TogglePlayback)!!
+    assertEquals(MusicCommand.PAUSE, pause.command)
+    assertEquals(MaMusicClient.Action.Transport(MusicCommand.PAUSE), pause.action)
+    val volume = musicMaDispatch(s, MusicPlayerUiAction.SetRoomVolume("ma:living", 35))!!
+    assertEquals(MaMusicClient.Action.Volume("ma:living", 35), volume.action)
+    for (action in listOf(MusicPlayerUiAction.Next, MusicPlayerUiAction.Previous,
+        MusicPlayerUiAction.Seek(25_000), MusicPlayerUiAction.SelectQueueItem("two")))
+      assertNull(action.toString(), musicMaDispatch(s, action))
+    assertNull(musicMaDispatch(s.copy(playback = PlaybackState.PAUSED), MusicPlayerUiAction.TogglePlayback))
+    assertNull(musicMaDispatch(s.copy(pending = PendingMusicCommand(1, s.sourceId,
+        MusicCommand.PAUSE, 0)), MusicPlayerUiAction.SetRoomVolume("ma:living", 35)))
+  }
+
+  @Test fun interruptedMaDispatchCanRemoveObservedMemberButCannotJoinAnAudioTarget() {
+    val s = state().copy(audioOwnedByOther = true)
+    val removal = musicMaDispatch(s, MusicPlayerUiAction.ToggleRoom("ma:living"))!!
+    assertEquals(MaMusicClient.Action.Group(remove = setOf("ma:living"), expectedLeaderId = "ma:family"),
+        removal.action)
+    assertNull(musicMaDispatch(s, MusicPlayerUiAction.ToggleRoom("ma:kitchen")))
+  }
+
+  @Test fun offlinePendingAndLocalStateCannotDispatchMaTransport() {
     for (s in listOf(state().copy(connection = MusicConnection.OFFLINE),
-        state().copy(audioOwnedByOther = true), state().copy(sourceId = "local:music"),
+        state().copy(sourceId = "local:music"),
         state().copy(pending = PendingMusicCommand(1, "ma:living", MusicCommand.PAUSE, 0)))) {
       assertNull(musicMaDispatch(s, MusicPlayerUiAction.TogglePlayback))
     }

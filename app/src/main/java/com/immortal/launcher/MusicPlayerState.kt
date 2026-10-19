@@ -16,6 +16,13 @@ enum class MusicCommand {
   CHANGE_ROOMS, SET_VOLUME, SHUFFLE, REPEAT, FAVORITE,
 }
 
+/** Commands that can begin output or replace its current stream position. */
+internal fun MusicCommand.requiresAudioStartOrReposition(): Boolean = when (this) {
+  MusicCommand.PLAY, MusicCommand.NEXT, MusicCommand.PREVIOUS, MusicCommand.SEEK,
+  MusicCommand.SELECT_QUEUE_ITEM -> true
+  else -> false
+}
+
 /** Unknown capabilities default to unavailable, including local media sessions. */
 data class MusicCapabilities(
     val play: Boolean = false,
@@ -121,7 +128,8 @@ data class MusicPlayerSnapshot(
     val queueId: String? = null,
 ) {
   fun can(command: MusicCommand): Boolean {
-    if (connection != MusicConnection.READY || audioOwnedByOther || sourceId.isBlank()) return false
+    if (connection != MusicConnection.READY || sourceId.isBlank()) return false
+    if (audioOwnedByOther && command.requiresAudioStartOrReposition()) return false
     if (track != null && track.sourceId != sourceId) return false
     val live = track?.isLive == true
     return when (command) {
@@ -141,6 +149,12 @@ data class MusicPlayerSnapshot(
     }
   }
 
+  /** MA's shared stream timeline remains authoritative when local output is interrupted. */
+  internal val advancesVisiblePosition: Boolean get() =
+      playback == PlaybackState.PLAYING && connection == MusicConnection.READY &&
+          (!audioOwnedByOther || (sourceId.startsWith("ma:") && sourceId.length > 3 &&
+              track?.sourceId == sourceId))
+
   /**
    * Monotonic extrapolation for the visible progress element only. A hidden UI does not
    * need to call this or subscribe to ticks. No fictional duration for radio/unknown media.
@@ -150,8 +164,7 @@ data class MusicPlayerSnapshot(
     if (media.isLive) return null
     val duration = media.durationMs?.takeIf { it > 0 } ?: return null
     val base = positionMs.coerceIn(0, duration)
-    if (playback != PlaybackState.PLAYING || connection != MusicConnection.READY ||
-        audioOwnedByOther) return base
+    if (!advancesVisiblePosition) return base
     val elapsed = (nowElapsedMs.coerceAtLeast(0) - positionAtElapsedMs.coerceAtLeast(0))
         .coerceAtLeast(0)
     return if (elapsed >= duration - base) duration else base + elapsed
