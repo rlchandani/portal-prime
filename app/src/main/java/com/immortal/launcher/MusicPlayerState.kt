@@ -82,6 +82,15 @@ data class PendingMusicCommand(
       sourceId.isNotBlank() && requestId == replyId && sourceId == replySource
 }
 
+/** Fixed, read-safe outcome retained until the next command or source selection. */
+enum class MusicCommandOutcome { CONFIRMED, FAILED, TIMED_OUT, DISCONNECTED }
+
+data class CompletedMusicCommand(
+    val requestId: Long,
+    val command: MusicCommand,
+    val outcome: MusicCommandOutcome,
+)
+
 /**
  * Shared presentation state, independent of the full/compact/photo view.
  * Adapters publish bounded copies of collection values; consumers never mutate them.
@@ -98,6 +107,7 @@ data class MusicPlayerSnapshot(
     val lyrics: List<MusicLyricLine> = emptyList(),
     val rooms: List<MusicRoom> = emptyList(),
     val pending: PendingMusicCommand? = null,
+    val lastCommand: CompletedMusicCommand? = null,
     val audioOwnedByOther: Boolean = false,
     val problem: String? = null,
     /** Shared session artwork is read-only here; the player does not recycle it. */

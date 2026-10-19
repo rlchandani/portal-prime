@@ -78,7 +78,10 @@ async function fixture(t, options = {}) {
           }, 503);
         }
         if (options.deny) return response({ ok: false, error: 'stale' }, 409);
-        return response({ ok: true, admitted: true, confirmed: false, status: 'admitted' }, 202);
+        return response({ ok: true, admitted: true, confirmed: false, status: 'admitted',
+          ...(options.commandResult ? { music: {
+            ...f.music, pending: { requestId: 101, command: 'pause', startedAtElapsedMs: 10 },
+          } } : {}) }, 202);
       },
     },
   });
@@ -181,7 +184,7 @@ test('pause, seek, queue, volume, grouping and selection send exact bound comman
   h.click('Join group');
   await h.settle();
   assert.deepEqual(lastCommand(), {
-    ...base, command: 'toggle-room', roomId: 'ma:kitchen', leaderId: 'ma:family',
+    ...base, command: 'toggle-room', roomId: 'ma:kitchen', wasInGroup: false, leaderId: 'ma:family',
   });
   await advance();
   root().querySelectorAll('.music-player-row')[1].querySelectorAll('button')
@@ -383,6 +386,7 @@ test('unknown volume needs an explicit valid value and group removal binds the o
   f.music.rooms[1].canSetVolume = true;
   f.music.rooms[1].canJoin = false;
   f.music.rooms[1].canRemove = true;
+  f.music.rooms[1].inCurrentGroup = true;
   await open();
   h.click('Players');
   h.click('Set volume');
@@ -406,6 +410,59 @@ test('unknown volume needs an explicit valid value and group removal binds the o
   await h.settle();
   assert.deepEqual(lastCommand(), {
     command: 'toggle-room', sourceRevision: 7, sourceId: 'ma:living',
-    roomId: 'ma:kitchen', leaderId: 'ma:family',
+    roomId: 'ma:kitchen', wasInGroup: true, leaderId: 'ma:family',
   });
+});
+
+test('a displayed group operation is rejected when membership changes under the same leader', async t => {
+  for (const originallyGrouped of [false, true]) {
+    const { h, f, root, open, advance } = await fixture(t);
+    Object.assign(f.music.rooms[1], {
+      inCurrentGroup: originallyGrouped,
+      canJoin: !originallyGrouped,
+      canRemove: originallyGrouped,
+    });
+    await open();
+    h.click('Players');
+    const label = originallyGrouped ? 'Remove from group' : 'Join group';
+    const displayed = root().querySelectorAll('button').find(button => button.textContent === label);
+    Object.assign(f.music.rooms[1], {
+      inCurrentGroup: !originallyGrouped,
+      canJoin: originallyGrouped,
+      canRemove: !originallyGrouped,
+    });
+    await advance();
+    displayed.click();
+    await h.settle();
+    assert.equal(f.posts, 0, 'A changed membership cannot invert the displayed operation.');
+    assert.match(root().textContent, /Music changed/);
+    h.hide();
+  }
+});
+
+test('an admitted command reports its later safe failure without replaying it', async t => {
+  const { h, f, root, open, advance } = await fixture(t, { commandResult: true });
+  f.music.playback = 'playing';
+  await open();
+  h.click('Pause');
+  await h.settle();
+  f.music.lastCommand = { requestId: 101, command: 'pause', outcome: 'failed' };
+  await advance();
+  assert.match(root().textContent, /player could not apply/i);
+  assert.equal(f.posts, 1);
+  await advance();
+  assert.match(root().textContent, /player could not apply/i, 'A healthy poll must not erase failure.');
+  assert.equal(f.posts, 1, 'Reading a failure must never replay the mutation.');
+});
+
+test('a different command result cannot confirm the browser request', async t => {
+  const { h, f, root, open, advance } = await fixture(t, { commandResult: true });
+  f.music.playback = 'playing';
+  await open();
+  h.click('Pause');
+  await h.settle();
+  f.music.lastCommand = { requestId: 102, command: 'pause', outcome: 'confirmed' };
+  await advance();
+  assert.match(root().textContent, /previous command was not confirmed/i);
+  assert.equal(f.posts, 1);
 });

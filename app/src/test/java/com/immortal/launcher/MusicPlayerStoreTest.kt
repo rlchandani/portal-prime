@@ -117,4 +117,54 @@ class MusicPlayerStoreTest {
     assertEquals(PlaybackState.PLAYING, store.current.playback)
     assertNotNull(store.current.problem)
   }
+
+  @Test fun failedCommandSurvivesHealthyPollsUntilAnotherCommandStarts() {
+    val store = MusicPlayerStore()
+    val generation = store.selectSource("ma:family")
+    store.publish(generation, ready())
+    store.beginCommand(7, MusicCommand.PAUSE, 1_000,
+        MusicConfirmation.Playback(PlaybackState.PAUSED))
+    assertTrue(store.reject(generation, 7, "Private backend failure"))
+    assertTrue(store.publish(generation, ready()))
+    assertEquals(CompletedMusicCommand(7, MusicCommand.PAUSE, MusicCommandOutcome.FAILED),
+        store.current.lastCommand)
+    assertEquals("Private backend failure", store.current.problem)
+    assertTrue(store.beginCommand(8, MusicCommand.PAUSE, 2_000,
+        MusicConfirmation.Playback(PlaybackState.PAUSED)))
+    assertNull(store.current.lastCommand)
+    assertNull(store.current.problem)
+  }
+
+  @Test fun observedStateCompletesTheExactPendingCommand() {
+    val store = MusicPlayerStore()
+    val generation = store.selectSource("ma:family")
+    store.publish(generation, ready())
+    store.beginCommand(7, MusicCommand.PAUSE, 1_000,
+        MusicConfirmation.Playback(PlaybackState.PAUSED))
+    store.acknowledge(generation, 7)
+    assertNull(store.current.lastCommand)
+    store.publish(generation, ready().copy(playback = PlaybackState.PAUSED))
+    assertEquals(CompletedMusicCommand(7, MusicCommand.PAUSE, MusicCommandOutcome.CONFIRMED),
+        store.current.lastCommand)
+    store.publish(generation, ready().copy(playback = PlaybackState.PAUSED))
+    assertEquals(7L, store.current.lastCommand?.requestId)
+  }
+
+  @Test fun timeoutAndDisconnectAreRetainedWithoutClaimingConfirmation() {
+    for (disconnect in listOf(false, true)) {
+      val store = MusicPlayerStore()
+      val generation = store.selectSource("ma:family")
+      store.publish(generation, ready())
+      store.beginCommand(7, MusicCommand.PAUSE, 1_000,
+          MusicConfirmation.Playback(PlaybackState.PAUSED))
+      if (disconnect) store.publish(generation, ready().copy(connection = MusicConnection.OFFLINE))
+      else store.expirePending(6_000)
+      assertEquals(if (disconnect) MusicCommandOutcome.DISCONNECTED else MusicCommandOutcome.TIMED_OUT,
+          store.current.lastCommand?.outcome)
+      store.publish(generation, ready())
+      assertNotNull(store.current.lastCommand)
+      store.selectSource("ma:other")
+      assertNull(store.current.lastCommand)
+    }
+  }
 }

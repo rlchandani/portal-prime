@@ -66,12 +66,13 @@ class MaMusicClient(
       val selectionMaxAgeMs: Long = 10_000,
       val reconnectInitialMs: Long = 500,
       val reconnectMaxMs: Long = 15_000,
+      val livenessIntervalMs: Long = 30_000,
   ) {
     init {
       require(pollMs in 1..1000 && requestTimeoutMs in 1..60_000)
       require(refreshCoalesceMs in 1..60_000 && progressRefreshMs in 1..60_000 &&
           selectionMaxAgeMs in 1..60_000 && reconnectInitialMs in 1..60_000 &&
-          reconnectMaxMs in reconnectInitialMs..60_000)
+          reconnectMaxMs in reconnectInitialMs..60_000 && livenessIntervalMs in 1..60_000)
     }
   }
 
@@ -105,7 +106,7 @@ class MaMusicClient(
       val epoch: Epoch, val action: Action, val expectedTrackId: String?,
       val expiresAt: Long, val callback: (CommandResult) -> Unit,
   )
-  private enum class Kind { AUTH, PLAYERS, QUEUE, ITEMS, COMMAND }
+  private enum class Kind { AUTH, PLAYERS, QUEUE, ITEMS, COMMAND, LIVENESS }
   private class Pending(
       val id: String, val epoch: Epoch, val kind: Kind, val deadline: Long,
       val command: Queued? = null,
@@ -155,6 +156,7 @@ class MaMusicClient(
   private var fullNotBefore = 0L
   private var lastFullAt = Long.MIN_VALUE / 2
   private var lastProgressAt = Long.MIN_VALUE / 2
+  private var lastValidatedAt = 0L
   private var nextReconnectAt = 0L
   private var reconnectDelay = limits.reconnectInitialMs
   private val worker = Thread({ runWorker() }, "MaMusicClient").apply { isDaemon = true; start() }
@@ -268,6 +270,10 @@ class MaMusicClient(
             if (command != null && command.epoch === wanted) startCommand(command)
           } else if (progressNeeded && now - lastProgressAt >= limits.progressRefreshMs) {
             startProgress(wanted)
+          } else if (now - lastValidatedAt >= limits.livenessIntervalMs) {
+            // Idle/paused queues may emit no events. Probe the verified read API without
+            // fetching queue items or changing the source/track observation used by commands.
+            send(Kind.LIVENESS, MaMusicProtocol.playersCommand(nextId()))
           }
         }
         if (pending?.let { now >= it.deadline } == true) {
@@ -350,7 +356,7 @@ class MaMusicClient(
       if (closed || desired !== e || transport !== socket) { socket.close(); return }
       if (!connected) throw IOException()
       sessionConfig = e.config
-      helloVerified = false; authenticated = false
+      helloVerified = false; authenticated = false; lastValidatedAt = 0
     } catch (_: Exception) {
       runCatching { socket?.close() }
       if (!closed && desired === e) disconnect(MusicConnection.OFFLINE, "Music Assistant connection failed")
@@ -455,6 +461,10 @@ class MaMusicClient(
     }
     val p = pending ?: return
     if (p.epoch !== e || desired !== e || messageId != p.id) return
+    if (elapsedMs() >= p.deadline) {
+      disconnect(MusicConnection.OFFLINE, "Music Assistant request timed out")
+      return
+    }
     val complete = assemble(p, envelope, text) ?: return
     cancelPending()
     when (p.kind) {
@@ -463,6 +473,7 @@ class MaMusicClient(
         is MaMusicProtocol.Reply.Success -> {
           if (!helloVerified) { disconnect(MusicConnection.INCOMPATIBLE, "Missing Music Assistant server contract", true); return }
           authenticated = true; fullNeeded = true; immediate = true
+          lastValidatedAt = elapsedMs()
         }
       }
       Kind.COMMAND -> when (val reply = MaMusicProtocol.parseCommandReply(complete, p.id)) {
@@ -472,6 +483,7 @@ class MaMusicClient(
           else { fullNeeded = true; immediate = true }
         }
         is MaMusicProtocol.Reply.Success -> {
+          lastValidatedAt = elapsedMs()
           p.command?.let {
             afterAck = it to p.id
             result(it, Outcome.ACKNOWLEDGED, p.id)
@@ -482,6 +494,7 @@ class MaMusicClient(
       Kind.PLAYERS -> {
         val refresh = refreshing ?: return
         refresh.players = MaMusicProtocol.parsePlayers(complete, p.id)
+        if (refresh.players is MaMusicProtocol.Reply.Success) lastValidatedAt = elapsedMs()
         val provisional = MaMusicProtocol.select(e.config.sourceId, refresh.players!!)
         if (provisional.snapshot.connection != MusicConnection.READY) finish(provisional)
         else send(Kind.QUEUE, MaMusicProtocol.activeQueueCommand(nextId(), e.config.sourceId))
@@ -489,6 +502,7 @@ class MaMusicClient(
       Kind.QUEUE -> {
         val refresh = refreshing ?: return
         refresh.queue = MaMusicProtocol.parseQueue(complete, p.id)
+        if (refresh.queue is MaMusicProtocol.Reply.Success) lastValidatedAt = elapsedMs()
         val q = (refresh.queue as? MaMusicProtocol.Reply.Success)?.value
         if (refresh.progressOnly || q == null || refresh.queue is MaMusicProtocol.Reply.Failure) {
           finish(MaMusicProtocol.select(e.config.sourceId, refresh.players!!, refresh.queue,
@@ -499,8 +513,15 @@ class MaMusicClient(
         val refresh = refreshing ?: return
         val q = (refresh.queue as? MaMusicProtocol.Reply.Success)?.value ?: return
         refresh.items = MaMusicProtocol.parseQueueItems(complete, q.queueId, p.id)
+        if (refresh.items is MaMusicProtocol.Reply.Success) lastValidatedAt = elapsedMs()
         finish(MaMusicProtocol.select(e.config.sourceId, refresh.players!!, refresh.queue, refresh.items,
             elapsedMs(), unixMs()))
+      }
+      Kind.LIVENESS -> when (val reply = MaMusicProtocol.parsePlayers(complete, p.id)) {
+        is MaMusicProtocol.Reply.Failure -> disconnect(reply.connection, reply.problem, true)
+        // Only a complete, correlated, validated response proves liveness. Do not renew
+        // selectionAt or publish these players with a cached queue/source mapping.
+        is MaMusicProtocol.Reply.Success -> lastValidatedAt = elapsedMs()
       }
     }
   }
@@ -517,7 +538,7 @@ class MaMusicClient(
     }
     if (envelope.has("error_code")) return text
     if (partial == true || p.chunks != null) {
-      if (p.kind != Kind.PLAYERS && p.kind != Kind.ITEMS) {
+      if (p.kind != Kind.PLAYERS && p.kind != Kind.ITEMS && p.kind != Kind.LIVENESS) {
         disconnect(MusicConnection.INCOMPATIBLE, "Unexpected Music Assistant partial reply", true); return null
       }
       val array = envelope.optJSONArray("result")

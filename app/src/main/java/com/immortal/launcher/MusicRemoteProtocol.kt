@@ -30,7 +30,8 @@ internal object MusicRemoteProtocol {
 
   /**
    * Explicit read-safe allowlist: no adapter problems, credentials, art URLs, borrowed images,
-   * session tokens, or request identities. Unknown/live duration and position remain null.
+   * session tokens, or raw errors. Only a local command number and fixed outcome are exposed.
+   * Unknown/live duration and position remain null.
    * Capability flags describe executable controls, including pending/focus and room eligibility.
    */
   fun state(snapshot: MusicPlayerSnapshot, sourceRevision: Long, elapsedMs: Long): JSONObject {
@@ -89,12 +90,17 @@ internal object MusicRemoteProtocol {
           .put("isLive", it.isLive)
     }
     val pending = s.pending?.let {
-      JSONObject().put("command", wire(it.command.name))
+      JSONObject().put("requestId", it.requestId).put("command", wire(it.command.name))
           .put("startedAtElapsedMs", it.startedAtElapsedMs.coerceAtLeast(0))
+    }
+    val lastCommand = s.lastCommand?.let {
+      JSONObject().put("requestId", it.requestId).put("command", wire(it.command.name))
+          .put("outcome", wire(it.outcome.name))
     }
     return JSONObject().put("schemaVersion", 1).put("sourceRevision", sourceRevision)
         .put("sourceId", text(s.sourceId)).put("connection", wire(s.connection.name))
         .put("playback", wire(s.playback.name)).put("pending", nullable(pending))
+        .put("lastCommand", nullable(lastCommand))
         .put("audioOwnedByOther", s.audioOwnedByOther)
         .put("controlPlayerId", nullable(s.controlPlayerId?.let(::text)))
         .put("track", nullable(metadata))
@@ -114,7 +120,7 @@ internal object MusicRemoteProtocol {
       "seek" -> setOf("trackId", "positionMs")
       "queue-item" -> setOf("trackId", "queueItemId")
       "volume" -> setOf("roomId", "percent")
-      "toggle-room" -> setOf("roomId", "leaderId")
+      "toggle-room" -> setOf("roomId", "leaderId", "wasInGroup")
       "select-player" -> setOf("roomId")
       else -> return bad()
     }
@@ -125,6 +131,8 @@ internal object MusicRemoteProtocol {
     val trackId = if (command in trackCommands) string(body, "trackId") ?: return bad() else null
     val roomId = if ("roomId" in extra) string(body, "roomId") ?: return bad() else null
     val leaderId = if ("leaderId" in extra) string(body, "leaderId") ?: return bad() else null
+    val wasInGroup = if ("wasInGroup" in extra)
+      body.opt("wasInGroup") as? Boolean ?: return bad() else null
     val queueItemId = if ("queueItemId" in extra) string(body, "queueItemId") ?: return bad() else null
     val position = if ("positionMs" in extra)
       integer(body, "positionMs")?.takeIf { it >= 0 } ?: return bad() else null
@@ -171,6 +179,7 @@ internal object MusicRemoteProtocol {
         if (leaderId != leader) return stale()
         val room = s.rooms.take(MAX_ROOMS).firstOrNull { it.id == roomId } ?: return unavailable()
         val policy = musicRoomActions(s, room)
+        if (wasInGroup != policy.inCurrentGroup) return stale()
         if (!policy.canJoin && !policy.canRemove) unavailable()
         else Accepted(MusicPlayerUiAction.ToggleRoom(roomId!!))
       }

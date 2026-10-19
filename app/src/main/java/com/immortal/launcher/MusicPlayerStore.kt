@@ -93,12 +93,26 @@ class MusicPlayerStore {
             .distinctBy { it.id }.map { it.copy(canGroupWith = it.canGroupWith.take(64).toSet()) }.toList(),
         pending = null)
     val pending = current.pending
+    val previousResult = current.lastCommand
+    val previousProblem = current.problem
     val observed = normalized.connection == MusicConnection.READY && confirmation?.matches(normalized) == true
     val disconnected = normalized.connection != MusicConnection.READY
     if (observed || disconnected) confirmation = null
     mutableState.value = normalized.copy(
         pending = pending.takeUnless { observed || disconnected },
-        problem = normalized.problem ?: if (disconnected && pending != null) "Player disconnected before confirming the change." else null)
+        lastCommand = when {
+          pending != null && observed -> CompletedMusicCommand(
+              pending.requestId, pending.command, MusicCommandOutcome.CONFIRMED)
+          pending != null && disconnected -> CompletedMusicCommand(
+              pending.requestId, pending.command, MusicCommandOutcome.DISCONNECTED)
+          else -> previousResult
+        },
+        problem = normalized.problem ?: when {
+          disconnected && pending != null -> "Player disconnected before confirming the change."
+          previousResult?.outcome != null && previousResult.outcome != MusicCommandOutcome.CONFIRMED ->
+            previousProblem
+          else -> null
+        })
     return true
   }
 
@@ -110,6 +124,7 @@ class MusicPlayerStore {
     this.confirmation = confirmation
     mutableState.value = current.copy(
         pending = PendingMusicCommand(requestId, current.sourceId, command, startedAtElapsedMs),
+        lastCommand = null,
         problem = null)
     return true
   }
@@ -120,7 +135,9 @@ class MusicPlayerStore {
   @Synchronized fun reject(sourceGeneration: Long, requestId: Long, problem: String): Boolean {
     if (!acknowledge(sourceGeneration, requestId)) return false
     confirmation = null
-    mutableState.value = current.copy(pending = null, problem = problem)
+    val pending = current.pending!!
+    mutableState.value = current.copy(pending = null, problem = problem,
+        lastCommand = CompletedMusicCommand(pending.requestId, pending.command, MusicCommandOutcome.FAILED))
     return true
   }
 
@@ -130,7 +147,8 @@ class MusicPlayerStore {
         nowElapsedMs - pending.startedAtElapsedMs < 5_000) return false
     confirmation = null
     mutableState.value = current.copy(
-        pending = null, problem = "The player did not confirm the change. Please try again.")
+        pending = null, problem = "The player did not confirm the change. Please try again.",
+        lastCommand = CompletedMusicCommand(pending.requestId, pending.command, MusicCommandOutcome.TIMED_OUT))
     return true
   }
 }

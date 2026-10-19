@@ -8,9 +8,11 @@ package com.immortal.launcher
 
 import java.io.IOException
 import java.net.SocketTimeoutException
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
@@ -19,12 +21,15 @@ import org.junit.Test
 /** Scripted protocol fixtures only; these tests do not establish live-server compatibility. */
 class MaMusicClientTest {
   private class Fake : MaMusicClient.Transport {
-    val received = LinkedBlockingQueue<String>()
+    val received = LinkedBlockingQueue<Any>()
     val sent = LinkedBlockingQueue<JSONObject>()
     @Volatile var closed = false
+    @Volatile var worker: Thread? = null
+    private var readFence: CountDownLatch? = null
     var connects = 0
     var failConnect = false
     override fun connect(timeoutMs: Int): Boolean {
+      worker = Thread.currentThread()
       connects++
       if (failConnect) return false
       received.add("""{"server_version":"2.10.7","schema_version":65}""")
@@ -32,9 +37,15 @@ class MaMusicClientTest {
     }
     override fun sendText(text: String) { if (closed) throw IOException(); sent.add(JSONObject(text)) }
     override fun readText(): String? {
+      readFence?.countDown()
+      readFence = null
       if (closed) return null
       val next = received.poll(10, TimeUnit.MILLISECONDS) ?: throw SocketTimeoutException()
-      return if (next == "CLOSE") null else next
+      if (next is CountDownLatch) {
+        readFence = next
+        throw SocketTimeoutException()
+      }
+      return if (next == "CLOSE") null else next as String
     }
     override fun close() { closed = true; received.offer("CLOSE") }
     fun next(command: String): JSONObject {
@@ -45,6 +56,12 @@ class MaMusicClientTest {
     fun reply(request: JSONObject, result: Any?, partial: Boolean = false) {
       received.add(JSONObject().put("message_id", request.getString("message_id"))
           .put("result", result ?: JSONObject.NULL).put("partial", partial).toString())
+    }
+    /** Wait until queued input and a subsequent worker scheduling cycle have completed. */
+    fun cycle() {
+      val fence = CountDownLatch(1)
+      received.add(fence)
+      assertTrue("Worker did not complete an idle cycle", fence.await(2, TimeUnit.SECONDS))
     }
   }
 
@@ -577,6 +594,157 @@ class MaMusicClientTest {
       assertEquals(MusicConnection.NOT_CONFIGURED, seen.connections.poll(2, TimeUnit.SECONDS)!!.second)
       assertTrue(fake.closed)
       assertFalse(client.command(MaMusicClient.Action.Transport(MusicCommand.PLAY), generation) {})
+    } finally { client.close() }
+  }
+
+  @Test fun idleAndPausedSilenceProbeExpiresThenReconnectsWithoutReplayingQueuedAction() {
+    for (state in listOf("idle", "paused")) {
+      val first = Fake(); val second = Fake(); val seen = Seen()
+      val opened = LinkedBlockingQueue<Fake>()
+      val clock = AtomicLong(1000)
+      var attempts = 0
+      val client = MaMusicClient(
+          onSelection = { g, s -> seen.selections.add(g to s) },
+          onConnection = { g, s -> seen.connections.add(g to s) },
+          transportFactory = { _, _ -> (if (attempts++ == 0) first else second).also { opened.add(it) } },
+          limits = limits.copy(requestTimeoutMs = 10_000), elapsedMs = { clock.get() },
+          unixMs = { 1_700_000_000_000 })
+      try {
+        val generation = client.config(config())
+        assertSame(first, opened.poll(2, TimeUnit.SECONDS))
+        auth(first); refresh(first, state); seen.ready()
+        seen.connections.clear()
+        clock.set(30_999); first.cycle()
+        assertNull(first.sent.poll())
+        clock.set(31_000)
+        val probe = first.next("players/all")
+        assertEquals(0, probe.getJSONObject("args").length())
+        assertTrue(client.command(MaMusicClient.Action.Transport(MusicCommand.PLAY), generation) {
+          seen.results.add(it)
+        })
+        // Neither another request's valid data nor an unfinished chunk extends this deadline.
+        clock.set(35_000)
+        first.received.add("""{"message_id":"unrelated","result":[]}""")
+        first.reply(probe, JSONArray().put(player()), partial = true)
+        first.cycle()
+        clock.set(40_999); first.cycle()
+        assertFalse(first.closed)
+        assertNull(first.sent.poll())
+        clock.set(41_000)
+        val offline = seen.selections.poll(2, TimeUnit.SECONDS)!!
+        assertEquals(MusicConnection.OFFLINE, offline.second.snapshot.connection)
+        assertEquals(MusicConnection.OFFLINE, seen.connections.poll(2, TimeUnit.SECONDS)!!.second)
+        assertTrue(first.closed)
+        assertEquals(MaMusicClient.Outcome.FAILED, seen.results.poll(2, TimeUnit.SECONDS)!!.outcome)
+        assertFalse(client.command(MaMusicClient.Action.Transport(MusicCommand.PLAY), generation) {})
+        clock.set(41_020)
+        assertSame(second, opened.poll(2, TimeUnit.SECONDS))
+        auth(second); refresh(second, state); seen.ready(); second.cycle()
+        assertNull("Reconnect must issue reads only, with no replay or auto-resume", second.sent.poll())
+        assertNull(seen.results.poll())
+      } finally { client.close() }
+    }
+  }
+
+  @Test fun healthyQueueAndProbeReadbacksResetSilenceWithoutFetchingItemsOrRenewingMapping() {
+    val fake = Fake(); val seen = Seen(); val clock = AtomicLong(1000)
+    val client = MaMusicClient(
+        onSelection = { g, s -> seen.selections.add(g to s) },
+        onConnection = { g, s -> seen.connections.add(g to s) },
+        transportFactory = { _, _ -> fake }, limits = limits.copy(requestTimeoutMs = 10_000),
+        elapsedMs = { clock.get() }, unixMs = { 1_700_000_000_000 })
+    try {
+      val generation = client.config(config()); auth(fake); refresh(fake, "paused"); seen.ready()
+      seen.connections.clear()
+      clock.set(21_000)
+      fake.received.add("""{"event":"queue_time_updated","object_id":"shared"}""")
+      fake.reply(fake.next("player_queues/get"), queue("paused")); seen.ready()
+      seen.connections.clear()
+      clock.set(31_000); fake.cycle()
+      assertNull("A healthy queue reply postpones the probe", fake.sent.poll())
+      clock.set(50_999); fake.cycle(); assertNull(fake.sent.poll())
+      clock.set(51_000)
+      val probe = fake.next("players/all")
+      clock.set(56_000)
+      fake.reply(probe, JSONArray().put(player()), partial = true)
+      fake.reply(probe, JSONArray())
+      fake.cycle()
+      assertNull("A liveness read must not fetch the queue or its 500-item page", fake.sent.poll())
+      assertNull("A probe must not publish a queue-less selection", seen.selections.poll())
+      clock.set(61_000); fake.cycle()
+      assertFalse(fake.closed)
+      assertNull(seen.connections.poll())
+      clock.set(85_999); fake.cycle(); assertNull(fake.sent.poll())
+      clock.set(86_000)
+      fake.reply(fake.next("players/all"), JSONArray().put(player()))
+      fake.cycle()
+      assertTrue(client.command(MaMusicClient.Action.Volume("ma:family", 42), generation) {})
+      // Liveness is not an authoritative queue/source refresh: the old mapping still needs one.
+      refresh(fake, "paused"); seen.ready()
+      assertEquals(42, fake.next("players/cmd/volume_set").getJSONObject("args").getInt("volume_level"))
+    } finally { client.close() }
+  }
+
+  @Test fun invalidOrOversizedLivenessRepliesFailClosedWithoutQueueFetches() {
+    for (failure in listOf("auth", "invalid", "chunks")) {
+      val fake = Fake(); val seen = Seen(); val clock = AtomicLong(1000)
+      val client = MaMusicClient(
+          onSelection = { g, s -> seen.selections.add(g to s) },
+          transportFactory = { _, _ -> fake }, limits = limits.copy(requestTimeoutMs = 10_000),
+          elapsedMs = { clock.get() }, unixMs = { 1_700_000_000_000 })
+      try {
+        val generation = client.config(config()); auth(fake); refresh(fake, "paused"); seen.ready()
+        clock.set(31_000)
+        val probe = fake.next("players/all")
+        when (failure) {
+          "auth" -> fake.received.add(JSONObject().put("message_id", probe.getString("message_id"))
+              .put("error_code", 20).toString())
+          "invalid" -> fake.reply(probe, JSONObject())
+          "chunks" -> {
+            repeat(16) { fake.reply(probe, JSONArray(), partial = true) }
+            fake.cycle()
+            assertFalse(fake.closed)
+            assertNull(seen.selections.poll())
+            fake.reply(probe, JSONArray())
+          }
+        }
+        val rejected = seen.selections.poll(2, TimeUnit.SECONDS)!!.second.snapshot
+        assertEquals(if (failure == "auth") MusicConnection.AUTH_REQUIRED else MusicConnection.INCOMPATIBLE,
+            rejected.connection)
+        assertTrue(fake.closed)
+        assertFalse(client.command(MaMusicClient.Action.Volume("ma:family", 42), generation) {})
+        assertNull(fake.sent.poll())
+      } finally { client.close() }
+    }
+  }
+
+  @Test fun detachDuringLivenessProbeClosesSocketAndStopsWorkerAndReconnectAttempts() {
+    val fake = Fake(); val seen = Seen(); val clock = AtomicLong(1000)
+    val opened = LinkedBlockingQueue<Fake>()
+    val client = MaMusicClient(
+        onSelection = { g, s -> seen.selections.add(g to s) },
+        onConnection = { g, s -> seen.connections.add(g to s) },
+        transportFactory = { _, _ -> fake.also { opened.add(it) } },
+        limits = limits.copy(requestTimeoutMs = 10_000), elapsedMs = { clock.get() },
+        unixMs = { 1_700_000_000_000 })
+    try {
+      client.config(config()); assertSame(fake, opened.poll(2, TimeUnit.SECONDS))
+      auth(fake); refresh(fake, "paused"); seen.ready()
+      clock.set(31_000)
+      val probe = fake.next("players/all")
+      client.close()
+      val selections = seen.selections.size
+      val connections = seen.connections.size
+      clock.set(100_000)
+      fake.reply(probe, JSONArray().put(player()))
+      fake.worker!!.join(1000)
+      assertFalse("Detach must terminate the worker", fake.worker!!.isAlive)
+      assertTrue(fake.closed)
+      assertFalse(client.refresh())
+      assertNull(opened.poll())
+      assertNull(fake.sent.poll())
+      assertEquals(selections, seen.selections.size)
+      assertEquals(connections, seen.connections.size)
     } finally { client.close() }
   }
 

@@ -1716,7 +1716,8 @@ function openMusicSheet() {
     ticket: session.capture(), root: el('div', { class: 'music-sheet' }),
     epoch: 0, timer: null, readController: null, commandController: null,
     lastReadAt: -Infinity, state: null, fresh: false, sending: false, admitted: false, uncertain: false,
-    unsupported: false, error: null, feedback: '', feedbackAfterRead: null, panel: 'queue', view: null,
+    unsupported: false, error: null, feedback: '', feedbackAfterRead: null, awaitingCommand: null,
+    panel: 'queue', view: null,
   };
   openSheet('Music', owner.root, () => closeMusicSheet(owner));
   musicSheet = owner;
@@ -1742,6 +1743,11 @@ function validateMusicState(response) {
       typeof s.audioOwnedByOther !== 'boolean' || !object(s.capabilities) ||
       (s.controlPlayerId !== null && !id(s.controlPlayerId)) ||
       (s.pending !== null && (!object(s.pending) || typeof s.pending.command !== 'string')) ||
+      (s.pending?.requestId !== undefined && (!Number.isSafeInteger(s.pending.requestId) || s.pending.requestId < 1)) ||
+      (s.lastCommand != null && (!object(s.lastCommand) ||
+        !Number.isSafeInteger(s.lastCommand.requestId) || s.lastCommand.requestId < 1 ||
+        typeof s.lastCommand.command !== 'string' ||
+        !['confirmed', 'failed', 'timed_out', 'disconnected'].includes(s.lastCommand.outcome))) ||
       (s.track !== null && (!object(s.track) || !id(s.track.id) ||
         !['title', 'artist', 'album'].every(key => typeof s.track[key] === 'string') ||
         typeof s.track.isLive !== 'boolean'))) throw new ApiError('invalid_response');
@@ -1783,7 +1789,19 @@ async function readMusicSheet(owner) {
     if (owner.state.pending === null) {
       owner.admitted = false;
       owner.uncertain = false;
-      if (owner.feedbackAfterRead !== null) owner.feedback = owner.feedbackAfterRead;
+      if (owner.awaitingCommand) {
+        const awaited = owner.awaitingCommand, result = owner.state.lastCommand;
+        const matches = owner.state.sourceRevision === awaited.revision &&
+          owner.state.sourceId === awaited.sourceId && result?.requestId === awaited.requestId &&
+          result.command === awaited.command;
+        owner.feedback = matches ? ({
+          confirmed: 'Change confirmed by the player.',
+          failed: 'The player could not apply this change.',
+          timed_out: 'The player did not confirm this change in time.',
+          disconnected: 'The player disconnected before confirming this change.',
+        })[result.outcome] : 'Latest state from the Portal. The previous command was not confirmed.';
+        owner.awaitingCommand = null;
+      } else if (owner.feedbackAfterRead !== null) owner.feedback = owner.feedbackAfterRead;
       owner.feedbackAfterRead = null;
     }
     renderMusicSheet(owner);
@@ -1816,6 +1834,7 @@ function musicCommandAllowed(s, command, extra) {
   if (!player?.available) return false;
   if (command === 'select-player') return caps.selectPlayer && player.canSelect;
   if (command === 'toggle-room') return caps.rooms && !!s.controlPlayerId &&
+    typeof extra.wasInGroup === 'boolean' && extra.wasInGroup === player.inCurrentGroup &&
     (player.canJoin || player.canRemove);
   if (command === 'volume') return caps.volume && player.canSetVolume &&
     Number.isInteger(extra.percent) && extra.percent >= 0 && extra.percent <= 100;
@@ -1826,7 +1845,8 @@ async function sendMusicCommand(owner, observed, command, extra = {}) {
   const latest = owner.state;
   const same = latest.sourceRevision === observed.sourceRevision && latest.sourceId === observed.sourceId &&
     (!musicTrackCommands.has(command) || latest.track?.id === observed.track?.id) &&
-    (command !== 'toggle-room' || latest.controlPlayerId === observed.controlPlayerId);
+    (command !== 'toggle-room' || (latest.controlPlayerId === observed.controlPlayerId &&
+      latest.rooms.find(player => player.id === extra.roomId)?.inCurrentGroup === extra.wasInGroup));
   if (!same || !musicCommandAllowed(latest, command, extra)) {
     owner.feedback = 'Music changed. Review the latest controls before trying again.';
     owner.fresh = false;
@@ -1848,6 +1868,7 @@ async function sendMusicCommand(owner, observed, command, extra = {}) {
   owner.sending = true;
   owner.feedback = '';
   owner.feedbackAfterRead = '';
+  owner.awaitingCommand = null;
   owner.error = null;
   renderMusicSheet(owner);
   try {
@@ -1858,6 +1879,10 @@ async function sendMusicCommand(owner, observed, command, extra = {}) {
       owner.admitted = true;
       owner.uncertain = false;
       owner.feedback = 'Command admitted. Waiting for the latest state…';
+      const pending = response.music?.pending;
+      if (Number.isSafeInteger(pending?.requestId) && pending.requestId > 0)
+        owner.awaitingCommand = { requestId: pending.requestId, command: pending.command,
+          revision: observed.sourceRevision, sourceId: observed.sourceId };
     } else if (response.status === 'already_applied') {
       owner.feedback = 'Already in that playback state. Reading the latest state…';
     } else throw new ApiError('invalid_response');
@@ -1984,7 +2009,8 @@ function renderMusicSheet(owner) {
         const controls = actions(control(player.id === s.sourceId ? 'Selected' : 'Use player',
           'select-player', { roomId: player.id }));
         if (player.canJoin || player.canRemove) controls.append(control(
-          player.canRemove ? 'Remove from group' : 'Join group', 'toggle-room', { roomId: player.id }));
+          player.canRemove ? 'Remove from group' : 'Join group', 'toggle-room',
+          { roomId: player.id, wasInGroup: player.inCurrentGroup }));
         const row = el('section', { class: 'music-player-row' },
           el('strong', { text: player.name }),
           text(!player.available ? 'Offline' : player.id === s.sourceId ? 'Selected player'

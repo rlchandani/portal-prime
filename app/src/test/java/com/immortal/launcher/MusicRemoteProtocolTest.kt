@@ -31,6 +31,7 @@ class MusicRemoteProtocolTest {
   private fun body(command: String): JSONObject = JSONObject()
       .put("command", command).put("sourceRevision", 7L).put("sourceId", "ma:living")
       .apply {
+        if (command == "toggle-room") put("wasInGroup", false)
         if (command in setOf("play", "pause", "next", "previous", "seek", "queue-item"))
           put("trackId", "track-1")
       }
@@ -119,7 +120,7 @@ class MusicRemoteProtocolTest {
     }
     val json = MusicRemoteProtocol.state(snapshot().copy(pending = pending), 7, 0)
     assertEquals("pause", json.getJSONObject("pending").getString("command"))
-    assertFalse(json.getJSONObject("pending").has("requestId"))
+    assertEquals(99L, json.getJSONObject("pending").getLong("requestId"))
   }
 
   @Test fun stateRoomControlsUseAuthoritativeLeaderAndRoomPolicy() {
@@ -192,7 +193,8 @@ class MusicRemoteProtocolTest {
           body("volume").put("roomId", "ma:family").put("percent", percent))
     for (room in listOf("ma:living", "ma:kitchen"))
       accepted(MusicPlayerUiAction.ToggleRoom(room),
-          body("toggle-room").put("roomId", room).put("leaderId", "ma:family"))
+          body("toggle-room").put("roomId", room).put("leaderId", "ma:family")
+              .put("wasInGroup", room == "ma:living"))
     accepted(MusicPlayerUiAction.SelectPlayer("ma:kitchen"),
         body("select-player").put("roomId", "ma:kitchen"))
   }
@@ -206,6 +208,42 @@ class MusicRemoteProtocolTest {
         body("seek"), body("volume"), body("toggle-room").put("roomId", "ma:kitchen"))) {
       rejected(400, "bad_request", request)
     }
+  }
+
+  @Test fun unchangedLeaderCannotInvertTheObservedGroupOperation() {
+    val join = body("toggle-room").put("roomId", "ma:kitchen").put("leaderId", "ma:family")
+    val joined = snapshot().copy(rooms = listOf(leader, follower,
+        kitchen.copy(groupId = "ma:family", removableFromGroup = true)))
+    rejected(409, "stale", join, joined)
+    val remove = body("toggle-room").put("roomId", "ma:living").put("leaderId", "ma:family")
+        .put("wasInGroup", true)
+    val left = snapshot().copy(rooms = listOf(leader, follower.copy(
+        groupId = null, removableFromGroup = false), kitchen))
+    rejected(409, "stale", remove, left)
+  }
+
+  @Test fun groupMembershipMustBeAnExplicitBoolean() {
+    val request = body("toggle-room").put("roomId", "ma:kitchen").put("leaderId", "ma:family")
+    for (invalid in listOf(JSONObject.NULL, "false", 0, JSONArray(), JSONObject()))
+      rejected(400, "bad_request", JSONObject(request.toString()).put("wasInGroup", invalid))
+    rejected(400, "bad_request", request.apply { remove("wasInGroup") })
+  }
+
+  @Test fun terminalReadbackExposesOnlyCorrelatedFixedOutcome() {
+    val s = snapshot().copy(
+        problem = "Private backend token or endpoint",
+        lastCommand = CompletedMusicCommand(31, MusicCommand.PAUSE, MusicCommandOutcome.FAILED))
+    val wire = MusicRemoteProtocol.state(s, 7, 1_000)
+    val result = wire.getJSONObject("lastCommand")
+    assertEquals(setOf("requestId", "command", "outcome"), result.keys().asSequence().toSet())
+    assertEquals(31L, result.getLong("requestId"))
+    assertEquals("pause", result.getString("command"))
+    assertEquals("failed", result.getString("outcome"))
+    assertFalse(wire.toString().contains("Private backend"))
+    val pending = MusicRemoteProtocol.state(s.copy(lastCommand = null,
+        pending = PendingMusicCommand(32, s.sourceId, MusicCommand.PAUSE, 1_000)), 7, 1_000)
+    assertEquals(32L, pending.getJSONObject("pending").getLong("requestId"))
+    assertTrue(pending.isNull("lastCommand"))
   }
 
   @Test fun identityFieldsRejectNullEmptyOversizedAndCoercedValues() {
@@ -325,11 +363,13 @@ class MusicRemoteProtocolTest {
 
   @Test fun groupCannotMutateLeaderStaticMembersOrIncompatibleRooms() {
     for (room in listOf("ma:family", "missing"))
-      rejected(409, "unavailable", body("toggle-room").put("roomId", room).put("leaderId", "ma:family"))
+      rejected(409, "unavailable", body("toggle-room").put("roomId", room).put("leaderId", "ma:family")
+          .put("wasInGroup", room == "ma:family"))
     val s = snapshot().copy(rooms = listOf(leader.copy(canGroupWith = emptySet()),
         follower.copy(removableFromGroup = false), kitchen))
     for (room in listOf("ma:living", "ma:kitchen"))
-      rejected(409, "unavailable", body("toggle-room").put("roomId", room).put("leaderId", "ma:family"), s)
+      rejected(409, "unavailable", body("toggle-room").put("roomId", room).put("leaderId", "ma:family")
+          .put("wasInGroup", room == "ma:living"), s)
   }
 
   @Test fun selectionRequiresAvailableCanonicalMaPlayerAndMaSource() {
