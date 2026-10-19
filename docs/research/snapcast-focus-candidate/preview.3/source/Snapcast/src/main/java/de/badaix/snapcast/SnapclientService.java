@@ -676,7 +676,3 @@ public class SnapclientService extends Service {
     }
 
 }
-
-
-
-
