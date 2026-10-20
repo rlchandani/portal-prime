@@ -1,6 +1,6 @@
 # Native music player goal
 
-Status: implementation incomplete. Development previews are installed on Family Area and Pixel; YouTube authorization, live audio and final acceptance remain pending.
+Status: the HA-hosted music route was cancelled by the user on October 19. Music Assistant and its YouTube helper were removed from HA; Family's old server connection is disabled. Existing music branches are preserved. Standalone alternatives are researched; no replacement is deployed. The original managed goal is blocked and its playback/performance gates remain unpassed.
 
 Approved by the user on October 18, 2026: implement the selected music player as a goal including functionality, performance and quality.
 
@@ -14,7 +14,7 @@ The initial goal registration was rejected because the older UX goal was unfinis
 
 One native Immortal music experience: full player, compact player and photos beside music; real queue selection, optional lyrics and source-qualified room controls; settings and phone/browser management parity. Preserve the existing audio and photo foundations and accepted navigation behavior.
 
-YouTube Music Premium and Home Assistant on Synology are confirmed. The existing host was inspected through its signed-in UI: Home Assistant OS 18.3, Core/Supervisor 2026.10.2. Stable Music Assistant 2.10.7 and YouTube PO-token helper 2.0.1 are installed and report Running. The host choice is the existing Home Assistant OS app system; no NAS-model question is needed. Family's connected Snapcast client is selected and authenticated in Immortal. YouTube Music cookie authorization and actual playback remain pending; Google cookie material stays server-side and must not enter the Portal app or chat.
+YouTube Music Premium is confirmed. The earlier HAOS music-server installation and Family connection were removed at the user's request. Home Assistant is excluded from the music design. [Verified cleanup and standalone alternatives](music-without-home-assistant-2026-10-19.md) are the current direction; the progress ledger below remains historical evidence, not a current running-server claim.
 
 ## Completion gates
 
@@ -219,3 +219,8 @@ The actual saved integration token authenticated successfully with MA. `players/
 - Narrow OS foreground checks identified both installed apps. Family Home was visually inspected at 2160 × 1440. Subsequent direct player/phone screenshot attempts did not establish current window focus, so they supply no player/phone visual verdict; no other-app screenshots were taken. Family Home return was requested. This does not replace the parked physical Compose fixture or final UI acceptance.
 - Private filtered logs, rollback APKs and receipts: `/private/tmp/portal-music-recovery/integrated-rollout/`, `integrated-controls-full-gate.log`, `companion-selection-full-gate.log`, `integrated-controls-node-gate.log`, `integrated-controls-chrome-gate.log`. Household photos, pairings, account credentials and fleet tokens are not committed.
 - YouTube account authorization remains pending in the already-open server form; its dialog presence was checked without reading input values. Live audio ownership is still not wired to production publishers; actual managed-receiver output/Calls/Jarvis handoff, remaining transport/room/lifecycle evidence, parked unmet performance targets and final accepted Living rollout remain open. This is a control-safety preview, not a completed music release.
+
+
+### User cancellation of HA route — October 19, evening Pacific
+
+Music Assistant and the YouTube PO helper were removed from Home Assistant, with both absent in actual Supervisor inventory, ten original apps retained in their original states and music ports closed. Family's old HA music connection was disabled through the registry, target fields cleared and stock client stopped; unrelated preferences/saver remained unchanged. Phone and Living were untouched. Source branches are preserved; no replacement was installed. The user's current request is to explore music independent of HA. [Current cleanup, source references, alternatives and recommendation](music-without-home-assistant-2026-10-19.md). The previous blocked goal was not marked complete and its unpassed device/audio/performance results were not reclassified.

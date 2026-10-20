@@ -1,5 +1,7 @@
 # Immortal music server readiness — MA + existing Snapcast path
 
+**Current state — October 19, 2026, Pacific:** the user rejected music deployment on Home Assistant. Both Music Assistant and its YouTube helper are removed; Family's old connection is disabled. The sections below document the earlier setup and are historical. [Verified removal and standalone alternatives](music-without-home-assistant-2026-10-19.md) supersede the HA host choice.
+
 Readiness and execution record, updated 2026-10-18 Pacific. The native adapter targets MA 2.10.7 / schema 65. The existing signed-in Home Assistant installation was confirmed as **HAOS 18.3 / Core 2026.10.2 / Supervisor 2026.10.2**, running on the user's Synology. **Stable Music Assistant 2.10.7 has been installed and reports Running.** YouTube Music Premium is confirmed. Provider authentication, actual Portal playback is still pending. Snapcast server and Family client connectivity are verified. No Google login cookies have been obtained or copied into Immortal.
 
 The existing path is **Music Assistant → Snapserver → stock Snapcast Android player (`de.badaix.snapcast`) → Portal audio**, with Immortal reading Snapcast metadata/topology and forwarding transport to MA. Native Immortal controls can use this path without introducing native Sendspin. Local references: [setup guide](../docs/guides/multi-room-audio-setup.md), [control client](../app/src/main/java/com/immortal/launcher/SnapcastControlClient.kt), [MA transport](../app/src/main/java/com/immortal/launcher/MaControl.kt).

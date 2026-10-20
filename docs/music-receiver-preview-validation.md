@@ -1,5 +1,7 @@
 # Music receiver preview.2 and companion parity — October 19, 2026
 
+**Current direction — October 19, evening Pacific:** the HA music route is cancelled and its two apps are removed. Family's old server connection is disabled. The APK/test/runtime sections below remain historical evidence; no final music acceptance is implied. [Cleanup and independent alternatives](music-without-home-assistant-2026-10-19.md).
+
 ## Latest integrated control preview — October 19, 11:08 UTC
 
 Current installed Family launcher SHA-256: `6fde3c6ab184339c006667263a46a40cc1a2a690d15a1503589d0626d544e6ad`; paired Pixel companion: `c2933b966edad3f1793641bf105e1a33292543132774beeaacc79318d8fcbbd3`. Both installed hashes and existing signers verified. In-place updates preserved recorded Family preferences/saver/stock native PIDs/music state, the phone's **two pairings** and selected targets; actual prior APKs retained. Family readback is **Ready / Idle / empty queue / no track / 13 discovered rooms**. Living untouched; no music-server write or managed-receiver/audio probe ran.
