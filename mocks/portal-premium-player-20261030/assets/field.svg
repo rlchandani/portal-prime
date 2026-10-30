@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <title>Field notes — original botanical landscape</title>
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#c4bda5"/><stop offset="1" stop-color="#ebd9ad"/></linearGradient><linearGradient id="earth" x2="0" y2="1"><stop stop-color="#8b8968"/><stop offset="1" stop-color="#4a5543"/></linearGradient></defs>
+  <path fill="url(#sky)" d="M0 0h900v900H0z"/>
+  <circle cx="312" cy="329" r="100" fill="#f5e7c2" opacity=".75"/>
+  <path d="M0 469Q249 419 421 475T900 432v468H0Z" fill="#a5a283"/>
+  <path d="M0 546Q251 439 488 550T900 501v399H0Z" fill="#879174"/>
+  <path d="M0 620Q421 544 900 644v256H0Z" fill="url(#earth)"/>
+  <path d="M476 900Q396 692 475 548 416 672 597 900Z" fill="#c4b599" opacity=".7"/>
+  <g fill="none" stroke="#d8c693" stroke-width="3" opacity=".8">
+    <path d="M118 900q10-183-39-248m77 248q19-137 81-214m-59 214q-4-136-54-197M777 900q-6-202 49-293m-96 293q-3-158-56-226m125 226q18-124 64-164"/>
+  </g>
+  <g fill="#d1c497"><ellipse cx="79" cy="661" rx="8" ry="31" transform="rotate(-21 79 661)"/><ellipse cx="224" cy="704" rx="7" ry="30" transform="rotate(33 224 704)"/><ellipse cx="816" cy="633" rx="8" ry="33" transform="rotate(15 816 633)"/><ellipse cx="681" cy="689" rx="8" ry="27" transform="rotate(-25 681 689)"/></g>
+  <text x="60" y="90" font-family="Arial,sans-serif" font-size="26" fill="#4e5747">June Assembly</text>
+  <text x="54" y="188" font-family="Georgia,serif" font-size="89" fill="#4e5747" letter-spacing="-3">Field notes</text>
+</svg>

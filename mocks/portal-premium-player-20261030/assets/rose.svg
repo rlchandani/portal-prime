@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <title>In the shape of light — original folded light artwork</title>
+  <defs><linearGradient id="base" x2="1" y2="1"><stop stop-color="#e0b7af"/><stop offset="1" stop-color="#9b707a"/></linearGradient><linearGradient id="fold" x2="1" y2="1"><stop stop-color="#f1d5be"/><stop offset="1" stop-color="#ba8290"/></linearGradient><linearGradient id="shadow" x2="1" y2="0"><stop stop-color="#704f68"/><stop offset="1" stop-color="#ad7482"/></linearGradient></defs>
+  <path fill="url(#base)" d="M0 0h900v900H0z"/>
+  <path d="m166 592 286-392 292 292-286 326Z" fill="url(#shadow)"/>
+  <path d="m166 592 286-392-66 337Z" fill="url(#fold)"/>
+  <path d="m452 200 292 292-358 45Z" fill="#edc8b1"/>
+  <path d="m386 537 358-45-286 326Z" fill="url(#fold)"/>
+  <path d="m166 592 220-55 72 281Z" fill="#ad7b86"/>
+  <path d="m452 200-66 337 358-45" fill="none" stroke="#f9e2ce" opacity=".55"/>
+  <text x="60" y="90" font-family="Arial,sans-serif" font-size="26" fill="#f5e9dd">Aster Vale</text>
+  <text x="59" y="847" font-family="Georgia,serif" font-size="50" fill="#f5e9dd" letter-spacing="-1">In the shape of light</text>
+</svg>

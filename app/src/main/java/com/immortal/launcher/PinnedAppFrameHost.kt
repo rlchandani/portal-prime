@@ -200,8 +200,8 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
         if (!retirement.canCreateCover) return false
         removeSurface()
         if (!retirement.canCreateCover) return false
-        val next = if (selection.lostBarrier) null else PhotoFrameController(service, interactivePreview = false)
-        if (selection.mode == PinnedCoverMode.NIGHT) next?.faceOverride = Face.flipNight(service)
+        val next = if (selection.lostBarrier) null else PhotoFrameController(service, interactivePreview = false,
+            nightClockOnly = selection.mode == PinnedCoverMode.NIGHT)
         val root = if (next != null) next.view as FrameLayout else FrameLayout(service)
         val flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
             WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
@@ -211,6 +211,9 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
             WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             flags, PixelFormat.OPAQUE).apply { gravity = Gravity.TOP or Gravity.LEFT }
         val cover = Cover(root, next, selection.mode, params, ++generation)
+        next?.onNightClockChanged = {
+            if (!closed && surface === cover && !cover.lostPanel) reconcilePower(cover)
+        }
         setPowerParams(cover, cfg)
         root.setOnTouchListener { _, event ->
             if (surface === cover && !cover.renderer.stopped) next?.onTouch(event)
@@ -240,8 +243,9 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
             DreamPolicy.hasBattery(service), cfg.batterySaver, DreamPolicy.isPowered(service))
         val bit = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         cover.params.flags = if (keep) cover.params.flags or bit else cover.params.flags and bit.inv()
-        cover.params.screenBrightness = if (cover.mode == PinnedCoverMode.NIGHT)
-            PhotoFramePreviewActivity.NIGHT_BRIGHTNESS else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        cover.params.screenBrightness = if (cover.mode == PinnedCoverMode.NIGHT ||
+            cover.frame?.isNightClockShowing == true) cfg.nightClockBrightness / 100f
+            else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     }
 
     private fun reconcilePower(cover: Cover, cfg: ScreensaverConfig.Settings = ScreensaverConfig.load(service)) {

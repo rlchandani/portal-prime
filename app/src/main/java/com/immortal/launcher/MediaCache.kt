@@ -39,9 +39,11 @@ class MediaCache internal constructor(private val dir: File, private val budgetB
     // Sweep temp files stranded by a process death mid-download/transcode. They're '.'-prefixed,
     // so the budget never counts them — without this sweep a crashy stretch could quietly fill
     // the disk with invisible half-downloaded sources (~100-200 MB each). Any live temp belongs
-    // to a previous controller instance, and only one screensaver runs at a time.
+    // to a previous controller instance, including a codec still acknowledging cancellation.
     runCatching {
-      dir.listFiles()?.filter { it.isFile && it.name.startsWith(".") }?.forEach { it.delete() }
+      dir.listFiles()?.filter {
+        it.isFile && it.name.startsWith(".") && !VideoExportOwnership.owns(it)
+      }?.forEach { it.delete() }
     }
   }
 
@@ -80,6 +82,10 @@ class MediaCache internal constructor(private val dir: File, private val budgetB
 
   /** A temp path beside a target file, for a transcoder/downloader to write before committing. */
   fun tempFor(target: File): File = File(dir, ".${target.name}.tmp")
+
+  /** A retiring video worker can never delete a replacement controller's source/output. */
+  fun uniqueTempFor(target: File): File =
+      File(dir, ".${target.name}.${java.util.UUID.randomUUID()}.tmp")
 
   /** Atomically move a finished temp file into place as [target], then enforce the budget. */
   fun commit(tmp: File, target: File): Boolean =
@@ -135,7 +141,9 @@ class MediaCache internal constructor(private val dir: File, private val budgetB
     fun purge(context: Context) {
       runCatching {
         val dir = File(context.filesDir, DIR)
-        if (dir.exists()) dir.deleteRecursively()
+        if (dir.exists()) dir.walkBottomUp().forEach { file ->
+          if (!VideoExportOwnership.owns(file)) file.delete()
+        }
       }
     }
 

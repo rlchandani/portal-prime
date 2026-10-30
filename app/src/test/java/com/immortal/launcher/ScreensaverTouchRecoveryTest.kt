@@ -44,13 +44,25 @@ class ScreensaverTouchRecoveryTest {
     assertEquals(1, exits)
   }
 
+  @Test fun nightClockTapDismissesOnceAndDoesNotTriggerPhotoRecovery() = withFrame(night = true) { frame, context ->
+    var exits = 0
+    frame.onExit = { exits++ }
+    frame.onTouch(event(MotionEvent.ACTION_DOWN))
+    assertEquals(0, exits)
+    DreamPolicy.onImmortalDreamingStopped(context)
+    Mockito.verify(context, Mockito.never()).startActivity(Mockito.any(Intent::class.java))
+    frame.onTouch(event(MotionEvent.ACTION_UP))
+    assertEquals(1, exits)
+  }
+
   private fun event(action: Int): MotionEvent = Mockito.mock(MotionEvent::class.java).also {
     `when`(it.actionMasked).thenReturn(action)
     `when`(it.x).thenReturn(100f)
     `when`(it.y).thenReturn(100f)
   }
 
-  private fun withFrame(alarm: Boolean = false, action: (PhotoFrameController, Context) -> Unit) {
+  private fun withFrame(alarm: Boolean = false, night: Boolean = false,
+      action: (PhotoFrameController, Context) -> Unit) {
     val context = ScreensaverTestPrefs(mapOf("enabled" to true)).context
     val power = Mockito.mock(PowerManager::class.java)
     `when`(power.isInteractive).thenReturn(true)
@@ -60,8 +72,11 @@ class ScreensaverTouchRecoveryTest {
     val renderer = Mockito.mock(FaceRenderer::class.java) { call ->
       if (call.method.name == "handleAlarmTouch") alarm else Mockito.RETURNS_DEFAULTS.answer(call)
     }
-    PhotoFrameController::class.java.getDeclaredField("faceRenderer").apply {
-      isAccessible = true; set(frame, renderer)
+    PhotoFrameController::class.java.getDeclaredField("faceRendererDelegate").apply {
+      isAccessible = true; set(frame, lazyOf(renderer))
+    }
+    PhotoFrameController::class.java.getDeclaredField("ambientNight").apply {
+      isAccessible = true; set(frame, night)
     }
     val previous = Triple(DreamPolicy.userExitAt, DreamPolicy.bridgeAt, DreamPolicy.inStockHandoff)
     try {

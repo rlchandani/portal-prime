@@ -62,9 +62,12 @@ class VideoTranscoder(
     private val bitrate: Int = 1_200_000,
     private val timeoutMinutes: Long = 10,
 ) {
+  val isIdle: Boolean get() = VideoExportOwnership.isIdle
+
   /** Transcode [src] into [dst] (overwritten). Returns true only on a complete, non-empty export. */
-  fun transcode(src: File, dst: File): Boolean {
-    if (!src.exists() || src.length() == 0L) return false
+  fun transcode(src: File, dst: File, shouldContinue: () -> Boolean = { true }): Boolean {
+    if (!src.exists() || src.length() == 0L || !shouldContinue()) return false
+    val ownership = VideoExportOwnership.acquire(src, dst) ?: return false
     val presentation = presentationFor(src)
     val thread = HandlerThread("wall-transcode")
     thread.start()
@@ -112,16 +115,39 @@ class VideoTranscoder(
             latch.countDown()
           }
     }
-    val finished = runCatching { latch.await(timeoutMinutes, TimeUnit.MINUTES) }.getOrDefault(false)
+    val deadline = android.os.SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(timeoutMinutes)
+    val finished = runCatching {
+      while (shouldContinue() && android.os.SystemClock.elapsedRealtime() < deadline) {
+        if (latch.await(250, TimeUnit.MILLISECONDS)) return@runCatching true
+      }
+      false
+    }.getOrDefault(false)
     if (!finished) {
       // Hung or over-long export: cancel on the transformer's own thread so the codec is
       // released, and report failure. Without this one bad clip would stall the prefetch
       // worker (and leak this thread) forever.
-      Log.w(TAG, "transcode timed out after ${timeoutMinutes}m for ${src.name}; cancelling")
-      handler.post { runCatching { transformerRef.get()?.cancel() } }
+      Log.w(TAG, "transcode suspended or timed out for ${src.name}; cancelling")
+      val acknowledged = CountDownLatch(1)
+      val accepted = handler.post {
+        val cancelled = runCatching { transformerRef.get()?.cancel() }.isSuccess
+        if (cancelled) {
+          // This worker owns cancelled temp files, including a cancel that acknowledges late.
+          src.delete()
+          dst.delete()
+          ownership.close()
+          acknowledged.countDown()
+        } else {
+          Log.w(TAG, "native cancel unconfirmed; retaining export ownership and temporary files")
+        }
+        thread.quitSafely()
+      }
+      if (accepted) runCatching { acknowledged.await(2, TimeUnit.SECONDS) }
+      // A rejected/late cancel remains owned and blocks new exports; don't claim completion.
       ok.set(false)
+    } else {
+      ownership.close()
+      runCatching { thread.quitSafely() }
     }
-    runCatching { thread.quitSafely() }
     return ok.get() && dst.exists() && dst.length() > 0L
   }
 

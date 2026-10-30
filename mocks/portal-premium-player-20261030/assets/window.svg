@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <title>Room with a view — original architectural artwork</title>
+  <defs>
+    <linearGradient id="wall" x2="1" y2="1"><stop stop-color="#d8bdaa"/><stop offset="1" stop-color="#a27968"/></linearGradient>
+    <linearGradient id="view" x2="0" y2="1"><stop stop-color="#b7c5c5"/><stop offset=".6" stop-color="#eadbc0"/><stop offset="1" stop-color="#cb9d79"/></linearGradient>
+    <linearGradient id="floor" x2="1" y2="1"><stop stop-color="#c6a48a"/><stop offset="1" stop-color="#745a50"/></linearGradient>
+  </defs>
+  <path fill="url(#wall)" d="M0 0h900v900H0z"/>
+  <path d="M190 623V312a220 220 0 0 1 440 0v311Z" fill="#73544b"/>
+  <path d="M211 621V315a199 199 0 0 1 398 0v306Z" fill="url(#view)"/>
+  <path d="M211 505Q320 398 427 499T609 480v141H211Z" fill="#bd9680"/>
+  <path d="M211 569Q398 457 609 559v62H211Z" fill="#8e8077"/>
+  <path d="M410 114v507M212 375h397" stroke="#76554b" stroke-width="16"/>
+  <path d="M0 650h900v250H0Z" fill="url(#floor)"/>
+  <path d="m213 623 235 277h345L609 623Z" fill="#f2d5a7" opacity=".55"/>
+  <path d="m406 623 209 277h16L423 623Z" fill="#805b4c" opacity=".8"/>
+  <path d="m211 375 158 248h267l-27-248Z" fill="#fff0d0" opacity=".1"/>
+  <ellipse cx="704" cy="752" rx="82" ry="20" fill="#483b35" opacity=".3"/>
+  <path d="M648 581h99l-15 158q-33 20-69 0Z" fill="#966a52"/>
+  <g fill="#536258"><path d="M699 593q-90-97-40-202 71 91 40 202Z"/><path d="M696 605q22-121 96-144-12 102-96 144Z"/><path d="M692 611q-104-18-123-89 87-10 123 89Z"/></g>
+  <text x="57" y="823" font-family="Arial,sans-serif" font-size="26" fill="#f4e9dc">Emi &amp; the City</text>
+  <text x="55" y="866" font-family="Georgia,serif" font-size="38" fill="#f4e9dc">Room with a view</text>
+</svg>

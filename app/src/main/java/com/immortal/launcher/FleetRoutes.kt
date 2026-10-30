@@ -66,7 +66,7 @@ class FleetRoutes(private val context: Context) {
       "/fs/read" -> requireMethod("GET", req) { fsRead(req) }
       "/fs/write" -> requireMethod("POST", req) { fsWrite(req) }
       "/logcat" -> requireMethod("GET", req) { logcat(req) }
-      "/diag" -> requireMethod("GET", req) { resp(200, FleetDiag.snapshot()) }
+      "/diag" -> requireMethod("GET", req) { resp(200, FleetDiag.snapshot(context)) }
       "/perf" -> performance(req)
       "/perf/home-ui" -> HomeUiDiagnostics.handle(context, req)
       "/perf/app-badges" -> AppBadgeProbe.handle(context, req)

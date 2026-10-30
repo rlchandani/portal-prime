@@ -81,7 +81,8 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     val construction = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.CONTROLLER_CONSTRUCTION)
     try {
       frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
-          interactivePreview = !intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock)
+          interactivePreview = !intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock,
+          nightClockOnly = nightClock)
     } finally { construction?.finish() }
     // Only the screensaver-continuation launch (DreamPolicy's force-wake handoff) honours the
     // "open when dismissed" choice — to the user that frame IS the screensaver, so a tap must
@@ -99,13 +100,21 @@ class PhotoFramePreviewActivity : ComponentActivity() {
       if (launchDismissOnExit) ScreensaverDismiss.launchChosenApp(this)
       finish()
     }
+    val priorBrightness = window.attributes.screenBrightness
+    frame.onNightClockChanged = { night ->
+      window.attributes = window.attributes.apply {
+        screenBrightness = if (night) ScreensaverConfig.load(this@PhotoFramePreviewActivity).nightClockBrightness / 100f
+            else priorBrightness
+      }
+    }
 
     if (nightClock) {
       // Bedside clock: force the screen on for the window and dim it to a soft glow. Brightness is
       // window-scoped, so it restores automatically when this activity finishes (tap, or window end).
-      frame.faceOverride = Face.flipNight(this)
       window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-      window.attributes = window.attributes.apply { screenBrightness = NIGHT_BRIGHTNESS }
+      window.attributes = window.attributes.apply {
+        screenBrightness = ScreensaverConfig.load(this@PhotoFramePreviewActivity).nightClockBrightness / 100f
+      }
     } else {
       applyKeepScreenOn()
       // Debug preview harness: render an arbitrary face (mantelframe WidgetConfig shape) instead

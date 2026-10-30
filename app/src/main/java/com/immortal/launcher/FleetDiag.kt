@@ -7,6 +7,10 @@
 
 package com.immortal.launcher
 
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorManager
+import android.os.Build
 import org.json.JSONObject
 
 /**
@@ -25,12 +29,29 @@ object FleetDiag {
    * denies an app `/proc/loadavg`. Anything that is denied degrades to an
    * "error: …" string rather than failing the whole call.
    */
-  fun snapshot(): JSONObject =
+  fun snapshot(context: Context? = null): JSONObject =
       JSONObject()
           .put("ok", true)
           .put("uptime", exec(arrayOf("uptime")).trim())
           .put("storage", exec(arrayOf("df", "-h")).trim())
           .put("meminfo", exec(arrayOf("cat", "/proc/meminfo"), maxBytes = 8 * 1024).trim())
+          .apply {
+            if (context != null) put("hardware", hardware(context))
+          }
+
+  /** Passive capability check: no sensor subscription, camera access or account data. */
+  private fun hardware(context: Context): JSONObject = JSONObject()
+      .put("board", Build.BOARD)
+      .put("hardware", Build.HARDWARE)
+      .put("cpuCores", Runtime.getRuntime().availableProcessors())
+      .put("appApkPath", context.applicationInfo?.sourceDir ?: JSONObject.NULL)
+      .put("lightSensor", runCatching {
+        (context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager)
+            ?.getDefaultSensor(Sensor.TYPE_LIGHT)?.let {
+              JSONObject().put("name", it.name).put("vendor", it.vendor)
+                  .put("reportingMode", it.reportingMode).put("powerMa", it.power)
+            }
+      }.getOrNull() ?: JSONObject.NULL)
 
   /** Bounded number of recent logcat lines (text). Clamped so a request can't pull
    *  an unbounded dump into memory; [FleetRoutes] streams larger pulls directly. */

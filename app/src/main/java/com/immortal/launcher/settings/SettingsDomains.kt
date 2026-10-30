@@ -429,6 +429,37 @@ object SettingsDomains {
                       get = { it.overnightNightClock },
                       set = ScreensaverConfig::setOvernightNightClock,
                       visible = { _, s -> s.overnightEnabled }),
+                  BoolSpec(
+                      "darkRoomClock",
+                      "Clock when the room is dark",
+                      get = { it.darkRoomClock },
+                      set = ScreensaverConfig::setDarkRoomClock,
+                      help = "A dim clock replaces photos after 20 seconds of darkness. Photos resume " +
+                          "when the lights return. Requires a light sensor; no camera is used."),
+                  IntSpec(
+                      "darkRoomLux",
+                      "Darkness threshold",
+                      get = { it.darkRoomLux },
+                      set = ScreensaverConfig::setDarkRoomLux,
+                      min = 1, max = 20, step = 1,
+                      format = { "$it lux" },
+                      visible = { _, s -> s.darkRoomClock }),
+                  IntSpec(
+                      "nightClockBrightness",
+                      "Night clock brightness",
+                      get = { it.nightClockBrightness },
+                      set = ScreensaverConfig::setNightClockBrightness,
+                      min = 1, max = 15, step = 1,
+                      format = { "$it%" },
+                      visible = { _, s -> s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock) }),
+                  EnumSpec(
+                      "nightClockTone",
+                      "Night clock colour",
+                      get = { it.nightClockTone },
+                      set = ScreensaverConfig::setNightClockTone,
+                      options = listOf("warm" to "Warm", "red" to "Red"),
+                      coerce = { it.takeIf { value -> value == "warm" || value == "red" } },
+                      visible = { _, s -> s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock) }),
                   // NOTE: `feed` (Photo feed picker) removed — PhotoFrameController hardcodes the
                   // built-in source chain and never read the setting. See settings-reimagining-audit.
                   BoolSpec(
@@ -512,6 +543,10 @@ object SettingsDomains {
                   "overnightStartMin" to "Power & sleep",
                   "overnightEndMin" to "Power & sleep",
                   "overnightNightClock" to "Power & sleep",
+                  "darkRoomClock" to "Power & sleep",
+                  "darkRoomLux" to "Power & sleep",
+                  "nightClockBrightness" to "Power & sleep",
+                  "nightClockTone" to "Power & sleep",
                   "sleepTimerEnabled" to "Sleep timer",
                   "sleepTimerMin" to "Sleep timer",
                   "pauseAudioOnSleep" to "Sleep timer",

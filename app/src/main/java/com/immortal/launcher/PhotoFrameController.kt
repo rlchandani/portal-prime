@@ -80,6 +80,8 @@ class PhotoFrameController(
     var interactivePreview: Boolean = false,
     /** In-page music photos: no clock/calendar/voice/soundscape or dream handoff. */
     private val photosOnly: Boolean = false,
+    /** Scheduled night clock: don't start a photo, calendar, weather or audio pipeline at all. */
+    private val nightClockOnly: Boolean = false,
 ) {
   private val io = Executors.newSingleThreadExecutor()
   // Decode-once screen-sized copies of local photos for the engine (see [EngineScaledCache]).
@@ -126,6 +128,13 @@ class PhotoFrameController(
   private var videoReady = false
   private var paused = false // User choice; covering the host must never overwrite it.
   @Volatile private var hostActive = true
+  private var hostVisible = true
+  private var ambientNight = false
+  private var quietClock: QuietNightClockView? = null
+  private var darkRoomObserver: DarkRoomObserver? = null
+  /** Hosts apply window-scoped dimming; restoring it never writes the device's global brightness. */
+  var onNightClockChanged: ((Boolean) -> Unit)? = null
+  val isNightClockShowing: Boolean get() = nightClockOnly || ambientNight
   private var hostSuspendedAt = 0L
   private var retainedVideoPosition = 0
   private var photoFade: AnimatorSet? = null
@@ -149,7 +158,8 @@ class PhotoFrameController(
 
   // The overlay (clock / date / weather / battery / now-playing) is built and driven by the
   // FaceRenderer from a Face descriptor; this controller owns only the photo/video layer.
-  private val faceRenderer = FaceRenderer(context, weatherRefreshMs)
+  private val faceRendererDelegate = lazy { FaceRenderer(context, weatherRefreshMs) }
+  private val faceRenderer get() = faceRendererDelegate.value
 
   // Calendar widget (top-right): a clean upcoming-events panel fed by a public ICS
   // feed (Google secret-iCal / Apple iCloud public-calendar). Hidden when no link.
@@ -186,6 +196,9 @@ class PhotoFrameController(
 
   // Ambient soundscape (synthesized) played while the frame is up (fork feature).
   private val soundscape = SoundscapePlayer()
+  // AudioTrack release may wait for its render thread. Keep all start/stop calls serialized off main.
+  private val soundscapeIoDelegate = lazy { Executors.newSingleThreadExecutor() }
+  private val soundscapeIo get() = soundscapeIoDelegate.value
 
   // Optional contact-free "wave to advance" (Camera2 motion; opt-in, off by default).
   private var gestureCamera: GestureCamera? = null
@@ -233,6 +246,7 @@ class PhotoFrameController(
   private var transcoder: VideoTranscoder? = null
   private val transcodeIo = Executors.newSingleThreadExecutor()
   @Volatile private var prefetchRunning = false
+  @Volatile private var videoPrefetchConnection: HttpURLConnection? = null
   // Set when a prefetch pass finds the cache out of room, so later misses don't spawn a worker
   // (and log) just to rediscover that every ~30s. Cleared when a corrupt entry is deleted (space
   // freed); resets with the controller each dream session.
@@ -281,6 +295,12 @@ class PhotoFrameController(
     // Meta can stop the Dream before ACTION_UP arrives. An in-progress touch is user
     // interaction, so recovery must not reopen photos between finger-down and dismissal.
     if (!photosOnly && ev.actionMasked == MotionEvent.ACTION_DOWN) DreamPolicy.userExitAt = System.currentTimeMillis()
+    if (isNightClockShowing) {
+      if (ev.actionMasked == MotionEvent.ACTION_UP &&
+          abs(ev.x - downX) < 48 && abs(ev.y - downY) < 48) onExit?.invoke()
+      if (ev.actionMasked == MotionEvent.ACTION_DOWN) { downX = ev.x; downY = ev.y }
+      return
+    }
     // While the timer alarm is showing, the slide-to-stop owns the touch stream.
     if (faceRenderer.handleAlarmTouch(ev)) return
     when (ev.actionMasked) {
@@ -325,6 +345,15 @@ class PhotoFrameController(
       if (photosOnly) musicPhotoSettings(it) else it
     }
     val root = view as FrameLayout
+    if (nightClockOnly) {
+      quietClock?.setActive(hostVisible)
+      onNightClockChanged?.invoke(true)
+      return
+    }
+    if (!photosOnly && settings.darkRoomClock) {
+      darkRoomObserver = DarkRoomObserver(context, settings.darkRoomLux.toFloat(), ::setAmbientNight)
+      darkRoomObserver?.setActive(hostVisible)
+    }
     val source = PhotoFrameSource.from(settings, allowWebPage = !photosOnly && faceOverride == null)
     nativePhotoMode = ScreensaverConfig.isNativeStage(settings.mode) && source !is PhotoFrameSource.WebPage
     if (nativePhotoMode) {
@@ -392,17 +421,11 @@ class PhotoFrameController(
     }
 
     // Start the ambient soundscape (no-op when set to Off).
-    if (!photosOnly) runCatching { soundscape.start(settings.soundscape, settings.soundscapeVolume) }
+    if (!photosOnly && settings.soundscape != ScreensaverConfig.SOUND_OFF) updateSoundscape()
 
     // Optional "wave to advance" — wholly guarded; any failure just disables it so the
     // always-on dream process is never put at risk.
-    if (!photosOnly && settings.gestureWave) {
-      runCatching {
-        gestureCamera = GestureCamera(context) {
-          if (hostActive && !stopped) ui.post { if (hostActive && !stopped) runCatching { next() } }
-        }.also { it.start() }
-      }
-    }
+    if (!photosOnly && settings.gestureWave) resumeGestureCamera()
 
     // Feed the ambient dashboard's weather, and schedule its cycle (first card after ~45s).
     // The ambient dashboard is a Classic-renderer feature: it pauses the photo and shows a big
@@ -1008,6 +1031,32 @@ class PhotoFrameController(
   /** Suspend a retained host without destroying its photo, WebView, or user pause choice. */
   @androidx.annotation.MainThread
   fun setHostActive(value: Boolean) {
+    hostVisible = value
+    darkRoomObserver?.setActive(value && !stopped)
+    quietClock?.setActive(value && isNightClockShowing && !stopped)
+    if (nightClockOnly) return
+    applyHostActive(DarkRoomPolicy.photosActive(value, ambientNight))
+  }
+
+  private fun setAmbientNight(value: Boolean) {
+    if (stopped || ambientNight == value) return
+    ambientNight = value
+    val root = view as FrameLayout
+    if (value && quietClock == null) {
+      quietClock = QuietNightClockView(context, settings.nightClockTone).also {
+        root.addView(it, FrameLayout.LayoutParams(MATCH, MATCH))
+      }
+    }
+    quietClock?.visibility = if (value) View.VISIBLE else View.GONE
+    if (value) quietClock?.bringToFront()
+    quietClock?.setActive(value && hostVisible)
+    applyHostActive(DarkRoomPolicy.photosActive(hostVisible, value))
+    onNightClockChanged?.invoke(value)
+    Log.i("ImmortalNight", if (value) "dark room: clock; photos suspended" else "light returned: retained photos resumed")
+  }
+
+  /** Effective renderer state combines external visibility with the ambient clock cover. */
+  private fun applyHostActive(value: Boolean) {
     if (stopped || hostActive == value) return
     val now = android.os.SystemClock.uptimeMillis()
     if (!value) {
@@ -1023,6 +1072,9 @@ class PhotoFrameController(
       nativeFilmstrip?.setHostActive(false)
       hybridFilmstrip?.setHostActive(false)
       faceRenderer.setHostActive(false)
+      runCatching { gestureCamera?.stop() }
+      gestureCamera = null
+      cancelVideoPrefetchTransport()
       webView?.let { wv ->
         if (engineActive) applyEnginePlayback(wv)
         wv.onPause()
@@ -1046,6 +1098,34 @@ class PhotoFrameController(
         if (!paused) runCatching { videoView.start() }
       }
       ui.setActive(true)
+      if (!photosOnly && settings.gestureWave) resumeGestureCamera()
+      if (remoteMode) schedulePrefetch()
+    }
+    updateSoundscape()
+  }
+
+  private fun updateSoundscape() {
+    if (photosOnly || settings.soundscape == ScreensaverConfig.SOUND_OFF) return
+    val shouldPlay = !stopped && hostActive
+    soundscapeIo.execute {
+      if (shouldPlay && !stopped && hostActive)
+        runCatching { soundscape.start(settings.soundscape, settings.soundscapeVolume) }
+      else runCatching { soundscape.stop() }
+    }
+  }
+
+  private fun resumeGestureCamera() {
+    if (!hostActive || stopped || gestureCamera != null) return
+    runCatching {
+      gestureCamera = GestureCamera(context) {
+        if (hostActive && !stopped) ui.post { if (hostActive && !stopped) runCatching { next() } }
+      }.also { it.start() }
+    }
+  }
+
+  private fun cancelVideoPrefetchTransport() {
+    videoPrefetchConnection?.let { connection ->
+      photoCancelIo.execute { runCatching { connection.disconnect() } }
     }
   }
 
@@ -1067,12 +1147,19 @@ class PhotoFrameController(
   @androidx.annotation.MainThread
   fun stop() {
     stopped = true
+    darkRoomObserver?.setActive(false)
+    darkRoomObserver = null
+    quietClock?.setActive(false)
+    // The host window is departing. Restoring brightness here would briefly brighten a frozen
+    // night surface; Android restores the underlying window's own brightness when ours disappears.
+    onNightClockChanged = null
     if (legacyPreparationDelegate.isInitialized()) legacyPreparation.close()
     retireLegacyEngine()
     gen++
     nativeStarting = false
     afterNativeStartup = null
     cancelPhotoTransports()
+    cancelVideoPrefetchTransport()
     if (nativeLoaderDelegate.isInitialized()) nativeLoader.close()
     if (this::nativeStage.isInitialized) nativeStage.stop()
     clearNativeHistory()
@@ -1091,13 +1178,16 @@ class PhotoFrameController(
     Thread {
       runCatching { ttsRef?.stop() }
       runCatching { ttsRef?.shutdown() }
-      runCatching { soundscape.stop() }
     }.start()
+    if (soundscapeIoDelegate.isInitialized()) {
+      soundscapeIo.execute { runCatching { soundscape.stop() } }
+      soundscapeIo.shutdown()
+    }
     photoFade?.removeAllListeners()
     photoFade?.cancel()
     photoFade = null
     cancelKenBurns()
-    faceRenderer.stop()
+    if (faceRendererDelegate.isInitialized()) faceRenderer.stop()
     if (this::videoView.isInitialized) runCatching { videoView.stopPlayback() }
     // Close the SMB connection off-thread (network I/O) before the io executor is killed.
     smbSource?.let { s -> Thread { runCatching { s.close() } }.start() }
@@ -1114,6 +1204,11 @@ class PhotoFrameController(
   private fun buildUi(): View {
     val root = FrameLayout(context)
     root.setBackgroundColor(Color.BLACK)
+    if (nightClockOnly) {
+      quietClock = QuietNightClockView(context, ScreensaverConfig.load(context).nightClockTone)
+      root.addView(quietClock, FrameLayout.LayoutParams(MATCH, MATCH))
+      return root
+    }
 
     // Back photo layer — sits below [photo]; receives the incoming bitmap during a crossfade.
     photoBack = ImageView(context)
@@ -1748,7 +1843,7 @@ class PhotoFrameController(
   }
 
   fun dispatchViewerControls(event: MotionEvent): Boolean =
-      interactivePreview && nativePhotoMode &&
+      !isNightClockShowing && interactivePreview && nativePhotoMode &&
           viewerControls.dispatchViewerTouch(event)
 
   fun updatePreviewInteraction(enabled: Boolean) {
@@ -2911,13 +3006,29 @@ class PhotoFrameController(
   private fun downloadToFile(spec: String, headers: Map<String, String>, dst: java.io.File): Boolean =
       runCatching {
             val c = URL(spec).openConnection() as HttpURLConnection
-            c.connectTimeout = 8000
-            c.readTimeout = 20000
-            c.instanceFollowRedirects = true
-            c.setRequestProperty("User-Agent", USER_AGENT)
-            headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
-            c.inputStream.use { input -> dst.outputStream().use { input.copyTo(it) } }
-            dst.length() > 0L
+            videoPrefetchConnection = c
+            try {
+              if (!hostActive || stopped) return@runCatching false
+              c.connectTimeout = 8000
+              c.readTimeout = 20000
+              c.instanceFollowRedirects = true
+              c.setRequestProperty("User-Agent", USER_AGENT)
+              headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
+              c.inputStream.use { input ->
+                dst.outputStream().use { output ->
+                  val buffer = ByteArray(32 * 1024)
+                  while (hostActive && !stopped && !Thread.currentThread().isInterrupted) {
+                    val count = input.read(buffer)
+                    if (count < 0) return@runCatching dst.length() > 0L
+                    output.write(buffer, 0, count)
+                  }
+                }
+              }
+              false
+            } finally {
+              if (videoPrefetchConnection === c) videoPrefetchConnection = null
+              c.disconnect()
+            }
           }
           .getOrDefault(false)
 
@@ -2936,7 +3047,7 @@ class PhotoFrameController(
   private fun schedulePrefetch() {
     val cache = mediaCache ?: return
     val tc = transcoder ?: return
-    if (prefetchRunning || prefetchFull) return
+    if (stopped || !hostActive || prefetchRunning || prefetchFull || !tc.isIdle) return
     // Snapshot playlist order + headers on the UI thread (both are mutated here only).
     val queue = prefetchOrder(remoteUrls, remoteVideos, remoteIndex)
     if (queue.isEmpty()) return
@@ -2949,7 +3060,8 @@ class PhotoFrameController(
             var failed = 0
             try {
               for (url in queue) {
-                if (!remoteMode || Thread.currentThread().isInterrupted) break
+                if (stopped || !hostActive || !remoteMode || !tc.isIdle ||
+                    Thread.currentThread().isInterrupted) break
                 if (!cache.hasRoom()) {
                   prefetchFull = true
                   Log.i(TAG, "prefetch: cache full at ${cache.sizeBytes() / MB}MB; stopping (album larger than budget)")
@@ -2957,15 +3069,17 @@ class PhotoFrameController(
                 }
                 if (cache.isCached(url, isVideo = true)) continue
                 val target = cache.videoFile(url)
-                val srcTmp = cache.tempFor(java.io.File(target.path + ".src"))
-                val outTmp = cache.tempFor(target)
+                val srcTmp = cache.uniqueTempFor(java.io.File(target.path + ".src"))
+                val outTmp = cache.uniqueTempFor(target)
                 try {
                   if (!downloadToFile(url, headers, srcTmp)) {
+                    if (!hostActive || stopped) break
                     failed++
                     Log.w(TAG, "prefetch: download failed for $url")
                     continue
                   }
-                  if (runCatching { tc.transcode(srcTmp, outTmp) }.getOrDefault(false) &&
+                  if (runCatching { tc.transcode(srcTmp, outTmp) { hostActive && !stopped } }.getOrDefault(false) &&
+                      hostActive && !stopped &&
                       cache.commit(outTmp, target)) {
                     built++
                     Log.i(
@@ -2975,8 +3089,9 @@ class PhotoFrameController(
                     failed++ // transcode already logged its own reason under ImmortalTranscode
                   }
                 } finally {
-                  runCatching { srcTmp.delete() }
-                  runCatching { if (outTmp.exists()) outTmp.delete() }
+                  // A pending native cancel retains file ownership until its worker acknowledges.
+                  if (!VideoExportOwnership.owns(srcTmp)) runCatching { srcTmp.delete() }
+                  if (!VideoExportOwnership.owns(outTmp)) runCatching { outTmp.delete() }
                 }
               }
             } finally {

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <title>The quiet hours — original dune landscape</title>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#a47761"/><stop offset=".6" stop-color="#dfb99b"/><stop offset="1" stop-color="#f0d8b8"/></linearGradient>
+    <linearGradient id="sand" x1=".15" y1="0" x2=".9" y2="1"><stop stop-color="#d5aa7a"/><stop offset=".45" stop-color="#bb8053"/><stop offset="1" stop-color="#73432e"/></linearGradient>
+    <linearGradient id="shadow" x2=".5" y2="1"><stop stop-color="#754730"/><stop offset="1" stop-color="#382b28"/></linearGradient>
+    <pattern id="grain" width="7" height="9" patternUnits="userSpaceOnUse"><circle cx="1" cy="2" r=".6" fill="#fff" opacity=".12"/><circle cx="5" cy="7" r=".5" fill="#241a13" opacity=".1"/></pattern>
+    <clipPath id="clip"><path d="M0 556C265 417 408 681 900 452V900H0Z"/></clipPath>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h900v900H0z"/>
+  <circle cx="609" cy="302" r="102" fill="#f5dfbb" opacity=".96"/>
+  <path d="M0 440C151 404 273 397 401 449s238 28 499-56v507H0Z" fill="#c39777"/>
+  <path d="M0 503C290 395 440 579 900 472v428H0Z" fill="#aa7354"/>
+  <path d="M0 556C265 417 408 681 900 452V900H0Z" fill="url(#sand)"/>
+  <path d="M0 556C265 417 408 681 900 452 724 599 652 706 528 900H0Z" fill="url(#shadow)"/>
+  <path d="M0 711C183 574 373 648 505 707S760 783 900 661v239H0Z" fill="#bb865d"/>
+  <path d="M0 734C163 626 329 669 483 732S739 834 900 695v205H0Z" fill="url(#sand)"/>
+  <g clip-path="url(#clip)" fill="none" stroke="#f2c796" opacity=".17">
+    <path d="M346 593Q628 757 945 528M337 604Q636 779 947 543M329 616Q642 797 950 558M320 628Q646 816 950 575M311 640Q651 832 954 593M303 652Q657 851 954 609M293 665Q662 869 956 625M282 678Q665 887 959 643M272 691Q670 905 958 661M262 704Q674 923 960 679M251 717Q679 941 961 697"/>
+  </g>
+  <path fill="url(#grain)" d="M0 0h900v900H0z"/>
+  <text x="65" y="83" font-family="Georgia,serif" font-size="25" fill="#fbefde">Sora Fields</text>
+  <text x="63" y="166" font-family="Georgia,serif" font-size="61" fill="#fbefde" letter-spacing="-2">The quiet hours</text>
+</svg>

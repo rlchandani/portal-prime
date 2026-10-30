@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <title>Tidal — original coastal landscape</title>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#a5bbc8"/><stop offset="1" stop-color="#e2d5c2"/></linearGradient>
+    <linearGradient id="sea" x2=".4" y2="1"><stop stop-color="#5c839b"/><stop offset="1" stop-color="#18394d"/></linearGradient>
+    <linearGradient id="shore" x2="1" y2="1"><stop stop-color="#c8ba9f"/><stop offset="1" stop-color="#897b68"/></linearGradient>
+    <pattern id="grain" width="9" height="7" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r=".5" fill="#fff" opacity=".15"/></pattern>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h900v900H0z"/>
+  <circle cx="631" cy="293" r="79" fill="#f1e3c8" opacity=".8"/>
+  <path d="M0 409Q430 403 900 413V900H0Z" fill="url(#sea)"/>
+  <path d="M900 441Q734 479 614 612T188 900h712Z" fill="url(#shore)"/>
+  <path d="M900 442Q729 487 600 615T169 900" fill="none" stroke="#e0dccc" stroke-width="12" opacity=".75"/>
+  <path d="M900 421Q722 470 580 601T124 900" fill="none" stroke="#c3d0ce" stroke-width="6" opacity=".5"/>
+  <g fill="none" stroke="#bacfd6" opacity=".32" stroke-width="2">
+    <path d="M0 459Q210 451 378 462m-378 58q224-14 501 5M0 592q203-21 419-5M0 690q184-18 322-12M0 800q152-17 221-4"/>
+    <path d="M43 477h231m-203 75h299M14 627h317M32 731h194"/>
+  </g>
+  <path fill="url(#grain)" d="M0 0h900v900H0z"/>
+  <text x="60" y="91" font-family="Arial,sans-serif" font-size="26" fill="#f5f4ed" letter-spacing="2">North Atlantic</text>
+  <text x="53" y="232" font-family="Georgia,serif" font-size="136" fill="#f7f5e9" letter-spacing="-7">Tidal</text>
+</svg>

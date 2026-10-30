@@ -28,6 +28,7 @@ object SettingsPresentation {
       "mqtt.username", "mqtt.password", "mqtt.useTls", "alpaca.key", "alpaca.secret",
       "options.type", "options.deltaMin", "options.deltaMax", "options.expiry", "options.symbol",
       "screensaver.albumRefreshMin", "screensaver.cacheBudgetGb", "screensaver.antiBurnIn",
+      "screensaver.darkRoomLux",
       "mqtt.validateCert", "digitalclock.style", "digitalclock.color", "digitalclock.font",
       "digitalclock.glow", "debug.enabled", "ha.url", "ha.token")
   private val shortHelp = mapOf(
@@ -47,6 +48,10 @@ object SettingsPresentation {
       "screensaver.photoSource" to "Choose the photos on your screen.",
       "screensaver.dismissTarget" to "Choose what opens when you leave the screensaver.",
       "screensaver.overnightEnabled" to "Let the screen rest overnight.",
+      "screensaver.darkRoomClock" to "Show a dim clock when the room is dark. Requires a light sensor.",
+      "screensaver.darkRoomLux" to "Dark for 20 seconds enters the clock; brighter light restores photos.",
+      "screensaver.nightClockBrightness" to "Dim only the night clock; daytime brightness stays unchanged.",
+      "screensaver.nightClockTone" to "Choose a gentle warm or red clock.",
       "screensaver.sleepTimerEnabled" to "Turn the screen off after a set time.",
       "screensaver.pauseAudioOnSleep" to "Pause playback when the screen goes to sleep.",
       "display.auto" to "Adjust brightness to the room.",

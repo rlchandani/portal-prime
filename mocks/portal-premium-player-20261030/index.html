@@ -1,0 +1,140 @@
+<!doctype html>
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#202124">
+  <title>Music · Portal design preview</title>
+  <link rel="icon" href="assets/dunes.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="player.css">
+  <script src="player.js" defer></script>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <a class="brand" href="#now" aria-label="Music, now playing">
+        <span class="brand-mark" aria-hidden="true">♪</span><span>Music</span>
+      </a>
+      <nav class="main-nav" aria-label="Music views">
+        <button class="nav-button selected" data-view="now" aria-current="page">Now playing</button>
+        <button class="nav-button" data-view="library">Library</button>
+        <button class="nav-button" data-view="playlists">Playlists</button>
+        <button class="nav-button" data-view="night-clock">Night clock</button>
+      </nav>
+      <div class="header-actions">
+        <span class="preview-badge"><span class="preview-dot"></span>Design preview · No audio</span>
+        <button class="icon-button" id="compact-toggle" aria-label="Switch to compact player" title="Compact player"></button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section id="now-view" class="view now-view" aria-label="Now playing">
+        <div class="notice" id="notice" role="status" hidden></div>
+        <div class="player-workspace">
+          <section class="current-player" aria-label="Current track">
+            <div id="artwork-frame" class="artwork-frame">
+              <img id="main-cover" src="assets/dunes.svg" alt="After the sun: original dune landscape cover" width="900" height="900">
+              <span class="artwork-caption">Original artwork</span>
+            </div>
+            <div class="track-meta">
+              <div class="track-title-line"><h1 id="track-title">After the sun</h1><span class="playing-status" id="playback-status">Preview paused</span></div>
+              <p class="artist" id="track-artist">Sora Fields</p>
+              <p class="album" id="track-album">The quiet hours</p>
+            </div>
+            <div class="seek-block" id="seek-block">
+              <label class="sr-only" for="seek">Track position</label>
+              <input type="range" id="seek" min="0" max="284" value="83" step="1" aria-valuetext="1 minute 23 seconds of 4 minutes 44 seconds">
+              <div class="time-labels"><span id="elapsed">1:23</span><span id="remaining">−3:21</span></div>
+            </div>
+            <p class="timeline-message" id="timeline-message" hidden></p>
+            <div class="transport" aria-label="Playback controls">
+              <button class="transport-button" id="previous" aria-label="Previous track"></button>
+              <button class="play-button" id="play" aria-label="Simulate play"></button>
+              <button class="transport-button" id="next" aria-label="Next track"></button>
+            </div>
+            <button class="output-button" id="output" aria-label="Open speakers"><span id="output-icon"></span><span id="output-label">Living room</span><span id="output-chevron"></span></button>
+          </section>
+          <aside class="side-panel" aria-label="Queue and speakers">
+            <div class="panel-tabs" role="tablist" aria-label="Player details">
+              <button class="panel-tab selected" id="queue-tab" role="tab" aria-selected="true" aria-controls="queue-panel" data-panel="queue">Queue <span id="queue-count">6</span></button>
+              <button class="panel-tab" id="speakers-tab" role="tab" aria-selected="false" aria-controls="speakers-panel" data-panel="speakers">Speakers</button>
+            </div>
+            <section id="queue-panel" role="tabpanel" aria-labelledby="queue-tab">
+              <div class="queue-heading"><div><h2>The quiet hours</h2><p id="queue-description">Sample playlist · 6 tracks</p></div><span class="queue-glyph" id="queue-glyph" aria-hidden="true"></span></div>
+              <div id="queue-list" class="queue-list"></div>
+              <div class="queue-footer"><span id="queue-summary">A little space to slow down.</span><button class="text-button" data-view="library">Browse library <span aria-hidden="true">↗</span></button></div>
+            </section>
+            <section id="speakers-panel" role="tabpanel" aria-labelledby="speakers-tab" hidden>
+              <div class="queue-heading"><div><h2>Where to listen</h2><p>Sample players · capability aware</p></div><span id="speaker-glyph" class="queue-glyph" aria-hidden="true"></span></div>
+              <div id="speaker-list" class="speaker-list"></div>
+              <p class="panel-footnote">Speaker selection, compatible grouping and volume are simulated. No device is contacted.</p>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section id="library-view" class="view browse-view" aria-label="Sample library" hidden>
+        <div class="browse-heading"><div><p class="section-note">Sample collection</p><h1>Your library</h1><p>Good music, close at hand.</p></div><label class="search-box"><span id="search-icon"></span><input id="search" type="search" placeholder="Search tracks or artists" aria-label="Search sample library"></label></div>
+        <div class="browse-disclaimer">Library preview · On Portal, Browse music opens your connected provider’s library.</div>
+        <div id="album-grid" class="album-grid"></div>
+        <div class="section-heading"><h2>All tracks</h2><span id="library-count">12 sample tracks</span></div>
+        <div id="library-list" class="library-list"></div>
+      </section>
+
+      <section id="playlists-view" class="view browse-view" aria-label="Sample playlists" hidden>
+        <div class="browse-heading"><div><p class="section-note">A soundtrack for your space</p><h1>Playlists</h1><p>Pick a mood. Stay a while.</p></div><span class="subtle-label">3 sample playlists</span></div>
+        <div class="browse-disclaimer">Playlist preview · Choosing a playlist changes the sample queue only. Provider browsing is deferred.</div>
+        <div id="playlist-grid" class="playlist-grid"></div>
+        <section id="playlist-detail" class="playlist-detail" hidden></section>
+      </section>
+
+      <section id="empty-view" class="empty-view" aria-label="Player availability" hidden></section>
+
+      <section id="night-clock-view" class="night-clock-view" aria-label="Night clock sample" hidden>
+        <canvas id="night-canvas" role="img" aria-label="Sample night clock: 10:08, Friday, October 30"></canvas>
+        <button class="night-back" id="night-back" aria-label="Return to music"><span aria-hidden="true">‹</span> Music</button>
+        <div class="night-controls">
+          <label>Ink <select id="night-ink"><option value="warm">Warm</option><option value="red">Red</option></select></label>
+          <label>Time <select id="night-format"><option value="12">12 hour sample</option><option value="24">24 hour sample</option></select></label>
+          <label>Presence <select id="night-presence"><option value="idle">Sample idle</option><option value="present">Sample present</option></select></label>
+          <p id="night-fixture-note">Sample time · Sensors and audio are not connected</p>
+        </div>
+      </section>
+
+      <section id="compact-view" class="compact-stage" aria-label="Compact player preview" hidden>
+        <div class="compact-context"><span class="context-mark" aria-hidden="true">♪</span><h1>Music, with room for everything else.</h1><p>The compact player keeps the essentials close.</p></div>
+        <div class="compact-player">
+          <img id="compact-cover" src="assets/dunes.svg" alt="" width="96" height="96">
+          <button class="compact-track" id="expand-track" aria-label="Open full player"><strong id="compact-title">After the sun</strong><span id="compact-artist">Sora Fields · Preview paused</span></button>
+          <button class="icon-button" id="compact-previous" aria-label="Previous track"></button>
+          <button class="play-button compact-play" id="compact-play" aria-label="Simulate play"></button>
+          <button class="icon-button" id="compact-next" aria-label="Next track"></button>
+          <button class="icon-button" id="expand" aria-label="Open full player"></button>
+        </div>
+        <p class="compact-note">Sample controls · No audio output</p>
+      </section>
+    </main>
+
+    <footer class="preview-toolbar">
+      <div class="fixture-control"><label for="scenario">Preview state</label><select id="scenario">
+        <option value="ready">Connected sample</option><option value="local">Local media session</option><option value="live">Live radio</option><option value="unknown">Unknown duration</option><option value="emptyqueue">Empty queue</option><option value="notconfigured">Not configured</option><option value="connecting">Connecting</option><option value="offline">Player offline</option><option value="auth">Authorization required</option><option value="incompatible">Incompatible server</option><option value="interrupted">Playback interrupted</option><option value="failed">Command failed</option>
+      </select></div>
+      <span class="fixture-note" id="fixture-note">All tracks, playlists and speakers are fixtures.</span>
+      <button class="text-button" id="reset">Reset preview</button>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <div class="dialog-heading"><h2 id="settings-title">Connect your music</h2><button class="icon-button" id="dialog-close" aria-label="Close connection information"></button></div>
+    <p>The native player can control a supported media session or a configured music provider.</p>
+    <p>This preview has no connection settings, credentials or audio engine. Its sample library lets you explore the design.</p>
+    <button class="primary-button" id="use-fixtures">Explore the sample player</button>
+  </dialog>
+</body>
+</html>

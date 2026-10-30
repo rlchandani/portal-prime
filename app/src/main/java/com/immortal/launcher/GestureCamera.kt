@@ -104,6 +104,8 @@ class GestureCamera(
   private fun openCamera(manager: CameraManager, cameraId: String) {
     manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
       override fun onOpened(camera: CameraDevice) {
+        // An asynchronous open may finish after its owner suspended/replaced this instance.
+        if (!running) { camera.close(); return }
         device = camera
         runCatching { createSession(camera) }.onFailure { Log.w(TAG, "session create failed", it); stop() }
       }

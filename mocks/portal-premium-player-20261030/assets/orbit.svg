@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <title>Soft landing — original orbital light artwork</title>
+  <defs>
+    <radialGradient id="sky"><stop stop-color="#403d60"/><stop offset="1" stop-color="#181d30"/></radialGradient>
+    <linearGradient id="sphere" x1=".2" y1="0" x2=".8" y2="1"><stop stop-color="#e4af98"/><stop offset=".45" stop-color="#9b758b"/><stop offset="1" stop-color="#393d60"/></linearGradient>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h900v900H0z"/>
+  <g fill="#e8e5f6" opacity=".6"><circle cx="127" cy="211" r="2"/><circle cx="742" cy="122" r="2"/><circle cx="627" cy="756" r="2"/><circle cx="183" cy="691" r="1.8"/><circle cx="632" cy="204" r="1"/><circle cx="76" cy="462" r="1"/><circle cx="823" cy="628" r="1.5"/><circle cx="371" cy="165" r="1.4"/><circle cx="242" cy="832" r="1"/><circle cx="808" cy="365" r="1.5"/></g>
+  <ellipse cx="450" cy="456" rx="354" ry="118" transform="rotate(-31 450 456)" fill="none" stroke="#b39fb6" stroke-width="1.5" opacity=".5"/>
+  <circle cx="450" cy="455" r="209" fill="url(#sphere)"/>
+  <path d="M317 294Q521 217 639 367" fill="none" stroke="#ebbc9e" stroke-width="1" opacity=".5"/>
+  <path d="M145 634c85 64 648-182 619-356" fill="none" stroke="#c8adc5" stroke-width="2" opacity=".8"/>
+  <circle cx="749" cy="321" r="7" fill="#ead1bb"/>
+  <text x="62" y="91" font-family="Arial,sans-serif" font-size="26" fill="#d4c7df">Low Orbit</text>
+  <text x="59" y="823" font-family="Georgia,serif" font-size="69" fill="#eddae4" letter-spacing="-2">Soft landing</text>
+</svg>

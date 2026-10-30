@@ -54,6 +54,16 @@ class PhotoDreamService : DreamService() {
         WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
         WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
     frame = PhotoFrameController(this)
+    val priorBrightness = window?.attributes?.screenBrightness
+        ?: WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+    frame.onNightClockChanged = { night ->
+      window?.let { ownedWindow ->
+        ownedWindow.attributes = ownedWindow.attributes.apply {
+          screenBrightness = if (night) ScreensaverConfig.load(this@PhotoDreamService).nightClockBrightness / 100f
+              else priorBrightness
+        }
+      }
+    }
     frame.onExit = {
       exitPinnedDream(
           pinnedOrigin = pinnedOrigin,

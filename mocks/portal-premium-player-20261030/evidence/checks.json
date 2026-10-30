@@ -1,0 +1,35 @@
+{
+  "viewports": [
+    "2160×1440",
+    "390×844",
+    "1280×800",
+    "896×414",
+    "1440×960"
+  ],
+  "passed": 21,
+  "checks": [
+    "Portal viewport fits all transport and footer controls",
+    "Simulated play advances only the visible fixture timeline",
+    "Seek, previous restart and next select coherent sample tracks",
+    "Queue selection changes artwork and stays honestly paused",
+    "Compact and full player share state and controls",
+    "Library search filters tracks and handles no results",
+    "Playlist detail replaces only the fixture queue",
+    "Speaker selection, compatible grouping and volume work locally",
+    "Local session gates unsupported library, queue and speaker controls",
+    "Live station and unknown duration never invent a seek timeline",
+    "Empty queue has a usable playlist recovery path",
+    "Offline preserves last known artwork with all transport disabled",
+    "Setup, authorization, connecting and incompatibility are actionable states",
+    "Interruption restricts starting and seeking while keeping supported pause and volume",
+    "Command failure never announces successful playback or seeking",
+    "Keyboard tab navigation and reduced motion are respected",
+    "Night clock matches Portal Canvas proportions and warm ink",
+    "Narrow touch viewport has no horizontal overflow or undersized controls",
+    "Tablet and short landscape layouts remain usable without horizontal overflow",
+    "Standalone file opens and works without a static server",
+    "No runtime errors or external network requests"
+  ],
+  "runtimeErrors": [],
+  "externalRequests": []
+}

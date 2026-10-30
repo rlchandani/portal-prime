@@ -226,6 +226,11 @@ object ScreensaverConfig {
       // clock as a bedside clock, kept on through the window. Only meaningful when
       // [overnightEnabled].
       val overnightNightClock: Boolean = false,
+      // Light sensor fallback is a no-op on models that don't expose an Android light sensor.
+      val darkRoomClock: Boolean = false,
+      val darkRoomLux: Int = 3,
+      val nightClockBrightness: Int = 3,
+      val nightClockTone: String = "warm",
       // Ambient soundscape (synthesized) played while the screensaver shows. Off by
       // default; [soundscapeVolume] is 0..100.
       val soundscape: String = SOUND_OFF,
@@ -351,6 +356,10 @@ object ScreensaverConfig {
         overnightStartMin = p.getInt("overnight_start_min", 22 * 60),
         overnightEndMin = p.getInt("overnight_end_min", 7 * 60),
         overnightNightClock = p.getBoolean("overnight_night_clock", false),
+        darkRoomClock = p.getBoolean("dark_room_clock", false),
+        darkRoomLux = p.getInt("dark_room_lux", 3),
+        nightClockBrightness = p.getInt("night_clock_brightness", 3),
+        nightClockTone = p.getString("night_clock_tone", "warm") ?: "warm",
         soundscape = p.getString("soundscape", SOUND_OFF) ?: SOUND_OFF,
         soundscapeVolume = p.getInt("soundscape_volume", 40).coerceIn(0, 100),
         ambientDashboard = p.getBoolean("ambient_dashboard", false),
@@ -549,6 +558,15 @@ object ScreensaverConfig {
   /** Choose the overnight display: false = screen off, true = a dimmed flip night clock. */
   fun setOvernightNightClock(c: Context, on: Boolean) =
       prefs(c).edit().putBoolean("overnight_night_clock", on).apply()
+
+  fun setDarkRoomClock(c: Context, on: Boolean) =
+      prefs(c).edit().putBoolean("dark_room_clock", on).apply()
+  fun setDarkRoomLux(c: Context, lux: Int) =
+      prefs(c).edit().putInt("dark_room_lux", lux).apply()
+  fun setNightClockBrightness(c: Context, percent: Int) =
+      prefs(c).edit().putInt("night_clock_brightness", percent).apply()
+  fun setNightClockTone(c: Context, tone: String) =
+      prefs(c).edit().putString("night_clock_tone", tone).apply()
 
   // --- Dismiss target (launcher / app / Home Assistant dashboard) ---------------
   // The three are mutually exclusive, so each setter clears the others.
