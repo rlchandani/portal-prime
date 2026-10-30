@@ -660,6 +660,67 @@ and **zero active listeners**. Living Area remains unchanged. Implementation,
 independent review, regression checks, deployment and commit completed within
 this batch's thirty-minute limit. The broader objective remains active.
 
+## Memories — 18:14 UTC batch
+
+Memories keeps its five individual photographs followed by a collage on every
+sixth successful beat. Each single photograph is complete on a quiet matte, with
+a gentle 4% push only without a cached face hint. Cached face hints retain a
+complete still photograph. Collages now use photo-shaped paper frames containing
+whole static photographs, with one, two or three unique images according to the
+library size. The small neutral heading remains `Photo memories`; no date, place
+or event is inferred from a photograph.
+
+Two fixed reusable scene roots replace two single scenes plus a separate retained
+collage. At most **four photo elements** own URLs during a single/collage dissolve,
+compared with up to **seven** in the preceding renderer. Duplicate blurred
+single-photo fills and independently moving collage tiles are removed. This is
+structural ownership/rendering evidence, not a measured Portal RAM or FPS gain.
+
+The shared incoming-only dissolve keeps the outgoing scene opaque until its
+replacement is ready and opaque. Retirement clears owned URLs, animation and
+promotion hints. Manual pause freezes both the dissolve and single-photo motion
+without relying on newer WebView animation APIs. Failed collage preparation
+retains the current photo and retries the collage beat rather than skipping it.
+Current-playback gates reject late publication and derivative work after pause
+or close, including resume/re-pause during asynchronous decode.
+
+| Final gate | Evidence |
+| --- | --- |
+| Slideshow source checks | **173 passed**, zero failures/skips; **12 new Memories tests** included |
+| Engine fixtures | **14/14 passed** |
+| Actual-source Chrome renderer | **102 assertions passed**, including **31 Memories assertions**, zero production-script errors |
+| Integrated debug build | Successful; unchanged JVM task was **UP-TO-DATE**, retaining **3,445 passing results / 358 suites** |
+| Native UI scope | Prior **56 checks / 151.09 seconds** cover unchanged Kotlin; not rerun in this asset batch |
+| Visual review | Actual-source single and collage screenshots inspected at 2160 × 1440 |
+
+Browser checks exercise the five-single/sixth-collage cadence, both layout
+transitions, opaque outgoing URLs, old-WebView pause beyond the fade deadline,
+retirement, terminal cleanup, small libraries, cached face hints, whole-photo
+card proportions, final zoom bounds and cancellation. The prior six renderer
+screenshots remain unchanged.
+
+The finite review server now includes Memories using its existing original local
+gallery fixtures. An optional five-second review pace reaches the collage quickly;
+normal review remains thirty seconds. The query does not alter Portal settings.
+No household photographs or credentials are served by the preview.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`3d68fb10606ad3aa36f0afcfb2f58449ef7c2e260e90e90ce56d3d0de8c52a36`
+(**48,910,412 bytes**). Its signing certificate matches the preceding Hero +
+Sidebar APK, retained privately as a rollback. One upload/install was used;
+installed-byte verification resolved the interrupted install HTTP response.
+All **97 settings** match the pre-install profile. Home/screensaver dispatches
+were acknowledged; these responses do not establish visible transitions.
+
+Capture state is independently confirmed inactive, with the collector stopped
+and **zero active listeners**. No new physical timing capture was requested;
+its admission issue remains parked. Living Area remains unchanged. Physical
+night-clock acceptance and reliable Portal presentation measurements remain
+open. Music backend wiring stays deferred, and no Home Assistant operation
+belongs to this batch. Implementation, parallel browser verification, deployment,
+cleanup and commit completed within the thirty-minute limit. The broader goal
+remains active.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

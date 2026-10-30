@@ -557,23 +557,57 @@
 
   // ---- 06 Memories (single + occasional titled collage beat) ----------------
   MODES.memories = { name: "Memories", run(ctx, deck) {
-    // Two alternating single layers (like kenBurns): reusing one layer swapped its
-    // background in place — an instant hard cut whenever the image was already cached.
-    const t = makeTimers(ctx); const singles = [mk(), mk()]; singles.forEach(s => ctx.root.appendChild(s.root)); let sCur = 0;
-    const collage = el("ss-collage", ctx.root); const title = el("ss-mtitle", ctx.root); const big = el("big", title); const sub = el("sub", title);
+    const t = makeTimers(ctx), scenes = [0, 1].map(() => el("ss-memory-scene retired", ctx.root));
+    const resources = new Map(scenes.map(scene => [scene, []]));
+    const dissolve = makeSceneDissolve(ctx, t, scenes, 2000, scene => {
+      resources.get(scene).forEach(image => {
+        image.style.backgroundImage = "none"; image.style.animation = "none";
+        image.style.willChange = "auto";
+      });
+      resources.set(scene, []); scene.innerHTML = "";
+      scene.style.opacity = ""; scene.style.transition = "";
+    });
     let beat = 0;
-    function mk() { const root = el("ss-single"); const fill = el("ss-fill", root); const hero = el("ss-hero", root); return { root, fill, hero }; }
-    async function showSingle() { const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 2200); if (!await t.load(u)) return false; collage.classList.remove("on"); const S = singles[1 - sCur]; bg(S.fill, u); bg(S.hero, u, "contain"); kbVars(S.hero, p); S.hero.style.animation = "none"; void S.hero.offsetWidth; S.hero.style.animation = ""; singles[sCur].root.classList.remove("on"); S.root.classList.add("on"); sCur = 1 - sCur; }
-    async function showCollage() {
-      const ps = SS.take(deck, ctx.cursor, ["any", "any", "any"]), urls = ps.map(p => ctx.url(p, 1100)); if (!await t.load(urls)) return false;
-      singles.forEach(s => s.root.classList.remove("on")); big.textContent = "Photo memories"; sub.textContent = ""; collage.innerHTML = "";
-      const W = ctx.W, H = ctx.H; const slots = [{ l: W * .08, t: H * .16, w: W * .42, h: H * .5 }, { l: W * .53, t: H * .1, w: W * .36, h: H * .42 }, { l: W * .5, t: H * .56, w: W * .4, h: H * .3 }];
-      ps.forEach((p, i) => { const s = slots[i]; const tile = el("ss-mtile", collage); tile.style.left = s.l + "px"; tile.style.top = s.t + "px"; tile.style.width = s.w + "px"; tile.style.height = s.h + "px"; tile.style.transitionDelay = (i * .15) + "s"; const im = el("ss-img breathe", tile); bg(im, urls[i]); faceBg(im, p); im.style.animationDelay = (-Math.random() * 8) + "s"; });
-      t.frame(() => { collage.classList.add("on"); title.classList.add("on"); }); t.after(() => title.classList.remove("on"), 4500);
+    function photo(parent, p, url, single) {
+      const image = el((single ? "ss-hero" : "ss-img") + " memory-photo", parent);
+      bg(image, url, "contain"); image.style.animation = "none"; image.style.willChange = "auto";
+      if (single && !hasFace(p)) {
+        image.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
+        image.style.willChange = "transform";
+      }
+      return image;
     }
-    function step() { beat++; return beat % 6 === 0 ? showCollage() : showSingle(); }
+    function renderCollage(scene, ps, urls) {
+      const title = el("ss-memory-caption", scene); title.textContent = "Photo memories";
+      const slots = ps.length === 1 ? [[.16, .14, .68, .72]] :
+        ps.length === 2 ? [[.07, .14, .40, .72], [.53, .14, .40, .72]] :
+        [[.08, .16, .42, .5], [.53, .1, .36, .42], [.5, .56, .4, .3]];
+      return ps.map((p, i) => {
+        const [x, y, sw, sh] = slots[i], boxW = ctx.W * sw, boxH = ctx.H * sh;
+        const imageH = Math.max(1, Math.min(boxH - 24, (boxW - 24) / aspect(p)));
+        const width = imageH * aspect(p) + 24, height = imageH + 24;
+        const tile = el("ss-memory-card", scene);
+        tile.style.left = (ctx.W * x + (boxW - width) / 2) + "px";
+        tile.style.top = (ctx.H * y + (boxH - height) / 2) + "px";
+        tile.style.width = width + "px"; tile.style.height = height + "px";
+        return photo(tile, p, urls[i], false);
+      });
+    }
+    async function step() {
+      if (!dissolve.active()) return false;
+      const nextBeat = beat + 1, collage = nextBeat % 6 === 0;
+      const ps = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, collage ? 3 : 1)).fill("any"));
+      const urls = await t.publish(() => ps.map(p => ctx.url(p, collage ? 1100 : 2200)));
+      if (urls === false || !await t.load(urls) || !dissolve.active()) return false;
+      return t.publish(() => {
+        if (!dissolve.active()) return false;
+        const scene = dissolve.next();
+        const images = collage ? renderCollage(scene, ps, urls) : [photo(scene, ps[0], urls[0], true)];
+        resources.set(scene, images); beat = nextBeat; dissolve.present(scene);
+      });
+    }
     t.start(step); t.every(step, ctx.photoMs);
-    return t.cleanup;
+    return dissolve.cleanup;
   }};
 
   // ---- 07 Panorama drift -----------------------------------------------------

@@ -16,14 +16,15 @@ function renderer() {
   function schedule(fn, ms) { const id = next++; pending.set(id, { fn, at: now + ms }); return id; }
   class Element {
     constructor() { this.children = []; this.style = { setProperty() {} }; this.textContent = ''; this.className = ''; }
-    get classList() { return { add: (...names) => { this.className = [...new Set([...this.className.split(' '), ...names])].join(' '); }, remove: (...names) => { this.className = this.className.split(' ').filter(n => !names.includes(n)).join(' '); }, toggle: (name, on) => { if (on) this.classList.add(name); else this.classList.remove(name); } }; }
-    appendChild(child) { child.parent = this; this.children.push(child); return child; }
-    remove() { if (this.parent) this.parent.children = this.parent.children.filter(c => c !== this); }
-    set innerHTML(_) { this.children = []; }
+    get classList() { return { contains: name => this.className.split(' ').includes(name), add: (...names) => { this.className = [...new Set([...this.className.split(' '), ...names])].join(' '); }, remove: (...names) => { this.className = this.className.split(' ').filter(n => !names.includes(n)).join(' '); }, toggle: (name, on) => { if (on) this.classList.add(name); else this.classList.remove(name); } }; }
+    appendChild(child) { child.remove(); child.parent = this; this.children.push(child); return child; }
+    remove() { if (this.parent) this.parent.children = this.parent.children.filter(c => c !== this); this.parent = null; }
+    set innerHTML(_) { for (const child of [...this.children]) child.remove(); }
     get offsetWidth() { return 0; }
   }
   const window = { aspect: p => p.w / p.h, shuffled: a => a.slice(), preloadDecoded: async () => true };
   const context = vm.createContext({ window, document: { createElement: () => new Element() }, AbortController,
+    getComputedStyle: node => ({ opacity: node.style.opacity || (node.classList.contains('on') ? '1' : '0') }),
     setTimeout: schedule, clearTimeout: id => pending.delete(id), requestAnimationFrame: fn => schedule(fn, 16),
     cancelAnimationFrame: id => pending.delete(id), Date: class extends Date { static now() { return now; } } });
   for (const file of ['modes.js', 'mode-impls.js']) vm.runInContext(readFileSync(new URL('../app/src/main/assets/screensaver/' + file, import.meta.url), 'utf8'), context);
@@ -60,7 +61,7 @@ test('Memories collages use a neutral heading without fabricated dates or travel
     for (let n = 0; n < 25; n++) {
       const text = r.elements().map(e => e.textContent).filter(Boolean);
       for (const label of text) assert.equal(label, 'Photo memories');
-      if (text.length) { sawCollage = true; assert.ok(r.elements().some(e => e.className.includes('ss-mtile'))); }
+       if (text.length) { sawCollage = true; assert.ok(r.elements().some(e => e.classList.contains('ss-memory-card'))); }
       await r.tick();
     }
     assert.ok(sawCollage, 'The real scheduled collage must be exercised');

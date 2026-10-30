@@ -154,10 +154,10 @@ fixtures. It never serves the repository root. Run:
 python3 slideshow/serve.py
 ```
 
-Open `http://127.0.0.1:8891/`. Diptych, Framed, Ken Burns, Cinematic Push, Gallery Wall and
-Hero + Sidebar are rendered by the actual
+Open `http://127.0.0.1:8891/`. Diptych, Framed, Ken Burns, Cinematic Push, Gallery Wall,
+Hero + Sidebar and Memories are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its **71 browser checks** include real stalled HTTP image requests, pause
+ambient sensors. Its **102 browser checks** include real stalled HTTP image requests, pause
 cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
 frames, initial readiness without a second fade, pause without the newer animation API,
 and cancellation immediately before DOM publication. Diptych preserves its existing
@@ -178,6 +178,21 @@ with an incoming-only fade. One-photo libraries expand to a single full-width pa
 Derivative admission and photo publication recheck the current pause state, including
 resume/re-pause during an asynchronous load. The review uses the same mixed-aspect
 original fixtures as Gallery Wall.
+
+Memories preserves five individual photographs followed by a collage on the sixth
+successful beat. Single photos remain whole, with a gentle 4% push only when no cached
+face hint exists. Collage frames fit the photographs' proportions and retain one to three
+unique, complete static photos, according to the library size. Its neutral heading
+does not invent dates, locations or events. Two reusable scene roots own at most four
+photo elements during the single/collage dissolve; retirement and cleanup release URLs
+and animation hints. Thirty-one actual-source Chrome assertions cover the cadence,
+incoming-only fades, old-WebView pause, card proportions, maximum zoom bounds, small
+libraries and cancellation. These are structural and functional results, not Portal
+RAM or FPS measurements.
+
+Open `http://127.0.0.1:8891/?mode=memories&review=1` for the five-second review pace.
+The normal preview remains at thirty seconds. This browser option does not change
+any Portal setting.
 
 Ken Burns now uses the same incoming-only dissolve owner as Diptych, a 3vmin inset
 and a quiet charcoal matte. It keeps the original source selection and gentle motion

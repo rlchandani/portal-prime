@@ -19,19 +19,26 @@ button:focus-visible{outline:3px solid #9ad2ff;outline-offset:3px}
 <button data-mode="diptych">Diptych</button><button data-mode="framed">Framed print</button>
 <button data-mode="kenBurns">Ken Burns</button><button data-mode="push">Cinematic push</button>
 <button data-mode="galleryWall">Gallery wall</button><button data-mode="heroSidebar">Hero + Sidebar</button>
+<button data-mode="memories">Memories</button>
+<button id="review" aria-pressed="false" title="Toggle review pace: 30 sec by default, 5 sec for faster review">Review pace: 30 sec</button>
 <button id="previous">Previous</button>
 <button id="pause">Pause</button><button id="next">Next</button>
 </header>
 <script>
 const frame=document.querySelector("iframe");
-let mode=new URLSearchParams(location.search).get("mode")||"diptych",paused=false;
+const params=new URLSearchParams(location.search);
+let mode=params.get("mode")||"diptych",review=params.get("review")==="1",paused=false;
 function load(){
- frame.src="/preview.html?nativeClock=1&mode="+encodeURIComponent(mode);
+ frame.src="/preview.html?nativeClock=1&mode="+encodeURIComponent(mode)+(review?"&review=1":"");
  paused=false;document.querySelector("#pause").textContent="Pause";
+ const pace=document.querySelector("#review");pace.textContent="Review pace: "+(review?"5":"30")+" sec";pace.setAttribute("aria-pressed",String(review));
  document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===mode)));
- const url=new URL(location);url.searchParams.set("mode",mode);history.replaceState({},'',url);
+ const url=new URL(location);url.searchParams.set("mode",mode);
+ if(review)url.searchParams.set("review","1");else url.searchParams.delete("review");
+ history.replaceState({},'',url);
 }
 document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;load()});
+document.querySelector("#review").onclick=()=>{review=!review;load()};
 document.querySelector("#next").onclick=()=>frame.contentWindow.immortalSlideshow?.next();
 document.querySelector("#previous").onclick=()=>frame.contentWindow.immortalSlideshow?.previous();
 document.querySelector("#pause").onclick=()=>{

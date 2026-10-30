@@ -28,17 +28,20 @@ gallery_photos = json.loads(files["/fixtures/gallery-fixtures.json"].read_text()
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if urlsplit(self.path).path == "/preview.html":
-            mode = parse_qs(urlsplit(self.path).query).get("mode", ["diptych"])[0]
-            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar"):
+            query = parse_qs(urlsplit(self.path).query)
+            mode = query.get("mode", ["diptych"])[0]
+            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories"):
                 self.send_error(400)
                 return
-            photos = gallery_photos if mode in ("galleryWall", "heroSidebar") else [
+            photos = gallery_photos if mode in ("galleryWall", "heroSidebar", "memories") else [
                 {"url": "/fixtures/" + name + ".png", "w": 480, "h": 720}
                 for name in ("dunes", "tidal")]
+            interval = 5 if query.get("review", ["0"])[0] == "1" else 30
             bridge = "<base href='/screensaver/'><script>window.Android={" + \
                 "getPhotos:()=>" + json.dumps(json.dumps(photos)) + \
                 ",getMode:()=>" + json.dumps(mode) + \
-                ",getIntervalSec:()=>30,scaledUrlForSize:url=>url};</script>"
+                ",getIntervalSec:()=>" + str(interval) + \
+                ",scaledUrlForSize:url=>url};</script>"
             content = (renderer / "index.html").read_text().replace("<head>", "<head>" + bridge).encode()
             content_type = "text/html"
         else:

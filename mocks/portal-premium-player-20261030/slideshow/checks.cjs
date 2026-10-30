@@ -29,8 +29,8 @@ const server = http.createServer((req, res) => {
     return;
   }
   let content, type;
-  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit"].includes(u.pathname)) {
-    const unitPhotos = ["/gallery-unit", "/sidebar-unit"].includes(u.pathname) ? galleryPhotos :
+  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit", "/memories-unit"].includes(u.pathname)) {
+    const unitPhotos = ["/gallery-unit", "/sidebar-unit", "/memories-unit"].includes(u.pathname) ? galleryPhotos :
       ["dunes", "tidal"].map((name, id) => ({
         id, url: "/fixtures/" + name + ".png", w: 480, h: 720,
       }));
@@ -44,7 +44,7 @@ const server = http.createServer((req, res) => {
   } else if (u.pathname === "/render") {
     const slow = u.searchParams.has("slow"), unknown = u.searchParams.has("unknown");
     const mode = u.searchParams.get("mode") || "diptych";
-    const photos = ["galleryWall", "heroSidebar"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
+    const photos = ["galleryWall", "heroSidebar", "memories"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
       url: (slow ? "/slow/" : "/fixtures/") + name + ".png",
       w: unknown ? 0 : 480, h: unknown ? 0 : 720,
     }));
@@ -64,7 +64,9 @@ const server = http.createServer((req, res) => {
   } else { res.writeHead(404); res.end(); return; }
   res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-store" }); res.end(content);
 });
-const demand = (name, condition) => { assert.ok(condition, name); checks.push(name); };
+const demand = (name, condition, detail) => {
+  assert.ok(condition, detail ? name + ": " + JSON.stringify(detail) : name); checks.push(name);
+};
 async function until(condition) {
   const end = Date.now() + 5000;
   while (!condition()) {
@@ -94,11 +96,12 @@ async function until(condition) {
       };
     });
     page.on("pageerror", error => errors.push(error.message));
-    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar"]) {
+    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories"]) {
       await page.goto(`${base}/render?nativeClock=1&mode=${mode}`);
       await page.locator("#loading.hide").waitFor({ state: "attached" });
       await page.waitForFunction(() => getComputedStyle(document.querySelector(".ss-beat.on")).opacity === "1" &&
-        [...document.querySelectorAll(".ss-frame.on,.ss-art.on,.ss-layer.on")].every(n => getComputedStyle(n).opacity === "1"));
+        [...document.querySelectorAll(".ss-frame.on,.ss-art.on,.ss-layer.on,.ss-memory-scene.on")]
+          .every(n => getComputedStyle(n).opacity === "1"));
       if (mode === "diptych") {
         const state = await page.evaluate(() => {
           const frame = document.querySelector(".ss-frame.on");
@@ -113,9 +116,254 @@ async function until(condition) {
           state.fills === 0 && state.images.every(n => n.size === "contain" && n.filter === "none" && n.motion === "none"));
         demand("Diptych matte inset scales to the actual viewport", Math.abs(state.padding - 43.2) < .1);
       }
-      await page.screenshot({ path: path.join(evidence, mode + ".png") });
+      // Keep the six existing styles' screenshots untouched during this bounded addition.
+      if (mode === "memories")
+        await page.screenshot({ path: path.join(evidence, mode + ".png") });
       demand(mode + " actual renderer becomes ready", await page.locator("#loading").evaluate(n => n.classList.contains("hide")));
     }
+    await page.goto(`${base}/memories-unit`);
+    await page.evaluate(async () => {
+      // Portal's old WebView has no animation enumeration. Exercise the manual path
+      // with both newer animation APIs unavailable, using real CSS/compositor timing.
+      Element.prototype.getAnimations = undefined;
+      Element.prototype.animate = undefined;
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.memoryRoot = root;
+      window.memoryRequests = [];
+      window.memoryCheck = SS.MODES.memories.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2800, motionMs: 6000,
+        url: (photo, edge) => { memoryRequests.push({ url: photo.url, edge }); return photo.url; },
+      }, window.PHOTOS);
+      await memoryCheck.ready;
+      window.memoryScenes = [...root.querySelectorAll(".ss-memory-scene")];
+      window.memoryState = () => memoryScenes.map(scene => ({
+        opacity: getComputedStyle(scene).opacity,
+        visibility: getComputedStyle(scene).visibility,
+        images: [...scene.querySelectorAll(".memory-photo")].map(image => ({
+          url: getComputedStyle(image).backgroundImage,
+          transform: getComputedStyle(image).transform,
+        })),
+      }));
+    });
+    demand("Memories readiness owns exactly two full-viewport fixed scene roots",
+      await page.evaluate(() => memoryScenes.length === 2 && memoryScenes.every(scene => {
+        const box = scene.getBoundingClientRect(), style = getComputedStyle(scene);
+        return scene.parentNode === memoryRoot && style.position === "absolute" &&
+          box.x === 0 && box.y === 0 && box.width === 2160 && box.height === 1440 &&
+          style.backgroundColor === "rgb(28, 27, 25)";
+      })));
+    demand("Memories first beat is one opaque complete photo without a second startup fade or blur",
+      await page.evaluate(() => {
+        const scene = memoryRoot.lastElementChild, image = scene.querySelector(".memory-photo");
+        return memoryRoot.querySelectorAll(".memory-photo").length === 1 &&
+          scene.querySelectorAll(".ss-memory-card,.ss-memory-caption,.ss-fill").length === 0 &&
+          +getComputedStyle(scene).opacity === 1 &&
+          getComputedStyle(image).backgroundSize === "contain" &&
+          getComputedStyle(image).filter === "none" && memoryRequests.length === 1 &&
+          memoryRequests[0].edge === 2200;
+      }));
+    demand("Memories unhinted single photo uses a bounded gentle push inside the viewport",
+      await page.evaluate(() => {
+        const image = memoryRoot.querySelector(".memory-photo"), style = getComputedStyle(image);
+        const box = image.getBoundingClientRect();
+        return style.animationName === "cinematicDrift" && style.willChange === "transform" &&
+          box.left >= 0 && box.top >= 0 && box.right <= innerWidth && box.bottom <= innerHeight;
+      }));
+    for (let beat = 2; beat <= 6; beat++) {
+      await page.evaluate(() => {
+        window.memoryOutgoing = memoryRoot.lastElementChild;
+        window.memoryOldImages = [...memoryOutgoing.querySelectorAll(".memory-photo")];
+        window.memoryOldUrls = memoryOldImages.map(image => image.style.backgroundImage);
+      });
+      await page.waitForFunction(() => memoryRoot.lastElementChild !== memoryOutgoing &&
+        +getComputedStyle(memoryRoot.lastElementChild).opacity > .1 &&
+        +getComputedStyle(memoryRoot.lastElementChild).opacity < .9);
+      demand(`Memories beat ${beat} fades only the incoming scene for 2000ms over opaque outgoing URLs`,
+        await page.evaluate(() => {
+          const incoming = memoryRoot.lastElementChild, style = getComputedStyle(incoming);
+          return style.transitionProperty === "opacity" && style.transitionDuration === "2s" &&
+            +getComputedStyle(memoryOutgoing).opacity === 1 &&
+            memoryOldImages.every((image, i) => image.isConnected &&
+              image.style.backgroundImage === memoryOldUrls[i]) &&
+            memoryScenes.every(scene => scene.parentNode === memoryRoot) &&
+            memoryRoot.querySelectorAll(".ss-memory-scene").length === 2 &&
+            memoryRoot.querySelectorAll(".memory-photo").length <= 4;
+        }));
+      demand(`Memories beat ${beat} ${beat === 6 ? "is the sixth-beat three-photo collage" : "remains a single photo"}`,
+        await page.evaluate(beat => {
+          const incoming = memoryRoot.lastElementChild;
+          return incoming.querySelectorAll(".memory-photo").length === (beat === 6 ? 3 : 1) &&
+            incoming.querySelectorAll(".ss-memory-card").length === (beat === 6 ? 3 : 0) &&
+            incoming.querySelectorAll(".ss-memory-caption").length === (beat === 6 ? 1 : 0);
+        }, beat));
+      if (beat === 2 || beat === 6) {
+        const heldMemories = await page.evaluate(async () => {
+          memoryCheck.pause();
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          return { scenes: memoryState(), admissions: memoryRequests.length };
+        });
+        await page.waitForTimeout(2300);
+        demand(`Memories old-WebView pause freezes ${beat === 6 ? "collage" : "single motion and"} dissolve beyond its retirement deadline`,
+          await page.evaluate(before => !Element.prototype.getAnimations && !Element.prototype.animate &&
+            JSON.stringify(memoryState()) === JSON.stringify(before.scenes) &&
+            memoryRequests.length === before.admissions &&
+            +getComputedStyle(memoryOutgoing).opacity === 1 &&
+            memoryOldImages.every(image => image.isConnected), heldMemories));
+        await page.evaluate(() => memoryCheck.resume());
+      }
+      await page.waitForFunction(() => memoryOutgoing.children.length === 0 &&
+        +getComputedStyle(memoryRoot.lastElementChild).opacity === 1);
+      const memoryRetirement = await page.evaluate(() => ({
+        visibility: getComputedStyle(memoryOutgoing).visibility,
+        opacity: +getComputedStyle(memoryOutgoing).opacity,
+        incomingOpacity: +getComputedStyle(memoryRoot.lastElementChild).opacity,
+        fixedRoots: memoryScenes.every(scene => scene.parentNode === memoryRoot),
+        images: memoryOldImages.map(image => ({
+          connected: image.isConnected, url: image.style.backgroundImage,
+          animation: image.style.animationName, promotion: image.style.willChange,
+        })),
+      }));
+      demand(`Memories beat ${beat} retires outgoing URLs and promotion only after incoming opacity one`,
+        memoryRetirement.visibility === "hidden" && memoryRetirement.opacity === 0 &&
+        memoryRetirement.incomingOpacity === 1 && memoryRetirement.fixedRoots &&
+        memoryRetirement.images.every(image => !image.connected && image.url === "none" &&
+          image.animation === "none" && image.promotion === "auto"), memoryRetirement);
+    }
+    await page.evaluate(() => memoryCheck.pause());
+    demand("Memories sixth collage has three unique whole static photos with neutral factual caption",
+      await page.evaluate(() => {
+        const scene = memoryRoot.lastElementChild, images = [...scene.querySelectorAll(".memory-photo")];
+        return scene.querySelector(".ss-memory-caption").textContent === "Photo memories" &&
+          new Set(images.map(image => image.style.backgroundImage)).size === 3 &&
+          images.every(image => {
+            const style = getComputedStyle(image);
+            return style.backgroundSize === "contain" && style.backgroundPosition === "50% 50%" &&
+              style.backgroundRepeat === "no-repeat" && style.animationName === "none" &&
+              style.transform === "none" && style.filter === "none" && style.willChange === "auto";
+          }) && memoryRequests.slice(-3).every(request => request.edge === 1100);
+      }));
+    demand("Memories collage cards preserve complete photo aspect ratios and stay within 2160 by 1440",
+      await page.evaluate(() => [...memoryRoot.querySelectorAll(".ss-memory-card")].every(card => {
+        const box = card.getBoundingClientRect(), image = card.querySelector(".memory-photo");
+        const photo = PHOTOS.find(photo => image.style.backgroundImage.includes(photo.url));
+        const imageBox = image.getBoundingClientRect();
+        return photo && box.left >= 0 && box.top >= 0 && box.right <= innerWidth &&
+          box.bottom <= innerHeight && Math.abs(imageBox.width / imageBox.height - photo.w / photo.h) < .002 &&
+          Math.abs(imageBox.left - box.left - 12) < .1 && Math.abs(imageBox.top - box.top - 12) < .1;
+      })));
+    await page.screenshot({ path: path.join(evidence, "memories-collage.png") });
+    await page.evaluate(() => {
+      window.memoryCleanupImages = [...memoryRoot.querySelectorAll(".memory-photo")];
+      window.memoryAdmissionsAtCleanup = memoryRequests.length;
+      memoryCheck(); memoryCheck(); memoryCheck.resume();
+    });
+    demand("Memories terminal cleanup hides both roots and releases every owned image URL and animation",
+      await page.evaluate(() => memoryScenes.length === 2 && memoryScenes.every(scene =>
+        scene.children.length === 0 && getComputedStyle(scene).visibility === "hidden" &&
+        +getComputedStyle(scene).opacity === 0 && scene.ontransitionend === null) &&
+        memoryCleanupImages.length === 3 && memoryCleanupImages.every(image =>
+          !image.isConnected && image.style.backgroundImage === "none" &&
+          image.style.animationName === "none" && image.style.willChange === "auto")));
+    await page.waitForTimeout(3000);
+    demand("Memories stopped ownership cannot republish photos or admit new derivative work",
+      await page.evaluate(() => memoryRoot.querySelectorAll(".memory-photo").length === 0 &&
+        memoryRequests.length === memoryAdmissionsAtCleanup));
+    for (const count of [1, 2, 3]) {
+      await page.goto(`${base}/memories-unit`);
+      await page.evaluate(async count => {
+        const root = document.createElement("div");
+        root.style.cssText = "position:fixed;inset:0";
+        document.querySelector("#stage").append(root);
+        window.smallMemoryRoot = root;
+        // Rapid real timer cadence reaches the sixth beat without changing production
+        // selection/publication. Pause before the seventh beat to inspect its cards.
+        window.smallMemoryCheck = SS.MODES.memories.run({
+          root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+          photoMs: 450, motionMs: 6000, url: photo => photo.url,
+        }, PHOTOS.slice(0, count));
+        await smallMemoryCheck.ready;
+      }, count);
+      await page.waitForFunction(() => smallMemoryRoot.lastElementChild.querySelector(".ss-memory-caption"));
+      await page.evaluate(() => smallMemoryCheck.pause());
+      demand(`Memories ${count}-photo library uses exactly ${count} unique complete static collage photos`,
+        await page.evaluate(count => {
+          const scene = smallMemoryRoot.lastElementChild, images = [...scene.querySelectorAll(".memory-photo")];
+          return scene.querySelectorAll(".ss-memory-card").length === count && images.length === count &&
+            new Set(images.map(image => image.style.backgroundImage)).size === count &&
+            images.every(image => {
+              const style = getComputedStyle(image), box = image.parentNode.getBoundingClientRect();
+              return style.backgroundSize === "contain" && style.animationName === "none" &&
+                style.transform === "none" && style.willChange === "auto" &&
+                box.left >= 0 && box.top >= 0 && box.right <= innerWidth && box.bottom <= innerHeight;
+            }) && smallMemoryRoot.querySelectorAll(".ss-memory-scene").length === 2 &&
+            smallMemoryRoot.querySelectorAll(".memory-photo").length <= count + 1;
+        }, count));
+      await page.evaluate(() => smallMemoryCheck());
+    }
+    await page.goto(`${base}/memories-unit`);
+    const faceMemory = await page.evaluate(async () => {
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      const cleanup = SS.MODES.memories.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, motionMs: 32400, url: photo => photo.url,
+      }, [{ ...PHOTOS[0], fx: .2, fy: .3 }]);
+      const ready = await cleanup.ready, image = root.querySelector(".memory-photo");
+      const style = getComputedStyle(image);
+      const result = { ready, size: style.backgroundSize, motion: style.animationName, promotion: style.willChange };
+      cleanup(); return result;
+    });
+    demand("Memories cached face hints retain a complete still single photo without promotion",
+      faceMemory.ready && faceMemory.size === "contain" && faceMemory.motion === "none" &&
+      faceMemory.promotion === "auto");
+    await page.goto(`${base}/memories-unit`);
+    const memoryZoomBounds = await page.evaluate(async () => {
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      const cleanup = SS.MODES.memories.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, motionMs: 1, url: photo => photo.url,
+      }, [PHOTOS[0]]);
+      await cleanup.ready;
+      await new Promise(resolve => setTimeout(resolve, 80));
+      const image = root.querySelector(".memory-photo"), style = getComputedStyle(image);
+      const box = image.getBoundingClientRect(), transform = new DOMMatrixReadOnly(style.transform);
+      const result = { scaleX: transform.a, scaleY: transform.d, left: box.left, top: box.top,
+        right: box.right, bottom: box.bottom, size: style.backgroundSize };
+      cleanup(); return result;
+    });
+    demand("Memories single at its maximum 4 percent zoom keeps the whole contained photo inside 2160 by 1440",
+      Math.abs(memoryZoomBounds.scaleX - 1.04) < .0001 &&
+      Math.abs(memoryZoomBounds.scaleY - 1.04) < .0001 &&
+      memoryZoomBounds.left >= 0 && memoryZoomBounds.top >= 0 &&
+      memoryZoomBounds.right <= 2160 && memoryZoomBounds.bottom <= 1440 &&
+      memoryZoomBounds.size === "contain", memoryZoomBounds);
+    await page.goto(`${base}/memories-unit`);
+    const cancelledMemory = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let cleanup, atCleanup, atRequests, requests = 0;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = root.querySelectorAll(".memory-photo").length; atRequests = requests;
+        })), () => {});
+        return prepared;
+      };
+      cleanup = SS.MODES.memories.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, motionMs: 32400,
+        url: photo => { requests++; return photo.url; },
+      }, PHOTOS);
+      const ready = await cleanup.ready; window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: root.querySelectorAll(".memory-photo").length, atRequests, requests };
+    });
+    demand("Memories decode-admission cancellation rejects late publication and derivative work",
+      cancelledMemory.ready === false && cancelledMemory.atCleanup === 0 &&
+      cancelledMemory.afterReady === 0 && cancelledMemory.atRequests === cancelledMemory.requests);
     await page.goto(`${base}/diptych-unit`);
     await page.evaluate(async () => {
       const root = document.createElement("div");
@@ -838,6 +1086,13 @@ async function until(condition) {
     await page.close();
     fs.writeFileSync(path.join(evidence, "checks.json"), JSON.stringify({
       complete: true, passed: checks.length, checks, errors,
+      viewport: page.viewportSize(), browser: browser.version(),
+      memories: {
+        passed: checks.filter(name => /memories/i.test(name)).length,
+        fixtureSource: "Local synthetic gallery-fixtures.json and gallery SVGs",
+        screenshots: ["memories.png", "memories-collage.png"],
+        oldWebViewManualPath: "Element.getAnimations and Element.animate unavailable",
+      },
       scope: "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",
       physicalPortalPerformanceMeasured: false,
     }, null, 2) + "\n");

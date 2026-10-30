@@ -112,6 +112,11 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
       if (this.parent) this.parent.children = this.parent.children.filter(node => node !== this);
       this.parent = null;
     }
+    set innerHTML(value) {
+      assert.equal(value, '');
+      this.children.forEach(child => { child.parent = null; });
+      this.children = [];
+    }
     get offsetWidth() { return 2160; }
     dispatchEvent(event) { this['on' + event.type]?.(event); }
   }
@@ -150,14 +155,22 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
     } }, deck);
   function nodes(node = root) { return [node, ...node.children.flatMap(child => nodes(child))]; }
   function prints() { return nodes().filter(node =>
-    node.classList.contains(['galleryWall', 'heroSidebar'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
-  function slot(print) { return mode === 'galleryWall' ? print : ['push', 'heroSidebar'].includes(mode) ? print.parent : print.parent.parent.parent.parent; }
+    node.classList.contains(mode === 'memories' ? 'memory-photo' : ['galleryWall', 'heroSidebar'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
+  function slot(print) {
+    if (mode === 'memories') {
+      let node = print;
+      while (node.parent && !node.classList.contains('ss-memory-scene')) node = node.parent;
+      return node;
+    }
+    return mode === 'galleryWall' ? print : ['push', 'heroSidebar'].includes(mode) ? print.parent : print.parent.parent.parent.parent;
+  }
   function state(print) {
     const style = computed(print), animation = style.animation || 'none';
     return { animation, promotion: style['will-change'] || 'auto', playState: style['animation-play-state'] || 'running',
       visible: slot(print).classList.contains('on'), opacity: slot(print).opacity() };
   }
-  async function flush() { for (let i = 0; i < 12; i++) await Promise.resolve(); }
+  // Drain the complete gated decode/publication chain before advancing the virtual clock.
+  async function flush() { for (let i = 0; i < 64; i++) await Promise.resolve(); }
   async function advanceTo(time) {
     assert.ok(time >= now);
     while (true) {

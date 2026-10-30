@@ -1,6 +1,6 @@
 {
   "complete": true,
-  "passed": 71,
+  "passed": 102,
   "checks": [
     "Diptych displays two complete static photos without blur",
     "Diptych matte inset scales to the actual viewport",
@@ -10,6 +10,37 @@
     "push actual renderer becomes ready",
     "galleryWall actual renderer becomes ready",
     "heroSidebar actual renderer becomes ready",
+    "memories actual renderer becomes ready",
+    "Memories readiness owns exactly two full-viewport fixed scene roots",
+    "Memories first beat is one opaque complete photo without a second startup fade or blur",
+    "Memories unhinted single photo uses a bounded gentle push inside the viewport",
+    "Memories beat 2 fades only the incoming scene for 2000ms over opaque outgoing URLs",
+    "Memories beat 2 remains a single photo",
+    "Memories old-WebView pause freezes single motion and dissolve beyond its retirement deadline",
+    "Memories beat 2 retires outgoing URLs and promotion only after incoming opacity one",
+    "Memories beat 3 fades only the incoming scene for 2000ms over opaque outgoing URLs",
+    "Memories beat 3 remains a single photo",
+    "Memories beat 3 retires outgoing URLs and promotion only after incoming opacity one",
+    "Memories beat 4 fades only the incoming scene for 2000ms over opaque outgoing URLs",
+    "Memories beat 4 remains a single photo",
+    "Memories beat 4 retires outgoing URLs and promotion only after incoming opacity one",
+    "Memories beat 5 fades only the incoming scene for 2000ms over opaque outgoing URLs",
+    "Memories beat 5 remains a single photo",
+    "Memories beat 5 retires outgoing URLs and promotion only after incoming opacity one",
+    "Memories beat 6 fades only the incoming scene for 2000ms over opaque outgoing URLs",
+    "Memories beat 6 is the sixth-beat three-photo collage",
+    "Memories old-WebView pause freezes collage dissolve beyond its retirement deadline",
+    "Memories beat 6 retires outgoing URLs and promotion only after incoming opacity one",
+    "Memories sixth collage has three unique whole static photos with neutral factual caption",
+    "Memories collage cards preserve complete photo aspect ratios and stay within 2160 by 1440",
+    "Memories terminal cleanup hides both roots and releases every owned image URL and animation",
+    "Memories stopped ownership cannot republish photos or admit new derivative work",
+    "Memories 1-photo library uses exactly 1 unique complete static collage photos",
+    "Memories 2-photo library uses exactly 2 unique complete static collage photos",
+    "Memories 3-photo library uses exactly 3 unique complete static collage photos",
+    "Memories cached face hints retain a complete still single photo without promotion",
+    "Memories single at its maximum 4 percent zoom keeps the whole contained photo inside 2160 by 1440",
+    "Memories decode-admission cancellation rejects late publication and derivative work",
     "Diptych initial readiness publishes an opaque scene without a second startup fade",
     "Diptych outgoing remains opaque throughout the dissolve",
     "Diptych incoming fades above the outgoing whole-photo scene",
@@ -75,6 +106,20 @@
     "No production-script errors"
   ],
   "errors": [],
+  "viewport": {
+    "width": 2160,
+    "height": 1440
+  },
+  "browser": "156.0.8078.74",
+  "memories": {
+    "passed": 31,
+    "fixtureSource": "Local synthetic gallery-fixtures.json and gallery SVGs",
+    "screenshots": [
+      "memories.png",
+      "memories-collage.png"
+    ],
+    "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
+  },
   "scope": "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",
   "physicalPortalPerformanceMeasured": false
 }

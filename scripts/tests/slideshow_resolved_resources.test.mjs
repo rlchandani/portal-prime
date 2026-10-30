@@ -219,7 +219,10 @@ test('Memories: the sixth beat carries the three decoded collage resources', asy
     await r.tick(30000); await r.drain();
     r.assertPrepared(before);
     assert.equal(r.writes.slice(before).length, 3);
-    assert.ok(r.writes.slice(before).every(write => write.node.classList.contains('breathe')));
+    assert.ok(r.writes.slice(before).every(write =>
+      write.node.classList.contains('memory-photo') &&
+      write.node.style.backgroundSize === 'contain' &&
+      write.node.style.animation === 'none'));
   } finally { r.stop(); }
 });
 
