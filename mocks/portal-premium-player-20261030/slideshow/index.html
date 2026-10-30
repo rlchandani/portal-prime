@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Immortal · photo spread review</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#1c1b19;color:#fff;font:16px system-ui}
+iframe{position:fixed;inset:0;width:100%;height:100%;border:0}
+header{position:fixed;z-index:2;left:20px;top:20px;right:20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.caption{padding:12px 16px;background:rgba(20,22,27,.94);border-radius:18px;margin-right:auto}
+.caption strong{display:block;font-size:18px}.caption small{color:#bbb}
+button{min-height:48px;padding:0 18px;border:1px solid #555;background:#2b2b2b;color:#fff;border-radius:18px;font:inherit;cursor:pointer}
+button[aria-pressed=true]{background:#fff;color:#14161b;border-color:#fff}
+button:focus-visible{outline:3px solid #9ad2ff;outline-offset:3px}
+</style>
+<iframe title="Actual bundled screensaver photo renderer"></iframe>
+<header>
+<div class="caption"><strong>Photo spread</strong><small>Production renderer · original sample artwork · clock overlays excluded</small></div>
+<button data-mode="diptych">Diptych</button><button data-mode="framed">Framed print</button>
+<button data-mode="kenBurns">Ken Burns</button><button id="previous">Previous</button>
+<button id="pause">Pause</button><button id="next">Next</button>
+</header>
+<script>
+const frame=document.querySelector("iframe");
+let mode=new URLSearchParams(location.search).get("mode")||"diptych",paused=false;
+function load(){
+ frame.src="/preview.html?nativeClock=1&mode="+encodeURIComponent(mode);
+ paused=false;document.querySelector("#pause").textContent="Pause";
+ document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===mode)));
+ const url=new URL(location);url.searchParams.set("mode",mode);history.replaceState({},'',url);
+}
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;load()});
+document.querySelector("#next").onclick=()=>frame.contentWindow.immortalSlideshow?.next();
+document.querySelector("#previous").onclick=()=>frame.contentWindow.immortalSlideshow?.previous();
+document.querySelector("#pause").onclick=()=>{
+ paused=!paused;frame.contentWindow.immortalSlideshow?.[paused?"pause":"resume"]();
+ document.querySelector("#pause").textContent=paused?"Resume":"Pause";
+};
+load();
+</script>
+</html>

@@ -29,8 +29,10 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 @keyframes pushOut { from { opacity: 1; transform: scale(1.0); } to { opacity: 0; transform: scale(0.82); } }
 
 /* diptych */
-.ss-frame { position: absolute; inset: 0; display: flex; gap: 14px; opacity: 0; transition: opacity 1.8s cubic-bezier(0.4,0,0.2,1); }
+.ss-frame { position: absolute; inset: 0; display: flex; padding: 3vmin; background: #1c1b19;
+  opacity: 0; transition: opacity 1.8s cubic-bezier(0.4,0,0.2,1); }
 .ss-frame.on { opacity: 1; }
+.ss-frame > .ss-cell + .ss-cell { margin-left: 2vmin; }
 .ss-cell { position: relative; flex: 1; overflow: hidden; }
 .ss-img { position: absolute; inset: 0; background-size: cover; background-position: center 25%; }
 /* Promote only the tiles that move: a static tile with will-change still costs a full compositor
@@ -39,7 +41,6 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-img.drift { animation: cellDrift 16s ease-in-out infinite alternate; }
 @keyframes cellDrift { from { transform: scale(1.06) translate(-1%,-1%); } to { transform: scale(1.14) translate(1%,1%); } }
 .ss-cell.contain .ss-img { background-size: contain; background-repeat: no-repeat; animation: none; }
-.ss-cell.contain .ss-fill { position: absolute; inset: -6%; background-size: cover; filter: blur(18px) brightness(0.72) saturate(1.12); transform: scale(1.1); }
 
 /* framed print */
 .ss-room { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% -10%, #23231f 0%, #141414 45%, #0b0b0c 100%); }

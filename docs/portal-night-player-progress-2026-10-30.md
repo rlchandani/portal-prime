@@ -154,6 +154,67 @@ This player batch closes within 30 minutes. The broader goal remains active:
 physical clock acceptance, hardware-based rendering measurements and additional
 existing-style refinements remain. Music provider wiring stays deferred.
 
+## Shuffle startup, paired photos and native browsing — 15:31 UTC
+
+The next bounded batch changes the production legacy renderer used by Family
+Area's saved Shuffle setting:
+
+- A paused startup now admits **zero** orientation image loads or scenes.
+  Active orientation preparation uses **two workers instead of six** and asks
+  for a ready 320px derivative. When no derivative exists it retains the original
+  URL fallback. Pause, page close and the 1.5-second deadline release the image
+  handlers and source; late results cannot mutate metadata.
+- A successful normal display decode recovers dimensions for photos whose initial
+  probe timed out. A bounded URL-to-metadata map holds at most 64 aliases and no
+  pixels. Initial Filmstrip widths and Gallery Wall rectangles are recomputed
+  from those recovered dimensions before publication, using the same prepared
+  photos and URLs, with no additional decode admission.
+- Diptych now displays whole photos on a quiet charcoal matte. A portrait pair
+  prepares **two resources instead of four**, with **zero blurred background
+  images instead of two**. It keeps the existing dissolve and adds no continuous
+  decorative work. Other mode IDs and saved preferences are preserved.
+- Native Library, Playlists and collection-detail components now render lazy
+  grids/lists, bounded local covers, collection metadata and tracks. They are
+  connected to the debug-only silent design host. Live provider data, network
+  cover loading and music backend integration remain deferred.
+
+Verification:
+
+| Gate | Result |
+| --- | --- |
+| Integrated Android build/JVM outputs | Build successful; 3,392 tests / 350 suites, zero failures/errors/skips |
+| Targeted production slideshow source suite | 107 passed, zero failures/skips |
+| Engine source fixtures | 14/14 passed |
+| Actual-source desktop Chrome checks | 13 passed, including real stalled HTTP cancellation and delayed dimension recovery |
+| Native API 34 layout checks | 29 passed, including scrolling, collection navigation, track selection, empty/offline, light and 1.8× text |
+
+The browser review at [8891](http://127.0.0.1:8891/) uses the actual production
+renderer with two original sample portraits. The [native capture review](http://127.0.0.1:8890/native-review.html)
+includes Library, Playlists and collection details. Both are explicitly silent
+visual previews, not evidence of audible playback or Portal GPU performance.
+
+A bounded **pre-change** Family Area capture recorded 326 valid frame callbacks,
+zero callback drops, 18ms p50, 33ms p95 and 109ms p99. Mean frame duration was
+22.601ms and maximum 125.706ms. Command submission accounted for 110.018ms of
+that worst frame. The capture did not identify a style cohort and did **not**
+measure delivered FPS. It cannot establish a before/after improvement for
+Diptych, Shuffle or an individual GPU path. The capture auto-ended; collector
+state was inactive with zero listeners.
+
+The tested candidate was installed on **Family Area only**, then read back
+through Fleet to verify the exact bytes:
+
+- SHA-256: `ff9ee93e5bb19dcf9d876360149ed9be9b6a7af4bf4574d8311083335f9931b8`
+- Size: 48,861,358 bytes; signing certificate matches the preceding installed build.
+- **97 full-profile setting values compared; zero changed.**
+- Home and screensaver requests were acknowledged; visible transitions remain
+  unverified. An actual byte-for-byte rollback APK is retained privately.
+
+The owned emulator was stopped after acceptance. Preview servers remain available
+for review. This batch closes within 30 minutes; no music service or configuration
+was deployed to Home Assistant. Remaining goal work includes physical night-clock
+acceptance, affected-path rendering measurements and further style refinement.
+
 ## Sources
 
 - [Android sensor monitoring and lifecycle](https://developer.android.com/develop/sensors-and-location/sensors/sensors_overview)

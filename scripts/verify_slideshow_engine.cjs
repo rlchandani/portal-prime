@@ -227,10 +227,12 @@ test("bundled page exposes the exact bridge before measurement and honors early 
     assert.deepEqual(Object.keys(bridge).sort(), ["next", "pause", "previous", "resume"]);
     if (!initialPause) bridge.pause();
     if (exit) f.events.get("pagehide")();
-    measured(); await f.settle(); await f.tick(50);
+    if (initialPause) assert.equal(measured, undefined, "paused startup admitted measurement");
+    measured?.(); await f.settle(); await f.tick(50);
     assert.equal(f.images.length, 0, "early pause or exit was lost");
+    assert.equal(f.stage.children.length, 0, "hidden startup admitted a scene");
     if (!exit) {
-      bridge.resume(); await f.settle(); await f.readyImages();
+      bridge.resume(); await f.settle(); measured(); await f.settle(); await f.readyImages();
       assert(elements.get("loading").classList.contains("hide"));
       f.events.get("pagehide")();
     }

@@ -33,16 +33,28 @@
   const stage = document.getElementById("stage"), startupAt = performance.now();
   let engine = null, closed = false,
       requestedPause = new URLSearchParams(location.search).get("hostPaused") === "1",
-      clockTimer = null, readyLogged = false;
+      clockTimer = null, readyLogged = false, measurement = null, wakeStartup = null;
+  function releaseStartup() {
+    if (wakeStartup) { const wake = wakeStartup; wakeStartup = null; wake(); }
+  }
   // Available during initial dimension measurement. This bridge belongs only to this asset page.
   window.immortalSlideshow = {
     next: () => engine && !closed ? engine.next() : false,
     previous: () => engine && !closed ? engine.previous() : false,
-    pause: () => { requestedPause = true; if (engine && !closed) engine.pause(); },
-    resume: () => { requestedPause = false; if (engine && !closed) engine.resume(); },
+    pause: () => {
+      requestedPause = true;
+      if (measurement) measurement.abort();
+      if (engine && !closed) engine.pause();
+    },
+    resume: () => {
+      requestedPause = false; releaseStartup();
+      if (engine && !closed) engine.resume();
+    },
   };
   addEventListener("pagehide", () => {
     closed = true; clearInterval(clockTimer);
+    if (measurement) measurement.abort();
+    releaseStartup();
     if (engine) engine.stop();
   }, { once: true });
 
@@ -89,13 +101,26 @@
 
   // Pre-measure photo dimensions so the very first mode already has correct orientation info.
   // Cap the initial measure so a huge library doesn't stall the start; the rest measure lazily.
-  if (window.premeasureAll) {
-    let measureTimer;
-    try {
-      await Promise.race([window.premeasureAll(6),
-        new Promise(resolve => { measureTimer = setTimeout(resolve, 1500); })]);
-    } catch (_) {}
-    finally { clearTimeout(measureTimer); }
+  for (;;) {
+    // A retained hidden/night host admits no orientation loads or new scene.
+    while (requestedPause && !closed) await new Promise(resolve => { wakeStartup = resolve; });
+    if (closed) return;
+    if (window.premeasureAll) {
+      let measureTimer;
+      const owner = new AbortController();
+      measurement = owner;
+      try {
+        await Promise.race([window.premeasureAll(6, owner.signal),
+          new Promise(resolve => {
+            measureTimer = setTimeout(() => { owner.abort(); resolve(); }, 1500);
+          })]);
+      } catch (_) {}
+      finally {
+        clearTimeout(measureTimer); owner.abort();
+        if (measurement === owner) measurement = null;
+      }
+    }
+    if (!requestedPause || closed) break;
   }
   if (closed) return;
 

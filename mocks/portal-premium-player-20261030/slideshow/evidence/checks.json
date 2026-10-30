@@ -1,0 +1,22 @@
+{
+  "complete": true,
+  "passed": 13,
+  "checks": [
+    "Diptych displays two complete static photos without blur",
+    "Diptych matte inset scales to the actual viewport",
+    "diptych actual renderer becomes ready",
+    "framed actual renderer becomes ready",
+    "kenBurns actual renderer becomes ready",
+    "Paused startup admits zero HTTP images",
+    "Orientation preparation has two concurrent HTTP requests",
+    "Pausing closes both real HTTP image requests",
+    "Paused preparation does not construct a scene",
+    "Startup timeout releases both measurement image owners",
+    "Any retained HTTP request belongs to normal display preparation",
+    "Normal display decode recovers delayed portrait ratio",
+    "No production-script errors"
+  ],
+  "errors": [],
+  "scope": "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",
+  "physicalPortalPerformanceMeasured": false
+}

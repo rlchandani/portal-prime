@@ -269,8 +269,8 @@
     const t = makeTimers(ctx);
     const frames = [el("ss-frame"), el("ss-frame")]; frames.forEach(f => ctx.root.appendChild(f));
     let cur = 0;
-    function coverCell(p) { const c = el("ss-cell"); const im = el("ss-img drift", c); bg(im, ctx.url(p, 1400)); faceBg(im, p); im.style.animationDelay = (-Math.random() * 8) + "s"; return c; }
-    function containCell(fillUrl, imageUrl) { const c = el("ss-cell contain"); const fill = el("ss-fill", c); bg(fill, fillUrl); const im = el("ss-img", c); bg(im, imageUrl, "contain"); return c; }
+    // A quiet, whole-photo spread: no second decoded copy or viewport-sized blur per pane.
+    function containCell(imageUrl) { const c = el("ss-cell contain"); const im = el("ss-img", c); bg(im, imageUrl, "contain"); return c; }
     async function step() {
       const f = frames[1 - cur]; f.innerHTML = "";
       const c = SS.counts(deck); const roll = Math.random();
@@ -278,9 +278,9 @@
       if (roll < 0.28 && c.pano) ps = SS.take(deck, ctx.cursor, ["pano"]);
       else if (roll < 0.6 && c.landscape) ps = SS.take(deck, ctx.cursor, ["landscape"]);
       else ps = SS.take(deck, ctx.cursor, ["portrait", "portrait"]);
-      const resources = ps.map(p => ({ fillUrl: ctx.url(p, 1400), imageUrl: ctx.url(p, 1800) }));
-      if (!await t.load([].concat(...resources.map(r => [r.fillUrl, r.imageUrl])))) return false;
-      resources.forEach(r => f.appendChild(containCell(r.fillUrl, r.imageUrl)));
+      const resources = ps.map(p => ctx.url(p, 1800));
+      if (!await t.load(resources)) return false;
+      resources.forEach(url => f.appendChild(containCell(url)));
       frames[cur].classList.remove("on"); f.classList.add("on"); cur = 1 - cur;
     }
     t.start(step); t.every(step, ctx.photoMs);
@@ -375,11 +375,13 @@
       entry.fallback = t.after(() => fallback(cell, old), 1200);
     }
     function buildImg(p, url) { const img = el("ss-img kb"); bg(img, url); faceBg(img, p); if (Math.random() < 0.4) { img.classList.remove("kb"); return img; } img.style.setProperty("--d", (14 + Math.random() * 8) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
-    function layout() {
+    function layout(preparedPhotos) {
       const W = ctx.W, H = ctx.H, pad = 16, gutter = 12; const targetH = H > 1000 ? 300 : 240;
       const rows = Math.max(2, Math.round((H - pad * 2 + gutter) / (targetH + gutter)));
-      const pick = []; const seen = new Set(); let g = 0;
-      while (pick.length < 10 && g < deck.length * 2) { const p = deck[ctx.cursor.i++ % deck.length]; g++; if (!seen.has(p.seed)) { seen.add(p.seed); pick.push(p); } }
+      const pick = preparedPhotos || []; const seen = new Set(); let g = 0;
+      if (!preparedPhotos) {
+        while (pick.length < 10 && g < deck.length * 2) { const p = deck[ctx.cursor.i++ % deck.length]; g++; if (!seen.has(p.seed)) { seen.add(p.seed); pick.push(p); } }
+      }
       const res = window.justifiedLayout(pick, W - pad * 2, { targetRowHeight: targetH, gutter, maxRows: rows });
       // Scale the whole packed layout UNIFORMLY to fill the height — cells keep their photo aspect
       // (justifiedLayout sized them to aspect) so cover never crops within a cell. When scaled up the
@@ -398,7 +400,14 @@
       target.forEach((slot, i) => { const c = cells[i]; c.el.style.left = slot.left + "px"; c.el.style.top = slot.top + "px"; c.el.style.width = slot.width + "px"; c.el.style.height = slot.height + "px";
         if (c.photo !== slot.photo) replace(c, slot.photo, slot.url); });
     }
-    async function rebuild() { const slots = layout().map(s => ({ ...s, url: ctx.url(s.photo, 1200) })); if (!await t.load(slots.map(s => s.url))) return false; render(slots); }
+    async function rebuild() {
+      const slots = layout().map(s => ({ ...s, url: ctx.url(s.photo, 1200) }));
+      if (!await t.load(slots.map(s => s.url))) return false;
+      // Decode may recover unknown ratios. Keep the same admitted photos/URLs,
+      // then recalculate their rectangles before the composition becomes visible.
+      const prepared = new Map(slots.map(s => [s.photo, s.url]));
+      render(layout(slots.map(s => s.photo)).map(s => ({ ...s, url: prepared.get(s.photo) })));
+    }
     async function swap() { if (!cells.length) return; const onWall = cells.map(x => x.photo && x.photo.seed).filter(Boolean); if (!SS.unused(deck, onWall).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; let p = null; const wallSet = new Set(onWall); for (let k = 0; k < deck.length; k++) { const cand = deck[(ctx.cursor.i + k) % deck.length]; if (!wallSet.has(cand.seed) && SS.bucket(cand) === SS.bucket(c.photo)) { p = cand; ctx.cursor.i += k + 1; break; } } if (!p) p = SS.take(deck, ctx.cursor, ["any"], onWall)[0]; const url = ctx.url(p, 1200); if (!await t.load(url)) return false; replace(c, p, url); }
     t.start(rebuild); t.every(swap, ctx.microMs);
     const cleanup = () => {
@@ -604,7 +613,9 @@
     function knownGeometry() {
       try {
         if (!(Number.isFinite(ctx.W) && ctx.W > 0 && Number.isFinite(ctx.H) && ctx.H > 0) ||
-            items.some(s => !(Number.isFinite(s.w) && s.w > 0 && Number.isFinite(s.off)))) return false;
+            items.some(s => !(Number.isFinite(s.w) && s.w > 0 && Number.isFinite(s.off) &&
+              Number.isFinite(s.photo.w) && s.photo.w > 0 &&
+              Number.isFinite(s.photo.h) && s.photo.h > 0))) return false;
         // Native WebView layout can recover from a small initial measurement or
         // swap orientation. Card widths/offsets stay fixed; admit the horizontal
         // exposure for either full-display orientation before declaring ready.
@@ -655,13 +666,25 @@
     }
     async function go(i) {
       if (disposed || !items[i]) return false;
-      const from = admitted ? items[center].off : 0, to = items[i].off;
+      const from = admitted ? items[center].off : 0, plannedTo = items[i].off;
       // Retain all previously prepared images. Their earlier admission envelope
       // also covers interrupted CSS motion; wrap pans include intermediate cards.
-      const batch = items.filter(s => !s.prepared && needed(s, from, to))
+      const batch = items.filter(s => !s.prepared && needed(s, from, plannedTo))
         .map(s => ({ item: s, url: ctx.url(s.photo, 1400) }));
       const u = ctx.url(items[i].photo, 1000);
       if (!await prepare(batch.map(s => s.url).concat(u)) || disposed) return false;
+      if (!admitted) {
+        // Unknown geometry uses full admission above. Recover ratios from those
+        // same display decodes before publishing the strip, not in a later jump.
+        let left = 0;
+        items.forEach(s => {
+          const w = ctx.H * .62 * aspect(s.photo);
+          if (w !== s.w) { s.el.style.width = w + "px"; s.img.style.width = w + "px"; }
+          s.w = w; s.off = left + w / 2; left += w + 60;
+        });
+        bounded = knownGeometry();
+      }
+      const to = items[i].off;
       // Commit one complete batch after decode/pause/ownership gates. Never
       // re-resolve at publication, or replace/clear an already-live image.
       batch.forEach(({ item, url }) => { bg(item.img, url); item.prepared = true; });

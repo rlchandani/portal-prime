@@ -58,29 +58,70 @@
   }));
 
   // Measure a photo's real dimensions (once). Returns a promise resolving to the photo with w/h set.
-  function measure(p) {
+  function measure(p, signal) {
     if (p.measured) return Promise.resolve(p);
+    if (signal && signal.aborted) return Promise.resolve(p);
     return new Promise((res) => {
       const im = new Image();
-      im.onload = () => { p.w = im.naturalWidth || 1600; p.h = im.naturalHeight || 1067; p.measured = true; res(p); };
-      im.onerror = () => { p.w = 1600; p.h = 1067; p.measured = true; res(p); }; // assume landscape on failure
-      im.src = p.url;
+      let settled = false;
+      function finish(loaded, cancelled = false) {
+        if (settled) return;
+        settled = true;
+        if (!cancelled) {
+          p.w = loaded && im.naturalWidth || 1600;
+          p.h = loaded && im.naturalHeight || 1067;
+          p.measured = true;
+        }
+        im.onload = im.onerror = null;
+        if (signal) signal.removeEventListener("abort", cancel);
+        im.src = "";
+        res(p);
+      }
+      function cancel() { finish(false, true); }
+      im.onload = () => finish(true);
+      im.onerror = () => finish(false); // assume landscape on an actual load failure
+      if (signal) signal.addEventListener("abort", cancel, { once: true });
+      // Dimensions need an aspect ratio, not display-resolution pixels. Known metadata
+      // bypasses this entirely; unknown photos use a ready small copy when available.
+      im.src = window.photoUrl(p, 320);
     });
   }
 
   // Pre-measure the whole set (bounded, fire-and-forget) so bucket logic has real ratios quickly.
   // We cap concurrency so we don't open 500 decodes at once on the old device.
-  async function premeasureAll(max) {
+  async function premeasureAll(max, signal) {
     const list = PHOTOS.slice(0, max || PHOTOS.length);
     let i = 0;
-    const CONC = 6;
-    async function worker() { while (i < list.length) { const p = list[i++]; await measure(p); } }
+    const CONC = 2;
+    async function worker() {
+      while (i < list.length && !(signal && signal.aborted)) {
+        const p = list[i++]; await measure(p, signal);
+      }
+    }
     await Promise.all(Array.from({ length: CONC }, worker));
   }
 
   window.PHOTOS = PHOTOS;
   window.measurePhoto = measure;
   window.premeasureAll = premeasureAll;
+
+  // Only unknown photos need display-load metadata. Bound aliases because ready
+  // derivative names can change after cache eviction; never retain image pixels here.
+  const dimensionSources = new Map();
+  function sizeSource(p, url) {
+    if (!p.measured) {
+      dimensionSources.delete(url); dimensionSources.set(url, p);
+      if (dimensionSources.size > 64) dimensionSources.delete(dimensionSources.keys().next().value);
+    }
+    return url;
+  }
+  window.recordPhotoDimensions = function (url, width, height) {
+    const p = dimensionSources.get(url);
+    dimensionSources.delete(url);
+    if (!p || p.measured || !Number.isFinite(width) || !Number.isFinite(height) ||
+        width <= 0 || height <= 0) return;
+    p.w = width; p.h = height; p.measured = true;
+  };
 
   // Engine helpers (mirror the mock's API so mode code is unchanged).
   // Ask for the slot's size at load cadence, never per animation frame. Revalidate ready files
@@ -93,9 +134,9 @@
       const ready = host && typeof host.scaledUrlForSize === "function"
         ? host.scaledUrlForSize(p.url, edge)
         : host && typeof host.scaledUrl === "function" ? host.scaledUrl(p.url) : "";
-      if (typeof ready === "string" && ready.length) return ready;
+      if (typeof ready === "string" && ready.length) return sizeSource(p, ready);
     } catch (_) {}
-    return p.url;
+    return sizeSource(p, p.url);
   };
   window.aspect = function (p) { return (p.w || 1600) / (p.h || 1067); };
   window.byKind = function (kind) { return PHOTOS.filter((p) => window.bucketOf(p) === kind); };

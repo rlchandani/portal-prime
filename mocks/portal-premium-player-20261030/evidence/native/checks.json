@@ -1,5 +1,5 @@
 {
-  "passed": 17,
+  "passed": 29,
   "checks": [
     "Native sample and six-track queue render",
     "Play has a 48dp touch target",
@@ -17,7 +17,19 @@
     "Large-font transport remains visible",
     "Actual native clock includes time and weekday",
     "Actual Gallery stage renders the new style",
-    "Gallery matte and retained photo differ"
+    "Gallery matte and retained photo differ",
+    "Native library reports six collections and renders the first row",
+    "Lazy library reveals its sixth supplied album on scroll",
+    "Album detail includes its supplied track and optional play action",
+    "Album back returns to library in the same activity",
+    "Native playlists present three supplied collections",
+    "Playlist detail presents its three supplied tracks",
+    "Collection selection returns to player and preserves the selected track",
+    "Unconfigured library shows an honest empty state",
+    "Unavailable playlists show status without fabricated cards",
+    "Large-font library retains visible navigation",
+    "Large-font album detail retains navigation and collection title",
+    "Light playlists retain their supplied metadata"
   ],
   "complete": true,
   "serial": "emulator-5556",
@@ -25,7 +37,7 @@
   "api": 34,
   "viewport": "2160x1440",
   "densityDpi": 240,
-  "durationSeconds": 32.75,
+  "durationSeconds": 77.9,
   "data": "debug-only silent fixtures and original local artwork",
   "physicalPortalPerformanceMeasured": false,
   "audioMeasured": false,

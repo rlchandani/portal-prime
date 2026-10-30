@@ -13,13 +13,13 @@ const assets = new URL('../../app/src/main/assets/screensaver/', import.meta.url
 const modes = ['kenBurns', 'diptych', 'framed', 'galleryWall', 'push', 'memories',
   'panorama', 'polaroid', 'mosaic', 'filmstrip', 'cinema', 'heroSidebar'];
 const affected = ['diptych', 'galleryWall', 'polaroid', 'mosaic', 'filmstrip'];
-const expectedEdges = { kenBurns: [2200], diptych: [1400, 1800], framed: [1800], galleryWall: [1200],
+const expectedEdges = { kenBurns: [2200], diptych: [1800], framed: [1800], galleryWall: [1200],
   push: [2200], memories: [2200], panorama: [2400], polaroid: [1400], mosaic: [1200],
   filmstrip: [1000, 1400], cinema: [2400], heroSidebar: [900, 1100, 1800] };
 
 // Synthetic DOM, clock and image transport only. Execute the actual photo resolver,
 // preload/decode helper, modes and scheduler; this fixture cannot measure rasterization.
-function fixture({ mode = 'galleryWall', count = 12, changing = true } = {}) {
+function fixture({ mode = 'galleryWall', count = 12, changing = true, random = .5, unknown = false } = {}) {
   let now = 0, nextId = 1, available = true, generation = 1;
   const pending = new Map(), images = [], decoded = new Set(), writes = [], calls = [];
   const resolutions = new Map();
@@ -59,7 +59,11 @@ function fixture({ mode = 'galleryWall', count = 12, changing = true } = {}) {
   }
   class Image {
     constructor() { images.push(this); this.naturalWidth = 1600; this.naturalHeight = 1067; this.state = 'new'; }
-    set src(value) { this.url = value; this.state = value ? 'loading' : 'cancelled'; }
+    set src(value) {
+      this.url = value; this.state = value ? 'loading' : 'cancelled';
+      const id = /(?:copy|photo)-(\d+)/.exec(value)?.[1];
+      if (id != null) { this.naturalWidth = photos[id].w; this.naturalHeight = photos[id].h; }
+    }
     decode() { this.state = 'decoding'; return new Promise((resolve, reject) => { this.finish = resolve; this.reject = reject; }); }
     load() { if (this.state === 'loading') this.onload?.(); }
     complete() { if (this.state === 'decoding') { decoded.add(this.url); this.state = 'decoded'; this.finish(); } }
@@ -75,9 +79,9 @@ function fixture({ mode = 'galleryWall', count = 12, changing = true } = {}) {
     requestAnimationFrame: fn => schedule(fn, 16), cancelAnimationFrame: id => pending.delete(id),
     addEventListener() {}, removeEventListener() {},
     Date: class extends Date { static now() { return now; } },
-    Math: Object.assign(Object.create(Math), { random: () => .5 }),
+    Math: Object.assign(Object.create(Math), { random: () => random }),
     Android: {
-      getPhotos: () => JSON.stringify(photos),
+      getPhotos: () => JSON.stringify(unknown ? photos.map(p => ({ ...p, w: 0, h: 0 })) : photos),
       isWatching: () => false,
       scaledUrlForSize: (url, edge) => {
         calls.push({ url, edge });
@@ -124,6 +128,53 @@ function fixture({ mode = 'galleryWall', count = 12, changing = true } = {}) {
     stop() { engine?.stop(); },
   };
 }
+
+test('Diptych prepares exactly one whole-photo resource per portrait pane with no blurred copy', async () => {
+  const r = fixture({ mode: 'diptych', random: .9 });
+  try {
+    r.start(); await r.drain();
+    const visible = r.stage.children[0].children.find(frame => frame.classList.contains('on'));
+    assert.equal(visible.children.length, 2);
+    assert.equal(r.images.length, 2);
+    assert.equal(r.calls.length, 2);
+    assert.equal(r.nodes().filter(node => node.classList.contains('ss-fill')).length, 0);
+    assert.ok(visible.children.every(cell => cell.children.length === 1 &&
+      cell.children[0].style.backgroundSize === 'contain'));
+    r.assertPrepared();
+  } finally { r.stop(); }
+});
+
+test('Filmstrip sizes previously unknown portraits from the actual display decode before promotion', async () => {
+  const r = fixture({ mode: 'filmstrip', unknown: true });
+  try {
+    r.start(); await r.drain();
+    const cards = r.nodes().filter(node => node.classList.contains('ss-slide'));
+    assert.ok(cards.length >= 5);
+    for (const card of cards) {
+      const id = /(?:copy|photo)-(\d+)/.exec(card.children[0].style.backgroundImage)[1];
+      const expectedAspect = Number(id) % 3 === 0 ? 1000 / 1500 : 1600 / 1067;
+      assert.ok(Math.abs(parseFloat(card.style.width) - 1440 * .62 * expectedAspect) < .01);
+    }
+    r.assertPrepared();
+  } finally { r.stop(); }
+});
+
+test('Gallery Wall publishes geometry from recovered portrait dimensions', async () => {
+  const r = fixture({ mode: 'galleryWall', unknown: true });
+  try {
+    r.start(); await r.drain();
+    const cells = r.nodes().filter(node => node.classList.contains('ss-gcell'));
+    let portraits = 0;
+    for (const cell of cells) {
+      const id = /(?:copy|photo)-(\d+)/.exec(cell.children[0].style.backgroundImage)[1];
+      const aspect = Number(id) % 3 === 0 ? 1000 / 1500 : 1600 / 1067;
+      if (Number(id) % 3 === 0) portraits++;
+      assert.ok(Math.abs(parseFloat(cell.style.width) / parseFloat(cell.style.height) - aspect) < .01);
+    }
+    assert.ok(portraits > 0);
+    r.assertPrepared();
+  } finally { r.stop(); }
+});
 
 // A resolver changes its result on a second lookup of the same requested resource.
 // Catches both re-resolution after decode and publishing a hidden background before decoding it.

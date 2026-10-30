@@ -17,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -87,6 +88,9 @@ class MusicDesignPreviewActivity : ComponentActivity() {
       var position by remember { mutableLongStateOf(83_000L) }
       var changedAt by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
       var layout by remember { mutableStateOf(MusicPlayerLayout.FULL) }
+      var browse by remember { mutableStateOf(intent.getStringExtra("screen")
+          ?.takeIf { it == "library" || it == "playlists" }) }
+      var collection by remember { mutableStateOf<MusicBrowseCollection?>(null) }
       var message by remember { mutableStateOf("Silent design preview · sample music · no audio") }
       val connection = when (intent.getStringExtra("scenario")) {
         "offline" -> MusicConnection.OFFLINE
@@ -95,6 +99,28 @@ class MusicDesignPreviewActivity : ComponentActivity() {
       }
       val source = "ma:design-preview"
       val item = tracks.getOrNull(selected)
+      val browseTracks = remember(tracks) { tracks.map {
+        MusicBrowseTrack(it.id, it.title, it.artist, it.durationMs, it.artUrl ?: "")
+      } }
+      val albums = remember(browseTracks) {
+        val titles = listOf("The quiet hours", "North shore", "Open windows",
+            "Small hours", "Open road", "Quiet bloom")
+        browseTracks.mapIndexed { index, track ->
+          MusicBrowseCollection("album-$index", titles[index], track.artist,
+              track.artworkUri, listOf(track))
+        }
+      }
+      val playlists = remember(browseTracks) {
+        listOf("Slow mornings" to listOf(0, 1, 4),
+            "After dark" to listOf(3, 5, 2), "At home" to listOf(0, 1, 2, 3, 4, 5))
+            .mapIndexed { index, (title, order) ->
+              val songs = order.mapNotNull { browseTracks.getOrNull(it) }
+              MusicBrowseCollection("playlist-$index", title,
+                  listOf("Ease into the day", "A quieter soundtrack", "Room to unwind")[index],
+                  songs.firstOrNull()?.artworkUri ?: "", songs,
+                  MusicBrowseCollectionKind.PLAYLIST)
+            }
+      }
       val snapshot = MusicPlayerSnapshot(connection = connection, sourceId = source,
           track = item?.let { MusicTrack(it.id, source, it.title, it.artist,
               "The quiet hours", it.artUrl, it.durationMs) },
@@ -110,7 +136,44 @@ class MusicDesignPreviewActivity : ComponentActivity() {
           LocalDensity provides Density(density.density, fontScale)) {
         MaterialTheme(colorScheme = approvedColorScheme(!light)) {
           Column(Modifier.fillMaxSize().background(palette.background).padding(16.dp)) {
-            Text(message, color = palette.secondary, modifier = Modifier.padding(8.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+              Text(message, color = palette.secondary,
+                  modifier = Modifier.weight(1f).padding(8.dp), maxLines = 1)
+              TextButton(onClick = { browse = "library"; collection = null }) { Text("Library") }
+              TextButton(onClick = { browse = "playlists"; collection = null }) { Text("Playlists") }
+            }
+            val showPlayer = { browse = null; collection = null; layout = MusicPlayerLayout.FULL }
+            val browseStatus = if (connection == MusicConnection.OFFLINE)
+                MusicBrowseStatus.UNAVAILABLE else MusicBrowseStatus.READY
+            val browseMessage = if (connection == MusicConnection.OFFLINE)
+                "Design preview · provider unavailable · no audio" else null
+            val selectTrack: (MusicBrowseTrack) -> Unit = { track ->
+              selected = tracks.indexOfFirst { it.id == track.id }.coerceAtLeast(0)
+              position = 0; playing = false; changedAt = SystemClock.elapsedRealtime()
+              showPlayer()
+            }
+            val detail = collection
+            if (detail != null) {
+              MusicCollectionDetail(detail,
+                  onBack = { collection = null }, onTrack = selectTrack,
+                  onShowPlayer = showPlayer, modifier = Modifier.weight(1f),
+                  status = browseStatus, statusMessage = browseMessage,
+                  currentTrackId = item?.id,
+                  onPlayCollection = {
+                    it.tracks.firstOrNull()?.let(selectTrack)
+                    playing = true
+                  })
+            } else if (browse == "library") {
+              MusicLibraryPage(if (connection == MusicConnection.NOT_CONFIGURED) emptyList() else albums,
+                  onBack = showPlayer, onCollection = { collection = it },
+                  onShowPlayer = showPlayer, modifier = Modifier.weight(1f),
+                  status = browseStatus, statusMessage = browseMessage)
+            } else if (browse == "playlists") {
+              MusicPlaylistsPage(if (connection == MusicConnection.NOT_CONFIGURED) emptyList() else playlists,
+                  onBack = showPlayer, onCollection = { collection = it },
+                  onShowPlayer = showPlayer, modifier = Modifier.weight(1f),
+                  status = browseStatus, statusMessage = browseMessage)
+            } else {
             val playerModifier = if (layout == MusicPlayerLayout.COMPACT) Modifier.fillMaxWidth()
                 else Modifier.weight(1f).fillMaxWidth()
             MusicPlayerContent(snapshot, layout, playerModifier,
@@ -136,6 +199,7 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                       playing = false
                     }
                     is MusicPlayerUiAction.Seek -> position = action.positionMs
+                    MusicPlayerUiAction.BrowseLibrary -> { browse = "library"; collection = null }
                     else -> message = "Design preview · provider controls are deferred · no audio"
                   }
                   changedAt = SystemClock.elapsedRealtime()
@@ -146,6 +210,7 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                         modifier = Modifier.padding(24.dp))
                   }
                 })
+            }
           }
         }
       }

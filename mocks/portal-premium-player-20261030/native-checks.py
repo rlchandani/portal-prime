@@ -120,6 +120,50 @@ demand("Actual Gallery stage renders the new style", node(nodes, "Gallery print"
 image = Image.open(out / "gallery-print.png").convert("RGB")
 demand("Gallery matte and retained photo differ", image.getpixel((32, 32)) == (28, 27, 25)
        and image.getpixel((image.width // 2, image.height // 2)) != (28, 27, 25))
+nodes = launch("library", "--es", "screen", "library")
+demand("Native library reports six collections and renders the first row",
+       node(nodes, "6 collections") is not None and
+       all(node(nodes, title) is not None for title in
+           ("The quiet hours", "North shore", "Open windows", "Small hours", "Open road")))
+adb("shell", "input", "swipe", "1000", "1250", "1000", "500", "350")
+nodes = capture("library-scrolled")
+demand("Lazy library reveals its sixth supplied album on scroll",
+       node(nodes, "Quiet bloom") is not None)
+adb("shell", "input", "swipe", "1000", "500", "1000", "1250", "350")
+nodes = capture("library-top")
+tap(nodes, "The quiet hours")
+nodes = capture("album-detail")
+demand("Album detail includes its supplied track and optional play action",
+       node(nodes, "After the sun") is not None and node(nodes, "Play").get("enabled") == "true")
+tap(nodes, "Back")
+nodes = capture("library-return")
+demand("Album back returns to library in the same activity", node(nodes, "6 collections") is not None)
+nodes = launch("playlists", "--es", "screen", "playlists")
+demand("Native playlists present three supplied collections",
+       all(node(nodes, title) is not None for title in ("Slow mornings", "After dark", "At home")))
+tap(nodes, "Slow mornings")
+nodes = capture("playlist-detail")
+demand("Playlist detail presents its three supplied tracks",
+       all(node(nodes, title) is not None for title in ("After the sun", "Blue distance", "The long way home")))
+tap(nodes, "Blue distance")
+nodes = capture("collection-selected-player")
+demand("Collection selection returns to player and preserves the selected track",
+       sum(n.get("text") == "Blue distance" for n in nodes) >= 2
+       and node(nodes, "Play").get("enabled") == "true")
+nodes = launch("library-empty", "--es", "screen", "library", "--es", "scenario", "setup")
+demand("Unconfigured library shows an honest empty state", node(nodes, "Your library is empty") is not None)
+nodes = launch("playlists-offline", "--es", "screen", "playlists", "--es", "scenario", "offline")
+demand("Unavailable playlists show status without fabricated cards",
+       node(nodes, "Playlists unavailable") is not None and not any(n.get("text") == "Slow mornings" for n in nodes))
+nodes = launch("library-large-font", "--es", "screen", "library", "--ef", "font_scale", "1.8")
+demand("Large-font library retains visible navigation", all(bounds(node(nodes, label))[3] <= 1440
+       for label in ("Back", "Now playing")))
+tap(nodes, "The quiet hours")
+nodes = capture("album-large-font")
+demand("Large-font album detail retains navigation and collection title",
+       node(nodes, "The quiet hours") is not None and bounds(node(nodes, "Back"))[3] <= 1440)
+nodes = launch("playlists-light", "--es", "screen", "playlists", "--es", "theme", "light")
+demand("Light playlists retain their supplied metadata", node(nodes, "After dark") is not None)
 adb("shell", "am", "force-stop", "com.immortal.launcher.debug")
 (out / "checks.json").write_text(json.dumps({
     "passed": len(checks), "checks": checks, "complete": True, "serial": args.serial,

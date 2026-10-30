@@ -86,12 +86,17 @@ The artwork budget includes control/capability-message height and font scale.
 `MusicDesignPreviewActivity` and its original 512px cover assets are debug-only. The preview
 never creates an audio controller, connects a server or reads household media. It renders the
 real native music, night-clock and Gallery print components with silent sample data.
-Library/provider actions remain deferred. The browser library/playlist exploration stays
-interactive; no native provider integration is implied.
+`MusicBrowseUi.kt` now supplies native library, playlist and collection-detail components.
+They accept immutable host-supplied metadata, use lazy grids/lists and bounded local artwork,
+and share navigation with the silent debug preview. Empty and unavailable states do not
+invent collections. Live provider actions and library data remain deferred; no native
+provider integration is implied.
 
 `native-checks.py` targets only the dedicated `PortalMusic20261030` AVD and refuses a household
 device. It captures layout evidence and checks touch sizes, transport visibility, queue/layout
-continuity, offline guards, theme/font variants and native clock/gallery rendering:
+continuity, offline guards, theme/font variants and native clock/gallery rendering.
+The latest run passed 29 checks, including lazy album scrolling, collection navigation,
+playlist track selection, honest empty/unavailable states and 1.8× text:
 
 ```sh
 python3 native-checks.py --serial emulator-5556
@@ -101,3 +106,18 @@ Results are in `evidence/native/checks.json`; `complete: true` is required befor
 whole check passed. Open `native-review.html` for the image review. The emulator's API 34/GMS
 image does not establish Portal API 29 timing, sensor behavior or audio compatibility.
 No Home Assistant music deployment belongs to either preview.
+
+## Actual slideshow renderer review
+
+`slideshow/serve.py` exposes an allowlist of production slideshow assets, an injected silent
+host and two original portrait fixtures. It never serves the repository root. Run:
+
+```sh
+python3 slideshow/serve.py
+```
+
+Open `http://127.0.0.1:8891/`. Diptych, Framed and Ken Burns are rendered by the actual
+production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
+ambient sensors. Its 13 browser checks include real stalled HTTP image requests, pause
+cancellation, bounded preparation and delayed dimension recovery. Chrome results do not
+establish Portal GPU timing; source tests separately cover Filmstrip and Gallery geometry.

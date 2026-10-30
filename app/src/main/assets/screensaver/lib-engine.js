@@ -20,6 +20,10 @@ window.preloadDecoded = function (url, signal) {
     function finish(ok) {
       if (settled) return;
       settled = true;
+      if (ok && typeof window.recordPhotoDimensions === "function") {
+        // Reuse the admitted display decode; slow startup probes need no retry worker.
+        try { window.recordPhotoDimensions(url, img.naturalWidth, img.naturalHeight); } catch (_) {}
+      }
       clearTimeout(timeout);
       img.onload = img.onerror = null;
       if (signal) signal.removeEventListener("abort", cancel);
