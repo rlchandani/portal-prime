@@ -155,9 +155,9 @@ python3 slideshow/serve.py
 ```
 
 Open `http://127.0.0.1:8891/`. Diptych, Framed, Ken Burns, Cinematic Push, Gallery Wall,
-Hero + Sidebar, Memories, Panorama Drift and Mosaic Wall are rendered by the actual
+Hero + Sidebar, Memories, Panorama Drift, Mosaic Wall and Polaroid Scatter are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its **174 browser checks** include real stalled HTTP image requests, pause
+ambient sensors. Its **206 browser checks** include real stalled HTTP image requests, pause
 cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
 frames, initial readiness without a second fade, pause without the newer animation API,
 and cancellation immediately before DOM publication. Diptych preserves its existing
@@ -221,6 +221,25 @@ limits, atomic two-cell exchanges, retained manual pause, cleanup and cancellati
 small libraries, decoded extreme-aspect bounds and static focal anchors.
 
 Open `http://127.0.0.1:8891/?mode=mosaic&review=1` for the five-second review pace.
+
+Polaroid Scatter retains scattered paper prints, small tilts and changing photo
+positions within distinct regions. Paper borders and each rotated envelope fit
+their allotted region; extreme-aspect photos stay whole. Six prints use seven
+reusable image/card slots, or library size plus one for smaller collections.
+Initial prints are opaque before the scheduler's outer fade. Replacements scale
+from 90% to 100% and fade in over 900ms while the outgoing print remains opaque.
+Retirement clears its URL; resting cards and paused drops use `will-change: auto`.
+Manual pause holds both opacity and transform, then resumes the remaining drop
+and cadence. Cached focal photos stay complete, and missing metadata never
+becomes an invented caption. These ownership and geometry limits are verified
+separately from physical Portal frame times or GPU allocations.
+Thirty-two actual-source Chrome assertions cover complete initial admission,
+opaque outgoing prints, one incoming promotion hint, URL retirement, retained
+manual pause/resume, rapid pool reuse and cancellation. Rotated whole-photo paper
+bounds are checked at five viewports from 320×240 to 2160×1440, with photo aspects
+from 0.025:1 to 40:1 and both tilt directions.
+
+Open `http://127.0.0.1:8891/?mode=polaroid&review=1` for the five-second review pace.
 Only a strip that actually moves requests transform promotion. Geometry and owned
 resource bounds are verified separately from physical Portal GPU memory or FPS.
 The preview uses original 3:1 and 8:1 landscapes with matching metadata.

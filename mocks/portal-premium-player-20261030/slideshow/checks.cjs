@@ -37,9 +37,9 @@ const server = http.createServer((req, res) => {
     return;
   }
   let content, type;
-  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit", "/memories-unit", "/panorama-unit", "/mosaic-unit"].includes(u.pathname)) {
+  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit", "/memories-unit", "/panorama-unit", "/mosaic-unit", "/polaroid-unit"].includes(u.pathname)) {
     const unitPhotos = u.pathname === "/panorama-unit" ? panoramaPhotos :
-      ["/gallery-unit", "/sidebar-unit", "/memories-unit", "/mosaic-unit"].includes(u.pathname) ? galleryPhotos :
+      ["/gallery-unit", "/sidebar-unit", "/memories-unit", "/mosaic-unit", "/polaroid-unit"].includes(u.pathname) ? galleryPhotos :
       ["dunes", "tidal"].map((name, id) => ({
         id, url: "/fixtures/" + name + ".png", w: 480, h: 720,
       }));
@@ -50,11 +50,12 @@ const server = http.createServer((req, res) => {
       window.PHOTOS=${JSON.stringify(unitPhotos)};
       </script></body></html>`;
     type = "text/html";
-  } else if (["/render", "/renderMosaic"].includes(u.pathname)) {
+  } else if (["/render", "/renderMosaic", "/renderPolaroid"].includes(u.pathname)) {
     const slow = u.searchParams.has("slow"), unknown = u.searchParams.has("unknown");
-    const mode = u.pathname === "/renderMosaic" ? "mosaic" : u.searchParams.get("mode") || "diptych";
+    const mode = u.pathname === "/renderMosaic" ? "mosaic" :
+      u.pathname === "/renderPolaroid" ? "polaroid" : u.searchParams.get("mode") || "diptych";
     const photos = mode === "panorama" ? panoramaPhotos :
-      ["galleryWall", "heroSidebar", "memories", "mosaic"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
+      ["galleryWall", "heroSidebar", "memories", "mosaic", "polaroid"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
       url: (slow ? "/slow/" : "/fixtures/") + name + ".png",
       w: unknown ? 0 : 480, h: unknown ? 0 : 720,
     }));
@@ -109,11 +110,12 @@ async function until(condition) {
       };
     });
     page.on("pageerror", error => errors.push(error.message));
-    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama", "mosaic"]) {
-      await page.goto(`${base}/${mode === "mosaic" ? "renderMosaic" : "render"}?nativeClock=1&mode=${mode}`);
+    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama", "mosaic", "polaroid"]) {
+      const route = mode === "mosaic" ? "renderMosaic" : mode === "polaroid" ? "renderPolaroid" : "render";
+      await page.goto(`${base}/${route}?nativeClock=1&mode=${mode}`);
       await page.locator("#loading.hide").waitFor({ state: "attached" });
       await page.waitForFunction(() => getComputedStyle(document.querySelector(".ss-beat.on")).opacity === "1" &&
-        [...document.querySelectorAll(".ss-frame.on,.ss-art.on,.ss-layer.on,.ss-memory-scene.on")]
+        [...document.querySelectorAll(".ss-frame.on,.ss-art.on,.ss-layer.on,.ss-memory-scene.on,.ss-polaroid.on")]
           .every(n => getComputedStyle(n).opacity === "1"));
       if (mode === "diptych") {
         const state = await page.evaluate(() => {
@@ -130,7 +132,7 @@ async function until(condition) {
         demand("Diptych matte inset scales to the actual viewport", Math.abs(state.padding - 43.2) < .1);
       }
       // Preserve all prior screenshots byte-for-byte during this bounded addition.
-      if (mode === "mosaic")
+      if (mode === "polaroid")
         await page.screenshot({ path: path.join(evidence, mode + ".png") });
       demand(mode + " actual renderer becomes ready", await page.locator("#loading").evaluate(n => n.classList.contains("hide")));
       if (mode === "mosaic")
@@ -140,7 +142,348 @@ async function until(condition) {
             [...document.querySelectorAll(".mosaic-cell")].every(cell =>
               +getComputedStyle(cell.lastElementChild).opacity === 1 &&
               getComputedStyle(cell.lastElementChild.firstElementChild).backgroundImage !== "none")));
+      if (mode === "polaroid")
+        demand("Polaroid outer publication owns six complete opaque unique prints from all twelve fixtures",
+          await page.evaluate(() => PHOTOS.length === 12 && document.querySelectorAll(".ss-polaroid").length === 7 &&
+            document.querySelectorAll(".ss-polaroid.on").length === 6 &&
+            new Set([...document.querySelectorAll(".ss-polaroid.on .ss-ph")]
+              .map(image => image.style.backgroundImage)).size === 6 &&
+            [...document.querySelectorAll(".ss-polaroid.on")].every(card =>
+              +getComputedStyle(card).opacity === 1 && getComputedStyle(card).willChange === "auto")));
     }
+    await page.goto(`${base}/polaroid-unit`);
+    const polaroidInitial = await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined; Element.prototype.animate = undefined;
+      const original = window.preloadDecoded;
+      let count = 0, release, reached;
+      const blocked = new Promise(resolve => { reached = resolve; });
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        if (++count !== 6) return prepared;
+        return prepared.then(value => new Promise(resolve => { release = () => resolve(value); reached(); }));
+      };
+      const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.polaroidRoot = root; window.polaroidRequests = []; window.polaroidReady = false;
+      window.polaroidCheck = SS.MODES.polaroid.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2500, microMs: 2500, motionMs: 2500,
+        url: (photo, edge) => {
+          const url = photo.url + "?prepared=" + (polaroidRequests.length + 1);
+          polaroidRequests.push({ url, edge }); return url;
+        },
+      }, PHOTOS);
+      polaroidCheck.ready.then(ok => { polaroidReady = ok; });
+      window.releasePolaroidInitial = () => release();
+      window.restorePolaroidLoader = () => { window.preloadDecoded = original; };
+      await blocked;
+      return { ready: polaroidReady, admitted: polaroidRequests.length,
+        published: root.querySelectorAll(".ss-polaroid.on").length,
+        opaque: [...root.querySelectorAll(".ss-polaroid.on")].every(card => +getComputedStyle(card).opacity === 1) };
+    });
+    demand("Polaroid withholds full readiness until the sixth real decode while early cards are immediately opaque",
+      !polaroidInitial.ready && polaroidInitial.admitted === 6 &&
+      polaroidInitial.published === 5 && polaroidInitial.opaque, polaroidInitial);
+    await page.evaluate(async () => {
+      releasePolaroidInitial(); await polaroidCheck.ready;
+      window.polaroidCards = [...polaroidRoot.querySelectorAll(".ss-polaroid")];
+      window.polaroidImages = polaroidCards.map(card => card.firstElementChild);
+      window.polaroidOldCard = polaroidCards.find(card => card.classList.contains("on"));
+      window.polaroidOldImage = polaroidOldCard.firstElementChild;
+      window.polaroidOldUrl = polaroidOldImage.style.backgroundImage;
+      window.polaroidResting = polaroidCards.filter(card => card !== polaroidOldCard && card.classList.contains("on"));
+      window.polaroidPositions = polaroidResting.map(card =>
+        [card.style.left, card.style.top, card.style.width, card.style.height, card.style.transform]);
+      window.polaroidState = () => polaroidCards.map(card => ({
+        opacity: getComputedStyle(card).opacity, transform: getComputedStyle(card).transform,
+        url: card.firstElementChild.style.backgroundImage,
+      }));
+    });
+    demand("Polaroid readiness owns six unique whole opaque photos and seven fixed cards/images without a second card fade",
+      await page.evaluate(() => polaroidReady && polaroidCards.length === 7 && polaroidImages.length === 7 &&
+        new Set(polaroidImages.filter(image => image.style.backgroundImage !== "none")
+          .map(image => image.style.backgroundImage)).size === 6 &&
+        polaroidCards.filter(card => card.classList.contains("on")).every(card =>
+          +getComputedStyle(card).opacity === 1 && getComputedStyle(card).transitionDuration === "0s") &&
+        polaroidImages.every(image => image.style.backgroundImage === "none" ||
+          getComputedStyle(image).backgroundSize === "contain")));
+    demand("Polaroid resting cards/photos request no permanent hints, blur, image animation or invented captions",
+      await page.evaluate(() => polaroidCards.every(card => getComputedStyle(card).willChange === "auto") &&
+        polaroidImages.every(image => getComputedStyle(image).willChange === "auto" &&
+          getComputedStyle(image).animationName === "none" && getComputedStyle(image).filter === "none") &&
+        polaroidRoot.querySelectorAll(".ss-fill,.ss-cap").length === 0 && polaroidRoot.textContent.trim() === ""));
+    demand("Polaroid initial printing resolves each 1400-edge derivative exactly once and publishes the admitted URL",
+      await page.evaluate(() => polaroidRequests.length === 6 &&
+        polaroidRequests.every(request => request.edge === 1400 &&
+          polaroidImages.some(image => image.style.backgroundImage === `url("${request.url}")`))));
+    await page.waitForFunction(() => [...polaroidRoot.querySelectorAll(".ss-polaroid")]
+      .some(card => +getComputedStyle(card).opacity > .1 && +getComputedStyle(card).opacity < .9));
+    const polaroidFade = await page.evaluate(() => {
+      window.polaroidIncoming = polaroidRoot.querySelector(".ss-table").lastElementChild;
+      const style = getComputedStyle(polaroidIncoming), matrix = new DOMMatrixReadOnly(style.transform);
+      return { incoming: +style.opacity, scale: Math.hypot(matrix.a, matrix.b),
+        outgoing: +getComputedStyle(polaroidOldCard).opacity,
+        outgoingUrl: polaroidOldImage.style.backgroundImage,
+        durations: style.transitionDuration, properties: style.transitionProperty,
+        hints: polaroidCards.filter(card => getComputedStyle(card).willChange !== "auto").length,
+        requests: polaroidRequests.length,
+        exactUrl: polaroidIncoming.firstElementChild.style.backgroundImage === `url("${polaroidRequests.at(-1).url}")` };
+    });
+    demand("Polaroid replacement fades and scales only one incoming card for 900ms above its opaque original URL",
+      polaroidFade.incoming > 0 && polaroidFade.incoming < 1 && polaroidFade.scale >= .9 && polaroidFade.scale < 1 &&
+      polaroidFade.outgoing === 1 && polaroidFade.outgoingUrl !== "none" && polaroidFade.hints === 1 &&
+      polaroidFade.durations.split(",").every(duration => duration.trim() === "0.9s") &&
+      polaroidFade.properties === "opacity, transform" && polaroidFade.requests === 7 && polaroidFade.exactUrl, polaroidFade);
+    const pausedPolaroid = await page.evaluate(async () => {
+      polaroidCheck.pause();
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return { state: polaroidState(), requests: polaroidRequests.length };
+    });
+    await page.waitForTimeout(2700);
+    demand("Polaroid old-WebView pause freezes incoming opacity/transform and URLs beyond fade and drop deadlines",
+      await page.evaluate(before => !Element.prototype.getAnimations && !Element.prototype.animate &&
+        JSON.stringify(polaroidState()) === JSON.stringify(before.state) &&
+        polaroidRequests.length === before.requests && polaroidOldImage.style.backgroundImage === polaroidOldUrl &&
+        polaroidCards.every(card => getComputedStyle(card).willChange === "auto"), pausedPolaroid));
+    const polaroidRemaining = await page.evaluate(() => {
+      window.polaroidResumedAt = performance.now();
+      polaroidCheck.resume();
+      return parseFloat(getComputedStyle(polaroidIncoming).transitionDuration) * 1000;
+    });
+    demand("Polaroid manual resume uses only the remaining fade duration",
+      polaroidRemaining > 0 && polaroidRemaining < 900, { polaroidRemaining });
+    await page.waitForFunction(() => polaroidOldImage.style.backgroundImage === "none" &&
+      +getComputedStyle(polaroidIncoming).opacity === 1);
+    demand("Polaroid retires the old URL only at full incoming opacity and returns every resting hint to auto",
+      await page.evaluate(() => getComputedStyle(polaroidOldCard).visibility === "hidden" &&
+        polaroidOldImage.style.backgroundImage === "none" &&
+        polaroidCards.every(card => getComputedStyle(card).willChange === "auto") &&
+        polaroidImages.filter(image => image.style.backgroundImage !== "none").length === 6 &&
+        polaroidRoot.querySelectorAll(".ss-polaroid").length === 7 &&
+        polaroidRequests.every(request => request.edge === 1400)));
+    demand("Polaroid drop preserves the other five original scattered paper positions and the fixed card pool",
+      await page.evaluate(() => polaroidResting.every((card, i) =>
+        JSON.stringify([card.style.left, card.style.top, card.style.width, card.style.height, card.style.transform]) ===
+          JSON.stringify(polaroidPositions[i])) && polaroidCards.every(card => card.isConnected)));
+    await page.waitForFunction(() => polaroidRequests.length === 8 &&
+      polaroidRoot.querySelector(".ss-table").lastElementChild.firstElementChild.style.backgroundImage ===
+        `url("${polaroidRequests.at(-1).url}")`);
+    const resumedPaperCadence = await page.evaluate(() => ({
+      elapsed: performance.now() - polaroidResumedAt,
+      requests: polaroidRequests.length,
+      fixed: polaroidCards.every(card => card.isConnected),
+      hints: polaroidCards.filter(card => getComputedStyle(card).willChange !== "auto").length,
+      edge: polaroidRequests.at(-1).edge,
+    }));
+    demand("Polaroid manual resume preserves the remaining drop cadence and admits one later replacement",
+      resumedPaperCadence.elapsed > 900 && resumedPaperCadence.elapsed < 3500 &&
+      resumedPaperCadence.requests === 8 && resumedPaperCadence.fixed &&
+      resumedPaperCadence.hints === 1 && resumedPaperCadence.edge === 1400, resumedPaperCadence);
+    await page.evaluate(() => {
+      polaroidCheck.pause(); polaroidCheck(); polaroidCheck(); polaroidCheck.resume();
+      window.polaroidClosedRequests = polaroidRequests.length; restorePolaroidLoader();
+    });
+    demand("Polaroid terminal cleanup removes the table and releases every retained URL, transform and hint",
+      await page.evaluate(() => polaroidRoot.children.length === 0 && polaroidCards.every(card =>
+        !card.isConnected && card.style.willChange === "auto" && card.style.transform === "none" &&
+        card.ontransitionend === null && card.firstElementChild.style.backgroundImage === "none")));
+    await page.waitForTimeout(2600);
+    demand("Polaroid stopped ownership cannot admit derivatives or republish the removed table",
+      await page.evaluate(() => polaroidRoot.children.length === 0 && polaroidRequests.length === polaroidClosedRequests));
+    for (const [W, H] of [[2160, 1440], [1920, 1080], [1024, 768], [640, 960], [320, 240]]) {
+      await page.setViewportSize({ width: W, height: H });
+      await page.goto(`${base}/polaroid-unit`);
+      for (const random of [.01, .99]) {
+        const paperGeometry = await page.evaluate(async ({ W, H, random }) => {
+          const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+          document.querySelector("#stage").append(root);
+          const photos = [40, .025, 1.5, 2 / 3, 1, 3].map((ratio, id) => {
+            const w = ratio < 1 ? 100 : ratio * 100, h = ratio < 1 ? 100 / ratio : 100;
+            const url = "data:image/svg+xml," + encodeURIComponent(
+              `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
+              `<rect width="${w}" height="${h}" fill="#647f83"/></svg>`);
+            return { id, seed: "paper-geometry-" + id, url, w, h, fx: .8, fy: .2 };
+          });
+          const originalRandom = Math.random; Math.random = () => random;
+          const cleanup = SS.MODES.polaroid.run({
+            root, cursor: { i: 0 }, W, H, photoMs: 2500, microMs: 30000, motionMs: 2500, url: photo => photo.url,
+          }, photos);
+          try {
+            await cleanup.ready;
+            const decoded = await Promise.all(photos.map(async photo => {
+              const image = new Image(); image.src = photo.url; await image.decode();
+              return Math.abs(image.naturalWidth / image.naturalHeight - photo.w / photo.h) < .0001;
+            }));
+            const cards = [...root.querySelectorAll(".ss-polaroid.on")], cols = Math.ceil(Math.sqrt(6 * W / H));
+            const COLS = Math.min(6, cols), ROWS = Math.ceil(6 / COLS), cellW = W / COLS, cellH = H / ROWS;
+            const boxes = cards.map(card => {
+              const box = card.getBoundingClientRect(), style = getComputedStyle(card);
+              const image = card.firstElementChild, imageStyle = getComputedStyle(image);
+              const photo = photos.find(photo => image.style.backgroundImage.includes(photo.url));
+              const edge = parseFloat(style.paddingLeft), chin = parseFloat(style.paddingBottom);
+              const matrix = new DOMMatrixReadOnly(style.transform);
+              const rotation = Math.atan2(matrix.b, matrix.a) * 180 / Math.PI;
+              const width = parseFloat(style.width), height = parseFloat(style.height);
+              const centerX = (box.left + box.right) / 2, centerY = (box.top + box.bottom) / 2;
+              const corners = [-1, 1].flatMap(x => [-1, 1].map(y => ({
+                x: centerX + matrix.a * x * width / 2 + matrix.c * y * height / 2,
+                y: centerY + matrix.b * x * width / 2 + matrix.d * y * height / 2,
+              })));
+              const col = Math.floor(centerX / cellW), row = Math.floor(centerY / cellH);
+              return { left: box.left, right: box.right, top: box.top, bottom: box.bottom, cell: row * COLS + col,
+                contained: corners.every(corner => corner.x >= -.1 && corner.y >= -.1 && corner.x <= W + .1 && corner.y <= H + .1) &&
+                  box.left >= col * cellW - .1 && box.right <= (col + 1) * cellW + .1 &&
+                  box.top >= row * cellH - .1 && box.bottom <= (row + 1) * cellH + .1,
+                aspect: photo && Math.abs(parseFloat(image.style.width) / parseFloat(image.style.height) - photo.w / photo.h) < .0001,
+                paper: Math.abs(width - parseFloat(image.style.width) - edge * 2) < .1 &&
+                  Math.abs(height - parseFloat(image.style.height) - edge - chin) < .1 && Math.abs(chin - edge * 2.5) < .1 &&
+                  edge >= 4 && edge <= 22 && Math.abs(rotation) <= 8,
+                staticWhole: imageStyle.backgroundSize === "contain" && imageStyle.backgroundRepeat === "no-repeat" &&
+                  imageStyle.animationName === "none" && imageStyle.willChange === "auto" &&
+                  style.willChange === "auto" && +style.opacity === 1 };
+            });
+            const overlap = boxes.some((a, i) => boxes.slice(i + 1).some(b =>
+              a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom));
+            return { boxes, overlap, decoded: decoded.every(Boolean),
+              cells: new Set(boxes.map(box => box.cell)).size, labels: root.textContent.trim(),
+              slots: root.querySelectorAll(".ss-polaroid").length };
+          } finally { cleanup(); Math.random = originalRandom; root.remove(); }
+        }, { W, H, random });
+        demand(`Polaroid ${W}x${H} tilt ${random < .5 ? "negative" : "positive"} keeps whole extreme-aspect photos and rotated paper corners in six separate cells`,
+          paperGeometry.decoded && paperGeometry.boxes.length === 6 && paperGeometry.slots === 7 &&
+          paperGeometry.cells === 6 && !paperGeometry.overlap && paperGeometry.labels === "" &&
+          paperGeometry.boxes.every(box => box.contained && box.aspect && box.paper && box.staticWhole), paperGeometry);
+      }
+    }
+    await page.setViewportSize({ width: 2160, height: 1440 });
+    for (const count of [1, 2, 5]) {
+      await page.goto(`${base}/polaroid-unit`);
+      const smallPaper = await page.evaluate(async count => {
+        const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+        document.querySelector("#stage").append(root);
+        const cleanup = SS.MODES.polaroid.run({
+          root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+          photoMs: 2500, microMs: 30000, motionMs: 2500, url: photo => photo.url,
+        }, PHOTOS.slice(0, count).map(photo => ({ ...photo, fx: .8, fy: .2 })));
+        await cleanup.ready;
+        const cards = [...root.querySelectorAll(".ss-polaroid.on")];
+        const result = { live: cards.length, pool: root.querySelectorAll(".ss-polaroid").length,
+          unique: new Set(cards.map(card => card.firstElementChild.style.backgroundImage)).size,
+          labels: root.textContent.trim(), staticWhole: cards.every(card =>
+            +getComputedStyle(card).opacity === 1 && getComputedStyle(card).willChange === "auto" &&
+            getComputedStyle(card.firstElementChild).backgroundSize === "contain" &&
+            getComputedStyle(card.firstElementChild).animationName === "none") };
+        cleanup(); return result;
+      }, count);
+      demand(`Polaroid ${count}-photo cached-face library keeps unique whole static prints in ${count + 1} fixed cards without labels`,
+        smallPaper.live === count && smallPaper.pool === count + 1 && smallPaper.unique === count &&
+        smallPaper.labels === "" && smallPaper.staticWhole, smallPaper);
+    }
+    await page.goto(`${base}/polaroid-unit`);
+    await page.evaluate(async () => {
+      const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.rapidPaperRoot = root; window.rapidPaperRequests = [];
+      window.rapidPaperCheck = SS.MODES.polaroid.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2500, microMs: 220, motionMs: 2500,
+        url: (photo, edge) => {
+          const url = photo.url + "?rapid=" + (rapidPaperRequests.length + 1);
+          rapidPaperRequests.push({ url, edge }); return url;
+        },
+      }, PHOTOS);
+      await rapidPaperCheck.ready;
+      window.rapidPaperCards = [...root.querySelectorAll(".ss-polaroid")];
+    });
+    const rapidPaperReceipts = [];
+    for (let drop = 1; drop <= 10; drop++) {
+      await page.waitForFunction(drop => rapidPaperRequests.length >= 6 + drop &&
+        rapidPaperRoot.querySelector(".ss-table").lastElementChild.firstElementChild.style.backgroundImage ===
+          `url("${rapidPaperRequests.at(-1).url}")`, drop);
+      rapidPaperReceipts.push(await page.evaluate(drop => {
+        const incoming = rapidPaperRoot.querySelector(".ss-table").lastElementChild;
+        if (drop === 1) { window.stalePaperCard = incoming; window.stalePaperEnd = incoming.ontransitionend; }
+        const urls = () => rapidPaperCards.map(card => card.firstElementChild.style.backgroundImage);
+        const before = urls();
+        if (drop > 1 && stalePaperEnd) stalePaperEnd({ target: stalePaperCard, propertyName: "opacity" });
+        return { guarded: JSON.stringify(urls()) === JSON.stringify(before),
+          fixed: rapidPaperCards.every(card => card.isConnected) && rapidPaperRoot.querySelectorAll(".ss-polaroid").length === 7 &&
+            rapidPaperRoot.querySelectorAll(".ss-ph").length === 7,
+          owners: before.filter(url => url !== "none").length,
+          hints: rapidPaperCards.filter(card => getComputedStyle(card).willChange !== "auto").length,
+          opaque: rapidPaperCards.some(card => +getComputedStyle(card).opacity === 1),
+          edges: rapidPaperRequests.every(request => request.edge === 1400) };
+      }, drop));
+    }
+    demand("Polaroid rapid pool reuse retains seven fixed owners, at most one promotion and guards old retirement callbacks",
+      rapidPaperReceipts.every(receipt => receipt.guarded && receipt.fixed && receipt.owners <= 7 &&
+        receipt.hints <= 1 && receipt.opaque && receipt.edges), rapidPaperReceipts);
+    await page.evaluate(() => {
+      rapidPaperCheck.pause(); rapidPaperCheck(); rapidPaperCheck.resume();
+      if (stalePaperEnd) stalePaperEnd({ target: stalePaperCard, propertyName: "opacity" });
+      window.rapidPaperClosedRequests = rapidPaperRequests.length;
+    });
+    await page.waitForTimeout(1000);
+    demand("Polaroid rapid cleanup rejects stale fade events and later drops while releasing reused cards",
+      await page.evaluate(() => rapidPaperRoot.children.length === 0 && rapidPaperRequests.length === rapidPaperClosedRequests &&
+        rapidPaperCards.every(card => card.firstElementChild.style.backgroundImage === "none" && card.style.willChange === "auto")));
+    for (const initial of [true, false]) {
+      await page.goto(`${base}/polaroid-unit`);
+      const gatedPaper = await page.evaluate(async initial => {
+        const original = window.preloadDecoded;
+        const root = document.createElement("div"); document.querySelector("#stage").append(root);
+        let hold = initial, release, reached, requests = 0;
+        const blocked = new Promise(resolve => { reached = resolve; });
+        window.preloadDecoded = (url, signal) => {
+          const prepared = original(url, signal);
+          if (!hold) return prepared;
+          hold = false;
+          return prepared.then(value => new Promise(resolve => { release = () => resolve(value); reached(); }));
+        };
+        const cleanup = SS.MODES.polaroid.run({
+          root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+          photoMs: 2500, microMs: 300, motionMs: 2500,
+          url: photo => { requests++; return photo.url; },
+        }, PHOTOS);
+        const urls = () => [...root.querySelectorAll(".ss-ph")].map(image => image.style.backgroundImage);
+        try {
+          if (!initial) { await cleanup.ready; hold = true; }
+          await blocked; cleanup.pause(); release(); await new Promise(resolve => setTimeout(resolve, 30));
+          cleanup.resume(); cleanup.pause();
+          const before = urls(), admitted = requests;
+          await new Promise(resolve => setTimeout(resolve, 50));
+          const held = JSON.stringify(urls()) === JSON.stringify(before) && requests === admitted;
+          cleanup.resume(); await cleanup.ready; await new Promise(resolve => setTimeout(resolve, 80));
+          return held && urls().filter(url => url !== "none").length >= 6;
+        } finally { cleanup(); window.preloadDecoded = original; }
+      }, initial);
+      demand(`Polaroid ${initial ? "initial" : "replacement"} real decode cannot publish through resume/re-pause gates`,
+        gatedPaper);
+    }
+    await page.goto(`${base}/polaroid-unit`);
+    const cancelledPaper = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let cleanup, atCleanup, atRequests, requests = 0;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = root.children.length; atRequests = requests;
+        })), () => {});
+        return prepared;
+      };
+      cleanup = SS.MODES.polaroid.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2500, microMs: 2500, motionMs: 2500,
+        url: photo => { requests++; return photo.url; },
+      }, PHOTOS);
+      const ready = await cleanup.ready; window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: root.children.length, atRequests, requests };
+    });
+    demand("Polaroid decode-admission cleanup rejects partial composition and further derivative publication",
+      cancelledPaper.ready === false && cancelledPaper.atCleanup === 0 &&
+      cancelledPaper.afterReady === 0 && cancelledPaper.atRequests === cancelledPaper.requests, cancelledPaper);
+    console.log(`${checks.filter(name => /polaroid/i.test(name)).length} Polaroid checks passed; replaying the retained browser baseline.`);
     await page.goto(`${base}/mosaic-unit`);
     const mosaicInitial = await page.evaluate(async () => {
       Element.prototype.getAnimations = undefined; Element.prototype.animate = undefined;
@@ -1673,6 +2016,15 @@ async function until(condition) {
         fixtureSource: "All twelve local synthetic gallery SVGs and exactly dimensioned synthetic geometry SVGs",
         screenshots: ["mosaic.png"],
         composition: { cells: 9, fixedImagePanes: 18, derivativeEdge: 1200 },
+        oldWebViewManualPath: "Element.getAnimations and Element.animate unavailable",
+      },
+      polaroid: {
+        passed: checks.filter(name => /polaroid/i.test(name)).length,
+        fixtureSource: "All twelve local synthetic gallery SVGs and exactly dimensioned extreme-aspect geometry SVGs",
+        screenshots: ["polaroid.png"],
+        composition: { livePrints: 6, fixedCards: 7, derivativeEdge: 1400 },
+        geometryViewports: [[2160, 1440], [1920, 1080], [1024, 768], [640, 960], [320, 240]],
+        geometryAspects: [40, .025, 1.5, 2 / 3, 1, 3],
         oldWebViewManualPath: "Element.getAnimations and Element.animate unavailable",
       },
       scope: "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",

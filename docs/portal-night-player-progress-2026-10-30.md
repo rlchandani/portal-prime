@@ -859,6 +859,70 @@ presentation measurements remain open; the source/browser checks do not establis
 a physical FPS improvement. Music backend wiring remains deferred, and no Home
 Assistant operation belongs to this batch. The broader goal remains active.
 
+## Polaroid Scatter — 18:55 UTC batch
+
+Polaroid retains its scattered paper prints, small tilts and in-place replacement
+of the oldest print. It now sizes the complete photograph and paper border using
+the **rotated envelope**, then places that envelope inside a distinct screen
+region. Photo proportions stay intact, including extreme portraits and panoramas.
+Borders adapt to the region size, the blank chin is 2.5× the side border, and tilt
+is bounded to ±8°. Cached face photos remain whole; missing metadata produces no
+invented caption.
+
+A six-print composition owns **seven reusable card/image slots**. Smaller
+libraries retain their unique-photo count plus one incoming slot. Initial cards
+are opaque before the scheduler publishes the composition, so there is no second
+per-card startup fade. A replacement scales from 90% to 100% over **900ms** while
+only its incoming opacity fades. The outgoing print retains its exact opaque URL
+until the replacement is opaque, then releases its URL, transform and hint.
+
+**Resting promotion hints: six → zero.** Only the incoming card asks for
+`transform, opacity` during a replacement. Rapid replacement settles the preceding
+incoming card before reusing its outgoing slot; stale retirement callbacks cannot
+release a later owner. These are verified DOM/CSS ownership limits, not measured
+GPU allocations or physical Portal FPS gains.
+
+Manual pause retains incoming opacity/transform and stops further requests and
+cadence timers. Resume continues the remaining fade and interval. Cleanup removes
+the table and clears all seven retained URLs and hints. Derivative acquisition and
+DOM publication recheck current playback ownership across close and resume/re-pause.
+Existing sequential 1400-edge derivative requests are retained.
+
+| Final gate | Evidence |
+| --- | --- |
+| Slideshow source checks | **209 passed**, zero failures/skips; **11 new Polaroid tests** included |
+| Engine fixtures | **14/14 passed** |
+| Actual-source Chrome renderer | **206 assertions passed**, including **32 Polaroid assertions**, zero script errors |
+| Rotated whole-photo geometry | Five viewports, **320×240 to 2160×1440**; six aspects from **0.025:1 to 40:1**, both tilt directions |
+| Composition and ownership | Six unique opaque prints, seven fixed slots, one incoming hint / zero resting hints |
+| Integrated debug build | Successful in **5 seconds**; unchanged JVM task **UP-TO-DATE**, retaining **3,445 passing results / 358 suites** |
+| Native UI scope | Prior **56 checks / 151.09 seconds** cover unchanged Kotlin; not rerun for this asset batch |
+| Visual review | Actual-source Polaroid screenshot inspected at **2160 × 1440** |
+
+Source regressions cover 25 checkpoints each for initial close, initial
+resume/re-pause and replacement resume/re-pause. Browser checks hold the sixth
+initial decode, verify exact admitted resources, retain an opaque outgoing print,
+pause beyond drop/fade deadlines without newer animation APIs, resume the remaining
+fade and cadence, and exercise rapid slot reuse and cleanup. Small cached-face
+libraries retain one/two/five complete, unique prints. Immediate same-task fade
+pause/resume was not separately tested. All **ten prior renderer PNGs** remain
+byte-identical. The finite review server adds Polaroid using the existing twelve
+synthetic gallery fixtures; no household media or credentials are served.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`2d55e3f96ef63b663eb1ce4924db484b9d0ffbff1cf32c979768a9162bf293b3`
+(**48,910,412 bytes**). Its signing certificate matches the preceding Mosaic APK,
+retained privately as a rollback. One upload/install was used; installed-byte
+verification resolved the interrupted install HTTP response. All **97 settings**
+match the pre-install profile. Navigation acknowledgments do not prove visible
+device transitions.
+
+The collector is independently confirmed inactive, stopped and holding **zero
+active listeners**. No new physical timing capture was requested. Living Area
+remains unchanged. Physical night-clock acceptance and reliable Portal presentation
+measurements remain open. Music backend wiring remains deferred; no Home Assistant
+operation belongs to this batch. The broader goal remains active.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

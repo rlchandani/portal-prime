@@ -655,46 +655,124 @@
 
   // ---- 08 Polaroid scatter ---------------------------------------------------
   MODES.polaroid = { name: "Polaroid Scatter", run(ctx, deck) {
-    // MAX clamps to the pool so the table can never demand more distinct photos than exist;
-    // dropping the oldest print always frees a seed before the next pick.
-    const t = makeTimers(ctx); const table = el("ss-table", ctx.root); let live = []; const MAX = SS.slots(deck, 6);
-    // The legacy input has no verified per-photo caption. Never invent a date, place or event.
-    // Uniform-random placement clumps (independent points cluster and leave dead zones), so
-    // scatter over a virtual grid instead: one print per cell, jittered inside it. Every print
-    // then lands in its own region of the screen — guaranteed spread, still messy-looking.
-    const COLS = Math.ceil(Math.sqrt(MAX * ctx.W / ctx.H)), ROWS = Math.ceil(MAX / COLS);
+    const t = makeTimers(ctx), table = el("ss-table", ctx.root), MAX = SS.slots(deck, 6);
+    let live = [], disposed = false, paused = false, fading = null;
+    const now = () => typeof performance !== "undefined" ? performance.now() : Date.now();
+    const COLS = Math.min(MAX, Math.ceil(Math.sqrt(MAX * ctx.W / ctx.H))), ROWS = Math.ceil(MAX / COLS);
     const cellW = ctx.W / COLS, cellH = ctx.H / ROWS;
-    let freeCells = window.shuffled(Array.from({ length: COLS * ROWS }, (_, i) => i)).slice(0, MAX);
-    function place(pl, pw, ph, cell) {
-      const cx = (cell % COLS) * cellW, cy = Math.floor(cell / COLS) * cellH;
-      // Jitter within the cell; clamp so the print (incl. ~110px chin) stays on screen.
-      const M = 16, footH = ph + 110;
-      const x = Math.min(Math.max(cx + Math.random() * Math.max(1, cellW - pw), M), ctx.W - pw - M);
-      const y = Math.min(Math.max(cy + Math.random() * Math.max(1, cellH - footH), M), ctx.H - footH - M);
-      pl.style.left = x + "px"; pl.style.top = y + "px";
+    const freeCells = window.shuffled(Array.from({ length: COLS * ROWS }, (_, i) => i)).slice(0, MAX);
+    // Six live prints and one reusable incoming owner. Resting paper never asks
+    // for permanent promotion; no guessed date, event or place belongs on it.
+    const pool = Array.from({ length: MAX + 1 }, () => {
+      const card = el("ss-polaroid retired", table), image = el("ss-ph", card);
+      card.style.willChange = "auto"; card.style.transition = "none";
+      image.style.backgroundImage = "none"; image.style.animation = "none";
+      image.style.willChange = "auto";
+      return { card, image, photo: null, cell: null, target: null };
+    });
+    function release(print) {
+      print.card.ontransitionend = null;
+      print.card.classList.add("retired"); print.card.classList.remove("on");
+      print.card.style.transition = "none"; print.card.style.opacity = "0";
+      print.card.style.transform = "none"; print.card.style.willChange = "auto";
+      print.image.style.backgroundImage = "none"; print.photo = null;
     }
-    async function drop(delay = 0) {
+    function layout(print, photo, cell) {
+      const raw = aspect(photo), ratio = Number.isFinite(raw) && raw > 0 ? raw : 1;
+      const pad = Math.max(8, Math.min(28, Math.min(cellW, cellH) * .045));
+      const edge = Math.max(4, Math.min(22, Math.min(cellW, cellH) * .035)), chin = edge * 2.5;
+      const rotation = (Math.random() * 2 - 1) * 8, angle = Math.abs(rotation) * Math.PI / 180;
+      const cos = Math.cos(angle), sin = Math.sin(angle), baseW = ratio >= 1 ? 600 : 480, baseH = baseW / ratio;
+      // Fit the rotated PAPER envelope, not only its unrotated photograph.
+      const scale = Math.max(Number.EPSILON, Math.min(1,
+        (cellW - pad * 2 - cos * edge * 2 - sin * (edge + chin)) / (cos * baseW + sin * baseH),
+        (cellH - pad * 2 - sin * edge * 2 - cos * (edge + chin)) / (sin * baseW + cos * baseH)));
+      const pw = baseW * scale, ph = baseH * scale, W = pw + edge * 2, H = ph + edge + chin;
+      const boundW = cos * W + sin * H, boundH = sin * W + cos * H;
+      const cx = (cell % COLS) * cellW, cy = Math.floor(cell / COLS) * cellH;
+      const x = cx + pad + boundW / 2 + Math.random() * Math.max(0, cellW - pad * 2 - boundW);
+      const y = cy + pad + boundH / 2 + Math.random() * Math.max(0, cellH - pad * 2 - boundH);
+      print.card.style.width = W + "px"; print.card.style.height = H + "px";
+      print.card.style.padding = `${edge}px ${edge}px ${chin}px`;
+      print.card.style.left = (x - W / 2) + "px"; print.card.style.top = (y - H / 2) + "px";
+      print.image.style.width = pw + "px"; print.image.style.height = ph + "px";
+      print.target = `rotate(${rotation}deg) scale(1)`; print.rotation = rotation;
+    }
+    function settle(request = fading) {
+      if (disposed || paused || !request || fading !== request) return;
+      const incoming = request.incoming.card;
+      incoming.style.transition = "none"; incoming.style.opacity = "1";
+      incoming.style.transform = request.incoming.target;
+      incoming.style.willChange = "auto"; incoming.ontransitionend = null;
+      t.cancel(request.timer); release(request.outgoing); fading = null;
+    }
+    function present(incoming, outgoing) {
+      const card = incoming.card;
+      card.classList.remove("retired"); card.classList.add("on");
+      card.style.transition = "none"; card.style.opacity = outgoing ? "0" : "1";
+      card.style.transform = outgoing ? `rotate(${incoming.rotation}deg) scale(.9)` : incoming.target;
+      table.appendChild(card);
+      if (!outgoing) return; // The outer scheduler owns the initial composition fade.
+      void card.offsetWidth;
+      const request = { incoming, outgoing, remaining: 900, startedAt: now(), timer: null };
+      fading = request;
+      card.style.willChange = "transform, opacity";
+      card.style.transition = `opacity 900ms ${EASE.outExpo}, transform 900ms ${EASE.outExpo}`;
+      card.style.opacity = "1"; card.style.transform = incoming.target;
+      card.ontransitionend = event => {
+        if (event.target === card && event.propertyName === "opacity" &&
+          Number(getComputedStyle(card).opacity) === 1) settle(request);
+      };
+      request.timer = t.after(() => settle(request), 1000);
+    }
+    async function drop(initial = false) {
       const excluded = live.length >= MAX ? live.slice(1) : live;
       const p = SS.take(deck, ctx.cursor, ["any"], excluded.map(x => x.photo.seed))[0];
-      const url = ctx.url(p, 1400); if (!await t.load(url)) return false;
-      if (live.length >= MAX) { const old = live.shift(); freeCells.push(old.cell); old.el.style.opacity = "0"; old.el.style.transform += " translateY(-30px)"; t.after(() => old.el.remove(), 1000); }
-      if (!freeCells.length) return;
-      const cell = freeCells.splice(Math.floor(Math.random() * freeCells.length), 1)[0];
-      // Exclude prints still on the table so a photo never appears twice at once.
-      const pl = el("ss-polaroid"); const a = aspect(p);
-      // Big prints (2x the original 300/240) — the table is a 2160px wall display.
-      const pw = a >= 1 ? 600 : 480; const ph = Math.round(pw / a);
-      const inner = el("ss-ph", pl); inner.style.width = pw + "px"; inner.style.height = ph + "px"; bg(inner, url);
-      table.appendChild(pl); pl.style.transitionDelay = delay + "ms";
-      place(pl, pw, ph, cell);
-      const rot = (Math.random() * 2 - 1) * 11;
-      pl.style.transform = `rotate(${rot}deg) scale(0.86)`;
-      t.frame(() => { pl.classList.add("on"); pl.style.transform = `rotate(${rot}deg) scale(1)`; });
-      live.push({ el: pl, photo: p, cell });
+      const url = await t.publish(() => ctx.url(p, 1400));
+      if (url === false || !await t.load(url) || disposed) return false;
+      return t.publish(() => {
+        if (disposed) return false;
+        settle();
+        const outgoing = live.length >= MAX ? live.shift() : null;
+        if (outgoing) freeCells.push(outgoing.cell);
+        const print = pool.find(candidate => !candidate.photo);
+        const cell = freeCells.splice(Math.floor(Math.random() * freeCells.length), 1)[0];
+        layout(print, p, cell); bg(print.image, url, "contain");
+        print.photo = p; print.cell = cell; live.push(print);
+        present(print, initial ? null : outgoing);
+      });
     }
-    t.start(async () => { for (let i = 0; i < MAX; i++) { if (await drop(i * 450) === false) return false; } });
+    t.start(async () => { for (let i = 0; i < MAX; i++) if (await drop(true) === false) return false; });
     t.every(() => drop(), ctx.microMs);
-    return t.cleanup;
+    const cleanup = () => {
+      if (disposed) return;
+      disposed = true; t.cleanup(); fading = null;
+      pool.forEach(release); live = []; table.remove();
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
+    cleanup.pause = () => {
+      if (disposed || paused) return;
+      paused = true; t.cleanup.pause();
+      if (!fading) return;
+      const card = fading.incoming.card, style = getComputedStyle(card);
+      const opacity = style.opacity, transform = style.transform;
+      fading.remaining = Math.max(0, fading.remaining - (now() - fading.startedAt));
+      card.style.transition = "none"; card.style.opacity = opacity; card.style.transform = transform;
+      card.style.willChange = "auto";
+    };
+    cleanup.resume = () => {
+      if (disposed || !paused) return;
+      paused = false;
+      if (fading) {
+        const card = fading.incoming.card;
+        fading.startedAt = now();
+        card.style.transition = `opacity ${fading.remaining}ms ${EASE.outExpo}, transform ${fading.remaining}ms ${EASE.outExpo}`;
+        card.style.willChange = "transform, opacity";
+        card.style.opacity = "1"; card.style.transform = fading.incoming.target;
+      }
+      t.cleanup.resume();
+    };
+    return cleanup;
   }};
 
   // ---- 09 Mosaic wall (BSP, choreographed) -----------------------------------

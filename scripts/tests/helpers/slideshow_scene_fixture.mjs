@@ -21,7 +21,7 @@ const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, decl
 }));
 
 export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = false,
-  mode = 'framed', W = 2160, H = 1440, ambientMs = 3500 } = {}) {
+  mode = 'framed', W = 2160, H = 1440, ambientMs = 3500, random = .5 } = {}) {
   let now = 0, nextId = 1, deferred = deferLoad;
   const pending = new Map(), loads = [], writes = [];
   function schedule(fn, ms) {
@@ -138,7 +138,7 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
     setTimeout: schedule, clearTimeout: id => pending.delete(id),
     requestAnimationFrame: fn => schedule(fn, 16), cancelAnimationFrame: id => pending.delete(id),
     Date: class extends Date { static now() { return now; } },
-    Math: Object.assign(Object.create(Math), { random: () => .5 }),
+    Math: Object.assign(Object.create(Math), { random: () => random }),
   });
   if (mode === 'galleryWall') {
     const loader = window.preloadDecoded;
@@ -162,6 +162,7 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
   function nodes(node = root) { return [node, ...node.children.flatMap(child => nodes(child))]; }
   function prints() { return nodes().filter(node =>
     node.classList.contains(mode === 'memories' ? 'memory-photo' : mode === 'panorama' ? 'ss-pan' :
+      mode === 'polaroid' ? 'ss-ph' :
       ['galleryWall', 'heroSidebar', 'mosaic'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
   function slot(print) {
     if (mode === 'memories') {
@@ -169,7 +170,7 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
       while (node.parent && !node.classList.contains('ss-memory-scene')) node = node.parent;
       return node;
     }
-    return mode === 'galleryWall' ? print : ['push', 'heroSidebar', 'panorama', 'mosaic'].includes(mode) ? print.parent : print.parent.parent.parent.parent;
+    return mode === 'galleryWall' ? print : ['push', 'heroSidebar', 'panorama', 'mosaic', 'polaroid'].includes(mode) ? print.parent : print.parent.parent.parent.parent;
   }
   function state(print) {
     const style = computed(print), animation = style.animation || 'none';

@@ -1,6 +1,6 @@
 {
   "complete": true,
-  "passed": 174,
+  "passed": 206,
   "checks": [
     "Diptych displays two complete static photos without blur",
     "Diptych matte inset scales to the actual viewport",
@@ -14,6 +14,38 @@
     "panorama actual renderer becomes ready",
     "mosaic actual renderer becomes ready",
     "Mosaic outer publication waits for nine complete opaque tiles from all twelve synthetic fixtures",
+    "polaroid actual renderer becomes ready",
+    "Polaroid outer publication owns six complete opaque unique prints from all twelve fixtures",
+    "Polaroid withholds full readiness until the sixth real decode while early cards are immediately opaque",
+    "Polaroid readiness owns six unique whole opaque photos and seven fixed cards/images without a second card fade",
+    "Polaroid resting cards/photos request no permanent hints, blur, image animation or invented captions",
+    "Polaroid initial printing resolves each 1400-edge derivative exactly once and publishes the admitted URL",
+    "Polaroid replacement fades and scales only one incoming card for 900ms above its opaque original URL",
+    "Polaroid old-WebView pause freezes incoming opacity/transform and URLs beyond fade and drop deadlines",
+    "Polaroid manual resume uses only the remaining fade duration",
+    "Polaroid retires the old URL only at full incoming opacity and returns every resting hint to auto",
+    "Polaroid drop preserves the other five original scattered paper positions and the fixed card pool",
+    "Polaroid manual resume preserves the remaining drop cadence and admits one later replacement",
+    "Polaroid terminal cleanup removes the table and releases every retained URL, transform and hint",
+    "Polaroid stopped ownership cannot admit derivatives or republish the removed table",
+    "Polaroid 2160x1440 tilt negative keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 2160x1440 tilt positive keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 1920x1080 tilt negative keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 1920x1080 tilt positive keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 1024x768 tilt negative keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 1024x768 tilt positive keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 640x960 tilt negative keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 640x960 tilt positive keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 320x240 tilt negative keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 320x240 tilt positive keeps whole extreme-aspect photos and rotated paper corners in six separate cells",
+    "Polaroid 1-photo cached-face library keeps unique whole static prints in 2 fixed cards without labels",
+    "Polaroid 2-photo cached-face library keeps unique whole static prints in 3 fixed cards without labels",
+    "Polaroid 5-photo cached-face library keeps unique whole static prints in 6 fixed cards without labels",
+    "Polaroid rapid pool reuse retains seven fixed owners, at most one promotion and guards old retirement callbacks",
+    "Polaroid rapid cleanup rejects stale fade events and later drops while releasing reused cards",
+    "Polaroid initial real decode cannot publish through resume/re-pause gates",
+    "Polaroid replacement real decode cannot publish through resume/re-pause gates",
+    "Polaroid decode-admission cleanup rejects partial composition and further derivative publication",
     "Mosaic initial loading admits only two decoded owners and withholds full readiness",
     "Mosaic full readiness publishes nine unique opaque photos in eighteen fixed image panes",
     "Mosaic BSP cells fit the real viewport without blur or oversized photo strips",
@@ -254,6 +286,49 @@
       "fixedImagePanes": 18,
       "derivativeEdge": 1200
     },
+    "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
+  },
+  "polaroid": {
+    "passed": 32,
+    "fixtureSource": "All twelve local synthetic gallery SVGs and exactly dimensioned extreme-aspect geometry SVGs",
+    "screenshots": [
+      "polaroid.png"
+    ],
+    "composition": {
+      "livePrints": 6,
+      "fixedCards": 7,
+      "derivativeEdge": 1400
+    },
+    "geometryViewports": [
+      [
+        2160,
+        1440
+      ],
+      [
+        1920,
+        1080
+      ],
+      [
+        1024,
+        768
+      ],
+      [
+        640,
+        960
+      ],
+      [
+        320,
+        240
+      ]
+    ],
+    "geometryAspects": [
+      40,
+      0.025,
+      1.5,
+      0.6666666666666666,
+      1,
+      3
+    ],
     "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
   },
   "scope": "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",

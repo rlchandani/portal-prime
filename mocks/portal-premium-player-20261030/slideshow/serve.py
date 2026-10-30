@@ -38,10 +38,10 @@ class Handler(BaseHTTPRequestHandler):
         if urlsplit(self.path).path == "/preview.html":
             query = parse_qs(urlsplit(self.path).query)
             mode = query.get("mode", ["diptych"])[0]
-            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama", "mosaic"):
+            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama", "mosaic", "polaroid"):
                 self.send_error(400)
                 return
-            photos = panorama_photos if mode == "panorama" else gallery_photos if mode in ("galleryWall", "heroSidebar", "memories", "mosaic") else [
+            photos = panorama_photos if mode == "panorama" else gallery_photos if mode in ("galleryWall", "heroSidebar", "memories", "mosaic", "polaroid") else [
                 {"url": "/fixtures/" + name + ".png", "w": 480, "h": 720}
                 for name in ("dunes", "tidal")]
             interval = 5 if query.get("review", ["0"])[0] == "1" else 30
