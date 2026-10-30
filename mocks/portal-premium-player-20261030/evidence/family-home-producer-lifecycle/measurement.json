@@ -1,0 +1,123 @@
+{
+  "device": "Family Area",
+  "decision": "withdrawn",
+  "candidateCodeRetained": false,
+  "startedUtc": "2026-10-30T22:11:47Z",
+  "finishedUtc": "2026-10-30T22:34:50.325751+00:00",
+  "issueDeadlineUtc": "2026-10-30T22:41:47Z",
+  "deadlineMet": true,
+  "observer": "API 29 Window FrameMetrics; unsampled; HomeActivity window only; 4-second minimum action cadence",
+  "deliveredFpsMeasured": false,
+  "blocks": {
+    "before": {
+      "frames": 782,
+      "meanMs": 12.609415673913043,
+      "p95Ms": 30.25,
+      "p99Ms": 38.5,
+      "maxMs": 56.050794,
+      "overBudget": 128,
+      "over33_333Ms": 20,
+      "invalidSamples": 0,
+      "callbackDrops": 0,
+      "firstDrawFrames": 0,
+      "overflowSamples": 0,
+      "cycles": 30,
+      "settingsCompared": 97,
+      "allSettingValuesAndScreensaverAndSourceGroupsUnchanged": true,
+      "startRequests": 1,
+      "stopRequests": 1,
+      "apkSha256": "1c8bfc936274fea69258d883cb8f0a29c2d2f8dbc576b896b05957596563994e"
+    },
+    "candidate": {
+      "frames": 780,
+      "meanMs": 12.420741087179488,
+      "p95Ms": 32.5,
+      "p99Ms": 43.5,
+      "maxMs": 52.575296,
+      "overBudget": 126,
+      "over33_333Ms": 35,
+      "invalidSamples": 0,
+      "callbackDrops": 0,
+      "firstDrawFrames": 0,
+      "overflowSamples": 0,
+      "cycles": 30,
+      "settingsCompared": 97,
+      "allSettingValuesAndScreensaverAndSourceGroupsUnchanged": true,
+      "startRequests": 1,
+      "stopRequests": 1,
+      "apkSha256": "10fbee4173ab7636a370ca6b230138a7d742b6beac7a0e41a14f8b6046109d1e"
+    },
+    "after": {
+      "frames": 781,
+      "meanMs": 12.98052571446863,
+      "p95Ms": 33,
+      "p99Ms": 43.25,
+      "maxMs": 52.594935,
+      "overBudget": 137,
+      "over33_333Ms": 39,
+      "invalidSamples": 0,
+      "callbackDrops": 0,
+      "firstDrawFrames": 0,
+      "overflowSamples": 0,
+      "cycles": 30,
+      "settingsCompared": 97,
+      "allSettingValuesAndScreensaverAndSourceGroupsUnchanged": true,
+      "startRequests": 1,
+      "stopRequests": 1,
+      "apkSha256": "1c8bfc936274fea69258d883cb8f0a29c2d2f8dbc576b896b05957596563994e"
+    }
+  },
+  "candidatePercentChangePositiveIsWorse": {
+    "versusBefore": {
+      "meanMs": -1.496,
+      "p95Ms": 7.438,
+      "p99Ms": 12.987
+    },
+    "versusAfter": {
+      "meanMs": -4.312,
+      "p95Ms": -1.515,
+      "p99Ms": 0.578
+    }
+  },
+  "frozenGates": {
+    "p95AtLeast10PercentBetterThanBothControls": false,
+    "p99NoMoreThan5PercentWorseThanEitherControl": false,
+    "meanNoMoreThan5PercentWorseThanEitherControl": true,
+    "controlP95P99DriftAtMost15Percent": true,
+    "candidateWarmMaximumBelow250ms": true,
+    "all97SettingsAndSourcesUnchanged": true,
+    "nativeProducerFunctionalAndRecompositionChecksPass": true
+  },
+  "experimentalNativeProbe": {
+    "originalPriorChecksPassed": 67,
+    "originalExtraRecompositions": 4,
+    "candidateChecksPassed": 68,
+    "candidateHostChecksPassed": 5,
+    "candidateExtraRecompositions": 0,
+    "cachedValuesUnchanged": true,
+    "syntheticGeneratedFixtureOnly": true,
+    "withdrawnWithCandidate": true
+  },
+  "restoredSource": {
+    "performanceApkSha256": "1c8bfc936274fea69258d883cb8f0a29c2d2f8dbc576b896b05957596563994e",
+    "freshJvmResults": {
+      "tests": 3460,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 360
+    },
+    "buildSuccessful": true,
+    "buildDuration": "1m 14s"
+  },
+  "installedApkSha256": "1c8bfc936274fea69258d883cb8f0a29c2d2f8dbc576b896b05957596563994e",
+  "installedApkBytes": 25702091,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "ownedTestAvdStopped": true,
+  "livingAreaTouched": false,
+  "phoneTouched": false,
+  "homeAssistantTouched": false,
+  "privateConfigurationExported": false,
+  "overallGoalComplete": false
+}

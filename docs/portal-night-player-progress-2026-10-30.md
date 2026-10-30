@@ -1627,6 +1627,49 @@ Actual Portal music pixels/interaction, Home/Apps frame tails, physical night
 transitions, stacked-Dream tap and slideshow startup presentation remain open.
 The overall goal remains active; this batch does not claim an FPS improvement.
 
+## Home producer lifecycle candidate withdrawn — 22:11 UTC batch
+
+A generated native probe isolated visibility-only producer recompositions. The
+original implementation passed its 67 previous checks but performed four extra
+recompositions on unchanged-key hide/reveal. Gating producer work through the
+existing stable page lifecycle instead of reading the active composition local
+reduced that count to zero; 68 native and five host checks passed. Cached values,
+hidden-worker suspension, cadence and serialized request ownership stayed intact.
+These were synthetic API 34 fixture checks, not physical Portal timing.
+
+The acceptance gates were frozen before the physical comparison: at least a 10%
+p95 reduction against both controls, no more than 5% p99/mean regression against
+either control, at most 15% control p95/p99 drift and a warmed maximum below 250ms.
+Family ran 30 Home/Apps cycles in each block, unsampled, with a four-second minimum
+cadence. Only the known HomeActivity window is compared; first-draw, dropped,
+invalid and overflow counts are zero. These are Window FrameMetrics timings,
+not delivered FPS or visible navigation latency.
+
+| Build | Frames | Mean | p95 | p99 | Maximum |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Exact control before | **782** | **12.609ms** | **30.25ms** | **38.50ms** | **56.051ms** |
+| Lifecycle candidate | **780** | **12.421ms** | **32.50ms** | **43.50ms** | **52.575ms** |
+| Exact control restored | **781** | **12.981ms** | **33.00ms** | **43.25ms** | **52.595ms** |
+
+The candidate fails the frozen acceptance gates and is **withdrawn**. Its source,
+debug probe and assertions are removed; the previous accepted source is restored.
+Family's independently read installed APK and the restored local optimized build
+both match `1c8bfc936274fea69258d883cb8f0a29c2d2f8dbc576b896b05957596563994e`. All **97 settings**, full
+screensaver configuration and source groups remain unchanged in all three blocks.
+A fresh **3,460 JVM tests / 360 suites** pass with zero failures/errors/skips;
+debug and performance APKs build in **1m 14s**. No speed improvement is claimed
+from this batch. The probe/recomposition success is retained as private experiment
+evidence, not as a delivered feature.
+
+The collector is inactive with **zero listeners**, and the owned API 34 AVD is
+stopped. Scalar evidence is in
+`mocks/portal-premium-player-20261030/evidence/family-home-producer-lifecycle/measurement.json`.
+The batch closes at **22:34 UTC**, before its original **22:41:47 UTC**
+deadline. Living Area, the phone and Home Assistant receive no operations.
+Home frame tails, slideshow startup presentation, physical night/wake acceptance,
+stacked-Dream tap and actual Portal music interaction remain open; the overall
+goal remains active. No further candidate is started in this issue window.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
