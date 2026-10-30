@@ -87,6 +87,9 @@ nodes = capture("queue-selected")
 demand("Queue selection updates hero metadata and remains paused",
        sum(n.get("text") == "Blue distance" for n in nodes) >= 2
        and node(nodes, "Play").get("enabled") == "true")
+demand("Selected queue track retains its artist separately from the paused status",
+       sum(n.get("text") == "North Atlantic" for n in nodes) >= 2
+       and node(nodes, "Paused") is not None)
 tap(nodes, "Minimize player")
 nodes = capture("compact")
 demand("Compact retains selected track and transport", node(nodes, "Blue distance") is not None

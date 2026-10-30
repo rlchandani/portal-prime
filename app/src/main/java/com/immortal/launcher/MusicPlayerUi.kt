@@ -501,6 +501,32 @@ private fun MusicSidePanel(
 private fun rememberMusicPanel(sourceId: String): MutableState<MusicPanel> =
     remember(sourceId) { mutableStateOf(MusicPanel.QUEUE) }
 
+/** Keep supplied metadata separate from the selected row's confirmed playback presentation. */
+internal data class MusicQueueRowPresentation(
+    val current: Boolean,
+    val artist: String,
+    val playbackLabel: String?,
+    val playbackIndicator: PlaybackState?,
+)
+
+internal fun musicQueueRowPresentation(
+    snapshot: MusicPlayerSnapshot,
+    item: MusicQueueItem,
+): MusicQueueRowPresentation {
+  val current = musicCoherentTrack(snapshot)?.id == item.id && item.id.isNotBlank()
+  val showPlayback = current && snapshot.connection == MusicConnection.READY &&
+      snapshot.pending == null &&
+      (!snapshot.audioOwnedByOther || musicMaPlayerId(snapshot) != null)
+  return MusicQueueRowPresentation(
+      current = current,
+      artist = item.artist,
+      playbackLabel = musicPlaybackLabel(snapshot).takeIf { current },
+      playbackIndicator = snapshot.playback.takeIf {
+        showPlayback && (it == PlaybackState.PLAYING || it == PlaybackState.PAUSED)
+      },
+  )
+}
+
 @Composable
 private fun MusicQueue(
     snapshot: MusicPlayerSnapshot,
@@ -523,7 +549,8 @@ private fun MusicQueue(
     // Stable source IDs, with no eager artwork decode for the entire queue.
     itemsIndexed(snapshot.queue, key = { index, item -> item.id.ifBlank { "unavailable:$index" } }) {
         _, item ->
-      val current = musicCoherentTrack(snapshot)?.id == item.id && item.id.isNotBlank()
+      val presentation = musicQueueRowPresentation(snapshot, item)
+      val current = presentation.current
       Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
           .background(if (current) palette.selected else Color.Transparent)
           .clickable(enabled = item.id.isNotBlank() && item.available &&
@@ -534,16 +561,27 @@ private fun MusicQueue(
           horizontalArrangement = Arrangement.spacedBy(14.dp)) {
         MusicCover(snapshot.sourceId, item.id, item.artUrl, Modifier.size(48.dp),
             borrowedArt = snapshot.artBitmap.takeIf { current }, maxEdge = 128)
-        Column(Modifier.weight(1f)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
           MusicText(item.title.ifBlank { "Untitled track" }, size = 20, bold = true, maxLines = 2)
-          MusicText(if (current) musicPlaybackLabel(snapshot) else item.artist,
-              muted = true, size = 16)
+          if (presentation.artist.isNotBlank())
+            MusicText(presentation.artist, muted = true, size = 16)
+          presentation.playbackLabel?.let { label ->
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+              val glyph = when (presentation.playbackIndicator) {
+                PlaybackState.PLAYING -> MusicGlyph.PLAY
+                PlaybackState.PAUSED -> MusicGlyph.PAUSE
+                else -> null
+              }
+              if (glyph != null)
+                MusicIcon(glyph, palette.secondary, Modifier.size(16.dp))
+              MusicText(label, muted = true, size = 13)
+            }
+          }
         }
         item.durationMs?.takeIf { it > 0 }?.let {
           MusicText(musicTime(it), muted = true, size = 15)
         }
-        if (current) MusicIcon(if (snapshot.playback == PlaybackState.PLAYING)
-          MusicGlyph.PLAY else MusicGlyph.PAUSE, palette.text, Modifier.size(20.dp))
       }
     }
   }

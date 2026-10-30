@@ -1,6 +1,6 @@
 {
   "complete": true,
-  "passed": 23,
+  "passed": 31,
   "checks": [
     "Diptych displays two complete static photos without blur",
     "Diptych matte inset scales to the actual viewport",
@@ -17,6 +17,14 @@
     "Diptych old-WebView fallback freezes opacity and retains outgoing resources",
     "Diptych old-WebView fallback resumes and retires safely",
     "Diptych cleanup between decode admission and publication rejects the prepared scene",
+    "Ken Burns readiness publishes one opaque photo without a second startup fade",
+    "Ken Burns uses a quiet matte without full-viewport blurred duplicate photos",
+    "Ken Burns keeps the outgoing photo opaque under the incoming dissolve",
+    "Ken Burns pause freezes both motion and dissolve without the newer animation API",
+    "Ken Burns retires the old photo and compositor hint after the incoming photo is opaque",
+    "Ken Burns cleanup releases photo URLs and stops motion in both owned slots",
+    "Ken Burns cached face hints keep the whole photo still without a permanent compositor hint",
+    "Ken Burns cancellation rejects a decoded photo immediately before publication",
     "Paused startup admits zero HTTP images",
     "Orientation preparation has two concurrent HTTP requests",
     "Pausing closes both real HTTP image requests",

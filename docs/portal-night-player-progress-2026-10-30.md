@@ -385,6 +385,60 @@ it was not retried in this batch. Physical night-clock acceptance and comparable
 rendering measurements remain open. Live music wiring remains deferred and no
 music operation was deployed to Home Assistant.
 
+## Ken Burns rendering work and queue refinement — 16:53 UTC batch
+
+The existing Ken Burns style now shows its prepared photo against a quiet charcoal
+matte with a 3vmin inset, preserving its source selection and gentle motion for
+photos without a cached face hint. It creates **zero full-viewport blurred duplicate
+photos**. A cached face hint preserves the complete image statically, without a
+permanent transform compositor hint; a point alone cannot prove a safe moving crop.
+Animated-source and Shuffle contracts were not replaced with a native still-only path.
+
+Ken Burns and Diptych share one incoming-only dissolve owner. Initial readiness
+publishes an opaque scene, the outgoing photo stays opaque during replacement,
+pause freezes motion and alpha without `getAnimations`, and outgoing URLs and
+motion are released after the replacement is opaque. The dissolve measures elapsed
+active time with a monotonic clock where available. Cleanup rejects publication
+between completed decode admission and the continuation that constructs a scene.
+
+The selected music queue row now retains its artist, with a separate smaller
+playback-status line. Only confirmed playing/paused states show those indicators;
+stopped, idle, pending, restricted local and offline states do not imply active
+playback. Command guards, bounded artwork and stable lazy-list keys remain intact.
+No backend or Home Assistant operation was added.
+
+The startup regression failed against the preceding renderer before the change.
+Fresh independent review found no actionable dissolve defects after the correction.
+The source-fixture gate was updated to permit legitimate terminal resource release
+while still rejecting any subsequent decode publication. The finite-style-ID check
+now explicitly distinguishes the two native Gallery styles from WebView styles.
+
+| Final gate | Evidence |
+| --- | --- |
+| Integrated JVM/debug build | **3,434 tests / 357 suites**, zero failures/errors; APK assembled |
+| Actual-source Chrome renderer | **31 passed**, including old-WebView motion/alpha pause and publication cancellation |
+| Slideshow source tests | **132 passed**, zero failures/skips |
+| Engine source fixtures | **14/14 passed** |
+| Native design/control acceptance | **51 passed in 129.58 seconds** on the dedicated API 34 emulator |
+| Native browser review | **36 captures loaded**, zero page errors |
+| Family Area profile preservation | **97 values**, zero changed |
+
+The installed Family Area APK was independently read back and matched SHA-256
+`b04b8a9d242dac4aab033f67d1082edcb156a5b1836b4ac6ae3220021431aeac`
+(**48,905,248 bytes**). Its certificate matches the preceding installed APK,
+retained privately as an exact rollback. Home/screensaver requests were acknowledged;
+visible transitions were not established by those acknowledgments. Living Area
+remains unchanged.
+
+No physical FPS or GPU-memory gain is claimed from removing the decorative layers.
+Physical night-clock acceptance is pending a real dark/bright check. Family Area is
+reachable through Fleet; the current ADB inventory contains only the two emulators,
+and the inspected Fleet routes expose no screenshot endpoint. Native and Chrome
+captures therefore remain scoped to their test surfaces.
+The owned emulator was stopped after acceptance. Family Area's collector was
+independently confirmed inactive with zero listeners; no new timing capture was
+attempted in this batch.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

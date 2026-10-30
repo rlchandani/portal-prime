@@ -74,7 +74,8 @@ test('native finite IDs cover every actual bundled scheduler style', () => {
   const source = readFileSync(new URL('../../app/src/main/java/com/immortal/launcher/SlideshowStyleSamples.kt', import.meta.url), 'utf8');
   const enumSource = source.split('internal enum class SlideshowStyle(val wireId: String) {')[1].split('companion object')[0];
   const nativeIds = [...enumSource.matchAll(/[A-Z_]+\("([^"\n]+)"\)/g)].map(match => match[1]);
-  assert.deepEqual(nativeIds, Array.from(context.SS.MODE_IDS));
+  // Gallery print/spread are native stage styles; they are not WebView scheduler modes.
+  assert.deepEqual(nativeIds, [...Array.from(context.SS.MODE_IDS), 'galleryPrint', 'gallerySpread']);
 });
 
 for (const mode of ids) test(`${mode}: emits only its finite ID after decoded promotion`, async () => {

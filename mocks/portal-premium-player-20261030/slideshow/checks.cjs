@@ -21,7 +21,7 @@ const server = http.createServer((req, res) => {
     return;
   }
   let content, type;
-  if (u.pathname === "/diptych-unit") {
+  if (["/diptych-unit", "/motion-unit"].includes(u.pathname)) {
     content = `<html><head><link rel="stylesheet" href="/assets/styles.css"></head><body>
       <div id="stage"></div><script src="/assets/lib-engine.js"></script>
       <script src="/assets/photos.js"></script><script src="/assets/modes.js"></script>
@@ -214,6 +214,102 @@ async function until(condition) {
     demand("Diptych cleanup between decode admission and publication rejects the prepared scene",
       cancelledPublication.ready === false && cancelledPublication.atCleanup === 0 &&
       cancelledPublication.afterReady === 0);
+    await page.goto(`${base}/motion-unit`);
+    await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined;
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.motionCheck = SS.MODES.kenBurns.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 3400, url: photo => photo.url,
+      }, window.PHOTOS);
+      await window.motionCheck.ready;
+    });
+    demand("Ken Burns readiness publishes one opaque photo without a second startup fade",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-layer")]
+        .filter(n => n.classList.contains("on")).every(n => +getComputedStyle(n).opacity === 1)));
+    demand("Ken Burns uses a quiet matte without full-viewport blurred duplicate photos",
+      await page.locator(".ss-fill").count() === 0 &&
+      await page.evaluate(() => [...document.querySelectorAll(".ss-layer")]
+        .every(n => getComputedStyle(n).filter === "none")));
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-layer")]
+      .some(n => +getComputedStyle(n).opacity > .1 && +getComputedStyle(n).opacity < .9));
+    const movingFade = await page.evaluate(() => [...document.querySelectorAll(".ss-layer")]
+      .filter(n => getComputedStyle(n.querySelector(".ss-hero")).backgroundImage !== "none")
+      .map(n => ({ opacity: +getComputedStyle(n).opacity, top: n === n.parentNode.lastElementChild })));
+    demand("Ken Burns keeps the outgoing photo opaque under the incoming dissolve",
+      movingFade.some(n => n.opacity === 1) &&
+      movingFade.some(n => n.top && n.opacity > 0 && n.opacity < 1));
+    const heldMotion = await page.evaluate(async () => {
+      window.motionCheck.pause();
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return [...document.querySelectorAll(".ss-layer")].map(n => ({
+        opacity: getComputedStyle(n).opacity,
+        transform: getComputedStyle(n.querySelector(".ss-hero")).transform,
+      }));
+    });
+    await page.waitForTimeout(450);
+    demand("Ken Burns pause freezes both motion and dissolve without the newer animation API",
+      await page.evaluate(before => [...document.querySelectorAll(".ss-layer")].every((n, i) =>
+        getComputedStyle(n).opacity === before[i].opacity &&
+        getComputedStyle(n.querySelector(".ss-hero")).transform === before[i].transform), heldMotion));
+    await page.evaluate(() => window.motionCheck.resume());
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-hero")]
+      .filter(n => getComputedStyle(n).backgroundImage !== "none").length === 1);
+    demand("Ken Burns retires the old photo and compositor hint after the incoming photo is opaque",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-layer")].every(n =>
+        n.classList.contains("retired")
+          ? getComputedStyle(n.querySelector(".ss-hero")).backgroundImage === "none" &&
+            getComputedStyle(n.querySelector(".ss-hero")).willChange === "auto"
+          : +getComputedStyle(n).opacity === 1)));
+    await page.evaluate(() => window.motionCheck());
+    demand("Ken Burns cleanup releases photo URLs and stops motion in both owned slots",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-hero")].every(n =>
+        getComputedStyle(n).backgroundImage === "none" &&
+        getComputedStyle(n).animationName === "none")));
+    await page.goto(`${base}/motion-unit`);
+    const faceMotion = await page.evaluate(async () => {
+      const root = document.createElement("div");
+      document.querySelector("#stage").append(root);
+      const cleanup = SS.MODES.kenBurns.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, url: photo => photo.url,
+      }, [{ ...window.PHOTOS[0], fx: .2, fy: .3 }]);
+      const ready = await cleanup.ready;
+      const hero = root.querySelector(".on .ss-hero"), style = getComputedStyle(hero);
+      const result = { ready, size: style.backgroundSize, motion: style.animationName,
+        compositor: style.willChange };
+      cleanup(); return result;
+    });
+    demand("Ken Burns cached face hints keep the whole photo still without a permanent compositor hint",
+      faceMotion.ready && faceMotion.size === "contain" && faceMotion.motion === "none" &&
+      faceMotion.compositor === "auto");
+    await page.goto(`${base}/motion-unit`);
+    const cancelledMotion = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let cleanup, atCleanup;
+      const images = () => [...root.querySelectorAll(".ss-hero")]
+        .filter(n => getComputedStyle(n).backgroundImage !== "none").length;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = images();
+        })), () => {});
+        return prepared;
+      };
+      cleanup = SS.MODES.kenBurns.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, url: photo => photo.url,
+      }, [window.PHOTOS[0]]);
+      const ready = await cleanup.ready;
+      window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: images() };
+    });
+    demand("Ken Burns cancellation rejects a decoded photo immediately before publication",
+      cancelledMotion.ready === false && cancelledMotion.atCleanup === 0 &&
+      cancelledMotion.afterReady === 0);
     await page.goto(`${base}/render?nativeClock=1&slow=1&unknown=1&hostPaused=1`);
     await page.waitForTimeout(200);
     demand("Paused startup admits zero HTTP images", admittedSlow === 0 && held.size === 0);

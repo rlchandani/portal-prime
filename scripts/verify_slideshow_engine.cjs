@@ -54,6 +54,9 @@ function fixture({ mode = "kenBurns", intervalSec = 30, photos, actualModes = tr
   const context = {
     Image, AbortController, innerWidth: 1920, innerHeight: 1280, screen: { width: 1920, height: 1280 },
     console: { log() {}, info() {} }, document: { createElement: element },
+    getComputedStyle: node => ({
+      opacity: node.style.opacity || (node.classList.contains("on") ? "1" : "0"),
+    }),
     setTimeout: timeout, clearTimeout: key => timers.delete(key),
     setInterval: (fn, ms) => timeout(fn, ms, true), clearInterval: key => timers.delete(key),
     requestAnimationFrame: fn => timeout(fn, 16), cancelAnimationFrame: key => timers.delete(key),
@@ -119,8 +122,13 @@ test("outgoing scene survives incoming load and decode, including failure", asyn
 });
 test("cleanup cancels pending image completion and a stopped engine cannot restart", async () => {
   const f = fixture(), engine = f.start(); await f.settle();
-  const dead = f.stage.children[0], before = f.nodes(dead).map(x => x.className + JSON.stringify(x.style));
-  const image = f.images[0]; engine.stop(); image.load(); await f.settle(); image.decodeOK?.();
+  const dead = f.stage.children[0], image = f.images[0];
+  engine.stop();
+  // Terminal cleanup may release resources; later decode completion must not republish them.
+  const before = f.nodes(dead).map(x => x.className + JSON.stringify(x.style));
+  assert(f.nodes(dead).filter(x => x.classList.contains("ss-hero"))
+      .every(x => x.style.backgroundImage === "none"));
+  image.load(); await f.settle(); image.decodeOK?.();
   await f.settle(); await f.tick(35000);
   assert.deepEqual(f.nodes(dead).map(x => x.className + JSON.stringify(x.style)), before,
       "completion mutated a dead root");
@@ -167,7 +175,7 @@ test("every named style gates initial composition on decode and cancels late com
     const dead = pending.stage.children[0];
     pending.images.forEach(x => x.load()); await pending.settle();
     const state = () => pending.nodes(dead).map(x => x.className + JSON.stringify(x.style));
-    const before = state(); canceled.stop();
+    canceled.stop(); const before = state();
     pending.images.forEach(x => x.decodeOK?.()); await pending.settle(); await pending.tick(40000);
     assert.deepEqual(state(), before, `${mode} mutated a dead root after decode`);
     assert.equal(pending.timers.size, 0, `${mode} leaked timers`);

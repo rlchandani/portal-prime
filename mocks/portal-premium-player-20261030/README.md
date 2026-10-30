@@ -98,6 +98,12 @@ collection and returning preserves the original query and complete collection. C
 restores the supplied order. Loading and unavailable status stays visible independently
 of query results. Search performs no provider or artwork request.
 
+The selected queue row now retains its supplied artist and shows playback status on a
+separate quiet line. Confirmed playing/paused states have the corresponding indicator;
+idle, stopped, pending, restricted local and offline states do not imply active playback.
+Nine JVM policy tests cover those distinctions. Artwork bounds, stable list keys and
+command guards are unchanged.
+
 Gallery spread uses the existing bounded native stage, decoder and bitmap ownership.
 It contains two whole portraits inside a 3vmin matte with a 2vmin gap, or one whole
 landscape when pairing is inappropriate. Overlay changes reposition retained views
@@ -118,7 +124,7 @@ python3 native-checks.py --serial emulator-5556
 ```
 
 Results are in `evidence/native/checks.json`; `complete: true` is required before claiming the
-whole check passed. The latest integrated run passed **50 checks in 129.1 seconds**.
+whole check passed. The latest integrated run passed **51 checks in 129.58 seconds**.
 Open `native-review.html` for the image review; all **36 capture tabs** loaded without page
 errors, recorded in `evidence/native-review-checks.json`. The emulator's API 34/GMS
 image does not establish Portal API 29 timing, sensor behavior or audio compatibility.
@@ -149,10 +155,18 @@ python3 slideshow/serve.py
 
 Open `http://127.0.0.1:8891/`. Diptych, Framed and Ken Burns are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its **23 browser checks** include real stalled HTTP image requests, pause
+ambient sensors. Its **31 browser checks** include real stalled HTTP image requests, pause
 cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
 frames, initial readiness without a second fade, pause without the newer animation API,
 and cancellation immediately before DOM publication. Diptych preserves its existing
 photo composition and source selection. Only the incoming frame fades; both retained
 frames are released on cleanup. Chrome results do not establish Portal GPU timing;
 source tests separately cover Filmstrip and Gallery geometry.
+
+Ken Burns now uses the same incoming-only dissolve owner as Diptych, a 3vmin inset
+and a quiet charcoal matte. It keeps the original source selection and gentle motion
+for photos without a cached face hint. Cached face hints retain the whole photo,
+statically, without a permanent compositor hint. Ken Burns has **zero blurred duplicate
+photos**, retires old image URLs after the dissolve, and freezes motion as well as opacity
+on pause without requiring `getAnimations`. These are rendering-work and lifecycle
+changes; they do not establish a physical Portal FPS improvement.

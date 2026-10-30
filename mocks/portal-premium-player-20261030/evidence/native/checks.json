@@ -1,5 +1,5 @@
 {
-  "passed": 50,
+  "passed": 51,
   "checks": [
     "Native sample and six-track queue render",
     "Play has a 48dp touch target",
@@ -9,6 +9,7 @@
     "Close player has a 48dp touch target",
     "Play circle bottom is visible, not clipped",
     "Queue selection updates hero metadata and remains paused",
+    "Selected queue track retains its artist separately from the paused status",
     "Compact retains selected track and transport",
     "Expand retains selected track",
     "Speakers pane replaces queue inside the same player",
@@ -58,7 +59,7 @@
   "api": 34,
   "viewport": "2160x1440",
   "densityDpi": 240,
-  "durationSeconds": 129.1,
+  "durationSeconds": 129.58,
   "data": "debug-only silent fixtures and original local artwork",
   "physicalPortalPerformanceMeasured": false,
   "audioMeasured": false,
