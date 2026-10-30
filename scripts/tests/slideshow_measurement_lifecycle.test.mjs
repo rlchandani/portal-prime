@@ -14,7 +14,7 @@ const photos = readFileSync(new URL('photos.js', assets), 'utf8');
 const entry = [...readFileSync(new URL('index.html', assets), 'utf8')
   .matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
 
-function fixture({ paused = false, known = false, runEntry = true } = {}) {
+function fixture({ paused = false, known = false, runEntry = true, face = false } = {}) {
   let now = 0, sequence = 0, engineStarts = 0;
   const images = [], timers = new Map(), handlers = new Map(), requestedSizes = [];
   class Image {
@@ -26,6 +26,7 @@ function fixture({ paused = false, known = false, runEntry = true } = {}) {
   const element = { style: {}, classList: { add() {}, remove() {} } };
   const source = Array.from({ length: 8 }, (_, i) => ({
     url: `file:///sample/${i}.jpg`, ...(known ? { w: 4000, h: 3000 } : {}),
+    ...(face ? { fx: .5, fy: .2, pw: .8 } : {}),
   }));
   const context = vm.createContext({
     Image, AbortController, URLSearchParams,
@@ -139,6 +140,50 @@ test('successful derivative metadata releases handlers and preserves aspect rati
   assert.equal(f.images[0].onload, null);
   assert.equal(f.images[0].onerror, null);
   assert.equal(f.active(), 0);
+});
+
+test('failed orientation probe releases work and leaves dimensions recoverable with a safe fallback', async () => {
+  const f = fixture({ runEntry: false }), controller = new AbortController();
+  const batch = f.context.premeasureAll(1, controller.signal); await f.flush();
+  const probe = f.images[0], late = probe.onload;
+  probe.onerror(); await batch;
+  assert.equal(probe.onload, null);
+  assert.equal(probe.onerror, null);
+  assert.equal(probe.src, '');
+  assert.equal(f.active(), 0);
+  assert.equal(f.timers.size, 0);
+  late(); controller.abort(); await f.flush();
+  const photo = f.context.PHOTOS[0];
+  assert.equal(photo.measured, false);
+  assert.equal(photo.w, 0);
+  assert.equal(photo.h, 0);
+  assert.equal(f.context.aspect(photo), 1600 / 1067);
+});
+
+test('successful display decode recovers portrait dimensions after an orientation probe error without changing face metadata', async () => {
+  const f = fixture({ runEntry: false, face: true }), controller = new AbortController();
+  const batch = f.context.premeasureAll(1, controller.signal); await f.flush();
+  f.images[0].onerror(); await batch;
+  const photo = f.context.PHOTOS[0], url = f.context.photoUrl(photo, 1800);
+  const ready = f.context.preloadDecoded(url);
+  const display = f.images.at(-1);
+  display.naturalWidth = 1200; display.naturalHeight = 1800;
+  let finishDecode;
+  display.decode = () => new Promise(resolve => { finishDecode = resolve; });
+  display.complete(); await f.flush();
+  assert.notEqual(photo.w, 1200, 'Dimensions must wait for display decode');
+  finishDecode(); await ready;
+  assert.equal(photo.measured, true);
+  assert.equal(photo.w, 1200);
+  assert.equal(photo.h, 1800);
+  assert.equal(f.context.aspect(photo), 2 / 3);
+  assert.deepEqual([photo.fx, photo.fy, photo.pw], [.5, .2, .8]);
+  assert.equal(f.context.PHOTOS.length, 8);
+  assert.equal(photo.url, 'file:///sample/0.jpg');
+  assert.equal(photo.seed, photo.url);
+  assert.equal(display.onload, null);
+  assert.equal(display.onerror, null);
+  assert.equal(f.timers.size, 0);
 });
 
 test('normal display preparation recovers portrait metadata after startup timeout', async () => {

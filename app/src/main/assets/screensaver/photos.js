@@ -67,7 +67,7 @@
       function finish(loaded, cancelled = false) {
         if (settled) return;
         settled = true;
-        if (!cancelled) {
+        if (!cancelled && loaded) {
           p.w = loaded && im.naturalWidth || 1600;
           p.h = loaded && im.naturalHeight || 1067;
           p.measured = true;

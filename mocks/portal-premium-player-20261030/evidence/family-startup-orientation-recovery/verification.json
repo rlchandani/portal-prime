@@ -1,0 +1,271 @@
+{
+  "date": "2026-10-30",
+  "device": "Family Area",
+  "configurationWrites": 0,
+  "startupObservation": {
+    "artifactSha256": "ed60d6d371b1a509d7b1f8ba9b08e8328c47afb55ebbe94dc6865bd449db6b70",
+    "mode": "shuffle",
+    "sampleCount": 3,
+    "timingMeaning": "Pre-command capture observation to guarded Main scene admission; includes Fleet/navigation overhead. Not pixels, ready-host-to-photo timing or a controlled cold-start benchmark.",
+    "observations": [
+      {
+        "cycle": 1,
+        "requestBeganCaptureMs": 59685,
+        "requestAcknowledgedCaptureMs": 59747,
+        "admissionReported": true,
+        "style": "cinema",
+        "acceptedCaptureMs": 61023,
+        "requestToAdmissionMs": 1338,
+        "ackToAdmissionMs": 1276
+      },
+      {
+        "cycle": 2,
+        "requestBeganCaptureMs": 61831,
+        "requestAcknowledgedCaptureMs": 61956,
+        "admissionReported": true,
+        "style": "kenBurns",
+        "acceptedCaptureMs": 62554,
+        "requestToAdmissionMs": 723,
+        "ackToAdmissionMs": 598
+      },
+      {
+        "cycle": 3,
+        "requestBeganCaptureMs": 63462,
+        "requestAcknowledgedCaptureMs": 63542,
+        "admissionReported": true,
+        "style": "panorama",
+        "acceptedCaptureMs": 64125,
+        "requestToAdmissionMs": 663,
+        "ackToAdmissionMs": 583
+      }
+    ],
+    "styleReports": 3,
+    "invalidStyleReports": 0,
+    "workStages": {
+      "metadataPreparation": {
+        "kind": "elapsed",
+        "records": 3,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 3,
+        "totalMs": 8.408958,
+        "meanMs": 2.802986,
+        "maxMs": 4.590677,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": 8.408958,
+        "otherThreadMeanMs": 2.802986,
+        "otherThreadMaxMs": 4.590677
+      },
+      "webViewAdmission": {
+        "kind": "elapsed",
+        "records": 3,
+        "mainThreadRecords": 3,
+        "otherThreadRecords": 0,
+        "totalMs": 113.346771,
+        "meanMs": 37.782257,
+        "maxMs": 61.146719,
+        "mainThreadTotalMs": 113.346771,
+        "mainThreadMeanMs": 37.782257,
+        "mainThreadMaxMs": 61.146719,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "enginePageFinished": {
+        "kind": "event",
+        "records": 3,
+        "mainThreadRecords": 3,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "engineRetired": {
+        "kind": "event",
+        "records": 2,
+        "mainThreadRecords": 2,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "controllerConstruction": {
+        "kind": "elapsed",
+        "records": 3,
+        "mainThreadRecords": 3,
+        "otherThreadRecords": 0,
+        "totalMs": 3.125885,
+        "meanMs": 1.0419616666666667,
+        "maxMs": 2.231719,
+        "mainThreadTotalMs": 3.125885,
+        "mainThreadMeanMs": 1.0419616666666667,
+        "mainThreadMaxMs": 2.231719,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "viewBuild": {
+        "kind": "elapsed",
+        "records": 3,
+        "mainThreadRecords": 3,
+        "otherThreadRecords": 0,
+        "totalMs": 35.524687,
+        "meanMs": 11.841562333333334,
+        "maxMs": 18.711927,
+        "mainThreadTotalMs": 35.524687,
+        "mainThreadMeanMs": 11.841562333333334,
+        "mainThreadMaxMs": 18.711927,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "controllerStart": {
+        "kind": "elapsed",
+        "records": 3,
+        "mainThreadRecords": 3,
+        "otherThreadRecords": 0,
+        "totalMs": 36.20646,
+        "meanMs": 12.06882,
+        "maxMs": 14.789532,
+        "mainThreadTotalMs": 36.20646,
+        "mainThreadMeanMs": 12.06882,
+        "mainThreadMaxMs": 14.789532,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "webViewConstruction": {
+        "kind": "elapsed",
+        "records": 3,
+        "mainThreadRecords": 3,
+        "otherThreadRecords": 0,
+        "totalMs": 59.114166000000004,
+        "meanMs": 19.704722,
+        "maxMs": 30.549739,
+        "mainThreadTotalMs": 59.114166000000004,
+        "mainThreadMeanMs": 19.704722,
+        "mainThreadMaxMs": 30.549739,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      }
+    },
+    "startRequests": 1,
+    "stopRequests": 1,
+    "phaseLabelMismatchInProbeCorrected": true,
+    "sameConfirmedSessionReconciled": true,
+    "additionalStartRequests": 0,
+    "activeListenersAfterStop": 0,
+    "settingsCompared": 97,
+    "settingsUnchanged": true,
+    "sourcesUnchanged": true,
+    "deliveredFpsMeasured": false,
+    "visiblePixelsVerified": false,
+    "startupSpeedImprovementClaimed": false
+  },
+  "orientationRecovery": {
+    "change": "Commit measurement metadata only after a successful probe; let normal display decode recover real orientation after an error.",
+    "behavioralRed": {
+      "nodeNewRegressionsFailed": 2,
+      "nodeExistingChecksPassed": 9,
+      "realBrowserPriorArtifactFailed": true
+    },
+    "checks": {
+      "workerLifecycleTests": 11,
+      "otherSourceTests": 268,
+      "totalSourceTests": 279,
+      "engineFixtures": 14,
+      "broaderBrowserChecks": 255,
+      "broaderBrowserErrors": 0,
+      "realImageBrowserChecks": 13
+    },
+    "sourceSha256": {
+      "photos.js": "cfa73baa9e7cd9decbeb9a5a02c094aeff083a3a33ce09ca2e8af8d6da391631",
+      "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "modes.js": "37c7ec6bac8748239faa921757792f8fc45e953c273f008d6dc0c570f7aa0c46"
+    },
+    "realHttp404AndSuccessExercised": true,
+    "portraitClassificationRecovered": true,
+    "faceHintsPreserved": true,
+    "imageHandlersReleased": true,
+    "deckIdentityPreserved": true,
+    "addedImageLoads": 0,
+    "addedWorkers": 0,
+    "householdMediaUsedInBrowserTests": false,
+    "onDeviceImageErrorPathExercised": false,
+    "physicalSpeedImprovementMeasured": false
+  },
+  "androidGate": {
+    "debugBuildSucceeded": true,
+    "performanceBuildSucceeded": true,
+    "buildSeconds": 29,
+    "jvm": {
+      "tests": 3460,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 360,
+      "reusedValidJvmTaskOutput": true
+    }
+  },
+  "deployment": {
+    "package": "com.immortal.launcher.debug",
+    "variant": "performance",
+    "sha256": "5a3f060b8480463351d0c05e10ab7d05cb34d5c5060895d06d459b2b816ee7b4",
+    "bytes": 25702091,
+    "previousSha256": "ed60d6d371b1a509d7b1f8ba9b08e8328c47afb55ebbe94dc6865bd449db6b70",
+    "installedBytesVerified": true,
+    "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "uploadRequests": 1,
+    "installRequests": 1,
+    "lostResponseReconciledByByteReadback": true,
+    "comparison": {
+      "changedMainAssets": [
+        "assets/screensaver/photos.js"
+      ],
+      "unchangedMainAssets": 52,
+      "nativeDexUnchanged": true,
+      "dexFilesCompared": 1,
+      "manifestUnchanged": true
+    },
+    "settingsCompared": 97,
+    "changedSettings": 0,
+    "sourceGroupsUnchanged": true,
+    "fullScreensaverConfigurationUnchanged": true,
+    "homeAppsHomeScreensaverAcknowledged": true,
+    "exactPreviousApkRetainedPrivately": true,
+    "livingAreaOperations": 0,
+    "phoneOperations": 0,
+    "homeAssistantOperations": 0
+  },
+  "runtimeSanity": {
+    "boundedLogLines": 402,
+    "fatalExceptionMarkers": 0,
+    "engineLines": 0,
+    "engineErrorMarkers": 0,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "visiblePixelsVerified": false,
+    "onDeviceImageErrorPathExercised": false
+  },
+  "remainingAcceptance": [
+    "Physical ready-host-to-photo startup timing across a controlled deck and styles.",
+    "Actual Android WebView failed-probe recovery and resulting visible framing.",
+    "Actual stacked OS-Dream tap dismissal.",
+    "Physical dark/bright night-clock acceptance.",
+    "Home/Apps steady-frame target."
+  ]
+}

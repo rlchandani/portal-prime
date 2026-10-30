@@ -1499,6 +1499,83 @@ No Living Area or phone operations occurred. Startup timing, the Home/Apps
 frame-time target, physical night-clock acceptance and the overall goal remain
 open; music backend wiring stays deferred.
 
+## Startup observation and recoverable orientation — 21:43 UTC batch
+
+Three new preview hosts were observed on Family's `ed60d6d…` optimized build,
+with the unchanged Shuffle setting and photo sources. One capture was started
+and stopped. A phase-label mismatch in the private probe initially prevented
+reconciliation; the authoritative state confirmed its original session was
+still live. The corrected probe reused that **same session**, with **zero
+additional starts**, then independently confirmed an inactive collector and
+zero listeners. All **97 values**, full screensaver configuration and source
+groups compare unchanged.
+
+| Selected first style | Pre-command observation → Main scene admission | Metadata preparation | WebView admission → page-finished event |
+| --- | ---: | ---: | ---: |
+| Cinema | **1,338ms** | **4.591ms**, off Main | **969ms** |
+| Ken Burns | **723ms** | **0.948ms**, off Main | **410ms** |
+| Panorama | **663ms** | **2.870ms**, off Main | **305ms** |
+
+The first timing includes Fleet reads, navigation, host construction and page/
+image work. It is **not** ready-host-to-visible-photo latency, a pristine cold
+start or a controlled style comparison. The three admission records and their
+layer observations have zero invalid/discarded records. Metadata is not the
+large observed interval in this cohort; the page-finished interval contains
+multiple kinds of work and does not isolate a WebView constructor, network,
+decode or GPU cost. No speculative startup speed edit was retained.
+
+The parallel JavaScript review found a separate concrete startup-metadata
+defect: a failed orientation probe wrote **1600 × 1067** and `measured=true`.
+Normal display decoding then refused to replace those fallback dimensions,
+keeping a real portrait classified as landscape. The one-condition repair
+commits probe metadata only after a successful load. Failed probes still resolve
+and release their handlers/source, use the existing safe landscape fallback and
+leave dimensions unknown. The normal successful display decode can then supply
+the actual dimensions and correct Shuffle's orientation bucket. No retry worker,
+extra image load, source/deck change or face-hint change was added.
+
+Both new source regressions first failed against the old condition while the
+nine existing lifecycle checks passed. The corrected worker scope passes
+**11 tests**, with **268 other source tests** run separately: **279 source tests**
+total, plus **14 engine fixtures**. A real Chrome check against the preceding
+asset also failed on the erroneous committed dimensions. The repaired scripts
+pass **13 targeted browser checks** using an actual HTTP 404 followed by a real
+480 × 720 SVG decode. They verify safe fallback, portrait recovery, Shuffle
+classification, retained face hints, source/deck identity and released handlers.
+The broader production-script browser run passes **255 checks**, zero page errors,
+with original/generated local fixtures. Household media was not used in either
+browser harness. These are source/browser checks, not physical Portal framing,
+FPS or speed comparisons.
+
+Debug and optimized performance APKs build successfully in **29 seconds**. The
+JVM command reuses its valid **3,460 tests / 360 suites** result, zero failures/
+errors/skips; it is **not a fresh JVM execution**. Family's independently read
+installed APK matches SHA-256
+`5a3f060b8480463351d0c05e10ab7d05cb34d5c5060895d06d459b2b816ee7b4`
+(**25,702,091 bytes**) and the existing certificate. Native DEX and manifest
+match the preceding `ed60d6d…` build exactly; **52 main assets** match, and only
+`assets/screensaver/photos.js` differs. The preceding exact APK is retained
+privately. One upload/install was used; installed-byte readback resolved the
+interrupted response without repeating the install.
+
+All **97 settings**, full screensaver configuration and photo-source groups are
+preserved after installation and Home → Apps → Home → screensaver acknowledgments.
+The bounded post-install log sample contains **402 lines** and **zero fatal
+exception markers**. It contains **zero ImmortalEngine lines**, so it cannot
+certify JavaScript execution or the failed-probe path on the Portal. The collector
+is inactive with **zero listeners**. Scalar evidence is in
+`mocks/portal-premium-player-20261030/evidence/family-startup-orientation-recovery/verification.json`;
+the reproducible real-image browser check is
+`mocks/portal-premium-player-20261030/slideshow/orientation-recovery-browser-checks.cjs`.
+
+This batch delivers orientation-error recovery, **not a measured startup speed
+gain**. Startup presentation remains open; this investigation is closed rather
+than extending into repeated cache experiments. Physical stacked-Dream tap and
+night-clock acceptance, Home/Apps frame tails and the broader goal remain open.
+Living Area and the phone received no operations; music backend wiring remains
+deferred. Build, deployment and evidence verification finished by **22:00 UTC**,
+before the **22:13 UTC** issue deadline.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
