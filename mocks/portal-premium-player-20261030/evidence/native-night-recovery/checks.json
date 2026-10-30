@@ -1,0 +1,342 @@
+{
+  "success": true,
+  "passed": 66,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "owned_AVD_API34",
+      "passed": true
+    },
+    {
+      "name": "owned_debug_package_installed",
+      "passed": true
+    },
+    {
+      "name": "parent_built_APK_is_installed",
+      "passed": true
+    },
+    {
+      "name": "owned_AVD_uses_default_photo_source",
+      "passed": true
+    },
+    {
+      "name": "registry_has_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_has_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_has_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_has_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_has_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_has_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_has_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_has_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_has_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registry_accepts_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registered_batch_applied_all_modified_fields",
+      "passed": true
+    },
+    {
+      "name": "registered_test_configuration_verified",
+      "passed": true
+    },
+    {
+      "name": "production_preview_explicit_component_launched",
+      "passed": true
+    },
+    {
+      "name": "actual_native_scene_reported_ready",
+      "passed": true
+    },
+    {
+      "name": "native_photo_stage_accessible",
+      "passed": true
+    },
+    {
+      "name": "bright_initial_has_no_quiet_clock",
+      "passed": true
+    },
+    {
+      "name": "native_scene_has_no_WebView",
+      "passed": true
+    },
+    {
+      "name": "before_native_2160x1440",
+      "passed": true
+    },
+    {
+      "name": "before-stable_native_2160x1440",
+      "passed": true
+    },
+    {
+      "name": "photo_ROI_has_nontrivial_image_content",
+      "passed": true
+    },
+    {
+      "name": "still_photo_ROI_is_stable_before_night",
+      "passed": true
+    },
+    {
+      "name": "dark-early_native_2160x1440",
+      "passed": true
+    },
+    {
+      "name": "dark_early_capture_is_before_dark_dwell",
+      "passed": true
+    },
+    {
+      "name": "dark_change_does_not_immediately_replace_photo",
+      "passed": true
+    },
+    {
+      "name": "early_dark_window_brightness_unchanged",
+      "passed": true
+    },
+    {
+      "name": "night-clock_native_2160x1440",
+      "passed": true
+    },
+    {
+      "name": "actual_fullscreen_native_clock_has_time_weekday_date",
+      "passed": true
+    },
+    {
+      "name": "native_clock_draws_visible_ink_on_black",
+      "passed": true
+    },
+    {
+      "name": "same_production_window_is_retained_at_night",
+      "passed": true
+    },
+    {
+      "name": "own_window_explicit_night_brightness_is_003",
+      "passed": true
+    },
+    {
+      "name": "actual_dark_room_photos_suspended_event",
+      "passed": true
+    },
+    {
+      "name": "single_dark_change_honors_20_second_dwell",
+      "passed": true
+    },
+    {
+      "name": "bright-early_native_2160x1440",
+      "passed": true
+    },
+    {
+      "name": "bright_early_capture_is_before_bright_dwell",
+      "passed": true
+    },
+    {
+      "name": "clock_remains_visible_during_bright_dwell",
+      "passed": true
+    },
+    {
+      "name": "own_window_remains_dim_during_bright_dwell",
+      "passed": true
+    },
+    {
+      "name": "after_native_2160x1440",
+      "passed": true
+    },
+    {
+      "name": "quiet_clock_disappears_after_bright_dwell",
+      "passed": true
+    },
+    {
+      "name": "native_photo_stage_returns",
+      "passed": true
+    },
+    {
+      "name": "same_production_window_returns_to_photos",
+      "passed": true
+    },
+    {
+      "name": "own_window_brightness_restored_to_initial_attributes",
+      "passed": true
+    },
+    {
+      "name": "retained_photo_ROI_pixels_are_exactly_identical",
+      "passed": true
+    },
+    {
+      "name": "actual_retained_photos_resumed_event",
+      "passed": true
+    },
+    {
+      "name": "single_bright_change_honors_5_second_dwell",
+      "passed": true
+    },
+    {
+      "name": "no_replacement_native_scene_was_presented",
+      "passed": true
+    },
+    {
+      "name": "parent_APK_unchanged_during_native_check",
+      "passed": true
+    },
+    {
+      "name": "all_modified_registered_settings_restored",
+      "passed": true
+    },
+    {
+      "name": "owned_light_restored_to_500",
+      "passed": true
+    }
+  ],
+  "failureCode": null,
+  "observations": {
+    "debugApkSha256": "54a05d12a2ef85319ae97d1dfa4635ffaf31ebe3f81cd3025c870d18cf934f63",
+    "modifiedSettingsCount": 7,
+    "photoRoiBounds": [
+      604,
+      403,
+      1555,
+      950
+    ],
+    "photoRoiSha256": "85e7639953808546ead647cca3cadb4027068df32c6ed24a3c8e094382ebb080",
+    "photoRoiEntropy": 7.526,
+    "stablePhotoRoiSha256": "85e7639953808546ead647cca3cadb4027068df32c6ed24a3c8e094382ebb080",
+    "initialWindowBrightness": -1.0,
+    "initialBrightnessExplicit": false,
+    "darkEarlyCaptureSeconds": 2.89,
+    "darkEventDelaySeconds": 20.08,
+    "nightWindowBrightness": 0.03,
+    "nightBrightnessAttributeAlias": "sbrt",
+    "brightEarlyCaptureSeconds": 2.154,
+    "returnedPhotoRoiSha256": "85e7639953808546ead647cca3cadb4027068df32c6ed24a3c8e094382ebb080",
+    "brightEventDelaySeconds": 5.052,
+    "returnedWindowBrightness": -1.0
+  },
+  "artifacts": [
+    {
+      "file": "before.xml"
+    },
+    {
+      "file": "before.png",
+      "sha256": "8e197889b3e1b2b6f390486de6e9469e89ce790d0bbd94c6712566304e35d05d"
+    },
+    {
+      "file": "before-stable.png",
+      "sha256": "8e197889b3e1b2b6f390486de6e9469e89ce790d0bbd94c6712566304e35d05d"
+    },
+    {
+      "file": "dark-early.png",
+      "sha256": "8e197889b3e1b2b6f390486de6e9469e89ce790d0bbd94c6712566304e35d05d"
+    },
+    {
+      "file": "night-clock.png",
+      "sha256": "4c6dffb5a2ecac6ad7032232b0cb8ab0cb8783cddae60c1e4175c7aba05c07c9"
+    },
+    {
+      "file": "night-clock.xml"
+    },
+    {
+      "file": "bright-early.png",
+      "sha256": "4c6dffb5a2ecac6ad7032232b0cb8ab0cb8783cddae60c1e4175c7aba05c07c9"
+    },
+    {
+      "file": "after.png",
+      "sha256": "057689e9bff72c050534d1a5a6324c2343ddfa7d7966f234c1b5e5d4e52d64c9"
+    },
+    {
+      "file": "after.xml"
+    }
+  ],
+  "avd": "PortalMusic20261030",
+  "serial": "emulator-5556",
+  "activity": "com.immortal.launcher.PhotoFramePreviewActivity",
+  "utc": "2026-10-30T23:38:16.648383+00:00",
+  "elapsedSeconds": 45.901,
+  "physicalPortalMeasured": false,
+  "fpsMeasured": false,
+  "foreignAvdTouched": false,
+  "hiddenHostCaseRun": false,
+  "userPausedStateCaseRun": false,
+  "scope": "Production native preview, actual light observer/controller/window; stable photo ROI",
+  "privacy": "No token, profile, source URL or raw logcat in public evidence"
+}

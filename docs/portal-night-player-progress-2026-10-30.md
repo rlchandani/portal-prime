@@ -1831,6 +1831,65 @@ not establish a physical darkness/brightness transition, instant SDK cancellatio
 or a measured CPU/FPS gain. Those claims remain open. Living Area, the phone and
 Home Assistant are untouched; the overall objective remains active.
 
+## Native night continuity and foreground-service startup — 23:21 UTC batch
+
+Original issue window: **23:21:18–23:51:18 UTC**, including verification,
+deployment, documentation, resource cleanup and commit.
+
+Family Area exposes a TCS34x0 on-change light sensor. Its registered settings
+already enable the dark-room clock at 3 lux, warm ink and 3% window brightness.
+These device capability/configuration readings do not establish a physical
+light transition or comfortable panel brightness.
+
+The dedicated API 34 emulator exposed an actual
+`MissingForegroundServiceTypeException` when the Fleet Agent started. Its
+manifest now declares `connectedDevice` and the normal
+`FOREGROUND_SERVICE_CONNECTED_DEVICE` permission. The existing
+`CHANGE_WIFI_MULTICAST_STATE` permission meets Android's prerequisite; no new
+interactive permission or device OS configuration is needed. This fixes the
+observed Android 14 service-startup crash, not a reproduced Android 9 crash.
+
+Verification:
+
+- Debug and optimized performance APK builds succeed. The relevant follow-up
+  native test uses the real `PhotoFramePreviewActivity`, light observer,
+  controller, clock view and Android window, not a mock controller.
+- **66 assertions pass, zero fail, in 45.901 seconds** on the owned API 34
+  emulator. A single dark reading produces the suspend event after **20.080
+  seconds**; a single bright reading produces resume after **5.052 seconds**.
+  Early observations confirm that each dwell is respected.
+- Window brightness follows **system default → 0.03 → system default**.
+  The same window identity is retained, the native clock exposes time,
+  weekday and date, and its captured pixels contain warm ink on black.
+  The returning photo region has exactly the original pixels; the scene
+  presentation counter does not increase during night/resume.
+- All **seven** temporarily modified settings are restored, and the owned
+  emulator's light is reset before shutdown. Its forwarding port is removed
+  and the owned emulator exits. The unrelated emulator is untouched.
+- Family Area's independently read installed APK matches
+  `b5e773b6eb4c919814993b655d9e845c64696d137c2e533a4a29d262c0403054`
+  (**25,702,123 bytes**) with the same signing certificate. Native DEX and
+  all **53 main assets** are byte-identical to the predecessor; only the
+  foreground-service type and its normal permission change in the manifest.
+- All **97 settings**, full screensaver configuration and photo-source groups
+  compare unchanged after installation and navigation dispatch.
+  The bounded runtime response contains **402 lines** and **zero fatal
+  exception markers**. The collector is inactive with **zero listeners**.
+  Clearing this batch's verified upload copy reclaims **25,702,123 bytes**;
+  the local candidate and rollback remain available.
+
+The previous batch's full JVM gate remains **3,496 tests in 362 suites**.
+It was not rerun for this manifest-only production change. Public receipts are
+in `mocks/portal-premium-player-20261030/evidence/family-night-readiness/verification.json`;
+native screenshots and the 66-assertion receipt are in
+`mocks/portal-premium-player-20261030/evidence/native-night-recovery/`.
+
+Physical Family darkness/brightness behavior, actual backlight comfort, cold
+first-photo timing, Home frame tails and physical music UI acceptance remain
+open. This native test does not measure delivered FPS, videos, hidden-host or
+user-paused night scenarios. Living Area, the phone and Home Assistant are
+untouched; the overall objective remains active.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
@@ -1847,3 +1906,4 @@ Home Assistant are untouched; the overall objective remains active.
 - [Android window brightness override](https://developer.android.com/reference/android/view/WindowManager.LayoutParams#screenBrightness)
 - [Hardware specifications, benchmarks and rendering evidence](portal-hardware-budget-2026-10-30.md)
 - [HA-free music alternatives](music-without-home-assistant-2026-10-19.md)
+- [Android 14 foreground-service types and connected-device prerequisites](https://developer.android.com/about/versions/14/changes/fgs-types-required#connected-device)

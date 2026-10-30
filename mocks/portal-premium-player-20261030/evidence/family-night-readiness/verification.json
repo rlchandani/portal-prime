@@ -1,0 +1,107 @@
+{
+  "utc": "2026-10-30T23:42:06.636165+00:00",
+  "device": "Family Area",
+  "physicalPortalMeasured": false,
+  "physicalNightTransitionVerified": false,
+  "fpsMeasuredThisBatch": false,
+  "scope": "Native API 34 light-observer/controller/window test plus API 29 Family installation and configuration preservation",
+  "sensor": {
+    "name": "light sensor",
+    "vendor": "tcs34x0",
+    "reportingMode": 1,
+    "powerMa": 0.5
+  },
+  "familyConfiguration": {
+    "darkRoomClock": true,
+    "darkRoomLux": 3,
+    "nightClockBrightness": 3,
+    "nightClockTone": "warm"
+  },
+  "deployment": {
+    "sha256": "b5e773b6eb4c919814993b655d9e845c64696d137c2e533a4a29d262c0403054",
+    "bytes": 25702123,
+    "previousSha256": "125f6ac526e70fc4377a72c4fbd4b639aab987e6cd330d1de7c61d5c904b28d4",
+    "settingValuesCompared": 97,
+    "changedSettingValues": 0,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "visibleTransitionsVerified": false,
+    "physicalFpsGainMeasured": false
+  },
+  "artifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": true,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": false
+  },
+  "manifestVerification": {
+    "addedPermission": "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE",
+    "existingEligibilityPermission": "android.permission.CHANGE_WIFI_MULTICAST_STATE",
+    "agentForegroundType": "connectedDevice",
+    "agentForegroundTypeMask": 16,
+    "allOtherManifestFieldsUnchanged": true
+  },
+  "native": {
+    "success": true,
+    "passed": 66,
+    "failed": 0,
+    "elapsedSeconds": 45.901,
+    "observations": {
+      "debugApkSha256": "54a05d12a2ef85319ae97d1dfa4635ffaf31ebe3f81cd3025c870d18cf934f63",
+      "modifiedSettingsCount": 7,
+      "photoRoiBounds": [
+        604,
+        403,
+        1555,
+        950
+      ],
+      "photoRoiSha256": "85e7639953808546ead647cca3cadb4027068df32c6ed24a3c8e094382ebb080",
+      "photoRoiEntropy": 7.526,
+      "stablePhotoRoiSha256": "85e7639953808546ead647cca3cadb4027068df32c6ed24a3c8e094382ebb080",
+      "initialWindowBrightness": -1.0,
+      "initialBrightnessExplicit": false,
+      "darkEarlyCaptureSeconds": 2.89,
+      "darkEventDelaySeconds": 20.08,
+      "nightWindowBrightness": 0.03,
+      "nightBrightnessAttributeAlias": "sbrt",
+      "brightEarlyCaptureSeconds": 2.154,
+      "returnedPhotoRoiSha256": "85e7639953808546ead647cca3cadb4027068df32c6ed24a3c8e094382ebb080",
+      "brightEventDelaySeconds": 5.052,
+      "returnedWindowBrightness": -1.0
+    },
+    "physicalPortalMeasured": false,
+    "hiddenHostCaseRun": false,
+    "userPausedStateCaseRun": false
+  },
+  "cleanup": {
+    "ownedUploadCleared": true,
+    "bytesReclaimed": 25702123,
+    "runtimeLines": 402,
+    "fatalExceptionMarkers": 0,
+    "collectorActive": false,
+    "collectorRunning": false,
+    "activeListeners": 0,
+    "candidateRetainedLocally": true,
+    "rollbackRetainedLocally": true,
+    "ownedEmulatorStopped": true,
+    "foreignEmulatorUntouched": true
+  },
+  "sourceHashes": {
+    "mocks/portal-premium-player-20261030/night-recovery-native-checks.py": "e5d5447f104bc4aa73cf53bfcc74877ed656b15d3fb66e54b99b5966f005e94c",
+    "app/src/main/AndroidManifest.xml": "f5623647efe5d0bb8b1fcd4bf59a6fd7522c11902d6f1573497e0e6cb1d5904e"
+  },
+  "checksReceiptSha256": "4768e5862d10ae32a54bd70dd1e2f72a1614e30907017fc52f2aef86d50de1b3",
+  "builds": [
+    "debug",
+    "performance"
+  ],
+  "unitTestSuiteRerunThisManifestOnlyBatch": false,
+  "remaining": [
+    "Physical Family dark/bright transition and backlight comfort",
+    "Actual slideshow cold first-photo timing",
+    "Home frame tails against hardware budget",
+    "Physical native music UI acceptance",
+    "Hidden-host and user-pause native night scenarios"
+  ]
+}
