@@ -6,7 +6,10 @@
  */
 package com.immortal.launcher
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -31,6 +34,7 @@ internal class QuietNightClockView(context: Context, tone: String) : View(contex
     textAlign = Paint.Align.CENTER
   }
   private var active = false
+  private var timeChanges: BroadcastReceiver? = null
   private var time = ""
   private var date = ""
   private val tick = object : Runnable {
@@ -57,17 +61,47 @@ internal class QuietNightClockView(context: Context, tone: String) : View(contex
   fun setActive(value: Boolean) {
     active = value
     removeCallbacks(tick)
-    if (value && isAttachedToWindow) tick.run()
+    if (value && isAttachedToWindow) {
+      observeTimeChanges()
+      tick.run()
+    } else stopObservingTimeChanges()
   }
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-    if (active) tick.run()
+    if (active) {
+      observeTimeChanges()
+      tick.run()
+    }
   }
 
   override fun onDetachedFromWindow() {
+    stopObservingTimeChanges()
     removeCallbacks(tick)
     super.onDetachedFromWindow()
+  }
+
+  private fun observeTimeChanges() {
+    if (timeChanges != null) return
+    val receiver = object : BroadcastReceiver() {
+      override fun onReceive(context: Context, intent: Intent) {
+        if (timeChanges !== this || !active || !isAttachedToWindow) return
+        if (intent.action == Intent.ACTION_TIME_CHANGED ||
+            intent.action == Intent.ACTION_TIMEZONE_CHANGED) tick.run()
+      }
+    }
+    val filter = IntentFilter().apply {
+      addAction(Intent.ACTION_TIME_CHANGED)
+      addAction(Intent.ACTION_TIMEZONE_CHANGED)
+    }
+    context.registerReceiver(receiver, filter)
+    timeChanges = receiver
+  }
+
+  private fun stopObservingTimeChanges() {
+    val receiver = timeChanges ?: return
+    timeChanges = null
+    context.unregisterReceiver(receiver)
   }
 
   override fun onDraw(canvas: Canvas) {

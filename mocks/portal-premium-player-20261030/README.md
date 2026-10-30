@@ -124,6 +124,20 @@ No Home Assistant music deployment belongs to either preview.
 
 ## Actual slideshow renderer review
 
+The debug-only `VideoDesignPreviewActivity` separately exercises the production
+background MediaPlayer owner using an original silent 1280×720 clip. Its
+on-demand position label leaves Android's UI inspector idle between commands.
+Run on the same dedicated AVD:
+
+```sh
+python3 video-native-checks.py
+```
+
+All **11 checks passed in 28.72 seconds**; the result is in
+`evidence/video-native/checks.json`. The checks cover pause/seek/resume, 100
+rapid replacements and close. They establish functional emulator behavior,
+not physical Portal timing or audio. The fixture/activity are debug-only.
+
 `slideshow/serve.py` exposes an allowlist of production slideshow assets, an injected silent
 host and two original portrait fixtures. It never serves the repository root. Run:
 

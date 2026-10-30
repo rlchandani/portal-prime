@@ -1,0 +1,21 @@
+{
+  "complete": true,
+  "passed": 11,
+  "checks": [
+    "Production native player prepares the 1280x720 silent clip",
+    "Native playback advances its cached position",
+    "Video Surface renders pixels below the controls",
+    "Pause retains the actual playback position",
+    "Seek completes while paused and updates the cached position",
+    "Resume advances from the retained seek position",
+    "Stop clears cached position",
+    "100 replacements accept only the current clip's prepared callback",
+    "The final replacement plays",
+    "Close rejects late playback callbacks",
+    "Closed playback clears the cached position"
+  ],
+  "elapsedSeconds": 28.72,
+  "avd": "PortalMusic20261030",
+  "physicalPortalPerformanceMeasured": false,
+  "householdMediaUsed": false
+}

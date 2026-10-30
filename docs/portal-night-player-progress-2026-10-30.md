@@ -283,7 +283,63 @@ This batch closes within 30 minutes including its deployment and cleanup.
 Remaining goal work includes physical dark/bright and backlight acceptance,
 the affected rendering targets and further existing-style refinement.
 
+## Bounded video ownership and clock lifecycle correction
+
+The preceding Gallery spread timings came from an album containing both photos
+and videos. They are not a pure still-photo benchmark. One bounded attribution
+capture observed `MediaPlayer._release`, `_start` and audio-attribute work on Main
+through the old `VideoView`. A 67.778ms callback contained 63.601ms of queued time
+and 1.199ms of command submission. Attribution used a 10ms sampler and carries
+profiling overhead; this does not establish a before/after rendering gain.
+
+Slideshow playback now retains a hardware `SurfaceView`, with every MediaPlayer
+operation on one process-wide background Looper. Commands hold one running and
+one latest pending request. Source/surface identities reject obsolete callbacks;
+blocked release work retains no strong View or Activity reference. Main reads
+immutable cached positions tagged to their source, so a late old read cannot
+seek a replacement clip to the old position. API 26+ precise seeking avoids
+backward keyframe jumps; older Android retains its existing fallback.
+SurfaceView layout/surface operations still belong on Main. This change does
+not claim that every source of scheduling or GPU stalls has been eliminated.
+
+The active night clock now refreshes immediately after clock/time-zone changes,
+with receiver registration limited to the active attached view. Stale broadcasts
+are rejected and minute ticking retains one scheduled callback.
+
+Verification of this exact build:
+
+- **3,422 JVM tests in 355 suites**, zero failures, errors or skips; debug APK built.
+- **11 native playback checks passed in 28.72 seconds** on the dedicated API 34
+  emulator: visible video, advancing position, pause, paused seek, retained
+  resume, stop, 100 rapid replacements, and close. The original silent debug
+  clip includes widely spaced keyframes. This is functional acceptance, not
+  Portal decoder throughput, audible playback or a physical FPS measurement.
+- Source-position regression tests failed before the fix and passed afterward.
+  Parallel static review confirmed the correction. Clock/sensor lifecycle tests
+  are included in the full suite.
+- Family Area's installed APK was read back and matched SHA-256
+  `dc6594bf025c1725af1880a87a64102537e4e232b16e29a81d5c2f6a08e54c4d`
+  (**48,901,257 bytes**). The signing certificate matched the preceding installed
+  APK, which was backed up privately before installation.
+- All **97 full-profile setting values were preserved**. Living Area was not
+  modified. Home/screensaver dispatch acknowledgments do not prove visible
+  transitions.
+
+Physical dark/bright/backlight/tap acceptance and a comparable measured Portal
+speedup remain open. The previous 44 native design checks and 33 review captures
+belong to the preceding UI acceptance run, not this video's runtime timing.
+
+The post-install timing run was not admitted: `/perf` returned HTTP 503
+`capture_command_not_applied` when starting the admission capture. No new
+performance distribution is reported. Cleanup independently verified all 97
+settings restored, collector inactive and zero listeners. The owned test
+emulator was stopped. This measurement is parked within the batch's 30-minute
+limit; deployment and functional acceptance above are independently verified.
+
 ## Sources
+
+- [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)
+- [Android SurfaceView versus TextureView tradeoffs](https://developer.android.com/reference/android/view/TextureView)
 
 - [Android sensor monitoring and lifecycle](https://developer.android.com/develop/sensors-and-location/sensors/sensors_overview)
 - [Android light sensors](https://developer.android.com/develop/sensors-and-location/sensors/sensors_environment)

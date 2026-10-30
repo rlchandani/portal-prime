@@ -32,7 +32,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.VideoView
 import androidx.exifinterface.media.ExifInterface
 import java.net.HttpURLConnection
 import java.net.URL
@@ -193,7 +192,7 @@ class PhotoFrameController(
   private var remainingHold = 0L
   private var nativeFailures = 0
   private lateinit var viewerControls: SlideshowViewerControls
-  private lateinit var videoView: VideoView
+  private lateinit var videoView: SlideshowVideoView
 
   // tvOS-style slow zoom/pan ("Ken Burns") on the photo layer. Runs over the dwell time and is
   // cancelled/restarted on each advance; only in fill mode (fit/letterbox is "show the whole
@@ -1187,7 +1186,7 @@ class PhotoFrameController(
     }
   }
 
-  /** Capture before Android tears down VideoView's surface; onStop may be too late. */
+  /** Capture the cached playback position before Android tears down the surface. */
   fun retainVideoPosition() {
     if (stopped || !this::videoView.isInitialized || videoView.visibility != View.VISIBLE) return
     val position = runCatching { videoView.currentPosition }.getOrDefault(0)
@@ -1248,7 +1247,7 @@ class PhotoFrameController(
     photoFade = null
     cancelKenBurns()
     if (faceRendererDelegate.isInitialized()) faceRenderer.stop()
-    if (this::videoView.isInitialized) runCatching { videoView.stopPlayback() }
+    if (this::videoView.isInitialized) videoView.close()
     // Close the SMB connection off-thread (network I/O) before the io executor is killed.
     smbSource?.let { s -> Thread { runCatching { s.close() } }.start() }
     smbSource = null
@@ -1280,7 +1279,7 @@ class PhotoFrameController(
     photo.scaleType = ImageView.ScaleType.CENTER_CROP
     root.addView(photo, FrameLayout.LayoutParams(MATCH, MATCH))
 
-    videoView = VideoView(context)
+    videoView = SlideshowVideoView(context)
     videoView.visibility = View.GONE
     root.addView(videoView, FrameLayout.LayoutParams(MATCH, MATCH, Gravity.CENTER))
 
@@ -1534,7 +1533,7 @@ class PhotoFrameController(
   }
 
   /**
-   * Honour the fit setting for the shared [videoView]. VideoView always letterboxes inside its
+   * Honour the fit setting for the shared [videoView]. The video surface letterboxes inside its
    * own bounds (its onMeasure shrinks to the clip's aspect even with EXACTLY specs), so "fill"
    * can't be a scaleType like the photo layer: instead the view is sized to *cover* the screen
    * (aspect-preserving, the video CENTER_CROP) and the parent clips the overflow. "Fit" — or an
@@ -2192,13 +2191,11 @@ class PhotoFrameController(
       else advanceLocal(+1)
     }
     runCatching {
-          videoView.setOnPreparedListener { mp ->
-            mp.isLooping = false
-            runCatching { mp.setVolume(0f, 0f) } // a screensaver shouldn't blare audio
+          videoView.setOnPreparedListener { width, height ->
             // Some streams only report their real dimensions after prepare.
-            mp.setOnVideoSizeChangedListener { _, w, h -> if (g == gen) applyVideoFit(w, h) }
+            videoView.setOnVideoSizeChangedListener { w, h -> if (g == gen) applyVideoFit(w, h) }
             if (g == gen) {
-              applyVideoFit(mp.videoWidth, mp.videoHeight)
+              applyVideoFit(width, height)
               if (hostActive && !paused && !stopped) {
                 if (retainedVideoPosition > 0) videoView.seekTo(retainedVideoPosition)
                 videoView.start()
@@ -2213,9 +2210,8 @@ class PhotoFrameController(
               }
             }
           }
-          videoView.setOnErrorListener { _, _, _ ->
+          videoView.setOnErrorListener { _, _ ->
             ui.post { failed() }
-            true
           }
           videoView.setVideoPath(path)
           // Safety net: advance even if a clip is very long or never reports done.
@@ -2239,7 +2235,7 @@ class PhotoFrameController(
     photoBack.setImageDrawable(null)
     photoBack.visibility = View.GONE
     videoView.visibility = View.VISIBLE
-    videoView.setOnInfoListener { _, what, _ ->
+    videoView.setOnInfoListener { what, _ ->
       if (g == gen && !stopped && what == android.media.MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
         videoReady = true
         if (native) {
@@ -2249,7 +2245,6 @@ class PhotoFrameController(
         }
         onRendered()
       }
-      false
     }
     if (native) viewerControls.photoChanged()
   }
@@ -2498,13 +2493,11 @@ class PhotoFrameController(
       advanceRemote(+1)
     }
     runCatching {
-          videoView.setOnPreparedListener { mp ->
-            mp.isLooping = false
-            runCatching { mp.setVolume(0f, 0f) } // a screensaver shouldn't blare audio
+          videoView.setOnPreparedListener { width, height ->
             // Some streams only report their real dimensions after prepare.
-            mp.setOnVideoSizeChangedListener { _, w, h -> if (g == gen) applyVideoFit(w, h) }
+            videoView.setOnVideoSizeChangedListener { w, h -> if (g == gen) applyVideoFit(w, h) }
             if (g == gen) {
-              applyVideoFit(mp.videoWidth, mp.videoHeight)
+              applyVideoFit(width, height)
               if (hostActive && !paused && !stopped) {
                 if (retainedVideoPosition > 0) videoView.seekTo(retainedVideoPosition)
                 videoView.start()
@@ -2519,9 +2512,8 @@ class PhotoFrameController(
               }
             }
           }
-          videoView.setOnErrorListener { _, _, _ ->
+          videoView.setOnErrorListener { _, _ ->
             ui.post { failed() }
-            true
           }
           videoView.setVideoURI(uri, headers)
           // Safety net: advance even if a clip is very long or never reports done.
