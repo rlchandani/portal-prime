@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Immortal · Native design review</title>
+<style>
+  :root{color-scheme:dark;font:16px system-ui;color:#f4f4f6;background:#14161b}
+  body{margin:0;padding:24px;max-width:1500px;margin-inline:auto}
+  h1{font-size:26px;margin:0 0 8px}p{color:#b8b8b8;line-height:1.5}
+  a{color:#d9e6ff}nav{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}
+  button{font:inherit;color:inherit;background:#2b2b2b;border:1px solid #484848;
+    border-radius:24px;padding:12px 18px;min-height:48px;cursor:pointer}
+  button[aria-pressed=true]{background:#414141;border-color:#b8b8b8}
+  button:focus-visible,a:focus-visible{outline:3px solid #b8ceff;outline-offset:4px}
+  figure{margin:0}img{width:100%;height:auto;display:block;border-radius:16px}
+  figcaption{color:#b8b8b8;margin-top:12px}
+</style>
+<h1>Immortal · Actual Android rendering</h1>
+<p>Silent sample data and original artwork. Captured from the native components on a separate
+API 34 test emulator at 2160 × 1440, 240 dpi. These images show layout; they do not measure
+Portal performance, audible playback or room-light transitions.</p>
+<p><a href="index.html#now">Open the interactive music design</a> ·
+<a href="evidence/native/checks.json">Native check results</a></p>
+<nav aria-label="Native layout samples"></nav>
+<figure><img alt="" src="evidence/native/full-dark.png"><figcaption></figcaption></figure>
+<script>
+  const samples = [
+    ["full-dark","Full player · dark"],["full-light","Full player · light"],
+    ["compact","Compact player"],["queue-selected","Selected queue item"],
+    ["speakers","Speakers"],["large-font","Larger text"],["offline","Offline"],
+    ["night-warm","Night clock · warm"],["night-red","Night clock · red"],
+    ["gallery-print","Gallery print"]
+  ];
+  const nav=document.querySelector("nav"),image=document.querySelector("img");
+  const caption=document.querySelector("figcaption");
+  for(const [id,label] of samples){
+    const button=document.createElement("button");
+    button.textContent=label;button.setAttribute("aria-pressed","false");
+    button.onclick=()=>{
+      for(const item of nav.children)item.setAttribute("aria-pressed","false");
+      button.setAttribute("aria-pressed","true");image.src=`evidence/native/${id}.png`;
+      image.alt=label;caption.textContent=label;
+    };
+    nav.append(button);
+  }
+  nav.firstElementChild.click();
+</script>
+</html>

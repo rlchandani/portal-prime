@@ -213,7 +213,8 @@ object SettingsDomains {
                       coerce = { v -> v.takeIf { it in ScreensaverConfig.MODES } },
                       help =
                           "Smart frame shows one photo with gentle motion. Portrait pair places two " +
-                              "portraits together. Whole photo preserves the complete image. Existing " +
+                              "portraits together. Whole photo preserves the complete image. Gallery " +
+                              "print holds the whole photo still inside a restrained matte. Existing " +
                               "styles remain available.",
                       visible = { _, s -> s.enabled }),
                   BoolSpec(
@@ -224,7 +225,8 @@ object SettingsDomains {
                       help = "Let photos move gently when there is room. Off keeps them still between dissolves.",
                       visible = { _, s ->
                         s.enabled && ScreensaverConfig.isNativeStage(s.mode) &&
-                            s.mode != ScreensaverConfig.MODE_WHOLE
+                            s.mode != ScreensaverConfig.MODE_WHOLE &&
+                            s.mode != ScreensaverConfig.MODE_GALLERY_PRINT
                       }),
                   BoolSpec(
                       "keep_people_in_frame",

@@ -1,0 +1,33 @@
+{
+  "passed": 17,
+  "checks": [
+    "Native sample and six-track queue render",
+    "Play has a 48dp touch target",
+    "Previous track has a 48dp touch target",
+    "Next track has a 48dp touch target",
+    "Minimize player has a 48dp touch target",
+    "Close player has a 48dp touch target",
+    "Play circle bottom is visible, not clipped",
+    "Queue selection updates hero metadata and remains paused",
+    "Compact retains selected track and transport",
+    "Expand retains selected track",
+    "Speakers pane replaces queue inside the same player",
+    "Offline transport is disabled",
+    "Light palette renders the same controls",
+    "Large-font transport remains visible",
+    "Actual native clock includes time and weekday",
+    "Actual Gallery stage renders the new style",
+    "Gallery matte and retained photo differ"
+  ],
+  "complete": true,
+  "serial": "emulator-5556",
+  "avd": "PortalMusic20261030",
+  "api": 34,
+  "viewport": "2160x1440",
+  "densityDpi": 240,
+  "durationSeconds": 32.75,
+  "data": "debug-only silent fixtures and original local artwork",
+  "physicalPortalPerformanceMeasured": false,
+  "audioMeasured": false,
+  "physicalLightSensorTransitionsMeasured": false
+}

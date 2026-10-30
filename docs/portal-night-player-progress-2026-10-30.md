@@ -98,13 +98,61 @@ Remaining acceptance is explicit:
    retained-photo continuity on that hardware.
 2. Verify camera/video cancellation with the relevant optional features enabled.
 3. Compare the affected active rendering paths against the hardware budget.
-4. Port the finalized music appearance to native UI and refine additional
-   existing slideshow styles. Browser samples do not close these items.
+4. Refine additional existing slideshow styles. Native core-player layout and the
+   new Gallery print option are delivered in the follow-up below; real playback
+   and provider-backed library/playlist views remain outside visual acceptance.
 
 The sensor-clock investigation and implementation batch is closed within its
 30-minute limit. Physical acceptance is pending, rather than an invitation to
 repeat diagnosis without new evidence. No Living Area rollout or phone modification
 belongs to this development pass.
+
+## Native player and Gallery follow-up — 15:05 UTC
+
+The core native player now has an artwork-led layout, one-row header, quieter
+transport, thin seek/volume tracks, a queue with bounded thumbnails and a compact
+strip. Full and compact views retain the existing controller and selected track.
+Artwork remains bounded at 480dp; queue thumbnails decode at no more than 128px.
+The existing lifecycle-aware progress ticker remains isolated from the full UI.
+No music backend, credentials, Home Assistant service or audio worker was added.
+
+The debug-only preview renders the production player, night clock and Gallery
+stage with original local artwork and silent fixtures. It is absent from release
+builds and does not create a controller or connect to household media. Native
+captures found a clipped play circle; layout reserves were corrected and a
+screenshot pixel assertion now checks that the circle's bottom remains visible.
+
+- The final integrated Gradle gate passed **3,392 tests in 350 suites**, with zero
+  failures, errors or skips, and assembled the debug APK.
+- **17 native checks** passed on an owned API 34 emulator at 2160 × 1440 and 240dpi,
+  including 48dp targets, queue selection, compact/expand continuity, unavailable
+  controls, light mode, 1.8 font scale, the actual weekday clock and Gallery stage.
+- The [native review](http://127.0.0.1:8890/native-review.html) loads all ten capture
+  tabs without page errors. Captures include Android emulator taskbar chrome;
+  these are actual Android renders, not photographs of a Portal.
+- Family Area's installed APK was read back and matched local SHA-256
+  `65820d2b22bf0d7584d84b74f2a73e649a07b5f395fa25ede50bc32e814fab9d`
+  (48,796,663 bytes). Its signing certificate matches the actual preceding
+  installed APK, which is retained privately as a byte-for-byte rollback.
+- Full screensaver registry snapshots before/after installation have **zero
+  changed setting values**. Home and screensaver requests were acknowledged.
+  The process replacement interrupted the install HTTP response; installed-byte
+  verification resolved that ambiguity without repeating installation.
+
+[Gallery print](portal-gallery-print-2026-10-30.md) adds a restrained whole-photo
+matte and reuses existing decoding, pixel ownership and dissolves. Late calendar
+layout changes reposition retained layers without decoding or restarting the
+dissolve. All five observer lifecycle tests passed in the integrated gate.
+
+Family Area retains its saved **Shuffle** mode, routed through the legacy engine.
+This native rendering evidence therefore does not establish performance gains for
+its currently active Shuffle path. No new physical FPS, audio, dark/bright sensor,
+backlight-comfort or retained-photo wake result is claimed. The owned emulator was
+stopped after capture; no ongoing performance recording was left running.
+
+This player batch closes within 30 minutes. The broader goal remains active:
+physical clock acceptance, hardware-based rendering measurements and additional
+existing-style refinements remain. Music provider wiring stays deferred.
 
 ## Sources
 

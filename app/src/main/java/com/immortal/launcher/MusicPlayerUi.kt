@@ -18,8 +18,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -37,6 +39,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -48,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
@@ -143,8 +148,8 @@ private fun MusicWorkspace(
       MusicHeading(snapshot, MusicPlayerLayout.FULL, onDismiss, onLayoutChange, onAction)
       MusicNotice(snapshot)
       if (wide) {
-        Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(40.dp)) {
-          MusicCurrent(snapshot, Modifier.weight(1f).fillMaxHeight(), false, onAction)
+        Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(48.dp)) {
+          MusicCurrent(snapshot, Modifier.weight(1.1f).fillMaxHeight(), false, onAction)
           MusicSidePanel(snapshot, Modifier.weight(1f).fillMaxHeight(), onAction)
         }
       } else {
@@ -181,32 +186,27 @@ private fun MusicHeading(
     onLayoutChange: (MusicPlayerLayout) -> Unit,
     onAction: (MusicPlayerUiAction) -> Unit,
 ) {
-  Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+  Row(verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       Column(Modifier.weight(1f)) {
         MusicText(if (layout == MusicPlayerLayout.PHOTOS) "Now playing" else "Music",
-            size = 30, bold = true)
-        MusicText(musicSourceLabel(snapshot), muted = true, size = 16)
+            size = 28, bold = true)
+        MusicText(musicSourceLabel(snapshot), muted = true, size = 14)
+      }
+      if (layout == MusicPlayerLayout.FULL) MusicButton("Minimize player",
+          glyph = MusicGlyph.MINIMIZE, iconOnly = true) {
+        onLayoutChange(MusicPlayerLayout.COMPACT)
+      }
+      MusicButton(if (layout == MusicPlayerLayout.PHOTOS) "Full player" else "Photos",
+          glyph = if (layout == MusicPlayerLayout.PHOTOS) MusicGlyph.EXPAND
+              else MusicGlyph.PHOTOS, iconOnly = true) {
+        onLayoutChange(if (layout == MusicPlayerLayout.PHOTOS) MusicPlayerLayout.FULL
+            else MusicPlayerLayout.PHOTOS)
       }
       MusicButton("Music settings", glyph = MusicGlyph.SETTINGS, iconOnly = true) {
         onAction(MusicPlayerUiAction.OpenSettings)
       }
       MusicButton("Close player", glyph = MusicGlyph.CLOSE, iconOnly = true, onClick = onDismiss)
-    }
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-      MusicButton(if (layout == MusicPlayerLayout.FULL) "Minimize" else "Full player",
-          modifier = Modifier.weight(1f), glyph = if (layout == MusicPlayerLayout.FULL)
-            MusicGlyph.MINIMIZE else MusicGlyph.EXPAND) {
-        onLayoutChange(if (layout == MusicPlayerLayout.FULL) MusicPlayerLayout.COMPACT
-            else MusicPlayerLayout.FULL)
-      }
-      MusicButton(if (layout == MusicPlayerLayout.PHOTOS) "Hide player" else "Photos",
-          modifier = Modifier.weight(1f), glyph = if (layout == MusicPlayerLayout.PHOTOS)
-            MusicGlyph.CLOSE else MusicGlyph.PHOTOS) {
-        if (layout == MusicPlayerLayout.PHOTOS) onDismiss()
-        else onLayoutChange(MusicPlayerLayout.PHOTOS)
-      }
-    }
   }
 }
 
@@ -237,16 +237,25 @@ private fun MusicCompact(
             listOf(track.artist, status).filter { it.isNotBlank() }.joinToString(" · "),
               muted = true, size = 15, maxLines = 2)
         }
-        if (!narrow) MusicPlayButton(snapshot, onAction)
+        if (!narrow) {
+          MusicTransport(snapshot, onAction, compact = true)
+          MusicButton("Open player", glyph = MusicGlyph.EXPAND, iconOnly = true) {
+            onLayoutChange(MusicPlayerLayout.FULL)
+          }
+          MusicButton("Photos", glyph = MusicGlyph.PHOTOS, iconOnly = true) {
+            onLayoutChange(MusicPlayerLayout.PHOTOS)
+          }
+        }
         MusicButton("Hide player", glyph = MusicGlyph.CLOSE, iconOnly = true, onClick = onDismiss)
       }
-      Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+      if (narrow) Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
           verticalAlignment = Alignment.CenterVertically) {
-        if (narrow) MusicPlayButton(snapshot, onAction)
-        MusicButton("Open player", Modifier.weight(1f), glyph = MusicGlyph.EXPAND) {
+        MusicTransport(snapshot, onAction, compact = true)
+        Spacer(Modifier.weight(1f))
+        MusicButton("Open player", glyph = MusicGlyph.EXPAND, iconOnly = true) {
           onLayoutChange(MusicPlayerLayout.FULL)
         }
-        MusicButton("Photos", Modifier.weight(1f), glyph = MusicGlyph.PHOTOS) {
+        MusicButton("Photos", glyph = MusicGlyph.PHOTOS, iconOnly = true) {
           onLayoutChange(MusicPlayerLayout.PHOTOS)
         }
       }
@@ -262,7 +271,17 @@ private fun MusicCurrent(
     onAction: (MusicPlayerUiAction) -> Unit,
 ) {
   val track = musicCoherentTrack(snapshot)
-  Column(modifier.verticalScroll(rememberScrollState()),
+  val fontScale = LocalDensity.current.fontScale
+  BoxWithConstraints(modifier) {
+  val skipNotice = !snapshot.can(MusicCommand.NEXT) && !snapshot.can(MusicCommand.PREVIOUS) &&
+      track?.isLive == false && snapshot.connection == MusicConnection.READY
+  val seekNotice = track?.isLive == false && (track.durationMs ?: 0) > 0 &&
+      !snapshot.can(MusicCommand.SEEK)
+  val helpHeight = (if (skipNotice) 14f * 1.3f * 2 * fontScale + 12f else 0f) +
+      (if (seekNotice) 14f * 1.3f * fontScale else 0f)
+  val coverEdge = MusicLayoutPolicy.coverEdge(maxWidth.value, maxHeight.value,
+      small, fontScale, helpHeight).dp
+  Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(12.dp)) {
     if (track == null) {
@@ -278,39 +297,57 @@ private fun MusicCurrent(
       MusicButton(if (snapshot.connection == MusicConnection.NOT_CONFIGURED)
         "Set up music" else "Music settings") { onAction(MusicPlayerUiAction.OpenSettings) }
     } else {
-      MusicCover(snapshot.sourceId, track.id, track.artUrl,
-          Modifier.widthIn(max = if (small) 180.dp else 420.dp).fillMaxWidth().aspectRatio(1f),
-          borrowedArt = snapshot.artBitmap, maxEdge = if (small) 384 else 1024)
-      MusicText(track.title.ifBlank { "Untitled track" }, size = if (small) 26 else 38,
-          bold = true, maxLines = 3, textAlign = TextAlign.Center)
-      if (track.artist.isNotBlank()) MusicText(track.artist, muted = true, size = if (small) 20 else 24,
-          maxLines = 2, textAlign = TextAlign.Center)
-      if (track.album.isNotBlank()) MusicText(track.album, muted = true, size = if (small) 16 else 20,
-          maxLines = 2, textAlign = TextAlign.Center)
-      MusicText(musicPlaybackLabel(snapshot), muted = true, size = 15)
-      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center,
-          verticalAlignment = Alignment.CenterVertically) {
-        MusicButton("Previous track", glyph = MusicGlyph.PREVIOUS, iconOnly = true,
-            enabled = musicCanSend(snapshot, MusicCommand.PREVIOUS)) {
-          onAction(MusicPlayerUiAction.Previous)
+      Column(Modifier.widthIn(max = if (small) 420.dp else 480.dp).fillMaxWidth(),
+          verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+          MusicCover(snapshot.sourceId, track.id, track.artUrl, Modifier.size(coverEdge),
+              borrowedArt = snapshot.artBitmap, maxEdge = if (small) 384 else 1024)
         }
-        Spacer(Modifier.width(16.dp))
-        MusicPlayButton(snapshot, onAction)
-        Spacer(Modifier.width(16.dp))
-        MusicButton("Next track", glyph = MusicGlyph.NEXT, iconOnly = true,
-            enabled = musicCanSend(snapshot, MusicCommand.NEXT)) {
-          onAction(MusicPlayerUiAction.Next)
+        Row(verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+          MusicText(track.title.ifBlank { "Untitled track" }, Modifier.weight(1f),
+              size = if (small) 26 else 34, bold = true)
+          MusicText(musicPlaybackLabel(snapshot), muted = true, size = 13)
         }
-      }
-      MusicProgress(snapshot, Modifier.fillMaxWidth(), onAction)
-      if (!snapshot.can(MusicCommand.NEXT) && !snapshot.can(MusicCommand.PREVIOUS) &&
-          !track.isLive && snapshot.connection == MusicConnection.READY) {
-        MusicText(if (snapshot.audioOwnedByOther) "Track skipping is unavailable during this interruption."
-          else "Track skipping is unavailable from this player.", muted = true, size = 14,
-            maxLines = 2, textAlign = TextAlign.Center)
+        if (track.artist.isNotBlank()) MusicText(track.artist, muted = true,
+            size = if (small) 18 else 22)
+        if (track.album.isNotBlank()) MusicText(track.album, muted = true,
+            size = if (small) 15 else 16, maxLines = 1)
+        MusicProgress(snapshot, Modifier.fillMaxWidth(), onAction)
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+          MusicTransport(snapshot, onAction, compact = small)
+        }
+        if (skipNotice) {
+          MusicText(if (snapshot.audioOwnedByOther) "Track skipping is unavailable during this interruption."
+            else "Track skipping is unavailable from this player.", muted = true, size = 14,
+              maxLines = 2, textAlign = TextAlign.Center)
+        }
       }
     }
     Spacer(Modifier.height(8.dp))
+  }
+  }
+}
+
+@Composable
+private fun MusicTransport(
+    snapshot: MusicPlayerSnapshot,
+    onAction: (MusicPlayerUiAction) -> Unit,
+    compact: Boolean = false,
+) {
+  Row(horizontalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 20.dp),
+      verticalAlignment = Alignment.CenterVertically) {
+    MusicButton("Previous track", glyph = MusicGlyph.PREVIOUS, iconOnly = true,
+        diameter = if (compact) 48 else 56, quiet = true,
+        enabled = musicCanSend(snapshot, MusicCommand.PREVIOUS)) {
+      onAction(MusicPlayerUiAction.Previous)
+    }
+    MusicPlayButton(snapshot, onAction, compact)
+    MusicButton("Next track", glyph = MusicGlyph.NEXT, iconOnly = true,
+        diameter = if (compact) 48 else 56, quiet = true,
+        enabled = musicCanSend(snapshot, MusicCommand.NEXT)) {
+      onAction(MusicPlayerUiAction.Next)
+    }
   }
 }
 
@@ -318,10 +355,12 @@ private fun MusicCurrent(
 private fun MusicPlayButton(
     snapshot: MusicPlayerSnapshot,
     onAction: (MusicPlayerUiAction) -> Unit,
+    compact: Boolean = false,
 ) {
   val playing = snapshot.playback == PlaybackState.PLAYING
   MusicButton(if (playing) "Pause" else "Play",
       glyph = if (playing) MusicGlyph.PAUSE else MusicGlyph.PLAY, emphasized = true,
+      iconOnly = true, diameter = if (compact) 52 else 80,
       enabled = musicCanSend(snapshot, if (playing) MusicCommand.PAUSE else MusicCommand.PLAY)) {
     onAction(MusicPlayerUiAction.TogglePlayback)
   }
@@ -386,7 +425,7 @@ private fun MusicProgress(
   val position = LocalMusicVisiblePosition.current.value ?: return
   val fraction = (position.toDouble() / duration).toFloat().coerceIn(0f, 1f)
   Column(modifier) {
-    Slider(
+    MusicSlider(
         value = draft ?: fraction,
         onValueChange = { if (enabled) draft = it },
         onValueChangeFinished = {
@@ -398,7 +437,6 @@ private fun MusicProgress(
           }
         },
         enabled = enabled,
-        colors = musicSliderColors(),
         modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
             .semantics { contentDescription = "Track position" },
     )
@@ -420,7 +458,10 @@ private fun MusicSidePanel(
 ) {
   var panel by rememberMusicPanel(snapshot.sourceId)
   Column(modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    val palette = LocalApprovedPalette.current
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp))
+        .background(palette.surface).padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)) {
       MusicPanel.entries.forEach { candidate ->
         // Queue and lyrics cannot be opened when the selected source does not supply them.
         // Players remains an informative view of real availability during setup/offline.
@@ -433,13 +474,23 @@ private fun MusicSidePanel(
             chosen = candidate == panel) { panel = candidate }
       }
     }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically) {
+      MusicText(when (panel) {
+        MusicPanel.QUEUE -> "Up next"
+        MusicPanel.LYRICS -> "Lyrics"
+        MusicPanel.ROOMS -> "Your speakers"
+      }, bold = true, size = 24)
+      if (panel == MusicPanel.QUEUE && snapshot.can(MusicCommand.OPEN_QUEUE))
+        MusicText("${snapshot.queue.size} tracks", muted = true, size = 14)
+    }
     when (panel) {
       MusicPanel.QUEUE -> MusicQueue(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction)
       MusicPanel.LYRICS -> MusicLyrics(snapshot, Modifier.weight(1f).fillMaxWidth())
       MusicPanel.ROOMS -> MusicRooms(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction)
     }
     if (musicCanBrowse(snapshot)) {
-      MusicButton("Browse music", Modifier.fillMaxWidth()) {
+      MusicButton("Browse library", Modifier.fillMaxWidth(), quiet = true) {
         onAction(MusicPlayerUiAction.BrowseLibrary)
       }
     }
@@ -474,15 +525,15 @@ private fun MusicQueue(
         _, item ->
       val current = musicCoherentTrack(snapshot)?.id == item.id && item.id.isNotBlank()
       Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
-          .background(if (current) palette.surface else Color.Transparent)
+          .background(if (current) palette.selected else Color.Transparent)
           .clickable(enabled = item.id.isNotBlank() && item.available &&
               musicCanSend(snapshot, MusicCommand.SELECT_QUEUE_ITEM), role = Role.Button) {
             onAction(MusicPlayerUiAction.SelectQueueItem(item.id))
           }.semantics { selected = current }.heightIn(min = 72.dp).padding(12.dp),
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-        MusicIcon(if (current && snapshot.playback == PlaybackState.PLAYING)
-          MusicGlyph.PLAY else MusicGlyph.MUSIC, palette.secondary, Modifier.size(28.dp))
+        MusicCover(snapshot.sourceId, item.id, item.artUrl, Modifier.size(48.dp),
+            borrowedArt = snapshot.artBitmap.takeIf { current }, maxEdge = 128)
         Column(Modifier.weight(1f)) {
           MusicText(item.title.ifBlank { "Untitled track" }, size = 20, bold = true, maxLines = 2)
           MusicText(if (current) musicPlaybackLabel(snapshot) else item.artist,
@@ -491,6 +542,8 @@ private fun MusicQueue(
         item.durationMs?.takeIf { it > 0 }?.let {
           MusicText(musicTime(it), muted = true, size = 15)
         }
+        if (current) MusicIcon(if (snapshot.playback == PlaybackState.PLAYING)
+          MusicGlyph.PLAY else MusicGlyph.PAUSE, palette.text, Modifier.size(20.dp))
       }
     }
   }
@@ -580,7 +633,7 @@ private fun MusicRoomVolume(
   Row(verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(12.dp)) {
     MusicIcon(MusicGlyph.VOLUME, LocalApprovedPalette.current.secondary, Modifier.size(24.dp))
-    Slider(value = draft ?: volume.toFloat(), valueRange = 0f..100f,
+    MusicSlider(value = draft ?: volume.toFloat(), valueRange = 0f..100f,
         onValueChange = { if (enabled) draft = it },
         onValueChangeFinished = {
           val value = draft
@@ -588,7 +641,7 @@ private fun MusicRoomVolume(
           if (value != null && enabled) onAction(
               MusicPlayerUiAction.SetRoomVolume(room.id, value.toInt().coerceIn(0, 100)))
         },
-        enabled = enabled, colors = musicSliderColors(),
+        enabled = enabled,
         modifier = Modifier.weight(1f).heightIn(min = 48.dp)
             .semantics { contentDescription = "${room.name} volume" })
     // Keep the displayed value server-confirmed; dragging never declares success.
@@ -702,6 +755,43 @@ private fun musicSliderColors() = LocalApprovedPalette.current.let { palette ->
       disabledActiveTrackColor = palette.secondary, disabledInactiveTrackColor = palette.divider)
 }
 
+/** Standard Material input/semantics with a quiet, shared seek/volume presentation. */
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun MusicSlider(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    onValueChangeFinished: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
+) {
+  val palette = LocalApprovedPalette.current
+  val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+  val fraction = ((value - valueRange.start) /
+      (valueRange.endInclusive - valueRange.start)).coerceIn(0f, 1f)
+  Slider(value = value, onValueChange = onValueChange,
+      onValueChangeFinished = onValueChangeFinished, enabled = enabled,
+      valueRange = valueRange, colors = musicSliderColors(), modifier = modifier,
+      thumb = {
+        Canvas(Modifier.size(16.dp)) {
+          drawCircle(if (enabled) palette.text else palette.secondary)
+        }
+      },
+      track = {
+        Canvas(Modifier.fillMaxWidth().height(4.dp)) {
+          val start = if (rtl) size.width else 0f
+          val end = if (rtl) 0f else size.width
+          drawLine(palette.divider, Offset(start, size.height / 2),
+              Offset(end, size.height / 2), size.height, StrokeCap.Round)
+          drawLine(if (enabled) palette.text else palette.secondary,
+              Offset(start, size.height / 2),
+              Offset(start + (end - start) * fraction, size.height / 2),
+              size.height, StrokeCap.Round)
+        }
+      })
+}
+
 /**
  * Prefer the read-only media-session bitmap, without recycling it. Otherwise consume the
  * shared network loader or bounded local provider reader. Key the whole state by source,
@@ -757,7 +847,7 @@ private fun MusicText(
   val palette = LocalApprovedPalette.current
   Text(text, modifier, color = if (muted) palette.secondary else palette.text,
       fontFamily = FontFamily.Default, fontSize = size.sp, lineHeight = (size * 1.3f).sp,
-      fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
+      fontWeight = if (bold) FontWeight.SemiBold else FontWeight.Normal,
       maxLines = maxLines, overflow = TextOverflow.Ellipsis, textAlign = textAlign)
 }
 
@@ -770,6 +860,8 @@ private fun MusicButton(
     iconOnly: Boolean = false,
     emphasized: Boolean = false,
     chosen: Boolean = false,
+    diameter: Int? = null,
+    quiet: Boolean = false,
     onClick: () -> Unit,
 ) {
   val palette = LocalApprovedPalette.current
@@ -777,17 +869,21 @@ private fun MusicButton(
   val background = when {
     emphasized -> palette.text
     chosen -> palette.selected
+    quiet -> Color.Transparent
     else -> palette.surface2
   }
-  Row(modifier.heightIn(min = 48.dp).widthIn(min = 48.dp).clip(RoundedCornerShape(12.dp))
-      .background(if (enabled) background else palette.surface)
+  val target = if (diameter != null) modifier.size(diameter.dp) else modifier
+  Row(target.heightIn(min = 48.dp).widthIn(min = 48.dp)
+      .clip(if (diameter != null) CircleShape else RoundedCornerShape(20.dp))
+      .background(if (enabled || quiet) background else palette.surface)
       .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
       .semantics { contentDescription = label; selected = chosen }
       .padding(horizontal = if (iconOnly) 12.dp else 14.dp, vertical = 12.dp),
       horizontalArrangement = Arrangement.Center,
       verticalAlignment = Alignment.CenterVertically) {
     val color = if (enabled) foreground else palette.secondary
-    if (glyph != null) MusicIcon(glyph, color, Modifier.size(24.dp))
+    if (glyph != null) MusicIcon(glyph, color,
+        Modifier.size(if (diameter != null && diameter >= 80) 32.dp else 24.dp))
     if (!iconOnly) {
       if (glyph != null) Spacer(Modifier.width(8.dp))
       Text(label, color = color, fontFamily = FontFamily.Default, fontSize = 16.sp,

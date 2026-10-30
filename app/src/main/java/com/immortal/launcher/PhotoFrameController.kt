@@ -25,6 +25,7 @@ import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
@@ -44,6 +45,55 @@ import kotlin.math.abs
 import org.json.JSONObject
 
 private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
+
+/** Layout-driven reservations, with no timer and no callback ownership after close. */
+internal class GalleryOverlayLayoutObserver(
+    private val root: View, private val refresh: () -> Unit,
+) : View.OnAttachStateChangeListener, ViewTreeObserver.OnGlobalLayoutListener {
+  private var active = false
+  private var closed = false
+  private var tree: ViewTreeObserver? = null
+
+  init { root.addOnAttachStateChangeListener(this) }
+
+  fun setActive(value: Boolean) {
+    if (closed || active == value) return
+    active = value
+    if (value) attach() else detach()
+  }
+
+  private fun attach() {
+    if (closed || !active || !root.isAttachedToWindow) return
+    val next = root.viewTreeObserver
+    if (!next.isAlive) return
+    if (tree !== next) {
+      detach()
+      tree = next
+      next.addOnGlobalLayoutListener(this)
+    }
+    // Bounds may have changed while the host was suspended without another layout on resume.
+    onGlobalLayout()
+  }
+
+  private fun detach() {
+    tree?.takeIf { it.isAlive }?.removeOnGlobalLayoutListener(this)
+    tree = null
+  }
+
+  override fun onGlobalLayout() {
+    if (!closed && active && tree?.isAlive == true && root.isAttachedToWindow) refresh()
+  }
+  override fun onViewAttachedToWindow(v: View) { attach() }
+  override fun onViewDetachedFromWindow(v: View) { detach() }
+
+  fun close() {
+    if (closed) return
+    closed = true
+    active = false
+    detach()
+    root.removeOnAttachStateChangeListener(this)
+  }
+}
 
 /**
  * The photo-frame UI + update logic, decoupled from any host. Used by both
@@ -100,6 +150,7 @@ class PhotoFrameController(
   // True when [photoBack] is currently the front (visible) layer and [photo] is the back.
   private var photoBackIsFront = false
   private lateinit var nativeStage: SlideshowStage
+  private var galleryOverlayObserver: GalleryOverlayLayoutObserver? = null
   private val pixelBudget = SlideshowPixelBudget()
   private val nativeLoaderDelegate = lazy {
     SlideshowLoader(context, pixelBudget, onCancelTransports = { cancelPhotoTransports() }, ui = ui)
@@ -385,6 +436,12 @@ class PhotoFrameController(
     // Build + drive the overlay from the user's selected face ([FaceCatalog]); faceOverride lets
     // the debug preview harness (and the overnight night clock) render a specific face instead.
     if (!photosOnly) faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
+    if (!photosOnly && settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT) {
+      galleryOverlayObserver?.close()
+      galleryOverlayObserver = GalleryOverlayLayoutObserver(root, ::refreshGalleryOverlays).also {
+        it.setActive(hostActive)
+      }
+    }
 
     // --- fork features layered on top of the Face overlay ---
     // Only spin up TTS when the welcome overlay will actually speak. The greeting uses the
@@ -1101,6 +1158,7 @@ class PhotoFrameController(
       if (!photosOnly && settings.gestureWave) resumeGestureCamera()
       if (remoteMode) schedulePrefetch()
     }
+    galleryOverlayObserver?.setActive(value)
     updateSoundscape()
   }
 
@@ -1147,6 +1205,8 @@ class PhotoFrameController(
   @androidx.annotation.MainThread
   fun stop() {
     stopped = true
+    galleryOverlayObserver?.close()
+    galleryOverlayObserver = null
     darkRoomObserver?.setActive(false)
     darkRoomObserver = null
     quietClock?.setActive(false)
@@ -1734,7 +1794,8 @@ class PhotoFrameController(
 
   private fun intervalMs(): Long = settings.intervalSec * 1000L
   private fun analyzePeople(): Boolean =
-      settings.keepPeopleInFrame && settings.mode != ScreensaverConfig.MODE_WHOLE
+      settings.keepPeopleInFrame && settings.mode != ScreensaverConfig.MODE_WHOLE &&
+          settings.mode != ScreensaverConfig.MODE_GALLERY_PRINT
 
   private fun localKey(path: String): String {
     val file = java.io.File(path)
@@ -1798,19 +1859,32 @@ class PhotoFrameController(
     if (ScreensaverConfig.isNativeStage(settings.mode)) index = -1
   }
 
-  private fun presentNative(photos: List<SlideshowPhoto>) {
-    if (stopped) return
-    nativeStage.visibility = View.VISIBLE
-    photo.visibility = View.GONE
-    photoBack.visibility = View.GONE
+  private fun measuredNativeOcclusions(): List<Rect> {
     val occupied = if (photosOnly) mutableListOf<Rect>() else faceRenderer.photoOcclusions().toMutableList()
     if (this::calendarPanel.isInitialized && calendarPanel.visibility == View.VISIBLE && calendarPanel.width > 0) {
       occupied.add(Rect(calendarPanel.left - dp(20), calendarPanel.top - dp(20),
           calendarPanel.right + dp(20), calendarPanel.bottom + dp(20)))
     }
+    return occupied
+  }
+
+  private fun refreshGalleryOverlays() {
+    if (stopped || !hostActive || settings.mode != ScreensaverConfig.MODE_GALLERY_PRINT ||
+        !this::nativeStage.isInitialized || nativeStage.visibility != View.VISIBLE ||
+        (this::viewerControls.isInitialized && viewerControls.isEditing)) return
+    nativeStage.refreshGalleryOverlays(measuredNativeOcclusions())
+  }
+
+  private fun presentNative(photos: List<SlideshowPhoto>) {
+    if (stopped) return
+    nativeStage.visibility = View.VISIBLE
+    photo.visibility = View.GONE
+    photoBack.visibility = View.GONE
     nativeStage.show(photos,
         settings.fit == ScreensaverConfig.FIT_FILL && settings.mode != ScreensaverConfig.MODE_WHOLE,
-        settings.photoMotion && settings.mode != ScreensaverConfig.MODE_WHOLE, intervalMs(), occupied)
+        settings.photoMotion && settings.mode != ScreensaverConfig.MODE_WHOLE,
+        intervalMs(), measuredNativeOcclusions(),
+        galleryPrint = settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT)
     if (paused) nativeStage.pause() else nativeStage.resume()
     viewerControls.photoChanged()
     Log.i("ImmortalSlideshow", "ready native scene: photos=${photos.size}, pixels=${photos.sumOf { it.bitmap.width.toLong() * it.bitmap.height }}")

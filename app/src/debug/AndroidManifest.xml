@@ -10,6 +10,11 @@
 
     <application>
         <activity
+            android:name=".MusicDesignPreviewActivity"
+            android:exported="true"
+            android:label="Silent music design preview"
+            android:theme="@style/Theme.SampleApp" />
+        <activity
             android:name=".PhotoFramePreviewActivity"
             android:exported="true"
             tools:replace="android:exported" />

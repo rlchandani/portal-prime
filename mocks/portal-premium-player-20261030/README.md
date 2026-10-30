@@ -32,7 +32,7 @@ All metadata, speaker availability, playback, time and presence are fixtures. Th
 
 ## Native implementation mapping
 
-Inspected `MusicPlayerUi.kt`, `MusicPlayerState.kt`, `MusicPlayerHost.kt`, `MusicRoomPolicy.kt` and `MusicMaDispatch.kt` before implementation. Native files were read only.
+Inspected `MusicPlayerUi.kt`, `MusicPlayerState.kt`, `MusicPlayerHost.kt`, `MusicRoomPolicy.kt` and `MusicMaDispatch.kt` before creating the browser mock. The subsequent native refinement is recorded separately below.
 
 | Mock visual / action | Existing native counterpart and constraints |
 | --- | --- |
@@ -74,4 +74,30 @@ PLAYWRIGHT_MODULE=/absolute/path/to/node_modules/playwright node checks.mjs
 
 21 functional browser checks cover Portal fit, silent transport/timeline, seek/skip, queue selection, full/compact state, search, playlists, speakers, capability gating, unavailable/error recovery, interruption, command failure, keyboard tabs, reduced motion, Night clock ratios/inks, mobile touch targets, short landscape/tablet layouts, standalone file use and absence of external requests/runtime errors. JS syntax and all SVGs also parse successfully. Screenshot and check evidence is in `evidence/`; `checks.json` records the checks.
 
-No Kotlin, backend, settings or HA configuration was edited by this task. No commit or deployment was performed.
+## Subsequent native refinement
+
+`MusicPlayerUi.kt` now has the artwork-led hierarchy, single-row header, circular transport,
+compact strip, queue covers and shared slender Material seek/volume controls. It preserves
+the existing command guards, player ownership and lifecycle-aware progress leaf. It uses
+Immortal's established light/dark palette rather than replacing the global theme.
+Title and artist are single-line ellipsized labels; full text remains in the native semantics.
+The artwork budget includes control/capability-message height and font scale.
+
+`MusicDesignPreviewActivity` and its original 512px cover assets are debug-only. The preview
+never creates an audio controller, connects a server or reads household media. It renders the
+real native music, night-clock and Gallery print components with silent sample data.
+Library/provider actions remain deferred. The browser library/playlist exploration stays
+interactive; no native provider integration is implied.
+
+`native-checks.py` targets only the dedicated `PortalMusic20261030` AVD and refuses a household
+device. It captures layout evidence and checks touch sizes, transport visibility, queue/layout
+continuity, offline guards, theme/font variants and native clock/gallery rendering:
+
+```sh
+python3 native-checks.py --serial emulator-5556
+```
+
+Results are in `evidence/native/checks.json`; `complete: true` is required before claiming the
+whole check passed. Open `native-review.html` for the image review. The emulator's API 34/GMS
+image does not establish Portal API 29 timing, sensor behavior or audio compatibility.
+No Home Assistant music deployment belongs to either preview.

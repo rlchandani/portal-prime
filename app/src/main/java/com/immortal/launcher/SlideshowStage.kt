@@ -33,7 +33,7 @@ internal class SlideshowStage(
 ) : FrameLayout(context) {
   private data class Presentation(
       val photos: List<SlideshowPhoto>, val fill: Boolean, val motion: Boolean, val dwell: Long,
-      val occupied: List<Rect>,
+      val occupied: List<Rect>, val galleryPrint: Boolean,
   )
   private val layers = arrayOf(Composition(context, budget, "stage0"), Composition(context, budget, "stage1"))
   private var current = 0
@@ -59,10 +59,14 @@ internal class SlideshowStage(
 
   fun show(
       photos: List<SlideshowPhoto>, fill: Boolean, motion: Boolean, dwell: Long,
-      occupied: List<Rect> = emptyList(),
+      occupied: List<Rect> = emptyList(), galleryPrint: Boolean = false,
   ) {
     if (photos.isEmpty() || photos.any { it.bitmap.isRecycled }) return
-    val presentation = Presentation(photos.take(2), fill, motion, dwell, occupied.map(::Rect))
+    // Retain one extra obstacle as an overflow sentinel; Gallery print then takes its
+    // conservative fallback without copying or searching an arbitrary metadata list.
+    val measured = if (galleryPrint) galleryOcclusions(occupied) else occupied.map(::Rect)
+    val presentation = Presentation(photos.take(if (galleryPrint) 1 else 2),
+        fill && !galleryPrint, motion && !galleryPrint, dwell, measured, galleryPrint)
     if (width <= 0 || height <= 0) {
       pending = presentation
       own("pending", presentation)
@@ -70,6 +74,22 @@ internal class SlideshowStage(
     }
     present(presentation)
   }
+
+  /** Reposition retained views only; keep bitmap ownership, alpha and any live dissolve intact. */
+  fun refreshGalleryOverlays(occupied: List<Rect>) {
+    val old = shown ?: return
+    if (!hostActive || !old.galleryPrint || editOriginal != null || width <= 0 || height <= 0) return
+    val measured = galleryOcclusions(occupied)
+    if (old.occupied == measured) return
+    shown = old.copy(occupied = measured)
+    // During an existing dissolve both retained photos need the new reservation.
+    layers.forEach { it.refreshGalleryOverlays(measured, width, height) }
+  }
+
+  private fun galleryOcclusions(occupied: List<Rect>): List<Rect> =
+      occupied.take(SlideshowPresentationPolicy.MAX_OCCLUSIONS + 1).map(::Rect)
+          .sortedWith(compareBy<Rect> { it.left }.thenBy { it.top }
+              .thenBy { it.right }.thenBy { it.bottom })
 
   private fun present(presentation: Presentation) {
     // Complete the previous replacement before reusing either slot. A canceled animator's
@@ -93,7 +113,11 @@ internal class SlideshowStage(
     layer.bringToFront()
     shown = presentation
     current = incoming
-    contentDescription = if (presentation.photos.size == 2) "Portrait pair" else "Photo slideshow"
+    contentDescription = when {
+      presentation.galleryPrint -> "Gallery print"
+      presentation.photos.size == 2 -> "Portrait pair"
+      else -> "Photo slideshow"
+    }
     if (first || !animationsAllowed()) {
       layer.alpha = 1f
       if (!first) layers[outgoing].clear()
@@ -212,26 +236,33 @@ internal class SlideshowStage(
         val transforms: List<SlideshowGeometry.Transform>, val times: List<Long>,
     )
     private val moves = ArrayList<AnimatorSet>()
+    private var displayed: Presentation? = null
     init { setBackgroundColor(MATTE); clipChildren = true }
 
     fun display(p: Presentation, width: Int, height: Int) {
       // Keep admission held across rebinding; a worker cannot reserve scratch
       // in the brief gap between removing and rebuilding this layer's views.
       clear(releasePixels = false)
+      displayed = p
       budget.setOwner(owner, p.photos.map {
         SlideshowPixelBudget.Entry(it.bitmap, it.bitmap.allocationByteCount.toLong())
       })
+      setBackgroundColor(if (p.galleryPrint) PRINT_MATTE else MATTE)
       visibility = View.VISIBLE
       val margin = if (p.photos.size == 2) (20 * resources.displayMetrics.density).toInt() else 0
       val tileWidth = (width - margin) / p.photos.size
       p.photos.forEachIndexed { index, photo ->
         val left = index * (tileWidth + margin)
         val tile = Rect(left, 0, if (index == p.photos.lastIndex) width else left + tileWidth, height)
-        val initial = SlideshowGeometry.plan(
+        val print = if (p.galleryPrint) SlideshowPresentationPolicy.galleryPrint(
+            photo.bitmap.width, photo.bitmap.height, width, height, resources.displayMetrics.density,
+            p.occupied.map { SlideshowPresentationPolicy.Bounds(it.left, it.top, it.right, it.bottom) },
+            photo.adjustment) else null
+        val initial = print?.path ?: SlideshowGeometry.plan(
             photo.bitmap.width, photo.bitmap.height, tile.width(), tile.height(), photo.regions,
             p.fill, p.motion && photo.adjustment == null, index % 2 == 1)
         // Reserve a measured free area only if a protected face would intersect an overlay.
-        val overlaps = photo.regions.any { region ->
+        val overlaps = print == null && photo.regions.any { region ->
           val rw = region.right - region.left
           val rh = region.bottom - region.top
           fun protected(transform: SlideshowGeometry.Transform): Rect = Rect(
@@ -248,7 +279,8 @@ internal class SlideshowStage(
           val sweep = protected(initial.start).apply { union(protected(initial.end)) }
           p.occupied.any { Rect.intersects(sweep, it) }
         }
-        val area = if (overlaps && photo.adjustment == null) freeArea(tile, p.occupied) else tile
+        val area = print?.area?.let { Rect(it.left, it.top, it.right, it.bottom) }
+            ?: if (overlaps && photo.adjustment == null) freeArea(tile, p.occupied) else tile
         val holder = FrameLayout(context).apply { clipChildren = true }
         addView(holder, LayoutParams(area.width(), area.height()).apply {
           leftMargin = area.left; topMargin = area.top
@@ -259,10 +291,10 @@ internal class SlideshowStage(
           pivotX = 0f; pivotY = 0f
         }
         holder.addView(image, LayoutParams(photo.bitmap.width, photo.bitmap.height))
-        val path = if (area == tile) initial else SlideshowGeometry.plan(
+        val path = if (print != null || area == tile) initial else SlideshowGeometry.plan(
             photo.bitmap.width, photo.bitmap.height, area.width(), area.height(), photo.regions,
             p.fill, p.motion, index % 2 == 1)
-        val manual = photo.adjustment?.transform(
+        val manual = if (print != null) null else photo.adjustment?.transform(
             photo.bitmap.width, photo.bitmap.height, area.width(), area.height())
         val start = manual ?: path.start
         image.scaleX = start.scale; image.scaleY = start.scale
@@ -282,6 +314,32 @@ internal class SlideshowStage(
           })
         }
       }
+    }
+
+    fun refreshGalleryOverlays(occupied: List<Rect>, width: Int, height: Int) {
+      val old = displayed ?: return
+      if (!old.galleryPrint || old.occupied == occupied) return
+      val photo = old.photos.singleOrNull() ?: return
+      if (photo.bitmap.isRecycled) return
+      val holder = getChildAt(0) as? FrameLayout ?: return
+      val image = holder.getChildAt(0) as? ImageView ?: return
+      displayed = old.copy(occupied = occupied)
+      // Saved manual positions already bypass reservations; leave their pose alone.
+      if (photo.adjustment != null) return
+      val print = SlideshowPresentationPolicy.galleryPrint(
+          photo.bitmap.width, photo.bitmap.height, width, height, resources.displayMetrics.density,
+          occupied.map { SlideshowPresentationPolicy.Bounds(it.left, it.top, it.right, it.bottom) })
+      val area = print.area
+      val params = holder.layoutParams as LayoutParams
+      if (params.width != area.width || params.height != area.height ||
+          params.leftMargin != area.left || params.topMargin != area.top) {
+        params.width = area.width; params.height = area.height
+        params.leftMargin = area.left; params.topMargin = area.top
+        holder.layoutParams = params
+      }
+      val transform = print.path.start
+      image.scaleX = transform.scale; image.scaleY = transform.scale
+      image.translationX = transform.x; image.translationY = transform.y
     }
 
     fun pause() { moves.forEach { it.pause() } }
@@ -320,6 +378,7 @@ internal class SlideshowStage(
       }
     }
     fun clear(releasePixels: Boolean = true) {
+      displayed = null
       moves.forEach { it.cancel() }
       moves.clear()
       // Drawable references are released only after their visible layer is detached/cleared.
@@ -349,6 +408,7 @@ internal class SlideshowStage(
     private fun animationsAllowed(): Boolean =
         android.os.Build.VERSION.SDK_INT < 26 || android.animation.ValueAnimator.areAnimatorsEnabled()
     val MATTE: Int = Color.rgb(20, 22, 27)
+    private val PRINT_MATTE: Int = Color.rgb(28, 27, 25)
     const val DISSOLVE_MS = 900L
   }
 }

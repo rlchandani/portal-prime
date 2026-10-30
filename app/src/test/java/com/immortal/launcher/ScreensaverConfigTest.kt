@@ -39,7 +39,7 @@ class ScreensaverConfigTest {
 
   @Test
   fun preferredAndLegacyStyles_roundTripThroughModeSetter() {
-    (listOf("smartFrame", "portraitPair", "wholePhoto") + legacyModes).forEach { mode ->
+    (listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint") + legacyModes).forEach { mode ->
       val prefs = ScreensaverTestPrefs()
       ScreensaverConfig.setMode(prefs.context, mode)
       assertEquals("selected style $mode must persist", mode, ScreensaverConfig.load(prefs.context).mode)
@@ -48,7 +48,7 @@ class ScreensaverConfigTest {
 
   @Test
   fun nativeStyles_doNotUseTheWebEngine_andLegacyRoutingStaysIntact() {
-    listOf("smartFrame", "portraitPair", "wholePhoto", "classic").forEach {
+    listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "classic").forEach {
       assertFalse("$it must use a native renderer", ScreensaverConfig.usesEngine(it))
       assertEquals(it != "classic", ScreensaverConfig.isNativeStage(it))
     }

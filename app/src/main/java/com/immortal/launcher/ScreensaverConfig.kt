@@ -54,6 +54,7 @@ object ScreensaverConfig {
   const val MODE_SMART = "smartFrame"
   const val MODE_PORTRAITS = "portraitPair"
   const val MODE_WHOLE = "wholePhoto"
+  const val MODE_GALLERY_PRINT = "galleryPrint"
   const val MODE_CLASSIC = "classic"
   const val MODE_SHUFFLE = "shuffle"
   // Engine mode ids — MUST match the SS.MODES keys in assets/screensaver/modes.js.
@@ -61,11 +62,12 @@ object ScreensaverConfig {
       "kenBurns", "diptych", "framed", "galleryWall", "push", "memories",
       "panorama", "polaroid", "mosaic", "filmstrip", "cinema", "heroSidebar")
   // Preferred styles first; all existing IDs stay selectable and valid for saved preferences.
-  val MODES = listOf(MODE_SMART, MODE_PORTRAITS, MODE_WHOLE, MODE_CLASSIC, MODE_SHUFFLE) + ENGINE_MODES
+  val MODES = listOf(MODE_SMART, MODE_PORTRAITS, MODE_WHOLE, MODE_GALLERY_PRINT, MODE_CLASSIC, MODE_SHUFFLE) + ENGINE_MODES
   fun modeLabel(m: String): String = when (m) {
     MODE_SMART -> "Smart frame"
     MODE_PORTRAITS -> "Portrait pair"
     MODE_WHOLE -> "Whole photo"
+    MODE_GALLERY_PRINT -> "Gallery print"
     MODE_CLASSIC -> "Classic (existing)"
     MODE_SHUFFLE -> "Shuffle - all styles (existing)"
     "kenBurns" -> "Cinematic Ken Burns (existing)"
@@ -83,7 +85,7 @@ object ScreensaverConfig {
     else -> m
   }
   fun isNativeStage(mode: String): Boolean =
-      mode == MODE_SMART || mode == MODE_PORTRAITS || mode == MODE_WHOLE
+      mode == MODE_SMART || mode == MODE_PORTRAITS || mode == MODE_WHOLE || mode == MODE_GALLERY_PRINT
 
   /** Existing engine IDs keep their WebView; Classic and the preferred styles remain native. */
   fun usesEngine(mode: String): Boolean = mode != MODE_CLASSIC && !isNativeStage(mode)
