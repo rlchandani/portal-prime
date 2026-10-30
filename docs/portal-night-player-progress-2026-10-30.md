@@ -554,6 +554,58 @@ Portal presentation measurements remain open. Music provider wiring stays deferr
 The owned emulator was stopped after acceptance. Family Area's collector is
 independently confirmed inactive with zero listeners. The broader goal remains active.
 
+## Living Gallery Wall — 17:42 UTC batch
+
+Living Gallery Wall now fits its packed rows within both screen dimensions.
+Row sizing follows screen height; shorter final rows are centered and all ten
+selected photographs are retained, including uniform portrait/landscape collections.
+Tiles show whole photographs on a quiet matte without continuous pan/zoom.
+
+Every cell owns two fixed image slots and uses the shared incoming-only dissolve.
+The outgoing photo stays opaque until its replacement is ready and fully visible;
+retirement and terminal cleanup release its URL and animation hints. The incoming
+slot paints an opaque matte so a differently shaped replacement does not expose
+the outgoing image in its margins. Pause freezes opacity without the newer WebView
+animation API. Closed owners reject decoded work immediately before publication.
+
+Independent review reproduced duplicate repeat scheduling when pause/resume occurs
+during a pending decode. The shared timer now tracks an executing callback
+separately from its timeout ID, preserving one cadence across resume. A controlled
+clock regression and a real asynchronous Chrome decode check both exercise that
+failure. This affects timer ownership shared by the slideshow modes, so the full
+source and browser regression suites were rerun after the correction.
+
+| Final gate | Evidence |
+| --- | --- |
+| Slideshow source checks | **150 passed**, zero failures/skips; **11 Gallery Wall checks** included |
+| Engine fixtures | **14/14 passed** |
+| Actual-source Chrome renderer | **59 passed**, zero production-script errors; five styles captured |
+| Integrated debug build | Successful; unchanged JVM task was **UP-TO-DATE**, retaining **3,445 passing results / 358 suites** |
+| Native UI scope | Prior **56 checks / 151.09 seconds** cover unchanged Kotlin; not rerun in this asset batch |
+| Visual review | Actual-source Gallery Wall screenshot inspected at 2160 × 1440 |
+
+The browser preview includes twelve original mixed-aspect SVG fixtures with verified
+dimensions and a finite asset allowlist. No household photographs or credentials
+are exposed by the preview server. The previous performance-capture admission issue
+remains parked; no new capture was requested. These rendering and timer corrections
+do not establish measured physical Portal FPS, texture memory or GPU savings.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`e98b85c2ac9f3fd232aeb297018d41af5e26fc3fadb1f208352717fd4960bad7`
+(**48,910,412 bytes**). Its signing certificate matches the exact preceding APK,
+retained privately as a rollback. There was one upload/install; the process
+replacement interrupted the HTTP response and installed-byte verification
+resolved that ambiguity without reinstalling. All **97 settings** match the
+pre-install snapshot. Home/screensaver dispatches were acknowledged; those
+responses do not establish visual transitions.
+
+Capture state is independently confirmed inactive, with the collector stopped
+and **zero active listeners**. Living Area remains unchanged. Physical night-clock
+acceptance, actual Portal visual acceptance and reliable presentation measurements
+remain open. No music provider/backend or Home Assistant service was deployed.
+The implementation, review, regression checks, deployment and commit completed
+within this batch's thirty-minute limit.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

@@ -1,0 +1,15 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title description">
+  <title id="title">Tidal terraces</title>
+  <desc id="description">Original synthetic abstract art: quiet bands of ocean, foam and a sandbar.</desc>
+  <rect width="720" height="480" fill="#dce3db"/>
+  <circle cx="530" cy="112" r="48" fill="#d4c7aa"/>
+  <path d="M0 221Q172 170 351 224T720 201V480H0Z" fill="#9eb4b0"/>
+  <path d="M0 304Q231 230 475 307T720 290V480H0Z" fill="#647f83"/>
+  <path d="M0 390Q174 319 359 384T720 361V480H0Z" fill="#45676e"/>
+  <path d="M436 480Q540 349 720 378V480Z" fill="#c7ba9f"/>
+</svg>

@@ -1,0 +1,16 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="720" viewBox="0 0 540 720" role="img" aria-labelledby="title description">
+  <title id="title">Kelp canopy</title>
+  <desc id="description">Original synthetic abstract art: branching marine leaf forms in muted green on pale ocean blue.</desc>
+  <rect width="540" height="720" fill="#cbd8d4"/>
+  <path d="M284 660Q217 422 304 95" fill="none" stroke="#647b7b" stroke-width="9"/>
+  <path d="M272 538Q97 540 116 354Q279 369 272 538Z" fill="#8b997f"/>
+  <path d="M267 431Q432 427 434 258Q279 269 267 431Z" fill="#647f83"/>
+  <path d="M276 297Q131 286 157 151Q290 167 276 297Z" fill="#a7b29a"/>
+  <path d="M298 184Q405 156 389 68Q298 82 298 184Z" fill="#7b866d"/>
+  <path d="M64 665H476" stroke="#a3b7ae" stroke-width="3"/>
+</svg>

@@ -1,0 +1,14 @@
+[
+  {"url": "/fixtures/gallery-01.svg", "w": 480, "h": 720},
+  {"url": "/fixtures/gallery-02.svg", "w": 720, "h": 480},
+  {"url": "/fixtures/gallery-03.svg", "w": 600, "h": 600},
+  {"url": "/fixtures/gallery-04.svg", "w": 540, "h": 720},
+  {"url": "/fixtures/gallery-05.svg", "w": 720, "h": 480},
+  {"url": "/fixtures/gallery-06.svg", "w": 600, "h": 600},
+  {"url": "/fixtures/gallery-07.svg", "w": 480, "h": 720},
+  {"url": "/fixtures/gallery-08.svg", "w": 800, "h": 500},
+  {"url": "/fixtures/gallery-09.svg", "w": 600, "h": 600},
+  {"url": "/fixtures/gallery-10.svg", "w": 540, "h": 720},
+  {"url": "/fixtures/gallery-11.svg", "w": 720, "h": 480},
+  {"url": "/fixtures/gallery-12.svg", "w": 600, "h": 600}
+]

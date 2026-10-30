@@ -1,0 +1,16 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="720" viewBox="0 0 540 720" role="img" aria-labelledby="title description">
+  <title id="title">Evening reeds</title>
+  <desc id="description">Original synthetic abstract art: sparse reed silhouettes and a pale disc over still water.</desc>
+  <rect width="540" height="720" fill="#dce3db"/>
+  <circle cx="338" cy="200" r="102" fill="#c7ba9f"/>
+  <path d="M0 470H540V720H0Z" fill="#91aaa7"/>
+  <path d="M104 720Q117 441 185 243M193 720Q178 451 113 343M308 720Q334 487 415 388" fill="none" stroke="#647b7b" stroke-width="8"/>
+  <ellipse cx="179" cy="263" rx="17" ry="63" fill="#7b866d" transform="rotate(19 179 263)"/>
+  <ellipse cx="119" cy="359" rx="15" ry="54" fill="#8b997f" transform="rotate(-18 119 359)"/>
+  <ellipse cx="405" cy="410" rx="15" ry="60" fill="#647b7b" transform="rotate(29 405 410)"/>
+</svg>

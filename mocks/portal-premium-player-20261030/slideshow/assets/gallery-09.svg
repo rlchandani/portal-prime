@@ -1,0 +1,14 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-labelledby="title description">
+  <title id="title">Shell fan</title>
+  <desc id="description">Original synthetic abstract art: a half-round shell with quiet radial lines and a sea-green ground.</desc>
+  <rect width="600" height="600" fill="#b7c5bd"/>
+  <path d="M97 366A203 203 0 0 1 503 366Z" fill="#dfd3b9"/>
+  <path d="M300 366L116 278M300 366L164 215M300 366L230 176M300 366V163M300 366L370 176M300 366L436 215M300 366L484 278" stroke="#b6a58b" stroke-width="5"/>
+  <path d="M97 390H503" stroke="#647f83" stroke-width="8"/>
+  <ellipse cx="300" cy="462" rx="93" ry="37" fill="#647b7b"/>
+</svg>

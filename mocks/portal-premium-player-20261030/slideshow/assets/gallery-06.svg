@@ -1,0 +1,15 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-labelledby="title description">
+  <title id="title">Rain circles</title>
+  <desc id="description">Original synthetic abstract art: nested circular ripples and a single small sand-colored disc.</desc>
+  <rect width="600" height="600" fill="#45676e"/>
+  <circle cx="300" cy="300" r="219" fill="none" stroke="#86a09e" stroke-width="29"/>
+  <circle cx="300" cy="300" r="157" fill="none" stroke="#b3c5bb" stroke-width="21"/>
+  <circle cx="300" cy="300" r="101" fill="none" stroke="#9db3a6" stroke-width="13"/>
+  <circle cx="300" cy="300" r="45" fill="#d4c7aa"/>
+  <circle cx="449" cy="161" r="19" fill="#bb9983"/>
+</svg>

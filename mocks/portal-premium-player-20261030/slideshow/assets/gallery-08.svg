@@ -1,0 +1,16 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500" role="img" aria-labelledby="title description">
+  <title id="title">Quiet headlands</title>
+  <desc id="description">Original synthetic abstract art: overlapping ocean headlands under a warm, flat sky.</desc>
+  <rect width="800" height="500" fill="#e4dccb"/>
+  <circle cx="608" cy="126" r="63" fill="#c7ad88"/>
+  <path d="M0 333L166 166L351 333Z" fill="#a7b29a"/>
+  <path d="M174 350L412 117L651 350Z" fill="#7e948c"/>
+  <path d="M440 350L655 220L800 310V500H440Z" fill="#647b7b"/>
+  <path d="M0 350H800V500H0Z" fill="#91aaa7"/>
+  <path d="M0 416Q258 390 482 424T800 401V500H0Z" fill="#45676e"/>
+</svg>

@@ -1,0 +1,18 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-labelledby="title description">
+  <title id="title">Coastal mosaic</title>
+  <desc id="description">Original synthetic abstract art: four geometric coastal fragments in a restrained square composition.</desc>
+  <rect width="600" height="600" fill="#d8d0be"/>
+  <path d="M70 70H288V288H70Z" fill="#a7b29a"/>
+  <path d="M312 70H530V288H312Z" fill="#647f83"/>
+  <path d="M70 312H288V530H70Z" fill="#bb9983"/>
+  <path d="M312 312H530V530H312Z" fill="#dce3db"/>
+  <path d="M70 288A218 218 0 0 1 288 70V288Z" fill="#e8e1d4"/>
+  <path d="M312 70A218 218 0 0 0 530 288H312Z" fill="#91aaa7"/>
+  <path d="M70 530L288 312V530Z" fill="#c7ad88"/>
+  <circle cx="421" cy="421" r="78" fill="#45676e"/>
+</svg>

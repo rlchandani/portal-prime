@@ -1,0 +1,15 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title description">
+  <title id="title">Sand and tide</title>
+  <desc id="description">Original synthetic abstract art: two offset half-discs meeting at a calm horizontal tide line.</desc>
+  <rect width="720" height="480" fill="#e8e1d4"/>
+  <path d="M106 252A144 144 0 0 1 394 252Z" fill="#bb9983"/>
+  <path d="M326 252A144 144 0 0 0 614 252Z" fill="#647f83"/>
+  <path d="M52 252H668" stroke="#7e948c" stroke-width="4"/>
+  <circle cx="552" cy="106" r="26" fill="#c7ad88"/>
+  <path d="M127 402H254M145 423H230" stroke="#b7c5bd" stroke-width="5"/>
+</svg>

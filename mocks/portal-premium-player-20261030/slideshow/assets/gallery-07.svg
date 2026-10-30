@@ -1,0 +1,16 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="720" viewBox="0 0 480 720" role="img" aria-labelledby="title description">
+  <title id="title">Sea arch</title>
+  <desc id="description">Original synthetic abstract art: a tall stone arch framing a small sun and ocean bands.</desc>
+  <rect width="480" height="720" fill="#d8d0be"/>
+  <path d="M66 636V269A174 174 0 0 1 414 269V636Z" fill="#a39480"/>
+  <path d="M116 636V277A124 124 0 0 1 364 277V636Z" fill="#dce3db"/>
+  <circle cx="264" cy="298" r="47" fill="#c5ad89"/>
+  <path d="M116 430H364V636H116Z" fill="#91aaa7"/>
+  <path d="M116 510Q218 474 364 520V636H116Z" fill="#647f83"/>
+  <path d="M116 591Q251 541 364 596V636H116Z" fill="#45676e"/>
+</svg>

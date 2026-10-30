@@ -19,6 +19,8 @@ const readAsset = name => process.env.SLIDESHOW_ASSET_REF
 let closedSlow = 0, admittedSlow = 0;
 const held = new Map(), checks = [], errors = [];
 const fixture = name => fs.readFileSync(path.join(here, "assets", name + ".png"));
+const galleryPhotos = JSON.parse(fs.readFileSync(path.join(here, "assets", "gallery-fixtures.json")))
+  .map((photo, id) => ({ ...photo, id, seed: "gallery-" + id }));
 const server = http.createServer((req, res) => {
   const u = new URL(req.url, "http://local");
   if (/^\/slow\/(dunes|tidal)\.png$/.test(u.pathname)) {
@@ -27,23 +29,25 @@ const server = http.createServer((req, res) => {
     return;
   }
   let content, type;
-  if (["/diptych-unit", "/motion-unit"].includes(u.pathname)) {
+  if (["/diptych-unit", "/motion-unit", "/gallery-unit"].includes(u.pathname)) {
+    const unitPhotos = u.pathname === "/gallery-unit" ? galleryPhotos :
+      ["dunes", "tidal"].map((name, id) => ({
+        id, url: "/fixtures/" + name + ".png", w: 480, h: 720,
+      }));
     content = `<html><head><link rel="stylesheet" href="/assets/styles.css"></head><body>
       <div id="stage"></div><script src="/assets/lib-engine.js"></script>
       <script src="/assets/photos.js"></script><script src="/assets/modes.js"></script>
       <script src="/assets/mode-impls.js"></script><script>
-      window.PHOTOS=${JSON.stringify(["dunes", "tidal"].map((name, id) => ({
-        id, url: "/fixtures/" + name + ".png", w: 480, h: 720,
-      })))};
+      window.PHOTOS=${JSON.stringify(unitPhotos)};
       </script></body></html>`;
     type = "text/html";
   } else if (u.pathname === "/render") {
     const slow = u.searchParams.has("slow"), unknown = u.searchParams.has("unknown");
-    const photos = ["dunes", "tidal"].map(name => ({
+    const mode = u.searchParams.get("mode") || "diptych";
+    const photos = mode === "galleryWall" ? galleryPhotos : ["dunes", "tidal"].map(name => ({
       url: (slow ? "/slow/" : "/fixtures/") + name + ".png",
       w: unknown ? 0 : 480, h: unknown ? 0 : 720,
     }));
-    const mode = u.searchParams.get("mode") || "diptych";
     const bridge = `<base href="/assets/"><script>window.Android={
       getPhotos:()=>${JSON.stringify(JSON.stringify(photos))},getMode:()=>${JSON.stringify(mode)},
       getIntervalSec:()=>30,scaledUrlForSize:url=>url};</script>`;
@@ -51,6 +55,9 @@ const server = http.createServer((req, res) => {
     type = "text/html";
   } else if (/^\/fixtures\/(dunes|tidal)\.png$/.test(u.pathname)) {
     content = fixture(path.basename(u.pathname, ".png")); type = "image/png";
+  } else if (galleryPhotos.some(photo => photo.url === u.pathname)) {
+    content = fs.readFileSync(path.join(here, "assets", path.basename(u.pathname)));
+    type = "image/svg+xml";
   } else if (/^\/assets\/(?:styles\.css|photos\.js|lib-engine\.js|modes\.js|mode-impls\.js|scheduler\.js)$/.test(u.pathname)) {
     content = readAsset(path.basename(u.pathname));
     type = u.pathname.endsWith(".css") ? "text/css" : "application/javascript";
@@ -87,7 +94,7 @@ async function until(condition) {
       };
     });
     page.on("pageerror", error => errors.push(error.message));
-    for (const mode of ["diptych", "framed", "kenBurns", "push"]) {
+    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall"]) {
       await page.goto(`${base}/render?nativeClock=1&mode=${mode}`);
       await page.locator("#loading.hide").waitFor({ state: "attached" });
       await page.waitForFunction(() => getComputedStyle(document.querySelector(".ss-beat.on")).opacity === "1" &&
@@ -521,6 +528,132 @@ async function until(condition) {
     });
     demand("Cinematic Push cancellation cannot republish a prepared photo after cleanup",
       cancelledPush.ready === false && cancelledPush.atCleanup === 0 && cancelledPush.afterReady === 0);
+    await page.goto(`${base}/gallery-unit`);
+    await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined;
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.galleryCheck = SS.MODES.galleryWall.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, microMs: 2400, url: photo => photo.url,
+      }, window.PHOTOS);
+      await window.galleryCheck.ready;
+    });
+    demand("Gallery Wall initially publishes one opaque static whole photo per cell",
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll(".ss-gcell")];
+        return cells.length > 1 && cells.length <= 10 && cells.every(cell => {
+          const images = [...cell.children].filter(n => getComputedStyle(n).backgroundImage !== "none");
+          return cell.children.length === 2 && images.length === 1 && images.every(n => {
+            const style = getComputedStyle(n);
+            return +style.opacity === 1 && style.backgroundSize === "contain" &&
+              style.backgroundColor === "rgb(28, 27, 25)" &&
+              style.animationName === "none" && style.willChange === "auto";
+          });
+        });
+      }));
+    demand("Gallery Wall keeps every tile inside the actual 2160 by 1440 viewport",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-gcell")].every(n => {
+        const box = n.getBoundingClientRect();
+        return box.left >= 15 && box.top >= 15 &&
+          box.right <= innerWidth - 15 && box.bottom <= innerHeight - 15;
+      })));
+    await page.waitForFunction(() => [...document.querySelectorAll(".gallery-photo")]
+      .some(n => +getComputedStyle(n).opacity > .1 && +getComputedStyle(n).opacity < .9));
+    demand("Gallery Wall fades the incoming tile above an opaque outgoing photo",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-gcell")].some(cell => {
+        const incoming = cell.lastElementChild, outgoing = cell.firstElementChild;
+        return +getComputedStyle(incoming).opacity > 0 &&
+          +getComputedStyle(incoming).opacity < 1 && +getComputedStyle(outgoing).opacity === 1;
+      })));
+    const heldGallery = await page.evaluate(() => {
+      window.galleryCheck.pause();
+      return [...document.querySelectorAll(".gallery-photo")].map(n => ({
+        opacity: getComputedStyle(n).opacity, url: getComputedStyle(n).backgroundImage,
+      }));
+    });
+    await page.waitForTimeout(1400);
+    demand("Gallery Wall old-WebView pause holds opacity and photo resources past the fade deadline",
+      await page.evaluate(before => [...document.querySelectorAll(".gallery-photo")]
+        .every((n, i) => getComputedStyle(n).opacity === before[i].opacity &&
+          getComputedStyle(n).backgroundImage === before[i].url), heldGallery));
+    await page.evaluate(() => window.galleryCheck.resume());
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-gcell")].every(cell =>
+      [...cell.children].filter(n => getComputedStyle(n).backgroundImage !== "none").length === 1));
+    demand("Gallery Wall retires URLs only after the replacement is fully opaque",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-gcell")].every(cell =>
+        [...cell.children].every(n => getComputedStyle(n).backgroundImage === "none"
+          ? n.classList.contains("retired") && +getComputedStyle(n).opacity === 0
+          : +getComputedStyle(n).opacity === 1))));
+    const ownedGallerySlots = await page.locator(".gallery-photo").count();
+    await page.waitForTimeout(6500);
+    demand("Gallery Wall replacements retain exactly two fixed image slots per cell",
+      await page.locator(".gallery-photo").count() === ownedGallerySlots &&
+      await page.evaluate(() => [...document.querySelectorAll(".ss-gcell")]
+        .every(cell => cell.children.length === 2 &&
+          [...cell.children].some(n => +getComputedStyle(n).opacity === 1))));
+    await page.evaluate(() => window.galleryCheck());
+    demand("Gallery Wall terminal cleanup releases every photo URL and animation hint",
+      await page.evaluate(() => [...document.querySelectorAll(".gallery-photo")].every(n => {
+        const style = getComputedStyle(n);
+        return style.backgroundImage === "none" && style.animationName === "none" &&
+          style.willChange === "auto" && +style.opacity === 0;
+      })));
+    await page.goto(`${base}/gallery-unit`);
+    const cancelledGallery = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let cleanup, atCleanup;
+      const images = () => [...root.querySelectorAll(".gallery-photo")]
+        .filter(n => getComputedStyle(n).backgroundImage !== "none").length;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = images();
+        })), () => {});
+        return prepared;
+      };
+      cleanup = SS.MODES.galleryWall.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, microMs: 30000, url: photo => photo.url,
+      }, [window.PHOTOS[0]]);
+      const ready = await cleanup.ready; window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: images() };
+    });
+    demand("Gallery Wall cancellation cannot republish photos after decode admission",
+      cancelledGallery.ready === false && cancelledGallery.atCleanup === 0 && cancelledGallery.afterReady === 0);
+    await page.goto(`${base}/gallery-unit`);
+    const resumedCadence = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let admissions = 0, hold = false, release, held;
+      const reached = new Promise(resolve => { held = resolve; });
+      window.preloadDecoded = (url, signal) => {
+        admissions++;
+        const prepared = original(url, signal);
+        if (!hold) return prepared;
+        hold = false;
+        return prepared.then(() => new Promise(resolve => {
+          release = () => resolve(true); held();
+        }));
+      };
+      const cleanup = SS.MODES.galleryWall.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, microMs: 500, url: photo => photo.url,
+      }, window.PHOTOS);
+      try {
+        await cleanup.ready;
+        const initial = admissions; hold = true;
+        await reached; cleanup.pause(); release();
+        await new Promise(resolve => setTimeout(resolve, 50));
+        cleanup.resume();
+        await new Promise(resolve => setTimeout(resolve, 550));
+        return admissions - initial;
+      } finally { cleanup(); window.preloadDecoded = original; }
+    });
+    demand("Gallery Wall resume during a real asynchronous decode preserves one swap per interval",
+      resumedCadence === 2);
     await page.goto(`${base}/render?nativeClock=1&slow=1&unknown=1&hostPaused=1`);
     await page.waitForTimeout(200);
     demand("Paused startup admits zero HTTP images", admittedSlow === 0 && held.size === 0);

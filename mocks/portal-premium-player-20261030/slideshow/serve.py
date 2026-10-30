@@ -17,17 +17,24 @@ for name in ("index.html", "styles.css", "photos.js", "lib-engine.js", "modes.js
     files["/screensaver/" + name] = renderer / name
 for name in ("dunes", "tidal"):
     files["/fixtures/" + name + ".png"] = here / "assets" / (name + ".png")
+for name in ("gallery-01.svg", "gallery-02.svg", "gallery-03.svg", "gallery-04.svg",
+             "gallery-05.svg", "gallery-06.svg", "gallery-07.svg", "gallery-08.svg",
+             "gallery-09.svg", "gallery-10.svg", "gallery-11.svg", "gallery-12.svg",
+             "gallery-fixtures.json"):
+    files["/fixtures/" + name] = here / "assets" / name
+gallery_photos = json.loads(files["/fixtures/gallery-fixtures.json"].read_text())
 
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if urlsplit(self.path).path == "/preview.html":
             mode = parse_qs(urlsplit(self.path).query).get("mode", ["diptych"])[0]
-            if mode not in ("diptych", "framed", "kenBurns", "push"):
+            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall"):
                 self.send_error(400)
                 return
-            photos = [{"url": "/fixtures/" + name + ".png", "w": 480, "h": 720}
-                      for name in ("dunes", "tidal")]
+            photos = gallery_photos if mode == "galleryWall" else [
+                {"url": "/fixtures/" + name + ".png", "w": 480, "h": 720}
+                for name in ("dunes", "tidal")]
             bridge = "<base href='/screensaver/'><script>window.Android={" + \
                 "getPhotos:()=>" + json.dumps(json.dumps(photos)) + \
                 ",getMode:()=>" + json.dumps(mode) + \

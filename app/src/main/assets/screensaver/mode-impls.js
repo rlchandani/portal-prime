@@ -70,12 +70,16 @@
       finally { busy = false; }
     }
     function schedule(task) {
-      if (!active || paused || (!started && !task.preparation)) return;
+      if (!active || paused || task.running || (!started && !task.preparation)) return;
       task.due = Date.now() + task.remaining;
       task.id = setTimeout(async () => {
         task.id = null;
         if (!active || paused) return;
-        if (task.repeat) await run(task.fn); else { tasks.delete(task); task.fn(); }
+        if (task.repeat) {
+          // Resume must not schedule a second callback while this one awaits decode.
+          task.running = true;
+          try { await run(task.fn); } finally { task.running = false; }
+        } else { tasks.delete(task); task.fn(); }
         if (task.repeat && active) { task.remaining = task.ms; schedule(task); }
       }, task.remaining);
     }
@@ -427,85 +431,88 @@
 
   // ---- 04 Living gallery wall (justified rows + swaps) ----------------------
   MODES.galleryWall = { name: "Living Gallery Wall", run(ctx, deck) {
-    const t = makeTimers(ctx); const wall = el("ss-wall", ctx.root); let cells = [];
-    const retiring = new Map(); let disposed = false;
-    function release(old, entry) {
-      if (old.ontransitionend === entry.handler) old.ontransitionend = null;
-      t.cancel(entry.fallback); entry.fallback = null; retiring.delete(old);
-    }
-    function retire(cell, old) {
-      const entry = retiring.get(old);
-      if (disposed || !entry || entry.cell !== cell || cell.img === old) return false;
-      if (old.parentNode !== cell.el) { release(old, entry); return true; }
-      // Missing style information is not transparency. Preserve content until CSS confirms zero.
-      let opacity;
-      try { opacity = getComputedStyle(old).opacity; } catch (_) { return false; }
-      if (typeof opacity !== "string" ||
-          !/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(opacity.trim()) || Number(opacity) !== 0) return false;
-      release(old, entry); old.remove(); return true;
-    }
-    function fallback(cell, old) {
-      const entry = retiring.get(old);
-      if (disposed || !entry || entry.cell !== cell) return;
-      entry.fallback = null;
-      if (!retire(cell, old) && retiring.get(old) === entry)
-        entry.fallback = t.after(() => fallback(cell, old), 1200);
-    }
+    const t = makeTimers(ctx), wall = el("ss-wall gallery-wall", ctx.root), cells = [];
+    let disposed = false;
     function replace(cell, photo, url) {
-      const img = buildImg(photo, url), old = cell.img;
-      cell.el.appendChild(img); cell.img = img; cell.photo = photo;
-      if (!old) return;
-      const entry = { cell, fallback: null, handler: null };
-      entry.handler = event => {
-        if (event.target === old && event.propertyName === "opacity") retire(cell, old);
-      };
-      retiring.set(old, entry); old.ontransitionend = entry.handler;
-      t.frame(() => { if (retiring.get(old) === entry && cell.img !== old) old.style.opacity = "0"; });
-      entry.fallback = t.after(() => fallback(cell, old), 1200);
+      if (disposed || !cell.dissolve.active()) return;
+      const img = cell.dissolve.next();
+      bg(img, url, "contain"); img.style.animation = "none"; img.style.willChange = "auto";
+      cell.photo = photo; cell.dissolve.present(img);
     }
-    function buildImg(p, url) { const img = el("ss-img kb"); bg(img, url); faceBg(img, p); if (Math.random() < 0.4) { img.classList.remove("kb"); return img; } img.style.setProperty("--d", (14 + Math.random() * 8) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s"; return img; }
     function layout(preparedPhotos) {
-      const W = ctx.W, H = ctx.H, pad = 16, gutter = 12; const targetH = H > 1000 ? 300 : 240;
-      const rows = Math.max(2, Math.round((H - pad * 2 + gutter) / (targetH + gutter)));
+      const W = ctx.W, H = ctx.H, pad = 16, gutter = 12;
+      const targetH = Math.max(240, H * .4);
       const pick = preparedPhotos || []; const seen = new Set(); let g = 0;
       if (!preparedPhotos) {
         while (pick.length < 10 && g < deck.length * 2) { const p = deck[ctx.cursor.i++ % deck.length]; g++; if (!seen.has(p.seed)) { seen.add(p.seed); pick.push(p); } }
       }
-      const res = window.justifiedLayout(pick, W - pad * 2, { targetRowHeight: targetH, gutter, maxRows: rows });
-      // Scale the whole packed layout UNIFORMLY to fill the height — cells keep their photo aspect
-      // (justifiedLayout sized them to aspect) so cover never crops within a cell. When scaled up the
-      // wall exceeds the width, so center it and let the outer columns bleed off-screen rather than
-      // leaving black bands (fills the frame; no per-cell distortion/clipping).
-      const sy = (H - pad * 2) / Math.max(res.height, 1);
-      const scaledW = (W - pad * 2) * sy;
-      const offX = pad + ((W - pad * 2) - scaledW) / 2;
+      const res = window.justifiedLayout(pick, W - pad * 2, { targetRowHeight: targetH, gutter, maxRows: 10 });
+      // Fit both dimensions. Filling height alone pushes complete outer photos
+      // off-screen; quiet matte space is preferable to clipping the gallery.
+      const sy = Math.min(1, (H - pad * 2) / Math.max(res.height, 1));
+      const offY = pad + ((H - pad * 2) - res.height * sy) / 2;
+      const rowWidths = new Map();
+      res.cells.forEach(c => rowWidths.set(c.top, Math.max(rowWidths.get(c.top) || 0, c.left + c.width)));
       return res.cells.map(c => ({
-        ...c, left: c.left * sy + offX, top: c.top * sy + pad, width: c.width * sy, height: c.height * sy,
+        ...c, left: c.left * sy + (W - rowWidths.get(c.top) * sy) / 2,
+        top: c.top * sy + offY, width: c.width * sy, height: c.height * sy,
       }));
     }
     function render(target) {
-      while (cells.length < target.length) { const e = el("ss-gcell", wall); cells.push({ el: e, img: null, photo: null }); }
-      while (cells.length > target.length) { cells.pop().el.remove(); }
-      target.forEach((slot, i) => { const c = cells[i]; c.el.style.left = slot.left + "px"; c.el.style.top = slot.top + "px"; c.el.style.width = slot.width + "px"; c.el.style.height = slot.height + "px";
-        if (c.photo !== slot.photo) replace(c, slot.photo, slot.url); });
+      target.forEach(slot => {
+        const root = el("ss-gcell", wall);
+        root.style.left = slot.left + "px"; root.style.top = slot.top + "px";
+        root.style.width = slot.width + "px"; root.style.height = slot.height + "px";
+        const layers = [0, 1].map(() => {
+          const img = el("ss-img gallery-photo retired", root);
+          img.style.backgroundImage = "none"; img.style.animation = "none";
+          img.style.willChange = "auto"; return img;
+        });
+        const dissolve = makeSceneDissolve({ ...ctx, root }, t, layers, 1100, img => {
+          img.style.backgroundImage = "none"; img.style.animation = "none";
+          img.style.willChange = "auto";
+        });
+        const cell = { el: root, photo: null, dissolve }; cells.push(cell);
+        replace(cell, slot.photo, slot.url);
+      });
     }
     async function rebuild() {
       const slots = layout().map(s => ({ ...s, url: ctx.url(s.photo, 1200) }));
-      if (!await t.load(slots.map(s => s.url))) return false;
-      // Decode may recover unknown ratios. Keep the same admitted photos/URLs,
-      // then recalculate their rectangles before the composition becomes visible.
+      if (!await t.load(slots.map(s => s.url)) || disposed) return false;
       const prepared = new Map(slots.map(s => [s.photo, s.url]));
       render(layout(slots.map(s => s.photo)).map(s => ({ ...s, url: prepared.get(s.photo) })));
     }
-    async function swap() { if (!cells.length) return; const onWall = cells.map(x => x.photo && x.photo.seed).filter(Boolean); if (!SS.unused(deck, onWall).length) return; const c = cells[Math.floor(Math.random() * cells.length)]; let p = null; const wallSet = new Set(onWall); for (let k = 0; k < deck.length; k++) { const cand = deck[(ctx.cursor.i + k) % deck.length]; if (!wallSet.has(cand.seed) && SS.bucket(cand) === SS.bucket(c.photo)) { p = cand; ctx.cursor.i += k + 1; break; } } if (!p) p = SS.take(deck, ctx.cursor, ["any"], onWall)[0]; const url = ctx.url(p, 1200); if (!await t.load(url)) return false; replace(c, p, url); }
+    async function swap() {
+      if (!cells.length || disposed) return;
+      const onWall = cells.map(c => c.photo.seed);
+      if (!SS.unused(deck, onWall).length) return;
+      const cell = cells[Math.floor(Math.random() * cells.length)], wallSet = new Set(onWall);
+      let photo = null;
+      for (let k = 0; k < deck.length; k++) {
+        const candidate = deck[(ctx.cursor.i + k) % deck.length];
+        if (!wallSet.has(candidate.seed) && SS.bucket(candidate) === SS.bucket(cell.photo)) {
+          photo = candidate; ctx.cursor.i += k + 1; break;
+        }
+      }
+      if (!photo) photo = SS.take(deck, ctx.cursor, ["any"], onWall)[0];
+      const url = ctx.url(photo, 1200);
+      if (!await t.load(url) || disposed) return false;
+      replace(cell, photo, url);
+    }
     t.start(rebuild); t.every(swap, ctx.microMs);
     const cleanup = () => {
       if (disposed) return;
-      disposed = true; t.cleanup();
-      retiring.forEach((entry, old) => release(old, entry)); retiring.clear();
+      disposed = true; t.cleanup(); cells.forEach(c => c.dissolve.cleanup());
     };
     Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
-    cleanup.pause = t.cleanup.pause; cleanup.resume = t.cleanup.resume;
+    cleanup.pause = () => {
+      if (disposed) return;
+      cells.forEach(c => c.dissolve.cleanup.pause()); t.cleanup.pause();
+    };
+    cleanup.resume = () => {
+      if (disposed) return;
+      cells.forEach(c => c.dissolve.cleanup.resume()); t.cleanup.resume();
+    };
     return cleanup;
   }};
 

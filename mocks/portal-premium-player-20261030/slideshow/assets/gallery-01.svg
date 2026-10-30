@@ -1,0 +1,14 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="720" viewBox="0 0 480 720" role="img" aria-labelledby="title description">
+  <title id="title">Dune arc</title>
+  <desc id="description">Original synthetic abstract art: a pale sun above layered sand and stone forms.</desc>
+  <rect width="480" height="720" fill="#e8e1d4"/>
+  <circle cx="316" cy="184" r="78" fill="#c7ad88"/>
+  <path d="M0 453Q148 237 329 441T480 434V720H0Z" fill="#a4ada0"/>
+  <path d="M0 546Q188 335 480 532V720H0Z" fill="#bb9983"/>
+  <path d="M0 651Q228 462 480 623V720H0Z" fill="#716e61"/>
+</svg>

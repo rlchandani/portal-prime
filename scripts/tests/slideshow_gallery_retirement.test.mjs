@@ -6,250 +6,204 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
-import vm from 'node:vm';
+import { createSceneFixture } from './helpers/slideshow_scene_fixture.mjs';
 
-const assets = new URL('../../app/src/main/assets/screensaver/', import.meta.url);
-const modeSource = process.env.GALLERY_MODE_REF
-  ? execFileSync('git', ['show', `${process.env.GALLERY_MODE_REF}:app/src/main/assets/screensaver/mode-impls.js`],
-    { encoding: 'utf8', cwd: new URL('../../', import.meta.url) })
-  : readFileSync(new URL('mode-impls.js', assets), 'utf8');
-
-// Real mode code with controlled DOM/timer boundaries. Computed opacity is an input
-// here, not a CSS/raster emulator; the separate Chromium probe checks actual pixels.
-function fixture({ microMs = 5000, deferInitial = false } = {}) {
-  let now = 0, id = 0, initialResolve, nextResolve, deferNext = false;
-  const pending = new Map(), allNodes = [];
-  function schedule(fn, delay) {
-    const key = ++id;
-    pending.set(key, { fn, at: now + delay });
-    return key;
+const photographs = () => Array.from({ length: 16 }, (_, id) => ({
+  seed: 'wall-' + id, w: id % 3 === 0 ? 900 : id % 3 === 1 ? 1800 : 1200,
+  h: id % 3 === 0 ? 1600 : id % 3 === 1 ? 1000 : 1200,
+  ...(id % 2 === 0 ? { fx: .2, fy: .35 } : {}),
+}));
+const fixture = options => createSceneFixture({ mode: 'galleryWall', photos: photographs(), ...options });
+const cells = r => r.nodes().filter(n => n.classList.contains('ss-gcell'));
+const photos = r => r.prints().filter(n => n.style.backgroundImage?.startsWith('url('));
+const fading = r => cells(r).find(c => c.children.filter(n => n.classList.contains('on')).length === 2);
+const current = cell => cell.children.at(-1);
+function released(r, image) {
+  assert.equal(image.style.backgroundImage, 'none');
+  assert.equal(r.state(image).animation, 'none');
+  assert.equal(r.state(image).promotion, 'auto');
+  assert.equal(r.state(image).opacity, 0);
+}
+function inside(r) {
+  for (const cell of cells(r)) {
+    const x = parseFloat(cell.style.left), y = parseFloat(cell.style.top);
+    const width = parseFloat(cell.style.width), height = parseFloat(cell.style.height);
+    assert.ok(x >= 15 && y >= 15 && x + width <= 2145 && y + height <= 1425,
+      `The entire photo tile must fit inside the viewport: ${x},${y},${width},${height}`);
   }
-  class Element {
-    constructor() {
-      this.children = []; this.parentNode = null; this.className = '';
-      this.style = { setProperty(k, v) { this[k] = v; } };
-      this.opacity = '1'; allNodes.push(this);
-    }
-    get classList() {
-      return {
-        contains: x => this.className.split(/\s+/).includes(x),
-        add: x => { this.className += ' ' + x; },
-        remove: x => { this.className = this.className.split(/\s+/).filter(c => c !== x).join(' '); },
-      };
-    }
-    appendChild(child) { child.parentNode = this; this.children.push(child); return child; }
-    remove() {
-      if (this.parentNode) this.parentNode.children = this.parentNode.children.filter(c => c !== this);
-      this.parentNode = null;
-    }
-    dispatchEvent(event) { this.ontransitionend?.(event); }
-  }
-  const initial = deferInitial ? new Promise(resolve => { initialResolve = resolve; }) : Promise.resolve();
-  const window = {
-    aspect: p => p.w / p.h,
-    preloadDecoded: () => deferNext ? new Promise(resolve => { nextResolve = resolve; }) : initial,
-    justifiedLayout: pick => ({ height: 100, cells: pick.slice(0, 2).map((photo, i) =>
-      ({ left: i * 100, top: 0, width: 100, height: 100, photo })) }),
-  };
-  const context = vm.createContext({
-    window, document: { createElement: () => new Element() }, AbortController,
-    getComputedStyle: node => ({ opacity: node.opacity }),
-    setTimeout: schedule, clearTimeout: key => pending.delete(key),
-    requestAnimationFrame: fn => schedule(fn, 16), cancelAnimationFrame: key => pending.delete(key),
-    Date: class extends Date { static now() { return now; } },
-    Math: Object.assign(Object.create(Math), { random: () => .5 }),
-  });
-  for (const file of ['modes.js', 'mode-impls.js']) {
-    vm.runInContext(file === 'mode-impls.js' ? modeSource : readFileSync(new URL(file, assets), 'utf8'),
-      context, { filename: file });
-  }
-  const root = new Element(), cursor = { i: 0 };
-  const deck = Array.from({ length: 16 }, (_, seed) => ({ seed: 'generated-' + seed, w: 400, h: 300 }));
-  const cleanup = window.SS.MODES.galleryWall.run({
-    root, cursor, W: 800, H: 600, microMs, url: p => 'generated://' + p.seed,
-  }, deck);
-  async function flush() { for (let i = 0; i < 30; i++) await Promise.resolve(); }
-  async function advanceTo(time) {
-    assert.ok(time >= now);
-    while (true) {
-      const entry = [...pending].sort((a, b) => a[1].at - b[1].at || a[0] - b[0])[0];
-      if (!entry || entry[1].at > time) break;
-      const [key, task] = entry; pending.delete(key); now = task.at;
-      task.fn(); await flush();
-    }
-    now = time; await flush();
-  }
-  function cells() { return root.children[0].children; }
-  function images() { return cells().flatMap(c => c.children); }
-  function end(node, { target = node, propertyName = 'opacity' } = {}) {
-    node.dispatchEvent({ type: 'transitionend', target, propertyName });
-  }
-  return { cleanup, root, cursor, pending, allNodes, cells, images, end, advanceTo, flush,
-    deferNext: () => { deferNext = true; },
-    finishNext: () => { deferNext = false; nextResolve(); },
-    finishInitial: () => initialResolve(),
-  };
 }
 
-async function swapped(options) {
-  const r = fixture(options);
-  await r.cleanup.ready; await r.advanceTo(options?.microMs ?? 5000);
-  const cell = r.cells().find(c => c.children.length === 2);
-  assert.ok(cell, 'Real Gallery Wall must publish a replacement');
-  const [old, current] = cell.children;
-  await r.advanceTo((options?.microMs ?? 5000) + 16);
-  assert.equal(old.style.opacity, '0');
-  return { r, cell, old, current };
-}
-
-// Missing transition retirement leaves a fully faded image attached after promotion pause.
-test('Gallery Wall retires a zero-opacity obsolete image when pause straddles its fade', async () => {
-  const { r, old, current, cell } = await swapped();
+test('Gallery Wall shows static whole photos with every tile inside the viewport', async () => {
+  const r = fixture();
   try {
-    old.opacity = '.4'; await r.advanceTo(5700); r.cleanup.pause();
-    assert.equal(r.pending.size, 0);
-    r.end(old); assert.equal(old.parentNode, cell, 'Visible image cannot retire');
-    await r.advanceTo(6100); old.opacity = '0'; r.end(old);
-    assert.equal(old.parentNode, null, 'Completed invisible image must retire while removal timer is paused');
-    assert.equal(current.parentNode, cell);
+    assert.equal(await r.cleanup.ready, true);
+    assert.ok(cells(r).length >= 2 && cells(r).length <= 10);
+    inside(r);
+    assert.equal(photos(r).length, cells(r).length);
+    for (const image of photos(r)) {
+      assert.equal(r.state(image).animation, 'none', 'A wall tile must not animate continuously');
+      assert.equal(r.state(image).promotion, 'auto');
+      assert.equal(r.computed(image)['background-size'], 'contain');
+      assert.equal(r.computed(image)['background-color'], '#1c1b19',
+        'The incoming matte must cover outgoing-photo margins before retirement');
+      assert.equal(r.state(image).opacity, 1);
+    }
+    assert.ok(r.resolutions.every(n => n.edge === 1200));
+    assert.equal(new Set(photos(r).map(n => n.style.backgroundImage)).size, cells(r).length);
   } finally { r.cleanup(); }
 });
 
-// Accepting bubbled/unrelated/stale completion or rounding near-zero opacity removes visible content.
-test('retirement requires the exact obsolete target, opacity property, and computed zero', async () => {
-  const { r, old, current, cell } = await swapped();
-  try {
-    r.cleanup.pause();
-    old.opacity = '0';
-    r.end(old, { target: current }); assert.equal(old.parentNode, cell);
-    r.end(old, { propertyName: 'transform' }); assert.equal(old.parentNode, cell);
-    old.opacity = '.000001'; r.end(old); assert.equal(old.parentNode, cell);
-    current.opacity = '0'; r.end(current); assert.equal(current.parentNode, cell);
-    old.opacity = '0'; r.end(old); assert.equal(old.parentNode, null);
-    assert.equal(old.ontransitionend == null, true, 'Completed retirement releases its listener');
-    assert.equal(current.parentNode, cell);
-  } finally { r.cleanup(); }
-});
-
-// Timer-only engines retain the existing 1200ms fallback, with the same visibility guard.
-test('the existing fallback retires only computed-zero obsolete images', async () => {
-  const { r, old, cell } = await swapped();
-  try {
-    old.opacity = '.5';
-    await r.advanceTo(6200);
-    assert.equal(old.parentNode, cell, 'A delayed CSS fade must not be cut short by the fallback');
-    old.opacity = '0'; r.end(old);
-    assert.equal(old.parentNode, null);
-  } finally { r.cleanup(); }
-});
-
-test('the fallback removes completed invisible images without a transition event', async () => {
-  const { r, old } = await swapped();
-  try {
-    old.opacity = '0'; await r.advanceTo(6199); assert.notEqual(old.parentNode, null);
-    await r.advanceTo(6200); assert.equal(old.parentNode, null);
-    assert.equal(old.ontransitionend == null, true);
-  } finally { r.cleanup(); }
-});
-
-// Two replacements of the same cell may finish independently; neither can delete the latest image.
-test('superseded replacements retire independently without touching the current image', async () => {
-  const { r, old, current: middle, cell } = await swapped({ microMs: 1000 });
-  try {
-    await r.advanceTo(2016);
-    const current = cell.children.at(-1);
-    assert.notEqual(current, middle);
-    old.opacity = '0'; middle.opacity = '.2';
-    const stale = old.ontransitionend;
-    r.end(old); assert.equal(old.parentNode, null);
-    assert.equal(middle.parentNode, cell); assert.equal(current.parentNode, cell);
-    stale?.({ target: current, propertyName: 'opacity' });
-    assert.equal(current.parentNode, cell);
-    middle.opacity = '0'; r.end(middle); assert.equal(middle.parentNode, null);
-    assert.deepEqual(cell.children, [current]);
-  } finally { r.cleanup(); }
-});
-
-// Shared pause/resume must keep the fallback's remaining delay and never rearm dead work.
-test('global pause/resume retains fallback timing and visible images', async () => {
-  const { r, old, cell } = await swapped();
-  try {
-    await r.advanceTo(5700); old.opacity = '.3'; r.cleanup.pause();
-    await r.advanceTo(20000); r.end(old); assert.equal(old.parentNode, cell);
-    r.cleanup.resume();
-    await r.advanceTo(20499); old.opacity = '0'; assert.equal(old.parentNode, cell);
-    await r.advanceTo(20500); assert.equal(old.parentNode, null);
-  } finally { r.cleanup(); }
-});
-
-// Disposal must release handlers and shared timers, including callbacks captured before disposal.
-test('cleanup releases all retirement handlers/timers and rejects delayed callbacks', async () => {
-  const { r, old, cell } = await swapped();
-  const callbacks = [...r.pending.values()].map(t => t.fn), event = old.ontransitionend;
-  r.cleanup.pause(); r.cleanup(); r.cleanup();
-  assert.equal(r.pending.size, 0);
-  for (const node of r.allNodes) assert.equal(node.ontransitionend == null, true);
-  old.opacity = '0'; event?.({ target: old, propertyName: 'opacity' });
-  for (const fn of callbacks) { fn(); await r.flush(); }
-  r.cleanup.resume(); await r.advanceTo(60000);
-  assert.equal(r.pending.size, 0);
-  assert.equal(old.parentNode, cell, 'Disposed code cannot mutate the detached scene');
-});
-
-test('cleanup during initial decode prevents publication and timer creation', async () => {
-  const r = fixture({ deferInitial: true });
-  await r.flush(); r.cleanup(); r.finishInitial();
-  assert.equal(await r.cleanup.ready, false);
-  assert.equal(r.images().length, 0); assert.equal(r.pending.size, 0);
-});
-
-test('cleanup during a paused replacement decode prevents late publication', async () => {
-  const r = fixture(); await r.cleanup.ready;
-  const before = r.images().slice();
-  r.deferNext(); await r.advanceTo(5000); r.cleanup.pause(); r.finishNext();
-  await r.flush(); assert.deepEqual(r.images(), before);
-  r.cleanup(); r.cleanup.resume(); await r.flush();
-  assert.deepEqual(r.images(), before); assert.equal(r.pending.size, 0);
-});
-
-// Unavailable/malformed style information must never be treated as transparent content.
-test('malformed computed opacity cannot retire through completion or fallback', async () => {
-  for (const opacity of ['', ' ', null, undefined, '0x0', 'not-a-number', 0]) {
-    const { r, old, cell } = await swapped();
+test('uniform portrait and landscape collections keep all ten selected photos within centered rows', async () => {
+  for (const [w, h] of [[900, 1600], [1800, 1000]]) {
+    const r = fixture({ photos: photographs().map(p => ({ ...p, w, h })) });
     try {
-      old.opacity = opacity; r.end(old);
-      assert.equal(old.parentNode, cell, 'Malformed opacity cannot retire via transitionend');
-      await r.advanceTo(6200);
-      assert.equal(old.parentNode, cell, 'Malformed opacity cannot retire via the fallback');
+      await r.cleanup.ready;
+      assert.equal(cells(r).length, 10, 'The row limit must not discard prepared gallery photos');
+      inside(r);
+      const rows = new Map();
+      for (const cell of cells(r)) {
+        const top = cell.style.top;
+        rows.set(top, [...(rows.get(top) || []), cell]);
+      }
+      for (const row of rows.values()) {
+        const left = Math.min(...row.map(c => parseFloat(c.style.left)));
+        const right = Math.max(...row.map(c => parseFloat(c.style.left) + parseFloat(c.style.width)));
+        assert.ok(Math.abs(left - (2160 - right)) < .01, 'A shorter final row remains centered');
+      }
     } finally { r.cleanup(); }
   }
 });
 
-// A consumed first fallback must not orphan a delayed fade whose completion event is lost.
-test('late zero without a transition event remains covered by the owned fallback', async () => {
-  const { r, old, cell } = await swapped();
+test('only an incoming tile fades, and outgoing resources retire after incoming opacity one', async () => {
+  const r = fixture();
   try {
-    old.opacity = '.4'; await r.advanceTo(6200);
-    assert.equal(old.parentNode, cell);
-    old.opacity = '0'; await r.advanceTo(7399);
-    assert.equal(old.parentNode, cell, 'Visible images stay until an actual guarded check');
-    await r.advanceTo(7400);
-    assert.equal(old.parentNode, null, 'A late invisible image must retire without an event');
-    assert.equal(old.ontransitionend == null, true);
-    assert.equal(r.pending.size, 1, 'Only the existing repeating swap remains');
+    await r.cleanup.ready;
+    for (let beat = 1; beat <= 6; beat++) {
+      await r.advanceTo(beat * 5000);
+      const cell = fading(r); assert.ok(cell);
+      const incoming = current(cell), outgoing = cell.children.find(n => n !== incoming);
+      assert.equal(r.state(outgoing).opacity, 1);
+      assert.equal(r.state(incoming).opacity, 0);
+      await r.advanceTo(beat * 5000 + 700);
+      assert.ok(r.state(incoming).opacity > 0 && r.state(incoming).opacity < 1);
+      assert.equal(r.state(outgoing).opacity, 1);
+      await r.advanceTo(beat * 5000 + 1100); r.end(incoming);
+      released(r, outgoing);
+      assert.equal(r.state(incoming).opacity, 1);
+      assert.equal(photos(r).length, cells(r).length);
+      inside(r);
+    }
   } finally { r.cleanup(); }
 });
 
-// Successful event retirement must cancel its fallback, including the paused schedule.
-test('event retirement cancels its fallback and resume does not rearm dead work', async () => {
-  const { r, old } = await swapped();
+test('Gallery Wall retains only two image slots per cell through rapid replacements', async () => {
+  const r = fixture({ photoMs: 500 });
   try {
-    assert.equal(r.pending.size, 2);
-    old.opacity = '0'; r.end(old);
-    assert.equal(r.pending.size, 1, 'Completion cancels the obsolete fallback');
-    r.cleanup.pause(); r.cleanup.resume();
-    assert.equal(r.pending.size, 1, 'Resume must not restore a retired-image callback');
+    await r.cleanup.ready;
+    const count = r.nodes().length;
+    for (let beat = 1; beat <= 20; beat++) {
+      await r.advanceTo(beat * 500);
+      assert.equal(r.nodes().length, count, 'Rapid replacement cannot accumulate DOM/image owners');
+      assert.ok(cells(r).every(cell => cell.children.length === 2));
+      assert.ok(photos(r).length <= cells(r).length + 1);
+      assert.ok(cells(r).every(cell => cell.children.some(n => r.state(n).opacity === 1)));
+    }
+  } finally { r.cleanup(); }
+});
+
+test('pausing the wall freezes a live tile fade without relying on getAnimations', async () => {
+  const r = fixture();
+  try {
+    await r.cleanup.ready; await r.advanceTo(5000); await r.advanceTo(5350);
+    const cell = fading(r), incoming = current(cell), outgoing = cell.children.find(n => n !== incoming);
+    const opacity = r.state(incoming).opacity, before = photos(r).map(n => n.style.backgroundImage);
+    r.cleanup.pause(); await r.advanceTo(25000);
+    assert.equal(r.state(incoming).opacity, opacity);
+    assert.deepEqual(photos(r).map(n => n.style.backgroundImage), before);
+    assert.equal(r.pending.size, 0);
+    r.cleanup.resume(); await r.advanceTo(25750); r.end(incoming);
+    released(r, outgoing);
+    assert.equal(r.state(incoming).opacity, 1);
+  } finally { r.cleanup(); }
+});
+
+test('terminal cleanup releases every wall photo and rejects stale timer/event work', async () => {
+  const r = fixture(); await r.cleanup.ready; await r.advanceTo(5000);
+  const callbacks = [...r.pending.values()].map(t => t.fn);
+  const cell = fading(r), incoming = current(cell), event = incoming.ontransitionend;
+  r.cleanup.pause(); r.cleanup(); r.cleanup();
+  const writes = r.writes.length;
+  event?.({ target: incoming, propertyName: 'opacity' });
+  for (const fn of callbacks) { fn(); await r.flush(); }
+  r.cleanup.resume(); await r.advanceTo(60000);
+  assert.equal(r.writes.length, writes);
+  r.prints().forEach(image => released(r, image));
+  assert.equal(r.pending.size, 0);
+});
+
+test('cleanup at each initial decode-admission boundary prevents late wall publication', async () => {
+  for (let checkpoint = 0; checkpoint <= 24; checkpoint++) {
+    const r = fixture({ deferLoad: true });
+    await r.flush(); r.finishLoad();
+    for (let turn = 0; turn < checkpoint; turn++) await Promise.resolve();
+    r.cleanup(); const writes = r.writes.length;
+    await r.cleanup.ready; await r.flush();
+    assert.equal(r.writes.length, writes, `Cleanup at microtask ${checkpoint} rejects publication`);
+    assert.equal(photos(r).length, 0);
+    assert.equal(r.pending.size, 0);
+  }
+});
+
+test('a paused replacement decode cannot publish after terminal cleanup', async () => {
+  const r = fixture(); await r.cleanup.ready;
+  const before = photos(r).map(n => n.style.backgroundImage);
+  r.deferNext(); await r.advanceTo(5000); r.cleanup.pause(); r.finishLoad(); await r.flush();
+  assert.deepEqual(photos(r).map(n => n.style.backgroundImage), before);
+  r.cleanup(); const writes = r.writes.length;
+  r.cleanup.resume(); await r.flush();
+  assert.equal(r.writes.length, writes);
+  assert.equal(photos(r).length, 0);
+  assert.equal(r.pending.size, 0);
+});
+
+test('resuming an in-flight wall replacement keeps one swap cadence and cancels every timeout', async () => {
+  const r = fixture();
+  try {
+    await r.cleanup.ready;
+    const initial = r.resolutions.length;
+    r.deferNext(); await r.advanceTo(5000);
+    r.cleanup.pause(); r.finishLoad(); await r.flush();
+    await r.advanceTo(25000);
+    r.cleanup.resume(); await r.flush();
+    await r.advanceTo(31000);
+    assert.equal(r.resolutions.length, initial + 2,
+      'The decoded replacement and the next interval each admit exactly one photo');
+    r.cleanup();
+    assert.equal(r.pending.size, 0, 'Cleanup cancels all scheduled swap callbacks');
+  } finally { r.cleanup(); }
+});
+
+test('failed replacement decode retains every opaque current tile', async () => {
+  const r = fixture();
+  try {
+    await r.cleanup.ready;
+    const before = photos(r).map(n => n.style.backgroundImage);
+    r.deferNext(); await r.advanceTo(5000); r.failLoad(); await r.flush();
+    assert.deepEqual(photos(r).map(n => n.style.backgroundImage), before);
+    assert.ok(photos(r).every(n => r.state(n).opacity === 1));
+  } finally { r.cleanup(); }
+});
+
+test('recovered dimensions recalculate the same admitted photos before wall publication', async () => {
+  const deck = photographs().map(p => ({ ...p, w: 0, h: 0 }));
+  const r = fixture({ photos: deck, deferLoad: true });
+  try {
+    await r.flush();
+    deck.forEach((p, i) => { p.w = i % 2 ? 1800 : 900; p.h = i % 2 ? 1000 : 1600; });
+    r.finishLoad(); assert.equal(await r.cleanup.ready, true);
+    inside(r);
+    const admitted = new Set(r.resolutions.map(n => `url("${n.url}")`));
+    assert.ok(photos(r).every(n => admitted.has(n.style.backgroundImage)));
+    assert.equal(new Set(photos(r).map(n => n.style.backgroundImage)).size, photos(r).length);
   } finally { r.cleanup(); }
 });

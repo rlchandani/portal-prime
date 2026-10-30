@@ -1,0 +1,14 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title description">
+  <title id="title">Estuary bend</title>
+  <desc id="description">Original synthetic abstract art: a winding ocean inlet between geometric salt marsh banks.</desc>
+  <rect width="720" height="480" fill="#d7d6c6"/>
+  <path d="M0 0H304Q172 107 358 206T302 480H0Z" fill="#8c9b85"/>
+  <path d="M304 0H398Q267 112 437 209T395 480H302Q483 306 358 206T304 0Z" fill="#647f83"/>
+  <path d="M398 0H720V480H395Q574 309 437 209T398 0Z" fill="#c1b395"/>
+  <path d="M542 91H656M568 117H671M61 340H178M43 367H150" stroke="#e8e1d4" stroke-width="5"/>
+</svg>

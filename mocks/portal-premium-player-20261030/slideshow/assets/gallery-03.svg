@@ -1,0 +1,15 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-labelledby="title description">
+  <title id="title">Shore stones</title>
+  <desc id="description">Original synthetic abstract art: three smooth pebble forms balanced over a thin shoreline.</desc>
+  <rect width="600" height="600" fill="#ded8cb"/>
+  <path d="M70 459H530" stroke="#8b9488" stroke-width="3"/>
+  <ellipse cx="293" cy="400" rx="157" ry="57" fill="#647b7b"/>
+  <ellipse cx="310" cy="296" rx="111" ry="65" fill="#ad9b86" transform="rotate(-12 310 296)"/>
+  <ellipse cx="279" cy="178" rx="69" ry="56" fill="#c5cbbd" transform="rotate(16 279 178)"/>
+  <circle cx="457" cy="142" r="18" fill="#bb9983"/>
+</svg>

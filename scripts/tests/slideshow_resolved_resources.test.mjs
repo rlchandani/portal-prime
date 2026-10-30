@@ -37,7 +37,7 @@ function fixture({ mode = 'galleryWall', count = 12, changing = true, random = .
         set: value => {
           background = value;
           const url = /^url\("(.*)"\)$/.exec(value)?.[1];
-          writes.push({ node: this, url, prepared: decoded.has(url) });
+          if (url) writes.push({ node: this, url, prepared: decoded.has(url) });
         },
       });
     }
@@ -51,7 +51,10 @@ function fixture({ mode = 'galleryWall', count = 12, changing = true, random = .
         toggle: (name, on) => { if (on == null) on = !this.classList.contains(name); on ? this.classList.add(name) : this.classList.remove(name); },
       };
     }
-    appendChild(child) { child.parent = this; this.children.push(child); return child; }
+    get parentNode() { return this.parent; }
+    appendChild(child) {
+      child.remove(); child.parent = this; this.children.push(child); return child;
+    }
     remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
     set innerHTML(value) { assert.equal(value, ''); this.children.forEach(child => { child.parent = null; }); this.children = []; }
     get offsetWidth() { return 100; }
@@ -166,7 +169,8 @@ test('Gallery Wall publishes geometry from recovered portrait dimensions', async
     const cells = r.nodes().filter(node => node.classList.contains('ss-gcell'));
     let portraits = 0;
     for (const cell of cells) {
-      const id = /(?:copy|photo)-(\d+)/.exec(cell.children[0].style.backgroundImage)[1];
+      const image = cell.children.find(node => node.style.backgroundImage.startsWith('url('));
+      const id = /(?:copy|photo)-(\d+)/.exec(image.style.backgroundImage)[1];
       const aspect = Number(id) % 3 === 0 ? 1000 / 1500 : 1600 / 1067;
       if (Number(id) % 3 === 0) portraits++;
       assert.ok(Math.abs(parseFloat(cell.style.width) / parseFloat(cell.style.height) - aspect) < .01);
