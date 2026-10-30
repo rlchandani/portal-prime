@@ -14,12 +14,16 @@ internal fun exitPinnedDream(
     showLostSession: () -> Unit,
     launchConfiguredApp: () -> Unit,
     finishDream: () -> Unit,
+    retireContinuation: () -> Unit = {},
 ) {
     if (pinnedOrigin || pinnedNow) {
         if (!admitPinnedReturn()) {
             showLostSession()
             return
         }
-    } else launchConfiguredApp()
+    } else {
+        retireContinuation()
+        launchConfiguredApp()
+    }
     finishDream()
 }

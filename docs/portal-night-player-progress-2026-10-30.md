@@ -1443,6 +1443,62 @@ music backend wiring stays deferred.
 Final installed-byte, source and idle-collector verification completed by
 **21:32 UTC**, within **22 minutes** of this issue's start.
 
+## Retained continuation tap dismissal — 21:35 UTC batch
+
+The source review found a recovery defect rather than a supported startup speed
+fix. A continuation `PhotoFramePreviewActivity` can survive underneath a later
+Immortal Dream. The ordinary unpinned tap previously finished only the Dream;
+the default configured dismiss target launches no Activity. The still-owned
+continuation could then become visible and resume instead of returning to the
+underlying task.
+
+The unpinned branch now retires that continuation before launching the configured
+target and finishing the Dream. Retirement requires the current Dream identity
+and a preview whose **current intent-derived** state identifies a continuation.
+It clears preview ownership and marks intentional exit before `finish()` can
+deliver lifecycle callbacks. Deliberate photo viewers and scheduled night-clock
+previews remain retained. Both admitted and failed pinned-return branches retain
+their existing behavior; this operation neither releases a pin nor relaunches
+the pinned app.
+
+The behavioral regression first failed with the old exit ordering:
+`[launch, dream]` instead of `[preview, launch, dream]`. After the missing
+retirement invocation was added, all **six new checks** pass. They exercise
+retirement before configured launch and Dream finish, no recovery from a
+reentrant owned stop, repeated retirement, deliberate-viewer retention, stale
+Dream identity, late old-preview detach and pinned-return success/failure.
+The full fresh JVM gate passes **3,460 tests / 360 suites**, with zero failures,
+errors or skips. Debug and optimized performance builds succeed in **1m 28s**.
+These tests use Android boundary doubles; they do not execute actual Activity
+intent/lifecycle transitions or an OS Dream window.
+
+Family Area's installed optimized APK was independently read back and matches
+SHA-256
+`ed60d6d371b1a509d7b1f8ba9b08e8328c47afb55ebbe94dc6865bd449db6b70`
+(**25,702,091 bytes**), with the existing certificate. The manifest and all
+**53 main non-profile assets** match the preceding accepted optimized build.
+The exact preceding `34889ea…` APK is retained privately for rollback.
+One upload/install was used; byte readback resolved the interrupted install
+response without a repeated install.
+
+All **97 values**, complete screensaver configuration and source groups compare
+unchanged after installation and Home → Apps → Home → screensaver acknowledgments.
+No new rendering work, worker, setting, scene geometry or animation was added.
+The bounded post-install log observation contains **401 lines**, **zero fatal
+exception markers** and **zero continuation-retirement messages**. Thus it does
+**not** prove that the new stacked-Dream path ran on the device. Wi-Fi ADB refused
+the connection, and no Family USB transport was present; the foreign emulator
+was untouched. Actual stacked OS-Dream tap dismissal, visible transitions,
+delivered FPS and a speed improvement remain unverified.
+
+The collector is inactive with **zero listeners**. Scalar evidence is in
+`mocks/portal-premium-player-20261030/evidence/family-dream-tap-continuation/verification.json`.
+Build, deployment and runtime verification finished by **21:43 UTC**, before the
+existing **22:02 UTC** issue deadline.
+No Living Area or phone operations occurred. Startup timing, the Home/Apps
+frame-time target, physical night-clock acceptance and the overall goal remain
+open; music backend wiring stays deferred.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

@@ -74,6 +74,11 @@ class PhotoDreamService : DreamService() {
             DreamPolicy.userExitAt = System.currentTimeMillis()
             ScreensaverDismiss.launchChosenApp(this)
           },
+          retireContinuation = {
+            DreamPolicy.userExitAt = System.currentTimeMillis()
+            val retired = ImmortalDreamNavigation.dismissContinuationForTap(this)
+            Log.i(TAG, "onExit: retained continuation retired=$retired")
+          },
           finishDream = {
             Log.i(TAG, "onExit (tap) -> finish()")
             DreamPolicy.userExitAt = System.currentTimeMillis()
@@ -176,6 +181,17 @@ internal object ImmortalDreamNavigation {
 
   /** Called on main by navigation admission; only Immortal registers here. */
   fun hasOwnedSurface(): Boolean = active.get() != null || preview.get() != null || PinnedAppScreensaver.hasFrame()
+
+  /** A tap ends the screensaver session, including a continuation retained under this Dream. */
+  fun dismissContinuationForTap(service: PhotoDreamService): Boolean {
+    if (active.get() !== service) return false
+    val continuation = preview.get()?.takeIf { it.isScreensaverContinuation } ?: return false
+    preview.clear()
+    // Clear ownership and suppress recovery before finish can deliver lifecycle callbacks.
+    DreamPolicy.userExitAt = System.currentTimeMillis()
+    continuation.finish()
+    return true
+  }
 
   fun dismissForNavigation(): Boolean {
     val service = active.get()

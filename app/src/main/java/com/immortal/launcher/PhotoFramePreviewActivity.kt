@@ -44,6 +44,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   // this activity is singleTask, so a relaunch while the frame is already up reuses the live
   // instance and skips onCreate entirely (issue #146 regression).
   private var launchDismissOnExit = false
+  internal val isScreensaverContinuation: Boolean get() = launchDismissOnExit
 
   // Overnight "night clock" mode: this activity is the dimmed bedside flip clock for the window.
   private var nightClock = false

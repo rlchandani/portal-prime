@@ -1,0 +1,82 @@
+{
+  "device": "Family Area",
+  "date": "2026-10-30",
+  "change": "Retire an owned continuation preview before an unpinned Dream tap launches its configured target and finishes the Dream.",
+  "behavioralRegression": {
+    "oldOrdering": ["launch", "dream"],
+    "requiredOrdering": ["preview", "launch", "dream"],
+    "failedBeforeInvocationWasAdded": true,
+    "newChecks": 6,
+    "passing": true,
+    "androidBoundariesDoubled": true,
+    "continuationGetterStubbed": true,
+    "actualActivityIntentTransitionsExercised": false,
+    "cases": [
+      "intentional exit marked before preview finish and reentrant recovery",
+      "continuation retired before configured launch and Dream finish",
+      "repeated retirement does not finish the preview twice",
+      "deliberate photo viewer remains owned",
+      "stale Dream cannot retire replacement ownership",
+      "late old-preview detach cannot clear replacement preview",
+      "admitted pinned return retains existing behavior",
+      "failed pinned return keeps Dream and underlying Activity"
+    ]
+  },
+  "freshBuildGate": {
+    "unitTests": 3460,
+    "unitSuites": 360,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "debugBuildSucceeded": true,
+    "performanceBuildSucceeded": true,
+    "buildSeconds": 88
+  },
+  "installedArtifact": {
+    "package": "com.immortal.launcher.debug",
+    "variant": "performance",
+    "sha256": "ed60d6d371b1a509d7b1f8ba9b08e8328c47afb55ebbe94dc6865bd449db6b70",
+    "bytes": 25702091,
+    "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "installedBytesVerified": true,
+    "previousExactApkRetainedPrivately": true,
+    "previousSha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+    "manifestUnchanged": true,
+    "unchangedMainAssets": 53,
+    "uploadRequests": 1,
+    "installRequests": 1,
+    "interruptedInstallResponseReconciledByByteReadback": true
+  },
+  "preservation": {
+    "settingsCompared": 97,
+    "changedSettings": 0,
+    "fullScreensaverConfigurationUnchanged": true,
+    "photoSourceGroupsUnchanged": true,
+    "sourceWrites": 0,
+    "livingAreaOperations": 0,
+    "phoneOperations": 0,
+    "homeAssistantOperations": 0
+  },
+  "deviceChecks": {
+    "homeAppsHomeScreensaverAcknowledged": true,
+    "boundedLogLines": 401,
+    "fatalExceptionMarkers": 0,
+    "continuationRetirementMessages": 0,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "wifiAdbConnectionRefused": true,
+    "familyUsbTransportPresent": false,
+    "foreignEmulatorUntouched": true,
+    "stackedOsDreamTapVerified": false,
+    "visibleTransitionsVerified": false,
+    "deliveredFpsMeasured": false,
+    "physicalSpeedImprovementMeasured": false
+  },
+  "remainingAcceptance": [
+    "Exercise an actual OS Dream above a retained continuation and verify one tap removes both screensaver surfaces.",
+    "Verify actual continuation versus deliberate-viewer intent transitions on Android.",
+    "Slideshow startup timing and recovery presentation.",
+    "Home/Apps steady-frame target.",
+    "Physical dark/bright night-clock acceptance."
+  ]
+}
