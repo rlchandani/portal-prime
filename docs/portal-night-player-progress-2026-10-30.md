@@ -215,6 +215,74 @@ for review. This batch closes within 30 minutes; no music service or configurati
 was deployed to Home Assistant. Remaining goal work includes physical night-clock
 acceptance, affected-path rendering measurements and further style refinement.
 
+## Native search and Gallery spread — latest batch
+
+The music Library and Playlists now include native metadata search, clear controls,
+result counts and honest no-result/unavailable states. Matching a nested track
+keeps the entire original collection. The host retains separate queries and
+lazy-grid positions across detail navigation. This is still visual implementation:
+no live library adapter, service connection or Home Assistant music deployment
+was added.
+
+The new **Gallery spread** setting uses the existing native stage and decoder:
+two whole portraits, a 3vmin matte and 2vmin tile gutter, with a whole-landscape
+fallback. Normal presentation is static, does not crop or analyze faces, and
+shares the existing 48MiB bitmap ownership budget. Overlay refresh updates both
+retained compositions during a dissolve without decoding the photos again.
+An explicit adjustment preview retains existing position metadata; save/cancel
+returns to the complete spread. Saved positions remain available for other styles.
+Gallery spread does not expose the ignored motion toggle on either settings
+surface. All previous mode IDs and the saved Shuffle selection are preserved.
+
+Verification:
+
+- **3,405 JVM tests in 351 suites** passed with no failures, errors or skips.
+  The integrated debug APK assembled successfully.
+- **44 native acceptance checks passed in 115.1 seconds**, including search
+  keyboard visibility, album/back continuity, separate page queries, unavailable
+  states and spread save/cancel/overlay behavior.
+- All **33 native review captures** loaded without page errors. These are
+  silent fixtures on the owned API 34 emulator, not Portal timing or audio proof.
+  The emulator was stopped after acceptance.
+- Family Area's installed APK was read back and matched SHA-256
+  `2bd5e75a0f76f93faf221b6ebfc40f47a0a006f2c8310445af11e267c17543f7`
+  (48,881,040 bytes). The signing certificate matches the previous installed APK.
+- All **97 full-profile setting values were preserved**. A byte-for-byte backup
+  of the actual preceding installed APK was retained privately. Living Area was
+  not modified.
+
+A separate fixed-mode **Diptych** device capture measured 343 valid frame
+callbacks, zero callback drops, 28ms p50, **31ms p95**, **37.5ms p99**, 26.973ms
+mean and 46.639ms maximum. 317 callbacks exceeded 16.667ms; six exceeded
+33.333ms. Command submission averaged 14.076ms and accounted for 40.822ms of
+the worst frame. This misses the proposed 16.667ms rendering target. It is not
+delivered FPS or a measured before/after speedup.
+
+The first Gallery spread capture setup hit the existing Main-status timeout
+before recording; cleanup restored all 97 settings and left no collector running.
+A subsequent bounded readiness check succeeded. The new native style was then
+admitted on Family Area at 588ms into its capture with zero Main admission delay.
+This proves scene admission only, not visible presentation or vsync.
+
+The subsequent 30-second Gallery spread capture recorded **142 valid frame
+callbacks**, zero callback drops and one first-draw callback. Its distribution,
+including that first draw, was **9.25ms p50, 16.75ms p95, 62.5ms p99**, 11.515ms
+mean and 134.641ms maximum. Eight callbacks exceeded 16.667ms and five exceeded
+33.333ms. Two further native spread scenes were admitted during the capture;
+neither required a Main admission delay. The p95 still misses the proposed
+16.667ms target. This is a different style from Diptych, not a measured
+before/after gain, a delivered-FPS measurement or evidence that Shuffle improved.
+Process PSS was 271,991KiB; the 48MiB budget bounds retained photo bitmaps,
+not total app or graphics memory.
+
+All 97 saved setting values were restored after the capture, including Shuffle
+and its 30-second interval. The collector was inactive with zero listeners.
+The new option is available for deliberate selection; it did not replace Shuffle.
+This batch closes within 30 minutes including its deployment and cleanup.
+
+Remaining goal work includes physical dark/bright and backlight acceptance,
+the affected rendering targets and further existing-style refinement.
+
 ## Sources
 
 - [Android sensor monitoring and lifecycle](https://developer.android.com/develop/sensors-and-location/sensors/sensors_overview)

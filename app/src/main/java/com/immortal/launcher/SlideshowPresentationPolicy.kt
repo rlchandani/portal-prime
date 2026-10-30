@@ -7,7 +7,7 @@
 package com.immortal.launcher
 
 /**
- * View-independent Gallery print placement. Only geometry is allocated; no image work or timers.
+ * View-independent Gallery placement. Only geometry is allocated; no image work or timers.
  * Overlay search visits at most 32 obstacles and retains at most 16 candidate rectangles.
  */
 internal object SlideshowPresentationPolicy {
@@ -42,13 +42,65 @@ internal object SlideshowPresentationPolicy {
     }
     val rank = compareByDescending<Bounds> { usefulScale(it) }
         .thenByDescending { it.width.toLong() * it.height }
+    val area = inset(freeArea(viewport, occupied, rank, adjustment == null))
+    val manual = adjustment?.transform(imageWidth, imageHeight, area.width, area.height)
+    val path = if (manual != null) SlideshowGeometry.Motion(manual, manual, adjustment.zoom == 1f)
+    else SlideshowGeometry.plan(imageWidth, imageHeight, area.width, area.height,
+        emptyList(), fill = false, motion = false)
+    return Plan(area, path)
+  }
+
+  /** Equal tiles in one safe spread; normal presentation always contains the entire photos. */
+  fun gallerySpread(
+      images: List<Pair<Int, Int>>, viewportWidth: Int, viewportHeight: Int,
+      occupied: List<Bounds> = emptyList(),
+  ): List<Plan> {
+    val sizes = images.take(2)
+    if (sizes.isEmpty()) return emptyList()
+    if (viewportWidth <= 0 || viewportHeight <= 0 || sizes.any { it.first <= 0 || it.second <= 0 }) {
+      val empty = SlideshowGeometry.Transform(0f, 0f, 0f)
+      return sizes.map { Plan(Bounds(0, 0, 0, 0), SlideshowGeometry.Motion(empty, empty, true)) }
+    }
+    val viewport = Bounds(0, 0, viewportWidth, viewportHeight)
+    val short = minOf(viewportWidth, viewportHeight)
+    val matte = (short * .03).toInt()
+    val gutter = (short * .02).toInt()
+    fun tiles(area: Bounds): List<Bounds> {
+      val margin = minOf(matte, (area.width - sizes.size).coerceAtLeast(0) / 2,
+          (area.height - 1).coerceAtLeast(0) / 2)
+      val inner = Bounds(area.left + margin, area.top + margin,
+          area.right - margin, area.bottom - margin)
+      val gap = if (sizes.size == 2) minOf(gutter, (inner.width - 2).coerceAtLeast(0)) else 0
+      val tileWidth = (inner.width - gap) / sizes.size
+      return sizes.indices.map { index ->
+        val left = inner.left + index * (tileWidth + gap)
+        Bounds(left, inner.top, left + tileWidth, inner.bottom)
+      }
+    }
+    val rank = compareByDescending<Bounds> { area ->
+      tiles(area).mapIndexed { index, tile ->
+        minOf(tile.width.toDouble() / sizes[index].first,
+            tile.height.toDouble() / sizes[index].second)
+      }.minOrNull() ?: 0.0
+    }.thenByDescending { it.width.toLong() * it.height }
+    return tiles(freeArea(viewport, occupied, rank)).mapIndexed { index, area ->
+      Plan(area, SlideshowGeometry.plan(sizes[index].first, sizes[index].second,
+          area.width, area.height, emptyList(), fill = false, motion = false))
+    }
+  }
+
+  /** Shared bounded reservation search for print and spread; impossible reservations fall back. */
+  private fun freeArea(
+      viewport: Bounds, occupied: List<Bounds>, rank: Comparator<Bounds>,
+      reserve: Boolean = true,
+  ): Bounds {
     var candidates = listOf(viewport)
     // Manual framing keeps its chosen focus; impossible/excessive reservations keep a usable
     // whole print rather than shrinking it to nothing or walking unbounded metadata.
-    if (adjustment == null && occupied.size <= MAX_OCCLUSIONS) {
+    if (reserve && occupied.size <= MAX_OCCLUSIONS) {
       occupied.forEach { raw ->
-        val obstacle = Bounds(raw.left.coerceIn(0, viewportWidth), raw.top.coerceIn(0, viewportHeight),
-            raw.right.coerceIn(0, viewportWidth), raw.bottom.coerceIn(0, viewportHeight))
+        val obstacle = Bounds(raw.left.coerceIn(0, viewport.right), raw.top.coerceIn(0, viewport.bottom),
+            raw.right.coerceIn(0, viewport.right), raw.bottom.coerceIn(0, viewport.bottom))
         if (obstacle.left >= obstacle.right || obstacle.top >= obstacle.bottom) return@forEach
         candidates = candidates.flatMap { area ->
           if (area.left >= obstacle.right || area.right <= obstacle.left ||
@@ -62,11 +114,6 @@ internal object SlideshowPresentationPolicy {
         }.distinct().sortedWith(rank).take(MAX_CANDIDATES)
       }
     }
-    val area = inset(candidates.firstOrNull() ?: viewport)
-    val manual = adjustment?.transform(imageWidth, imageHeight, area.width, area.height)
-    val path = if (manual != null) SlideshowGeometry.Motion(manual, manual, adjustment.zoom == 1f)
-    else SlideshowGeometry.plan(imageWidth, imageHeight, area.width, area.height,
-        emptyList(), fill = false, motion = false)
-    return Plan(area, path)
+    return candidates.firstOrNull() ?: viewport
   }
 }

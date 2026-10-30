@@ -85,25 +85,40 @@ The artwork budget includes control/capability-message height and font scale.
 
 `MusicDesignPreviewActivity` and its original 512px cover assets are debug-only. The preview
 never creates an audio controller, connects a server or reads household media. It renders the
-real native music, night-clock and Gallery print components with silent sample data.
+real native music, night-clock, Gallery print and Gallery spread components with silent sample data.
 `MusicBrowseUi.kt` now supplies native library, playlist and collection-detail components.
 They accept immutable host-supplied metadata, use lazy grids/lists and bounded local artwork,
 and share navigation with the silent debug preview. Empty and unavailable states do not
 invent collections. Live provider actions and library data remain deferred; no native
 provider integration is implied.
 
+Library and playlist search now filters only host-supplied collection, track and artist
+metadata. Queries and lazy-grid positions are hoisted above detail navigation; opening a
+collection and returning preserves the original query and complete collection. Clearing
+restores the supplied order. Loading and unavailable status stays visible independently
+of query results. Search performs no provider or artwork request.
+
+Gallery spread uses the existing bounded native stage, decoder and bitmap ownership.
+It contains two whole portraits inside a 3vmin matte with a 2vmin gap, or one whole
+landscape when pairing is inappropriate. Overlay changes reposition retained views
+during the existing dissolve; editing save/cancel returns to the complete spread.
+The normal spread is still and does not run face inference or background blur.
+
 `native-checks.py` targets only the dedicated `PortalMusic20261030` AVD and refuses a household
 device. It captures layout evidence and checks touch sizes, transport visibility, queue/layout
 continuity, offline guards, theme/font variants and native clock/gallery rendering.
-The latest run passed 29 checks, including lazy album scrolling, collection navigation,
-playlist track selection, honest empty/unavailable states and 1.8× text:
+The acceptance suite includes lazy album scrolling, collection navigation, playlist track
+selection, honest empty/unavailable states, 1.8× text, native search continuity, keyboard
+visibility and Gallery spread edit/overlay behavior:
 
 ```sh
 python3 native-checks.py --serial emulator-5556
 ```
 
 Results are in `evidence/native/checks.json`; `complete: true` is required before claiming the
-whole check passed. Open `native-review.html` for the image review. The emulator's API 34/GMS
+whole check passed. The latest integrated run passed **44 checks in 115.1 seconds**.
+Open `native-review.html` for the image review; all **33 capture tabs** loaded without page
+errors, recorded in `evidence/native-review-checks.json`. The emulator's API 34/GMS
 image does not establish Portal API 29 timing, sensor behavior or audio compatibility.
 No Home Assistant music deployment belongs to either preview.
 

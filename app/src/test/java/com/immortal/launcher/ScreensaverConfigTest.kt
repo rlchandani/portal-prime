@@ -39,7 +39,7 @@ class ScreensaverConfigTest {
 
   @Test
   fun preferredAndLegacyStyles_roundTripThroughModeSetter() {
-    (listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint") + legacyModes).forEach { mode ->
+    (listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "gallerySpread") + legacyModes).forEach { mode ->
       val prefs = ScreensaverTestPrefs()
       ScreensaverConfig.setMode(prefs.context, mode)
       assertEquals("selected style $mode must persist", mode, ScreensaverConfig.load(prefs.context).mode)
@@ -48,7 +48,7 @@ class ScreensaverConfigTest {
 
   @Test
   fun nativeStyles_doNotUseTheWebEngine_andLegacyRoutingStaysIntact() {
-    listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "classic").forEach {
+    listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "gallerySpread", "classic").forEach {
       assertFalse("$it must use a native renderer", ScreensaverConfig.usesEngine(it))
       assertEquals(it != "classic", ScreensaverConfig.isNativeStage(it))
     }
@@ -56,6 +56,17 @@ class ScreensaverConfigTest {
       assertTrue("$it must keep its existing engine", ScreensaverConfig.usesEngine(it))
       assertFalse("$it must keep its existing engine", ScreensaverConfig.isNativeStage(it))
     }
+  }
+
+  @Test fun gallerySpreadIsAPreferredNativeModeWithoutReplacingAnyExistingId() {
+    assertEquals("gallerySpread", ScreensaverConfig.MODE_GALLERY_SPREAD)
+    assertEquals("Gallery spread", ScreensaverConfig.modeLabel("gallerySpread"))
+    assertTrue(ScreensaverConfig.isNativeStage("gallerySpread"))
+    assertFalse(ScreensaverConfig.usesEngine("gallerySpread"))
+    assertTrue(ScreensaverConfig.MODES.containsAll(legacyModes))
+    assertEquals(ScreensaverConfig.MODES.size, ScreensaverConfig.MODES.toSet().size)
+    assertTrue(ScreensaverConfig.MODES.indexOf("gallerySpread") <
+        ScreensaverConfig.MODES.indexOf("classic"))
   }
 
   @Test

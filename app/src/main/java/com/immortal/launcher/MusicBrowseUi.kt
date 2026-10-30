@@ -16,38 +16,55 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
@@ -85,6 +102,48 @@ data class MusicBrowseCollection(
     val available: Boolean = true,
 )
 
+/** Filters supplied metadata only; a result retains the complete original collection. */
+internal fun musicBrowseSearchCollections(
+    collections: List<MusicBrowseCollection>,
+    query: String,
+): List<MusicBrowseCollection> {
+  val term = query.trim()
+  if (term.isEmpty()) return collections
+  return collections.filter { collection ->
+    collection.title.contains(term, ignoreCase = true) ||
+        collection.subtitle.contains(term, ignoreCase = true) ||
+        collection.tracks.any { track ->
+          track.title.contains(term, ignoreCase = true) ||
+              track.artist.contains(term, ignoreCase = true)
+        }
+  }
+}
+
+/**
+ * Hoist above conditional detail navigation to retain the query and grid position on Back.
+ * Keep one state per library/playlist page; this holds only UI drafts, never provider data.
+ */
+@Stable
+class MusicBrowseState internal constructor(
+    initialQuery: String = "",
+    initialIndex: Int = 0,
+    initialOffset: Int = 0,
+) {
+  var query by mutableStateOf(initialQuery)
+  internal val gridState = LazyGridState(initialIndex, initialOffset)
+}
+
+private val MusicBrowseStateSaver = listSaver<MusicBrowseState, Any>(
+    save = { listOf(it.query, it.gridState.firstVisibleItemIndex,
+        it.gridState.firstVisibleItemScrollOffset) },
+    restore = { MusicBrowseState(it[0] as String, it[1] as Int, it[2] as Int) },
+)
+
+/** Call in the enclosing player, before its grid/detail branch, to preserve detail -> Back. */
+@Composable
+fun rememberMusicBrowseState(): MusicBrowseState =
+    rememberSaveable(saver = MusicBrowseStateSaver) { MusicBrowseState() }
+
 /**
  * Album-style collection grid. Supply real collections (or an empty list), never placeholders.
  * Navigation belongs to the enclosing player; this component creates no controllers or routes.
@@ -98,8 +157,9 @@ fun MusicLibraryPage(
     modifier: Modifier = Modifier,
     status: MusicBrowseStatus = MusicBrowseStatus.READY,
     statusMessage: String? = null,
+    browseState: MusicBrowseState = rememberMusicBrowseState(),
 ) {
-  MusicBrowseCollections("Library", collections, false, modifier, status, statusMessage,
+  MusicBrowseCollections("Library", collections, false, browseState, modifier, status, statusMessage,
       onBack, onCollection, onShowPlayer)
 }
 
@@ -113,8 +173,9 @@ fun MusicPlaylistsPage(
     modifier: Modifier = Modifier,
     status: MusicBrowseStatus = MusicBrowseStatus.READY,
     statusMessage: String? = null,
+    browseState: MusicBrowseState = rememberMusicBrowseState(),
 ) {
-  MusicBrowseCollections("Playlists", playlists, true, modifier, status, statusMessage,
+  MusicBrowseCollections("Playlists", playlists, true, browseState, modifier, status, statusMessage,
       onBack, onCollection, onShowPlayer)
 }
 
@@ -195,6 +256,7 @@ private fun MusicBrowseCollections(
     title: String,
     collections: List<MusicBrowseCollection>,
     playlists: Boolean,
+    browseState: MusicBrowseState,
     modifier: Modifier,
     status: MusicBrowseStatus,
     statusMessage: String?,
@@ -204,6 +266,18 @@ private fun MusicBrowseCollections(
 ) {
   val palette = LocalApprovedPalette.current
   val fontScale = LocalDensity.current.fontScale.coerceAtLeast(1f)
+  val query = browseState.query
+  val term = query.trim()
+  val gridState = browseState.gridState
+  val matching = remember(collections, term, status) {
+    if (status == MusicBrowseStatus.READY) musicBrowseSearchCollections(collections, term)
+    else emptyList()
+  }
+  val focusManager = LocalFocusManager.current
+  val openCollection: (MusicBrowseCollection) -> Unit = {
+    focusManager.clearFocus()
+    onCollection(it)
+  }
   BoxWithConstraints(modifier.fillMaxSize().background(palette.background)) {
     val padding = if (maxWidth < 600.dp) 16.dp else 28.dp
     // Fewer columns at larger text scales; card heights remain content-driven.
@@ -213,6 +287,7 @@ private fun MusicBrowseCollections(
       key(title) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minimumCell),
+            state = gridState,
             modifier = Modifier.weight(1f).fillMaxWidth(),
             contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
             horizontalArrangement = Arrangement.spacedBy(24.dp),
@@ -220,41 +295,118 @@ private fun MusicBrowseCollections(
         ) {
           item(key = "heading", span = { GridItemSpan(maxLineSpan) },
               contentType = "heading") {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
               MusicBrowseText(title, Modifier.semantics { heading() },
                   size = 36, bold = true, maxLines = 2)
-              if (status == MusicBrowseStatus.READY && collections.isNotEmpty()) {
+              if (status != MusicBrowseStatus.READY) {
+                MusicBrowseMessage(status, emptyTitle = "", emptyDetail = "",
+                    unavailableTitle = if (playlists) "Playlists unavailable" else "Library unavailable",
+                    statusMessage = statusMessage, compact = true)
+              }
+              MusicBrowseSearch(query, label = "Search ${title.lowercase()}",
+                  onQuery = {
+                    browseState.query = it
+                    gridState.requestScrollToItem(0)
+                  })
+              if (status == MusicBrowseStatus.READY) {
                 MusicBrowseText(
-                    if (playlists) musicBrowseCount(collections.size, "playlist", "playlists")
+                    if (term.isNotEmpty()) {
+                      "${matching.size} of " + if (playlists)
+                        musicBrowseCount(collections.size, "playlist", "playlists")
+                      else musicBrowseCount(collections.size, "collection", "collections")
+                    } else if (playlists) musicBrowseCount(collections.size, "playlist", "playlists")
                     else musicBrowseCount(collections.size, "collection", "collections"),
+                    Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                     size = 17, muted = true)
               }
             }
           }
           if (status != MusicBrowseStatus.READY || collections.isEmpty()) {
-            item(key = "message", span = { GridItemSpan(maxLineSpan) },
+            if (status == MusicBrowseStatus.READY) {
+              item(key = "message", span = { GridItemSpan(maxLineSpan) },
+                  contentType = "message") {
+                MusicBrowseMessage(status,
+                    emptyTitle = if (playlists) "No playlists yet" else "Your library is empty",
+                    emptyDetail = if (playlists) "Playlists appear here when they are supplied."
+                        else "Albums and collections appear here when they are supplied.",
+                    unavailableTitle = if (playlists) "Playlists unavailable" else "Library unavailable",
+                    statusMessage = statusMessage)
+              }
+            }
+          } else if (matching.isEmpty()) {
+            item(key = "no-results", span = { GridItemSpan(maxLineSpan) },
                 contentType = "message") {
-              MusicBrowseMessage(status,
-                  emptyTitle = if (playlists) "No playlists yet" else "Your library is empty",
-                  emptyDetail = if (playlists) "Playlists appear here when they are supplied."
-                      else "Albums and collections appear here when they are supplied.",
-                  unavailableTitle = if (playlists) "Playlists unavailable" else "Library unavailable",
-                  statusMessage = statusMessage)
+              MusicBrowseMessage(MusicBrowseStatus.READY,
+                  emptyTitle = "No matching ${if (playlists) "playlists" else "collections"}",
+                  emptyDetail = "Try a collection name, track title or artist, or clear your search.",
+                  unavailableTitle = "", statusMessage = null)
             }
           } else {
-            gridItemsIndexed(collections,
+            gridItemsIndexed(matching,
                 key = { index, collection ->
                   collection.id.ifBlank { "missing-collection:$index" }
                 }, contentType = { _, _ -> if (playlists) "playlist" else "album" }) {
                 _, collection ->
-              if (playlists) MusicBrowsePlaylistCard(collection) { onCollection(collection) }
-              else MusicBrowseAlbumCard(collection) { onCollection(collection) }
+              Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (playlists) MusicBrowsePlaylistCard(collection) { openCollection(collection) }
+                else MusicBrowseAlbumCard(collection) { openCollection(collection) }
+                MusicBrowseSearchHint(collection, term)
+              }
             }
           }
         }
       }
     }
   }
+}
+
+/** Search remains inside the bounded grid, so the keyboard and large text can scroll it. */
+@Composable
+private fun MusicBrowseSearch(query: String, label: String, onQuery: (String) -> Unit) {
+  val palette = LocalApprovedPalette.current
+  val focusManager = LocalFocusManager.current
+  var focused by remember { mutableStateOf(false) }
+  val shape = RoundedCornerShape(24.dp)
+  BasicTextField(query, onValueChange = onQuery, singleLine = true,
+      textStyle = TextStyle(color = palette.text, fontFamily = FontFamily.Default,
+          fontSize = 20.sp, lineHeight = 26.sp),
+      cursorBrush = SolidColor(palette.accent),
+      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search, autoCorrectEnabled = false),
+      keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
+      modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
+          .onFocusChanged { focused = it.isFocused }
+          .semantics { contentDescription = label }
+          .clip(shape).background(palette.surface)
+          .border(if (focused) 2.dp else 1.dp,
+              if (focused) palette.accent else palette.divider, shape),
+      decorationBox = { inner ->
+        Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+          MusicBrowseIcon(MusicBrowseGlyph.SEARCH, palette.secondary, Modifier.size(24.dp))
+          Box(Modifier.weight(1f).padding(vertical = 14.dp)) {
+            if (query.isEmpty()) MusicBrowseText(label, size = 20, muted = true)
+            inner()
+          }
+          if (query.isNotEmpty()) {
+            MusicBrowseButton("Clear search", glyph = MusicBrowseGlyph.CLEAR,
+                iconOnly = true, onClick = { onQuery("") })
+          }
+        }
+      })
+}
+
+/** Explain nested track matches without inventing a playback action or a partial collection. */
+@Composable
+private fun MusicBrowseSearchHint(collection: MusicBrowseCollection, term: String) {
+  if (term.isEmpty() || collection.title.contains(term, ignoreCase = true) ||
+      collection.subtitle.contains(term, ignoreCase = true)) return
+  val track = collection.tracks.firstOrNull {
+    it.title.contains(term, ignoreCase = true) || it.artist.contains(term, ignoreCase = true)
+  } ?: return
+  val caption = listOf(track.title, track.artist).filter { it.isNotBlank() }.joinToString(" · ")
+  MusicBrowseText("Includes $caption", Modifier.padding(horizontal = 4.dp),
+      size = 16, muted = true, maxLines = 2)
 }
 
 @Composable
@@ -436,11 +588,13 @@ private fun MusicBrowseMessage(
     emptyDetail: String,
     unavailableTitle: String,
     statusMessage: String?,
+    compact: Boolean = false,
 ) {
   val palette = LocalApprovedPalette.current
-  Column(Modifier.fillMaxWidth().heightIn(min = 260.dp)
+  Column(Modifier.fillMaxWidth().heightIn(min = if (compact) 0.dp else 260.dp)
       .clip(RoundedCornerShape(20.dp)).background(palette.surface)
-      .padding(28.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+      .padding(if (compact) 20.dp else 28.dp),
+      verticalArrangement = Arrangement.spacedBy(if (compact) 12.dp else 16.dp)) {
     if (status == MusicBrowseStatus.LOADING) {
       CircularProgressIndicator(Modifier.size(32.dp), color = palette.text, strokeWidth = 3.dp)
     } else {
@@ -514,7 +668,7 @@ private fun MusicBrowseText(
       maxLines = maxLines, overflow = TextOverflow.Ellipsis, textAlign = textAlign)
 }
 
-private enum class MusicBrowseGlyph { BACK, PLAYER, PLAY, MUSIC }
+private enum class MusicBrowseGlyph { BACK, PLAYER, PLAY, MUSIC, SEARCH, CLEAR }
 
 @Composable
 private fun MusicBrowseButton(
@@ -581,6 +735,13 @@ private fun MusicBrowseIcon(glyph: MusicBrowseGlyph, color: Color, modifier: Mod
         line(9f, 17f, 9f, 5f); line(9f, 5f, 19f, 3f); line(19f, 3f, 19f, 15f)
         drawOval(color, point(3f, 15f), Size(6 * unit, 5 * unit))
         drawOval(color, point(13f, 13f), Size(6 * unit, 5 * unit))
+      }
+      MusicBrowseGlyph.SEARCH -> {
+        drawCircle(color, 7 * unit, point(10f, 10f), style = Stroke(2 * unit))
+        line(15f, 15f, 21f, 21f)
+      }
+      MusicBrowseGlyph.CLEAR -> {
+        line(6f, 6f, 18f, 18f); line(6f, 18f, 18f, 6f)
       }
     }
   }

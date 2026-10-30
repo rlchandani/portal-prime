@@ -10,9 +10,10 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SlideshowStyleSamplesTest {
-  @Test fun onlyTwelveExactCodeDefinedIdsAreAccepted() {
+  @Test fun onlyExactCodeDefinedNativeAndLegacyIdsAreAccepted() {
     val expected = listOf("kenBurns", "diptych", "framed", "galleryWall", "push", "memories",
-        "panorama", "polaroid", "mosaic", "filmstrip", "cinema", "heroSidebar")
+        "panorama", "polaroid", "mosaic", "filmstrip", "cinema", "heroSidebar",
+        "galleryPrint", "gallerySpread")
     assertEquals(expected, SlideshowStyle.entries.map { it.wireId })
     for (id in expected) assertEquals(id, SlideshowStyle.fromWire(id)?.wireId)
     for (id in listOf("", "shuffle", "Filmstrip", " filmstrip", "filmstrip\n", "file:///synthetic.jpg", "x".repeat(4096)))

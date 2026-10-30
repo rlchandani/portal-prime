@@ -33,8 +33,11 @@ internal class SlideshowStage(
 ) : FrameLayout(context) {
   private data class Presentation(
       val photos: List<SlideshowPhoto>, val fill: Boolean, val motion: Boolean, val dwell: Long,
-      val occupied: List<Rect>, val galleryPrint: Boolean,
-  )
+      val occupied: List<Rect>, val galleryPrint: Boolean, val gallerySpread: Boolean,
+      val editing: Boolean = false,
+  ) {
+    val galleryStyle: Boolean get() = galleryPrint || gallerySpread
+  }
   private val layers = arrayOf(Composition(context, budget, "stage0"), Composition(context, budget, "stage1"))
   private var current = 0
   private var fade: ObjectAnimator? = null
@@ -57,16 +60,20 @@ internal class SlideshowStage(
     contentDescription = "Photo slideshow"
   }
 
+  /** Spread keeps up to two whole, still photos; Gallery print wins if both flags are supplied. */
   fun show(
       photos: List<SlideshowPhoto>, fill: Boolean, motion: Boolean, dwell: Long,
       occupied: List<Rect> = emptyList(), galleryPrint: Boolean = false,
+      gallerySpread: Boolean = false,
   ) {
     if (photos.isEmpty() || photos.any { it.bitmap.isRecycled }) return
-    // Retain one extra obstacle as an overflow sentinel; Gallery print then takes its
+    // Retain one extra obstacle as an overflow sentinel; gallery styles then take their
     // conservative fallback without copying or searching an arbitrary metadata list.
-    val measured = if (galleryPrint) galleryOcclusions(occupied) else occupied.map(::Rect)
+    val gallery = galleryPrint || gallerySpread
+    val measured = if (gallery) galleryOcclusions(occupied) else occupied.map(::Rect)
     val presentation = Presentation(photos.take(if (galleryPrint) 1 else 2),
-        fill && !galleryPrint, motion && !galleryPrint, dwell, measured, galleryPrint)
+        fill && !gallery, motion && !gallery, dwell, measured, galleryPrint,
+        gallerySpread && !galleryPrint)
     if (width <= 0 || height <= 0) {
       pending = presentation
       own("pending", presentation)
@@ -78,11 +85,11 @@ internal class SlideshowStage(
   /** Reposition retained views only; keep bitmap ownership, alpha and any live dissolve intact. */
   fun refreshGalleryOverlays(occupied: List<Rect>) {
     val old = shown ?: return
-    if (!hostActive || !old.galleryPrint || editOriginal != null || width <= 0 || height <= 0) return
+    if (!hostActive || !old.galleryStyle || editOriginal != null || width <= 0 || height <= 0) return
     val measured = galleryOcclusions(occupied)
     if (old.occupied == measured) return
     shown = old.copy(occupied = measured)
-    // During an existing dissolve both retained photos need the new reservation.
+    // During an existing dissolve both retained compositions need the new reservation.
     layers.forEach { it.refreshGalleryOverlays(measured, width, height) }
   }
 
@@ -115,6 +122,7 @@ internal class SlideshowStage(
     current = incoming
     contentDescription = when {
       presentation.galleryPrint -> "Gallery print"
+      presentation.gallerySpread -> "Gallery spread"
       presentation.photos.size == 2 -> "Portrait pair"
       else -> "Photo slideshow"
     }
@@ -168,7 +176,8 @@ internal class SlideshowStage(
       own("edit", old)
     }
     val first = old.photos.firstOrNull() ?: return
-    val edited = old.copy(photos = listOf(first.copy(adjustment = adjustment)), motion = false)
+    val edited = old.copy(photos = listOf(first.copy(adjustment = adjustment)),
+        motion = false, editing = true)
     shown = edited
     if (!entering && layers[current].updateAdjustment(first.bitmap, adjustment)) return
     // Editing is deliberate; it never triggers another scene dissolve or acquires an image.
@@ -184,12 +193,18 @@ internal class SlideshowStage(
   fun finishAdjustment(save: Boolean) {
     val original = editOriginal
     val snapshot = editSnapshot
+    val adjustment = shown?.photos?.firstOrNull()?.adjustment
     editOriginal = null
     editSnapshot = null
-    if (!save && original != null) {
-      shown = original
-      layers[current].display(original, width, height)
-      if (snapshot != null) layers[current].restore(snapshot, width, height)
+    if (original != null && (!save || original.gallerySpread)) {
+      // Spread returns to its full pair after either editing outcome. Saved metadata remains
+      // available for explicit editing/other styles, while the spread itself always contains.
+      val restored = if (save) original.copy(photos = original.photos.mapIndexed { index, photo ->
+        if (index == 0) photo.copy(adjustment = adjustment) else photo
+      }) else original
+      shown = restored
+      layers[current].display(restored, width, height)
+      if (!save && snapshot != null) layers[current].restore(snapshot, width, height)
       if (paused || !hostActive) layers[current].pause()
       layers[current].alpha = 1f
     }
@@ -247,17 +262,15 @@ internal class SlideshowStage(
       budget.setOwner(owner, p.photos.map {
         SlideshowPixelBudget.Entry(it.bitmap, it.bitmap.allocationByteCount.toLong())
       })
-      setBackgroundColor(if (p.galleryPrint) PRINT_MATTE else MATTE)
+      setBackgroundColor(if (p.galleryStyle) PRINT_MATTE else MATTE)
       visibility = View.VISIBLE
+      val gallery = galleryPlans(p, width, height)
       val margin = if (p.photos.size == 2) (20 * resources.displayMetrics.density).toInt() else 0
       val tileWidth = (width - margin) / p.photos.size
       p.photos.forEachIndexed { index, photo ->
         val left = index * (tileWidth + margin)
         val tile = Rect(left, 0, if (index == p.photos.lastIndex) width else left + tileWidth, height)
-        val print = if (p.galleryPrint) SlideshowPresentationPolicy.galleryPrint(
-            photo.bitmap.width, photo.bitmap.height, width, height, resources.displayMetrics.density,
-            p.occupied.map { SlideshowPresentationPolicy.Bounds(it.left, it.top, it.right, it.bottom) },
-            photo.adjustment) else null
+        val print = gallery?.getOrNull(index)
         val initial = print?.path ?: SlideshowGeometry.plan(
             photo.bitmap.width, photo.bitmap.height, tile.width(), tile.height(), photo.regions,
             p.fill, p.motion && photo.adjustment == null, index % 2 == 1)
@@ -316,30 +329,55 @@ internal class SlideshowStage(
       }
     }
 
+    /** Reuses only bitmap dimensions and views; no composite images or extra pixel owners. */
+    private fun galleryPlans(
+        p: Presentation, width: Int, height: Int,
+    ): List<SlideshowPresentationPolicy.Plan>? {
+      if (!p.galleryStyle) return null
+      val occupied = p.occupied.map {
+        SlideshowPresentationPolicy.Bounds(it.left, it.top, it.right, it.bottom)
+      }
+      if (p.galleryPrint) {
+        val photo = p.photos.first()
+        return listOf(SlideshowPresentationPolicy.galleryPrint(
+            photo.bitmap.width, photo.bitmap.height, width, height, resources.displayMetrics.density,
+            occupied, photo.adjustment))
+      }
+      val plans = SlideshowPresentationPolicy.gallerySpread(
+          p.photos.map { it.bitmap.width to it.bitmap.height }, width, height, occupied)
+      // Normal spread ignores saved crops. Explicit editing keeps the existing manual preview;
+      // cancellation restores the complete original pair and its exact retained transforms.
+      return if (!p.editing) plans else plans.mapIndexed { index, plan ->
+        val photo = p.photos[index]
+        val manual = photo.adjustment?.transform(photo.bitmap.width, photo.bitmap.height,
+            plan.area.width, plan.area.height) ?: return@mapIndexed plan
+        plan.copy(path = SlideshowGeometry.Motion(manual, manual, photo.adjustment.zoom == 1f))
+      }
+    }
+
     fun refreshGalleryOverlays(occupied: List<Rect>, width: Int, height: Int) {
       val old = displayed ?: return
-      if (!old.galleryPrint || old.occupied == occupied) return
-      val photo = old.photos.singleOrNull() ?: return
-      if (photo.bitmap.isRecycled) return
-      val holder = getChildAt(0) as? FrameLayout ?: return
-      val image = holder.getChildAt(0) as? ImageView ?: return
+      if (!old.galleryStyle || old.occupied == occupied || old.editing) return
+      if (old.photos.any { it.bitmap.isRecycled }) return
       displayed = old.copy(occupied = occupied)
       // Saved manual positions already bypass reservations; leave their pose alone.
-      if (photo.adjustment != null) return
-      val print = SlideshowPresentationPolicy.galleryPrint(
-          photo.bitmap.width, photo.bitmap.height, width, height, resources.displayMetrics.density,
-          occupied.map { SlideshowPresentationPolicy.Bounds(it.left, it.top, it.right, it.bottom) })
-      val area = print.area
-      val params = holder.layoutParams as LayoutParams
-      if (params.width != area.width || params.height != area.height ||
-          params.leftMargin != area.left || params.topMargin != area.top) {
-        params.width = area.width; params.height = area.height
-        params.leftMargin = area.left; params.topMargin = area.top
-        holder.layoutParams = params
+      if (old.galleryPrint && old.photos.first().adjustment != null) return
+      val plans = galleryPlans(displayed ?: return, width, height) ?: return
+      plans.forEachIndexed { index, plan ->
+        val holder = getChildAt(index) as? FrameLayout ?: return@forEachIndexed
+        val image = holder.getChildAt(0) as? ImageView ?: return@forEachIndexed
+        val area = plan.area
+        val params = holder.layoutParams as LayoutParams
+        if (params.width != area.width || params.height != area.height ||
+            params.leftMargin != area.left || params.topMargin != area.top) {
+          params.width = area.width; params.height = area.height
+          params.leftMargin = area.left; params.topMargin = area.top
+          holder.layoutParams = params
+        }
+        val transform = plan.path.start
+        image.scaleX = transform.scale; image.scaleY = transform.scale
+        image.translationX = transform.x; image.translationY = transform.y
       }
-      val transform = print.path.start
-      image.scaleX = transform.scale; image.scaleY = transform.scale
-      image.translationX = transform.x; image.translationY = transform.y
     }
 
     fun pause() { moves.forEach { it.pause() } }

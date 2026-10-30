@@ -11,6 +11,75 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SlideshowPresentationPolicyTest {
+  @Test fun gallerySpreadUsesMatchingPortraitTilesWithViewportMatteAndGap() {
+    val plans = SlideshowPresentationPolicy.gallerySpread(
+        listOf(800 to 1200, 1000 to 1600), 1280, 800)
+    assertEquals(listOf(Bounds(24, 24, 632, 776), Bounds(648, 24, 1256, 776)),
+        plans.map { it.area })
+    assertWhole(plans[0], 800, 1200)
+    assertWhole(plans[1], 1000, 1600)
+  }
+
+  @Test fun gallerySpreadSingleLandscapeUsesTheWholeMatteArea() {
+    val plan = SlideshowPresentationPolicy.gallerySpread(listOf(1200 to 800), 1280, 800).single()
+    assertEquals(Bounds(24, 24, 1256, 776), plan.area)
+    assertWhole(plan, 1200, 800)
+  }
+
+  @Test fun gallerySpreadReservesClockAndCalendarTogetherWithoutFaceMetadataOrCropping() {
+    val plans = SlideshowPresentationPolicy.gallerySpread(
+        listOf(800 to 1200, 1000 to 1600), 1280, 800,
+        occupied = listOf(Bounds(0, 0, 1280, 180), Bounds(1000, 0, 1280, 800)))
+    assertEquals(listOf(Bounds(24, 204, 492, 776), Bounds(508, 204, 976, 776)),
+        plans.map { it.area })
+    assertWhole(plans[0], 800, 1200)
+    assertWhole(plans[1], 1000, 1600)
+  }
+
+  @Test fun gallerySpreadTinyOddAndHugeViewportsKeepBothTilesBoundedAndMatching() {
+    listOf(1 to 1, 2 to 3, 3 to 2, 1279 to 799, Int.MAX_VALUE to Int.MAX_VALUE)
+        .forEach { (w, h) ->
+          val plans = SlideshowPresentationPolicy.gallerySpread(listOf(800 to 1200, 800 to 1200), w, h)
+          assertEquals(2, plans.size)
+          assertEquals(plans[0].area.width, plans[1].area.width)
+          assertEquals(plans[0].area.height, plans[1].area.height)
+          plans.forEach { plan ->
+            assertTrue(plan.area.left >= 0 && plan.area.top >= 0)
+            assertTrue(plan.area.right <= w && plan.area.bottom <= h)
+            assertTrue(plan.area.width >= 0 && plan.area.height >= 0)
+            if (plan.area.width > 0 && plan.area.height > 0) assertWhole(plan, 800, 1200)
+          }
+        }
+  }
+
+  @Test fun gallerySpreadExcessiveOrImpossibleOverlaysKeepBothWholePhotos() {
+    val sizes = listOf(800 to 1200, 1000 to 1600)
+    val baseline = SlideshowPresentationPolicy.gallerySpread(sizes, 1280, 800)
+    val excessive = object : AbstractList<Bounds>() {
+      override val size = Int.MAX_VALUE
+      override fun get(index: Int): Bounds = error("oversized metadata must not be traversed")
+    }
+    assertEquals(baseline, SlideshowPresentationPolicy.gallerySpread(sizes, 1280, 800, excessive))
+    assertEquals(baseline, SlideshowPresentationPolicy.gallerySpread(sizes, 1280, 800,
+        listOf(Bounds(Int.MIN_VALUE, Int.MIN_VALUE, Int.MAX_VALUE, Int.MAX_VALUE))))
+  }
+
+  @Test fun gallerySpreadBoundsItsInputAndRejectsInvalidDimensionsWithoutNegativeTiles() {
+    val sizes = object : AbstractList<Pair<Int, Int>>() {
+      override val size = Int.MAX_VALUE
+      override fun get(index: Int): Pair<Int, Int> {
+        check(index < 2) { "only two supplied image dimensions may be read" }
+        return 800 to 1200
+      }
+    }
+    assertEquals(2, SlideshowPresentationPolicy.gallerySpread(sizes, 1280, 800).size)
+    assertTrue(SlideshowPresentationPolicy.gallerySpread(emptyList(), 1280, 800).isEmpty())
+    assertEquals(Bounds(0, 0, 0, 0),
+        SlideshowPresentationPolicy.gallerySpread(listOf(0 to 1200), 1280, 800).single().area)
+    assertEquals(Bounds(0, 0, 0, 0),
+        SlideshowPresentationPolicy.gallerySpread(listOf(800 to 1200), -1, 800).single().area)
+  }
+
   @Test fun galleryPrintInsetsAWholeStaticPhotoWithoutChangingAspect() {
     val plan = SlideshowPresentationPolicy.galleryPrint(1200, 800, 1000, 600)
     assertEquals(Bounds(24, 24, 976, 576), plan.area)

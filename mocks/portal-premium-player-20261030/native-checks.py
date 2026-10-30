@@ -164,6 +164,82 @@ demand("Large-font album detail retains navigation and collection title",
        node(nodes, "The quiet hours") is not None and bounds(node(nodes, "Back"))[3] <= 1440)
 nodes = launch("playlists-light", "--es", "screen", "playlists", "--es", "theme", "light")
 demand("Light playlists retain their supplied metadata", node(nodes, "After dark") is not None)
+nodes = launch("library-search", "--es", "screen", "library")
+tap(nodes, "Search library")
+nodes = capture("library-keyboard")
+demand("Library search remains visible with keyboard focus",
+       any(n.get("class") == "android.widget.EditText" and n.get("focused") == "true"
+           and bounds(n) == bounds(node(nodes, "Search library")) for n in nodes)
+       and bounds(node(nodes, "Search library"))[3] <= 720)
+adb("shell", "input", "text", "north")
+adb("shell", "input", "keyevent", "66")
+nodes = capture("library-search")
+demand("Native search filters supplied collection and artist metadata",
+       node(nodes, "1 of 6 collections") is not None and node(nodes, "North shore") is not None
+       and not any(n.get("text") == "The quiet hours" for n in nodes))
+tap(nodes, "North shore")
+nodes = capture("search-album-detail")
+demand("Search result opens its complete supplied collection",
+       node(nodes, "Blue distance") is not None)
+tap(nodes, "Back")
+nodes = capture("search-return")
+demand("Collection back preserves the search query and results",
+       node(nodes, "1 of 6 collections") is not None and node(nodes, "north") is not None)
+left, top, right, bottom = bounds(node(nodes, "Clear search"))
+demand("Clear search has a 48dp touch target", min(right - left, bottom - top) >= 72)
+tap(nodes, "Clear search")
+nodes = capture("search-cleared")
+demand("Clearing search restores all supplied collections", node(nodes, "6 collections") is not None)
+tap(nodes, "Search library")
+adb("shell", "input", "text", "long")
+adb("shell", "input", "keyevent", "66")
+nodes = capture("search-track")
+demand("Nested track search explains why its collection matched",
+       node(nodes, "Open road") is not None and
+       any("Includes The long way home" in n.get("text", "") for n in nodes))
+tap(nodes, "Clear search")
+tap(nodes, "Search library")
+adb("shell", "input", "text", "zzzz")
+adb("shell", "input", "keyevent", "66")
+nodes = capture("search-empty")
+demand("Unmatched search shows zero results without fabricated cards",
+       node(nodes, "0 of 6 collections") is not None and node(nodes, "No matching collections") is not None)
+tap(nodes, "Playlists")
+nodes = capture("playlists-query-independent")
+demand("Library and playlist search drafts remain separate", node(nodes, "3 playlists") is not None
+       and not any(n.get("text") == "zzzz" for n in nodes))
+nodes = launch("offline-search", "--es", "screen", "playlists", "--es", "scenario", "offline")
+tap(nodes, "Search playlists")
+adb("shell", "input", "text", "zzzz")
+adb("shell", "input", "keyevent", "66")
+nodes = capture("offline-search")
+demand("Unmatched query cannot mask provider unavailability",
+       node(nodes, "Playlists unavailable") is not None
+       and not any(n.get("text") == "No matching playlists" for n in nodes))
+nodes = launch("gallery-spread", "--es", "screen", "spread")
+image = Image.open(out / "gallery-spread.png").convert("RGB")
+demand("Native Gallery spread displays two whole-photo panes and a matte gap",
+       node(nodes, "Gallery spread") is not None and image.getpixel((1080, 720)) == (28, 27, 25)
+       and image.getpixel((540, 720)) != (28, 27, 25)
+       and image.getpixel((1620, 720)) != (28, 27, 25))
+nodes = launch("gallery-spread-landscape", "--es", "screen", "spread", "--es", "scenario", "landscape")
+image = Image.open(out / "gallery-spread-landscape.png").convert("RGB")
+demand("Gallery spread single-photo fallback preserves a whole landscape",
+       node(nodes, "Gallery spread") is not None and image.getpixel((1080, 720)) != (28, 27, 25)
+       and image.getpixel((32, 32)) == (28, 27, 25))
+for scenario in ("cancel", "save"):
+    launch(f"gallery-spread-{scenario}", "--es", "screen", "spread", "--es", "scenario", scenario)
+    image = Image.open(out / f"gallery-spread-{scenario}.png").convert("RGB")
+    demand(f"Gallery spread restores its whole pair after edit {scenario}",
+           image.getpixel((1080, 720)) == (28, 27, 25)
+           and image.getpixel((540, 720)) != (28, 27, 25)
+           and image.getpixel((1620, 720)) != (28, 27, 25))
+launch("gallery-spread-overlays", "--es", "screen", "spread", "--es", "scenario", "overlays")
+image = Image.open(out / "gallery-spread-overlays.png").convert("RGB")
+demand("Overlay change during a dissolve reserves space while retaining both photos",
+       image.getpixel((540, 250)) == (28, 27, 25) and image.getpixel((1620, 250)) == (28, 27, 25)
+       and image.getpixel((540, 1000)) != (28, 27, 25)
+       and image.getpixel((1620, 1000)) != (28, 27, 25))
 adb("shell", "am", "force-stop", "com.immortal.launcher.debug")
 (out / "checks.json").write_text(json.dumps({
     "passed": len(checks), "checks": checks, "complete": True, "serial": args.serial,

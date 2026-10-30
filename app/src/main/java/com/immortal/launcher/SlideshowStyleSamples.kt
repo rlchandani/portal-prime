@@ -13,7 +13,8 @@ import org.json.JSONObject
 internal enum class SlideshowStyle(val wireId: String) {
   KEN_BURNS("kenBurns"), DIPTYCH("diptych"), FRAMED("framed"), GALLERY_WALL("galleryWall"),
   PUSH("push"), MEMORIES("memories"), PANORAMA("panorama"), POLAROID("polaroid"),
-  MOSAIC("mosaic"), FILMSTRIP("filmstrip"), CINEMA("cinema"), HERO_SIDEBAR("heroSidebar");
+  MOSAIC("mosaic"), FILMSTRIP("filmstrip"), CINEMA("cinema"), HERO_SIDEBAR("heroSidebar"),
+  GALLERY_PRINT("galleryPrint"), GALLERY_SPREAD("gallerySpread");
 
   companion object {
     fun fromWire(value: String): SlideshowStyle? =
@@ -70,7 +71,7 @@ internal class SlideshowStyleSamples {
   }
 
   fun snapshot(): JSONObject = JSONObject()
-      .put("measurement", "scheduler promotion bridge receipt and guarded Main acceptance; not presentation or vsync")
+      .put("measurement", "scene admission signal and guarded Main acceptance; not presentation or vsync")
       .put("presentationTimeMeasured", false).put("photoAdvancementMeasured", false)
       .put("styleBeforeFirstReportKnown", false)
       .put("records", records).put("invalidRecords", invalidRecords)

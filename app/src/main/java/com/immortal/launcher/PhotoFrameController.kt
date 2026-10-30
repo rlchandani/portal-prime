@@ -436,7 +436,7 @@ class PhotoFrameController(
     // Build + drive the overlay from the user's selected face ([FaceCatalog]); faceOverride lets
     // the debug preview harness (and the overnight night clock) render a specific face instead.
     if (!photosOnly) faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
-    if (!photosOnly && settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT) {
+    if (!photosOnly && isGalleryStyle()) {
       galleryOverlayObserver?.close()
       galleryOverlayObserver = GalleryOverlayLayoutObserver(root, ::refreshGalleryOverlays).also {
         it.setActive(hostActive)
@@ -1287,7 +1287,23 @@ class PhotoFrameController(
     // Draw the ready photograph above the SurfaceView's transparent hole until video renders.
     nativeStage = SlideshowStage(context, pixelBudget).apply {
       visibility = View.GONE
-      onPresented = { finishNativeStartup() }
+      onPresented = {
+        finishNativeStartup()
+        // Finite native scene admission, only while a bounded capture owns a listener.
+        val style = when (settings.mode) {
+          ScreensaverConfig.MODE_GALLERY_PRINT -> SlideshowStyle.GALLERY_PRINT
+          ScreensaverConfig.MODE_GALLERY_SPREAD -> SlideshowStyle.GALLERY_SPREAD
+          else -> null
+        }
+        if (style != null && !stopped && hostActive && !paused) {
+          val host = when (context) {
+            is PhotoFramePreviewActivity -> SlideshowStyleHost.PREVIEW
+            is PhotoDreamService -> SlideshowStyleHost.DREAM
+            else -> SlideshowStyleHost.UNKNOWN
+          }
+          FramePerformanceCapture.prepareSlideshowStyleReport(host, style)?.accept()
+        }
+      }
     }
     root.addView(nativeStage, FrameLayout.LayoutParams(MATCH, MATCH))
 
@@ -1793,9 +1809,12 @@ class PhotoFrameController(
   }
 
   private fun intervalMs(): Long = settings.intervalSec * 1000L
+  private fun isGalleryStyle(): Boolean =
+      settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT ||
+          settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD
   private fun analyzePeople(): Boolean =
       settings.keepPeopleInFrame && settings.mode != ScreensaverConfig.MODE_WHOLE &&
-          settings.mode != ScreensaverConfig.MODE_GALLERY_PRINT
+          !isGalleryStyle()
 
   private fun localKey(path: String): String {
     val file = java.io.File(path)
@@ -1869,7 +1888,7 @@ class PhotoFrameController(
   }
 
   private fun refreshGalleryOverlays() {
-    if (stopped || !hostActive || settings.mode != ScreensaverConfig.MODE_GALLERY_PRINT ||
+    if (stopped || !hostActive || !isGalleryStyle() ||
         !this::nativeStage.isInitialized || nativeStage.visibility != View.VISIBLE ||
         (this::viewerControls.isInitialized && viewerControls.isEditing)) return
     nativeStage.refreshGalleryOverlays(measuredNativeOcclusions())
@@ -1884,7 +1903,8 @@ class PhotoFrameController(
         settings.fit == ScreensaverConfig.FIT_FILL && settings.mode != ScreensaverConfig.MODE_WHOLE,
         settings.photoMotion && settings.mode != ScreensaverConfig.MODE_WHOLE,
         intervalMs(), measuredNativeOcclusions(),
-        galleryPrint = settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT)
+        galleryPrint = settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT,
+        gallerySpread = settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD)
     if (paused) nativeStage.pause() else nativeStage.resume()
     viewerControls.photoChanged()
     Log.i("ImmortalSlideshow", "ready native scene: photos=${photos.size}, pixels=${photos.sumOf { it.bitmap.width.toLong() * it.bitmap.height }}")
@@ -2045,7 +2065,8 @@ class PhotoFrameController(
       val next = playlist.getOrNull(nextIndex)?.takeUnless { it.isVideo }
           ?.let { localAsset(it.path, localDeckKeys[nextIndex]) }
       nativeLoader.load(localAsset(path, localDeckKeys[anchor]), partners, next,
-          settings.mode == ScreensaverConfig.MODE_PORTRAITS, analyzePeople(),
+          settings.mode == ScreensaverConfig.MODE_PORTRAITS ||
+              settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD, analyzePeople(),
           { photos, partner ->
             if (g != gen || stopped) return@load
             nativeFailures = 0
@@ -2401,7 +2422,8 @@ class PhotoFrameController(
       val next = deck.getOrNull((anchor + 1) % deck.size)?.takeUnless { it in remoteVideos }
           ?.let(::remoteAsset)
       nativeLoader.load(remoteAsset(url), partners, next,
-          settings.mode == ScreensaverConfig.MODE_PORTRAITS, analyzePeople(),
+          settings.mode == ScreensaverConfig.MODE_PORTRAITS ||
+              settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD, analyzePeople(),
           { photos, partner ->
             if (g != gen || stopped) return@load
             stopVideo()

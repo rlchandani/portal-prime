@@ -44,18 +44,37 @@ class MusicDesignPreviewActivity : ComponentActivity() {
       setContentView(nightClock)
       return
     }
-    if (intent.getStringExtra("screen") == "gallery") {
+    if (intent.getStringExtra("screen") in listOf("gallery", "spread")) {
+      val spread = intent.getStringExtra("screen") == "spread"
       gallery = SlideshowStage(this)
       setContentView(gallery)
       lifecycleScope.launch {
-        val bitmap = withContext(Dispatchers.IO) {
-          assets.open("music-design/window.png").use {
-            android.graphics.BitmapFactory.decodeStream(it)
+        val photos = withContext(Dispatchers.IO) {
+          val names = if (!spread) listOf("window") else
+              if (intent.getStringExtra("scenario") == "landscape") listOf("spread-landscape")
+              else listOf("spread-dunes", "spread-tidal")
+          names.mapNotNull { name ->
+            assets.open("music-design/$name.png").use {
+              android.graphics.BitmapFactory.decodeStream(it)
+            }?.let { SlideshowPhoto("silent-$name", it) }
           }
         }
-        bitmap?.let {
-          gallery?.show(listOf(SlideshowPhoto("silent-print-preview", it)),
-              fill = false, motion = false, dwell = 30_000, galleryPrint = true)
+        if (photos.isNotEmpty()) {
+          gallery?.show(photos, fill = false, motion = false, dwell = 30_000,
+              galleryPrint = !spread, gallerySpread = spread)
+          if (spread) {
+            when (intent.getStringExtra("scenario")) {
+              "cancel", "save" -> {
+                gallery?.adjust(SlideshowAdjustment(2f, .2f, .8f))
+                gallery?.finishAdjustment(intent.getStringExtra("scenario") == "save")
+              }
+              "overlays" -> {
+                gallery?.show(photos.reversed(), fill = false, motion = false,
+                    dwell = 30_000, gallerySpread = true)
+                gallery?.refreshGalleryOverlays(listOf(android.graphics.Rect(0, 0, 2160, 500)))
+              }
+            }
+          }
         }
       }
       return
@@ -90,6 +109,8 @@ class MusicDesignPreviewActivity : ComponentActivity() {
       var layout by remember { mutableStateOf(MusicPlayerLayout.FULL) }
       var browse by remember { mutableStateOf(intent.getStringExtra("screen")
           ?.takeIf { it == "library" || it == "playlists" }) }
+      val libraryBrowseState = rememberMusicBrowseState()
+      val playlistsBrowseState = rememberMusicBrowseState()
       var collection by remember { mutableStateOf<MusicBrowseCollection?>(null) }
       var message by remember { mutableStateOf("Silent design preview · sample music · no audio") }
       val connection = when (intent.getStringExtra("scenario")) {
@@ -167,12 +188,14 @@ class MusicDesignPreviewActivity : ComponentActivity() {
               MusicLibraryPage(if (connection == MusicConnection.NOT_CONFIGURED) emptyList() else albums,
                   onBack = showPlayer, onCollection = { collection = it },
                   onShowPlayer = showPlayer, modifier = Modifier.weight(1f),
-                  status = browseStatus, statusMessage = browseMessage)
+                  status = browseStatus, statusMessage = browseMessage,
+                  browseState = libraryBrowseState)
             } else if (browse == "playlists") {
               MusicPlaylistsPage(if (connection == MusicConnection.NOT_CONFIGURED) emptyList() else playlists,
                   onBack = showPlayer, onCollection = { collection = it },
                   onShowPlayer = showPlayer, modifier = Modifier.weight(1f),
-                  status = browseStatus, statusMessage = browseMessage)
+                  status = browseStatus, statusMessage = browseMessage,
+                  browseState = playlistsBrowseState)
             } else {
             val playerModifier = if (layout == MusicPlayerLayout.COMPACT) Modifier.fillMaxWidth()
                 else Modifier.weight(1f).fillMaxWidth()

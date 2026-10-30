@@ -16,13 +16,13 @@ class SlideshowSettingsPresentationTest {
   private val options = ScreensaverConfig.MODES.map { it to ScreensaverConfig.modeLabel(it) }
 
   @Test fun basicPicker_containsOnlyPreferredStyles() {
-    assertEquals(listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint"),
+    assertEquals(listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "gallerySpread"),
         visible("smartFrame", false).map { it.first })
   }
 
   @Test fun savedLegacySelection_remainsVisibleWithoutChangingIt() {
     ScreensaverConfig.MODES.filterNot(ScreensaverConfig::isNativeStage).forEach { selected ->
-      assertEquals(listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", selected),
+      assertEquals(listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "gallerySpread", selected),
           visible(selected, false).map { it.first })
     }
   }
