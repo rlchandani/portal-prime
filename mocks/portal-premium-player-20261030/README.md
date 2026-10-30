@@ -146,6 +146,27 @@ All **11 checks passed in 28.72 seconds**; the result is in
 rapid replacements and close. They establish functional emulator behavior,
 not physical Portal timing or audio. The fixture/activity are debug-only.
 
+The shipped Home/Apps/Tools renderer uses one shared animation clock for every moving
+page, replacing separate animation coroutines for each visible page. The existing
+160ms easing, placement-phase reads, retained pages and input/lifecycle gates remain.
+Clock endpoints alternate without a reset; rapid reversals preserve both displayed
+positions. Hidden retained pages do not read the running clock. Five JVM regressions
+cover bidirectional movement, interrupted reversals, three-page interruptions,
+hidden-page exclusion and bounded clock progress. This reduces scheduling ownership;
+placement and accessibility geometry still run, and physical Portal FPS is unmeasured.
+The rejected native Home/layer candidate remains disabled.
+
+`launcher-tabs-native-checks.py` verifies the actual fallback on the dedicated
+API 34 AVD: **165 fixture checks plus five accessibility checks** passed in
+**25.717 seconds**. Three interrupted reversals retained both displayed offsets;
+sixteen observed animation frames caused zero generated-page recompositions.
+Checks include direction, settlement, resize, retained state, lifecycle, a held
+touch crossing hide/show, fresh-touch recovery and terminal disposal. Five
+generated PNG/XML pairs and scalar results live in `evidence/launcher-tabs-native/`.
+The fixture controls animation time and uses a synthetic parent lifecycle, so
+these results do not establish physical Portal FPS or real Activity backgrounding.
+Its cache was removed and the dedicated AVD stopped after testing.
+
 Native Filmstrip prepares its small blurred backdrops with one worker-owned scratch
 session per deck. The session reuses its bitmap, Canvas, Paint, two allocations and blur
 script; every finished backdrop is a separate caller-owned bitmap. Transparent input

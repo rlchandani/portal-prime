@@ -1039,11 +1039,78 @@ presentation measurements and remaining Home/Apps performance outliers stay open
 Music backend wiring remains deferred; no Home Assistant operation belongs to
 this batch. The broader goal remains active.
 
+## Shared Home/Apps/Tools animation clock — 19:47 UTC batch
+
+The shipped Compose tab renderer previously kept three `Animatable` instances
+and launched a separate animation coroutine for each visible page. It now owns
+**one `Animatable` and one running animation coroutine** for the slide. Moving
+pages derive their positions from the same progress value during placement;
+hidden retained pages do not subscribe to the running clock.
+
+The existing **160ms FastOutSlowIn** slide, entrance direction, theme, visited
+page retention and input/lifecycle gates remain. An interrupted plan first
+records both displayed positions. Alternating clock endpoints avoids a reset
+still visible to outgoing placement; the replacement plan then starts from those
+positions. Existing transition ownership rejects obsolete completion. No
+hardware layer or Compose dependency change was enabled: the earlier native Home
+candidate remains disabled after its failed device timing gate.
+
+Five JVM regressions cover bidirectional movement, interrupted reversal, repeated
+three-page interruptions, hidden-page exclusion and arbitrary interrupted clock
+values. The initial RED run could not compile because the new animation model
+was absent. The fresh integrated GREEN gate passed **3,454 tests / 359 suites**,
+with zero failures/errors/skips, and assembled debug in **48 seconds**.
+
+This reduces animation scheduling ownership. It does not remove placement or
+accessibility geometry work, and no physical Portal FPS improvement is claimed.
+
+The native debug-only fixture invokes the **actual shipped Compose fallback**,
+using generated Home/Apps/Tools pages. **165 fixture checks and five accessibility
+checks passed in 25.717 seconds** on the dedicated API 34 AVD. Three interrupted
+reversals preserve both displayed offsets; sixteen observed animation frames
+cause **zero generated-page recompositions**. Other checks cover direction,
+settlement, normalized resize, exactly one creation/disposal of each retained
+page, selected-page lifecycle/input, cancellation of a held touch across
+hide/show, fresh-touch recovery and terminal cleanup.
+
+Five PNG/XML checkpoint pairs verify that only the active page exports its
+accessible labels, including no page labels while content is inactive. Native
+layout observations are not independently presented-pixel measurements. The
+fixture controls animation time and uses a synthetic parent lifecycle; it does
+not establish real Activity background/resume behavior or household-content
+performance. Its cache was removed, its dedicated AVD stopped, and the foreign
+AVD remained untouched.
+
+Evidence lives in
+`mocks/portal-premium-player-20261030/evidence/launcher-tabs-native/`. The fixture
+build passed in **11 seconds** after the full JVM gate; production hashes match
+that gate. Native tested/installed APK SHA-256 is
+`3684b50a648f45936d3da488a46969573c4cee55a1ed14e1c210d719180f8a56`
+(**48,965,062 bytes**).
+
+Family Area's installed APK was independently read back and matches those exact
+tested bytes. Its signing certificate matches the preceding Filmstrip build,
+retained privately as a rollback. One upload/install was used; installed-byte
+readback resolved the interrupted install HTTP response without repeating
+installation. The bounded **Home → Apps → Home → screensaver** route smoke was
+acknowledged, and all **97 setting values** match both pre-install and
+post-navigation profiles. Those acknowledgments do not verify visible
+transitions or physical input-to-display latency.
+
+The collector was inactive with zero listeners before installation and remains
+inactive afterward. No timing capture was started. Verification/deployment
+completed by **19:58 UTC**, within the thirty-minute issue window. Living Area
+remains unchanged. Actual Portal frame improvements, physical night-clock
+acceptance and the broader performance goal remain open. Music backend wiring
+stays deferred, and no Home Assistant operation belongs to this batch.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
 - [Android Allocation bitmap synchronization and lifecycle](https://developer.android.com/reference/android/renderscript/Allocation)
 - [Android RenderScript process-context caching](https://developer.android.com/reference/kotlin/android/renderscript/RenderScript)
+- [Compose Animatable continuity and cancellation](https://developer.android.com/develop/ui/compose/animation/value-based)
+- [Compose placement-phase animation reads](https://developer.android.com/agents/skills/jetpack-compose/jetpack-compose-performance/references/animation)
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)
 - [Android SurfaceView versus TextureView tradeoffs](https://developer.android.com/reference/android/view/TextureView)

@@ -59,3 +59,19 @@ internal class ApprovedHomeTabTransition(initial: ApprovedLauncherTab) {
     visible = setOf(selected)
   }
 }
+
+/** One bounded clock drives every moving page, without snapping an interrupted clock. */
+internal class ApprovedHomeTabAnimation(
+    val plan: ApprovedHomeTabTransition.Plan,
+    private val start: Float,
+) {
+  // Alternate endpoints instead of resetting a clock still read by the outgoing placement.
+  val target = if (start < .5f) 1f else 0f
+
+  fun progress(clock: Float): Float = ((clock - start) / (target - start)).coerceIn(0f, 1f)
+
+  fun offset(tab: ApprovedLauncherTab, clock: Float): Float? {
+    val motion = plan.motions.firstOrNull { it.tab == tab } ?: return null
+    return motion.from + (motion.to - motion.from) * progress(clock)
+  }
+}

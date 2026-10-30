@@ -1,0 +1,3448 @@
+{
+  "complete": true,
+  "success": true,
+  "renderer": "Actual production ApprovedLauncherTabs Compose fallback",
+  "nativeHomeCandidateUsed": false,
+  "api": 34,
+  "animationClock": "Debug fixture BroadcastFrameClock; fixed 16.666667ms steps",
+  "measurement": "Compose layout coordinates, composition counters, lifecycle and input",
+  "physicalDisplayMeasured": false,
+  "physicalPortalPerformanceMeasured": false,
+  "fpsMeasured": false,
+  "syntheticHostLifecycle": true,
+  "householdConfigRead": false,
+  "checks": [
+    "Fixture runs Android API 34",
+    "Initial Home created once, unvisited pages not composed",
+    "initial-home selected page settles at zero",
+    "initial-home only selected page active",
+    "initial-home only selected page accepts input",
+    "Active Home button accepts a real dispatched touch",
+    "home-to-apps outgoing follows direction",
+    "home-to-apps incoming follows direction",
+    "home-to-apps paired pages stay one viewport apart",
+    "home-to-apps outgoing follows direction",
+    "home-to-apps incoming follows direction",
+    "home-to-apps paired pages stay one viewport apart",
+    "home-to-apps frame-4 has no page recomposition",
+    "home-to-apps outgoing follows direction",
+    "home-to-apps incoming follows direction",
+    "home-to-apps paired pages stay one viewport apart",
+    "home-to-apps frame-5 has no page recomposition",
+    "home-to-apps outgoing follows direction",
+    "home-to-apps incoming follows direction",
+    "home-to-apps paired pages stay one viewport apart",
+    "home-to-apps frame-6 has no page recomposition",
+    "home-to-apps outgoing follows direction",
+    "home-to-apps incoming follows direction",
+    "home-to-apps paired pages stay one viewport apart",
+    "home-to-apps frame-7 has no page recomposition",
+    "home-to-apps observes in-flight layout coordinates",
+    "home-to-apps observes multiple placement frames without page recomposition",
+    "home-to-apps selected page settles at zero",
+    "home-to-apps only selected page active",
+    "home-to-apps only selected page accepts input",
+    "apps-to-tools outgoing follows direction",
+    "apps-to-tools incoming follows direction",
+    "apps-to-tools paired pages stay one viewport apart",
+    "apps-to-tools outgoing follows direction",
+    "apps-to-tools incoming follows direction",
+    "apps-to-tools paired pages stay one viewport apart",
+    "apps-to-tools frame-4 has no page recomposition",
+    "apps-to-tools outgoing follows direction",
+    "apps-to-tools incoming follows direction",
+    "apps-to-tools paired pages stay one viewport apart",
+    "apps-to-tools frame-5 has no page recomposition",
+    "apps-to-tools outgoing follows direction",
+    "apps-to-tools incoming follows direction",
+    "apps-to-tools paired pages stay one viewport apart",
+    "apps-to-tools frame-6 has no page recomposition",
+    "apps-to-tools outgoing follows direction",
+    "apps-to-tools incoming follows direction",
+    "apps-to-tools paired pages stay one viewport apart",
+    "apps-to-tools frame-7 has no page recomposition",
+    "apps-to-tools observes in-flight layout coordinates",
+    "apps-to-tools observes multiple placement frames without page recomposition",
+    "apps-to-tools selected page settles at zero",
+    "apps-to-tools only selected page active",
+    "apps-to-tools only selected page accepts input",
+    "tools-to-apps outgoing follows direction",
+    "tools-to-apps incoming follows direction",
+    "tools-to-apps paired pages stay one viewport apart",
+    "tools-to-apps outgoing follows direction",
+    "tools-to-apps incoming follows direction",
+    "tools-to-apps paired pages stay one viewport apart",
+    "tools-to-apps frame-4 has no page recomposition",
+    "tools-to-apps outgoing follows direction",
+    "tools-to-apps incoming follows direction",
+    "tools-to-apps paired pages stay one viewport apart",
+    "tools-to-apps frame-5 has no page recomposition",
+    "tools-to-apps outgoing follows direction",
+    "tools-to-apps incoming follows direction",
+    "tools-to-apps paired pages stay one viewport apart",
+    "tools-to-apps frame-6 has no page recomposition",
+    "tools-to-apps outgoing follows direction",
+    "tools-to-apps incoming follows direction",
+    "tools-to-apps paired pages stay one viewport apart",
+    "tools-to-apps frame-7 has no page recomposition",
+    "tools-to-apps observes in-flight layout coordinates",
+    "tools-to-apps observes multiple placement frames without page recomposition",
+    "tools-to-apps selected page settles at zero",
+    "tools-to-apps only selected page active",
+    "tools-to-apps only selected page accepts input",
+    "apps-to-home outgoing follows direction",
+    "apps-to-home incoming follows direction",
+    "apps-to-home paired pages stay one viewport apart",
+    "apps-to-home outgoing follows direction",
+    "apps-to-home incoming follows direction",
+    "apps-to-home paired pages stay one viewport apart",
+    "apps-to-home frame-4 has no page recomposition",
+    "apps-to-home outgoing follows direction",
+    "apps-to-home incoming follows direction",
+    "apps-to-home paired pages stay one viewport apart",
+    "apps-to-home frame-5 has no page recomposition",
+    "apps-to-home outgoing follows direction",
+    "apps-to-home incoming follows direction",
+    "apps-to-home paired pages stay one viewport apart",
+    "apps-to-home frame-6 has no page recomposition",
+    "apps-to-home outgoing follows direction",
+    "apps-to-home incoming follows direction",
+    "apps-to-home paired pages stay one viewport apart",
+    "apps-to-home frame-7 has no page recomposition",
+    "apps-to-home observes in-flight layout coordinates",
+    "apps-to-home observes multiple placement frames without page recomposition",
+    "apps-to-home selected page settles at zero",
+    "apps-to-home only selected page active",
+    "apps-to-home only selected page accepts input",
+    "home-apps-rapid-reversal-origin selected page settles at zero",
+    "home-apps-rapid-reversal-origin only selected page active",
+    "home-apps-rapid-reversal-origin only selected page accepts input",
+    "home-apps-rapid-reversal captures an interrupted transition",
+    "home-apps-rapid-reversal outgoing preserved before new animation frame",
+    "home-apps-rapid-reversal incoming preserved before new animation frame",
+    "home-apps-rapid-reversal outgoing does not jump to an edge at restart",
+    "home-apps-rapid-reversal incoming does not jump to an edge at restart",
+    "home-apps-rapid-reversal selected page settles at zero",
+    "home-apps-rapid-reversal only selected page active",
+    "home-apps-rapid-reversal only selected page accepts input",
+    "tools-apps-rapid-reversal-origin selected page settles at zero",
+    "tools-apps-rapid-reversal-origin only selected page active",
+    "tools-apps-rapid-reversal-origin only selected page accepts input",
+    "tools-apps-rapid-reversal captures an interrupted transition",
+    "tools-apps-rapid-reversal outgoing preserved before new animation frame",
+    "tools-apps-rapid-reversal incoming preserved before new animation frame",
+    "tools-apps-rapid-reversal outgoing does not jump to an edge at restart",
+    "tools-apps-rapid-reversal incoming does not jump to an edge at restart",
+    "tools-apps-rapid-reversal selected page settles at zero",
+    "tools-apps-rapid-reversal only selected page active",
+    "tools-apps-rapid-reversal only selected page accepts input",
+    "home-tools-rapid-reversal-origin selected page settles at zero",
+    "home-tools-rapid-reversal-origin only selected page active",
+    "home-tools-rapid-reversal-origin only selected page accepts input",
+    "home-tools-rapid-reversal captures an interrupted transition",
+    "home-tools-rapid-reversal outgoing preserved before new animation frame",
+    "home-tools-rapid-reversal incoming preserved before new animation frame",
+    "home-tools-rapid-reversal outgoing does not jump to an edge at restart",
+    "home-tools-rapid-reversal incoming does not jump to an edge at restart",
+    "home-tools-rapid-reversal selected page settles at zero",
+    "home-tools-rapid-reversal only selected page active",
+    "home-tools-rapid-reversal only selected page accepts input",
+    "resize-origin selected page settles at zero",
+    "resize-origin only selected page active",
+    "resize-origin only selected page accepts input",
+    "Resize changes the measured launcher viewport",
+    "Resize preserves displayed normalized offsets with animation time frozen",
+    "Resize retains normalized pair separation",
+    "resize-settled selected page settles at zero",
+    "resize-settled only selected page active",
+    "resize-settled only selected page accepts input",
+    "full-width-restored selected page settles at zero",
+    "full-width-restored only selected page active",
+    "full-width-restored only selected page accepts input",
+    "Parent CREATED pauses every retained page lifecycle",
+    "Parent CREATED denies every retained page input",
+    "Parent RESUMED resumes only selected Tools",
+    "Inactive content denies all input and active producers",
+    "touch-origin selected page settles at zero",
+    "touch-origin only selected page active",
+    "touch-origin only selected page accepts input",
+    "held-touch-hidden selected page settles at zero",
+    "held-touch-hidden only selected page active",
+    "held-touch-hidden only selected page accepts input",
+    "held-touch-returned selected page settles at zero",
+    "held-touch-returned only selected page active",
+    "held-touch-returned only selected page accepts input",
+    "Held touch cannot click after hide and quick return",
+    "Fresh touch works after a cancelled held gesture",
+    "All visited pages created exactly once and retained throughout transitions",
+    "Unmount disposes every retained page exactly once",
+    "Unmount closes every page input gate"
+  ],
+  "samples": [
+    {
+      "label": "initial-home",
+      "clockNanos": 1400000008,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 1,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "accessibility-home",
+      "clockNanos": 1400000008,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 1,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "home-to-apps-0",
+      "clockNanos": 1483333343,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 2,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 1,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 2160,
+          "offsetFraction": 1
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "home-to-apps-1",
+      "clockNanos": 1500000010,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 2,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 1,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 2160,
+          "offsetFraction": 1
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "home-to-apps-2",
+      "clockNanos": 1516666677,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 3,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -61,
+          "offsetFraction": -0.02824074
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 2,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 2099,
+          "offsetFraction": 0.97175926
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "home-to-apps-3",
+      "clockNanos": 1533333344,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 4,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -321,
+          "offsetFraction": -0.14861111
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 3,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 1839,
+          "offsetFraction": 0.8513889
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "home-to-apps-4",
+      "clockNanos": 1550000011,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 5,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -867,
+          "offsetFraction": -0.40138888
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 4,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 1293,
+          "offsetFraction": 0.5986111
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "home-to-apps-5",
+      "clockNanos": 1566666678,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 6,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1396,
+          "offsetFraction": -0.6462963
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 5,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 764,
+          "offsetFraction": 0.3537037
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "home-to-apps-6",
+      "clockNanos": 1583333345,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 7,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1729,
+          "offsetFraction": -0.80046296
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 6,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 431,
+          "offsetFraction": 0.19953704
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "home-to-apps-7",
+      "clockNanos": 1600000012,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 8,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1932,
+          "offsetFraction": -0.89444447
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 7,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 228,
+          "offsetFraction": 0.10555556
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "home-to-apps",
+      "clockNanos": 1866666684,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 13,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 12,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "accessibility-apps",
+      "clockNanos": 1866666684,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 13,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 12,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "tools": {
+          "created": 0,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 0,
+          "placements": 0,
+          "active": false,
+          "lifecycle": "INITIALIZED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": null,
+          "offsetFraction": null
+        }
+      }
+    },
+    {
+      "label": "apps-to-tools-0",
+      "clockNanos": 1916666685,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 13,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 1,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-tools-1",
+      "clockNanos": 1933333352,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 13,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 1,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-tools-2",
+      "clockNanos": 1950000019,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -61,
+          "offsetFraction": -0.02824074
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 2,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 2099,
+          "offsetFraction": 0.97175926
+        }
+      }
+    },
+    {
+      "label": "apps-to-tools-3",
+      "clockNanos": 1966666686,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 15,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -321,
+          "offsetFraction": -0.14861111
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 3,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 1839,
+          "offsetFraction": 0.8513889
+        }
+      }
+    },
+    {
+      "label": "apps-to-tools-4",
+      "clockNanos": 1983333353,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 16,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -867,
+          "offsetFraction": -0.40138888
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 4,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 1293,
+          "offsetFraction": 0.5986111
+        }
+      }
+    },
+    {
+      "label": "apps-to-tools-5",
+      "clockNanos": 2000000020,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 17,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1396,
+          "offsetFraction": -0.6462963
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 5,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 764,
+          "offsetFraction": 0.3537037
+        }
+      }
+    },
+    {
+      "label": "apps-to-tools-6",
+      "clockNanos": 2016666687,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 18,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1729,
+          "offsetFraction": -0.80046296
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 6,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 431,
+          "offsetFraction": 0.19953704
+        }
+      }
+    },
+    {
+      "label": "apps-to-tools-7",
+      "clockNanos": 2033333354,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 19,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1932,
+          "offsetFraction": -0.89444447
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 7,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 228,
+          "offsetFraction": 0.10555556
+        }
+      }
+    },
+    {
+      "label": "apps-to-tools",
+      "clockNanos": 2300000026,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 12,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "accessibility-tools",
+      "clockNanos": 2300000026,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 1,
+          "placements": 12,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "tools-to-apps-0",
+      "clockNanos": 2350000027,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 25,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 13,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "tools-to-apps-1",
+      "clockNanos": 2366666694,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 25,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 13,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "tools-to-apps-2",
+      "clockNanos": 2383333361,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 26,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -2099,
+          "offsetFraction": -0.97175926
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 61,
+          "offsetFraction": 0.02824074
+        }
+      }
+    },
+    {
+      "label": "tools-to-apps-3",
+      "clockNanos": 2400000028,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 27,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -1839,
+          "offsetFraction": -0.8513889
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 15,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 321,
+          "offsetFraction": 0.14861111
+        }
+      }
+    },
+    {
+      "label": "tools-to-apps-4",
+      "clockNanos": 2416666695,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 28,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -1293,
+          "offsetFraction": -0.5986111
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 16,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 867,
+          "offsetFraction": 0.40138888
+        }
+      }
+    },
+    {
+      "label": "tools-to-apps-5",
+      "clockNanos": 2433333362,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 29,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -764,
+          "offsetFraction": -0.3537037
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 17,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1396,
+          "offsetFraction": 0.6462963
+        }
+      }
+    },
+    {
+      "label": "tools-to-apps-6",
+      "clockNanos": 2450000029,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 30,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -431,
+          "offsetFraction": -0.19953704
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 18,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1729,
+          "offsetFraction": 0.80046296
+        }
+      }
+    },
+    {
+      "label": "tools-to-apps-7",
+      "clockNanos": 2466666696,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 31,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -228,
+          "offsetFraction": -0.10555556
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 19,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1932,
+          "offsetFraction": 0.89444447
+        }
+      }
+    },
+    {
+      "label": "tools-to-apps",
+      "clockNanos": 2733333368,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 2,
+          "placements": 14,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 36,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-home-0",
+      "clockNanos": 2783333369,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 15,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 37,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-home-1",
+      "clockNanos": 2800000036,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 15,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 37,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-home-2",
+      "clockNanos": 2816666703,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 16,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -2099,
+          "offsetFraction": -0.97175926
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 38,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 61,
+          "offsetFraction": 0.02824074
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-home-3",
+      "clockNanos": 2833333370,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 17,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -1839,
+          "offsetFraction": -0.8513889
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 39,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 321,
+          "offsetFraction": 0.14861111
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-home-4",
+      "clockNanos": 2850000037,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 18,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -1293,
+          "offsetFraction": -0.5986111
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 40,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 867,
+          "offsetFraction": 0.40138888
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-home-5",
+      "clockNanos": 2866666704,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 19,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -764,
+          "offsetFraction": -0.3537037
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 41,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1396,
+          "offsetFraction": 0.6462963
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-home-6",
+      "clockNanos": 2883333371,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 20,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -431,
+          "offsetFraction": -0.19953704
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 42,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1729,
+          "offsetFraction": 0.80046296
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-home-7",
+      "clockNanos": 2900000038,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 21,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -228,
+          "offsetFraction": -0.10555556
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 43,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1932,
+          "offsetFraction": 0.89444447
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "apps-to-home",
+      "clockNanos": 3166666710,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 26,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 48,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "home-apps-rapid-reversal-origin",
+      "clockNanos": 3433333382,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 3,
+          "placements": 26,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 48,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "home-apps-rapid-reversal-before",
+      "clockNanos": 3550000051,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 4,
+          "placements": 30,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -867,
+          "offsetFraction": -0.40138888
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 5,
+          "placements": 52,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 1293,
+          "offsetFraction": 0.5986111
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "home-apps-rapid-reversal-retarget-no-tick",
+      "clockNanos": 3550000051,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 5,
+          "placements": 31,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -867,
+          "offsetFraction": -0.40138888
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 6,
+          "placements": 53,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1293,
+          "offsetFraction": 0.5986111
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "home-apps-rapid-reversal-first-tick",
+      "clockNanos": 3566666718,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 5,
+          "placements": 32,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -843,
+          "offsetFraction": -0.39027777
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 6,
+          "placements": 54,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1317,
+          "offsetFraction": 0.6097222
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "home-apps-rapid-reversal",
+      "clockNanos": 3833333390,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 5,
+          "placements": 42,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 6,
+          "placements": 64,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 2,
+          "placements": 24,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "tools-apps-rapid-reversal-origin",
+      "clockNanos": 4100000062,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 6,
+          "placements": 54,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 6,
+          "placements": 64,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 3,
+          "placements": 36,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "tools-apps-rapid-reversal-before",
+      "clockNanos": 4216666731,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 6,
+          "placements": 54,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 7,
+          "placements": 68,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -1293,
+          "offsetFraction": -0.5986111
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 4,
+          "placements": 40,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 867,
+          "offsetFraction": 0.40138888
+        }
+      }
+    },
+    {
+      "label": "tools-apps-rapid-reversal-retarget-no-tick",
+      "clockNanos": 4216666731,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 6,
+          "placements": 54,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 69,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1293,
+          "offsetFraction": -0.5986111
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 5,
+          "placements": 41,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 867,
+          "offsetFraction": 0.40138888
+        }
+      }
+    },
+    {
+      "label": "tools-apps-rapid-reversal-first-tick",
+      "clockNanos": 4233333398,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 6,
+          "placements": 54,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 70,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1317,
+          "offsetFraction": -0.6097222
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 5,
+          "placements": 42,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 843,
+          "offsetFraction": 0.39027777
+        }
+      }
+    },
+    {
+      "label": "tools-apps-rapid-reversal",
+      "clockNanos": 4500000070,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 6,
+          "placements": 54,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 80,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 5,
+          "placements": 52,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "home-tools-rapid-reversal-origin",
+      "clockNanos": 4766666742,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 7,
+          "placements": 66,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 80,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 6,
+          "placements": 64,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "home-tools-rapid-reversal-before",
+      "clockNanos": 4883333411,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 8,
+          "placements": 70,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -867,
+          "offsetFraction": -0.40138888
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 80,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 7,
+          "placements": 68,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 1293,
+          "offsetFraction": 0.5986111
+        }
+      }
+    },
+    {
+      "label": "home-tools-rapid-reversal-retarget-no-tick",
+      "clockNanos": 4883333411,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 9,
+          "placements": 71,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -867,
+          "offsetFraction": -0.40138888
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 80,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 69,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1293,
+          "offsetFraction": 0.5986111
+        }
+      }
+    },
+    {
+      "label": "home-tools-rapid-reversal-first-tick",
+      "clockNanos": 4900000078,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 9,
+          "placements": 72,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": -843,
+          "offsetFraction": -0.39027777
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 80,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 70,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 1317,
+          "offsetFraction": 0.6097222
+        }
+      }
+    },
+    {
+      "label": "home-tools-rapid-reversal",
+      "clockNanos": 5166666750,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 9,
+          "placements": 82,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 80,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 80,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "resize-origin",
+      "clockNanos": 5433333422,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 10,
+          "placements": 94,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 9,
+          "placements": 92,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 8,
+          "placements": 80,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "resize-recomposition",
+      "clockNanos": 5516666757,
+      "selected": "tools",
+      "viewportWidthPx": 1080,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 10,
+          "placements": 95,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1080,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 10,
+          "placements": 95,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -31,
+          "offsetFraction": -0.028703704
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 9,
+          "placements": 83,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 1049,
+          "offsetFraction": 0.9712963
+        }
+      }
+    },
+    {
+      "label": "resize-settled",
+      "clockNanos": 5783333429,
+      "selected": "tools",
+      "viewportWidthPx": 1080,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 10,
+          "placements": 95,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1080,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 10,
+          "placements": 105,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -1080,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 9,
+          "placements": 93,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "full-width-restored",
+      "clockNanos": 6050000101,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 10,
+          "placements": 96,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 10,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 9,
+          "placements": 94,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "parent-created",
+      "clockNanos": 6116666769,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 10,
+          "placements": 96,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 10,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 10,
+          "placements": 94,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "content-inactive",
+      "clockNanos": 6250000105,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 10,
+          "placements": 96,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 10,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 94,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "accessibility-inactive",
+      "clockNanos": 6250000105,
+      "selected": "tools",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 10,
+          "placements": 96,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 10,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 94,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        }
+      }
+    },
+    {
+      "label": "touch-origin",
+      "clockNanos": 6516666777,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 11,
+          "placements": 108,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 10,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "held-touch-hidden",
+      "clockNanos": 6783333449,
+      "selected": "apps",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 12,
+          "placements": 120,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": -2160,
+          "offsetFraction": -1
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 11,
+          "placements": 118,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "held-touch-returned",
+      "clockNanos": 7050000121,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 1,
+          "compositions": 13,
+          "placements": 132,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 130,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "accessibility-final-home",
+      "clockNanos": 7150000123,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 2,
+          "compositions": 13,
+          "placements": 132,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": true,
+          "inputAllowed": true,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 130,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 0,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    },
+    {
+      "label": "unmounted",
+      "clockNanos": 7216666791,
+      "selected": "home",
+      "viewportWidthPx": 2160,
+      "pages": {
+        "home": {
+          "created": 1,
+          "disposed": 1,
+          "clicks": 2,
+          "compositions": 13,
+          "placements": 132,
+          "active": true,
+          "lifecycle": "RESUMED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 0,
+          "offsetFraction": 0
+        },
+        "apps": {
+          "created": 1,
+          "disposed": 1,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 130,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        },
+        "tools": {
+          "created": 1,
+          "disposed": 1,
+          "clicks": 0,
+          "compositions": 12,
+          "placements": 106,
+          "active": false,
+          "lifecycle": "CREATED",
+          "inputGateActive": false,
+          "inputAllowed": false,
+          "xPx": 2160,
+          "offsetFraction": 1
+        }
+      }
+    }
+  ],
+  "expectedAccessibleTab": "home",
+  "resizeBeforeFractions": {
+    "home": -1,
+    "apps": -0.02824074,
+    "tools": 0.97175926
+  },
+  "resizeAfterFractions": {
+    "home": -1,
+    "apps": -0.028703704,
+    "tools": 0.9712963
+  },
+  "finalCounters": {
+    "home": {
+      "created": 1,
+      "disposed": 1,
+      "clicks": 2,
+      "compositions": 13,
+      "placements": 132
+    },
+    "apps": {
+      "created": 1,
+      "disposed": 1,
+      "clicks": 0,
+      "compositions": 12,
+      "placements": 130
+    },
+    "tools": {
+      "created": 1,
+      "disposed": 1,
+      "clicks": 0,
+      "compositions": 12,
+      "placements": 106
+    }
+  },
+  "passed": 165,
+  "serial": "emulator-5556",
+  "avd": "PortalMusic20261030",
+  "hostChecks": [
+    "home: only active page has accessibility labels",
+    "apps: only active page has accessibility labels",
+    "tools: only active page has accessibility labels",
+    "inactive: only active page has accessibility labels",
+    "final-home: only active page has accessibility labels"
+  ],
+  "artifacts": [
+    {
+      "file": "home.xml",
+      "sha256": "c99822f9194a50080bd2897ed729ed6cd05257990c0568d24c8b4d83ad92a5ca"
+    },
+    {
+      "file": "home.png",
+      "sha256": "50427087f39c7ba8ba23ba12dc0ef64aaa5d6e79971b45027e35fdbfe4e076ac"
+    },
+    {
+      "file": "apps.xml",
+      "sha256": "361fc90126640500c9fad3a7f39baa1d6b2122b1252ca2e67122ce967ca9b166"
+    },
+    {
+      "file": "apps.png",
+      "sha256": "eaaba2d5f866ad379a5441c35eeee4cf7c09fae0b08edb7faa132ff4b962d743"
+    },
+    {
+      "file": "tools.xml",
+      "sha256": "e42e01323bc330b5d4ef44e9fdaa6967c97136c5d2d72e5d05afa49cfc80a445"
+    },
+    {
+      "file": "tools.png",
+      "sha256": "a9ca12fe788fa48e1136109b3f5087f52e76109a31cc49372cb5147d23b94000"
+    },
+    {
+      "file": "inactive.xml",
+      "sha256": "687780e8e881f49c264701f67fdab64594237c9cee8cc6c83884dffa1414ad93"
+    },
+    {
+      "file": "inactive.png",
+      "sha256": "40365fa57096bd5ee0c6fb48d8ef69a9d5f0225bdf639868ad5bd7cc5867543e"
+    },
+    {
+      "file": "final-home.xml",
+      "sha256": "c99822f9194a50080bd2897ed729ed6cd05257990c0568d24c8b4d83ad92a5ca"
+    },
+    {
+      "file": "final-home.png",
+      "sha256": "50427087f39c7ba8ba23ba12dc0ef64aaa5d6e79971b45027e35fdbfe4e076ac"
+    }
+  ],
+  "startedUtc": "2026-10-30T19:54:45.208937+00:00",
+  "elapsedSeconds": 25.717,
+  "debugApkSha256": "3684b50a648f45936d3da488a46969573c4cee55a1ed14e1c210d719180f8a56",
+  "installedApkSha256": "3684b50a648f45936d3da488a46969573c4cee55a1ed14e1c210d719180f8a56",
+  "fixtureCacheRemoved": true,
+  "dedicatedAvdStopped": true,
+  "elapsedSecondsIncludingCleanup": 27.942,
+  "finishedUtc": "2026-10-30T19:55:13.150471+00:00",
+  "hostSuccess": true,
+  "hostEvidenceReverifiedAfterRun": true,
+  "buildCommand": "ANDROID_HOME=/opt/homebrew/share/android-commandlinetools ./gradlew :app:assembleDebug --no-daemon --offline",
+  "finalBuildSeconds": 11,
+  "nativeCheckCommand": "python3 mocks/portal-premium-player-20261030/launcher-tabs-native-checks.py --stop-owned-avd",
+  "debugApkBytes": 48965062,
+  "observedFramesWithoutFixturePageRecomposition": 16,
+  "rapidReversalsPreservingBothDisplayedOffsets": 3,
+  "productionSourceSha256": {
+    "app/src/main/java/com/immortal/launcher/ApprovedLauncherTabs.kt": "3325d14bcb665da4c80f3bfe085871a1f98372ae382961d3d927ad574dfa5976",
+    "app/src/main/java/com/immortal/launcher/ApprovedHomeTabTransition.kt": "40496a0eecb3a8f15894919239de53ab62e60fa50e043deace30821fe5e2face"
+  },
+  "sourceFingerprintRecordedAfterRun": true,
+  "foreignAvd5554Touched": false,
+  "agentStartedUtc": "2026-10-30T19:49:50+00:00",
+  "handoffVerifiedUtc": "2026-10-30T19:56:26.850919+00:00",
+  "limits": [
+    "API 34 arm64 emulator, not physical API 28/29 Portal hardware.",
+    "Controlled Compose animation clock; no physical display timing or FPS measurement.",
+    "Parent lifecycle uses a fixture LifecycleOwner, not backgrounding the Android Activity.",
+    "Composition counters measure generated fixture pages; no household Home/Apps/Tools content or providers."
+  ]
+}

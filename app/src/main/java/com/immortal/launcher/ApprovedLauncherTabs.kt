@@ -44,8 +44,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -142,32 +140,32 @@ internal fun ApprovedLauncherTabs(
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
   val hostOwner = LocalLifecycleOwner.current
-  val offsets = remember { ApprovedLauncherTab.entries.map { Animatable(if (it == selected) 0f else 1f) } }
+  val transition = remember { ApprovedHomeTabTransition(selected) }
+  val clock = remember { Animatable(0f) }
+  var animation by remember { mutableStateOf<ApprovedHomeTabAnimation?>(null) }
   var visited by remember { mutableStateOf(setOf(selected)) }
   var visible by remember { mutableStateOf(setOf(selected)) }
-  var previous by remember { mutableStateOf(selected) }
   val focus = LocalFocusManager.current
   val view = LocalView.current
   LaunchedEffect(selected) {
-    if (selected == previous) return@LaunchedEffect
+    if (selected == transition.selected) return@LaunchedEffect
     focus.clearFocus(force = true)
     view.findFocus()?.clearFocus()
-    val direction = if (selected.ordinal > previous.ordinal) 1f else -1f
-    if (selected !in visible) offsets[selected.ordinal].snapTo(direction)
-    previous = selected
+    // Cancellation stopped the old coroutine. Preserve both displayed positions before
+    // the replacement plan chooses its entrance side or the clock's next endpoint.
+    animation?.let { transition.advance(it.plan, it.progress(clock.value)) }
+    val next = ApprovedHomeTabAnimation(
+        transition.select(selected) ?: return@LaunchedEffect, clock.value)
     visited = visited + selected
-    visible = visible + selected
+    visible = transition.visible
+    animation = next
     // The new page gets one initial layout; subsequent frames read offsets during placement.
     withFrameNanos { }
-    coroutineScope {
-      visible.forEach { tab ->
-        launch {
-          offsets[tab.ordinal].animateTo(if (tab == selected) 0f else -direction,
-              tween(160, easing = FastOutSlowInEasing))
-        }
-      }
+    clock.animateTo(next.target, tween(160, easing = FastOutSlowInEasing))
+    if (transition.finish(next.plan)) {
+      animation = null
+      visible = transition.visible
     }
-    visible = setOf(selected)
   }
   BoxWithConstraints(modifier.clipToBounds()) {
     val widthPx = with(LocalDensity.current) { maxWidth.toPx() }
@@ -176,10 +174,15 @@ internal fun ApprovedLauncherTabs(
       val active = contentActive && tab == selected
       val drawing = contentActive && tab in visible
       val input = remember(hostOwner) { LauncherPageInputGate() }
+      val moving = animation?.takeIf { motion -> motion.plan.motions.any { it.tab == tab } }
       Box(Modifier.fillMaxSize()
           // Placement keeps descendant geometry on cached integer offsets rather than
           // transforming every descendant rectangle through an animated layer matrix.
-          .absoluteOffset { IntOffset((offsets[tab.ordinal].value * widthPx).roundToInt(), 0) }
+          .absoluteOffset {
+            // Hidden retained pages do not subscribe to animation frames.
+            val offset = moving?.offset(tab, clock.value) ?: transition.offset(tab)
+            IntOffset((offset * widthPx).roundToInt(), 0)
+          }
           .graphicsLayer { alpha = if (drawing) 1f else 0f }
           .focusProperties { canFocus = active }
           .pointerInput(input) {
