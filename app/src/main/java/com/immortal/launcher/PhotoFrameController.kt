@@ -771,7 +771,10 @@ class PhotoFrameController(
     val photoMotion = settings.photoMotion
     val use24 = ImmortalSettings.use24HourClock(context)
     val frozenFetch = remoteFetch
-    val faceStore = FaceFocusStore(context.applicationContext).also { legacyFaceStore = it }
+    val faceStore = FaceFocusStore(context.applicationContext).also {
+      it.setActive(hostActive && !paused)
+      legacyFaceStore = it
+    }
     engineActive = true // Preparing is already legacy-owned; do not admit native playback.
     legacyPreparation.request(
         prepare = { current ->
@@ -1009,7 +1012,10 @@ class PhotoFrameController(
     retireLegacyEngine()
     nativeFilmstripInput = input
     val owner = ++legacyEngineRevision
-    val faceStore = FaceFocusStore(context.applicationContext).also { legacyFaceStore = it }
+    val faceStore = FaceFocusStore(context.applicationContext).also {
+      it.setActive(hostActive && !paused)
+      legacyFaceStore = it
+    }
     engineActive = true
     val root = view as FrameLayout
     val stage = FilmstripEngine(context, urls, intervalMs(),
@@ -1136,6 +1142,7 @@ class PhotoFrameController(
     if (!value) {
       hostSuspendedAt = now
       hostActive = false
+      legacyFaceStore?.setActive(false)
       ui.setActive(false)
       if (videoView.visibility == View.VISIBLE) {
         retainVideoPosition()
@@ -1174,6 +1181,7 @@ class PhotoFrameController(
       ui.setActive(true)
       if (!photosOnly && settings.gestureWave) resumeGestureCamera()
       if (remoteMode) schedulePrefetch()
+      legacyFaceStore?.setActive(!paused)
     }
     galleryOverlayObserver?.setActive(value)
     updateSoundscape()
@@ -1939,6 +1947,7 @@ class PhotoFrameController(
   private fun setPaused(value: Boolean) {
     if (paused == value) return
     paused = value
+    legacyFaceStore?.setActive(hostActive && !value)
     nativeFilmstrip?.setPaused(value)
     hybridFilmstrip?.setPaused(value)
     if (hybridFilmstrip != null) webView?.let(::applyEnginePlayback)

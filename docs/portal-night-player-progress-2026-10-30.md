@@ -1776,6 +1776,61 @@ claim of measured startup latency or FPS gain**; physical execution of this
 legacy gate, first-photo timing, Home frame tails, night/wake acceptance and
 stacked-Dream tap remain open. The overall objective stays active.
 
+## Retained face-analysis suspension — 23:07 UTC batch
+
+Original issue window: **23:07:34–23:37:34 UTC**, including verification,
+deployment, documentation and commit.
+
+Entering the night clock already suspended the photo renderers, but did not
+suspend an admitted `FaceFocusStore` warm-up. The same gap existed when its
+retained host was hidden or user-paused.
+
+- The controller now passes effective host visibility and user pause to the
+  store, for both legacy scenes and standalone native Filmstrip.
+- `FaceFocusWork.setActive(false)` invalidates its captured request promptly.
+  Network cleanup remains off the caller, and late cache results are rejected.
+  The existing SDK-disposal rule remains intact: an unfinished ML Kit task must
+  surrender its bitmap before replacement analysis can run.
+- Resume creates a fresh request and uses the existing shared cache to skip
+  completed photos. Normally completed analysis never restarts on subsequent
+  hide/wake cycles. Each finalizer checks its captured request identity so it
+  cannot cancel a resumed job.
+- Hidden registration does not interrupt a visible peer. A superseded retained
+  host can return and resume; explicit shutdown remains terminal. The global
+  single-worker/latest-pending-job limit is preserved, with no new executor or
+  timer. The displayed photo, styling, brightness and settings are unchanged.
+
+Verification:
+
+- Original implementation plus a compiling no-op activity method: **24 tests,
+  9 behavioral failures**. The original worker/store/cache tests stayed green.
+- Review exposed two candidate lifecycle errors: hidden registration stole a
+  visible peer's slot, and supersession permanently closed a retained host.
+  Both were reproduced before deployment: **26 tests, 2 failures**.
+- Corrected implementation: **26/26 focused tests pass**, including **14 new
+  activity tests** and all **12 existing worker/store/cache tests**. These
+  exercise real worker/request/cache behavior on the JVM, not physical Portal
+  sensor or host transitions.
+- Fresh full verification passes **3,496 tests in 362 suites**, with zero
+  failures, errors or skips. Debug and optimized performance APK builds succeed.
+- Family Area's independently read installed APK matches
+  `125f6ac526e70fc4377a72c4fbd4b639aab987e6cd330d1de7c61d5c904b28d4`
+  (**25,702,091 bytes**), with the existing signing certificate. All **53 main
+  assets**, the manifest, **97 settings**, full screensaver configuration and
+  photo-source groups remain unchanged.
+- The bounded post-install log response contains **402 lines** and **zero fatal
+  exception markers**. The performance collector is inactive with **zero
+  listeners**. This batch's verified upload copy is cleared to zero bytes,
+  reclaiming **25,702,091 device bytes**; local candidate and rollback APKs are
+  retained.
+
+Evidence:
+`mocks/portal-premium-player-20261030/evidence/family-face-visibility/verification.json`.
+This closes the face-worker suspension gap in code and JVM verification. It does
+not establish a physical darkness/brightness transition, instant SDK cancellation
+or a measured CPU/FPS gain. Those claims remain open. Living Area, the phone and
+Home Assistant are untouched; the overall objective remains active.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

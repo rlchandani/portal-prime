@@ -1,0 +1,93 @@
+{
+  "issue": "Suspend unfinished face analysis while retained photos are hidden, paused or covered by night clock",
+  "startedUtc": "2026-10-30T23:07:34Z",
+  "deadlineUtc": "2026-10-30T23:37:34Z",
+  "focusedVerification": {
+    "red": {
+      "tests": 24,
+      "failures": 9,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 4
+    },
+    "red-review": {
+      "tests": 26,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 4
+    },
+    "green": {
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 4
+    }
+  },
+  "fullBuild": {
+    "tests": 3496,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 362,
+    "freshUnitTaskExecuted": true,
+    "debugBuildPassed": true,
+    "performanceBuildPassed": true,
+    "exitCode": 0
+  },
+  "deployment": {
+    "device": "Family Area",
+    "sha256": "125f6ac526e70fc4377a72c4fbd4b639aab987e6cd330d1de7c61d5c904b28d4",
+    "bytes": 25702091,
+    "previousSha256": "36f1a0d448705937bd61e0ac6d130a2fc6ce9407825ab55bd4f17c3d2ca0e0b7",
+    "settingValuesCompared": 97,
+    "changedSettingValues": 0,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "visibleTransitionsVerified": false,
+    "physicalFpsGainMeasured": false
+  },
+  "artifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "runtime": {
+    "logLines": 402,
+    "fatalExceptionMarkers": 0,
+    "collectorActive": false,
+    "collectorRunning": false,
+    "activeListeners": 0
+  },
+  "cleanup": {
+    "ownedUploadedApkBytesReclaimed": 25702091,
+    "ownedUploadBytesRemaining": 0,
+    "localCandidateAndRollbackRetained": true
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": "608a0343bed82d8c1a09a42f19cc2e238322c5dca822bc957dade4ac4d2c5c43",
+    "app/src/main/java/com/immortal/launcher/FaceFocusStore.kt": "4b31d622a27ef8b3568c000bddd9d499ea3ca5f0eadc22aa4d9ae2d78cfe8368",
+    "app/src/main/java/com/immortal/launcher/FaceFocusWork.kt": "954ead3c5c0f58c6771c58ea7509e5011865aada616db806e48937bc5ee28ffb",
+    "app/src/test/java/com/immortal/launcher/FaceFocusWorkActivityTest.kt": "90f107837469ff766a9b07394935005c874e0bb6bbf826cd31a9ec50af2ce053"
+  },
+  "scope": {
+    "workerActivityTests": 14,
+    "realWorkerRequestAndCacheJvmTests": true,
+    "originalWorkerStoreAndCacheTestsPreserved": 12,
+    "workerAndQueueLimitsUnchanged": true,
+    "newExecutorsOrTimers": 0,
+    "cachedResultsPreserved": true,
+    "sdkBitmapReleasedOnlyAfterTaskCompletion": true,
+    "physicalNightTransitionVerified": false,
+    "instantSdkCancellationClaimed": false,
+    "deviceCpuGainMeasured": false,
+    "livingAreaTouched": false,
+    "phoneTouched": false,
+    "homeAssistantTouched": false
+  },
+  "verificationCompletedUtc": "2026-10-30T23:20:42Z",
+  "elapsedSecondsAtVerification": 789
+}

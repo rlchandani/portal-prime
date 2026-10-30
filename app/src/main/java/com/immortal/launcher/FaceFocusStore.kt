@@ -60,17 +60,24 @@ class FaceFocusStore(context: Context) : AutoCloseable {
   fun startWarmUp(urls: List<String>, authHeaders: Map<String, String> = emptyMap()) {
     val photos = urls.toList()
     val headers = authHeaders.toMap()
-    work.start {
-      runCatching { warmUp(photos, headers) }
+    work.start { request ->
+      runCatching { warmUp(photos, headers, request) }
           .onFailure { Log.w(TAG, "face warm-up failed: ${it.javaClass.simpleName}") }
     }
   }
 
+  /** Suspend new analysis and reject late results while the retained photo host is covered. */
+  fun setActive(active: Boolean) { work.setActive(active) }
+
   override fun close() { work.close() }
 
   /** Blocking worker entry point. Close/supersession rejects late results, including no-face. */
-  fun warmUp(urls: List<String>, authHeaders: Map<String, String> = emptyMap()) {
-    val request = work.request
+  fun warmUp(urls: List<String>, authHeaders: Map<String, String> = emptyMap()) =
+      warmUp(urls, authHeaders, work.request)
+
+  private fun warmUp(
+      urls: List<String>, authHeaders: Map<String, String>, request: FaceFocusRequest,
+  ) {
     if (!request.current()) return
     // Old two-field focal entries get one re-pass for people weighting. No-face stays final.
     val pending = urls.distinct().filter { cache.needsAnalysis(it) }
@@ -240,44 +247,6 @@ internal class FaceFocusCache(file: File) {
     val states = ConcurrentHashMap<String, State>()
     fun incomplete(entry: String?): Boolean =
         entry == null || (entry.isNotEmpty() && entry.split(",").size < 3)
-  }
-}
-
-/** One running legacy job plus one latest queued frame, reusing slideshow cancellation. */
-internal class FaceFocusWork : AutoCloseable {
-  val request = FaceFocusRequest()
-  private var started = false
-
-  fun start(block: (FaceFocusRequest) -> Unit): Boolean = synchronized(lock) {
-    if (started || request.cancelled) return false
-    started = true
-    active?.request?.cancel()
-    active = this
-    worker.submit {
-      try {
-        if (request.current()) block(request)
-      } finally {
-        request.cancel()
-        request.awaitCleanup() // Bound cleanup too: no replacement transport while a close is stuck.
-        synchronized(lock) { if (active === this) active = null }
-      }
-    }
-    true
-  }
-
-  override fun close() = synchronized(lock) {
-    request.cancel()
-    if (active === this) {
-      active = null
-      worker.submit { } // Interrupt the running job and discard its queued replacement.
-    }
-    Unit
-  }
-
-  private companion object {
-    val lock = Any()
-    val worker = SlideshowWork()
-    var active: FaceFocusWork? = null
   }
 }
 
