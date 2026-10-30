@@ -11,7 +11,7 @@ import vm from 'node:vm';
 
 const assets = new URL('../../app/src/main/assets/screensaver/', import.meta.url);
 const css = readFileSync(new URL('styles.css', assets), 'utf8');
-// Evaluate the real class/descendant declarations used by Framed Print. This fixture does
+// Evaluate the real class/descendant declarations used by Framed Print and Cinematic Push. This fixture does
 // not emulate rasterization; it checks the mode's DOM lifecycle and resulting CSS inputs.
 const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, declarations]) => ({
   selectors: selectors.replace(/\/\*[\s\S]*?\*\//g, '').trim().split(','),
@@ -21,7 +21,7 @@ const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, decl
   }).filter(pair => pair.length)),
 }));
 
-function fixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = false } = {}) {
+function fixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = false, mode = 'framed' } = {}) {
   let now = 0, nextId = 1, deferred = deferLoad;
   const pending = new Map(), loads = [], writes = [];
   function schedule(fn, ms) {
@@ -132,14 +132,15 @@ function fixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = fal
     seed: 'generated-' + i, w: i % 2 ? 1000 : 1600, h: i % 2 ? 1600 : 1000,
   }));
   const cursor = { i: 0 }, resolutions = [];
-  const cleanup = window.SS.MODES.framed.run({ root, cursor, W: 2160, H: 1440,
-    photoMs, url: (photo, edge) => {
+  const cleanup = window.SS.MODES[mode].run({ root, cursor, W: 2160, H: 1440,
+    photoMs, motionMs: 5400, url: (photo, edge) => {
       const url = 'generated://' + photo.seed + (changingUrls ? '-r' + (resolutions.length + 1) : '');
       resolutions.push({ photo, edge, url }); return url;
     } }, deck);
   function nodes(node = root) { return [node, ...node.children.flatMap(child => nodes(child))]; }
-  function prints() { return nodes().filter(node => node.classList.contains('ss-print')); }
-  function slot(print) { return print.parent.parent.parent.parent; }
+  function prints() { return nodes().filter(node =>
+    node.classList.contains(mode === 'push' ? 'ss-hero' : 'ss-print')); }
+  function slot(print) { return mode === 'push' ? print.parent : print.parent.parent.parent.parent; }
   function state(print) {
     const style = computed(print), animation = style.animation || 'none';
     return { animation, promotion: style['will-change'] || 'auto', playState: style['animation-play-state'] || 'running',
@@ -181,6 +182,86 @@ function breathing(r, print) {
   assert.equal(r.state(print).promotion, 'transform');
   assert.equal(r.state(print).playState, 'running');
 }
+
+test('Cinematic Push shows an opaque whole photo without duplicate blurred layers', async () => {
+  const r = fixture({ mode: 'push' });
+  try {
+    assert.equal(await r.cleanup.ready, true);
+    assert.equal(r.nodes().filter(node => node.classList.contains('ss-fill')).length, 0);
+    const photo = r.incoming();
+    assert.ok(photo);
+    assert.equal(r.state(photo).opacity, 1);
+    assert.equal(r.computed(photo)['background-size'], 'contain');
+    assert.equal(r.computed(photo).inset, '5%');
+    assert.match(r.state(photo).animation, /^cinematicDrift 5400ms linear forwards$/);
+    assert.equal(r.state(photo).promotion, 'transform');
+    assert.ok(r.resolutions.every(resource => resource.edge === 2200));
+  } finally { r.cleanup(); }
+});
+
+test('Cinematic Push retains the opaque outgoing scene until each incoming dissolve completes', async () => {
+  const r = fixture({ mode: 'push' });
+  try {
+    await r.cleanup.ready;
+    for (let swap = 1; swap <= 6; swap++) {
+      await r.advanceTo(swap * 5000);
+      const incoming = r.incoming(), outgoing = r.prints().find(photo => photo !== incoming);
+      assert.equal(r.state(incoming).opacity, 0);
+      assert.equal(r.state(outgoing).opacity, 1);
+      assert.equal(r.computed(r.slot(incoming)).background, '#1c1b19');
+      await r.advanceTo(swap * 5000 + 2199);
+      assert.ok(r.state(incoming).opacity > 0 && r.state(incoming).opacity < 1);
+      assert.equal(r.state(outgoing).opacity, 1);
+      await r.advanceTo(swap * 5000 + 2200);
+      r.end(incoming);
+      retired(r, outgoing);
+      assert.equal(r.state(incoming).opacity, 1);
+    }
+  } finally { r.cleanup(); }
+});
+
+test('Cinematic Push freezes the dissolve and motion during a long pause', async () => {
+  const r = fixture({ mode: 'push' });
+  try {
+    await r.cleanup.ready; await r.advanceTo(5000); await r.advanceTo(5700);
+    const incoming = r.incoming(), outgoing = r.prints().find(photo => photo !== incoming);
+    const opacity = r.state(incoming).opacity;
+    r.cleanup.pause();
+    assert.equal(r.state(incoming).playState, 'paused');
+    assert.equal(r.state(outgoing).playState, 'paused');
+    await r.advanceTo(25000);
+    assert.equal(r.state(incoming).opacity, opacity);
+    assert.notEqual(outgoing.style.backgroundImage, 'none');
+    r.cleanup.resume();
+    await r.advanceTo(26500); r.end(incoming);
+    retired(r, outgoing);
+  } finally { r.cleanup(); }
+});
+
+test('Cinematic Push retains cached-face photographs still and whole', async () => {
+  const r = fixture({ mode: 'push', photos: [{ seed: 'face', w: 900, h: 1600, fx: .1, fy: .4 }] });
+  try {
+    await r.cleanup.ready;
+    const photo = r.incoming();
+    assert.equal(r.computed(photo)['background-size'], 'contain');
+    assert.equal(r.state(photo).animation, 'none');
+    assert.equal(r.state(photo).promotion, 'auto');
+  } finally { r.cleanup(); }
+});
+
+test('Cinematic Push rejects publication after cleanup at every decode admission microtask', async () => {
+  for (let checkpoint = 0; checkpoint <= 16; checkpoint++) {
+    const r = fixture({ mode: 'push', deferLoad: true });
+    await r.flush(); r.finishLoad();
+    for (let turn = 0; turn < checkpoint; turn++) await Promise.resolve();
+    r.cleanup();
+    const writes = r.writes.length;
+    await r.cleanup.ready; await r.flush();
+    assert.equal(r.writes.length, writes, `Cleanup at microtask ${checkpoint} forbids later publication`);
+    r.prints().forEach(photo => retired(r, photo));
+    assert.equal(r.pending.size, 0);
+  }
+});
 
 // Catches fading the outgoing scene, retiring before incoming opacity 1, or changing cadence.
 test('Framed Print admits an opaque first scene and fades only incoming scenes over eight swaps', async () => {

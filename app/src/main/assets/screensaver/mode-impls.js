@@ -511,17 +511,30 @@
 
   // ---- 05 Cinematic push -----------------------------------------------------
   MODES.push = { name: "Cinematic Push", run(ctx, deck) {
-    const t = makeTimers(ctx); const layers = [mk(), mk()]; layers.forEach(l => ctx.root.appendChild(l.root)); let cur = 0, first = true;
-    function mk() { const root = el("ss-layer"); const fill = el("ss-fill", root); const hero = el("ss-hero", root); return { root, fill, hero }; }
+    const t = makeTimers(ctx); const layers = [mk(), mk()]; layers.forEach(l => ctx.root.appendChild(l.root));
+    function mk() {
+      const root = el("ss-layer cinematic-push retired"), hero = el("ss-hero", root);
+      hero.style.animation = "none"; hero.style.willChange = "auto";
+      return { root, hero };
+    }
+    const dissolve = makeSceneDissolve(ctx, t, layers.map(l => l.root), 2200, root => {
+      const hero = layers.find(l => l.root === root).hero;
+      hero.style.backgroundImage = "none"; hero.style.animation = "none";
+      hero.style.willChange = "auto";
+    });
     async function step() {
-      const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 2200); if (!await t.load(u)) return false;
-      const inL = layers[1 - cur], outL = layers[cur]; bg(inL.fill, u); bg(inL.hero, u, "contain");
-      inL.root.className = "ss-layer push-enter"; if (!first) outL.root.className = "ss-layer push-leave";
-      t.after(() => { inL.root.className = "ss-layer"; inL.root.style.opacity = "1"; inL.hero.style.animation = hasFace(p) ? "none" : `drift ${ctx.motionMs}ms linear forwards`; }, 1150);
-      cur = 1 - cur; first = false;
+      const p = SS.take(deck, ctx.cursor, ["any"])[0], u = ctx.url(p, 2200);
+      if (!await t.load(u) || !dissolve.active()) return false;
+      const root = dissolve.next(), hero = layers.find(l => l.root === root).hero;
+      bg(hero, u, "contain"); hero.style.animation = "none"; hero.style.willChange = "auto";
+      if (!hasFace(p)) {
+        hero.style.willChange = "transform"; void hero.offsetWidth;
+        hero.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
+      }
+      dissolve.present(root);
     }
     t.start(step); t.every(step, ctx.photoMs);
-    return t.cleanup;
+    return dissolve.cleanup;
   }};
 
   // ---- 06 Memories (single + occasional titled collage beat) ----------------

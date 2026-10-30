@@ -124,8 +124,8 @@ python3 native-checks.py --serial emulator-5556
 ```
 
 Results are in `evidence/native/checks.json`; `complete: true` is required before claiming the
-whole check passed. The latest integrated run passed **51 checks in 129.58 seconds**.
-Open `native-review.html` for the image review; all **36 capture tabs** loaded without page
+whole check passed. The latest integrated run passed **56 checks in 151.09 seconds**.
+Open `native-review.html` for the image review; all **39 capture tabs** loaded without page
 errors, recorded in `evidence/native-review-checks.json`. The emulator's API 34/GMS
 image does not establish Portal API 29 timing, sensor behavior or audio compatibility.
 No Home Assistant music deployment belongs to either preview.
@@ -153,9 +153,9 @@ host and two original portrait fixtures. It never serves the repository root. Ru
 python3 slideshow/serve.py
 ```
 
-Open `http://127.0.0.1:8891/`. Diptych, Framed and Ken Burns are rendered by the actual
+Open `http://127.0.0.1:8891/`. Diptych, Framed, Ken Burns and Cinematic Push are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its **39 browser checks** include real stalled HTTP image requests, pause
+ambient sensors. Its **49 browser checks** include real stalled HTTP image requests, pause
 cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
 frames, initial readiness without a second fade, pause without the newer animation API,
 and cancellation immediately before DOM publication. Diptych preserves its existing
@@ -178,3 +178,22 @@ opacity on older WebViews, and retired/closed slots release photo URLs and anima
 hints. Cached face hints retain the complete, still print. Its original frame geometry,
 matte, lighting and photo interval remain intact. Eight added actual-source browser
 checks cover these contracts; the startup check fails against the preceding renderer.
+
+Cinematic Push retains its whole-photo presentation and configured interval, with
+a slower 4% push inside a 5% inset and an incoming-only dissolve. It creates no
+blurred duplicate fill. Initial readiness is opaque; pause, retirement and terminal
+cleanup use the same tested owner. Cached face hints keep the entire image still.
+Five additional source regressions fail against the previous implementation and pass
+against the refinement. Actual Chrome checks also verify that the complete photo
+container stays inside the screen at the final zoom. These results do not measure
+physical Portal presentation performance.
+
+The native speaker chooser now marks the selected source independently of its
+group leader. It disables redundant selection, shows eligible group actions and
+explains temporary or unsupported grouping states. At larger text sizes or narrow
+widths, actions stack while retaining 48dp touch targets. The debug-only
+`speaker-groups` scenario supplies silent compatible/incompatible/offline players;
+selection updates fixture state only, with no provider or household connection.
+The native speaker-selection check exposed a tab reset caused by keying UI state to
+the music source. Tab state now belongs to the current UI composition, so selecting
+a speaker retains the chooser while every pane reads the fresh snapshot.

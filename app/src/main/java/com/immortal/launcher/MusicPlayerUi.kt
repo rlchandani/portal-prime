@@ -456,7 +456,7 @@ private fun MusicSidePanel(
     modifier: Modifier,
     onAction: (MusicPlayerUiAction) -> Unit,
 ) {
-  var panel by rememberMusicPanel(snapshot.sourceId)
+  var panel by rememberMusicPanel()
   Column(modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
     val palette = LocalApprovedPalette.current
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp))
@@ -498,8 +498,10 @@ private fun MusicSidePanel(
 }
 
 @Composable
-private fun rememberMusicPanel(sourceId: String): MutableState<MusicPanel> =
-    remember(sourceId) { mutableStateOf(MusicPanel.QUEUE) }
+private fun rememberMusicPanel(): MutableState<MusicPanel> =
+    // A tab is a presentation choice, not a source lease. Selecting a speaker
+    // must retain its chooser; each pane still reads the current snapshot.
+    remember { mutableStateOf(MusicPanel.QUEUE) }
 
 /** Keep supplied metadata separate from the selected row's confirmed playback presentation. */
 internal data class MusicQueueRowPresentation(
@@ -624,30 +626,46 @@ private fun MusicRooms(
   LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(12.dp),
       contentPadding = PaddingValues(bottom = 12.dp)) {
     item {
-      MusicText("Choose a player. Group controls appear only for compatible rooms.",
+      MusicText("Choose a player. Available group controls are shown below.",
           muted = true, size = 16, maxLines = 3)
     }
     itemsIndexed(snapshot.rooms, key = { index, room -> room.id.ifBlank { "room:$index" } }) { _, room ->
       val actions = musicRoomActions(snapshot, room)
       val sameGroup = actions.inCurrentGroup
+      val presentation = musicRoomPresentation(snapshot, room)
+      val palette = LocalApprovedPalette.current
       Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
-          .background(LocalApprovedPalette.current.surface).padding(16.dp),
+          .background(if (presentation.selected) palette.surface2 else palette.surface)
+          .semantics { selected = presentation.selected }.padding(16.dp),
           verticalArrangement = Arrangement.spacedBy(12.dp)) {
         MusicText(room.name.ifBlank { "Unnamed player" }, size = 20, bold = true, maxLines = 2)
-        MusicText(when {
-          !room.available -> "Offline"
-          sameGroup -> "In the current group"
-          !room.groupId.isNullOrBlank() -> "In a group"
-          else -> "Available"
-        }, muted = true, size = 15)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          MusicButton("Use player", Modifier.weight(1f), enabled = actions.canSelect) {
-            onAction(MusicPlayerUiAction.SelectPlayer(room.id))
+        MusicText(presentation.status, muted = !presentation.selected, size = 15, maxLines = 3)
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+          val controls: @Composable (Modifier) -> Unit = { buttonModifier ->
+            MusicButton(presentation.selectionLabel, buttonModifier,
+                chosen = presentation.selected,
+                enabled = actions.canSelect && !presentation.selected) {
+              onAction(MusicPlayerUiAction.SelectPlayer(room.id))
+            }
+            presentation.groupLabel?.let { label ->
+              MusicButton(label, buttonModifier,
+                  enabled = if (sameGroup) actions.canRemove else actions.canJoin) {
+                onAction(MusicPlayerUiAction.ToggleRoom(room.id))
+              }
+            }
           }
-          MusicButton(if (sameGroup) "Remove" else "Join group", Modifier.weight(1f),
-              enabled = if (sameGroup) actions.canRemove else actions.canJoin) {
-            onAction(MusicPlayerUiAction.ToggleRoom(room.id))
+          if (maxWidth < 320.dp || LocalDensity.current.fontScale > 1.3f) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+              controls(Modifier.fillMaxWidth())
+            }
+          } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              controls(Modifier.weight(1f))
+            }
           }
+        }
+        presentation.groupUnavailableReason?.let {
+          MusicText(it, muted = true, size = 14, maxLines = Int.MAX_VALUE)
         }
         val volume = room.volume?.takeIf { it in 0..100 }
         if (volume != null) MusicRoomVolume(snapshot, room, volume, onAction)

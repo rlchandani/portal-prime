@@ -23,7 +23,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if urlsplit(self.path).path == "/preview.html":
             mode = parse_qs(urlsplit(self.path).query).get("mode", ["diptych"])[0]
-            if mode not in ("diptych", "framed", "kenBurns"):
+            if mode not in ("diptych", "framed", "kenBurns", "push"):
                 self.send_error(400)
                 return
             photos = [{"url": "/fixtures/" + name + ".png", "w": 480, "h": 720}

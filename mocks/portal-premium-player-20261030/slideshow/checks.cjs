@@ -87,7 +87,7 @@ async function until(condition) {
       };
     });
     page.on("pageerror", error => errors.push(error.message));
-    for (const mode of ["diptych", "framed", "kenBurns"]) {
+    for (const mode of ["diptych", "framed", "kenBurns", "push"]) {
       await page.goto(`${base}/render?nativeClock=1&mode=${mode}`);
       await page.locator("#loading.hide").waitFor({ state: "attached" });
       await page.waitForFunction(() => getComputedStyle(document.querySelector(".ss-beat.on")).opacity === "1" &&
@@ -410,6 +410,117 @@ async function until(condition) {
     });
     demand("Framed Print cancellation rejects the decoded print immediately before publication",
       cancelledPrint.ready === false && cancelledPrint.atCleanup === 0 && cancelledPrint.afterReady === 0);
+    await page.goto(`${base}/motion-unit`);
+    await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined;
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.pushCheck = SS.MODES.push.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 3400, motionMs: 6000, url: photo => photo.url,
+      }, window.PHOTOS);
+      await window.pushCheck.ready;
+    });
+    demand("Cinematic Push readiness publishes one complete opaque scene",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-layer")]
+        .filter(n => n.classList.contains("on")).length === 1 &&
+        [...document.querySelectorAll(".ss-layer.on")]
+          .every(n => +getComputedStyle(n).opacity === 1)));
+    demand("Cinematic Push uses whole photos on matte without duplicate blurred images",
+      await page.locator(".ss-fill").count() === 0 &&
+      await page.evaluate(() => [...document.querySelectorAll(".ss-layer")].every(n =>
+        getComputedStyle(n).filter === "none" &&
+        (getComputedStyle(n.querySelector(".ss-hero")).backgroundImage === "none" ||
+          getComputedStyle(n.querySelector(".ss-hero")).backgroundSize === "contain"))));
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-layer")]
+      .some(n => +getComputedStyle(n).opacity > .1 && +getComputedStyle(n).opacity < .9));
+    demand("Cinematic Push retains an opaque outgoing photo beneath its incoming dissolve",
+      await page.evaluate(() => {
+        const layers = [...document.querySelectorAll(".ss-layer")];
+        return layers.some(n => +getComputedStyle(n).opacity === 1) &&
+          +getComputedStyle(layers.at(-1)).opacity > 0 &&
+          +getComputedStyle(layers.at(-1)).opacity < 1;
+      }));
+    const heldPush = await page.evaluate(async () => {
+      window.pushCheck.pause();
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return [...document.querySelectorAll(".ss-layer")].map(n => ({
+        opacity: getComputedStyle(n).opacity,
+        transform: getComputedStyle(n.querySelector(".ss-hero")).transform,
+      }));
+    });
+    await page.waitForTimeout(450);
+    demand("Cinematic Push old-WebView pause freezes photo motion and scene opacity",
+      await page.evaluate(before => [...document.querySelectorAll(".ss-layer")].every((n, i) =>
+        getComputedStyle(n).opacity === before[i].opacity &&
+        getComputedStyle(n.querySelector(".ss-hero")).transform === before[i].transform), heldPush));
+    await page.evaluate(() => window.pushCheck.resume());
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-hero")]
+      .filter(n => getComputedStyle(n).backgroundImage !== "none").length === 1);
+    demand("Cinematic Push retires the old photo URL and promotion only after incoming opacity one",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-layer")].every(n =>
+        n.classList.contains("retired")
+          ? getComputedStyle(n.querySelector(".ss-hero")).backgroundImage === "none" &&
+            getComputedStyle(n.querySelector(".ss-hero")).willChange === "auto"
+          : +getComputedStyle(n).opacity === 1)));
+    await page.evaluate(() => window.pushCheck());
+    demand("Cinematic Push cleanup releases both image resources and their animations",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-hero")].every(n =>
+        getComputedStyle(n).backgroundImage === "none" &&
+        getComputedStyle(n).animationName === "none")));
+    await page.goto(`${base}/motion-unit`);
+    const pushFace = await page.evaluate(async () => {
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      const cleanup = SS.MODES.push.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, motionMs: 32400, url: photo => photo.url,
+      }, [{ ...window.PHOTOS[0], fx: .2, fy: .3 }]);
+      await cleanup.ready;
+      const photo = root.querySelector(".on .ss-hero"), style = getComputedStyle(photo);
+      const result = { size: style.backgroundSize, animation: style.animationName, promotion: style.willChange };
+      cleanup(); return result;
+    });
+    demand("Cinematic Push cached face hints keep the entire photo still without promotion",
+      pushFace.size === "contain" && pushFace.animation === "none" && pushFace.promotion === "auto");
+    await page.goto(`${base}/motion-unit`);
+    const pushBounds = await page.evaluate(async () => {
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      const cleanup = SS.MODES.push.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, motionMs: 1, url: photo => photo.url,
+      }, [window.PHOTOS[0]]);
+      await cleanup.ready; await new Promise(resolve => setTimeout(resolve, 50));
+      const box = root.querySelector(".on .ss-hero").getBoundingClientRect();
+      const result = box.left >= 0 && box.top >= 0 && box.right <= innerWidth && box.bottom <= innerHeight;
+      cleanup(); return result;
+    });
+    demand("Cinematic Push keeps the whole-photo container inside the screen at its final zoom", pushBounds);
+    await page.goto(`${base}/motion-unit`);
+    const cancelledPush = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let cleanup, atCleanup;
+      const images = () => [...root.querySelectorAll(".ss-hero")]
+        .filter(n => getComputedStyle(n).backgroundImage !== "none").length;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = images();
+        })), () => {});
+        return prepared;
+      };
+      cleanup = SS.MODES.push.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, motionMs: 32400, url: photo => photo.url,
+      }, [window.PHOTOS[0]]);
+      const ready = await cleanup.ready; window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: images() };
+    });
+    demand("Cinematic Push cancellation cannot republish a prepared photo after cleanup",
+      cancelledPush.ready === false && cancelledPush.atCleanup === 0 && cancelledPush.afterReady === 0);
     await page.goto(`${base}/render?nativeClock=1&slow=1&unknown=1&hostPaused=1`);
     await page.waitForTimeout(200);
     demand("Paused startup admits zero HTTP images", admittedSlow === 0 && held.size === 0);

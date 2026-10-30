@@ -140,7 +140,8 @@ class MusicDesignPreviewActivity : ComponentActivity() {
         "setup" -> MusicConnection.NOT_CONFIGURED
         else -> MusicConnection.READY
       }
-      val source = "ma:design-preview"
+      var source by remember { mutableStateOf("ma:design-preview") }
+      val groupPreview = intent.getStringExtra("scenario") == "speaker-groups"
       val item = tracks.getOrNull(selected)
       val browseTracks = remember(tracks) { tracks.map {
         MusicBrowseTrack(it.id, it.title, it.artist, it.durationMs, it.artUrl ?: "")
@@ -173,7 +174,14 @@ class MusicDesignPreviewActivity : ComponentActivity() {
               next = true, seek = true, queue = true, rooms = true, volume = true),
           queue = tracks, queueId = "sample-queue",
           controlPlayerId = source,
-          rooms = listOf(MusicRoom(source, "Family Area", true, 35,
+          rooms = if (groupPreview) listOf(
+              MusicRoom("ma:design-preview", "Family Area", true, 35,
+                  volumeControllable = true, canGroupWith = setOf("ma:kitchen")),
+              MusicRoom("ma:kitchen", "Kitchen", true, 42,
+                  volumeControllable = true, canGroupWith = setOf("ma:design-preview")),
+              MusicRoom("ma:bedroom", "Bedroom", true, 20, volumeControllable = true),
+              MusicRoom("ma:office", "Office", false),
+          ) else listOf(MusicRoom(source, "Family Area", true, 35,
               volumeControllable = true)))
       CompositionLocalProvider(LocalApprovedPalette provides palette,
           LocalDensity provides Density(density.density, fontScale)) {
@@ -244,6 +252,12 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                       playing = false
                     }
                     is MusicPlayerUiAction.Seek -> position = action.positionMs
+                    is MusicPlayerUiAction.SelectPlayer -> {
+                      if (groupPreview) {
+                        source = action.roomId
+                        message = "Silent design preview · sample player selected · no audio"
+                      } else message = "Design preview · provider controls are deferred · no audio"
+                    }
                     MusicPlayerUiAction.BrowseLibrary -> { browse = "library"; collection = null }
                     else -> message = "Design preview · provider controls are deferred · no audio"
                   }

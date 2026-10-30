@@ -494,6 +494,66 @@ acceptance and reliable presentation-performance measurements remain open. Remov
 of redundant rendering work and the tested lifecycle corrections do not establish
 a measured physical FPS gain.
 
+## Cinematic Push and speaker chooser — 17:19 UTC batch
+
+Cinematic Push now presents a whole photograph on a quiet matte, with a slow 4%
+push inside a 5% inset. At the final zoom the complete photo container remains
+inside the screen. The existing configured interval and photo-resolution request
+remain intact. Cached face-hinted photographs stay whole and still.
+
+The style uses the shared incoming-only dissolve controller. Its first ready scene
+is opaque, pause freezes motion and opacity without the newer WebView animation
+API, and retirement/cleanup release image URLs and animation hints. A closed owner
+rejects publication even between decode admission and the continuation that builds
+the scene. Background photo draws drop from four to two; full-screen blurred fills
+drop from two to zero. These are code-level rendering changes, not measured texture
+allocation, GPU execution or delivered-FPS savings.
+
+The native speaker chooser identifies the selected source separately from its group
+leader, disables redundant selection, displays eligible group actions and explains
+unavailable states. Buttons stack at narrow widths or large text while retaining
+48dp touch targets. Existing selection/group command guards remain authoritative;
+no provider, audio backend or Home Assistant service was added.
+
+A new native selection regression found a real navigation defect: selecting another
+speaker changed `sourceId`, which reset the remembered tab to Queue. Tab state now
+belongs to the current UI composition rather than the source lease. The chooser
+remains open across selection, and each pane still reads the current snapshot.
+The debug-only silent `speaker-groups` fixture exercises compatible, incompatible,
+offline and selected players without connecting to household media.
+
+| Final gate | Evidence |
+| --- | --- |
+| Integrated JVM/debug build | **3,445 tests / 358 suites**, zero failures/errors/skips; APK assembled |
+| Speaker presentation policy | **11 tests**, included in the JVM total |
+| Slideshow source tests | **151 passed**, zero failures/skips |
+| Engine source fixtures | **14/14 passed** |
+| Actual-source Chrome renderer | **49 passed**, zero production-script errors |
+| Native UI acceptance | **56 passed in 151.09 seconds**, including chooser continuity and stacked large-text actions |
+| Browser native review | **39 captures loaded**, zero page errors |
+| Family Area profile preservation | **97 values**, zero changes |
+
+The five added Cinematic Push source regressions fail against the preceding renderer
+and pass against the refinement. The native selection test failed before removing
+the source-keyed tab reset and passes afterward. A verifier initially read enabled
+state from a text label; it now checks the actual clickable ancestor. The large-text
+speaker screenshot and the actual-source Cinematic Push screenshot were visually
+inspected. Native evidence is from the dedicated API 34 emulator, not a physical
+Portal performance benchmark.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`5b4dbbdf9b7b0799495f6f0de58bd6158807c71b2e7b0970251a9fe167e709a0`
+(**48,910,412 bytes**). Its signing certificate matches the prior installed APK,
+retained privately as an exact rollback. All 97 settings match the pre-install
+profile. Home/screensaver dispatches were acknowledged; visible transitions are
+not established by those acknowledgments. Living Area remains unchanged.
+
+The existing performance-capture admission issue remains parked; no further timing
+capture was attempted in this batch. Physical night-clock acceptance and reliable
+Portal presentation measurements remain open. Music provider wiring stays deferred.
+The owned emulator was stopped after acceptance. Family Area's collector is
+independently confirmed inactive with zero listeners. The broader goal remains active.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

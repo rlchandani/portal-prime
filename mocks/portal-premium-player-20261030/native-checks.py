@@ -58,6 +58,16 @@ def bounds(n):
     return tuple(map(int, re.findall(r"\d+", n.get("bounds"))))
 
 
+def button_node(nodes, label):
+    described = node(nodes, label)
+    if described.get("clickable") == "true":
+        return described
+    # Text buttons expose their label in a child View. Enabled state belongs to
+    # the clickable ancestor, which has the same complete touch-target bounds.
+    return next(n for n in nodes if n.get("clickable") == "true"
+                and n.get("bounds") == described.get("bounds"))
+
+
 def tap(nodes, label):
     left, top, right, bottom = bounds(node(nodes, label))
     adb("shell", "input", "tap", str((left + right) // 2), str((top + bottom) // 2))
@@ -101,6 +111,37 @@ tap(nodes, "Players")
 nodes = capture("speakers")
 demand("Speakers pane replaces queue inside the same player",
        node(nodes, "Your speakers") is not None and node(nodes, "Family Area") is not None)
+demand("Selected speaker is explicit and redundant selection is disabled",
+       node(nodes, "Selected player") is not None and button_node(nodes, "Selected").get("enabled") == "false")
+demand("Unavailable group actions are explained instead of displaying a disabled Join button",
+       not any(n.get("text") == "Join group" for n in nodes)
+       and node(nodes, "Group controls apply to other players.") is not None)
+nodes = launch("speaker-groups", "--es", "scenario", "speaker-groups")
+tap(nodes, "Players")
+nodes = capture("speaker-groups")
+demand("Compatible speaker offers an enabled group action",
+       node(nodes, "Kitchen") is not None and button_node(nodes, "Join group").get("enabled") == "true")
+tap(nodes, "Use player")
+nodes = capture("speaker-selected")
+demand("Speaker selection updates the same native chooser without opening another page",
+       node(nodes, "Your speakers") is not None and node(nodes, "Selected player") is not None
+       and sum(n.get("text") == "Selected" for n in nodes) == 1
+       and bounds(node(nodes, "Selected"))[1] >= bounds(node(nodes, "Kitchen"))[3]
+       and bounds(node(nodes, "Family Area"))[1] < bounds(node(nodes, "Kitchen"))[1])
+nodes = launch("speakers-large-font", "--es", "scenario", "speaker-groups", "--ef", "font_scale", "1.8")
+tap(nodes, "Players")
+nodes = capture("speakers-large-font")
+pane = next(n for n in nodes if n.get("scrollable") == "true"
+            and any(child.get("text") in ("Family Area", "Kitchen") for child in n.iter("node")))
+left, top, right, bottom = bounds(pane)
+adb("shell", "input", "swipe", str((left + right) // 2), str(bottom - 24),
+    str((left + right) // 2), str(max(top + 24, bottom - 324)), "350")
+nodes = capture("speakers-large-font")
+use = bounds(button_node(nodes, "Use player"))
+join = bounds(button_node(nodes, "Join group"))
+demand("Larger-text speaker actions stack with full-width 48dp touch targets",
+       use[0] == join[0] and use[2] == join[2] and join[1] >= use[3]
+       and use[3] - use[1] >= 72 and join[3] - join[1] >= 72)
 nodes = launch("offline", "--es", "scenario", "offline")
 demand("Offline transport is disabled", all(node(nodes, label).get("enabled") == "false"
        for label in ("Play", "Previous track", "Next track")))

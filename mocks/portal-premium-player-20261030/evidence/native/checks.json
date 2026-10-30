@@ -1,5 +1,5 @@
 {
-  "passed": 51,
+  "passed": 56,
   "checks": [
     "Native sample and six-track queue render",
     "Play has a 48dp touch target",
@@ -13,6 +13,11 @@
     "Compact retains selected track and transport",
     "Expand retains selected track",
     "Speakers pane replaces queue inside the same player",
+    "Selected speaker is explicit and redundant selection is disabled",
+    "Unavailable group actions are explained instead of displaying a disabled Join button",
+    "Compatible speaker offers an enabled group action",
+    "Speaker selection updates the same native chooser without opening another page",
+    "Larger-text speaker actions stack with full-width 48dp touch targets",
     "Offline transport is disabled",
     "Light palette renders the same controls",
     "Large-font transport remains visible",
@@ -59,7 +64,7 @@
   "api": 34,
   "viewport": "2160x1440",
   "densityDpi": 240,
-  "durationSeconds": 129.58,
+  "durationSeconds": 151.09,
   "data": "debug-only silent fixtures and original local artwork",
   "physicalPortalPerformanceMeasured": false,
   "audioMeasured": false,
