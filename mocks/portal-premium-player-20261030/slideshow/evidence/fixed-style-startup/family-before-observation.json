@@ -1,0 +1,51 @@
+{
+  "room": "Family Area",
+  "cycles": 3,
+  "startRequests": 1,
+  "stopRequests": 1,
+  "sessionId": 1,
+  "settingsCompared": 97,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "knownHomeWindowVerified": true,
+  "settingValuesUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "sourceGroupsUnchanged": true,
+  "screensaverRestorationAcknowledged": true,
+  "pendingStart": false,
+  "utc": "2026-10-30T23:52:32.304534+00:00",
+  "observations": [
+    {
+      "style": "push",
+      "requestToAdmissionMs": 1463,
+      "metadataMs": 0.658542,
+      "webViewConstructorMs": 31.769739,
+      "webViewAdmissionMs": 61.121875,
+      "admissionToPageFinishedMs": 1073,
+      "pageFinishedToSceneAdmissionMs": 56
+    },
+    {
+      "style": "galleryWall",
+      "requestToAdmissionMs": 730,
+      "metadataMs": 0.795573,
+      "webViewConstructorMs": 19.714115,
+      "webViewAdmissionMs": 35.320469,
+      "admissionToPageFinishedMs": 402,
+      "pageFinishedToSceneAdmissionMs": 143
+    },
+    {
+      "style": "kenBurns",
+      "requestToAdmissionMs": 614,
+      "metadataMs": 3.404167,
+      "webViewConstructorMs": 18.765416,
+      "webViewAdmissionMs": 52.525833,
+      "admissionToPageFinishedMs": 283,
+      "pageFinishedToSceneAdmissionMs": 79
+    }
+  ],
+  "firstPanelPresentationMeasured": false,
+  "pristineColdStartMeasured": false,
+  "all11ImageResolutionsRequestedTierReady": true,
+  "deliveredFpsMeasured": false,
+  "scope": "Family Area fresh preview-host observations with unchanged Shuffle, settings and sources; not a fixed-style before/after speed comparison"
+}

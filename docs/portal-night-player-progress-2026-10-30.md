@@ -1890,6 +1890,81 @@ open. This native test does not measure delivered FPS, videos, hidden-host or
 user-paused night scenarios. Living Area, the phone and Home Assistant are
 untouched; the overall objective remains active.
 
+## Fixed-style startup probe bypass — 23:42 UTC batch
+
+Original issue window: **23:42:59–00:12:59 UTC**, including investigation,
+verification, deployment, documentation, cleanup and commit.
+
+A bounded Family-only capture first observed three fresh preview hosts with
+the existing Shuffle setting and sources. One capture was started and stopped;
+its collector is independently confirmed inactive with zero listeners.
+
+| First selected style | Pre-command observation → guarded scene admission | Metadata preparation | Native WebView constructor | WebView admission → page-finished event |
+| --- | ---: | ---: | ---: | ---: |
+| Push | 1,463ms | 0.659ms | 31.770ms | 1,073ms |
+| Gallery Wall | 730ms | 0.796ms | 19.714ms | 402ms |
+| Ken Burns | 614ms | 3.404ms | 18.765ms | 283ms |
+
+These include Fleet/navigation/host work and existing caches. All eleven image
+resolutions found their requested derivative ready. They do not establish
+pristine cold-start latency, panel presentation or an isolated WebView cost.
+Native metadata is not the large delay in this cohort.
+
+The parallel source investigation found a concrete avoidable wait elsewhere:
+every fixed style awaited orientation probes for up to six photos before
+starting, with a 1,500ms timeout. **Ken Burns, Framed Print, Cinematic Push,
+Memories and Polaroid** select any photo and apply size-dependent geometry
+after the actual display decode has supplied dimensions. They now bypass that
+probe batch. Shuffle and every other style retain their preparation, protecting
+orientation selection, pairing and Filmstrip admission. The existing pause,
+decode-readiness, failure/retry and cancellation paths remain in place.
+
+Verification:
+
+- The worker's initial actual-source regressions reported **12 expected
+  failures** before the patch. The parent independently verifies the finished
+  **29/29 focused tests** against the production entry, renderers, scheduler and
+  metadata code. These cover unknown dimensions, portrait/panoramic geometry,
+  decode completion, cancellation, pause/resume and failed-load recovery.
+- The parallel full source suite reports **1,008 passed, four opt-in browser
+  checks skipped and zero failures**; its tool receipt is recorded. That suite
+  was not rerun by the parent.
+- Independent real Chromium acceptance verifies **61 assertions across twelve
+  cases**: all five optimized styles with known and unknown dimensions, plus
+  Cinema and Shuffle protection. The fixture uses generated photos, actual
+  production HTML/scripts, controlled deck ordering and delayed local HTTP
+  probes. Actual browser image decoding and metadata are observed before the
+  first scene report.
+- The preceding HTML fails the targeted browser condition: Ken Burns performs
+  two unrelated probes and reports its first scene at **1,574.2ms**. The repaired
+  HTML reports at **67.3ms** in that fixture, with zero probes. Its five optimized
+  styles' first reports range **19.0–67.3ms** across the ten cases. Cinema and
+  Shuffle retain two in-flight probes and their bounded timeout behavior.
+  These are fixture observations, not a measured Portal speedup or FPS.
+- Debug and optimized performance APKs build successfully in **28 seconds**.
+  The JVM task is **UP-TO-DATE**, retaining the prior valid **3,496 tests /
+  362 suites** result; it did not execute a fresh full JVM suite.
+- Family Area's independently read installed APK matches
+  `49a5fbae2a64cc1fc46155658c2b73776fb6ea77b0de54e5ee81074ecfde4d2e`
+  (**25,702,323 bytes**) with the existing signing certificate. Native DEX,
+  manifest and **52 main assets** match the predecessor; only
+  `assets/screensaver/index.html` changes.
+- All **97 settings**, full screensaver configuration and photo-source groups
+  compare unchanged. The bounded runtime response contains **418 lines** and
+  **zero fatal exception markers**. The collector remains inactive with zero
+  listeners. Clearing the verified upload reclaims **25,702,323 bytes**;
+  the local candidate and exact predecessor rollback are retained.
+
+Reproducible browser verifier:
+`mocks/portal-premium-player-20261030/slideshow/fixed-style-startup-browser-checks.cjs`.
+Public scalar receipts are in
+`mocks/portal-premium-player-20261030/slideshow/evidence/fixed-style-startup/`.
+This closes the unnecessary fixed-style startup gate. Family's configured
+Shuffle policy is intentionally unchanged; first panel presentation, pristine
+cold startup, physical night-clock acceptance, Home frame tails and physical
+music UI acceptance remain open. Living Area, the phone and Home Assistant
+receive no operations; the overall objective remains active.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

@@ -1,0 +1,449 @@
+{
+  "success": true,
+  "passed": 61,
+  "failed": 0,
+  "failureType": null,
+  "sourceRef": "working-tree",
+  "observations": [
+    {
+      "mode": "kenBurns",
+      "known": true,
+      "protectedSeed": false,
+      "style": "kenBurns",
+      "at": 67.30000019073486,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    },
+    {
+      "mode": "kenBurns",
+      "known": false,
+      "protectedSeed": false,
+      "style": "kenBurns",
+      "at": 22.200000286102295,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    },
+    {
+      "mode": "framed",
+      "known": true,
+      "protectedSeed": false,
+      "style": "framed",
+      "at": 45.5,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    },
+    {
+      "mode": "framed",
+      "known": false,
+      "protectedSeed": false,
+      "style": "framed",
+      "at": 34.90000009536743,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    },
+    {
+      "mode": "push",
+      "known": true,
+      "protectedSeed": false,
+      "style": "push",
+      "at": 19,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    },
+    {
+      "mode": "push",
+      "known": false,
+      "protectedSeed": false,
+      "style": "push",
+      "at": 27.100000381469727,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    },
+    {
+      "mode": "memories",
+      "known": true,
+      "protectedSeed": false,
+      "style": "memories",
+      "at": 31,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    },
+    {
+      "mode": "memories",
+      "known": false,
+      "protectedSeed": false,
+      "style": "memories",
+      "at": 39.90000009536743,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    },
+    {
+      "mode": "polaroid",
+      "known": true,
+      "protectedSeed": false,
+      "style": "polaroid",
+      "at": 34.69999980926514,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 6
+    },
+    {
+      "mode": "polaroid",
+      "known": false,
+      "protectedSeed": false,
+      "style": "polaroid",
+      "at": 28.40000009536743,
+      "probes": 0,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 6
+    },
+    {
+      "mode": "cinema",
+      "known": true,
+      "protectedSeed": true,
+      "style": "cinema",
+      "at": 1538.9000000953674,
+      "probes": 2,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    },
+    {
+      "mode": "shuffle",
+      "known": true,
+      "protectedSeed": true,
+      "style": "cinema",
+      "at": 1528.5,
+      "probes": 2,
+      "firstPhotoMetadata": [
+        720,
+        480,
+        true
+      ],
+      "loadingHidden": true,
+      "decodedImages": 1
+    }
+  ],
+  "checks": [
+    {
+      "name": "kenBurns (known first dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "kenBurns (known first dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "kenBurns (known first dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "kenBurns (known first dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "kenBurns (known first dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "kenBurns (unknown dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "kenBurns (unknown dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "kenBurns (unknown dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "kenBurns (unknown dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "kenBurns (unknown dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "framed (known first dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "framed (known first dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "framed (known first dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "framed (known first dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "framed (known first dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "framed (unknown dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "framed (unknown dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "framed (unknown dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "framed (unknown dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "framed (unknown dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "push (known first dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "push (known first dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "push (known first dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "push (known first dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "push (known first dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "push (unknown dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "push (unknown dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "push (unknown dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "push (unknown dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "push (unknown dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "memories (known first dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "memories (known first dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "memories (known first dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "memories (known first dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "memories (known first dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "memories (unknown dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "memories (unknown dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "memories (unknown dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "memories (unknown dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "memories (unknown dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "polaroid (known first dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "polaroid (known first dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "polaroid (known first dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "polaroid (known first dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "polaroid (known first dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "polaroid (unknown dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "polaroid (unknown dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "polaroid (unknown dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "polaroid (unknown dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "polaroid (unknown dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "cinema (known first dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "cinema (known first dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "cinema (known first dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "cinema (known first dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "cinema (known first dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "shuffle (known first dimensions): selected style is admitted",
+      "passed": true
+    },
+    {
+      "name": "shuffle (known first dimensions): loading indicator is removed",
+      "passed": true
+    },
+    {
+      "name": "shuffle (known first dimensions): actual photo image is decoded",
+      "passed": true
+    },
+    {
+      "name": "shuffle (known first dimensions): first-photo dimensions are valid at scene admission",
+      "passed": true
+    },
+    {
+      "name": "shuffle (known first dimensions): orientation seed follows selected-style policy",
+      "passed": true
+    },
+    {
+      "name": "no page errors or external image requests",
+      "passed": true
+    }
+  ],
+  "assetHashes": {
+    "index.html": "c3bca19fde318dd6b2dad30a6ba0d017045a94839ff89f7706df257707c211e1",
+    "styles.css": "42e62333a60a28b3e07011a3b282a0a561c0e03c748f049c442f34f596c3c842",
+    "photos.js": "cfa73baa9e7cd9decbeb9a5a02c094aeff083a3a33ce09ca2e8af8d6da391631",
+    "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+    "modes.js": "37c7ec6bac8748239faa921757792f8fc45e953c273f008d6dc0c570f7aa0c46",
+    "mode-impls.js": "e5571e2673304f5724d8cbb56e6a511088c0c426a395647614febc52a8693770",
+    "scheduler.js": "bbc8e0b4ff043c65cca3828fae7709f2ce2141718ae080b13a34cf287112c871",
+    "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+  },
+  "physicalPortalMeasured": false,
+  "fpsMeasured": false,
+  "fixtureDeckOrderControlled": true,
+  "scope": "Actual production HTML first decoded scene with delayed local orientation probes"
+}

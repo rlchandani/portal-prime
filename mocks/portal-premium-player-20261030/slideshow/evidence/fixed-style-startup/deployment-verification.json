@@ -1,0 +1,73 @@
+{
+  "utc": "2026-10-30T23:52:58.645998+00:00",
+  "deployment": {
+    "device": "Family Area",
+    "sha256": "49a5fbae2a64cc1fc46155658c2b73776fb6ea77b0de54e5ee81074ecfde4d2e",
+    "bytes": 25702323,
+    "previousSha256": "b5e773b6eb4c919814993b655d9e845c64696d137c2e533a4a29d262c0403054",
+    "settingValuesCompared": 97,
+    "changedSettingValues": 0,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "visibleTransitionsVerified": false,
+    "physicalFpsGainMeasured": false
+  },
+  "artifactComparison": {
+    "changedMainAssets": [
+      "assets/screensaver/index.html"
+    ],
+    "unchangedMainAssets": 52,
+    "nativeDexUnchanged": true,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "cleanup": {
+    "ownedUploadCleared": true,
+    "bytesReclaimed": 25702323,
+    "runtimeLines": 418,
+    "fatalExceptionMarkers": 0,
+    "collectorActive": false,
+    "collectorRunning": false,
+    "activeListeners": 0,
+    "candidateRetainedLocally": true,
+    "rollbackRetainedLocally": true
+  },
+  "sourceSha256": {
+    "app/src/main/assets/screensaver/index.html": "c3bca19fde318dd6b2dad30a6ba0d017045a94839ff89f7706df257707c211e1",
+    "scripts/tests/slideshow_fixed_startup.test.mjs": "c34d1aa4a07200b3bc4e092e5950b39d31238d16e93dacf33d10264149630e5e",
+    "mocks/portal-premium-player-20261030/slideshow/fixed-style-startup-browser-checks.cjs": "64d3960c02d90989a6b02d4e66ba2dfaaa4c989f7b0eded813b9391a779f4164"
+  },
+  "focusedSourceTests": {
+    "tests": 29,
+    "failures": 0,
+    "verifiedByParent": true
+  },
+  "parallelSourceSuite": {
+    "tests": 1012,
+    "passed": 1008,
+    "skipped": 4,
+    "failures": 0,
+    "toolReceipt": "309060",
+    "verifiedByParentRerun": false
+  },
+  "parallelInitialRed": {
+    "tests": 21,
+    "passed": 9,
+    "failed": 12,
+    "toolReceipt": "3d7bb0"
+  },
+  "browserAcceptance": {
+    "checks": 61,
+    "failures": 0,
+    "cases": 12,
+    "physicalPortalMeasured": false
+  },
+  "debugAndPerformanceBuildsSucceeded": true,
+  "unitTestTask": "UP-TO-DATE; prior valid 3496-test result retained, not reexecuted",
+  "limits": [
+    "No physical fixed-style before/after latency measurement",
+    "No measured FPS or CPU gain",
+    "First panel presentation and pristine cold start remain unverified",
+    "Configured Family Shuffle preparation intentionally unchanged"
+  ]
+}

@@ -106,13 +106,17 @@
     })();
   }
 
-  // Pre-measure photo dimensions so the very first mode already has correct orientation info.
-  // Cap the initial measure so a huge library doesn't stall the start; the rest measure lazily.
+  // These fixed modes select "any" photos and apply aspect-dependent geometry only
+  // after t.load: the admitted display decode records dimensions before publication.
+  // Keep probes for Shuffle's appetites, orientation-based selection, and Filmstrip's
+  // bounded admission; bypassing those could change pairing or increase display loads.
+  const displayMetadataModes = new Set(["kenBurns", "framed", "push", "memories", "polaroid"]);
+  // Cap required initial probes so a huge library doesn't stall the start.
   for (;;) {
     // A retained hidden/night host admits no orientation loads or new scene.
     while (requestedPause && !closed) await new Promise(resolve => { wakeStartup = resolve; });
     if (closed) return;
-    if (window.premeasureAll) {
+    if (window.premeasureAll && !displayMetadataModes.has(bridgeMode())) {
       let measureTimer;
       const owner = new AbortController();
       measurement = owner;
