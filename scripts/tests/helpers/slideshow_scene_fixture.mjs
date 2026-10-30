@@ -21,7 +21,7 @@ const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, decl
 }));
 
 export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = false,
-  mode = 'framed', W = 2160, H = 1440 } = {}) {
+  mode = 'framed', W = 2160, H = 1440, ambientMs = 3500 } = {}) {
   let now = 0, nextId = 1, deferred = deferLoad;
   const pending = new Map(), loads = [], writes = [];
   function schedule(fn, ms) {
@@ -96,6 +96,11 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
         contains: name => this.names.split(/\s+/).includes(name),
         add: (...names) => { this.className = [...new Set([...this.names.split(/\s+/), ...names])].join(' ').trim(); },
         remove: (...names) => { this.className = this.names.split(/\s+/).filter(name => !names.includes(name)).join(' '); },
+        toggle: (name, on) => {
+          const add = on === undefined ? !this.classList.contains(name) : on;
+          if (add) this.classList.add(name); else this.classList.remove(name);
+          return add;
+        },
       };
     }
     opacity() {
@@ -121,7 +126,7 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
     get offsetWidth() { return 2160; }
     dispatchEvent(event) { this['on' + event.type]?.(event); }
   }
-  const window = { aspect: photo => photo.w / photo.h, preloadDecoded: (url, signal) => {
+  const window = { aspect: photo => photo.w / photo.h, shuffled: values => values.slice(), preloadDecoded: (url, signal) => {
     const request = { url, signal };
     loads.push(request);
     if (!deferred) return Promise.resolve(true);
@@ -150,21 +155,21 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
   }));
   const cursor = { i: 0 }, resolutions = [];
   const cleanup = window.SS.MODES[mode].run({ root, cursor, W, H,
-    photoMs, microMs: photoMs, motionMs: 5400, url: (photo, edge) => {
+    photoMs, microMs: photoMs, motionMs: 5400, ambientMs, url: (photo, edge) => {
       const url = 'generated://' + photo.seed + (changingUrls ? '-r' + (resolutions.length + 1) : '');
       resolutions.push({ photo, edge, url }); return url;
     } }, deck);
   function nodes(node = root) { return [node, ...node.children.flatMap(child => nodes(child))]; }
   function prints() { return nodes().filter(node =>
     node.classList.contains(mode === 'memories' ? 'memory-photo' : mode === 'panorama' ? 'ss-pan' :
-      ['galleryWall', 'heroSidebar'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
+      ['galleryWall', 'heroSidebar', 'mosaic'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
   function slot(print) {
     if (mode === 'memories') {
       let node = print;
       while (node.parent && !node.classList.contains('ss-memory-scene')) node = node.parent;
       return node;
     }
-    return mode === 'galleryWall' ? print : ['push', 'heroSidebar', 'panorama'].includes(mode) ? print.parent : print.parent.parent.parent.parent;
+    return mode === 'galleryWall' ? print : ['push', 'heroSidebar', 'panorama', 'mosaic'].includes(mode) ? print.parent : print.parent.parent.parent.parent;
   }
   function state(print) {
     const style = computed(print), animation = style.animation || 'none';

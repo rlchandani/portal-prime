@@ -37,9 +37,9 @@ const server = http.createServer((req, res) => {
     return;
   }
   let content, type;
-  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit", "/memories-unit", "/panorama-unit"].includes(u.pathname)) {
+  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit", "/memories-unit", "/panorama-unit", "/mosaic-unit"].includes(u.pathname)) {
     const unitPhotos = u.pathname === "/panorama-unit" ? panoramaPhotos :
-      ["/gallery-unit", "/sidebar-unit", "/memories-unit"].includes(u.pathname) ? galleryPhotos :
+      ["/gallery-unit", "/sidebar-unit", "/memories-unit", "/mosaic-unit"].includes(u.pathname) ? galleryPhotos :
       ["dunes", "tidal"].map((name, id) => ({
         id, url: "/fixtures/" + name + ".png", w: 480, h: 720,
       }));
@@ -50,11 +50,11 @@ const server = http.createServer((req, res) => {
       window.PHOTOS=${JSON.stringify(unitPhotos)};
       </script></body></html>`;
     type = "text/html";
-  } else if (u.pathname === "/render") {
+  } else if (["/render", "/renderMosaic"].includes(u.pathname)) {
     const slow = u.searchParams.has("slow"), unknown = u.searchParams.has("unknown");
-    const mode = u.searchParams.get("mode") || "diptych";
+    const mode = u.pathname === "/renderMosaic" ? "mosaic" : u.searchParams.get("mode") || "diptych";
     const photos = mode === "panorama" ? panoramaPhotos :
-      ["galleryWall", "heroSidebar", "memories"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
+      ["galleryWall", "heroSidebar", "memories", "mosaic"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
       url: (slow ? "/slow/" : "/fixtures/") + name + ".png",
       w: unknown ? 0 : 480, h: unknown ? 0 : 720,
     }));
@@ -109,8 +109,8 @@ async function until(condition) {
       };
     });
     page.on("pageerror", error => errors.push(error.message));
-    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama"]) {
-      await page.goto(`${base}/render?nativeClock=1&mode=${mode}`);
+    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama", "mosaic"]) {
+      await page.goto(`${base}/${mode === "mosaic" ? "renderMosaic" : "render"}?nativeClock=1&mode=${mode}`);
       await page.locator("#loading.hide").waitFor({ state: "attached" });
       await page.waitForFunction(() => getComputedStyle(document.querySelector(".ss-beat.on")).opacity === "1" &&
         [...document.querySelectorAll(".ss-frame.on,.ss-art.on,.ss-layer.on,.ss-memory-scene.on")]
@@ -129,11 +129,315 @@ async function until(condition) {
           state.fills === 0 && state.images.every(n => n.size === "contain" && n.filter === "none" && n.motion === "none"));
         demand("Diptych matte inset scales to the actual viewport", Math.abs(state.padding - 43.2) < .1);
       }
-      // Keep all seven previous styles' screenshots untouched during this addition.
-      if (mode === "panorama")
+      // Preserve all prior screenshots byte-for-byte during this bounded addition.
+      if (mode === "mosaic")
         await page.screenshot({ path: path.join(evidence, mode + ".png") });
       demand(mode + " actual renderer becomes ready", await page.locator("#loading").evaluate(n => n.classList.contains("hide")));
+      if (mode === "mosaic")
+        demand("Mosaic outer publication waits for nine complete opaque tiles from all twelve synthetic fixtures",
+          await page.evaluate(() => PHOTOS.length === 12 &&
+            document.querySelectorAll(".mosaic-cell").length === 9 &&
+            [...document.querySelectorAll(".mosaic-cell")].every(cell =>
+              +getComputedStyle(cell.lastElementChild).opacity === 1 &&
+              getComputedStyle(cell.lastElementChild.firstElementChild).backgroundImage !== "none")));
     }
+    await page.goto(`${base}/mosaic-unit`);
+    const mosaicInitial = await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined; Element.prototype.animate = undefined;
+      const original = window.preloadDecoded;
+      let active = 0, peak = 0, count = 0, reached, releases = [];
+      const blocked = new Promise(resolve => { reached = resolve; });
+      window.preloadDecoded = (url, signal) => {
+        active++; peak = Math.max(peak, active); const firstBatch = ++count <= 2;
+        return original(url, signal).then(value => firstBatch ? new Promise(resolve => {
+          releases.push(() => resolve(value)); if (releases.length === 2) reached();
+        }) : value).finally(() => { active--; });
+      };
+      const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.mosaicRoot = root; window.mosaicRequests = []; window.mosaicReady = false;
+      window.mosaicCheck = SS.MODES.mosaic.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2500, microMs: 2500, ambientMs: 350, motionMs: 2500,
+        url: (photo, edge) => { mosaicRequests.push({ url: photo.url, edge }); return photo.url; },
+      }, PHOTOS);
+      mosaicCheck.ready.then(ok => { mosaicReady = ok; });
+      window.releaseMosaicInitial = () => releases.forEach(release => release());
+      window.mosaicPeak = () => peak;
+      window.restoreMosaicLoader = () => { window.preloadDecoded = original; };
+      await blocked;
+      return { admitted: mosaicRequests.length, active, peak, ready: mosaicReady,
+        published: [...root.querySelectorAll(".mosaic-photo")]
+          .filter(image => image.style.backgroundImage !== "none").length };
+    });
+    demand("Mosaic initial loading admits only two decoded owners and withholds full readiness",
+      mosaicInitial.admitted === 2 && mosaicInitial.active === 2 && mosaicInitial.peak === 2 &&
+      !mosaicInitial.ready && mosaicInitial.published === 0, mosaicInitial);
+    await page.evaluate(async () => {
+      releaseMosaicInitial(); await mosaicCheck.ready;
+      window.mosaicCells = [...mosaicRoot.querySelectorAll(".mosaic-cell")];
+      window.mosaicImages = [...mosaicRoot.querySelectorAll(".mosaic-photo")];
+      window.mosaicLayout = () => mosaicCells.map(cell =>
+        [cell.offsetLeft, cell.offsetTop, cell.offsetWidth, cell.offsetHeight]);
+      window.mosaicOriginalLayout = mosaicLayout();
+      window.mosaicCurrentUrls = () => mosaicCells.map(cell => cell.lastElementChild.firstElementChild.style.backgroundImage);
+      window.mosaicInitialUrls = mosaicCurrentUrls();
+      window.mosaicState = () => mosaicCells.map(cell => ({
+        transform: getComputedStyle(cell).transform,
+        panes: [...cell.children].map(pane => ({
+          opacity: getComputedStyle(pane).opacity,
+          url: pane.firstElementChild.style.backgroundImage,
+          transform: getComputedStyle(pane.firstElementChild).transform,
+        })),
+      }));
+      window.mosaicVisited = [mosaicCells.findIndex(cell => cell.classList.contains("spot"))];
+      window.mosaicSpotObserver = new MutationObserver(() => {
+        const selected = mosaicCells.findIndex(cell => cell.classList.contains("spot"));
+        if (selected >= 0 && mosaicVisited.at(-1) !== selected) mosaicVisited.push(selected);
+      });
+      mosaicSpotObserver.observe(mosaicRoot, { attributes: true, attributeFilter: ["class"], subtree: true });
+      window.mosaicMonitor = { steadyHints: 0, fadeHints: 0, steadyMotion: 0, fadeMotion: 0, wrongSpot: 0 };
+      window.mosaicMonitoring = true;
+      const sample = () => {
+        if (!mosaicMonitoring) return;
+        const fade = mosaicCells.some(cell => [...cell.children].some(pane => {
+          const opacity = +getComputedStyle(pane).opacity; return opacity > 0 && opacity < 1;
+        }));
+        let hints = 0, motion = 0;
+        mosaicImages.forEach(image => {
+          const style = getComputedStyle(image), promoted = style.willChange === "transform";
+          const running = style.animationName !== "none" && style.animationPlayState === "running";
+          if (promoted) hints++; if (running) motion++;
+          if ((promoted || running) && !image.parentNode.parentNode.classList.contains("spot"))
+            mosaicMonitor.wrongSpot++;
+        });
+        const prefix = fade ? "fade" : "steady";
+        mosaicMonitor[prefix + "Hints"] = Math.max(mosaicMonitor[prefix + "Hints"], hints);
+        mosaicMonitor[prefix + "Motion"] = Math.max(mosaicMonitor[prefix + "Motion"], motion);
+        window.mosaicMonitorFrame = requestAnimationFrame(sample);
+      };
+      sample();
+    });
+    demand("Mosaic full readiness publishes nine unique opaque photos in eighteen fixed image panes",
+      await page.evaluate(() => mosaicReady && mosaicCells.length === 9 && mosaicImages.length === 18 &&
+        new Set(mosaicCurrentUrls()).size === 9 && mosaicRequests.length === 9 &&
+        mosaicPeak() === 2 && mosaicRequests.every(request => request.edge === 1200) &&
+        mosaicCells.every(cell => cell.children.length === 2 &&
+          +getComputedStyle(cell.lastElementChild).opacity === 1 &&
+          cell.lastElementChild.firstElementChild.style.backgroundImage !== "none")));
+    demand("Mosaic BSP cells fit the real viewport without blur or oversized photo strips",
+      await page.evaluate(() => mosaicRoot.querySelectorAll(".ss-fill").length === 0 &&
+        mosaicCells.every(cell => {
+          const W = cell.offsetWidth, H = cell.offsetHeight, image = cell.lastElementChild.firstElementChild;
+          const style = getComputedStyle(image), width = parseFloat(style.width), height = parseFloat(style.height);
+          return cell.offsetLeft >= 0 && cell.offsetTop >= 0 && cell.offsetLeft + W <= innerWidth &&
+            cell.offsetTop + H <= innerHeight && width > 0 && height > 0 && width <= W * 2 && height <= H * 2 &&
+            style.backgroundSize === "contain" && style.backgroundRepeat === "no-repeat" && style.filter === "none" &&
+            (image.classList.contains("panv") ? width <= W :
+              image.classList.contains("panh") ? height <= H :
+                Math.abs(width - W * .92) < .1 && Math.abs(height - H * .92) < .1);
+        })));
+    await page.waitForFunction(() => [...mosaicRoot.querySelectorAll(".ss-mosaic-pane")]
+      .some(pane => +getComputedStyle(pane).opacity > .1 && +getComputedStyle(pane).opacity < .9));
+    const mosaicReplacement = await page.evaluate(() => {
+      const changed = mosaicCells.filter((cell, i) => mosaicCurrentUrls()[i] !== mosaicInitialUrls[i]);
+      window.mosaicChangedCell = changed[0];
+      window.mosaicOutgoingPane = mosaicChangedCell.firstElementChild;
+      window.mosaicOutgoingImage = mosaicOutgoingPane.firstElementChild;
+      window.mosaicOutgoingUrl = mosaicOutgoingImage.style.backgroundImage;
+      const incoming = mosaicChangedCell.lastElementChild, style = getComputedStyle(incoming);
+      return { changed: changed.length, admitted: mosaicRequests.length, unique: new Set(mosaicCurrentUrls()).size,
+        incomingNew: !mosaicInitialUrls.includes(incoming.firstElementChild.style.backgroundImage),
+        outgoing: +getComputedStyle(mosaicOutgoingPane).opacity,
+        incoming: +style.opacity, duration: style.transitionDuration, property: style.transitionProperty };
+    });
+    demand("Mosaic unseen replacement changes one tile with incoming-only 1100ms fade over opaque outgoing URL",
+      mosaicReplacement.changed === 1 && mosaicReplacement.admitted === 10 && mosaicReplacement.unique === 9 &&
+      mosaicReplacement.incomingNew && mosaicReplacement.outgoing === 1 &&
+      mosaicReplacement.incoming > 0 && mosaicReplacement.incoming < 1 &&
+      mosaicReplacement.duration === "1.1s" && mosaicReplacement.property === "opacity", mosaicReplacement);
+    const pausedMosaic = await page.evaluate(async () => {
+      mosaicCheck.pause();
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return { state: mosaicState(), admissions: mosaicRequests.length };
+    });
+    await page.waitForTimeout(2700);
+    demand("Mosaic old-WebView pause freezes parent transforms, live opacity and photo CSS beyond cadence and retirement",
+      await page.evaluate(before => !Element.prototype.getAnimations && !Element.prototype.animate &&
+        JSON.stringify(mosaicState()) === JSON.stringify(before.state) &&
+        mosaicRequests.length === before.admissions && mosaicOutgoingImage.style.backgroundImage === mosaicOutgoingUrl &&
+        +getComputedStyle(mosaicOutgoingPane).opacity === 1, pausedMosaic));
+    demand("Mosaic pause removes every photo compositor hint and pauses every owned animation",
+      await page.evaluate(() => mosaicImages.every(image =>
+        getComputedStyle(image).willChange === "auto" && getComputedStyle(image).animationPlayState === "paused")));
+    const mosaicResume = await page.evaluate(() => {
+      mosaicCheck.resume();
+      return { clearParents: mosaicCells.every(cell => cell.style.transform === "" && cell.style.transition === ""),
+        duration: parseFloat(getComputedStyle(mosaicChangedCell.lastElementChild).transitionDuration) * 1000 };
+    });
+    demand("Mosaic resume clears held parent transforms and consumes only the remaining dissolve duration",
+      mosaicResume.clearParents && mosaicResume.duration > 0 && mosaicResume.duration < 1100, mosaicResume);
+    await page.waitForFunction(() => mosaicOutgoingImage.style.backgroundImage === "none" &&
+      +getComputedStyle(mosaicChangedCell.lastElementChild).opacity === 1);
+    demand("Mosaic retirement clears outgoing URL, animation and hint only after replacement opacity one",
+      await page.evaluate(() => mosaicOutgoingImage.style.backgroundImage === "none" &&
+        mosaicOutgoingImage.style.animationName === "none" && mosaicOutgoingImage.style.willChange === "auto" &&
+        getComputedStyle(mosaicOutgoingPane).visibility === "hidden" &&
+        mosaicImages.filter(image => image.style.backgroundImage !== "none").length === 9));
+    await page.waitForFunction(() => new Set(mosaicVisited).size === 9, null, { timeout: 6000 });
+    demand("Mosaic spotlight visits every tile in round-robin order while cells retain their original BSP rectangles",
+      await page.evaluate(() => new Set(mosaicVisited).size === 9 &&
+        mosaicVisited.every((index, i) => i === 0 || index === (mosaicVisited[i - 1] + 1) % 9) &&
+        JSON.stringify(mosaicLayout()) === JSON.stringify(mosaicOriginalLayout) &&
+        mosaicRoot.querySelectorAll(".mosaic-cell").length === 9 &&
+        mosaicRoot.querySelectorAll(".ss-mosaic-pane").length === 18 &&
+        mosaicRoot.querySelectorAll(".mosaic-photo").length === 18));
+    demand("Mosaic actual frame samples promote and animate only the spotlight with at most one steady or two fading photos",
+      await page.evaluate(() => mosaicMonitor.wrongSpot === 0 &&
+        mosaicMonitor.steadyHints <= 1 && mosaicMonitor.steadyMotion <= 1 &&
+        mosaicMonitor.fadeHints <= 2 && mosaicMonitor.fadeMotion <= 2 &&
+        mosaicMonitor.steadyMotion > 0), await page.evaluate(() => mosaicMonitor));
+    await page.evaluate(() => {
+      mosaicMonitoring = false; cancelAnimationFrame(mosaicMonitorFrame); mosaicSpotObserver.disconnect();
+      const stale = [...mosaicRoot.querySelectorAll(".ss-mosaic-pane")].map(pane => [pane, pane.ontransitionend]);
+      mosaicCheck.pause(); mosaicCheck(); mosaicCheck(); mosaicCheck.resume();
+      stale.forEach(([pane, end]) => { if (end) end({ target: pane, propertyName: "opacity" }); });
+      window.mosaicClosedAdmissions = mosaicRequests.length; restoreMosaicLoader();
+    });
+    demand("Mosaic terminal cleanup removes the wall and releases all eighteen retained image references",
+      await page.evaluate(() => mosaicRoot.children.length === 0 && mosaicImages.every(image =>
+        !image.isConnected && image.style.backgroundImage === "none" &&
+        image.style.animationName === "none" && image.style.willChange === "auto")));
+    await page.waitForTimeout(2600);
+    demand("Mosaic cleanup gates reject stale fade, resume and cadence publication or derivative work",
+      await page.evaluate(() => mosaicRoot.children.length === 0 && mosaicRequests.length === mosaicClosedAdmissions));
+    await page.goto(`${base}/mosaic-unit`);
+    const atomicMosaic = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      let hold = false, pair = 0, release, reached;
+      const blocked = new Promise(resolve => { reached = resolve; });
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        if (!hold || ++pair !== 2) return prepared;
+        hold = false;
+        return prepared.then(value => new Promise(resolve => { release = () => resolve(value); reached(); }));
+      };
+      const cleanup = SS.MODES.mosaic.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2500, microMs: 2500, ambientMs: 900, motionMs: 2500, url: photo => photo.url,
+      }, PHOTOS.slice(0, 9));
+      try {
+        await cleanup.ready;
+        const cells = [...root.querySelectorAll(".mosaic-cell")];
+        const urls = () => cells.map(cell => cell.lastElementChild.firstElementChild.style.backgroundImage);
+        const before = urls(); hold = true; await blocked;
+        const held = JSON.stringify(urls()) === JSON.stringify(before);
+        release(); await new Promise(resolve => setTimeout(resolve, 80));
+        const after = urls(), changed = cells.map((cell, i) => after[i] !== before[i] ? i : -1).filter(i => i >= 0);
+        const appetite = cell => cell.offsetWidth / cell.offsetHeight < .85 ? "portrait" :
+          cell.offsetWidth / cell.offsetHeight > 1.8 ? "pano" : "landscape";
+        const [a, b] = changed;
+        return { held, changed: changed.length, unique: new Set(after).size,
+          exchange: changed.length === 2 && after[a] === before[b] && after[b] === before[a],
+          compatible: changed.length === 2 && appetite(cells[a]) === appetite(cells[b]),
+          slots: root.querySelectorAll(".mosaic-photo").length,
+          outgoingOpaque: changed.every(i => +getComputedStyle(cells[i].firstElementChild).opacity === 1) };
+      } finally { cleanup(); window.preloadDecoded = original; }
+    });
+    demand("Mosaic full-library exchange waits for both real decodes before any tile publication", atomicMosaic.held, atomicMosaic);
+    demand("Mosaic full-library exchange atomically swaps two compatible-appetite cells without duplicates or extra slots",
+      atomicMosaic.changed === 2 && atomicMosaic.unique === 9 && atomicMosaic.exchange &&
+      atomicMosaic.compatible && atomicMosaic.slots === 18 && atomicMosaic.outgoingOpaque, atomicMosaic);
+    for (const count of [1, 2, 5]) {
+      await page.goto(`${base}/mosaic-unit`);
+      const smallMosaic = await page.evaluate(async count => {
+        const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+        document.querySelector("#stage").append(root);
+        const cleanup = SS.MODES.mosaic.run({
+          root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+          photoMs: 2500, microMs: 30000, ambientMs: 30000, motionMs: 2500, url: photo => photo.url,
+        }, PHOTOS.slice(0, count));
+        await cleanup.ready;
+        const cells = [...root.querySelectorAll(".mosaic-cell")];
+        const result = { cells: cells.length, slots: root.querySelectorAll(".mosaic-photo").length,
+          unique: new Set(cells.map(cell => cell.lastElementChild.firstElementChild.style.backgroundImage)).size,
+          opaque: cells.every(cell => +getComputedStyle(cell.lastElementChild).opacity === 1) };
+        cleanup(); return result;
+      }, count);
+      demand(`Mosaic ${count}-photo library retains ${count} unique opaque cells and ${count * 2} fixed panes`,
+        smallMosaic.cells === count && smallMosaic.slots === count * 2 &&
+        smallMosaic.unique === count && smallMosaic.opaque, smallMosaic);
+    }
+    for (const ratio of [.025, 1.5, 10]) {
+      await page.goto(`${base}/mosaic-unit`);
+      const mosaicGeometry = await page.evaluate(async ratio => {
+        const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+        document.querySelector("#stage").append(root);
+        const w = ratio < 1 ? 100 : ratio * 100, h = ratio < 1 ? 100 / ratio : 100;
+        const url = "data:image/svg+xml," + encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
+          `<rect width="${w}" height="${h}" fill="#647f83"/></svg>`);
+        const photo = { seed: "mosaic-geometry", url, w, h, ...(ratio === 1.5 ? {} : { fx: .8, fy: .8 }) };
+        const cleanup = SS.MODES.mosaic.run({
+          root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+          photoMs: 2500, microMs: 30000, ambientMs: 30000, motionMs: 2500, url: photo => photo.url,
+        }, [photo]);
+        await cleanup.ready;
+        const image = root.querySelector(".on .mosaic-photo"), style = getComputedStyle(image);
+        if (ratio === 1.5) { const animation = image.getAnimations()[0]; animation.pause(); animation.currentTime = 12000; }
+        const actual = new Image(); actual.src = url; await actual.decode();
+        const width = parseFloat(style.width), height = parseFloat(style.height), box = image.getBoundingClientRect();
+        const matrix = style.transform === "none" ? new DOMMatrixReadOnly() : new DOMMatrixReadOnly(style.transform);
+        const result = { decodedAspect: actual.naturalWidth / actual.naturalHeight, width, height,
+          panv: image.classList.contains("panv"), panh: image.classList.contains("panh"),
+          left: box.left, top: box.top, right: box.right, bottom: box.bottom,
+          focalX: parseFloat(style.left) + width * .8 + matrix.m41,
+          focalY: parseFloat(style.top) + height * .8 + matrix.m42,
+          motion: style.animationName, hint: style.willChange, size: style.backgroundSize,
+          repeat: style.backgroundRepeat, scale: matrix.a };
+        cleanup(); return result;
+      }, ratio);
+      demand(`Mosaic decoded ${ratio}:1 photo preserves bounded cross-axis fit and ${ratio === 1.5 ? "a contained maximum 4 percent push" : "a static visible cached focal anchor"}`,
+        Math.abs(mosaicGeometry.decodedAspect - ratio) < .0001 &&
+        mosaicGeometry.width <= 4320 && mosaicGeometry.height <= 2880 &&
+        mosaicGeometry.size === "contain" && mosaicGeometry.repeat === "no-repeat" &&
+        (ratio === 1.5
+          ? Math.abs(mosaicGeometry.width - 2160 * .92) < .1 &&
+            Math.abs(mosaicGeometry.height - 1440 * .92) < .1 && Math.abs(mosaicGeometry.scale - 1.04) < .0001 &&
+            mosaicGeometry.left >= 0 && mosaicGeometry.top >= 0 &&
+            mosaicGeometry.right <= 2160 && mosaicGeometry.bottom <= 1440
+          : mosaicGeometry.motion === "none" && mosaicGeometry.hint === "auto" &&
+            (ratio < 1 ? mosaicGeometry.panv && mosaicGeometry.width <= 2160 &&
+              mosaicGeometry.focalY >= 0 && mosaicGeometry.focalY <= 1440 :
+              mosaicGeometry.panh && mosaicGeometry.height <= 1440 &&
+              mosaicGeometry.focalX >= 0 && mosaicGeometry.focalX <= 2160)), mosaicGeometry);
+    }
+    await page.goto(`${base}/mosaic-unit`);
+    const cancelledMosaic = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let cleanup, atCleanup, atRequests, requests = 0;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = root.children.length; atRequests = requests;
+        })), () => {});
+        return prepared;
+      };
+      cleanup = SS.MODES.mosaic.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2500, microMs: 2500, ambientMs: 350, motionMs: 2500,
+        url: photo => { requests++; return photo.url; },
+      }, PHOTOS);
+      const ready = await cleanup.ready; window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: root.children.length, atRequests, requests };
+    });
+    demand("Mosaic decode-admission cleanup rejects partial wall publication and later derivative admissions",
+      cancelledMosaic.ready === false && cancelledMosaic.atCleanup === 0 &&
+      cancelledMosaic.afterReady === 0 && cancelledMosaic.atRequests === cancelledMosaic.requests, cancelledMosaic);
+    console.log(`${checks.filter(name => /mosaic/i.test(name)).length} Mosaic checks passed; replaying the retained browser baseline.`);
     await page.goto(`${base}/panorama-unit`);
     await page.evaluate(async () => {
       Element.prototype.getAnimations = undefined;
@@ -1362,6 +1666,13 @@ async function until(condition) {
         geometryViewports: [[2160, 1440], [1920, 1080], [1024, 768], [640, 960]],
         geometryAspects: [1.3, 1.5, 2, 3, 8, 10],
         originalEndMarkerPixels: { rightEdge, matte, photoCenter },
+        oldWebViewManualPath: "Element.getAnimations and Element.animate unavailable",
+      },
+      mosaic: {
+        passed: checks.filter(name => /mosaic/i.test(name)).length,
+        fixtureSource: "All twelve local synthetic gallery SVGs and exactly dimensioned synthetic geometry SVGs",
+        screenshots: ["mosaic.png"],
+        composition: { cells: 9, fixedImagePanes: 18, derivativeEdge: 1200 },
         oldWebViewManualPath: "Element.getAnimations and Element.animate unavailable",
       },
       scope: "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",

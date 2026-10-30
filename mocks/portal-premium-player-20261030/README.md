@@ -155,9 +155,9 @@ python3 slideshow/serve.py
 ```
 
 Open `http://127.0.0.1:8891/`. Diptych, Framed, Ken Burns, Cinematic Push, Gallery Wall,
-Hero + Sidebar, Memories and Panorama Drift are rendered by the actual
+Hero + Sidebar, Memories, Panorama Drift and Mosaic Wall are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its **151 browser checks** include real stalled HTTP image requests, pause
+ambient sensors. Its **174 browser checks** include real stalled HTTP image requests, pause
 cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
 frames, initial readiness without a second fade, pause without the newer animation API,
 and cancellation immediately before DOM publication. Diptych preserves its existing
@@ -203,6 +203,24 @@ points hold a static panoramic window around the anchor. The sweep completes wit
 the photo interval, independent of the scheduler's longer zoom-motion overlap.
 The two reusable scenes use an incoming-only 1.8-second fade, current-playback
 publication gates, and retirement/cleanup that clear URLs and promotion hints.
+
+Mosaic Wall retains its varied fixed tiles, in-place photo exchanges and roaming
+spotlight. Nine tiles own eighteen reusable image slots. The spotlight guides one
+photo's motion; a live fade can temporarily retain two moving photos in that tile.
+Other photos pause their motion and release explicit transform promotion hints.
+Pan strips fit their cross axis and never exceed two tile widths or heights.
+Compatible photos stay whole on matte with a gentle 4% push; cached focal points
+remain static. Initial decode admission proceeds in batches of two, with the
+complete composition gating readiness. Incoming-only 1.1-second fades retain
+opaque outgoing pixels until retirement; pause and cleanup retain or release those
+owners explicitly. These are bounded rendering contracts, not measured Portal
+texture allocations or FPS gains.
+Twenty-three actual-source Chrome assertions cover the initial two-decode limit,
+nine unique opaque tiles, stable geometry, spotlight coverage, photo motion/hint
+limits, atomic two-cell exchanges, retained manual pause, cleanup and cancellation,
+small libraries, decoded extreme-aspect bounds and static focal anchors.
+
+Open `http://127.0.0.1:8891/?mode=mosaic&review=1` for the five-second review pace.
 Only a strip that actually moves requests transform promotion. Geometry and owned
 resource bounds are verified separately from physical Portal GPU memory or FPS.
 The preview uses original 3:1 and 8:1 landscapes with matching metadata.

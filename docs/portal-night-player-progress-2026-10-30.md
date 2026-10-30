@@ -791,6 +791,74 @@ Music backend wiring remains deferred, with no Home Assistant operation.
 Implementation, parallel verification, deployment, cleanup and commit completed
 within this batch's thirty-minute limit. The broader goal remains active.
 
+## Mosaic Wall — 18:39 UTC batch
+
+Mosaic retains its varied fixed BSP tiles, roaming spotlight and in-place photo
+exchanges. A nine-tile wall now owns **eighteen fixed image slots** instead of
+appending replacement images. Each cell uses the shared incoming-only
+**1.1-second dissolve**, retaining opaque outgoing pixels until the new pane is
+opaque. Retirement and terminal cleanup clear photo URLs, motion and explicit
+promotion hints.
+
+Only the spotlighted tile runs photo motion: **at most one photo in steady
+state**, with up to two during that tile's live dissolve. The spotlight visits
+every tile in order without reshaping the wall. Paused photos use
+`animation-play-state: paused` and `will-change: auto`; these are verified CSS
+states, not measurements of actual GPU layer allocation.
+
+Mismatched-aspect pan strips fit their cross axis and are capped at **two tile
+widths/heights**, with quiet matte behind them. Compatible photos remain whole
+inside a 92% inset box with a gentle maximum 4% push. Cached focal anchors stay
+static and visible rather than running a pan across them. Existing 1200-edge
+derivative requests are retained; this batch does not add adaptive derivative
+sizing or face inference.
+
+Initial decode admission proceeds in **batches of two**, with all selected tiles
+ready before the outer scene is published. Unseen-photo replacement changes one
+cell; full-library exchanges prepare both resources before atomically swapping
+two cells with matching layout appetite. Current-playback gates prevent further
+derivative requests or DOM publication after close or a second pause.
+
+Manual pause holds the cell's spotlight transform, photo animation and any live
+fade without relying on newer WebView animation APIs. Resume continues the
+remaining fade and cadence. Cleanup removes the wall and releases every retained
+image reference, including when initial decode completion races with close.
+
+| Final gate | Evidence |
+| --- | --- |
+| Slideshow source checks | **198 passed**, zero failures/skips; **13 new Mosaic tests** included |
+| Engine fixtures | **14/14 passed** |
+| Actual-source Chrome renderer | **174 assertions passed**, including **23 Mosaic assertions**, zero script errors |
+| Initial composition | Nine unique opaque tiles, eighteen fixed panes, maximum two concurrent decode admissions |
+| Motion and geometry | Spotlight visits every tile; photo motion/hints remain ≤1 steady / ≤2 during a fade; bounds and layout remain fixed |
+| Integrated debug build | Successful in **5 seconds**; unchanged JVM task **UP-TO-DATE**, retaining **3,445 passing results / 358 suites** |
+| Native UI scope | Prior **56 checks / 151.09 seconds** cover unchanged Kotlin; not rerun for this asset batch |
+| Visual review | Actual-source Mosaic screenshot inspected at **2160 × 1440** |
+
+Source regressions close or resume/re-pause at 25 asynchronous checkpoints for
+each of three initial/replacement cases. Browser coverage includes the complete
+production scheduler, a held two-decode initial batch, atomic full-library
+exchange, incoming-only fades, manual retained pause, cleanup/cancellation,
+one/two/five-photo libraries, and real decoded extreme-aspect SVGs with static
+cached anchors. All **nine prior renderer PNGs** remain byte-identical. The finite
+review server adds Mosaic using the existing twelve synthetic gallery fixtures;
+it serves no household photos or credentials.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`681ae44c02c6d97b77a848cc26d1bf0f9f79b725691a641d135c97ccd5e50819`
+(**48,910,412 bytes**). Its signing certificate matches the preceding Panorama
+APK, retained privately as a rollback. One upload/install was used; installed-byte
+verification resolved the interrupted install HTTP response. All **97 settings**
+match the pre-install profile. Navigation dispatch acknowledgments do not prove
+visible device transitions.
+
+The performance collector is independently confirmed inactive, stopped and
+holding **zero active listeners**. No new physical timing capture was requested.
+Living Area remains unchanged. Physical night-clock acceptance and reliable Portal
+presentation measurements remain open; the source/browser checks do not establish
+a physical FPS improvement. Music backend wiring remains deferred, and no Home
+Assistant operation belongs to this batch. The broader goal remains active.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

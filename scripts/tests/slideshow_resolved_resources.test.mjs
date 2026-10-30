@@ -233,14 +233,15 @@ test('Mosaic: exchanging two occupied tiles carries each corresponding prepared 
     const before = r.writes.length;
     const photoId = value => /(?:copy|photo)-(\d+)[-.]/.exec(value)[1];
     const previous = new Map(r.nodes().filter(node => node.classList.contains('ss-mcell'))
-      .map(cell => [cell, photoId(cell.children.at(-1).style.backgroundImage)]));
+      .map(cell => [cell, photoId(cell.children.find(pane =>
+        pane.classList.contains('on')).children[0].style.backgroundImage)]));
     r.setGeneration(2); await r.tick(30000); await r.drain();
     r.assertPrepared(before);
     const exchanged = r.writes.slice(before);
     assert.equal(exchanged.length, 2);
     assert.ok(exchanged.every(write => write.url.includes('-g2-')));
-    assert.equal(photoId(exchanged[0].url), previous.get(exchanged[1].node.parent));
-    assert.equal(photoId(exchanged[1].url), previous.get(exchanged[0].node.parent));
+    assert.equal(photoId(exchanged[0].url), previous.get(exchanged[1].node.parent.parent));
+    assert.equal(photoId(exchanged[1].url), previous.get(exchanged[0].node.parent.parent));
   } finally { r.stop(); }
 });
 

@@ -1,6 +1,6 @@
 {
   "complete": true,
-  "passed": 151,
+  "passed": 174,
   "checks": [
     "Diptych displays two complete static photos without blur",
     "Diptych matte inset scales to the actual viewport",
@@ -12,6 +12,29 @@
     "heroSidebar actual renderer becomes ready",
     "memories actual renderer becomes ready",
     "panorama actual renderer becomes ready",
+    "mosaic actual renderer becomes ready",
+    "Mosaic outer publication waits for nine complete opaque tiles from all twelve synthetic fixtures",
+    "Mosaic initial loading admits only two decoded owners and withholds full readiness",
+    "Mosaic full readiness publishes nine unique opaque photos in eighteen fixed image panes",
+    "Mosaic BSP cells fit the real viewport without blur or oversized photo strips",
+    "Mosaic unseen replacement changes one tile with incoming-only 1100ms fade over opaque outgoing URL",
+    "Mosaic old-WebView pause freezes parent transforms, live opacity and photo CSS beyond cadence and retirement",
+    "Mosaic pause removes every photo compositor hint and pauses every owned animation",
+    "Mosaic resume clears held parent transforms and consumes only the remaining dissolve duration",
+    "Mosaic retirement clears outgoing URL, animation and hint only after replacement opacity one",
+    "Mosaic spotlight visits every tile in round-robin order while cells retain their original BSP rectangles",
+    "Mosaic actual frame samples promote and animate only the spotlight with at most one steady or two fading photos",
+    "Mosaic terminal cleanup removes the wall and releases all eighteen retained image references",
+    "Mosaic cleanup gates reject stale fade, resume and cadence publication or derivative work",
+    "Mosaic full-library exchange waits for both real decodes before any tile publication",
+    "Mosaic full-library exchange atomically swaps two compatible-appetite cells without duplicates or extra slots",
+    "Mosaic 1-photo library retains 1 unique opaque cells and 2 fixed panes",
+    "Mosaic 2-photo library retains 2 unique opaque cells and 4 fixed panes",
+    "Mosaic 5-photo library retains 5 unique opaque cells and 10 fixed panes",
+    "Mosaic decoded 0.025:1 photo preserves bounded cross-axis fit and a static visible cached focal anchor",
+    "Mosaic decoded 1.5:1 photo preserves bounded cross-axis fit and a contained maximum 4 percent push",
+    "Mosaic decoded 10:1 photo preserves bounded cross-axis fit and a static visible cached focal anchor",
+    "Mosaic decode-admission cleanup rejects partial wall publication and later derivative admissions",
     "Panorama readiness retains exactly two fixed scene roots and two reusable strips",
     "Panorama starts with one opaque contained non-repeating photo and one 2400-edge admission",
     "Panorama unhinted wide photo moves only its transform with linear forward dolly",
@@ -217,6 +240,19 @@
         173,
         138
       ]
+    },
+    "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
+  },
+  "mosaic": {
+    "passed": 23,
+    "fixtureSource": "All twelve local synthetic gallery SVGs and exactly dimensioned synthetic geometry SVGs",
+    "screenshots": [
+      "mosaic.png"
+    ],
+    "composition": {
+      "cells": 9,
+      "fixedImagePanes": 18,
+      "derivativeEdge": 1200
     },
     "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
   },

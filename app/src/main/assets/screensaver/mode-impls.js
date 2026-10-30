@@ -698,79 +698,138 @@
   }};
 
   // ---- 09 Mosaic wall (BSP, choreographed) -----------------------------------
-  // The layout is fixed for the mode's whole run — tiles never move or reshape
-  // (rearranging read as restless). Motion comes from within the frames: per-tile
-  // Ken Burns / pan-through, a roaming spotlight (filter/transform only), and
-  // photo crossfades — including exchanging two tiles' photos in place when the
-  // whole library is already on the wall.
+  // Keep the fixed BSP layout and in-place exchanges. The spotlight guides photo
+  // motion, so the wall never runs nine independent animations simultaneously.
   MODES.mosaic = { name: "Mosaic Wall", run(ctx, deck) {
-    const t = makeTimers(ctx); const wall = el("ss-wall spotlit", ctx.root); let cells = [];
+    const t = makeTimers(ctx), wall = el("ss-wall spotlit mosaic-wall", ctx.root);
+    let cells = [], disposed = false, paused = false, spot = -1;
     function bsp(rect, n) { if (n <= 1) return [rect]; const k = Math.max(1, Math.round(n * (0.42 + Math.random() * 0.16))); const horiz = rect.w >= rect.h; const ratio = k / n; if (horiz) { const w1 = Math.round(rect.w * ratio); return bsp({ x: rect.x, y: rect.y, w: w1, h: rect.h }, k).concat(bsp({ x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, n - k)); } const h1 = Math.round(rect.h * ratio); return bsp({ x: rect.x, y: rect.y, w: rect.w, h: h1 }, k).concat(bsp({ x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, n - k)); }
-    // A photo whose shape fights its cell (portrait in a wide frame) would lose most of
-    // itself to the cover crop, so it pans through its full extent instead of Ken Burns.
-    // A cached point cannot prove a safe motion path: keep that focus still. Cover crops
-    // anchor on it; photos without a point retain the existing pan presentation.
-    function mkImg(p, rect, url) {
-      const plan = SS.fitPlan(aspect(p), rect.w / rect.h);
-      if (plan.mode !== "cover") {
-        const img = el(plan.mode === "panV" ? "ss-img panv" : "ss-img panh");
-        bg(img, url);
-        if (plan.mode === "panV") { img.style.height = plan.size + "%"; img.style.setProperty("--travel", -(plan.size - 100) / plan.size * 100 + "%"); }
-        else { img.style.width = plan.size + "%"; img.style.setProperty("--travel", -(plan.size - 100) / plan.size * 100 + "%"); }
-        // Follow the configured hold plus dissolve, including long slideshow intervals.
-        const dur = ctx.motionMs / 1000;
-        img.style.setProperty("--d", dur + "s");
-        // Place a known focus in the visible window and do not tour away from it.
-        const start = SS.panStart(plan.mode === "panV" ? p.fy : p.fx, plan.size);
-        if (hasFace(p)) {
-          img.style.animation = "none";
-          img.style.transform = `${plan.mode === "panV" ? "translateY" : "translateX"}(${-((plan.size - 100) / plan.size * 100) * start}%)`;
-        }
-        return img;
+    function applySpot(cell) {
+      cell.c.classList.toggle("spot", cell.spot);
+      cell.layers.forEach(layer => {
+        const active = cell.spot && layer.moves && !paused;
+        layer.image.style.animationPlayState = active ? "running" : "paused";
+        layer.image.style.willChange = active ? "transform" : "auto";
+      });
+    }
+    function createCell(rect) {
+      const c = el("ss-mcell mosaic-cell", wall);
+      c.style.left = rect.x + "px"; c.style.top = rect.y + "px";
+      c.style.width = rect.w + "px"; c.style.height = rect.h + "px";
+      const layers = [0, 1].map(() => {
+        const pane = el("ss-mosaic-pane retired", c), image = el("ss-img mosaic-photo", pane);
+        image.style.backgroundImage = "none"; image.style.animation = "none";
+        image.style.willChange = "auto"; image.style.animationPlayState = "paused";
+        return { pane, image, moves: false };
+      });
+      const dissolve = makeSceneDissolve({ ...ctx, root: c }, t, layers.map(layer => layer.pane), 1100, pane => {
+        const layer = layers.find(layer => layer.pane === pane);
+        layer.image.style.backgroundImage = "none"; layer.image.style.animation = "none";
+        layer.image.style.willChange = "auto"; layer.image.style.transform = "none";
+        layer.image.style.animationPlayState = "paused"; layer.moves = false;
+      });
+      return { c, rect, layers, dissolve, photo: null, spot: false };
+    }
+    function setImg(cell, p, url) {
+      const pane = cell.dissolve.next(), layer = cell.layers.find(layer => layer.pane === pane), image = layer.image;
+      const W = cell.rect.w, H = cell.rect.h, rawAspect = aspect(p);
+      const ratio = Number.isFinite(rawAspect) && rawAspect > 0 ? rawAspect : W / H;
+      const plan = SS.fitPlan(ratio, W / H);
+      let width = W * .92, height = H * .92, left = W * .04, top = H * .04, travel = 0;
+      let animation = "cinematicDrift", axis = null, size = 100;
+      if (plan.mode === "panV") {
+        height = Math.min(H * 2, Math.max(H, W / ratio)); width = Math.min(W, height * ratio);
+        left = (W - width) / 2; top = 0; travel = (H - height) / height * 100;
+        animation = "panV"; axis = "translateY"; size = height / H * 100;
+      } else if (plan.mode === "panH") {
+        width = Math.min(W * 2, Math.max(W, H * ratio)); height = Math.min(H, width / ratio);
+        left = 0; top = (H - height) / 2; travel = (W - width) / width * 100;
+        animation = "panH"; axis = "translateX"; size = width / W * 100;
       }
-      const img = el("ss-img kb"); bg(img, url); if (Math.random() < 0.4) img.classList.remove("kb"); img.style.setProperty("--d", (12 + Math.random() * 6) + "s"); img.style.setProperty("--dx", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.setProperty("--dy", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "%"); img.style.animationDelay = (-Math.random() * 10) + "s";
-      faceBg(img, p);
-      return img;
+      image.className = "ss-img mosaic-photo " + (axis ? (plan.mode === "panV" ? "panv" : "panh") : "kb");
+      image.style.width = width + "px"; image.style.height = height + "px";
+      image.style.left = left + "px"; image.style.top = top + "px";
+      image.style.right = "auto"; image.style.bottom = "auto";
+      image.style.setProperty("--travel", travel + "%");
+      bg(image, url, "contain"); layer.moves = !hasFace(p);
+      image.style.animation = layer.moves ?
+        `${animation} ${Math.max(12000, ctx.motionMs)}ms ease-in-out infinite alternate` : "none";
+      const start = SS.panStart(plan.mode === "panV" ? p.fy : p.fx, size);
+      image.style.transform = hasFace(p) && axis ? `${axis}(${travel * start}%)` : "none";
+      cell.photo = p; applySpot(cell); cell.dissolve.present(pane);
     }
     function wantFor(cellA) { return cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape"; }
-    // Every pick excludes what's already on the wall, so no tile duplicates another.
     function onWall() { return cells.map(x => x.photo && x.photo.seed).filter(Boolean); }
-    function setRect(cell, r) { cell.rect = r; cell.c.style.left = r.x + "px"; cell.c.style.top = r.y + "px"; cell.c.style.width = r.w + "px"; cell.c.style.height = r.h + "px"; }
-    // Replace a cell's image (crossfade in place — the cell itself never moves).
-    function setImg(cell, p, url) { const img = mkImg(p, cell.rect, url); cell.c.appendChild(img); const old = cell.img; t.frame(() => { if (old) old.style.opacity = "0"; }); t.after(() => { if (old) old.remove(); }, 1200); cell.img = img; cell.photo = p; }
+    async function prepare(pairs) {
+      const urls = await t.publish(() => pairs.map(pair => ctx.url(pair.photo, 1200)));
+      if (urls === false || !await t.load(urls) || disposed) return false;
+      return t.publish(() => {
+        if (disposed) return false;
+        pairs.forEach((pair, i) => setImg(pair.cell, pair.photo, urls[i]));
+      });
+    }
     async function build() {
       const selected = [];
       const slots = bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, SS.slots(deck, 9)).map(rect => {
         const photo = SS.take(deck, ctx.cursor, [wantFor(rect.w / rect.h)], selected)[0];
         selected.push(photo.seed); return { rect, photo };
-      }).map(s => ({ ...s, url: ctx.url(s.photo, 1200) }));
-      if (!await t.load(slots.map(s => s.url))) return false;
-      slots.forEach(({ rect, photo, url }) => {
-        const c = el("ss-mcell", wall), cell = { c, img: mkImg(photo, rect, url), photo, rect };
-        setRect(cell, rect); c.appendChild(cell.img); cells.push(cell);
       });
-      spotlight();
+      if (await t.publish(() => {
+        if (disposed) return false;
+        slots.forEach(slot => { slot.cell = createCell(slot.rect); cells.push(slot.cell); });
+      }) === false) return false;
+      // Build the full composition before readiness, with only two simultaneous decodes.
+      for (let i = 0; i < slots.length; i += 2)
+        if (await prepare(slots.slice(i, i + 2)) === false) return false;
+      return t.publish(spotlight);
     }
-    // Refresh one tile with an unseen photo; when the whole library is already on the
-    // wall, exchange two same-appetite tiles' photos instead (crossfades, no movement).
     async function swap() {
-      if (!cells.length) return;
-      if (SS.unused(deck, onWall()).length) { const c = cells[Math.floor(Math.random() * cells.length)]; const p = SS.take(deck, ctx.cursor, [wantFor(c.rect.w / c.rect.h)], onWall())[0]; const url = ctx.url(p, 1200); if (!await t.load(url)) return false; setImg(c, p, url); return; }
+      if (disposed || !cells.length) return false;
+      if (SS.unused(deck, onWall()).length) {
+        const cell = cells[Math.floor(Math.random() * cells.length)];
+        const photo = SS.take(deck, ctx.cursor, [wantFor(cell.rect.w / cell.rect.h)], onWall())[0];
+        return prepare([{ cell, photo }]);
+      }
       const groups = {};
       cells.forEach(c => { const k = wantFor(c.rect.w / c.rect.h); (groups[k] = groups[k] || []).push(c); });
       const eligible = Object.values(groups).filter(g => g.length >= 2);
       if (!eligible.length) return;
       const [a, b] = window.shuffled(eligible[Math.floor(Math.random() * eligible.length)]).slice(0, 2);
-      const pa = a.photo, pb = b.photo, ua = ctx.url(pa, 1200), ub = ctx.url(pb, 1200); if (!await t.load([ua, ub])) return false; setImg(a, pb, ub); setImg(b, pa, ua);
+      return prepare([{ cell: a, photo: b.photo }, { cell: b, photo: a.photo }]);
     }
-    // One tile gently lifts while the rest dim a touch; the focus wanders per beat.
-    function spotlight() { const i = Math.floor(Math.random() * cells.length); cells.forEach((c, k) => c.c.classList.toggle("spot", k === i)); }
+    function spotlight() {
+      if (disposed || !cells.length) return false;
+      if (spot >= 0) { cells[spot].spot = false; applySpot(cells[spot]); }
+      spot = (spot + 1) % cells.length;
+      cells[spot].spot = true; applySpot(cells[spot]);
+    }
     t.start(build);
-    // The spotlight wanders every beat; photos change only every fourth beat (~20s) —
-    // anything faster reads as restless on a wall display.
-    let beat = 0;
-    t.every(spotlight, ctx.ambientMs); t.every(swap, ctx.microMs);
-    return t.cleanup;
+    if (SS.slots(deck, 9) > 1) { t.every(spotlight, ctx.ambientMs); t.every(swap, ctx.microMs); }
+    const cleanup = () => {
+      if (disposed) return;
+      disposed = true; t.cleanup(); cells.forEach(cell => cell.dissolve.cleanup());
+      cells = []; wall.remove();
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
+    cleanup.pause = () => {
+      if (disposed || paused) return;
+      paused = true; t.cleanup.pause();
+      const transforms = cells.map(cell => getComputedStyle(cell.c).transform);
+      cells.forEach((cell, i) => {
+        cell.c.style.transition = "none"; cell.c.style.transform = transforms[i];
+        cell.dissolve.cleanup.pause(); applySpot(cell);
+      });
+    };
+    cleanup.resume = () => {
+      if (disposed || !paused) return;
+      paused = false;
+      cells.forEach(cell => {
+        cell.c.style.transition = ""; cell.c.style.transform = "";
+        applySpot(cell); cell.dissolve.cleanup.resume();
+      });
+      t.cleanup.resume();
+    };
+    return cleanup;
   }};
 
   // ---- 10 Filmstrip coverflow ------------------------------------------------

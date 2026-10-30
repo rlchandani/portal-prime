@@ -88,6 +88,12 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
    every beat, a recurring whole-wall stall on the weak GPU. */
 .ss-wall.spotlit .ss-mcell { transition: transform 1.2s ease; }
 .ss-wall.spotlit .ss-mcell.spot { transform: scale(1.02); z-index: 2; }
+.ss-wall.mosaic-wall, .mosaic-cell { background: #1c1b19; }
+.ss-mosaic-pane { position: absolute; inset: 0; opacity: 0; background: #1c1b19;
+  transition: opacity 1.1s ease; }
+.ss-mosaic-pane.on { opacity: 1; }
+.ss-mosaic-pane.retired { opacity: 0; visibility: hidden; transition: none; }
+.mosaic-cell .mosaic-photo { transition: none; }
 
 /* memories */
 .ss-memory-scene { position: absolute; inset: 0; background: #1c1b19;
