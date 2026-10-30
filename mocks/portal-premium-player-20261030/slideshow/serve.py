@@ -45,10 +45,12 @@ class Handler(BaseHTTPRequestHandler):
                 {"url": "/fixtures/" + name + ".png", "w": 480, "h": 720}
                 for name in ("dunes", "tidal")]
             interval = 5 if query.get("review", ["0"])[0] == "1" else 30
+            motion = query.get("motion", ["gentle"])[0] != "still"
             bridge = "<base href='/screensaver/'><script>window.Android={" + \
                 "getPhotos:()=>" + json.dumps(json.dumps(photos)) + \
                 ",getMode:()=>" + json.dumps(mode) + \
                 ",getIntervalSec:()=>" + str(interval) + \
+                ",getPhotoMotion:()=>" + json.dumps(motion) + \
                 ",scaledUrlForSize:url=>url};</script>"
             content = (renderer / "index.html").read_text().replace("<head>", "<head>" + bridge).encode()
             content_type = "text/html"

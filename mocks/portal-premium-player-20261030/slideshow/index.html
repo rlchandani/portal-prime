@@ -24,24 +24,29 @@ button:focus-visible{outline:3px solid #9ad2ff;outline-offset:3px}
 <button data-mode="polaroid">Polaroid Scatter</button>
 <button data-mode="cinema">Cinema Letterbox</button>
 <button id="review" aria-pressed="false" title="Toggle review pace: 30 sec by default, 5 sec for faster review">Review pace: 30 sec</button>
+<button id="motion" aria-pressed="true" title="Keep photo changes and navigation while stopping continuous photo movement">Photo motion: Gentle</button>
 <button id="previous">Previous</button>
 <button id="pause">Pause</button><button id="next">Next</button>
 </header>
 <script>
 const frame=document.querySelector("iframe");
 const params=new URLSearchParams(location.search);
-let mode=params.get("mode")||"diptych",review=params.get("review")==="1",paused=false;
+let mode=params.get("mode")||"diptych",review=params.get("review")==="1",paused=false,
+ motion=params.get("motion")!=="still";
 function load(){
- frame.src="/preview.html?nativeClock=1&mode="+encodeURIComponent(mode)+(review?"&review=1":"");
+ frame.src="/preview.html?nativeClock=1&mode="+encodeURIComponent(mode)+(review?"&review=1":"")+"&motion="+(motion?"gentle":"still");
  paused=false;document.querySelector("#pause").textContent="Pause";
  const pace=document.querySelector("#review");pace.textContent="Review pace: "+(review?"5":"30")+" sec";pace.setAttribute("aria-pressed",String(review));
+ const movement=document.querySelector("#motion");movement.textContent="Photo motion: "+(motion?"Gentle":"Still");movement.setAttribute("aria-pressed",String(motion));
  document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===mode)));
  const url=new URL(location);url.searchParams.set("mode",mode);
  if(review)url.searchParams.set("review","1");else url.searchParams.delete("review");
+ if(motion)url.searchParams.delete("motion");else url.searchParams.set("motion","still");
  history.replaceState({},'',url);
 }
 document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;load()});
 document.querySelector("#review").onclick=()=>{review=!review;load()};
+document.querySelector("#motion").onclick=()=>{motion=!motion;load()};
 document.querySelector("#next").onclick=()=>frame.contentWindow.immortalSlideshow?.next();
 document.querySelector("#previous").onclick=()=>frame.contentWindow.immortalSlideshow?.previous();
 document.querySelector("#pause").onclick=()=>{

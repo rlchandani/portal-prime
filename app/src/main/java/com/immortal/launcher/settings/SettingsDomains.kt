@@ -223,13 +223,9 @@ object SettingsDomains {
                       "Gentle photo motion",
                       get = { it.photoMotion },
                       set = ScreensaverConfig::setPhotoMotion,
-                      help = "Let photos move gently when there is room. Off keeps them still between dissolves.",
-                      visible = { _, s ->
-                        s.enabled && ScreensaverConfig.isNativeStage(s.mode) &&
-                            s.mode != ScreensaverConfig.MODE_WHOLE &&
-                            s.mode != ScreensaverConfig.MODE_GALLERY_PRINT &&
-                            s.mode != ScreensaverConfig.MODE_GALLERY_SPREAD
-                      }),
+                      help = "Let photos move gently when there is room. Off keeps them still " +
+                          "between photo changes. Transitions and navigation continue.",
+                      visible = { _, s -> s.enabled && ScreensaverConfig.supportsPhotoMotion(s.mode) }),
                   BoolSpec(
                       "keep_people_in_frame",
                       "Keep people in frame",

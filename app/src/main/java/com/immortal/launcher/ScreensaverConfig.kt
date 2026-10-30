@@ -65,6 +65,11 @@ object ScreensaverConfig {
   // Preferred styles first; all existing IDs stay selectable and valid for saved preferences.
   val MODES = listOf(MODE_SMART, MODE_PORTRAITS, MODE_WHOLE, MODE_GALLERY_PRINT,
       MODE_GALLERY_SPREAD, MODE_CLASSIC, MODE_SHUFFLE) + ENGINE_MODES
+  private val PHOTO_MOTION_MODES = setOf(MODE_SMART, MODE_PORTRAITS, MODE_SHUFFLE,
+      "kenBurns", "diptych", "framed", "push", "memories", "panorama", "mosaic",
+      "cinema", "heroSidebar")
+  fun supportsPhotoMotion(mode: String): Boolean = mode in PHOTO_MOTION_MODES
+
   fun modeLabel(m: String): String = when (m) {
     MODE_SMART -> "Smart frame"
     MODE_PORTRAITS -> "Portrait pair"

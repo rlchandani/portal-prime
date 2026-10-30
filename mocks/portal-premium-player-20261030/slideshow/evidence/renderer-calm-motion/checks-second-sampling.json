@@ -1,0 +1,5811 @@
+{
+  "startedAt": "2026-10-30T20:09:12.528Z",
+  "viewport": {
+    "width": 2160,
+    "height": 1440
+  },
+  "sources": {
+    "index.html": "6502dd3e482c9ace4b9b347dff1aa6226a18004c6cd4a4e5e9e8289d62a0dcf4",
+    "styles.css": "42e62333a60a28b3e07011a3b282a0a561c0e03c748f049c442f34f596c3c842",
+    "photos.js": "1b2596b9a4bc0bfe81985940a6dfd68a5fa59bb50359ddf14b52efa82221470a",
+    "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+    "modes.js": "37c7ec6bac8748239faa921757792f8fc45e953c273f008d6dc0c570f7aa0c46",
+    "mode-impls.js": "e5571e2673304f5724d8cbb56e6a511088c0c426a395647614febc52a8693770",
+    "scheduler.js": "bbc8e0b4ff043c65cca3828fae7709f2ce2141718ae080b13a34cf287112c871",
+    "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+  },
+  "bridgeMethod": "getPhotoMotion",
+  "checks": [
+    {
+      "name": "kenBurns/still: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": false,
+        "contexts": [
+          false
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/still: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.3968671844149006,
+        "colorfulFraction": 0.33355271817822824,
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/still: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/still: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1,
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/still: all photo animations none and hints auto",
+      "pass": true,
+      "numeric": {
+        "photos": [
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          }
+        ],
+        "mosaic": []
+      }
+    },
+    {
+      "name": "kenBurns/still: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "kenBurns/still: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "kenBurns/still: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-07.svg",
+        "after": "/fixtures/gallery-03.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "kenBurns/still: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/gallery-07.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "kenBurns/still: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/default: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": true,
+        "contexts": [
+          true
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/default: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.9398446755298144,
+        "colorfulFraction": 0.205607476635514,
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/default: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/default: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 8.030200000000008,
+        "compared": 1,
+        "animations": [
+          "kb"
+        ],
+        "hints": [
+          "transform"
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/default: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "kenBurns/default: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "kenBurns/default: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-11.svg",
+        "after": "/fixtures/gallery-06.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "kenBurns/default: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/gallery-11.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "kenBurns/default: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "diptych/still: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": false,
+        "contexts": [
+          false
+        ]
+      }
+    },
+    {
+      "name": "diptych/still: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.8907463472423325,
+        "colorfulFraction": 0.8671844149006187,
+        "edges": [
+          1800
+        ]
+      }
+    },
+    {
+      "name": "diptych/still: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          1800
+        ]
+      }
+    },
+    {
+      "name": "diptych/still: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1,
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "diptych/still: all photo animations none and hints auto",
+      "pass": true,
+      "numeric": {
+        "photos": [
+          {
+            "animation": "none",
+            "hint": "auto"
+          }
+        ],
+        "mosaic": []
+      }
+    },
+    {
+      "name": "diptych/still: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "diptych/still: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "diptych/still: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-05.svg",
+        "after": "/fixtures/gallery-08.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "diptych/still: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/gallery-05.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "diptych/still: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "url(\"/fixtures/gallery-05.svg\")",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "diptych/default: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": true,
+        "contexts": [
+          true
+        ]
+      }
+    },
+    {
+      "name": "diptych/default: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.8907463472423325,
+        "colorfulFraction": 0.8671844149006187,
+        "edges": [
+          1800
+        ]
+      }
+    },
+    {
+      "name": "diptych/default: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          1800
+        ]
+      }
+    },
+    {
+      "name": "diptych/default: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1,
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "diptych/default: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "diptych/default: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "diptych/default: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-05.svg",
+        "after": "/fixtures/gallery-07.svg|/fixtures/gallery-10.svg",
+        "liveCount": 2
+      }
+    },
+    {
+      "name": "diptych/default: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 2,
+        "urls": "/fixtures/gallery-07.svg|/fixtures/gallery-10.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "diptych/default: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "url(\"/fixtures/gallery-10.svg\")",
+            "ownedAfterCleanup": false,
+            "hint": ""
+          },
+          {
+            "url": "url(\"/fixtures/gallery-07.svg\")",
+            "ownedAfterCleanup": false,
+            "hint": ""
+          }
+        ]
+      }
+    },
+    {
+      "name": "framed/still: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": false,
+        "contexts": [
+          false
+        ]
+      }
+    },
+    {
+      "name": "framed/still: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.42766881663814665,
+        "colorfulFraction": 0.2848492826115572,
+        "edges": [
+          1800
+        ]
+      }
+    },
+    {
+      "name": "framed/still: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          1800
+        ]
+      }
+    },
+    {
+      "name": "framed/still: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1,
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "framed/still: all photo animations none and hints auto",
+      "pass": true,
+      "numeric": {
+        "photos": [
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          }
+        ],
+        "mosaic": []
+      }
+    },
+    {
+      "name": "framed/still: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "framed/still: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "framed/still: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-12.svg",
+        "after": "/fixtures/gallery-08.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "framed/still: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/gallery-12.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "framed/still: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "framed/default: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": true,
+        "contexts": [
+          true
+        ]
+      }
+    },
+    {
+      "name": "framed/default: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.42766881663814665,
+        "colorfulFraction": 0.34921679610372514,
+        "edges": [
+          1800
+        ]
+      }
+    },
+    {
+      "name": "framed/default: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          1800
+        ]
+      }
+    },
+    {
+      "name": "framed/default: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0.0014600000000000168,
+        "compared": 1,
+        "animations": [
+          "breathe"
+        ],
+        "hints": [
+          "transform"
+        ]
+      }
+    },
+    {
+      "name": "framed/default: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "framed/default: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "framed/default: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-06.svg",
+        "after": "/fixtures/gallery-01.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "framed/default: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/gallery-06.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "framed/default: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "push/still: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": false,
+        "contexts": [
+          false
+        ]
+      }
+    },
+    {
+      "name": "push/still: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.36790838488877187,
+        "colorfulFraction": 0.3072265367908385,
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "push/still: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "push/still: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1,
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "push/still: all photo animations none and hints auto",
+      "pass": true,
+      "numeric": {
+        "photos": [
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          }
+        ],
+        "mosaic": []
+      }
+    },
+    {
+      "name": "push/still: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "push/still: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "push/still: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-07.svg",
+        "after": "/fixtures/gallery-01.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "push/still: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/gallery-07.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "push/still: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "push/default: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": true,
+        "contexts": [
+          true
+        ]
+      }
+    },
+    {
+      "name": "push/default: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.8470448861392655,
+        "colorfulFraction": 0.16506515729893378,
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "push/default: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "push/default: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0.0026999999999999247,
+        "compared": 1,
+        "animations": [
+          "cinematicDrift"
+        ],
+        "hints": [
+          "transform"
+        ]
+      }
+    },
+    {
+      "name": "push/default: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "push/default: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "push/default: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-11.svg",
+        "after": "/fixtures/gallery-12.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "push/default: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/gallery-11.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "push/default: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "memories/still: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": false,
+        "contexts": [
+          false
+        ]
+      }
+    },
+    {
+      "name": "memories/still: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.36790838488877187,
+        "colorfulFraction": 0.07581940239568251,
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "memories/still: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "memories/still: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1,
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "memories/still: all photo animations none and hints auto",
+      "pass": true,
+      "numeric": {
+        "photos": [
+          {
+            "animation": "none",
+            "hint": "auto"
+          }
+        ],
+        "mosaic": []
+      }
+    },
+    {
+      "name": "memories/still: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "memories/still: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "memories/still: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-01.svg",
+        "after": "/fixtures/gallery-02.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "memories/still: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/gallery-01.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "memories/still: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "memories/default: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": true,
+        "contexts": [
+          true
+        ]
+      }
+    },
+    {
+      "name": "memories/default: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.36790838488877187,
+        "colorfulFraction": 0.07687244965117809,
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "memories/default: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2200
+        ]
+      }
+    },
+    {
+      "name": "memories/default: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0.0026999999999999247,
+        "compared": 1,
+        "animations": [
+          "cinematicDrift"
+        ],
+        "hints": [
+          "transform"
+        ]
+      }
+    },
+    {
+      "name": "memories/default: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "memories/default: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "memories/default: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-01.svg",
+        "after": "/fixtures/gallery-11.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "memories/default: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/gallery-01.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "memories/default: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "panorama/still: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": false,
+        "contexts": [
+          false
+        ]
+      }
+    },
+    {
+      "name": "panorama/still: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.38028169014084506,
+        "colorfulFraction": 0.38028169014084506,
+        "edges": [
+          2400
+        ]
+      }
+    },
+    {
+      "name": "panorama/still: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2400
+        ]
+      }
+    },
+    {
+      "name": "panorama/still: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1,
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "panorama/still: all photo animations none and hints auto",
+      "pass": true,
+      "numeric": {
+        "photos": [
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          }
+        ],
+        "mosaic": []
+      }
+    },
+    {
+      "name": "panorama/still: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "panorama/still: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "panorama/still: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/panorama-extreme.svg",
+        "after": "/fixtures/panorama-wide.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "panorama/still: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/panorama-extreme.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "panorama/still: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "panorama/default: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": true,
+        "contexts": [
+          true
+        ]
+      }
+    },
+    {
+      "name": "panorama/default: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 1,
+        "colorfulFraction": 0.6127418717914966,
+        "edges": [
+          2400
+        ]
+      }
+    },
+    {
+      "name": "panorama/default: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2400
+        ]
+      }
+    },
+    {
+      "name": "panorama/default: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 208.77800000000002,
+        "compared": 1,
+        "animations": [
+          "dolly"
+        ],
+        "hints": [
+          "transform"
+        ]
+      }
+    },
+    {
+      "name": "panorama/default: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "panorama/default: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "panorama/default: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/panorama-wide.svg",
+        "after": "/fixtures/panorama-extreme.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "panorama/default: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/panorama-wide.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "panorama/default: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "mosaic/still: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": false,
+        "contexts": [
+          false
+        ]
+      }
+    },
+    {
+      "name": "mosaic/still: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 9,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.9315519283927867,
+        "colorfulFraction": 0.5215216532841911,
+        "edges": [
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200
+        ]
+      }
+    },
+    {
+      "name": "mosaic/still: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200
+        ]
+      }
+    },
+    {
+      "name": "mosaic/still: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 9,
+        "animations": [
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none"
+        ],
+        "hints": [
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "mosaic/still: all photo animations none and hints auto",
+      "pass": true,
+      "numeric": {
+        "photos": [
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          }
+        ],
+        "mosaic": [
+          {
+            "transform": "none",
+            "spot": false
+          },
+          {
+            "transform": "none",
+            "spot": false
+          },
+          {
+            "transform": "none",
+            "spot": false
+          },
+          {
+            "transform": "none",
+            "spot": false
+          },
+          {
+            "transform": "none",
+            "spot": false
+          },
+          {
+            "transform": "none",
+            "spot": false
+          },
+          {
+            "transform": "none",
+            "spot": false
+          },
+          {
+            "transform": "none",
+            "spot": false
+          },
+          {
+            "transform": "none",
+            "spot": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "mosaic/still: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 9
+      }
+    },
+    {
+      "name": "mosaic/still: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 9
+      }
+    },
+    {
+      "name": "mosaic/still: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-01.svg|/fixtures/gallery-02.svg|/fixtures/gallery-03.svg|/fixtures/gallery-04.svg|/fixtures/gallery-05.svg|/fixtures/gallery-06.svg|/fixtures/gallery-07.svg|/fixtures/gallery-10.svg|/fixtures/gallery-12.svg",
+        "after": "/fixtures/gallery-01.svg|/fixtures/gallery-04.svg|/fixtures/gallery-05.svg|/fixtures/gallery-07.svg|/fixtures/gallery-08.svg|/fixtures/gallery-09.svg|/fixtures/gallery-10.svg|/fixtures/gallery-11.svg|/fixtures/gallery-12.svg",
+        "liveCount": 9
+      }
+    },
+    {
+      "name": "mosaic/still: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 9,
+        "urls": "/fixtures/gallery-01.svg|/fixtures/gallery-02.svg|/fixtures/gallery-03.svg|/fixtures/gallery-04.svg|/fixtures/gallery-05.svg|/fixtures/gallery-06.svg|/fixtures/gallery-07.svg|/fixtures/gallery-10.svg|/fixtures/gallery-12.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "mosaic/still: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "mosaic/default: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": true,
+        "contexts": [
+          true
+        ]
+      }
+    },
+    {
+      "name": "mosaic/default: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 9,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.9239173357904436,
+        "colorfulFraction": 0.4582071870475188,
+        "edges": [
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200
+        ]
+      }
+    },
+    {
+      "name": "mosaic/default: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200,
+          1200
+        ]
+      }
+    },
+    {
+      "name": "mosaic/default: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0.0010200000000000209,
+        "compared": 9,
+        "animations": [
+          "cinematicDrift",
+          "cinematicDrift",
+          "cinematicDrift",
+          "cinematicDrift",
+          "panH",
+          "panH",
+          "panH",
+          "panV",
+          "panV"
+        ],
+        "hints": [
+          "transform",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "mosaic/default: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 9
+      }
+    },
+    {
+      "name": "mosaic/default: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 9
+      }
+    },
+    {
+      "name": "mosaic/default: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-01.svg|/fixtures/gallery-02.svg|/fixtures/gallery-04.svg|/fixtures/gallery-05.svg|/fixtures/gallery-07.svg|/fixtures/gallery-09.svg|/fixtures/gallery-10.svg|/fixtures/gallery-11.svg|/fixtures/gallery-12.svg",
+        "after": "/fixtures/gallery-01.svg|/fixtures/gallery-02.svg|/fixtures/gallery-04.svg|/fixtures/gallery-06.svg|/fixtures/gallery-07.svg|/fixtures/gallery-08.svg|/fixtures/gallery-10.svg|/fixtures/gallery-11.svg|/fixtures/gallery-12.svg",
+        "liveCount": 9
+      }
+    },
+    {
+      "name": "mosaic/default: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 9,
+        "urls": "/fixtures/gallery-01.svg|/fixtures/gallery-02.svg|/fixtures/gallery-04.svg|/fixtures/gallery-05.svg|/fixtures/gallery-06.svg|/fixtures/gallery-07.svg|/fixtures/gallery-08.svg|/fixtures/gallery-10.svg|/fixtures/gallery-11.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "mosaic/default: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cinema/still: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": false,
+        "contexts": [
+          false
+        ]
+      }
+    },
+    {
+      "name": "cinema/still: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.8028169014084507,
+        "colorfulFraction": 0.4926944846649993,
+        "edges": [
+          2400
+        ]
+      }
+    },
+    {
+      "name": "cinema/still: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2400
+        ]
+      }
+    },
+    {
+      "name": "cinema/still: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1,
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "cinema/still: all photo animations none and hints auto",
+      "pass": true,
+      "numeric": {
+        "photos": [
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          }
+        ],
+        "mosaic": []
+      }
+    },
+    {
+      "name": "cinema/still: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "cinema/still: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "cinema/still: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/panorama-wide.svg",
+        "after": "/fixtures/panorama-extreme.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "cinema/still: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/panorama-wide.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "cinema/still: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cinema/default: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": true,
+        "contexts": [
+          true
+        ]
+      }
+    },
+    {
+      "name": "cinema/default: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.8028169014084507,
+        "colorfulFraction": 0.49295774647887325,
+        "edges": [
+          2400
+        ]
+      }
+    },
+    {
+      "name": "cinema/default: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          2400
+        ]
+      }
+    },
+    {
+      "name": "cinema/default: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0.0041400000000000325,
+        "compared": 1,
+        "animations": [
+          "cinematicDrift"
+        ],
+        "hints": [
+          "transform"
+        ]
+      }
+    },
+    {
+      "name": "cinema/default: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "cinema/default: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 1
+      }
+    },
+    {
+      "name": "cinema/default: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/panorama-wide.svg",
+        "after": "/fixtures/panorama-extreme.svg",
+        "liveCount": 1
+      }
+    },
+    {
+      "name": "cinema/default: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 1,
+        "urls": "/fixtures/panorama-wide.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "cinema/default: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": false,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/still: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": false,
+        "contexts": [
+          false
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/still: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 3,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.6448598130841121,
+        "colorfulFraction": 0.4699223377649072,
+        "edges": [
+          1800,
+          1100,
+          1100
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/still: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          1800,
+          1100,
+          1100
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/still: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 3,
+        "animations": [
+          "none",
+          "none",
+          "none"
+        ],
+        "hints": [
+          "auto",
+          "auto",
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/still: all photo animations none and hints auto",
+      "pass": true,
+      "numeric": {
+        "photos": [
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          },
+          {
+            "animation": "none",
+            "hint": "auto"
+          }
+        ],
+        "mosaic": []
+      }
+    },
+    {
+      "name": "heroSidebar/still: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 3
+      }
+    },
+    {
+      "name": "heroSidebar/still: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 3
+      }
+    },
+    {
+      "name": "heroSidebar/still: manual next presents a new composition",
+      "pass": true,
+      "numeric": {
+        "before": "/fixtures/gallery-04.svg|/fixtures/gallery-05.svg|/fixtures/gallery-10.svg",
+        "after": "/fixtures/gallery-04.svg|/fixtures/gallery-07.svg|/fixtures/gallery-11.svg",
+        "liveCount": 3
+      }
+    },
+    {
+      "name": "heroSidebar/still: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 3,
+        "urls": "/fixtures/gallery-04.svg|/fixtures/gallery-05.svg|/fixtures/gallery-10.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "heroSidebar/still: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/default: bridge to scheduler to mode",
+      "pass": true,
+      "numeric": {
+        "option": true,
+        "contexts": [
+          true
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/default: first ready composition has decoded visible photo pixels",
+      "pass": true,
+      "numeric": {
+        "liveCount": 3,
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.6310385678557325,
+        "colorfulFraction": 0.5386336711859945,
+        "edges": [
+          1800,
+          1100,
+          1100
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/default: fitting keeps display-resolution requests",
+      "pass": true,
+      "numeric": {
+        "edges": [
+          1800,
+          1100,
+          1100
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/default: expected steady transforms",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 3,
+        "animations": [
+          "none",
+          "none",
+          "none"
+        ],
+        "hints": [
+          "auto",
+          "auto",
+          "auto"
+        ]
+      }
+    },
+    {
+      "name": "heroSidebar/default: pause holds photo transforms and owners",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 3
+      }
+    },
+    {
+      "name": "heroSidebar/default: immediate re-pause does not restart motion",
+      "pass": true,
+      "numeric": {
+        "max": 0,
+        "compared": 3
+      }
+    },
+    {
+      "name": "heroSidebar/default: manual next presents a new composition",
+      "pass": false,
+      "numeric": {
+        "before": "/fixtures/gallery-05.svg|/fixtures/gallery-07.svg|/fixtures/gallery-10.svg",
+        "after": "/fixtures/gallery-05.svg|/fixtures/gallery-07.svg|/fixtures/gallery-10.svg",
+        "liveCount": 3
+      }
+    },
+    {
+      "name": "heroSidebar/default: manual previous restores a decoded composition",
+      "pass": true,
+      "numeric": {
+        "liveCount": 3,
+        "urls": "/fixtures/gallery-05.svg|/fixtures/gallery-07.svg|/fixtures/gallery-10.svg",
+        "first": 0,
+        "previous": 0
+      }
+    },
+    {
+      "name": "heroSidebar/default: engine stop removes scenes and releases photo assets",
+      "pass": true,
+      "numeric": {
+        "stageChildren": 0,
+        "values": [
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          },
+          {
+            "url": "none",
+            "ownedAfterCleanup": true,
+            "hint": "auto"
+          }
+        ]
+      }
+    },
+    {
+      "name": "kenBurns/still/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "kenBurns/still/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "kenBurns/still/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "kenBurns/still/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "kenBurns/still/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "kenBurns/moving/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "kenBurns/moving/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "kenBurns/moving/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "kenBurns/moving/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "kenBurns/moving/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/still/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/still/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/still/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/still/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/still/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/moving/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/moving/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/moving/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/moving/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "diptych/moving/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 3,
+        "decoded": 3,
+        "liveResources": 3,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/still/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/still/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/still/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/still/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/still/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/moving/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/moving/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/moving/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/moving/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "framed/moving/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/still/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/still/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/still/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/still/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/still/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/moving/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/moving/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/moving/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/moving/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "push/moving/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/still/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/still/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/still/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/still/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/still/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/moving/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/moving/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/moving/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/moving/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "memories/moving/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/still/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/still/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/still/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/still/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/still/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/moving/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/moving/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/moving/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/moving/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/moving/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/still/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/still/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/still/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/still/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/still/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/moving/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/moving/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/moving/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/moving/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "mosaic/moving/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 10,
+        "decoded": 10,
+        "liveResources": 10,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/still/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/still/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/still/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/still/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/still/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/moving/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/moving/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/moving/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/moving/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "cinema/moving/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 2,
+        "decoded": 2,
+        "liveResources": 2,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/still/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/still/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/still/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/still/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/still/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/moving/initial decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/moving/initial decode: automatic photo advancement remains active",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/moving/initial decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/moving/replacement decode: real decode resumes through a re-pause without stale work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "heroSidebar/moving/replacement decode: cleanup releases retained assets and rejects late work",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "stable": true,
+        "quietHeld": true,
+        "advanced": true,
+        "records": 2,
+        "admissions": 4,
+        "decoded": 4,
+        "liveResources": 4,
+        "released": true,
+        "noLateAdmission": true
+      }
+    },
+    {
+      "name": "panorama/still 1.3:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.3,
+        "naturalWidth": 1560,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 1872,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.3:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.3,
+        "naturalWidth": 1560,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 1872,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 144,
+        "focalY": 0,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.3:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.3,
+        "naturalWidth": 1560,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 1872,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 612,
+        "focalY": 360,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.3:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.3,
+        "naturalWidth": 1560,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 1872,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.3:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.3,
+        "naturalWidth": 1560,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 1872,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1641.6000000000001,
+        "focalY": 1152,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.3:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.3,
+        "naturalWidth": 1560,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 1872,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 2016,
+        "focalY": 1440,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.5:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 2160,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.5:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 2160,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 0,
+        "focalY": 0,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.5:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 2160,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 540,
+        "focalY": 360,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.5:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 2160,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.5:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 2160,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1728,
+        "focalY": 1152,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 1.5:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 2160,
+        "height": 1440,
+        "renderedW": 2160,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 2160,
+        "focalY": 1440,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 2:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 2,
+        "naturalWidth": 2400,
+        "naturalHeight": 1200,
+        "width": 2880,
+        "height": 1440,
+        "renderedW": 2880,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -360,
+        "top": 0,
+        "right": 2520,
+        "bottom": 1440,
+        "tx": -360,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 2:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 2,
+        "naturalWidth": 2400,
+        "naturalHeight": 1200,
+        "width": 2880,
+        "height": 1440,
+        "renderedW": 2880,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2880,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 0,
+        "focalY": 0,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 2:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 2,
+        "naturalWidth": 2400,
+        "naturalHeight": 1200,
+        "width": 2880,
+        "height": 1440,
+        "renderedW": 2880,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 2880,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 720,
+        "focalY": 360,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 2:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 2,
+        "naturalWidth": 2400,
+        "naturalHeight": 1200,
+        "width": 2880,
+        "height": 1440,
+        "renderedW": 2880,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -360,
+        "top": 0,
+        "right": 2520,
+        "bottom": 1440,
+        "tx": -360,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 2:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 2,
+        "naturalWidth": 2400,
+        "naturalHeight": 1200,
+        "width": 2880,
+        "height": 1440,
+        "renderedW": 2880,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -720,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": -720,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1584,
+        "focalY": 1152,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 2:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 2,
+        "naturalWidth": 2400,
+        "naturalHeight": 1200,
+        "width": 2880,
+        "height": 1440,
+        "renderedW": 2880,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -720,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": -720,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 2160,
+        "focalY": 1440,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 3:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 0,
+        "right": 3240,
+        "bottom": 1440,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 3:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 4320,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 0,
+        "focalY": 0,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 3:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 4320,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 360,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 3:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 0,
+        "right": 3240,
+        "bottom": 1440,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 3:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1296,
+        "focalY": 1152,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 3:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 2160,
+        "focalY": 1440,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 8:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 8,
+        "naturalWidth": 9600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 540,
+        "renderedW": 4320,
+        "renderedH": 540,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 450,
+        "right": 3240,
+        "bottom": 990,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 8:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 8,
+        "naturalWidth": 9600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 540,
+        "renderedW": 4320,
+        "renderedH": 540,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 450,
+        "right": 4320,
+        "bottom": 990,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 0,
+        "focalY": 450,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 8:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 8,
+        "naturalWidth": 9600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 540,
+        "renderedW": 4320,
+        "renderedH": 540,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 450,
+        "right": 4320,
+        "bottom": 990,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 585,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 8:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 8,
+        "naturalWidth": 9600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 540,
+        "renderedW": 4320,
+        "renderedH": 540,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 450,
+        "right": 3240,
+        "bottom": 990,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 8:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 8,
+        "naturalWidth": 9600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 540,
+        "renderedW": 4320,
+        "renderedH": 540,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 450,
+        "right": 2160,
+        "bottom": 990,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1296,
+        "focalY": 882,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 8:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 8,
+        "naturalWidth": 9600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 540,
+        "renderedW": 4320,
+        "renderedH": 540,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 450,
+        "right": 2160,
+        "bottom": 990,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 2160,
+        "focalY": 990,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 10:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 504,
+        "right": 3240,
+        "bottom": 936,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 10:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 504,
+        "right": 4320,
+        "bottom": 936,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 0,
+        "focalY": 504,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 10:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 504,
+        "right": 4320,
+        "bottom": 936,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 612,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 10:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 504,
+        "right": 3240,
+        "bottom": 936,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 10:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 504,
+        "right": 2160,
+        "bottom": 936,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1296,
+        "focalY": 849.6,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "panorama/still 10:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 504,
+        "right": 2160,
+        "bottom": 936,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 2160,
+        "focalY": 936,
+        "mosaicCells": 0
+      }
+    },
+    {
+      "name": "mosaic/still 0.025:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.025,
+        "naturalWidth": 96,
+        "naturalHeight": 3840,
+        "width": 72,
+        "height": 2880,
+        "renderedW": 72,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 1044,
+        "top": -720,
+        "right": 1116,
+        "bottom": 2160,
+        "tx": 0,
+        "ty": -720,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.025:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.025,
+        "naturalWidth": 96,
+        "naturalHeight": 3840,
+        "width": 72,
+        "height": 2880,
+        "renderedW": 72,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 1044,
+        "top": 0,
+        "right": 1116,
+        "bottom": 2880,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1044,
+        "focalY": 0,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.025:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.025,
+        "naturalWidth": 96,
+        "naturalHeight": 3840,
+        "width": 72,
+        "height": 2880,
+        "renderedW": 72,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 1044,
+        "top": 0,
+        "right": 1116,
+        "bottom": 2880,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1062,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.025:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.025,
+        "naturalWidth": 96,
+        "naturalHeight": 3840,
+        "width": 72,
+        "height": 2880,
+        "renderedW": 72,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 1044,
+        "top": -720,
+        "right": 1116,
+        "bottom": 2160,
+        "tx": 0,
+        "ty": -720,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.025:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.025,
+        "naturalWidth": 96,
+        "naturalHeight": 3840,
+        "width": 72,
+        "height": 2880,
+        "renderedW": 72,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 1044,
+        "top": -1440,
+        "right": 1116,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": -1440,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1101.6,
+        "focalY": 864,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.025:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.025,
+        "naturalWidth": 96,
+        "naturalHeight": 3840,
+        "width": 72,
+        "height": 2880,
+        "renderedW": 72,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 1044,
+        "top": -1440,
+        "right": 1116,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": -1440,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1116,
+        "focalY": 1440,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.5:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.5,
+        "naturalWidth": 96,
+        "naturalHeight": 192,
+        "width": 1440,
+        "height": 2880,
+        "renderedW": 1440,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 360,
+        "top": -720,
+        "right": 1800,
+        "bottom": 2160,
+        "tx": 0,
+        "ty": -720,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.5:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.5,
+        "naturalWidth": 96,
+        "naturalHeight": 192,
+        "width": 1440,
+        "height": 2880,
+        "renderedW": 1440,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 360,
+        "top": 0,
+        "right": 1800,
+        "bottom": 2880,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 360,
+        "focalY": 0,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.5:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.5,
+        "naturalWidth": 96,
+        "naturalHeight": 192,
+        "width": 1440,
+        "height": 2880,
+        "renderedW": 1440,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 360,
+        "top": 0,
+        "right": 1800,
+        "bottom": 2880,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 720,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.5:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.5,
+        "naturalWidth": 96,
+        "naturalHeight": 192,
+        "width": 1440,
+        "height": 2880,
+        "renderedW": 1440,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 360,
+        "top": -720,
+        "right": 1800,
+        "bottom": 2160,
+        "tx": 0,
+        "ty": -720,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.5:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.5,
+        "naturalWidth": 96,
+        "naturalHeight": 192,
+        "width": 1440,
+        "height": 2880,
+        "renderedW": 1440,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 360,
+        "top": -1440,
+        "right": 1800,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": -1440,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1512,
+        "focalY": 864,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 0.5:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 0.5,
+        "naturalWidth": 96,
+        "naturalHeight": 192,
+        "width": 1440,
+        "height": 2880,
+        "renderedW": 1440,
+        "renderedH": 2880,
+        "axis": "vertical",
+        "left": 360,
+        "top": -1440,
+        "right": 1800,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": -1440,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1800,
+        "focalY": 1440,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 1.5:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 1987.19,
+        "height": 1324.8,
+        "renderedW": 1987.19,
+        "renderedH": 1324.7933333333333,
+        "axis": "horizontal",
+        "left": 86.390625,
+        "top": 57.59375,
+        "right": 2073.578125,
+        "bottom": 1382.390625,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1079.985625,
+        "focalY": 719.99375,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 1.5:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 1987.19,
+        "height": 1324.8,
+        "renderedW": 1987.19,
+        "renderedH": 1324.7933333333333,
+        "axis": "horizontal",
+        "left": 86.390625,
+        "top": 57.59375,
+        "right": 2073.578125,
+        "bottom": 1382.390625,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 86.390625,
+        "focalY": 57.59708333333333,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 1.5:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 1987.19,
+        "height": 1324.8,
+        "renderedW": 1987.19,
+        "renderedH": 1324.7933333333333,
+        "axis": "horizontal",
+        "left": 86.390625,
+        "top": 57.59375,
+        "right": 2073.578125,
+        "bottom": 1382.390625,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 583.188125,
+        "focalY": 388.79541666666665,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 1.5:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 1987.19,
+        "height": 1324.8,
+        "renderedW": 1987.19,
+        "renderedH": 1324.7933333333333,
+        "axis": "horizontal",
+        "left": 86.390625,
+        "top": 57.59375,
+        "right": 2073.578125,
+        "bottom": 1382.390625,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1079.985625,
+        "focalY": 719.99375,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 1.5:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 1987.19,
+        "height": 1324.8,
+        "renderedW": 1987.19,
+        "renderedH": 1324.7933333333333,
+        "axis": "horizontal",
+        "left": 86.390625,
+        "top": 57.59375,
+        "right": 2073.578125,
+        "bottom": 1382.390625,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1676.1426250000002,
+        "focalY": 1117.43175,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 1.5:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 1.5,
+        "naturalWidth": 1800,
+        "naturalHeight": 1200,
+        "width": 1987.19,
+        "height": 1324.8,
+        "renderedW": 1987.19,
+        "renderedH": 1324.7933333333333,
+        "axis": "horizontal",
+        "left": 86.390625,
+        "top": 57.59375,
+        "right": 2073.578125,
+        "bottom": 1382.390625,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 2073.580625,
+        "focalY": 1382.3904166666666,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 3:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 0,
+        "right": 3240,
+        "bottom": 1440,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 3:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 4320,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 0,
+        "focalY": 0,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 3:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 0,
+        "right": 4320,
+        "bottom": 1440,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 360,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 3:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 0,
+        "right": 3240,
+        "bottom": 1440,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 3:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1296,
+        "focalY": 1152,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 3:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 3,
+        "naturalWidth": 3600,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 1440,
+        "renderedW": 4320,
+        "renderedH": 1440,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 0,
+        "right": 2160,
+        "bottom": 1440,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 2160,
+        "focalY": 1440,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 10:1 focal=center decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 504,
+        "right": 3240,
+        "bottom": 936,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 10:1 focal=0 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 504,
+        "right": 4320,
+        "bottom": 936,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 0,
+        "focalY": 504,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 10:1 focal=0.25 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": 0,
+        "top": 504,
+        "right": 4320,
+        "bottom": 936,
+        "tx": 0,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 612,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 10:1 focal=0.5 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": -1080,
+        "top": 504,
+        "right": 3240,
+        "bottom": 936,
+        "tx": -1080,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1080,
+        "focalY": 720,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 10:1 focal=0.8 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 504,
+        "right": 2160,
+        "bottom": 936,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 1296,
+        "focalY": 849.6,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "mosaic/still 10:1 focal=1 decoded aspect and bounded anchor",
+      "pass": true,
+      "numeric": {
+        "ready": true,
+        "decodedAspect": 10,
+        "naturalWidth": 12000,
+        "naturalHeight": 1200,
+        "width": 4320,
+        "height": 432,
+        "renderedW": 4320,
+        "renderedH": 432,
+        "axis": "horizontal",
+        "left": -2160,
+        "top": 504,
+        "right": 2160,
+        "bottom": 936,
+        "tx": -2160,
+        "ty": 0,
+        "animation": "none",
+        "hint": "auto",
+        "size": "contain",
+        "repeat": "no-repeat",
+        "focalX": 2160,
+        "focalY": 936,
+        "mosaicCells": 1
+      }
+    },
+    {
+      "name": "kenBurns: original-fixture review URL is quiet",
+      "pass": true,
+      "numeric": {
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ],
+        "photos": [
+          "/fixtures/tidal.png"
+        ]
+      }
+    },
+    {
+      "name": "kenBurns: quiet review PNG preserves visible original art",
+      "pass": true,
+      "numeric": {
+        "file": "kenBurns-still-2160x1440.png",
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.3968671844149006,
+        "colorfulFraction": 0.33565881268921943
+      }
+    },
+    {
+      "name": "panorama: original-fixture review URL is quiet",
+      "pass": true,
+      "numeric": {
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ],
+        "photos": [
+          "/fixtures/panorama-wide.svg"
+        ]
+      }
+    },
+    {
+      "name": "panorama: quiet review PNG preserves visible original art",
+      "pass": true,
+      "numeric": {
+        "file": "panorama-still-2160x1440.png",
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 1,
+        "colorfulFraction": 0.624588653415822
+      }
+    },
+    {
+      "name": "mosaic: original-fixture review URL is quiet",
+      "pass": true,
+      "numeric": {
+        "animations": [
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none",
+          "none"
+        ],
+        "hints": [
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto",
+          "auto"
+        ],
+        "photos": [
+          "/fixtures/gallery-07.svg",
+          "/fixtures/gallery-04.svg",
+          "/fixtures/gallery-01.svg",
+          "/fixtures/gallery-10.svg",
+          "/fixtures/gallery-09.svg",
+          "/fixtures/gallery-05.svg",
+          "/fixtures/gallery-08.svg",
+          "/fixtures/gallery-02.svg",
+          "/fixtures/gallery-11.svg"
+        ]
+      }
+    },
+    {
+      "name": "mosaic: quiet review PNG preserves visible original art",
+      "pass": true,
+      "numeric": {
+        "file": "mosaic-still-2160x1440.png",
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.9195735158615242,
+        "colorfulFraction": 0.5011188627089641
+      }
+    },
+    {
+      "name": "cinema: original-fixture review URL is quiet",
+      "pass": true,
+      "numeric": {
+        "animations": [
+          "none"
+        ],
+        "hints": [
+          "auto"
+        ],
+        "photos": [
+          "/fixtures/panorama-wide.svg"
+        ]
+      }
+    },
+    {
+      "name": "cinema: quiet review PNG preserves visible original art",
+      "pass": true,
+      "numeric": {
+        "file": "cinema-still-2160x1440.png",
+        "width": 2160,
+        "height": 1440,
+        "brightFraction": 0.8028169014084507,
+        "colorfulFraction": 0.4901934974331973
+      }
+    },
+    {
+      "name": "No uncaught browser errors",
+      "pass": true,
+      "numeric": {
+        "count": 0,
+        "errors": []
+      }
+    },
+    {
+      "name": "Production asset snapshot stayed unchanged during the run",
+      "pass": true,
+      "numeric": {
+        "changedAssets": []
+      }
+    }
+  ],
+  "browserErrors": [],
+  "sampling": "Pause baselines are captured after two render frames so the CSS compositor pause boundary is complete.",
+  "limitations": [
+    "Actual desktop Chrome source/lifecycle verification; no physical Portal FPS or GPU claim.",
+    "Only the review server's original art and finite generated art were decoded or exported.",
+    "Lifecycle decode races hold completion after a real decode; they do not emulate every network failure."
+  ],
+  "browser": "156.0.8078.74",
+  "completedAt": "2026-10-30T20:11:48.474Z",
+  "elapsedMs": 155946,
+  "counts": {
+    "total": 337,
+    "passed": 336,
+    "failed": 1
+  }
+}

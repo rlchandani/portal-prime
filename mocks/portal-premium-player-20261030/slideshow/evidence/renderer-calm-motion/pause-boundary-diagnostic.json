@@ -1,0 +1,206 @@
+{
+  "startedAt": "2026-10-30T20:07:23.834Z",
+  "modes": {
+    "kenBurns": [
+      {
+        "label": "before",
+        "at": 2196.199999809265,
+        "transform": "matrix(1.06973, 0, 0, 1.06973, -36.8857, -15.717)",
+        "playState": "running",
+        "animations": [
+          {
+            "time": 1999.9339997869433,
+            "state": "running",
+            "name": "kb"
+          }
+        ],
+        "parent": "ss-beat on"
+      },
+      {
+        "label": "synchronous",
+        "at": 2196.7999997138977,
+        "transform": "matrix(1.06973, 0, 0, 1.06973, -36.8857, -15.717)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 1999.9339997869433,
+            "state": "paused",
+            "name": "kb"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "frame1",
+        "at": 2207.8999996185303,
+        "transform": "matrix(1.06998, 0, 0, 1.06998, -36.967, -15.4092)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.5819997869435,
+            "state": "paused",
+            "name": "kb"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "frame2",
+        "at": 2224.0999999046326,
+        "transform": "matrix(1.06998, 0, 0, 1.06998, -36.967, -15.4092)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.5819997869435,
+            "state": "paused",
+            "name": "kb"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "250ms",
+        "at": 2476.2999997138977,
+        "transform": "matrix(1.06998, 0, 0, 1.06998, -36.967, -15.4092)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.5819997869435,
+            "state": "paused",
+            "name": "kb"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "re-pause frame2",
+        "at": 2491.2999997138977,
+        "transform": "matrix(1.06998, 0, 0, 1.06998, -36.967, -15.4092)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.5819997869435,
+            "state": "paused",
+            "name": "kb"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "re-pause 250ms",
+        "at": 2742.0999999046326,
+        "transform": "matrix(1.06998, 0, 0, 1.06998, -36.967, -15.4092)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.5819997869435,
+            "state": "paused",
+            "name": "kb"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      }
+    ],
+    "framed": [
+      {
+        "label": "before",
+        "at": 2030.5,
+        "transform": "matrix(1.00545, 0, 0, 1.00545, 0, 0)",
+        "playState": "running",
+        "animations": [
+          {
+            "time": 1999.958999667734,
+            "state": "running",
+            "name": "breathe"
+          }
+        ],
+        "parent": "ss-beat on"
+      },
+      {
+        "label": "synchronous",
+        "at": 2030.9000000953674,
+        "transform": "matrix(1.00545, 0, 0, 1.00545, 0, 0)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 1999.958999667734,
+            "state": "paused",
+            "name": "breathe"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "frame1",
+        "at": 2045.2000002861023,
+        "transform": "matrix(1.0055, 0, 0, 1.0055, 0, 0)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.6069996677338,
+            "state": "paused",
+            "name": "breathe"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "frame2",
+        "at": 2061.2000002861023,
+        "transform": "matrix(1.0055, 0, 0, 1.0055, 0, 0)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.6069996677338,
+            "state": "paused",
+            "name": "breathe"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "250ms",
+        "at": 2314.1000003814697,
+        "transform": "matrix(1.0055, 0, 0, 1.0055, 0, 0)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.6069996677338,
+            "state": "paused",
+            "name": "breathe"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "re-pause frame2",
+        "at": 2328.5,
+        "transform": "matrix(1.0055, 0, 0, 1.0055, 0, 0)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.6069996677338,
+            "state": "paused",
+            "name": "breathe"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      },
+      {
+        "label": "re-pause 250ms",
+        "at": 2580.6000003814697,
+        "transform": "matrix(1.0055, 0, 0, 1.0055, 0, 0)",
+        "playState": "paused",
+        "animations": [
+          {
+            "time": 2016.6069996677338,
+            "state": "paused",
+            "name": "breathe"
+          }
+        ],
+        "parent": "ss-beat on paused"
+      }
+    ]
+  },
+  "completedAt": "2026-10-30T20:07:29.376Z"
+}

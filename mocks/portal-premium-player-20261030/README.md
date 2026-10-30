@@ -337,3 +337,26 @@ selection updates fixture state only, with no provider or household connection.
 The native speaker-selection check exposed a tab reset caused by keying UI state to
 the music source. Tab state now belongs to the current UI composition, so selecting
 a speaker retains the chooser while every pane reads the fresh snapshot.
+
+## Gentle photo motion
+
+The existing registry option now covers Shuffle, Ken Burns, Diptych, Framed Print,
+Cinematic Push, Memories, Panorama Drift, Mosaic Wall, Cinema Letterbox and
+Hero + Sidebar, alongside Smart frame and Portrait pair. Turning it off keeps
+photos steady between changes while retaining fades, cadence and navigation.
+Still panoramic windows use the middle of the crop or the cached face anchor.
+Mosaic also stops its spotlight scale. Already still and transition-only styles
+do not expose a redundant option; Filmstrip navigation remains intact.
+
+The native host freezes this existing value at engine startup, and the scheduler
+passes it to each scene. A missing or failing host bridge retains the enabled
+default unless the browser fallback explicitly supplies `false`. No new
+preference, duplicate route or per-frame preference lookup was added.
+
+Open [Panorama with still photos](http://127.0.0.1:8891/?mode=panorama&motion=still&review=1)
+or [Mosaic with still photos](http://127.0.0.1:8891/?mode=mosaic&motion=still&review=1)
+and use **Photo motion: Still / Gentle** to compare. These preview controls use
+synthetic artwork and do not change a Portal setting. The separate
+`slideshow/calm-motion-browser-checks.cjs` checks actual production assets,
+decoded geometry, retained pause/resume, navigation and cleanup; its report
+distinguishes browser evidence from physical Portal performance.

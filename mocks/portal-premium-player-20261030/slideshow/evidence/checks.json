@@ -418,7 +418,7 @@
     ],
     "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
   },
-  "runtimeMs": 167921,
+  "runtimeMs": 167442,
   "scope": "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",
   "physicalPortalPerformanceMeasured": false
 }

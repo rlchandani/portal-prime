@@ -365,12 +365,16 @@
       const u = ctx.url(p, 2200); if (!await t.load(u) || !dissolve.active()) return false;
       const root = dissolve.next(), L = layers.find(l => l.root === root);
       bg(L.hero, u, "contain");
-      L.hero.style.animation = "none";
+      L.hero.style.animation = "none"; L.hero.style.willChange = "auto";
       if (hasFace(p)) {
         L.hero.style.willChange = "auto";
       } else {
-        kbVars(L.hero, p); L.hero.style.willChange = "transform";
-        void L.hero.offsetWidth; L.hero.style.animation = "";
+        // Keep the same random draws so motion preference cannot alter later photo selection.
+        kbVars(L.hero, p);
+        if (ctx.photoMotion !== false) {
+          L.hero.style.willChange = "transform";
+          void L.hero.offsetWidth; L.hero.style.animation = "";
+        }
       }
       dissolve.present(root);
     }
@@ -385,7 +389,11 @@
     frames.forEach(f => ctx.root.appendChild(f));
     const dissolve = makeSceneDissolve(ctx, t, frames, 1800, frame => { frame.innerHTML = ""; });
     // A quiet, whole-photo spread: no second decoded copy or viewport-sized blur per pane.
-    function containCell(imageUrl) { const c = el("ss-cell contain"); const im = el("ss-img", c); bg(im, imageUrl, "contain"); return c; }
+    function containCell(imageUrl) {
+      const c = el("ss-cell contain"), im = el("ss-img", c); bg(im, imageUrl, "contain");
+      if (ctx.photoMotion === false) { im.style.animation = "none"; im.style.willChange = "auto"; }
+      return c;
+    }
     async function step() {
       const c = SS.counts(deck); const roll = Math.random();
       let ps;
@@ -427,10 +435,10 @@
       A.photo.style.width = w + "px"; A.photo.style.height = h + "px";
       // Frame geometry already follows the photo's aspect. Cached face hints keep
       // the complete print still; do not introduce a focal crop or another decode.
-      bg(A.photo, u, hasFace(p) ? "contain" : "cover");
+      bg(A.photo, u, ctx.photoMotion === false || hasFace(p) ? "contain" : "cover");
       A.photo.style.animation = "none"; A.photo.style.willChange = "auto";
       A.photo.style.animationDelay = (-Math.random() * 10) + "s";
-      if (!hasFace(p)) {
+      if (ctx.photoMotion !== false && !hasFace(p)) {
         A.photo.style.willChange = "transform";
         void A.photo.offsetWidth; A.photo.style.animation = "";
       }
@@ -545,7 +553,7 @@
       if (!await t.load(u) || !dissolve.active()) return false;
       const root = dissolve.next(), hero = layers.find(l => l.root === root).hero;
       bg(hero, u, "contain"); hero.style.animation = "none"; hero.style.willChange = "auto";
-      if (!hasFace(p)) {
+      if (ctx.photoMotion !== false && !hasFace(p)) {
         hero.style.willChange = "transform"; void hero.offsetWidth;
         hero.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
       }
@@ -571,7 +579,7 @@
     function photo(parent, p, url, single) {
       const image = el((single ? "ss-hero" : "ss-img") + " memory-photo", parent);
       bg(image, url, "contain"); image.style.animation = "none"; image.style.willChange = "auto";
-      if (single && !hasFace(p)) {
+      if (single && ctx.photoMotion !== false && !hasFace(p)) {
         image.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
         image.style.willChange = "transform";
       }
@@ -639,13 +647,14 @@
         pan.style.width = width + "px"; pan.style.height = height + "px";
         pan.style.top = (ctx.H - height) / 2 + "px";
         bg(pan, url, "contain"); pan.style.setProperty("--shift", travel + "%");
-        const moving = width > ctx.W && !hasFace(p);
+        const moving = ctx.photoMotion !== false && width > ctx.W && !hasFace(p);
         // Unlike zoom, the full panoramic sweep must finish before the next photo.
         const duration = Math.min(ctx.motionMs, ctx.photoMs);
         pan.style.animation = moving ? `dolly ${duration}ms linear forwards` : "none";
         pan.style.willChange = moving ? "transform" : "auto";
-        pan.style.transform = hasFace(p) ?
-          `translateX(${travel * SS.panStart(p.fx, width / ctx.W * 100)}%)` : "none";
+        // A still strip uses the cached face or the middle of the admitted crop.
+        pan.style.transform = hasFace(p) || ctx.photoMotion === false ?
+          `translateX(${travel * SS.panStart(hasFace(p) ? p.fx : .5, width / ctx.W * 100)}%)` : "none";
         dissolve.present(root);
       });
     }
@@ -783,7 +792,7 @@
     let cells = [], disposed = false, paused = false, spot = -1;
     function bsp(rect, n) { if (n <= 1) return [rect]; const k = Math.max(1, Math.round(n * (0.42 + Math.random() * 0.16))); const horiz = rect.w >= rect.h; const ratio = k / n; if (horiz) { const w1 = Math.round(rect.w * ratio); return bsp({ x: rect.x, y: rect.y, w: w1, h: rect.h }, k).concat(bsp({ x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, n - k)); } const h1 = Math.round(rect.h * ratio); return bsp({ x: rect.x, y: rect.y, w: rect.w, h: h1 }, k).concat(bsp({ x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, n - k)); }
     function applySpot(cell) {
-      cell.c.classList.toggle("spot", cell.spot);
+      cell.c.classList.toggle("spot", ctx.photoMotion !== false && cell.spot);
       cell.layers.forEach(layer => {
         const active = cell.spot && layer.moves && !paused;
         layer.image.style.animationPlayState = active ? "running" : "paused";
@@ -829,11 +838,13 @@
       image.style.left = left + "px"; image.style.top = top + "px";
       image.style.right = "auto"; image.style.bottom = "auto";
       image.style.setProperty("--travel", travel + "%");
-      bg(image, url, "contain"); layer.moves = !hasFace(p);
+      bg(image, url, "contain"); layer.moves = ctx.photoMotion !== false && !hasFace(p);
       image.style.animation = layer.moves ?
         `${animation} ${Math.max(12000, ctx.motionMs)}ms ease-in-out infinite alternate` : "none";
-      const start = SS.panStart(plan.mode === "panV" ? p.fy : p.fx, size);
-      image.style.transform = hasFace(p) && axis ? `${axis}(${travel * start}%)` : "none";
+      const focal = plan.mode === "panV" ? p.fy : p.fx;
+      const start = SS.panStart(ctx.photoMotion === false && !hasFace(p) ? .5 : focal, size);
+      image.style.transform = axis && (hasFace(p) || ctx.photoMotion === false) ?
+        `${axis}(${travel * start}%)` : "none";
       cell.photo = p; applySpot(cell); cell.dissolve.present(pane);
     }
     function wantFor(cellA) { return cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape"; }
@@ -1066,7 +1077,7 @@
           const renderedW = Math.max(ctx.W, scopeH * ratio), renderedH = renderedW / ratio;
           image.style.backgroundPosition =
             `${SS.panStart(p.fx, renderedW / ctx.W * 100) * 100}% ${SS.panStart(p.fy, renderedH / scopeH * 100) * 100}%`;
-        } else if (wide) {
+        } else if (wide && ctx.photoMotion !== false) {
           image.style.willChange = "transform";
           image.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
         }

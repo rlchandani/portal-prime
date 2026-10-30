@@ -16,7 +16,8 @@ const html = readFileSync(new URL('index.html', assets), 'utf8');
 const entry = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
 
 // Actual entry page and scheduler, synthetic scene readiness/DOM/clock; no image data or network.
-function fixture({ mode = 'filmstrip', bridge = 'present' } = {}) {
+function fixture({ mode = 'filmstrip', bridge = 'present', motionBridge = 'missing',
+  motionValue = true, configMotion } = {}) {
   let now = 0, nextId = 1;
   const timers = new Map(), handlers = new Map(), scenes = [], reports = [];
   class Element {
@@ -30,19 +31,24 @@ function fixture({ mode = 'filmstrip', bridge = 'present' } = {}) {
   const elements = new Map(['stage', 'loading', 'chrome-clock', 'chrome-scrim', 'chrome-mode'].map(id => [id, new Element()]));
   function schedule(fn, ms) { const id = nextId++; timers.set(id, { fn, at: now + Number(ms || 0) }); return id; }
   const Android = { getMode: () => mode, getIntervalSec: () => 30 };
+  if (motionBridge !== 'missing') Android.getPhotoMotion = () => {
+    if (motionBridge === 'throwing') throw Error('synthetic motion bridge failure');
+    return motionValue;
+  };
   if (bridge !== 'missing') Android.reportPresentedStyle = id => {
     if (bridge === 'throwing') throw Error('synthetic bridge failure');
     reports.push({ id, at: now });
   };
-  const modes = Object.fromEntries(ids.map(id => [id, { name: 'Generated style label', run() {
+  const modes = Object.fromEntries(ids.map(id => [id, { name: 'Generated style label', run(ctx) {
     let finish; const ready = new Promise(resolve => { finish = resolve; });
-    const scene = { finish, cleanup: null }; scenes.push(scene);
+    const scene = { finish, cleanup: null, photoMotion: ctx.photoMotion }; scenes.push(scene);
     const cleanup = () => {}; cleanup.ready = ready; cleanup.pause = () => {}; cleanup.resume = () => {};
     scene.cleanup = cleanup; return cleanup;
   } }]));
   const context = vm.createContext({ URLSearchParams, AbortController, performance: { now: () => now },
     Date: class extends Date { static now() { return now; } },
     console: { info() {} }, location: { search: '?nativeClock=1' }, Android,
+    SS_CONFIG: { photoMotion: configMotion },
     PHOTOS: [{ seed: 1 }], shuffled: photos => photos,
     photoUrl: () => 'file:///generated.jpg',
     innerWidth: 2160, innerHeight: 1440, screen: { width: 2160, height: 1440 },
@@ -67,6 +73,19 @@ function fixture({ mode = 'filmstrip', bridge = 'present' } = {}) {
   }
   return { reports, scenes, elements, context, tick, flush, close: () => handlers.get('pagehide')() };
 }
+
+for (const [name, options, expected] of [
+  ['older host without motion bridge', {}, true],
+  ['native motion disabled', { motionBridge: 'present', motionValue: false }, false],
+  ['native motion enabled wins over fallback', { motionBridge: 'present', motionValue: true, configMotion: false }, true],
+  ['fallback motion disabled', { configMotion: false }, false],
+  ['throwing bridge uses fallback', { motionBridge: 'throwing', configMotion: false }, false],
+  ['wrong-typed bridge does not silently disable motion', { motionBridge: 'present', motionValue: 'false' }, true],
+]) test(`entry and scheduler preserve ${name}`, () => {
+  const f = fixture({ mode: 'kenBurns', ...options });
+  assert.equal(f.scenes[0].photoMotion, expected);
+  f.close();
+});
 
 test('native finite IDs cover every actual bundled scheduler style', () => {
   const context = vm.createContext({}); context.window = context;

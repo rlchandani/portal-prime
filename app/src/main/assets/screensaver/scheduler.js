@@ -184,6 +184,7 @@
         root: layer, deck, cursor, W: innerWidth, H: innerHeight, nativeToken: scene.nativeToken,
         url: (photo, edge) => window.photoUrl(photo, edge),
         photoMs: intervalMs, microMs: intervalMs, motionMs: intervalMs + MOTION_OVERLAP_MS,
+        photoMotion: opts.photoMotion !== false,
         ambientMs: Math.min(9000, Math.max(3500, Math.round(intervalMs / 4))),
         record: start => { if (scene.live) remember(scene, start); },
         done: () => { if (scene === current && scene.live) advance("auto"); },

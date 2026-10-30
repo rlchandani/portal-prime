@@ -74,6 +74,13 @@
     if (window.SS_CONFIG && window.SS_CONFIG.intervalSec) return window.SS_CONFIG.intervalSec;
     return 0;
   }
+  function photoMotion() {
+    try {
+      if (window.Android && window.Android.getPhotoMotion)
+        return window.Android.getPhotoMotion() !== false;
+    } catch (_) {}
+    return !window.SS_CONFIG || window.SS_CONFIG.photoMotion !== false;
+  }
 
   // When the host renders its own native clock/overlays on top (?nativeClock=1), suppress the
   // engine's built-in clock + scrim so we don't draw two clocks. The engine is then purely the
@@ -134,6 +141,7 @@
     stage,
     mode: bridgeMode(),
     intervalSec: intervalSec(),
+    photoMotion: photoMotion(),
     onMode: (_, modeId) => {
       // Code-defined style only, once per decoded promotion; optional diagnostics never stop playback.
       try {

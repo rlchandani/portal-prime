@@ -765,6 +765,7 @@ class PhotoFrameController(
     val headers = authHeaders.toMap()
     val mode = settings.mode
     val intervalSec = settings.intervalSec
+    val photoMotion = settings.photoMotion
     val use24 = ImmortalSettings.use24HourClock(context)
     val frozenFetch = remoteFetch
     val faceStore = FaceFocusStore(context.applicationContext).also { legacyFaceStore = it }
@@ -896,6 +897,7 @@ class PhotoFrameController(
                     // Per-photo dwell (seconds). The engine holds each photo this long instead of its old
                     // hardcoded ~9s step, so the user's interval actually takes effect in engine modes.
                     @android.webkit.JavascriptInterface fun getIntervalSec(): Int = intervalSec
+                    @android.webkit.JavascriptInterface fun getPhotoMotion(): Boolean = photoMotion
                     @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
                     // Ready derivatives only: bridge calls never decode or compress on the load path.
                     @android.webkit.JavascriptInterface

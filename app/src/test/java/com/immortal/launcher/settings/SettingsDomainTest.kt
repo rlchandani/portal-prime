@@ -80,8 +80,19 @@ class SettingsDomainTest {
         "galleryPrint" to emptySet(),
         "gallerySpread" to emptySet(),
         "classic" to emptySet(),
-        "shuffle" to emptySet(),
-        "kenBurns" to emptySet())
+        "shuffle" to setOf("photo_motion"),
+        "kenBurns" to setOf("photo_motion"),
+        "diptych" to setOf("photo_motion"),
+        "framed" to setOf("photo_motion"),
+        "push" to setOf("photo_motion"),
+        "memories" to setOf("photo_motion"),
+        "panorama" to setOf("photo_motion"),
+        "mosaic" to setOf("photo_motion"),
+        "cinema" to setOf("photo_motion"),
+        "heroSidebar" to setOf("photo_motion"),
+        "galleryWall" to emptySet(),
+        "polaroid" to emptySet(),
+        "filmstrip" to emptySet())
     expected.forEach { (mode, visible) ->
       prefs.edit().putString("mode", mode).apply()
       val controls = slideshowControls(prefs)

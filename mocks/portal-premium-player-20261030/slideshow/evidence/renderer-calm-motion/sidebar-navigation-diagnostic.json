@@ -1,0 +1,21 @@
+{
+  "meaning": "SS.take can revisit the same sorted photo set in a new scene; sorted URLs are not a valid manual-navigation identity.",
+  "cases": [
+    {
+      "attempt": 0,
+      "first": [
+        "/fixtures/gallery-05.svg",
+        "/fixtures/gallery-07.svg",
+        "/fixtures/gallery-04.svg"
+      ],
+      "next": [
+        "/fixtures/gallery-05.svg",
+        "/fixtures/gallery-07.svg",
+        "/fixtures/gallery-04.svg"
+      ],
+      "firstEnd": 11,
+      "nextEnd": 23,
+      "placementChanged": false
+    }
+  ]
+}

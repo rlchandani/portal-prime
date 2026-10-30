@@ -21,7 +21,7 @@ const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, decl
 }));
 
 export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = false,
-  mode = 'framed', W = 2160, H = 1440, ambientMs = 3500, random = .5 } = {}) {
+  mode = 'framed', W = 2160, H = 1440, ambientMs = 3500, random = .5, photoMotion } = {}) {
   let now = 0, nextId = 1, deferred = deferLoad;
   const pending = new Map(), loads = [], writes = [];
   function schedule(fn, ms) {
@@ -155,7 +155,7 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
   }));
   const cursor = { i: 0 }, resolutions = [];
   const cleanup = window.SS.MODES[mode].run({ root, cursor, W, H,
-    photoMs, microMs: photoMs, motionMs: 5400, ambientMs, url: (photo, edge) => {
+    photoMs, microMs: photoMs, motionMs: 5400, ambientMs, photoMotion, url: (photo, edge) => {
       const url = 'generated://' + photo.seed + (changingUrls ? '-r' + (resolutions.length + 1) : '');
       resolutions.push({ photo, edge, url }); return url;
     } }, deck);

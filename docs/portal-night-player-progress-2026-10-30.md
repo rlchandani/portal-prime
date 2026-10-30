@@ -1104,6 +1104,69 @@ remains unchanged. Actual Portal frame improvements, physical night-clock
 acceptance and the broader performance goal remain open. Music backend wiring
 stays deferred, and no Home Assistant operation belongs to this batch.
 
+## Shared photo-motion option — 20:00 UTC batch
+
+The existing `photo_motion` registry control previously affected Smart frame and
+Portrait pair. It now also appears for Shuffle and the nine legacy styles with
+continuous photo movement: Ken Burns, Diptych, Framed Print, Cinematic Push,
+Memories, Panorama Drift, Mosaic Wall, Cinema Letterbox and Hero + Sidebar.
+Already still or transition-only styles hide the redundant control. Filmstrip
+track navigation remains intact.
+
+Turning motion off keeps the admitted photos still between changes. It preserves
+photo selection, cadence, incoming fades, next/previous, retained pause/resume and
+cleanup. Panoramic crops use their middle or cached face anchor; Mosaic also
+stops spotlight scaling. No face detection, additional decode or new persisted
+field was introduced. Device and remote visibility use the same registry spec.
+The existing preference is frozen once at engine startup and passed through the
+bridge and scheduler, with no per-frame preferences access. Missing host support
+defaults to the preceding enabled behavior.
+
+| Gate | Evidence |
+| --- | --- |
+| Fresh Android JVM/build | **3,454 tests / 359 suites**, zero failures/errors/skips; **39 seconds** |
+| Slideshow source regressions | **277 passed**, including **56 new motion regressions** and six new bridge cases |
+| Actual engine fixtures | **14/14 passed** |
+| Existing Chrome renderer gate | **255 assertions passed**, zero script errors; **167.442 seconds** |
+| Still/default Chrome renderer | **337 assertions passed**, zero script errors; **155.933 seconds** |
+| Geometry and imagery | Nine styles, decoded extreme-aspect and cached-focal checks; four still-mode **2160 × 1440** PNGs |
+| Default compatibility | Frozen pre-change scene-output hashes and random-selection counts match; explicit true matches absent preference |
+| Packaged source | All eight slideshow assets match the built APK and browser source hashes |
+
+The still-mode checker samples after two animation frames because CSS pause
+commits at the next frame boundary. Its retained-pause checks then require stable
+transforms. A separate diagnostic also records a valid Hero + Sidebar case where
+navigation advances the scene/cursor but revisits the same three eligible photos.
+Sorted URL sets therefore do not define navigation identity. Both initial
+checker failures and the corrected final run are retained in
+`slideshow/evidence/renderer-calm-motion/`; no production patch was made to
+accommodate either observation.
+
+The existing renderer run leaves eleven prior PNG files byte-identical; Cinema
+captures a different valid synthetic fixture in its scope. This is not an
+all-captures pixel-identity claim. New still-mode captures were visually reviewed
+for the Mosaic composition and anchored Panorama window.
+
+The functional preview adds a **Photo motion: Gentle / Still** control at
+`http://127.0.0.1:8891/?mode=panorama&motion=still&review=1`.
+Its bridge and artwork are local fixtures; it changes no Portal preference.
+Browser results do not establish Portal GPU memory, FPS, startup latency or
+physical night-clock acceptance. Those broader acceptance items remain open.
+Music backend wiring stays deferred, and no Home Assistant operation belongs to
+this batch.
+
+Family Area's installed APK was independently read back and matches tested
+SHA-256 `4c00e39eae3b84373d55d7d9e79d0dfe849991258776786c92f5cf072eb8ce99`
+(**48,965,301 bytes**). Its certificate matches the previous installed build,
+retained privately as a rollback. One upload/install was used; installed-byte
+readback resolved the interrupted HTTP install response. All **97 settings**
+match before installation, after installation and after the bounded
+**Home → Apps → Home → screensaver** navigation smoke. The saved Shuffle mode
+and enabled motion value remain intact. Navigation acknowledgments do not prove
+visible transitions. The collector remains inactive with **zero listeners**.
+Verification/deployment completed by **20:18 UTC**, within the thirty-minute
+issue window. Living Area remains unchanged; the broader goal stays active.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
