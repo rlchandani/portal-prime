@@ -10,7 +10,7 @@ import subprocess
 import time
 import xml.etree.ElementTree as ET
 
-from PIL import Image
+from PIL import Image, ImageStat
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--serial", default="emulator-5556")
@@ -83,8 +83,118 @@ def demand(name, condition):
     print("PASS", name, flush=True)
 
 
+def side_panel_tabs(nodes):
+    """Resolve labeled tab controls without assuming that availability implies selection."""
+    labels = ("Queue", "Lyrics", "Players")
+    parents = {child: parent for parent in nodes for child in parent}
+    tabs = {}
+    for label in labels:
+        current = node(nodes, label)
+        # Compose exposes the label inside its tab owner. A selected Role.Tab
+        # can deliberately have clickable=false in Android accessibility, so
+        # resolve the owner by its labeled children, rather than clickability.
+        while not any(child.get("text") == label for child in current):
+            assert current in parents, f"No tab control for {label}"
+            current = parents[current]
+        tabs[label] = current
+    return tabs
+
+
+def side_panel_segments(name, nodes, selected, *, offline=False, pixels=True):
+    labels = ("Queue", "Lyrics", "Players")
+    tabs = side_panel_tabs(nodes)
+    demand(f"{name}: exactly one tab is semantically selected ({selected})",
+           [label for label in labels if tabs[label].get("selected") == "true"] == [selected])
+    # Selection is independent of availability: Queue remains current when offline.
+    demand(f"{name}: Queue/Lyrics/Players retain their enabled states",
+           [tabs[label].get("enabled") for label in labels]
+           == ["false" if offline else "true", "false", "true"])
+    if not pixels:
+        return
+    side_panel_segment_pixels(name, nodes, tabs, selected)
+
+
+def side_panel_segment_pixels(name, nodes, tabs, selected):
+    """Compare a saved native render with its shared container, in either palette.
+
+    Reads saved pixels without issuing device commands. Keeping these assertions
+    separate also lets previous renders reveal visual defects despite older XML
+    selection semantics; the caller records verdicts through demand.
+    """
+    labels = ("Queue", "Lyrics", "Players")
+    containers = [n for n in nodes if all(tab in set(n.iter("node")) for tab in tabs.values())]
+    container = min(containers, key=lambda n:
+                    (bounds(n)[2] - bounds(n)[0]) * (bounds(n)[3] - bounds(n)[1]))
+    boxes = [bounds(tabs[label]) for label in labels]
+    left, top, right, bottom = bounds(container)
+    demand(f"{name}: labeled tabs share one horizontal container",
+           all(left <= b[0] < b[2] <= right and top <= b[1] < b[3] <= bottom
+               for b in boxes)
+           and len({(b[1], b[3]) for b in boxes}) == 1
+           and all(a[2] < b[0] for a, b in zip(boxes, boxes[1:])))
+
+    with Image.open(out / f"{name}.png") as screenshot:
+        image = screenshot.convert("RGB")
+
+    def patch(box):
+        x1, y1, x2, y2 = box
+        assert 0 <= x1 < x2 <= image.width and 0 <= y1 < y2 <= image.height, (
+            f"{name}: invalid background sampling patch {box}")
+        crop = image.crop(box)
+        color = tuple(ImageStat.Stat(crop).median)
+        noise = max(max(abs(a - b) for a, b in zip(pixel, color))
+                    for pixel in crop.getdata())
+        return color, noise
+
+    def distance(a, b):
+        return max(abs(x - y) for x, y in zip(a, b))
+
+    # The central strips BETWEEN the labeled tab bounds belong to the actual
+    # common container. Inset from their edges to avoid button antialiasing.
+    references = []
+    for a, b in zip(boxes, boxes[1:]):
+        height = a[3] - a[1]
+        references.append(patch((a[2] + 1, a[1] + round(height * .35),
+                                 b[0] - 1, a[1] + round(height * .65))))
+    background = references[0][0]
+    noise = max(sample[1] for sample in references)
+    demand(f"{name}: common-container reference patches agree",
+           distance(background, references[1][0]) <= 2 and noise <= 2)
+
+    interiors = {}
+    for label, box in zip(labels, boxes):
+        x1, y1, x2, y2 = box
+        width, height = x2 - x1, y2 - y1
+        text_boxes = [bounds(n) for n in tabs[label].iter("node")
+                      if n.get("text") == label]
+        assert text_boxes, f"{name}: missing text bounds for {label}"
+        samples = []
+        # Wide interior patches on BOTH sides, midway down the button: far from
+        # rounded corners and the centered label. Guard against label overlap.
+        for start, end in ((.18, .26), (.74, .82)):
+            region = (x1 + round(width * start), y1 + round(height * .4),
+                      x1 + round(width * end), y1 + round(height * .6))
+            margin = round(height * .12)
+            assert all(region[2] <= text[0] - margin or region[0] >= text[2] + margin
+                       for text in text_boxes), f"{name}: {label} patch approaches text"
+            samples.append(patch(region))
+        interiors[label] = samples
+    contrast = min(distance(color, background) for color, _ in interiors[selected])
+    tolerance = max(2, noise * 2, contrast * .12)
+    demand(f"{name}: selected {selected} has one distinct interior fill",
+           contrast >= max(6, noise * 4)
+           and all(spread <= 2 for color, spread in interiors[selected])
+           and distance(interiors[selected][0][0], interiors[selected][1][0]) <= 2)
+    for label in labels:
+        if label != selected:
+            demand(f"{name}: unselected {label} interiors match the common container",
+                   all(distance(color, background) <= tolerance and spread <= 2
+                       for color, spread in interiors[label]))
+
+
 nodes = launch("full-dark")
 demand("Native sample and six-track queue render", node(nodes, "6 tracks") is not None)
+side_panel_segments("full-dark", nodes, "Queue")
 for label in ("Play", "Previous track", "Next track", "Minimize player", "Close player"):
     left, top, right, bottom = bounds(node(nodes, label))
     demand(f"{label} has a 48dp touch target", min(right - left, bottom - top) >= 72)
@@ -111,11 +221,19 @@ tap(nodes, "Players")
 nodes = capture("speakers")
 demand("Speakers pane replaces queue inside the same player",
        node(nodes, "Your speakers") is not None and node(nodes, "Family Area") is not None)
+side_panel_segments("speakers", nodes, "Players")
 demand("Selected speaker is explicit and redundant selection is disabled",
        node(nodes, "Selected player") is not None and button_node(nodes, "Selected").get("enabled") == "false")
 demand("Unavailable group actions are explained instead of displaying a disabled Join button",
        not any(n.get("text") == "Join group" for n in nodes)
        and node(nodes, "Group controls apply to other players.") is not None)
+tap(nodes, "Queue")
+nodes = capture("queue-return")
+side_panel_segments("queue-return", nodes, "Queue")
+demand("Returning from Players retains the selected queue track and paused transport",
+       node(nodes, "6 tracks") is not None
+       and sum(n.get("text") == "Blue distance" for n in nodes) >= 2
+       and node(nodes, "Play").get("enabled") == "true")
 nodes = launch("speaker-groups", "--es", "scenario", "speaker-groups")
 tap(nodes, "Players")
 nodes = capture("speaker-groups")
@@ -145,8 +263,23 @@ demand("Larger-text speaker actions stack with full-width 48dp touch targets",
 nodes = launch("offline", "--es", "scenario", "offline")
 demand("Offline transport is disabled", all(node(nodes, label).get("enabled") == "false"
        for label in ("Play", "Previous track", "Next track")))
+side_panel_segments("offline", nodes, "Queue", offline=True, pixels=False)
+tap(nodes, "Lyrics")
+nodes = capture("offline")
+side_panel_segments("offline after disabled Lyrics", nodes, "Queue", offline=True, pixels=False)
+demand("Disabled Lyrics cannot replace the unavailable current Queue tab",
+       node(nodes, "Queue unavailable") is not None)
 nodes = launch("full-light", "--es", "theme", "light")
 demand("Light palette renders the same controls", node(nodes, "Play").get("enabled") == "true")
+side_panel_segments("full-light", nodes, "Queue")
+tap(nodes, "Players")
+nodes = capture("speakers-light")
+side_panel_segments("speakers-light", nodes, "Players")
+demand("Light Players tab opens the native speakers pane", node(nodes, "Your speakers") is not None)
+tap(nodes, "Queue")
+nodes = capture("queue-return-light")
+side_panel_segments("queue-return-light", nodes, "Queue")
+demand("Light Queue return restores the native six-track queue", node(nodes, "6 tracks") is not None)
 nodes = launch("large-font", "--ef", "font_scale", "1.8")
 left, top, right, bottom = bounds(node(nodes, "Play"))
 image = Image.open(out / "large-font.png").convert("RGB")

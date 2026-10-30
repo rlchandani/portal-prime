@@ -104,6 +104,12 @@ idle, stopped, pending, restricted local and offline states do not imply active 
 Nine JVM policy tests cover those distinctions. Artwork bounds, stable list keys and
 command guards are unchanged.
 
+Queue, Lyrics and Players now form one shared segmented control. Only its current tab
+has a filled highlight; unselected tabs use the container background in both palettes.
+Native tab/group semantics keep selection separate from capability availability.
+Pixel and semantics checks cover both palettes, Players → Queue continuity and offline
+selection without adding a playback worker, artwork request or animation.
+
 Gallery spread uses the existing bounded native stage, decoder and bitmap ownership.
 It contains two whole portraits inside a 3vmin matte with a 2vmin gap, or one whole
 landscape when pairing is inappropriate. Overlay changes reposition retained views
@@ -124,8 +130,8 @@ python3 native-checks.py --serial emulator-5556
 ```
 
 Results are in `evidence/native/checks.json`; `complete: true` is required before claiming the
-whole check passed. The latest integrated run passed **56 checks in 151.09 seconds**.
-Open `native-review.html` for the image review; all **39 capture tabs** loaded without page
+whole check passed. The latest integrated run passed **106 checks in 159.88 seconds**.
+Open `native-review.html` for the image review; all **42 capture tabs** loaded without page
 errors, recorded in `evidence/native-review-checks.json`. The emulator's API 34/GMS
 image does not establish Portal API 29 timing, sensor behavior or audio compatibility.
 No Home Assistant music deployment belongs to either preview.

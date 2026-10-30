@@ -1576,6 +1576,57 @@ Living Area and the phone received no operations; music backend wiring remains
 deferred. Build, deployment and evidence verification finished by **22:00 UTC**,
 before the **22:13 UTC** issue deadline.
 
+## Native music selection clarity — 22:01 UTC batch
+
+The native player, Library, Playlists, collection details and search were already
+implemented. This audit found a concrete mismatch with the intended segmented
+control: the unselected Players tab inherited a standalone button background,
+so it looked highlighted alongside the selected Queue tab.
+
+Music tabs now share their container's background and only the current tab has
+a selected fill. They expose native tab/group semantics instead of generic
+button roles. Existing availability guards, 48dp touch targets, current track,
+player ownership and layout are retained. No runtime timer, artwork load,
+animation, provider connection or Home Assistant service was added.
+
+The new pixel verifier rejects the defect in both **previous actual native**
+dark/light captures at the preceding commit; these are not fresh baseline runs.
+It samples label-free interiors against actual container gaps, without assuming
+theme colours. A selected native tab can be reported as non-clickable by Android
+accessibility, so checks resolve its owner rather than treating clickability as
+selection.
+
+- A fresh **3,460 JVM tests / 360 suites** pass with zero failures, errors or
+  skips. Debug and optimized performance APKs build in **1m 32s**.
+- **106 native acceptance checks** pass in **159.88 seconds** on the dedicated
+  API 34 AVD at 2160 × 1440 / 240dpi. They include exactly one selected tab,
+  unchanged enabled states, dark/light Players → Queue continuity, offline
+  guards, retained queue selection, library, playlists, search, larger text and
+  existing native clock/Gallery controls. This is silent fixture evidence,
+  not Portal API 29 performance or audible playback.
+- All **42 native review capture tabs** load in actual Chrome with zero page
+  errors. The review includes dark/light Queue return and light Players captures.
+- Family's installed optimized APK is independently read back and matches
+  `1c8bfc936274fea69258d883cb8f0a29c2d2f8dbc576b896b05957596563994e`
+  (**25,702,091 bytes**) with the existing certificate. All **53 main assets**
+  and the manifest are unchanged; native DEX changes contain the UI correction.
+  The preceding exact `5a3f060…` APK is retained privately as rollback.
+- All **97 settings**, full screensaver configuration and photo-source groups
+  are unchanged after install and navigation acknowledgments. A bounded
+  **402-line** runtime sample contains zero fatal exception markers. The
+  performance collector is inactive with zero listeners.
+
+Scalar evidence is in
+`mocks/portal-premium-player-20261030/evidence/family-music-tabs/verification.json`.
+Build, native/browser checks and Family deployment are verified by **22:10 UTC**,
+before the original audit's **22:29 UTC** deadline. The owned test AVD is shut
+down after its checks; Living Area, the phone and Home Assistant receive no
+operations.
+
+Actual Portal music pixels/interaction, Home/Apps frame tails, physical night
+transitions, stacked-Dream tap and slideshow startup presentation remain open.
+The overall goal remains active; this batch does not claim an FPS improvement.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

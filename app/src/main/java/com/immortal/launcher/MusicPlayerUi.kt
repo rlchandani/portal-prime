@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -460,7 +461,7 @@ private fun MusicSidePanel(
   Column(modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
     val palette = LocalApprovedPalette.current
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp))
-        .background(palette.surface).padding(4.dp),
+        .background(palette.surface).selectableGroup().padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)) {
       MusicPanel.entries.forEach { candidate ->
         // Queue and lyrics cannot be opened when the selected source does not supply them.
@@ -471,7 +472,7 @@ private fun MusicSidePanel(
           MusicPanel.ROOMS -> snapshot.rooms.isNotEmpty()
         }
         MusicButton(candidate.label, Modifier.weight(1f), enabled = enabled,
-            chosen = candidate == panel) { panel = candidate }
+            chosen = candidate == panel, quiet = true, role = Role.Tab) { panel = candidate }
       }
     }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
@@ -918,6 +919,7 @@ private fun MusicButton(
     chosen: Boolean = false,
     diameter: Int? = null,
     quiet: Boolean = false,
+    role: Role = Role.Button,
     onClick: () -> Unit,
 ) {
   val palette = LocalApprovedPalette.current
@@ -932,7 +934,7 @@ private fun MusicButton(
   Row(target.heightIn(min = 48.dp).widthIn(min = 48.dp)
       .clip(if (diameter != null) CircleShape else RoundedCornerShape(20.dp))
       .background(if (enabled || quiet) background else palette.surface)
-      .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+      .clickable(enabled = enabled, role = role, onClick = onClick)
       .semantics { contentDescription = label; selected = chosen }
       .padding(horizontal = if (iconOnly) 12.dp else 14.dp, vertical = 12.dp),
       horizontalArrangement = Arrangement.Center,
