@@ -163,14 +163,14 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
   function prints() { return nodes().filter(node =>
     node.classList.contains(mode === 'memories' ? 'memory-photo' : mode === 'panorama' ? 'ss-pan' :
       mode === 'polaroid' ? 'ss-ph' :
-      ['galleryWall', 'heroSidebar', 'mosaic'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
+      ['galleryWall', 'heroSidebar', 'mosaic', 'cinema'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
   function slot(print) {
     if (mode === 'memories') {
       let node = print;
       while (node.parent && !node.classList.contains('ss-memory-scene')) node = node.parent;
       return node;
     }
-    return mode === 'galleryWall' ? print : ['push', 'heroSidebar', 'panorama', 'mosaic', 'polaroid'].includes(mode) ? print.parent : print.parent.parent.parent.parent;
+    return mode === 'galleryWall' ? print : ['push', 'heroSidebar', 'panorama', 'mosaic', 'polaroid', 'cinema'].includes(mode) ? print.parent : print.parent.parent.parent.parent;
   }
   function state(print) {
     const style = computed(print), animation = style.animation || 'none';

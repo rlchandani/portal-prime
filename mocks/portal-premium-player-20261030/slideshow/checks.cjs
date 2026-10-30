@@ -17,6 +17,10 @@ const readAsset = name => process.env.SLIDESHOW_ASSET_REF
       `${process.env.SLIDESHOW_ASSET_REF}:app/src/main/assets/screensaver/${name}`],
       { cwd: repo, encoding: "utf8" })
   : fs.readFileSync(path.join(assets, name), "utf8");
+const readBinaryAsset = name => process.env.SLIDESHOW_ASSET_REF
+  ? execFileSync("git", ["-c", "core.hooksPath=/dev/null", "--no-optional-locks", "show",
+      `${process.env.SLIDESHOW_ASSET_REF}:app/src/main/assets/screensaver/${name}`], { cwd: repo })
+  : fs.readFileSync(path.join(assets, name));
 let closedSlow = 0, admittedSlow = 0;
 const held = new Map(), checks = [], errors = [];
 const fixture = name => fs.readFileSync(path.join(here, "assets", name + ".png"));
@@ -37,8 +41,8 @@ const server = http.createServer((req, res) => {
     return;
   }
   let content, type;
-  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit", "/memories-unit", "/panorama-unit", "/mosaic-unit", "/polaroid-unit"].includes(u.pathname)) {
-    const unitPhotos = u.pathname === "/panorama-unit" ? panoramaPhotos :
+  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit", "/memories-unit", "/panorama-unit", "/mosaic-unit", "/polaroid-unit", "/cinema-unit"].includes(u.pathname)) {
+    const unitPhotos = ["/panorama-unit", "/cinema-unit"].includes(u.pathname) ? panoramaPhotos :
       ["/gallery-unit", "/sidebar-unit", "/memories-unit", "/mosaic-unit", "/polaroid-unit"].includes(u.pathname) ? galleryPhotos :
       ["dunes", "tidal"].map((name, id) => ({
         id, url: "/fixtures/" + name + ".png", w: 480, h: 720,
@@ -54,7 +58,7 @@ const server = http.createServer((req, res) => {
     const slow = u.searchParams.has("slow"), unknown = u.searchParams.has("unknown");
     const mode = u.pathname === "/renderMosaic" ? "mosaic" :
       u.pathname === "/renderPolaroid" ? "polaroid" : u.searchParams.get("mode") || "diptych";
-    const photos = mode === "panorama" ? panoramaPhotos :
+    const photos = ["panorama", "cinema"].includes(mode) ? panoramaPhotos :
       ["galleryWall", "heroSidebar", "memories", "mosaic", "polaroid"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
       url: (slow ? "/slow/" : "/fixtures/") + name + ".png",
       w: unknown ? 0 : 480, h: unknown ? 0 : 720,
@@ -72,6 +76,8 @@ const server = http.createServer((req, res) => {
   } else if (["/fixtures/panorama-wide.svg", "/fixtures/panorama-extreme.svg"].includes(u.pathname)) {
     content = fs.readFileSync(path.join(here, "assets", path.basename(u.pathname)));
     type = "image/svg+xml";
+  } else if (u.pathname === "/assets/cinema-grain.png") {
+    content = readBinaryAsset("cinema-grain.png"); type = "image/png";
   } else if (/^\/assets\/(?:styles\.css|photos\.js|lib-engine\.js|modes\.js|mode-impls\.js|scheduler\.js)$/.test(u.pathname)) {
     content = readAsset(path.basename(u.pathname));
     type = u.pathname.endsWith(".css") ? "text/css" : "application/javascript";
@@ -89,6 +95,7 @@ async function until(condition) {
   }
 }
 (async () => {
+  const startedAt = Date.now();
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
   let browser;
@@ -110,7 +117,7 @@ async function until(condition) {
       };
     });
     page.on("pageerror", error => errors.push(error.message));
-    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama", "mosaic", "polaroid"]) {
+    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama", "mosaic", "polaroid", "cinema"]) {
       const route = mode === "mosaic" ? "renderMosaic" : mode === "polaroid" ? "renderPolaroid" : "render";
       await page.goto(`${base}/${route}?nativeClock=1&mode=${mode}`);
       await page.locator("#loading.hide").waitFor({ state: "attached" });
@@ -132,7 +139,7 @@ async function until(condition) {
         demand("Diptych matte inset scales to the actual viewport", Math.abs(state.padding - 43.2) < .1);
       }
       // Preserve all prior screenshots byte-for-byte during this bounded addition.
-      if (mode === "polaroid")
+      if (mode === "cinema")
         await page.screenshot({ path: path.join(evidence, mode + ".png") });
       demand(mode + " actual renderer becomes ready", await page.locator("#loading").evaluate(n => n.classList.contains("hide")));
       if (mode === "mosaic")
@@ -151,6 +158,338 @@ async function until(condition) {
             [...document.querySelectorAll(".ss-polaroid.on")].every(card =>
               +getComputedStyle(card).opacity === 1 && getComputedStyle(card).willChange === "auto")));
     }
+    const grainResponse = await page.request.get(`${base}/assets/cinema-grain.png`);
+    const grainBytes = await grainResponse.body(), grainPng = PNG.sync.read(grainBytes);
+    demand("Cinema serves the exact original binary grain PNG at the production asset path",
+      grainResponse.ok() && grainResponse.headers()["content-type"] === "image/png" &&
+      grainBytes.equals(readBinaryAsset("cinema-grain.png")) && grainPng.width === 128 && grainPng.height === 128);
+    await page.goto(`${base}/cinema-unit`);
+    const cinemaInitial = await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined; Element.prototype.animate = undefined;
+      const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.cinemaRoot = root; window.cinemaRequests = [];
+      window.cinemaCheck = SS.MODES.cinema.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight, photoMs: 3000, motionMs: 6000,
+        url: (photo, edge) => {
+          const url = photo.url + "?cinema=" + (cinemaRequests.length + 1);
+          cinemaRequests.push({ url, edge }); return url;
+        },
+      }, PHOTOS.slice(0, 2));
+      await cinemaCheck.ready;
+      window.cinemaScenes = [...root.querySelectorAll(".cinema-layer")];
+      window.cinemaImages = [...root.querySelectorAll(".ss-cinema-photo")];
+      window.cinemaGrains = [...root.querySelectorAll(".ss-grain")];
+      window.cinemaState = () => cinemaScenes.map(scene => ({
+        opacity: getComputedStyle(scene).opacity,
+        transform: getComputedStyle(scene.firstElementChild).transform,
+        url: scene.firstElementChild.style.backgroundImage,
+      }));
+      const grain = new Image(); grain.src = "/assets/cinema-grain.png"; await grain.decode();
+      const scope = root.querySelector(".ss-scope"), box = scope.getBoundingClientRect();
+      return { scenes: cinemaScenes.length, photos: cinemaImages.length, grains: cinemaGrains.length,
+        owners: cinemaImages.filter(image => image.style.backgroundImage !== "none").length,
+        opaque: +getComputedStyle(scope.lastElementChild).opacity,
+        scope: { top: box.top, height: box.height, width: box.width, overflow: getComputedStyle(scope).overflow },
+        grain: [grain.naturalWidth, grain.naturalHeight],
+        preferred: cinemaRequests[0].url.startsWith(PHOTOS[0].url),
+        bars: [...root.querySelectorAll(".ss-bar")].map(bar => ({
+          top: bar.getBoundingClientRect().top, height: bar.getBoundingClientRect().height,
+          color: getComputedStyle(bar).backgroundColor,
+        })) };
+    });
+    demand("Cinema initially owns one opaque preferred wide photo in two fixed scenes/photos and two grain children",
+      cinemaInitial.scenes === 2 && cinemaInitial.photos === 2 && cinemaInitial.grains === 2 &&
+      cinemaInitial.owners === 1 && cinemaInitial.opaque === 1 && cinemaInitial.preferred, cinemaInitial);
+    demand("Cinema production bars are black eleven percent and bound a clipped seventy-eight percent scope",
+      Math.abs(cinemaInitial.scope.top - 158.4) < .1 && Math.abs(cinemaInitial.scope.height - 1123.2) < .1 &&
+      cinemaInitial.scope.width === 2160 && cinemaInitial.scope.overflow === "hidden" &&
+      cinemaInitial.bars.length === 2 && cinemaInitial.bars.every(bar =>
+        Math.abs(bar.height - 158.4) < .1 && bar.color === "rgb(0, 0, 0)") &&
+      Math.abs(cinemaInitial.bars[0].top) < .1 && Math.abs(cinemaInitial.bars[1].top - 1281.6) < .1, cinemaInitial);
+    demand("Cinema decodes 128px raster grain with normal blending and no filter, animation or permanent grain hint",
+      cinemaInitial.grain[0] === 128 && cinemaInitial.grain[1] === 128 &&
+      await page.evaluate(() => cinemaGrains.every(grain => {
+        const style = getComputedStyle(grain);
+        return grain.parentElement.classList.contains("ss-cinema-photo") &&
+          style.backgroundImage.endsWith('/assets/cinema-grain.png")') &&
+          style.backgroundSize === "128px 128px" && style.backgroundRepeat === "repeat" &&
+          style.mixBlendMode === "normal" && style.filter === "none" && style.animationName === "none" &&
+          style.willChange === "auto" && style.opacity === "0.035";
+      })));
+    demand("Cinema wide photo uses cover with bounded linear four-percent drift and no duplicate blur image",
+      await page.evaluate(() => {
+        const image = cinemaRoot.querySelector(".on .ss-cinema-photo"), style = getComputedStyle(image);
+        const scale = new DOMMatrixReadOnly(style.transform).a;
+        return style.backgroundSize === "cover" && style.backgroundRepeat === "no-repeat" &&
+          style.animationName === "cinematicDrift" && style.animationTimingFunction === "linear" &&
+          style.animationFillMode === "forwards" && style.willChange === "transform" &&
+          scale >= 1 && scale <= 1.04 && style.filter === "none" && cinemaRoot.querySelectorAll(".ss-fill").length === 0;
+      }));
+    demand("Cinema resolves a 2400-edge derivative once and displays exactly its admitted URL",
+      await page.evaluate(() => cinemaRequests.length === 1 && cinemaRequests[0].edge === 2400 &&
+        cinemaImages.some(image => image.style.backgroundImage === `url("${cinemaRequests[0].url}")`)));
+    await page.evaluate(() => {
+      window.cinemaOutgoing = cinemaRoot.querySelector(".ss-scope").lastElementChild;
+      window.cinemaOldImage = cinemaOutgoing.firstElementChild;
+      window.cinemaOldUrl = cinemaOldImage.style.backgroundImage;
+    });
+    await page.waitForFunction(() => cinemaRoot.querySelector(".ss-scope").lastElementChild !== cinemaOutgoing &&
+      +getComputedStyle(cinemaRoot.querySelector(".ss-scope").lastElementChild).opacity > .1 &&
+      +getComputedStyle(cinemaRoot.querySelector(".ss-scope").lastElementChild).opacity < .9);
+    const cinemaFade = await page.evaluate(() => {
+      window.cinemaIncoming = cinemaRoot.querySelector(".ss-scope").lastElementChild;
+      const style = getComputedStyle(cinemaIncoming);
+      return { incoming: +style.opacity, outgoing: +getComputedStyle(cinemaOutgoing).opacity,
+        duration: style.transitionDuration, property: style.transitionProperty,
+        retained: cinemaOldImage.style.backgroundImage === cinemaOldUrl,
+        fixed: cinemaScenes.every(scene => scene.isConnected) && cinemaRoot.querySelectorAll(".cinema-layer").length === 2 };
+    });
+    demand("Cinema replacement uses incoming-only 2200ms opacity above the opaque original URL",
+      cinemaFade.incoming > 0 && cinemaFade.incoming < 1 && cinemaFade.outgoing === 1 &&
+      cinemaFade.duration === "2.2s" && cinemaFade.property === "opacity" && cinemaFade.retained && cinemaFade.fixed, cinemaFade);
+    const pausedCinema = await page.evaluate(async () => {
+      cinemaCheck.pause();
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return { state: cinemaState(), requests: cinemaRequests.length };
+    });
+    await page.waitForTimeout(3200);
+    demand("Cinema old-WebView pause freezes both photo transforms, dissolve opacity and derivative cadence",
+      await page.evaluate(before => !Element.prototype.getAnimations && !Element.prototype.animate &&
+        JSON.stringify(cinemaState()) === JSON.stringify(before.state) && cinemaRequests.length === before.requests &&
+        cinemaImages.filter(image => image.style.backgroundImage !== "none")
+          .every(image => getComputedStyle(image).animationPlayState === "paused"), pausedCinema));
+    const cinemaRemaining = await page.evaluate(() => {
+      window.cinemaResumedAt = performance.now(); cinemaCheck.resume();
+      return parseFloat(getComputedStyle(cinemaIncoming).transitionDuration) * 1000;
+    });
+    demand("Cinema resume runs only the remaining dissolve and resumes the prepared photo animation",
+      cinemaRemaining > 0 && cinemaRemaining < 2200 && await page.evaluate(() =>
+        getComputedStyle(cinemaIncoming.firstElementChild).animationPlayState === "running"), { cinemaRemaining });
+    await page.waitForFunction(() => cinemaOldImage.style.backgroundImage === "none" && +getComputedStyle(cinemaIncoming).opacity === 1);
+    demand("Cinema retires the outgoing URL only after full incoming opacity and clears its motion hint",
+      await page.evaluate(() => getComputedStyle(cinemaOutgoing).visibility === "hidden" &&
+        cinemaOldImage.style.backgroundImage === "none" && cinemaOldImage.style.animationName === "none" &&
+        cinemaOldImage.style.willChange === "auto" &&
+        cinemaImages.filter(image => image.style.backgroundImage !== "none").length === 1));
+    await page.waitForFunction(() => cinemaRequests.length === 3 &&
+      cinemaRoot.querySelector(".ss-scope").lastElementChild.firstElementChild.style.backgroundImage ===
+        `url("${cinemaRequests.at(-1).url}")`);
+    const cinemaCadence = await page.evaluate(() => ({
+      elapsed: performance.now() - cinemaResumedAt,
+      exact: cinemaRequests.every(request => request.edge === 2400),
+      owners: cinemaImages.filter(image => image.style.backgroundImage !== "none").length,
+    }));
+    demand("Cinema manual resume preserves the remaining photo cadence and admits exactly one subsequent replacement",
+      cinemaCadence.elapsed >= cinemaRemaining - 100 && cinemaCadence.elapsed < 3500 &&
+      cinemaCadence.exact && cinemaCadence.owners === 2, cinemaCadence);
+    await page.evaluate(() => {
+      window.cinemaEvents = cinemaScenes.map(scene => [scene, scene.ontransitionend]);
+      cinemaCheck.pause(); cinemaCheck(); cinemaCheck(); cinemaCheck.resume();
+      cinemaEvents.forEach(([target, event]) => event?.({ target, propertyName: "opacity" }));
+      window.cinemaClosedRequests = cinemaRequests.length;
+    });
+    demand("Cinema cleanup removes bars/scope and releases every retained photo, raster grain and hint",
+      await page.evaluate(() => cinemaRoot.children.length === 0 &&
+        cinemaImages.every(image => !image.isConnected && image.style.backgroundImage === "none" &&
+          image.style.animationName === "none" && image.style.transform === "none" && image.style.willChange === "auto") &&
+        cinemaGrains.every(grain => grain.style.backgroundImage === "none") &&
+        cinemaScenes.every(scene => scene.ontransitionend === null)));
+    await page.waitForTimeout(3100);
+    demand("Cinema terminal ownership rejects late fade events, cadence callbacks and resume admissions",
+      await page.evaluate(() => cinemaRoot.children.length === 0 && cinemaRequests.length === cinemaClosedRequests));
+    for (const [W, H] of [[2160, 1440], [1920, 1080], [640, 960]]) {
+      await page.setViewportSize({ width: W, height: H });
+      await page.goto(`${base}/cinema-unit`);
+      for (const ratio of [.2, 2 / 3, 1, 1.5, 2.2, 3, 8]) {
+        const cinemaGeometry = await page.evaluate(async ({ W, H, ratio, gallery }) => {
+          const original = [...PHOTOS, ...gallery].find(photo => Math.abs(photo.w / photo.h - ratio) < .00001);
+          const w = ratio * 100, h = 100;
+          const photo = original || { w, h, url: "data:image/svg+xml," + encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="${w}" height="${h}" fill="#647f83"/></svg>`) };
+          const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+          document.querySelector("#stage").append(root);
+          const cleanup = SS.MODES.cinema.run({
+            root, cursor: { i: 0 }, W, H, photoMs: 30000, motionMs: 1, url: photo => photo.url,
+          }, [{ ...photo, id: 0, seed: "cinema-geometry" }]);
+          try {
+            await cleanup.ready; await new Promise(resolve => setTimeout(resolve, 80));
+            const decoded = new Image(); decoded.src = photo.url; await decoded.decode();
+            const image = root.querySelector(".on .ss-cinema-photo"), style = getComputedStyle(image);
+            const scope = root.querySelector(".ss-scope"), box = image.getBoundingClientRect();
+            const grainBox = image.firstElementChild.getBoundingClientRect();
+            const matrix = style.transform === "none" ? { a: 1 } : new DOMMatrixReadOnly(style.transform);
+            return { aspect: decoded.naturalWidth / decoded.naturalHeight,
+              width: parseFloat(style.width), height: parseFloat(style.height),
+              left: box.left, top: box.top, right: box.right, bottom: box.bottom, scale: matrix.a,
+              centerX: (box.left + box.right) / 2, centerY: (box.top + box.bottom) / 2,
+              size: style.backgroundSize, motion: style.animationName, hint: style.willChange, filter: style.filter,
+              clipped: getComputedStyle(scope).overflow === "hidden",
+              grainScoped: Math.abs(grainBox.left - box.left) < .1 && Math.abs(grainBox.top - box.top) < .1 &&
+                Math.abs(grainBox.width - box.width) < .1 && Math.abs(grainBox.height - box.height) < .1 };
+          } finally { cleanup(); root.remove(); }
+        }, { W, H, ratio, gallery: galleryPhotos });
+        const wide = ratio > 2.2, scopeH = H * .78;
+        demand(`Cinema ${W}x${H} decoded ${ratio}:1 ${wide ? "wide crop stays clipped within four-percent drift" : "ordinary photo stays whole centered and static"}`,
+          Math.abs(cinemaGeometry.aspect - ratio) < .0001 && cinemaGeometry.grainScoped && cinemaGeometry.filter === "none" &&
+          Math.abs(cinemaGeometry.centerX - W / 2) < .1 && Math.abs(cinemaGeometry.centerY - H / 2) < .1 &&
+          (wide ? cinemaGeometry.size === "cover" && cinemaGeometry.motion === "cinematicDrift" &&
+              cinemaGeometry.hint === "transform" && Math.abs(cinemaGeometry.scale - 1.04) < .0001 && cinemaGeometry.clipped &&
+              Math.abs(cinemaGeometry.width - W) < .1 && Math.abs(cinemaGeometry.height - scopeH) < .1 &&
+              cinemaGeometry.left >= -.0201 * W && cinemaGeometry.right <= 1.0201 * W &&
+              cinemaGeometry.top >= .11 * H - .0201 * scopeH && cinemaGeometry.bottom <= .89 * H + .0201 * scopeH
+            : cinemaGeometry.size === "contain" && cinemaGeometry.motion === "none" && cinemaGeometry.hint === "auto" &&
+              Math.abs(cinemaGeometry.width / cinemaGeometry.height - ratio) < .001 &&
+              cinemaGeometry.left >= -.1 && cinemaGeometry.right <= W + .1 &&
+              cinemaGeometry.top >= .11 * H - .1 && cinemaGeometry.bottom <= .89 * H + .1), cinemaGeometry);
+      }
+    }
+    for (const [W, H, index, fx, fy] of [
+      ...[0, .1, .5, .8, 1].map(fx => [2160, 1440, 1, fx, .5]),
+      ...[.1, .5, .8].map(fy => [3840, 1080, 0, .5, fy]),
+    ]) {
+      await page.setViewportSize({ width: W, height: H }); await page.goto(`${base}/cinema-unit`);
+      const cinemaAnchor = await page.evaluate(async ({ W, H, index, fx, fy }) => {
+        const photo = { ...PHOTOS[index], fx, fy }, root = document.createElement("div");
+        root.style.cssText = "position:fixed;inset:0"; document.querySelector("#stage").append(root);
+        const cleanup = SS.MODES.cinema.run({
+          root, cursor: { i: 0 }, W, H, photoMs: 30000, motionMs: 1, url: photo => photo.url,
+        }, [photo]);
+        await cleanup.ready;
+        const image = root.querySelector(".on .ss-cinema-photo"), style = getComputedStyle(image);
+        const positions = style.backgroundPosition.split(" ").map(parseFloat);
+        const renderedW = Math.max(W, H * .78 * photo.w / photo.h), renderedH = renderedW * photo.h / photo.w;
+        const result = { x: fx * renderedW - (renderedW - W) * positions[0] / 100,
+          y: fy * renderedH - (renderedH - H * .78) * positions[1] / 100,
+          canCenterX: fx * renderedW >= W / 2 && fx * renderedW <= renderedW - W / 2,
+          canCenterY: fy * renderedH >= H * .78 / 2 && fy * renderedH <= renderedH - H * .78 / 2,
+          positions, size: style.backgroundSize, motion: style.animationName, hint: style.willChange };
+        cleanup(); return result;
+      }, { W, H, index, fx, fy });
+      demand(`Cinema ${W}x${H} cached wide focal ${fx},${fy} stays static and centers where crop edges permit`,
+        cinemaAnchor.size === "cover" && cinemaAnchor.motion === "none" && cinemaAnchor.hint === "auto" &&
+        cinemaAnchor.positions.every(position => position >= 0 && position <= 100) &&
+        cinemaAnchor.x >= -.1 && cinemaAnchor.x <= W + .1 && cinemaAnchor.y >= -.1 && cinemaAnchor.y <= H * .78 + .1 &&
+        (!cinemaAnchor.canCenterX || Math.abs(cinemaAnchor.x - W / 2) < .1) &&
+        (!cinemaAnchor.canCenterY || Math.abs(cinemaAnchor.y - H * .78 / 2) < .1), cinemaAnchor);
+    }
+    await page.setViewportSize({ width: 2160, height: 1440 }); await page.goto(`${base}/cinema-unit`);
+    const cinemaAdmission = await page.evaluate(async () => {
+      const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root); let requests = 0;
+      const cleanup = SS.MODES.cinema.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight, photoMs: 30000, motionMs: 1000,
+        url: photo => { requests++; return photo.url; },
+      }, [PHOTOS[0]]);
+      cleanup.pause(); await new Promise(resolve => setTimeout(resolve, 30));
+      cleanup.resume(); cleanup.pause(); await new Promise(resolve => setTimeout(resolve, 30));
+      const held = requests === 0 && [...root.querySelectorAll(".ss-cinema-photo")]
+        .every(image => image.style.backgroundImage === "none");
+      cleanup.resume(); const ready = await cleanup.ready;
+      const result = { held, ready, requests, owners: [...root.querySelectorAll(".ss-cinema-photo")]
+        .filter(image => image.style.backgroundImage !== "none").length,
+        fixed: root.querySelectorAll(".ss-cinema-photo").length };
+      cleanup(); return result;
+    });
+    demand("Cinema single-photo source gates derivative admission through immediate pause/resume/re-pause before readiness",
+      cinemaAdmission.held && cinemaAdmission.ready && cinemaAdmission.requests === 1 &&
+      cinemaAdmission.owners === 1 && cinemaAdmission.fixed === 2, cinemaAdmission);
+    await page.goto(`${base}/cinema-unit`);
+    await page.evaluate(async () => {
+      const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root); window.rapidCinemaRoot = root; window.rapidCinemaRequests = [];
+      window.rapidCinemaCheck = SS.MODES.cinema.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight, photoMs: 220, motionMs: 3000,
+        url: (photo, edge) => {
+          const url = photo.url + "?rapidCinema=" + (rapidCinemaRequests.length + 1);
+          rapidCinemaRequests.push({ url, edge }); return url;
+        },
+      }, PHOTOS.slice(0, 2));
+      await rapidCinemaCheck.ready;
+      window.rapidCinemaScenes = [...root.querySelectorAll(".cinema-layer")];
+    });
+    const rapidCinemaReceipts = [];
+    for (let beat = 1; beat <= 10; beat++) {
+      await page.waitForFunction(beat => rapidCinemaRequests.length >= beat + 1 &&
+        rapidCinemaRoot.querySelector(".ss-scope").lastElementChild.firstElementChild.style.backgroundImage ===
+          `url("${rapidCinemaRequests.at(-1).url}")`, beat);
+      rapidCinemaReceipts.push(await page.evaluate(beat => {
+        const incoming = rapidCinemaRoot.querySelector(".ss-scope").lastElementChild;
+        if (beat === 1) { window.staleCinemaScene = incoming; window.staleCinemaEvent = incoming.ontransitionend; }
+        const urls = () => rapidCinemaScenes.map(scene => scene.firstElementChild.style.backgroundImage);
+        const before = urls(); if (beat > 1) staleCinemaEvent?.({ target: staleCinemaScene, propertyName: "opacity" });
+        return { guarded: JSON.stringify(urls()) === JSON.stringify(before),
+          fixed: rapidCinemaScenes.every(scene => scene.isConnected) &&
+            rapidCinemaRoot.querySelectorAll(".cinema-layer,.ss-cinema-photo,.ss-grain").length === 6,
+          opaque: rapidCinemaScenes.some(scene => +getComputedStyle(scene).opacity === 1),
+          owners: before.filter(url => url !== "none").length,
+          edges: rapidCinemaRequests.every(request => request.edge === 2400) };
+      }, beat));
+    }
+    demand("Cinema rapid scene reuse guards old retirement callbacks and retains two fixed photo/grain owners",
+      rapidCinemaReceipts.every(receipt => receipt.guarded && receipt.fixed && receipt.opaque &&
+        receipt.owners <= 2 && receipt.edges), rapidCinemaReceipts);
+    await page.evaluate(() => {
+      rapidCinemaCheck(); rapidCinemaCheck.resume();
+      staleCinemaEvent?.({ target: staleCinemaScene, propertyName: "opacity" });
+      window.rapidCinemaClosed = rapidCinemaRequests.length;
+    });
+    await page.waitForTimeout(500);
+    demand("Cinema rapid cleanup releases reused scene resources and rejects stale retirement and subsequent admissions",
+      await page.evaluate(() => rapidCinemaRoot.children.length === 0 && rapidCinemaRequests.length === rapidCinemaClosed &&
+        rapidCinemaScenes.every(scene => scene.firstElementChild.style.backgroundImage === "none" &&
+          scene.firstElementChild.style.willChange === "auto" &&
+          scene.firstElementChild.firstElementChild.style.backgroundImage === "none")));
+    for (const initial of [true, false]) {
+      await page.goto(`${base}/cinema-unit`);
+      const gatedCinema = await page.evaluate(async initial => {
+        const original = window.preloadDecoded, root = document.createElement("div");
+        root.style.cssText = "position:fixed;inset:0"; document.querySelector("#stage").append(root);
+        let hold = initial, reached, release, requests = 0;
+        const blocked = new Promise(resolve => { reached = resolve; });
+        window.preloadDecoded = (url, signal) => {
+          const prepared = original(url, signal);
+          if (!hold) return prepared;
+          hold = false; return prepared.then(value => new Promise(resolve => { release = () => resolve(value); reached(); }));
+        };
+        const cleanup = SS.MODES.cinema.run({
+          root, cursor: { i: 0 }, W: innerWidth, H: innerHeight, photoMs: 300, motionMs: 1000,
+          url: photo => { requests++; return photo.url + "?gatedCinema=" + requests; },
+        }, PHOTOS.slice(0, 2));
+        const urls = () => [...root.querySelectorAll(".ss-cinema-photo")].map(image => image.style.backgroundImage);
+        try {
+          if (!initial) { await cleanup.ready; hold = true; }
+          await blocked; cleanup.pause(); release(); await new Promise(resolve => setTimeout(resolve, 30));
+          cleanup.resume(); cleanup.pause(); const before = urls(), admitted = requests;
+          await new Promise(resolve => setTimeout(resolve, 50));
+          const held = JSON.stringify(urls()) === JSON.stringify(before) && requests === admitted;
+          cleanup.resume(); await cleanup.ready; await new Promise(resolve => setTimeout(resolve, 80));
+          return held && urls().some(url => url !== "none");
+        } finally { cleanup(); window.preloadDecoded = original; }
+      }, initial);
+      demand(`Cinema ${initial ? "initial" : "replacement"} real decoded photo stays behind resumed/re-paused publication gates`, gatedCinema);
+    }
+    await page.goto(`${base}/cinema-unit`);
+    const cancelledCinema = await page.evaluate(async () => {
+      const original = window.preloadDecoded, root = document.createElement("div");
+      document.querySelector("#stage").append(root); let cleanup, atCleanup, admitted, requests = 0;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = root.children.length; admitted = requests;
+        })), () => {}); return prepared;
+      };
+      cleanup = SS.MODES.cinema.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight, photoMs: 30000, motionMs: 1000,
+        url: photo => { requests++; return photo.url; },
+      }, PHOTOS);
+      const ready = await cleanup.ready; window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: root.children.length, admitted, requests };
+    });
+    demand("Cinema decode cancellation removes scope/bars and rejects late readiness or derivative publication",
+      cancelledCinema.ready === false && cancelledCinema.atCleanup === 0 && cancelledCinema.afterReady === 0 &&
+      cancelledCinema.requests === cancelledCinema.admitted, cancelledCinema);
+    console.log(`${checks.filter(name => /^Cinema\b/i.test(name)).length} Cinema checks passed; replaying the retained browser baseline.`);
     await page.goto(`${base}/polaroid-unit`);
     const polaroidInitial = await page.evaluate(async () => {
       Element.prototype.getAnimations = undefined; Element.prototype.animate = undefined;
@@ -2027,6 +2366,16 @@ async function until(condition) {
         geometryAspects: [40, .025, 1.5, 2 / 3, 1, 3],
         oldWebViewManualPath: "Element.getAnimations and Element.animate unavailable",
       },
+      cinema: {
+        passed: checks.filter(name => /^Cinema\b/i.test(name)).length,
+        fixtureSource: "Original panorama/gallery SVGs and exactly dimensioned synthetic aspect SVGs",
+        screenshots: ["cinema.png"], grainAsset: "Production cinema-grain.png, decoded 128x128 binary",
+        composition: { fixedScenes: 2, fixedPhotos: 2, fixedGrains: 2, derivativeEdge: 2400 },
+        geometryViewports: [[2160, 1440], [1920, 1080], [640, 960]],
+        geometryAspects: [.2, 2 / 3, 1, 1.5, 2.2, 3, 8],
+        oldWebViewManualPath: "Element.getAnimations and Element.animate unavailable",
+      },
+      runtimeMs: Date.now() - startedAt,
       scope: "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",
       physicalPortalPerformanceMeasured: false,
     }, null, 2) + "\n");

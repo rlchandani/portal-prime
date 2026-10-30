@@ -155,9 +155,9 @@ python3 slideshow/serve.py
 ```
 
 Open `http://127.0.0.1:8891/`. Diptych, Framed, Ken Burns, Cinematic Push, Gallery Wall,
-Hero + Sidebar, Memories, Panorama Drift, Mosaic Wall and Polaroid Scatter are rendered by the actual
+Hero + Sidebar, Memories, Panorama Drift, Mosaic Wall, Polaroid Scatter and Cinema Letterbox are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its **206 browser checks** include real stalled HTTP image requests, pause
+ambient sensors. Its **255 browser checks** include real stalled HTTP image requests, pause
 cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
 frames, initial readiness without a second fade, pause without the newer animation API,
 and cancellation immediately before DOM publication. Diptych preserves its existing
@@ -166,6 +166,17 @@ frames are released on cleanup. Chrome results do not establish Portal GPU timin
 source tests separately cover Filmstrip and Gallery geometry.
 The renderer checks use developer-installed Playwright/Chrome and `pngjs`; these are
 verification tools, not application or preview runtime dependencies.
+
+Cinema Letterbox retains its black 11% bars and immersive wide-photo crop. Cached focal
+points are centered within that crop where its edges permit, and remain static. Other
+wide photos use a gentle 4% zoom; ordinary landscapes and portraits stay whole and still.
+Two reusable scenes use an incoming-only 2.2-second dissolve, retain their photo motion
+and remaining cadence during pause, and release outgoing URLs and hints on retirement.
+A deterministic bundled 128×128 grayscale PNG replaces the full-screen SVG grain filter
+and overlay blend. Grain belongs to each photo rectangle, leaving bars and matte black.
+Forty-nine actual-source Chrome assertions cover its geometry, focal points, decoded
+grain, incoming-only fade, retained manual pause, cadence, rapid reuse and cleanup.
+These rendering and ownership changes do not establish physical Portal FPS.
 
 Living Gallery Wall fits all ten selected photographs inside the viewport, adapts
 row height to the screen and centers the shorter final row. Whole static photographs

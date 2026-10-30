@@ -143,11 +143,13 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 
 /* cinema */
 .ss-scope { position: absolute; left: 0; right: 0; top: 11%; bottom: 11%; overflow: hidden; background: #000; }
-.ss-scope .ss-layer.on .ss-img, .ss-scope .ss-layer .ss-img.ss-motion { animation: kb var(--motion-duration, 32400ms) linear forwards; }
+.ss-layer.cinema-layer { background: #000; }
+.ss-layer.cinema-layer.retired { opacity: 0; visibility: hidden; transition: none; }
 .ss-bar { position: absolute; left: 0; right: 0; height: 11%; background: #000; z-index: 3; }
 .ss-bar.top { top: 0; } .ss-bar.bot { bottom: 0; }
-.ss-grain { position: absolute; inset: 0; pointer-events: none; opacity: .06; mix-blend-mode: overlay; z-index: 2;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.ss-grain { position: absolute; inset: 0; pointer-events: none; opacity: .035; mix-blend-mode: normal; z-index: 2;
+  background-image: url("cinema-grain.png"); background-repeat: repeat; background-size: 128px 128px;
+  animation: none; filter: none; will-change: auto; }
 
 /* hero + sidebar */
 .ss-hero-sidebar { position: absolute; inset: 0; background: #1c1b19; }

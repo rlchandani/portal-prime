@@ -923,6 +923,65 @@ remains unchanged. Physical night-clock acceptance and reliable Portal presentat
 measurements remain open. Music backend wiring remains deferred; no Home Assistant
 operation belongs to this batch. The broader goal remains active.
 
+## Cinema Letterbox — 19:15 UTC batch
+
+Cinema retains its black **11% letterbox bars** and wide-photo preference. Wide
+photographs keep their immersive cover crop, using a gentle maximum **4% zoom**
+without a cached focal point. Cached focal points remain still and are centered
+within the crop where its edges permit. A point does not establish the extent of
+a face, so this does not promise that a wide photograph or an entire face is
+uncropped. Ordinary landscapes and portraits remain complete, centered and static.
+
+Two fixed photo scenes use the shared incoming-only **2.2-second dissolve**. The
+outgoing URL stays opaque until the incoming scene is opaque, then loses its
+photo URL, motion and promotion hint. Manual pause retains both photo animation
+and fade opacity without newer WebView animation APIs; resume continues the
+remaining fade and photo cadence. Cleanup removes the bars/scope and clears
+photo/grain owners. Current-playback gates reject work after close or re-pause.
+
+A deterministic **128×128 grayscale PNG, 12,657 bytes**, replaces the previous
+full-screen SVG turbulence filter and overlay blend. Each static grain tile
+belongs to its photo rectangle and uses ordinary blending; bars and matte remain
+black. It requests no independent animation or promotion hint. The APK contains
+the exact tested asset, and the native file-asset loading path needs no server.
+This removes a rendering mechanism; it does not establish measured GPU cost or
+physical Portal FPS.
+
+| Final gate | Evidence |
+| --- | --- |
+| Slideshow source checks | **222 passed**, zero failures/skips; **13 new Cinema tests** included |
+| Engine fixtures | **14/14 passed**, including runtime Cinema dwell/motion checks at 5/30/120 seconds |
+| Actual-source Chrome renderer | **255 assertions passed**, including **49 Cinema assertions**, zero script errors; **167.921 seconds** |
+| Photo geometry | Three viewports × seven decoded aspects; **21 cases**, plus eight cached focal-point cases |
+| Integrated debug build | Successful in **5 seconds**; unchanged JVM task **UP-TO-DATE**, retaining **3,445 passing results / 358 suites** |
+| Native UI scope | Prior **56 checks / 151.09 seconds** cover unchanged Kotlin; not rerun for this asset batch |
+| Visual review | Actual-source Cinema capture inspected at **2160 × 1440** |
+
+Source regressions close or resume/re-pause at 25 asynchronous checkpoints.
+The close test allows readiness that completed before closing, while requiring
+no later publication, derivative requests or timers. Browser coverage includes
+the real decoded grain, black bars, whole ordinary photos, cached crop anchors,
+full 4% zoom bounds, opaque outgoing URLs, retained manual pause, remaining
+cadence, rapid reuse, one-photo admission and terminal cleanup. All **eleven prior
+renderer PNGs** remain byte-identical. The finite local preview adds Cinema using
+original synthetic panorama/gallery fixtures and serves no household photos.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`fd81830d8c93ce26d370e791a1cd59813cf6a0a516ac3bdb8bdfb1b956e0b7bb`
+(**48,910,493 bytes**). Its signing certificate matches the preceding Polaroid APK,
+retained privately as a rollback. One upload/install was used; installed-byte
+verification resolved the interrupted install HTTP response. All **97 settings**
+match the pre-install profile. Navigation acknowledgments do not prove visible
+device transitions.
+
+The performance collector is inactive, stopped and holding **zero active
+listeners**. No new physical timing capture was requested. Verification and
+deployment completed by **19:29 UTC**, within the batch's thirty-minute limit.
+Living Area remains unchanged. Physical night-clock acceptance and reliable
+Portal presentation measurements remain open. Music backend wiring remains
+deferred, and no Home Assistant operation belongs to this batch. The broader
+goal remains active.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

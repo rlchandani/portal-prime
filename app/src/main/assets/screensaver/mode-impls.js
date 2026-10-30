@@ -1032,12 +1032,57 @@
 
   // ---- 11 Cinema letterbox ---------------------------------------------------
   MODES.cinema = { name: "Cinema Letterbox", run(ctx, deck) {
-    const t = makeTimers(ctx); const frame = el("ss-scope", ctx.root); const barT = el("ss-bar top", ctx.root), barB = el("ss-bar bot", ctx.root); const grain = el("ss-grain", ctx.root);
-    const layers = [mk(), mk()]; layers.forEach(l => frame.appendChild(l.root)); let cur = 0;
-    function mk() { const root = el("ss-layer"); const img = el("ss-img", root); return { root, img }; }
-    async function step() { const c = SS.counts(deck); const p = SS.take(deck, ctx.cursor, [c.pano ? "pano" : "landscape"])[0]; const u = ctx.url(p, 2400); if (!await t.load(u)) return false; const L = layers[1 - cur]; const wide = aspect(p) > 2.2; bg(L.img, u, wide ? "cover" : "contain"); if (wide && !hasFace(p)) { kbVars(L.img, p); L.img.style.animation = "none"; void L.img.offsetWidth; L.img.style.animation = ""; } else { faceBg(L.img, p); L.img.style.animation = "none"; } layers[cur].root.classList.remove("on"); L.root.classList.add("on"); cur = 1 - cur; }
+    const t = makeTimers(ctx), frame = el("ss-scope", ctx.root), scopeH = ctx.H * .78;
+    const bars = [el("ss-bar top", ctx.root), el("ss-bar bot", ctx.root)];
+    let disposed = false;
+    const layers = [0, 1].map(() => {
+      const root = el("ss-layer cinema-layer retired", frame), img = el("ss-img ss-cinema-photo", root);
+      const grain = el("ss-grain", img);
+      img.style.backgroundImage = "none"; img.style.animation = "none"; img.style.willChange = "auto";
+      return { root, img, grain };
+    });
+    const dissolve = makeSceneDissolve({ ...ctx, root: frame }, t, layers.map(layer => layer.root), 2200, root => {
+      const image = layers.find(layer => layer.root === root).img;
+      image.style.backgroundImage = "none"; image.style.animation = "none";
+      image.style.willChange = "auto"; image.style.transform = "none";
+    });
+    async function step() {
+      const c = SS.counts(deck), p = SS.take(deck, ctx.cursor, [c.pano ? "pano" : "landscape"])[0];
+      const u = await t.publish(() => ctx.url(p, 2400));
+      if (u === false || !await t.load(u) || disposed) return false;
+      return t.publish(() => {
+        if (disposed || !dissolve.active()) return false;
+        const root = dissolve.next(), image = layers.find(layer => layer.root === root).img;
+        const raw = aspect(p), ratio = Number.isFinite(raw) && raw > 0 ? raw : 1;
+        const wide = ratio > 2.2, W = wide ? ctx.W : Math.min(ctx.W, scopeH * ratio), H = wide ? scopeH : W / ratio;
+        image.style.width = W + "px"; image.style.height = H + "px";
+        image.style.left = ((ctx.W - W) / 2) + "px"; image.style.top = ((scopeH - H) / 2) + "px";
+        image.style.right = "auto"; image.style.bottom = "auto"; image.style.transform = "none";
+        image.style.animation = "none"; image.style.willChange = "auto";
+        bg(image, u, wide ? "cover" : "contain");
+        if (wide && hasFace(p)) {
+          // Keep the immersive crop, but center the cached focal point rather than
+          // confusing CSS edge alignment with the focal point's image coordinate.
+          const renderedW = Math.max(ctx.W, scopeH * ratio), renderedH = renderedW / ratio;
+          image.style.backgroundPosition =
+            `${SS.panStart(p.fx, renderedW / ctx.W * 100) * 100}% ${SS.panStart(p.fy, renderedH / scopeH * 100) * 100}%`;
+        } else if (wide) {
+          image.style.willChange = "transform";
+          image.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
+        }
+        dissolve.present(root);
+      });
+    }
     t.start(step); t.every(step, ctx.photoMs);
-    return t.cleanup;
+    const cleanup = () => {
+      if (disposed) return;
+      disposed = true; dissolve.cleanup();
+      layers.forEach(layer => { layer.grain.style.backgroundImage = "none"; });
+      frame.remove(); bars.forEach(bar => bar.remove());
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
+    cleanup.pause = dissolve.cleanup.pause; cleanup.resume = dissolve.cleanup.resume;
+    return cleanup;
   }};
 
   // ---- 12 Hero + sidebar -----------------------------------------------------

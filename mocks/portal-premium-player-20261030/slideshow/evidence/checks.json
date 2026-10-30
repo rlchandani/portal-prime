@@ -1,6 +1,6 @@
 {
   "complete": true,
-  "passed": 206,
+  "passed": 255,
   "checks": [
     "Diptych displays two complete static photos without blur",
     "Diptych matte inset scales to the actual viewport",
@@ -16,6 +16,55 @@
     "Mosaic outer publication waits for nine complete opaque tiles from all twelve synthetic fixtures",
     "polaroid actual renderer becomes ready",
     "Polaroid outer publication owns six complete opaque unique prints from all twelve fixtures",
+    "cinema actual renderer becomes ready",
+    "Cinema serves the exact original binary grain PNG at the production asset path",
+    "Cinema initially owns one opaque preferred wide photo in two fixed scenes/photos and two grain children",
+    "Cinema production bars are black eleven percent and bound a clipped seventy-eight percent scope",
+    "Cinema decodes 128px raster grain with normal blending and no filter, animation or permanent grain hint",
+    "Cinema wide photo uses cover with bounded linear four-percent drift and no duplicate blur image",
+    "Cinema resolves a 2400-edge derivative once and displays exactly its admitted URL",
+    "Cinema replacement uses incoming-only 2200ms opacity above the opaque original URL",
+    "Cinema old-WebView pause freezes both photo transforms, dissolve opacity and derivative cadence",
+    "Cinema resume runs only the remaining dissolve and resumes the prepared photo animation",
+    "Cinema retires the outgoing URL only after full incoming opacity and clears its motion hint",
+    "Cinema manual resume preserves the remaining photo cadence and admits exactly one subsequent replacement",
+    "Cinema cleanup removes bars/scope and releases every retained photo, raster grain and hint",
+    "Cinema terminal ownership rejects late fade events, cadence callbacks and resume admissions",
+    "Cinema 2160x1440 decoded 0.2:1 ordinary photo stays whole centered and static",
+    "Cinema 2160x1440 decoded 0.6666666666666666:1 ordinary photo stays whole centered and static",
+    "Cinema 2160x1440 decoded 1:1 ordinary photo stays whole centered and static",
+    "Cinema 2160x1440 decoded 1.5:1 ordinary photo stays whole centered and static",
+    "Cinema 2160x1440 decoded 2.2:1 ordinary photo stays whole centered and static",
+    "Cinema 2160x1440 decoded 3:1 wide crop stays clipped within four-percent drift",
+    "Cinema 2160x1440 decoded 8:1 wide crop stays clipped within four-percent drift",
+    "Cinema 1920x1080 decoded 0.2:1 ordinary photo stays whole centered and static",
+    "Cinema 1920x1080 decoded 0.6666666666666666:1 ordinary photo stays whole centered and static",
+    "Cinema 1920x1080 decoded 1:1 ordinary photo stays whole centered and static",
+    "Cinema 1920x1080 decoded 1.5:1 ordinary photo stays whole centered and static",
+    "Cinema 1920x1080 decoded 2.2:1 ordinary photo stays whole centered and static",
+    "Cinema 1920x1080 decoded 3:1 wide crop stays clipped within four-percent drift",
+    "Cinema 1920x1080 decoded 8:1 wide crop stays clipped within four-percent drift",
+    "Cinema 640x960 decoded 0.2:1 ordinary photo stays whole centered and static",
+    "Cinema 640x960 decoded 0.6666666666666666:1 ordinary photo stays whole centered and static",
+    "Cinema 640x960 decoded 1:1 ordinary photo stays whole centered and static",
+    "Cinema 640x960 decoded 1.5:1 ordinary photo stays whole centered and static",
+    "Cinema 640x960 decoded 2.2:1 ordinary photo stays whole centered and static",
+    "Cinema 640x960 decoded 3:1 wide crop stays clipped within four-percent drift",
+    "Cinema 640x960 decoded 8:1 wide crop stays clipped within four-percent drift",
+    "Cinema 2160x1440 cached wide focal 0,0.5 stays static and centers where crop edges permit",
+    "Cinema 2160x1440 cached wide focal 0.1,0.5 stays static and centers where crop edges permit",
+    "Cinema 2160x1440 cached wide focal 0.5,0.5 stays static and centers where crop edges permit",
+    "Cinema 2160x1440 cached wide focal 0.8,0.5 stays static and centers where crop edges permit",
+    "Cinema 2160x1440 cached wide focal 1,0.5 stays static and centers where crop edges permit",
+    "Cinema 3840x1080 cached wide focal 0.5,0.1 stays static and centers where crop edges permit",
+    "Cinema 3840x1080 cached wide focal 0.5,0.5 stays static and centers where crop edges permit",
+    "Cinema 3840x1080 cached wide focal 0.5,0.8 stays static and centers where crop edges permit",
+    "Cinema single-photo source gates derivative admission through immediate pause/resume/re-pause before readiness",
+    "Cinema rapid scene reuse guards old retirement callbacks and retains two fixed photo/grain owners",
+    "Cinema rapid cleanup releases reused scene resources and rejects stale retirement and subsequent admissions",
+    "Cinema initial real decoded photo stays behind resumed/re-paused publication gates",
+    "Cinema replacement real decoded photo stays behind resumed/re-paused publication gates",
+    "Cinema decode cancellation removes scope/bars and rejects late readiness or derivative publication",
     "Polaroid withholds full readiness until the sixth real decode while early cards are immediately opaque",
     "Polaroid readiness owns six unique whole opaque photos and seven fixed cards/images without a second card fade",
     "Polaroid resting cards/photos request no permanent hints, blur, image animation or invented captions",
@@ -331,6 +380,45 @@
     ],
     "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
   },
+  "cinema": {
+    "passed": 49,
+    "fixtureSource": "Original panorama/gallery SVGs and exactly dimensioned synthetic aspect SVGs",
+    "screenshots": [
+      "cinema.png"
+    ],
+    "grainAsset": "Production cinema-grain.png, decoded 128x128 binary",
+    "composition": {
+      "fixedScenes": 2,
+      "fixedPhotos": 2,
+      "fixedGrains": 2,
+      "derivativeEdge": 2400
+    },
+    "geometryViewports": [
+      [
+        2160,
+        1440
+      ],
+      [
+        1920,
+        1080
+      ],
+      [
+        640,
+        960
+      ]
+    ],
+    "geometryAspects": [
+      0.2,
+      0.6666666666666666,
+      1,
+      1.5,
+      2.2,
+      3,
+      8
+    ],
+    "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
+  },
+  "runtimeMs": 167921,
   "scope": "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",
   "physicalPortalPerformanceMeasured": false
 }

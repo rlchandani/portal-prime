@@ -187,11 +187,20 @@ test("motion duration follows the configured dwell and covers the fade", async (
     const duration = parseFloat(f.stage.children[0].style.getPropertyValue("--motion-duration"));
     assert(duration >= intervalSec * 1000 + 2200, "motion ends during the configured hold/fade");
     const css = fs.readFileSync(path.join(assets, "styles.css"), "utf8");
-    for (const selector of [".ss-layer.on .ss-hero", ".ss-single.on .ss-hero", ".ss-scope .ss-layer.on .ss-img"]) {
+    for (const selector of [".ss-layer.on .ss-hero", ".ss-single.on .ss-hero"]) {
       const rule = css.slice(css.indexOf(selector)).split("}")[0];
       assert.match(rule, /var\(--motion-duration/, `${selector} ignores the configured motion duration`);
     }
     engine.stop();
+    const cinema = fixture({ intervalSec, mode: "cinema",
+      photos: [{ seed: "wide", url: "fixture:wide", w: 3000, h: 1000 }] });
+    const cinemaEngine = cinema.start(); await cinema.settle(); await cinema.readyImages();
+    const photo = cinema.nodes().find(node => node.classList.contains("ss-cinema-photo") &&
+      node.style.backgroundImage?.startsWith("url("));
+    assert(photo, "Cinema wide photo never published");
+    assert.equal(photo.style.animation, `cinematicDrift ${duration}ms linear forwards`,
+      "Cinema motion must use the configured hold/fade duration");
+    cinemaEngine.stop();
   }
 });
 test("cached face focus stays still throughout a mismatched mosaic pan", async () => {

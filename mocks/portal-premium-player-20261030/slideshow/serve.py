@@ -13,7 +13,7 @@ repo = here.parents[2]
 renderer = repo / "app/src/main/assets/screensaver"
 files = {"/": here / "index.html"}
 for name in ("index.html", "styles.css", "photos.js", "lib-engine.js", "modes.js",
-             "mode-impls.js", "scheduler.js"):
+             "mode-impls.js", "scheduler.js", "cinema-grain.png"):
     files["/screensaver/" + name] = renderer / name
 for name in ("dunes", "tidal"):
     files["/fixtures/" + name + ".png"] = here / "assets" / (name + ".png")
@@ -38,10 +38,10 @@ class Handler(BaseHTTPRequestHandler):
         if urlsplit(self.path).path == "/preview.html":
             query = parse_qs(urlsplit(self.path).query)
             mode = query.get("mode", ["diptych"])[0]
-            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama", "mosaic", "polaroid"):
+            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama", "mosaic", "polaroid", "cinema"):
                 self.send_error(400)
                 return
-            photos = panorama_photos if mode == "panorama" else gallery_photos if mode in ("galleryWall", "heroSidebar", "memories", "mosaic", "polaroid") else [
+            photos = panorama_photos if mode in ("panorama", "cinema") else gallery_photos if mode in ("galleryWall", "heroSidebar", "memories", "mosaic", "polaroid") else [
                 {"url": "/fixtures/" + name + ".png", "w": 480, "h": 720}
                 for name in ("dunes", "tidal")]
             interval = 5 if query.get("review", ["0"])[0] == "1" else 30
