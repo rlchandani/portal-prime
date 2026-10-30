@@ -1725,6 +1725,57 @@ Actual Portal music interaction, Home frame tails, slideshow startup presentatio
 physical night/wake acceptance and stacked-Dream tap remain open. The overall
 objective remains active and backend wiring stays deferred.
 
+## Legacy slideshow face warm-up admission — 22:54 UTC batch
+
+Original issue window: **22:54:35–23:24:35 UTC**, including build, deployment,
+documentation and commit.
+
+The legacy WebView controller previously started uncached face analysis immediately
+after loading its page, while first-scene images and orientation were still being
+prepared. Cached focal positions and people weights already exist in the prepared
+photo metadata; the first scene does not require that new analysis.
+
+- New analysis now waits for the existing scheduler callback after its decoded
+  scene is promoted. This is a **decoded-scene promotion**, not a measurement of
+  the first physical pixels.
+- `LegacySlideshowWarmupGate` admits work once for the current controller, source
+  revision and WebView. Duplicate bridge reports share one Main delivery. A hidden
+  or paused presentation retains readiness for resume; retirement and stale-source
+  callbacks cannot start analysis.
+- Failed transport delivery releases ownership for a later legitimate signal.
+  Callback failures fail closed; warming failure is not retried by this gate.
+- The production trigger works independently of optional performance diagnostics.
+  No polling timer, extra image load, setting, JS asset or standalone native
+  Filmstrip behavior was added or changed. Existing cached face hints remain in
+  the first-scene metadata.
+
+Verification:
+
+- The focused gate stub compiled but failed **18 of 22** behavioral tests before
+  implementation. The completed gate passes **22/22**, covering admission,
+  duplicate/concurrent reports, pause/resume, stale owners, shutdown and failures.
+  These are new gate JVM tests; they do not execute the original controller on a
+  physical Portal.
+- Fresh full JVM verification passes **3,482 tests across 361 suites**, with zero
+  failures, errors or skips. Debug and optimized performance APK builds succeed.
+  All **12 legacy JS mode identifiers** are accepted by the existing Kotlin
+  whitelist of **14 native/legacy style identifiers**.
+- Family Area's independently read installed APK matches
+  `36f1a0d448705937bd61e0ac6d130a2fc6ce9407825ab55bd4f17c3d2ca0e0b7`
+  (**25,702,091 bytes**), with the existing signing certificate. All **53 main
+  assets** and the manifest remain unchanged; the native DEX changes.
+- All **97 settings**, full screensaver configuration and photo-source groups
+  are preserved. The bounded post-install log response contains **418 lines** and
+  **zero fatal exception markers**. The collector is inactive with **zero
+  listeners**. Living Area, the phone and Home Assistant are untouched.
+
+Evidence:
+`mocks/portal-premium-player-20261030/evidence/family-slideshow-warmup/verification.json`.
+This batch removes eager analysis admission from legacy startup. It makes **no
+claim of measured startup latency or FPS gain**; physical execution of this
+legacy gate, first-photo timing, Home frame tails, night/wake acceptance and
+stacked-Dream tap remain open. The overall objective stays active.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

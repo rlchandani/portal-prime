@@ -161,6 +161,7 @@ class PhotoFrameController(
       val headers: Map<String, String>, val warmLocal: Boolean)
   private var nativeFilmstripInput: NativeFilmstripInput? = null
   private var legacyFaceStore: FaceFocusStore? = null
+  private var legacyWarmup: LegacySlideshowWarmupGate? = null
   // Main owns both a pending store and the admitted WebView; preparation owns no Android view.
   private val legacyPreparationDelegate = lazy {
     LegacySlideshowPreparation(
@@ -758,6 +759,8 @@ class PhotoFrameController(
     }
     if (legacyPreparationDelegate.isInitialized()) legacyPreparation.cancel()
     val owner = ++legacyEngineRevision
+    legacyWarmup?.close()
+    legacyWarmup = null
     legacyFaceStore?.close()
     // Freeze source/bridge inputs without doing cache hydration or JSON work on Main.
     val urls = photoUrls.toList()
@@ -865,6 +868,13 @@ class PhotoFrameController(
                   it.setPaused(paused)
                 }
               } else null
+              val warmup = LegacySlideshowWarmupGate(
+                  postMain = { task -> ui.post { task() } },
+                  isCurrent = { !stopped && owner == legacyEngineRevision &&
+                      legacyFaceStore === faceStore && engineActive && webView === wv },
+                  mayRun = { hostActive && !paused },
+                  startWarm = { faceStore.startWarmUp(urls, headers) },
+              ).also { legacyWarmup = it }
               val styleReporter = SlideshowStyleReporter(
                   host = when (context) {
                     is PhotoFramePreviewActivity -> SlideshowStyleHost.PREVIEW
@@ -884,7 +894,12 @@ class PhotoFrameController(
               wv.addJavascriptInterface(
                   object {
                     @android.webkit.JavascriptInterface
-                    fun reportPresentedStyle(modeId: String) { styleReporter.receive(modeId) }
+                    fun reportPresentedStyle(modeId: String) {
+                      styleReporter.receive(modeId)
+                      // The scheduler reports only after its decoded scene is promoted.
+                      // Warming is independent of optional diagnostics being enabled.
+                      if (SlideshowStyle.fromWire(modeId) != null) warmup.presented()
+                    }
                     @android.webkit.JavascriptInterface fun supportsNativeFilmstrip(): Boolean = hybrid != null
                     @android.webkit.JavascriptInterface fun prepareNativeFilmstrip(token: String, idsJson: String): Boolean =
                         hybrid?.prepare(token,idsJson) ?: false
@@ -961,9 +976,8 @@ class PhotoFrameController(
               val initiallyPaused = if (hostActive && !paused) 0 else 1
               wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1&v=$assetVer&hostPaused=$initiallyPaused")
               if (!hostActive) wv.onPause()
-              // Cache-writing analysis and derivative warming start only after current Main admission.
-              // People weights still feed legacy presence ordering even when native framing is off.
-              faceStore.startWarmUp(urls, headers)
+              // Cached face hints were read during metadata preparation. New analysis waits for
+              // the first decoded scene, leaving page/image startup free of that extra work.
               if (warmLocalCopies) {
                 val localPaths = urls.map { it.removePrefix("file://") }
                 ui.postDelayed({
@@ -1065,6 +1079,8 @@ class PhotoFrameController(
 
   @androidx.annotation.MainThread
   private fun retireWebView() {
+    legacyWarmup?.close()
+    legacyWarmup = null
     hybridFilmstrip?.close()
     hybridFilmstrip = null
     engineLayoutRoot?.let { root ->
@@ -1201,6 +1217,7 @@ class PhotoFrameController(
   private fun applyEnginePlayback(wv: android.webkit.WebView) {
     val action = if (hostActive && !paused) "resume" else "pause"
     wv.evaluateJavascript("window.immortalSlideshow?.$action()", null)
+    if (hostActive && !paused) legacyWarmup?.resume()
   }
 
   @androidx.annotation.MainThread
@@ -1925,6 +1942,7 @@ class PhotoFrameController(
     nativeFilmstrip?.setPaused(value)
     hybridFilmstrip?.setPaused(value)
     if (hybridFilmstrip != null) webView?.let(::applyEnginePlayback)
+    if (!value && hostActive) legacyWarmup?.resume()
     if (value) {
       remainingHold = (holdDeadline - playbackUptime()).coerceAtLeast(100L)
       ui.removeCallbacks(localTick); ui.removeCallbacks(remoteTick); ui.removeCallbacks(rotate)

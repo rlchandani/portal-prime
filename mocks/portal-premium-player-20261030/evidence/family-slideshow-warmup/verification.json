@@ -1,0 +1,75 @@
+{
+  "issue": "Defer new legacy face analysis until first decoded-scene promotion",
+  "deadlineUtc": "2026-10-30T23:24:35Z",
+  "focusedGateTests": {
+    "red": {
+      "tests": 22,
+      "failures": 18,
+      "errors": 0
+    },
+    "green": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "fullBuild": {
+    "tests": 3482,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 361,
+    "freshUnitTaskExecuted": true,
+    "debugBuildPassed": true,
+    "performanceBuildPassed": true,
+    "exitCode": 0
+  },
+  "styleSourceCheck": {
+    "legacyJsModes": 12,
+    "whitelistedLegacyJsModes": 12,
+    "knownNativeAndLegacyModes": 14
+  },
+  "deployment": {
+    "device": "Family Area",
+    "sha256": "36f1a0d448705937bd61e0ac6d130a2fc6ce9407825ab55bd4f17c3d2ca0e0b7",
+    "bytes": 25702091,
+    "previousSha256": "7871c213a34c79cb34bb3c87241d4f5a343b821df5fb6ce35a36d1a03a2f4fc9",
+    "settingValuesCompared": 97,
+    "changedSettingValues": 0,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "visibleTransitionsVerified": false,
+    "physicalFpsGainMeasured": false
+  },
+  "artifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "runtime": {
+    "logLines": 418,
+    "fatalExceptionMarkers": 0,
+    "collectorActive": false,
+    "collectorRunning": false,
+    "activeListeners": 0
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": "41152fcd407e1dce659bbca5284c7d898f02e8a14a9ebdf78bed33fd12183ee6",
+    "app/src/main/java/com/immortal/launcher/LegacySlideshowWarmupGate.kt": "292e68c4ce5c93c483fccd8ee765b1f7995a490c2dc86a23abc77c1b6610fe24",
+    "app/src/test/java/com/immortal/launcher/LegacySlideshowWarmupGateTest.kt": "9c735b479d1c96fa41e0284a94334314b8d8ef893e31df3585df083c40ceb0ae"
+  },
+  "scope": {
+    "cachedFaceHintsPreserved": true,
+    "newTimersOrImageRequests": 0,
+    "nativeStandaloneFilmstripChanged": false,
+    "firstPhysicalPhotoLatencyMeasured": false,
+    "deviceLegacyGateExecutionObserved": false,
+    "livingAreaTouched": false,
+    "phoneTouched": false,
+    "homeAssistantTouched": false
+  },
+  "verificationCompletedUtc": "2026-10-30T23:06:58Z"
+}
