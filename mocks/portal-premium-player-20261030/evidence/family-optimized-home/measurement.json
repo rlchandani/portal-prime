@@ -1,0 +1,170 @@
+{
+  "device": "Family Area",
+  "osApi": 29,
+  "displayBudgetMs": 16.666666,
+  "workload": "30 Home / Apps / Home cycles per block, four-second minimum cadence; one shared Window",
+  "blocks": [
+    {
+      "block": "controlBefore",
+      "apkSha256": "d45b1a4f601d1f8dbbb9981e494723a84590fbca625297688abff83a2de8a601",
+      "cycles": 30,
+      "frames": 778,
+      "meanMs": 16.98179614395887,
+      "p95Ms": 60,
+      "p99Ms": 83.5,
+      "maxMs": 103.101946,
+      "overBudget": 149,
+      "budgetMs": 16.666666,
+      "firstDrawFrames": 0,
+      "callbackDrops": 0,
+      "invalidSamples": 0,
+      "overflowSamples": 0,
+      "overBudgetPercent": 19.1517,
+      "settingsCompared": 97,
+      "configurationPreserved": true,
+      "collectorInactive": true,
+      "sourceReportSha256": "7376960f78b0248e484f0b971e9d1447e4cd19c39656f36d86798244e0f604a0"
+    },
+    {
+      "block": "optimized",
+      "apkSha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+      "cycles": 30,
+      "frames": 781,
+      "meanMs": 13.36782123815621,
+      "p95Ms": 37,
+      "p99Ms": 53.75,
+      "maxMs": 66.979111,
+      "overBudget": 133,
+      "budgetMs": 16.666666,
+      "firstDrawFrames": 0,
+      "callbackDrops": 0,
+      "invalidSamples": 0,
+      "overflowSamples": 0,
+      "overBudgetPercent": 17.0294,
+      "settingsCompared": 97,
+      "configurationPreserved": true,
+      "collectorInactive": true,
+      "sourceReportSha256": "063f919056ed4d232ca53e8b3016b7bddd92de7236e7700cc40a8ddb4ec37ffd"
+    },
+    {
+      "block": "controlAfter",
+      "apkSha256": "d45b1a4f601d1f8dbbb9981e494723a84590fbca625297688abff83a2de8a601",
+      "cycles": 30,
+      "frames": 777,
+      "meanMs": 17.4864327992278,
+      "p95Ms": 62.75,
+      "p99Ms": 85.25,
+      "maxMs": 117.29379,
+      "overBudget": 152,
+      "budgetMs": 16.666666,
+      "firstDrawFrames": 0,
+      "callbackDrops": 0,
+      "invalidSamples": 0,
+      "overflowSamples": 0,
+      "overBudgetPercent": 19.5624,
+      "settingsCompared": 97,
+      "configurationPreserved": true,
+      "collectorInactive": true,
+      "sourceReportSha256": "614a99a705e9111bdba66338b09deca1a11dcaa2655da864db3c623cddedcea2"
+    }
+  ],
+  "acceptancePolicy": {
+    "p95ImprovementAgainstEachControlPercent": 20,
+    "p99ImprovementAgainstEachControlPercent": 20,
+    "meanMaximumRegressionAgainstEachControlPercent": 5,
+    "p95ControlDriftMaximumPercent": 15,
+    "p99ControlDriftMaximumPercent": 15,
+    "maximumWarmedFrameMs": 250
+  },
+  "gates": {
+    "controlBeforeP95": true,
+    "controlBeforeP99": true,
+    "controlBeforeMean": true,
+    "controlAfterP95": true,
+    "controlAfterP99": true,
+    "controlAfterMean": true,
+    "p95MsControlDrift": true,
+    "p99MsControlDrift": true,
+    "candidateMaximum": true
+  },
+  "comparisonPassed": true,
+  "improvementPercent": {
+    "controlBefore": {
+      "p95Ms": 38.3333,
+      "p99Ms": 35.6287,
+      "meanMs": 21.2815,
+      "maxMs": 35.036
+    },
+    "controlAfter": {
+      "p95Ms": 41.0359,
+      "p99Ms": 36.9501,
+      "meanMs": 23.5532,
+      "maxMs": 42.8963
+    }
+  },
+  "goalFrameTargetPassed": false,
+  "deliveredFpsMeasured": false,
+  "visibleTabReadinessVerified": false,
+  "limitations": [
+    "Small warmed-process cohort; no statistical or causal certification.",
+    "JIT, thermal and background state not controlled.",
+    "Initial guard abort admitted zero captures. Optimized/control-after warmup added three stable Window observations before capture; measured cadence was unchanged.",
+    "R8, non-debuggable mode and debug-fixture exclusion change together; this does not isolate R8 alone.",
+    "No pixels, UI hierarchy, input-to-photon or physical night acceptance captured."
+  ],
+  "privateSnapshotsExported": false,
+  "buildVerification": {
+    "sha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+    "bytes": 25702091,
+    "controlBytes": 48994322,
+    "nonProfileNonFixtureAssetsIdentical": 53,
+    "omittedDebugFixtureAssets": 10,
+    "dexFiles": 1,
+    "nonDebuggable": true,
+    "nativeFilmstrip": true,
+    "nativeHome": false,
+    "uiDiagnostics": false,
+    "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "jvmResults": {
+      "tests": 3454,
+      "suites": 359,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "jvmTaskUpToDate": true,
+    "build": "BUILD SUCCESSFUL in 1m 45s",
+    "debugFixturesAbsentFromMergedManifest": true,
+    "initialVerifierCorrection": "Debug-only artwork is absent by source-set design; ten exact omitted paths checked against debug assets."
+  },
+  "retainedInstallation": {
+    "device": "Family Area",
+    "sha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+    "bytes": 25702091,
+    "settingValuesCompared": 97,
+    "changedSettingValues": 0,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "visibleTransitionsVerified": false,
+    "physicalFpsGainMeasured": false
+  },
+  "closedAtUtc": "2026-10-30T20:58:45.790107+00:00",
+  "issueStartedAtUtc": "2026-10-30T20:34:54Z",
+  "elapsedMinutes": 23.86316845,
+  "compiledBridgeVerification": {
+    "annotatedBridgeMethods": 13,
+    "allRuntimeAnnotatedAndPublic": true,
+    "photoMotionMethodKept": true
+  },
+  "finalRuntimeGuard": {
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "homeUiProbeForbidden": true,
+    "recentLogLines": 402,
+    "fatalExceptionMarkers": 0,
+    "missingPhotoMotionFunctionMarkers": 0,
+    "scope": "Bounded recent log sample and gate/collector state; not complete UI or FPS acceptance."
+  },
+  "verifiedAtUtc": "2026-10-30T21:01:26.977815+00:00",
+  "verifiedElapsedMinutes": 26.54963025
+}

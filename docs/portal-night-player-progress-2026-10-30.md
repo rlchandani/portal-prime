@@ -1229,6 +1229,93 @@ or swipe transition. The Home/Apps frame-time outlier, physical night acceptance
 and overall performance goal remain open; the earlier capture-admission issue
 stays parked. Music backend wiring remains deferred.
 
+## Optimized Family build and real Home timings — 20:34 UTC batch
+
+The recent Family deployments used unoptimized debug APKs. The earlier accepted
+Settings improvement used native R8 optimization. This batch adds a separate
+`performance` build using those existing rules, release defaults, the same
+`.debug` package and signing key, and no debug-only fixtures. Native Filmstrip
+stays enabled; native Home and all UI diagnostic feature gates stay disabled.
+No Kotlin UI, asset, animation duration, preference or OS configuration changed.
+
+The first navigation preflight stopped before starting any collector because an
+initial same-package accessibility observation did not retain its Window ID
+through warmup. It admitted **zero captures**. A settled Home Window was then
+observed three times before the first control. The subsequent driver establishes
+its Window owner after warmup, allowing the exiting photo Activity's initial
+same-package observation to retire. Twelve virtual safety cases cover ownership,
+unapplied/lost/pending starts, lost/unapplied stops, expiry, configuration drift,
+warmup handover and a Window change during capture. There is no blind start retry.
+
+Three unsampled physical blocks completed **30 Home → Apps → Home cycles each**,
+at a four-second minimum cadence. Each owned collector was stopped once and
+independently confirmed inactive with zero listeners. Full metrics were read
+every five cycles, with light ownership checks before commands. Only Home's
+Window produced nonempty frame samples; all first-draw, dropped-callback, invalid
+and overflow counts were zero.
+
+| Home Window callback metric | Debug control before | Optimized build | Debug control after |
+| --- | ---: | ---: | ---: |
+| Frames | 778 | 781 | 777 |
+| Mean | 16.982ms | **13.368ms** | 17.486ms |
+| p95 | 60.00ms | **37.00ms** | 62.75ms |
+| p99 | 83.50ms | **53.75ms** | 85.25ms |
+| Maximum | 103.102ms | **66.979ms** | 117.294ms |
+| Above 16.667ms proxy budget | 19.15% | **17.03%** | 19.56% |
+
+Against the two controls, optimized p95 improves **38.33–41.04%**, p99
+**35.63–36.95%**, mean **21.28–23.55%**, and maximum **35.04–42.90%**.
+All nine gates frozen before candidate timing pass: both tails at least 20%
+better than each control, mean no more than 5% worse, control-tail drift within
+15%, and no candidate warmed frame over 250ms. Control p95/p99 drift is
+4.58%/2.10%. This accepts the focused build improvement; **37ms p95 still fails
+the broader 16.667ms target**, and these callbacks do not measure delivered FPS.
+
+This is a small warmed-process cohort with uncontrolled JIT, thermal and
+background state. R8, non-debuggable mode and debug-fixture exclusion change
+together, so the result does not isolate R8 alone. Optimized/control-after
+preflight adds three stable Window observations before collection; measured
+cadence is unchanged. No screenshots or hierarchy dumps were taken during
+timing. Window ownership and command receipts do not establish visible tab
+readiness, physical input latency or complete optimized-APK UI compatibility.
+
+The integrated debug/unit/performance command succeeds in **1m 45s**, including
+R8 and vital lint. The unchanged JVM task is **UP-TO-DATE**, retaining
+**3,454 tests / 359 suites** with zero failures/errors/skips; it was not rerun.
+Manifest/configuration checks confirm the same package/certificate, a
+non-debuggable artifact, disabled diagnostic/native Home flags and no debug
+fixture Activities. All **53 non-profile, non-fixture assets** match the control
+and main sources. Ten exact omitted artwork/video paths belong to the debug
+source set; the initial verifier's blanket asset comparison was corrected to
+check that expected exclusion explicitly. A separate source review found no
+new R8 reflection/JavaScript keep-rule blocker; runtime coverage remains bounded.
+The actual optimized DEX retains **13 public runtime-annotated JavaScript
+bridge methods**, including `getPhotoMotion`. This verifies their compiled
+visibility/annotation boundary, not execution of every bridge method.
+
+The optimized APK is **25,702,091 bytes**, versus **48,994,322 bytes** for debug.
+This is an APK-size result, not a measured RAM saving. Family's final installed
+bytes were independently verified as
+`34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052`.
+Each deliberate comparison installation used one upload/install; response loss
+was reconciled by byte readback without repeating installation. The exact debug
+control remains privately available for rollback.
+
+All **97 settings**, screensaver configuration and dormant photo-source groups
+match across all blocks and the final optimized promotion. Final Home/Apps/Home/
+screensaver requests are acknowledged, and the collector is stopped with zero
+listeners. Deployment and evidence were verified by **20:59 UTC**, within the
+thirty-minute issue window. Scalar-only evidence is in
+`mocks/portal-premium-player-20261030/evidence/family-optimized-home/measurement.json`;
+private helpers, configurations and rollback APKs stay outside Git.
+
+Use `:app:assemblePerformance` for the optimized Family iteration APK, while
+debug-only native fixtures continue using `:app:assembleDebug`. Do not overwrite
+the measured optimized installation with a fixture APK as a speed improvement.
+Living Area remains unchanged. Physical night-clock acceptance, the remaining
+Home frame tails and the broader goal stay open. Music backend wiring remains
+deferred; no Home Assistant operation belongs to this batch.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

@@ -106,6 +106,17 @@ android {
       // Lets a debug build install alongside a provisioned release for testing.
       applicationIdSuffix = ".debug"
     }
+    // Family iteration uses the accepted native R8 rules with ordinary production
+    // feature gates. Debug fixtures and benchmark-only UI observers stay excluded.
+    create("performance") {
+      initWith(getByName("release"))
+      applicationIdSuffix = ".debug"
+      isDebuggable = false
+      isMinifyEnabled = true
+      signingConfig = signingConfigs.getByName("debug")
+      matchingFallbacks += "release"
+      proguardFiles("portal-r8-rules.pro", "benchmark-r8-native-rules.pro")
+    }
     // Measure without replacing a provisioned release or losing the debug device's
     // configuration. Native R8 is the accepted Family Area benchmark default;
     // explicit portalBenchmarkNativeR8=false retains the unoptimized control.

@@ -156,6 +156,29 @@ hidden-page exclusion and bounded clock progress. This reduces scheduling owners
 placement and accessibility geometry still run, and physical Portal FPS is unmeasured.
 The rejected native Home/layer candidate remains disabled.
 
+Family's current iteration build now uses the separate optimized `performance`
+variant, with the established native R8 rules and ordinary production feature
+gates. A physical before/optimized/after comparison completed 90 Home/Apps/Home
+cycles: Window p95 **60.00 / 37.00 / 62.75ms**, p99
+**83.50 / 53.75 / 85.25ms**, with zero dropped callbacks. The focused improvement
+passes its frozen comparison gates, but remains above the 16.667ms frame target;
+delivered FPS and visible tab readiness are unmeasured. See
+`evidence/family-optimized-home/measurement.json` and the progress journal for
+protocol limits, exact installed bytes and preserved configuration.
+
+Build the optimized Family iteration APK with:
+
+```sh
+./gradlew :app:assemblePerformance --no-daemon --offline
+```
+
+Its output is `app/build/outputs/apk/performance/app-performance.apk`, using the
+existing `.debug` package/signature so configuration survives an in-place update.
+Debug native fixtures still use `:app:assembleDebug`; their ten bundled artwork/
+video assets and fixture Activities are absent from the performance APK.
+The earlier fixture checks therefore remain debug-artifact evidence, rather
+than complete optimized-APK UI acceptance. Living Area is unchanged.
+
 `launcher-tabs-native-checks.py` verifies the actual fallback on the dedicated
 API 34 AVD: **165 fixture checks plus five accessibility checks** passed in
 **25.717 seconds**. Three interrupted reversals retained both displayed offsets;
