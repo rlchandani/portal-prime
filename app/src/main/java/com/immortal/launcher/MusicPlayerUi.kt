@@ -95,6 +95,7 @@ fun MusicPlayerContent(
     photoContent: @Composable (Modifier) -> Unit = {},
 ) {
   val palette = LocalApprovedPalette.current
+  val panelState = rememberMusicPanel()
   CompositionLocalProvider(
       LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = FontFamily.Default),
   ) {
@@ -103,7 +104,7 @@ fun MusicPlayerContent(
           snapshot, modifier, onDismiss, onLayoutChange, onAction)
       MusicPlayerLayout.FULL -> MusicPositionScope(snapshot) {
         MusicWorkspace(snapshot, modifier.background(palette.background),
-            onDismiss, onLayoutChange, onAction)
+            onDismiss, onLayoutChange, onAction, panelState)
       }
       MusicPlayerLayout.PHOTOS -> BoxWithConstraints(
           modifier.fillMaxSize().background(palette.background).padding(16.dp)) {
@@ -142,6 +143,7 @@ private fun MusicWorkspace(
     onDismiss: () -> Unit,
     onLayoutChange: (MusicPlayerLayout) -> Unit,
     onAction: (MusicPlayerUiAction) -> Unit,
+    panelState: MutableState<MusicPanel>,
 ) {
   BoxWithConstraints(modifier.fillMaxSize().padding(24.dp)) {
     val wide = maxWidth >= 760.dp
@@ -151,13 +153,15 @@ private fun MusicWorkspace(
       if (wide) {
         Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(48.dp)) {
           MusicCurrent(snapshot, Modifier.weight(1.1f).fillMaxHeight(), false, onAction)
-          MusicSidePanel(snapshot, Modifier.weight(1f).fillMaxHeight(), onAction)
+          MusicSidePanel(snapshot, Modifier.weight(1f).fillMaxHeight(), onAction,
+              panelState)
         }
       } else {
         // Each pane has a finite height: no LazyColumn inside an unbounded scroller.
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
           MusicCurrent(snapshot, Modifier.weight(1.1f).fillMaxWidth(), true, onAction)
-          MusicSidePanel(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction)
+          MusicSidePanel(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction,
+              panelState)
         }
       }
     }
@@ -456,8 +460,9 @@ private fun MusicSidePanel(
     snapshot: MusicPlayerSnapshot,
     modifier: Modifier,
     onAction: (MusicPlayerUiAction) -> Unit,
+    panelState: MutableState<MusicPanel>,
 ) {
-  var panel by rememberMusicPanel()
+  var panel by panelState
   Column(modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
     val palette = LocalApprovedPalette.current
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp))
@@ -500,8 +505,8 @@ private fun MusicSidePanel(
 
 @Composable
 private fun rememberMusicPanel(): MutableState<MusicPanel> =
-    // A tab is a presentation choice, not a source lease. Selecting a speaker
-    // must retain its chooser; each pane still reads the current snapshot.
+    // Owned by the stable player, so compact/photo layouts can temporarily remove the pane.
+    // A tab is a presentation choice, not a source lease; panes read the current snapshot.
     remember { mutableStateOf(MusicPanel.QUEUE) }
 
 /** Keep supplied metadata separate from the selected row's confirmed playback presentation. */

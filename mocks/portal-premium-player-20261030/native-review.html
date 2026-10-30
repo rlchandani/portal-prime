@@ -2,6 +2,7 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
 <title>Immortal · Native design review</title>
 <style>
   :root{color-scheme:dark;font:16px system-ui;color:#f4f4f6;background:#14161b}
@@ -21,6 +22,7 @@ API 34 test emulator at 2160 × 1440, 240 dpi. These images show layout; they do
 Portal performance, audible playback or room-light transitions.</p>
 <p><a href="index.html#now">Open the interactive music design</a> ·
 <a href="evidence/native/checks.json">Native check results</a> ·
+<a href="evidence/music-continuity-native/checks.json">Layout continuity checks</a> ·
 <a href="http://127.0.0.1:8891/">Try the actual slideshow renderer</a></p>
 <nav aria-label="Native layout samples"></nav>
 <figure><img alt="" src="evidence/native/full-dark.png"><figcaption></figcaption></figure>
@@ -32,6 +34,12 @@ Portal performance, audible playback or room-light transitions.</p>
     ["queue-return","Queue · returned from Players"],
     ["speakers-light","Speakers · light"],
     ["queue-return-light","Queue · returned from Players · light"],
+    ["dark-compact-return","Players · returned from compact","music-continuity-native"],
+    ["dark-photos-return","Players · returned from photos","music-continuity-native"],
+    ["dark-metadata","Selected track · matching album","music-continuity-native"],
+    ["light-compact-return","Players · returned from compact · light","music-continuity-native"],
+    ["light-photos-return","Players · returned from photos · light","music-continuity-native"],
+    ["light-metadata","Selected track · matching album · light","music-continuity-native"],
     ["speaker-groups","Speakers · compatible groups"],
     ["speaker-selected","Speakers · selected player"],
     ["speakers-large-font","Speakers · larger text"],
@@ -58,12 +66,12 @@ Portal performance, audible playback or room-light transitions.</p>
   ];
   const nav=document.querySelector("nav"),image=document.querySelector("img");
   const caption=document.querySelector("figcaption");
-  for(const [id,label] of samples){
+  for(const [id,label,folder="native"] of samples){
     const button=document.createElement("button");
     button.textContent=label;button.setAttribute("aria-pressed","false");
     button.onclick=()=>{
       for(const item of nav.children)item.setAttribute("aria-pressed","false");
-      button.setAttribute("aria-pressed","true");image.src=`evidence/native/${id}.png`;
+      button.setAttribute("aria-pressed","true");image.src=`evidence/${folder}/${id}.png`;
       image.alt=label;caption.textContent=label;
     };
     nav.append(button);

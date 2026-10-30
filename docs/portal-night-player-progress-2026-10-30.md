@@ -1670,6 +1670,61 @@ Home frame tails, slideshow startup presentation, physical night/wake acceptance
 stacked-Dream tap and actual Portal music interaction remain open; the overall
 goal remains active. No further candidate is started in this issue window.
 
+## Music layout continuity and preview metadata — 22:35 UTC batch
+
+Physical music UI verification was attempted first. Family responds through Fleet
+on API 29, but USB debugging is absent and the current optimized build does not
+expose music pixels or a control hierarchy through its Wi-Fi API. That gate is
+parked rather than reported as passed; no replacement capture subsystem is built.
+
+The native/source review found a production presentation defect: Players selection
+was stored inside the full-size pane. Compact and photo layouts removed that pane,
+so returning to the full player silently reset it to Queue. The existing state is
+now owned by the stable player container and read only inside the side panel.
+Layout changes retain selection without adding a preference, timer, animation,
+artwork request or controller. Closing the player still ends its presentation state.
+
+A parallel, debug-only correction removes the hardcoded first-album label from the
+silent preview snapshot. Each selected track now uses the title of its existing
+sample album, keeping now-playing and library metadata aligned. The sample albums
+were already coherent; their IDs, tracks and mixed playlists are unchanged.
+Production provider metadata, backend wiring and audio commands are untouched.
+
+- The original APK fails **six of 18 new native checks**: compact/full and photo/full
+  selection retention plus album identity, in both palettes. The repaired APK passes
+  **18/18 in 42.708s**, retaining current track, paused transport and Queue
+  availability. Existing native acceptance also passes **106/106**: **124 checks**
+  total on the owned API 34 AVD. This is generated silent fixture evidence.
+- The first broad-suite invocation used system Python without Pillow and failed at
+  import before running assertions. The terminal process was reconciled; the bundled
+  Python invocation then ran the full 106 checks successfully. No app change was
+  made in response to that runner error.
+- A fresh **3,460 JVM tests / 360 suites** pass, zero failures/errors/skips.
+  Debug and optimized APKs build in **1m 24s**. The AVD's installed debug APK matches
+  `0eec46aea13cc3280da018801ec04da7d5057d5e2b2837d80b7d2604f29eced1` exactly and both tested source hashes are recorded.
+- The review adds six continuity/album captures. Actual Chrome loads and selects all
+  **48 native capture tabs**, with **zero page and console errors**. Generated images
+  remain 2160 × 1440; no household media is included.
+- Family's independently read installed optimized APK matches
+  `7871c213a34c79cb34bb3c87241d4f5a343b821df5fb6ce35a36d1a03a2f4fc9`
+  (**25,702,091 bytes**), with the existing certificate.
+  All **53 main assets** and the manifest are unchanged. Native DEX contains the
+  tab-retention change; the sample-album fix remains in debug source only.
+- All **97 settings**, full screensaver configuration and photo-source groups are
+  preserved. The bounded **402-line** post-install log sample has **zero fatal
+  exception markers**. The collector is inactive with **zero listeners** and the
+  owned test AVD is stopped. Living Area, the phone and Home Assistant are untouched.
+
+Evidence:
+`mocks/portal-premium-player-20261030/evidence/family-music-continuity/verification.json`;
+reproducible focused checks: `music-continuity-native-checks.py`; review:
+`http://127.0.0.1:8890/native-review.html`. Verification closes at
+**22:52 UTC**, before the original **23:05:33 UTC** deadline.
+This batch claims two UI/preview corrections, **not a physical FPS improvement**.
+Actual Portal music interaction, Home frame tails, slideshow startup presentation,
+physical night/wake acceptance and stacked-Dream tap remain open. The overall
+objective remains active and backend wiring stays deferred.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

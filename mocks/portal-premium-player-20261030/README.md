@@ -130,9 +130,13 @@ python3 native-checks.py --serial emulator-5556
 ```
 
 Results are in `evidence/native/checks.json`; `complete: true` is required before claiming the
-whole check passed. The latest integrated run passed **106 checks in 159.88 seconds**.
-Open `native-review.html` for the image review; all **42 capture tabs** loaded without page
-errors, recorded in `evidence/native-review-checks.json`. The emulator's API 34/GMS
+whole check passed. The latest integrated run passed **106 checks**.
+The focused `music-continuity-native-checks.py` adds **18 passing checks in 42.708 seconds**
+for dark/light compact/photo round trips and coherent preview album metadata. The selected
+pane is held by the stable player and read only by its panel; layout changes retain it
+without adding polling, preferences or a controller. Closing the player ends that choice.
+Open `native-review.html` for the image review; all **48 capture tabs** loaded without page
+or console errors, recorded in `evidence/native-review-checks.json`. The emulator's API 34/GMS
 image does not establish Portal API 29 timing, sensor behavior or audio compatibility.
 No Home Assistant music deployment belongs to either preview.
 

@@ -1,0 +1,87 @@
+{
+  "complete": true,
+  "success": true,
+  "passed": 18,
+  "total": 18,
+  "checks": [
+    {
+      "name": "dark: Players selected before layout change",
+      "passed": true
+    },
+    {
+      "name": "dark: compact player retains current track",
+      "passed": true
+    },
+    {
+      "name": "dark: compact \u2192 full retains Players selection",
+      "passed": true
+    },
+    {
+      "name": "dark: compact \u2192 full retains track and paused transport",
+      "passed": true
+    },
+    {
+      "name": "dark: photo presentation retains current track",
+      "passed": true
+    },
+    {
+      "name": "dark: photos \u2192 full retains Players selection",
+      "passed": true
+    },
+    {
+      "name": "dark: photos \u2192 full retains track and paused transport",
+      "passed": true
+    },
+    {
+      "name": "dark: Queue remains selectable after both layout round trips",
+      "passed": true
+    },
+    {
+      "name": "dark: selected track has its own album and artist",
+      "passed": true
+    },
+    {
+      "name": "light: Players selected before layout change",
+      "passed": true
+    },
+    {
+      "name": "light: compact player retains current track",
+      "passed": true
+    },
+    {
+      "name": "light: compact \u2192 full retains Players selection",
+      "passed": true
+    },
+    {
+      "name": "light: compact \u2192 full retains track and paused transport",
+      "passed": true
+    },
+    {
+      "name": "light: photo presentation retains current track",
+      "passed": true
+    },
+    {
+      "name": "light: photos \u2192 full retains Players selection",
+      "passed": true
+    },
+    {
+      "name": "light: photos \u2192 full retains track and paused transport",
+      "passed": true
+    },
+    {
+      "name": "light: Queue remains selectable after both layout round trips",
+      "passed": true
+    },
+    {
+      "name": "light: selected track has its own album and artist",
+      "passed": true
+    }
+  ],
+  "elapsedSeconds": 42.708,
+  "avd": "PortalMusic20261030",
+  "api": 34,
+  "generatedSilentFixtureOnly": true,
+  "physicalPortalUiVerified": false,
+  "physicalPortalPerformanceMeasured": false,
+  "audioPlaybackVerified": false
+}

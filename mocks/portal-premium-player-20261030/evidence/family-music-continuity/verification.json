@@ -1,0 +1,72 @@
+{
+  "device": "Family Area",
+  "startedUtc": "2026-10-30T22:35:33Z",
+  "verifiedUtc": "2026-10-30T22:52:07.748277+00:00",
+  "issueDeadlineUtc": "2026-10-30T23:05:33Z",
+  "deadlineMet": true,
+  "installedOptimizedApk": {
+    "sha256": "7871c213a34c79cb34bb3c87241d4f5a343b821df5fb6ce35a36d1a03a2f4fc9",
+    "bytes": 25702091
+  },
+  "previousOptimizedApkSha256": "1c8bfc936274fea69258d883cb8f0a29c2d2f8dbc576b896b05957596563994e",
+  "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "mainAssetsUnchanged": 53,
+  "manifestUnchanged": true,
+  "nativeDexChanged": true,
+  "nativeAcceptance": {
+    "originalRegressionPassed": 106,
+    "focusedRedPassed": 12,
+    "focusedRedTotal": 18,
+    "focusedRedFailures": [
+      "dark: compact \u2192 full retains Players selection",
+      "dark: photos \u2192 full retains Players selection",
+      "dark: selected track has its own album and artist",
+      "light: compact \u2192 full retains Players selection",
+      "light: photos \u2192 full retains Players selection",
+      "light: selected track has its own album and artist"
+    ],
+    "focusedGreenPassed": 18,
+    "focusedGreenSeconds": 42.708,
+    "totalPassed": 124,
+    "api": 34,
+    "generatedSilentFixturesOnly": true,
+    "installedDebugApkSha256": "0eec46aea13cc3280da018801ec04da7d5057d5e2b2837d80b7d2604f29eced1",
+    "sourceSha256": {
+      "app/src/main/java/com/immortal/launcher/MusicPlayerUi.kt": "c0a3a1a99230d019fcf2f3bbead13e7c33771aa0ad56df42608376bc746e4277",
+      "app/src/debug/java/com/immortal/launcher/MusicDesignPreviewActivity.kt": "d84a065e3da5bc86623067fab017aa0e2d408bb99a1908cdcf49022f10745845"
+    }
+  },
+  "freshJvmResults": {
+    "tests": 3460,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 360
+  },
+  "buildDuration": "1m 24s",
+  "reviewCapturesLoaded": 48,
+  "reviewPageErrors": 0,
+  "reviewConsoleErrors": 0,
+  "settingsCompared": 97,
+  "changedSettingValues": 0,
+  "screensaverConfigurationUnchanged": true,
+  "sourceGroupsUnchanged": true,
+  "runtime": {
+    "sampleLines": 402,
+    "fatalExceptionMarkers": 0,
+    "boundedSampleOnly": true
+  },
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "ownedAvdStopped": true,
+  "foreignAvdTouched": false,
+  "livingAreaTouched": false,
+  "phoneTouched": false,
+  "homeAssistantTouched": false,
+  "physicalPortalMusicUiVerified": false,
+  "physicalFpsGainMeasured": false,
+  "audiblePlaybackVerified": false,
+  "backendWiringDeferred": true,
+  "privateConfigurationExported": false,
+  "overallGoalComplete": false
+}

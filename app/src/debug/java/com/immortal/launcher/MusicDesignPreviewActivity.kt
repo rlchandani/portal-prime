@@ -165,9 +165,12 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                   MusicBrowseCollectionKind.PLAYLIST)
             }
       }
+      val currentAlbum = item?.let { track ->
+        albums.firstOrNull { album -> album.tracks.any { it.id == track.id } }
+      }
       val snapshot = MusicPlayerSnapshot(connection = connection, sourceId = source,
           track = item?.let { MusicTrack(it.id, source, it.title, it.artist,
-              "The quiet hours", it.artUrl, it.durationMs) },
+              currentAlbum?.title ?: "", it.artUrl, it.durationMs) },
           playback = if (playing) PlaybackState.PLAYING else PlaybackState.PAUSED,
           positionMs = position, positionAtElapsedMs = changedAt,
           capabilities = MusicCapabilities(play = true, pause = true, previous = true,
