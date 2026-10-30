@@ -10,6 +10,11 @@
 
     <application>
         <activity
+            android:name=".WidgetPagesPreviewActivity"
+            android:exported="true"
+            android:label="Retained widget producer native check"
+            android:theme="@style/Theme.SampleApp" />
+        <activity
             android:name=".LauncherTabsPreviewActivity"
             android:exported="true"
             android:label="Launcher fallback native check"

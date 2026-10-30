@@ -877,7 +877,7 @@ private fun ApprovedWidgetArea(
               }
             }
             .focusProperties { canFocus = active }) {
-          CompositionLocalProvider(LocalApprovedWidgetPageInput provides active) {
+          ApprovedWidgetPageScope(active) {
             ApprovedWidgetPage(displayed, widgets, host, manager, onChanged,
                 onEnterEdit, onRemove, editMode && selected)
           }
@@ -901,7 +901,7 @@ private fun ApprovedWidgetArea(
     HorizontalPager(pager, modifier.clipToBounds().semantics { contentDescription = "Home widgets" }, userScrollEnabled = false,
         beyondViewportPageCount = 1) { index ->
       val active = LocalApprovedLauncherPageActive.current && index == pager.currentPage
-      CompositionLocalProvider(LocalApprovedWidgetPageInput provides active) {
+      ApprovedWidgetPageScope(active) {
         ApprovedWidgetPage(HomePresentation.page(widgets, index), widgets, host, manager,
             onChanged, onEnterEdit, onRemove, editMode && active)
       }

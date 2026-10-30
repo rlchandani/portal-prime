@@ -360,3 +360,20 @@ synthetic artwork and do not change a Portal setting. The separate
 `slideshow/calm-motion-browser-checks.cjs` checks actual production assets,
 decoded geometry, retained pause/resume, navigation and cleanup; its report
 distinguishes browser evidence from physical Portal performance.
+
+## Retained widget-page lifecycle check
+
+Home's touch and TV widget pages now use the same child lifecycle boundary.
+Selected pages can refresh; hidden retained neighbors pause built-in producers
+and photo lifecycle work while preserving their remembered values. The
+enclosing tab keeps its original input gate, and the existing neighbor-retention
+window, page layout and transitions remain intact.
+
+`widget-pages-native-checks.py` runs the debug-only generated subtree on the
+owned API 34 AVD. Its old-wiring replay has three polling bodies and three
+RESUMED workers; the production scope has one of each, and a paused parent has
+zero. **67 native checks plus four host checks** cover caching, changed keys,
+selected-only resume hooks, delayed cancellation without duplicate requests,
+stable owners, input identity and cleanup. Evidence and five generated
+screenshots are in `evidence/widget-pages-native/`. These counts do not measure
+Portal FPS or third-party widget-provider background updates.

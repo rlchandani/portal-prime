@@ -1167,6 +1167,68 @@ visible transitions. The collector remains inactive with **zero listeners**.
 Verification/deployment completed by **20:18 UTC**, within the thirty-minute
 issue window. Living Area remains unchanged; the broader goal stays active.
 
+## Retained widget-page work — 20:19 UTC batch
+
+Home retains neighboring widget pages to prepare smooth swipes. Previously only
+their touch permission was scoped to the selected page: built-in polling
+producers still inherited the active Home tab, and photo widgets inherited its
+RESUMED lifecycle. Hidden neighbors could therefore refresh feeds, tick timers
+or run the photo worker.
+
+Both touch and TV paging now use `ApprovedWidgetPageScope`. It reuses the
+existing tab lifecycle owner logic for each retained child, scopes the active
+flag and preserves the enclosing tab's input-gate identity. Hidden children stay
+CREATED, while a selected child is capped by its parent lifecycle. Remembered
+values and owner identities survive hide/reveal within the retained subtree.
+The existing bounded neighbor-retention window is unchanged.
+
+| Native generated-subtree observation | Old wiring replay | Production scope |
+| --- | ---: | ---: |
+| Active polling bodies, three retained pages | **3** | **1** |
+| RESUMED photo-like lifecycle workers | **3** | **1** |
+| Paused parent, polling/lifecycle workers | — | **0 / 0** |
+| Concurrent generated requests per page | — | **≤1** |
+
+These numbers come from actual Compose `produceHomeState`, the production scope
+and `OnResume`, with generated delayed IO and a generated RESUMED worker. The
+baseline is a replay of the old provider wiring in the tested APK, rather than a
+physical comparison of two Portal builds. It trips the intended maximum-one
+producer assertion. The corrected scope passes **67 native checks and four host
+checks**, in **5.467 seconds**; cleanup finishes at **6.473 seconds**.
+
+Checks include page 0/1/2 and reverse selection, retained cache/deadline reuse,
+hidden key changes, cancellation-resistant IO without duplicate admission,
+selected-only resume hooks, parent STARTED/CREATED/RESUMED caps, shared input
+gate preservation and complete disposal. An in-flight blocking request may need
+to finish after hiding; this is not an instant-cancellation claim.
+
+The full Android gate passes **3,454 tests / 359 suites**, zero failures/errors/
+skips, with a successful build in **54 seconds**. All five production source
+hashes match the native-tested APK. Evidence and five generated PNGs live in
+`mocks/portal-premium-player-20261030/evidence/widget-pages-native/`. The fixture
+is registered only in the debug source set; no release APK was inspected.
+Its cache was removed, the owned API 34 AVD stopped and the foreign AVD untouched.
+There are no household source reads or physical Portal FPS measurements.
+Third-party AppWidget provider background updates are outside this verification.
+The preceding slideshow/browser and player checks cover unchanged sources and
+were not repeated.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`d45b1a4f601d1f8dbbb9981e494723a84590fbca625297688abff83a2de8a601`
+(**48,994,322 bytes**), matching the native-tested APK and existing certificate.
+The preceding installed APK is retained privately as a rollback. One upload/
+install was used; independent byte verification resolved the interrupted HTTP
+install response. All **97 setting values** match before/after installation and
+after Home → Apps → Home → screensaver acknowledgments. Those acknowledgments
+do not verify presented pixels or input latency. The collector is inactive with
+**zero listeners**. Verification/deployment completed by **20:33 UTC**, within
+the thirty-minute issue window. Living Area remains unchanged.
+
+This reduces unnecessary retained-widget work without changing the page layout
+or swipe transition. The Home/Apps frame-time outlier, physical night acceptance
+and overall performance goal remain open; the earlier capture-admission issue
+stays parked. Music backend wiring remains deferred.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
