@@ -1,0 +1,34 @@
+<!--
+ Copyright (c) 2026 Starbright Lab.
+
+ This source code is licensed under the MIT license found in the
+ LICENSE file in the root directory of this source tree.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="800" viewBox="0 0 2400 800" role="img" aria-labelledby="title description">
+  <title id="title">Panorama Drift: wide coastal landscape</title>
+  <desc id="description">Original synthetic 3:1 landscape. A rust west marker, teal east marker, central island and right-hand beacon make horizontal travel visible.</desc>
+  <rect width="2400" height="800" fill="#dce7e4"/>
+  <circle cx="670" cy="170" r="76" fill="#ead3a3"/>
+  <path d="M0 415L230 285L420 384L700 220L960 397L1210 282L1460 390L1770 238L2060 383L2260 293L2400 361V800H0Z" fill="#9fb5ad"/>
+  <path d="M0 471Q300 401 640 468T1230 467T1830 463T2400 450V800H0Z" fill="#647f83"/>
+  <path d="M0 586Q420 507 810 580T1630 568T2400 576V800H0Z" fill="#45676e"/>
+  <path d="M1000 555L1100 469L1220 434L1370 537L1450 555Z" fill="#d4c6a6"/>
+  <path d="M1510 800Q1730 552 1940 527T2400 582V800Z" fill="#c7ba9f"/>
+  <path d="M1888 546L1898 372H1942L1952 546Z" fill="#eae3d7"/>
+  <path d="M1885 372H1955L1920 329Z" fill="#b26d4d"/>
+  <rect x="1905" y="391" width="30" height="28" fill="#45676e"/>
+  <path d="M1893 463H1947" stroke="#b26d4d" stroke-width="16"/>
+  <path d="M430 643H690M870 690H1130M1410 625H1590" stroke="#a8bfba" stroke-width="9" stroke-linecap="round"/>
+  <rect x="0" y="0" width="110" height="800" fill="#a65b42"/>
+  <rect x="2290" y="0" width="110" height="800" fill="#286e73"/>
+  <g fill="#fff8e9" font-family="sans-serif" font-size="56" font-weight="700" text-anchor="middle">
+    <text x="55" y="125">W</text>
+    <text x="2345" y="125">E</text>
+  </g>
+  <g fill="#344e53" font-family="sans-serif" font-size="28" text-anchor="middle">
+    <text x="600" y="760">600</text>
+    <text x="1200" y="760">1200 · ISLAND</text>
+    <text x="1920" y="760">1920 · BEACON</text>
+  </g>
+  <path d="M600 0V30M1200 0V30M1800 0V30M600 770V800M1200 770V800M1800 770V800" stroke="#344e53" stroke-width="6"/>
+</svg>

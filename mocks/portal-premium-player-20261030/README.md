@@ -147,23 +147,25 @@ rapid replacements and close. They establish functional emulator behavior,
 not physical Portal timing or audio. The fixture/activity are debug-only.
 
 `slideshow/serve.py` exposes an allowlist of production slideshow assets, an injected silent
-host, two original portrait fixtures and twelve original mixed-aspect Gallery Wall
-fixtures. It never serves the repository root. Run:
+host, two original portrait fixtures, twelve original mixed-aspect gallery fixtures,
+and two original panoramic landscapes. It never serves the repository root. Run:
 
 ```sh
 python3 slideshow/serve.py
 ```
 
 Open `http://127.0.0.1:8891/`. Diptych, Framed, Ken Burns, Cinematic Push, Gallery Wall,
-Hero + Sidebar and Memories are rendered by the actual
+Hero + Sidebar, Memories and Panorama Drift are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its **102 browser checks** include real stalled HTTP image requests, pause
+ambient sensors. Its **151 browser checks** include real stalled HTTP image requests, pause
 cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
 frames, initial readiness without a second fade, pause without the newer animation API,
 and cancellation immediately before DOM publication. Diptych preserves its existing
 photo composition and source selection. Only the incoming frame fades; both retained
 frames are released on cleanup. Chrome results do not establish Portal GPU timing;
 source tests separately cover Filmstrip and Gallery geometry.
+The renderer checks use developer-installed Playwright/Chrome and `pngjs`; these are
+verification tools, not application or preview runtime dependencies.
 
 Living Gallery Wall fits all ten selected photographs inside the viewport, adapts
 row height to the screen and centers the shorter final row. Whole static photographs
@@ -193,6 +195,26 @@ RAM or FPS measurements.
 Open `http://127.0.0.1:8891/?mode=memories&review=1` for the five-second review pace.
 The normal preview remains at thirty seconds. This browser option does not change
 any Portal setting.
+
+Panorama Drift retains horizontal transform panning while limiting the moving strip
+to two screen widths. Extreme panoramas fit vertically on matte rather than creating
+elements many screens wide; fitting landscapes remain whole and still. Cached focal
+points hold a static panoramic window around the anchor. The sweep completes within
+the photo interval, independent of the scheduler's longer zoom-motion overlap.
+The two reusable scenes use an incoming-only 1.8-second fade, current-playback
+publication gates, and retirement/cleanup that clear URLs and promotion hints.
+Only a strip that actually moves requests transform promotion. Geometry and owned
+resource bounds are verified separately from physical Portal GPU memory or FPS.
+The preview uses original 3:1 and 8:1 landscapes with matching metadata.
+Forty-nine actual-source Chrome assertions cover the full sweep before retirement,
+the old-WebView manual pause path, fixed ownership, focal anchors, 24 viewport/aspect
+combinations, cancellation, and the rendered right-edge marker pixels.
+
+The rendering choices follow Google's [high-performance animation guidance](https://web.dev/articles/animations-guide)
+and [compositor layer guidance](https://web.dev/articles/stick-to-compositor-only-properties-and-manage-layer-count):
+animate transforms and opacity, avoid layout/paint properties for movement, and
+release unnecessary layer hints. These sources guide the implementation; they
+do not establish a Portal benchmark.
 
 Ken Burns now uses the same incoming-only dissolve owner as Diptych, a 3vmin inset
 and a quiet charcoal matte. It keeps the original source selection and gentle motion

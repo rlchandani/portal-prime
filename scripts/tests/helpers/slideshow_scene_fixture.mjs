@@ -20,7 +20,8 @@ const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, decl
   }).filter(pair => pair.length)),
 }));
 
-export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = false, mode = 'framed' } = {}) {
+export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = false,
+  mode = 'framed', W = 2160, H = 1440 } = {}) {
   let now = 0, nextId = 1, deferred = deferLoad;
   const pending = new Map(), loads = [], writes = [];
   function schedule(fn, ms) {
@@ -148,21 +149,22 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
     seed: 'generated-' + i, w: i % 2 ? 1000 : 1600, h: i % 2 ? 1600 : 1000,
   }));
   const cursor = { i: 0 }, resolutions = [];
-  const cleanup = window.SS.MODES[mode].run({ root, cursor, W: 2160, H: 1440,
+  const cleanup = window.SS.MODES[mode].run({ root, cursor, W, H,
     photoMs, microMs: photoMs, motionMs: 5400, url: (photo, edge) => {
       const url = 'generated://' + photo.seed + (changingUrls ? '-r' + (resolutions.length + 1) : '');
       resolutions.push({ photo, edge, url }); return url;
     } }, deck);
   function nodes(node = root) { return [node, ...node.children.flatMap(child => nodes(child))]; }
   function prints() { return nodes().filter(node =>
-    node.classList.contains(mode === 'memories' ? 'memory-photo' : ['galleryWall', 'heroSidebar'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
+    node.classList.contains(mode === 'memories' ? 'memory-photo' : mode === 'panorama' ? 'ss-pan' :
+      ['galleryWall', 'heroSidebar'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
   function slot(print) {
     if (mode === 'memories') {
       let node = print;
       while (node.parent && !node.classList.contains('ss-memory-scene')) node = node.parent;
       return node;
     }
-    return mode === 'galleryWall' ? print : ['push', 'heroSidebar'].includes(mode) ? print.parent : print.parent.parent.parent.parent;
+    return mode === 'galleryWall' ? print : ['push', 'heroSidebar', 'panorama'].includes(mode) ? print.parent : print.parent.parent.parent.parent;
   }
   function state(print) {
     const style = computed(print), animation = style.animation || 'none';

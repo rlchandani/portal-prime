@@ -115,8 +115,10 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-mtitle .sub { font-size: 22px; opacity: .8; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
 
 /* panorama */
-.ss-pan { position: absolute; top: 0; height: 100%; background-size: cover; will-change: transform; }
-.ss-layer .ss-pan { animation: dolly var(--motion-duration, 32400ms) linear forwards; }
+.ss-layer.panorama-drift { overflow: hidden; background: #1c1b19;
+  transition: opacity 1.8s cubic-bezier(0.4,0,0.2,1); }
+.ss-layer.panorama-drift.retired { opacity: 0; visibility: hidden; transition: none; }
+.ss-pan { position: absolute; left: 0; top: 0; height: 100%; background-size: contain; will-change: auto; }
 @keyframes dolly { from { transform: translateX(0); } to { transform: translateX(var(--shift,-20%)); } }
 
 /* polaroid */

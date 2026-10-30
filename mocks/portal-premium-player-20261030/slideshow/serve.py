@@ -20,9 +20,17 @@ for name in ("dunes", "tidal"):
 for name in ("gallery-01.svg", "gallery-02.svg", "gallery-03.svg", "gallery-04.svg",
              "gallery-05.svg", "gallery-06.svg", "gallery-07.svg", "gallery-08.svg",
              "gallery-09.svg", "gallery-10.svg", "gallery-11.svg", "gallery-12.svg",
-             "gallery-fixtures.json"):
+             "gallery-fixtures.json", "panorama-wide.svg", "panorama-extreme.svg"):
     files["/fixtures/" + name] = here / "assets" / name
 gallery_photos = json.loads(files["/fixtures/gallery-fixtures.json"].read_text())
+panorama_photos = [
+    {"url": "/fixtures/panorama-wide.svg", "w": 2400, "h": 800},
+    {"url": "/fixtures/panorama-extreme.svg", "w": 2400, "h": 300},
+    # A distinct URL reuses the original art with a cached focal point on its beacon.
+    {"url": "/fixtures/panorama-wide.svg?anchor=beacon", "w": 2400, "h": 800,
+     "fx": 0.8, "fy": 0.5},
+    gallery_photos[1], gallery_photos[7],
+]
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -30,10 +38,10 @@ class Handler(BaseHTTPRequestHandler):
         if urlsplit(self.path).path == "/preview.html":
             query = parse_qs(urlsplit(self.path).query)
             mode = query.get("mode", ["diptych"])[0]
-            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories"):
+            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama"):
                 self.send_error(400)
                 return
-            photos = gallery_photos if mode in ("galleryWall", "heroSidebar", "memories") else [
+            photos = panorama_photos if mode == "panorama" else gallery_photos if mode in ("galleryWall", "heroSidebar", "memories") else [
                 {"url": "/fixtures/" + name + ".png", "w": 480, "h": 720}
                 for name in ("dunes", "tidal")]
             interval = 5 if query.get("review", ["0"])[0] == "1" else 30

@@ -1,6 +1,6 @@
 {
   "complete": true,
-  "passed": 102,
+  "passed": 151,
   "checks": [
     "Diptych displays two complete static photos without blur",
     "Diptych matte inset scales to the actual viewport",
@@ -11,6 +11,55 @@
     "galleryWall actual renderer becomes ready",
     "heroSidebar actual renderer becomes ready",
     "memories actual renderer becomes ready",
+    "panorama actual renderer becomes ready",
+    "Panorama readiness retains exactly two fixed scene roots and two reusable strips",
+    "Panorama starts with one opaque contained non-repeating photo and one 2400-edge admission",
+    "Panorama unhinted wide photo moves only its transform with linear forward dolly",
+    "Panorama clamps the longer scheduler motion duration to the 2500ms photo dwell",
+    "Panorama swap 1 uses incoming-only 1800ms opacity above an opaque outgoing URL",
+    "Panorama swap 1 outgoing strip reaches its right edge before URL retirement",
+    "Panorama old-WebView pause freezes both strip transforms and opacity beyond retirement",
+    "Panorama resume consumes the remaining dissolve duration without restarting 1800ms",
+    "Panorama swap 1 retires the outgoing URL, motion and compositor hint after incoming opacity one",
+    "Panorama swap 2 uses incoming-only 1800ms opacity above an opaque outgoing URL",
+    "Panorama swap 2 outgoing strip reaches its right edge before URL retirement",
+    "Panorama swap 2 retires the outgoing URL, motion and compositor hint after incoming opacity one",
+    "Panorama swap 3 uses incoming-only 1800ms opacity above an opaque outgoing URL",
+    "Panorama swap 3 outgoing strip reaches its right edge before URL retirement",
+    "Panorama terminal cleanup during dissolve hides both scenes and releases both fixed strips",
+    "Panorama stopped owners reject stale retirement, cadence and resume publication",
+    "Panorama 2160x1440 1.3:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 2160x1440 1.5:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 2160x1440 2:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 2160x1440 3:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 2160x1440 8:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 2160x1440 10:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1920x1080 1.3:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1920x1080 1.5:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1920x1080 2:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1920x1080 3:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1920x1080 8:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1920x1080 10:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1024x768 1.3:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1024x768 1.5:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1024x768 2:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1024x768 3:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1024x768 8:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 1024x768 10:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 640x960 1.3:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 640x960 1.5:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 640x960 2:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 640x960 3:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 640x960 8:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama 640x960 10:1 decoded photo preserves vertical extent within a two-viewport strip",
+    "Panorama original 8:1 SVG keeps its complete vertical photo extent and reaches the right edge",
+    "Panorama final Chrome pixels show the original east-edge marker rather than an all-matte blank",
+    "Panorama cached fx=0 anchor stays visible and static without a compositor hint",
+    "Panorama cached fx=0.25 anchor stays visible and static without a compositor hint",
+    "Panorama cached fx=0.5 anchor stays visible and static without a compositor hint",
+    "Panorama cached fx=0.8 anchor stays visible and static without a compositor hint",
+    "Panorama cached fx=1 anchor stays visible and static without a compositor hint",
+    "Panorama decode-admission cancellation rejects late publication and derivative work",
     "Memories readiness owns exactly two full-viewport fixed scene roots",
     "Memories first beat is one opaque complete photo without a second startup fade or blur",
     "Memories unhinted single photo uses a bounded gentle push inside the viewport",
@@ -118,6 +167,57 @@
       "memories.png",
       "memories-collage.png"
     ],
+    "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
+  },
+  "panorama": {
+    "passed": 49,
+    "fixtureSource": "Local original panorama-wide.svg, panorama-extreme.svg and exact-aspect synthetic SVGs",
+    "screenshots": [
+      "panorama.png"
+    ],
+    "geometryViewports": [
+      [
+        2160,
+        1440
+      ],
+      [
+        1920,
+        1080
+      ],
+      [
+        1024,
+        768
+      ],
+      [
+        640,
+        960
+      ]
+    ],
+    "geometryAspects": [
+      1.3,
+      1.5,
+      2,
+      3,
+      8,
+      10
+    ],
+    "originalEndMarkerPixels": {
+      "rightEdge": [
+        40,
+        110,
+        115
+      ],
+      "matte": [
+        28,
+        27,
+        25
+      ],
+      "photoCenter": [
+        199,
+        173,
+        138
+      ]
+    },
     "oldWebViewManualPath": "Element.getAnimations and Element.animate unavailable"
   },
   "scope": "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",

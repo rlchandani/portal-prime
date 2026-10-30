@@ -721,6 +721,76 @@ belongs to this batch. Implementation, parallel browser verification, deployment
 cleanup and commit completed within the thirty-minute limit. The broader goal
 remains active.
 
+## Panorama Drift — 18:28 UTC batch
+
+Panorama Drift retains its slow horizontal sweep and existing preference for wide
+photographs. The moving strip is now capped at **two viewport widths**; its height
+fits the photo's aspect ratio and is centered vertically on matte. This preserves
+the complete vertical image while allowing both horizontal edges to pass through
+the window. Landscapes that already fit remain whole and static. Cached focal
+points hold a static panoramic window around the anchor, without a permanent
+promotion hint.
+
+For a **10:1 input at 2160 × 1440**, the preceding nominal strip geometry was
+approximately **14,400 × 1,440**; the new geometry is **4,320 × 432**. This is a
+calculation from element bounds, not a measured texture allocation or physical
+Portal FPS result. Only genuinely moving strips request transform promotion.
+
+The two fixed scene roots and two strips now use an incoming-only **1.8-second**
+dissolve. The outgoing URL remains opaque until the incoming scene is ready and
+opaque; retirement and terminal cleanup clear image URLs, animation, transforms
+and promotion hints. Current-playback publication gates reject new work after
+pause or close. Manual pause freezes strip motion and a live dissolve without
+newer WebView animation APIs.
+
+Source inspection found that the shared scheduler gives zoom motion an extra
+2.4 seconds. A panorama using that duration could retire before completing its
+sweep. Panorama now limits its motion duration to the selected photo interval,
+so the last horizontal edge is reached before outgoing URL retirement. A source
+test also caught an inherited fade-duration mismatch; the style explicitly
+matches its CSS transition to the 1.8-second owner.
+
+| Final gate | Evidence |
+| --- | --- |
+| Slideshow source checks | **185 passed**, zero failures/skips; **12 new Panorama tests** included |
+| Engine fixtures | **14/14 passed** |
+| Actual-source Chrome renderer | **151 assertions passed**, including **49 Panorama assertions**, zero production-script errors |
+| Geometry coverage | Four viewports × six photo aspects; **24 actual decoded-SVG cases** |
+| End-of-pan rendering | Original 8:1 landscape's right-edge marker pixels confirmed in Chrome |
+| Integrated debug build | Successful; unchanged JVM task was **UP-TO-DATE**, retaining **3,445 passing results / 358 suites** |
+| Native UI scope | Prior **56 checks / 151.09 seconds** cover unchanged Kotlin; not rerun in this asset batch |
+| Visual review | Actual-source Panorama screenshot inspected at 2160 × 1440 |
+
+Source regressions cover 25 checkpoints each for initial close, initial
+resume/re-pause and replacement resume/re-pause. Browser checks exercise the
+actual pan endpoints before retirement, incoming-only fades, retained pause,
+remaining-time resume, static landscapes, five cached focal anchors, cleanup
+and decode-admission cancellation. Prior renderer PNG evidence remains
+byte-identical. The finite review server adds original 3:1 and 8:1 landscape
+fixtures with matching dimensions; it serves no household media or credentials.
+
+The implementation follows Google's [high-performance animation guide](https://web.dev/articles/animations-guide)
+and [compositor layer guidance](https://web.dev/articles/stick-to-compositor-only-properties-and-manage-layer-count):
+use transforms/opacity for movement and fading, avoid per-frame layout/paint
+properties, and release unnecessary layer hints. These authoritative documents
+support the rendering strategy, not a device performance pass.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`8873059eaf3aac200b053315f2eaf2560d6e417570cf21f114544df812a13a2b`
+(**48,910,412 bytes**). Its signing certificate matches the preceding Memories
+APK, retained privately as a rollback. One upload/install was used; independent
+installed-byte verification resolved the interrupted install HTTP response.
+All **97 settings** match the pre-install profile. Home/screensaver dispatches
+were acknowledged; these responses do not establish visible transitions.
+
+Capture state is independently confirmed inactive, with the collector stopped
+and **zero active listeners**. No new physical timing capture was requested.
+Living Area remains unchanged. Physical night-clock acceptance, reliable Portal
+presentation measurements and the remaining style refinements stay open.
+Music backend wiring remains deferred, with no Home Assistant operation.
+Implementation, parallel verification, deployment, cleanup and commit completed
+within this batch's thirty-minute limit. The broader goal remains active.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

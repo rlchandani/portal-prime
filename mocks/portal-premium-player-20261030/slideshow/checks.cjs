@@ -7,6 +7,7 @@ const path = require("node:path");
 const http = require("node:http");
 const { execFileSync } = require("node:child_process");
 const { chromium } = require("playwright");
+const { PNG } = require("pngjs");
 const here = __dirname, repo = path.resolve(here, "../../..");
 const assets = path.join(repo, "app/src/main/assets/screensaver");
 const evidence = process.env.SLIDESHOW_EVIDENCE_DIR || path.join(here, "evidence");
@@ -21,6 +22,13 @@ const held = new Map(), checks = [], errors = [];
 const fixture = name => fs.readFileSync(path.join(here, "assets", name + ".png"));
 const galleryPhotos = JSON.parse(fs.readFileSync(path.join(here, "assets", "gallery-fixtures.json")))
   .map((photo, id) => ({ ...photo, id, seed: "gallery-" + id }));
+// Same original-art deck and focal-point variant as the read-only preview sidecar.
+const panoramaPhotos = [
+  { url: "/fixtures/panorama-wide.svg", w: 2400, h: 800 },
+  { url: "/fixtures/panorama-extreme.svg", w: 2400, h: 300 },
+  { url: "/fixtures/panorama-wide.svg?anchor=beacon", w: 2400, h: 800, fx: .8, fy: .5 },
+  galleryPhotos[1], galleryPhotos[7],
+].map((photo, id) => ({ ...photo, id, seed: "panorama-" + id }));
 const server = http.createServer((req, res) => {
   const u = new URL(req.url, "http://local");
   if (/^\/slow\/(dunes|tidal)\.png$/.test(u.pathname)) {
@@ -29,8 +37,9 @@ const server = http.createServer((req, res) => {
     return;
   }
   let content, type;
-  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit", "/memories-unit"].includes(u.pathname)) {
-    const unitPhotos = ["/gallery-unit", "/sidebar-unit", "/memories-unit"].includes(u.pathname) ? galleryPhotos :
+  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit", "/memories-unit", "/panorama-unit"].includes(u.pathname)) {
+    const unitPhotos = u.pathname === "/panorama-unit" ? panoramaPhotos :
+      ["/gallery-unit", "/sidebar-unit", "/memories-unit"].includes(u.pathname) ? galleryPhotos :
       ["dunes", "tidal"].map((name, id) => ({
         id, url: "/fixtures/" + name + ".png", w: 480, h: 720,
       }));
@@ -44,7 +53,8 @@ const server = http.createServer((req, res) => {
   } else if (u.pathname === "/render") {
     const slow = u.searchParams.has("slow"), unknown = u.searchParams.has("unknown");
     const mode = u.searchParams.get("mode") || "diptych";
-    const photos = ["galleryWall", "heroSidebar", "memories"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
+    const photos = mode === "panorama" ? panoramaPhotos :
+      ["galleryWall", "heroSidebar", "memories"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
       url: (slow ? "/slow/" : "/fixtures/") + name + ".png",
       w: unknown ? 0 : 480, h: unknown ? 0 : 720,
     }));
@@ -56,6 +66,9 @@ const server = http.createServer((req, res) => {
   } else if (/^\/fixtures\/(dunes|tidal)\.png$/.test(u.pathname)) {
     content = fixture(path.basename(u.pathname, ".png")); type = "image/png";
   } else if (galleryPhotos.some(photo => photo.url === u.pathname)) {
+    content = fs.readFileSync(path.join(here, "assets", path.basename(u.pathname)));
+    type = "image/svg+xml";
+  } else if (["/fixtures/panorama-wide.svg", "/fixtures/panorama-extreme.svg"].includes(u.pathname)) {
     content = fs.readFileSync(path.join(here, "assets", path.basename(u.pathname)));
     type = "image/svg+xml";
   } else if (/^\/assets\/(?:styles\.css|photos\.js|lib-engine\.js|modes\.js|mode-impls\.js|scheduler\.js)$/.test(u.pathname)) {
@@ -96,7 +109,7 @@ async function until(condition) {
       };
     });
     page.on("pageerror", error => errors.push(error.message));
-    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories"]) {
+    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar", "memories", "panorama"]) {
       await page.goto(`${base}/render?nativeClock=1&mode=${mode}`);
       await page.locator("#loading.hide").waitFor({ state: "attached" });
       await page.waitForFunction(() => getComputedStyle(document.querySelector(".ss-beat.on")).opacity === "1" &&
@@ -116,11 +129,260 @@ async function until(condition) {
           state.fills === 0 && state.images.every(n => n.size === "contain" && n.filter === "none" && n.motion === "none"));
         demand("Diptych matte inset scales to the actual viewport", Math.abs(state.padding - 43.2) < .1);
       }
-      // Keep the six existing styles' screenshots untouched during this bounded addition.
-      if (mode === "memories")
+      // Keep all seven previous styles' screenshots untouched during this addition.
+      if (mode === "panorama")
         await page.screenshot({ path: path.join(evidence, mode + ".png") });
       demand(mode + " actual renderer becomes ready", await page.locator("#loading").evaluate(n => n.classList.contains("hide")));
     }
+    await page.goto(`${base}/panorama-unit`);
+    await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined;
+      Element.prototype.animate = undefined;
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.panoramaRoot = root; window.panoramaRequests = [];
+      window.panoramaCheck = SS.MODES.panorama.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2500, motionMs: 4800,
+        url: (photo, edge) => { panoramaRequests.push({ url: photo.url, edge }); return photo.url; },
+      }, PHOTOS.slice(0, 2));
+      await panoramaCheck.ready;
+      window.panoramaScenes = [...root.querySelectorAll(".panorama-drift")];
+      window.panoramaStrips = [...root.querySelectorAll(".ss-pan")];
+      window.panoramaState = () => panoramaScenes.map(scene => ({
+        opacity: getComputedStyle(scene).opacity, visibility: getComputedStyle(scene).visibility,
+        url: getComputedStyle(scene.querySelector(".ss-pan")).backgroundImage,
+        transform: getComputedStyle(scene.querySelector(".ss-pan")).transform,
+      }));
+    });
+    demand("Panorama readiness retains exactly two fixed scene roots and two reusable strips",
+      await page.evaluate(() => panoramaScenes.length === 2 && panoramaStrips.length === 2 &&
+        panoramaScenes.every(scene => {
+          const box = scene.getBoundingClientRect(), style = getComputedStyle(scene);
+          return scene.parentNode === panoramaRoot && scene.children.length === 1 &&
+            style.position === "absolute" && style.backgroundColor === "rgb(28, 27, 25)" &&
+            box.x === 0 && box.y === 0 && box.width === 2160 && box.height === 1440;
+        })));
+    demand("Panorama starts with one opaque contained non-repeating photo and one 2400-edge admission",
+      await page.evaluate(() => {
+        const scene = panoramaRoot.lastElementChild, pan = scene.querySelector(".ss-pan");
+        const style = getComputedStyle(pan);
+        return +getComputedStyle(scene).opacity === 1 &&
+          panoramaStrips.filter(pan => getComputedStyle(pan).backgroundImage !== "none").length === 1 &&
+          panoramaRoot.querySelectorAll(".ss-fill").length === 0 &&
+          style.backgroundSize === "contain" && style.backgroundRepeat === "no-repeat" &&
+          style.filter === "none" && panoramaRequests.length === 1 && panoramaRequests[0].edge === 2400;
+      }));
+    demand("Panorama unhinted wide photo moves only its transform with linear forward dolly",
+      await page.evaluate(() => {
+        const style = getComputedStyle(panoramaRoot.lastElementChild.querySelector(".ss-pan"));
+        return style.animationName === "dolly" && style.animationTimingFunction === "linear" &&
+          style.animationFillMode === "forwards" && style.willChange === "transform";
+      }));
+    demand("Panorama clamps the longer scheduler motion duration to the 2500ms photo dwell",
+      await page.evaluate(() => getComputedStyle(panoramaRoot.lastElementChild.querySelector(".ss-pan"))
+        .animationDuration === "2.5s"));
+    for (let swap = 1; swap <= 3; swap++) {
+      await page.evaluate(() => {
+        window.panoramaOutgoing = panoramaRoot.lastElementChild;
+        window.panoramaOldStrip = panoramaOutgoing.querySelector(".ss-pan");
+        window.panoramaOldUrl = panoramaOldStrip.style.backgroundImage;
+      });
+      await page.waitForFunction(() => panoramaRoot.lastElementChild !== panoramaOutgoing &&
+        +getComputedStyle(panoramaRoot.lastElementChild).opacity > .1 &&
+        +getComputedStyle(panoramaRoot.lastElementChild).opacity < .9);
+      demand(`Panorama swap ${swap} uses incoming-only 1800ms opacity above an opaque outgoing URL`,
+        await page.evaluate(() => {
+          const incoming = panoramaRoot.lastElementChild, style = getComputedStyle(incoming);
+          return style.transitionProperty === "opacity" && style.transitionDuration === "1.8s" &&
+            +getComputedStyle(panoramaOutgoing).opacity === 1 &&
+            panoramaOldStrip.style.backgroundImage === panoramaOldUrl &&
+            panoramaRoot.querySelectorAll(".panorama-drift").length === 2 &&
+            panoramaRoot.querySelectorAll(".ss-pan").length === 2 &&
+            panoramaScenes.every(scene => scene.parentNode === panoramaRoot) &&
+            panoramaStrips.every(pan => pan.isConnected);
+        }));
+      demand(`Panorama swap ${swap} outgoing strip reaches its right edge before URL retirement`,
+        await page.evaluate(() => {
+          const style = getComputedStyle(panoramaOldStrip), width = parseFloat(style.width);
+          const shift = new DOMMatrixReadOnly(style.transform).m41;
+          return Math.abs(shift - (innerWidth - width)) < .1 &&
+            panoramaOldStrip.style.backgroundImage === panoramaOldUrl &&
+            +getComputedStyle(panoramaOutgoing).opacity === 1;
+        }));
+      if (swap === 1) {
+        const pausedPanorama = await page.evaluate(async () => {
+          panoramaCheck.pause();
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          return { scenes: panoramaState(), admissions: panoramaRequests.length };
+        });
+        await page.waitForTimeout(2000);
+        demand("Panorama old-WebView pause freezes both strip transforms and opacity beyond retirement",
+          await page.evaluate(before => !Element.prototype.getAnimations && !Element.prototype.animate &&
+            JSON.stringify(panoramaState()) === JSON.stringify(before.scenes) &&
+            panoramaRequests.length === before.admissions &&
+            +getComputedStyle(panoramaOutgoing).opacity === 1, pausedPanorama));
+        const resumedDuration = await page.evaluate(() => {
+          panoramaCheck.resume();
+          return parseFloat(getComputedStyle(panoramaRoot.lastElementChild).transitionDuration) * 1000;
+        });
+        demand("Panorama resume consumes the remaining dissolve duration without restarting 1800ms",
+          resumedDuration > 0 && resumedDuration < 1800, { resumedDuration });
+      }
+      if (swap === 3) break;
+      await page.waitForFunction(() => panoramaOldStrip.style.backgroundImage === "none" &&
+        +getComputedStyle(panoramaRoot.lastElementChild).opacity === 1);
+      demand(`Panorama swap ${swap} retires the outgoing URL, motion and compositor hint after incoming opacity one`,
+        await page.evaluate(() => getComputedStyle(panoramaOutgoing).visibility === "hidden" &&
+          +getComputedStyle(panoramaOutgoing).opacity === 0 &&
+          panoramaOldStrip.style.backgroundImage === "none" &&
+          panoramaOldStrip.style.animationName === "none" &&
+          panoramaOldStrip.style.willChange === "auto" && panoramaOldStrip.style.transform === "none" &&
+          panoramaStrips.filter(pan => pan.style.backgroundImage !== "none").length === 1));
+    }
+    await page.evaluate(() => {
+      const incoming = panoramaRoot.lastElementChild, staleEnd = incoming.ontransitionend;
+      panoramaCheck(); panoramaCheck(); panoramaCheck.resume();
+      if (staleEnd) staleEnd({ target: incoming, propertyName: "opacity" });
+      window.panoramaClosedState = panoramaState();
+      window.panoramaClosedAdmissions = panoramaRequests.length;
+    });
+    demand("Panorama terminal cleanup during dissolve hides both scenes and releases both fixed strips",
+      await page.evaluate(() => panoramaScenes.every(scene =>
+        getComputedStyle(scene).visibility === "hidden" && +getComputedStyle(scene).opacity === 0 &&
+        scene.ontransitionend === null) && panoramaStrips.every(pan =>
+        pan.style.backgroundImage === "none" && pan.style.animationName === "none" &&
+        pan.style.willChange === "auto" && pan.style.transform === "none")));
+    await page.waitForTimeout(2600);
+    demand("Panorama stopped owners reject stale retirement, cadence and resume publication",
+      await page.evaluate(() => JSON.stringify(panoramaState()) === JSON.stringify(panoramaClosedState) &&
+        panoramaRequests.length === panoramaClosedAdmissions &&
+        panoramaRoot.querySelectorAll(".ss-pan").length === 2));
+    // Each geometry case uses a decoded synthetic SVG with exactly the declared aspect.
+    for (const [W, H] of [[2160, 1440], [1920, 1080], [1024, 768], [640, 960]]) {
+      await page.setViewportSize({ width: W, height: H });
+      await page.goto(`${base}/panorama-unit`);
+      for (const ratio of [1.3, 1.5, 2, 3, 8, 10]) {
+        const geometry = await page.evaluate(async ({ W, H, ratio }) => {
+          const root = document.createElement("div");
+          root.style.cssText = "position:fixed;inset:0";
+          document.querySelector("#stage").append(root);
+          const w = ratio * 100, h = 100;
+          const url = "data:image/svg+xml," + encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
+            `<rect width="${w}" height="${h}" fill="#647f83"/>` +
+            `<rect width="10" height="${h}" fill="#a65b42"/>` +
+            `<rect x="${w - 10}" width="10" height="${h}" fill="#286e73"/></svg>`);
+          const cleanup = SS.MODES.panorama.run({
+            root, cursor: { i: 0 }, W, H, photoMs: 30000, motionMs: 1,
+            url: photo => photo.url,
+          }, [{ id: 0, seed: "geometry", url, w, h }]);
+          await cleanup.ready;
+          await new Promise(resolve => setTimeout(resolve, 80));
+          const image = new Image(); image.src = url; await image.decode();
+          const pan = root.querySelector(".on .ss-pan"), style = getComputedStyle(pan);
+          const box = pan.getBoundingClientRect(), width = parseFloat(style.width), height = parseFloat(style.height);
+          const matrix = style.transform === "none" ? { m41: 0 } : new DOMMatrixReadOnly(style.transform);
+          const result = { width, height, top: parseFloat(style.top), left: box.left, right: box.right,
+            translateX: matrix.m41, size: style.backgroundSize, repeat: style.backgroundRepeat,
+            aspect: image.naturalWidth / image.naturalHeight, motion: style.animationName, hint: style.willChange };
+          cleanup(); root.remove(); return result;
+        }, { W, H, ratio });
+        const width = Math.min(2 * W, Math.max(W, H * ratio)), height = Math.min(H, width / ratio);
+        demand(`Panorama ${W}x${H} ${ratio}:1 decoded photo preserves vertical extent within a two-viewport strip`,
+          Math.abs(geometry.aspect - ratio) < .0001 &&
+          Math.abs(geometry.width - width) < .1 && Math.abs(geometry.height - height) < .1 &&
+          Math.abs(geometry.top - (H - height) / 2) < .1 &&
+          geometry.width >= W && geometry.width <= 2 * W && geometry.height > 0 && geometry.height <= H &&
+          geometry.size === "contain" && geometry.repeat === "no-repeat" &&
+          Math.abs(geometry.translateX - (W - width)) < .1 && Math.abs(geometry.right - W) < .1 &&
+          (width > W
+            ? geometry.motion === "dolly" && geometry.hint === "transform" &&
+              Math.abs(geometry.width / geometry.height - ratio) < .001
+            : geometry.motion === "none" && geometry.hint === "auto" && geometry.left === 0), geometry);
+      }
+    }
+    await page.setViewportSize({ width: 2160, height: 1440 });
+    await page.goto(`${base}/panorama-unit`);
+    const extremePanorama = await page.evaluate(async () => {
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.extremePanoramaRoot = root;
+      window.extremePanoramaCheck = SS.MODES.panorama.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, motionMs: 1, url: photo => photo.url,
+      }, [PHOTOS[1]]);
+      await extremePanoramaCheck.ready;
+      await new Promise(resolve => setTimeout(resolve, 80));
+      const image = new Image(); image.src = PHOTOS[1].url; await image.decode();
+      const pan = root.querySelector(".on .ss-pan"), box = pan.getBoundingClientRect();
+      return { width: box.width, height: box.height, top: box.top, left: box.left,
+        right: box.right, naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight };
+    });
+    demand("Panorama original 8:1 SVG keeps its complete vertical photo extent and reaches the right edge",
+      extremePanorama.naturalWidth === 2400 && extremePanorama.naturalHeight === 300 &&
+      extremePanorama.width === 4320 && extremePanorama.height === 540 &&
+      extremePanorama.top === 450 && extremePanorama.left === -2160 && extremePanorama.right === 2160,
+      extremePanorama);
+    const endPixels = PNG.sync.read(await page.screenshot());
+    const pixelAt = (x, y) => [...endPixels.data.slice((y * endPixels.width + x) * 4,
+      (y * endPixels.width + x) * 4 + 3)];
+    const rightEdge = pixelAt(2150, 720), matte = pixelAt(2150, 100), photoCenter = pixelAt(1080, 720);
+    demand("Panorama final Chrome pixels show the original east-edge marker rather than an all-matte blank",
+      JSON.stringify(rightEdge) === JSON.stringify([40, 110, 115]) &&
+      JSON.stringify(matte) === JSON.stringify([28, 27, 25]) &&
+      JSON.stringify(photoCenter) !== JSON.stringify(matte), { rightEdge, matte, photoCenter });
+    await page.evaluate(() => extremePanoramaCheck());
+    for (const fx of [0, .25, .5, .8, 1]) {
+      await page.goto(`${base}/panorama-unit`);
+      const anchor = await page.evaluate(async fx => {
+        const root = document.createElement("div");
+        root.style.cssText = "position:fixed;inset:0";
+        document.querySelector("#stage").append(root);
+        const cleanup = SS.MODES.panorama.run({
+          root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+          photoMs: 30000, motionMs: 1, url: photo => photo.url,
+        }, [{ ...PHOTOS[1], fx, fy: .5 }]);
+        await cleanup.ready;
+        const pan = root.querySelector(".on .ss-pan"), style = getComputedStyle(pan);
+        const width = parseFloat(style.width), matrix = new DOMMatrixReadOnly(style.transform);
+        const result = { width, shift: matrix.m41, focalX: width * fx + matrix.m41,
+          expected: (innerWidth - width) * SS.panStart(fx, width / innerWidth * 100),
+          motion: style.animationName, hint: style.willChange, size: style.backgroundSize };
+        cleanup(); return result;
+      }, fx);
+      demand(`Panorama cached fx=${fx} anchor stays visible and static without a compositor hint`,
+        Math.abs(anchor.shift - anchor.expected) < .1 && anchor.focalX >= -.1 &&
+        anchor.focalX <= 2160.1 && anchor.width <= 4320 && anchor.motion === "none" &&
+        anchor.hint === "auto" && anchor.size === "contain", anchor);
+    }
+    await page.goto(`${base}/panorama-unit`);
+    const cancelledPanorama = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let cleanup, atCleanup, atRequests, requests = 0;
+      const images = () => [...root.querySelectorAll(".ss-pan")]
+        .filter(pan => pan.style.backgroundImage && pan.style.backgroundImage !== "none").length;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = images(); atRequests = requests;
+        })), () => {});
+        return prepared;
+      };
+      cleanup = SS.MODES.panorama.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, motionMs: 32400,
+        url: photo => { requests++; return photo.url; },
+      }, PHOTOS);
+      const ready = await cleanup.ready; window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: images(), atRequests, requests };
+    });
+    demand("Panorama decode-admission cancellation rejects late publication and derivative work",
+      cancelledPanorama.ready === false && cancelledPanorama.atCleanup === 0 &&
+      cancelledPanorama.afterReady === 0 && cancelledPanorama.atRequests === cancelledPanorama.requests);
     await page.goto(`${base}/memories-unit`);
     await page.evaluate(async () => {
       // Portal's old WebView has no animation enumeration. Exercise the manual path
@@ -254,7 +516,7 @@ async function until(condition) {
           box.bottom <= innerHeight && Math.abs(imageBox.width / imageBox.height - photo.w / photo.h) < .002 &&
           Math.abs(imageBox.left - box.left - 12) < .1 && Math.abs(imageBox.top - box.top - 12) < .1;
       })));
-    await page.screenshot({ path: path.join(evidence, "memories-collage.png") });
+    // The previously verified Memories collage screenshot remains unchanged.
     await page.evaluate(() => {
       window.memoryCleanupImages = [...memoryRoot.querySelectorAll(".memory-photo")];
       window.memoryAdmissionsAtCleanup = memoryRequests.length;
@@ -1091,6 +1353,15 @@ async function until(condition) {
         passed: checks.filter(name => /memories/i.test(name)).length,
         fixtureSource: "Local synthetic gallery-fixtures.json and gallery SVGs",
         screenshots: ["memories.png", "memories-collage.png"],
+        oldWebViewManualPath: "Element.getAnimations and Element.animate unavailable",
+      },
+      panorama: {
+        passed: checks.filter(name => /panorama/i.test(name)).length,
+        fixtureSource: "Local original panorama-wide.svg, panorama-extreme.svg and exact-aspect synthetic SVGs",
+        screenshots: ["panorama.png"],
+        geometryViewports: [[2160, 1440], [1920, 1080], [1024, 768], [640, 960]],
+        geometryAspects: [1.3, 1.5, 2, 3, 8, 10],
+        originalEndMarkerPixels: { rightEdge, matte, photoCenter },
         oldWebViewManualPath: "Element.getAnimations and Element.animate unavailable",
       },
       scope: "Actual production renderer in synthetic desktop Chrome; no Portal GPU/FPS claim",
