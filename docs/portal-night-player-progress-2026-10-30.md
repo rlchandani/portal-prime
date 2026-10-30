@@ -439,6 +439,61 @@ The owned emulator was stopped after acceptance. Family Area's collector was
 independently confirmed inactive with zero listeners; no new timing capture was
 attempted in this batch.
 
+## Framed Print refinement and bounded capture check — 17:05 UTC batch
+
+Framed Print now uses the same incoming-only dissolve owner as Diptych and Ken Burns.
+Initial scene readiness is opaque; each incoming scene paints the existing room
+gradient behind the print, covering the outgoing frame even when the two photographs
+have different dimensions. Original frame geometry, matte, lighting, interval and
+gentle breathe motion for photos without a cached face hint remain intact. Cached
+face hints retain a complete still print rather than introducing a speculative crop.
+
+Pause freezes opacity and breathe without depending on the newer WebView animation
+API. Retirement and terminal cleanup release image URLs and animation hints. A
+completed decode cannot repopulate a scene after its owner has been closed.
+
+The added actual-source Chrome startup check failed against exact preceding commit
+`c82edd2839e82c0bd97c0c42c07df5d85f348fd0` and passes with the refinement. Eight new
+browser checks also cover room coverage, outgoing opacity, pause, resource retirement,
+face preservation and cancellation immediately before publication. The synthetic
+Framed screenshot was visually inspected.
+
+| Current gate | Evidence |
+| --- | --- |
+| Integrated JVM/debug build | Build successful; existing outputs contain **3,434 tests / 357 suites**, zero failures/errors/skips |
+| Actual-source Chrome renderer | **39 passed**, zero production-script errors |
+| Slideshow source tests | **146 passed**, zero failures/skips |
+| Engine source fixtures | **14/14 passed** |
+| Family Area profile preservation | **97 values**, zero changes after install and after capture cleanup |
+
+The preceding **51 native UI checks** remain evidence for unchanged Kotlin UI code;
+they were not rerun in this JavaScript/CSS batch. No emulator was started.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`f2ed045fa62f3097bf27fcd4806cb3caba6532fe8078e168cd2310c5c76ae7f9`
+(**48,905,248 bytes**). The signing certificate matches the preceding installation,
+which is retained privately as an exact rollback. Home/screensaver dispatches were
+acknowledged; these are not proof of visible transitions. Living Area remains unchanged.
+
+One initial ten-second diagnostic capture started with HTTP **200 in 294.4 ms** and
+expired cleanly. It recorded ten Window callbacks and no slideshow style events;
+that sparse, unscoped sample cannot establish slideshow smoothness or delivered FPS.
+The later fixed-Framed start returned HTTP **503 in 2,061.6 ms**, before navigation
+into the intended capture. The two-second deadline is consistent with the existing
+command admission boundary, but the exact underlying cause is not established.
+No performance-capture software fix is claimed. There was no blind retry.
+
+Temporary mode/interval changes were restored through the settings registry. All
+97 profile values and the photo-source/folder-path values match the pre-capture
+state. The night-clock setting remained enabled throughout. Final capture state is
+inactive, with the collector stopped and zero listeners. The capture-admission
+investigation is parked at this batch's time limit.
+
+Physical dark/bright night-clock acceptance, actual Portal visual transition
+acceptance and reliable presentation-performance measurements remain open. Removal
+of redundant rendering work and the tested lifecycle corrections do not establish
+a measured physical FPS gain.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

@@ -5,11 +5,17 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const http = require("node:http");
+const { execFileSync } = require("node:child_process");
 const { chromium } = require("playwright");
 const here = __dirname, repo = path.resolve(here, "../../..");
 const assets = path.join(repo, "app/src/main/assets/screensaver");
-const evidence = path.join(here, "evidence");
+const evidence = process.env.SLIDESHOW_EVIDENCE_DIR || path.join(here, "evidence");
 fs.mkdirSync(evidence, { recursive: true });
+const readAsset = name => process.env.SLIDESHOW_ASSET_REF
+  ? execFileSync("git", ["-c", "core.hooksPath=/dev/null", "--no-optional-locks", "show",
+      `${process.env.SLIDESHOW_ASSET_REF}:app/src/main/assets/screensaver/${name}`],
+      { cwd: repo, encoding: "utf8" })
+  : fs.readFileSync(path.join(assets, name), "utf8");
 let closedSlow = 0, admittedSlow = 0;
 const held = new Map(), checks = [], errors = [];
 const fixture = name => fs.readFileSync(path.join(here, "assets", name + ".png"));
@@ -41,12 +47,12 @@ const server = http.createServer((req, res) => {
     const bridge = `<base href="/assets/"><script>window.Android={
       getPhotos:()=>${JSON.stringify(JSON.stringify(photos))},getMode:()=>${JSON.stringify(mode)},
       getIntervalSec:()=>30,scaledUrlForSize:url=>url};</script>`;
-    content = fs.readFileSync(path.join(assets, "index.html"), "utf8").replace("<head>", "<head>" + bridge);
+    content = readAsset("index.html").replace("<head>", "<head>" + bridge);
     type = "text/html";
   } else if (/^\/fixtures\/(dunes|tidal)\.png$/.test(u.pathname)) {
     content = fixture(path.basename(u.pathname, ".png")); type = "image/png";
   } else if (/^\/assets\/(?:styles\.css|photos\.js|lib-engine\.js|modes\.js|mode-impls\.js|scheduler\.js)$/.test(u.pathname)) {
-    content = fs.readFileSync(path.join(assets, path.basename(u.pathname)));
+    content = readAsset(path.basename(u.pathname));
     type = u.pathname.endsWith(".css") ? "text/css" : "application/javascript";
   } else { res.writeHead(404); res.end(); return; }
   res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-store" }); res.end(content);
@@ -310,6 +316,100 @@ async function until(condition) {
     demand("Ken Burns cancellation rejects a decoded photo immediately before publication",
       cancelledMotion.ready === false && cancelledMotion.atCleanup === 0 &&
       cancelledMotion.afterReady === 0);
+    await page.goto(`${base}/motion-unit`);
+    await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined;
+      const root = document.createElement("div"); root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      const landscape = "data:image/svg+xml," + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640">' +
+        '<rect width="960" height="640" fill="#52695c"/></svg>');
+      window.framedCheck = SS.MODES.framed.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 3700, url: photo => photo.url,
+      }, [window.PHOTOS[0], { id: 2, url: landscape, w: 960, h: 640 }]);
+      await window.framedCheck.ready;
+    });
+    demand("Framed Print readiness publishes an opaque scene without a second startup fade",
+      await page.evaluate(() => +getComputedStyle(document.querySelector(".ss-art.on")).opacity === 1));
+    demand("Framed Print scenes cover the outgoing frame with the identical room background",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-art")].every(n =>
+        getComputedStyle(n).backgroundImage === getComputedStyle(document.querySelector(".ss-room")).backgroundImage)));
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-art")]
+      .some(n => +getComputedStyle(n).opacity > .1 && +getComputedStyle(n).opacity < .9));
+    demand("Framed Print retains the opaque outgoing print under the incoming scene",
+      await page.evaluate(() => {
+        const roots = [...document.querySelectorAll(".ss-art")];
+        return roots.some(n => +getComputedStyle(n).opacity === 1) &&
+          roots.some(n => n === n.parentNode.lastElementChild &&
+            +getComputedStyle(n).opacity > 0 && +getComputedStyle(n).opacity < 1);
+      }));
+    const heldPrint = await page.evaluate(async () => {
+      window.framedCheck.pause();
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return [...document.querySelectorAll(".ss-art")].map(n => ({
+        opacity: getComputedStyle(n).opacity,
+        transform: getComputedStyle(n.querySelector(".ss-print")).transform,
+      }));
+    });
+    await page.waitForTimeout(450);
+    demand("Framed Print pause freezes both breathe and opacity without the newer animation API",
+      await page.evaluate(before => [...document.querySelectorAll(".ss-art")].every((n, i) =>
+        getComputedStyle(n).opacity === before[i].opacity &&
+        getComputedStyle(n.querySelector(".ss-print")).transform === before[i].transform), heldPrint));
+    await page.evaluate(() => window.framedCheck.resume());
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-print")]
+      .filter(n => getComputedStyle(n).backgroundImage !== "none").length === 1);
+    demand("Framed Print releases retired photo URLs and compositor hints after full incoming opacity",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-art")].every(n =>
+        n.classList.contains("retired")
+          ? getComputedStyle(n.querySelector(".ss-print")).backgroundImage === "none" &&
+            getComputedStyle(n.querySelector(".ss-print")).willChange === "auto"
+          : +getComputedStyle(n).opacity === 1)));
+    await page.evaluate(() => window.framedCheck());
+    demand("Framed Print terminal cleanup releases both photo slots and their animation",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-print")].every(n =>
+        getComputedStyle(n).backgroundImage === "none" &&
+        getComputedStyle(n).animationName === "none")));
+    await page.goto(`${base}/motion-unit`);
+    const facePrint = await page.evaluate(async () => {
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      const cleanup = SS.MODES.framed.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, url: photo => photo.url,
+      }, [{ ...window.PHOTOS[0], fx: .2, fy: .3 }]);
+      const ready = await cleanup.ready;
+      const print = root.querySelector(".on .ss-print"), style = getComputedStyle(print);
+      const result = { ready, size: style.backgroundSize, motion: style.animationName,
+        compositor: style.willChange, width: parseFloat(style.width), height: parseFloat(style.height) };
+      cleanup(); return result;
+    });
+    demand("Framed Print face hints retain an upright complete static print with its original aspect",
+      facePrint.ready && facePrint.size === "contain" && facePrint.motion === "none" &&
+      facePrint.compositor === "auto" && Math.abs(facePrint.width / facePrint.height - 2 / 3) < .002);
+    await page.goto(`${base}/motion-unit`);
+    const cancelledPrint = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let cleanup, atCleanup;
+      const images = () => [...root.querySelectorAll(".ss-print")]
+        .filter(n => getComputedStyle(n).backgroundImage !== "none").length;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = images();
+        })), () => {});
+        return prepared;
+      };
+      cleanup = SS.MODES.framed.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, url: photo => photo.url,
+      }, [window.PHOTOS[0]]);
+      const ready = await cleanup.ready; window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: images() };
+    });
+    demand("Framed Print cancellation rejects the decoded print immediately before publication",
+      cancelledPrint.ready === false && cancelledPrint.atCleanup === 0 && cancelledPrint.afterReady === 0);
     await page.goto(`${base}/render?nativeClock=1&slow=1&unknown=1&hostPaused=1`);
     await page.waitForTimeout(200);
     demand("Paused startup admits zero HTTP images", admittedSlow === 0 && held.size === 0);

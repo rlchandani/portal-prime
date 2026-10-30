@@ -391,50 +391,38 @@
   // ---- 03 Framed print (art mode) -------------------------------------------
   MODES.framed = { name: "Framed Print", run(ctx, deck) {
     const t = makeTimers(ctx);
-    const room = el("ss-room", ctx.root);
+    el("ss-room", ctx.root);
     const arts = [mk(), mk()]; arts.forEach(a => ctx.root.appendChild(a.root));
-    let cur = 0, disposed = false;
-    const FADE_MS = 2400; // Matches .ss-art; one fallback, never a polling loop.
-    function retire(A, ticket) {
-      if (disposed || A.ticket !== ticket || A.root.classList.contains("on")) return;
-      // A delayed/stale transition event must not stop a newer fade still on screen.
-      if (Number(getComputedStyle(A.root).opacity) !== 0) return;
-      A.root.classList.add("retired");
-    }
     function mk() {
       const root = el("ss-art retired"); const edge = el("ss-frameEdge", root); const mat = el("ss-mat", edge);
       const bevel = el("ss-bevel", mat); const photo = el("ss-print", bevel);
-      const A = { root, photo, ticket: 0 };
-      root.ontransitionend = event => {
-        if (event.target === root && event.propertyName === "opacity") retire(A, A.ticket);
-      };
-      return A;
+      photo.style.animation = "none"; photo.style.willChange = "auto";
+      return { root, photo };
     }
+    const dissolve = makeSceneDissolve(ctx, t, arts.map(a => a.root), 2400, root => {
+      const photo = arts.find(a => a.root === root).photo;
+      photo.style.backgroundImage = "none"; photo.style.animation = "none";
+      photo.style.willChange = "auto";
+    });
     function sizeFor(p) { const maxW = ctx.W * 0.6, maxH = ctx.H * 0.72; const ar = aspect(p); let w = maxW, h = w / ar; if (h > maxH) { h = maxH; w = h * ar; } return { w: Math.round(w), h: Math.round(h) }; }
     async function step() {
-      const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 1800); if (!await t.load(u)) return false;
-      const A = arts[1 - cur]; const { w, h } = sizeFor(p);
-      A.photo.style.width = w + "px"; A.photo.style.height = h + "px"; bg(A.photo, u);
+      const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 1800);
+      if (!await t.load(u) || !dissolve.active()) return false;
+      const root = dissolve.next(), A = arts.find(a => a.root === root), { w, h } = sizeFor(p);
+      A.photo.style.width = w + "px"; A.photo.style.height = h + "px";
+      // Frame geometry already follows the photo's aspect. Cached face hints keep
+      // the complete print still; do not introduce a focal crop or another decode.
+      bg(A.photo, u, hasFace(p) ? "contain" : "cover");
+      A.photo.style.animation = "none"; A.photo.style.willChange = "auto";
       A.photo.style.animationDelay = (-Math.random() * 10) + "s";
-      A.ticket++; A.root.classList.remove("retired");
-      const outgoing = arts[cur], fading = outgoing.root.classList.contains("on"), ticket = ++outgoing.ticket;
-      outgoing.root.classList.remove("on"); A.root.classList.add("on"); cur = 1 - cur;
-      if (fading) t.after(() => retire(outgoing, ticket), FADE_MS);
+      if (!hasFace(p)) {
+        A.photo.style.willChange = "transform";
+        void A.photo.offsetWidth; A.photo.style.animation = "";
+      }
+      dissolve.present(root);
     }
     t.start(step); t.every(step, ctx.photoMs);
-    const cleanup = () => {
-      if (disposed) return;
-      disposed = true;
-      t.cleanup(); // Owns the fade-retire fallback as well as the repeat/decode work.
-      arts.forEach(A => {
-        A.ticket++;
-        A.root.ontransitionend = null;
-        A.root.classList.add("retired");
-      });
-    };
-    Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
-    cleanup.pause = t.cleanup.pause; cleanup.resume = t.cleanup.resume;
-    return cleanup;
+    return dissolve.cleanup;
   }};
 
   // ---- 04 Living gallery wall (justified rows + swaps) ----------------------

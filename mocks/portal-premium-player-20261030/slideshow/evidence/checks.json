@@ -1,6 +1,6 @@
 {
   "complete": true,
-  "passed": 31,
+  "passed": 39,
   "checks": [
     "Diptych displays two complete static photos without blur",
     "Diptych matte inset scales to the actual viewport",
@@ -25,6 +25,14 @@
     "Ken Burns cleanup releases photo URLs and stops motion in both owned slots",
     "Ken Burns cached face hints keep the whole photo still without a permanent compositor hint",
     "Ken Burns cancellation rejects a decoded photo immediately before publication",
+    "Framed Print readiness publishes an opaque scene without a second startup fade",
+    "Framed Print scenes cover the outgoing frame with the identical room background",
+    "Framed Print retains the opaque outgoing print under the incoming scene",
+    "Framed Print pause freezes both breathe and opacity without the newer animation API",
+    "Framed Print releases retired photo URLs and compositor hints after full incoming opacity",
+    "Framed Print terminal cleanup releases both photo slots and their animation",
+    "Framed Print face hints retain an upright complete static print with its original aspect",
+    "Framed Print cancellation rejects the decoded print immediately before publication",
     "Paused startup admits zero HTTP images",
     "Orientation preparation has two concurrent HTTP requests",
     "Pausing closes both real HTTP image requests",

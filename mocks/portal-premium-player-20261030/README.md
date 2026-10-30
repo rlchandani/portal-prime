@@ -155,7 +155,7 @@ python3 slideshow/serve.py
 
 Open `http://127.0.0.1:8891/`. Diptych, Framed and Ken Burns are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its **31 browser checks** include real stalled HTTP image requests, pause
+ambient sensors. Its **39 browser checks** include real stalled HTTP image requests, pause
 cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
 frames, initial readiness without a second fade, pause without the newer animation API,
 and cancellation immediately before DOM publication. Diptych preserves its existing
@@ -170,3 +170,11 @@ statically, without a permanent compositor hint. Ken Burns has **zero blurred du
 photos**, retires old image URLs after the dissolve, and freezes motion as well as opacity
 on pause without requiring `getAnimations`. These are rendering-work and lifecycle
 changes; they do not establish a physical Portal FPS improvement.
+
+Framed Print now shares that dissolve owner. Each incoming scene includes the same
+room gradient, preventing an outgoing print from showing around a differently sized
+replacement. Initial readiness is opaque, pause freezes both the breathe motion and
+opacity on older WebViews, and retired/closed slots release photo URLs and animation
+hints. Cached face hints retain the complete, still print. Its original frame geometry,
+matte, lighting and photo interval remain intact. Eight added actual-source browser
+checks cover these contracts; the startup check fails against the preceding renderer.
