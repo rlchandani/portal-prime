@@ -29,10 +29,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if urlsplit(self.path).path == "/preview.html":
             mode = parse_qs(urlsplit(self.path).query).get("mode", ["diptych"])[0]
-            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall"):
+            if mode not in ("diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar"):
                 self.send_error(400)
                 return
-            photos = gallery_photos if mode == "galleryWall" else [
+            photos = gallery_photos if mode in ("galleryWall", "heroSidebar") else [
                 {"url": "/fixtures/" + name + ".png", "w": 480, "h": 720}
                 for name in ("dunes", "tidal")]
             bridge = "<base href='/screensaver/'><script>window.Android={" + \

@@ -29,8 +29,8 @@ const server = http.createServer((req, res) => {
     return;
   }
   let content, type;
-  if (["/diptych-unit", "/motion-unit", "/gallery-unit"].includes(u.pathname)) {
-    const unitPhotos = u.pathname === "/gallery-unit" ? galleryPhotos :
+  if (["/diptych-unit", "/motion-unit", "/gallery-unit", "/sidebar-unit"].includes(u.pathname)) {
+    const unitPhotos = ["/gallery-unit", "/sidebar-unit"].includes(u.pathname) ? galleryPhotos :
       ["dunes", "tidal"].map((name, id) => ({
         id, url: "/fixtures/" + name + ".png", w: 480, h: 720,
       }));
@@ -44,7 +44,7 @@ const server = http.createServer((req, res) => {
   } else if (u.pathname === "/render") {
     const slow = u.searchParams.has("slow"), unknown = u.searchParams.has("unknown");
     const mode = u.searchParams.get("mode") || "diptych";
-    const photos = mode === "galleryWall" ? galleryPhotos : ["dunes", "tidal"].map(name => ({
+    const photos = ["galleryWall", "heroSidebar"].includes(mode) ? galleryPhotos : ["dunes", "tidal"].map(name => ({
       url: (slow ? "/slow/" : "/fixtures/") + name + ".png",
       w: unknown ? 0 : 480, h: unknown ? 0 : 720,
     }));
@@ -94,7 +94,7 @@ async function until(condition) {
       };
     });
     page.on("pageerror", error => errors.push(error.message));
-    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall"]) {
+    for (const mode of ["diptych", "framed", "kenBurns", "push", "galleryWall", "heroSidebar"]) {
       await page.goto(`${base}/render?nativeClock=1&mode=${mode}`);
       await page.locator("#loading.hide").waitFor({ state: "attached" });
       await page.waitForFunction(() => getComputedStyle(document.querySelector(".ss-beat.on")).opacity === "1" &&
@@ -654,6 +654,159 @@ async function until(condition) {
     });
     demand("Gallery Wall resume during a real asynchronous decode preserves one swap per interval",
       resumedCadence === 2);
+    await page.goto(`${base}/sidebar-unit`);
+    await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined;
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.sidebarCheck = SS.MODES.heroSidebar.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, microMs: 2400, url: photo => photo.url,
+      }, window.PHOTOS);
+      await window.sidebarCheck.ready;
+    });
+    demand("Hero + Sidebar initially shows three unique opaque whole photos without blur",
+      await page.locator(".ss-fill").count() === 0 &&
+      await page.evaluate(() => {
+        const images = [...document.querySelectorAll(".ss-pane .ss-img")]
+          .filter(n => getComputedStyle(n).backgroundImage !== "none");
+        return images.length === 3 &&
+          new Set(images.map(n => getComputedStyle(n).backgroundImage)).size === 3 &&
+          images.every(n => {
+            const style = getComputedStyle(n), pane = getComputedStyle(n.parentNode);
+            return style.backgroundSize === "contain" && style.animationName === "none" &&
+              style.willChange === "auto" && +pane.opacity === 1 &&
+              pane.backgroundColor === "rgb(28, 27, 25)";
+          });
+      }));
+    demand("Hero + Sidebar retains a larger hero and two stacked side panes inside the viewport",
+      await page.evaluate(() => {
+        const [hero, a, b] = [...document.querySelectorAll(".ss-hs .ss-cell")]
+          .map(n => n.getBoundingClientRect());
+        return hero.width > a.width * 1.8 && a.left === b.left && a.bottom < b.top &&
+          hero.top === a.top && hero.bottom === b.bottom &&
+          [hero, a, b].every(box => box.left >= 19 && box.top >= 19 &&
+            box.right <= innerWidth - 19 && box.bottom <= innerHeight - 19);
+      }));
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-pane")]
+      .some(n => +getComputedStyle(n).opacity > .1 && +getComputedStyle(n).opacity < .9));
+    demand("Hero + Sidebar fades only the incoming pane over its opaque outgoing photo",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-hs .ss-cell")].some(cell =>
+        +getComputedStyle(cell.lastElementChild).opacity > 0 &&
+        +getComputedStyle(cell.lastElementChild).opacity < 1 &&
+        +getComputedStyle(cell.firstElementChild).opacity === 1)));
+    const heldSidebar = await page.evaluate(() => {
+      window.sidebarCheck.pause();
+      return [...document.querySelectorAll(".ss-pane")].map(n => ({
+        opacity: getComputedStyle(n).opacity,
+        url: getComputedStyle(n.querySelector(".ss-img")).backgroundImage,
+      }));
+    });
+    await page.waitForTimeout(1400);
+    demand("Hero + Sidebar old-WebView pause freezes the live pane fade and retains photo URLs",
+      await page.evaluate(before => [...document.querySelectorAll(".ss-pane")].every((n, i) =>
+        getComputedStyle(n).opacity === before[i].opacity &&
+        getComputedStyle(n.querySelector(".ss-img")).backgroundImage === before[i].url), heldSidebar));
+    await page.evaluate(() => window.sidebarCheck.resume());
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-hs .ss-cell")]
+      .every(cell => [...cell.querySelectorAll(".ss-img")]
+        .filter(n => getComputedStyle(n).backgroundImage !== "none").length === 1));
+    demand("Hero + Sidebar retires the old URL only after its replacement becomes opaque",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-pane")].every(n =>
+        n.classList.contains("retired")
+          ? getComputedStyle(n.querySelector(".ss-img")).backgroundImage === "none"
+          : +getComputedStyle(n).opacity === 1)));
+    await page.waitForTimeout(6500);
+    demand("Hero + Sidebar retains exactly six image slots through repeated pane swaps",
+      await page.locator(".ss-pane .ss-img").count() === 6 &&
+      await page.evaluate(() => [...document.querySelectorAll(".ss-hs .ss-cell")]
+        .every(cell => cell.children.length === 2 &&
+          [...cell.children].some(n => +getComputedStyle(n).opacity === 1))));
+    await page.evaluate(() => { window.sidebarCheck.pause(); window.sidebarCheck(); });
+    demand("Hero + Sidebar terminal cleanup hides every pane and releases its photo resources",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-pane")].every(n =>
+        getComputedStyle(n).visibility === "hidden" && +getComputedStyle(n).opacity === 0 &&
+        getComputedStyle(n.querySelector(".ss-img")).backgroundImage === "none")));
+    await page.goto(`${base}/sidebar-unit`);
+    const cancelledSidebar = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div"); document.querySelector("#stage").append(root);
+      let cleanup, atCleanup, atRequests, requests = 0;
+      const images = () => [...root.querySelectorAll(".ss-img")]
+        .filter(n => getComputedStyle(n).backgroundImage !== "none").length;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = images(); atRequests = requests;
+        })), () => {});
+        return prepared;
+      };
+      cleanup = SS.MODES.heroSidebar.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, microMs: 30000,
+        url: photo => { requests++; return photo.url; },
+      }, window.PHOTOS);
+      const ready = await cleanup.ready; window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: images(), atRequests, requests };
+    });
+    demand("Hero + Sidebar cancellation rejects both late photo publication and derivative admission",
+      cancelledSidebar.ready === false && cancelledSidebar.atCleanup === 0 &&
+      cancelledSidebar.afterReady === 0 && cancelledSidebar.atRequests === cancelledSidebar.requests);
+    await page.goto(`${base}/sidebar-unit`);
+    const singleSidebar = await page.evaluate(async () => {
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      const cleanup = SS.MODES.heroSidebar.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 30000, microMs: 30000, url: photo => photo.url,
+      }, [window.PHOTOS[0]]);
+      await cleanup.ready;
+      const result = root.querySelectorAll(".ss-cell").length === 1 &&
+        root.querySelectorAll(".ss-col").length === 1 &&
+        root.querySelector(".ss-cell").getBoundingClientRect().width === innerWidth - 40;
+      cleanup(); return result;
+    });
+    demand("Hero + Sidebar expands a one-photo library to one full-width pane", singleSidebar);
+    for (const initial of [true, false]) {
+      await page.goto(`${base}/sidebar-unit`);
+      const rapidPause = await page.evaluate(async initial => {
+        const original = window.preloadDecoded;
+        const root = document.createElement("div"); document.querySelector("#stage").append(root);
+        let hold = initial, release, reached, requests = 0;
+        const blocked = new Promise(resolve => { reached = resolve; });
+        window.preloadDecoded = (url, signal) => {
+          const prepared = original(url, signal);
+          if (!hold) return prepared;
+          hold = false;
+          return prepared.then(() => new Promise(resolve => {
+            release = () => resolve(true); reached();
+          }));
+        };
+        const cleanup = SS.MODES.heroSidebar.run({
+          root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+          photoMs: 30000, microMs: 300,
+          url: photo => { requests++; return photo.url; },
+        }, window.PHOTOS);
+        const photos = () => [...root.querySelectorAll(".ss-img")]
+          .map(n => getComputedStyle(n).backgroundImage);
+        try {
+          if (!initial) { await cleanup.ready; hold = true; }
+          await blocked; cleanup.pause(); release();
+          await new Promise(resolve => setTimeout(resolve, 20));
+          cleanup.resume(); cleanup.pause();
+          const before = photos(), admitted = requests;
+          await new Promise(resolve => setTimeout(resolve, 50));
+          const held = JSON.stringify(photos()) === JSON.stringify(before) && requests === admitted;
+          cleanup.resume(); await cleanup.ready;
+          await new Promise(resolve => setTimeout(resolve, 50));
+          return held && photos().filter(url => url !== "none").length >= 3;
+        } finally { cleanup(); window.preloadDecoded = original; }
+      }, initial);
+      demand(`Hero + Sidebar ${initial ? "initial" : "replacement"} decode survives resume/re-pause without hidden work`,
+        rapidPause);
+    }
     await page.goto(`${base}/render?nativeClock=1&slow=1&unknown=1&hostPaused=1`);
     await page.waitForTimeout(200);
     demand("Paused startup admits zero HTTP images", admittedSlow === 0 && held.size === 0);

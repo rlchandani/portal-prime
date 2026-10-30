@@ -154,9 +154,10 @@ fixtures. It never serves the repository root. Run:
 python3 slideshow/serve.py
 ```
 
-Open `http://127.0.0.1:8891/`. Diptych, Framed, Ken Burns, Cinematic Push and Gallery Wall are rendered by the actual
+Open `http://127.0.0.1:8891/`. Diptych, Framed, Ken Burns, Cinematic Push, Gallery Wall and
+Hero + Sidebar are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its **59 browser checks** include real stalled HTTP image requests, pause
+ambient sensors. Its **71 browser checks** include real stalled HTTP image requests, pause
 cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
 frames, initial readiness without a second fade, pause without the newer animation API,
 and cancellation immediately before DOM publication. Diptych preserves its existing
@@ -170,6 +171,13 @@ replace continuous tile motion. Each cell retains two fixed image slots; only th
 incoming slot fades over its own opaque matte. Retirement releases the outgoing URL,
 and pause freezes a live fade even without the newer WebView animation API.
 An asynchronous-decode regression checks that pause/resume preserves one swap cadence.
+
+Hero + Sidebar preserves its larger hero and two portrait panes, showing whole static
+photos on matte instead of duplicate blurred fills. Each pane owns two fixed slots
+with an incoming-only fade. One-photo libraries expand to a single full-width pane.
+Derivative admission and photo publication recheck the current pause state, including
+resume/re-pause during an asynchronous load. The review uses the same mixed-aspect
+original fixtures as Gallery Wall.
 
 Ken Burns now uses the same incoming-only dissolve owner as Diptych, a 3vmin inset
 and a quiet charcoal matte. It keeps the original source selection and gentle motion

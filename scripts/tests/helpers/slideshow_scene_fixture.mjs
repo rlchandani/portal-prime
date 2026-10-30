@@ -150,8 +150,8 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
     } }, deck);
   function nodes(node = root) { return [node, ...node.children.flatMap(child => nodes(child))]; }
   function prints() { return nodes().filter(node =>
-    node.classList.contains(mode === 'galleryWall' ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
-  function slot(print) { return mode === 'galleryWall' ? print : mode === 'push' ? print.parent : print.parent.parent.parent.parent; }
+    node.classList.contains(['galleryWall', 'heroSidebar'].includes(mode) ? 'ss-img' : mode === 'push' ? 'ss-hero' : 'ss-print')); }
+  function slot(print) { return mode === 'galleryWall' ? print : ['push', 'heroSidebar'].includes(mode) ? print.parent : print.parent.parent.parent.parent; }
   function state(print) {
     const style = computed(print), animation = style.animation || 'none';
     return { animation, promotion: style['will-change'] || 'auto', playState: style['animation-play-state'] || 'running',

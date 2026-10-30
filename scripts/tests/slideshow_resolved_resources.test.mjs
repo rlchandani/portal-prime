@@ -15,7 +15,7 @@ const modes = ['kenBurns', 'diptych', 'framed', 'galleryWall', 'push', 'memories
 const affected = ['diptych', 'galleryWall', 'polaroid', 'mosaic', 'filmstrip'];
 const expectedEdges = { kenBurns: [2200], diptych: [1800], framed: [1800], galleryWall: [1200],
   push: [2200], memories: [2200], panorama: [2400], polaroid: [1400], mosaic: [1200],
-  filmstrip: [1000, 1400], cinema: [2400], heroSidebar: [900, 1100, 1800] };
+  filmstrip: [1000, 1400], cinema: [2400], heroSidebar: [1100, 1800] };
 
 // Synthetic DOM, clock and image transport only. Execute the actual photo resolver,
 // preload/decode helper, modes and scheduler; this fixture cannot measure rasterization.

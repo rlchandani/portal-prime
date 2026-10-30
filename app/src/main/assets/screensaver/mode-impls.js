@@ -50,10 +50,21 @@
       if (!paused) return Promise.resolve(true);
       return new Promise(resolve => waiters.push(resolve));
     }
+    async function publish(fn) {
+      while (active) {
+        if (!await running() || !active) return false;
+        // A resume grant can be followed by another pause before this continuation.
+        if (paused) continue;
+        return fn();
+      }
+      return false;
+    }
     async function load(urls) {
       try {
-        await Promise.all(Array.from(new Set([].concat(urls))).map(u => window.preloadDecoded(u, controller.signal)));
-        return active && await running();
+        const loaded = await publish(() => Promise.all(Array.from(new Set([].concat(urls)))
+          .map(u => window.preloadDecoded(u, controller.signal))));
+        if (loaded === false) return false;
+        return publish(() => true);
       } catch (_) { return false; }
     }
     async function run(fn) {
@@ -117,7 +128,7 @@
       tasks.forEach(task => { if (task.id == null) schedule(task); });
     };
     return {
-      load, frame, cleanup,
+      load, publish, frame, cleanup,
       cancel: task => { if (task) { clearTimeout(task.id); task.id = null; tasks.delete(task); } },
       every: (fn, ms) => add(fn, ms, true), after: (fn, ms) => add(fn, ms, false),
       // Bridge deadlines run before readiness, but consume only active playback time.
@@ -838,35 +849,71 @@
 
   // ---- 12 Hero + sidebar -----------------------------------------------------
   MODES.heroSidebar = { name: "Hero + Sidebar", run(ctx, deck) {
-    const t = makeTimers(ctx); const stage = el("ss-hs", ctx.root); const heroCol = el("ss-col", stage); heroCol.style.flex = "1.9"; const heroCell = el("ss-cell", heroCol); const side = el("ss-col", stage); side.style.flex = "1";
-    // Each pane shows the WHOLE photo (contain) over a soft blurred fill of itself — never a
-    // cover-crop, so a face is never clipped (reuses the .ss-cell.contain styling). Panes crossfade.
-    async function fill(cell, p, le) {
-      const fillUrl = ctx.url(p, 900), imageUrl = ctx.url(p, le || 1400);
-      if (!await t.load([fillUrl, imageUrl])) return false;
-      cell.classList.add("contain");
-      const wrap = el("ss-pane", cell);
-      bg(el("ss-fill", wrap), fillUrl);
-      bg(el("ss-img", wrap), imageUrl, "contain");
-      const old = cell._wrap;
-      t.frame(() => { if (old) old.style.opacity = "0"; });
-      t.after(() => { if (old) old.remove(); }, 1100);
-      cell._wrap = wrap;
+    const t = makeTimers(ctx), backdrop = el("ss-hero-sidebar", ctx.root);
+    const stage = el("ss-hs", backdrop), heroCol = el("ss-col", stage), cells = [];
+    const count = SS.slots(deck, 3);
+    heroCol.style.flex = count > 1 ? "1.9" : "1";
+    let disposed = false;
+    function makeCell(column, edge) {
+      const root = el("ss-cell contain", column);
+      const layers = [0, 1].map(() => {
+        const pane = el("ss-pane retired", root), image = el("ss-img", pane);
+        image.style.backgroundImage = "none"; image.style.animation = "none";
+        image.style.willChange = "auto"; return { pane, image };
+      });
+      const dissolve = makeSceneDissolve({ ...ctx, root }, t, layers.map(l => l.pane), 1100, pane => {
+        const image = layers.find(l => l.pane === pane).image;
+        image.style.backgroundImage = "none"; image.style.animation = "none";
+        image.style.willChange = "auto";
+        pane.style.opacity = ""; pane.style.transition = "";
+      });
+      const cell = { photo: null, edge, layers, dissolve }; cells.push(cell); return cell;
     }
-    // Track what's on screen (hero + both side cells) so no pane duplicates another.
-    let sideCells = []; const shown = { hero: null, sides: [null, null] };
-    function seeds() { return [shown.hero, ...shown.sides].filter(Boolean).map(p => p.seed); }
+    const hero = makeCell(heroCol, 1800), sides = [];
+    if (count > 1) {
+      const side = el("ss-col", stage); side.style.flex = "1";
+      for (let i = 1; i < count; i++) sides.push(makeCell(side, 1100));
+    }
+    function seeds() { return cells.filter(c => c.photo).map(c => c.photo.seed); }
+    async function fill(cell, photo) {
+      if (disposed || !cell.dissolve.active()) return false;
+      const url = await t.publish(() => ctx.url(photo, cell.edge));
+      if (url === false) return false;
+      if (!await t.load(url) || disposed || !cell.dissolve.active()) return false;
+      return t.publish(() => {
+        if (disposed || !cell.dissolve.active()) return false;
+        const pane = cell.dissolve.next(), image = cell.layers.find(l => l.pane === pane).image;
+        bg(image, url, "contain");
+        cell.photo = photo; cell.dissolve.present(pane);
+      });
+    }
     t.start(async () => {
-      const h0 = SS.take(deck, ctx.cursor, ["landscape"], seeds())[0]; shown.hero = h0;
-      if (await fill(heroCell, h0, 1800) === false) return false;
-      for (let i = 0; i < Math.min(2, SS.slots(deck, 3) - 1); i++) {
-        const c = el("ss-cell", side); sideCells.push(c);
-        const p = SS.take(deck, ctx.cursor, ["portrait"], seeds())[0]; shown.sides[i] = p;
-        if (await fill(c, p, 1100) === false) return false;
+      if (await fill(hero, SS.take(deck, ctx.cursor, ["landscape"], seeds())[0]) === false) return false;
+      for (const cell of sides) {
+        if (await fill(cell, SS.take(deck, ctx.cursor, ["portrait"], seeds())[0]) === false) return false;
       }
     });
-    let turn = 0; t.every(async () => { if (!SS.unused(deck, seeds()).length) return; turn++; if (turn % 3 === 0 || !sideCells.length) { const p = SS.take(deck, ctx.cursor, ["landscape"], seeds())[0]; if (await fill(heroCell, p, 1800) === false) return false; shown.hero = p; } else { const i = turn % sideCells.length; const p = SS.take(deck, ctx.cursor, ["portrait"], seeds())[0]; if (await fill(sideCells[i], p, 1100) === false) return false; shown.sides[i] = p; } }, ctx.microMs);
-    return t.cleanup;
+    let turn = 0;
+    t.every(async () => {
+      if (disposed || !SS.unused(deck, seeds()).length) return;
+      turn++;
+      const cell = turn % 3 === 0 || !sides.length ? hero : sides[turn % sides.length];
+      return fill(cell, SS.take(deck, ctx.cursor, [cell === hero ? "landscape" : "portrait"], seeds())[0]);
+    }, ctx.microMs);
+    const cleanup = () => {
+      if (disposed) return;
+      disposed = true; t.cleanup(); cells.forEach(c => c.dissolve.cleanup());
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
+    cleanup.pause = () => {
+      if (disposed) return;
+      cells.forEach(c => c.dissolve.cleanup.pause()); t.cleanup.pause();
+    };
+    cleanup.resume = () => {
+      if (disposed) return;
+      cells.forEach(c => c.dissolve.cleanup.resume()); t.cleanup.resume();
+    };
+    return cleanup;
   }};
 
   SS.MODES = MODES;

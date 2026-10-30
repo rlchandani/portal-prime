@@ -606,6 +606,60 @@ remain open. No music provider/backend or Home Assistant service was deployed.
 The implementation, review, regression checks, deployment and commit completed
 within this batch's thirty-minute limit.
 
+## Hero + Sidebar — 17:59 UTC batch
+
+The three-pane composition now shows whole static photographs on matte, preserving
+the larger landscape hero and two portrait side panes. One-photo libraries use a
+full-width hero instead of leaving an empty sidebar. The existing orientation
+preferences, unique-photo selection and configured swap interval remain intact.
+
+Initial size-resolution requests drop from **six to three**: one 1800px hero request
+and two 1100px sidebar requests. Three duplicate blurred-fill draws are removed.
+This is structural rendering/preparation evidence, not a claim of measured decode
+time, texture memory, GPU cost or physical FPS.
+
+Each pane owns two fixed scene slots and uses the tested incoming-only dissolve.
+Its outgoing photo stays opaque until the replacement is ready and opaque.
+Retirement and cleanup release URLs and animation hints; pause freezes a live
+fade without the newer WebView animation API. Closed owners reject both display
+publication and requests for the next sidebar derivative.
+
+Independent review reproduced a resume/re-pause race during asynchronous decode.
+The shared preparation gate now rechecks current playback state before admitting
+decode and after it completes. Hero's derivative resolution and DOM publication
+also use a synchronous action inside that gate. A stale resume grant waits for
+the next valid resume rather than starting hidden photo work. Source regressions
+cover 25 handoff checkpoints each for initial and replacement preparation; actual
+Chrome checks exercise both phases with real asynchronous image decode.
+
+| Final gate | Evidence |
+| --- | --- |
+| Slideshow source checks | **161 passed**, zero failures/skips; **11 Hero + Sidebar tests** included |
+| Engine fixtures | **14/14 passed** |
+| Actual-source Chrome renderer | **71 passed**, zero production-script errors; six styles captured |
+| Integrated debug build | Successful; unchanged JVM task was **UP-TO-DATE**, retaining **3,445 passing results / 358 suites** |
+| Native UI scope | Prior **56 checks / 151.09 seconds** cover unchanged Kotlin; not rerun in this asset batch |
+| Visual review | Actual-source Hero + Sidebar screenshot inspected at 2160 × 1440 |
+
+The finite preview allowlist reuses the existing twelve original gallery fixtures.
+Music backend wiring remains deferred and no Home Assistant operation belongs to
+this batch. No new physical timing capture was requested; its admission issue stays
+parked. Physical night-mode acceptance and reliable Portal presentation measurements
+remain open.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`d8b868cb981a64da9f11955367f6204ef4b047da8b61736bdba02965d2afe453`
+(**48,910,412 bytes**). Its signing certificate matches the exact preceding
+Gallery Wall APK, retained privately as a rollback. One upload/install was used;
+installed-byte verification resolved the interrupted install HTTP response.
+All **97 settings** match the pre-install profile. Home/screensaver dispatches
+were acknowledged; these responses do not establish visible transitions.
+
+Capture state is independently confirmed inactive, with the collector stopped
+and **zero active listeners**. Living Area remains unchanged. Implementation,
+independent review, regression checks, deployment and commit completed within
+this batch's thirty-minute limit. The broader objective remains active.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)
