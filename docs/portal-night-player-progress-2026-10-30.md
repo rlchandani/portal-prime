@@ -1316,6 +1316,64 @@ Living Area remains unchanged. Physical night-clock acceptance, the remaining
 Home frame tails and the broader goal stay open. Music backend wiring remains
 deferred; no Home Assistant operation belongs to this batch.
 
+## Native Filmstrip steady-motion observation — 21:02 UTC batch
+
+The older Filmstrip outlier reports concern different artifacts and rendering
+paths. This batch measures the currently enabled native renderer on Family's
+optimized APK before considering another visual or rendering change. The
+installed APK was independently read back after observation and still matches
+`34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052`
+(**25,702,091 bytes**). No production code changed and no installation occurred.
+
+The settings registry temporarily selected Filmstrip with a ten-second interval.
+The native deck was ready before collection, with a further three-second settle.
+One unsampled collector then observed ninety seconds and **nine automatic
+advances**, including the return to the first card. Native readiness remained
+active/unpaused with **nine cards**, **2160 × 1440** viewport and stable retained
+pixels of **33,285,312 bytes (31.74 MiB)**. Those state counters do not prove that
+each photo was presented on the panel.
+
+| PhotoFramePreviewActivity Window metric | Observation | Existing steady-frame gate |
+| --- | ---: | ---: |
+| Frames | **837** | Nonempty native host |
+| Mean | **9.049ms** | Informational |
+| p95 | **12.50ms** | ≤16.667ms — pass |
+| p99 | **14.75ms** | ≤33.333ms — pass |
+| Above 16.667ms | **2 / 837 (0.239%)** | ≤1% — pass |
+| Above 33.333ms | **0** | Informational |
+| Maximum | **19.747ms** | <100ms — pass |
+
+The retained Home Window contributed zero frames; hosts were not pooled.
+First-draw, dropped-callback, invalid and overflow counts are all zero. No
+collector stack sampling, screenshots, hierarchy dumps or full metrics reads
+ran during the timed interval; checkpoints used light ownership/readiness reads.
+Seven virtual driver cases cover normal completion, lost start/stop responses,
+an unapplied start, a pre-existing collector, foreign ownership and settings
+drift. There is no blind capture retry.
+
+The owned collector received one stop and was independently confirmed inactive
+with **zero listeners**. The original mode and interval were restored through
+the registry. All **97 values**, complete screensaver configuration and
+photo-source groups compare unchanged; source groups received no writes.
+Independent installed-byte verification followed collection, so APK transfer
+did not affect the timed interval. Scalar-only evidence is in
+`mocks/portal-premium-player-20261030/evidence/family-native-filmstrip/measurement.json`;
+the capture driver and detailed reports remain private.
+
+This is a pass for this warmed native preview cohort, not a measured
+before/after Filmstrip gain, delivered FPS or universal slideshow acceptance.
+Cold startup, system DreamService timing, retained-app recovery, visible
+composition, longer runs and larger libraries are outside the observation.
+Physical night-clock acceptance and the Home/Apps tails remain open.
+
+A parallel source review identified a possible redundant outgoing backdrop
+after an opaque dissolve. Transparent backdrops still need their underlying
+contributor; hiding it unconditionally would change pixels. The cost and benefit
+were not measured, and the current warmed path passes its gates, so that
+candidate was not implemented. Previously rejected offscreen-card/layer
+experiments were not repeated. Existing blur, shadows, geometry and motion
+remain intact. Living Area is unchanged; music backend work remains deferred.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

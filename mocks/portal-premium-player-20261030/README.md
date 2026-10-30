@@ -400,3 +400,19 @@ selected-only resume hooks, delayed cancellation without duplicate requests,
 stable owners, input identity and cleanup. Evidence and five generated
 screenshots are in `evidence/widget-pages-native/`. These counts do not measure
 Portal FPS or third-party widget-provider background updates.
+
+## Native Filmstrip device evidence
+
+The optimized Family Area build's existing native Filmstrip passed a warmed
+ninety-second preview observation: **837 Window frames**, **12.50ms p95**,
+**14.75ms p99**, **19.747ms maximum**, and **2 / 837 (0.239%)** above 16.667ms.
+The native deck advanced nine times with nine cards and stable retained pixels.
+All 97 settings, screensaver configuration and source groups were restored;
+the collector stopped with zero listeners. No production edit or new deployment
+was needed for this observation.
+
+See `evidence/family-native-filmstrip/measurement.json` for the exact installed
+artifact and scalar results. This is one warmed PhotoFramePreviewActivity
+cohort, not a before/after gain, delivered FPS, visible-pixel check or a pass for
+cold startup, the system DreamService, retained-app recovery or all styles.
+Home/Apps and physical night-clock acceptance remain open.

@@ -1,0 +1,84 @@
+{
+  "device": "Family Area",
+  "osApi": 29,
+  "viewportPx": [
+    2160,
+    1440
+  ],
+  "artifact": {
+    "device": "Family Area",
+    "sha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+    "bytes": 25702091,
+    "collectorInactive": true,
+    "activeListeners": 0
+  },
+  "workload": "90 seconds after native readiness and three-second settle; Filmstrip, 10-second interval; nine automatic advances including return to first card",
+  "host": "PhotoFramePreviewActivity",
+  "metrics": {
+    "frames": 837,
+    "meanMs": 9.048665637992832,
+    "p95Ms": 12.5,
+    "p99Ms": 14.75,
+    "maxMs": 19.747199,
+    "overBudget": 2,
+    "over33_333Ms": 0,
+    "budgetMs": 16.666666,
+    "firstDrawFrames": 0,
+    "callbackDrops": 0,
+    "invalidSamples": 0,
+    "overflowSamples": 0
+  },
+  "overBudgetPercent": 0.23894862604540024,
+  "steadyFramePolicy": {
+    "p95MaximumMs": 16.666666,
+    "p99MaximumMs": 33.333333,
+    "overBudgetMaximumPercent": 1,
+    "maximumWarmedFrameMs": 100
+  },
+  "gates": {
+    "p95": true,
+    "p99": true,
+    "overBudgetPercent": true,
+    "maximumWarmedFrame": true
+  },
+  "nativeDeck": {
+    "ready": true,
+    "cards": 9,
+    "index": 0,
+    "advances": 9,
+    "pixelsBytes": 33285312,
+    "widthPx": 2160,
+    "heightPx": 1440,
+    "paused": false,
+    "hostActive": true
+  },
+  "observation": {
+    "settingsCompared": 97,
+    "startRequests": 1,
+    "stopRequests": 1,
+    "advancesObserved": 9,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "restorationAcknowledged": true,
+    "settingsUnchanged": true,
+    "screensaverUnchanged": true,
+    "sourceGroupsUnchanged": true,
+    "sourceWrites": 0
+  },
+  "driverSafetyCases": 7,
+  "driverSafetyCasesPassed": true,
+  "sourceReportSha256": "ba49b083a81ddb62ec421c94b0212974a6919d5c369a050b6946e05c02ee1d92",
+  "productionEdits": 0,
+  "newDeployment": false,
+  "deliveredFpsMeasured": false,
+  "visiblePixelsVerified": false,
+  "limitations": [
+    "One warmed 90-second household-photo deck; no startup, long-run or cross-device conclusion.",
+    "PhotoFramePreviewActivity Window callbacks; system DreamService host and overlay recovery not measured.",
+    "No frame presentation, input-to-photon or screen pixels captured; nine advances do not equal nine presented photos.",
+    "Existing native renderer and optimized artifact verified; no before/after Filmstrip improvement measured.",
+    "PSS and retained pixel bytes are not a complete GPU texture residency or peak-memory measurement."
+  ],
+  "startedAtUtc": "2026-10-30T21:02:29Z",
+  "verifiedAtUtc": "2026-10-30T21:08:53.232685+00:00"
+}
