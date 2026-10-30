@@ -1374,6 +1374,75 @@ candidate was not implemented. Previously rejected offscreen-card/layer
 experiments were not repeated. Existing blur, shadows, geometry and motion
 remain intact. Living Area is unchanged; music backend work remains deferred.
 
+## Home settings-snapshot trial — withdrawn, 21:10 UTC batch
+
+Home cards reload the large `ScreensaverConfig.Settings` snapshot when their
+retained page resumes. One bounded candidate read current preferences on every
+call, decoded changed scalar maps through a frozen read-only view and reused
+the preceding immutable Settings object when the source identity and values
+matched. It retained one bounded entry with a weak preference reference. No UI,
+animation, layout, dependency, setting definition or persisted value changed.
+
+The candidate passed **13 new JVM checks**: ten cache cases and three checks
+against the actual screensaver decoder. They cover typed/default/coerced values,
+unchanged object reuse, edits/deletion/restoration, atomic generated connection
+fields, mutation during decode, single-entry/source identity, bounded/bypass
+maps, failed publication and concurrent reads. A generated 64-scalar test
+decodes once across 21 loads and verifies one source `getAll` per call. This is
+an operation-count fixture, not a physical Home workload or latency result.
+The complete candidate gate passes **3,467 tests / 361 suites**, with zero
+failures/errors/skips. Debug/performance build succeeds in **1m 48s**; the final
+three decoder tests were then included in a fresh full JVM invocation.
+
+Three physical blocks used the same unsampled thirty-cycle Home/Apps/Home
+driver and four-second minimum cadence. The policy was frozen before timing:
+p95 and p99 at least 20% better than each control, mean no more than 5% worse,
+control tails within 15%, and no warmed frame above 100ms.
+
+| Home Window metric | Optimized control before | Snapshot candidate | Exact control restored |
+| --- | ---: | ---: | ---: |
+| Frames | 780 | 782 | 782 |
+| Mean | 12.630ms | 13.273ms | 12.986ms |
+| p95 | 33.25ms | 34.75ms | 34.25ms |
+| p99 | 46.50ms | 48.00ms | 47.25ms |
+| Maximum | 58.841ms | 57.684ms | 63.421ms |
+
+The candidate's p95 is **1.46–4.51% worse**, p99 **1.59–3.23% worse** and mean
+**2.21–5.09% worse** than the surrounding controls. Both 20% tail gates fail;
+the first mean gate also fails. Control p95/p99 drift is **3.01% / 1.61%**.
+All first-draw, callback-drop, invalid and overflow counts are zero; only the
+Home Window contributes nonempty samples. This small warmed cohort does not
+causally identify the cost of preference reading, decoding or allocation.
+It establishes that this implementation did not earn retention.
+
+The cache integration and all three new source/test files were withdrawn.
+Their prototype, APK and reports remain private to avoid repeating the same
+trial. A fresh restored gate passes **3,454 tests / 359 suites**, zero
+failures/errors/skips, with debug/performance build success in **1m 21s**.
+The rebuilt optimized APK is byte-identical to the original control, including
+DEX; the prototype marker is absent. Family's independently verified restored
+APK remains
+`34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052`.
+Candidate APK
+`ea514e90a3bf1e21b03bf79676a9634a3a28c7b27ca7100176d871831898593d`
+has the same certificate, identical manifest and all 53 non-profile assets.
+Install response loss was resolved by byte readback without repeating installs.
+
+Each block closes its owned collector with zero listeners, acknowledges the
+known Home/screensaver return and preserves all **97 settings**, full
+screensaver configuration and source groups. Visible content readiness,
+physical input latency and delivered FPS remain unverified. Living Area
+received no operations. Scalar evidence is in
+`mocks/portal-premium-player-20261030/evidence/family-settings-snapshot-trial/measurement.json`.
+
+No new speed improvement is retained from this batch. Home/Apps still misses
+the broader steady-frame target; further Home cache trials are parked.
+The original optimized build and preceding accepted improvements remain
+installed. Slideshow startup/recovery and physical night acceptance remain open;
+music backend wiring stays deferred.
+Final installed-byte, source and idle-collector verification completed by
+**21:32 UTC**, within **22 minutes** of this issue's start.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

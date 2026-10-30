@@ -1,0 +1,171 @@
+{
+  "device": "Family Area",
+  "workload": "30 Home / Apps / Home cycles per block, four-second minimum cadence; identical unsampled driver; A/B/A optimized APKs",
+  "blocks": [
+    {
+      "block": "before",
+      "apkSha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+      "cycles": 30,
+      "metrics": {
+        "frames": 780,
+        "meanMs": 12.630275811538462,
+        "p95Ms": 33.25,
+        "p99Ms": 46.5,
+        "maxMs": 58.840585,
+        "overBudget": 123,
+        "budgetMs": 16.666666,
+        "firstDrawFrames": 0,
+        "callbackDrops": 0,
+        "invalidSamples": 0,
+        "overflowSamples": 0
+      },
+      "overBudgetPercent": 15.76923076923077,
+      "configurationPreserved": true,
+      "settingsCompared": 97,
+      "collectorInactive": true,
+      "activeListeners": 0,
+      "windowChangedDuringWarmup": true,
+      "sourceReportSha256": "aa4b2c05a8763c73aa4a683600d8f4dc91aa3a5a54ff75cd66a254534330dc92"
+    },
+    {
+      "block": "candidate",
+      "apkSha256": "ea514e90a3bf1e21b03bf79676a9634a3a28c7b27ca7100176d871831898593d",
+      "cycles": 30,
+      "metrics": {
+        "frames": 782,
+        "meanMs": 13.273466984654732,
+        "p95Ms": 34.75,
+        "p99Ms": 48,
+        "maxMs": 57.683536,
+        "overBudget": 127,
+        "budgetMs": 16.666666,
+        "firstDrawFrames": 0,
+        "callbackDrops": 0,
+        "invalidSamples": 0,
+        "overflowSamples": 0
+      },
+      "overBudgetPercent": 16.240409207161125,
+      "configurationPreserved": true,
+      "settingsCompared": 97,
+      "collectorInactive": true,
+      "activeListeners": 0,
+      "windowChangedDuringWarmup": true,
+      "sourceReportSha256": "0417b25880ece1f0d2942292c574a47a83d11c379e667a580bd3e15673c41bd1"
+    },
+    {
+      "block": "after",
+      "apkSha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+      "cycles": 30,
+      "metrics": {
+        "frames": 782,
+        "meanMs": 12.986231190537083,
+        "p95Ms": 34.25,
+        "p99Ms": 47.25,
+        "maxMs": 63.420783,
+        "overBudget": 134,
+        "budgetMs": 16.666666,
+        "firstDrawFrames": 0,
+        "callbackDrops": 0,
+        "invalidSamples": 0,
+        "overflowSamples": 0
+      },
+      "overBudgetPercent": 17.135549872122763,
+      "configurationPreserved": true,
+      "settingsCompared": 97,
+      "collectorInactive": true,
+      "activeListeners": 0,
+      "windowChangedDuringWarmup": false,
+      "sourceReportSha256": "6cd5a9cfb1753612e7001ed7dea02b2e3bbeb5ba4444fdc40b7136ddeaa2a559"
+    }
+  ],
+  "frozenPolicy": {
+    "issueStartedAtUtc": "2026-10-30T21:10:14Z",
+    "deadlineUtc": "2026-10-30T21:40:14Z",
+    "cyclesPerBlock": 30,
+    "minimumCycleSeconds": 4,
+    "p95ImprovementAgainstEachControlPercent": 20,
+    "p99ImprovementAgainstEachControlPercent": 20,
+    "maximumMeanRegressionPercent": 5,
+    "maximumControlDriftPercent": 15,
+    "maximumWarmedFrameMs": 100,
+    "sourceCodeChange": "ScreensaverConfig immutable snapshot reuse, no UI/layout/animation/dependency changes"
+  },
+  "gates": {
+    "beforeP95": false,
+    "beforeP99": false,
+    "beforeMean": false,
+    "afterP95": false,
+    "afterP99": false,
+    "afterMean": true,
+    "p95MsControlDrift": true,
+    "p99MsControlDrift": true,
+    "maximumWarmedFrame": true
+  },
+  "improvementPercent": {
+    "before": {
+      "meanMs": -5.092455483265683,
+      "p95Ms": -4.511278195488722,
+      "p99Ms": -3.225806451612903
+    },
+    "after": {
+      "meanMs": -2.211848764304722,
+      "p95Ms": -1.4598540145985401,
+      "p99Ms": -1.5873015873015872
+    }
+  },
+  "comparisonPassed": false,
+  "candidateRetained": false,
+  "productionSourceRestored": true,
+  "finalInstalledSha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+  "candidateBuild": {
+    "sha256": "ea514e90a3bf1e21b03bf79676a9634a3a28c7b27ca7100176d871831898593d",
+    "bytes": 25702091,
+    "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "nonProfileAssetsIdentical": 53,
+    "manifestIdentical": true,
+    "dexFiles": 1,
+    "nativeFilmstrip": true,
+    "nativeHome": false,
+    "sourceChange": "ScreensaverConfig immutable preference-snapshot reuse"
+  },
+  "candidateJvm": {
+    "tests": 3467,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 361
+  },
+  "restoredVerification": {
+    "jvm": {
+      "tests": 3454,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 359
+    },
+    "performanceApkSha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+    "controlApkSha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+    "dexMatchesControl": true,
+    "prototypeMarkerAbsent": true
+  },
+  "newTestsWithdrawn": 13,
+  "goalFrameTargetPassed": false,
+  "deliveredFpsMeasured": false,
+  "visibleTabReadinessVerified": false,
+  "limitations": [
+    "Small warmed cohorts; JIT, thermal and background state uncontrolled.",
+    "Observation establishes failure of this implementation to meet the frozen comparison gates; it does not causally isolate settings decode or CPU allocation cost.",
+    "Window callbacks, request acknowledgments and stable Window identity do not verify presentation, UI hierarchy, visible readiness or physical input latency.",
+    "All original household settings and sources remain private."
+  ],
+  "startedAtUtc": "2026-10-30T21:10:14Z",
+  "verifiedAtUtc": "2026-10-30T21:31:32.932320+00:00",
+  "finalDeviceVerification": {
+    "installedSha256": "34889ea71b3b2a4d9c2beb7da9a454389ff2254015627857d50f14a76d289052",
+    "bytes": 25702091,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "appSourcesMatchHead": true,
+    "verifiedAtUtc": "2026-10-30T21:31:32.932320+00:00"
+  }
+}
