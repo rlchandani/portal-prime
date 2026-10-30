@@ -267,24 +267,100 @@
   // ---- 02 Diptych (orientation-aware pairing) -------------------------------
   MODES.diptych = { name: "Orientation Diptych", run(ctx, deck) {
     const t = makeTimers(ctx);
-    const frames = [el("ss-frame"), el("ss-frame")]; frames.forEach(f => ctx.root.appendChild(f));
-    let cur = 0;
+    const frames = [el("ss-frame retired"), el("ss-frame retired")];
+    frames.forEach(f => ctx.root.appendChild(f));
+    let cur = 0, disposed = false, fading = null, admitted = false, paused = false;
+    const FADE_MS = 1800;
+    function retire(request) {
+      if (disposed || paused || fading !== request || frames[cur] !== request.incoming) return;
+      if (Number(getComputedStyle(request.incoming).opacity) !== 1) return;
+      request.outgoing.classList.add("retired");
+      request.outgoing.classList.remove("on");
+      request.outgoing.innerHTML = "";
+      request.incoming.ontransitionend = null;
+      request.incoming.style.opacity = ""; request.incoming.style.transition = "";
+      t.cancel(request.timer);
+      fading = null;
+    }
+    function settle(request = fading) {
+      if (!request || request !== fading || disposed || paused) return;
+      // Finish the owned dissolve before reusing either slot. One layout flush per
+      // replacement, never a per-frame loop; the outgoing scene is still opaque.
+      request.incoming.style.transition = "none";
+      request.incoming.style.opacity = "1";
+      void request.incoming.offsetWidth;
+      request.incoming.style.opacity = "";
+      request.incoming.style.transition = "";
+      retire(request);
+    }
     // A quiet, whole-photo spread: no second decoded copy or viewport-sized blur per pane.
     function containCell(imageUrl) { const c = el("ss-cell contain"); const im = el("ss-img", c); bg(im, imageUrl, "contain"); return c; }
     async function step() {
-      const f = frames[1 - cur]; f.innerHTML = "";
       const c = SS.counts(deck); const roll = Math.random();
       let ps;
       if (roll < 0.28 && c.pano) ps = SS.take(deck, ctx.cursor, ["pano"]);
       else if (roll < 0.6 && c.landscape) ps = SS.take(deck, ctx.cursor, ["landscape"]);
       else ps = SS.take(deck, ctx.cursor, ["portrait", "portrait"]);
       const resources = ps.map(p => ctx.url(p, 1800));
-      if (!await t.load(resources)) return false;
+      if (!await t.load(resources) || disposed) return false;
+      settle();
+      const outgoing = frames[cur], f = frames[1 - cur];
+      f.innerHTML = "";
       resources.forEach(url => f.appendChild(containCell(url)));
-      frames[cur].classList.remove("on"); f.classList.add("on"); cur = 1 - cur;
+      f.classList.remove("on"); f.classList.remove("retired");
+      ctx.root.appendChild(f); // Incoming must paint above the opaque outgoing slot.
+      cur = 1 - cur;
+      if (!admitted) {
+        // The scheduler supplies the first/whole-beat fade. Do not multiply it by
+        // another inner fade after signaling readiness.
+        f.style.transition = "none"; f.classList.add("on");
+        void f.offsetWidth;
+        f.style.transition = ""; admitted = true;
+        return;
+      }
+      void f.offsetWidth;
+      const request = { incoming: f, outgoing, timer: null, remaining: FADE_MS,
+        startedAt: Date.now(), held: false };
+      fading = request;
+      f.ontransitionend = event => {
+        if (event.target === f && event.propertyName === "opacity") retire(request);
+      };
+      f.classList.add("on");
+      // Covers missing transitionend and older engines; timers consume active time only.
+      request.timer = t.after(() => settle(request), FADE_MS + 100);
     }
     t.start(step); t.every(step, ctx.photoMs);
-    return t.cleanup;
+    const cleanup = () => {
+      if (disposed) return;
+      disposed = true; t.cleanup(); fading = null;
+      frames.forEach(f => { f.ontransitionend = null; f.classList.add("retired"); f.innerHTML = ""; });
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
+    cleanup.pause = () => {
+      if (disposed || paused) return;
+      paused = true;
+      t.cleanup.pause();
+      const request = fading;
+      if (!request) return;
+      request.remaining = Math.max(0, request.remaining - (Date.now() - request.startedAt));
+      const opacity = getComputedStyle(request.incoming).opacity;
+      request.incoming.style.transition = "none";
+      request.incoming.style.opacity = opacity;
+      void request.incoming.offsetWidth;
+      request.held = true;
+    };
+    cleanup.resume = () => {
+      if (disposed || !paused) return;
+      paused = false;
+      const request = fading;
+      if (request && request.held) {
+        request.held = false; request.startedAt = Date.now();
+        request.incoming.style.transition = `opacity ${request.remaining}ms ${EASE.fade}`;
+        request.incoming.style.opacity = "1";
+      }
+      t.cleanup.resume();
+    };
+    return cleanup;
   }};
 
   // ---- 03 Framed print (art mode) -------------------------------------------

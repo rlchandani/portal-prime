@@ -18,6 +18,11 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 
+/** Gallery spread always shows whole photos, so saved crops cannot affect its presentation. */
+internal fun slideshowCropEditingAllowed(
+    mode: String, stageVisible: Boolean, hasPhoto: Boolean,
+): Boolean = stageVisible && hasPhoto && mode != ScreensaverConfig.MODE_GALLERY_SPREAD
+
 /** Deliberate-viewer controls; the idle Dream never displays or dispatches this toolbar. */
 internal class SlideshowViewerControls(
     context: Context,
@@ -28,6 +33,7 @@ internal class SlideshowViewerControls(
     private val onExit: () -> Unit,
   private val onSave: (String, SlideshowAdjustment?, (Boolean) -> Unit) -> Unit,
   private val onEditingStart: () -> Unit = {},
+  private val currentMode: () -> String = { ScreensaverConfig.MODE_SMART },
 ) : LinearLayout(context) {
   private val ui = Handler(Looper.getMainLooper())
   private val row = LinearLayout(context).apply { gravity = Gravity.CENTER; orientation = HORIZONTAL }
@@ -110,7 +116,9 @@ internal class SlideshowViewerControls(
       editing = false; saving = false; assetKey = null
       editor.visibility = View.GONE; row.visibility = View.VISIBLE
     }
-    adjustButton.isEnabled = stage.visibility == View.VISIBLE && stage.currentPhoto != null
+    adjustButton.visibility =
+        if (currentMode() == ScreensaverConfig.MODE_GALLERY_SPREAD) View.GONE else View.VISIBLE
+    adjustButton.isEnabled = canEditPhoto()
     adjustButton.alpha = if (adjustButton.isEnabled) 1f else .4f
     status.text = if (isPaused) "Paused" else ""
   }
@@ -125,7 +133,7 @@ internal class SlideshowViewerControls(
 
   private fun beginEdit() {
     val photo = stage.currentPhoto ?: return
-    if (stage.visibility != View.VISIBLE) return
+    if (!canEditPhoto()) return
     onEditingStart()
     editRevision++
     wasPaused = isPaused
@@ -138,6 +146,9 @@ internal class SlideshowViewerControls(
     status.text = "Adjust photo"
     stage.adjust(draft)
   }
+
+  private fun canEditPhoto(): Boolean = slideshowCropEditingAllowed(
+      currentMode(), stage.visibility == View.VISIBLE, stage.currentPhoto != null)
 
   fun cancelEdit() {
     if (!editing || saving) return

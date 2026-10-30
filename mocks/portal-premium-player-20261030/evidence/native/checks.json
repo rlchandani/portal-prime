@@ -1,5 +1,5 @@
 {
-  "passed": 44,
+  "passed": 50,
   "checks": [
     "Native sample and six-track queue render",
     "Play has a 48dp touch target",
@@ -44,7 +44,13 @@
     "Gallery spread single-photo fallback preserves a whole landscape",
     "Gallery spread restores its whole pair after edit cancel",
     "Gallery spread restores its whole pair after edit save",
-    "Overlay change during a dissolve reserves space while retaining both photos"
+    "Overlay change during a dissolve reserves space while retaining both photos",
+    "Gallery spread omits crop editing that cannot affect its whole-photo layout",
+    "Gallery spread retains navigation, pause and exit controls",
+    "Gallery spread pause still reaches its viewer controls",
+    "Gallery print retains its functioning crop editor",
+    "Gallery print Adjust opens the native position editor",
+    "Gallery print Cancel restores viewer controls"
   ],
   "complete": true,
   "serial": "emulator-5556",
@@ -52,7 +58,7 @@
   "api": 34,
   "viewport": "2160x1440",
   "densityDpi": 240,
-  "durationSeconds": 115.1,
+  "durationSeconds": 129.1,
   "data": "debug-only silent fixtures and original local artwork",
   "physicalPortalPerformanceMeasured": false,
   "audioMeasured": false,

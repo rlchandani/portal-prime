@@ -1336,7 +1336,8 @@ class PhotoFrameController(
             callback(saved)
           }
         },
-        onEditingStart = { cancelNativeRequest() })
+        onEditingStart = { cancelNativeRequest() },
+        currentMode = { settings.mode })
     root.addView(viewerControls, FrameLayout.LayoutParams(MATCH, WRAP, Gravity.BOTTOM))
     viewerControls.visibility = View.GONE
     return root

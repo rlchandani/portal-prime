@@ -240,6 +240,27 @@ demand("Overlay change during a dissolve reserves space while retaining both pho
        image.getpixel((540, 250)) == (28, 27, 25) and image.getpixel((1620, 250)) == (28, 27, 25)
        and image.getpixel((540, 1000)) != (28, 27, 25)
        and image.getpixel((1620, 1000)) != (28, 27, 25))
+nodes = launch("gallery-spread-controls", "--es", "screen", "spread", "--ez", "controls", "true")
+demand("Gallery spread omits crop editing that cannot affect its whole-photo layout",
+       not any(n.get("text") == "Adjust" for n in nodes))
+demand("Gallery spread retains navigation, pause and exit controls",
+       all(node(nodes, label).get("enabled") == "true" for label in ("Previous", "Pause", "Next", "Done")))
+tap(nodes, "Pause")
+nodes = capture("gallery-spread-paused")
+demand("Gallery spread pause still reaches its viewer controls",
+       node(nodes, "Resume") is not None and node(nodes, "Paused") is not None)
+nodes = launch("gallery-print-controls", "--es", "screen", "gallery", "--ez", "controls", "true")
+demand("Gallery print retains its functioning crop editor",
+       node(nodes, "Adjust").get("enabled") == "true")
+tap(nodes, "Adjust")
+nodes = capture("gallery-print-editor")
+demand("Gallery print Adjust opens the native position editor",
+       node(nodes, "Photo zoom") is not None and node(nodes, "Cancel") is not None
+       and node(nodes, "Save position") is not None)
+tap(nodes, "Cancel")
+nodes = capture("gallery-print-controls-return")
+demand("Gallery print Cancel restores viewer controls",
+       node(nodes, "Adjust").get("enabled") == "true")
 adb("shell", "am", "force-stop", "com.immortal.launcher.debug")
 (out / "checks.json").write_text(json.dumps({
     "passed": len(checks), "checks": checks, "complete": True, "serial": args.serial,

@@ -101,23 +101,25 @@ of query results. Search performs no provider or artwork request.
 Gallery spread uses the existing bounded native stage, decoder and bitmap ownership.
 It contains two whole portraits inside a 3vmin matte with a 2vmin gap, or one whole
 landscape when pairing is inappropriate. Overlay changes reposition retained views
-during the existing dissolve; editing save/cancel returns to the complete spread.
-The normal spread is still and does not run face inference or background blur.
+during the existing dissolve. Spread omits the photo-adjustment control because its
+whole-photo presentation does not use crop positions. Gallery print and the other
+styles retain their existing adjustment controls. The normal spread is still and
+does not run face inference or background blur.
 
 `native-checks.py` targets only the dedicated `PortalMusic20261030` AVD and refuses a household
 device. It captures layout evidence and checks touch sizes, transport visibility, queue/layout
 continuity, offline guards, theme/font variants and native clock/gallery rendering.
 The acceptance suite includes lazy album scrolling, collection navigation, playlist track
 selection, honest empty/unavailable states, 1.8× text, native search continuity, keyboard
-visibility and Gallery spread edit/overlay behavior:
+visibility, Gallery spread overlay behavior, and the actual viewer controls:
 
 ```sh
 python3 native-checks.py --serial emulator-5556
 ```
 
 Results are in `evidence/native/checks.json`; `complete: true` is required before claiming the
-whole check passed. The latest integrated run passed **44 checks in 115.1 seconds**.
-Open `native-review.html` for the image review; all **33 capture tabs** loaded without page
+whole check passed. The latest integrated run passed **50 checks in 129.1 seconds**.
+Open `native-review.html` for the image review; all **36 capture tabs** loaded without page
 errors, recorded in `evidence/native-review-checks.json`. The emulator's API 34/GMS
 image does not establish Portal API 29 timing, sensor behavior or audio compatibility.
 No Home Assistant music deployment belongs to either preview.
@@ -147,6 +149,10 @@ python3 slideshow/serve.py
 
 Open `http://127.0.0.1:8891/`. Diptych, Framed and Ken Burns are rendered by the actual
 production JavaScript/CSS. This preview suppresses host clock overlays and does not simulate
-ambient sensors. Its 13 browser checks include real stalled HTTP image requests, pause
-cancellation, bounded preparation and delayed dimension recovery. Chrome results do not
-establish Portal GPU timing; source tests separately cover Filmstrip and Gallery geometry.
+ambient sensors. Its **23 browser checks** include real stalled HTTP image requests, pause
+cancellation, bounded preparation, delayed dimension recovery, opaque outgoing Diptych
+frames, initial readiness without a second fade, pause without the newer animation API,
+and cancellation immediately before DOM publication. Diptych preserves its existing
+photo composition and source selection. Only the incoming frame fades; both retained
+frames are released on cleanup. Chrome results do not establish Portal GPU timing;
+source tests separately cover Filmstrip and Gallery geometry.

@@ -336,6 +336,55 @@ settings restored, collector inactive and zero listeners. The owned test
 emulator was stopped. This measurement is parked within the batch's 30-minute
 limit; deployment and functional acceptance above are independently verified.
 
+## Diptych dissolve and accurate viewer controls — 16:26 UTC batch
+
+Diptych retains its existing photo-format, pairing, shuffle, source and composition
+contracts. A native replacement was not used to trade those contracts for an
+unmatched timing result. The production WebView renderer now keeps the outgoing
+scene opaque while only the incoming scene fades. Initial readiness publishes an
+opaque scene because the scheduler already supplies the whole-beat startup fade.
+This removes the two simultaneous opacity fades that exposed the dark matte.
+
+Two reusable scene slots retain the existing bounded preparation. Outgoing image
+DOM resources are released only after the incoming scene is opaque. Pause captures
+and holds the current opacity without requiring `getAnimations`; resume consumes
+the remaining active duration. Cleanup rejects a prepared scene even when it
+arrives between decode admission and DOM publication. An independent review
+reproduced both the older-WebView pause failure and late-publication failure;
+the final regression suite covers both. This is a functional and visual correction,
+not a measured GPU-memory or Portal frame-time improvement.
+
+Gallery spread now omits **Adjust**, since its normal whole-photo composition does
+not use stored crop positions. Navigation, pause and exit remain available.
+Gallery print and other eligible native styles retain their existing editor.
+The production controller supplies the current mode to the controls; an additional
+guard prevents entering editing when the current style cannot use it.
+
+Final acceptance of the tested APK:
+
+| Gate | Result |
+| --- | --- |
+| Integrated debug build and JVM suite | Successful; **3,425 tests / 356 suites**, zero failures or errors |
+| Actual-source slideshow browser suite | **23 passed**, including dissolve, pause fallback and publication cancellation |
+| Native design/control suite | **50 passed in 129.1 seconds** on the owned API 34 emulator |
+| Native capture review | **36 tabs loaded**, zero page errors |
+| Family Area installed-byte readback | Exact local/installed APK match |
+| Full-profile settings comparison | **97 values; zero changed** |
+
+Family Area's installed SHA-256 is
+`4ffba1c2e83004d0fab75b17b3ad3d5111d918d6f3f93236f6a1b55602190c2b`
+(**48,903,278 bytes**). Its certificate matches the preceding installed APK, which
+was downloaded and retained privately as a byte-for-byte rollback.
+Home/screensaver dispatches were acknowledged; those acknowledgments are not
+visible-transition proof. Living Area was not changed.
+
+The native captures use original silent fixtures and do not establish physical
+Portal timing, sensor behavior or audio. The owned emulator was stopped after
+acceptance. The earlier rejected timing-capture admission remains parked;
+it was not retried in this batch. Physical night-clock acceptance and comparable
+rendering measurements remain open. Live music wiring remains deferred and no
+music operation was deployed to Home Assistant.
+
 ## Sources
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)

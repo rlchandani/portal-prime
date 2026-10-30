@@ -10,6 +10,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.WindowManager
+import android.view.Gravity
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +35,7 @@ import java.io.File
 class MusicDesignPreviewActivity : ComponentActivity() {
   private var nightClock: QuietNightClockView? = null
   private var gallery: SlideshowStage? = null
+  private var galleryControls: SlideshowViewerControls? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -46,8 +49,12 @@ class MusicDesignPreviewActivity : ComponentActivity() {
     }
     if (intent.getStringExtra("screen") in listOf("gallery", "spread")) {
       val spread = intent.getStringExtra("screen") == "spread"
-      gallery = SlideshowStage(this)
-      setContentView(gallery)
+      val stage = SlideshowStage(this)
+      gallery = stage
+      stage.onPresented = { galleryControls?.photoChanged() }
+      val root = FrameLayout(this)
+      root.addView(stage, FrameLayout.LayoutParams(-1, -1))
+      setContentView(root)
       lifecycleScope.launch {
         val photos = withContext(Dispatchers.IO) {
           val names = if (!spread) listOf("window") else
@@ -62,6 +69,21 @@ class MusicDesignPreviewActivity : ComponentActivity() {
         if (photos.isNotEmpty()) {
           gallery?.show(photos, fill = false, motion = false, dwell = 30_000,
               galleryPrint = !spread, gallerySpread = spread)
+          if (intent.getBooleanExtra("controls", false)) {
+            galleryControls = SlideshowViewerControls(this@MusicDesignPreviewActivity, stage,
+                onPrevious = { stage.show(photos.reversed(), false, false, 30_000,
+                    galleryPrint = !spread, gallerySpread = spread) },
+                onNext = { stage.show(photos, false, false, 30_000,
+                    galleryPrint = !spread, gallerySpread = spread) },
+                onPause = { paused -> if (paused) stage.pause() else stage.resume() },
+                onExit = { finish() }, onSave = { _, _, reply -> reply(true) },
+                currentMode = {
+                  if (spread) ScreensaverConfig.MODE_GALLERY_SPREAD else ScreensaverConfig.MODE_GALLERY_PRINT
+                }).also { controls ->
+              root.addView(controls, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
+              controls.photoChanged()
+            }
+          }
           if (spread) {
             when (intent.getStringExtra("scenario")) {
               "cancel", "save" -> {
@@ -253,6 +275,7 @@ class MusicDesignPreviewActivity : ComponentActivity() {
   }
 
   override fun onDestroy() {
+    galleryControls?.stop()
     nightClock?.setActive(false)
     gallery?.stop()
     super.onDestroy()

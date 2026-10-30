@@ -21,7 +21,17 @@ const server = http.createServer((req, res) => {
     return;
   }
   let content, type;
-  if (u.pathname === "/render") {
+  if (u.pathname === "/diptych-unit") {
+    content = `<html><head><link rel="stylesheet" href="/assets/styles.css"></head><body>
+      <div id="stage"></div><script src="/assets/lib-engine.js"></script>
+      <script src="/assets/photos.js"></script><script src="/assets/modes.js"></script>
+      <script src="/assets/mode-impls.js"></script><script>
+      window.PHOTOS=${JSON.stringify(["dunes", "tidal"].map((name, id) => ({
+        id, url: "/fixtures/" + name + ".png", w: 480, h: 720,
+      })))};
+      </script></body></html>`;
+    type = "text/html";
+  } else if (u.pathname === "/render") {
     const slow = u.searchParams.has("slow"), unknown = u.searchParams.has("unknown");
     const photos = ["dunes", "tidal"].map(name => ({
       url: (slow ? "/slow/" : "/fixtures/") + name + ".png",
@@ -93,6 +103,117 @@ async function until(condition) {
       await page.screenshot({ path: path.join(evidence, mode + ".png") });
       demand(mode + " actual renderer becomes ready", await page.locator("#loading").evaluate(n => n.classList.contains("hide")));
     }
+    await page.goto(`${base}/diptych-unit`);
+    await page.evaluate(async () => {
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      const ctx = { root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2800, url: photo => photo.url };
+      window.diptychCheck = window.SS.MODES.diptych.run(ctx, window.PHOTOS);
+      await window.diptychCheck.ready;
+    });
+    demand("Diptych initial readiness publishes an opaque scene without a second startup fade",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-frame")]
+        .filter(n => n.children.length).every(n => +getComputedStyle(n).opacity === 1)));
+    await page.waitForFunction(() => {
+      const nodes = [...document.querySelectorAll(".ss-frame")];
+      return nodes.filter(n => n.children.length && +getComputedStyle(n).opacity > 0).length === 2 &&
+        nodes.some(n => {
+          const opacity = +getComputedStyle(n).opacity;
+          return opacity > .1 && opacity < .9;
+        });
+    });
+    const dissolve = await page.evaluate(() => [...document.querySelectorAll(".ss-frame")]
+      .filter(n => n.children.length).map(n => ({
+        opacity: +getComputedStyle(n).opacity, top: n === n.parentNode.lastElementChild,
+      })));
+    demand("Diptych outgoing remains opaque throughout the dissolve",
+      dissolve.some(n => n.opacity === 1));
+    demand("Diptych incoming fades above the outgoing whole-photo scene",
+      dissolve.some(n => n.top && n.opacity > 0 && n.opacity < 1));
+    await page.evaluate(async () => {
+      window.diptychCheck.pause();
+      // Animation.pause schedules a compositor pause; ready acknowledges that change.
+      await Promise.all([...document.querySelectorAll(".ss-frame")]
+        .flatMap(frame => frame.getAnimations()).map(animation => animation.ready));
+    });
+    const frozen = await page.evaluate(() => [...document.querySelectorAll(".ss-frame")]
+      .map(n => +getComputedStyle(n).opacity));
+    await page.waitForTimeout(250);
+    demand("Diptych pause freezes the live dissolve",
+      await page.evaluate(values => [...document.querySelectorAll(".ss-frame")]
+        .every((n, i) => Math.abs(+getComputedStyle(n).opacity - values[i]) < .001), frozen));
+    await page.evaluate(() => window.diptychCheck.resume());
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-frame")]
+      .filter(n => n.children.length).length === 1);
+    demand("Diptych retires outgoing resources only after incoming is opaque",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-frame")]
+        .filter(n => n.children.length).every(n => +getComputedStyle(n).opacity === 1)));
+    await page.evaluate(() => window.diptychCheck());
+    demand("Diptych cleanup releases both scene resources",
+      await page.locator(".ss-frame .ss-img").count() === 0);
+    await page.waitForTimeout(1900);
+    demand("Diptych stopped ownership cannot repopulate scene resources",
+      await page.locator(".ss-frame .ss-img").count() === 0);
+    await page.goto(`${base}/diptych-unit`);
+    await page.evaluate(async () => {
+      Element.prototype.getAnimations = undefined;
+      const root = document.createElement("div");
+      root.style.cssText = "position:fixed;inset:0";
+      document.querySelector("#stage").append(root);
+      window.diptychCheck = window.SS.MODES.diptych.run({
+        root, cursor: { i: 0 }, W: innerWidth, H: innerHeight,
+        photoMs: 2800, url: photo => photo.url,
+      }, window.PHOTOS);
+      await window.diptychCheck.ready;
+    });
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-frame")]
+      .some(n => n.children.length && +getComputedStyle(n).opacity > .1 &&
+        +getComputedStyle(n).opacity < .9));
+    const fallbackFrozen = await page.evaluate(() => {
+      window.diptychCheck.pause();
+      return [...document.querySelectorAll(".ss-frame")].map(n => +getComputedStyle(n).opacity);
+    });
+    await page.waitForTimeout(1900);
+    demand("Diptych old-WebView fallback freezes opacity and retains outgoing resources",
+      await page.evaluate(values => [...document.querySelectorAll(".ss-frame")]
+        .every((n, i) => Math.abs(+getComputedStyle(n).opacity - values[i]) < .001)
+        && [...document.querySelectorAll(".ss-frame")].filter(n => n.children.length).length === 2,
+      fallbackFrozen));
+    await page.evaluate(() => window.diptychCheck.resume());
+    await page.waitForFunction(() => [...document.querySelectorAll(".ss-frame")]
+      .filter(n => n.children.length).length === 1);
+    demand("Diptych old-WebView fallback resumes and retires safely",
+      await page.evaluate(() => [...document.querySelectorAll(".ss-frame")]
+        .filter(n => n.children.length).every(n => +getComputedStyle(n).opacity === 1)));
+    await page.evaluate(() => window.diptychCheck());
+    await page.goto(`${base}/diptych-unit`);
+    const cancelledPublication = await page.evaluate(async () => {
+      const original = window.preloadDecoded;
+      const root = document.createElement("div");
+      document.querySelector("#stage").append(root);
+      let cleanup, atCleanup;
+      window.preloadDecoded = (url, signal) => {
+        const prepared = original(url, signal);
+        prepared.then(() => queueMicrotask(() => queueMicrotask(() => {
+          cleanup(); atCleanup = root.querySelectorAll(".ss-img").length;
+        })), () => {});
+        return prepared;
+      };
+      const url = "data:image/svg+xml," + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="50">' +
+        '<rect width="30" height="50" fill="red"/></svg>');
+      cleanup = SS.MODES.diptych.run({
+        root, cursor: { i: 0 }, photoMs: 30000, url: photo => photo.url,
+      }, [{ id: 0, url, w: 30, h: 50 }]);
+      const ready = await cleanup.ready;
+      window.preloadDecoded = original;
+      return { ready, atCleanup, afterReady: root.querySelectorAll(".ss-img").length };
+    });
+    demand("Diptych cleanup between decode admission and publication rejects the prepared scene",
+      cancelledPublication.ready === false && cancelledPublication.atCleanup === 0 &&
+      cancelledPublication.afterReady === 0);
     await page.goto(`${base}/render?nativeClock=1&slow=1&unknown=1&hostPaused=1`);
     await page.waitForTimeout(200);
     demand("Paused startup admits zero HTTP images", admittedSlow === 0 && held.size === 0);
