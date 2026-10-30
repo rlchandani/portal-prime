@@ -147,14 +147,19 @@ internal class FilmstripEngine(
       val span = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.NATIVE_FILMSTRIP_PREPARATION)
       val images = ArrayList<Pixels>(12)
       var handedOff = false
+      var backdropSession: FilmstripBackdrop.Session? = null
+      var backdropScratch: SlideshowPixelBudget.Reservation? = null
       try {
         // Same legacy selection: shuffled unique deck, stable people bias while watched, at most 12.
         val shuffled = if (orderedSelection) frozenUrls else frozenUrls.distinct().shuffled()
         val deck = (if (!orderedSelection && frozenWatching) shuffled.sortedByDescending { weight(it) } else shuffled).take(12)
         val count = reusePhotos?.size ?: deck.size
+        // Keep the small bitmap and two allocations charged while shared across the deck.
+        backdropScratch = budget.reserve(3L * 1024 * 1024, current) ?: throw CancellationException()
+        backdropSession = FilmstripBackdrop.session(context, viewportWidth, viewportHeight, density)
         for (index in 0 until count) {
           if (!current()) throw CancellationException()
-          // 1400px is the legacy card target; reserve EXIF's possible second bitmap plus blur scratch.
+          // 1400px is the legacy card target; retain decoder/EXIF and independent-output admission.
           val reservation = budget.reserve((if (reusePhotos == null) 24L else 3L) * 1024 * 1024, current) ?: throw CancellationException()
           var photo: Bitmap? = null
           var backdrop: Bitmap? = null
@@ -174,7 +179,7 @@ internal class FilmstripEngine(
               continue
             }
             if (!current()) throw CancellationException()
-            backdrop = FilmstripBackdrop.prepare(context, photo, viewportWidth, viewportHeight, density)
+            backdrop = backdropSession.prepare(photo)
             if (!current()) throw CancellationException()
             val pixels = Pixels(photo, backdrop, reusedPhoto = reusePhotos != null)
             images.add(pixels)
@@ -199,6 +204,8 @@ internal class FilmstripEngine(
       } catch (_: OutOfMemoryError) {
         ui.post { if (!closed && revision == preparationRevision) onFailure() }
       } finally {
+        runCatching { backdropSession?.close() }
+        backdropScratch?.let { budget.release(it) }
         if (!handedOff) {
           images.forEach { it.discard() }
           budget.setOwner(budgetKey,emptyList())

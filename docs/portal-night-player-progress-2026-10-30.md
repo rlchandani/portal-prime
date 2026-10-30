@@ -982,7 +982,68 @@ Portal presentation measurements remain open. Music backend wiring remains
 deferred, and no Home Assistant operation belongs to this batch. The broader
 goal remains active.
 
+## Native Filmstrip scratch reuse — 19:30 UTC batch
+
+Native Filmstrip was already enabled in the installed build. This change targets
+repeated backdrop preparation: one worker-owned session now reuses the small
+bitmap, Canvas, Paint, two RenderScript allocations and blur script across the
+deck. Each finished backdrop remains a separate caller-owned bitmap. Clearing
+transparent input and resetting ping-pong direction preserves the preceding
+algorithm's pixels, including after even-pass photos or interruption.
+
+For twelve valid photos, allocation-construction calls fall **24 → 2** and blur
+script constructions **12 → 1** per preparation batch. This does not establish
+equivalent reductions in latency or frame time. Android already caches process
+RenderScript contexts from API 23, so no native-context reduction is claimed.
+The existing **256 MiB** Filmstrip deck budget is unchanged; **3 MiB** of scratch
+admission stays charged until the worker closes its session. The measured deck
+below does not establish a universal memory limit for larger libraries.
+
+| Final gate | Evidence |
+| --- | --- |
+| Fresh Android JVM gate | **3,449 tests / 358 suites**, zero failures/skips; full test/build invocation succeeded in **49 seconds** |
+| Native backdrop fixture | **233 API 34 checks passed**, including **60 exact pixel comparisons** against the frozen pre-change algorithm |
+| Input and pass coverage | Twelve generated opaque/transparent sources × five scenarios with **1/2/3/6/8** blur passes |
+| Host pixel evidence | Twelve oracle/session PNG pairs match byte-for-byte |
+| Resource ownership | Two stable allocation handles, one stable blur handle, independent returned pixels, thread ownership, closed-state rejection and explicit handle destruction |
+| Family Area runtime smoke | Native host ready with **9 cards**, advanced **0 → 1**, retained pixel bytes stable at **33,285,312 (31.74 MiB)**, viewport **2160 × 1440** |
+| Smoke restoration | All **97 settings** restored, zero changed values; collector inactive with **zero listeners** |
+
+The native fixture additionally checks lazy initialization, deterministic
+pre-interruption and reuse after interruption without transparent residual pixels.
+Interruption inside a native blur pass was not measured. The debug-only activity
+uses generated artwork; its fixture cache was removed and its dedicated AVD
+stopped after testing. Evidence lives in
+`mocks/portal-premium-player-20261030/evidence/filmstrip-backdrop-native/`.
+The earlier **222 source checks / 14 engine fixtures / 255 Chrome assertions**
+cover unchanged slideshow assets and were not rerun for this worker-only change.
+
+Family Area's installed APK was independently read back and matches SHA-256
+`897126651957786667ae89df9f51b6102e7183ff4f689fce83611af1badea6b0`
+(**48,933,019 bytes**), also matching the APK used by the native fixture. Its
+signing certificate matches the preceding Cinema build, retained privately as a
+rollback. The final fixture-only ownership correction was rebuilt after the full
+JVM gate; production source hashes remain identical to that gate. One upload/install
+was used; installed-byte verification resolved the interrupted HTTP install
+response without repeating installation.
+
+The live smoke temporarily selected Filmstrip and a five-second interval through
+the settings registry. It read native readiness and advance counters without
+starting a performance capture, then restored the original mode and interval.
+The complete settings profile matches its pre-smoke state. Readiness and advance
+establish the running native stage; they do **not** verify presented pixels,
+startup latency or physical FPS. No new timing capture was requested.
+
+Living Area remains unchanged. Physical night-clock acceptance, reliable Portal
+presentation measurements and remaining Home/Apps performance outliers stay open.
+Music backend wiring remains deferred; no Home Assistant operation belongs to
+this batch. The broader goal remains active.
+
 ## Sources
+
+- [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
+- [Android Allocation bitmap synchronization and lifecycle](https://developer.android.com/reference/android/renderscript/Allocation)
+- [Android RenderScript process-context caching](https://developer.android.com/reference/kotlin/android/renderscript/RenderScript)
 
 - [Android MediaPlayer thread and seek contracts](https://developer.android.com/reference/android/media/MediaPlayer)
 - [Android SurfaceView versus TextureView tradeoffs](https://developer.android.com/reference/android/view/TextureView)

@@ -1,0 +1,513 @@
+{
+  "complete": true,
+  "passed": 233,
+  "checks": [
+    "portal-1pass preserves frozen dimensions, pass count and radius",
+    "Session rejects prepare and close on another worker",
+    "portal-1pass/source-0 pixel-identical to frozen oracle",
+    "portal-1pass/source-0 output has independent ownership",
+    "portal-1pass initializes exactly two allocations and one blur handle",
+    "portal-1pass/source-0 convenience prepare matches frozen oracle",
+    "portal-1pass/source-1 pixel-identical to frozen oracle",
+    "portal-1pass/source-1 output has independent ownership",
+    "portal-1pass/source-1 reuses the same resource identities",
+    "portal-1pass/source-2 pixel-identical to frozen oracle",
+    "portal-1pass/source-2 output has independent ownership",
+    "portal-1pass/source-2 reuses the same resource identities",
+    "portal-1pass/source-3 pixel-identical to frozen oracle",
+    "portal-1pass/source-3 output has independent ownership",
+    "portal-1pass/source-3 reuses the same resource identities",
+    "portal-1pass/source-4 pixel-identical to frozen oracle",
+    "portal-1pass/source-4 output has independent ownership",
+    "portal-1pass/source-4 reuses the same resource identities",
+    "portal-1pass/source-5 pixel-identical to frozen oracle",
+    "portal-1pass/source-5 output has independent ownership",
+    "portal-1pass/source-5 reuses the same resource identities",
+    "portal-1pass/source-6 pixel-identical to frozen oracle",
+    "portal-1pass/source-6 output has independent ownership",
+    "portal-1pass/source-6 reuses the same resource identities",
+    "portal-1pass/source-7 pixel-identical to frozen oracle",
+    "portal-1pass/source-7 output has independent ownership",
+    "portal-1pass/source-7 reuses the same resource identities",
+    "portal-1pass/source-8 pixel-identical to frozen oracle",
+    "portal-1pass/source-8 output has independent ownership",
+    "portal-1pass/source-8 reuses the same resource identities",
+    "portal-1pass/source-9 pixel-identical to frozen oracle",
+    "portal-1pass/source-9 output has independent ownership",
+    "portal-1pass/source-9 reuses the same resource identities",
+    "portal-1pass/source-10 pixel-identical to frozen oracle",
+    "portal-1pass/source-10 output has independent ownership",
+    "portal-1pass/source-10 reuses the same resource identities",
+    "portal-1pass/source-11 pixel-identical to frozen oracle",
+    "portal-1pass/source-11 output has independent ownership",
+    "portal-1pass/source-11 reuses the same resource identities",
+    "portal-1pass/source-11 convenience prepare matches frozen oracle",
+    "portal-1pass retained outputs remain unchanged after all 12 preparations",
+    "portal-1pass close clears all scratch and native handle references",
+    "portal-1pass close is idempotent and leaves caller-owned outputs intact",
+    "portal-1pass prepare rejects a closed session",
+    "portal-1pass close destroys both allocation handles",
+    "portal-1pass close destroys the blur handle",
+    "landscape-2pass preserves frozen dimensions, pass count and radius",
+    "landscape-2pass/source-0 pixel-identical to frozen oracle",
+    "landscape-2pass/source-0 output has independent ownership",
+    "landscape-2pass initializes exactly two allocations and one blur handle",
+    "landscape-2pass/source-0 convenience prepare matches frozen oracle",
+    "landscape-2pass/source-1 pixel-identical to frozen oracle",
+    "landscape-2pass/source-1 output has independent ownership",
+    "landscape-2pass/source-1 reuses the same resource identities",
+    "landscape-2pass/source-2 pixel-identical to frozen oracle",
+    "landscape-2pass/source-2 output has independent ownership",
+    "landscape-2pass/source-2 reuses the same resource identities",
+    "landscape-2pass/source-3 pixel-identical to frozen oracle",
+    "landscape-2pass/source-3 output has independent ownership",
+    "landscape-2pass/source-3 reuses the same resource identities",
+    "landscape-2pass/source-4 pixel-identical to frozen oracle",
+    "landscape-2pass/source-4 output has independent ownership",
+    "landscape-2pass/source-4 reuses the same resource identities",
+    "landscape-2pass/source-5 pixel-identical to frozen oracle",
+    "landscape-2pass/source-5 output has independent ownership",
+    "landscape-2pass/source-5 reuses the same resource identities",
+    "landscape-2pass/source-6 pixel-identical to frozen oracle",
+    "landscape-2pass/source-6 output has independent ownership",
+    "landscape-2pass/source-6 reuses the same resource identities",
+    "landscape-2pass/source-7 pixel-identical to frozen oracle",
+    "landscape-2pass/source-7 output has independent ownership",
+    "landscape-2pass/source-7 reuses the same resource identities",
+    "landscape-2pass/source-8 pixel-identical to frozen oracle",
+    "landscape-2pass/source-8 output has independent ownership",
+    "landscape-2pass/source-8 reuses the same resource identities",
+    "landscape-2pass/source-9 pixel-identical to frozen oracle",
+    "landscape-2pass/source-9 output has independent ownership",
+    "landscape-2pass/source-9 reuses the same resource identities",
+    "landscape-2pass/source-10 pixel-identical to frozen oracle",
+    "landscape-2pass/source-10 output has independent ownership",
+    "landscape-2pass/source-10 reuses the same resource identities",
+    "landscape-2pass/source-11 pixel-identical to frozen oracle",
+    "landscape-2pass/source-11 output has independent ownership",
+    "landscape-2pass/source-11 reuses the same resource identities",
+    "landscape-2pass/source-11 convenience prepare matches frozen oracle",
+    "landscape-2pass retained outputs remain unchanged after all 12 preparations",
+    "landscape-2pass close clears all scratch and native handle references",
+    "landscape-2pass close is idempotent and leaves caller-owned outputs intact",
+    "landscape-2pass prepare rejects a closed session",
+    "landscape-2pass close destroys both allocation handles",
+    "landscape-2pass close destroys the blur handle",
+    "portrait-3pass preserves frozen dimensions, pass count and radius",
+    "portrait-3pass/source-0 pixel-identical to frozen oracle",
+    "portrait-3pass/source-0 output has independent ownership",
+    "portrait-3pass initializes exactly two allocations and one blur handle",
+    "portrait-3pass/source-0 convenience prepare matches frozen oracle",
+    "portrait-3pass/source-1 pixel-identical to frozen oracle",
+    "portrait-3pass/source-1 output has independent ownership",
+    "portrait-3pass/source-1 reuses the same resource identities",
+    "portrait-3pass/source-2 pixel-identical to frozen oracle",
+    "portrait-3pass/source-2 output has independent ownership",
+    "portrait-3pass/source-2 reuses the same resource identities",
+    "portrait-3pass/source-3 pixel-identical to frozen oracle",
+    "portrait-3pass/source-3 output has independent ownership",
+    "portrait-3pass/source-3 reuses the same resource identities",
+    "portrait-3pass/source-4 pixel-identical to frozen oracle",
+    "portrait-3pass/source-4 output has independent ownership",
+    "portrait-3pass/source-4 reuses the same resource identities",
+    "portrait-3pass/source-5 pixel-identical to frozen oracle",
+    "portrait-3pass/source-5 output has independent ownership",
+    "portrait-3pass/source-5 reuses the same resource identities",
+    "portrait-3pass/source-6 pixel-identical to frozen oracle",
+    "portrait-3pass/source-6 output has independent ownership",
+    "portrait-3pass/source-6 reuses the same resource identities",
+    "portrait-3pass/source-7 pixel-identical to frozen oracle",
+    "portrait-3pass/source-7 output has independent ownership",
+    "portrait-3pass/source-7 reuses the same resource identities",
+    "portrait-3pass/source-8 pixel-identical to frozen oracle",
+    "portrait-3pass/source-8 output has independent ownership",
+    "portrait-3pass/source-8 reuses the same resource identities",
+    "portrait-3pass/source-9 pixel-identical to frozen oracle",
+    "portrait-3pass/source-9 output has independent ownership",
+    "portrait-3pass/source-9 reuses the same resource identities",
+    "portrait-3pass/source-10 pixel-identical to frozen oracle",
+    "portrait-3pass/source-10 output has independent ownership",
+    "portrait-3pass/source-10 reuses the same resource identities",
+    "portrait-3pass/source-11 pixel-identical to frozen oracle",
+    "portrait-3pass/source-11 output has independent ownership",
+    "portrait-3pass/source-11 reuses the same resource identities",
+    "portrait-3pass/source-11 convenience prepare matches frozen oracle",
+    "portrait-3pass retained outputs remain unchanged after all 12 preparations",
+    "portrait-3pass close clears all scratch and native handle references",
+    "portrait-3pass close is idempotent and leaves caller-owned outputs intact",
+    "portrait-3pass prepare rejects a closed session",
+    "portrait-3pass close destroys both allocation handles",
+    "portrait-3pass close destroys the blur handle",
+    "landscape-6pass preserves frozen dimensions, pass count and radius",
+    "landscape-6pass/source-0 pixel-identical to frozen oracle",
+    "landscape-6pass/source-0 output has independent ownership",
+    "landscape-6pass initializes exactly two allocations and one blur handle",
+    "landscape-6pass/source-0 convenience prepare matches frozen oracle",
+    "landscape-6pass/source-1 pixel-identical to frozen oracle",
+    "landscape-6pass/source-1 output has independent ownership",
+    "landscape-6pass/source-1 reuses the same resource identities",
+    "landscape-6pass/source-2 pixel-identical to frozen oracle",
+    "landscape-6pass/source-2 output has independent ownership",
+    "landscape-6pass/source-2 reuses the same resource identities",
+    "landscape-6pass/source-3 pixel-identical to frozen oracle",
+    "landscape-6pass/source-3 output has independent ownership",
+    "landscape-6pass/source-3 reuses the same resource identities",
+    "landscape-6pass/source-4 pixel-identical to frozen oracle",
+    "landscape-6pass/source-4 output has independent ownership",
+    "landscape-6pass/source-4 reuses the same resource identities",
+    "landscape-6pass/source-5 pixel-identical to frozen oracle",
+    "landscape-6pass/source-5 output has independent ownership",
+    "landscape-6pass/source-5 reuses the same resource identities",
+    "landscape-6pass/source-6 pixel-identical to frozen oracle",
+    "landscape-6pass/source-6 output has independent ownership",
+    "landscape-6pass/source-6 reuses the same resource identities",
+    "landscape-6pass/source-7 pixel-identical to frozen oracle",
+    "landscape-6pass/source-7 output has independent ownership",
+    "landscape-6pass/source-7 reuses the same resource identities",
+    "landscape-6pass/source-8 pixel-identical to frozen oracle",
+    "landscape-6pass/source-8 output has independent ownership",
+    "landscape-6pass/source-8 reuses the same resource identities",
+    "landscape-6pass/source-9 pixel-identical to frozen oracle",
+    "landscape-6pass/source-9 output has independent ownership",
+    "landscape-6pass/source-9 reuses the same resource identities",
+    "landscape-6pass/source-10 pixel-identical to frozen oracle",
+    "landscape-6pass/source-10 output has independent ownership",
+    "landscape-6pass/source-10 reuses the same resource identities",
+    "landscape-6pass/source-11 pixel-identical to frozen oracle",
+    "landscape-6pass/source-11 output has independent ownership",
+    "landscape-6pass/source-11 reuses the same resource identities",
+    "landscape-6pass/source-11 convenience prepare matches frozen oracle",
+    "landscape-6pass retained outputs remain unchanged after all 12 preparations",
+    "landscape-6pass close clears all scratch and native handle references",
+    "landscape-6pass close is idempotent and leaves caller-owned outputs intact",
+    "landscape-6pass prepare rejects a closed session",
+    "landscape-6pass close destroys both allocation handles",
+    "landscape-6pass close destroys the blur handle",
+    "capped-8pass preserves frozen dimensions, pass count and radius",
+    "capped-8pass/source-0 pixel-identical to frozen oracle",
+    "capped-8pass/source-0 output has independent ownership",
+    "capped-8pass initializes exactly two allocations and one blur handle",
+    "capped-8pass/source-0 convenience prepare matches frozen oracle",
+    "capped-8pass/source-1 pixel-identical to frozen oracle",
+    "capped-8pass/source-1 output has independent ownership",
+    "capped-8pass/source-1 reuses the same resource identities",
+    "capped-8pass/source-2 pixel-identical to frozen oracle",
+    "capped-8pass/source-2 output has independent ownership",
+    "capped-8pass/source-2 reuses the same resource identities",
+    "capped-8pass/source-3 pixel-identical to frozen oracle",
+    "capped-8pass/source-3 output has independent ownership",
+    "capped-8pass/source-3 reuses the same resource identities",
+    "capped-8pass/source-4 pixel-identical to frozen oracle",
+    "capped-8pass/source-4 output has independent ownership",
+    "capped-8pass/source-4 reuses the same resource identities",
+    "capped-8pass/source-5 pixel-identical to frozen oracle",
+    "capped-8pass/source-5 output has independent ownership",
+    "capped-8pass/source-5 reuses the same resource identities",
+    "capped-8pass/source-6 pixel-identical to frozen oracle",
+    "capped-8pass/source-6 output has independent ownership",
+    "capped-8pass/source-6 reuses the same resource identities",
+    "capped-8pass/source-7 pixel-identical to frozen oracle",
+    "capped-8pass/source-7 output has independent ownership",
+    "capped-8pass/source-7 reuses the same resource identities",
+    "capped-8pass/source-8 pixel-identical to frozen oracle",
+    "capped-8pass/source-8 output has independent ownership",
+    "capped-8pass/source-8 reuses the same resource identities",
+    "capped-8pass/source-9 pixel-identical to frozen oracle",
+    "capped-8pass/source-9 output has independent ownership",
+    "capped-8pass/source-9 reuses the same resource identities",
+    "capped-8pass/source-10 pixel-identical to frozen oracle",
+    "capped-8pass/source-10 output has independent ownership",
+    "capped-8pass/source-10 reuses the same resource identities",
+    "capped-8pass/source-11 pixel-identical to frozen oracle",
+    "capped-8pass/source-11 output has independent ownership",
+    "capped-8pass/source-11 reuses the same resource identities",
+    "capped-8pass/source-11 convenience prepare matches frozen oracle",
+    "capped-8pass retained outputs remain unchanged after all 12 preparations",
+    "capped-8pass close clears all scratch and native handle references",
+    "capped-8pass close is idempotent and leaves caller-owned outputs intact",
+    "capped-8pass prepare rejects a closed session",
+    "capped-8pass close destroys both allocation handles",
+    "capped-8pass close destroys the blur handle",
+    "New session allocates no bitmap or native scratch before preparation",
+    "Pre-interrupted preparation throws CancellationException and publishes no output",
+    "Pre-interrupted first preparation allocates no scratch or native handles",
+    "Interrupted initialized session publishes no output and retains its handles",
+    "Session recovers after interruption and clears transparent input without residual pixels",
+    "Interruption and recovery preserve previously returned output",
+    "All original source bitmaps remain caller-owned"
+  ],
+  "scenarios": [
+    {
+      "label": "portal-1pass",
+      "viewportWidth": 2160,
+      "viewportHeight": 1440,
+      "density": 1.5,
+      "textureWidth": 512,
+      "textureHeight": 341,
+      "passes": 1,
+      "radius": 16.277779,
+      "pixelIdenticalSources": 12,
+      "allocationHandlesObserved": 2,
+      "blurHandlesObserved": 1,
+      "closedAllocationErrors": [
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference"
+      ],
+      "closedBlurError": "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+      "resourceReleaseVerified": true
+    },
+    {
+      "label": "landscape-2pass",
+      "viewportWidth": 1080,
+      "viewportHeight": 720,
+      "density": 1.5,
+      "textureWidth": 512,
+      "textureHeight": 341,
+      "passes": 2,
+      "radius": 23.641575,
+      "pixelIdenticalSources": 12,
+      "allocationHandlesObserved": 2,
+      "blurHandlesObserved": 1,
+      "closedAllocationErrors": [
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference"
+      ],
+      "closedBlurError": "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+      "resourceReleaseVerified": true
+    },
+    {
+      "label": "portrait-3pass",
+      "viewportWidth": 720,
+      "viewportHeight": 1280,
+      "density": 2,
+      "textureWidth": 288,
+      "textureHeight": 512,
+      "passes": 3,
+      "radius": 21.59401,
+      "pixelIdenticalSources": 12,
+      "allocationHandlesObserved": 2,
+      "blurHandlesObserved": 1,
+      "closedAllocationErrors": [
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference"
+      ],
+      "closedBlurError": "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+      "resourceReleaseVerified": true
+    },
+    {
+      "label": "landscape-6pass",
+      "viewportWidth": 800,
+      "viewportHeight": 600,
+      "density": 2,
+      "textureWidth": 512,
+      "textureHeight": 384,
+      "passes": 6,
+      "radius": 24.627888,
+      "pixelIdenticalSources": 12,
+      "allocationHandlesObserved": 2,
+      "blurHandlesObserved": 1,
+      "closedAllocationErrors": [
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference"
+      ],
+      "closedBlurError": "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+      "resourceReleaseVerified": true
+    },
+    {
+      "label": "capped-8pass",
+      "viewportWidth": 480,
+      "viewportHeight": 320,
+      "density": 3,
+      "textureWidth": 512,
+      "textureHeight": 341,
+      "passes": 8,
+      "radius": 25,
+      "pixelIdenticalSources": 12,
+      "allocationHandlesObserved": 2,
+      "blurHandlesObserved": 1,
+      "closedAllocationErrors": [
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+        "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference"
+      ],
+      "closedBlurError": "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.renderscript.RenderScript.validate()' on a null object reference",
+      "resourceReleaseVerified": true
+    }
+  ],
+  "api": 34,
+  "oracle": "Frozen pre-session FilmstripBackdrop.prepare algorithm",
+  "originalInMemorySources": 12,
+  "physicalPortalPerformanceMeasured": false,
+  "renderScriptContextCreationSavingsMeasured": false,
+  "inFlightInterruptionDeterministicallyMeasured": false,
+  "success": true,
+  "serial": "emulator-5556",
+  "avd": "PortalMusic20261030",
+  "hostPixelComparisons": [
+    "oracle-00 == session-00 (PNG bytes)",
+    "oracle-01 == session-01 (PNG bytes)",
+    "oracle-02 == session-02 (PNG bytes)",
+    "oracle-03 == session-03 (PNG bytes)",
+    "oracle-04 == session-04 (PNG bytes)",
+    "oracle-05 == session-05 (PNG bytes)",
+    "oracle-06 == session-06 (PNG bytes)",
+    "oracle-07 == session-07 (PNG bytes)",
+    "oracle-08 == session-08 (PNG bytes)",
+    "oracle-09 == session-09 (PNG bytes)",
+    "oracle-10 == session-10 (PNG bytes)",
+    "oracle-11 == session-11 (PNG bytes)"
+  ],
+  "artifacts": [
+    {
+      "file": "oracle-00.png",
+      "sha256": "4cf9d71e43eaf20f09200575fa0839bb4cc24c3c8be8d9ea2625447c45e0a3d0"
+    },
+    {
+      "file": "oracle-01.png",
+      "sha256": "19290f3bd39a3e44d9a4caab47213bf3caa62265d76416294fee721c2ea63234"
+    },
+    {
+      "file": "oracle-02.png",
+      "sha256": "b17d880fc449cbc02e8fde3fb115c154aac17e415cd4c410b9fa3c2b5b7c6c3b"
+    },
+    {
+      "file": "oracle-03.png",
+      "sha256": "3b0b62974f3a6f482f3d7e11f6ee0e3a617d812e2988cc5511c6442376e924a7"
+    },
+    {
+      "file": "oracle-04.png",
+      "sha256": "29227bff81dec920adb5be689e846a86e79be112c13edbf1b28f8481752e1774"
+    },
+    {
+      "file": "oracle-05.png",
+      "sha256": "b946f456cc83727aec7adec6bc49d635a60cabd6641fc84d19973e6049fbee16"
+    },
+    {
+      "file": "oracle-06.png",
+      "sha256": "1f103465022afc2844d94c9fad56ed41c09ef4ff8a00f44d5f756cd532cdba1c"
+    },
+    {
+      "file": "oracle-07.png",
+      "sha256": "bd90a6d823dbf549d92aba71ac71631e99d79812b8e5d4cf53bc19009b994609"
+    },
+    {
+      "file": "oracle-08.png",
+      "sha256": "767bf0449229ff503bf5501dbe4beb9dd676c003e21a03a722deef83c06eb1c6"
+    },
+    {
+      "file": "oracle-09.png",
+      "sha256": "b66ed780633033d5d5c78b986afbf9a970c41b9ac5e2404bd6e50fc20b08a0ce"
+    },
+    {
+      "file": "oracle-10.png",
+      "sha256": "5f788e8cd05ccd06e1c6a2e4e2099d961eec80823093b36a4086a3c84ca9f2df"
+    },
+    {
+      "file": "oracle-11.png",
+      "sha256": "3030bb674e21ee30b84b7e9792c781f1a8f7e2024491e081536819edf34f1731"
+    },
+    {
+      "file": "session-00.png",
+      "sha256": "4cf9d71e43eaf20f09200575fa0839bb4cc24c3c8be8d9ea2625447c45e0a3d0"
+    },
+    {
+      "file": "session-01.png",
+      "sha256": "19290f3bd39a3e44d9a4caab47213bf3caa62265d76416294fee721c2ea63234"
+    },
+    {
+      "file": "session-02.png",
+      "sha256": "b17d880fc449cbc02e8fde3fb115c154aac17e415cd4c410b9fa3c2b5b7c6c3b"
+    },
+    {
+      "file": "session-03.png",
+      "sha256": "3b0b62974f3a6f482f3d7e11f6ee0e3a617d812e2988cc5511c6442376e924a7"
+    },
+    {
+      "file": "session-04.png",
+      "sha256": "29227bff81dec920adb5be689e846a86e79be112c13edbf1b28f8481752e1774"
+    },
+    {
+      "file": "session-05.png",
+      "sha256": "b946f456cc83727aec7adec6bc49d635a60cabd6641fc84d19973e6049fbee16"
+    },
+    {
+      "file": "session-06.png",
+      "sha256": "1f103465022afc2844d94c9fad56ed41c09ef4ff8a00f44d5f756cd532cdba1c"
+    },
+    {
+      "file": "session-07.png",
+      "sha256": "bd90a6d823dbf549d92aba71ac71631e99d79812b8e5d4cf53bc19009b994609"
+    },
+    {
+      "file": "session-08.png",
+      "sha256": "767bf0449229ff503bf5501dbe4beb9dd676c003e21a03a722deef83c06eb1c6"
+    },
+    {
+      "file": "session-09.png",
+      "sha256": "b66ed780633033d5d5c78b986afbf9a970c41b9ac5e2404bd6e50fc20b08a0ce"
+    },
+    {
+      "file": "session-10.png",
+      "sha256": "5f788e8cd05ccd06e1c6a2e4e2099d961eec80823093b36a4086a3c84ca9f2df"
+    },
+    {
+      "file": "session-11.png",
+      "sha256": "3030bb674e21ee30b84b7e9792c781f1a8f7e2024491e081536819edf34f1731"
+    },
+    {
+      "file": "source-00.png",
+      "sha256": "b1ec1df2b41e967382ff1d82dac70af96a503399dcd5688c021133d662953e87"
+    },
+    {
+      "file": "source-01.png",
+      "sha256": "162f75b33c842b49d036e80fade33bb893456976047689b49e893e4185b9b9a2"
+    },
+    {
+      "file": "source-02.png",
+      "sha256": "0cf953f8669a5929ef7a4cd9bd60cdac2fb3d3a0a1c9f998732d10e27400d4d1"
+    },
+    {
+      "file": "source-03.png",
+      "sha256": "c34a5dcc73dc597778bcb535838ec5c30dbbc68adc5042bc759d8ec3e1bce127"
+    },
+    {
+      "file": "source-04.png",
+      "sha256": "22bbe9e23f32e9eeb553a003d6ef9659e00c2f6fd9dbc14184b9bc19859ca502"
+    },
+    {
+      "file": "source-05.png",
+      "sha256": "9d289136112d4a2d44700504788a72935fe2dfb058686017bef2716e9a37d3b0"
+    },
+    {
+      "file": "source-06.png",
+      "sha256": "b69598193b926c09f74284508985c1f4277617715243c97239e51f8491c7bd63"
+    },
+    {
+      "file": "source-07.png",
+      "sha256": "80091dc49290883f7e8985a0d9916e85867027753217ba6570bc6cd27606e001"
+    },
+    {
+      "file": "source-08.png",
+      "sha256": "3f913aa9003e49ac7087f5f9694630a45a8b958d295189690c1f37d79f9329a8"
+    },
+    {
+      "file": "source-09.png",
+      "sha256": "1c47eb0a442729c0d3e49e2667d9a192144b2a4c0d41d38d1d8eaa0d5ab36981"
+    },
+    {
+      "file": "source-10.png",
+      "sha256": "c3f38b44d4354792d2e14c48cdfe80dc830e1d14e33ed1b4b79f1d291578ac09"
+    },
+    {
+      "file": "source-11.png",
+      "sha256": "0aa9081a018c5170f2c7fcf16fa62634705c7e2895376fb4f71ea648395ae9aa"
+    }
+  ],
+  "debugApkSha256": "897126651957786667ae89df9f51b6102e7183ff4f689fce83611af1badea6b0",
+  "debugApkBuiltAtUtc": "2026-10-30T19:40:33.252217+00:00",
+  "nativeVerifiedAtUtc": "2026-10-30T19:40:57.871549+00:00",
+  "fixtureCacheRemoved": true,
+  "dedicatedAvdStopped": true,
+  "cleanupAtUtc": "2026-10-30T19:41:49.471679+00:00",
+  "oracleGitRevision": "92604f69",
+  "assembleDebugOfflinePassed": true
+}

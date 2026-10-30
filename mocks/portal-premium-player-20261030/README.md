@@ -146,6 +146,24 @@ All **11 checks passed in 28.72 seconds**; the result is in
 rapid replacements and close. They establish functional emulator behavior,
 not physical Portal timing or audio. The fixture/activity are debug-only.
 
+Native Filmstrip prepares its small blurred backdrops with one worker-owned scratch
+session per deck. The session reuses its bitmap, Canvas, Paint, two allocations and blur
+script; every finished backdrop is a separate caller-owned bitmap. Transparent input
+is cleared and ping-pong direction reset before each preparation. Three MiB of scratch
+admission stays charged until the worker closes the session; the existing 256 MiB
+Filmstrip deck budget is unchanged.
+
+`filmstrip-backdrop-native-checks.py` runs only on the dedicated API 34 AVD. Its
+debug-only activity compares the real session with a frozen pre-change algorithm:
+**233 checks passed**, including **60 exact pixel comparisons** across twelve generated
+opaque/transparent sources and 1/2/3/6/8 blur passes. Twelve host PNG pairs also match
+byte-for-byte. Checks cover unchanged returned pixels, stable resource identities,
+thread ownership, closed-state rejection, handle destruction and recovery after a
+deterministic pre-interruption. Interruption inside a native blur pass was not measured.
+Evidence is in `evidence/filmstrip-backdrop-native/`; the fixture cache and owned AVD
+are removed/stopped after testing. These checks establish output compatibility and
+resource ownership, not Portal startup latency or frame time.
+
 `slideshow/serve.py` exposes an allowlist of production slideshow assets, an injected silent
 host, two original portrait fixtures, twelve original mixed-aspect gallery fixtures,
 and two original panoramic landscapes. It never serves the repository root. Run:

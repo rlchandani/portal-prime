@@ -10,6 +10,11 @@
 
     <application>
         <activity
+            android:name=".FilmstripBackdropPreviewActivity"
+            android:exported="true"
+            android:label="Filmstrip backdrop native check"
+            android:theme="@style/Theme.SampleApp" />
+        <activity
             android:name=".VideoDesignPreviewActivity"
             android:exported="true"
             android:label="Silent slideshow video check"
