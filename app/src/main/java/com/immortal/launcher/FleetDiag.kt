@@ -11,6 +11,8 @@ import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Build
+import android.os.SystemClock
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -52,6 +54,17 @@ object FleetDiag {
                   .put("reportingMode", it.reportingMode).put("powerMa", it.power)
             }
       }.getOrNull() ?: JSONObject.NULL)
+      .put("nightClockObservers", JSONArray().apply {
+        val now = SystemClock.uptimeMillis()
+        DarkRoomObserver.diagnostics().forEach { state ->
+          put(JSONObject().put("host", state.host).put("sensorAvailable", state.available)
+              .put("requested", state.requested).put("registered", state.registered)
+              .put("lux", state.lux ?: JSONObject.NULL).put("readings", state.readings)
+              .put("receiptAgeMs", state.receiptUptimeMs?.let { (now - it).coerceAtLeast(0) } ?: JSONObject.NULL)
+              .put("night", state.night).put("darkLux", state.darkLux)
+              .put("settleRemainingMs", state.deadlineUptimeMs?.let { (it - now).coerceAtLeast(0) } ?: JSONObject.NULL))
+        }
+      })
 
   /** Bounded number of recent logcat lines (text). Clamped so a request can't pull
    *  an unbounded dump into memory; [FleetRoutes] streams larger pulls directly. */

@@ -1,0 +1,144 @@
+{
+  "utc": "2026-10-31T00:47:22.626684+00:00",
+  "issueWindow": {
+    "issueStartUtc": "2026-10-31T00:33:05Z",
+    "deadlineUtc": "2026-10-31T01:03:05Z",
+    "reportedFailure": "Clock did not appear after physical sensor cover/uncover",
+    "focus": "Family Area live light input and night-clock admission",
+    "humanPhysicalResultRequired": true,
+    "newSensorSubscriptionsAdded": false,
+    "newOnDevicePollingAdded": false,
+    "HomeTrialsParked": true,
+    "LivingAreaOperations": false
+  },
+  "humanReportedOriginalResult": "Clock did not appear",
+  "originalPhysicalFailureFixed": false,
+  "repeatPhysicalResultReceived": false,
+  "implementation": {
+    "passiveExistingListenerReadout": true,
+    "maximumWeakObserverReferences": 8,
+    "inactiveEntriesEvictedFirst": true,
+    "activationRestoresRegistryMembership": true,
+    "callbackAgeExplicitlyNamedReceiptAgeMs": true,
+    "diagnosticsStartsNoSensorOrCallback": true,
+    "newSensorSubscriptions": 0,
+    "newOnDevicePollingLoops": 0,
+    "sensorPolicyChanged": false,
+    "clockVisualsChanged": false
+  },
+  "freshFullJvm": {
+    "suites": 363,
+    "tests": 3506,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "finalBuild": {
+    "debug": true,
+    "performance": true,
+    "elapsedSeconds": 75
+  },
+  "newTests": [
+    "Actual registered reading and timer-settled night state",
+    "Hidden and reactivated readout cannot claim stale lux as fresh",
+    "Absent sensor vs failed registration",
+    "One active oldest observer retained through eight unused frame constructions"
+  ],
+  "testFirstFailure": "New readout tests failed compilation because diagnosticSnapshot did not yet exist; this was not a reproduced clock-rendering regression.",
+  "review": {
+    "independentReviewCompleted": true,
+    "findingsCorrected": [
+      "Active observer eviction",
+      "Callback receipt age mislabeled as sample age"
+    ],
+    "remainingScopedFindings": 0
+  },
+  "familyDeployment": {
+    "device": "Family Area",
+    "sha256": "64dca367e97ea8ce17452080c237c7118512d2392293974d9bed2e8f409436c2",
+    "bytes": 25702323,
+    "previousSha256": "c8651adc869e4a998c419e654b87b6a22daece82b13a4b293777e269192ec303",
+    "settingValuesCompared": 97,
+    "changedSettingValues": 0,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "visibleTransitionsVerified": false,
+    "physicalFpsGainMeasured": false
+  },
+  "artifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "familyCleanup": {
+    "installedSha256": "64dca367e97ea8ce17452080c237c7118512d2392293974d9bed2e8f409436c2",
+    "installedBytes": 25702323,
+    "installedMatchesFinalLocalBuild": true,
+    "ownedUploadCleared": true,
+    "bytesReclaimed": 25702323,
+    "collectorActive": false,
+    "activeListeners": 0,
+    "privateRollbackRetained": true,
+    "livingAreaTouched": false,
+    "phoneTouched": false,
+    "homeAssistantTouched": false
+  },
+  "initialAfterRelaunch": {
+    "lightSensor": {
+      "name": "light sensor",
+      "vendor": "tcs34x0",
+      "reportingMode": 1,
+      "powerMa": 0.5
+    },
+    "nightClockObservers": [
+      {
+        "host": "PhotoFramePreviewActivity",
+        "sensorAvailable": true,
+        "requested": true,
+        "registered": true,
+        "lux": 13,
+        "readings": 21,
+        "receiptAgeMs": 199,
+        "night": false,
+        "darkLux": 3,
+        "settleRemainingMs": null
+      }
+    ],
+    "presence": {
+      "presence": "PRESENT",
+      "screen": "INTERACTIVE",
+      "confident": true
+    },
+    "collectorInactive": true
+  },
+  "finitePhysicalReadout": {
+    "observedSeconds": 180.825,
+    "snapshots": 85,
+    "everRegistered": true,
+    "everReceivedLux": true,
+    "everNight": false,
+    "collectorInactiveAfter": true,
+    "minLux": 9,
+    "maxLux": 16,
+    "darkThresholdLux": 3,
+    "belowThresholdReadingObserved": false,
+    "pendingDarkTimerObserved": false,
+    "originalFailureRetrospectivelyAttributed": false,
+    "readingMinimumMeasuredDuringConfirmedUserCover": false,
+    "physicalClockPixelsOrBrightnessComfortVerified": false,
+    "samePhysicalPhotoReturnVerified": false
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/DarkRoomObserver.kt": "5b7161c0daba250883455996e1b70b82a70688f1d9a67d56d1a5e9650b03892a",
+    "app/src/main/java/com/immortal/launcher/FleetDiag.kt": "fbd0fd91f096e172b209c263751cd54c541830202b36226e4afc279b07c7297f",
+    "app/src/test/java/com/immortal/launcher/DarkRoomObserverTest.kt": "14ecc548c48717278c1eb48ab3e9bfcc1802e67a4effb781bc56b019e8ca38e4"
+  },
+  "credentialsOrPhotoSourcesExported": false,
+  "livingAreaTouched": false,
+  "phoneTouched": false,
+  "homeAssistantTouched": false,
+  "wholeGoalComplete": false,
+  "nextRequiredEvidence": "A confirmed physical below-threshold light event, followed by the dim clock and retained photo return."
+}

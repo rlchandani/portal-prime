@@ -2093,6 +2093,57 @@ This Home path is parked within its original window. No further candidate is
 started in that window. Living Area, the phone and Home Assistant receive no
 operations; the full goal and its remaining physical acceptance stay open.
 
+## Physical night-clock failure and live light readout — 00:33 UTC window
+
+Original issue window: **00:33:05–01:03:05 UTC**. The user reports that the clock
+**did not appear** after the requested sensor-cover check. This physical failure
+remains open; neither the repeat check nor brightness/photo-return acceptance
+has been reported.
+
+Family has no current USB/Wi-Fi ADB transport. Its fleet diagnostics confirms the
+TCS34x0 on-change light sensor, but the prior API exposed only its capability.
+`DarkRoomObserver` now publishes an immutable passive readout of the existing
+listener's requested/registered state, latest finite lux, callback count,
+receipt age, pending dwell and night state. `FleetDiag.hardware` includes it.
+No additional sensor subscription, on-device polling loop, preference or sensor
+policy is introduced. At most eight weak observer references are retained;
+inactive entries are evicted first and activation restores membership. Readout
+age explicitly means **callback receipt age**, not the physical measurement age.
+
+The initial tests fail compilation because the new `diagnosticSnapshot` API did
+not exist; this is a test-first readout contract, not reproduction of a rendering
+bug. Final fresh validation passes **3,506 tests / 363 suites**, zero failures,
+errors or skips; debug and optimized builds succeed in **1m 15s**. Independent
+review identified and then verified corrections for active-observer eviction
+and misleading age naming. The four new tests cover actual input/settle state,
+hidden/reactivated stale-input rejection, failed vs absent registration and
+preservation of an active readout through eight unused frame constructions.
+
+After update/relaunch, Family's `PhotoFramePreviewActivity` listener is registered
+and receiving readings: the initial readout contains **13 lux / 21 callbacks**,
+with the **3-lux** dark threshold and no pending timer. A finite three-minute
+read-only client observation sees **9–16 lux**, no below-threshold reading,
+no dark dwell and no night transition. This does **not** establish what happened
+during the original cover test, prove the correct aperture was covered, or prove
+clock pixels/brightness/photo continuity. The repeat physical check is pending.
+No threshold is changed to force a passing result.
+
+The independently read installed optimized APK matches
+`64dca367e97ea8ce17452080c237c7118512d2392293974d9bed2e8f409436c2`
+(**25,702,323 bytes**). Signing certificate, all **53 main assets** and manifest
+match the accepted predecessor; native DEX contains the passive readout. All
+**97 settings**, screensaver configuration and photo-source groups remain
+unchanged. The collector remains inactive with zero listeners; clearing the
+verified owned upload reclaims **25,702,323 bytes**. The exact predecessor APK
+is privately retained. No emulator is launched and no Living Area, phone or
+Home Assistant operation is performed.
+
+Public scalar receipt:
+`mocks/portal-premium-player-20261030/evidence/family-night-sensor-readout/verification.json`.
+The physical clock issue and full goal remain open. The next evidence must be
+confirmed below-threshold light input followed by the actual dim clock and
+retained-photo return; working subscription alone is insufficient acceptance.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
@@ -2111,3 +2162,6 @@ operations; the full goal and its remaining physical acceptance stay open.
 - [HA-free music alternatives](music-without-home-assistant-2026-10-19.md)
 - [Android 14 foreground-service types and connected-device prerequisites](https://developer.android.com/about/versions/14/changes/fgs-types-required#connected-device)
 - [Android lifecycle-scoped coroutine restart and cancellation](https://developer.android.com/topic/libraries/architecture/views/coroutines-views)
+
+- [AOSP on-change sensor reporting modes](https://source.android.com/docs/core/interaction/sensors/report-modes)
+- [Android 10 SensorManager registration contract](https://android.googlesource.com/platform/frameworks/base/+/android-10.0.0_r1/core/java/android/hardware/SensorManager.java#820)

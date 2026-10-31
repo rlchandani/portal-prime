@@ -146,4 +146,62 @@ class DarkRoomObserverTest {
     f.advance(30_000)
     assertTrue(f.changes.isEmpty())
   }
+
+  @Test fun passiveReadoutShowsActualSubscriptionReadingAndSettledNight() = withFixture { f ->
+    f.observer.setActive(true)
+    assertTrue(f.observer.diagnosticSnapshot().registered)
+    assertEquals(0, f.observer.diagnosticSnapshot().readings)
+    f.now = 100
+    f.read(1f)
+    val pending = f.observer.diagnosticSnapshot()
+    assertEquals(1f, pending.lux)
+    assertEquals(100L, pending.receiptUptimeMs)
+    assertEquals(20_100L, pending.deadlineUptimeMs)
+    assertFalse(pending.night)
+    f.advance(20_100)
+    assertTrue(f.observer.diagnosticSnapshot().night)
+    assertNull(f.observer.diagnosticSnapshot().deadlineUptimeMs)
+    assertTrue(f.pending.isEmpty())
+  }
+
+  @Test fun hiddenReadoutCannotPresentAnOldLuxAsAFreshSubscription() = withFixture { f ->
+    f.observer.setActive(true)
+    f.read(0f)
+    f.observer.setActive(false)
+    f.read(0f)
+    val hidden = f.observer.diagnosticSnapshot()
+    assertFalse(hidden.requested)
+    assertFalse(hidden.registered)
+    assertNull(hidden.lux)
+    assertNull(hidden.receiptUptimeMs)
+    f.observer.setActive(true)
+    assertEquals(0, f.observer.diagnosticSnapshot().readings)
+    assertNull(f.observer.diagnosticSnapshot().lux)
+    assertTrue(f.pending.isEmpty())
+  }
+
+  @Test fun readoutDistinguishesUnavailableAndRejectedSensorRegistration() {
+    withFixture(hasSensor = false) { f ->
+      f.observer.setActive(true)
+      assertFalse(f.observer.diagnosticSnapshot().available)
+      assertTrue(f.observer.diagnosticSnapshot().requested)
+      assertFalse(f.observer.diagnosticSnapshot().registered)
+    }
+    withFixture(registrationSucceeds = false) { f ->
+      f.observer.setActive(true)
+      assertTrue(f.observer.diagnosticSnapshot().available)
+      assertFalse(f.observer.diagnosticSnapshot().registered)
+      f.observer.setActive(false)
+      assertFalse(f.observer.diagnosticSnapshot().requested)
+    }
+  }
+
+  @Test fun unusedFramesCannotEvictALiveSensorReadout() = withFixture { f ->
+    f.observer.setActive(true)
+    val active = f.observer.diagnosticSnapshot()
+    val unused = List(8) { DarkRoomObserver(f.context, 3f) {} }
+    assertEquals(8, unused.size)
+    assertTrue(DarkRoomObserver.diagnostics().any { it === active })
+    assertTrue(DarkRoomObserver.diagnostics().size <= 8)
+  }
 }
