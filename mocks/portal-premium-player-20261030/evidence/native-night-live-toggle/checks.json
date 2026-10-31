@@ -1,0 +1,537 @@
+{
+  "success": true,
+  "passed": 108,
+  "failed": 0,
+  "failureCode": null,
+  "lastPhase": "CLEANUP",
+  "checks": [
+    {
+      "name": "exact_owned_AVD_name",
+      "passed": true
+    },
+    {
+      "name": "owned_API34",
+      "passed": true
+    },
+    {
+      "name": "single_owned_debug_APK_installed",
+      "passed": true
+    },
+    {
+      "name": "installed_current_debug_APK_hash_matches_local",
+      "passed": true
+    },
+    {
+      "name": "full_private_registry_profile_available",
+      "passed": true
+    },
+    {
+      "name": "default_photo_source_before_mutations",
+      "passed": true
+    },
+    {
+      "name": "default_photo_source_before_configuration",
+      "passed": true
+    },
+    {
+      "name": "registry_has_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_has_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_has_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_has_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_has_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_has_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_has_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_has_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_has_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registry_applied_complete_batch",
+      "passed": true
+    },
+    {
+      "name": "registry_configuration_readback",
+      "passed": true
+    },
+    {
+      "name": "production_preview_started_without_CLEAR_TASK",
+      "passed": true
+    },
+    {
+      "name": "native_stage_without_WebView",
+      "passed": true
+    },
+    {
+      "name": "actual_accessible_stage_to_open_toolbar",
+      "passed": true
+    },
+    {
+      "name": "show_toolbar_observed_bounds",
+      "passed": true
+    },
+    {
+      "name": "show_toolbar_bounds_in_native_screen",
+      "passed": true
+    },
+    {
+      "name": "actual_toolbar_Pause",
+      "passed": true
+    },
+    {
+      "name": "Pause_observed_bounds",
+      "passed": true
+    },
+    {
+      "name": "Pause_bounds_in_native_screen",
+      "passed": true
+    },
+    {
+      "name": "toggle-before_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "toggle-before-stable_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "toggle-before_photo_content",
+      "passed": true
+    },
+    {
+      "name": "toggle-before_stable_ROI",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "live_batch_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "live_readback_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-dark_photo_stage_and_no_clock",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-dark_same_window",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-dark_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-dark_same_process",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-dark_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-dark_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-dark_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-dark_actual_brightness_restored",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-dark_retained_photo_ROI",
+      "passed": true
+    },
+    {
+      "name": "disabled_clock_has_no_registered_light_observer",
+      "passed": true
+    },
+    {
+      "name": "live_batch_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "live_readback_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "toggle-enabled-night_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "toggle-enabled-night_actual_accessible_fullscreen_clock",
+      "passed": true
+    },
+    {
+      "name": "toggle-enabled-night_visible_clock_ink_on_black",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "toggle-enabled-night_same_window",
+      "passed": true
+    },
+    {
+      "name": "toggle-enabled-night_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "toggle-enabled-night_same_process",
+      "passed": true
+    },
+    {
+      "name": "toggle-enabled-night_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "toggle-enabled-night_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "toggle-enabled-night_actual_window_brightness_003",
+      "passed": true
+    },
+    {
+      "name": "live_batch_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "live_readback_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-visible-clock_photo_stage_and_no_clock",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-visible-clock_same_window",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-visible-clock_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-visible-clock_same_process",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-visible-clock_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-visible-clock_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-visible-clock_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-visible-clock_actual_brightness_restored",
+      "passed": true
+    },
+    {
+      "name": "toggle-disabled-visible-clock_retained_photo_ROI",
+      "passed": true
+    },
+    {
+      "name": "disabling_clock_keeps_USER_PAUSED",
+      "passed": true
+    },
+    {
+      "name": "live_batch_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "live_readback_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "toggle-reenabled-bright_photo_stage_and_no_clock",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_DISABLE_ENABLE_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "toggle-reenabled-bright_same_window",
+      "passed": true
+    },
+    {
+      "name": "toggle-reenabled-bright_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "toggle-reenabled-bright_same_process",
+      "passed": true
+    },
+    {
+      "name": "toggle-reenabled-bright_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "toggle-reenabled-bright_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "toggle-reenabled-bright_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "toggle-reenabled-bright_actual_brightness_restored",
+      "passed": true
+    },
+    {
+      "name": "toggle-reenabled-bright_retained_photo_ROI",
+      "passed": true
+    },
+    {
+      "name": "all_live_toggles_keep_the_same_photo_scene",
+      "passed": true
+    },
+    {
+      "name": "actual_toolbar_Done",
+      "passed": true
+    },
+    {
+      "name": "finish_live_toggle_case_observed_bounds",
+      "passed": true
+    },
+    {
+      "name": "finish_live_toggle_case_bounds_in_native_screen",
+      "passed": true
+    },
+    {
+      "name": "all_original_registry_values_accepted_for_restore",
+      "passed": true
+    },
+    {
+      "name": "all_modified_registry_settings_restored",
+      "passed": true
+    },
+    {
+      "name": "owned_light_restored_500",
+      "passed": true
+    }
+  ],
+  "cases": {
+    "liveDisableEnable": {
+      "executed": true,
+      "success": true,
+      "retainedPhotoRoiSha256": "15e27f3720f7e0aa9ca0e42d5770641ee3ba6172ecbf4bd475cb1dba1ffeabe2"
+    }
+  },
+  "observations": {
+    "debugApkSha256": "b0a6cf6f981154fe9b9557f1dd3103f52a14cdc38ddeafe4f97166d4c81d9a93",
+    "photoRoiBounds": [
+      604,
+      403,
+      1555,
+      950
+    ],
+    "source": "default",
+    "api": 34,
+    "modifiedSettingsCount": 7
+  },
+  "artifacts": [
+    {
+      "file": "toggle-before-roi.png",
+      "sha256": "9de35df4ecb8c8062c45bb5cebc1c336068c6620d40c5a8dee08dd87c2821fff",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "toggle-before-stable-roi.png",
+      "sha256": "9de35df4ecb8c8062c45bb5cebc1c336068c6620d40c5a8dee08dd87c2821fff",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "toggle-disabled-dark-roi.png",
+      "sha256": "9de35df4ecb8c8062c45bb5cebc1c336068c6620d40c5a8dee08dd87c2821fff",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "toggle-enabled-night-roi.png",
+      "sha256": "74d05e922870aac1f190ba827341507ee60060bfe32dd9db8645757320d46a62",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "toggle-disabled-visible-clock-roi.png",
+      "sha256": "9de35df4ecb8c8062c45bb5cebc1c336068c6620d40c5a8dee08dd87c2821fff",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "toggle-reenabled-bright-roi.png",
+      "sha256": "9de35df4ecb8c8062c45bb5cebc1c336068c6620d40c5a8dee08dd87c2821fff",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    }
+  ],
+  "avd": "PortalMusic20261030",
+  "serial": "emulator-5556",
+  "activity": "com.immortal.launcher.PhotoFramePreviewActivity",
+  "utc": "2026-10-31T01:01:37.637298+00:00",
+  "elapsedSeconds": 70.846,
+  "hiddenHostCaseRun": false,
+  "userPausedStateCaseRun": false,
+  "physicalPortalMeasured": false,
+  "fpsMeasured": false,
+  "cpuMeasured": false,
+  "foreignAvdTouched": false,
+  "clearTaskUsed": false,
+  "scope": "Production light observer/controller; actual UI taps, window/activity identity, scene readiness events and native default-photo ROIs",
+  "retentionClaim": "Same window/activity/process plus no additional ready-native-scene events across each suspended cycle and matching photo ROI. No direct heap/controller object identity measurement.",
+  "privacy": "No credentials, full settings, source URLs, raw hierarchy or raw logs exported; only scalar receipts and default-photo/synthetic-clock screenshot interiors"
+}

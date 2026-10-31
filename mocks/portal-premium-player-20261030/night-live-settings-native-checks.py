@@ -58,20 +58,64 @@ class Driver(retained.Driver):
         self.require("existing_clock_displays_exact_warm_palette",
                      sum(pixel == (185, 159, 135) for pixel in image.getdata()) > 50)
 
+    def toggle_case(self):
+        self.progress("LIVE_DISABLE_ENABLE")
+        case = self.cases["liveDisableEnable"] = {"executed": True, "success": False}
+        self.configure(5)
+        self.light(500)
+        self.launch_device_epoch = float(self.adb("shell", "date", "+%s.%N").decode().strip())
+        self.launch()
+        self.dismiss_immersive_education()
+        self.settle_startup(0)
+        self.tap_node("Pause", self.toolbar("Pause"))
+        self.wait_until(time.monotonic() + 2)
+        photo_hash = self.capture_baseline("toggle-before")
+        baseline = self.identities()
+        scene_count = len(self.events()["scene"])
+        self.update({"darkRoomClock": False})
+        self.light(0)
+        self.wait_until(time.monotonic() + 6)
+        self.demand_photo("toggle-disabled-dark", baseline, photo_hash)
+        observers = self.api("/diag")["hardware"]["nightClockObservers"]
+        self.require("disabled_clock_has_no_registered_light_observer",
+                     not any(observer["registered"] for observer in observers))
+        self.update({"darkRoomClock": True})
+        self.wait_until(time.monotonic() + 22)
+        self.demand_clock("toggle-enabled-night", baseline)
+        self.update({"darkRoomClock": False})
+        self.demand_photo("toggle-disabled-visible-clock", baseline, photo_hash)
+        self.require("disabling_clock_keeps_USER_PAUSED",
+                     any(node.get("text") == "Resume" for node in self.ui()))
+        self.light(500)
+        self.update({"darkRoomClock": True})
+        self.wait_until(time.monotonic() + 6)
+        self.demand_photo("toggle-reenabled-bright", baseline, photo_hash)
+        self.require("all_live_toggles_keep_the_same_photo_scene",
+                     len(self.events()["scene"]) == scene_count)
+        case["success"] = True
+        case["retainedPhotoRoiSha256"] = photo_hash
+        self.tap_node("finish_live_toggle_case", self.toolbar("Done"))
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--connection", type=pathlib.Path, required=True)
+    parser.add_argument("--toggle-only", action="store_true")
     args = parser.parse_args()
     connection = json.loads(args.connection.read_text())
     url = urllib.parse.urlparse(connection["base"])
     if url.hostname != "127.0.0.1" or url.scheme != "http" or not connection.get("token"):
         raise ValueError("A private owned-emulator localhost connection is required")
     driver = Driver(connection)
+    if args.toggle_only:
+        driver.out = BASE / "evidence/native-night-live-toggle"
     try:
         driver.preflight()
         driver.finish_prior_preview()
-        driver.pause_case()
+        if args.toggle_only:
+            driver.toggle_case()
+        else:
+            driver.pause_case()
     except Exception as error:
         driver.failure = str(error) if isinstance(error, retained.CheckFailure) else type(error).__name__
     finally:

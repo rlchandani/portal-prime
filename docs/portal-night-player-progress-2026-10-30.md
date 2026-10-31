@@ -2203,6 +2203,25 @@ Deployment scalar receipt:
 This delivers the live-settings correction within the existing timebox.
 It does not close or relabel the failed physical clock check.
 
+The remaining ambient-enable switch receives a separate native check in this
+same issue window: **108 assertions pass in 70.846 seconds**, with zero failures.
+Through the production registry API, disabling prevents a registered light
+observer; enabling in darkness displays the clock after its dwell; disabling a
+visible clock restores the identical paused photo and prior window brightness;
+enabling in bright light preserves that photo. All toggles retain the same
+process/window/activity and ready-scene count. Original registered values are
+restored, the collector remains inactive, forwarding is removed and the owned
+emulator stops. Evidence is in
+`mocks/portal-premium-player-20261030/evidence/native-night-live-toggle/checks.json`.
+No new app-code change, build, Family setting mutation or deployment is needed
+for this supplementary check; it exercises the exact debug counterpart of the
+already deployed correction.
+
+The physical issue is parked within the original timebox pending confirmed
+below-threshold input and a human observation of clock comfort/photo return.
+No threshold is raised to manufacture an appearance result, and no repeated
+sensor observation or fresh timer resets are started.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
