@@ -1,0 +1,77 @@
+{
+  "device": "Family Area",
+  "sha256": "2b1caa8fdc871c9b0ea2f391850ce4c17fb69342b6f2d3e306265c64d36ad01a",
+  "bytes": 25702379,
+  "previousSha256": "c2a5d755f9704b8a5c2f869fe02799be7540fb5ec5a4425e21fa0389dfeb0a26",
+  "settingValuesCompared": 97,
+  "changedSettingValues": 0,
+  "navigationAcknowledgments": [
+    {
+      "action": "screensaver",
+      "response": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    }
+  ],
+  "sourceGroupsUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "visibleTransitionsVerified": false,
+  "physicalFpsGainMeasured": false,
+  "installedApkReadbackVerified": true,
+  "ownedUploadBytesReclaimed": 25702379,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "physicalBrightnessFadeAccepted": false,
+  "changedMainAssets": [],
+  "unchangedMainAssets": 53,
+  "nativeDexUnchanged": false,
+  "dexFilesCompared": 1,
+  "manifestUnchanged": true,
+  "transitionMs": 1800,
+  "callbackStepMs": 33,
+  "curve": "smoothstep (gentle start and finish)",
+  "systemLevelChecks": "start and final default-policy handoff; not per-tick provider polling",
+  "quantizationStep": 0.00392156862745098,
+  "unitTests": {
+    "suites": 365,
+    "tests": 3524,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "freshFullSuite": true
+  },
+  "newFadeUnitTests": 11,
+  "nativeAssertions": 479,
+  "nativeApi": 34,
+  "nativeScope": "actual PreviewActivity window attributes, retained photo/pause, sensor entry/return, and live retarget; no physical panel luminance/FPS measurement",
+  "review": "one default-policy handoff edge case found and fixed; follow-up has no actionable findings",
+  "preflightTransportFailure": {
+    "error": "RemoteDisconnected",
+    "phase": "preflight",
+    "elapsedSeconds": 0.34,
+    "changedSettings": 0,
+    "resolution": "Complete profile independently verified after APK/API restart, then one finite rerun passed."
+  },
+  "debugAndPerformanceBuildsPassed": true,
+  "debugApkSha256": "ef971bb98884ff9b1437362ed2d2412329ac8eaa8ba8ec65aa752766bbaeab1a",
+  "nativeCleanup": {
+    "ownedAvd": "PortalMusic20261030",
+    "serial": "emulator-5556",
+    "currentDebugApkVerified": true,
+    "settingsCompared": 97,
+    "changedSettingValues": 0,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "nativeAssertions": 479,
+    "sourceGroupsDefault": true,
+    "ownedForwardingRemoved": true,
+    "ownedEmulatorStopRequested": true,
+    "ownedEmulatorStopped": true
+  },
+  "livingAreaOperations": 0,
+  "homeAssistantOperations": 0,
+  "physicalGradualFadeFeelVerified": false,
+  "limits": "The earlier human appearance/comfort/same-photo pass preceded this new fade. Its feel on the physical Portal has not been reported. Window brightness is a policy input, not a measured panel-luminance trace."
+}

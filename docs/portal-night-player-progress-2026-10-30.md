@@ -2261,6 +2261,54 @@ physical FPS. The user then requested gradual dimming and brightening rather
 than a brightness jump; that is the next bounded refinement.
 Evidence: `mocks/portal-premium-player-20261030/evidence/family-night-physical/verification.json`.
 
+## Gradual night brightness — 01:21:40–01:51:40 UTC window
+
+The user accepted the physical clock and same-photo return, then requested a
+soothing transition rather than immediate brightness changes. Both Preview and
+Dream now use one window-scoped **1,800 ms smoothstep** fade in each direction.
+It posts at **33 ms** only while active and skips sub-step brightness writes.
+Live edits/reversals start from the last applied level; hidden/closed hosts
+cancel pending work without brightening the departing window. No photo, source,
+renderer or user pause choice is recreated by the fade.
+
+Android's **-1** window value is a default-policy sentinel. Normal restoration
+fades toward the selected system brightness and hands back the original override
+at the endpoint. Read-only Android 10 AOSP inspection confirms automatic brightness
+publishes its selected level through SCREEN_BRIGHTNESS. Review caught a system
+level changing during restoration: a test reproduced that snap, and the handoff
+now rechecks once, continuing the fade to a changed level before releasing the
+override. No global brightness, auto mode, registry fields or permissions change.
+
+Fresh debug/optimized builds pass, as do **3,524 tests / 365 suites**, zero
+failures, errors or skips. The **11** new unit tests cover both directions,
+explicit/default restoration, reversal, live edits, repeated targets, hidden
+hosts, stale callbacks, late callbacks and a changed system level. Follow-up
+independent review has no actionable findings.
+
+The final API 34 native check passes **479 assertions in 73.749 seconds**.
+It samples actual window attributes across sensor-driven down/up transitions,
+observes multiple monotonic intermediate levels, verifies exact default-policy
+restoration and interrupted live-target fading, and keeps the identical paused
+photo/process/activity/window/scene. A post-install API connection reset stopped
+one prior preflight at four passing assertions before any setting mutation;
+complete API readiness was independently checked before the finite passing run.
+This measures window inputs and native continuity, not physical luminance or FPS.
+All **97** emulator settings are independently unchanged; the collector is idle,
+forwarding is removed and the owned emulator is stopped.
+
+Family's installed optimized APK is independently read back as
+`2b1caa8fdc871c9b0ea2f391850ce4c17fb69342b6f2d3e306265c64d36ad01a`
+(**25,702,379 bytes**). Certificate, manifest and all **53 main assets** match
+the predecessor. All **97 settings**, screensaver configuration and photo-source
+groups remain unchanged. The verified owned upload is cleared, rollback retained
+privately, and the collector is inactive with zero listeners. Living Area remains
+for later rollout. The physical feel of this new gradual fade has not yet been
+reported; the prior clock appearance/comfort/same-photo pass stays scoped to that
+human test.
+
+Evidence: `mocks/portal-premium-player-20261030/evidence/family-night-brightness/verification.json`
+and `mocks/portal-premium-player-20261030/evidence/native-night-brightness/checks.json`.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
@@ -2282,3 +2330,5 @@ Evidence: `mocks/portal-premium-player-20261030/evidence/family-night-physical/v
 
 - [AOSP on-change sensor reporting modes](https://source.android.com/docs/core/interaction/sensors/report-modes)
 - [Android 10 SensorManager registration contract](https://android.googlesource.com/platform/frameworks/base/+/android-10.0.0_r1/core/java/android/hardware/SensorManager.java#820)
+
+- [Android 10 display power/brightness policy](https://android.googlesource.com/platform/frameworks/base/+/android-10.0.0_r1/services/core/java/com/android/server/display/DisplayPowerController.java)

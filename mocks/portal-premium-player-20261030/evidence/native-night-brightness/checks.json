@@ -1,0 +1,3094 @@
+{
+  "success": true,
+  "passed": 479,
+  "failed": 0,
+  "failureCode": null,
+  "lastPhase": "CLEANUP",
+  "checks": [
+    {
+      "name": "exact_owned_AVD_name",
+      "passed": true
+    },
+    {
+      "name": "owned_API34",
+      "passed": true
+    },
+    {
+      "name": "single_owned_debug_APK_installed",
+      "passed": true
+    },
+    {
+      "name": "installed_current_debug_APK_hash_matches_local",
+      "passed": true
+    },
+    {
+      "name": "full_private_registry_profile_available",
+      "passed": true
+    },
+    {
+      "name": "default_photo_source_before_mutations",
+      "passed": true
+    },
+    {
+      "name": "default_photo_source_before_configuration",
+      "passed": true
+    },
+    {
+      "name": "registry_has_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_has_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_has_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_has_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_has_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_has_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_has_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_has_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_has_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registry_applied_complete_batch",
+      "passed": true
+    },
+    {
+      "name": "registry_configuration_readback",
+      "passed": true
+    },
+    {
+      "name": "production_preview_started_without_CLEAR_TASK",
+      "passed": true
+    },
+    {
+      "name": "native_stage_without_WebView",
+      "passed": true
+    },
+    {
+      "name": "actual_accessible_stage_to_open_toolbar",
+      "passed": true
+    },
+    {
+      "name": "show_toolbar_observed_bounds",
+      "passed": true
+    },
+    {
+      "name": "show_toolbar_bounds_in_native_screen",
+      "passed": true
+    },
+    {
+      "name": "actual_toolbar_Pause",
+      "passed": true
+    },
+    {
+      "name": "Pause_observed_bounds",
+      "passed": true
+    },
+    {
+      "name": "Pause_bounds_in_native_screen",
+      "passed": true
+    },
+    {
+      "name": "baseline_USER_PAUSED",
+      "passed": true
+    },
+    {
+      "name": "paused-before_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "paused-before-stable_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "paused-before_photo_content",
+      "passed": true
+    },
+    {
+      "name": "paused-before_stable_ROI",
+      "passed": true
+    },
+    {
+      "name": "PAUSED_BASELINE_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "PAUSED_BASELINE_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "initial_window_override_is_exact_system_default",
+      "passed": true
+    },
+    {
+      "name": "system_brightness_supports_visible_down_and_up_range",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_several_observed_values",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_normalized_window_bounds",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_monotonic",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_no_default_override_during_downward_ramp",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_reaches_exact_target",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_at_least_four_distinct_intermediate_values",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_observed_gradual_duration",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_no_single_observed_snap",
+      "passed": true
+    },
+    {
+      "name": "settled-night_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "settled-night_actual_accessible_fullscreen_clock",
+      "passed": true
+    },
+    {
+      "name": "settled-night_visible_clock_ink_on_black",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "settled-night_same_window",
+      "passed": true
+    },
+    {
+      "name": "settled-night_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "settled-night_same_process",
+      "passed": true
+    },
+    {
+      "name": "settled-night_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "settled-night_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "settled-night_actual_window_brightness_003",
+      "passed": true
+    },
+    {
+      "name": "real_sensor_dark_settle_event",
+      "passed": true
+    },
+    {
+      "name": "dark_entry_retains_scene",
+      "passed": true
+    },
+    {
+      "name": "live_registered_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "live_valid_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "live_batch_accepted",
+      "passed": true
+    },
+    {
+      "name": "live_batch_readback",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "LIVE_TARGET_REVERSAL_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live_edit_observed_before_old_target",
+      "passed": true
+    },
+    {
+      "name": "live_registered_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "live_valid_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "live_batch_accepted",
+      "passed": true
+    },
+    {
+      "name": "live_batch_readback",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_several_observed_values",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_normalized_window_bounds",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_monotonic",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_no_default_override_during_downward_ramp",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_reaches_exact_target",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_at_least_four_distinct_intermediate_values",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_observed_gradual_duration",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_no_single_observed_snap",
+      "passed": true
+    },
+    {
+      "name": "live_retarget_has_no_observable_restart_snap",
+      "passed": true
+    },
+    {
+      "name": "live_reversal_does_not_reach_abandoned_target",
+      "passed": true
+    },
+    {
+      "name": "live-target-back-at-003_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "live-target-back-at-003_actual_accessible_fullscreen_clock",
+      "passed": true
+    },
+    {
+      "name": "live-target-back-at-003_visible_clock_ink_on_black",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "live-reversed-down_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "live-target-back-at-003_same_window",
+      "passed": true
+    },
+    {
+      "name": "live-target-back-at-003_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "live-target-back-at-003_same_process",
+      "passed": true
+    },
+    {
+      "name": "live-target-back-at-003_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "live-target-back-at-003_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "live-target-back-at-003_actual_window_brightness_003",
+      "passed": true
+    },
+    {
+      "name": "live_reversal_no_new_scene",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_several_observed_values",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_normalized_window_bounds",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_monotonic",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_starts_at_night_target",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_observed_positive_upward_motion",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_exact_system_default_restored",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_no_override_reapplied_after_restore",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_at_least_four_distinct_intermediate_values",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_observed_gradual_duration",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_no_single_observed_snap",
+      "passed": true
+    },
+    {
+      "name": "paused-return_photo_stage_and_no_clock",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "paused-return_same_window",
+      "passed": true
+    },
+    {
+      "name": "paused-return_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "paused-return_same_process",
+      "passed": true
+    },
+    {
+      "name": "paused-return_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "paused-return_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "paused-return_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "paused-return_actual_brightness_restored",
+      "passed": true
+    },
+    {
+      "name": "paused-return_retained_photo_ROI",
+      "passed": true
+    },
+    {
+      "name": "real_sensor_bright_settle_event",
+      "passed": true
+    },
+    {
+      "name": "USER_PAUSED_choice_retained",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_photo_stage_and_no_clock",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_same_window",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_same_process",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_actual_brightness_restored",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_retained_photo_ROI",
+      "passed": true
+    },
+    {
+      "name": "whole_cycle_and_paused_hold_no_new_scene",
+      "passed": true
+    },
+    {
+      "name": "default_source_after_case",
+      "passed": true
+    },
+    {
+      "name": "global_brightness_setting_unchanged",
+      "passed": true
+    },
+    {
+      "name": "actual_toolbar_Done",
+      "passed": true
+    },
+    {
+      "name": "finish_bounded_case_observed_bounds",
+      "passed": true
+    },
+    {
+      "name": "finish_bounded_case_bounds_in_native_screen",
+      "passed": true
+    },
+    {
+      "name": "all_original_registry_values_accepted_for_restore",
+      "passed": true
+    },
+    {
+      "name": "all_modified_registry_settings_restored",
+      "passed": true
+    },
+    {
+      "name": "owned_light_restored_500",
+      "passed": true
+    }
+  ],
+  "cases": {
+    "pausedBrightnessCycle": {
+      "executed": true,
+      "success": true,
+      "initialOverride": -1.0,
+      "initialOverrideExplicit": false,
+      "systemBrightnessSetting": 102,
+      "baselineSceneCount": 3,
+      "baselinePhotoRoiSha256": "ea7e815bbe2f9a45c1d3aed5e53fe58c64cd9b27a698ba261937b676b3a5fe14",
+      "windowIdentitySha256": "3db354ea29db63ac4ca50a146a6bcd975d4236ab8f204729d91d3514f49973b0",
+      "activityIdentitySha256": "36a7c251594586e18f0f64288d9d4a86bf89822e510b0b83993167263303ed82",
+      "processId": 5535,
+      "darkSettleEventSeconds": 20.141,
+      "brightSettleEventSeconds": 5.138
+    },
+    "liveTargetReversal": {
+      "executed": true,
+      "success": true,
+      "targetEditTransportSeconds": 0.154721,
+      "unsampledRetargetApertureSeconds": 0.179074,
+      "lastObservedBeforeEdit": 0.048153576,
+      "firstObservedAfterEdit": 0.05917392
+    }
+  },
+  "ramps": {
+    "dark-entry-down": {
+      "samples": [
+        {
+          "seconds": 35.641871,
+          "readDurationMs": 95.373,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 35.757141,
+          "readDurationMs": 34.585,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 35.836067,
+          "readDurationMs": 34.571,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 35.915637,
+          "readDurationMs": 24.463,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 35.984061,
+          "readDurationMs": 23.661,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.049325,
+          "readDurationMs": 24.991,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.118234,
+          "readDurationMs": 26.3,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.196299,
+          "readDurationMs": 36.398,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.277422,
+          "readDurationMs": 25.717,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.352404,
+          "readDurationMs": 24.77,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.423869,
+          "readDurationMs": 25.608,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.495127,
+          "readDurationMs": 25.09,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.567473,
+          "readDurationMs": 26.95,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.639988,
+          "readDurationMs": 23.897,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.709067,
+          "readDurationMs": 25.922,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.783785,
+          "readDurationMs": 25.464,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.85467,
+          "readDurationMs": 31.786,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 36.930995,
+          "readDurationMs": 31.211,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.002154,
+          "readDurationMs": 27.725,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.073258,
+          "readDurationMs": 26.507,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.141412,
+          "readDurationMs": 26.678,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.214911,
+          "readDurationMs": 24.795,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.288859,
+          "readDurationMs": 23.024,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.360193,
+          "readDurationMs": 24.956,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.436793,
+          "readDurationMs": 28.162,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.512818,
+          "readDurationMs": 26.784,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.584908,
+          "readDurationMs": 24.021,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.657773,
+          "readDurationMs": 26.2,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.729979,
+          "readDurationMs": 26.502,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.806336,
+          "readDurationMs": 26.104,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.879847,
+          "readDurationMs": 32.871,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.962551,
+          "readDurationMs": 30.328,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.03188,
+          "readDurationMs": 23.882,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.103338,
+          "readDurationMs": 25.91,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.178705,
+          "readDurationMs": 24.747,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.25174,
+          "readDurationMs": 25.128,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.324038,
+          "readDurationMs": 25.361,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.391094,
+          "readDurationMs": 22.201,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.455276,
+          "readDurationMs": 23.263,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.520647,
+          "readDurationMs": 24.576,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.59131,
+          "readDurationMs": 25.839,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.661359,
+          "readDurationMs": 22.906,
+          "brightness": 0.39960897,
+          "explicit": true
+        },
+        {
+          "seconds": 38.735132,
+          "readDurationMs": 24.536,
+          "brightness": 0.3939826,
+          "explicit": true
+        },
+        {
+          "seconds": 38.808352,
+          "readDurationMs": 24.502,
+          "brightness": 0.38694358,
+          "explicit": true
+        },
+        {
+          "seconds": 38.876527,
+          "readDurationMs": 26.188,
+          "brightness": 0.37736502,
+          "explicit": true
+        },
+        {
+          "seconds": 38.9536,
+          "readDurationMs": 27.817,
+          "brightness": 0.36519426,
+          "explicit": true
+        },
+        {
+          "seconds": 39.023771,
+          "readDurationMs": 28.209,
+          "brightness": 0.35158843,
+          "explicit": true
+        },
+        {
+          "seconds": 39.093111,
+          "readDurationMs": 27.282,
+          "brightness": 0.3358214,
+          "explicit": true
+        },
+        {
+          "seconds": 39.168619,
+          "readDurationMs": 27.516,
+          "brightness": 0.31878158,
+          "explicit": true
+        },
+        {
+          "seconds": 39.23721,
+          "readDurationMs": 27.77,
+          "brightness": 0.30076897,
+          "explicit": true
+        },
+        {
+          "seconds": 39.311473,
+          "readDurationMs": 23.452,
+          "brightness": 0.28148228,
+          "explicit": true
+        },
+        {
+          "seconds": 39.378574,
+          "readDurationMs": 24.379,
+          "brightness": 0.26142108,
+          "explicit": true
+        },
+        {
+          "seconds": 39.446658,
+          "readDurationMs": 24.419,
+          "brightness": 0.23040082,
+          "explicit": true
+        },
+        {
+          "seconds": 39.520758,
+          "readDurationMs": 23.688,
+          "brightness": 0.20852618,
+          "explicit": true
+        },
+        {
+          "seconds": 39.588286,
+          "readDurationMs": 24.278,
+          "brightness": 0.1873425,
+          "explicit": true
+        },
+        {
+          "seconds": 39.654669,
+          "readDurationMs": 22.42,
+          "brightness": 0.17670617,
+          "explicit": true
+        },
+        {
+          "seconds": 39.722094,
+          "readDurationMs": 24.194,
+          "brightness": 0.15610978,
+          "explicit": true
+        },
+        {
+          "seconds": 39.792431,
+          "readDurationMs": 24.014,
+          "brightness": 0.13706347,
+          "explicit": true
+        },
+        {
+          "seconds": 39.860394,
+          "readDurationMs": 23.853,
+          "brightness": 0.11780989,
+          "explicit": true
+        },
+        {
+          "seconds": 39.931904,
+          "readDurationMs": 24.227,
+          "brightness": 0.09202975,
+          "explicit": true
+        },
+        {
+          "seconds": 39.996012,
+          "readDurationMs": 23.262,
+          "brightness": 0.08415687,
+          "explicit": true
+        },
+        {
+          "seconds": 40.062537,
+          "readDurationMs": 23.268,
+          "brightness": 0.069073826,
+          "explicit": true
+        },
+        {
+          "seconds": 40.131719,
+          "readDurationMs": 23.714,
+          "brightness": 0.051081777,
+          "explicit": true
+        },
+        {
+          "seconds": 40.196585,
+          "readDurationMs": 23.416,
+          "brightness": 0.04173127,
+          "explicit": true
+        },
+        {
+          "seconds": 40.260144,
+          "readDurationMs": 23.454,
+          "brightness": 0.04173127,
+          "explicit": true
+        },
+        {
+          "seconds": 40.331718,
+          "readDurationMs": 31.967,
+          "brightness": 0.035025805,
+          "explicit": true
+        },
+        {
+          "seconds": 40.40746,
+          "readDurationMs": 25.109,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 40.4828,
+          "readDurationMs": 25.493,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 40.555907,
+          "readDurationMs": 25.132,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 40.626713,
+          "readDurationMs": 23.239,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 40.695085,
+          "readDurationMs": 24.667,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 40.766556,
+          "readDurationMs": 23.546,
+          "brightness": 0.03,
+          "explicit": true
+        }
+      ],
+      "complete": true,
+      "startValue": -1.0,
+      "targetValue": 0.03,
+      "samplingBudgetSeconds": 10,
+      "distinctIntermediateValues": 24,
+      "observedProgressionSeconds": 1.746101,
+      "largestObservedStep": 0.03102,
+      "largestSampleGapSeconds": 0.11527,
+      "sampleCount": 72
+    },
+    "live-up-before-reversal": {
+      "samples": [
+        {
+          "seconds": 43.335202,
+          "readDurationMs": 22.415,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 43.402602,
+          "readDurationMs": 24.51,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 43.472161,
+          "readDurationMs": 24.444,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 43.54675,
+          "readDurationMs": 24.576,
+          "brightness": 0.03423452,
+          "explicit": true
+        },
+        {
+          "seconds": 43.614615,
+          "readDurationMs": 25.454,
+          "brightness": 0.039112292,
+          "explicit": true
+        },
+        {
+          "seconds": 43.683118,
+          "readDurationMs": 22.401,
+          "brightness": 0.043323174,
+          "explicit": true
+        },
+        {
+          "seconds": 43.75749,
+          "readDurationMs": 26.208,
+          "brightness": 0.048153576,
+          "explicit": true
+        }
+      ],
+      "complete": false,
+      "targetValue": 0.15,
+      "intentionallyInterrupted": true
+    },
+    "live-reversed-down": {
+      "samples": [
+        {
+          "seconds": 43.936564,
+          "readDurationMs": 22.368,
+          "brightness": 0.05917392,
+          "explicit": true
+        },
+        {
+          "seconds": 44.007038,
+          "readDurationMs": 24.071,
+          "brightness": 0.05917392,
+          "explicit": true
+        },
+        {
+          "seconds": 44.078571,
+          "readDurationMs": 27.634,
+          "brightness": 0.05917392,
+          "explicit": true
+        },
+        {
+          "seconds": 44.151568,
+          "readDurationMs": 23.214,
+          "brightness": 0.05917392,
+          "explicit": true
+        },
+        {
+          "seconds": 44.225349,
+          "readDurationMs": 24.95,
+          "brightness": 0.05917392,
+          "explicit": true
+        },
+        {
+          "seconds": 44.290598,
+          "readDurationMs": 22.132,
+          "brightness": 0.05917392,
+          "explicit": true
+        },
+        {
+          "seconds": 44.361841,
+          "readDurationMs": 23.45,
+          "brightness": 0.054724406,
+          "explicit": true
+        },
+        {
+          "seconds": 44.428667,
+          "readDurationMs": 25.969,
+          "brightness": 0.054724406,
+          "explicit": true
+        },
+        {
+          "seconds": 44.499157,
+          "readDurationMs": 23.482,
+          "brightness": 0.054724406,
+          "explicit": true
+        },
+        {
+          "seconds": 44.563792,
+          "readDurationMs": 24.462,
+          "brightness": 0.050575774,
+          "explicit": true
+        },
+        {
+          "seconds": 44.630753,
+          "readDurationMs": 23.94,
+          "brightness": 0.050575774,
+          "explicit": true
+        },
+        {
+          "seconds": 44.700133,
+          "readDurationMs": 24.119,
+          "brightness": 0.050575774,
+          "explicit": true
+        },
+        {
+          "seconds": 44.773722,
+          "readDurationMs": 24.617,
+          "brightness": 0.046623204,
+          "explicit": true
+        },
+        {
+          "seconds": 44.843649,
+          "readDurationMs": 25.21,
+          "brightness": 0.046623204,
+          "explicit": true
+        },
+        {
+          "seconds": 44.911825,
+          "readDurationMs": 24.261,
+          "brightness": 0.042598926,
+          "explicit": true
+        },
+        {
+          "seconds": 44.980998,
+          "readDurationMs": 25.478,
+          "brightness": 0.042598926,
+          "explicit": true
+        },
+        {
+          "seconds": 45.04812,
+          "readDurationMs": 24.433,
+          "brightness": 0.042598926,
+          "explicit": true
+        },
+        {
+          "seconds": 45.112418,
+          "readDurationMs": 23.895,
+          "brightness": 0.038665384,
+          "explicit": true
+        },
+        {
+          "seconds": 45.181706,
+          "readDurationMs": 23.9,
+          "brightness": 0.038665384,
+          "explicit": true
+        },
+        {
+          "seconds": 45.255694,
+          "readDurationMs": 25.915,
+          "brightness": 0.038665384,
+          "explicit": true
+        },
+        {
+          "seconds": 45.324716,
+          "readDurationMs": 25.923,
+          "brightness": 0.034522012,
+          "explicit": true
+        },
+        {
+          "seconds": 45.402243,
+          "readDurationMs": 29.046,
+          "brightness": 0.034522012,
+          "explicit": true
+        },
+        {
+          "seconds": 45.478907,
+          "readDurationMs": 25.143,
+          "brightness": 0.034522012,
+          "explicit": true
+        },
+        {
+          "seconds": 45.554353,
+          "readDurationMs": 25.651,
+          "brightness": 0.034522012,
+          "explicit": true
+        },
+        {
+          "seconds": 45.62048,
+          "readDurationMs": 25.788,
+          "brightness": 0.030428043,
+          "explicit": true
+        },
+        {
+          "seconds": 45.687848,
+          "readDurationMs": 25.745,
+          "brightness": 0.030428043,
+          "explicit": true
+        },
+        {
+          "seconds": 45.760497,
+          "readDurationMs": 31.427,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 45.837326,
+          "readDurationMs": 22.146,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 45.906307,
+          "readDurationMs": 22.999,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 45.974818,
+          "readDurationMs": 23.884,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 46.041435,
+          "readDurationMs": 22.94,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 46.107167,
+          "readDurationMs": 24.92,
+          "brightness": 0.03,
+          "explicit": true
+        }
+      ],
+      "complete": true,
+      "startValue": 0.048153576,
+      "targetValue": 0.03,
+      "samplingBudgetSeconds": 5,
+      "distinctIntermediateValues": 8,
+      "observedProgressionSeconds": 1.823933,
+      "largestObservedStep": 0.00445,
+      "largestSampleGapSeconds": 0.077527,
+      "sampleCount": 32
+    },
+    "bright-return-up": {
+      "samples": [
+        {
+          "seconds": 51.636938,
+          "readDurationMs": 43.42,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 51.720586,
+          "readDurationMs": 30.268,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 51.791045,
+          "readDurationMs": 26.683,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 51.864464,
+          "readDurationMs": 27.639,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 51.941036,
+          "readDurationMs": 25.843,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.012917,
+          "readDurationMs": 25.591,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.084847,
+          "readDurationMs": 26.141,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.157236,
+          "readDurationMs": 24.884,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.227418,
+          "readDurationMs": 24.948,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.297373,
+          "readDurationMs": 24.329,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.371098,
+          "readDurationMs": 25.842,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.437364,
+          "readDurationMs": 24.53,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.508025,
+          "readDurationMs": 24.431,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.574495,
+          "readDurationMs": 25.35,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.644132,
+          "readDurationMs": 25.03,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.718043,
+          "readDurationMs": 24.046,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.790159,
+          "readDurationMs": 24.177,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.857284,
+          "readDurationMs": 24.869,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.924054,
+          "readDurationMs": 23.917,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 52.991744,
+          "readDurationMs": 24.263,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.059499,
+          "readDurationMs": 26.128,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.12745,
+          "readDurationMs": 24.409,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.197072,
+          "readDurationMs": 24.794,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.270487,
+          "readDurationMs": 25.871,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.340384,
+          "readDurationMs": 24.463,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.41154,
+          "readDurationMs": 22.762,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.486038,
+          "readDurationMs": 26.121,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.559271,
+          "readDurationMs": 23.591,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.625443,
+          "readDurationMs": 27.952,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.691779,
+          "readDurationMs": 23.632,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.76034,
+          "readDurationMs": 25.849,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 53.831121,
+          "readDurationMs": 21.169,
+          "brightness": 0.043304317,
+          "explicit": true
+        },
+        {
+          "seconds": 53.896909,
+          "readDurationMs": 23.007,
+          "brightness": 0.053110328,
+          "explicit": true
+        },
+        {
+          "seconds": 53.964101,
+          "readDurationMs": 24.525,
+          "brightness": 0.06537581,
+          "explicit": true
+        },
+        {
+          "seconds": 54.036144,
+          "readDurationMs": 24.577,
+          "brightness": 0.07927932,
+          "explicit": true
+        },
+        {
+          "seconds": 54.106927,
+          "readDurationMs": 24.178,
+          "brightness": 0.09538374,
+          "explicit": true
+        },
+        {
+          "seconds": 54.173953,
+          "readDurationMs": 24.894,
+          "brightness": 0.11226201,
+          "explicit": true
+        },
+        {
+          "seconds": 54.247728,
+          "readDurationMs": 26.589,
+          "brightness": 0.13061757,
+          "explicit": true
+        },
+        {
+          "seconds": 54.314114,
+          "readDurationMs": 22.835,
+          "brightness": 0.15055119,
+          "explicit": true
+        },
+        {
+          "seconds": 54.381667,
+          "readDurationMs": 23.444,
+          "brightness": 0.17007805,
+          "explicit": true
+        },
+        {
+          "seconds": 54.449952,
+          "readDurationMs": 22.657,
+          "brightness": 0.1903983,
+          "explicit": true
+        },
+        {
+          "seconds": 54.515954,
+          "readDurationMs": 22.834,
+          "brightness": 0.2116085,
+          "explicit": true
+        },
+        {
+          "seconds": 54.592569,
+          "readDurationMs": 31.756,
+          "brightness": 0.23285857,
+          "explicit": true
+        },
+        {
+          "seconds": 54.681391,
+          "readDurationMs": 57.55,
+          "brightness": 0.25691542,
+          "explicit": true
+        },
+        {
+          "seconds": 54.771455,
+          "readDurationMs": 22.452,
+          "brightness": 0.2872459,
+          "explicit": true
+        },
+        {
+          "seconds": 54.846942,
+          "readDurationMs": 31.527,
+          "brightness": 0.30680326,
+          "explicit": true
+        },
+        {
+          "seconds": 54.926219,
+          "readDurationMs": 31.877,
+          "brightness": 0.32596296,
+          "explicit": true
+        },
+        {
+          "seconds": 55.044742,
+          "readDurationMs": 113.571,
+          "brightness": 0.3657605,
+          "explicit": true
+        },
+        {
+          "seconds": 55.189515,
+          "readDurationMs": 75.774,
+          "brightness": 0.38342068,
+          "explicit": true
+        },
+        {
+          "seconds": 55.284224,
+          "readDurationMs": 29.121,
+          "brightness": 0.38767442,
+          "explicit": true
+        },
+        {
+          "seconds": 55.361265,
+          "readDurationMs": 24.829,
+          "brightness": 0.39448896,
+          "explicit": true
+        },
+        {
+          "seconds": 55.432169,
+          "readDurationMs": 24.856,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 55.501983,
+          "readDurationMs": 26.664,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 55.57813,
+          "readDurationMs": 27.643,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 55.650829,
+          "readDurationMs": 32.187,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 55.733009,
+          "readDurationMs": 32.001,
+          "brightness": -1.0,
+          "explicit": false
+        }
+      ],
+      "complete": true,
+      "startValue": 0.03,
+      "targetValue": -1.0,
+      "samplingBudgetSeconds": 10,
+      "distinctIntermediateValues": 20,
+      "observedProgressionSeconds": 1.601048,
+      "largestObservedStep": 0.039798,
+      "largestSampleGapSeconds": 0.144773,
+      "sampleCount": 56
+    }
+  },
+  "observations": {
+    "debugApkSha256": "ef971bb98884ff9b1437362ed2d2412329ac8eaa8ba8ec65aa752766bbaeab1a",
+    "photoRoiBounds": [
+      604,
+      403,
+      1555,
+      950
+    ],
+    "source": "default",
+    "api": 34,
+    "modifiedSettingsCount": 8
+  },
+  "artifacts": [
+    {
+      "file": "paused-before-roi.png",
+      "sha256": "6962ee6dfe2614d14ac15a6d83930a7a3955f9ea0f9cabe6158b2c48086b7de6",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "paused-before-stable-roi.png",
+      "sha256": "6962ee6dfe2614d14ac15a6d83930a7a3955f9ea0f9cabe6158b2c48086b7de6",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "settled-night-roi.png",
+      "sha256": "38a49df2c1eb553b05a3ee535595e505e5945a6441aa986b1d76f2605f7e5c7a",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "live-target-back-at-003-roi.png",
+      "sha256": "38a49df2c1eb553b05a3ee535595e505e5945a6441aa986b1d76f2605f7e5c7a",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "paused-return-roi.png",
+      "sha256": "6962ee6dfe2614d14ac15a6d83930a7a3955f9ea0f9cabe6158b2c48086b7de6",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "paused-held-beyond-interval-roi.png",
+      "sha256": "6962ee6dfe2614d14ac15a6d83930a7a3955f9ea0f9cabe6158b2c48086b7de6",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    }
+  ],
+  "avd": "PortalMusic20261030",
+  "serial": "emulator-5556",
+  "activity": "com.immortal.launcher.PhotoFramePreviewActivity",
+  "api": 34,
+  "utc": "2026-10-31T01:31:12.139923+00:00",
+  "elapsedSeconds": 73.749,
+  "mainBudgetSeconds": 180,
+  "cleanupBudgetSeconds": 45,
+  "rampContractMs": 1800,
+  "implementationCadenceContractMs": 33,
+  "requestedObservationPollMs": 40.0,
+  "physicalPortalMeasured": false,
+  "panelFpsMeasured": false,
+  "comfortMeasured": false,
+  "cpuMeasured": false,
+  "foreignAvdTouched": false,
+  "clearTaskUsed": false,
+  "globalBrightnessWritten": false,
+  "scope": "One paused PhotoFramePreviewActivity on owned API34 AVD; real registry and emulated light sensor, actual Window.LayoutParams screenBrightness.",
+  "limits": "ADB samples observe several monotonic intermediate window attributes and bounded ramp duration; they do not measure every 33ms callback, exact easing, idle scheduler work, physical panel output, or hidden/stopped cancellation. Retarget transport aperture is reported. Host object identity is inferred from process/activity/window, unchanged scene count and matching photo ROI.",
+  "privacy": "Only scalar receipts and default-photo/synthetic-clock interior ROIs; no credentials, source URLs, complete profiles, raw hierarchy or raw logs."
+}

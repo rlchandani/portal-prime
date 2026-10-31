@@ -39,6 +39,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   private var powerReceiver: BroadcastReceiver? = null
   private var screenReceiver: BroadcastReceiver? = null
   private var hostStarted = false
+  private var nightBrightness: NightWindowBrightness? = null
 
   // Read from the *latest* intent (onCreate or onNewIntent), never captured in a closure:
   // this activity is singleTask, so a relaunch while the frame is already up reuses the live
@@ -101,21 +102,15 @@ class PhotoFramePreviewActivity : ComponentActivity() {
       if (launchDismissOnExit) ScreensaverDismiss.launchChosenApp(this)
       finish()
     }
-    val priorBrightness = window.attributes.screenBrightness
+    nightBrightness = NightWindowBrightness(this, window)
     frame.onNightClockChanged = { night ->
-      window.attributes = window.attributes.apply {
-        screenBrightness = if (night) ScreensaverConfig.load(this@PhotoFramePreviewActivity).nightClockBrightness / 100f
-            else priorBrightness
-      }
+      nightBrightness?.setNight(night, ScreensaverConfig.load(this@PhotoFramePreviewActivity).nightClockBrightness)
     }
 
     if (nightClock) {
       // Bedside clock: force the screen on for the window and dim it to a soft glow. Brightness is
       // window-scoped, so it restores automatically when this activity finishes (tap, or window end).
       window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-      window.attributes = window.attributes.apply {
-        screenBrightness = ScreensaverConfig.load(this@PhotoFramePreviewActivity).nightClockBrightness / 100f
-      }
     } else {
       applyKeepScreenOn()
       // Debug preview harness: render an arbitrary face (mantelframe WidgetConfig shape) instead
@@ -201,7 +196,9 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   private fun updateHostVisibility() {
     if (!this::frame.isInitialized) return
     val power = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
-    frame.setHostActive(hostStarted && power.isInteractive)
+    val visible = hostStarted && power.isInteractive
+    nightBrightness?.setActive(visible)
+    frame.setHostActive(visible)
   }
 
   private fun applyKeepScreenOn() {
@@ -230,6 +227,8 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     powerReceiver?.let { runCatching { unregisterReceiver(it) } }
     screenReceiver?.let { runCatching { unregisterReceiver(it) } }
     nightWatch.removeCallbacks(nightWatchTick)
+    nightBrightness?.close()
+    nightBrightness = null
     if (this::frame.isInitialized) frame.stop()
     super.onDestroy()
   }

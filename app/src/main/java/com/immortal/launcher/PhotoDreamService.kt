@@ -28,6 +28,7 @@ class PhotoDreamService : DreamService() {
   private var pinnedOrigin = false
   private var frameStopped = false
   private var lostPanelShown = false
+  private var nightBrightness: NightWindowBrightness? = null
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
@@ -54,15 +55,9 @@ class PhotoDreamService : DreamService() {
         WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
         WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
     frame = PhotoFrameController(this)
-    val priorBrightness = window?.attributes?.screenBrightness
-        ?: WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+    nightBrightness = window?.let { NightWindowBrightness(this, it).also { brightness -> brightness.setActive(true) } }
     frame.onNightClockChanged = { night ->
-      window?.let { ownedWindow ->
-        ownedWindow.attributes = ownedWindow.attributes.apply {
-          screenBrightness = if (night) ScreensaverConfig.load(this@PhotoDreamService).nightClockBrightness / 100f
-              else priorBrightness
-        }
-      }
+      nightBrightness?.setNight(night, ScreensaverConfig.load(this@PhotoDreamService).nightClockBrightness)
     }
     frame.onExit = {
       exitPinnedDream(
@@ -146,10 +141,13 @@ class PhotoDreamService : DreamService() {
 
   /** Freeze the last photo until window removal; clearing bitmaps here would flash black. */
   private fun pauseFrameIfReady() {
+    nightBrightness?.setActive(false)
     if (!frameStopped && this::frame.isInitialized) frame.setHostActive(false)
   }
 
   private fun stopFrameOnce() {
+    nightBrightness?.close()
+    nightBrightness = null
     if (!frameStopped && this::frame.isInitialized) {
       frameStopped = true
       frame.onExit = null
