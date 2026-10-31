@@ -1,0 +1,154 @@
+{
+  "scope": "Actual API34 OS Dream and singleTask intent continuity on the exclusively owned emulator; physical Meta/Portal UI not accepted by this result",
+  "sourceCommit": "264d7279c591b2500983e9d249005fca53988a57",
+  "debugApkSha256": "4f63b5a190ffdff89686f3e968cc242e7bfd9743d6a81c30aea8bcb1e4fa0cae",
+  "appSourceChanged": false,
+  "appRunsAsNormalUid": true,
+  "testAdbdRootUsedForOsDreamCommand": true,
+  "testAdbdReturnedToShell": true,
+  "continuationDreamTap": {
+    "actualOsDream": true,
+    "continuationAndHomeBelowDream": true,
+    "singleTap": true,
+    "continuationRetired": true,
+    "dreamTapExitCount": 1,
+    "userExitVerdict": true,
+    "redreamAfterTap": false,
+    "activeContinuationRecordsAfterTap": 0,
+    "activeDreamRecordsAfterTap": 0,
+    "originalHomeActivityRetained": true,
+    "noOwnedScreensaverWindowAfterTap": true
+  },
+  "videoObservation": {
+    "framesSampledAt30Hz": 52,
+    "classificationCounts": {
+      "photo": 26,
+      "home": 20,
+      "transition": 6
+    },
+    "firstHomeFrame": 32,
+    "firstHomeSecondsFromRecordingStart": 1.0666666666666667,
+    "nonHomeFramesAfterFirstHome": 0,
+    "nearBlackFrames": 0,
+    "minimumMeanLuminance": 95.391,
+    "photoReference": "First recorded frame visually confirmed as the actual Dream photo; an earlier screenshot had already changed photos",
+    "isPhysicalPortal": false,
+    "isDeliveredFpsMeasurement": false,
+    "visualizationDurationSeconds": 1.729467,
+    "fullWallClockObservationSeconds": 6,
+    "postHomeLiveOsRecordsVerified": true
+  },
+  "deliberatePausedViewerDreamTap": {
+    "apiLevel": 34,
+    "actualOsDream": true,
+    "deliberateViewerPreserved": true,
+    "sameActivityToken": true,
+    "samePid": true,
+    "continuationRetired": false,
+    "userExitVerdict": true,
+    "photoRegion": [
+      100,
+      100,
+      2060,
+      1000
+    ],
+    "photoMeanAbsoluteRgbDifference": 0.026533257747543462,
+    "physicalPortalVerified": false,
+    "pauseLabelsAfterVisuallyVerified": true,
+    "maximumChannelDifference": 1,
+    "photoPixelsExactlyEqual": false,
+    "pauseLabelsBeforeVisuallyVerified": true,
+    "explicitPauseChoiceRetained": true,
+    "initialExactPixelThresholdFailed": true,
+    "passed": true
+  },
+  "singleTaskIntentModeCheck": {
+    "passed": true,
+    "serial": "emulator-5556",
+    "avd": "PortalMusic20261030",
+    "api": 34,
+    "tap_exit": false,
+    "back_return": true,
+    "home_restored": true,
+    "apk_guard": true,
+    "on_new_intent_true": true,
+    "on_new_intent_false": true,
+    "same_activity_record": true,
+    "same_pid": true,
+    "viewer_retained_after_tap": true
+  },
+  "initialIntentAttempt": {
+    "passed": false,
+    "failure": "home_return_failed",
+    "sameActivityAndPid": true,
+    "onNewIntentBothFlagsVerified": true,
+    "correctedWithBoundedLiveRecordPolling": true
+  },
+  "otherFiniteAttempts": [
+    {
+      "failure": "emulator_boot_service_not_yet_ready",
+      "appSourceChanged": false
+    },
+    {
+      "failure": "direct_dream_command_requires_test_root",
+      "physicalPortalConfigurationChanged": false
+    },
+    {
+      "failure": "overmatched_mLastPausedActivity_history",
+      "reconciledFromExistingCaptureAndLiveRecords": true
+    },
+    {
+      "failure": "uiautomator_dump_timeout_8s",
+      "pausedControlsVerifiedFromActualNativePixels": true
+    },
+    {
+      "failure": "strict_exact_pixel_threshold",
+      "meanRgbDifference": 0.026533257747543462,
+      "maximumChannelDifference": 1,
+      "pixelExactlyEqual": false,
+      "nearIdentityReconciledWithoutRepeatingTheCapture": true
+    }
+  ],
+  "emulatorRecovery": {
+    "zeroBytePreferenceFilesOnColdStart": 4,
+    "recoveredKnownPreferenceFiles": 7,
+    "exactRecoveredPayloads": true,
+    "filesystemSyncCompleted": true,
+    "physicalPortalChanged": false
+  },
+  "finalCleanup": {
+    "coldBoot": true,
+    "savedRamSnapshotLoaded": false,
+    "adbdUidRestoredToShell": true,
+    "zeroBytePreferenceFiles": 0,
+    "criticalPreferencePayloadsExact": true,
+    "criticalPreferenceFilesCompared": 3,
+    "completeSettingsProfileExact": true,
+    "sourceGroupsExact": true,
+    "screensaverConfigurationExact": true,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "finalPreferencesExactBeforeStop": true,
+    "ownedForwardRemoved": true,
+    "ownedEmulatorStopRequested": true,
+    "ownedEmulatorStopped": true,
+    "foreignEmulatorsTouched": false
+  },
+  "familyOperations": {
+    "wifiAdbRefused": true,
+    "readOnlyFleetDiagnostics": true,
+    "nightClockHostObserved": "PhotoFramePreviewActivity",
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "appInstalls": 0,
+    "settingWrites": 0,
+    "sourceWrites": 0,
+    "uiActions": 0,
+    "physicalStackedDreamVerified": false
+  },
+  "physicalPortalPixelsVerified": false,
+  "deliveredFpsMeasured": false,
+  "performanceGainMeasured": false,
+  "livingAreaOperations": 0,
+  "nextConcreteSourceOutlier": "FaceRenderer.tick reassigns unchanged date/battery/weather text every second; no implementation change or performance gain claimed here"
+}

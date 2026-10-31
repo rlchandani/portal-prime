@@ -2415,6 +2415,69 @@ outside this software/native-loading result.
 Evidence: `mocks/portal-premium-player-20261030/evidence/native-bounded-remote-photos/checks.json`
 and `mocks/portal-premium-player-20261030/evidence/family-bounded-remote-photos/verification.json`.
 
+## Actual OS Dream tap-return verification — 02:26:33–02:56:33 UTC window
+
+The existing continuation-retirement fix now has actual Android lifecycle
+evidence, beyond its boundary-double unit tests. On the exclusively owned API 34
+emulator, a real `PhotoDreamService` Dream window was started above a retained
+continuation and Home. One tap logged **one** Dream exit, retired the continuation,
+classified the stop as **USER_EXIT**, removed both live screensaver activity
+records/windows and revealed the original Home activity. No REDREAM followed.
+
+The screen recording produced **52 frames resampled at 30 Hz**, with **26**
+classified as the initial Dream photo, **six** transitional and **20** Home.
+There were **zero** near-black frames and **zero** non-Home frames after the
+first stable Home classification. Encoded changing-screen output spans
+**1.729 seconds** within a six-second recording command; this is neither a
+physical Portal observation nor delivered FPS or tap-latency measurement.
+
+A second real-Dream case preserves a deliberately opened, explicitly paused
+viewer. The same process/activity returns with **Paused / Resume** visible and
+the same photo. In the compared **1960×900** photo region, mean absolute RGB
+difference is **0.02653 / 255**, maximum channel difference **one**. These captures
+are near-identical, not pixel-exact, and do not prove bitmap heap identity.
+Unlike the continuation case, the viewer is retained and the retirement log
+correctly reports **false**.
+
+The new finite `screensaver-intent-native-checks.py` also verifies real
+`singleTask` **false → true → false** intent transitions: both `onNewIntent`
+flags arrive on the same activity/process; the deliberate viewer remains after
+a tap and returns through Back. Its final passing run uses bounded live-record
+polling. The initial immediate Back assertion raced asynchronous destruction.
+Another initial assertion incorrectly counted Android's lingering
+`mLastPausedActivity` diagnostic history as a live surface; existing live-record,
+window and video evidence reconciled it without repeating that capture.
+An eight-second UIAutomator dump timed out; paused controls were verified from
+actual native pixels. The overly strict exact-pixel threshold is retained beside
+the measured one-level difference rather than presented as a pixel-exact pass.
+
+The direct OS Dream test command requires root on this emulator. Only the test
+ADB daemon temporarily used root; Immortal remained its normal app user, no app
+permissions changed, and ADB returned to shell afterward. No Portal rooting or
+configuration change was attempted. At the initial emulator cold boot, four
+preference files were empty despite the previous turn's successful pre-stop
+payload check. Seven known saved payloads were restored privately. Final
+restoration now flushes the filesystem, and an additional cold boot independently
+verifies **zero** empty preference files, exact Fleet/screensaver/bridge payloads,
+the complete settings profile and all source groups unchanged. This establishes
+the corrected test-device recovery sequence, not the cause of the initial
+empty files or a physical Portal persistence defect.
+
+Both owned emulator processes have exited, forwarding is removed, exact
+preferences are restored, ADB root is reverted and collectors have zero
+listeners. Foreign emulators were untouched. Family Fleet diagnostics were
+read-only: its current host is `PhotoFramePreviewActivity`, collector inactive,
+zero listeners. Wi-Fi ADB remains refused; physical API 29 stacked-Dream pixels
+and transitions remain unaccepted. App source/APK was unchanged and no Portal
+installation, setting write, source write or UI action occurred in this window.
+
+Source inspection identified a next concrete optimization:
+`FaceRenderer.tick` reassigns unchanged date, battery and weather text every
+second. This section claims discovery only; no fix or speed gain for that path
+has been delivered yet.
+
+Evidence: `mocks/portal-premium-player-20261030/evidence/native-dream-tap-return/checks.json`.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
