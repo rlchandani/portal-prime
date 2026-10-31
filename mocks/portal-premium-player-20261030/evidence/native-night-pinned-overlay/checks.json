@@ -1,0 +1,2483 @@
+{
+  "success": true,
+  "passed": 374,
+  "failed": 0,
+  "failureCode": null,
+  "lastPhase": "CLEANUP",
+  "checks": [
+    {
+      "name": "exact_owned_AVD_name",
+      "passed": true
+    },
+    {
+      "name": "owned_API34",
+      "passed": true
+    },
+    {
+      "name": "single_owned_debug_APK_installed",
+      "passed": true
+    },
+    {
+      "name": "installed_current_debug_APK_hash_matches_local",
+      "passed": true
+    },
+    {
+      "name": "full_private_registry_profile_available",
+      "passed": true
+    },
+    {
+      "name": "default_photo_source_before_mutations",
+      "passed": true
+    },
+    {
+      "name": "default_photo_source_before_configuration",
+      "passed": true
+    },
+    {
+      "name": "registry_has_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_has_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_has_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_has_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_has_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_has_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_has_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_has_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_has_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registry_applied_complete_batch",
+      "passed": true
+    },
+    {
+      "name": "registry_configuration_readback",
+      "passed": true
+    },
+    {
+      "name": "actual_Files_activity_present",
+      "passed": true
+    },
+    {
+      "name": "production_command_/remote/pin",
+      "passed": true
+    },
+    {
+      "name": "overlay_service_available_and_unpinned",
+      "passed": true
+    },
+    {
+      "name": "production_command_/remote/pin",
+      "passed": true
+    },
+    {
+      "name": "Files_pinned_with_live_session",
+      "passed": true
+    },
+    {
+      "name": "production_command_/remote/pin",
+      "passed": true
+    },
+    {
+      "name": "production_accessibility_cover_shown",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "overlay_initial_default_brightness",
+      "passed": true
+    },
+    {
+      "name": "before_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_several_observed_values",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_normalized_window_bounds",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_monotonic",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_no_default_override_during_downward_ramp",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_reaches_exact_target",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_at_least_four_distinct_intermediate_values",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_observed_gradual_duration",
+      "passed": true
+    },
+    {
+      "name": "pinned-dark-down_no_single_observed_snap",
+      "passed": true
+    },
+    {
+      "name": "clock_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "overlay_clock_has_black_background",
+      "passed": true
+    },
+    {
+      "name": "overlay_clock_has_visible_warm_ink",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "one_actual_fullscreen_accessibility_cover",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_same_visible_overlay",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_several_observed_values",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_normalized_window_bounds",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_monotonic",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_starts_at_night_target",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_observed_positive_upward_motion",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_exact_system_default_restored",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_no_override_reapplied_after_restore",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_at_least_four_distinct_intermediate_values",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_observed_gradual_duration",
+      "passed": true
+    },
+    {
+      "name": "pinned-bright-up_no_single_observed_snap",
+      "passed": true
+    },
+    {
+      "name": "returned_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "overlay_returns_exact_same_photo",
+      "passed": true
+    },
+    {
+      "name": "production_command_/remote/pin",
+      "passed": true
+    },
+    {
+      "name": "cover_retains_Files_window_and_valid_pin",
+      "passed": true
+    },
+    {
+      "name": "actual_Files_activity_present",
+      "passed": true
+    },
+    {
+      "name": "same_underlying_Files_activity",
+      "passed": true
+    },
+    {
+      "name": "same_underlying_Files_process",
+      "passed": true
+    },
+    {
+      "name": "production_command_/remote/pin",
+      "passed": true
+    },
+    {
+      "name": "one_tap_removes_cover_and_keeps_pin",
+      "passed": true
+    },
+    {
+      "name": "actual_Files_activity_present",
+      "passed": true
+    },
+    {
+      "name": "tap_reveals_same_Files_activity",
+      "passed": true
+    },
+    {
+      "name": "tap_reveals_same_Files_process",
+      "passed": true
+    },
+    {
+      "name": "overlay_retirement_has_no_failed_cleanup",
+      "passed": true
+    },
+    {
+      "name": "production_command_/remote/pin",
+      "passed": true
+    },
+    {
+      "name": "production_command_/remote/pin",
+      "passed": true
+    },
+    {
+      "name": "all_original_registry_values_accepted_for_restore",
+      "passed": true
+    },
+    {
+      "name": "all_modified_registry_settings_restored",
+      "passed": true
+    },
+    {
+      "name": "owned_light_restored_500",
+      "passed": true
+    }
+  ],
+  "cases": {},
+  "ramps": {
+    "pinned-dark-down": {
+      "samples": [
+        {
+          "seconds": 25.6179,
+          "readDurationMs": 46.856,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 25.697576,
+          "readDurationMs": 25.004,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 25.768589,
+          "readDurationMs": 34.975,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 25.843695,
+          "readDurationMs": 25.813,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 25.908961,
+          "readDurationMs": 24.267,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 25.983011,
+          "readDurationMs": 25.492,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.054399,
+          "readDurationMs": 25.335,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.127102,
+          "readDurationMs": 26.111,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.199256,
+          "readDurationMs": 25.725,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.266494,
+          "readDurationMs": 27.631,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.340968,
+          "readDurationMs": 26.587,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.416772,
+          "readDurationMs": 26.05,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.492023,
+          "readDurationMs": 26.794,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.565371,
+          "readDurationMs": 26.616,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.632999,
+          "readDurationMs": 23.199,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.699888,
+          "readDurationMs": 22.597,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.767905,
+          "readDurationMs": 25.058,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.839867,
+          "readDurationMs": 26.784,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.908351,
+          "readDurationMs": 28.007,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 26.979249,
+          "readDurationMs": 25.167,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.046429,
+          "readDurationMs": 25.424,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.114905,
+          "readDurationMs": 26.177,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.181177,
+          "readDurationMs": 25.449,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.246393,
+          "readDurationMs": 22.022,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.315303,
+          "readDurationMs": 22.029,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.384173,
+          "readDurationMs": 29.246,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.451458,
+          "readDurationMs": 24.588,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.533628,
+          "readDurationMs": 33.797,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.627216,
+          "readDurationMs": 59.68,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.729835,
+          "readDurationMs": 46.139,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.839128,
+          "readDurationMs": 88.834,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 27.947915,
+          "readDurationMs": 42.912,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 28.042271,
+          "readDurationMs": 46.995,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 28.134737,
+          "readDurationMs": 37.818,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 28.209922,
+          "readDurationMs": 32.329,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 28.286997,
+          "readDurationMs": 35.614,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 28.366295,
+          "readDurationMs": 27.451,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 28.451811,
+          "readDurationMs": 44.175,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 28.539674,
+          "readDurationMs": 31.45,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 28.616649,
+          "readDurationMs": 27.321,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 28.71033,
+          "readDurationMs": 54.6,
+          "brightness": 0.39978063,
+          "explicit": true
+        },
+        {
+          "seconds": 28.803208,
+          "readDurationMs": 47.268,
+          "brightness": 0.39610174,
+          "explicit": true
+        },
+        {
+          "seconds": 28.893311,
+          "readDurationMs": 32.65,
+          "brightness": 0.3925067,
+          "explicit": true
+        },
+        {
+          "seconds": 28.976337,
+          "readDurationMs": 41.329,
+          "brightness": 0.38336253,
+          "explicit": true
+        },
+        {
+          "seconds": 29.075502,
+          "readDurationMs": 59.958,
+          "brightness": 0.37326634,
+          "explicit": true
+        },
+        {
+          "seconds": 29.17009,
+          "readDurationMs": 41.395,
+          "brightness": 0.35289794,
+          "explicit": true
+        },
+        {
+          "seconds": 29.256756,
+          "readDurationMs": 38.387,
+          "brightness": 0.34362128,
+          "explicit": true
+        },
+        {
+          "seconds": 29.350823,
+          "readDurationMs": 49.548,
+          "brightness": 0.32406053,
+          "explicit": true
+        },
+        {
+          "seconds": 29.441128,
+          "readDurationMs": 40.741,
+          "brightness": 0.30131695,
+          "explicit": true
+        },
+        {
+          "seconds": 29.523553,
+          "readDurationMs": 40.763,
+          "brightness": 0.28686482,
+          "explicit": true
+        },
+        {
+          "seconds": 29.620472,
+          "readDurationMs": 52.951,
+          "brightness": 0.26382574,
+          "explicit": true
+        },
+        {
+          "seconds": 29.723639,
+          "readDurationMs": 62.57,
+          "brightness": 0.25571668,
+          "explicit": true
+        },
+        {
+          "seconds": 29.841536,
+          "readDurationMs": 70.499,
+          "brightness": 0.21624681,
+          "explicit": true
+        },
+        {
+          "seconds": 29.968045,
+          "readDurationMs": 90.919,
+          "brightness": 0.19423456,
+          "explicit": true
+        },
+        {
+          "seconds": 30.156607,
+          "readDurationMs": 191.838,
+          "brightness": 0.1474733,
+          "explicit": true
+        },
+        {
+          "seconds": 30.314257,
+          "readDurationMs": 35.835,
+          "brightness": 0.1317802,
+          "explicit": true
+        },
+        {
+          "seconds": 30.397624,
+          "readDurationMs": 45.568,
+          "brightness": 0.12183713,
+          "explicit": true
+        },
+        {
+          "seconds": 30.48754,
+          "readDurationMs": 42.234,
+          "brightness": 0.103560686,
+          "explicit": true
+        },
+        {
+          "seconds": 30.58153,
+          "readDurationMs": 50.25,
+          "brightness": 0.09281284,
+          "explicit": true
+        },
+        {
+          "seconds": 30.696285,
+          "readDurationMs": 83.478,
+          "brightness": 0.08312981,
+          "explicit": true
+        },
+        {
+          "seconds": 30.860586,
+          "readDurationMs": 138.812,
+          "brightness": 0.05993064,
+          "explicit": true
+        },
+        {
+          "seconds": 31.000957,
+          "readDurationMs": 49.614,
+          "brightness": 0.050476134,
+          "explicit": true
+        },
+        {
+          "seconds": 31.100659,
+          "readDurationMs": 61.716,
+          "brightness": 0.044484682,
+          "explicit": true
+        },
+        {
+          "seconds": 31.196574,
+          "readDurationMs": 40.86,
+          "brightness": 0.041072067,
+          "explicit": true
+        },
+        {
+          "seconds": 31.291055,
+          "readDurationMs": 54.083,
+          "brightness": 0.03638332,
+          "explicit": true
+        },
+        {
+          "seconds": 31.396423,
+          "readDurationMs": 62.161,
+          "brightness": 0.033413522,
+          "explicit": true
+        },
+        {
+          "seconds": 31.502417,
+          "readDurationMs": 65.526,
+          "brightness": 0.031541213,
+          "explicit": true
+        },
+        {
+          "seconds": 31.600908,
+          "readDurationMs": 38.313,
+          "brightness": 0.030181667,
+          "explicit": true
+        },
+        {
+          "seconds": 31.693352,
+          "readDurationMs": 51.643,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 31.795082,
+          "readDurationMs": 67.387,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 31.894477,
+          "readDurationMs": 31.323,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 31.965239,
+          "readDurationMs": 29.877,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 32.041132,
+          "readDurationMs": 25.014,
+          "brightness": 0.03,
+          "explicit": true
+        }
+      ],
+      "complete": true,
+      "startValue": -1.0,
+      "targetValue": 0.03,
+      "samplingBudgetSeconds": 10,
+      "distinctIntermediateValues": 28,
+      "observedProgressionSeconds": 2.983022,
+      "largestObservedStep": 0.046761,
+      "largestSampleGapSeconds": 0.188562,
+      "sampleCount": 73
+    },
+    "pinned-bright-up": {
+      "samples": [
+        {
+          "seconds": 35.468301,
+          "readDurationMs": 30.817,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 35.540393,
+          "readDurationMs": 27.275,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 35.609553,
+          "readDurationMs": 29.295,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 35.684209,
+          "readDurationMs": 25.824,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 35.760221,
+          "readDurationMs": 29.764,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 35.829964,
+          "readDurationMs": 26.53,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 35.897504,
+          "readDurationMs": 24.77,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 35.972609,
+          "readDurationMs": 25.351,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.038927,
+          "readDurationMs": 25.4,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.107247,
+          "readDurationMs": 23.74,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.173892,
+          "readDurationMs": 23.717,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.241923,
+          "readDurationMs": 26.508,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.308353,
+          "readDurationMs": 23.334,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.379921,
+          "readDurationMs": 30.776,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.450554,
+          "readDurationMs": 24.797,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.518379,
+          "readDurationMs": 26.892,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.592198,
+          "readDurationMs": 23.561,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.656806,
+          "readDurationMs": 22.875,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.72475,
+          "readDurationMs": 25.462,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.793719,
+          "readDurationMs": 27.342,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.862013,
+          "readDurationMs": 24.093,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.930837,
+          "readDurationMs": 25.029,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 36.996641,
+          "readDurationMs": 23.122,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 37.070047,
+          "readDurationMs": 23.597,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 37.13988,
+          "readDurationMs": 22.432,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 37.210528,
+          "readDurationMs": 27.646,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 37.279586,
+          "readDurationMs": 24.563,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 37.350718,
+          "readDurationMs": 24.804,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 37.425745,
+          "readDurationMs": 25.162,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 37.490799,
+          "readDurationMs": 24.258,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 37.563711,
+          "readDurationMs": 28.33,
+          "brightness": 0.030074552,
+          "explicit": true
+        },
+        {
+          "seconds": 37.642697,
+          "readDurationMs": 32.147,
+          "brightness": 0.030685412,
+          "explicit": true
+        },
+        {
+          "seconds": 37.725227,
+          "readDurationMs": 32.818,
+          "brightness": 0.03137499,
+          "explicit": true
+        },
+        {
+          "seconds": 37.807272,
+          "readDurationMs": 35.92,
+          "brightness": 0.033439063,
+          "explicit": true
+        },
+        {
+          "seconds": 37.891468,
+          "readDurationMs": 36.451,
+          "brightness": 0.036002293,
+          "explicit": true
+        },
+        {
+          "seconds": 37.975668,
+          "readDurationMs": 31.83,
+          "brightness": 0.039057247,
+          "explicit": true
+        },
+        {
+          "seconds": 38.057314,
+          "readDurationMs": 41.379,
+          "brightness": 0.045261964,
+          "explicit": true
+        },
+        {
+          "seconds": 38.140502,
+          "readDurationMs": 38.813,
+          "brightness": 0.04810052,
+          "explicit": true
+        },
+        {
+          "seconds": 38.232963,
+          "readDurationMs": 46.011,
+          "brightness": 0.054909255,
+          "explicit": true
+        },
+        {
+          "seconds": 38.322705,
+          "readDurationMs": 32.662,
+          "brightness": 0.06290437,
+          "explicit": true
+        },
+        {
+          "seconds": 38.399918,
+          "readDurationMs": 35.648,
+          "brightness": 0.067063615,
+          "explicit": true
+        },
+        {
+          "seconds": 38.479382,
+          "readDurationMs": 34.733,
+          "brightness": 0.07689964,
+          "explicit": true
+        },
+        {
+          "seconds": 38.561403,
+          "readDurationMs": 38.909,
+          "brightness": 0.08665258,
+          "explicit": true
+        },
+        {
+          "seconds": 38.646635,
+          "readDurationMs": 33.096,
+          "brightness": 0.09840026,
+          "explicit": true
+        },
+        {
+          "seconds": 38.723057,
+          "readDurationMs": 34.906,
+          "brightness": 0.104953334,
+          "explicit": true
+        },
+        {
+          "seconds": 38.806602,
+          "readDurationMs": 34.11,
+          "brightness": 0.119049415,
+          "explicit": true
+        },
+        {
+          "seconds": 38.887685,
+          "readDurationMs": 27.956,
+          "brightness": 0.13145132,
+          "explicit": true
+        },
+        {
+          "seconds": 38.962741,
+          "readDurationMs": 33.221,
+          "brightness": 0.14835702,
+          "explicit": true
+        },
+        {
+          "seconds": 39.04385,
+          "readDurationMs": 30.296,
+          "brightness": 0.15444684,
+          "explicit": true
+        },
+        {
+          "seconds": 39.116209,
+          "readDurationMs": 31.553,
+          "brightness": 0.17738013,
+          "explicit": true
+        },
+        {
+          "seconds": 39.195171,
+          "readDurationMs": 27.045,
+          "brightness": 0.192823,
+          "explicit": true
+        },
+        {
+          "seconds": 39.264667,
+          "readDurationMs": 30.242,
+          "brightness": 0.202988,
+          "explicit": true
+        },
+        {
+          "seconds": 39.344186,
+          "readDurationMs": 33.118,
+          "brightness": 0.22275044,
+          "explicit": true
+        },
+        {
+          "seconds": 39.42714,
+          "readDurationMs": 31.957,
+          "brightness": 0.2322634,
+          "explicit": true
+        },
+        {
+          "seconds": 39.503218,
+          "readDurationMs": 32.77,
+          "brightness": 0.25208527,
+          "explicit": true
+        },
+        {
+          "seconds": 39.582591,
+          "readDurationMs": 32.039,
+          "brightness": 0.26978442,
+          "explicit": true
+        },
+        {
+          "seconds": 39.663151,
+          "readDurationMs": 35.52,
+          "brightness": 0.28853384,
+          "explicit": true
+        },
+        {
+          "seconds": 39.745612,
+          "readDurationMs": 30.068,
+          "brightness": 0.30798954,
+          "explicit": true
+        },
+        {
+          "seconds": 39.825447,
+          "readDurationMs": 40.244,
+          "brightness": 0.3261521,
+          "explicit": true
+        },
+        {
+          "seconds": 39.907217,
+          "readDurationMs": 34.046,
+          "brightness": 0.33470786,
+          "explicit": true
+        },
+        {
+          "seconds": 39.98579,
+          "readDurationMs": 40.752,
+          "brightness": 0.35191497,
+          "explicit": true
+        },
+        {
+          "seconds": 40.074591,
+          "readDurationMs": 36.745,
+          "brightness": 0.35910216,
+          "explicit": true
+        },
+        {
+          "seconds": 40.153395,
+          "readDurationMs": 32.364,
+          "brightness": 0.3756992,
+          "explicit": true
+        },
+        {
+          "seconds": 40.233374,
+          "readDurationMs": 32.975,
+          "brightness": 0.3850269,
+          "explicit": true
+        },
+        {
+          "seconds": 40.310864,
+          "readDurationMs": 26.941,
+          "brightness": 0.38962623,
+          "explicit": true
+        },
+        {
+          "seconds": 40.392826,
+          "readDurationMs": 37.842,
+          "brightness": 0.39657533,
+          "explicit": true
+        },
+        {
+          "seconds": 40.474801,
+          "readDurationMs": 40.314,
+          "brightness": 0.39957508,
+          "explicit": true
+        },
+        {
+          "seconds": 40.551221,
+          "readDurationMs": 26.257,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 40.616725,
+          "readDurationMs": 24.374,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 40.690817,
+          "readDurationMs": 25.133,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 40.759911,
+          "readDurationMs": 26.081,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 40.82676,
+          "readDurationMs": 23.969,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 40.893413,
+          "readDurationMs": 26.671,
+          "brightness": -1.0,
+          "explicit": false
+        }
+      ],
+      "complete": true,
+      "startValue": 0.03,
+      "targetValue": -1.0,
+      "samplingBudgetSeconds": 10,
+      "distinctIntermediateValues": 37,
+      "observedProgressionSeconds": 2.98751,
+      "largestObservedStep": 0.022933,
+      "largestSampleGapSeconds": 0.092461,
+      "sampleCount": 73
+    }
+  },
+  "observations": {
+    "debugApkSha256": "553862796ec527281e6e2eb1693ccceb5382509f005efc2c62c5f7fdba3bb16c",
+    "photoRoiBounds": [
+      604,
+      403,
+      1555,
+      950
+    ],
+    "source": "default",
+    "api": 34,
+    "pinnedOverlay": {
+      "underlyingActivitySha256": "9bb7d3ef0689f04c3ce83b82f4ffb1ae5be8f5b2d453aa516acb7f37552f593f",
+      "samePhoto": true,
+      "sameUnderlyingActivityAndProcess": true,
+      "oneTapReveal": true,
+      "physicalPanelMeasured": false
+    },
+    "modifiedSettingsCount": 7
+  },
+  "artifacts": [
+    {
+      "file": "before-roi.png",
+      "sha256": "bd84b879b64c2ec84ee0714872f54962ff02afc3526594213e47089500dac905",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "clock-roi.png",
+      "sha256": "a13ff612bc6e40168d12b668df4bcae17a36774a3cf49316c6c57a8caf0be664",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "returned-roi.png",
+      "sha256": "bd84b879b64c2ec84ee0714872f54962ff02afc3526594213e47089500dac905",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    }
+  ],
+  "avd": "PortalMusic20261030",
+  "serial": "emulator-5556",
+  "activity": null,
+  "api": 34,
+  "utc": "2026-10-31T05:19:36.296538+00:00",
+  "elapsedSeconds": 43.453,
+  "mainBudgetSeconds": 180,
+  "cleanupBudgetSeconds": 45,
+  "rampContractMs": 3000,
+  "implementationCadenceContractMs": 33,
+  "requestedObservationPollMs": 40.0,
+  "physicalPortalMeasured": false,
+  "panelFpsMeasured": false,
+  "comfortMeasured": false,
+  "cpuMeasured": false,
+  "foreignAvdTouched": false,
+  "clearTaskUsed": false,
+  "globalBrightnessWritten": false,
+  "scope": "Production PinnedAppFrameHost over retained Android Files on owned API34; actual overlay attributes, native clock/photo regions and one-tap reveal.",
+  "limits": "Window brightness commands and API34 software rendering are verified; physical Portal backlight, pinned-overlay FPS and physical tap latency are not measured.",
+  "privacy": "Only scalar receipts and default-photo/synthetic-clock interior ROIs; no credentials, source URLs, complete profiles, raw hierarchy or raw logs.",
+  "surface": "TYPE_ACCESSIBILITY_OVERLAY"
+}

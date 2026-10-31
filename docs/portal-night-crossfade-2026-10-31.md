@@ -50,11 +50,37 @@ panel restores brightness rather than retaining a night override.
   forward was removed, the owned recording was removed from Android, and the
   owned emulator exited. The other emulator was untouched.
 
+## Additional pinned-overlay verification
+
+The same debug artifact subsequently passed two production accessibility-overlay
+checks on the owned API 34 emulator:
+
+- [Full night/bright cycle](../mocks/portal-premium-player-20261030/evidence/native-night-pinned-overlay/checks.json):
+  **374 assertions**, zero failures, **43.453 seconds**. Observed down/up
+  progression **2.983 / 2.988 seconds**, with **28 / 37** distinct intermediate
+  brightness values. The clock renders black and warm ink; returning photos
+  match the baseline exactly. One tap reveals the same Files Activity/process.
+- [Tap while showing the night clock](../mocks/portal-premium-player-20261030/evidence/native-night-pinned-tap/checks.json):
+  **228 assertions**, zero failures. One tap removes the clock cover and reveals
+  that same Files Activity/process with its valid pin retained.
+
+These are actual `TYPE_ACCESSIBILITY_OVERLAY` checks, separate from the preview
+Activity. They observe window commands and native clock/photo pixels, not physical
+backlight or display latency. Android Settings was rejected as a test pin because
+its package also supplies `FallbackHome`; the fixture uses the resolved Files
+launcher instead. Initial fixture/parser failures are retained privately.
+Android emits this overlay type numerically as `2032` and brightness as `sbrt`;
+the verifier supports those forms. No product source change or new deployment
+was needed for this additional verification.
+
+Eight preference files, accessibility service settings and screen timeout were
+restored exactly and synced. The owned forward was removed and emulator exited.
+
 ## Limits
 
 Family Area has Fleet access but no available ADB connection. This delivery
 does **not** claim physical API 29 fade comfort, panel FPS, or rendered acceptance
-of the pinned-overlay path. Android 9/10 exposes the selected system brightness
+of the pinned-overlay path on the physical Portal. Android 9/10 exposes the selected system brightness
 but not a public measurement of the Portal's actual adaptive backlight. Restoring
 Android's default brightness policy can therefore still depend on firmware.
 The finite software transitions and native API 34 pixels are verified; the

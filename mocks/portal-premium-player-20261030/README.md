@@ -56,6 +56,12 @@ The production automatic photo/clock handoff now uses a coordinated three-second
 content and brightness fade. This browser's static clock preview does not measure
 that native transition. See the [delivery and limits](../../docs/portal-night-crossfade-2026-10-31.md)
 and [native rendered checks](evidence/native-night-crossfade/checks.json).
+Additional actual accessibility-overlay checks cover the
+[pinned photo/clock cycle](evidence/native-night-pinned-overlay/checks.json)
+and [tap while showing the night clock](evidence/native-night-pinned-tap/checks.json).
+They use `night-pinned-overlay-native-checks.py` with an already prepared,
+explicitly owned API 34 emulator and a private `--connection` file; add
+`--tap-in-night` for the second case. Parent preparation/restoration is required.
 
 `#night-clock` matches the parent's `QuietNightClockView` drawing approach, inspected read only after it appeared:
 
