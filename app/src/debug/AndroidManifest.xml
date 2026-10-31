@@ -9,6 +9,20 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application>
+        <!-- API 34 acceptance fixture: skip ImmortalApp's preference/service hooks.
+             Enumerate the ordinary process too; its Application stays unchanged. -->
+        <processes>
+            <process android:process="${applicationId}" android:name="com.immortal.launcher.ImmortalApp" />
+            <process android:process=":artwork_cache_check" android:name="android.app.Application" />
+        </processes>
+        <activity
+            android:name=".ArtworkCacheCheckActivity"
+            android:process=":artwork_cache_check"
+            android:taskAffinity="${applicationId}.artwork_cache_check"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="Localhost artwork cache acceptance check"
+            android:theme="@style/Theme.SampleApp" />
         <activity
             android:name=".WidgetPagesPreviewActivity"
             android:exported="true"

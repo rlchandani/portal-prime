@@ -52,7 +52,7 @@ following size delivery installs these changes too. Animated-image pixel
 residency remains open: the native drawable API does not directly supply resized
 encoded animation to the current WebView pipeline.
 
-**Latest delivery:** [clock-size checks][clock-size] pass the 12-case native
+**Clock-size delivery:** [clock-size checks][clock-size] pass the 12-case native
 geometry matrix in 70.622 seconds; fresh gates pass **3,591 tests / 376 suites**.
 [Family installation][clock-size-deployment] verifies optimized APK `f6a50378…`,
 all 97 settings/source configuration unchanged, the previous signing certificate
@@ -61,6 +61,25 @@ fade and prior date/clock work. Exact emulator preferences were restored and
 synced, independent of the native helper's live API rollback acknowledgment.
 Actual Portal brightness feel, geometry/FPS and legacy font/format controls remain
 outside this software verification.
+
+**Latest delivery:** [artwork-cache checks][artwork-cache] verify cached covers
+can return while an unrelated network response is held. All **16 actual API 34
+checks** pass; the observed cached fetch takes **1 ms**, reuses the bitmap and
+makes no duplicate request. Cold loads remain serialized with the existing
+8 MiB body, 1024 px edge and 16 MiB cache caps. Final gates pass **3,596 tests /
+377 suites**, and both builds pass. [Family installation][artwork-deployment]
+verifies APK `dc80c3af…`, all 97 settings/source configuration unchanged,
+reclaimed upload and zero active listeners. Exact emulator preferences were
+restored/synced and the emulator exited. Physical Portal cache latency/FPS is
+unmeasured; whole-platform acceptance remains open.
+
+The separate typography candidate at `b2bafb7d` is preserved on its original
+branch, parked after its final native harness timed out. Its earlier captures
+do not verify the final candidate. This latest deployed build starts at verified
+`848c4246` and excludes that candidate.
+
+[artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
+[artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json
 
 [clock-size]: ../mocks/portal-premium-player-20261030/evidence/native-clock-size/checks.json
 [clock-size-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-clock-size/verification.json

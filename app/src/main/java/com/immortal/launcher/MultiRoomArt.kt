@@ -30,25 +30,28 @@ object MultiRoomArt {
     override fun sizeOf(key: ArtKey, value: Bitmap): Int = value.allocationByteCount
     // Do not recycle on eviction: the UI may still display a returned bitmap.
   }
+  private val loads = ArtworkLoadCoordinator()
 
   /** Card/header thumbnail. Blocking — call off-main. */
   fun fetch(url: String): Bitmap? = fetch(url, DEFAULT_EDGE)
 
   /** Sampled cover, capped at 1024 px even if a caller requests more. Call off-main. */
-  @Synchronized
   fun fetch(url: String, maxEdge: Int): Bitmap? {
     if (url.isBlank() || maxEdge <= 0) return null
     val edge = minOf(maxEdge, MAX_EDGE)
     val key = ArtKey(url, edge)
-    cache.get(key)?.let {
-      if (!it.isRecycled) return it
-      cache.remove(key)
-    }
     return runCatching {
-      val raw = download(url, redirects = 3) ?: return null
-      val bitmap = decodeSampled(raw, edge) ?: return null
-      cache.put(key, bitmap)
-      bitmap
+      loads.fetch(
+          cached = { synchronized(cache) {
+            cache.get(key)?.takeIf { !it.isRecycled } ?: run {
+              cache.remove(key)
+              null
+            }
+          } },
+          load = {
+            download(url, redirects = 3)?.let { decodeSampled(it, edge) }
+          },
+          publish = { bitmap -> synchronized(cache) { cache.put(key, bitmap) } })
     }.getOrNull()
   }
 

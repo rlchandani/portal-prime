@@ -1,0 +1,27 @@
+{
+  "device": "Family Area",
+  "sha256": "dc80c3af3b4c8556b40b26ad68f4beca5244e6c4cd942817a62a08962d2c027f",
+  "bytes": 25842558,
+  "previousSha256": "f6a50378ae50ab7f06ef4886ec6e34beec38695044066990d1803ac182400601",
+  "settingValuesCompared": 97,
+  "changedSettingValues": 0,
+  "navigationAcknowledgments": [],
+  "sourceGroupsUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "visibleTransitionsVerified": false,
+  "physicalFpsGainMeasured": false,
+  "installedApkReadbackVerified": true,
+  "ownedUploadBytesReclaimed": 25842558,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "physicalArtworkLatencyMeasured": false,
+  "mainArtifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "sourceBaseCommit": "848c4246",
+  "parkedClockCandidateIncluded": false
+}

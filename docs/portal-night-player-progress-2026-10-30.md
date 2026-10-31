@@ -2633,6 +2633,45 @@ Evidence: `evidence/native-clock-size/checks.json` and
 `evidence/family-clock-size/verification.json` under
 `mocks/portal-premium-player-20261030`.
 
+## Cached artwork no longer waits behind unrelated downloads — October 31
+
+Bounded issue window: **04:15:24–04:45:24 UTC**. The network artwork loader held
+one monitor across cache reads, downloading and decoding. A slow uncached cover
+therefore delayed a cover already in the 16 MiB cache. Cache reads now use a short,
+separate lock; misses still serialize downloading/decoding and recheck the cache
+after admission. The existing 8 MiB encoded-body cap, 1024 px edge cap and bitmap
+ownership remain unchanged. No polling, new cache or dependency was added.
+
+The extracted old serialization model reproduces one failing test out of five:
+a cached value cannot return within 500 ms while another load is deliberately
+held. Final gates pass **3,596 tests / 377 suites**, zero failures/errors/skips;
+debug and optimized builds pass in **96 seconds**. Review found no production
+defect; its same-key overlap test finding was addressed before the final gates.
+The actual API 34 socket/decoder/cache fixture passes **16 checks**: warm artwork
+returns in **1 ms** before releasing the cold response, with identical bitmap
+identity and exactly one request per URL. Its complete helper takes **0.773 s**.
+Those are synthetic emulator observations, not Portal latency/FPS measurements.
+
+Family Area installed APK readback matches
+`dc80c3af3b4c8556b40b26ad68f4beca5244e6c4cd942817a62a08962d2c027f`,
+**25,842,558 bytes**, with the existing certificate. All **97 settings**,
+source groups and screensaver configuration compare unchanged. The manifest and
+53 main assets match the previous verified `f6a50378…` build; native DEX differs.
+The owned upload was reclaimed and the collector is idle with zero listeners.
+The exact eight-file emulator preference backup was restored and synced, its
+fixture receipt removed, and the owned emulator exited. No Living Area write.
+
+This branch starts from verified commit `848c4246`. The unverified typography
+candidate remains preserved at `b2bafb7d` on
+`codex/portal-night-player-20261030`; it is excluded from this deployment and
+remains parked. This delivery retains the verified **1.8-second gradual
+down/up brightness fade**; its physical feel is still awaiting user feedback.
+
+Evidence: `evidence/native-artwork-cache/checks.json` and
+`evidence/family-artwork-cache/verification.json` under
+`mocks/portal-premium-player-20261030`. The debug-only native helper is
+`artwork-cache-native-check.py`; it refuses any other AVD or Android API.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

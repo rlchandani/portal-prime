@@ -1,0 +1,143 @@
+{
+  "issue": "Cached artwork waits behind unrelated download",
+  "issueStartedUtc": "2026-10-31T04:15:24Z",
+  "deadlineUtc": "2026-10-31T04:45:24Z",
+  "baseCommit": "848c4246",
+  "preservedParkedClockCommit": "b2bafb7d",
+  "regressionRed": {
+    "model": "Extracted source-equivalent global serialization before the fix",
+    "tests": 5,
+    "failures": 1,
+    "failedCheck": "cachedCoverReturnsWhileAnotherDownloadIsStillBlocked",
+    "waitBudgetMs": 500
+  },
+  "finalGates": {
+    "unit": {
+      "tests": 3596,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 377
+    },
+    "buildSuccess": true,
+    "buildElapsedSeconds": 96,
+    "artifacts": {
+      "debug": {
+        "sha256": "aed56608f79c0a9bfe8c8d771b218a4bea5f07fbbe593855fe048843673bbd1f",
+        "bytes": 49734349
+      },
+      "performance": {
+        "sha256": "dc80c3af3b4c8556b40b26ad68f4beca5244e6c4cd942817a62a08962d2c027f",
+        "bytes": 25842558
+      }
+    }
+  },
+  "native": {
+    "complete": true,
+    "success": true,
+    "serial": "emulator-5556",
+    "avd": "PortalMusic20261030",
+    "api": 34,
+    "guardsPassed": true,
+    "runId": "e76f5e94fcb74a1e9171161fc329ddc4",
+    "localhostOnly": true,
+    "syntheticPngOnly": true,
+    "passed": 16,
+    "total": 16,
+    "checks": [
+      {
+        "name": "isolated_api34_base_application",
+        "passed": true
+      },
+      {
+        "name": "initial_warm_fetch_success",
+        "passed": true
+      },
+      {
+        "name": "warm_url_requested_once_before_cold_fetch",
+        "passed": true
+      },
+      {
+        "name": "cold_fetch_has_open_socket_and_held_body",
+        "passed": true
+      },
+      {
+        "name": "warm_fetch_completed_before_cold_body_release",
+        "passed": true
+      },
+      {
+        "name": "warm_fetch_before_release_has_same_bitmap_identity",
+        "passed": true
+      },
+      {
+        "name": "warm_fetch_eventually_has_same_bitmap_identity",
+        "passed": true
+      },
+      {
+        "name": "cold_fetch_eventually_success",
+        "passed": true
+      },
+      {
+        "name": "cold_bitmap_dimensions_at_most_384",
+        "passed": true
+      },
+      {
+        "name": "warm_url_one_network_request",
+        "passed": true
+      },
+      {
+        "name": "cold_url_one_network_request",
+        "passed": true
+      },
+      {
+        "name": "cold_server_sent_complete_png",
+        "passed": true
+      },
+      {
+        "name": "executors_terminated",
+        "passed": true
+      },
+      {
+        "name": "all_localhost_sockets_closed",
+        "passed": true
+      },
+      {
+        "name": "worker_exceptions_absent",
+        "passed": true
+      },
+      {
+        "name": "total_wait_budget_at_most_8_seconds",
+        "passed": true
+      }
+    ],
+    "workerFailures": [],
+    "maxWaitMs": 8000,
+    "warmWaitLimitMs": 1200,
+    "sourceWidth": 768,
+    "sourceHeight": 512,
+    "pngBytes": 2744,
+    "warmWaitMs": 1,
+    "coldWidth": 384,
+    "coldHeight": 256,
+    "warmRequests": 1,
+    "coldRequests": 1,
+    "elapsedMs": 39,
+    "helperElapsedSeconds": 0.773
+  },
+  "cleanup": {
+    "avd": "PortalMusic20261030",
+    "api": 34,
+    "restoredPreferenceFiles": 8,
+    "exactPreferenceBytesRestored": true,
+    "syncCompleted": true,
+    "fixtureReceiptRemoved": true,
+    "ownedForwardCreated": false,
+    "appStopped": true,
+    "emulatorExited": true
+  },
+  "review": {
+    "productionFindings": 0,
+    "sameKeyOverlapTestTightened": true
+  },
+  "limits": "The API 34 check exercises the real socket, BitmapFactory decoder and LruCache with synthetic loopback images. Its 1 ms warm cache wait is one emulator observation, not physical Portal latency or FPS. Download/decode concurrency remains one; existing byte, edge and cache budgets remain unchanged. The parked typography candidate is excluded."
+}
