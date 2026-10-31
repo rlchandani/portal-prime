@@ -13,6 +13,8 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.LocaleList
 import android.text.format.DateFormat
 import java.lang.reflect.InvocationTargetException
@@ -29,7 +31,10 @@ class QuietNightClockViewTest {
     val view = Mockito.mock(QuietNightClockView::class.java, Mockito.CALLS_REAL_METHODS)
     var attached = true
     var refreshes = 0
+    var invalidations = 0
     var description = ""
+    val clockPaint = paint(0xffb99f87.toInt())
+    val datePaint = paint(0xb4b99f87.toInt())
     val pending = linkedSetOf<Runnable>()
     val receivers = linkedSetOf<BroadcastReceiver>()
     val actions = mutableSetOf<String>()
@@ -59,7 +64,10 @@ class QuietNightClockViewTest {
         refreshes++
         null
       }.`when`(view).setContentDescription(Mockito.any(CharSequence::class.java))
-      Mockito.doNothing().`when`(view).invalidate()
+      Mockito.doAnswer { invalidations++; null }.`when`(view).invalidate()
+      setField("ink", 0xffb99f87.toInt())
+      setField("clockPaint", clockPaint)
+      setField("datePaint", datePaint)
       QuietNightClockView::class.java.getDeclaredField("tick").apply {
         isAccessible = true
         set(view, type.declaredConstructors.single().apply { isAccessible = true }
@@ -74,6 +82,37 @@ class QuietNightClockViewTest {
         receivers.remove(call.getArgument<BroadcastReceiver>(0))
         null
       }.`when`(context).unregisterReceiver(Mockito.any(BroadcastReceiver::class.java))
+    }
+
+    private fun setField(name: String, value: Any) {
+      QuietNightClockView::class.java.getDeclaredField(name).apply {
+        isAccessible = true
+        set(view, value)
+      }
+    }
+
+    fun displayedText(): List<String> = listOf("time", "date").map { name ->
+      QuietNightClockView::class.java.getDeclaredField(name).run {
+        isAccessible = true
+        get(view) as String
+      }
+    }
+
+    private fun paint(initialColor: Int): Paint {
+      var color = initialColor
+      return Mockito.mock(Paint::class.java).also { paint ->
+        Mockito.doAnswer { color }.`when`(paint).getColor()
+        Mockito.doAnswer { color ushr 24 }.`when`(paint).getAlpha()
+        Mockito.doAnswer { call ->
+          // Paint.setColor also replaces alpha, so the view must restore date opacity.
+          color = call.getArgument(0)
+          null
+        }.`when`(paint).setColor(Mockito.anyInt())
+        Mockito.doAnswer { call ->
+          color = (color and 0x00ffffff) or (call.getArgument<Int>(0) shl 24)
+          null
+        }.`when`(paint).setAlpha(Mockito.anyInt())
+      }
     }
 
     fun broadcast(action: String) {
@@ -109,9 +148,74 @@ class QuietNightClockViewTest {
           null
         }.`when`(filter).addAction(Mockito.anyString())
       }.use {
-        block(fixture)
+        Mockito.mockStatic(Color::class.java).use { colors ->
+          colors.`when`<Int> { Color.rgb(166, 85, 72) }.thenReturn(0xffa65548.toInt())
+          colors.`when`<Int> { Color.rgb(185, 159, 135) }.thenReturn(0xffb99f87.toInt())
+          block(fixture)
+        }
       }
     }
+  }
+
+  @Test fun updateToneRecolorsExistingPaintsAndPreservesDateOpacity() = withFixture { f ->
+    f.view.updateTone("red")
+    assertEquals(0xffa65548.toInt(), f.clockPaint.color)
+    assertEquals(0xb4a65548.toInt(), f.datePaint.color)
+    assertEquals(180, f.datePaint.alpha)
+    assertEquals(1, f.invalidations)
+
+    f.view.updateTone("warm")
+    assertEquals(0xffb99f87.toInt(), f.clockPaint.color)
+    assertEquals(0xb4b99f87.toInt(), f.datePaint.color)
+    assertEquals(180, f.datePaint.alpha)
+    assertEquals(2, f.invalidations)
+    assertTrue(f.pending.isEmpty())
+    assertTrue(f.receivers.isEmpty())
+    assertEquals(0, f.refreshes)
+  }
+
+  @Test fun updateToneDoesNothingWhenEffectivePaletteIsUnchanged() = withFixture { f ->
+    Mockito.clearInvocations(f.clockPaint, f.datePaint)
+    f.view.updateTone("warm")
+    f.view.updateTone("unknown")
+    assertEquals(0, f.invalidations)
+    Mockito.verifyNoInteractions(f.clockPaint, f.datePaint)
+
+    f.view.updateTone("red")
+    Mockito.clearInvocations(f.clockPaint, f.datePaint)
+    f.view.updateTone("red")
+    assertEquals(1, f.invalidations)
+    Mockito.verifyNoInteractions(f.clockPaint, f.datePaint)
+  }
+
+  @Test fun updateToneRetainsTextMinuteScheduleReceiverAndActiveState() = withFixture { f ->
+    f.view.setActive(true)
+    val tick = f.pending.single()
+    val receiver = f.receivers.single()
+    val description = f.description
+    val text = f.displayedText()
+    Mockito.clearInvocations(f.view, f.context)
+
+    f.view.updateTone("red")
+    f.view.updateTone("red")
+    assertEquals(text, f.displayedText())
+    assertEquals(description, f.description)
+    assertEquals(1, f.refreshes)
+    assertEquals(2, f.invalidations)
+    assertSame(tick, f.pending.single())
+    assertSame(receiver, f.receivers.single())
+    Mockito.verify(f.view, Mockito.never()).removeCallbacks(Mockito.any(Runnable::class.java))
+    Mockito.verify(f.view, Mockito.never()).postDelayed(
+        Mockito.any(Runnable::class.java), Mockito.anyLong())
+    Mockito.verifyNoInteractions(f.context)
+
+    tick.run()
+    assertEquals(2, f.refreshes)
+    assertSame(tick, f.pending.single())
+    f.broadcast(Intent.ACTION_TIME_CHANGED)
+    assertEquals(3, f.refreshes)
+    assertSame(receiver, f.receivers.single())
+    f.view.setActive(false)
   }
 
   @Test fun timeAndTimezoneChangesRefreshImmediatelyWithoutWaitingForMinute() = withFixture { f ->

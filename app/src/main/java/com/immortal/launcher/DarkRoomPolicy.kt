@@ -17,8 +17,9 @@ internal class DarkRoomPolicy(
     private val brightLux: Float = maxOf(10f, darkLux * 3f),
     private val darkDwellMs: Long = 20_000L,
     private val brightDwellMs: Long = 5_000L,
+    initialNight: Boolean = false,
 ) {
-  var night = false
+  var night = initialNight
     private set
   var deadlineMs: Long? = null
     private set

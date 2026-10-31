@@ -10,6 +10,22 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class DarkRoomPolicyTest {
+  @Test fun replacingThresholdPreservesNightAndRequiresFreshBrightDwell() {
+    val policy = DarkRoomPolicy(darkLux = 3f, initialNight = true)
+    assertFalse(policy.read(13f, 100))
+    assertTrue(policy.night)
+    assertEquals(5_100L, policy.deadlineMs)
+    assertFalse(policy.settle(5_099))
+    assertTrue(policy.settle(5_100))
+    assertFalse(policy.night)
+  }
+
+  @Test fun replacingThresholdInDarknessKeepsTheRetainedClockWithoutAnotherDarkDwell() {
+    val policy = DarkRoomPolicy(darkLux = 3f, initialNight = true)
+    assertFalse(policy.read(0f, 100))
+    assertTrue(policy.night)
+    assertNull(policy.deadlineMs)
+  }
   @Test fun aSingleOnChangeReadingSettlesWithoutMoreSensorEvents() {
     val policy = DarkRoomPolicy()
     assertFalse(policy.read(0f, 1_000))

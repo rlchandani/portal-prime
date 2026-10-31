@@ -1,0 +1,43 @@
+{
+  "device": "Family Area",
+  "sha256": "e08f21e05d4062e60752aaba60d8a93ee7c79428b35f599ad7ebe4c96a60830d",
+  "bytes": 25702323,
+  "previousSha256": "64dca367e97ea8ce17452080c237c7118512d2392293974d9bed2e8f409436c2",
+  "settingValuesCompared": 97,
+  "changedSettingValues": 0,
+  "sourceGroupsUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "visibleTransitionsVerified": false,
+  "physicalFpsGainMeasured": false,
+  "ownedUploadReclaimedBytes": 25702323,
+  "ownedUploadRemainingBytes": 0,
+  "collectorActive": false,
+  "collectorRunning": false,
+  "activeListeners": 0,
+  "sensorObservers": [
+    {
+      "host": "PhotoFramePreviewActivity",
+      "sensorAvailable": true,
+      "requested": true,
+      "registered": true,
+      "lux": 9,
+      "readings": 85,
+      "receiptAgeMs": 2284,
+      "night": false,
+      "darkLux": 3,
+      "settleRemainingMs": null
+    }
+  ],
+  "physicalNightAppearanceVerified": false,
+  "unitTests": {
+    "tests": 3513,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 364
+  },
+  "nativeAssertionsPassed": 136,
+  "nativeAssertionsFailed": 0,
+  "issueWindowStartedUtc": "2026-10-31T00:33:05Z",
+  "issueWindowDeadlineUtc": "2026-10-31T01:03:05Z"
+}

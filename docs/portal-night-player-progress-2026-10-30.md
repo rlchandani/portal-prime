@@ -2144,6 +2144,65 @@ The physical clock issue and full goal remain open. The next evidence must be
 confirmed below-threshold light input followed by the actual dim clock and
 retained-photo return; working subscription alone is insufficient acceptance.
 
+## Live night controls in retained frames — same 00:33 UTC issue window
+
+This change stays inside the original **00:33:05–01:03:05 UTC** issue window.
+The sensor readout exposed a separate software gap: the controller read night
+controls at startup, but validated settings changes never reached a running
+slideshow. This is a concrete live-application fix, **not proof of the cause of
+the user's failed physical cover test**.
+
+The shared `SettingsGuard.afterScreensaverApply` hook now sends one
+package-scoped event for a relevant settings batch. Device and remote consumers
+already converge there. A retained frame copies only the four night controls;
+it does not recreate the frame, change source groups, restart discovery or
+reload the photo. Tone repaints the existing native clock; brightness updates
+the host window. Enabling/disabling or changing the threshold replaces only
+the light observer. Threshold replacement seeds the currently visible night
+state and requires a fresh bright dwell to return. Hidden hosts remain
+unsubscribed from the sensor, and receiver identity rejects queued callbacks
+after teardown. The scheduled night-clock mode remains independent of the
+ambient-enable switch.
+
+Test-first checks initially fail for the missing notification API and initial
+night-state parameter. Fresh full validation passes **3,513 tests / 364 suites**,
+zero failures, errors or skips. Debug and optimized APKs build in **2m 1s**.
+An independent review reports no actionable findings.
+
+The production API 34 native test passes **136 assertions in 91.983 seconds**.
+It changes brightness, tone and light threshold through the registered remote
+API while the clock is visible, verifies exact warm/red pixels, actual window
+brightness, unchanged process/window/activity identity and no new photo scene,
+then confirms the same paused photo returns. Dark and bright events arrive at
+**20.215 seconds** and **5.152 seconds**; the photo remains paused for another
+**9.525 seconds** and advances only after explicit Resume. All ten modified
+registered settings are restored. The owned emulator's collector is inactive;
+its localhost forwarding is removed and the emulator is stopped.
+
+Native evidence:
+`mocks/portal-premium-player-20261030/evidence/native-night-live-settings/checks.json`.
+The latest passive Family reading before this update is **10 lux**, with a
+registered observer, enabled night clock and **3-lux** threshold. No confirmed
+physical below-threshold input or comfortable clock/photo-return result has
+arrived. Physical acceptance and the full goal remain open.
+
+Family's independently read installed optimized APK matches
+`e08f21e05d4062e60752aaba60d8a93ee7c79428b35f599ad7ebe4c96a60830d`
+(**25,702,323 bytes**). The certificate, all **53 main assets** and manifest match
+the accepted predecessor. All **97 setting values**, screensaver configuration
+and photo-source groups remain unchanged. A single Screensaver request restores
+the preview after install; its acknowledgement is not visual transition proof.
+The observer remains registered, reporting **9 lux**, night false and no dark
+dwell. The capture collector is inactive with zero listeners. The verified
+owned upload is cleared to zero bytes, reclaiming **25,702,323 bytes**; the exact
+predecessor APK is privately retained. Living Area, phone and Home Assistant
+receive no operations.
+
+Deployment scalar receipt:
+`mocks/portal-premium-player-20261030/evidence/family-night-live-settings/verification.json`.
+This delivers the live-settings correction within the existing timebox.
+It does not close or relabel the failed physical clock check.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

@@ -21,7 +21,7 @@ import java.util.Locale
 
 /** One small native drawing surface, refreshed at minute boundaries; no second ticker or effects. */
 internal class QuietNightClockView(context: Context, tone: String) : View(context) {
-  private val ink = if (tone == "red") Color.rgb(166, 85, 72) else Color.rgb(185, 159, 135)
+  private var ink = if (tone == "red") Color.rgb(166, 85, 72) else Color.rgb(185, 159, 135)
   private val clockPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     color = ink
     typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
@@ -56,6 +56,16 @@ internal class QuietNightClockView(context: Context, tone: String) : View(contex
   init {
     setBackgroundColor(Color.BLACK)
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+  }
+
+  fun updateTone(tone: String) {
+    val newInk = if (tone == "red") Color.rgb(166, 85, 72) else Color.rgb(185, 159, 135)
+    if (newInk == ink) return
+    ink = newInk
+    clockPaint.color = ink
+    datePaint.color = ink
+    datePaint.alpha = 180
+    invalidate()
   }
 
   fun setActive(value: Boolean) {

@@ -12,6 +12,9 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.BroadcastReceiver
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -183,6 +186,7 @@ class PhotoFrameController(
   private var ambientNight = false
   private var quietClock: QuietNightClockView? = null
   private var darkRoomObserver: DarkRoomObserver? = null
+  private var nightSettingsReceiver: BroadcastReceiver? = null
   /** Hosts apply window-scoped dimming; restoring it never writes the device's global brightness. */
   var onNightClockChanged: ((Boolean) -> Unit)? = null
   val isNightClockShowing: Boolean get() = nightClockOnly || ambientNight
@@ -393,13 +397,15 @@ class PhotoFrameController(
       if (photosOnly) musicPhotoSettings(it) else it
     }
     val root = view as FrameLayout
+    observeNightSettings()
     if (nightClockOnly) {
       quietClock?.setActive(hostVisible)
       onNightClockChanged?.invoke(true)
       return
     }
     if (!photosOnly && settings.darkRoomClock) {
-      darkRoomObserver = DarkRoomObserver(context, settings.darkRoomLux.toFloat(), ::setAmbientNight)
+      darkRoomObserver = DarkRoomObserver(context, settings.darkRoomLux.toFloat(),
+          onNightChanged = ::setAmbientNight)
       darkRoomObserver?.setActive(hostVisible)
     }
     val source = PhotoFrameSource.from(settings, allowWebPage = !photosOnly && faceOverride == null)
@@ -1115,6 +1121,41 @@ class PhotoFrameController(
     applyHostActive(DarkRoomPolicy.photosActive(value, ambientNight))
   }
 
+  private fun observeNightSettings() {
+    if (photosOnly || nightSettingsReceiver != null) return
+    val receiver = object : BroadcastReceiver() {
+      override fun onReceive(context: Context?, intent: Intent?) {
+        if (!stopped && nightSettingsReceiver === this && intent?.action == NightSettingsChanges.ACTION)
+          applyNightSettings(ScreensaverConfig.load(this@PhotoFrameController.context))
+      }
+    }
+    nightSettingsReceiver = receiver
+    androidx.core.content.ContextCompat.registerReceiver(context, receiver,
+        IntentFilter(NightSettingsChanges.ACTION),
+        androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED)
+  }
+
+  /** Update only clock controls; source discovery and the retained media session stay intact. */
+  private fun applyNightSettings(fresh: ScreensaverConfig.Settings) {
+    val sensorChanged = settings.darkRoomClock != fresh.darkRoomClock ||
+        settings.darkRoomLux != fresh.darkRoomLux
+    val brightnessChanged = settings.nightClockBrightness != fresh.nightClockBrightness
+    val toneChanged = settings.nightClockTone != fresh.nightClockTone
+    settings = settings.copy(darkRoomClock = fresh.darkRoomClock, darkRoomLux = fresh.darkRoomLux,
+        nightClockBrightness = fresh.nightClockBrightness, nightClockTone = fresh.nightClockTone)
+    if (toneChanged) quietClock?.updateTone(fresh.nightClockTone)
+    if (sensorChanged && !nightClockOnly) {
+      darkRoomObserver?.setActive(false)
+      darkRoomObserver = null
+      if (fresh.darkRoomClock) {
+        darkRoomObserver = DarkRoomObserver(context, fresh.darkRoomLux.toFloat(),
+            initialNight = ambientNight, onNightChanged = ::setAmbientNight)
+        darkRoomObserver?.setActive(hostVisible)
+      } else setAmbientNight(false)
+    }
+    if (brightnessChanged && isNightClockShowing) onNightClockChanged?.invoke(true)
+  }
+
   private fun setAmbientNight(value: Boolean) {
     if (stopped || ambientNight == value) return
     ambientNight = value
@@ -1229,6 +1270,9 @@ class PhotoFrameController(
   @androidx.annotation.MainThread
   fun stop() {
     stopped = true
+    val receiver = nightSettingsReceiver
+    nightSettingsReceiver = null
+    receiver?.let { runCatching { context.unregisterReceiver(it) } }
     galleryOverlayObserver?.close()
     galleryOverlayObserver = null
     darkRoomObserver?.setActive(false)

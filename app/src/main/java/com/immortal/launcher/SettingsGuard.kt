@@ -99,6 +99,7 @@ object SettingsGuard {
   fun afterScreensaverApply(context: Context, appliedKeys: Collection<String>) {
     reaffirmScreensaver(context)
     if (appliedKeys.any { it.startsWith("overnight") }) SleepScheduler.applyOvernightNow(context)
+    NightSettingsChanges.notifyApplied(context, appliedKeys)
   }
 
   /**

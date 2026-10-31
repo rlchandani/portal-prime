@@ -20,12 +20,13 @@ import java.lang.ref.WeakReference
 internal class DarkRoomObserver(
     context: Context,
     private val darkLux: Float,
+    initialNight: Boolean = false,
     private val onNightChanged: (Boolean) -> Unit,
 ) : SensorEventListener {
   private val manager = context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
   private val sensor = manager?.getDefaultSensor(Sensor.TYPE_LIGHT)
   private val main = Handler(Looper.getMainLooper())
-  private val policy = DarkRoomPolicy(darkLux)
+  private val policy = DarkRoomPolicy(darkLux, initialNight = initialNight)
   private var active = false
   internal data class Diagnostic(
       val host: String, val available: Boolean, val requested: Boolean = false,
@@ -34,7 +35,7 @@ internal class DarkRoomObserver(
       val deadlineUptimeMs: Long? = null, val darkLux: Float,
   )
   @Volatile private var diagnostic = Diagnostic(
-      context.javaClass.simpleName, sensor != null, darkLux = darkLux)
+      context.javaClass.simpleName, sensor != null, night = initialNight, darkLux = darkLux)
   private var queuedDeadline: Long? = null
   private val settle = Runnable {
     queuedDeadline = null
