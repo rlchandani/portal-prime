@@ -172,7 +172,7 @@ class PhotoFrameController(
         postMain = { task -> ui.post { task() } })
   }
   private val legacyPreparation get() = legacyPreparationDelegate.value
-  private var legacyEngineRevision = 0L // Main only; also guards refresh and delayed warming.
+  @Volatile private var legacyEngineRevision = 0L // Main writes; request threads check ownership.
   private var engineLayoutRoot: View? = null
   private var engineLayoutListener: View.OnLayoutChangeListener? = null
   @Volatile private var stopped = false
@@ -305,7 +305,7 @@ class PhotoFrameController(
   @Volatile private var prefetchFull = false
   // Web-page source: a fullscreen WebView that owns the whole frame (the page brings its own
   // clock/widgets, so the photo layer and Immortal overlay are skipped).
-  private var webView: android.webkit.WebView? = null
+  @Volatile private var webView: android.webkit.WebView? = null
 
   // Web-feed history so swipes can go back as well as forward.
   private val history = ArrayList<Bitmap>() // Classic retains its original history policy.
@@ -767,6 +767,7 @@ class PhotoFrameController(
     legacyFaceStore?.close()
     // Freeze source/bridge inputs without doing cache hydration or JSON work on Main.
     val urls = photoUrls.toList()
+    val localPhotoRequests = EngineLocalPhotoRequests(urls, owner)
     val dimensions = dims.toMap()
     val headers = authHeaders.toMap()
     val mode = settings.mode
@@ -803,6 +804,7 @@ class PhotoFrameController(
               } finally { construction?.finish() }
               // Register immediately so any later bridge/layout/load failure has Main-owned cleanup.
               webView = wv
+              if (BuildConfig.DEBUG) android.webkit.WebView.setWebContentsDebuggingEnabled(true)
               wv.setBackgroundColor(Color.BLACK)
               wv.isVerticalScrollBarEnabled = false
               wv.isHorizontalScrollBarEnabled = false
@@ -816,10 +818,8 @@ class PhotoFrameController(
                 @Suppress("DEPRECATION")
                 allowFileAccessFromFileURLs = true
               }
-              // LOCAL photos load natively (fast, no on-the-fly decode → no image "buffering"; the WebView's
-              // Chromium honors EXIF orientation itself, so portraits stay upright). Only REMOTE sources that
-              // need auth headers are intercepted and re-fetched with those headers; everything else (incl.
-              // local file:// and the engine's own assets) falls through to normal loading.
+              // Local misses wait on the request thread for the shared bounded decoder, never Main.
+              // Remote authentication and the engine's bundled assets retain their existing path.
               wv.webViewClient =
                   object : android.webkit.WebViewClient() {
                     override fun onPageFinished(v: android.webkit.WebView, url: String) {
@@ -833,8 +833,21 @@ class PhotoFrameController(
                         v: android.webkit.WebView,
                         req: android.webkit.WebResourceRequest,
                     ): android.webkit.WebResourceResponse? {
-                      if (headers.isEmpty()) return null
                       val u = req.url
+                      if (localPhotoRequests.owns(u.toString())) {
+                        fun unavailable() = android.webkit.WebResourceResponse("image/jpeg", null,
+                            404, "Photo unavailable", emptyMap(), java.io.ByteArrayInputStream(byteArrayOf()))
+                        if (stopped || webView !== v || owner != legacyEngineRevision ||
+                            !req.method.equals("GET", ignoreCase = true)) return unavailable()
+                        val resource = localPhotoRequests.resolve(u.toString()) ?: return unavailable()
+                        val file = scaledCache.prepareForLoad(resource.first, resource.second) ?: return unavailable()
+                        if (stopped || webView !== v || owner != legacyEngineRevision) return unavailable()
+                        val stream = runCatching { file.inputStream() }.getOrNull() ?: return unavailable()
+                        val mime = android.webkit.MimeTypeMap.getSingleton()
+                            .getMimeTypeFromExtension(file.extension.lowercase()) ?: "image/jpeg"
+                        return android.webkit.WebResourceResponse(mime, null, stream)
+                      }
+                      if (headers.isEmpty()) return null
                       val scheme = u.scheme?.lowercase()
                       if (scheme != "http" && scheme != "https") return null
                       if (!req.method.equals("GET", ignoreCase = true)) return null
@@ -920,15 +933,15 @@ class PhotoFrameController(
                     @android.webkit.JavascriptInterface fun getIntervalSec(): Int = intervalSec
                     @android.webkit.JavascriptInterface fun getPhotoMotion(): Boolean = photoMotion
                     @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
-                    // Ready derivatives only: bridge calls never decode or compress on the load path.
+                    // Ready copies or opaque bounded requests; bridge calls never decode or wait.
                     @android.webkit.JavascriptInterface
                     fun scaledUrl(url: String): String = scaledUrlForSize(url, EngineScaledCache.TARGET_EDGE)
                     @android.webkit.JavascriptInterface
                     fun scaledUrlForSize(url: String, edge: Int): String {
-                      if (!url.startsWith("file://")) return ""
+                      val pendingUrl = localPhotoRequests.urlFor(url, edge) ?: return ""
                       val file = FramePerformanceCapture.measureImageResolution { measurement ->
-                        scaledCache.resolveAndRequest(url.removePrefix("file://"), edge, measurement)
-                      } ?: return ""
+                        scaledCache.resolveForBoundedLoad(url.removePrefix("file://"), edge, measurement)
+                      } ?: return pendingUrl
                       return "file://" + file.absolutePath
                     }
                     // Live presence for the engine's people-bias: the deck leans toward photos of

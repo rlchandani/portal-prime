@@ -1,0 +1,125 @@
+{
+  "scope": "Actual API34 Android WebView; synthetic local images only",
+  "native": {
+    "status": "passed",
+    "native": true,
+    "serial": "emulator-5556",
+    "avd": "PortalMusic20261030",
+    "apiLevel": 34,
+    "firstScene": true,
+    "coldGuarded": true,
+    "coldDecoded": true,
+    "smallDecoded": true,
+    "invalid404": true,
+    "restored": true,
+    "ownedForwardRemoved": true,
+    "apkSha256": "1d1393db244fbea3cfde55891ed2a4d70ad4d9309a5adfec73d7a285b819ffb8",
+    "cdpStage": "native-checks",
+    "cdpHttpStatus": 200,
+    "sceneDimensions": [
+      [
+        1800,
+        2400
+      ]
+    ],
+    "smallDimensions": [
+      720,
+      540
+    ],
+    "coldDimensions": [
+      1800,
+      2400
+    ],
+    "privateRecoveryRetained": true,
+    "elapsedMs": 6069
+  },
+  "unitGate": {
+    "suites": 367,
+    "tests": 3536,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "freshRun": true,
+    "debugBuild": "passed",
+    "optimizedBuild": "passed"
+  },
+  "attempts": [
+    {
+      "status": "failed",
+      "failure": "single_apk_guard",
+      "elapsedMs": 369,
+      "restored": true
+    },
+    {
+      "status": "failed",
+      "failure": "cdp_unsupported",
+      "elapsedMs": 6668,
+      "restored": false,
+      "cleanupFailures": [
+        "api_restore",
+        "exact_preferences_restore",
+        "restore_readback"
+      ]
+    },
+    {
+      "status": "unsupported",
+      "failure": "cdp_unsupported",
+      "elapsedMs": 4939,
+      "restored": true
+    },
+    {
+      "status": "failed",
+      "failure": "native_condition_timeout",
+      "elapsedMs": 33194,
+      "restored": true,
+      "cdpStage": "native-checks"
+    },
+    {
+      "status": "passed",
+      "elapsedMs": 6069,
+      "restored": true,
+      "cdpStage": "native-checks"
+    }
+  ],
+  "independentRecoveryAfterArchiveMismatch": {
+    "allPreferencePayloadsUnchanged": true,
+    "preferenceFilesCompared": 7,
+    "profileUnchanged": true,
+    "screensaverUnchanged": true,
+    "sourcesUnchanged": true,
+    "collectorIdle": true,
+    "ownedRestoreDirectoryRemoved": true
+  },
+  "calculatedPixelStorage": {
+    "originalDimensions": [
+      6400,
+      4800
+    ],
+    "preparedDimensions": [
+      1800,
+      2400
+    ],
+    "originalPixels": 30720000,
+    "preparedPixels": 4320000,
+    "argbOriginalMiB": 117.1875,
+    "argbPreparedMiB": 16.4794921875,
+    "pixelReductionPercent": 85.9375,
+    "isMeasuredProcessHeap": false
+  },
+  "physicalPortalPixelsVerified": false,
+  "physicalFpsGainMeasured": false,
+  "remoteAuthenticatedPhotosCovered": false,
+  "finalCleanup": {
+    "settingsValuesCompared": 97,
+    "profileUnchanged": true,
+    "sourceGroupsUnchanged": true,
+    "screensaverUnchanged": true,
+    "allPreferencePayloadsUnchanged": true,
+    "preferenceFilesCompared": 7,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "ownedApiForwardRemoved": true,
+    "ownedEmulatorStopRequested": true,
+    "foreignEmulatorsTouched": false
+  }
+}

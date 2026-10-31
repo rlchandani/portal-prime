@@ -1,0 +1,44 @@
+{
+  "device": "Family Area",
+  "sha256": "06fccf2e1a773fc4a1305b6f439ea721080c389b9485153e9c04ed0796beeded",
+  "bytes": 25702379,
+  "previousSha256": "2b1caa8fdc871c9b0ea2f391850ce4c17fb69342b6f2d3e306265c64d36ad01a",
+  "settingValuesCompared": 97,
+  "changedSettingValues": 0,
+  "sourceGroupsUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "visibleTransitionsVerified": false,
+  "physicalFpsGainMeasured": false,
+  "installedApkReadbackVerified": true,
+  "ownedUploadBytesReclaimed": 25702379,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "physicalImageLoadingAccepted": false,
+  "scope": "Local WebView photo misses only; authenticated remote sources retain their existing path",
+  "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "artifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "unitGate": {
+    "suites": 367,
+    "tests": 3536,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "freshRun": true,
+    "debugBuild": "passed",
+    "optimizedBuild": "passed"
+  },
+  "issueWindow": {
+    "startUtc": "2026-10-31T01:35:39Z",
+    "deadlineUtc": "2026-10-31T02:05:39Z",
+    "scope": "Bounded local image loading on a cache miss in legacy WebView slideshow; no main/bridge waits",
+    "device": "Family Area"
+  },
+  "livingAreaDeployed": false,
+  "rollbackRetainedPrivately": true
+}

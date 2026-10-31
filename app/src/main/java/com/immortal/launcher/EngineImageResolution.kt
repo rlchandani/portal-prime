@@ -11,7 +11,8 @@ import org.json.JSONObject
 /** Code-defined cache-path outcomes; no source identity or pixel dimensions. */
 internal enum class EngineImageResolutionResult(val key: String) {
   MISSING_ORIGINAL("missing-original"), REQUESTED_TIER_READY("requested-tier-ready"),
-  LARGER_TIER_READY("larger-tier-ready"), ORIGINAL_FALLBACK("original-fallback")
+  LARGER_TIER_READY("larger-tier-ready"), ORIGINAL_FALLBACK("original-fallback"),
+  BOUNDED_LOAD_PENDING("bounded-load-pending")
 }
 
 internal fun interface EngineImageResolutionMeasurement {
@@ -39,7 +40,8 @@ internal class EngineImageResolutionSamples {
     val requestedTier = tier(requested, maximum)
     val deliveredTier = tier(deliveredEdge, maximum)
     val valid = when (result) {
-      EngineImageResolutionResult.MISSING_ORIGINAL, EngineImageResolutionResult.ORIGINAL_FALLBACK ->
+      EngineImageResolutionResult.MISSING_ORIGINAL, EngineImageResolutionResult.ORIGINAL_FALLBACK,
+      EngineImageResolutionResult.BOUNDED_LOAD_PENDING ->
         deliveredEdge == 0
       EngineImageResolutionResult.REQUESTED_TIER_READY -> deliveredTier != null && deliveredEdge == requested
       EngineImageResolutionResult.LARGER_TIER_READY -> deliveredTier != null && deliveredEdge > requested

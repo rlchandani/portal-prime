@@ -71,6 +71,12 @@ class EngineScaledCacheResolutionTest {
     assertEquals(0, submitted())
   }
 
+  @Test fun boundedLoadMissRecordsPendingInsteadOfAnOriginalFallback() = fixture { f, submitted ->
+    assertNull(f.cache.resolveForBoundedLoad(f.original.path, 1000, f.measurement))
+    assertEquals(listOf(listOf(EngineImageResolutionResult.BOUNDED_LOAD_PENDING, 1200, 0, 2400)), f.observations)
+    assertEquals(1, submitted())
+  }
+
   @Test fun observationDoesNotRelookupFilesAfterTheChosenBranch() = fixture { f, submitted ->
     val chosen = f.ready(1200)
     val measurement = EngineImageResolutionMeasurement { result, requested, delivered, cap ->

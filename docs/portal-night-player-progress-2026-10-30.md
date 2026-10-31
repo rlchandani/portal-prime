@@ -2309,6 +2309,55 @@ human test.
 Evidence: `mocks/portal-premium-player-20261030/evidence/family-night-brightness/verification.json`
 and `mocks/portal-premium-player-20261030/evidence/native-night-brightness/checks.json`.
 
+## Bounded local WebView loading — 01:35:39–02:05:39 UTC window
+
+A missing prepared local photo previously returned an empty bridge result, so
+the HTML engine could decode the unchecked camera original while preparation
+ran. Local misses now use an opaque, owner-scoped intercepted image request.
+The WebView request thread waits at most five seconds for the existing shared
+decoder; neither Main nor the JavaScript bridge waits, decodes or compresses.
+Ready copies remain immediate. Concurrent bridge/request readers share the
+same preparation future. Cancellation releases readers and rejects late
+publication; volatile engine ownership is rechecked before returning a stream.
+Only an original already header-verified within the existing tier tolerance
+can be returned directly. Invalid, failed or timed-out preparations return 404.
+Remote/authenticated photo loading retains its existing path.
+
+Fresh unit/debug/optimized gates pass: **3,536 tests / 367 suites**, zero
+failures, errors or skips, including **12** new local-request/resolution tests.
+Independent production review has no remaining actionable findings. The final
+actual API 34 WebView check passes in **6.069 seconds**: first composition,
+cold opaque URL, decoded **1800×2400** prepared copy, immediate ready-copy URL,
+header-verified **720×540** small original and corrupt-image 404.
+For a **6400×4800** original, the prepared copy has **85.9375% fewer pixels**.
+Calculated ARGB storage falls from **117.1875 MiB** to **16.4795 MiB** per image;
+these are pixel calculations, not measured total heap, GPU residency or Portal FPS.
+
+Every finite test attempt is retained. Initial guards rejected Android's normal
+`~~` APK path; later tests used desktop browser CDP instead of WebView's page
+socket, force-stopped immediately after asynchronous preference writes, or looked
+for `<img>` nodes in a CSS-background renderer. The test now uses the exact
+owned page socket, bounded readiness and actual rendered background URLs.
+Archive metadata initially failed restoration verification; independent checks
+confirmed all seven preference-file payloads unchanged. Corrected cleanup and
+final independent checks confirm all **97 settings**, source groups and
+screensaver configuration unchanged, zero collector listeners, owned forwards
+removed and the owned emulator stopped. Foreign emulators were untouched.
+
+Family's optimized APK is read back as
+`06fccf2e1a773fc4a1305b6f439ea721080c389b9485153e9c04ed0796beeded`
+(**25,702,379 bytes**). Its signing certificate, manifest and all **53 main
+assets** match the brightness-fade predecessor. All **97 Family settings**,
+photo-source groups and screensaver configuration remain unchanged; the verified
+owned upload is cleared and rollback retained privately. Living Area remains
+for final rollout. API 34 native loading and Family installation are verified;
+physical Portal pixels/FPS, remote-image bounds and full GPU residency remain
+outside this result. The previously deployed **1.8-second brightness fade**
+remains in this build.
+
+Evidence: `mocks/portal-premium-player-20261030/evidence/native-bounded-local-photos/checks.json`
+and `mocks/portal-premium-player-20261030/evidence/family-bounded-local-photos/verification.json`.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

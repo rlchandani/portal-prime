@@ -20,6 +20,8 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.security.MessageDigest
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 /**
  * Prepared local-photo derivatives for the HTML engine. Slot sizes round up to bounded tiers;
@@ -36,6 +38,7 @@ class EngineScaledCache(
   init { require(targetEdge in 1..TARGET_EDGE); require(budgetBytes >= 0) }
 
   private val owner = work.owner()
+  private val imageRequests = EngineImageRequests(owner::submit)
   private val warming = AtomicBoolean(false)
   private var maintained = false // Accessed only by the shared serial decoder.
   // Remember small originals without repeatedly opening their headers. Identity changes on edits.
@@ -55,7 +58,15 @@ class EngineScaledCache(
 
   /** Observe the actual chosen branch without a second lookup, extra stats or decoder work. */
   internal fun resolveAndRequest(originalPath: String, requestedEdge: Int,
-      measurement: EngineImageResolutionMeasurement?): File? {
+      measurement: EngineImageResolutionMeasurement?): File? =
+      resolveAndRequest(originalPath, requestedEdge, measurement, EngineImageResolutionResult.ORIGINAL_FALLBACK)
+
+  internal fun resolveForBoundedLoad(originalPath: String, requestedEdge: Int,
+      measurement: EngineImageResolutionMeasurement?): File? =
+      resolveAndRequest(originalPath, requestedEdge, measurement, EngineImageResolutionResult.BOUNDED_LOAD_PENDING)
+
+  private fun resolveAndRequest(originalPath: String, requestedEdge: Int,
+      measurement: EngineImageResolutionMeasurement?, missResult: EngineImageResolutionResult): File? {
     val original = File(originalPath)
     val edge = derivativeEdge(requestedEdge, targetEdge)
     if (!original.isFile) {
@@ -78,9 +89,27 @@ class EngineScaledCache(
       if (measurement != null) observe(measurement, EngineImageResolutionResult.LARGER_TIER_READY, edge, targetEdge)
       return it
     }
-    // null makes the bridge retain the original URL. It says nothing about original pixel size.
-    if (measurement != null) observe(measurement, EngineImageResolutionResult.ORIGINAL_FALLBACK, edge)
+    // The bounded bridge uses an intercepted request on a miss; it never assumes original size.
+    if (measurement != null) observe(measurement, missResult, edge)
     return null
+  }
+
+  /** WebView request thread only. Main and JS bridge never decode, compress or wait here. */
+  @androidx.annotation.WorkerThread
+  internal fun prepareForLoad(originalPath: String, requestedEdge: Int): File? {
+    val original = File(originalPath)
+    if (!original.isFile) return null
+    val edge = derivativeEdge(requestedEdge, targetEdge)
+    ready(original, edge)?.let { return it }
+    val prepared = request(original, edge)
+    return try {
+      prepared.get(5L, TimeUnit.SECONDS)
+    } catch (_: InterruptedException) {
+      Thread.currentThread().interrupt()
+      null
+    } catch (_: Exception) {
+      null // Failure/timeout never sends an unchecked camera original to Chromium.
+    }
   }
 
   private fun observe(measurement: EngineImageResolutionMeasurement, result: EngineImageResolutionResult,
@@ -117,16 +146,23 @@ class EngineScaledCache(
     enqueue(0)
   }
 
-  fun cancel() = owner.close()
+  fun cancel() {
+    imageRequests.close()
+    owner.close()
+  }
 
-  private fun request(original: File, edge: Int) {
+  private fun request(original: File, edge: Int): CompletableFuture<File?> {
     val bytes = original.length()
     val modified = original.lastModified()
     val key = keyFor(original.path, bytes, modified, edge)
-    if (synchronized(unneeded) { unneeded.containsKey(key) }) return
-    owner.submit(key) { current ->
+    if (synchronized(unneeded) { unneeded.containsKey(key) })
+      return CompletableFuture.completedFuture(original)
+    return imageRequests.request(key) { current ->
       runCatching { scaleOne(original, bytes, modified, edge, key, current) }
           .onFailure { Log.w(TAG, "Local photo derivative failed: ${it.javaClass.simpleName}") }
+      if (!current() || !original.isFile || original.length() != bytes ||
+          original.lastModified() != modified) null
+      else ready(original, edge) ?: if (synchronized(unneeded) { unneeded.containsKey(key) }) original else null
     }
   }
 
