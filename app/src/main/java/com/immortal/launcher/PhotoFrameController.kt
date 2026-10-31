@@ -221,9 +221,6 @@ class PhotoFrameController(
   // Text/padding scale for the current calendar size (0/1/2 → small/medium/large),
   // applied as the panel is (re)rendered so a size change takes effect live.
   private var calScale: Float = 1f
-  // The minute we last re-windowed the calendar, so the 1s tick only rebuilds it
-  // when the clock minute changes (drops past events, refreshes Today/Tomorrow).
-  private var lastCalMinute: Long = -1L
 
   // Ambient dashboard: full-screen glanceable info card shown periodically (fork feature).
   private var dashboardPanel: View? = null
@@ -1179,6 +1176,7 @@ class PhotoFrameController(
         if (!paused) runCatching { videoView.start() }
       }
       ui.setActive(true)
+      if (!photosOnly) calendarTick.run()
       if (!photosOnly && settings.gestureWave) resumeGestureCamera()
       if (remoteMode) schedulePrefetch()
       legacyFaceStore?.setActive(!paused)
@@ -1979,19 +1977,11 @@ class PhotoFrameController(
 
   // --- periodic loops ---------------------------------------------------------
   private val calendarTick =
-      object : Runnable {
-        override fun run() {
-          // Re-window the calendar once per minute (cheap, no network): drops events
-          // as they pass and rolls the Today/Tomorrow labels over at midnight.
-          val now = Date()
-          val minute = now.time / 60_000L
-          if (minute != lastCalMinute) {
-            lastCalMinute = minute
-            renderCalendar()
-          }
-          ui.postDelayed(this, 1_000L)
-        }
-      }
+      CalendarMinuteRefresh(
+          clock = System::currentTimeMillis,
+          cancel = ui::removeCallbacks,
+          schedule = { task, delay -> ui.postDelayed(task, delay) },
+          refresh = ::renderCalendar)
 
   private val rotate =
       object : Runnable {

@@ -1965,6 +1965,72 @@ cold startup, physical night-clock acceptance, Home frame tails and physical
 music UI acceptance remain open. Living Area, the phone and Home Assistant
 receive no operations; the overall objective remains active.
 
+## Minute-aligned calendar and retained night-state acceptance — 23:54 UTC batch
+
+Original issue window: **23:54:05–00:24:05 UTC**, including investigation,
+tests, build, deployment, evidence, cleanup and commit.
+
+The photo-frame calendar already rendered only when the minute changed, but
+its UI callback woke every second to discover that change. `CalendarMinuteRefresh`
+now schedules directly for the next wall-clock minute boundary, reusing
+`DarkRoomPolicy.nextMinuteDelay`. When a retained host becomes active, it
+immediately checks for a crossed minute and replaces the old frozen callback.
+Repeated activation in the same minute neither rerenders nor adds a duplicate
+callback. The photos-only pipeline still starts no calendar work.
+
+The six new scheduler regressions fail against the original one-second cadence,
+with **six assertion failures and zero errors**. The corrected code passes the
+fresh full JVM gate: **3,502 tests / 363 suites**, zero failures, errors or skips,
+in **46 seconds**. They cover actual minute boundaries, midnight wake, repeated
+activation, backwards clock adjustment and negative epoch time. Scheduled
+periodic checks fall from **60 to 1 per minute**; this is a verified scheduling
+reduction, not a measured CPU or delivered-FPS gain.
+
+Debug and optimized performance APKs build successfully in **1m 14s**. The
+owned API 34 AVD independently confirms the installed debug APK matches the
+new local artifact before the final native acceptance:
+
+| Production native scenario | Verified result |
+| --- | --- |
+| User-paused photo → night clock → bright return | Dark settles in 20.151s; bright in 5.144s. The original photo pixels and paused state remain for another 9.573s, beyond the configured five-second interval. Explicit Resume permits advancement. |
+| Hidden before dark settles | Remains hidden past 24.103s with no night event, dimming or additional scene. On return, a fresh dark dwell settles in 20.384s. |
+| Hidden while already displaying the night clock | Brightness remains 0.03 while hidden. Returning starts a fresh bright dwell, settling in 5.149s and restoring exactly the original photo region. |
+
+The completed run passes **231 assertions, zero fail, in 153.179 seconds**.
+Actual production UI taps, window/activity/process identity, native scene events
+and default-photo screenshot regions establish retained presentation. This is
+not direct heap/controller identity inspection or physical Portal acceptance.
+All seven temporarily modified registered settings are restored; the emulator's
+light is reset, its forwarding port removed and the owned AVD shut down.
+The unrelated AVD remains present and receives no mutation.
+
+The initial run passed the user-paused case but captured the outgoing Android
+cover surface before it completed handover in the hidden case: **177 assertions
+passed, one failed**. The verifier now observes the actual slideshow UI before
+capturing that region. No product change was made for this fixture race. The
+successful final run uses the newly built calendar code.
+
+Family Area's independently read installed optimized APK matches
+`c8651adc869e4a998c419e654b87b6a22daece82b13a4b293777e269192ec303`
+(**25,702,323 bytes**) and the existing signing certificate. All **53 main
+assets** and the manifest match the predecessor; native DEX contains the
+calendar change. All **97 settings**, full screensaver configuration and
+photo-source groups remain unchanged. The bounded runtime sample contains
+**402 lines and zero fatal exception markers**. The collector is inactive
+with zero listeners. Clearing the verified owned upload reclaims
+**25,702,323 bytes**; the local candidate and exact predecessor rollback remain.
+
+Public deployment evidence:
+`mocks/portal-premium-player-20261030/evidence/family-calendar-minute/verification.json`.
+Native receipt and captures:
+`mocks/portal-premium-player-20261030/evidence/native-night-retention/`.
+Reproducible verifier: `night-retention-native-checks.py`.
+
+Physical Family night/backlight comfort, stacked-Dream tap, actual first-photo
+panel presentation, pristine cold startup, Home frame-time tails and physical
+music interaction remain open. Living Area, the phone and Home Assistant receive
+no operations; the overall objective remains active.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

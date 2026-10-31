@@ -1,0 +1,174 @@
+{
+  "utc": "2026-10-31T00:10:34.415081+00:00",
+  "issueWindow": {
+    "startUtc": "2026-10-30T23:54:05Z",
+    "deadlineUtc": "2026-10-31T00:24:05Z"
+  },
+  "calendarCadence": {
+    "oldPeriodicCallbacksPerMinute": 60,
+    "newPeriodicCallbacksPerMinute": 1,
+    "callbackReductionPercent": 98.333,
+    "measuredCpuSaving": false,
+    "hostWakeRefreshesImmediately": true,
+    "sameMinuteWakeDoesNotDuplicateWork": true
+  },
+  "focusedRegressionRed": {
+    "tests": 6,
+    "failures": 6,
+    "errors": 0,
+    "cases": [
+      {
+        "name": "starting partway through a minute targets its real boundary",
+        "failure": "java.lang.AssertionError: expected:<[60000]> but was:<[60750]>"
+      },
+      {
+        "name": "repeated wake in the same minute neither rerenders nor duplicates scheduled work",
+        "failure": "java.lang.AssertionError: expected:<[60000]> but was:<[1040]>"
+      },
+      {
+        "name": "one minute schedules one periodic wake instead of sixty",
+        "failure": "java.lang.AssertionError: expected:<2> but was:<61>"
+      },
+      {
+        "name": "a backwards clock change refreshes and aligns to the corrected minute",
+        "failure": "java.lang.AssertionError: expected:<[120000]> but was:<[61250]>"
+      },
+      {
+        "name": "wake after a retained midnight pause refreshes immediately and replaces old delay",
+        "failure": "java.lang.AssertionError: expected:<[86460000]> but was:<[86401250]>"
+      },
+      {
+        "name": "negative wall time uses floor division and a positive boundary delay",
+        "failure": "java.lang.AssertionError: expected:<[0]> but was:<[999]>"
+      }
+    ]
+  },
+  "freshFullJvm": {
+    "suites": 363,
+    "tests": 3502,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "build": {
+    "debug": true,
+    "performance": true,
+    "elapsedSeconds": 74,
+    "sourceCommentRemovedAfterBuild": true,
+    "executableSourceChangedAfterBuild": false
+  },
+  "nativeRetention": {
+    "passed": 231,
+    "failed": 0,
+    "elapsedSeconds": 153.179,
+    "debugApkSha256": "df7314a03ea201cbdfa5a921c7f34386598b4f5cf4c2fc557887275d0d117df4",
+    "userPaused": {
+      "executed": true,
+      "success": true,
+      "pauseTapBounds": [
+        792,
+        1317,
+        984,
+        1413
+      ],
+      "baselineSceneCount": 3,
+      "windowIdentitySha256": "94e19080e87d36d3857ba72ff64b622a7ec93374d1d388674b1d4cb3ef39e484",
+      "activityIdentitySha256": "5b4bf9993353a872489cd34aaf7c98bc766173afb012007b0e6c9fa36e894d04",
+      "baselinePhotoRoiSha256": "e6f1d27543117d4323d6b2556578ec7a2f8ae3736a78c6af8df879198fa4bb40",
+      "darkEventDelaySeconds": 20.151,
+      "brightEventDelaySeconds": 5.144,
+      "pausedHoldSeconds": 9.573,
+      "pausedSceneCountAfterHold": 3,
+      "resumeTapBounds": [
+        792,
+        1317,
+        984,
+        1413
+      ],
+      "automaticAdvanceSecondsAfterResume": 8.15,
+      "sceneCountAfterExplicitResume": 4
+    },
+    "hiddenHost": {
+      "executed": true,
+      "success": true,
+      "baselinePhotoRoiSha256": "6b41f7b25919ece0eec229056357dc97a3e813c86ba2d198c666930a1575e7ab",
+      "baselineSceneCount": 7,
+      "windowIdentitySha256": "a50b35559e6782848530c7631e3320cfa415b386ec38fcd2aa1d3dd8e3b9bd45",
+      "activityIdentitySha256": "8340906946efebcd6671e30a2d326ce14ebfecbe26f62bc42edc68df86b9c9f4",
+      "hiddenBeforeSettleSeconds": 3.141,
+      "hiddenPastDarkDeadlineSeconds": 24.103,
+      "nightEventsWhileHidden": 0,
+      "returnedDarkEventDelaySeconds": 20.384,
+      "alreadyClockHiddenCaseRun": true,
+      "returnedBrightEventDelaySeconds": 5.149,
+      "finalSceneCount": 7
+    },
+    "temporarilyModifiedSettings": 7,
+    "allModifiedSettingsRestored": true,
+    "physicalPortalMeasured": false,
+    "fpsMeasured": false,
+    "cpuMeasured": false,
+    "receipt": "../native-night-retention/checks.json",
+    "initialHarnessFailure": {
+      "assertionsPassed": 177,
+      "assertionsFailed": 1,
+      "classification": "capture occurred before outgoing Android cover surface finished handover",
+      "correction": "Observe the actual slideshow UI before ROI capture; no product change for this fixture failure"
+    }
+  },
+  "familyDeployment": {
+    "device": "Family Area",
+    "sha256": "c8651adc869e4a998c419e654b87b6a22daece82b13a4b293777e269192ec303",
+    "bytes": 25702323,
+    "previousSha256": "49a5fbae2a64cc1fc46155658c2b73776fb6ea77b0de54e5ee81074ecfde4d2e",
+    "settingValuesCompared": 97,
+    "changedSettingValues": 0,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "visibleTransitionsVerified": false,
+    "physicalFpsGainMeasured": false
+  },
+  "artifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "familyCleanup": {
+    "ownedUploadCleared": true,
+    "bytesReclaimed": 25702323,
+    "runtimeLines": 402,
+    "fatalExceptionMarkers": 0,
+    "collectorActive": false,
+    "collectorRunning": false,
+    "activeListeners": 0,
+    "localCandidateRetained": true,
+    "localRollbackRetained": true
+  },
+  "ownedEmulatorCleanup": {
+    "ownedAvd": "PortalMusic20261030",
+    "serial": "emulator-5556",
+    "nativeCheckerTerminal": true,
+    "ownedForwardRemoved": true,
+    "shutdownRequested": true,
+    "foreignAvdMutation": false,
+    "ownedAvdAbsentFromInventory": true,
+    "foreignAvdStillPresent": true
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/CalendarMinuteRefresh.kt": "c3cbba6a73b837ab7305ea455c5627869612e0603563bd7386db14969bc30b59",
+    "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": "a2908f835b003237eb5c85bf961697684d415ced1799bd431be595671edbe66e",
+    "app/src/test/java/com/immortal/launcher/CalendarMinuteRefreshTest.kt": "1ff332f41db8a99ac5e81576633787bd84aba814b86429536a2292b669cfa322",
+    "mocks/portal-premium-player-20261030/night-retention-native-checks.py": "b796d32794c60a5e716d802d0675196deb7afa7a68e4e9670f25e1dc62f089c4"
+  },
+  "remainingAcceptance": [
+    "Physical Family night/backlight comfort and stacked-Dream tap",
+    "Actual first-photo panel presentation and pristine cold startup",
+    "Home frame-time tails",
+    "Physical music interaction"
+  ],
+  "livingAreaTouched": false,
+  "phoneTouched": false,
+  "homeAssistantTouched": false
+}
