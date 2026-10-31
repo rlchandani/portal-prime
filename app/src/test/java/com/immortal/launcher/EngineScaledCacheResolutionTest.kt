@@ -8,6 +8,10 @@ package com.immortal.launcher
 
 import java.io.File
 import java.nio.file.Files
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mockito
@@ -103,6 +107,41 @@ class EngineScaledCacheResolutionTest {
       assertEquals(branch, baseline, measured)
       assertEquals(branch, 1, calls)
       assertEquals(branch, baselineSubmissions, submitted() - baselineSubmissions)
+    }
+  }
+
+  @Test fun retiredRemoteOwnerReleasesItsWaiterAndRejectsQueuedPixelPublication() {
+    val jobs = LinkedBlockingQueue<(() -> Boolean) -> Unit>()
+    val settings = Mockito.withSettings().defaultAnswer { invocation ->
+      if (invocation.method.name == "submit") {
+        jobs.add(invocation.getArgument(1)); true
+      } else Mockito.RETURNS_DEFAULTS.answer(invocation)
+    }
+    val root = Files.createTempDirectory("remote-pixel-cancellation").toFile()
+    Mockito.mockConstruction(EngineDerivativeWork.Owner::class.java, settings).use {
+      val f = Fixture(root, 2400)
+      val active = AtomicBoolean(true)
+      val cancelled = CompletableFuture<Unit>()
+      val queued = f.cache.requestForLoad(f.original.path, 1200, active::get)
+      val result = CompletableFuture<File?>()
+      val waiter = Thread {
+        result.complete(f.cache.prepareForLoad(f.original.path, 1200, active::get, cancelled))
+      }.apply { isDaemon = true }
+      try {
+        waiter.start()
+        val until = System.nanoTime() + TimeUnit.SECONDS.toNanos(1)
+        while (waiter.state != Thread.State.TIMED_WAITING && System.nanoTime() < until) Thread.sleep(1)
+        assertEquals(Thread.State.TIMED_WAITING, waiter.state)
+        active.set(false); cancelled.complete(Unit)
+        assertNull(result.get(1, TimeUnit.SECONDS)) // Pixel job has not run.
+        assertFalse(queued.isDone)
+        f.ready(1200) // Even a now-ready copy cannot publish for the retired owner.
+        jobs.remove().invoke { true }
+        assertNull(queued.get(1, TimeUnit.SECONDS))
+      } finally {
+        active.set(false); cancelled.complete(Unit); f.cache.cancel()
+        waiter.join(1000); root.deleteRecursively()
+      }
     }
   }
 }

@@ -2358,6 +2358,63 @@ remains in this build.
 Evidence: `mocks/portal-premium-player-20261030/evidence/native-bounded-local-photos/checks.json`
 and `mocks/portal-premium-player-20261030/evidence/family-bounded-local-photos/verification.json`.
 
+## Bounded remote WebView loading — 02:00:50–02:30:50 UTC window
+
+Authenticated HTTP(S) photo misses now use opaque, owner-scoped WebView image
+requests. Downloads stream into private partial files with **16 KiB** scratch
+space and a **32 MiB** encoded cap, then static photos enter the existing shared
+pixel decoder. The serialized network pipeline is separate from pixel work;
+tiers reuse their source transfer. Source LRU retains **64 MiB** after
+preparation, with one bounded transfer allowed in flight. Main and the JavaScript
+bridge only look up ready copies. They do not wait for networking or decoding.
+Configured source headers are retained by the request path.
+
+Prepared alpha images use PNG and responses identify the actual encoded MIME.
+GIF and animated WebP retain playback and the encoded cap; **their decoded
+pixel/GPU residency is outside the static-copy budget**. No claim of complete
+WebView GPU bounds follows from this change.
+
+Retirement completes waiting readers, invalidates transport leases immediately
+and cancels HTTP calls off Main. Review caught a disconnect-before-connect race
+in `HttpURLConnection`; this remote path now uses OkHttp's persistent
+`Call.cancel()`, which remains cancelled before `execute()`. The existing native
+photo transport is unchanged. Cancellation also propagates into queued static
+preparation, releases the network pipeline's decoder wait and rejects late
+publication. A real JVM HTTP-call regression proves retirement before execution
+does not open a socket. Follow-up independent review found no actionable blocker.
+
+Fresh unit/debug/optimized gates pass: **3,561 tests / 372 suites**, zero
+failures, errors or skips. The final actual API 34 WebView check passes in
+**31.019 seconds**: authenticated first composition, cold opaque URL, decoded
+**2400×1800** prepared copy, immediate ready derivative, alpha PNG preservation,
+corrupt-image 404 and **32 MiB + 1 byte** response rejection. The final local
+regression passes in **8.855 seconds**, including **1800×2400** cold delivery,
+**720×540** small-photo preservation and corrupt-image 404. A 6400×4800 source
+delivered at 2400×1800 has **85.9375% fewer pixels**, a calculation rather than
+measured total heap or Portal FPS.
+
+All finite attempts remain recorded: initial missing APIs failed compilation;
+six Mockito fixture errors failed the first full unit gate and were corrected.
+The subsequent 3,554- and 3,559-test gates passed before the final cancellation
+revision and 3,561-test gate. Earlier native passes are retained with their
+artifact identities. Final recovery independently confirms exact API profile,
+source groups, screensaver configuration and all **seven preference-file
+payloads** unchanged. Collector listeners are zero, owned forwarding is removed
+and the owned emulator's process has exited. Foreign emulators were untouched.
+
+Family's installed optimized APK is independently read back as
+`129109128155f38ec2a91e3edaa32a532275569e40d8dfa7e51fb90b8e14db29`
+(**25,842,558 bytes**). Certificate, manifest and all **53 main assets** match
+the predecessor. All **97 settings**, photo-source groups and screensaver
+configuration remain unchanged. The verified owned upload is cleared and rollback
+retained privately. The prior **1.8-second brightness fade** remains included.
+Living Area remains for final rollout. Physical photo presentation, Portal FPS,
+animated pixel residency and the physical feel of the new brightness fade remain
+outside this software/native-loading result.
+
+Evidence: `mocks/portal-premium-player-20261030/evidence/native-bounded-remote-photos/checks.json`
+and `mocks/portal-premium-player-20261030/evidence/family-bounded-remote-photos/verification.json`.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

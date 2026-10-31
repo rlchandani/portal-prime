@@ -96,20 +96,28 @@ class EngineScaledCache(
 
   /** WebView request thread only. Main and JS bridge never decode, compress or wait here. */
   @androidx.annotation.WorkerThread
-  internal fun prepareForLoad(originalPath: String, requestedEdge: Int): File? {
-    val original = File(originalPath)
-    if (!original.isFile) return null
-    val edge = derivativeEdge(requestedEdge, targetEdge)
-    ready(original, edge)?.let { return it }
-    val prepared = request(original, edge)
+  internal fun prepareForLoad(originalPath: String, requestedEdge: Int,
+      isCurrent: () -> Boolean = { true }, cancelled: CompletableFuture<Unit>? = null): File? {
+    val prepared = requestForLoad(originalPath, requestedEdge, isCurrent)
     return try {
-      prepared.get(5L, TimeUnit.SECONDS)
+      val result = if (cancelled == null) prepared.get(5L, TimeUnit.SECONDS)
+        else CompletableFuture.anyOf(prepared, cancelled).get(5L, TimeUnit.SECONDS)
+      if (isCurrent()) result as? File else null
     } catch (_: InterruptedException) {
       Thread.currentThread().interrupt()
       null
     } catch (_: Exception) {
       null // Failure/timeout never sends an unchecked camera original to Chromium.
     }
+  }
+
+  internal fun requestForLoad(originalPath: String, requestedEdge: Int,
+      isCurrent: () -> Boolean): CompletableFuture<File?> {
+    val original = File(originalPath)
+    if (!isCurrent() || !original.isFile) return CompletableFuture.completedFuture(null)
+    val edge = derivativeEdge(requestedEdge, targetEdge)
+    ready(original, edge)?.let { return CompletableFuture.completedFuture(it) }
+    return request(original, edge, isCurrent)
   }
 
   private fun observe(measurement: EngineImageResolutionMeasurement, result: EngineImageResolutionResult,
@@ -151,14 +159,16 @@ class EngineScaledCache(
     owner.close()
   }
 
-  private fun request(original: File, edge: Int): CompletableFuture<File?> {
+  private fun request(original: File, edge: Int,
+      isCurrent: () -> Boolean = { true }): CompletableFuture<File?> {
     val bytes = original.length()
     val modified = original.lastModified()
     val key = keyFor(original.path, bytes, modified, edge)
     if (synchronized(unneeded) { unneeded.containsKey(key) })
-      return CompletableFuture.completedFuture(original)
-    return imageRequests.request(key) { current ->
-      runCatching { scaleOne(original, bytes, modified, edge, key, current) }
+      return CompletableFuture.completedFuture(if (isCurrent()) original else null)
+    return imageRequests.request(key) { owned ->
+      fun current(): Boolean = owned() && isCurrent()
+      runCatching { scaleOne(original, bytes, modified, edge, key, ::current) }
           .onFailure { Log.w(TAG, "Local photo derivative failed: ${it.javaClass.simpleName}") }
       if (!current() || !original.isFile || original.length() != bytes ||
           original.lastModified() != modified) null
@@ -211,7 +221,8 @@ class EngineScaledCache(
         if (!valid()) return
         dir.mkdirs()
         FileOutputStream(tmp).use {
-          check(out.compress(Bitmap.CompressFormat.JPEG, QUALITY, it)) { "JPEG compression failed" }
+          val format = if (out.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG
+          check(out.compress(format, QUALITY, it)) { "Image compression failed" }
         }
         if (!valid()) return
         check(tmp.renameTo(dst)) { "Derivative publication failed" }

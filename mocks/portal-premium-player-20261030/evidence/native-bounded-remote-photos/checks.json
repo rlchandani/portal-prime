@@ -1,0 +1,229 @@
+{
+  "scope": "Actual API34 Android WebView; synthetic authenticated remote images; static copies, encoded caps, transparency and local regression",
+  "remoteNative": {
+    "status": "passed",
+    "native": true,
+    "serial": "emulator-5556",
+    "avd": "PortalMusic20261030",
+    "apiLevel": 34,
+    "firstScene": true,
+    "coldGuarded": true,
+    "coldDecoded": true,
+    "readyDerivative": true,
+    "authRespected": true,
+    "invalid404": true,
+    "oversize404": true,
+    "invalidCheckSkipped": false,
+    "oversizeCheckSkipped": false,
+    "restored": true,
+    "alphaProvided": true,
+    "alphaCheckSkipped": false,
+    "alphaDecoded": true,
+    "alphaPngMagic": true,
+    "ownedForwardRemoved": true,
+    "ownedReverseRemoved": true,
+    "serverClosed": true,
+    "apkSha256": "4f63b5a190ffdff89686f3e968cc242e7bfd9743d6a81c30aea8bcb1e4fa0cae",
+    "coldWidth": 2400,
+    "coldHeight": 1800,
+    "sceneImageCount": 1,
+    "sceneMaxEdge": 2400,
+    "alphaWidth": 2400,
+    "alphaHeight": 1800,
+    "alphaPngColorType": 6,
+    "preferencePayloadsExact": true,
+    "syntheticCacheFilesRemoved": 4,
+    "fullProfileExact": true,
+    "allSourceGroupsExact": true,
+    "cleanupFailureCount": 0,
+    "privateRecoveryRetained": true,
+    "authenticatedRequestCount": 17,
+    "rejectedAuthRequestCount": 0,
+    "metadataRequestCount": 3,
+    "imageRequestCount": 14,
+    "invalidImageRequestCount": 2,
+    "oversizeImageRequestCount": 1,
+    "syntheticBytesSent": 48449361,
+    "elapsedMs": 31019
+  },
+  "localNativeRegression": {
+    "status": "passed",
+    "native": true,
+    "serial": "emulator-5556",
+    "avd": "PortalMusic20261030",
+    "apiLevel": 34,
+    "firstScene": true,
+    "coldGuarded": true,
+    "coldDecoded": true,
+    "smallDecoded": true,
+    "invalid404": true,
+    "restored": true,
+    "ownedForwardRemoved": true,
+    "apkSha256": "4f63b5a190ffdff89686f3e968cc242e7bfd9743d6a81c30aea8bcb1e4fa0cae",
+    "cdpStage": "native-checks",
+    "cdpHttpStatus": 200,
+    "sceneDimensions": [
+      [
+        720,
+        540
+      ]
+    ],
+    "smallDimensions": [
+      720,
+      540
+    ],
+    "coldDimensions": [
+      1800,
+      2400
+    ],
+    "privateRecoveryRetained": true,
+    "elapsedMs": 8855
+  },
+  "unitGate": {
+    "suites": 372,
+    "tests": 3561,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "freshRun": true,
+    "debugBuild": "passed",
+    "optimizedBuild": "passed"
+  },
+  "priorNativeAttempt": {
+    "status": "passed",
+    "native": true,
+    "serial": "emulator-5556",
+    "avd": "PortalMusic20261030",
+    "apiLevel": 34,
+    "firstScene": true,
+    "coldGuarded": true,
+    "coldDecoded": true,
+    "readyDerivative": true,
+    "authRespected": true,
+    "invalid404": true,
+    "oversize404": true,
+    "invalidCheckSkipped": false,
+    "oversizeCheckSkipped": false,
+    "restored": true,
+    "alphaProvided": true,
+    "alphaCheckSkipped": false,
+    "alphaDecoded": true,
+    "alphaPngMagic": true,
+    "ownedForwardRemoved": true,
+    "ownedReverseRemoved": true,
+    "serverClosed": true,
+    "apkSha256": "94bf7012d6d4c76d3a07379af4e4ab43c8a2c1c08b6b117236724528c706b1f4",
+    "coldWidth": 2400,
+    "coldHeight": 1800,
+    "sceneImageCount": 1,
+    "sceneMaxEdge": 2400,
+    "alphaWidth": 2400,
+    "alphaHeight": 1800,
+    "alphaPngColorType": 6,
+    "preferencePayloadsExact": true,
+    "syntheticCacheFilesRemoved": 3,
+    "fullProfileExact": true,
+    "allSourceGroupsExact": true,
+    "cleanupFailureCount": 0,
+    "privateRecoveryRetained": true,
+    "authenticatedRequestCount": 17,
+    "rejectedAuthRequestCount": 0,
+    "metadataRequestCount": 3,
+    "imageRequestCount": 14,
+    "invalidImageRequestCount": 2,
+    "oversizeImageRequestCount": 2,
+    "syntheticBytesSent": 81990795,
+    "elapsedMs": 9390
+  },
+  "priorLocalRegression": {
+    "status": "passed",
+    "native": true,
+    "serial": "emulator-5556",
+    "avd": "PortalMusic20261030",
+    "apiLevel": 34,
+    "firstScene": true,
+    "coldGuarded": true,
+    "coldDecoded": true,
+    "smallDecoded": true,
+    "invalid404": true,
+    "restored": true,
+    "ownedForwardRemoved": true,
+    "apkSha256": "94bf7012d6d4c76d3a07379af4e4ab43c8a2c1c08b6b117236724528c706b1f4",
+    "cdpStage": "native-checks",
+    "cdpHttpStatus": 200,
+    "sceneDimensions": [
+      [
+        720,
+        540
+      ]
+    ],
+    "smallDimensions": [
+      720,
+      540
+    ],
+    "coldDimensions": [
+      1800,
+      2400
+    ],
+    "privateRecoveryRetained": true,
+    "elapsedMs": 4492
+  },
+  "buildAttempts": [
+    {
+      "gate": "initial API compilation",
+      "status": "failed"
+    },
+    {
+      "gate": "initial full unit gate",
+      "failures": 6,
+      "cause": "Mockito test fixture setup",
+      "status": "failed"
+    },
+    {
+      "gate": "corrected fixture gate",
+      "tests": 3554,
+      "status": "passed"
+    },
+    {
+      "gate": "cancellation gate",
+      "tests": 3559,
+      "status": "passed"
+    },
+    {
+      "gate": "final persistent HTTP cancellation gate",
+      "tests": 3561,
+      "status": "passed"
+    }
+  ],
+  "finalCleanup": {
+    "profileExact": true,
+    "sourceGroupsExact": true,
+    "screensaverConfigurationExact": true,
+    "preferencePayloadsExact": true,
+    "preferenceFilesCompared": 7,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "ownedParentForwardRemoved": true,
+    "ownedEmulatorStopRequested": true,
+    "ownedEmulatorStopped": true,
+    "foreignEmulatorsTouched": false
+  },
+  "encodedPhotoLimitMiB": 32,
+  "retainedRemoteSourceBudgetMiB": 64,
+  "streamScratchKiB": 16,
+  "calculatedPixelReduction": {
+    "originalDimensions": [
+      6400,
+      4800
+    ],
+    "preparedDimensions": [
+      2400,
+      1800
+    ],
+    "percent": 85.9375,
+    "isMeasuredProcessHeap": false
+  },
+  "animatedGifWebpPixelResidencyBounded": false,
+  "physicalPortalPixelsVerified": false,
+  "physicalFpsGainMeasured": false
+}

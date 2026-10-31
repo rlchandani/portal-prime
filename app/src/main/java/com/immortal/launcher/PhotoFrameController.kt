@@ -306,6 +306,8 @@ class PhotoFrameController(
   // Web-page source: a fullscreen WebView that owns the whole frame (the page brings its own
   // clock/widgets, so the photo layer and Immortal overlay are skipped).
   @Volatile private var webView: android.webkit.WebView? = null
+  private var legacyRemoteImages: EngineRemoteImageCache? = null // Main owns retirement.
+  private var legacyRemoteTransports: EnginePhotoTransports? = null
 
   // Web-feed history so swipes can go back as well as forward.
   private val history = ArrayList<Bitmap>() // Classic retains its original history policy.
@@ -768,6 +770,7 @@ class PhotoFrameController(
     // Freeze source/bridge inputs without doing cache hydration or JSON work on Main.
     val urls = photoUrls.toList()
     val localPhotoRequests = EngineLocalPhotoRequests(urls, owner)
+    val remotePhotoRequests = EngineRemotePhotoRequests(urls, owner)
     val dimensions = dims.toMap()
     val headers = authHeaders.toMap()
     val mode = settings.mode
@@ -805,6 +808,27 @@ class PhotoFrameController(
               // Register immediately so any later bridge/layout/load failure has Main-owned cleanup.
               webView = wv
               if (BuildConfig.DEBUG) android.webkit.WebView.setWebContentsDebuggingEnabled(true)
+              val remoteTransports = if (remotePhotoRequests.hasSources)
+                EnginePhotoTransports { photoCancelIo.execute(it) }.also { legacyRemoteTransports = it } else null
+              val remoteImages = if (remotePhotoRequests.hasSources) EngineRemoteImageCache(
+                  java.io.File(context.cacheDir, "ss_remote/${java.util.UUID.randomUUID()}"),
+                  download = { url, target, current ->
+                    val generation = photoTransportGeneration.get()
+                    runCatching {
+                      EngineRemoteHttp.download(url, headers, USER_AGENT, target, remoteTransports!!) {
+                        current() && photoRequestCurrent(generation)
+                      }
+                    }.getOrDefault(false)
+                  },
+                  prepare = { source, edge, current, cancelled ->
+                    val format = source.inputStream().use(EnginePhotoContentType::inspect)
+                    // Animated sources retain encoded playback. Their pixel residency remains
+                    // outside the static-copy budget; never silently flatten a user's animation.
+                    if (format.animation) source else scaledCache.prepareForLoad(source.path, edge, current, cancelled)
+                  },
+                  isActive = { !stopped && hostActive && owner == legacyEngineRevision && webView === wv },
+                  onCancel = { remoteTransports?.close() },
+              ).also { legacyRemoteImages = it } else null
               wv.setBackgroundColor(Color.BLACK)
               wv.isVerticalScrollBarEnabled = false
               wv.isHorizontalScrollBarEnabled = false
@@ -834,24 +858,35 @@ class PhotoFrameController(
                         req: android.webkit.WebResourceRequest,
                     ): android.webkit.WebResourceResponse? {
                       val u = req.url
-                      if (localPhotoRequests.owns(u.toString())) {
+                      if (localPhotoRequests.owns(u.toString()) || remotePhotoRequests.owns(u.toString())) {
                         fun unavailable() = android.webkit.WebResourceResponse("image/jpeg", null,
                             404, "Photo unavailable", emptyMap(), java.io.ByteArrayInputStream(byteArrayOf()))
                         if (stopped || webView !== v || owner != legacyEngineRevision ||
                             !req.method.equals("GET", ignoreCase = true)) return unavailable()
-                        val resource = localPhotoRequests.resolve(u.toString()) ?: return unavailable()
-                        val file = scaledCache.prepareForLoad(resource.first, resource.second) ?: return unavailable()
+                        val remote = remotePhotoRequests.resolve(u.toString())
+                        val local = localPhotoRequests.resolve(u.toString())
+                        val file = when {
+                          remote != null -> remoteImages?.prepareForLoad(remote.first, remote.second)
+                          local != null -> scaledCache.prepareForLoad(local.first, local.second)
+                          else -> null
+                        } ?: return unavailable()
                         if (stopped || webView !== v || owner != legacyEngineRevision) return unavailable()
-                        val stream = runCatching { file.inputStream() }.getOrNull() ?: return unavailable()
-                        val mime = android.webkit.MimeTypeMap.getSingleton()
-                            .getMimeTypeFromExtension(file.extension.lowercase()) ?: "image/jpeg"
-                        return android.webkit.WebResourceResponse(mime, null, stream)
+                        val stream = runCatching { file.inputStream().buffered() }.getOrNull() ?: return unavailable()
+                        val format = runCatching {
+                          stream.mark(32); EnginePhotoContentType.inspect(stream).also { stream.reset() }
+                        }.getOrElse { stream.close(); return unavailable() }
+                        return android.webkit.WebResourceResponse(format.mime, null, stream)
                       }
                       if (headers.isEmpty()) return null
                       val scheme = u.scheme?.lowercase()
                       if (scheme != "http" && scheme != "https") return null
                       if (!req.method.equals("GET", ignoreCase = true)) return null
-                      val bytes = Http.getBytes(u.toString(), headers = headers) ?: return null
+                      // Auxiliary non-photo image requests keep their existing behavior, but no
+                      // longer allocate an unbounded byte array or bypass transport cancellation.
+                      val generation = photoTransportGeneration.get()
+                      val bytes = runCatching { downloadBytes(u.toString(), headers, generation) }.getOrNull()
+                          ?: return android.webkit.WebResourceResponse("image/jpeg", null,
+                              404, "Photo unavailable", emptyMap(), java.io.ByteArrayInputStream(byteArrayOf()))
                       val mime = when {
                         u.toString().endsWith(".png", true) -> "image/png"
                         u.toString().endsWith(".webp", true) -> "image/webp"
@@ -938,6 +973,9 @@ class PhotoFrameController(
                     fun scaledUrl(url: String): String = scaledUrlForSize(url, EngineScaledCache.TARGET_EDGE)
                     @android.webkit.JavascriptInterface
                     fun scaledUrlForSize(url: String, edge: Int): String {
+                      remotePhotoRequests.urlFor(url, edge)?.let { pending ->
+                        return remoteImages?.ready(url, edge)?.let { "file://" + it.absolutePath } ?: pending
+                      }
                       val pendingUrl = localPhotoRequests.urlFor(url, edge) ?: return ""
                       val file = FramePerformanceCapture.measureImageResolution { measurement ->
                         scaledCache.resolveForBoundedLoad(url.removePrefix("file://"), edge, measurement)
@@ -1101,6 +1139,10 @@ class PhotoFrameController(
 
   @androidx.annotation.MainThread
   private fun retireWebView() {
+    legacyRemoteImages?.close()
+    legacyRemoteImages = null
+    legacyRemoteTransports?.close()
+    legacyRemoteTransports = null
     legacyWarmup?.close()
     legacyWarmup = null
     hybridFilmstrip?.close()
@@ -1193,6 +1235,7 @@ class PhotoFrameController(
     if (!value) {
       hostSuspendedAt = now
       hostActive = false
+      legacyRemoteTransports?.cancelCurrent()
       legacyFaceStore?.setActive(false)
       ui.setActive(false)
       if (videoView.visibility == View.VISIBLE) {

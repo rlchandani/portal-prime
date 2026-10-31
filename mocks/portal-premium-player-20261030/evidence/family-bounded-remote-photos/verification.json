@@ -1,0 +1,45 @@
+{
+  "device": "Family Area",
+  "sha256": "129109128155f38ec2a91e3edaa32a532275569e40d8dfa7e51fb90b8e14db29",
+  "bytes": 25842558,
+  "previousSha256": "06fccf2e1a773fc4a1305b6f439ea721080c389b9485153e9c04ed0796beeded",
+  "settingValuesCompared": 97,
+  "changedSettingValues": 0,
+  "sourceGroupsUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "visibleTransitionsVerified": false,
+  "physicalFpsGainMeasured": false,
+  "installedApkReadbackVerified": true,
+  "ownedUploadBytesReclaimed": 25842558,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "physicalImageLoadingAccepted": false,
+  "scope": "Authenticated remote WebView photo loading: capped streamed input, static prepared copies, alpha preservation and owner cancellation; animated pixel residency outside scope",
+  "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "artifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "unitGate": {
+    "suites": 372,
+    "tests": 3561,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "freshRun": true,
+    "debugBuild": "passed",
+    "optimizedBuild": "passed"
+  },
+  "issueWindow": {
+    "startUtc": "2026-10-31T02:00:50Z",
+    "deadlineUtc": "2026-10-31T02:30:50Z",
+    "scope": "Bound remote HTTP WebView photo transfers and deliver prepared image copies with original source credentials retained privately",
+    "device": "Family Area"
+  },
+  "livingAreaDeployed": false,
+  "rollbackRetainedPrivately": true,
+  "priorBrightnessFadeRetained": true
+}
