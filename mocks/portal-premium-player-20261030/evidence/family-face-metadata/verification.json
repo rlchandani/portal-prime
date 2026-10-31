@@ -1,0 +1,27 @@
+{
+  "device": "Family Area",
+  "sha256": "fb8bc97781a8f6b8e5f351f2268c7cee5284c72ea2eda69e0a1abf2da8a2dc9e",
+  "bytes": 25842558,
+  "previousSha256": "129109128155f38ec2a91e3edaa32a532275569e40d8dfa7e51fb90b8e14db29",
+  "settingValuesCompared": 97,
+  "changedSettingValues": 0,
+  "sourceGroupsUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "visibleTransitionsVerified": false,
+  "physicalFpsGainMeasured": false,
+  "installedApkReadbackVerified": true,
+  "ownedUploadBytesReclaimed": 25842558,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "physicalMetadataPresentationAccepted": false,
+  "artifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "issueStartUtc": "2026-10-31T02:51:04Z",
+  "issueDeadlineUtc": "2026-10-31T03:21:04Z",
+  "finishedBeforeDeadline": true
+}

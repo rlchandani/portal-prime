@@ -2478,6 +2478,54 @@ has been delivered yet.
 
 Evidence: `mocks/portal-premium-player-20261030/evidence/native-dream-tap-return/checks.json`.
 
+## Unchanged screensaver metadata — 2026-10-31
+
+The following issue began at **02:51:04 UTC**, with a fixed **03:21:04 UTC**
+deadline covering code, tests, builds, native checks, deployment and cleanup.
+`FaceRenderer.tick` now compares each plain metadata label with its current
+content before writing date, battery, weather or countdown text. The existing
+one-second tick, clock/colon update, countdown calculation, visibility and
+burn-in drift remain intact. No additional metadata cache or preference is added.
+
+The regression first failed for repeated identical writes. Four final tests
+exercise the actual renderer tick: **60** unchanged ticks write each of three
+metadata labels **once**, reducing **180 → 3** writes (**98.333%**). The clock
+still receives **60** updates and schedules **60** one-second callbacks. Midnight,
+date-format changes, charging/discharging, weather disappearance/reappearance,
+paused timer deduplication and running countdown changes remain covered. This
+measures avoided `TextView` writes, not physical CPU savings or FPS.
+
+Fresh gates pass **3,565 tests / 373 suites**, zero failures/errors/skips, plus
+debug and optimized builds (**1m 23s**). The first combined run had one test
+fixture verification failure; the final run fixes that check and explicitly
+pins/restores locale/timezone. Independent review also strengthened final
+visibility assertions.
+
+The actual owned API 34 viewer publishes **41% discharging → 50% charging**
+while retaining the rendered date and process. Its finite native check passes
+in **13.525 seconds**; raw settings/hierarchy stay private. Countdown/date
+rollover are unit-verified, not physically demonstrated by that native case.
+
+Family Area now has optimized APK
+`fb8bc97781a8f6b8e5f351f2268c7cee5284c72ea2eda69e0a1abf2da8a2dc9e`,
+**25,842,558 bytes**, verified by installed-byte readback. All **97** setting
+values, photo sources, screensaver configuration, signing certificate, manifest
+and **53** main assets are unchanged. The install connection closed as the app
+was replaced; independent readback confirmed success without another install.
+The owned upload was cleared, rollback retained privately and collectors idle
+with zero listeners. Living Area was not touched.
+
+The native device was restored to eight exact, nonempty preference payloads,
+flushed to disk, its owned forwarding removed and emulator process confirmed
+exited. The first recovery API read closed during service restart; one bounded
+readiness check succeeded before comparing all 97 values and source groups.
+No physical FPS, physical metadata pixels or new brightness-feel acceptance
+is claimed.
+
+Evidence:
+`mocks/portal-premium-player-20261030/evidence/native-face-metadata/checks.json`
+and `evidence/family-face-metadata/verification.json`.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

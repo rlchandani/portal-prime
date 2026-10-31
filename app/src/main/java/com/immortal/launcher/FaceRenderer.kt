@@ -632,6 +632,11 @@ class FaceRenderer(
     col.visibility = View.VISIBLE
   }
 
+  /** Metadata has plain text; unchanged content does not need another layout/invalidation. */
+  private fun TextView.setMetadataText(value: String) {
+    if (text?.toString() != value) text = value
+  }
+
   // --- periodic loops ---------------------------------------------------------
   private val tick =
       object : Runnable {
@@ -641,17 +646,16 @@ class FaceRenderer(
           blinkOn = !blinkOn
           clockFace?.update(now, blinkOn)
           if (face.clock.showDate)
-              dateView?.text =
-                  face.clock.dateFormat.format(now)
+              dateView?.setMetadataText(face.clock.dateFormat.format(now))
           if (batteryView != null) {
             val (pct, charging) = batteryInfo()
             val hasBattery = pct >= 0
-            batteryView?.text = if (hasBattery) (if (charging) "$pct% ⚡" else "$pct%") else ""
+            batteryView?.setMetadataText(if (hasBattery) (if (charging) "$pct% ⚡" else "$pct%") else "")
             batteryView?.visibility = if (hasBattery) View.VISIBLE else View.GONE
             batteryDivider?.visibility = if (hasBattery) View.VISIBLE else View.GONE
           }
           val hasWeather = weatherText.isNotBlank()
-          weatherView?.text = weatherText
+          weatherView?.setMetadataText(weatherText)
           weatherView?.visibility = if (hasWeather) View.VISIBLE else View.GONE
           weatherDivider?.visibility = if (hasWeather) View.VISIBLE else View.GONE
           // Shared countdown timer: show "M:SS" while running, the alarm banner while ringing.
@@ -660,7 +664,7 @@ class FaceRenderer(
           if (timerRemaining > 0L && !timerState.ringing) {
             val tm = (timerRemaining / 60_000).toInt()
             val ts = ((timerRemaining / 1000) % 60).toInt()
-            timerView?.text = "⏱ %d:%02d".format(tm, ts)
+            timerView?.setMetadataText("⏱ %d:%02d".format(tm, ts))
             timerView?.visibility = View.VISIBLE
           } else {
             timerView?.visibility = View.GONE

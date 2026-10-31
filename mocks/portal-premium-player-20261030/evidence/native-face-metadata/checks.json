@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "serial": "emulator-5556",
+  "avd": "PortalMusic20261030",
+  "api": 34,
+  "debugApkSha256": "53cc4da35319979463acd52e1f950376ae451e028efc2c9636f0d1fc6049fed1",
+  "physicalPortalVerified": false,
+  "renderedDatePreserved": true,
+  "discharging41PercentPublished": true,
+  "charging50PercentPublished": true,
+  "sameProcess": true,
+  "previewStillPresent": true,
+  "batteryAndSettingValuesRestored": true,
+  "elapsedSeconds": 13.525,
+  "unitRegression": {
+    "tests": 4,
+    "unchangedTicks": 60,
+    "metadataLabels": 3,
+    "textWritesBefore": 180,
+    "textWritesAfter": 3,
+    "writesReducedPercent": 98.3333333333,
+    "clockUpdates": 60,
+    "oneSecondCallbacks": 60,
+    "midnightAndDateFormatLive": true,
+    "weatherDisappearReappearLive": true,
+    "batteryDisappearReappearLive": true,
+    "runningCountdownLive": true,
+    "pausedCountdownDeduplicated": true
+  },
+  "gates": {
+    "tests": 3565,
+    "suites": 373,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "debugApkSha256": "53cc4da35319979463acd52e1f950376ae451e028efc2c9636f0d1fc6049fed1",
+    "debugApkBytes": 49734349,
+    "performanceApkSha256": "fb8bc97781a8f6b8e5f351f2268c7cee5284c72ea2eda69e0a1abf2da8a2dc9e",
+    "performanceApkBytes": 25842558
+  },
+  "restoration": {
+    "settingValuesCompared": 97,
+    "settingValuesUnchanged": true,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "firstRecoveryRead": "RemoteDisconnected during service restart; one bounded readiness check succeeded",
+    "exactPreferencePayloadsRestored": 8,
+    "zeroBytePreferenceFiles": 0,
+    "filesystemSynced": true,
+    "ownedForwardRemoved": true,
+    "ownedEmulatorProcessExited": true
+  },
+  "scope": {
+    "physicalFpsGainMeasured": false,
+    "physicalMetadataPixelsVerified": false,
+    "physicalFadeFeelReported": false
+  }
+}

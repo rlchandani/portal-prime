@@ -28,6 +28,15 @@ Status is scoped to each row: **verified** means the stated evidence supports th
 
 No absent mandatory product implementation is established by this audit. The remaining gaps are the documented performance work and target-hardware acceptance above, rather than a new feature list.
 
+**Latest bounded delivery:** the [metadata regression][metadata] reduces unchanged
+date/battery/weather writes from **180 to 3 over 60 ticks**, preserving all 60
+clock updates and one-second callbacks. Actual API 34 labels update correctly
+for discharging/charging while preserving the date and viewer process.
+[Family deployment][metadata-deployment] verifies the new optimized APK and all
+97 settings/source configuration unchanged. Fresh gates pass **3,565 tests /
+373 suites**. These establish reduced label writes and native correctness;
+they do not close the remaining physical FPS or brightness-feel acceptance.
+
 [home]: ../mocks/portal-premium-player-20261030/evidence/family-optimized-home/measurement.json
 [filmstrip]: ../mocks/portal-premium-player-20261030/evidence/family-native-filmstrip/measurement.json
 [startup]: ../mocks/portal-premium-player-20261030/evidence/family-startup-orientation-recovery/verification.json
@@ -48,3 +57,5 @@ No absent mandatory product implementation is established by this audit. The rem
 [remote-photos]: ../mocks/portal-premium-player-20261030/evidence/native-bounded-remote-photos/checks.json
 [remote-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-bounded-remote-photos/verification.json
 [dream-return]: ../mocks/portal-premium-player-20261030/evidence/native-dream-tap-return/checks.json
+[metadata]: ../mocks/portal-premium-player-20261030/evidence/native-face-metadata/checks.json
+[metadata-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-face-metadata/verification.json
