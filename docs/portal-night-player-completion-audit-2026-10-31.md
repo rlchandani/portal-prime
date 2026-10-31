@@ -89,6 +89,16 @@ blocked provider can retain admission until its read returns. Physical heap,
 CPU/FPS and artwork-loading improvement remain unmeasured. The full goal
 remains incomplete.
 
+One subsequent **40.181-second**, profiled Family Home/Apps attribution block
+reported **133 frames**, **p95 41.50 ms** and **p99 155.00 ms**, including first
+Apps visit work. Sampling has overhead and incomplete stack admission; this
+is not a matched acceptance comparison or a causal proof. No justified new
+rendering change was identified, so the investigation was parked early with
+no source trial. The rejected/parked Home experiments remain closed. Installed
+APK and all 97 settings/source configuration were verified unchanged; the
+screensaver restore was acknowledged and the collector has zero listeners.
+See [the bounded attribution receipt][home-tail-attribution].
+
 The separate typography candidate at `b2bafb7d` is preserved on its original
 branch, parked after its final native harness timed out. Its earlier captures
 do not verify the final candidate. This latest deployed build starts at verified
@@ -103,6 +113,7 @@ do not verify the final candidate. This latest deployed build starts at verified
 [clock-size-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-clock-size/verification.json
 
 [home]: ../mocks/portal-premium-player-20261030/evidence/family-optimized-home/measurement.json
+[home-tail-attribution]: ../mocks/portal-premium-player-20261030/evidence/family-home-tail-attribution/measurement.json
 [filmstrip]: ../mocks/portal-premium-player-20261030/evidence/family-native-filmstrip/measurement.json
 [startup]: ../mocks/portal-premium-player-20261030/evidence/family-startup-orientation-recovery/verification.json
 [retention]: ../mocks/portal-premium-player-20261030/evidence/native-night-retention/checks.json

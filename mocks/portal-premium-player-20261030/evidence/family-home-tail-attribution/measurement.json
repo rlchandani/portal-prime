@@ -1,0 +1,77 @@
+{
+  "device": "Family Area",
+  "installedApkSha256": "1b56603f6afa80560c1f44aaa833a6a08b766771cf24e79596248c6111a06821",
+  "issueStartedUtc": "2026-10-31T04:46:10Z",
+  "issueDeadlineUtc": "2026-10-31T05:16:10Z",
+  "decision": "parked_without_source_change",
+  "protocol": {
+    "purpose": "bounded attribution, not matched before/after performance acceptance",
+    "requestedDurationSec": 45,
+    "actualElapsedMs": 40181,
+    "sampleMain": true,
+    "sampleSettingsWork": false,
+    "homeAppsHomeCycles": 5,
+    "minimumNavigationCadenceSec": 4,
+    "screensaverRestoreAcknowledged": true
+  },
+  "homeActivityWindow": {
+    "frames": 133,
+    "budgetMs": 16.666666,
+    "overBudget": 22,
+    "callbackDrops": 0,
+    "firstDrawFrames": 0,
+    "invalidSamples": 0,
+    "overflowSamples": 0,
+    "meanMs": 15.211420383458647,
+    "p95Ms": 41.5,
+    "p99Ms": 155.0,
+    "maxMs": 173.136554,
+    "largestFrame": {
+      "receiptElapsedMs": 301,
+      "totalMs": 173.136554,
+      "drawMs": 133.605677,
+      "animationMs": 10.729583,
+      "queuedMs": 21.360773
+    },
+    "laterTailExample": {
+      "receiptElapsedMs": 24218,
+      "totalMs": 56.899709,
+      "animationMs": 34.010365,
+      "drawMs": 9.45276,
+      "layoutMs": 0.145052
+    }
+  },
+  "mainThreadWallTimeObservations": {
+    "profilingOverhead": true,
+    "samples": 1565,
+    "nativePollSamples": 1496,
+    "outsideNativePollSamples": 69,
+    "accessibilityFamilySamples": 29,
+    "semanticsFamilySamples": 23,
+    "composerFamilySamples": 6,
+    "layoutMeasureFamilySamples": 6,
+    "familiesMayOverlap": true,
+    "dynamicSymbolLimitReached": true,
+    "discardedSymbols": 116,
+    "discardedDepthFrames": 353,
+    "droppedTicks": 2448
+  },
+  "cleanup": {
+    "installedApkReadbackVerified": true,
+    "settingsUnchanged": 97,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "collectorRunning": false,
+    "activeListeners": 0,
+    "livingAreaOperations": 0
+  },
+  "limits": [
+    "Stack observations describe wall time, not CPU usage or a causal assignment of individual slow frames.",
+    "The short profiled block includes the first Apps visit. It is not comparable to the earlier warmed, unprofiled matched experiment.",
+    "FrameMetrics animation duration can include main-thread frame callbacks; it does not identify one app animator.",
+    "Delivered FPS, tab readiness, physical pixels, thermal state and GPU residency were not measured.",
+    "The active icon renderer uses cached painterResource; its small unused identity lookup is not established as the source of these stalls.",
+    "The rejected native tabs/layer candidate and parked cache, producer-lifecycle and resume-admission experiments were not repeated.",
+    "The existing gradual brightness implementation remains deployed; its physical feel is awaiting user feedback."
+  ]
+}

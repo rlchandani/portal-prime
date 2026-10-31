@@ -2724,6 +2724,42 @@ Evidence: `evidence/native-local-artwork/checks.json` and
 The Kotlin [runInterruptible contract](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-interruptible.html)
 documents the cancellation-to-thread-interruption bridge used here.
 
+## Home/Apps tail attribution closed without a source trial — October 31
+
+Original issue window: **04:46:10–05:16:10 UTC**. One short Family-only
+attribution capture completed five Home → Apps → Home cycles at a minimum
+four-second navigation cadence. Its collector ran for **40.181 seconds**.
+The existing optimized APK `1b56603f…` remained installed throughout.
+
+The shared HomeActivity Window reported **133 frames**, **22 over budget**,
+**p95 41.50 ms**, **p99 155.00 ms**, and **max 173.137 ms**; no dropped callbacks,
+invalid samples or first-draw flags. The largest receipt was near the first Apps
+visit, with **133.606 ms** in the draw component. A later tail had **34.010 ms**
+in the animation component. These are component observations, not causal
+attribution to an app animator or a delivered-FPS result.
+
+Main-thread sampling observed accessibility and semantics work, but also incurred
+profiling overhead, dropped sampling ticks, a dynamic symbol limit and truncated
+stacks. This short block includes first-visit work and is not comparable to the
+earlier warmed, unprofiled matched comparison. It does not justify a fresh
+rendering change or establish a regression.
+
+A parallel source audit found the active glyph renderer already uses
+`painterResource`; no per-draw path parsing was established. A small unused
+identity lookup in bitmap app tiles is not established as a tail-frame cause.
+No speculative source patch was made. The rejected native/layer candidate and
+parked cache, producer-lifecycle and resume-admission experiments stay closed.
+This issue is parked early instead of spending the rest of its window on repeats.
+
+The screensaver restore request was acknowledged. Installed APK bytes were
+independently verified, all **97 settings**, photo-source groups and screensaver
+configuration are unchanged, and the collector has **zero listeners**.
+No Living Area operations. The requested **1.8-second brightness fade** remains
+deployed; its physical feel still awaits the already-requested user feedback.
+
+Evidence: `evidence/family-home-tail-attribution/measurement.json` under
+`mocks/portal-premium-player-20261030`.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
