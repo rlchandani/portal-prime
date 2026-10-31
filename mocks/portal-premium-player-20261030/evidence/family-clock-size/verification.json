@@ -1,0 +1,59 @@
+{
+  "device": "Family Area",
+  "sha256": "f6a50378ae50ab7f06ef4886ec6e34beec38695044066990d1803ac182400601",
+  "bytes": 25842558,
+  "previousSha256": "fb8bc97781a8f6b8e5f351f2268c7cee5284c72ea2eda69e0a1abf2da8a2dc9e",
+  "settingValuesCompared": 97,
+  "changedSettingValues": 0,
+  "navigationAcknowledgments": [
+    {
+      "action": "screensaver",
+      "response": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    }
+  ],
+  "sourceGroupsUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "visibleTransitionsVerified": false,
+  "physicalFpsGainMeasured": false,
+  "installedApkReadbackVerified": true,
+  "ownedUploadBytesReclaimed": 25842558,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "physicalMetadataPresentationAccepted": false,
+  "candidate": {
+    "sha256": "f6a50378ae50ab7f06ef4886ec6e34beec38695044066990d1803ac182400601",
+    "bytes": 25842558,
+    "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "artifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "gates": {
+    "tests": 3591,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 376,
+    "debug": {
+      "sha256": "8953299f9eaa655e07d4fa182564b7199f2d9ae5bfb6bab93779aaa6daacd085",
+      "bytes": 49734349
+    },
+    "performance": {
+      "sha256": "f6a50378ae50ab7f06ef4886ec6e34beec38695044066990d1803ac182400601",
+      "bytes": 25842558
+    },
+    "buildResult": "BUILD SUCCESSFUL in 1m 26s"
+  },
+  "livingAreaWrites": 0,
+  "includesPriorClockDateOptimization": true,
+  "includesGradualNightBrightnessFade": true,
+  "brightnessFadeSeconds": 1.8
+}

@@ -399,7 +399,7 @@ class FaceRenderer(
     }
 
     val col = bucket(clock.position)
-    // WRAP: PrimeDigitalClockFaceView reports its own fixed width via onMeasure.
+    // Canvas clocks measure their chosen size within this grid bucket's available space.
     col.addView(
         made.view,
         LinearLayout.LayoutParams(

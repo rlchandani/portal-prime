@@ -1,0 +1,470 @@
+{
+  "passed": true,
+  "serial": "emulator-5556",
+  "avd": "PortalMusic20261030",
+  "api": 34,
+  "debugApkSha256": "8953299f9eaa655e07d4fa182564b7199f2d9ae5bfb6bab93779aaa6daacd085",
+  "physicalPortalVerified": false,
+  "testDeadlineSeconds": 150,
+  "totalDeadlineSeconds": 180,
+  "minimumGrowthPercent": 5,
+  "requiredGlyphMarginPx": 1,
+  "measurements": [
+    {
+      "orientation": "landscape",
+      "screenSizePx": [
+        2160,
+        1440
+      ],
+      "densityDpi": 240,
+      "style": "big",
+      "sizeScale": 280,
+      "clockBoundsPx": [
+        620,
+        507,
+        1540,
+        932
+      ],
+      "viewWidthPx": 920,
+      "viewHeightPx": 425,
+      "glyphAreaPx": 101564,
+      "glyphHeightPx": 259,
+      "glyphBoundsPx": [
+        636,
+        585,
+        1520,
+        844
+      ],
+      "glyphMarginPx": 16
+    },
+    {
+      "orientation": "landscape",
+      "screenSizePx": [
+        2160,
+        1440
+      ],
+      "densityDpi": 240,
+      "style": "big",
+      "sizeScale": 380,
+      "clockBoundsPx": [
+        456,
+        433,
+        1703,
+        1007
+      ],
+      "viewWidthPx": 1247,
+      "viewHeightPx": 574,
+      "glyphAreaPx": 187977,
+      "glyphHeightPx": 352,
+      "glyphBoundsPx": [
+        476,
+        537,
+        1679,
+        889
+      ],
+      "glyphMarginPx": 20
+    },
+    {
+      "orientation": "landscape",
+      "screenSizePx": [
+        2160,
+        1440
+      ],
+      "densityDpi": 240,
+      "style": "big",
+      "sizeScale": 460,
+      "clockBoundsPx": [
+        326,
+        373,
+        1834,
+        1067
+      ],
+      "viewWidthPx": 1508,
+      "viewHeightPx": 694,
+      "glyphAreaPx": 275197,
+      "glyphHeightPx": 426,
+      "glyphBoundsPx": [
+        349,
+        499,
+        1807,
+        925
+      ],
+      "glyphMarginPx": 23
+    },
+    {
+      "orientation": "landscape",
+      "screenSizePx": [
+        2160,
+        1440
+      ],
+      "densityDpi": 240,
+      "style": "bold",
+      "sizeScale": 320,
+      "clockBoundsPx": [
+        554,
+        477,
+        1605,
+        962
+      ],
+      "viewWidthPx": 1051,
+      "viewHeightPx": 485,
+      "glyphAreaPx": 134177,
+      "glyphHeightPx": 296,
+      "glyphBoundsPx": [
+        571,
+        566,
+        1587,
+        862
+      ],
+      "glyphMarginPx": 17
+    },
+    {
+      "orientation": "landscape",
+      "screenSizePx": [
+        2160,
+        1440
+      ],
+      "densityDpi": 240,
+      "style": "bold",
+      "sizeScale": 430,
+      "clockBoundsPx": [
+        375,
+        395,
+        1785,
+        1044
+      ],
+      "viewWidthPx": 1410,
+      "viewHeightPx": 649,
+      "glyphAreaPx": 243324,
+      "glyphHeightPx": 398,
+      "glyphBoundsPx": [
+        397,
+        513,
+        1763,
+        911
+      ],
+      "glyphMarginPx": 22
+    },
+    {
+      "orientation": "landscape",
+      "screenSizePx": [
+        2160,
+        1440
+      ],
+      "densityDpi": 240,
+      "style": "bold",
+      "sizeScale": 500,
+      "clockBoundsPx": [
+        261,
+        343,
+        1899,
+        1097
+      ],
+      "viewWidthPx": 1638,
+      "viewHeightPx": 754,
+      "glyphAreaPx": 327244,
+      "glyphHeightPx": 463,
+      "glyphBoundsPx": [
+        286,
+        480,
+        1873,
+        943
+      ],
+      "glyphMarginPx": 25
+    },
+    {
+      "orientation": "portrait",
+      "screenSizePx": [
+        1440,
+        2160
+      ],
+      "densityDpi": 240,
+      "style": "big",
+      "sizeScale": 280,
+      "clockBoundsPx": [
+        346,
+        907,
+        1093,
+        1252
+      ],
+      "viewWidthPx": 747,
+      "viewHeightPx": 345,
+      "glyphAreaPx": 67108,
+      "glyphHeightPx": 210,
+      "glyphBoundsPx": [
+        359,
+        970,
+        1079,
+        1180
+      ],
+      "glyphMarginPx": 13
+    },
+    {
+      "orientation": "portrait",
+      "screenSizePx": [
+        1440,
+        2160
+      ],
+      "densityDpi": 240,
+      "style": "big",
+      "sizeScale": 380,
+      "clockBoundsPx": [
+        214,
+        847,
+        1225,
+        1313
+      ],
+      "viewWidthPx": 1011,
+      "viewHeightPx": 466,
+      "glyphAreaPx": 123646,
+      "glyphHeightPx": 285,
+      "glyphBoundsPx": [
+        231,
+        932,
+        1209,
+        1217
+      ],
+      "glyphMarginPx": 16
+    },
+    {
+      "orientation": "portrait",
+      "screenSizePx": [
+        1440,
+        2160
+      ],
+      "densityDpi": 240,
+      "style": "big",
+      "sizeScale": 460,
+      "clockBoundsPx": [
+        108,
+        798,
+        1331,
+        1361
+      ],
+      "viewWidthPx": 1223,
+      "viewHeightPx": 563,
+      "glyphAreaPx": 181735,
+      "glyphHeightPx": 344,
+      "glyphBoundsPx": [
+        128,
+        901,
+        1311,
+        1245
+      ],
+      "glyphMarginPx": 20
+    },
+    {
+      "orientation": "portrait",
+      "screenSizePx": [
+        1440,
+        2160
+      ],
+      "densityDpi": 240,
+      "style": "bold",
+      "sizeScale": 320,
+      "clockBoundsPx": [
+        293,
+        883,
+        1146,
+        1277
+      ],
+      "viewWidthPx": 853,
+      "viewHeightPx": 394,
+      "glyphAreaPx": 88272,
+      "glyphHeightPx": 241,
+      "glyphBoundsPx": [
+        307,
+        955,
+        1130,
+        1196
+      ],
+      "glyphMarginPx": 14
+    },
+    {
+      "orientation": "portrait",
+      "screenSizePx": [
+        1440,
+        2160
+      ],
+      "densityDpi": 240,
+      "style": "bold",
+      "sizeScale": 430,
+      "clockBoundsPx": [
+        148,
+        816,
+        1291,
+        1343
+      ],
+      "viewWidthPx": 1143,
+      "viewHeightPx": 527,
+      "glyphAreaPx": 158241,
+      "glyphHeightPx": 323,
+      "glyphBoundsPx": [
+        167,
+        912,
+        1272,
+        1235
+      ],
+      "glyphMarginPx": 19
+    },
+    {
+      "orientation": "portrait",
+      "screenSizePx": [
+        1440,
+        2160
+      ],
+      "densityDpi": 240,
+      "style": "bold",
+      "sizeScale": 500,
+      "clockBoundsPx": [
+        56,
+        774,
+        1384,
+        1386
+      ],
+      "viewWidthPx": 1328,
+      "viewHeightPx": 612,
+      "glyphAreaPx": 214997,
+      "glyphHeightPx": 376,
+      "glyphBoundsPx": [
+        77,
+        885,
+        1363,
+        1261
+      ],
+      "glyphMarginPx": 21
+    }
+  ],
+  "comparisons": [
+    {
+      "orientation": "landscape",
+      "style": "big",
+      "fromScale": 280,
+      "toScale": 380,
+      "viewWidthGrowthPercent": 35.543,
+      "glyphHeightGrowthPercent": 35.907,
+      "viewWidthGrewAtLeast5Percent": true,
+      "glyphHeightGrewAtLeast5Percent": true
+    },
+    {
+      "orientation": "landscape",
+      "style": "big",
+      "fromScale": 380,
+      "toScale": 460,
+      "viewWidthGrowthPercent": 20.93,
+      "glyphHeightGrowthPercent": 21.023,
+      "viewWidthGrewAtLeast5Percent": true,
+      "glyphHeightGrewAtLeast5Percent": true
+    },
+    {
+      "orientation": "landscape",
+      "style": "bold",
+      "fromScale": 320,
+      "toScale": 430,
+      "viewWidthGrowthPercent": 34.158,
+      "glyphHeightGrowthPercent": 34.459,
+      "viewWidthGrewAtLeast5Percent": true,
+      "glyphHeightGrewAtLeast5Percent": true
+    },
+    {
+      "orientation": "landscape",
+      "style": "bold",
+      "fromScale": 430,
+      "toScale": 500,
+      "viewWidthGrowthPercent": 16.17,
+      "glyphHeightGrowthPercent": 16.332,
+      "viewWidthGrewAtLeast5Percent": true,
+      "glyphHeightGrewAtLeast5Percent": true
+    },
+    {
+      "orientation": "portrait",
+      "style": "big",
+      "fromScale": 280,
+      "toScale": 380,
+      "viewWidthGrowthPercent": 35.341,
+      "glyphHeightGrowthPercent": 35.714,
+      "viewWidthGrewAtLeast5Percent": true,
+      "glyphHeightGrewAtLeast5Percent": true
+    },
+    {
+      "orientation": "portrait",
+      "style": "big",
+      "fromScale": 380,
+      "toScale": 460,
+      "viewWidthGrowthPercent": 20.969,
+      "glyphHeightGrowthPercent": 20.702,
+      "viewWidthGrewAtLeast5Percent": true,
+      "glyphHeightGrewAtLeast5Percent": true
+    },
+    {
+      "orientation": "portrait",
+      "style": "bold",
+      "fromScale": 320,
+      "toScale": 430,
+      "viewWidthGrowthPercent": 33.998,
+      "glyphHeightGrowthPercent": 34.025,
+      "viewWidthGrewAtLeast5Percent": true,
+      "glyphHeightGrewAtLeast5Percent": true
+    },
+    {
+      "orientation": "portrait",
+      "style": "bold",
+      "fromScale": 430,
+      "toScale": 500,
+      "viewWidthGrowthPercent": 16.185,
+      "glyphHeightGrowthPercent": 16.409,
+      "viewWidthGrewAtLeast5Percent": true,
+      "glyphHeightGrewAtLeast5Percent": true
+    }
+  ],
+  "cleanup": {
+    "originalWmSizeAndDensityRestored": true,
+    "originalRegistryValuesRestored": true,
+    "packageStopped": true,
+    "ownXmlRemoved": true
+  },
+  "guardsPassed": true,
+  "elapsedSeconds": 70.622,
+  "parentRestorationVerification": {
+    "allSettingValuesUnchanged": true,
+    "settingsCompared": 97,
+    "sourceGroupsUnchanged": true,
+    "screensaverUnchanged": true,
+    "performanceCollectorUnchangedIdle": true,
+    "windowSizeRestored": true,
+    "exactEightFilePreferenceRestoreVerified": true,
+    "asyncRegistryRestoreRequiredExactParentBackup": true,
+    "defaultPreviewHierarchy": "not captured: UIAutomator did not emit XML with original moving-photo configuration",
+    "defaultPreviewPixelsSavedPrivately": true,
+    "finalPreferenceFilesExact": 8,
+    "finalPreferencesSynced": true,
+    "defaultClockAndDateVisuallyReviewed": true,
+    "packageStopped": true,
+    "ownForwardRemoved": true,
+    "ownTemporaryFilesRemoved": true
+  },
+  "ownedEmulatorExited": true,
+  "gates": {
+    "tests": 3591,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 376,
+    "debug": {
+      "sha256": "8953299f9eaa655e07d4fa182564b7199f2d9ae5bfb6bab93779aaa6daacd085",
+      "bytes": 49734349
+    },
+    "performance": {
+      "sha256": "f6a50378ae50ab7f06ef4886ec6e34beec38695044066990d1803ac182400601",
+      "bytes": 25842558
+    },
+    "buildResult": "BUILD SUCCESSFUL in 1m 26s"
+  },
+  "issue": {
+    "startedUtc": "2026-10-31T03:28:12Z",
+    "deadlineUtc": "2026-10-31T03:58:12Z",
+    "maximumMinutes": 30,
+    "implementationAndVerificationCompleteBeforeDeadline": true
+  },
+  "independentCodeReview": "no actionable findings"
+}

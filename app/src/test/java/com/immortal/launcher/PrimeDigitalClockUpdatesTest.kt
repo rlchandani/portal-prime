@@ -56,6 +56,14 @@ class PrimeDigitalClockUpdatesTest {
     assertEquals(60, f.invalidations)
   }
 
+  @Test fun accessibleTimeUpdatesAtTheMinuteRatherThanOnEveryBlink() =
+      fixture(ClockSpec(separator = Separator.BLINK)) { f ->
+        repeat(60) { f.update(it) }
+        assertEquals("12:34", f.get("accessibleTime"))
+        f.update(60)
+        assertEquals("12:35", f.get("accessibleTime"))
+      }
+
   @Test fun timezoneChangesRefreshTheRetainedClockWithoutRecreatingItsView() = fixture { f ->
     f.update(0)
     TimeZone.setDefault(TimeZone.getTimeZone("GMT+05:30"))

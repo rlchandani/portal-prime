@@ -19,7 +19,7 @@ import com.immortal.launcher.ClockSpec
 import com.immortal.launcher.FaceStyle
 import com.immortal.launcher.ui.theme.AccentGlow
 import com.immortal.launcher.ui.theme.ArcTrack
-import com.immortal.launcher.ui.theme.ClockPrimary
+import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -43,6 +43,9 @@ class PrimeDigitalClockFaceView(
 
     private var currentHourMin = "--:--"
     private var currentSeconds = 0
+    private var accessibleTime: String? = null
+    private var measuredTextSize = 0f
+    private val fontMetrics = Paint.FontMetrics()
 
     // Paint for the large time text — left-aligned so left edge matches the date row below
     private val timePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -67,15 +70,34 @@ class PrimeDigitalClockFaceView(
 
     override val view: View = object : View(context) {
 
-        init { setBackgroundColor(android.graphics.Color.TRANSPARENT) }
+        init {
+            setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+        }
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-            // Fixed 500dp wide x 100dp tall — wide enough for a large readable time,
-            // constrained so it stays in the bottom-left corner rather than spanning the screen.
             val density = context.resources.displayMetrics.density
-            val w = (500 * density).toInt()
-            val h = (100 * density).toInt()
-            setMeasuredDimension(w, h)
+            timePaint.textSize = 100f
+            timePaint.getFontMetrics(fontMetrics)
+            // Stable digit reservation prevents the layout changing every minute.
+            val eight = (DecimalFormatSymbols.getInstance(formatterLocale).zeroDigit.code + 8).toChar()
+            val widestTime = "$eight$eight:$eight$eight"
+            val widthUnit = maxOf(
+                timePaint.measureText(widestTime), timePaint.measureText(currentHourMin),
+            ) / 100f
+            fun limit(measureSpec: Int): Int =
+                if (MeasureSpec.getMode(measureSpec) == MeasureSpec.UNSPECIFIED) Int.MAX_VALUE
+                else MeasureSpec.getSize(measureSpec)
+            val geometry = DigitalClockGeometry.measure(
+                density, spec.sizeScale, widthUnit,
+                (fontMetrics.descent - fontMetrics.ascent) / 100f,
+                limit(widthMeasureSpec), limit(heightMeasureSpec), 2f * density,
+            )
+            measuredTextSize = geometry.textSize
+            setMeasuredDimension(
+                resolveSize(geometry.width, widthMeasureSpec),
+                resolveSize(geometry.height, heightMeasureSpec),
+            )
         }
 
         override fun onDraw(canvas: Canvas) {
@@ -84,23 +106,30 @@ class PrimeDigitalClockFaceView(
             val h = height.toFloat()
             if (w <= 0f || h <= 0f) return
 
-            // Auto-fit: scale text so it fills the full view width
-            val sample = currentHourMin.ifEmpty { "00:00" }
-            var textSize = h * 0.85f * (spec.sizeScale / 100f)
+            val padding = minOf(2f * context.resources.displayMetrics.density, w / 2f, h / 2f)
+            timePaint.textSize = measuredTextSize
+            timePaint.getFontMetrics(fontMetrics)
+            val textWidth = timePaint.measureText(currentHourMin)
+            val textHeight = fontMetrics.descent - fontMetrics.ascent
+            // Only shrink to respect a tighter exact parent or a changed locale; never
+            // enlarge back to the full width and cancel the selected scale.
+            val fit = minOf(
+                1f,
+                if (textWidth > 0f) (w - padding * 2f) / textWidth else 1f,
+                if (textHeight > 0f) (h - padding * 2f) / textHeight else 1f,
+            ).coerceAtLeast(0f)
+            val textSize = measuredTextSize * fit
+            if (textSize <= 0f) return
             timePaint.textSize = textSize
-            val measured = timePaint.measureText(sample)
-            if (measured > 0f) textSize *= (w / measured)
-            timePaint.textSize = textSize
-
-            // Draw left-aligned from x=0, baseline at 85% height
-            val textY = h * 0.85f
-            canvas.drawText(currentHourMin, 0f, textY, timePaint)
+            timePaint.getFontMetrics(fontMetrics)
+            val textY = (h - (fontMetrics.descent - fontMetrics.ascent)) / 2f - fontMetrics.ascent
+            canvas.drawText(currentHourMin, padding, textY, timePaint)
 
             // Seconds arc — thin ring enclosing the clock face (only when user enables seconds)
             if (spec.showSeconds) {
                 val margin = textSize * 0.08f
-                val arcRadius = minOf(w, h) * 0.45f - margin
                 val arcStroke = maxOf(textSize * 0.035f, 3f)
+                val arcRadius = (minOf(w, h) * 0.45f - margin - arcStroke / 2f).coerceAtLeast(0f)
                 arcTrackPaint.strokeWidth = arcStroke
                 arcFillPaint.strokeWidth = arcStroke
 
@@ -128,12 +157,17 @@ class PrimeDigitalClockFaceView(
             formatterLocale = locale
             hourMinFmt = SimpleDateFormat(if (spec.is24h) "HH:mm" else "hh:mm", locale)
             secondsFmt = SimpleDateFormat("ss", locale)
+            view.requestLayout()
         }
         val zone = TimeZone.getDefault()
         if (hourMinFmt.timeZone != zone) hourMinFmt.timeZone = zone
         if (spec.showSeconds && secondsFmt.timeZone != zone) secondsFmt.timeZone = zone
         // Honour blink separator: replace colon with space on blink-off ticks
         val raw = hourMinFmt.format(now)
+        if (accessibleTime != raw) {
+            accessibleTime = raw
+            view.contentDescription = "Clock $raw"
+        }
         val hourMin = if (!blinkOn && spec.separator.name == "BLINK") raw.replace(':', ' ') else raw
         val seconds = if (spec.showSeconds) secondsFmt.format(now).toIntOrNull() ?: 0 else 0
         if (currentHourMin == hourMin && currentSeconds == seconds) return

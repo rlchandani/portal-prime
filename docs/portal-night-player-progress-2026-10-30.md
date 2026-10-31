@@ -2568,7 +2568,7 @@ DST cases and pass in **40s**. Actual API 34 label/retention checks pass in
 Native settings/source configuration and all eight exact nonempty preferences
 were restored and synced; owned forwarding was removed and the emulator exited.
 
-**Family deployment is pending.** Candidate optimized APK is
+**Family deployment was pending at this issue's close; the next issue below resolves it.** Candidate optimized APK is
 `e669b738da8514cc03da66c7b1797c3106b2b94113f67d18159891ce5ed66d9f`,
 **25,842,558 bytes**. The very first `/perf/state` preflight timed out before any
 upload or install. One read-only check confirmed timeout on Fleet and Wi-Fi ADB
@@ -2584,6 +2584,53 @@ not another speculative Home-cache trial.
 
 Evidence: `evidence/native-clock-work/checks.json` and
 `evidence/family-clock-work/pending.json` under
+`mocks/portal-premium-player-20261030`.
+
+## Bounded issue: functional Canvas clock sizes — October 31
+
+The issue started **03:28:12 UTC**, with an unchanged **03:58:12 UTC** deadline.
+The old fixed 500×100dp box and width-fitting calculation cancelled the selected
+scale and could clip tall glyphs. The clock now measures a proportional layout
+within Android's parent constraints and draws from real font ascent/descent.
+Large-clock choices share a responsive maximum, so narrower portrait panels
+retain distinct Small, Medium and Large choices. Fitting can only shrink text.
+Minute changes do not request new layouts; locale changes do. Accessible time
+also updates only when the displayed minute changes, independent of blinking.
+
+The old geometry reproduced **four failing regression cases out of six**.
+Fresh full gates pass **3,591 tests / 376 suites**, zero failures/errors/skips;
+debug and optimized builds pass. Independent review found no actionable defects.
+Actual API 34 screenshots verify **12 cases**: all three Big and Bold size scales
+at **2160×1440** and **1440×2160**, density 240. Eight adjacent-size comparisons
+show **16.170–35.543% view-width growth** and **16.332–35.907% glyph-height growth**.
+Every captured glyph stays at least **13 pixels inside its clock bounds**.
+The native matrix, including cleanup, completes in **70.622 seconds**.
+These are rendered API 34 geometry checks, not physical Portal FPS measurements
+or verification of the legacy font choices, which remain outside this patch.
+
+The restored default clock/date were visually checked. UIAutomator did not emit
+an idle hierarchy with the original moving-photo configuration; no additional
+hierarchy pass is claimed. All **97 settings**, source groups and screensaver
+configuration compare unchanged. The test's live API rollback did not reliably
+persist through immediate force-stop, so the parent restored the exact private
+eight-file backup with the process stopped, synced it and compared every file
+byte. This authoritative rollback is recorded separately from API acknowledgment.
+The owned forward and temporary files were removed and the emulator exited.
+
+**Family Area delivery is verified.** It became reachable during this issue.
+Installed optimized APK readback matches
+`f6a50378ae50ab7f06ef4886ec6e34beec38695044066990d1803ac182400601`,
+**25,842,558 bytes**, signed with the existing certificate. The previous installed
+APK was `fb8bc977…`; the earlier `e669b738…` candidate was never installed.
+This delivery includes the previous clock/date optimization and the already
+implemented **1.8-second down/up brightness fade**. All 97 settings, source groups
+and screensaver configuration remain unchanged; manifest and 53 main assets match
+the prior installation. The owned upload was reclaimed, and the performance
+collector is inactive with zero listeners. No Living Area operation occurred.
+Physical fade feel and actual API 29 geometry/FPS remain unmeasured here.
+
+Evidence: `evidence/native-clock-size/checks.json` and
+`evidence/family-clock-size/verification.json` under
 `mocks/portal-premium-player-20261030`.
 
 ## Sources
