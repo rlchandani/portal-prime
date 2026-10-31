@@ -23,6 +23,7 @@ import com.immortal.launcher.ui.theme.ClockPrimary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 /**
  * Premium digital clock face drawn entirely on Canvas.
@@ -36,12 +37,12 @@ class PrimeDigitalClockFaceView(
     @Suppress("UNUSED_PARAMETER") private val assets: AssetResolver,
 ) : ClockFaceView {
 
-    private val hourMinFmt = SimpleDateFormat(if (spec.is24h) "HH:mm" else "hh:mm", Locale.getDefault())
-    private val secondsFmt = SimpleDateFormat("ss", Locale.getDefault())
+    private var formatterLocale = Locale.getDefault()
+    private var hourMinFmt = SimpleDateFormat(if (spec.is24h) "HH:mm" else "hh:mm", formatterLocale)
+    private var secondsFmt = SimpleDateFormat("ss", formatterLocale)
 
     private var currentHourMin = "--:--"
     private var currentSeconds = 0
-    private var blinkColon = true
 
     // Paint for the large time text — left-aligned so left edge matches the date row below
     private val timePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -121,11 +122,23 @@ class PrimeDigitalClockFaceView(
     }
 
     override fun update(now: Date, blinkOn: Boolean) {
+        // Retained clock views must follow system language/timezone changes.
+        val locale = Locale.getDefault()
+        if (locale != formatterLocale) {
+            formatterLocale = locale
+            hourMinFmt = SimpleDateFormat(if (spec.is24h) "HH:mm" else "hh:mm", locale)
+            secondsFmt = SimpleDateFormat("ss", locale)
+        }
+        val zone = TimeZone.getDefault()
+        if (hourMinFmt.timeZone != zone) hourMinFmt.timeZone = zone
+        if (spec.showSeconds && secondsFmt.timeZone != zone) secondsFmt.timeZone = zone
         // Honour blink separator: replace colon with space on blink-off ticks
         val raw = hourMinFmt.format(now)
-        currentHourMin = if (!blinkOn && spec.separator.name == "BLINK") raw.replace(':', ' ') else raw
-        currentSeconds = secondsFmt.format(now).toIntOrNull() ?: 0
-        blinkColon = blinkOn
+        val hourMin = if (!blinkOn && spec.separator.name == "BLINK") raw.replace(':', ' ') else raw
+        val seconds = if (spec.showSeconds) secondsFmt.format(now).toIntOrNull() ?: 0 else 0
+        if (currentHourMin == hourMin && currentSeconds == seconds) return
+        currentHourMin = hourMin
+        currentSeconds = seconds
         view.invalidate()
     }
 }

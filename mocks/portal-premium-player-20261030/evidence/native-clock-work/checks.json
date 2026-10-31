@@ -1,0 +1,66 @@
+{
+  "passed": true,
+  "serial": "emulator-5556",
+  "avd": "PortalMusic20261030",
+  "api": 34,
+  "debugApkSha256": "ec037d60886842ad731eb34742bffa1dd61c7f8198fdd71e561745c3adf4d27d",
+  "physicalPortalVerified": false,
+  "renderedDatePreserved": true,
+  "discharging41PercentPublished": true,
+  "charging50PercentPublished": true,
+  "sameProcess": true,
+  "previewStillPresent": true,
+  "batteryAndSettingValuesRestored": true,
+  "elapsedSeconds": 13.445,
+  "gates": {
+    "tests": 3584,
+    "suites": 375,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "debugApkSha256": "ec037d60886842ad731eb34742bffa1dd61c7f8198fdd71e561745c3adf4d27d",
+    "debugApkBytes": 49734349,
+    "performanceApkSha256": "e669b738da8514cc03da66c7b1797c3106b2b94113f67d18159891ce5ed66d9f",
+    "performanceApkBytes": 25842558
+  },
+  "restoration": {
+    "settingValuesCompared": 97,
+    "settingValuesUnchanged": true,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "collectorInactive": true,
+    "activeListeners": 0,
+    "exactNonemptyPreferencePayloadsRestored": 8,
+    "filesystemSynced": true,
+    "ownedForwardRemoved": true,
+    "shutdownRequested": true,
+    "ownedEmulatorProcessExited": true
+  },
+  "clockRegression": {
+    "tests": 9,
+    "steadyMinuteTicks": 60,
+    "clockIssuedInvalidationsBefore": 60,
+    "clockIssuedInvalidationsAfter": 1,
+    "minuteChangeLive": true,
+    "enabledSecondsInvalidations": 60,
+    "blinkInvalidations": 60,
+    "duplicateSecondDeduplicated": true,
+    "hiddenSecondsFormatterInteractions": 0,
+    "localeAndTimezoneLive": true,
+    "dstAndSameIdRuleChangesLive": true,
+    "physicalFpsGainMeasured": false
+  },
+  "dateFormattingRegression": {
+    "tests": 10,
+    "changingDatesFormatted": 100,
+    "icuPatternQueries": 1,
+    "perThreadEntryCap": 8,
+    "concurrentCallers": 4,
+    "localeTimezoneDstAndEvictionCovered": true
+  },
+  "review": {
+    "independentSourceReviewPassed": true,
+    "additionalPrimeDstCasesAdded": 2,
+    "existingClockOptionGapsLeftOpen": true
+  }
+}

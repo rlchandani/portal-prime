@@ -26,7 +26,11 @@ Status is scoped to each row: **verified** means the stated evidence supports th
 3. **Address the documented platform performance gaps**, led by Home/Apps tails and the affected screensaver paths. [Local WebView misses][bounded-photos] wait off Main for prepared copies. [Remote loading][remote-photos] now streams authenticated input with a **32 MiB** cap, prepares static copies through the shared decoder, preserves PNG transparency and cancels retired owners. Fresh gates pass **3,561 tests**. Actual API 34 WebView checks verify a **31-megapixel** remote photo delivered as **2400×1800**, alpha preservation, corrupt/oversized 404, plus a final local regression. [Remote Family deployment][remote-deployment] verifies the installed APK and all **97 settings** unchanged. These resolve the identified local/remote static loading gaps; physical startup presentation, animated GIF/WebP pixel residency and complete GPU residency remain open. Use the existing hardware budget and matched accepted baselines; retain only supported improvements. The warmed Filmstrip pass does not require another speculative renderer/layer experiment.
 4. **Complete physical music UI acceptance** for the delivered artwork, controls, playlist presentation and full/compact continuity. Backend/provider installation, credentials, real audio and provider-backed library wiring remain deliberately deferred; they are outside this goal’s remaining work.
 
-No absent mandatory product implementation is established by this audit. The remaining gaps are the documented performance work and target-hardware acceptance above, rather than a new feature list.
+Source inspection additionally identifies existing clock-option gaps in the
+[active Canvas renderer](../app/src/main/java/com/immortal/launcher/ui/clock/PrimeDigitalClock.kt):
+fixed measurement plus automatic width fitting defeats intended size scaling,
+and some legacy font/format options are ignored. Correct those functional/layout
+gaps before accepting the existing clock-style controls as complete.
 
 **Latest bounded delivery:** the [metadata regression][metadata] reduces unchanged
 date/battery/weather writes from **180 to 3 over 60 ticks**, preserving all 60
@@ -36,6 +40,16 @@ for discharging/charging while preserving the date and viewer process.
 97 settings/source configuration unchanged. Fresh gates pass **3,565 tests /
 373 suites**. These establish reduced label writes and native correctness;
 they do not close the remaining physical FPS or brightness-feel acceptance.
+
+**Newest software improvement:** [clock work][clock-work] skips unchanged
+Canvas clock invalidations (**60 → 1 during a tested steady minute**) and hidden
+seconds formatting, with blink/seconds behavior preserved. Localized date
+formatters use an eight-entry per-thread cache; 100 changing-date calls resolve
+the ICU pattern once. Fresh gates pass **3,584 tests / 375 suites** and native
+API 34 label/retention checks. [Family delivery][clock-pending] is pending after
+its first preflight timed out; no device write occurred. Animated-image pixel
+residency remains open: the native drawable API does not directly supply resized
+encoded animation to the current WebView pipeline.
 
 [home]: ../mocks/portal-premium-player-20261030/evidence/family-optimized-home/measurement.json
 [filmstrip]: ../mocks/portal-premium-player-20261030/evidence/family-native-filmstrip/measurement.json
@@ -59,3 +73,5 @@ they do not close the remaining physical FPS or brightness-feel acceptance.
 [dream-return]: ../mocks/portal-premium-player-20261030/evidence/native-dream-tap-return/checks.json
 [metadata]: ../mocks/portal-premium-player-20261030/evidence/native-face-metadata/checks.json
 [metadata-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-face-metadata/verification.json
+[clock-work]: ../mocks/portal-premium-player-20261030/evidence/native-clock-work/checks.json
+[clock-pending]: ../mocks/portal-premium-player-20261030/evidence/family-clock-work/pending.json

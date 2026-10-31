@@ -1,0 +1,27 @@
+{
+  "device": "Family Area",
+  "host": "192.168.0.70",
+  "ipUnchangedInRegistry": true,
+  "writesAttempted": false,
+  "8723": "TimeoutError",
+  "5555": "TimeoutError",
+  "fleetReachable": false,
+  "readOnlyRetryFailure": "URLError",
+  "status": "deployment pending: first preflight timed out before writes",
+  "candidateSha256": "e669b738da8514cc03da66c7b1797c3106b2b94113f67d18159891ce5ed66d9f",
+  "candidateBytes": 25842558,
+  "lastVerifiedFamilySha256": "fb8bc97781a8f6b8e5f351f2268c7cee5284c72ea2eda69e0a1abf2da8a2dc9e",
+  "installedCandidateVerified": false,
+  "uploadAttempted": false,
+  "installAttempted": false,
+  "deviceSettingsComparedThisWindow": false,
+  "localArtifactComparison": {
+    "unchangedMainAssets": 53,
+    "manifestUnchanged": true,
+    "nativeDexChanged": true,
+    "signingCertificateUnchanged": true
+  },
+  "issueStartUtc": "2026-10-31T03:01:20Z",
+  "issueDeadlineUtc": "2026-10-31T03:31:20Z",
+  "livingAreaTouched": false
+}

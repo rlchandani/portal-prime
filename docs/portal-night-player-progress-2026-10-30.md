@@ -2526,6 +2526,66 @@ Evidence:
 `mocks/portal-premium-player-20261030/evidence/native-face-metadata/checks.json`
 and `evidence/family-face-metadata/verification.json`.
 
+## Clock redraw and localized formatting — 2026-10-31
+
+This window starts **03:01:20 UTC** and retains a fixed **03:31:20 UTC**
+deadline, including investigation, code, checks, attempted deployment and cleanup.
+The previous turn is progress: `41b9708c` was installed and verified on Family.
+
+The animated-image memory gap was investigated and parked. Android API 28+
+`ImageDecoder` supports target-size animated **drawables**, not an encoded
+animated-file export that can be passed to the current WebView image pipeline.
+The NDK's per-frame animation APIs require API 31, above Family's API 29.
+Integrating a native animation renderer across the approved layouts needs a
+separate change. No animation was flattened, rejected or advertised as memory
+bounded by this window. References:
+[ImageDecoder](https://developer.android.com/reference/android/graphics/ImageDecoder),
+[NDK image decoder](https://developer.android.com/ndk/reference/group/image-decoder).
+
+The active Canvas clock already reused its time formatters. Its avoidable work
+was formatting hidden seconds and invalidating identical visible content.
+`PrimeDigitalClockFaceView.update` now skips both, while keeping enabled seconds
+and blink separators live. Real-method tests measure **60 → 1 clock-issued
+invalidations** during one steady minute; a minute change produces the second.
+Seconds-enabled and blinking cases still invalidate **60 times**; duplicate
+delivery of one second adds no invalidation. Retained views now also refresh
+locale/timezone-dependent formatters. Direct tests cover both DST transitions
+and same-ID/raw-offset zones with different DST rules.
+
+In parallel, `DateFormatter` gained an **eight-entry per-thread LRU**. A test
+formats 100 changing dates while querying the Android pattern boundary **once**;
+dates, capitalization, locale, timezone and DST output remain live. Tests cover
+four concurrent callers and eviction. Native time formatters were already cached;
+these results concern localized date setup and clock-issued work, not Portal
+CPU time, Window frame count or delivered FPS. Burn-in translation and the
+one-second renderer tick remain unchanged.
+
+Fresh gates pass **3,584 tests / 375 suites**, zero failures/errors/skips.
+Both builds pass (**1m 58s**); the final units include two additional review-driven
+DST cases and pass in **40s**. Actual API 34 label/retention checks pass in
+**13.445s** on debug APK
+`ec037d60886842ad731eb34742bffa1dd61c7f8198fdd71e561745c3adf4d27d`.
+Native settings/source configuration and all eight exact nonempty preferences
+were restored and synced; owned forwarding was removed and the emulator exited.
+
+**Family deployment is pending.** Candidate optimized APK is
+`e669b738da8514cc03da66c7b1797c3106b2b94113f67d18159891ce5ed66d9f`,
+**25,842,558 bytes**. The very first `/perf/state` preflight timed out before any
+upload or install. One read-only check confirmed timeout on Fleet and Wi-Fi ADB
+ports and on the Fleet retry. No Family setting, file or navigation write was
+attempted; no Living operation occurred. `fb8bc977…` remains the last verified
+Family installation, not a newly re-read current-state claim.
+
+Review/source inspection also found older clock-option omissions outside this
+patch. The fixed 500×100dp measurement and automatic text-width fitting cancel
+the intended size scaling; the active Canvas renderer also does not honor some
+legacy font/format options. These require a separate functional/layout fix,
+not another speculative Home-cache trial.
+
+Evidence: `evidence/native-clock-work/checks.json` and
+`evidence/family-clock-work/pending.json` under
+`mocks/portal-premium-player-20261030`.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
