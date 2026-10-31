@@ -2000,10 +2000,9 @@ private fun NowPlayingCard(modifier: Modifier = Modifier) {
 
   var urlArt by remember(np.artUrl, np.artBitmap) { mutableStateOf<android.graphics.Bitmap?>(null) }
   LaunchedEffect(np.artUrl, np.artBitmap) {
-    urlArt =
-        if (np.artBitmap == null && np.artUrl.isNotBlank())
-            withContext(Dispatchers.IO) { MediaArt.resolveUri(context, np.artUrl) }
-        else null
+    if (np.artBitmap == null && np.artUrl.isNotBlank()) {
+      MediaArt.deliverUri(context, np.artUrl) { urlArt = it }
+    } else urlArt = null
   }
   val cover = np.artBitmap ?: urlArt
 
@@ -2079,10 +2078,9 @@ private fun MiniPlayer(state: NowPlayingState, modifier: Modifier = Modifier, on
   // phone remote already do this via [MediaArt]; the mini-player was the one place that didn't.
   var urlArt by remember(state.artUrl, state.artBitmap) { mutableStateOf<android.graphics.Bitmap?>(null) }
   androidx.compose.runtime.LaunchedEffect(state.artUrl, state.artBitmap) {
-    urlArt =
-        if (state.artBitmap == null && state.artUrl.isNotBlank())
-            withContext(Dispatchers.IO) { MediaArt.resolveUri(context, state.artUrl) }
-        else null
+    if (state.artBitmap == null && state.artUrl.isNotBlank()) {
+      MediaArt.deliverUri(context, state.artUrl) { urlArt = it }
+    } else urlArt = null
   }
   val cover = state.artBitmap ?: urlArt
   Row(

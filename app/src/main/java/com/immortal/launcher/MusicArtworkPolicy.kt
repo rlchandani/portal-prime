@@ -10,6 +10,7 @@ package com.immortal.launcher
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.io.InterruptedIOException
 import java.util.Locale
 
 /** Android-free byte/framing and decode admission rules shared by both artwork transports. */
@@ -33,6 +34,7 @@ object MusicArtworkPolicy {
       if (count < 0) return out.toByteArray()
       out.write(buffer, 0, count)
     }
+    checkInterrupted()
     if (input.read() != -1) throw IOException("Artwork body exceeds its byte budget")
     return out.toByteArray()
   }
@@ -167,6 +169,7 @@ object MusicArtworkPolicy {
 
   private fun readByte(input: InputStream, budget: ReadBudget): Int {
     if (budget.remaining-- <= 0) throw IOException("Artwork HTTP framing exceeds its byte budget")
+    checkInterrupted()
     return input.read().takeIf { it >= 0 } ?: throw IOException("Truncated artwork HTTP framing")
   }
 
@@ -182,11 +185,19 @@ object MusicArtworkPolicy {
   }
 
   private fun readSome(input: InputStream, buffer: ByteArray, length: Int): Int {
+    checkInterrupted()
     val count = input.read(buffer, 0, length)
     if (count != 0) return count
+    checkInterrupted()
     val byte = input.read()
     if (byte < 0) return -1
     buffer[0] = byte.toByte()
     return 1
+  }
+
+  private fun checkInterrupted() {
+    if (Thread.currentThread().isInterrupted) {
+      throw InterruptedIOException("Artwork read interrupted")
+    }
   }
 }

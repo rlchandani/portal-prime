@@ -62,7 +62,7 @@ synced, independent of the native helper's live API rollback acknowledgment.
 Actual Portal brightness feel, geometry/FPS and legacy font/format controls remain
 outside this software verification.
 
-**Latest delivery:** [artwork-cache checks][artwork-cache] verify cached covers
+**Cached-artwork delivery:** [artwork-cache checks][artwork-cache] verify cached covers
 can return while an unrelated network response is held. All **16 actual API 34
 checks** pass; the observed cached fetch takes **1 ms**, reuses the bitmap and
 makes no duplicate request. Cold loads remain serialized with the existing
@@ -73,6 +73,22 @@ reclaimed upload and zero active listeners. Exact emulator preferences were
 restored/synced and the emulator exited. Physical Portal cache latency/FPS is
 unmeasured; whole-platform acceptance remains open.
 
+**Latest delivery:** [local-artwork checks][local-artwork] establish one local
+read/decode producer, interruptible queued cancellation and cleanup of results
+discarded during UI delivery. All **22 actual API 34 provider checks** and
+**16 network regression checks** pass; the cancelled path opens zero times.
+Receiver-blocked JVM coroutine tests verify disposal exactly once before
+publication, and retention after successful publication. Fresh full gates pass
+**3,605 tests / 380 suites**, with both builds passing.
+[Family installation][local-artwork-deployment] verifies APK `1b56603f…`,
+all 97 settings/source configuration unchanged, upload reclaimed and zero
+active listeners. Eight emulator preference files were restored exactly and
+synced; both receipts were removed and the emulator exited.
+This bounds concurrent live producer work, not the entire heap; an already
+blocked provider can retain admission until its read returns. Physical heap,
+CPU/FPS and artwork-loading improvement remain unmeasured. The full goal
+remains incomplete.
+
 The separate typography candidate at `b2bafb7d` is preserved on its original
 branch, parked after its final native harness timed out. Its earlier captures
 do not verify the final candidate. This latest deployed build starts at verified
@@ -80,6 +96,8 @@ do not verify the final candidate. This latest deployed build starts at verified
 
 [artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
 [artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json
+[local-artwork]: ../mocks/portal-premium-player-20261030/evidence/native-local-artwork/checks.json
+[local-artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-local-artwork/verification.json
 
 [clock-size]: ../mocks/portal-premium-player-20261030/evidence/native-clock-size/checks.json
 [clock-size-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-clock-size/verification.json

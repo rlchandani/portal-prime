@@ -1,0 +1,284 @@
+{
+  "issue": "Bound local artwork producers and clean up cancelled UI delivery",
+  "issueStartedUtc": "2026-10-31T04:27:51Z",
+  "deadlineUtc": "2026-10-31T04:57:51Z",
+  "baseCommit": "fec5e2d9",
+  "producerAndReaderRegressions": [
+    {
+      "class": "ArtworkDecodeAdmissionTest",
+      "tests": 4,
+      "failures": 3,
+      "failedCases": [
+        "cancellingAQueuedRequestNeverOpensItsProvider",
+        "preInterruptedWorkerDoesNotBeginReading",
+        "localProviderReadsAndDecodesNeverOverlap"
+      ]
+    },
+    {
+      "class": "MusicArtworkCancellationTest",
+      "tests": 2,
+      "failures": 2,
+      "failedCases": [
+        "interruptedWorkerDoesNotBeginAnEncodedRead",
+        "cancellationBetweenChunksStopsReadingAndClosesTheLocalStream"
+      ]
+    }
+  ],
+  "deliveryRegressionRed": {
+    "tests": 3,
+    "failures": 2,
+    "failedCases": [
+      "failedPublicationDisposesTheUntransferredResult",
+      "cancelledReturnToUiDisposesTheDecodedResultExactlyOnce"
+    ]
+  },
+  "finalGates": {
+    "unit": {
+      "tests": 3605,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 380
+    },
+    "buildSuccess": true,
+    "buildElapsedSeconds": 108,
+    "artifacts": {
+      "debug": {
+        "sha256": "fa35b767548617bcf9a16674186abe48e69d7fc4fcda768829f839163b31a173",
+        "bytes": 49734349
+      },
+      "performance": {
+        "sha256": "1b56603f6afa80560c1f44aaa833a6a08b766771cf24e79596248c6111a06821",
+        "bytes": 25842558
+      }
+    }
+  },
+  "nativeLocalArtwork": {
+    "complete": true,
+    "success": true,
+    "serial": "emulator-5556",
+    "avd": "PortalMusic20261030",
+    "api": 34,
+    "guardsPassed": true,
+    "runId": "fdbfaf185e524f4086b0f64efb419fee",
+    "syntheticProviderOnly": true,
+    "syntheticPngOnly": true,
+    "passed": 22,
+    "total": 22,
+    "checks": [
+      {
+        "name": "isolated_api34_base_application",
+        "passed": true
+      },
+      {
+        "name": "first_provider_held_after_first_byte",
+        "passed": true
+      },
+      {
+        "name": "second_fetch_queued_before_cancellation",
+        "passed": true
+      },
+      {
+        "name": "queued_future_cancelled",
+        "passed": true
+      },
+      {
+        "name": "cancelled_worker_returned_before_release",
+        "passed": true
+      },
+      {
+        "name": "two_other_fetches_queued_before_release",
+        "passed": true
+      },
+      {
+        "name": "one_provider_open_before_release",
+        "passed": true
+      },
+      {
+        "name": "cancelled_path_not_opened_before_release",
+        "passed": true
+      },
+      {
+        "name": "first_body_still_held_before_release",
+        "passed": true
+      },
+      {
+        "name": "first_decoded_at_most_384",
+        "passed": true
+      },
+      {
+        "name": "other_one_decoded_at_most_384",
+        "passed": true
+      },
+      {
+        "name": "other_two_decoded_at_most_384",
+        "passed": true
+      },
+      {
+        "name": "first_producer_sent_complete_png",
+        "passed": true
+      },
+      {
+        "name": "first_producer_finished",
+        "passed": true
+      },
+      {
+        "name": "cancelled_path_never_opened",
+        "passed": true
+      },
+      {
+        "name": "exactly_three_provider_opens",
+        "passed": true
+      },
+      {
+        "name": "fetch_workers_terminated",
+        "passed": true
+      },
+      {
+        "name": "provider_workers_terminated",
+        "passed": true
+      },
+      {
+        "name": "first_producer_terminated",
+        "passed": true
+      },
+      {
+        "name": "all_pipe_descriptors_closed",
+        "passed": true
+      },
+      {
+        "name": "worker_exceptions_absent",
+        "passed": true
+      },
+      {
+        "name": "total_wait_budget_at_most_8_seconds",
+        "passed": true
+      }
+    ],
+    "workerFailures": [],
+    "firstHeight": 256,
+    "cancelledOpens": 0,
+    "opensBeforeRelease": 1,
+    "maxWaitMs": 8000,
+    "other_oneWidth": 384,
+    "sourceWidth": 768,
+    "other_twoWidth": 384,
+    "other_oneHeight": 256,
+    "other_twoHeight": 256,
+    "elapsedMs": 45,
+    "sourceHeight": 512,
+    "providerOpens": 3,
+    "firstWidth": 384,
+    "pngBytes": 2744,
+    "helperElapsedSeconds": 0.933
+  },
+  "nativeNetworkRegression": {
+    "complete": true,
+    "success": true,
+    "serial": "emulator-5556",
+    "avd": "PortalMusic20261030",
+    "api": 34,
+    "guardsPassed": true,
+    "runId": "560113aa898f4d72b22a1b0c280e9b2c",
+    "localhostOnly": true,
+    "syntheticPngOnly": true,
+    "passed": 16,
+    "total": 16,
+    "checks": [
+      {
+        "name": "isolated_api34_base_application",
+        "passed": true
+      },
+      {
+        "name": "initial_warm_fetch_success",
+        "passed": true
+      },
+      {
+        "name": "warm_url_requested_once_before_cold_fetch",
+        "passed": true
+      },
+      {
+        "name": "cold_fetch_has_open_socket_and_held_body",
+        "passed": true
+      },
+      {
+        "name": "warm_fetch_completed_before_cold_body_release",
+        "passed": true
+      },
+      {
+        "name": "warm_fetch_before_release_has_same_bitmap_identity",
+        "passed": true
+      },
+      {
+        "name": "warm_fetch_eventually_has_same_bitmap_identity",
+        "passed": true
+      },
+      {
+        "name": "cold_fetch_eventually_success",
+        "passed": true
+      },
+      {
+        "name": "cold_bitmap_dimensions_at_most_384",
+        "passed": true
+      },
+      {
+        "name": "warm_url_one_network_request",
+        "passed": true
+      },
+      {
+        "name": "cold_url_one_network_request",
+        "passed": true
+      },
+      {
+        "name": "cold_server_sent_complete_png",
+        "passed": true
+      },
+      {
+        "name": "executors_terminated",
+        "passed": true
+      },
+      {
+        "name": "all_localhost_sockets_closed",
+        "passed": true
+      },
+      {
+        "name": "worker_exceptions_absent",
+        "passed": true
+      },
+      {
+        "name": "total_wait_budget_at_most_8_seconds",
+        "passed": true
+      }
+    ],
+    "workerFailures": [],
+    "maxWaitMs": 8000,
+    "warmWaitLimitMs": 1200,
+    "sourceWidth": 768,
+    "sourceHeight": 512,
+    "pngBytes": 2744,
+    "warmWaitMs": 0,
+    "coldWidth": 384,
+    "coldHeight": 256,
+    "warmRequests": 1,
+    "coldRequests": 1,
+    "elapsedMs": 105,
+    "helperElapsedSeconds": 0.351
+  },
+  "cleanup": {
+    "avd": "PortalMusic20261030",
+    "api": 34,
+    "restoredPreferenceFiles": 8,
+    "exactPreferenceBytesRestored": true,
+    "syncCompleted": true,
+    "fixtureReceiptRemoved": true,
+    "ownedForwardCreated": false,
+    "appStopped": true,
+    "emulatorExited": true,
+    "fixtureReceiptsRemoved": 2
+  },
+  "review": {
+    "initialDeliveryOwnershipFindingResolved": true,
+    "finalActionableFindings": 0
+  },
+  "limits": "One producer bounds simultaneously live local encoded read/decode work; this is not a total Java/native/GPU heap cap. An already-blocking provider read may continue until it returns despite interruption. Queued cancellation and the provider-read gate are verified with an actual API 34 ContentResolver/pipe fixture. UI handoff ownership is verified by JVM coroutines with the receiver deliberately blocked. Physical Portal heap, CPU, FPS and perceptual artwork loading improvement were not measured."
+}

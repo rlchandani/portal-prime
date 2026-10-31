@@ -19,6 +19,7 @@ internal enum class MusicArtworkRoute { LOCAL, NETWORK, UNSUPPORTED }
 /** Local cover reads share the network byte/decode limits, without a second artwork cache. */
 internal object MusicLocalArtwork {
   data class DecodePlan(val maxEdge: Int, val sampleSize: Int)
+  private val admission = ArtworkDecodeAdmission()
 
   /** Unknown/malformed URIs never fall through to a provider or network request. */
   fun routeFor(uri: String): MusicArtworkRoute {
@@ -54,24 +55,34 @@ internal object MusicLocalArtwork {
 
   /** Blocking: invoke off-main. All device-local schemes go through ContentResolver. */
   fun fetch(resolver: ContentResolver, uri: String, maxEdge: Int = 384): Bitmap? {
-    if (maxEdge <= 0) return null
-    val raw = readLocal(uri) { resolver.openInputStream(Uri.parse(it).normalizeScheme()) } ?: return null
+    if (maxEdge <= 0 || routeFor(uri) != MusicArtworkRoute.LOCAL) return null
     return try {
-      val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-      BitmapFactory.decodeByteArray(raw, 0, raw.size, bounds)
-      val plan = decodePlan(bounds.outWidth, bounds.outHeight, maxEdge) ?: return null
-      val options = BitmapFactory.Options().apply {
-        inSampleSize = plan.sampleSize
-        inScaled = false
-        inPreferredConfig = Bitmap.Config.ARGB_8888
+      admission.run {
+        val raw = readLocal(uri) {
+          resolver.openInputStream(Uri.parse(it).normalizeScheme())
+        } ?: return@run null
+        if (Thread.currentThread().isInterrupted) return@run null
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(raw, 0, raw.size, bounds)
+        val plan = decodePlan(bounds.outWidth, bounds.outHeight, maxEdge) ?: return@run null
+        if (Thread.currentThread().isInterrupted) return@run null
+        val options = BitmapFactory.Options().apply {
+          inSampleSize = plan.sampleSize
+          inScaled = false
+          inPreferredConfig = Bitmap.Config.ARGB_8888
+        }
+        val bitmap = BitmapFactory.decodeByteArray(raw, 0, raw.size, options) ?: return@run null
+        if (Thread.currentThread().isInterrupted ||
+            bitmap.width !in 1..plan.maxEdge || bitmap.height !in 1..plan.maxEdge ||
+            bitmap.allocationByteCount.toLong() > plan.maxEdge.toLong() * plan.maxEdge * 4) {
+          // This is an owned, unpublished decode, never a borrowed media-session bitmap.
+          bitmap.recycle()
+          null
+        } else bitmap
       }
-      val bitmap = BitmapFactory.decodeByteArray(raw, 0, raw.size, options) ?: return null
-      if (bitmap.width !in 1..plan.maxEdge || bitmap.height !in 1..plan.maxEdge ||
-          bitmap.allocationByteCount.toLong() > plan.maxEdge.toLong() * plan.maxEdge * 4) {
-        // This is an owned decode, never the borrowed media-session bitmap.
-        bitmap.recycle()
-        null
-      } else bitmap
+    } catch (_: InterruptedException) {
+      Thread.currentThread().interrupt()
+      null
     } catch (_: Exception) {
       null
     }

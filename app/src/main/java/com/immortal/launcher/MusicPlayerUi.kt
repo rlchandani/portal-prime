@@ -60,7 +60,7 @@ import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runInterruptible
 
 /** Presentation only: switching layout never changes the playback session. */
 enum class MusicPlayerLayout { FULL, COMPACT, PHOTOS }
@@ -875,12 +875,15 @@ private fun MusicCover(
     }
     val bitmap by produceState<ImageBitmap?>(null) {
       if (supplied == null && sourceId.isNotBlank() && trackId.isNotBlank() && artUrl.isNotBlank()) {
-        value = withContext(Dispatchers.IO) {
-          when (MusicLocalArtwork.routeFor(artUrl)) {
-            MusicArtworkRoute.NETWORK -> MultiRoomArt.fetch(artUrl, maxEdge)
-            MusicArtworkRoute.LOCAL -> MusicLocalArtwork.fetch(resolver, artUrl, maxEdge)
-            MusicArtworkRoute.UNSUPPORTED -> null
-          }?.asImageBitmap()
+        when (MusicLocalArtwork.routeFor(artUrl)) {
+          MusicArtworkRoute.NETWORK -> value = runInterruptible(Dispatchers.IO) {
+            MultiRoomArt.fetch(artUrl, maxEdge)?.asImageBitmap()
+          }
+          MusicArtworkRoute.LOCAL -> deliverOwnedMusicArtwork(
+              load = { MusicLocalArtwork.fetch(resolver, artUrl, maxEdge) },
+              dispose = { if (!it.isRecycled) it.recycle() },
+              publish = { value = it?.asImageBitmap() })
+          MusicArtworkRoute.UNSUPPORTED -> Unit
         }
       }
     }

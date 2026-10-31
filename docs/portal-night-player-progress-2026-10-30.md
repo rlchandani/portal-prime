@@ -2672,6 +2672,58 @@ Evidence: `evidence/native-artwork-cache/checks.json` and
 `mocks/portal-premium-player-20261030`. The debug-only native helper is
 `artwork-cache-native-check.py`; it refuses any other AVD or Android API.
 
+## Local artwork admission and cancelled delivery cleanup — October 31
+
+Bounded issue window: **04:27:51–04:57:51 UTC**. Local covers previously read
+their independently bounded bodies and decoded concurrently on the IO pool.
+One interruptible admission lock now covers provider open, encoded reading and
+both decode passes. Cancelled waiting requests never begin provider work.
+Shared encoded readers check interruption between chunks/header bytes; their
+8 MiB limit remains unchanged. The existing 1024 px/4 MiB output admission
+also remains unchanged.
+
+Library and player effects, plus both Home artwork effects, now support
+interruptible loading. Local results stay owned across the cancellable IO-to-UI
+handoff: an untransferred result is disposed exactly once when delivery is
+cancelled or publication fails. Successful publication transfers ownership.
+Cached network and borrowed media-session bitmaps never enter that disposal
+path. The review finding that exposed the handoff gap was resolved before
+the final gates; final review found no additional actionable issue.
+
+The old admission/reader model reproduces **five failures out of six tests**;
+the old delivery model reproduces **two failures out of three tests**.
+Final gates pass **3,605 tests / 380 suites**, zero failures/errors/skips,
+with debug and optimized builds passing in **108 seconds**.
+The actual API 34 ContentResolver/pipe fixture passes **22 checks**:
+**one** provider opens while the first body is held, the cancelled path opens
+**zero** times, and all three remaining reads produce **384×256** bitmaps.
+Its complete helper takes **0.933 s**. The shared-reader network regression
+also passes all **16 checks**.
+
+This bounds simultaneously live local producer work; it is not a total
+Java/native/GPU heap limit or measured physical memory saving. Thread
+interruption cannot guarantee immediate abortion of a provider already blocked
+inside a read. The gate remains held until that producer exits, avoiding
+unbounded replacement producers. The receiver-blocked coroutine tests establish
+handoff ownership; the Android fixture establishes real provider cancellation
+and decode behavior. Neither proves physical Portal FPS.
+
+Family Area installed APK readback matches
+`1b56603f6afa80560c1f44aaa833a6a08b766771cf24e79596248c6111a06821`,
+**25,842,558 bytes**, with the existing certificate. All **97 settings**,
+source groups and screensaver configuration remain unchanged. Manifest and
+53 main assets match the previous verified `dc80c3af…` build; native DEX differs.
+The owned upload was reclaimed and the collector is idle with zero listeners.
+All eight emulator preference files were restored byte for byte and synced;
+both fixture receipts were removed and the owned emulator exited.
+No Living Area write. The parked typography candidate remains excluded.
+
+Evidence: `evidence/native-local-artwork/checks.json` and
+`evidence/family-local-artwork/verification.json` under
+`mocks/portal-premium-player-20261030`.
+The Kotlin [runInterruptible contract](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-interruptible.html)
+documents the cancellation-to-thread-interruption bridge used here.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

@@ -24,6 +24,19 @@
             android:label="Localhost artwork cache acceptance check"
             android:theme="@style/Theme.SampleApp" />
         <activity
+            android:name=".LocalArtworkCheckActivity"
+            android:process=":artwork_cache_check"
+            android:taskAffinity="${applicationId}.local_artwork_check"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="Synthetic local artwork acceptance check"
+            android:theme="@style/Theme.SampleApp" />
+        <provider
+            android:name=".LocalArtworkCheckProvider"
+            android:authorities="${applicationId}.local-artwork-check"
+            android:process=":artwork_cache_check"
+            android:exported="false" />
+        <activity
             android:name=".WidgetPagesPreviewActivity"
             android:exported="true"
             android:label="Retained widget producer native check"

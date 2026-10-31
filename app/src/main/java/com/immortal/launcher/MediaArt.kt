@@ -9,6 +9,8 @@ package com.immortal.launcher
 
 import android.content.Context
 import android.graphics.Bitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 
 /**
  * Shared URI artwork facade for the screensaver, home-header mini-player and phone remote.
@@ -23,6 +25,18 @@ object MediaArt {
       url,
       network = { spec, edge -> MultiRoomArt.fetch(spec, edge) },
       local = { spec, edge -> MusicLocalArtwork.fetch(context.contentResolver, spec, edge) })
+
+  /** UI delivery owns local decodes until publication; cached network art stays shared. */
+  internal suspend fun deliverUri(context: Context, url: String, publish: (Bitmap?) -> Unit) {
+    if (MusicLocalArtwork.routeFor(url) == MusicArtworkRoute.LOCAL) {
+      deliverOwnedMusicArtwork(
+          load = { resolveUri(context, url) },
+          dispose = { if (!it.isRecycled) it.recycle() },
+          publish = publish)
+    } else {
+      publish(runInterruptible(Dispatchers.IO) { resolveUri(context, url) })
+    }
+  }
 
   /** Admit the URI before invoking either transport, including access to a local resolver. */
   internal fun resolveUri(

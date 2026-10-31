@@ -71,8 +71,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 enum class MusicBrowseCollectionKind(val label: String) { ALBUM("Album"), PLAYLIST("Playlist") }
 enum class MusicBrowseStatus { READY, LOADING, UNAVAILABLE }
@@ -629,9 +627,10 @@ private fun MusicBrowseArtwork(
   key(id, uri, maxEdge, resolver) {
     val bitmap by produceState<ImageBitmap?>(null) {
       if (MusicLocalArtwork.routeFor(uri) == MusicArtworkRoute.LOCAL) {
-        value = withContext(Dispatchers.IO) {
-          MusicLocalArtwork.fetch(resolver, uri, maxEdge)?.asImageBitmap()
-        }
+        deliverOwnedMusicArtwork(
+            load = { MusicLocalArtwork.fetch(resolver, uri, maxEdge) },
+            dispose = { if (!it.isRecycled) it.recycle() },
+            publish = { value = it?.asImageBitmap() })
       }
     }
     val palette = LocalApprovedPalette.current
