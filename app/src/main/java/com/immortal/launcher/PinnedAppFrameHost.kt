@@ -59,6 +59,7 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
         val renderer = PinnedRendererLifetime { frame?.onExit = null; frame?.stop() }
         var receiver: BroadcastReceiver? = null
         var nightTick: Runnable? = null
+        var brightness: NightBrightnessFade? = null
         var lostPanel = false
     }
 
@@ -224,6 +225,25 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
         return try {
             wm.addView(root, params)
             surface = cover
+            cover.brightness = NightBrightnessFade(
+                priorBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE,
+                readBrightness = { cover.params.screenBrightness },
+                readSystemBrightness = {
+                    android.provider.Settings.System.getInt(service.contentResolver,
+                        android.provider.Settings.System.SCREEN_BRIGHTNESS, 128) / 255f
+                },
+                writeBrightness = { level ->
+                    if (!closed && surface === cover) {
+                        cover.params.screenBrightness = level
+                        runCatching { wm.updateViewLayout(cover.root, cover.params) }
+                    }
+                },
+                nowMs = SystemClock::uptimeMillis,
+                postDelayed = { task, delay -> main.postDelayed(task, delay) },
+                removeCallbacks = { task -> main.removeCallbacks(task) }).also {
+                    it.setActive(true)
+                }
+            reconcilePower(cover, cfg)
             shownCount++
             next?.start()
             registerPowerReceiver(cover)
@@ -243,15 +263,15 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
             DreamPolicy.hasBattery(service), cfg.batterySaver, DreamPolicy.isPowered(service))
         val bit = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         cover.params.flags = if (keep) cover.params.flags or bit else cover.params.flags and bit.inv()
-        cover.params.screenBrightness = if (cover.mode == PinnedCoverMode.NIGHT ||
-            cover.frame?.isNightClockShowing == true) cfg.nightClockBrightness / 100f
-            else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
     }
 
     private fun reconcilePower(cover: Cover, cfg: ScreensaverConfig.Settings = ScreensaverConfig.load(service)) {
         if (closed || surface !== cover) return
         setPowerParams(cover, cfg)
         runCatching { wm.updateViewLayout(cover.root, cover.params) }
+        cover.brightness?.setNight(
+            !cover.lostPanel && (cover.mode == PinnedCoverMode.NIGHT || cover.frame?.isNightClockShowing == true),
+            cfg.nightClockBrightness / 100f)
     }
 
     private fun registerPowerReceiver(cover: Cover) {
@@ -356,6 +376,8 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
     private fun showLostSession(cover: Cover) {
         if (cover.lostPanel) return
         cover.lostPanel = true
+        // The recovery panel survives in this same window; restore its policy gradually.
+        cover.brightness?.setNight(false, 0f)
         val panel = pinnedSessionLostPanel(service) {
             if (!closed && surface === cover) service.openApprovedHomeTab(ApprovedLauncherTab.HOME)
         }
@@ -375,6 +397,8 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
     }
 
     private fun retireCover(old: Cover) {
+        old.brightness?.close()
+        old.brightness = null
         val ticket = retirement.retire(old.root, old.renderer) // GONE before any deferred destruction
         old.nightTick?.let { main.removeCallbacks(it) }
         old.nightTick = null

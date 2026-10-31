@@ -1,0 +1,3295 @@
+{
+  "success": true,
+  "passed": 430,
+  "failed": 0,
+  "failureCode": null,
+  "lastPhase": "CLEANUP",
+  "checks": [
+    {
+      "name": "exact_owned_AVD_name",
+      "passed": true
+    },
+    {
+      "name": "owned_API34",
+      "passed": true
+    },
+    {
+      "name": "single_owned_debug_APK_installed",
+      "passed": true
+    },
+    {
+      "name": "installed_current_debug_APK_hash_matches_local",
+      "passed": true
+    },
+    {
+      "name": "full_private_registry_profile_available",
+      "passed": true
+    },
+    {
+      "name": "default_photo_source_before_mutations",
+      "passed": true
+    },
+    {
+      "name": "default_photo_source_before_configuration",
+      "passed": true
+    },
+    {
+      "name": "registry_has_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_enabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_darkRoomClock",
+      "passed": true
+    },
+    {
+      "name": "registry_has_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_darkRoomLux",
+      "passed": true
+    },
+    {
+      "name": "registry_has_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_nightClockBrightness",
+      "passed": true
+    },
+    {
+      "name": "registry_has_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_mode",
+      "passed": true
+    },
+    {
+      "name": "registry_has_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_photo_motion",
+      "passed": true
+    },
+    {
+      "name": "registry_has_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_intervalSec",
+      "passed": true
+    },
+    {
+      "name": "registry_has_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_includeVideo",
+      "passed": true
+    },
+    {
+      "name": "registry_has_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_idleSleepMin",
+      "passed": true
+    },
+    {
+      "name": "registry_has_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_overnightEnabled",
+      "passed": true
+    },
+    {
+      "name": "registry_has_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_antiBurnIn",
+      "passed": true
+    },
+    {
+      "name": "registry_has_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registry_validates_showNowPlaying",
+      "passed": true
+    },
+    {
+      "name": "registry_applied_complete_batch",
+      "passed": true
+    },
+    {
+      "name": "registry_configuration_readback",
+      "passed": true
+    },
+    {
+      "name": "production_preview_started_without_CLEAR_TASK",
+      "passed": true
+    },
+    {
+      "name": "native_stage_without_WebView",
+      "passed": true
+    },
+    {
+      "name": "actual_accessible_stage_to_open_toolbar",
+      "passed": true
+    },
+    {
+      "name": "show_toolbar_observed_bounds",
+      "passed": true
+    },
+    {
+      "name": "show_toolbar_bounds_in_native_screen",
+      "passed": true
+    },
+    {
+      "name": "actual_toolbar_Pause",
+      "passed": true
+    },
+    {
+      "name": "Pause_observed_bounds",
+      "passed": true
+    },
+    {
+      "name": "Pause_bounds_in_native_screen",
+      "passed": true
+    },
+    {
+      "name": "baseline_USER_PAUSED",
+      "passed": true
+    },
+    {
+      "name": "paused-before_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "paused-before-stable_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "paused-before_photo_content",
+      "passed": true
+    },
+    {
+      "name": "paused-before_stable_ROI",
+      "passed": true
+    },
+    {
+      "name": "PAUSED_BASELINE_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "PAUSED_BASELINE_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "initial_window_override_is_exact_system_default",
+      "passed": true
+    },
+    {
+      "name": "system_brightness_supports_visible_down_and_up_range",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_several_observed_values",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_normalized_window_bounds",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_monotonic",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_no_default_override_during_downward_ramp",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_reaches_exact_target",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_at_least_four_distinct_intermediate_values",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_observed_gradual_duration",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_no_single_observed_snap",
+      "passed": true
+    },
+    {
+      "name": "settled-night_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "settled-night_actual_accessible_fullscreen_clock",
+      "passed": true
+    },
+    {
+      "name": "settled-night_visible_clock_ink_on_black",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "dark-entry-down_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "settled-night_same_window",
+      "passed": true
+    },
+    {
+      "name": "settled-night_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "settled-night_same_process",
+      "passed": true
+    },
+    {
+      "name": "settled-night_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "settled-night_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "settled-night_actual_window_brightness_003",
+      "passed": true
+    },
+    {
+      "name": "real_sensor_dark_settle_event",
+      "passed": true
+    },
+    {
+      "name": "dark_entry_retains_scene",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_sample_same_focused_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_several_observed_values",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_normalized_window_bounds",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_monotonic",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_starts_at_night_target",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_observed_positive_upward_motion",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_exact_system_default_restored",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_no_override_reapplied_after_restore",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_at_least_four_distinct_intermediate_values",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_observed_gradual_duration",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_no_single_observed_snap",
+      "passed": true
+    },
+    {
+      "name": "paused-return_photo_stage_and_no_clock",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "paused-return_same_window",
+      "passed": true
+    },
+    {
+      "name": "paused-return_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "paused-return_same_process",
+      "passed": true
+    },
+    {
+      "name": "paused-return_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "paused-return_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "paused-return_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "paused-return_actual_brightness_restored",
+      "passed": true
+    },
+    {
+      "name": "paused-return_retained_photo_ROI",
+      "passed": true
+    },
+    {
+      "name": "real_sensor_bright_settle_event",
+      "passed": true
+    },
+    {
+      "name": "USER_PAUSED_choice_retained",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_photo_stage_and_no_clock",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_window",
+      "passed": true
+    },
+    {
+      "name": "bright-return-up_one_actual_preview_activity_record",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_same_window",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_same_activity_record",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_same_process",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_correct_focus",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_correct_lifecycle",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_2160x1440_native_capture",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_actual_brightness_restored",
+      "passed": true
+    },
+    {
+      "name": "paused-held-beyond-interval_retained_photo_ROI",
+      "passed": true
+    },
+    {
+      "name": "whole_cycle_and_paused_hold_no_new_scene",
+      "passed": true
+    },
+    {
+      "name": "default_source_after_case",
+      "passed": true
+    },
+    {
+      "name": "global_brightness_setting_unchanged",
+      "passed": true
+    },
+    {
+      "name": "actual_toolbar_Done",
+      "passed": true
+    },
+    {
+      "name": "finish_bounded_case_observed_bounds",
+      "passed": true
+    },
+    {
+      "name": "finish_bounded_case_bounds_in_native_screen",
+      "passed": true
+    },
+    {
+      "name": "owned_native_recording_completed",
+      "passed": true
+    },
+    {
+      "name": "native_content_has_sufficient_frames",
+      "passed": true
+    },
+    {
+      "name": "default_photo_probe_has_visible_detail",
+      "passed": true
+    },
+    {
+      "name": "clock_cover_reaches_black_outside_text",
+      "passed": true
+    },
+    {
+      "name": "photos_to_clock_has_many_blended_native_frames",
+      "passed": true
+    },
+    {
+      "name": "clock_to_photos_has_many_blended_native_frames",
+      "passed": true
+    },
+    {
+      "name": "photos_to_clock_gradual_content_duration",
+      "passed": true
+    },
+    {
+      "name": "clock_to_photos_gradual_content_duration",
+      "passed": true
+    },
+    {
+      "name": "photo_dim_has_no_intermediate_flash",
+      "passed": true
+    },
+    {
+      "name": "photo_return_has_no_intermediate_black_flash",
+      "passed": true
+    },
+    {
+      "name": "all_original_registry_values_accepted_for_restore",
+      "passed": true
+    },
+    {
+      "name": "all_modified_registry_settings_restored",
+      "passed": true
+    },
+    {
+      "name": "owned_light_restored_500",
+      "passed": true
+    }
+  ],
+  "cases": {
+    "pausedBrightnessCycle": {
+      "executed": true,
+      "success": true,
+      "initialOverride": -1.0,
+      "initialOverrideExplicit": false,
+      "systemBrightnessSetting": 102,
+      "baselineSceneCount": 3,
+      "baselinePhotoRoiSha256": "f7dfb543a0d925c9c59943037ba7cbd142e2828d1e155324d1d3b1b473b6a872",
+      "windowIdentitySha256": "40ddd46245c36973c4ae87aa7aeb599923dceb1a51711c8db41fb7d26388af9c",
+      "activityIdentitySha256": "bafaf85521bd32d7b195868cca6d014ca24425df0b91c9c2a2b43de013d65348",
+      "processId": 4241,
+      "darkSettleEventSeconds": 20.197,
+      "brightSettleEventSeconds": 5.198
+    },
+    "liveTargetReversal": {
+      "executed": false
+    }
+  },
+  "ramps": {
+    "dark-entry-down": {
+      "samples": [
+        {
+          "seconds": 37.256506,
+          "readDurationMs": 23.034,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.339206,
+          "readDurationMs": 57.176,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.423118,
+          "readDurationMs": 23.527,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.486992,
+          "readDurationMs": 23.895,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.55419,
+          "readDurationMs": 25.151,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.621452,
+          "readDurationMs": 22.104,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.686093,
+          "readDurationMs": 24.914,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.752582,
+          "readDurationMs": 24.035,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.818972,
+          "readDurationMs": 23.948,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.884629,
+          "readDurationMs": 22.446,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 37.952949,
+          "readDurationMs": 24.096,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.020346,
+          "readDurationMs": 24.193,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.086777,
+          "readDurationMs": 23.442,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.151664,
+          "readDurationMs": 24.066,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.219513,
+          "readDurationMs": 24.995,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.285941,
+          "readDurationMs": 24.555,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.356506,
+          "readDurationMs": 29.527,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.428045,
+          "readDurationMs": 24.276,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.495364,
+          "readDurationMs": 23.808,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.563501,
+          "readDurationMs": 25.209,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.633152,
+          "readDurationMs": 24.017,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.702095,
+          "readDurationMs": 23.774,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.766234,
+          "readDurationMs": 24.213,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.835388,
+          "readDurationMs": 24.129,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.902958,
+          "readDurationMs": 24.719,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 38.970565,
+          "readDurationMs": 24.278,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.035918,
+          "readDurationMs": 24.768,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.104118,
+          "readDurationMs": 25.488,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.173827,
+          "readDurationMs": 23.784,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.239465,
+          "readDurationMs": 23.749,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.3057,
+          "readDurationMs": 24.569,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.374462,
+          "readDurationMs": 23.981,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.438437,
+          "readDurationMs": 23.784,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.503211,
+          "readDurationMs": 23.737,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.569095,
+          "readDurationMs": 24.172,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.637618,
+          "readDurationMs": 25.038,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.702418,
+          "readDurationMs": 24.054,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.769036,
+          "readDurationMs": 24.05,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.836135,
+          "readDurationMs": 25.251,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.904097,
+          "readDurationMs": 24.707,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 39.969268,
+          "readDurationMs": 23.526,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 40.037072,
+          "readDurationMs": 23.917,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 40.104549,
+          "readDurationMs": 25.561,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 40.175392,
+          "readDurationMs": 28.046,
+          "brightness": 0.39969403,
+          "explicit": true
+        },
+        {
+          "seconds": 40.243965,
+          "readDurationMs": 23.549,
+          "brightness": 0.39773503,
+          "explicit": true
+        },
+        {
+          "seconds": 40.316686,
+          "readDurationMs": 34.061,
+          "brightness": 0.3953069,
+          "explicit": true
+        },
+        {
+          "seconds": 40.389236,
+          "readDurationMs": 30.808,
+          "brightness": 0.38927963,
+          "explicit": true
+        },
+        {
+          "seconds": 40.460705,
+          "readDurationMs": 27.404,
+          "brightness": 0.3807217,
+          "explicit": true
+        },
+        {
+          "seconds": 40.530594,
+          "readDurationMs": 30.635,
+          "brightness": 0.370193,
+          "explicit": true
+        },
+        {
+          "seconds": 40.607374,
+          "readDurationMs": 33.793,
+          "brightness": 0.3575427,
+          "explicit": true
+        },
+        {
+          "seconds": 40.687123,
+          "readDurationMs": 35.619,
+          "brightness": 0.3499271,
+          "explicit": true
+        },
+        {
+          "seconds": 40.778339,
+          "readDurationMs": 56.705,
+          "brightness": 0.3289767,
+          "explicit": true
+        },
+        {
+          "seconds": 40.867895,
+          "readDurationMs": 38.513,
+          "brightness": 0.31963485,
+          "explicit": true
+        },
+        {
+          "seconds": 40.953144,
+          "readDurationMs": 45.736,
+          "brightness": 0.29123735,
+          "explicit": true
+        },
+        {
+          "seconds": 41.038589,
+          "readDurationMs": 35.054,
+          "brightness": 0.28183562,
+          "explicit": true
+        },
+        {
+          "seconds": 41.118321,
+          "readDurationMs": 34.319,
+          "brightness": 0.26254666,
+          "explicit": true
+        },
+        {
+          "seconds": 41.194794,
+          "readDurationMs": 29.001,
+          "brightness": 0.2435439,
+          "explicit": true
+        },
+        {
+          "seconds": 41.273474,
+          "readDurationMs": 38.241,
+          "brightness": 0.22591293,
+          "explicit": true
+        },
+        {
+          "seconds": 41.351878,
+          "readDurationMs": 33.083,
+          "brightness": 0.20813723,
+          "explicit": true
+        },
+        {
+          "seconds": 41.428148,
+          "readDurationMs": 36.557,
+          "brightness": 0.19951099,
+          "explicit": true
+        },
+        {
+          "seconds": 41.508819,
+          "readDurationMs": 34.674,
+          "brightness": 0.18226974,
+          "explicit": true
+        },
+        {
+          "seconds": 41.590169,
+          "readDurationMs": 42.519,
+          "brightness": 0.16160019,
+          "explicit": true
+        },
+        {
+          "seconds": 41.670054,
+          "readDurationMs": 30.711,
+          "brightness": 0.15300144,
+          "explicit": true
+        },
+        {
+          "seconds": 41.744651,
+          "readDurationMs": 34.693,
+          "brightness": 0.13914932,
+          "explicit": true
+        },
+        {
+          "seconds": 41.823566,
+          "readDurationMs": 33.031,
+          "brightness": 0.12482839,
+          "explicit": true
+        },
+        {
+          "seconds": 41.90029,
+          "readDurationMs": 33.667,
+          "brightness": 0.111984596,
+          "explicit": true
+        },
+        {
+          "seconds": 41.977078,
+          "readDurationMs": 32.361,
+          "brightness": 0.10245696,
+          "explicit": true
+        },
+        {
+          "seconds": 42.050727,
+          "readDurationMs": 31.471,
+          "brightness": 0.09155183,
+          "explicit": true
+        },
+        {
+          "seconds": 42.130005,
+          "readDurationMs": 40.837,
+          "brightness": 0.08130397,
+          "explicit": true
+        },
+        {
+          "seconds": 42.21163,
+          "readDurationMs": 32.313,
+          "brightness": 0.07171344,
+          "explicit": true
+        },
+        {
+          "seconds": 42.29057,
+          "readDurationMs": 35.451,
+          "brightness": 0.06378413,
+          "explicit": true
+        },
+        {
+          "seconds": 42.370568,
+          "readDurationMs": 34.405,
+          "brightness": 0.057118725,
+          "explicit": true
+        },
+        {
+          "seconds": 42.450269,
+          "readDurationMs": 41.951,
+          "brightness": 0.05388109,
+          "explicit": true
+        },
+        {
+          "seconds": 42.528453,
+          "readDurationMs": 33.202,
+          "brightness": 0.048979934,
+          "explicit": true
+        },
+        {
+          "seconds": 42.605458,
+          "readDurationMs": 36.83,
+          "brightness": 0.044321045,
+          "explicit": true
+        },
+        {
+          "seconds": 42.684366,
+          "readDurationMs": 36.866,
+          "brightness": 0.040194716,
+          "explicit": true
+        },
+        {
+          "seconds": 42.761846,
+          "readDurationMs": 27.992,
+          "brightness": 0.036740366,
+          "explicit": true
+        },
+        {
+          "seconds": 42.833929,
+          "readDurationMs": 29.433,
+          "brightness": 0.034165375,
+          "explicit": true
+        },
+        {
+          "seconds": 42.907209,
+          "readDurationMs": 33.663,
+          "brightness": 0.03249257,
+          "explicit": true
+        },
+        {
+          "seconds": 42.986799,
+          "readDurationMs": 35.416,
+          "brightness": 0.03150721,
+          "explicit": true
+        },
+        {
+          "seconds": 43.061869,
+          "readDurationMs": 26.663,
+          "brightness": 0.030420106,
+          "explicit": true
+        },
+        {
+          "seconds": 43.136386,
+          "readDurationMs": 32.283,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 43.209527,
+          "readDurationMs": 23.914,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 43.275977,
+          "readDurationMs": 23.841,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 43.345636,
+          "readDurationMs": 25.33,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 43.410254,
+          "readDurationMs": 23.472,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 43.478391,
+          "readDurationMs": 24.984,
+          "brightness": 0.03,
+          "explicit": true
+        }
+      ],
+      "complete": true,
+      "startValue": -1.0,
+      "targetValue": 0.03,
+      "samplingBudgetSeconds": 10,
+      "distinctIntermediateValues": 38,
+      "observedProgressionSeconds": 2.960994,
+      "largestObservedStep": 0.028398,
+      "largestSampleGapSeconds": 0.091216,
+      "sampleCount": 87
+    },
+    "bright-return-up": {
+      "samples": [
+        {
+          "seconds": 48.982713,
+          "readDurationMs": 36.261,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.055417,
+          "readDurationMs": 27.407,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.123373,
+          "readDurationMs": 24.97,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.192758,
+          "readDurationMs": 23.68,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.259484,
+          "readDurationMs": 24.356,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.324156,
+          "readDurationMs": 23.995,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.392301,
+          "readDurationMs": 25.054,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.458981,
+          "readDurationMs": 23.312,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.527411,
+          "readDurationMs": 23.812,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.596587,
+          "readDurationMs": 24.447,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.663917,
+          "readDurationMs": 24.365,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.731673,
+          "readDurationMs": 24.676,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.800913,
+          "readDurationMs": 23.688,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.869043,
+          "readDurationMs": 23.81,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 49.938425,
+          "readDurationMs": 25.207,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.004298,
+          "readDurationMs": 22.611,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.071593,
+          "readDurationMs": 21.893,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.138025,
+          "readDurationMs": 24.361,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.205987,
+          "readDurationMs": 24.038,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.270274,
+          "readDurationMs": 21.741,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.333838,
+          "readDurationMs": 21.955,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.406468,
+          "readDurationMs": 36.216,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.488495,
+          "readDurationMs": 37.645,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.57061,
+          "readDurationMs": 36.456,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.647197,
+          "readDurationMs": 35.136,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.722872,
+          "readDurationMs": 34.369,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.799981,
+          "readDurationMs": 32.901,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.872944,
+          "readDurationMs": 28.595,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 50.94446,
+          "readDurationMs": 29.025,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 51.022376,
+          "readDurationMs": 36.66,
+          "brightness": 0.03,
+          "explicit": true
+        },
+        {
+          "seconds": 51.116234,
+          "readDurationMs": 64.95,
+          "brightness": 0.030319264,
+          "explicit": true
+        },
+        {
+          "seconds": 51.217977,
+          "readDurationMs": 53.2,
+          "brightness": 0.030854724,
+          "explicit": true
+        },
+        {
+          "seconds": 51.315679,
+          "readDurationMs": 52.083,
+          "brightness": 0.03410913,
+          "explicit": true
+        },
+        {
+          "seconds": 51.410333,
+          "readDurationMs": 51.363,
+          "brightness": 0.03648936,
+          "explicit": true
+        },
+        {
+          "seconds": 51.50604,
+          "readDurationMs": 49.292,
+          "brightness": 0.04083738,
+          "explicit": true
+        },
+        {
+          "seconds": 51.6056,
+          "readDurationMs": 58.447,
+          "brightness": 0.043518286,
+          "explicit": true
+        },
+        {
+          "seconds": 51.715792,
+          "readDurationMs": 76.781,
+          "brightness": 0.05476085,
+          "explicit": true
+        },
+        {
+          "seconds": 51.835387,
+          "readDurationMs": 81.456,
+          "brightness": 0.0635188,
+          "explicit": true
+        },
+        {
+          "seconds": 51.958153,
+          "readDurationMs": 73.956,
+          "brightness": 0.07457428,
+          "explicit": true
+        },
+        {
+          "seconds": 52.076678,
+          "readDurationMs": 72.321,
+          "brightness": 0.08452336,
+          "explicit": true
+        },
+        {
+          "seconds": 52.221864,
+          "readDurationMs": 126.744,
+          "brightness": 0.10849778,
+          "explicit": true
+        },
+        {
+          "seconds": 52.348988,
+          "readDurationMs": 45.944,
+          "brightness": 0.12419455,
+          "explicit": true
+        },
+        {
+          "seconds": 52.439748,
+          "readDurationMs": 53.98,
+          "brightness": 0.14085934,
+          "explicit": true
+        },
+        {
+          "seconds": 52.534921,
+          "readDurationMs": 49.112,
+          "brightness": 0.1564466,
+          "explicit": true
+        },
+        {
+          "seconds": 52.629745,
+          "readDurationMs": 59.71,
+          "brightness": 0.17854822,
+          "explicit": true
+        },
+        {
+          "seconds": 52.735114,
+          "readDurationMs": 58.989,
+          "brightness": 0.19971497,
+          "explicit": true
+        },
+        {
+          "seconds": 52.829173,
+          "readDurationMs": 40.827,
+          "brightness": 0.20751715,
+          "explicit": true
+        },
+        {
+          "seconds": 52.917836,
+          "readDurationMs": 52.616,
+          "brightness": 0.22908424,
+          "explicit": true
+        },
+        {
+          "seconds": 53.007962,
+          "readDurationMs": 42.754,
+          "brightness": 0.25123072,
+          "explicit": true
+        },
+        {
+          "seconds": 53.094708,
+          "readDurationMs": 42.495,
+          "brightness": 0.27127087,
+          "explicit": true
+        },
+        {
+          "seconds": 53.17984,
+          "readDurationMs": 41.718,
+          "brightness": 0.28665593,
+          "explicit": true
+        },
+        {
+          "seconds": 53.269108,
+          "readDurationMs": 46.667,
+          "brightness": 0.3059785,
+          "explicit": true
+        },
+        {
+          "seconds": 53.357031,
+          "readDurationMs": 45.696,
+          "brightness": 0.32785073,
+          "explicit": true
+        },
+        {
+          "seconds": 53.451159,
+          "readDurationMs": 59.669,
+          "brightness": 0.34466136,
+          "explicit": true
+        },
+        {
+          "seconds": 53.544701,
+          "readDurationMs": 35.698,
+          "brightness": 0.3520793,
+          "explicit": true
+        },
+        {
+          "seconds": 53.642522,
+          "readDurationMs": 55.251,
+          "brightness": 0.37114292,
+          "explicit": true
+        },
+        {
+          "seconds": 53.736925,
+          "readDurationMs": 50.276,
+          "brightness": 0.37791276,
+          "explicit": true
+        },
+        {
+          "seconds": 53.833801,
+          "readDurationMs": 54.236,
+          "brightness": 0.3925067,
+          "explicit": true
+        },
+        {
+          "seconds": 53.935316,
+          "readDurationMs": 58.622,
+          "brightness": 0.39773503,
+          "explicit": true
+        },
+        {
+          "seconds": 54.03116,
+          "readDurationMs": 48.058,
+          "brightness": 0.3998636,
+          "explicit": true
+        },
+        {
+          "seconds": 54.112041,
+          "readDurationMs": 29.031,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 54.185282,
+          "readDurationMs": 27.335,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 54.256485,
+          "readDurationMs": 26.321,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 54.325859,
+          "readDurationMs": 25.742,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 54.393024,
+          "readDurationMs": 25.093,
+          "brightness": -1.0,
+          "explicit": false
+        },
+        {
+          "seconds": 54.45798,
+          "readDurationMs": 24.641,
+          "brightness": -1.0,
+          "explicit": false
+        }
+      ],
+      "complete": true,
+      "startValue": 0.03,
+      "targetValue": -1.0,
+      "samplingBudgetSeconds": 10,
+      "distinctIntermediateValues": 30,
+      "observedProgressionSeconds": 2.995807,
+      "largestObservedStep": 0.023974,
+      "largestSampleGapSeconds": 0.145186,
+      "sampleCount": 66
+    }
+  },
+  "observations": {
+    "debugApkSha256": "553862796ec527281e6e2eb1693ccceb5382509f005efc2c62c5f7fdba3bb16c",
+    "photoRoiBounds": [
+      604,
+      403,
+      1555,
+      950
+    ],
+    "source": "default",
+    "api": 34,
+    "renderedContentFade": {
+      "sampleFps": 12,
+      "downBlendedFrames": 22,
+      "upBlendedFrames": 22,
+      "downIntermediateSeconds": 1.75,
+      "upIntermediateSeconds": 1.75,
+      "probeBoundsAt1080x720": [
+        300,
+        170,
+        750,
+        220
+      ],
+      "normalizedLuminanceSamples": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.9956,
+        0.9778,
+        0.9644,
+        0.9422,
+        0.9156,
+        0.8933,
+        0.8711,
+        0.8444,
+        0.8089,
+        0.7733,
+        0.7422,
+        0.7022,
+        0.6533,
+        0.6222,
+        0.5778,
+        0.5289,
+        0.4933,
+        0.4489,
+        0.4,
+        0.3689,
+        0.3244,
+        0.2889,
+        0.2533,
+        0.2133,
+        0.1822,
+        0.1422,
+        0.12,
+        0.0844,
+        0.0622,
+        0.04,
+        0.0267,
+        0.0089,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0133,
+        0.0222,
+        0.0489,
+        0.0578,
+        0.0711,
+        0.1022,
+        0.1289,
+        0.16,
+        0.2,
+        0.2311,
+        0.2756,
+        0.3111,
+        0.3689,
+        0.3911,
+        0.4444,
+        0.4756,
+        0.5244,
+        0.5511,
+        0.6044,
+        0.6533,
+        0.6844,
+        0.7289,
+        0.7644,
+        0.7867,
+        0.8311,
+        0.8444,
+        0.8844,
+        0.9022,
+        0.9289,
+        0.9511,
+        0.9644,
+        0.9778,
+        0.9867,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        0.9956,
+        1.0,
+        1.0,
+        1.0,
+        1.3067,
+        2.7422,
+        2.7644,
+        2.7689,
+        2.7689,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733,
+        2.7733
+      ],
+      "physicalPanelMeasured": false
+    },
+    "modifiedSettingsCount": 7
+  },
+  "artifacts": [
+    {
+      "file": "paused-before-roi.png",
+      "sha256": "07f211e8b0a2fd14ec942a6321df914d4edbd9140b570f337419cdfc0ffdfd54",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "paused-before-stable-roi.png",
+      "sha256": "07f211e8b0a2fd14ec942a6321df914d4edbd9140b570f337419cdfc0ffdfd54",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "settled-night-roi.png",
+      "sha256": "c8e8d87cacf372f04b66947e31584e943ee79321658b655dc436676335656aa6",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "paused-return-roi.png",
+      "sha256": "07f211e8b0a2fd14ec942a6321df914d4edbd9140b570f337419cdfc0ffdfd54",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    },
+    {
+      "file": "paused-held-beyond-interval-roi.png",
+      "sha256": "07f211e8b0a2fd14ec942a6321df914d4edbd9140b570f337419cdfc0ffdfd54",
+      "nativeCropBounds": [
+        604,
+        403,
+        1555,
+        950
+      ]
+    }
+  ],
+  "avd": "PortalMusic20261030",
+  "serial": "emulator-5556",
+  "activity": "com.immortal.launcher.PhotoFramePreviewActivity",
+  "api": 34,
+  "utc": "2026-10-31T05:07:48.014838+00:00",
+  "elapsedSeconds": 83.349,
+  "mainBudgetSeconds": 180,
+  "cleanupBudgetSeconds": 45,
+  "rampContractMs": 3000,
+  "implementationCadenceContractMs": 33,
+  "requestedObservationPollMs": 40.0,
+  "physicalPortalMeasured": false,
+  "panelFpsMeasured": false,
+  "comfortMeasured": false,
+  "cpuMeasured": false,
+  "foreignAvdTouched": false,
+  "clearTaskUsed": false,
+  "globalBrightnessWritten": false,
+  "scope": "One paused PhotoFramePreviewActivity on owned API34 AVD; real registry and emulated light sensor, actual Window.LayoutParams screenBrightness.",
+  "limits": "ADB samples observe several monotonic intermediate window attributes and bounded ramp duration; they do not measure every 33ms callback, exact easing, idle scheduler work, physical panel output, or hidden/stopped cancellation. Retarget transport aperture is reported. Host object identity is inferred from process/activity/window, unchanged scene count and matching photo ROI.",
+  "privacy": "Only scalar receipts and default-photo/synthetic-clock interior ROIs; no credentials, source URLs, complete profiles, raw hierarchy or raw logs."
+}

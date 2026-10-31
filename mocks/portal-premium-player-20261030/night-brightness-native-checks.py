@@ -31,7 +31,7 @@ retained = live.retained
 CheckFailure = retained.CheckFailure
 EPS = 1e-6
 TARGET = .03
-RAMP_SECONDS = 1.8
+RAMP_SECONDS = 3.0
 POLL_SECONDS = .04
 
 
@@ -151,7 +151,7 @@ class Driver(live.Driver):
         gaps = [b["seconds"] - a["seconds"] for a, b in zip(samples, samples[1:])]
         duration = end_sample["seconds"] - moved["seconds"]
         self.require(name + "_observed_gradual_duration",
-                     .9 <= duration <= 3.0 + max(gaps, default=0))
+                     1.8 <= duration <= 4.0 + max(gaps, default=0))
         self.require(name + "_no_single_observed_snap",
                      max(jumps, default=0) <= max(.015, span * .45))
         self.ramps[name].update({
@@ -192,10 +192,10 @@ class Driver(live.Driver):
         self.assert_progression("live-reversed-down", reversed_samples, -1, TARGET)
         first = reversed_samples[0]
         aperture = first["seconds"] - before_edit["seconds"]
-        # Conservative 2x average slope bound for an eased 1800ms .12 span.
+        # Conservative 3x average slope bound for an eased perceptual .12 span.
         self.require("live_retarget_has_no_observable_restart_snap",
                      abs(first["brightness"] - before_edit["brightness"])
-                     <= .12 * min(1, 2 * aperture / RAMP_SECONDS) + .005)
+                     <= .12 * min(1, 3 * aperture / RAMP_SECONDS) + .005)
         self.require("live_reversal_does_not_reach_abandoned_target",
                      all(TARGET - EPS <= sample["brightness"] < .15 - EPS
                          for sample in reversed_samples))
@@ -295,7 +295,7 @@ class Driver(live.Driver):
             "activity": retained.ACTIVITY, "api": 34, "utc": datetime.now(timezone.utc).isoformat(),
             "elapsedSeconds": round(time.monotonic() - self.started, 3),
             "mainBudgetSeconds": self.main_budget, "cleanupBudgetSeconds": 45,
-            "rampContractMs": 1800, "implementationCadenceContractMs": 33,
+            "rampContractMs": 3000, "implementationCadenceContractMs": 33,
             "requestedObservationPollMs": POLL_SECONDS * 1000,
             "physicalPortalMeasured": False, "panelFpsMeasured": False,
             "comfortMeasured": False, "cpuMeasured": False, "foreignAvdTouched": False,

@@ -52,6 +52,11 @@ Compose construction is ordinary `Row` / `Column` / `BoxWithConstraints`, `Text`
 
 ## Night clock route
 
+The production automatic photo/clock handoff now uses a coordinated three-second
+content and brightness fade. This browser's static clock preview does not measure
+that native transition. See the [delivery and limits](../../docs/portal-night-crossfade-2026-10-31.md)
+and [native rendered checks](evidence/native-night-crossfade/checks.json).
+
 `#night-clock` matches the parent's `QuietNightClockView` drawing approach, inspected read only after it appeared:
 
 - Black `#000000`; one Canvas; no seconds, blur or animation.

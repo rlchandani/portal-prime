@@ -21,6 +21,7 @@ import java.util.Locale
 
 /** One small native drawing surface, refreshed at minute boundaries; no second ticker or effects. */
 internal class QuietNightClockView(context: Context, tone: String) : View(context) {
+  private var reveal = 1f
   private var ink = if (tone == "red") Color.rgb(166, 85, 72) else Color.rgb(185, 159, 135)
   private val clockPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     color = ink
@@ -54,8 +55,15 @@ internal class QuietNightClockView(context: Context, tone: String) : View(contex
   }
 
   init {
-    setBackgroundColor(Color.BLACK)
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+  }
+
+  /** Draw the black cover directly: no full-screen bitmap or offscreen alpha layer. */
+  fun setReveal(value: Float) {
+    val fresh = value.coerceIn(0f, 1f)
+    if (reveal == fresh) return
+    reveal = fresh
+    invalidate()
   }
 
   fun updateTone(tone: String) {
@@ -117,6 +125,9 @@ internal class QuietNightClockView(context: Context, tone: String) : View(contex
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
     if (width <= 0 || height <= 0) return
+    canvas.drawColor(Color.argb((255 * reveal).toInt(), 0, 0, 0))
+    clockPaint.alpha = (255 * reveal).toInt()
+    datePaint.alpha = (180 * reveal).toInt()
     clockPaint.textSize = height * 0.28f
     val measured = clockPaint.measureText(time).coerceAtLeast(1f)
     clockPaint.textSize *= minOf(1f, width * 0.82f / measured)

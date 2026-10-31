@@ -1,0 +1,35 @@
+{
+  "device": "Family Area",
+  "sha256": "f602ba024021eb0a8c5c36d1b3478c07a02fd0aacb765328bca1e1574bcbc517",
+  "bytes": 25842558,
+  "previousSha256": "1b56603f6afa80560c1f44aaa833a6a08b766771cf24e79596248c6111a06821",
+  "settingValuesCompared": 97,
+  "changedSettingValues": 0,
+  "sourceGroupsUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "installedApkReadbackVerified": true,
+  "ownedUploadBytesReclaimed": 25842558,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "branch": "codex/portal-night-crossfade-20261031",
+  "physicalPanelMeasured": false,
+  "physicalPinnedOverlayFadeMeasured": false,
+  "globalBrightnessWritten": false,
+  "emulatorCleanup": {
+    "avd": "PortalMusic20261030",
+    "api": 34,
+    "restoredPreferenceFiles": 8,
+    "exactPreferenceBytesRestored": true,
+    "syncCompleted": true,
+    "ownedForwardRemoved": true,
+    "ownedRecordingRemoved": true,
+    "foreignAvdTouched": false
+  },
+  "contentEndpointRecheck": {
+    "endpointTrimRecheckPassed": true,
+    "downIntermediateFrames": 22,
+    "upIntermediateFrames": 22,
+    "originalPhotoLevelRestored": true,
+    "physicalPanelMeasured": false
+  }
+}

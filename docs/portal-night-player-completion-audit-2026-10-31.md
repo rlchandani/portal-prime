@@ -2,6 +2,14 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s repeated physical check now passes for clock appearance, comfortable brightness and smooth same-photo return. This audit combines recorded checks with that human report; the full performance/music goal remains incomplete.
 
+**Subsequent user feedback:** brightness and clock changes still jumped.
+The [new coordinated night transition](portal-night-crossfade-2026-10-31.md)
+fixes the immediate clock visibility switch and pinned-overlay brightness
+assignment, adds a three-second fade in both directions, and preserves direct
+tap exit. All 3,615 JVM tests and 430 native API 34 checks pass; Family's installed
+APK is independently verified with all 97 settings unchanged. The earlier
+physical comfort report does not verify this newer transition's panel behavior.
+
 Status is scoped to each row: **verified** means the stated evidence supports that result; **incomplete** means implementation/evidence exists but required acceptance remains open; **missing** would mean an absent required deliverable. Recorded test results are not fresh runs. API 34 emulator pixels, browser fixtures, source inspection and deployment receipts do not establish physical API 29 presentation, backlight comfort or delivered FPS.
 
 | Actual requirement | Authoritative current evidence and limits | Status |

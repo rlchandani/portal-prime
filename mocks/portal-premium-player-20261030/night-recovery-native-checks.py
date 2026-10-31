@@ -266,8 +266,8 @@ class Driver:
         text = self.adb("logcat", "-d", "-v", "epoch", "--pid", self.pid,
                         "-s", "ImmortalNight:I", "ImmortalSlideshow:I", "*:S").decode()
         found = {"night": [], "resumed": [], "scene": []}
-        markers = {"night": "dark room: clock; photos suspended",
-                   "resumed": "light returned: retained photos resumed",
+        markers = {"night": "dark room: fading to clock; photos suspended",
+                   "resumed": "light returned: fading to retained photo",
                    "scene": "ready native scene:"}
         for line in text.splitlines():
             stamp = re.match(r"\s*(\d+\.\d+)", line)

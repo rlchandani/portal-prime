@@ -187,6 +187,19 @@ class PhotoFrameController(
   private var quietClock: QuietNightClockView? = null
   private var darkRoomObserver: DarkRoomObserver? = null
   private var nightSettingsReceiver: BroadcastReceiver? = null
+  private val nightTransitionHandler = android.os.Handler(android.os.Looper.getMainLooper())
+  private val nightTransition = NightClockTransition(
+      nowMs = android.os.SystemClock::uptimeMillis,
+      postDelayed = { task, delay -> nightTransitionHandler.postDelayed(task, delay) },
+      removeCallbacks = { task -> nightTransitionHandler.removeCallbacks(task) },
+      onReveal = { level ->
+        quietClock?.setReveal(level)
+        if (level == 0f) quietClock?.visibility = View.GONE
+      },
+      onSettled = { night ->
+        quietClock?.setActive(night && hostVisible && !stopped)
+        applyHostActive(hostVisible && !night && !stopped)
+      })
   /** Hosts apply window-scoped dimming; restoring it never writes the device's global brightness. */
   var onNightClockChanged: ((Boolean) -> Unit)? = null
   val isNightClockShowing: Boolean get() = nightClockOnly || ambientNight
@@ -1171,9 +1184,10 @@ class PhotoFrameController(
   fun setHostActive(value: Boolean) {
     hostVisible = value
     darkRoomObserver?.setActive(value && !stopped)
-    quietClock?.setActive(value && isNightClockShowing && !stopped)
+    quietClock?.setActive(value && (isNightClockShowing || nightTransition.coversPhotos) && !stopped)
     if (nightClockOnly) return
-    applyHostActive(DarkRoomPolicy.photosActive(value, ambientNight))
+    nightTransition.setActive(value && !stopped)
+    applyHostActive(value && !nightTransition.coversPhotos)
   }
 
   private fun observeNightSettings() {
@@ -1217,15 +1231,21 @@ class PhotoFrameController(
     val root = view as FrameLayout
     if (value && quietClock == null) {
       quietClock = QuietNightClockView(context, settings.nightClockTone).also {
+        it.setReveal(0f)
         root.addView(it, FrameLayout.LayoutParams(MATCH, MATCH))
       }
     }
-    quietClock?.visibility = if (value) View.VISIBLE else View.GONE
-    if (value) quietClock?.bringToFront()
-    quietClock?.setActive(value && hostVisible)
-    applyHostActive(DarkRoomPolicy.photosActive(hostVisible, value))
+    if (value) {
+      quietClock?.visibility = View.VISIBLE
+      quietClock?.bringToFront()
+      quietClock?.setActive(hostVisible)
+      applyHostActive(false)
+    }
+    // Both directions retain the same photo until this finite cover has finished.
+    nightTransition.setActive(hostVisible)
+    nightTransition.setNight(value)
     onNightClockChanged?.invoke(value)
-    Log.i("ImmortalNight", if (value) "dark room: clock; photos suspended" else "light returned: retained photos resumed")
+    Log.i("ImmortalNight", if (value) "dark room: fading to clock; photos suspended" else "light returned: fading to retained photo")
   }
 
   /** Effective renderer state combines external visibility with the ambient clock cover. */
@@ -1326,6 +1346,7 @@ class PhotoFrameController(
   @androidx.annotation.MainThread
   fun stop() {
     stopped = true
+    nightTransition.close()
     val receiver = nightSettingsReceiver
     nightSettingsReceiver = null
     receiver?.let { runCatching { context.unregisterReceiver(it) } }

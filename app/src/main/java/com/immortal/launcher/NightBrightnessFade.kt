@@ -12,7 +12,7 @@ import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
 import android.view.Window
-import kotlin.math.abs
+import kotlin.math.pow
 
 /** Finite, main-thread brightness ramp. Hidden or departing windows never keep ticking. */
 internal class NightBrightnessFade(
@@ -42,7 +42,7 @@ internal class NightBrightnessFade(
           // A user may change system brightness while our window is dimmed.
           // Recheck once at handoff, rather than polling the settings provider every tick.
           val freshTarget = systemLevel()
-          if (abs(freshTarget - current.target) >= 1f / 255f) {
+          if (freshTarget != current.target) {
             ramp = Ramp(readBrightness().coerceIn(0f, 1f), freshTarget,
                 current.finalOverride, nowMs())
             postDelayed(this, STEP_MS)
@@ -56,9 +56,18 @@ internal class NightBrightnessFade(
       val progress = elapsed.toFloat() / DURATION_MS
       // Smoothstep has zero slope at both ends: no hard start or stop.
       val eased = progress * progress * (3f - 2f * progress)
-      val level = (current.from + (current.target - current.from) * eased).coerceIn(0f, 1f)
-      // Suppress redundant sub-step commands at Android's 8-bit setting granularity.
-      if (abs(level - readBrightness()) >= 1f / 255f) writeBrightness(level)
+      // Android's BrightnessUtils distinguishes linear brightness from perceptual
+      // (gamma) brightness. Use our own simple power-law approximation here, not
+      // its hidden API or conversion implementation. Equal perceived increments
+      // produce smaller absolute commands near dark; hardware response may vary.
+      val fromPerceptual = current.from.toDouble().pow(1.0 / GAMMA)
+      val targetPerceptual = current.target.toDouble().pow(1.0 / GAMMA)
+      val level = (fromPerceptual + (targetPerceptual - fromPerceptual) * eased)
+          .pow(GAMMA).toFloat().coerceIn(0f, 1f)
+      // Window brightness is a float, not the 8-bit global settings value.
+      // Discard only identical commands; 1/255 is a large relative step near dark.
+      // The fixed tick interval and finite duration bound the number of writes.
+      if (level != readBrightness()) writeBrightness(level)
       postDelayed(this, minOf(STEP_MS, DURATION_MS - elapsed))
     }
   }
@@ -110,8 +119,9 @@ internal class NightBrightnessFade(
   }
 
   internal companion object {
-    const val DURATION_MS = 1_800L
+    const val DURATION_MS = 3_000L
     const val STEP_MS = 33L
+    private const val GAMMA = 2.2
   }
 }
 
