@@ -2222,6 +2222,45 @@ below-threshold input and a human observation of clock comfort/photo return.
 No threshold is raised to manufacture an appearance result, and no repeated
 sensor observation or fresh timer resets are started.
 
+## First decoded scene reveal — 01:02:44–01:32:44 UTC
+
+The outer slideshow composition previously started at opacity zero and faded for
+1.6 seconds even when it had no predecessor. The first decoded scene now skips
+that redundant parent fade; later compositions retain their normal dissolve.
+Style-owned motion, readiness, decode, pause and native handoff are unchanged.
+This removes an extra fade, not a measured 1.6-second total Portal startup delay.
+
+The frozen baseline fails for opacity zero / 1.6-second transition. Updated
+production assets pass **73** browser assertions; the broader renderer suite
+passes **255**. Source gates pass **311/315**, with four opt-in tests skipped.
+Debug and optimized builds pass; the unchanged native unit task is UP-TO-DATE
+with the prior **3,513 tests / 364 suites** result. Independent review has no findings.
+
+Family’s installed optimized APK is independently verified as
+`c2a5d755f9704b8a5c2f869fe02799be7540fb5ec5a4425e21fa0389dfeb0a26`
+(**25,702,379 bytes**). Only three screensaver assets differ (one comment-only);
+50 other main assets, native DEX, manifest, signing certificate, all 97 setting
+values, screensaver configuration and source groups remain unchanged. The owned
+upload is cleared; the rollback APK is privately retained. Living Area is untouched.
+
+One finite capture reports two decoded-scene admissions at **650/630 ms** from
+pre-command observation (**595/568 ms** after acknowledgement), for Memories and
+Hero + Sidebar. This includes Fleet navigation and is neither first-pixel nor
+cold-start timing. Its helper exits 1 because an old three-cycle completion
+assertion remained in a two-cycle plan. The original failure is preserved;
+independent validation confirms both planned records, unchanged settings and
+collector cleanup without repeating capture. Zero active listeners remain.
+Evidence: `mocks/portal-premium-player-20261030/evidence/family-first-scene-reveal/verification.json`.
+
+## Physical night acceptance — new human report
+
+The user now reports **“Clock appeared; brightness comfortable; same photo
+returned smoothly.”** This closes the earlier physical appearance/comfort/basic
+photo-return check. It does not establish measured covered lux, exact dwell or
+physical FPS. The user then requested gradual dimming and brightening rather
+than a brightness jump; that is the next bounded refinement.
+Evidence: `mocks/portal-premium-player-20261030/evidence/family-night-physical/verification.json`.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)

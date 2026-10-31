@@ -7,6 +7,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
    the still-running previous one (duration matches XFADE_MS in scheduler.js). */
 .ss-beat { position: absolute; inset: 0; opacity: 0; transition: opacity 1.6s cubic-bezier(0.4,0,0.2,1); }
 .ss-beat.on { opacity: 1; }
+.ss-beat.first-scene { transition: none; }
 /* During a crossfade the OUTGOING beat is frozen so only the incoming mode animates — otherwise two
    heavy modes (e.g. mosaic + gallery = ~27 transforms) run at once through the 1.6s fade. */
 .ss-beat.freeze, .ss-beat.freeze *, .ss-beat.paused, .ss-beat.paused * { animation-play-state: paused !important; }

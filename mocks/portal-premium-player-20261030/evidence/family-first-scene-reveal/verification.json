@@ -1,0 +1,83 @@
+{
+  "device": "Family Area",
+  "sha256": "c2a5d755f9704b8a5c2f869fe02799be7540fb5ec5a4425e21fa0389dfeb0a26",
+  "bytes": 25702379,
+  "previousSha256": "e08f21e05d4062e60752aaba60d8a93ee7c79428b35f599ad7ebe4c96a60830d",
+  "settingValuesCompared": 97,
+  "changedSettingValues": 0,
+  "navigationAcknowledgments": [
+    {
+      "action": "screensaver",
+      "response": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    }
+  ],
+  "sourceGroupsUnchanged": true,
+  "screensaverConfigurationUnchanged": true,
+  "visibleTransitionsVerified": false,
+  "physicalFpsGainMeasured": false,
+  "changedMainAssets": [
+    "assets/screensaver/mode-impls.js",
+    "assets/screensaver/scheduler.js",
+    "assets/screensaver/styles.css"
+  ],
+  "unchangedMainAssets": 50,
+  "nativeDexUnchanged": true,
+  "dexFilesCompared": 1,
+  "manifestUnchanged": true,
+  "installedApkReadbackVerified": true,
+  "ownedUploadBytesReclaimed": 25702379,
+  "collectorInactive": true,
+  "activeListeners": 0,
+  "runtime": {
+    "plannedCycles": 2,
+    "observedCycles": 2,
+    "twoCycleDataValidated": true,
+    "helperProcessExitCode": 1,
+    "helperCompletedFlag": false,
+    "staleThreeCycleAssertion": true,
+    "repeatCapturePerformed": false,
+    "startRequests": 1,
+    "stopRequests": 1,
+    "startupObservations": [
+      {
+        "cycle": 1,
+        "requestBeganCaptureMs": 657,
+        "requestAcknowledgedCaptureMs": 712,
+        "admissionReported": true,
+        "style": "memories",
+        "acceptedCaptureMs": 1307,
+        "requestToAdmissionMs": 650,
+        "ackToAdmissionMs": 595
+      },
+      {
+        "cycle": 2,
+        "requestBeganCaptureMs": 2559,
+        "requestAcknowledgedCaptureMs": 2621,
+        "admissionReported": true,
+        "style": "heroSidebar",
+        "acceptedCaptureMs": 3189,
+        "requestToAdmissionMs": 630,
+        "ackToAdmissionMs": 568
+      }
+    ],
+    "measurement": "decoded scene admission from pre-command Fleet observation; not first pixels, cold startup or delivered FPS"
+  },
+  "browserAssertions": 73,
+  "broaderBrowserAssertions": 255,
+  "sourceTests": {
+    "total": 315,
+    "passed": 311,
+    "skippedOptIn": 4,
+    "failed": 0
+  },
+  "unitTests": {
+    "tests": 3513,
+    "suites": 364,
+    "task": "UP-TO-DATE; results from prior unchanged native source gate"
+  },
+  "debugAndPerformanceBuildsPassed": true
+}

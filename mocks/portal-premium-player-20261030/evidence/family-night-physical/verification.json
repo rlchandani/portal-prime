@@ -1,0 +1,14 @@
+{
+  "device": "Family Area",
+  "recordedUtc": "2026-10-31T01:21:09.246292+00:00",
+  "evidence": "human physical test report",
+  "report": "Clock appeared; brightness comfortable; same photo returned smoothly",
+  "clockAppearanceVerified": true,
+  "brightnessComfortVerified": true,
+  "smoothSamePhotoReturnVerified": true,
+  "measuredCoveredLux": false,
+  "dwellMeasuredDuringPhysicalTest": false,
+  "physicalFpsMeasured": false,
+  "gradualBrightnessTransitionAccepted": false,
+  "followUp": "User requests gradual dimming and brightening instead of a brightness jump."
+}

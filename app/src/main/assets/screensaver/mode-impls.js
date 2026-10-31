@@ -721,7 +721,7 @@
       card.style.transition = "none"; card.style.opacity = outgoing ? "0" : "1";
       card.style.transform = outgoing ? `rotate(${incoming.rotation}deg) scale(.9)` : incoming.target;
       table.appendChild(card);
-      if (!outgoing) return; // The outer scheduler owns the initial composition fade.
+      if (!outgoing) return; // The first decoded composition needs no internal dissolve.
       void card.offsetWidth;
       const request = { incoming, outgoing, remaining: 900, startedAt: now(), timer: null };
       fading = request;

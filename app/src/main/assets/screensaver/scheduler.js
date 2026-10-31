@@ -55,6 +55,8 @@
         outgoing.layer.classList.add("freeze");
         outgoing.cleanup.pause();
       }
+      // The first decoded composition has no predecessor to dissolve over.
+      if (!outgoing) scene.layer.classList.add("first-scene");
       scene.layer.classList.remove("freeze");
       scene.layer.classList.add("on");
       if (opts.onMode) opts.onMode(SS.MODES[scene.modeId].name, scene.modeId);
