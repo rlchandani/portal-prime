@@ -1,0 +1,390 @@
+{
+  "utc": "2026-10-31T00:31:56.217953+00:00",
+  "candidate": "Defer selected-tab RESUMED until the paired slide settles",
+  "decision": "Rejected and withdrawn; no new Home trial in this issue window",
+  "performance": {
+    "policy": {
+      "issueStartUtc": "2026-10-31T00:11:41Z",
+      "deadlineUtc": "2026-10-31T00:41:41Z",
+      "comparison": "exact optimized control before / resume-admission candidate / exact control restored",
+      "navigationCyclesPerBlock": 30,
+      "minimumCycleSeconds": 4,
+      "sampleMain": false,
+      "sampleSettingsWork": false,
+      "acceptance": {
+        "p95ImprovementAgainstEachControlPercent": 10,
+        "p99MaximumRegressionAgainstEachControlPercent": 5,
+        "meanMaximumRegressionAgainstEachControlPercent": 5,
+        "p95ControlDriftMaximumPercent": 15,
+        "p99ControlDriftMaximumPercent": 15,
+        "maximumWarmedFrameMs": 250
+      },
+      "wholeGoalNotClosedByComparison": true,
+      "deliveredFpsMeasured": false,
+      "captureDriverSha256": "2c1a08080bf0398b6dd7f75ac1e692a890dd5bfcf10c8a3443380f0e1fd03975"
+    },
+    "blocks": {
+      "control-before": {
+        "frames": 781,
+        "meanMs": 13.130594929577464,
+        "p95Ms": 36.25,
+        "p99Ms": 51,
+        "maxMs": 77.860015,
+        "firstDrawFrames": 0,
+        "callbackDrops": 0,
+        "invalidSamples": 0,
+        "overflowSamples": 0,
+        "components": {
+          "queued": {
+            "samples": 781,
+            "missing": 0,
+            "meanMs": 2.1344238988476314,
+            "maxMs": 31.773885
+          },
+          "input": {
+            "samples": 781,
+            "missing": 0,
+            "meanMs": 0.031918576184379,
+            "maxMs": 0.311562
+          },
+          "animation": {
+            "samples": 781,
+            "missing": 0,
+            "meanMs": 2.7767504122919333,
+            "maxMs": 51.841406
+          },
+          "layout": {
+            "samples": 781,
+            "missing": 0,
+            "meanMs": 0.11247641741357234,
+            "maxMs": 0.559687
+          },
+          "draw": {
+            "samples": 781,
+            "missing": 0,
+            "meanMs": 1.2868201882202304,
+            "maxMs": 18.635
+          },
+          "sync": {
+            "samples": 781,
+            "missing": 0,
+            "meanMs": 0.5021557055057618,
+            "maxMs": 3.193021
+          },
+          "commands": {
+            "samples": 781,
+            "missing": 0,
+            "meanMs": 4.0214871318822025,
+            "maxMs": 12.11276
+          },
+          "swap": {
+            "samples": 781,
+            "missing": 0,
+            "meanMs": 1.5267720012804098,
+            "maxMs": 8.995781
+          }
+        }
+      },
+      "candidate": {
+        "frames": 780,
+        "meanMs": 13.394722905128205,
+        "p95Ms": 34,
+        "p99Ms": 48.5,
+        "maxMs": 67.30141,
+        "firstDrawFrames": 0,
+        "callbackDrops": 0,
+        "invalidSamples": 0,
+        "overflowSamples": 0,
+        "components": {
+          "queued": {
+            "samples": 780,
+            "missing": 0,
+            "meanMs": 2.094743953846154,
+            "maxMs": 30.195697
+          },
+          "input": {
+            "samples": 780,
+            "missing": 0,
+            "meanMs": 0.03324472051282051,
+            "maxMs": 0.271615
+          },
+          "animation": {
+            "samples": 780,
+            "missing": 0,
+            "meanMs": 2.8829929961538463,
+            "maxMs": 49.81651
+          },
+          "layout": {
+            "samples": 780,
+            "missing": 0,
+            "meanMs": 0.11321214102564103,
+            "maxMs": 0.643229
+          },
+          "draw": {
+            "samples": 780,
+            "missing": 0,
+            "meanMs": 1.3163256384615383,
+            "maxMs": 14.002656
+          },
+          "sync": {
+            "samples": 780,
+            "missing": 0,
+            "meanMs": 0.5181200051282051,
+            "maxMs": 3.735208
+          },
+          "commands": {
+            "samples": 780,
+            "missing": 0,
+            "meanMs": 4.154860042307692,
+            "maxMs": 10.420469
+          },
+          "swap": {
+            "samples": 780,
+            "missing": 0,
+            "meanMs": 1.5505623474358974,
+            "maxMs": 8.537968
+          }
+        }
+      },
+      "control-after": {
+        "frames": 782,
+        "meanMs": 12.912150076726343,
+        "p95Ms": 34.5,
+        "p99Ms": 44.75,
+        "maxMs": 58.771385,
+        "firstDrawFrames": 0,
+        "callbackDrops": 0,
+        "invalidSamples": 0,
+        "overflowSamples": 0,
+        "components": {
+          "queued": {
+            "samples": 782,
+            "missing": 0,
+            "meanMs": 1.946716956521739,
+            "maxMs": 27.076366
+          },
+          "input": {
+            "samples": 782,
+            "missing": 0,
+            "meanMs": 0.032664048593350384,
+            "maxMs": 0.529167
+          },
+          "animation": {
+            "samples": 782,
+            "missing": 0,
+            "meanMs": 2.777527778772378,
+            "maxMs": 45.215
+          },
+          "layout": {
+            "samples": 782,
+            "missing": 0,
+            "meanMs": 0.1081895294117647,
+            "maxMs": 0.756458
+          },
+          "draw": {
+            "samples": 782,
+            "missing": 0,
+            "meanMs": 1.3661461611253198,
+            "maxMs": 12.112291
+          },
+          "sync": {
+            "samples": 782,
+            "missing": 0,
+            "meanMs": 0.503498611253197,
+            "maxMs": 3.639323
+          },
+          "commands": {
+            "samples": 782,
+            "missing": 0,
+            "meanMs": 3.9275443069053706,
+            "maxMs": 19.579115
+          },
+          "swap": {
+            "samples": 782,
+            "missing": 0,
+            "meanMs": 1.5300041905370843,
+            "maxMs": 6.827031
+          }
+        }
+      }
+    },
+    "candidateDeltaPercent": {
+      "control-before": {
+        "meanMs": 2.012,
+        "p95Ms": -6.207,
+        "p99Ms": -4.902
+      },
+      "control-after": {
+        "meanMs": 3.737,
+        "p95Ms": -1.449,
+        "p99Ms": 8.38
+      }
+    },
+    "controlDriftPercent": {
+      "p95Ms": 4.828,
+      "p99Ms": 12.255
+    },
+    "gates": {
+      "control-before-p95": false,
+      "control-before-p99": true,
+      "control-before-mean": true,
+      "control-after-p95": false,
+      "control-after-p99": false,
+      "control-after-mean": true,
+      "p95-control-drift": true,
+      "p99-control-drift": true,
+      "candidate-maximum": true
+    },
+    "accepted": false,
+    "totalCycles": 90,
+    "deliveredFpsMeasured": false,
+    "visibleTabReadinessVerified": false,
+    "settingsCompared": 97,
+    "collectorsClosed": 3,
+    "activeListenersAfterEach": 0,
+    "wholeGoalComplete": false
+  },
+  "candidateScope": {
+    "deferredWork": "OnResume hooks and genuinely RESUMED-scoped work",
+    "activeCompositionProducersDeferred": false,
+    "selectedInputAvailableDuringMotion": true
+  },
+  "candidateFreshJvm": {
+    "suites": 364,
+    "tests": 3510,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "nativeCandidateVerification": {
+    "prototypeOnly": true,
+    "productionComposeRenderer": true,
+    "nativeHomeCandidateUsed": false,
+    "fixtureAssertionsPassed": 242,
+    "accessibilityChecksPassed": 5,
+    "elapsedSeconds": 27.262,
+    "api": 34,
+    "syntheticHostLifecycle": true,
+    "controlledFrameClock": true,
+    "generatedPagesOnly": true,
+    "householdConfigurationRead": false,
+    "physicalDisplayMeasured": false,
+    "physicalPortalPerformanceMeasured": false,
+    "candidateDebugApkSha256": "f660f422ca3c5920857dd7e8fbda13b711a7b6c00687866f058c49db10ba9660",
+    "independentlyReadInstalledDebugApkMatches": true,
+    "coveredCases": [
+      "Initial settled page resumes immediately",
+      "Selected page remains STARTED during motion and keeps input",
+      "Exactly one resume after settling",
+      "Obsolete reversed destination never resumes",
+      "Host background and return during motion",
+      "Retained page ownership and disposal",
+      "No per-frame page recomposition",
+      "Resize and held/fresh touch",
+      "Only active page accessibility labels"
+    ]
+  },
+  "familyCandidateDeployment": {
+    "device": "Family Area",
+    "sha256": "1c93cd3326a05164f59b7a67ebc59e0150c3a72da29ada665645e36130aef45e",
+    "bytes": 25702323,
+    "previousSha256": "c8651adc869e4a998c419e654b87b6a22daece82b13a4b293777e269192ec303",
+    "settingValuesCompared": 97,
+    "changedSettingValues": 0,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "visibleTransitionsVerified": false,
+    "physicalFpsGainMeasured": false
+  },
+  "familyControlRestore": {
+    "device": "Family Area",
+    "sha256": "c8651adc869e4a998c419e654b87b6a22daece82b13a4b293777e269192ec303",
+    "bytes": 25702323,
+    "previousSha256": "1c93cd3326a05164f59b7a67ebc59e0150c3a72da29ada665645e36130aef45e",
+    "settingValuesCompared": 97,
+    "changedSettingValues": 0,
+    "sourceGroupsUnchanged": true,
+    "screensaverConfigurationUnchanged": true,
+    "visibleTransitionsVerified": false,
+    "physicalFpsGainMeasured": false
+  },
+  "candidateArtifactComparison": {
+    "changedMainAssets": [],
+    "unchangedMainAssets": 53,
+    "nativeDexUnchanged": false,
+    "dexFilesCompared": 1,
+    "manifestUnchanged": true
+  },
+  "sourceWithdrawal": {
+    "candidateWithdrawn": true,
+    "productionSourcesRestoredToHead": true,
+    "candidateOnlyPolicyTestsAndProbeRemoved": true,
+    "candidateSourcesAndGeneratedNativeEvidenceRetainedPrivately": true
+  },
+  "restoredBuild": {
+    "freshFullJvm": {
+      "suites": 363,
+      "tests": 3502,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "debugBuilt": true,
+    "performanceBuilt": true,
+    "elapsedSeconds": 79,
+    "policyAbsentFromRestoredR8Mapping": true,
+    "freshPerformanceApkSha256": "0b7a66b456aaa27ee68f5e6cdf5d821d007c94d6e8453a13f57c866cabf5e418",
+    "freshBytesMatchExactSavedControl": false,
+    "savedControlInstalledInsteadOfFreshRebuild": true,
+    "originalControlBuiltBeforeCommentRemoval": true,
+    "executableCalendarSourceChangedAfterOriginalControlBuild": false
+  },
+  "familyFinalVerification": {
+    "device": "Family Area",
+    "installedSha256": "c8651adc869e4a998c419e654b87b6a22daece82b13a4b293777e269192ec303",
+    "installedBytes": 25702323,
+    "exactControlRestored": true,
+    "rebuiltPerformanceSha256": "0b7a66b456aaa27ee68f5e6cdf5d821d007c94d6e8453a13f57c866cabf5e418",
+    "rebuiltBytesMatchOriginalControl": false,
+    "candidatePolicyAbsentFromRestoredMapping": true,
+    "freshRestoredJvm": {
+      "suites": 363,
+      "tests": 3502,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "ownedUploads": [
+      {
+        "ownedUploadCleared": true,
+        "bytesReclaimed": 25702323,
+        "sha256": "1c93cd3326a05164f59b7a67ebc59e0150c3a72da29ada665645e36130aef45e"
+      },
+      {
+        "ownedUploadCleared": true,
+        "bytesReclaimed": 25702323,
+        "sha256": "c8651adc869e4a998c419e654b87b6a22daece82b13a4b293777e269192ec303"
+      }
+    ],
+    "totalBytesReclaimed": 51404646,
+    "runtimeLines": 402,
+    "fatalExceptionMarkers": 0,
+    "collectorActive": false,
+    "collectorRunning": false,
+    "activeListeners": 0,
+    "localControlAndCandidateRetained": true
+  },
+  "ownedEmulatorCleanup": {
+    "ownedAvdStopped": true,
+    "fixtureCacheRemoved": true,
+    "ownedSerialAbsent": true,
+    "foreignAvdStillPresent": true,
+    "foreignAvdTouched": false
+  },
+  "credentialsOrPhotoSourcesExported": false,
+  "livingAreaTouched": false,
+  "phoneTouched": false,
+  "homeAssistantTouched": false,
+  "wholeGoalComplete": false,
+  "parkedReason": "The frozen 10% p95 reduction was not met against either control and p99 exceeded the 5% regression limit against the restored control."
+}

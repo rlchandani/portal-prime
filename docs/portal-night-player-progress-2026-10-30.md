@@ -2031,6 +2031,68 @@ panel presentation, pristine cold startup, Home frame-time tails and physical
 music interaction remain open. Living Area, the phone and Home Assistant receive
 no operations; the overall objective remains active.
 
+## Home resume admission — rejected and withdrawn, 00:11 UTC window
+
+Original issue window: **00:11:41–00:41:41 UTC**, including investigation,
+implementation, native checks, physical comparison, rollback, cleanup and commit.
+
+The trial deferred the selected tab's `RESUMED` lifecycle until its 160ms paired
+slide settled. The page stayed `STARTED` and interactive during motion; initial
+settled Home resumed immediately. This moved OnResume hooks and genuinely
+RESUMED-scoped work. It did **not** defer Home's active-composition producers.
+Rapid reversal never resumed the abandoned destination.
+
+The candidate passed **3,510 JVM tests / 364 suites**, with zero failures, errors
+or skips, and built debug/optimized APKs in **2m 3s**. The actual production Compose
+fallback passed **242 native fixture assertions plus five accessibility checks**
+in **27.262 seconds** on the owned API 34 AVD. Those generated-page checks used a
+controlled frame clock and synthetic host lifecycle; they establish functional
+contracts, not physical Portal performance or household UI acceptance.
+
+Before capturing, acceptance was frozen at **at least 10% p95 improvement against
+both controls**, no more than **5% mean/p99 regression**, at most **15% control
+p95/p99 drift**, and warmed maximum below **250ms**. Three identical 30-cycle
+Home/Apps blocks compared the exact accepted optimized APK, the candidate, then
+the exact restored accepted APK. Main/settings-work sampling was disabled.
+
+| Physical Family block | Home Window frames | Mean ms | p95 ms | p99 ms | Maximum ms |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Exact control before | 781 | 13.131 | 36.25 | 51.00 | 77.860 |
+| Resume-admission candidate | 780 | 13.395 | 34.00 | 48.50 | 67.301 |
+| Exact control restored | 782 | 12.912 | 34.50 | 44.75 | 58.771 |
+
+Candidate p95 reductions were **6.207%** and **1.449%**, both below the required
+10%. Candidate p99 regressed **8.380%** against the restored control, exceeding
+the 5% limit. Control p95/p99 drift was **4.828% / 12.255%**, within the frozen
+bounds. The trial is **rejected**; no accepted performance gain is claimed.
+FrameMetrics Window callback timings are not delivered FPS, panel latency or
+visual tab-readiness measurements. All 90 cycles completed with zero first-draw,
+callback-drop, invalid or overflow samples; all three collectors closed.
+
+The candidate source, policy, tests and debug probe are withdrawn from the branch;
+the prototype sources and generated native evidence remain privately retained.
+The restored code passes a fresh **3,502 tests / 363 suites**, zero failures,
+errors or skips, and both builds succeed in **1m 19s**. Restored R8 mapping contains
+no candidate admission policy. The freshly rebuilt restored APK has a different
+hash from the original saved control, which was built before the documented
+calendar comment removal; executable calendar source was unchanged. The saved
+control is used for restoration and the final physical comparison.
+
+Family's independently read installed APK is the exact accepted
+`c8651adc869e4a998c419e654b87b6a22daece82b13a4b293777e269192ec303`
+(**25,702,323 bytes**). Candidate/control installs retain the signing certificate,
+all **53 main assets** and manifest. All **97 settings**, screensaver configuration
+and photo-source groups remain unchanged. The final bounded runtime response has
+**402 lines / zero fatal exception markers**. The collector is inactive with zero
+listeners. Clearing both verified owned uploads reclaims **51,404,646 bytes**.
+The owned AVD and its fixture cache are removed; the unrelated AVD is untouched.
+
+Public scalar receipt:
+`mocks/portal-premium-player-20261030/evidence/home-resume-admission-trial/verification.json`.
+This Home path is parked within its original window. No further candidate is
+started in that window. Living Area, the phone and Home Assistant receive no
+operations; the full goal and its remaining physical acceptance stay open.
+
 ## Sources
 
 - [Android intrinsic blur contract](https://developer.android.com/reference/android/renderscript/ScriptIntrinsicBlur)
@@ -2048,3 +2110,4 @@ no operations; the overall objective remains active.
 - [Hardware specifications, benchmarks and rendering evidence](portal-hardware-budget-2026-10-30.md)
 - [HA-free music alternatives](music-without-home-assistant-2026-10-19.md)
 - [Android 14 foreground-service types and connected-device prerequisites](https://developer.android.com/about/versions/14/changes/fgs-types-required#connected-device)
+- [Android lifecycle-scoped coroutine restart and cancellation](https://developer.android.com/topic/libraries/architecture/views/coroutines-views)
