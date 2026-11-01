@@ -47,6 +47,10 @@ class MusicDesignPreviewActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN or
         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    if (intent.getStringExtra("screen") == "repeated-items") {
+      repeatedItemsContent(intent.getStringExtra("list") ?: "tracks")
+      return
+    }
     if (intent.getStringExtra("screen") == "night") {
       window.attributes = window.attributes.apply { screenBrightness = 0.03f }
       nightClock = QuietNightClockView(this, intent.getStringExtra("tone") ?: "warm")
@@ -304,6 +308,59 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                         modifier = Modifier.padding(24.dp))
                   }
                 })
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /** Generated RAM metadata only. No artwork URIs, controller, commands or running timeline. */
+  private fun repeatedItemsContent(list: String) {
+    require(list in setOf("tracks", "collections", "queue", "rooms"))
+    fun title(index: Int) = when (index) {
+      0 -> "Repeat one"
+      1 -> "Repeat two"
+      else -> "Generated row ${index + 1}"
+    }
+    fun id(index: Int) = if (index < 2) "generated-repeat" else "generated-$index"
+    val tracks = (0 until 66).map {
+      MusicBrowseTrack(id(it), title(it), "Generated artist", 180_000L)
+    }
+    val collections = (0 until 66).map {
+      MusicBrowseCollection(id(it), title(it), "Generated collection")
+    }
+    val queue = (0 until 66).map {
+      MusicQueueItem(id(it), title(it), "Generated artist", 180_000L)
+    }
+    val rooms = (0 until 66).map { MusicRoom(id(it), title(it), available = true) }
+    val source = "fixture:generated-repeated-items"
+    val snapshot = MusicPlayerSnapshot(
+        connection = MusicConnection.READY, sourceId = source,
+        track = MusicTrack("generated-current", source, "Generated paused track",
+            "Generated artist", durationMs = 180_000L),
+        playback = PlaybackState.PAUSED,
+        capabilities = MusicCapabilities(queue = true, rooms = true),
+        queue = if (list == "queue") queue else listOf(
+            MusicQueueItem("generated-single", "Generated paused track")),
+        queueId = "generated-queue",
+        rooms = if (list == "rooms") rooms else emptyList(),
+    )
+    setContent {
+      CompositionLocalProvider(LocalApprovedPalette provides ApprovedDarkPalette) {
+        MaterialTheme(colorScheme = approvedColorScheme(true)) {
+          Column(Modifier.fillMaxSize().background(ApprovedDarkPalette.background)) {
+            Text("Generated repeated items · $list · paused",
+                color = ApprovedDarkPalette.secondary, modifier = Modifier.padding(8.dp))
+            when (list) {
+              "tracks" -> MusicCollectionDetail(
+                  MusicBrowseCollection("generated-detail", "Generated tracks",
+                      tracks = tracks, kind = MusicBrowseCollectionKind.PLAYLIST),
+                  onBack = {}, onTrack = {}, onShowPlayer = {}, modifier = Modifier.weight(1f))
+              "collections" -> MusicLibraryPage(collections,
+                  onBack = {}, onCollection = {}, onShowPlayer = {}, modifier = Modifier.weight(1f))
+              "queue" -> MusicQueue(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction = {})
+              "rooms" -> MusicRooms(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction = {})
             }
           }
         }

@@ -196,6 +196,7 @@ fun MusicCollectionDetail(
 ) {
   val palette = LocalApprovedPalette.current
   val fontScale = LocalDensity.current.fontScale.coerceAtLeast(1f)
+  val trackKeys = remember(collection.tracks) { musicItemKeys(collection.tracks) { it.id } }
   BoxWithConstraints(modifier.fillMaxSize().background(palette.background)) {
     val padding = if (maxWidth < 600.dp) 16.dp else 28.dp
     val horizontalHero = maxWidth >= (720 * fontScale).dp
@@ -234,7 +235,7 @@ fun MusicCollectionDetail(
             }
           } else {
             itemsIndexed(collection.tracks,
-                key = { index, track -> track.id.ifBlank { "missing-track:$index" } },
+                key = { index, _ -> trackKeys[index] },
                 contentType = { _, _ -> "track" }) { index, track ->
               MusicBrowseTrackRow(track, index + 1, compactRows,
                   current = track.id.isNotBlank() && track.id == currentTrackId,
@@ -271,6 +272,7 @@ private fun MusicBrowseCollections(
     if (status == MusicBrowseStatus.READY) musicBrowseSearchCollections(collections, term)
     else emptyList()
   }
+  val collectionKeys = remember(matching) { musicItemKeys(matching) { it.id } }
   val focusManager = LocalFocusManager.current
   val openCollection: (MusicBrowseCollection) -> Unit = {
     focusManager.clearFocus()
@@ -341,9 +343,8 @@ private fun MusicBrowseCollections(
             }
           } else {
             gridItemsIndexed(matching,
-                key = { index, collection ->
-                  collection.id.ifBlank { "missing-collection:$index" }
-                }, contentType = { _, _ -> if (playlists) "playlist" else "album" }) {
+                key = { index, _ -> collectionKeys[index] },
+                contentType = { _, _ -> if (playlists) "playlist" else "album" }) {
                 _, collection ->
               Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (playlists) MusicBrowsePlaylistCard(collection) { openCollection(collection) }

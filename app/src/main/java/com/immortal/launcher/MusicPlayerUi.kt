@@ -536,7 +536,7 @@ internal fun musicQueueRowPresentation(
 }
 
 @Composable
-private fun MusicQueue(
+internal fun MusicQueue(
     snapshot: MusicPlayerSnapshot,
     modifier: Modifier,
     onAction: (MusicPlayerUiAction) -> Unit,
@@ -552,10 +552,12 @@ private fun MusicQueue(
     return
   }
   val palette = LocalApprovedPalette.current
+  val rowKeys = remember(snapshot.queue) { musicItemKeys(snapshot.queue) { it.id } }
   LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(8.dp),
       contentPadding = PaddingValues(bottom = 12.dp)) {
-    // Stable source IDs, with no eager artwork decode for the entire queue.
-    itemsIndexed(snapshot.queue, key = { index, item -> item.id.ifBlank { "unavailable:$index" } }) {
+    // Stable occurrence keys, with no eager artwork decode for the entire queue.
+    itemsIndexed(snapshot.queue, key = { index, _ -> rowKeys[index] },
+        contentType = { _, _ -> "track" }) {
         _, item ->
       val presentation = musicQueueRowPresentation(snapshot, item)
       val current = presentation.current
@@ -620,7 +622,7 @@ private fun MusicLyrics(snapshot: MusicPlayerSnapshot, modifier: Modifier) {
 }
 
 @Composable
-private fun MusicRooms(
+internal fun MusicRooms(
     snapshot: MusicPlayerSnapshot,
     modifier: Modifier,
     onAction: (MusicPlayerUiAction) -> Unit,
@@ -629,13 +631,15 @@ private fun MusicRooms(
     MusicPanelMessage("No players available", "Choose or connect a player in Music settings.", modifier)
     return
   }
+  val rowKeys = remember(snapshot.rooms) { musicItemKeys(snapshot.rooms) { it.id } }
   LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(12.dp),
       contentPadding = PaddingValues(bottom = 12.dp)) {
-    item {
+    item(contentType = "heading") {
       MusicText("Choose a player. Available group controls are shown below.",
           muted = true, size = 16, maxLines = 3)
     }
-    itemsIndexed(snapshot.rooms, key = { index, room -> room.id.ifBlank { "room:$index" } }) { _, room ->
+    itemsIndexed(snapshot.rooms, key = { index, _ -> rowKeys[index] },
+        contentType = { _, _ -> "player" }) { _, room ->
       val actions = musicRoomActions(snapshot, room)
       val sameGroup = actions.inCurrentGroup
       val presentation = musicRoomPresentation(snapshot, room)

@@ -181,7 +181,7 @@ Status is scoped to each row: **verified** means the stated evidence supports th
 1. **Natural lighting and optical comfort remain open:** continued brightness/clock jumps prompted the [three-second coordinated transition][night-crossfade] and subsequent [Android 10 Dream delivery fix](portal-dream-brightness-2026-10-31.md). The current optimized APK `199aa8a1…` has recorded physical Dream and [pinned-overlay checks](portal-pinned-night-physical-2026-10-31.md), including native content fades, command ramps, retained photo regions and taps to the retained app. All **97 settings and 22 source fields** were restored. The earlier human appearance/comfort report applies to an older artifact; natural bright-room exit, optical comfort, short-interval autoplay pause and delivered panel timing on the current build remain unaccepted.
 2. **Startup delivery is scoped:** the extra first-scene parent fade is removed and deployed within **01:02:44–01:32:44 UTC**. [Deployment/runtime receipt][first-reveal] retains the two-cycle helper’s stale three-cycle completion failure and independently validates the planned two observations without repeating the capture. [Actual API 34 Dream checks][dream-return] now verify continuation retirement, one retained-Home return, deliberate paused-viewer retention and both `singleTask` intent-mode transitions. The recording has zero near-black frames or post-Home reappearance. This closes the native emulator lifecycle gap; actual API 29 cold/panel presentation and stacked-Dream return remain open.
 3. **Address the documented platform performance gaps**, led by Home/Apps tails and the affected screensaver paths. [Local WebView misses][bounded-photos] wait off Main for prepared copies. [Remote loading][remote-photos] now streams authenticated input with a **32 MiB** cap, prepares static copies through the shared decoder, preserves PNG transparency and cancels retired owners. Fresh gates pass **3,561 tests**. Actual API 34 WebView checks verify a **31-megapixel** remote photo delivered as **2400×1800**, alpha preservation, corrupt/oversized 404, plus a final local regression. [Remote Family deployment][remote-deployment] verifies the installed APK and all **97 settings** unchanged. These resolve the identified local/remote static loading gaps; physical startup presentation, animated GIF/WebP pixel residency and complete GPU residency remain open. Use the existing hardware budget and matched accepted baselines; retain only supported improvements. The warmed Filmstrip pass does not require another speculative renderer/layer experiment.
-4. **Physical music UI acceptance is now recorded** for the delivered artwork, controls, playlist presentation and full/compact continuity; see the [223-check physical record](portal-music-physical-ui-2026-10-31.md). Backend/provider installation, credentials, real audio and provider-backed library wiring remain deliberately deferred; they are outside this goal’s remaining work. Photos used a test placeholder, so this gate does not accept its actual photo integration.
+4. **Physical music UI acceptance is recorded** for artwork, controls, playlist presentation and full/compact continuity in the [223-check physical record](portal-music-physical-ui-2026-10-31.md). That historical gate used a photo placeholder; the separate [real-photo continuity delivery](portal-music-photo-pause-2026-11-01.md) passes **17/17 native checks**, and [configuration continuity](portal-music-config-continuity-2026-11-01.md) covers unrelated-setting changes. These are scoped observations, not blanket acceptance of every music/photo interaction. Backend/provider installation, credentials, real audio and provider-backed library wiring remain deliberately deferred; they are outside this goal’s remaining work.
 
 The [Canvas size fix][clock-size] now honors selected size and parent constraints:
 12 API 34 landscape/portrait captures show distinct Big/Bold sizes and at least
@@ -447,3 +447,17 @@ pin, brightness policy and original Dream restored. Native verification and
 cleanup completed in **6 minutes 59 seconds** of the original 30-minute slot.
 This is a clock layout improvement, not a panel FPS or physical fade-comfort
 result; those broader acceptance requirements remain incomplete.
+
+**Repeated music items delivered:** [the bounded Family Area correction](portal-music-repeated-items-2026-11-01.md)
+uses cached occurrence keys in collection tracks, library/playlist grids,
+queues and player lists, preserving original callback IDs and data. The key
+regression goes from **5 failures / 8 tests** to **8/8 passing**.
+Actual Android 10 component rendering and scrolling pass **30/30 checks** in
+**13.796 seconds**, with four 66-entry cases and eight owned window captures.
+The full fresh gate passes **3,756 tests**; a separate four-test disk-space
+failure remains recorded, followed by a passing serialized rerun.
+Optimized APK **d4b2d1e2…** is installed with all settings, sources, services,
+pin, brightness policy and original Dream restored. Native validation and
+cleanup completed in **15 minutes 28 seconds** of the original 30-minute slot.
+These are generated UI rendering/scroll checks, not provider/group control,
+audio, measured FPS or physical brightness acceptance.

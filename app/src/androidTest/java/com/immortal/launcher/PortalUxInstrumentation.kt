@@ -40,6 +40,21 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Owned generated debug music windows; no UiAutomation or generic diagnostics.
+        if (options.getString("command") == "musicRepeatedItems") {
+            val music = try {
+                MusicRepeatedItemsDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("musicRepeatedItemsCompleted", false)
+                    putBoolean("musicRepeatedItemsPassed", false)
+                    putBoolean("musicRepeatedItemsNativePassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (music.getBoolean("musicRepeatedItemsPassed")) 0 else 1, music)
+            return
+        }
         // Generated fixed-time Canvas only; no UiAutomation, Activities or private diagnostics.
         if (options.getString("command") == "digitalClockFormat") {
             val clock = try {

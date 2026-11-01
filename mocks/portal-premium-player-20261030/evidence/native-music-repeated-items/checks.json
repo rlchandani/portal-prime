@@ -1,0 +1,237 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "tracks.first_two_repeat_labels_visible",
+      "passed": true
+    },
+    {
+      "name": "tracks.top.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "tracks.local_touch_scroll_observed",
+      "passed": true
+    },
+    {
+      "name": "tracks.real_lazy_scroll_to_end_accepted",
+      "passed": true
+    },
+    {
+      "name": "tracks.final_generated_row_visible",
+      "passed": true
+    },
+    {
+      "name": "tracks.bottom.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "tracks.top_bottom_native_pixels_differ",
+      "passed": true
+    },
+    {
+      "name": "collections.first_two_repeat_labels_visible",
+      "passed": true
+    },
+    {
+      "name": "collections.top.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "collections.local_touch_scroll_observed",
+      "passed": true
+    },
+    {
+      "name": "collections.real_lazy_scroll_to_end_accepted",
+      "passed": true
+    },
+    {
+      "name": "collections.final_generated_row_visible",
+      "passed": true
+    },
+    {
+      "name": "collections.bottom.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "collections.top_bottom_native_pixels_differ",
+      "passed": true
+    },
+    {
+      "name": "queue.first_two_repeat_labels_visible",
+      "passed": true
+    },
+    {
+      "name": "queue.top.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "queue.local_touch_scroll_observed",
+      "passed": true
+    },
+    {
+      "name": "queue.real_lazy_scroll_to_end_accepted",
+      "passed": true
+    },
+    {
+      "name": "queue.final_generated_row_visible",
+      "passed": true
+    },
+    {
+      "name": "queue.bottom.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "queue.top_bottom_native_pixels_differ",
+      "passed": true
+    },
+    {
+      "name": "rooms.first_two_repeat_labels_visible",
+      "passed": true
+    },
+    {
+      "name": "rooms.top.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "rooms.local_touch_scroll_observed",
+      "passed": true
+    },
+    {
+      "name": "rooms.real_lazy_scroll_to_end_accepted",
+      "passed": true
+    },
+    {
+      "name": "rooms.final_generated_row_visible",
+      "passed": true
+    },
+    {
+      "name": "rooms.bottom.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "rooms.top_bottom_native_pixels_differ",
+      "passed": true
+    },
+    {
+      "name": "owned_activities_destroyed",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "list": "tracks",
+      "localTouchScrollObserved": true,
+      "bottomViaRealLazySemantics": true,
+      "renderCount": 2
+    },
+    {
+      "list": "collections",
+      "localTouchScrollObserved": true,
+      "bottomViaRealLazySemantics": true,
+      "renderCount": 2
+    },
+    {
+      "list": "queue",
+      "localTouchScrollObserved": true,
+      "bottomViaRealLazySemantics": true,
+      "renderCount": 2
+    },
+    {
+      "list": "rooms",
+      "localTouchScrollObserved": true,
+      "bottomViaRealLazySemantics": true,
+      "renderCount": 2
+    }
+  ],
+  "artifacts": [
+    {
+      "list": "tracks",
+      "phase": "top",
+      "relativePath": "tracks-top.png",
+      "path": "tracks-top.png",
+      "width": 2160,
+      "height": 1440,
+      "nativePixels": 162746
+    },
+    {
+      "list": "tracks",
+      "phase": "bottom",
+      "relativePath": "tracks-bottom.png",
+      "path": "tracks-bottom.png",
+      "width": 2160,
+      "height": 1440,
+      "nativePixels": 99165
+    },
+    {
+      "list": "collections",
+      "phase": "top",
+      "relativePath": "collections-top.png",
+      "path": "collections-top.png",
+      "width": 2160,
+      "height": 1440,
+      "nativePixels": 1577688
+    },
+    {
+      "list": "collections",
+      "phase": "bottom",
+      "relativePath": "collections-bottom.png",
+      "path": "collections-bottom.png",
+      "width": 2160,
+      "height": 1440,
+      "nativePixels": 1127991
+    },
+    {
+      "list": "queue",
+      "phase": "top",
+      "relativePath": "queue-top.png",
+      "path": "queue-top.png",
+      "width": 2160,
+      "height": 1440,
+      "nativePixels": 76605
+    },
+    {
+      "list": "queue",
+      "phase": "bottom",
+      "relativePath": "queue-bottom.png",
+      "path": "queue-bottom.png",
+      "width": 2160,
+      "height": 1440,
+      "nativePixels": 78702
+    },
+    {
+      "list": "rooms",
+      "phase": "top",
+      "relativePath": "rooms-top.png",
+      "path": "rooms-top.png",
+      "width": 2160,
+      "height": 1440,
+      "nativePixels": 2783597
+    },
+    {
+      "list": "rooms",
+      "phase": "bottom",
+      "relativePath": "rooms-bottom.png",
+      "path": "rooms-bottom.png",
+      "width": 2160,
+      "height": 1440,
+      "nativePixels": 2832721
+    }
+  ],
+  "caseCount": 4,
+  "renderCount": 8,
+  "checkCount": 30,
+  "failureCount": 0,
+  "isolatedFailureCount": 0,
+  "passed": true,
+  "generatedOnly": true,
+  "providerProof": false,
+  "groupControlProof": false,
+  "audioProof": false,
+  "fpsProof": false,
+  "elapsedMs": 13796,
+  "relativeReportPath": "checks.json"
+}
