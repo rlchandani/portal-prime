@@ -421,3 +421,16 @@ Final native verification finished within **20 minutes 40 seconds** of the origi
 30-minute slot. This improves framing from cached detections, not detector
 recall or measured FPS. Natural-light brightness comfort and the broader goal
 remain incomplete.
+
+**Canvas clock format options delivered:** [the bounded Family Area fix](portal-digital-clock-format-2026-11-01.md)
+connects the existing leading-zero, separator and AM/PM options to the shipped
+Canvas renderer. **3,743 fresh Android unit tests** pass. The actual Android
+10 detached Canvas probe passes **133/133 checks across 24 literal cases and
+six renders**, including a narrow parent; the AM/PM minute-cadence regression
+retains one invalidation across 60 ticks and the same cached formatter.
+Optimized APK **28494a67…** is installed with all 97 settings, photo sources,
+services, persistent pin, brightness policy and original Dream restored.
+Native validation and cleanup completed in **12 minutes 33 seconds** of the
+original 30-minute slot. The disk-full build failure is retained separately;
+the rerun passed. These checks do not establish panel FPS or physical fade
+comfort. The user's brightness check and broader goal remain incomplete.

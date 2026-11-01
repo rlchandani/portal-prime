@@ -8,6 +8,7 @@ package com.immortal.launcher
 
 import android.view.View
 import com.immortal.launcher.ui.clock.PrimeDigitalClockFaceView
+import com.immortal.launcher.ui.clock.DigitalClockTimeFormat
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Calendar
@@ -21,6 +22,75 @@ import org.mockito.Mockito
 
 /** Runs the shipped update method; only the Android drawing boundary is replaced. */
 class PrimeDigitalClockUpdatesTest {
+  @Test fun configuredSeparatorsAndLeadingZeroAreRenderedByTheActualUpdatePath() {
+    for (format in listOf("12h", "24h")) {
+      for (zero in listOf(false, true)) {
+        for ((separator, character) in listOf(
+            Separator.COLON to ":", Separator.DOT to ".", Separator.NONE to "", Separator.BLINK to ":",
+        )) {
+          fixture(ClockSpec(format = format, leadingZero = zero, separator = separator)) { f ->
+            f.at("2030-01-01T01:07:00Z")
+            assertEquals((if (zero) "01" else "1") + character + "07", f.displayed())
+          }
+        }
+      }
+    }
+  }
+
+  @Test fun optionalMeridiemFollowsNoonMidnightAndRetainedTimezoneChanges() =
+      fixture(ClockSpec(showAmPm = true)) { f ->
+        for ((instant, expected) in listOf(
+            "2030-01-01T00:07:00Z" to "12:07 AM",
+            "2030-01-01T12:07:00Z" to "12:07 PM",
+            "2030-01-01T13:07:00Z" to "1:07 PM",
+        )) {
+          f.at(instant)
+          assertEquals(expected, f.displayed())
+        }
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT-02:00"))
+        f.at("2030-01-01T13:07:00Z")
+        assertEquals("11:07 AM", f.displayed())
+      }
+
+  @Test fun blinkingMeridiemKeepsAccessibilityStableWhileItsColonChanges() =
+      fixture(ClockSpec(showAmPm = true, leadingZero = false, separator = Separator.BLINK)) { f ->
+        f.at("2030-01-01T01:07:00Z", true)
+        assertEquals("1:07 AM", f.displayed())
+        f.at("2030-01-01T01:07:01Z", false)
+        assertEquals("1 07 AM", f.displayed())
+        assertEquals("1:07 AM", f.get("accessibleTime"))
+        assertEquals(2, f.invalidations)
+      }
+
+  @Test fun formatOptionsPreserveLocalizedDigitsAndMeridiemOnLocaleChange() =
+      fixture(ClockSpec(showAmPm = true, separator = Separator.DOT)) { f ->
+        f.at("2030-01-01T13:07:00Z")
+        assertEquals("1.07 PM", f.displayed())
+        Locale.setDefault(Locale.forLanguageTag("ar-EG"))
+        f.at("2030-01-01T13:07:00Z")
+        assertEquals("١.٠٧ م", f.displayed())
+        assertEquals(2, f.invalidations)
+      }
+
+  @Test fun meridiemKeepsMinuteCadenceAndTheSameCachedFormatter() =
+      fixture(ClockSpec(showAmPm = true)) { f ->
+        val formatter = f.get("hourMinFmt")
+        repeat(60) { f.update(it) }
+        assertEquals("12:34 PM", f.displayed())
+        assertSame(formatter, f.get("hourMinFmt"))
+        assertEquals(1, f.invalidations)
+        f.update(60)
+        assertEquals("12:35 PM", f.displayed())
+        assertEquals(2, f.invalidations)
+      }
+
+  @Test fun secondsRemainAnArcWhenMeridiemIsEnabled() =
+      fixture(ClockSpec(showSeconds = true, showAmPm = true, separator = Separator.DOT)) { f ->
+        f.update(37)
+        assertEquals("12.34 PM", f.displayed())
+        assertEquals(37, f.get("currentSeconds"))
+      }
+
   @Test fun steadyMinuteClockDrawsOnceAcrossSixtyTicksAndStillAdvancesAtTheMinute() = fixture { f ->
     repeat(60) { f.update(it) }
     assertEquals("12:34", f.displayed())
@@ -68,7 +138,7 @@ class PrimeDigitalClockUpdatesTest {
     f.update(0)
     TimeZone.setDefault(TimeZone.getTimeZone("GMT+05:30"))
     f.update(0)
-    assertEquals("06:04", f.displayed())
+    assertEquals("6:04", f.displayed())
     assertEquals(2, f.invalidations)
   }
 
@@ -90,10 +160,10 @@ class PrimeDigitalClockUpdatesTest {
   @Test fun retainedClockTracksBothDstTransitions() = fixture { f ->
     TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"))
     val cases = listOf(
-        "2026-03-08T06:59:59Z" to "01:59",
-        "2026-03-08T07:00:00Z" to "03:00",
-        "2026-11-01T05:59:59Z" to "01:59",
-        "2026-11-01T06:00:00Z" to "01:00",
+        "2026-03-08T06:59:59Z" to "1:59",
+        "2026-03-08T07:00:00Z" to "3:00",
+        "2026-11-01T05:59:59Z" to "1:59",
+        "2026-11-01T06:00:00Z" to "1:00",
     )
     cases.forEach { (time, expected) ->
       f.clock.update(Date.from(Instant.parse(time)), true)
@@ -123,7 +193,7 @@ class PrimeDigitalClockUpdatesTest {
 
     init {
       set("spec", spec)
-      set("hourMinFmt", SimpleDateFormat(if (spec.is24h) "HH:mm" else "hh:mm", Locale.US))
+      set("hourMinFmt", SimpleDateFormat(DigitalClockTimeFormat.pattern(spec), Locale.US))
       set("secondsFmt", SimpleDateFormat("ss", Locale.US))
       set("currentHourMin", "--:--")
       // Available after the fix; the baseline has no live-locale state.
@@ -135,6 +205,7 @@ class PrimeDigitalClockUpdatesTest {
     }
 
     fun update(seconds: Int) = clock.update(Date(start + seconds * 1_000L), seconds % 2 == 0)
+    fun at(instant: String, blink: Boolean = true) = clock.update(Date.from(Instant.parse(instant)), blink)
     fun displayed(): String = get("currentHourMin") as String
     fun get(name: String): Any? = field(name).get(clock)
     fun set(name: String, value: Any) = field(name).set(clock, value)

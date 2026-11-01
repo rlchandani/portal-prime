@@ -19,7 +19,6 @@ import com.immortal.launcher.ClockSpec
 import com.immortal.launcher.FaceStyle
 import com.immortal.launcher.ui.theme.AccentGlow
 import com.immortal.launcher.ui.theme.ArcTrack
-import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -38,7 +37,7 @@ class PrimeDigitalClockFaceView(
 ) : ClockFaceView {
 
     private var formatterLocale = Locale.getDefault()
-    private var hourMinFmt = SimpleDateFormat(if (spec.is24h) "HH:mm" else "hh:mm", formatterLocale)
+    private var hourMinFmt = SimpleDateFormat(DigitalClockTimeFormat.pattern(spec), formatterLocale)
     private var secondsFmt = SimpleDateFormat("ss", formatterLocale)
 
     private var currentHourMin = "--:--"
@@ -80,10 +79,10 @@ class PrimeDigitalClockFaceView(
             timePaint.textSize = 100f
             timePaint.getFontMetrics(fontMetrics)
             // Stable digit reservation prevents the layout changing every minute.
-            val eight = (DecimalFormatSymbols.getInstance(formatterLocale).zeroDigit.code + 8).toChar()
-            val widestTime = "$eight$eight:$eight$eight"
             val widthUnit = maxOf(
-                timePaint.measureText(widestTime), timePaint.measureText(currentHourMin),
+                DigitalClockTimeFormat.reservedLabels(spec, formatterLocale)
+                    .maxOf { timePaint.measureText(it) },
+                timePaint.measureText(currentHourMin),
             ) / 100f
             fun limit(measureSpec: Int): Int =
                 if (MeasureSpec.getMode(measureSpec) == MeasureSpec.UNSPECIFIED) Int.MAX_VALUE
@@ -155,7 +154,7 @@ class PrimeDigitalClockFaceView(
         val locale = Locale.getDefault()
         if (locale != formatterLocale) {
             formatterLocale = locale
-            hourMinFmt = SimpleDateFormat(if (spec.is24h) "HH:mm" else "hh:mm", locale)
+            hourMinFmt = SimpleDateFormat(DigitalClockTimeFormat.pattern(spec), locale)
             secondsFmt = SimpleDateFormat("ss", locale)
             view.requestLayout()
         }

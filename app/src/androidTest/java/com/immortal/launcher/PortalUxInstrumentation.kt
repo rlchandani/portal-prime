@@ -40,6 +40,20 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Generated fixed-time Canvas only; no UiAutomation, Activities or private diagnostics.
+        if (options.getString("command") == "digitalClockFormat") {
+            val clock = try {
+                DigitalClockFormatDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("digitalClockFormatCompleted", false)
+                    putBoolean("digitalClockFormatPassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (clock.getBoolean("digitalClockFormatPassed")) 0 else 1, clock)
+            return
+        }
         // Explicitly gated real PCM connection probe; never mutates MA playback or queue.
         if (options.getString("command") == "musicPcmContinuity") {
             val receiver = MusicPcmContinuityDeviceChecks.run(this, options)
