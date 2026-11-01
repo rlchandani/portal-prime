@@ -1,0 +1,14 @@
+{
+  "nativePass": false,
+  "passed": 80,
+  "total": 96,
+  "edgeTouchesPassed": 0,
+  "edgeTouchesTested": 16,
+  "nativeFrameCount": 36,
+  "elapsedSeconds": 86.345,
+  "installedDebugApkSha256": "106108132a5b8ee6e40af6aa18a767dc0df924a11ab416ca1927fa59b31d5793",
+  "parentRestorationPass": false,
+  "rawBrightnessExact": false,
+  "baselineBrightnessPolicyCaptured": false,
+  "note": "Baseline used an invalid exact raw-brightness restoration criterion for automatic mode. This receipt retains its failed check; the fixed run snapshots and verifies mode and adjustment. No global brightness write was made by the music harness."
+}

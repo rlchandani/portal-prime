@@ -1,0 +1,14 @@
+{
+  "debug": {
+    "sha256": "7b37617c31f7ab2f66200047eb23a1cef55c6f7affd5376a7667dd7bfd51b95b",
+    "bytes": 49734349
+  },
+  "performance": {
+    "sha256": "e4f8b0ce143bbafb691b4fc4eb9e803e0cb0879763ea945f4bb47a098f4aee46",
+    "bytes": 25858942
+  },
+  "test": {
+    "sha256": "70ce8202bef7bd67319f42217cf5b7e35427900a62ae17a74fb15f0171028e74",
+    "bytes": 2427125
+  }
+}

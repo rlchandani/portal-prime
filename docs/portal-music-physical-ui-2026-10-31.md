@@ -4,6 +4,14 @@ The silent native music components passed **223/223 assertions** on Family Area'
 actual Android 10 / API 29 Portal+, at 2160 × 1440 and its measured 180 dpi density.
 This verifies UI behavior; audio/provider setup remains explicitly deferred.
 
+**November 1 follow-on:** the [native slider touch fix](portal-music-touch-native-2026-11-01.md)
+changes the inner gesture area from 18 to 54 px while preserving the small visible
+thumb. Previously ignored edge taps improve **0/16 → 16/16**, and **112/112**
+focused checks pass. It also verifies the queue's correct non-tab native
+checkable/checked state. The historical run and qualifications below remain
+scoped to its original artifact; the follow-on closes those sampled interaction
+gaps, with dragging, real audio and panel FPS still outside acceptance.
+
 | Gate | Passed | Native captures | Elapsed |
 | --- | ---: | ---: | ---: |
 | Six-case dark/light, ready/offline and 1.8 font matrix | 206/206 | 50 | 112.024 s |

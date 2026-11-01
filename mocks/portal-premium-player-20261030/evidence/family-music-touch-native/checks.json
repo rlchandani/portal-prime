@@ -1,0 +1,774 @@
+[
+  {
+    "case": "dark-font-1_0-ready",
+    "name": "After the sun: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 1
+  },
+  {
+    "case": "dark-font-1_0-ready",
+    "name": "Blue distance: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 1
+  },
+  {
+    "case": "dark-font-1_0-queue",
+    "name": "After the sun: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 2
+  },
+  {
+    "case": "dark-font-1_0-queue",
+    "name": "Blue distance: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 2
+  },
+  {
+    "case": "dark-font-1_0-seek-25",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 2,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": -25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-font-1_0-seek-25",
+    "name": "Track position: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 2
+  },
+  {
+    "case": "dark-font-1_0-seek-25-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 3
+  },
+  {
+    "case": "dark-font-1_0-seek-25-after-edge",
+    "name": "Track position: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 3
+  },
+  {
+    "case": "dark-font-1_0-seek-25-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 3
+  },
+  {
+    "case": "dark-font-1_0-seek-75",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 3,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-font-1_0-seek-75",
+    "name": "Track position: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 3
+  },
+  {
+    "case": "dark-font-1_0-seek-75-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 4
+  },
+  {
+    "case": "dark-font-1_0-seek-75-after-edge",
+    "name": "Track position: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 4
+  },
+  {
+    "case": "dark-font-1_0-seek-75-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 4
+  },
+  {
+    "case": "dark-font-1_0-volume-25",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 5,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": -25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-font-1_0-volume-25",
+    "name": "Family Area volume: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 5
+  },
+  {
+    "case": "dark-font-1_0-volume-25-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 6
+  },
+  {
+    "case": "dark-font-1_0-volume-25-after-edge",
+    "name": "Family Area volume: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 6
+  },
+  {
+    "case": "dark-font-1_0-volume-25-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 6
+  },
+  {
+    "case": "dark-font-1_0-volume-75",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 6,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-font-1_0-volume-75",
+    "name": "Family Area volume: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 6
+  },
+  {
+    "case": "dark-font-1_0-volume-75-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 7
+  },
+  {
+    "case": "dark-font-1_0-volume-75-after-edge",
+    "name": "Family Area volume: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 7
+  },
+  {
+    "case": "dark-font-1_0-volume-75-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 7
+  },
+  {
+    "case": "dark-font-1_8-ready",
+    "name": "After the sun: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 8
+  },
+  {
+    "case": "dark-font-1_8-ready",
+    "name": "Blue distance: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 8
+  },
+  {
+    "case": "dark-font-1_8-queue",
+    "name": "After the sun: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 9
+  },
+  {
+    "case": "dark-font-1_8-queue",
+    "name": "Blue distance: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 9
+  },
+  {
+    "case": "dark-font-1_8-seek-25",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 9,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": -25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-font-1_8-seek-25",
+    "name": "Track position: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 9
+  },
+  {
+    "case": "dark-font-1_8-seek-25-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 10
+  },
+  {
+    "case": "dark-font-1_8-seek-25-after-edge",
+    "name": "Track position: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 10
+  },
+  {
+    "case": "dark-font-1_8-seek-25-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 10
+  },
+  {
+    "case": "dark-font-1_8-seek-75",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 10,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-font-1_8-seek-75",
+    "name": "Track position: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 10
+  },
+  {
+    "case": "dark-font-1_8-seek-75-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 11
+  },
+  {
+    "case": "dark-font-1_8-seek-75-after-edge",
+    "name": "Track position: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 11
+  },
+  {
+    "case": "dark-font-1_8-seek-75-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 11
+  },
+  {
+    "case": "dark-font-1_8-volume-25",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 12,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": -25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-font-1_8-volume-25",
+    "name": "Family Area volume: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 12
+  },
+  {
+    "case": "dark-font-1_8-volume-25-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 13
+  },
+  {
+    "case": "dark-font-1_8-volume-25-after-edge",
+    "name": "Family Area volume: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 13
+  },
+  {
+    "case": "dark-font-1_8-volume-25-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 13
+  },
+  {
+    "case": "dark-font-1_8-volume-75",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 13,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-font-1_8-volume-75",
+    "name": "Family Area volume: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 13
+  },
+  {
+    "case": "dark-font-1_8-volume-75-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 14
+  },
+  {
+    "case": "dark-font-1_8-volume-75-after-edge",
+    "name": "Family Area volume: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 14
+  },
+  {
+    "case": "dark-font-1_8-volume-75-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 14
+  },
+  {
+    "case": "dark-offline-ready",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 15,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-offline-ready-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-ready-after-edge",
+    "name": "Track position: disabled value unchanged",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-ready-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-players",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 17,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "dark-offline-players-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-players-after-edge",
+    "name": "Family Area volume: disabled value unchanged",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-players-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "light-font-1_0-ready",
+    "name": "After the sun: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 19
+  },
+  {
+    "case": "light-font-1_0-ready",
+    "name": "Blue distance: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 19
+  },
+  {
+    "case": "light-font-1_0-queue",
+    "name": "After the sun: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 20
+  },
+  {
+    "case": "light-font-1_0-queue",
+    "name": "Blue distance: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 20
+  },
+  {
+    "case": "light-font-1_0-seek-25",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 20,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": -25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-font-1_0-seek-25",
+    "name": "Track position: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 20
+  },
+  {
+    "case": "light-font-1_0-seek-25-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 21
+  },
+  {
+    "case": "light-font-1_0-seek-25-after-edge",
+    "name": "Track position: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 21
+  },
+  {
+    "case": "light-font-1_0-seek-25-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 21
+  },
+  {
+    "case": "light-font-1_0-seek-75",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 21,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-font-1_0-seek-75",
+    "name": "Track position: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 21
+  },
+  {
+    "case": "light-font-1_0-seek-75-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 22
+  },
+  {
+    "case": "light-font-1_0-seek-75-after-edge",
+    "name": "Track position: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 22
+  },
+  {
+    "case": "light-font-1_0-seek-75-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 22
+  },
+  {
+    "case": "light-font-1_0-volume-25",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 23,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": -25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-font-1_0-volume-25",
+    "name": "Family Area volume: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 23
+  },
+  {
+    "case": "light-font-1_0-volume-25-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 24
+  },
+  {
+    "case": "light-font-1_0-volume-25-after-edge",
+    "name": "Family Area volume: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 24
+  },
+  {
+    "case": "light-font-1_0-volume-25-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 24
+  },
+  {
+    "case": "light-font-1_0-volume-75",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 24,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-font-1_0-volume-75",
+    "name": "Family Area volume: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 24
+  },
+  {
+    "case": "light-font-1_0-volume-75-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 25
+  },
+  {
+    "case": "light-font-1_0-volume-75-after-edge",
+    "name": "Family Area volume: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 25
+  },
+  {
+    "case": "light-font-1_0-volume-75-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 25
+  },
+  {
+    "case": "light-font-1_8-ready",
+    "name": "After the sun: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 26
+  },
+  {
+    "case": "light-font-1_8-ready",
+    "name": "Blue distance: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 26
+  },
+  {
+    "case": "light-font-1_8-queue",
+    "name": "After the sun: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 27
+  },
+  {
+    "case": "light-font-1_8-queue",
+    "name": "Blue distance: correct non-tab selection",
+    "passed": true,
+    "frameNumber": 27
+  },
+  {
+    "case": "light-font-1_8-seek-25",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 27,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": -25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-font-1_8-seek-25",
+    "name": "Track position: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 27
+  },
+  {
+    "case": "light-font-1_8-seek-25-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 28
+  },
+  {
+    "case": "light-font-1_8-seek-25-after-edge",
+    "name": "Track position: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 28
+  },
+  {
+    "case": "light-font-1_8-seek-25-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 28
+  },
+  {
+    "case": "light-font-1_8-seek-75",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 28,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-font-1_8-seek-75",
+    "name": "Track position: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 28
+  },
+  {
+    "case": "light-font-1_8-seek-75-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 29
+  },
+  {
+    "case": "light-font-1_8-seek-75-after-edge",
+    "name": "Track position: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 29
+  },
+  {
+    "case": "light-font-1_8-seek-75-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 29
+  },
+  {
+    "case": "light-font-1_8-volume-25",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 30,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": -25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-font-1_8-volume-25",
+    "name": "Family Area volume: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 30
+  },
+  {
+    "case": "light-font-1_8-volume-25-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 31
+  },
+  {
+    "case": "light-font-1_8-volume-25-after-edge",
+    "name": "Family Area volume: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 31
+  },
+  {
+    "case": "light-font-1_8-volume-25-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 31
+  },
+  {
+    "case": "light-font-1_8-volume-75",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 31,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-font-1_8-volume-75",
+    "name": "Family Area volume: native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 31
+  },
+  {
+    "case": "light-font-1_8-volume-75-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 32
+  },
+  {
+    "case": "light-font-1_8-volume-75-after-edge",
+    "name": "Family Area volume: edge touch changes confirmed value",
+    "passed": true,
+    "frameNumber": 32
+  },
+  {
+    "case": "light-font-1_8-volume-75-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 32
+  },
+  {
+    "case": "light-offline-ready",
+    "name": "Track position: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 33,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-offline-ready-after-edge",
+    "name": "Track position: coherent native range",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-ready-after-edge",
+    "name": "Track position: disabled value unchanged",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-ready-after-edge",
+    "name": "paused elapsed text matches native seek value",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-players",
+    "name": "Family Area volume: edge point beyond painted thumb",
+    "passed": true,
+    "frameNumber": 35,
+    "nativeGestureHeightPx": 54,
+    "paintedThumbHeightPx": 18,
+    "verticalOffsetPx": 25,
+    "declaredLayoutMinimumPx": 54,
+    "testedVerticalSpanPx": 50
+  },
+  {
+    "case": "light-offline-players-after-edge",
+    "name": "Family Area volume: coherent native range",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-players-after-edge",
+    "name": "Family Area volume: disabled value unchanged",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-players-after-edge",
+    "name": "volume label acknowledges native value",
+    "passed": true,
+    "frameNumber": 36
+  }
+]

@@ -2,10 +2,21 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Latest delivery, November 1 — Gallery photo colors.** The
+**Latest delivery, November 1 — music slider touch area.** The
+[actual Family touch check](portal-music-touch-native-2026-11-01.md) found that
+48 dp outer spacing left an 18 px inner gesture area. The fix increases that
+area to **54 px**, retaining the 18 px painted thumb. Previously ignored edge
+taps improve from **0/16 to 16/16**; **112/112 focused native assertions** and
+**3,717 unit tests** pass. Optimized APK **e4f8b0ce…** is installed, with fresh
+health verified **18 minutes 36 seconds** into the original 30-minute slot.
+All settings, sources, pin/accessibility configuration, font scale and brightness
+policy are preserved, with the original Dream restored. This accepts sampled
+silent UI interaction, not audio, dragging, panel FPS or brightness comfort.
+
+**Previous delivery, November 1 — Gallery photo colors.** The
 [actual Family Gallery check](portal-gallery-native-2026-11-01.md) found and fixed
 the clock gradient darkening Gallery's photos. Optimized APK **e47d6e71…** is
-installed. **80/80 native image/geometry assertions** cover landscape and portrait
+was installed before the music follow-on. **80/80 native image/geometry assertions** cover landscape and portrait
 prints, a matched portrait spread, and its pinned overlay. Both spread photos
 return with byte-identical pixels after the night clock; one tap preserves the
 same Files activity/window/process. **3,717 unit tests** pass. Delivery and fresh
@@ -104,7 +115,7 @@ Status is scoped to each row: **verified** means the stated evidence supports th
 | Apply clock settings live without recreating retained media | Current [notification](../app/src/main/java/com/immortal/launcher/NightSettingsChanges.kt), [settings hook](../app/src/main/java/com/immortal/launcher/SettingsGuard.kt) and photo controller apply only `darkRoomClock`, `darkRoomLux`, `nightClockBrightness`, `nightClockTone`. Observer replacement preserves visible night and requires fresh bright dwell; receiver identity and teardown protect ownership. **40e48686** has the [deployed `e08f21e…` receipt][live-deployment]; [live-control checks][live-controls] pass **136**, and **bed6c821** adds [108 passing toggle checks][toggles]. These recorded software checks accompany the earlier scoped physical appearance/comfort/return pass on the older artifact; they are not direct heap-identity proof or acceptance of the final fade. | verified |
 | Retain media and pause choice through night/hidden/bright transitions | Native retention/live-control records support unchanged photo regions, process/window/activity, ready-scene count and explicit Resume behavior. [Actual API 34 Dream checks][dream-return] additionally retain a deliberately paused viewer through a real Dream: same activity/process, Paused / Resume visible, maximum photo-region channel difference **one**. Current controller suspends retained renderers/video/callbacks and unregisters its sensor on hidden hosts. The basic Family night-to-photo continuity check passed by human report on the older tested artifact. Physical API 29 tap/wake return and relevant optional camera/video cancellation remain unaccepted; already admitted work may finish into the paused queue. | incomplete |
 | Deliver premium music UI: artwork, buttons, playlists, full and compact | Current [player UI](../app/src/main/java/com/immortal/launcher/MusicPlayerUi.kt) supplies artwork-led full/compact/photo layouts, transport, queue, seek/volume and guarded controls; [browse UI](../app/src/main/java/com/immortal/launcher/MusicBrowseUi.kt) supplies host-fed library, playlists and collection detail. [Native UI checks][music-ui] pass **106**; [continuity checks][music-continuity] pass **18** for retained Players selection/track across layouts in both palettes. Silent API 34 fixtures and generated artwork verify presentation, not provider data or audio. | verified |
-| Accept the premium music UI on the target Portal | [Physical Family checks](portal-music-physical-ui-2026-10-31.md) pass **223/223 assertions** with 59 native captures. Actual Android 10 components cover dark/light, larger text, offline, collection/search navigation, transport and full/compact state continuity. Eight representative scenarios were visually reviewed without observed overlap. Silent data does not accept live provider/audio or actual photo integration; the slider touch envelope and queue accessibility selection flag remain explicitly qualified. | verified for the delivered silent UI scope |
+| Accept the premium music UI on the target Portal | [Physical Family checks](portal-music-physical-ui-2026-10-31.md) pass **223/223 assertions** with 59 native captures. Actual Android 10 components cover dark/light, larger text, offline, collection/search navigation, transport and full/compact state continuity. Eight representative scenarios were visually reviewed without observed overlap. The [touch follow-on](portal-music-touch-native-2026-11-01.md) passes **112/112**, closes the sampled slider edge-touch gap and verifies queue checkable/checked state. Silent data does not accept live provider/audio, actual photo integration, every touch pixel or dragging. | verified for the delivered silent UI scope |
 
 ## Necessary remaining work
 

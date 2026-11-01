@@ -1,0 +1,56 @@
+{
+  "sourceCommit": "2773bc1a",
+  "nativeCapturesReviewed": 4,
+  "totalNativeCaptures": 36,
+  "generatedSilentFixtureOnly": true,
+  "allCapturesIndividuallyReviewed": false,
+  "productionHomeDockAccepted": false,
+  "audioProviderAccepted": false,
+  "panelFpsMeasured": false,
+  "physicalComfortTested": false,
+  "sliderNativeGestureHeightPx": 54,
+  "sliderPaintedThumbHeightPx": 18,
+  "testedVerticalOffsetsPx": [
+    -25,
+    25
+  ],
+  "everyTouchPixelTested": false,
+  "reviewedCaptures": [
+    {
+      "case": "dark-font-1_8-seek-75-after-edge",
+      "file": "dark-font-1_8-seek-75-after-edge.png",
+      "pngSha256": "c70e0060af84880f2409b8c459ddc757a7860cfa3c3e837ee088caa05e3c6c26",
+      "widthPx": 2160,
+      "heightPx": 1440,
+      "visuallyReviewed": true,
+      "observedOverlap": false
+    },
+    {
+      "case": "dark-font-1_8-volume-75-after-edge",
+      "file": "dark-font-1_8-volume-75-after-edge.png",
+      "pngSha256": "3b4fd213fcbf5818d6e04248e87014cdd142c3cef3ab337332c390002c9922d1",
+      "widthPx": 2160,
+      "heightPx": 1440,
+      "visuallyReviewed": true,
+      "observedOverlap": false
+    },
+    {
+      "case": "light-font-1_8-seek-75-after-edge",
+      "file": "light-font-1_8-seek-75-after-edge.png",
+      "pngSha256": "82d1a69ea3caf656620a3209bd8a0a87c37ce4a1bc0fd2cc6d80bd3d95e08182",
+      "widthPx": 2160,
+      "heightPx": 1440,
+      "visuallyReviewed": true,
+      "observedOverlap": false
+    },
+    {
+      "case": "light-font-1_8-volume-75-after-edge",
+      "file": "light-font-1_8-volume-75-after-edge.png",
+      "pngSha256": "f8c5047fecc3feca23bb1ab11c30c9100a1b2971c4c511e7b9403bd253ec5681",
+      "widthPx": 2160,
+      "heightPx": 1440,
+      "visuallyReviewed": true,
+      "observedOverlap": false
+    }
+  ]
+}
