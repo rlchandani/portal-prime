@@ -1,0 +1,146 @@
+{
+  "productionSourceChanged": false,
+  "appInstalled": false,
+  "syntheticPhotosOnly": true,
+  "opticalComfortTested": false,
+  "panelFpsTested": false,
+  "coldStartupBenchmarked": false,
+  "cases": [
+    {
+      "name": "kenBurns-moving",
+      "host": "PhotoDreamService",
+      "mode": "kenBurns",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "245557e4ab814f6f8860f97f5b514c67a777981bea603f2517259550a4687142",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "diptych-moving",
+      "host": "PhotoDreamService",
+      "mode": "diptych",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "3ac0ebeb0e41499732a8449b4c9118581f2f946c6d59523398fb50f6fc8e97b6",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "galleryWall-moving",
+      "host": "PhotoDreamService",
+      "mode": "galleryWall",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "7cb21a98c70db34a7eed0df349f485660a599b51cd21b2da61710e05745b6284",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "memories-moving",
+      "host": "PhotoDreamService",
+      "mode": "memories",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "6832f25a7892088ff9bb3b73a4765bbd87471971b5226b0b14b144e330d4d7a2",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "polaroid-moving",
+      "host": "PhotoDreamService",
+      "mode": "polaroid",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "549bf356f991f77c012050de001486f9eacb1c41b800c3e8c0bb583f064d1cbf",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "filmstrip-moving",
+      "host": "PhotoDreamService",
+      "mode": "filmstrip",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "eaee6e482a587c6b1b82720403166cad9bbc30d34bd1c5b70099a6cc11b7b579",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "cinema-moving",
+      "host": "PhotoDreamService",
+      "mode": "cinema",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "af3caa34a0ba73ab5a3cf6fd80d6e2d8cc59ef9c92e6bdeb428b36f7ea9b6cd4",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "heroSidebar-moving",
+      "host": "PhotoDreamService",
+      "mode": "heroSidebar",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "d58522c20999ab85e29100751eaf84437d9b81e68e83253e9e1a9e415be70b95",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    }
+  ],
+  "originalDreamActive": true,
+  "ownedFixturesRemoved": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "pinCleanupSettled": true,
+  "apkUnchanged": true,
+  "accessibilityExact": true,
+  "systemProcessUnchanged": true,
+  "globalBrightnessPolicyUnchanged": true,
+  "collectorInactive": true,
+  "instrumentationAbsent": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "pass": true,
+  "elapsedSeconds": 183.835
+}

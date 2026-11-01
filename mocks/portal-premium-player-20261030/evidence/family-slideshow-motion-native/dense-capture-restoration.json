@@ -1,0 +1,90 @@
+{
+  "productionSourceChanged": false,
+  "appInstalled": false,
+  "syntheticPhotosOnly": true,
+  "opticalComfortTested": false,
+  "panelFpsTested": false,
+  "coldStartupBenchmarked": false,
+  "cases": [
+    {
+      "name": "mosaic-dense",
+      "host": "PhotoDreamService",
+      "mode": "mosaic",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "fixturePhotoCount": 16,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "3d2676ea918827543dba52baed2f82539e7ffd423e2b52d1674480520f9b5253",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "galleryWall-dense",
+      "host": "PhotoDreamService",
+      "mode": "galleryWall",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "fixturePhotoCount": 16,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "d9bc65501699d1cd3c5cbb7addf2684cc46a42f4bf3dd53779b71f917d516b27",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "heroSidebar-dense",
+      "host": "PhotoDreamService",
+      "mode": "heroSidebar",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "fixturePhotoCount": 16,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "ee915ccd7c169a035a22e6efd42febd7a2bbd791367875acc0d5a3be578e12db",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "filmstrip-dense",
+      "host": "PhotoDreamService",
+      "mode": "filmstrip",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "fixturePhotoCount": 16,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "d3ef0fb2166290bece8c55bf2c93b0a8ae101aa04404b8ba511cebdae158f517",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    }
+  ],
+  "originalDreamActive": true,
+  "ownedFixturesRemoved": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "pinCleanupSettled": true,
+  "apkUnchanged": true,
+  "accessibilityExact": true,
+  "systemProcessUnchanged": true,
+  "globalBrightnessPolicyUnchanged": true,
+  "collectorInactive": true,
+  "instrumentationAbsent": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "pass": true,
+  "elapsedSeconds": 95.041
+}

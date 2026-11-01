@@ -1,0 +1,86 @@
+{
+  "productionSourceChanged": false,
+  "appInstalled": false,
+  "syntheticPhotosOnly": true,
+  "opticalComfortTested": false,
+  "panelFpsTested": false,
+  "coldStartupBenchmarked": false,
+  "cases": [
+    {
+      "name": "mosaic-moving",
+      "host": "PhotoDreamService",
+      "mode": "mosaic",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "67cad4e3ebf40995cdf21a03f8767362bc52cc7978349fb09f96b11a33d465db",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "panorama-moving",
+      "host": "PhotoDreamService",
+      "mode": "panorama",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "bcb2a85eb059aae9b8488953675bbda17ffaa1746d9bca65611b2bd1c41489c4",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "push-moving",
+      "host": "PhotoDreamService",
+      "mode": "push",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "0ea052a829f38903898b54599c47e956f6736b005ec034b05b3e3e54bc31f392",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    },
+    {
+      "name": "framed-moving",
+      "host": "PhotoDreamService",
+      "mode": "framed",
+      "photoMotion": true,
+      "intervalSec": 5,
+      "recordingSeconds": 18,
+      "encodedSize": [
+        1080,
+        720
+      ],
+      "videoSha256": "5de4eeaf1db2ad8ccb72b362bec5b09461636acd1c1cf0efcacea23d4d59450f",
+      "encoderAddsOverhead": true,
+      "panelFpsMeasured": false
+    }
+  ],
+  "originalDreamActive": true,
+  "ownedFixturesRemoved": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "pinCleanupSettled": true,
+  "apkUnchanged": true,
+  "accessibilityExact": true,
+  "systemProcessUnchanged": true,
+  "globalBrightnessPolicyUnchanged": true,
+  "collectorInactive": true,
+  "instrumentationAbsent": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "pass": true,
+  "elapsedSeconds": 96.474
+}

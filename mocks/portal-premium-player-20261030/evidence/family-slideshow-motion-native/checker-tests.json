@@ -1,0 +1,7 @@
+{
+  "tests": 13,
+  "failures": 0,
+  "scope": "in-memory timestamp and ROI contract",
+  "androidBuildRerun": false,
+  "productSourceChanged": false
+}

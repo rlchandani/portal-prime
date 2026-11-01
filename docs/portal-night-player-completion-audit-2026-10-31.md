@@ -2,7 +2,27 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Latest delivery, November 1 — Framed Print colors.** The
+**Latest native verification, November 1 — slideshow sequences.**
+[The full legacy-style content pass](portal-slideshow-sequences-native-2026-11-01.md)
+checks **10,222 decoded frames in 16 recordings**: 12 legacy styles, then four
+16-photo dense cases. There are zero near-black central-region observations,
+and every decoded state retains more than 10% known generated-photo interior
+there. This does not accept every tile, continuous panel states, FPS or optical
+smoothness. The quiet two-photo Gallery Wall/Hero Sidebar clips observe only
+**1.917/1.003 seconds**; dense cases add later states without removing temporal
+gaps. No runtime fix or install was needed. APK **bfc9430d…**, settings, sources
+and original Dream are preserved, with fresh health before **12:14:15 UTC**,
+within **14 minutes 26 seconds** of the original 30-minute slot.
+
+**Latest runtime delivery, November 1 — still Mosaic containment.**
+[The actual static-style survey](portal-slideshow-style-matrix-2026-11-01.md)
+reproduced a stopped-pan crop and delivered complete portrait/panorama geometry,
+with **279 JavaScript tests passing**. Its optimized APK **bfc9430d…** is
+installed on Family Area. The 31 static captures retain their **9 strict passes,
+16 marker-area failures, 5 cases outside the contract and 1 reproduced crop**;
+those results are not 31 passing layouts.
+
+**Previous delivery, November 1 — Framed Print colors.** The
 [actual Family print check](portal-framed-print-native-2026-11-01.md) passes
 **22/22 native image assertions** and **3,722 unit tests**. The lower blue
 portrait marker improves from **29,54,104 to its original 64,120,232**.
