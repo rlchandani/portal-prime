@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Immortal · Family Area night transition</title>
+<style>
+  :root{color-scheme:dark;font:16px system-ui;color:#f4f4f6;background:#14161b}
+  body{margin:0;padding:24px;max-width:1200px;margin-inline:auto}
+  h1{font-size:26px;margin:0 0 8px}p{max-width:80ch;color:#b8b8b8;line-height:1.5}
+  a{color:#d9e6ff}video,img{width:100%;height:auto;display:block;border-radius:16px}
+  video{background:#000}table{width:100%;border-collapse:collapse;margin:24px 0}
+  th,td{text-align:left;padding:12px;border-bottom:1px solid #34353a}
+  a:focus-visible{outline:3px solid #b8ceff;outline-offset:4px}
+  figure{margin:24px 0}figcaption{color:#b8b8b8;margin-top:12px;line-height:1.5}
+</style>
+<h1>Night transition on Family Area</h1>
+<p>Recorded from the production accessibility overlay on the actual Android 10 Portal.
+Photos fade into the warm clock and back to the same photo. This excerpt shows
+rendered content; a screen recording cannot show the panel’s actual backlight dimming.</p>
+<video controls playsinline preload="metadata" aria-label="Actual Portal photo to clock and back transition">
+  <source src="evidence/family-pinned-night/content-fade.mp4" type="video/mp4">
+  <a href="evidence/family-pinned-night/content-fade.mp4">Open the native recording excerpt</a>
+</video>
+<table>
+  <thead><tr><th>Brightness command ramp</th><th>Observed duration</th><th>Intermediate values</th></tr></thead>
+  <tbody>
+    <tr><td>Dark entry</td><td>3.009 s</td><td>17</td></tr>
+    <tr><td>3% → 15%</td><td>2.976 s</td><td>17</td></tr>
+    <tr><td>15% → 3%</td><td>2.965 s</td><td>17</td></tr>
+    <tr><td>Registered night-mode disable</td><td>2.960 s</td><td>17</td></tr>
+    <tr><td>Second dark entry</td><td>2.982 s</td><td>17</td></tr>
+  </tbody>
+</table>
+<p>Both photo and night-clock taps revealed the same pinned Files window and process.
+The photo region matched exactly after return. Time, weekday and date are visible
+in the native capture below. All 97 settings and 22 source fields were restored,
+and the original screensaver is running again.</p>
+<figure>
+  <img src="evidence/family-pinned-night/clock.png" alt="Native warm clock showing 11:41 and Saturday, October 31">
+  <figcaption>Actual clock pixels, cropped from the Portal. Optical brightness comfort,
+  natural bright-room exit and pinned browser document reload behavior remain unverified.
+  The test used a 120-second whole-photo interval and the default photo source.</figcaption>
+</figure>
+<p><a href="evidence/family-pinned-night/verification.json">Physical verification receipt</a> ·
+<a href="family-music-review.html">Actual Family Area music captures</a> ·
+<a href="native-review.html">Earlier native design review</a></p>
+</html>

@@ -10,6 +10,17 @@ settings and Dream restoration; the helper never installs an APK or starts the
 observer. `--search-only` exercises the native dark-theme search route separately.
 The fixtures are silent; provider integration and audio remain deferred.
 
+The [Family Area night review](family-night-review.html) contains an actual
+pinned-overlay photo/clock recording and its [physical receipt](evidence/family-pinned-night/verification.json).
+`family-pinned-night-checks.py --help` describes its exact physical-target guards.
+Execution requires Python with Pillow, the already installed approved optimized
+APK, a private authenticated connection, and a NEW private evidence directory.
+The parent must preserve/restore the active photo source and original Dream;
+the helper restores its registered setting changes and pin. `--tap-in-night`
+adds a second night cover/tap, and `--live-brightness` adds registered 3% → 15% → 3%
+ramps. No sensor injection, APK install, UiAutomation or global brightness write
+is used. The recorded content fade does not measure optical brightness.
+
 A silent, functional browser mock for Portal Android 10 / API 29. Open `index.html` directly; no build, packages, external fonts, downloads, credentials or network services are required. Original local SVG artwork and fictional music metadata are bundled.
 
 For a local browser URL, run from this folder:

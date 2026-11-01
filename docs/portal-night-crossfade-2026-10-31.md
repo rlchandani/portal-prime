@@ -78,12 +78,20 @@ restored exactly and synced. The owned forward was removed and emulator exited.
 
 ## Limits
 
+The [physical pinned-overlay follow-up](portal-pinned-night-physical-2026-10-31.md)
+now verifies five approximately three-second command ramps, recorded content
+blending both ways, an exact retained-photo region and taps from both photo and
+night clock revealing the same pinned Files window/process. That scope used
+real 5-lux readings, registered disable for exit and a 120-second photo interval;
+it does not accept natural bright-room exit, optical comfort or browser document
+reload behavior.
+
 Family Area's USB authorization and Wi-Fi ADB were subsequently restored.
 The [physical Dream fix and verification](portal-dream-brightness-2026-10-31.md)
 found that Android 10 required an explicit WindowManager update to deliver the
 brightness ramp. That fix is installed and actual Dream window/display-power
-delivery and recorded content fades are verified. Physical comfort, panel FPS
-and the pinned-overlay path on the Portal remain unverified. Android 9/10 exposes the selected system brightness
+delivery and recorded content fades are verified. Physical comfort and panel FPS
+remain unverified. Android 9/10 exposes the selected system brightness
 but not a public measurement of the Portal's actual adaptive backlight. Restoring
 Android's default brightness policy can therefore still depend on firmware.
 The finite software transitions and native API 34 pixels are verified; the
