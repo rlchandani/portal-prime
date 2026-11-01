@@ -2,6 +2,19 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Newest delivery, November 1 — Classic photo ownership on exit.**
+[The cleanup fix](portal-classic-photo-cleanup-2026-11-01.md) changes the same
+Family Area check from **3 failures / 16 to 16/16 passing**. A queued unpublished
+**2,073,600-byte bitmap** is recycled by production stop, and retained drawables
+change from **2 to 0**; ordinary admission and displayed-pixel safety pass.
+All **3,765 fresh JVM tests** and builds pass. Optimized APK **8bc77c2c…** is
+installed with original configuration, both face caches and Dream preserved
+**10 minutes 48 seconds** into the original 30-minute slot. Remote/default-feed
+changes use the same queue API but their complete flows/history are outside
+this generated local-folder device check. No PSS/FPS improvement is inferred.
+The separate legacy night-motion gap stays parked; physical fade acceptance
+and the broader goal remain incomplete.
+
 **Newest verification, November 1 — legacy night-motion gap, parked.**
 [The full legacy matrix](portal-night-legacy-2026-11-01.md) completed all eleven
 styles at 2160 × 1440. Four passed; seven moving styles changed their transforms

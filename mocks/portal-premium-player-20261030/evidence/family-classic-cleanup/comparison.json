@@ -1,0 +1,16 @@
+{
+  "sameOrderedCheckCount": 16,
+  "baselineFailures": 3,
+  "finalFailures": 0,
+  "unpublishedAllocationBytes": 2073600,
+  "unpublishedBitmapRecycledBefore": false,
+  "unpublishedBitmapRecycledAfter": true,
+  "drawableReferencesAfterStopBefore": 2,
+  "drawableReferencesAfterStopAfter": 0,
+  "controllerSourceSha256Before": "d3f3aacbb9dd51936d5700097baf9c62c8c8b909fd32d2a68ac5ff19c3c75584",
+  "controllerSourceSha256After": "83243b8bd92078ffe013502d4e815d74eae54be57970b9e0b46ed95975c654dd",
+  "allOtherRecordedProductionInputsUnchanged": true,
+  "signingCertificateMatches": true,
+  "signingCertificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "nativeScope": "Generated Classic local-folder callback and drawable ownership on Family Area API29; not remote/default-feed end-to-end, PSS or FPS."
+}

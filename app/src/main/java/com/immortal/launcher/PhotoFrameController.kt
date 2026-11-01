@@ -1439,6 +1439,11 @@ class PhotoFrameController(
     photoFade?.cancel()
     photoFade = null
     cancelKenBurns()
+    // A departed Classic host must release its drawable/history references too.
+    // Rendered pixels may still belong to Android's display list; never recycle them here.
+    if (this::photo.isInitialized) photo.setImageDrawable(null)
+    if (this::photoBack.isInitialized) photoBack.setImageDrawable(null)
+    history.clear()
     if (faceRendererDelegate.isInitialized()) faceRenderer.stop()
     if (this::videoView.isInitialized) videoView.close()
     // Close the SMB connection off-thread (network I/O) before the io executor is killed.
@@ -2286,17 +2291,17 @@ class PhotoFrameController(
     stopVideo()
     io.execute {
       val bmp = runCatching { decodeCorrected(path) }.getOrNull()
-      ui.post {
-        if (g != gen || stopped) { bmp?.recycle(); return@post }
+      ui.postOwned(Runnable {
+        if (g != gen || stopped) { bmp?.recycle(); return@Runnable }
         if (bmp == null) {
           advanceLocal(+1) // skip an unreadable file
-          return@post
+          return@Runnable
         }
         photo.visibility = View.VISIBLE
         show(bmp)
         loadCaptionForLocal(path, g)
         ui.postDelayed(localTick, intervalMs())
-      }
+      }, onDiscard = { bmp?.let { if (!it.isRecycled) it.recycle() } })
     }
   }
 
@@ -2638,13 +2643,13 @@ class PhotoFrameController(
     stopVideo()
     io.execute {
       val bmp = runCatching { fetchRemoteImage(url) }.getOrNull()
-      ui.post {
-        if (g != gen || stopped) { bmp?.recycle(); return@post }
-        if (!remoteMode) return@post // raced with startWeb() flipping us off
+      ui.postOwned(Runnable {
+        if (g != gen || stopped) { bmp?.recycle(); return@Runnable }
+        if (!remoteMode) { bmp?.recycle(); return@Runnable } // raced with startWeb() flipping us off
         if (bmp == null) {
           remoteFailStreak++
           advanceRemote(+1)
-          return@post
+          return@Runnable
         }
         remoteFailStreak = 0
         remoteReresolveStreak = 0
@@ -2654,7 +2659,7 @@ class PhotoFrameController(
         // (iCloud/Google/Immich/DAV) serve EXIF-stripped images, so they carry no caption.
         if (smbSource != null) loadCaptionForSmb(url, g) else faceRenderer.setCaption(null, null)
         ui.postDelayed(remoteTick, intervalMs())
-      }
+      }, onDiscard = { bmp?.let { if (!it.isRecycled) it.recycle() } })
     }
   }
 
@@ -2857,14 +2862,14 @@ class PhotoFrameController(
     }
     io.execute {
       val bmp = fetchWebPhoto() ?: return@execute
-      ui.post {
-        if (stopped) { bmp.recycle(); return@post }
+      ui.postOwned(Runnable {
+        if (stopped) { bmp.recycle(); return@Runnable }
         photo.visibility = View.VISIBLE
         if (history.size >= 6) history.removeAt(0) // cap memory; GC reclaims
         history.add(bmp)
         index = history.size - 1
         show(bmp)
-      }
+      }, onDiscard = { if (!bmp.isRecycled) bmp.recycle() })
     }
   }
 

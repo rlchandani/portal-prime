@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        if (options.getString("command") == "classicCleanup") {
+            val cleanup = try { ClassicPhotoCleanupDeviceChecks.run(this) }
+            catch (_: Throwable) { Bundle().apply { putBoolean("classicCleanupPassed", false) } }
+            finish(if (cleanup.getBoolean("classicCleanupPassed")) 0 else 1, cleanup)
+            return
+        }
         if (options.getString("command") == "nightLegacy") {
             val legacy = try { NightLegacyPhotoDeviceChecks.run(this) }
             catch (_: Throwable) { Bundle().apply { putBoolean("nightLegacyPassed", false) } }

@@ -1,0 +1,131 @@
+{
+  "mode": "classic",
+  "checks": [
+    {
+      "name": "owned_activity_started",
+      "passed": true
+    },
+    {
+      "name": "real_generated_photo_displayed",
+      "passed": true
+    },
+    {
+      "name": "uuid_generated_local_source",
+      "passed": true
+    },
+    {
+      "name": "native_views_have_dimensions",
+      "passed": true
+    },
+    {
+      "name": "initial_crossfade_settled",
+      "passed": true
+    },
+    {
+      "name": "ordinary_admission_displays_same_bitmap",
+      "passed": true
+    },
+    {
+      "name": "ordinary_admission_bitmap_unrecycled",
+      "passed": true
+    },
+    {
+      "name": "queued_never_displayed",
+      "passed": true
+    },
+    {
+      "name": "queued_bitmap_recycled_by_stop",
+      "passed": true
+    },
+    {
+      "name": "ui_pending_count_zero_after_stop",
+      "passed": true
+    },
+    {
+      "name": "both_displayed_drawables_present_before_stop",
+      "passed": true
+    },
+    {
+      "name": "photo_drawable_cleared_by_stop",
+      "passed": true
+    },
+    {
+      "name": "photoBack_drawable_cleared_by_stop",
+      "passed": true
+    },
+    {
+      "name": "displayed_bitmaps_not_recycled_by_stop",
+      "passed": true
+    },
+    {
+      "name": "owned_activities_destroyed",
+      "passed": true
+    },
+    {
+      "name": "total_elapsed_within_60s",
+      "passed": true
+    }
+  ],
+  "mainWaitLimitMs": 2000,
+  "totalLimitMs": 60000,
+  "evidence": "native drawable and queue ownership; no physical FPS measurement",
+  "native": {
+    "nativeWidth": 2160,
+    "nativeHeight": 1440,
+    "photoWidth": 2160,
+    "photoHeight": 1440,
+    "photoBackWidth": 2160,
+    "photoBackHeight": 1440,
+    "generatedPhotoCount": 16,
+    "ownedPaths": true,
+    "localMode": true,
+    "webViewAbsent": true
+  },
+  "admissionPendingCount": 4,
+  "admissionCapturedBitmapCount": 1,
+  "admissionBitmap": {
+    "identity": 137405619,
+    "allocationBytes": 2304000,
+    "byteCount": 2304000,
+    "width": 600,
+    "height": 960,
+    "recycled": false
+  },
+  "stopPendingCount": 4,
+  "stopCapturedBitmapCount": 1,
+  "queuedBitmap": {
+    "identity": 111224786,
+    "allocationBytes": 2073600,
+    "byteCount": 2073600,
+    "width": 720,
+    "height": 720,
+    "recycled": false
+  },
+  "counts": {
+    "pendingBeforeStop": 4,
+    "pendingAfterStop": 0
+  },
+  "drawablesBeforeStop": [
+    {
+      "identity": 29198169,
+      "bitmapIdentity": 137405619
+    },
+    {
+      "identity": 80080670,
+      "bitmapIdentity": 106308607
+    }
+  ],
+  "drawablesAfterStop": [
+    null,
+    null
+  ],
+  "queuedBitmapRecycledAfterStop": true,
+  "baselineQueuedBitmapRecycledByHarness": false,
+  "passed": true,
+  "completed": true,
+  "isolatedFailure": false,
+  "assertionFailure": false,
+  "ownedActivitiesDestroyed": true,
+  "maxMainWaitMs": 1513,
+  "elapsedMs": 4329
+}

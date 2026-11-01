@@ -63,7 +63,7 @@ class NightPhotoPreviewActivity : Activity() {
     }
     val motion = intent.getBooleanExtra("photo_motion", false)
     val mode = intent.getStringExtra("slideshow_mode") ?: "smartFrame"
-    check(mode in setOf("smartFrame", "kenBurns", "diptych", "framed", "galleryWall",
+    check(mode in setOf("classic", "smartFrame", "kenBurns", "diptych", "framed", "galleryWall",
         "push", "memories", "panorama", "polaroid", "mosaic", "cinema", "heroSidebar"))
     val native = mode == "smartFrame"
     val generatedKeys = mutableListOf<String>()
