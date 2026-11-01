@@ -148,6 +148,19 @@ were restored exactly. Natural bright-room exit, optical comfort, browser
 document retention, short-interval autoplay pause and panel FPS remain open;
 the broader goal is incomplete.
 
+**Physical cold-start follow-up:** [the Family observation](portal-cold-start-physical-2026-11-01.md)
+records approximately **3.42 seconds** of blank photo area after the native
+Dream clock appears. A separate sampled first-renderer run attributes
+**422.994 ms** to Main-thread WebView construction and **6.815 ms** to off-Main
+metadata preparation; these are not a before/after comparison. Unsafe
+force-stop attempts exposed an Android accessibility-manager system crash
+and were excluded. Successful observations temporarily detached only
+Immortal's accessibility components and verified exact restoration plus an
+unchanged system process. The tap helper's window assertion failed despite
+visual Home return; it remains a qualified failed receipt. No production
+speed improvement was delivered in this bounded issue. Cold Shuffle startup
+is parked and remains incomplete.
+
 [artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
 [artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json
 [local-artwork]: ../mocks/portal-premium-player-20261030/evidence/native-local-artwork/checks.json

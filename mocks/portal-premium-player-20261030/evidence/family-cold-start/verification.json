@@ -1,0 +1,82 @@
+{
+  "device": "Family Area",
+  "apiLevel": 29,
+  "resolution": [2160, 1440],
+  "installedApkSha256": "199aa8a171f400eb852ea4cac0e879ae179a623999f705fa09555f9d4b95ce29",
+  "productSource": "cc8bc9de",
+  "productionChangeMade": false,
+  "startupPerformanceAccepted": false,
+  "wirelessAdbVerifiedAtEnd": true,
+  "investigationBudget": {
+    "startedAtUtc": "2026-11-01T06:48:48Z",
+    "parkedAtUtc": "2026-11-01T07:02:31Z",
+    "elapsedSecondsAtParking": 823,
+    "limitSeconds": 1800,
+    "timerReset": false
+  },
+  "panelFpsMeasured": false,
+  "opticalLuminanceMeasured": false,
+  "coldProcessObservation": {
+    "freshAppProcessVerified": true,
+    "actualDreamVerified": true,
+    "systemProcessUnchanged": true,
+    "osAndDiskCachesCleared": false,
+    "recordingAffectsWorkload": true,
+    "visibleBlankPhotoAreaApproxSeconds": 3.417,
+    "visualSamplesPerSecond": 12,
+    "approxEndpointUncertaintySeconds": 0.167,
+    "dreamAttachmentToEngineReadyLogMs": 3490,
+    "rendererReadinessIsFirstPixels": false,
+    "restorationPass": true
+  },
+  "separateFirstRendererObservation": {
+    "scope": "First Shuffle renderer after a fresh Home process; recording and diagnostic sampling enabled",
+    "webViewConstructionMs": 422.993802,
+    "webViewConstructionOnMain": true,
+    "metadataPreparationMs": 6.81474,
+    "metadataPreparationOnMain": false,
+    "webViewAdmissionMs": 464.397239,
+    "spansOverlap": true,
+    "dreamWindowCallbacks": 18,
+    "dreamWindowMaxCallbackMs": 570.149378,
+    "steadyStatePerformanceAccepted": false,
+    "matchedBeforeAfterComparison": false,
+    "restorationPass": true
+  },
+  "invalidInitialAttempts": [
+    {
+      "transport": "wireless",
+      "failureType": "TimeoutExpired",
+      "systemAccessibilityCrashObserved": true,
+      "initialCleanupPassed": false,
+      "subsequentUsbRecoveryVerified": true,
+      "validStartupMeasurement": false
+    },
+    {
+      "transport": "usb",
+      "failureType": "cold_dream_attach_timeout",
+      "systemAccessibilityCrashObserved": true,
+      "restorationPass": true,
+      "validStartupMeasurement": false
+    }
+  ],
+  "tapObservation": {
+    "startedOnNightClock": true,
+    "parentPass": false,
+    "failureType": "home_return_timeout",
+    "homeVisuallyObservedInRecording": true,
+    "coldPhotoTapAccepted": false,
+    "restorationPass": true
+  },
+  "restoration": {
+    "settingsValuesExact": 97,
+    "sourceFieldsExact": 22,
+    "originalEnabledAccessibilityServiceListExact": true,
+    "installedArtifactUnchanged": true,
+    "originalDreamRestored": true,
+    "ownedRecordingsRemovedFromDevice": true,
+    "performanceCollectorInactive": true,
+    "activePerformanceListeners": 0
+  },
+  "decision": "Park the unresolved cold Shuffle startup within the original 30-minute issue budget; retain evidence without another speculative production trial."
+}
