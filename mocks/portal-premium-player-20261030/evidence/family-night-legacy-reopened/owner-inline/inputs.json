@@ -1,0 +1,7 @@
+{
+  "debugApk": "0ea2e9d4e1dbd4a2637491899d1d9e16f004483810367f724201c75b3947bf18",
+  "optimizedApk": "d96a79ec3a67a4d73bd50c03d0d8cbd8e280a12ea553c2014cfd99708ac6787e",
+  "instrumentation": "30ada9c72d7cd28da40be7840dcba25514505af4c09caf2effdf9d92d4ce715d",
+  "scheduler": "3e30575d309efabbcb7c5cd8b9082c603f8ae83c3a198c27244f24a579aa5df4",
+  "nightPauseTest": "a539c9753593c2e27c60a0363d603bb7bc1f41902d58e3e0912c3c858dec35ed"
+}

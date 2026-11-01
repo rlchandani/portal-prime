@@ -1,0 +1,112 @@
+diff --git a/app/src/main/assets/screensaver/scheduler.js b/app/src/main/assets/screensaver/scheduler.js
+index 0c62bf8a..ed7c251a 100644
+--- a/app/src/main/assets/screensaver/scheduler.js
++++ b/app/src/main/assets/screensaver/scheduler.js
+@@ -18,6 +18,8 @@
+     let history = [], historyIndex = -1;
+     const clocks = { beat: null, fade: null, resize: null, handoff: null };
+     const pausedAnimations = new Set();
++    const heldCssRates = new Map();
++    const heldCssStyles = new Map();
+     function arm(key, fn, ms) {
+       disarm(key);
+       const clock = { fn, remaining: ms, due: Date.now() + ms, id: null };
+@@ -220,30 +222,80 @@
+         if (clock.id != null) { clock.remaining = Math.max(0, clock.due - Date.now()); clearTimeout(clock.id); clock.id = null; }
+       });
+       [current, incoming, outgoing].filter(Boolean).forEach(scene => {
+-        scene.cleanup.pause();
+-        // CSS transitions where supported; timers and admission pause on every supported engine.
++        // Old WebViews can ignore getAnimations({subtree:true}). Query each owner.
+         try {
+-          scene.layer.getAnimations({ subtree: true }).forEach(animation => {
+-            // CSS owns paused/freeze/retired. API play() would override those later rules.
+-            const cssAnimation = typeof animation.animationName === "string" ||
+-                (typeof CSSAnimation !== "undefined" && animation instanceof CSSAnimation);
+-            if (!cssAnimation && animation.playState === "running") {
+-              animation.pause(); pausedAnimations.add(animation);
++          const animations = new Set();
++          const nodes = [scene.layer];
++          if (typeof scene.layer.querySelectorAll === "function") {
++            nodes.push(...Array.from(scene.layer.querySelectorAll("*")));
++          }
++          nodes.forEach(node => {
++            if (typeof node.getAnimations === "function") {
++              node.getAnimations(node === scene.layer ? { subtree: true } : undefined)
++                  .forEach(animation => animations.add(animation));
+             }
+           });
++          animations.forEach(animation => {
++            try {
++              // CSS retains paused/freeze/retired ownership; API play() overrides it.
++              const cssAnimation = typeof animation.animationName === "string" ||
++                  (typeof CSSAnimation !== "undefined" && animation instanceof CSSAnimation);
++              if (cssAnimation) {
++                // Portal's WebView defers CSS pause commits until another frame.
++                // Zero rate holds immediately without seeking or taking CSS ownership.
++                const rate = animation.playbackRate;
++                if (Number.isFinite(rate) && !heldCssRates.has(animation)) {
++                  const node = animation.effect && animation.effect.target;
++                  const style = node && node.style;
++                  if (style && typeof style.getPropertyValue === "function" && !heldCssStyles.has(node)) {
++                    heldCssStyles.set(node, {
++                      style, value: style.getPropertyValue("animation-play-state"),
++                      priority: style.getPropertyPriority("animation-play-state"),
++                    });
++                  }
++                  heldCssRates.set(animation, rate);
++                  animation.playbackRate = 0;
++                  // Explicit owner state wakes Portal CSS on reveal; ancestor-only
++                  // state can report running while its retained effect stays held.
++                  if (heldCssStyles.has(node)) style.setProperty("animation-play-state", "paused", "important");
++                }
++                return;
++              }
++              const time = animation.currentTime;
++              if (animation.playState === "running") {
++                animation.pause(); pausedAnimations.add(animation);
++              }
++              // A pending pause reports "paused" before its hold time is committed.
++              // Seeking to the same time completes it synchronously, before onPause().
++              if (animation.playState === "paused" && Number.isFinite(time)) {
++                animation.currentTime = time;
++              }
++            } catch (_) {}
++          });
+         } catch (_) {}
++        scene.cleanup.pause();
+         scene.layer.classList.add("paused");
+       });
+     }
+     function resume() {
+       if (!paused || stopped) return;
+       paused = false;
+-      pausedAnimations.forEach(animation => { try { animation.play(); } catch (_) {} }); pausedAnimations.clear();
++      pausedAnimations.forEach(animation => {
++        try { if (animation.playState !== "idle") animation.play(); } catch (_) {}
++      }); pausedAnimations.clear();
+       [current, incoming].filter(Boolean).forEach(scene => {
+         scene.layer.classList.remove("paused");
+         if (!handoff || (!handoff.recovering && scene !== handoff.previous)) scene.cleanup.resume();
+       });
+       if (outgoing) outgoing.layer.classList.remove("paused");
++      heldCssRates.forEach((rate, animation) => { try { animation.playbackRate = rate; } catch (_) {} });
++      heldCssStyles.forEach(({ style, value, priority }) => {
++        try {
++          if (value) style.setProperty("animation-play-state", value, priority);
++          else style.removeProperty("animation-play-state");
++        } catch (_) {}
++      });
++      heldCssRates.clear(); heldCssStyles.clear();
+       Object.keys(clocks).forEach(key => {
+         const clock = clocks[key];
+         if (clock) arm(key, clock.fn, clock.remaining);
+@@ -277,7 +329,7 @@
+         if (promotionFrame != null) cancelAnimationFrame(promotionFrame);
+         removeEventListener("resize", onResize);
+         [incoming, current, outgoing].forEach(dispose); incoming = current = outgoing = null;
+-        pausedAnimations.clear(); stage.innerHTML = "";
++        pausedAnimations.clear(); heldCssRates.clear(); heldCssStyles.clear(); stage.innerHTML = "";
+       },
+     };
+   };

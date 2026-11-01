@@ -1,0 +1,369 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import vm from 'node:vm';
+
+const assets = new URL('../../app/src/main/assets/screensaver/', import.meta.url);
+// Optional source override allows an isolated baseline run without changing production files.
+const scheduler = process.env.IMMORTAL_SLIDESHOW_SCHEDULER_SOURCE ||
+  readFileSync(new URL('scheduler.js', assets), 'utf8');
+
+// A pending CSS pause already reports "paused" while its timeline still advances.
+// Model that observable API29 condition, rather than assuming playState proves a hold.
+// Portal's vendor WebView also leaves CSS effects sticky after a currentTime seek:
+// removing the pause class reports running CSS but does not restore retained motion.
+// Rate suppression also needs an explicit owner inline pause/restore to wake this vendor.
+function pendingPauseFixture({ ignoreSubtree = true, stickyCssSeek = true, stickyRateResume = true } = {}) {
+  let now = 0, id = 0;
+  const tasks = new Map(), animations = [], calls = { cssPause: 0, cssPlay: 0, cssSeek: 0, cleanup: 0 };
+  class Element {
+    constructor(parent = null) {
+      this.parentNode = parent; this.children = []; this.effects = []; this.names = new Set();
+      const properties = new Map(), owner = this;
+      this.style = {
+        getPropertyValue: name => properties.get(name)?.value || '',
+        getPropertyPriority: name => properties.get(name)?.priority || '',
+        setProperty(name, value, priority = '') {
+          properties.set(name, { value, priority }); sync(name === 'animation-play-state' ? owner : null);
+        },
+        removeProperty(name) {
+          const old = this.getPropertyValue(name); properties.delete(name);
+          sync(name === 'animation-play-state' ? owner : null); return old;
+        },
+        get animationPlayState() { return this.getPropertyValue('animation-play-state'); },
+        set animationPlayState(value) { this.setProperty('animation-play-state', value); },
+      };
+      this.classList = { add: name => { this.names.add(name); sync(); },
+        remove: name => { this.names.delete(name); sync(); }, contains: name => this.names.has(name) };
+    }
+    set className(value) { this.names = new Set(value.split(/\s+/)); }
+    appendChild(child) { child.parentNode = this; this.children.push(child); return child; }
+    querySelectorAll() { return this.children.flatMap(child => [child, ...child.querySelectorAll('*')]); }
+    getAnimations(options) {
+      return !ignoreSubtree && options?.subtree ?
+        [...this.effects, ...this.querySelectorAll('*').flatMap(node => node.effects)] : this.effects;
+    }
+    remove() { if (this.parentNode) this.parentNode.children = this.parentNode.children.filter(x => x !== this); }
+    set innerHTML(value) { assert.equal(value, ''); this.children = []; }
+  }
+  function cssPaused(owner) {
+    if (owner.style.getPropertyValue('animation-play-state') === 'paused') return true;
+    for (let node = owner; node; node = node.parentNode) {
+      if (['paused', 'freeze', 'retired', 'intentional'].some(name => node.names.has(name))) return true;
+    }
+    return false;
+  }
+  function sync(inlineOwner = null) { for (const animation of animations) animation.sync(inlineOwner); }
+  function effect(owner, { css = true, rate = 1, time = 4000, intentional = false } = {}) {
+    let base = time, epoch = now, held = intentional, pending = false, cssWasPaused = false;
+    let playbackRate = rate, sticky = false, needsInlineWake = false;
+    const animation = {
+      ...(css ? { animationName: 'fixture-motion' } : {}),
+      effect: { target: owner },
+      get playbackRate() { return playbackRate; },
+      // Rate changes preserve the present time, rather than retroactively scaling elapsed time.
+      set playbackRate(value) {
+        base = this.currentTime; epoch = now;
+        if (css && stickyRateResume && value === 0 && playbackRate !== 0 && !held) needsInlineWake = true;
+        playbackRate = value;
+      },
+      get currentTime() { return held ? base : base + (now - epoch) * playbackRate; },
+      set currentTime(value) {
+        if (css) { calls.cssSeek++; if (stickyCssSeek && pending) sticky = true; }
+        base = value; epoch = now;
+        if (pending) { held = true; pending = false; }
+      },
+      get playState() { return held || pending ? 'paused' : 'running'; },
+      pause() { if (css) calls.cssPause++; base = this.currentTime; epoch = now; pending = true; },
+      play() { if (css) calls.cssPlay++; epoch = now; held = false; pending = false; },
+      sync(inlineOwner) {
+        if (!css) return;
+        const paused = cssPaused(owner);
+        // Ancestor-only CSS changes do not wake this vendor's rate-held effects.
+        // Restoring the owner inline property after all pause classes clear does.
+        if (inlineOwner === owner && !paused && !sticky) needsInlineWake = false;
+        if (paused && !cssWasPaused) { base = this.currentTime; epoch = now; pending = !held; }
+        if (!paused && cssWasPaused) {
+          base = this.currentTime; epoch = now; held = sticky || needsInlineWake; pending = false;
+        }
+        cssWasPaused = paused;
+      },
+    };
+    owner.effects.push(animation); animations.push(animation); animation.sync(); return animation;
+  }
+  const stage = new Element();
+  const context = vm.createContext({ window: null, document: { createElement: () => new Element() },
+    innerWidth: 800, innerHeight: 600, screen: { width: 800, height: 600 },
+    Date: class extends Date { static now() { return now; } },
+    addEventListener() {}, removeEventListener() {},
+    setTimeout(fn) { const token = ++id; tasks.set(token, fn); return token; },
+    clearTimeout: token => tasks.delete(token),
+    requestAnimationFrame(fn) { const token = ++id; tasks.set(token, fn); return token; },
+    cancelAnimationFrame: token => tasks.delete(token),
+    PHOTOS: [{ seed: 'fixture' }], shuffled: values => values, photoUrl: () => 'fixture://photo',
+    SS: { peopleDeck: deck => deck, BEAT: {}, MODES: { probe: { name: 'Probe', run({ root }) {
+      const wrapper = root.appendChild(new Element()), child = wrapper.appendChild(new Element());
+      child.style.setProperty('animation-play-state', 'running', 'important');
+      effect(child); effect(child, { rate: -.5 }); effect(child, { rate: 0 });
+      effect(child, { css: false });
+      const intentional = wrapper.appendChild(new Element()); intentional.names.add('intentional');
+      intentional.style.setProperty('animation-play-state', 'paused', 'important');
+      effect(intentional, { intentional: true });
+      const retired = wrapper.appendChild(new Element()); retired.names.add('retired');
+      effect(retired, { intentional: true });
+      // Unlike Mosaic's child above, this owner receives no mode-level inline wake.
+      effect(wrapper.appendChild(new Element()));
+      const cleanup = () => { calls.cleanup++; };
+      cleanup.ready = Promise.resolve(true);
+      cleanup.pause = () => child.style.setProperty('animation-play-state', 'paused');
+      cleanup.resume = () => child.style.setProperty('animation-play-state', 'running');
+      return cleanup;
+    } } } },
+  });
+  context.window = context; vm.runInContext(scheduler, context, { filename: 'scheduler.js' });
+  const engine = context.SS.startEngine({ stage, mode: 'probe', intervalSec: 600 });
+  return { engine, stage, animations, calls, elapse: ms => { now += ms; },
+    async ready() {
+      for (let n = 0; n < 8; n++) await Promise.resolve();
+      for (const [token, fn] of [...tasks]) { tasks.delete(token); fn(); }
+    } };
+}
+
+for (const ignoreSubtree of [true, false]) {
+test(`public pause restores owner styles and sticky vendor CSS (${ignoreSubtree ? 'ignored' : 'supported'} subtree option)`, async () => {
+  const f = pendingPauseFixture({ ignoreSubtree }); await f.ready();
+  try {
+    for (let cycle = 0; cycle < 3; cycle++) {
+      f.elapse(240);
+      const before = f.animations.map(a => a.currentTime);
+      const styles = f.animations.map(a => [a.effect.target.style.getPropertyValue('animation-play-state'),
+        a.effect.target.style.getPropertyPriority('animation-play-state')]);
+      f.engine.pause(); f.engine.pause();
+      assert.ok(f.animations.slice(0, 3).every(a => a.playState === 'paused'),
+        'CSS already reports paused; the regression is advancement despite those flags');
+      f.elapse(30000);
+      assert.deepEqual(f.animations.map(a => a.currentTime), before,
+        'Paused flags must accompany held currentTime, including descendants and negative/zero rates');
+      f.engine.resume(); f.engine.resume(); f.elapse(240);
+      assert.equal(f.stage.children[0].classList.contains('paused'), false,
+        'CSS pause flags clear on resume even when the vendor seek trap keeps effects held');
+      assert.deepEqual(f.animations.slice(0, 4).map(a => a.currentTime),
+        before.slice(0, 4).map((time, i) => time + 240 * [1, -.5, 0, 1][i]),
+        'The same retained effects must resume motion at their original rates');
+      assert.deepEqual(f.animations.slice(4, 6).map(a => a.currentTime), before.slice(4, 6),
+        'Intentional and retired CSS pauses must survive resume');
+      assert.equal(f.animations[6].currentTime, before[6] + 240,
+        'An ancestor-only CSS owner must wake without waiting for the next photo');
+      assert.deepEqual(f.animations.map(a => a.playbackRate), [1, -.5, 0, 1, 1, 1, 1]);
+      assert.deepEqual(f.animations.map(a => [a.effect.target.style.getPropertyValue('animation-play-state'),
+        a.effect.target.style.getPropertyPriority('animation-play-state')]), styles,
+      'Shared-owner effects restore the original inline value and priority captured before cleanup.pause');
+    }
+    assert.equal(f.calls.cssPause, 0, 'Do not take CSS pause ownership through Animation.pause()');
+    assert.equal(f.calls.cssPlay, 0, 'Do not override future CSS freeze/retirement through Animation.play()');
+    assert.equal(f.calls.cssSeek, 0, 'A CSS currentTime seek traps retained motion on the vendor WebView');
+  } finally { f.engine.stop(); }
+});
+}
+
+test('resume skips non-CSS effects canceled by cleanup.pause while resuming surviving effects', async () => {
+  const animation = () => ({
+    playState: 'running', currentTime: 150, plays: 0,
+    pause() { this.playState = 'paused'; },
+    play() { this.plays++; this.playState = 'running'; },
+    cancel() { this.playState = 'idle'; this.currentTime = null; },
+  });
+  const canceled = animation(), surviving = animation(), frames = [];
+  function element() {
+    const names = new Set();
+    return { style: { setProperty() {} }, children: [],
+      classList: { add: name => names.add(name), remove: name => names.delete(name) },
+      appendChild(child) { this.children.push(child); }, remove() {},
+      getAnimations: () => [canceled, surviving], querySelectorAll: () => [] };
+  }
+  const stage = element();
+  const context = vm.createContext({
+    document: { createElement: element }, PHOTOS: [{}], shuffled: xs => xs,
+    innerWidth: 800, innerHeight: 600, screen: { width: 800, height: 600 },
+    addEventListener() {}, removeEventListener() {}, setTimeout: () => 1, clearTimeout() {},
+    requestAnimationFrame: fn => { frames.push(fn); return frames.length; }, cancelAnimationFrame() {},
+    SS: { BEAT: {}, peopleDeck: xs => xs, MODES: { probe: { name: 'Probe', run() {
+      const cleanup = () => { canceled.cancel(); surviving.cancel(); };
+      cleanup.ready = Promise.resolve(true);
+      cleanup.pause = () => canceled.cancel(); cleanup.resume = () => {};
+      return cleanup;
+    } } } },
+  });
+  context.window = context; vm.runInContext(scheduler, context);
+  const engine = context.SS.startEngine({ stage, mode: 'probe' });
+  await Promise.resolve(); await Promise.resolve(); frames.splice(0).forEach(fn => fn());
+  try {
+    engine.pause();
+    assert.equal(canceled.playState, 'idle', 'Mode cleanup canceled the captured effect');
+    assert.equal(surviving.playState, 'paused');
+    engine.resume();
+    assert.equal(canceled.plays, 0, 'Resume must not restart a canceled effect');
+    assert.equal(canceled.playState, 'idle'); assert.equal(canceled.currentTime, null);
+    assert.equal(surviving.plays, 1, 'A surviving engine-paused effect still resumes');
+  } finally { engine.stop(); }
+});
+
+test('Chrome: a dissolve canceled by cleanup.pause stays canceled and never resets opacity on resume', {
+  skip: process.env.IMMORTAL_SLIDESHOW_CHROME === '1' ? false :
+    'Set IMMORTAL_SLIDESHOW_CHROME=1 and NODE_PATH to existing playwright.',
+  timeout: 15000,
+}, async t => {
+  const { chromium } = createRequire(import.meta.url)('playwright');
+  const browser = await chromium.launch({ headless: true, channel: 'chrome', timeout: 10000 });
+  try {
+    const context = await browser.newContext(); await context.setOffline(true);
+    const page = await context.newPage();
+    await page.setContent('<style>.box{opacity:0;transition:opacity 10s linear}</style><div id="stage"></div>');
+    await page.evaluate(() => {
+      window.PHOTOS = [{}]; window.shuffled = xs => xs;
+      window.SS = { BEAT: {}, peopleDeck: xs => xs, MODES: { probe: { name: 'Probe', run({ root }) {
+        window.box = document.createElement('div'); box.className = 'box'; root.appendChild(box);
+        void box.offsetWidth; box.style.opacity = '1';
+        const cleanup = () => {};
+        cleanup.ready = Promise.resolve(true);
+        cleanup.pause = () => {
+          const opacity = getComputedStyle(box).opacity;
+          box.style.transition = 'none'; box.style.opacity = opacity; void box.offsetWidth;
+        };
+        cleanup.resume = () => { box.style.transition = 'opacity 1s linear'; box.style.opacity = '1'; };
+        return cleanup;
+      } } } };
+    });
+    await page.addScriptTag({ content: scheduler });
+    await page.evaluate(() => { window.engine = SS.startEngine({ stage: document.querySelector('#stage'), mode: 'probe' }); });
+    await page.waitForFunction(() => Number(getComputedStyle(box).opacity) > .01);
+    const held = await page.evaluate(() => {
+      window.oldTransition = box.getAnimations()[0];
+      engine.pause();
+      return { opacity: Number(getComputedStyle(box).opacity), state: oldTransition.playState };
+    });
+    assert.equal(held.state, 'idle', 'Holding the dissolve cancels its original CSS transition');
+    const resumed = await page.evaluate(() => {
+      engine.resume();
+      return { opacity: Number(getComputedStyle(box).opacity), state: oldTransition.playState };
+    });
+    assert.equal(resumed.state, 'idle', 'The canceled CSS transition must stay idle');
+    assert.ok(Math.abs(resumed.opacity - held.opacity) < .001, 'Resume must retain the held opacity');
+    await page.waitForTimeout(150);
+    const later = await page.evaluate(() => ({
+      opacity: Number(getComputedStyle(box).opacity), state: oldTransition.playState }));
+    assert.equal(later.state, 'idle');
+    assert.ok(later.opacity > held.opacity + .05, 'The replacement dissolve progresses from the held value');
+    await page.evaluate(() => engine.stop());
+    t.diagnostic(JSON.stringify({ held, resumed, later }));
+  } finally { await browser.close(); }
+});
+
+test('stop while paused is terminal and never plays retained CSS effects', async () => {
+  const f = pendingPauseFixture(); await f.ready();
+  f.engine.pause();
+  const stoppedRates = f.animations.map(a => a.playbackRate);
+  f.engine.stop(); f.engine.stop(); f.engine.resume(); f.engine.pause();
+  assert.equal(f.stage.children.length, 0); assert.equal(f.calls.cleanup, 1);
+  assert.equal(f.calls.cssPlay, 0); assert.equal(f.calls.cssPause, 0);
+  assert.equal(f.calls.cssSeek, 0);
+  assert.deepEqual(f.animations.map(a => a.playbackRate), stoppedRates,
+    'Stop must drop captured rates without restoring removed or retired CSS animations');
+});
+
+// Opt-in uses a fresh offline Chrome profile; no Portal, external images, or existing tabs.
+const browserEnabled = process.env.IMMORTAL_SLIDESHOW_CHROME === '1';
+test('Chrome: old no-subtree provider holds descendant effects and leaves CSS freeze/retirement ownership intact', {
+  skip: browserEnabled ? false : 'Set IMMORTAL_SLIDESHOW_CHROME=1 and NODE_PATH to existing playwright.',
+  timeout: 25000,
+}, async t => {
+  const { chromium } = createRequire(import.meta.url)('playwright');
+  const browser = await chromium.launch({ headless: true, channel: 'chrome', timeout: 10000 });
+  try {
+    const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
+    await context.setOffline(true);
+    const page = await context.newPage();
+    await page.setContent(`<style>${readFileSync(new URL('styles.css', assets), 'utf8')}
+      @keyframes nightProbe { from { transform: translateX(0px) } to { transform: translateX(100px) } }
+      .motion { width:20px; height:20px; animation:nightProbe 10s linear infinite; }
+      .intentional { animation-play-state:paused !important; }
+      </style><div id="stage"></div>`);
+    await page.evaluate(() => {
+      window.PHOTOS = [{}]; window.shuffled = xs => xs;
+      const nativeGet = Element.prototype.getAnimations;
+      Element.prototype.getAnimations = function () { return nativeGet.call(this); };
+      window.SS = { BEAT: {}, peopleDeck: xs => xs, MODES: { probe: { name: 'Probe', run({ root }) {
+        root.innerHTML = '<div><div class="motion" style="animation-play-state:running"></div>' +
+          '<div class="motion intentional" style="animation-play-state:paused!important"></div>' +
+          '<div class="ss-art retired"><div class="ss-print motion"></div></div><div class="web"></div></div>';
+        const web = root.querySelector('.web').animate([{ opacity: .2 }, { opacity: 1 }],
+          { duration: 10000, iterations: Infinity });
+        window.effects = [...root.querySelectorAll('.motion')].map(node => node.getAnimations()[0]);
+        window.effects.push(web);
+        window.originalCssStyles = effects.slice(0, 3).map(a => [
+          a.effect.target.style.getPropertyValue('animation-play-state'),
+          a.effect.target.style.getPropertyPriority('animation-play-state')]);
+        window.cssCalls = { pause: 0, play: 0, seek: 0 };
+        for (const animation of effects.slice(0, 3)) {
+          const timing = Object.getOwnPropertyDescriptor(Animation.prototype, 'currentTime');
+          Object.defineProperty(animation, 'currentTime', {
+            get() { return timing.get.call(this); },
+            set(value) { cssCalls.seek++; timing.set.call(this, value); },
+          });
+          for (const method of ['pause', 'play']) {
+            const native = animation[method].bind(animation);
+            animation[method] = () => { cssCalls[method]++; return native(); };
+          }
+        }
+        const cleanup = () => web.cancel(); cleanup.ready = Promise.resolve(true);
+        cleanup.pause = () => {}; cleanup.resume = () => {}; return cleanup;
+      } } } };
+    });
+    await page.addScriptTag({ content: scheduler });
+    await page.evaluate(() => { window.engine = SS.startEngine({ stage: document.querySelector('#stage'), mode: 'probe' }); });
+    await page.waitForFunction(() => document.querySelector('.ss-beat.on'));
+    const sample = () => page.evaluate(() => effects.map(a => ({
+      time: a.currentTime, state: a.playState, rate: a.playbackRate })));
+    for (let cycle = 0; cycle < 2; cycle++) {
+      await page.waitForTimeout(120);
+      await page.evaluate(() => { engine.pause(); engine.pause(); });
+      // Let the normal browser settle; pending API29 commit behavior is covered above.
+      await page.waitForTimeout(40); const held = await sample();
+      await page.waitForTimeout(180); const after = await sample();
+      for (let i = 0; i < held.length; i++) {
+        assert.equal(after[i].state, 'paused', `Effect ${i} is paused`);
+        assert.ok(Math.abs(after[i].time - held[i].time) < 1, `Effect ${i} holds its timeline`);
+      }
+      await page.evaluate(() => { engine.resume(); engine.resume(); });
+      await page.waitForTimeout(160); const resumed = await sample();
+      assert.ok(resumed[0].time > after[0].time + 50, 'CSS motion resumes');
+      assert.ok(resumed[3].time > after[3].time + 50, 'Descendant Web Animation resumes');
+      for (const i of [1, 2]) assert.equal(resumed[i].time, after[i].time, 'Intentional/retired effects stay held');
+      assert.deepEqual(resumed.map(a => a.rate), [1, 1, 1, 1], 'Resume restores original rates');
+      assert.deepEqual(await page.evaluate(() => effects.slice(0, 3).map(a => [
+        a.effect.target.style.getPropertyValue('animation-play-state'),
+        a.effect.target.style.getPropertyPriority('animation-play-state')])),
+      await page.evaluate(() => originalCssStyles), 'Resume restores original inline styles and priorities');
+    }
+    await page.evaluate(() => document.querySelector('.ss-beat').classList.add('freeze'));
+    await page.waitForTimeout(40); const frozen = await sample();
+    await page.waitForTimeout(120); const frozenLater = await sample();
+    assert.equal(frozenLater[0].time, frozen[0].time, 'A later CSS freeze still owns the animation');
+    assert.deepEqual(await page.evaluate(() => cssCalls), { pause: 0, play: 0, seek: 0 });
+    const stoppedRates = await page.evaluate(() => {
+      engine.pause(); const rates = effects.slice(0, 3).map(a => a.playbackRate);
+      engine.stop(); engine.resume(); return rates;
+    });
+    assert.equal(await page.locator('#stage > *').count(), 0);
+    assert.deepEqual(await page.evaluate(() => effects.slice(0, 3).map(a => a.playbackRate)), stoppedRates);
+    assert.deepEqual(await page.evaluate(() => cssCalls), { pause: 0, play: 0, seek: 0 });
+    t.diagnostic('Real CSSAnimation and Web Animation effects; provider ignores subtree; two pause/resume cycles.');
+  } finally { await browser.close(); }
+});

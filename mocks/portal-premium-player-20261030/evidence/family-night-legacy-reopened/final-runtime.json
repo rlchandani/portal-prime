@@ -1,0 +1,9 @@
+{
+  "installedOriginalSha256": "872b6af7354b6616320b0081f0525d8c27c0bad29759c3bcc7a02a4a5d76ae10",
+  "originalSourceRestored": true,
+  "rebuiltApksContainOriginalSource": true,
+  "noInstrumentation": true,
+  "noCollector": true,
+  "activeListeners": 0,
+  "photoPreviewResumed": true
+}

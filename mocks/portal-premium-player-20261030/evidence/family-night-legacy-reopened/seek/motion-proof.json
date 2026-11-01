@@ -1,0 +1,104 @@
+{
+  "passed": false,
+  "modes": [
+    {
+      "mode": "kenBurns",
+      "passed": false,
+      "retainedSamplesBeforeNewImage": 36,
+      "retainedActiveAnimations": 1,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "diptych",
+      "passed": true,
+      "retainedSamplesBeforeNewImage": 37,
+      "retainedActiveAnimations": 0,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "framed",
+      "passed": false,
+      "retainedSamplesBeforeNewImage": 32,
+      "retainedActiveAnimations": 1,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "galleryWall",
+      "passed": true,
+      "retainedSamplesBeforeNewImage": 31,
+      "retainedActiveAnimations": 0,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "push",
+      "passed": false,
+      "retainedSamplesBeforeNewImage": 35,
+      "retainedActiveAnimations": 1,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "memories",
+      "passed": false,
+      "retainedSamplesBeforeNewImage": 36,
+      "retainedActiveAnimations": 1,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "panorama",
+      "passed": false,
+      "retainedSamplesBeforeNewImage": 36,
+      "retainedActiveAnimations": 1,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "polaroid",
+      "passed": true,
+      "retainedSamplesBeforeNewImage": 32,
+      "retainedActiveAnimations": 0,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "mosaic",
+      "passed": true,
+      "retainedSamplesBeforeNewImage": 25,
+      "retainedActiveAnimations": 1,
+      "retainedAnimationsAdvanced": 1,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "cinema",
+      "passed": false,
+      "retainedSamplesBeforeNewImage": 34,
+      "retainedActiveAnimations": 1,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    },
+    {
+      "mode": "heroSidebar",
+      "passed": true,
+      "retainedSamplesBeforeNewImage": 32,
+      "retainedActiveAnimations": 0,
+      "retainedAnimationsAdvanced": 0,
+      "computedPhotoPlayStatesRestored": true,
+      "animationResetObserved": false
+    }
+  ]
+}

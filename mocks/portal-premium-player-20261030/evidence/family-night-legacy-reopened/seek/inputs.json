@@ -1,0 +1,6 @@
+{
+  "scheduler": "e10ba3236836b1cfa4bd7ca8c108c8e3ad1991b2bf366dd29f9f943aa64279c5",
+  "debugApk": "38b0249fcdafa0a33d241d7b39f820d527056c1c2ed510ce8993ae2a8de73b3a",
+  "optimizedApk": "d8741fdb7306e9daf6f9d699389845400b5e0e77a38e35fa37c72808edf5b81c",
+  "instrumentation": "30ada9c72d7cd28da40be7840dcba25514505af4c09caf2effdf9d92d4ce715d"
+}

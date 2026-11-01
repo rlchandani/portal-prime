@@ -1,0 +1,7 @@
+{
+  "passed": 6,
+  "failed": 0,
+  "includesChrome": true,
+  "newCanceledTransitionTestsFailWithoutGuard": true,
+  "scope": "Rejected guarded prototype only. No device/native acceptance; guard was not built or installed."
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "candidate": "seek",
+    "nativeChecks": 1269,
+    "nativeFailedChecks": 0,
+    "nativeModesPassed": 11,
+    "strictModesPassed": 5,
+    "strictMotionPassed": false,
+    "elapsedMs": 220914,
+    "deployedAsFinal": false
+  },
+  {
+    "candidate": "rate-only",
+    "nativeChecks": 1267,
+    "nativeFailedChecks": 0,
+    "nativeModesPassed": 11,
+    "strictModesPassed": 5,
+    "strictMotionPassed": false,
+    "elapsedMs": 219019,
+    "deployedAsFinal": false
+  },
+  {
+    "candidate": "owner-inline",
+    "nativeChecks": 1271,
+    "nativeFailedChecks": 2,
+    "nativeModesPassed": 9,
+    "strictModesPassed": 5,
+    "strictMotionPassed": false,
+    "elapsedMs": 219200,
+    "deployedAsFinal": false
+  }
+]
