@@ -1,0 +1,202 @@
+[
+  {
+    "label": "Sans light",
+    "font": "sans-serif-light",
+    "weight": 400,
+    "shape": "wide",
+    "before": "before-sans_serif_light-400-wide.png",
+    "after": "sans_serif_light-400-wide.png",
+    "width": 960,
+    "height": 336
+  },
+  {
+    "label": "Sans light",
+    "font": "sans-serif-light",
+    "weight": 400,
+    "shape": "narrow",
+    "before": "before-sans_serif_light-400-narrow.png",
+    "after": "sans_serif_light-400-narrow.png",
+    "width": 240,
+    "height": 87
+  },
+  {
+    "label": "Sans light",
+    "font": "sans-serif-light",
+    "weight": 700,
+    "shape": "wide",
+    "before": "before-sans_serif_light-700-wide.png",
+    "after": "sans_serif_light-700-wide.png",
+    "width": 960,
+    "height": 330
+  },
+  {
+    "label": "Sans light",
+    "font": "sans-serif-light",
+    "weight": 700,
+    "shape": "narrow",
+    "before": "before-sans_serif_light-700-narrow.png",
+    "after": "sans_serif_light-700-narrow.png",
+    "width": 240,
+    "height": 85
+  },
+  {
+    "label": "Monospace",
+    "font": "Courier New",
+    "weight": 400,
+    "shape": "wide",
+    "before": "before-Courier_New-400-wide.png",
+    "after": "Courier_New-400-wide.png",
+    "width": 960,
+    "height": 298
+  },
+  {
+    "label": "Monospace",
+    "font": "Courier New",
+    "weight": 400,
+    "shape": "narrow",
+    "before": "before-Courier_New-400-narrow.png",
+    "after": "Courier_New-400-narrow.png",
+    "width": 240,
+    "height": 77
+  },
+  {
+    "label": "Monospace",
+    "font": "Courier New",
+    "weight": 700,
+    "shape": "wide",
+    "before": "before-Courier_New-700-wide.png",
+    "after": "Courier_New-700-wide.png",
+    "width": 960,
+    "height": 298
+  },
+  {
+    "label": "Monospace",
+    "font": "Courier New",
+    "weight": 700,
+    "shape": "narrow",
+    "before": "before-Courier_New-700-narrow.png",
+    "after": "Courier_New-700-narrow.png",
+    "width": 240,
+    "height": 77
+  },
+  {
+    "label": "Serif",
+    "font": "Georgia",
+    "weight": 400,
+    "shape": "wide",
+    "before": "before-Georgia-400-wide.png",
+    "after": "Georgia-400-wide.png",
+    "width": 960,
+    "height": 339
+  },
+  {
+    "label": "Serif",
+    "font": "Georgia",
+    "weight": 400,
+    "shape": "narrow",
+    "before": "before-Georgia-400-narrow.png",
+    "after": "Georgia-400-narrow.png",
+    "width": 240,
+    "height": 87
+  },
+  {
+    "label": "Serif",
+    "font": "Georgia",
+    "weight": 700,
+    "shape": "wide",
+    "before": "before-Georgia-700-wide.png",
+    "after": "Georgia-700-wide.png",
+    "width": 960,
+    "height": 338
+  },
+  {
+    "label": "Serif",
+    "font": "Georgia",
+    "weight": 700,
+    "shape": "narrow",
+    "before": "before-Georgia-700-narrow.png",
+    "after": "Georgia-700-narrow.png",
+    "width": 240,
+    "height": 87
+  },
+  {
+    "label": "Bebas Neue",
+    "font": "Bebas Neue",
+    "weight": 400,
+    "shape": "wide",
+    "before": "before-Bebas_Neue-400-wide.png",
+    "after": "Bebas_Neue-400-wide.png",
+    "width": 960,
+    "height": 444
+  },
+  {
+    "label": "Bebas Neue",
+    "font": "Bebas Neue",
+    "weight": 400,
+    "shape": "narrow",
+    "before": "before-Bebas_Neue-400-narrow.png",
+    "after": "Bebas_Neue-400-narrow.png",
+    "width": 240,
+    "height": 113
+  },
+  {
+    "label": "Bebas Neue",
+    "font": "Bebas Neue",
+    "weight": 700,
+    "shape": "wide",
+    "before": "before-Bebas_Neue-700-wide.png",
+    "after": "Bebas_Neue-700-wide.png",
+    "width": 960,
+    "height": 444
+  },
+  {
+    "label": "Bebas Neue",
+    "font": "Bebas Neue",
+    "weight": 700,
+    "shape": "narrow",
+    "before": "before-Bebas_Neue-700-narrow.png",
+    "after": "Bebas_Neue-700-narrow.png",
+    "width": 240,
+    "height": 113
+  },
+  {
+    "label": "Default system fallback",
+    "font": "Plus Jakarta Sans",
+    "weight": 200,
+    "shape": "wide",
+    "before": "before-Plus_Jakarta_Sans-200-wide.png",
+    "after": "Plus_Jakarta_Sans-200-wide.png",
+    "width": 960,
+    "height": 335
+  },
+  {
+    "label": "Default system fallback",
+    "font": "Plus Jakarta Sans",
+    "weight": 200,
+    "shape": "narrow",
+    "before": "before-Plus_Jakarta_Sans-200-narrow.png",
+    "after": "Plus_Jakarta_Sans-200-narrow.png",
+    "width": 240,
+    "height": 86
+  },
+  {
+    "label": "Sans light",
+    "font": "sans-serif-light",
+    "weight": 200,
+    "shape": "wide",
+    "before": null,
+    "after": "sans_serif_light-200-wide.png",
+    "width": 960,
+    "height": 335
+  },
+  {
+    "label": "Sans light",
+    "font": "sans-serif-light",
+    "weight": 200,
+    "shape": "narrow",
+    "before": null,
+    "after": "sans_serif_light-200-narrow.png",
+    "width": 240,
+    "height": 86
+  }
+]

@@ -9,6 +9,7 @@ package com.immortal.launcher
 
 import android.content.Context
 import android.graphics.Typeface
+import android.os.Build
 import android.util.Log
 import java.io.File
 
@@ -30,19 +31,29 @@ import java.io.File
 class AssetResolver(private val context: Context) {
 
   private val cacheDir: File by lazy { File(context.filesDir, "face-assets").apply { mkdirs() } }
-  private val typefaceCache = HashMap<String, Typeface>()
+  private val baseTypefaceCache = HashMap<String, Typeface>()
+  private val typefaceCache = HashMap<Pair<String, Int>, Typeface>()
 
   /**
    * Resolve a font family name (a mantelframe `clockFont` value, or [Face.FONT_SANS_LIGHT])
-   * to a [Typeface], applying [weight] as a faux-bold hint where the platform can't load a
-   * true weight. Always returns *something* — falls back to the system default.
+   * to a [Typeface], requesting its native weight on API 28+ and using normal/bold on older
+   * platforms. Always returns *something* — falls back to the nearest system family.
    */
   fun font(name: String, weight: Int = 400): Typeface {
-    typefaceCache[name]?.let {
+    // Imported face descriptors can contain arbitrary weights; keep the native API drawable.
+    val nativeWeight = weight.coerceIn(1, 1000)
+    val key = name to nativeWeight
+    typefaceCache[key]?.let {
       return it
     }
-    val tf = loadFont(name) ?: systemFallback(name, weight)
-    typefaceCache[name] = tf
+    // Resolve an asset only once per family, even when one face requests several weights.
+    val base = baseTypefaceCache.getOrPut(name) { loadFont(name) ?: systemFallback(name) }
+    val tf = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      Typeface.create(base, nativeWeight, false)
+    } else {
+      Typeface.create(base, if (nativeWeight >= 600) Typeface.BOLD else Typeface.NORMAL)
+    }
+    typefaceCache[key] = tf
     return tf
   }
 
@@ -73,18 +84,13 @@ class AssetResolver(private val context: Context) {
   private fun fontFileName(name: String): String = name.replace(" ", "") + ".ttf"
 
   /** Closest system typeface when a named family isn't available anywhere. */
-  private fun systemFallback(name: String, weight: Int): Typeface {
-    val base =
+  private fun systemFallback(name: String): Typeface =
         when (name) {
           "Courier New" -> Typeface.MONOSPACE
           "Georgia",
           "Playfair Display" -> Typeface.SERIF
           else -> Typeface.SANS_SERIF
         }
-    // Approximate weight: 600+ reads as bold on devices without the true cut.
-    val style = if (weight >= 600) Typeface.BOLD else Typeface.NORMAL
-    return Typeface.create(base, style)
-  }
 
   private companion object {
     const val TAG = "FaceAssets"

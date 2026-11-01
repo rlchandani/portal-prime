@@ -1,0 +1,402 @@
+{
+  "sans_serif_light-400-wide": {
+    "nativeDimensions": [
+      960,
+      336
+    ],
+    "allPixelBounds": [
+      19,
+      82,
+      958,
+      268
+    ],
+    "margins": [
+      19,
+      82,
+      2,
+      68
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 45251
+  },
+  "sans_serif_light-400-narrow": {
+    "nativeDimensions": [
+      240,
+      87
+    ],
+    "allPixelBounds": [
+      6,
+      22,
+      238,
+      68
+    ],
+    "margins": [
+      6,
+      22,
+      2,
+      19
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 3085
+  },
+  "sans_serif_light-700-wide": {
+    "nativeDimensions": [
+      960,
+      330
+    ],
+    "allPixelBounds": [
+      16,
+      80,
+      958,
+      263
+    ],
+    "margins": [
+      16,
+      80,
+      2,
+      67
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 57918
+  },
+  "sans_serif_light-700-narrow": {
+    "nativeDimensions": [
+      240,
+      85
+    ],
+    "allPixelBounds": [
+      5,
+      22,
+      238,
+      67
+    ],
+    "margins": [
+      5,
+      22,
+      2,
+      18
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 3902
+  },
+  "Courier_New-400-wide": {
+    "nativeDimensions": [
+      960,
+      298
+    ],
+    "allPixelBounds": [
+      20,
+      53,
+      958,
+      238
+    ],
+    "margins": [
+      20,
+      53,
+      2,
+      60
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 38059
+  },
+  "Courier_New-400-narrow": {
+    "nativeDimensions": [
+      240,
+      77
+    ],
+    "allPixelBounds": [
+      6,
+      15,
+      238,
+      61
+    ],
+    "margins": [
+      6,
+      15,
+      2,
+      16
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 2649
+  },
+  "Courier_New-700-wide": {
+    "nativeDimensions": [
+      960,
+      298
+    ],
+    "allPixelBounds": [
+      20,
+      45,
+      958,
+      238
+    ],
+    "margins": [
+      20,
+      45,
+      2,
+      60
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 51928
+  },
+  "Courier_New-700-narrow": {
+    "nativeDimensions": [
+      240,
+      77
+    ],
+    "allPixelBounds": [
+      6,
+      13,
+      238,
+      61
+    ],
+    "margins": [
+      6,
+      13,
+      2,
+      16
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 3516
+  },
+  "Georgia-400-wide": {
+    "nativeDimensions": [
+      960,
+      339
+    ],
+    "allPixelBounds": [
+      15,
+      60,
+      958,
+      270
+    ],
+    "margins": [
+      15,
+      60,
+      2,
+      69
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 48753
+  },
+  "Georgia-400-narrow": {
+    "nativeDimensions": [
+      240,
+      87
+    ],
+    "allPixelBounds": [
+      5,
+      17,
+      238,
+      69
+    ],
+    "margins": [
+      5,
+      17,
+      2,
+      18
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 3408
+  },
+  "Georgia-700-wide": {
+    "nativeDimensions": [
+      960,
+      338
+    ],
+    "allPixelBounds": [
+      11,
+      60,
+      958,
+      269
+    ],
+    "margins": [
+      11,
+      60,
+      2,
+      69
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 66238
+  },
+  "Georgia-700-narrow": {
+    "nativeDimensions": [
+      240,
+      87
+    ],
+    "allPixelBounds": [
+      4,
+      16,
+      238,
+      68
+    ],
+    "margins": [
+      4,
+      16,
+      2,
+      19
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 4441
+  },
+  "Bebas_Neue-400-wide": {
+    "nativeDimensions": [
+      960,
+      444
+    ],
+    "allPixelBounds": [
+      14,
+      72,
+      958,
+      340
+    ],
+    "margins": [
+      14,
+      72,
+      2,
+      104
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 86926
+  },
+  "Bebas_Neue-400-narrow": {
+    "nativeDimensions": [
+      240,
+      113
+    ],
+    "allPixelBounds": [
+      4,
+      20,
+      238,
+      86
+    ],
+    "margins": [
+      4,
+      20,
+      2,
+      27
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 5700
+  },
+  "Bebas_Neue-700-wide": {
+    "nativeDimensions": [
+      960,
+      444
+    ],
+    "allPixelBounds": [
+      14,
+      61,
+      958,
+      340
+    ],
+    "margins": [
+      14,
+      61,
+      2,
+      104
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 111250
+  },
+  "Bebas_Neue-700-narrow": {
+    "nativeDimensions": [
+      240,
+      113
+    ],
+    "allPixelBounds": [
+      4,
+      17,
+      238,
+      86
+    ],
+    "margins": [
+      4,
+      17,
+      2,
+      27
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 7148
+  },
+  "Plus_Jakarta_Sans-200-wide": {
+    "nativeDimensions": [
+      960,
+      335
+    ],
+    "allPixelBounds": [
+      19,
+      82,
+      958,
+      268
+    ],
+    "margins": [
+      19,
+      82,
+      2,
+      67
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 39136
+  },
+  "Plus_Jakarta_Sans-200-narrow": {
+    "nativeDimensions": [
+      240,
+      86
+    ],
+    "allPixelBounds": [
+      6,
+      22,
+      238,
+      68
+    ],
+    "margins": [
+      6,
+      22,
+      2,
+      18
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 2686
+  },
+  "sans_serif_light-200-wide": {
+    "nativeDimensions": [
+      960,
+      335
+    ],
+    "allPixelBounds": [
+      19,
+      82,
+      958,
+      268
+    ],
+    "margins": [
+      19,
+      82,
+      2,
+      67
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 39136
+  },
+  "sans_serif_light-200-narrow": {
+    "nativeDimensions": [
+      240,
+      86
+    ],
+    "allPixelBounds": [
+      6,
+      22,
+      238,
+      68
+    ],
+    "margins": [
+      6,
+      22,
+      2,
+      18
+    ],
+    "independentGlyphPixelsExact": true,
+    "glyphPixels": 2686
+  }
+}

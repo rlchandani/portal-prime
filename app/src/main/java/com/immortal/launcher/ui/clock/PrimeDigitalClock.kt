@@ -10,7 +10,6 @@ package com.immortal.launcher.ui.clock
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Typeface
 import android.view.View
 import androidx.compose.ui.graphics.toArgb
 import com.immortal.launcher.AssetResolver
@@ -33,7 +32,7 @@ import java.util.TimeZone
 class PrimeDigitalClockFaceView(
     context: Context,
     private val spec: ClockSpec,
-    @Suppress("UNUSED_PARAMETER") private val assets: AssetResolver,
+    private val assets: AssetResolver,
 ) : ClockFaceView {
 
     private var formatterLocale = Locale.getDefault()
@@ -51,7 +50,7 @@ class PrimeDigitalClockFaceView(
     private val timePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = FaceStyle.colorWithOpacity(spec.color, spec.opacity)
         textAlign = Paint.Align.LEFT
-        typeface = Typeface.DEFAULT_BOLD
+        typeface = FaceStyle.typeface(assets, spec, light = false)
     }
 
     // Paint for the seconds arc track (translucent background ring)

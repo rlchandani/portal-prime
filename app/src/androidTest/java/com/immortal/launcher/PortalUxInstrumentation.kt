@@ -40,6 +40,20 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Detached generated Canvas/font fixtures only; never acquire UiAutomation.
+        if (options.getString("command") == "digitalClockFont") {
+            val fonts = try {
+                DigitalClockFontDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("digitalClockFontCompleted", false)
+                    putBoolean("digitalClockFontPassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (fonts.getBoolean("digitalClockFontPassed")) 0 else 1, fonts)
+            return
+        }
         // UUID-owned generated lyrics windows; dispatch before acquiring UiAutomation.
         if (options.getString("command") == "musicLyrics") {
             val lyrics = try {

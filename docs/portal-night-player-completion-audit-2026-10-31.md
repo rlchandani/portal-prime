@@ -2,7 +2,21 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — music lyrics following.**
+**Newest delivery, November 1 — photo-clock fonts.**
+[The font correction](portal-digital-clock-fonts-2026-11-01.md) replaces the
+digital renderer's hardcoded bold font with the existing face font/weight.
+The shared resolver caches base assets by family and resolved Typefaces by
+normalized family/weight. The native baseline has **144 failed assertions out
+of 329** and one glyph mask for every requested font; the final gate passes
+**351/351**, retains all original assertions and adds the shipped light-font
+weight. Independent pixels match all **20** native references exactly; nine
+distinct glyph masks now render. **3,761 fresh JVM tests** pass. Optimized
+APK **e59bb10c…** is installed with restoration verified **13 minutes 10 seconds**
+into the original 30-minute slot. These are detached Android 10 Canvas/font
+checks, not Window/GPU/panel timing, every preset layout or optical comfort.
+The dedicated quiet night clock is unchanged.
+
+**Previous delivery, November 1 — music lyrics following.**
 [The player refinement](portal-music-lyrics-2026-11-01.md) keeps the active
 timed lyric visible, pauses following for manual browsing, and supplies a
 return button. It reuses the shared clock and lazy list, with source/track
@@ -255,8 +269,9 @@ Status is scoped to each row: **verified** means the stated evidence supports th
 The [Canvas size fix][clock-size] now honors selected size and parent constraints:
 12 API 34 landscape/portrait captures show distinct Big/Bold sizes and at least
 13 pixels of glyph margin. The default clock/date were visually checked.
-Some legacy font/format options remain ignored by the active renderer; this
-size-only patch does not claim those controls are complete.
+The size-only patch did not cover font/format controls. The later bounded
+format delivery and [font correction](portal-digital-clock-fonts-2026-11-01.md)
+now accept their stated native component cases.
 
 **Latest bounded delivery:** the [metadata regression][metadata] reduces unchanged
 date/battery/weather writes from **180 to 3 over 60 ticks**, preserving all 60
@@ -285,7 +300,7 @@ all 97 settings/source configuration unchanged, the previous signing certificate
 and zero active performance listeners. That build includes the gradual brightness
 fade and prior date/clock work. Exact emulator preferences were restored and
 synced, independent of the native helper's live API rollback acknowledgment.
-Actual Portal brightness feel, geometry/FPS and legacy font/format controls remain
+Actual Portal brightness feel and delivered geometry/FPS remain
 outside this software verification.
 
 **Cached-artwork delivery:** [artwork-cache checks][artwork-cache] verify cached covers

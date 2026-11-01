@@ -1,0 +1,89 @@
+<!doctype html>
+<!-- Copyright (c) 2026 Starbright Lab. Licensed under the MIT license in the root LICENSE. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Immortal — Family Area clock fonts</title>
+  <style>
+    :root { color-scheme:dark; font:16px/1.5 system-ui,sans-serif; background:#14171a; color:#f4f5f7 }
+    * { box-sizing:border-box } body { margin:0; padding:clamp(20px,4vw,56px) }
+    main { max-width:1280px; margin:auto } h1 { font-size:clamp(28px,4vw,44px); line-height:1.15; margin:0 0 16px }
+    p { max-width:1000px; color:#c0c4c9 } a { color:#b8d4f4 } nav { display:flex; flex-wrap:wrap; gap:8px; margin:28px 0 }
+    button { min-height:48px; padding:10px 16px; border:1px solid #43464b; border-radius:12px; background:#25282c; color:inherit; font:inherit; cursor:pointer }
+    button[aria-pressed=true] { background:#e8edf3; color:#16191d; border-color:#e8edf3 }
+    button:focus-visible,a:focus-visible { outline:3px solid #a4ceff; outline-offset:4px }
+    .comparison { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px }
+    figure { margin:0; padding:24px; background:#1d2024; border:1px solid #373a3f; border-radius:20px; min-width:0 }
+    h2 { font-size:18px; margin:0 0 20px } img { display:block; width:100%; height:300px; object-fit:contain } img[hidden] { display:none }
+    figcaption { margin-top:20px; color:#b9bec5; overflow-wrap:anywhere } #result { color:#e9edf2 } #error { color:#ffb6aa }
+    @media(max-width:700px) { .comparison { grid-template-columns:1fr } img { height:220px } figure { padding:20px } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>The clock uses your selected font.</h1>
+  <p>Generated time, drawn by the production clock on Family Area’s Android 10 hardware.
+    Compare the original bold system text with the selected family and weight.
+    These are detached Canvas captures, not browser font imitations or full-screen device captures.</p>
+  <p id="result" aria-live="polite">Loading recorded checks…</p>
+  <p><a href="native-review.html">Native review</a> ·
+    <a href="evidence/family-clock-fonts/checks.json">Native assertions</a> ·
+    <a href="evidence/family-clock-fonts/pixels.json">Independent pixel checks</a> ·
+    <a href="evidence/family-clock-fonts/verification.json">Deployment and restoration</a></p>
+  <nav aria-label="Clock font comparisons" id="cases"></nav>
+  <div class="comparison">
+    <figure><h2>Before</h2><img id="before" alt=""><figcaption id="before-label"></figcaption></figure>
+    <figure><h2>After</h2><img id="after" alt=""><figcaption id="after-label"></figcaption></figure>
+  </div>
+  <p>The narrow cases check that the chosen font and seconds indicator fit together.
+    A missing font uses the existing system fallback. Room-light fade comfort, GPU presentation and FPS are outside this check.</p>
+  <p id="error" role="status"></p>
+</main>
+<script>
+  const root = "evidence/family-clock-fonts/";
+  Promise.all([
+    fetch(root + "compare.json").then(r => { if (!r.ok) throw Error("comparison"); return r.json() }),
+    fetch(root + "checks.json").then(r => { if (!r.ok) throw Error("checks"); return r.json() })
+  ]).then(([cases, checks]) => {
+    document.querySelector("#result").textContent =
+      `${checks.checkCount - checks.failureCount}/${checks.checkCount} recorded native assertions pass across ${checks.renderCount} generated compositions.`;
+    const nav = document.querySelector("#cases");
+    const buttons = cases.map((entry, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = `${entry.label} · ${entry.weight} · ${entry.shape}`;
+      button.setAttribute("aria-pressed", "false");
+      button.addEventListener("click", () => select(index));
+      nav.append(button);
+      return button;
+    });
+    function select(index) {
+      const entry = cases[index];
+      buttons.forEach((button, i) => button.setAttribute("aria-pressed", String(i === index)));
+      for (const side of ["before", "after"]) {
+        const image = document.querySelector("#" + side);
+        image.hidden = !entry[side];
+        if (entry[side]) image.src = root + entry[side];
+        else image.removeAttribute("src");
+        image.alt = `${side}: ${entry.label}, requested weight ${entry.weight}, ${entry.shape} layout, generated 08:34 clock`;
+      }
+      document.querySelector("#before-label").textContent =
+        entry.before ? `Requested ${entry.label} ${entry.weight}; rendered bold system text.`
+          : "Additional light-font preset check; this exact case was not captured in the original baseline.";
+      document.querySelector("#after-label").textContent =
+        `${entry.label} ${entry.weight} · ${entry.width} × ${entry.height} native Canvas pixels.`;
+      const url = new URL(location.href);
+      url.searchParams.set("case", String(index));
+      history.replaceState(null, "", url);
+    }
+    const requested = Number(new URL(location.href).searchParams.get("case"));
+    select(Number.isInteger(requested) && requested >= 0 && requested < cases.length ? requested : 0);
+  }).catch(() => {
+    document.querySelector("#result").textContent = "Recorded comparison unavailable.";
+    document.querySelector("#error").textContent = "The native evidence could not be loaded.";
+  });
+</script>
+</body>
+</html>

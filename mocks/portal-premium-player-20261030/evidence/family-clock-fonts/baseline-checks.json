@@ -1,0 +1,1985 @@
+{
+  "checks": [
+    {
+      "name": "preflight.worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "preflight.literal_ascii_digits",
+      "passed": true
+    },
+    {
+      "name": "preflight.native_weight_api_28",
+      "passed": true
+    },
+    {
+      "name": "cache.sans-serif-light.400.400.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.sans-serif-light.400.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.sans-serif-light.400.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.sans-serif-light.400.700.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.sans-serif-light.400.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.sans-serif-light.400.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.sans-serif-light.400.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.sans-serif-light.700.700.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.sans-serif-light.700.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.sans-serif-light.700.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.sans-serif-light.700.400.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.sans-serif-light.700.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.sans-serif-light.700.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.sans-serif-light.700.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Courier New.400.400.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Courier New.400.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Courier New.400.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Courier New.400.700.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Courier New.400.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Courier New.400.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Courier New.400.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Courier New.700.700.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Courier New.700.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Courier New.700.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Courier New.700.400.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Courier New.700.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Courier New.700.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Courier New.700.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Georgia.400.400.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Georgia.400.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Georgia.400.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Georgia.400.700.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Georgia.400.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Georgia.400.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Georgia.400.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Georgia.700.700.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Georgia.700.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Georgia.700.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Georgia.700.400.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Georgia.700.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Georgia.700.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Georgia.700.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Bebas Neue.400.400.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Bebas Neue.400.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Bebas Neue.400.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Bebas Neue.400.700.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Bebas Neue.400.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Bebas Neue.400.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Bebas Neue.400.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Bebas Neue.700.700.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Bebas Neue.700.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Bebas Neue.700.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Bebas Neue.700.400.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Bebas Neue.700.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Bebas Neue.700.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Bebas Neue.700.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.400.400.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.400.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.400.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.400.700.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.400.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.400.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.400.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.700.700.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.700.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.700.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.700.400.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.700.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.700.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Generated Missing Clock Font.700.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.400.400.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.400.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.400.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.400.700.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.400.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.400.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.400.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.700.700.native_weight",
+      "passed": true
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.700.700.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.700.700.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.700.400.native_weight",
+      "passed": false
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.700.400.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.700.400.exact_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "cache.Plus Jakarta Sans.700.weights_are_distinct",
+      "passed": false
+    },
+    {
+      "name": "default_font_200.resolver_native_weight",
+      "passed": false
+    },
+    {
+      "name": "default_font_200.resolver_independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.sans-serif-light.-50.native_boundary_weight",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.sans-serif-light.-50.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.sans-serif-light.-50.normalized_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "imported_weight.sans-serif-light.5000.native_boundary_weight",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.sans-serif-light.5000.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.sans-serif-light.5000.normalized_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "imported_weight.Courier New.-50.native_boundary_weight",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Courier New.-50.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Courier New.-50.normalized_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "imported_weight.Courier New.5000.native_boundary_weight",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Courier New.5000.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Courier New.5000.normalized_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "imported_weight.Georgia.-50.native_boundary_weight",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Georgia.-50.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Georgia.-50.normalized_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "imported_weight.Georgia.5000.native_boundary_weight",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Georgia.5000.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Georgia.5000.normalized_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "imported_weight.Bebas Neue.-50.native_boundary_weight",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Bebas Neue.-50.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Bebas Neue.-50.normalized_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "imported_weight.Bebas Neue.5000.native_boundary_weight",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Bebas Neue.5000.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "imported_weight.Bebas Neue.5000.normalized_pair_reused",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.detached",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.literal",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-400-wide.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.detached",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.literal",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-400-narrow.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.detached",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.literal",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.native_weight",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.literal_independent_font_pixels",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-wide.fixed_glyph_reference_pixels",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.detached",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.literal",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.native_weight",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.literal_independent_font_pixels",
+      "passed": true
+    },
+    {
+      "name": "render.sans_serif_light-700-narrow.fixed_glyph_reference_pixels",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-wide.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-wide.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-wide.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-400-wide.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-400-wide.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-wide.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-wide.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-wide.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-wide.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-wide.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-400-wide.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-400-narrow.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-narrow.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-narrow.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-400-narrow.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-400-narrow.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-narrow.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-narrow.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-narrow.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-narrow.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-400-narrow.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-400-narrow.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-700-wide.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-wide.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-wide.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-700-wide.native_weight",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-wide.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-wide.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-wide.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-wide.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-wide.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-wide.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-700-wide.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-700-narrow.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-narrow.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-narrow.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-700-narrow.native_weight",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-narrow.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-narrow.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-narrow.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-narrow.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-narrow.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Courier_New-700-narrow.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Courier_New-700-narrow.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-400-wide.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-wide.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-wide.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-400-wide.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-400-wide.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-wide.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-wide.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-wide.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-wide.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-wide.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-400-wide.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-400-narrow.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-narrow.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-narrow.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-400-narrow.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-400-narrow.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-narrow.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-narrow.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-narrow.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-narrow.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-400-narrow.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-400-narrow.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-700-wide.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-wide.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-wide.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-700-wide.native_weight",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-wide.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-wide.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-wide.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-wide.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-wide.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-wide.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-700-wide.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-700-narrow.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-narrow.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-narrow.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-700-narrow.native_weight",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-narrow.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-narrow.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-narrow.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-narrow.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-narrow.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Georgia-700-narrow.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Georgia-700-narrow.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-400-wide.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-400-narrow.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.native_weight",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-700-wide.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.native_weight",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Bebas_Neue-700-narrow.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-wide.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.detached",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.literal",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.independent_typeface",
+      "passed": false
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.native_weight",
+      "passed": false
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.bounded_dimensions",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.glyph_present",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.arc_present",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.glyph_arc_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.all_pixels_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.literal_independent_font_pixels",
+      "passed": false
+    },
+    {
+      "name": "render.Plus_Jakarta_Sans-200-narrow.fixed_glyph_reference_pixels",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.400.0.1.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.400.0.2.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.400.0.3.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.400.1.2.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.400.1.3.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.400.2.3.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.700.0.1.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.700.0.2.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.700.0.3.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.700.1.2.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.700.1.3.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_families.700.2.3.distinct",
+      "passed": false
+    },
+    {
+      "name": "glyph_weights.sans-serif-light.match_native_reference_difference",
+      "passed": false
+    },
+    {
+      "name": "glyph_weights.Courier New.match_native_reference_difference",
+      "passed": false
+    },
+    {
+      "name": "glyph_weights.Georgia.match_native_reference_difference",
+      "passed": false
+    },
+    {
+      "name": "glyph_weights.Bebas Neue.match_native_reference_difference",
+      "passed": false
+    },
+    {
+      "name": "glyph_weights.built_in_reference_has_visible_weight_difference",
+      "passed": true
+    },
+    {
+      "name": "budget.within_15_seconds",
+      "passed": true
+    }
+  ],
+  "renders": [
+    {
+      "name": "sans_serif_light-400-wide",
+      "font": "sans-serif-light",
+      "fontWeight": 400,
+      "nativeWeight": 700,
+      "referenceWeight": 400,
+      "shape": "wide",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 960,
+      "viewHeight": 330,
+      "glyphBounds": [
+        16,
+        80,
+        738,
+        263
+      ],
+      "indicatorOnlyBounds": [
+        796,
+        84,
+        958,
+        246
+      ],
+      "allPixelBounds": [
+        16,
+        80,
+        958,
+        263
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "7c3533decec8b6075cb64731ed7c04e6b65cc262162212d2ffbf4ddff0238f66",
+      "path": "before-sans_serif_light-400-wide.png"
+    },
+    {
+      "name": "sans_serif_light-400-narrow",
+      "font": "sans-serif-light",
+      "fontWeight": 400,
+      "nativeWeight": 700,
+      "referenceWeight": 400,
+      "shape": "narrow",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 85,
+      "glyphBounds": [
+        5,
+        22,
+        183,
+        67
+      ],
+      "indicatorOnlyBounds": [
+        198,
+        22,
+        238,
+        63
+      ],
+      "allPixelBounds": [
+        5,
+        22,
+        238,
+        67
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "7c3533decec8b6075cb64731ed7c04e6b65cc262162212d2ffbf4ddff0238f66",
+      "path": "before-sans_serif_light-400-narrow.png"
+    },
+    {
+      "name": "sans_serif_light-700-wide",
+      "font": "sans-serif-light",
+      "fontWeight": 700,
+      "nativeWeight": 700,
+      "referenceWeight": 700,
+      "shape": "wide",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 960,
+      "viewHeight": 330,
+      "glyphBounds": [
+        16,
+        80,
+        738,
+        263
+      ],
+      "indicatorOnlyBounds": [
+        796,
+        84,
+        958,
+        246
+      ],
+      "allPixelBounds": [
+        16,
+        80,
+        958,
+        263
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "path": "before-sans_serif_light-700-wide.png"
+    },
+    {
+      "name": "sans_serif_light-700-narrow",
+      "font": "sans-serif-light",
+      "fontWeight": 700,
+      "nativeWeight": 700,
+      "referenceWeight": 700,
+      "shape": "narrow",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 85,
+      "glyphBounds": [
+        5,
+        22,
+        183,
+        67
+      ],
+      "indicatorOnlyBounds": [
+        198,
+        22,
+        238,
+        63
+      ],
+      "allPixelBounds": [
+        5,
+        22,
+        238,
+        67
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "path": "before-sans_serif_light-700-narrow.png"
+    },
+    {
+      "name": "Courier_New-400-wide",
+      "font": "Courier New",
+      "fontWeight": 400,
+      "nativeWeight": 700,
+      "referenceWeight": 400,
+      "shape": "wide",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 960,
+      "viewHeight": 330,
+      "glyphBounds": [
+        16,
+        80,
+        738,
+        263
+      ],
+      "indicatorOnlyBounds": [
+        796,
+        84,
+        958,
+        246
+      ],
+      "allPixelBounds": [
+        16,
+        80,
+        958,
+        263
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "756212d85bfeaeb1913a63ebdaaf17d105f350e622fcf0793fc098e01018a28d",
+      "path": "before-Courier_New-400-wide.png"
+    },
+    {
+      "name": "Courier_New-400-narrow",
+      "font": "Courier New",
+      "fontWeight": 400,
+      "nativeWeight": 700,
+      "referenceWeight": 400,
+      "shape": "narrow",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 85,
+      "glyphBounds": [
+        5,
+        22,
+        183,
+        67
+      ],
+      "indicatorOnlyBounds": [
+        198,
+        22,
+        238,
+        63
+      ],
+      "allPixelBounds": [
+        5,
+        22,
+        238,
+        67
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "756212d85bfeaeb1913a63ebdaaf17d105f350e622fcf0793fc098e01018a28d",
+      "path": "before-Courier_New-400-narrow.png"
+    },
+    {
+      "name": "Courier_New-700-wide",
+      "font": "Courier New",
+      "fontWeight": 700,
+      "nativeWeight": 700,
+      "referenceWeight": 700,
+      "shape": "wide",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 960,
+      "viewHeight": 330,
+      "glyphBounds": [
+        16,
+        80,
+        738,
+        263
+      ],
+      "indicatorOnlyBounds": [
+        796,
+        84,
+        958,
+        246
+      ],
+      "allPixelBounds": [
+        16,
+        80,
+        958,
+        263
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "694997524adc41ecfd99bc0493782a7f74c643e96656181e11758592335d20ed",
+      "path": "before-Courier_New-700-wide.png"
+    },
+    {
+      "name": "Courier_New-700-narrow",
+      "font": "Courier New",
+      "fontWeight": 700,
+      "nativeWeight": 700,
+      "referenceWeight": 700,
+      "shape": "narrow",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 85,
+      "glyphBounds": [
+        5,
+        22,
+        183,
+        67
+      ],
+      "indicatorOnlyBounds": [
+        198,
+        22,
+        238,
+        63
+      ],
+      "allPixelBounds": [
+        5,
+        22,
+        238,
+        67
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "694997524adc41ecfd99bc0493782a7f74c643e96656181e11758592335d20ed",
+      "path": "before-Courier_New-700-narrow.png"
+    },
+    {
+      "name": "Georgia-400-wide",
+      "font": "Georgia",
+      "fontWeight": 400,
+      "nativeWeight": 700,
+      "referenceWeight": 400,
+      "shape": "wide",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 960,
+      "viewHeight": 330,
+      "glyphBounds": [
+        16,
+        80,
+        738,
+        263
+      ],
+      "indicatorOnlyBounds": [
+        796,
+        84,
+        958,
+        246
+      ],
+      "allPixelBounds": [
+        16,
+        80,
+        958,
+        263
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "4ade6a076eebb2b84c80457399471b1c5a9ef731d2246cd9c5acf51d769a9ebf",
+      "path": "before-Georgia-400-wide.png"
+    },
+    {
+      "name": "Georgia-400-narrow",
+      "font": "Georgia",
+      "fontWeight": 400,
+      "nativeWeight": 700,
+      "referenceWeight": 400,
+      "shape": "narrow",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 85,
+      "glyphBounds": [
+        5,
+        22,
+        183,
+        67
+      ],
+      "indicatorOnlyBounds": [
+        198,
+        22,
+        238,
+        63
+      ],
+      "allPixelBounds": [
+        5,
+        22,
+        238,
+        67
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "4ade6a076eebb2b84c80457399471b1c5a9ef731d2246cd9c5acf51d769a9ebf",
+      "path": "before-Georgia-400-narrow.png"
+    },
+    {
+      "name": "Georgia-700-wide",
+      "font": "Georgia",
+      "fontWeight": 700,
+      "nativeWeight": 700,
+      "referenceWeight": 700,
+      "shape": "wide",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 960,
+      "viewHeight": 330,
+      "glyphBounds": [
+        16,
+        80,
+        738,
+        263
+      ],
+      "indicatorOnlyBounds": [
+        796,
+        84,
+        958,
+        246
+      ],
+      "allPixelBounds": [
+        16,
+        80,
+        958,
+        263
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "77e1f34b5bd4aa0f97baf6377f5e64353d67c8791d69a29bdc3211bb9595d9ff",
+      "path": "before-Georgia-700-wide.png"
+    },
+    {
+      "name": "Georgia-700-narrow",
+      "font": "Georgia",
+      "fontWeight": 700,
+      "nativeWeight": 700,
+      "referenceWeight": 700,
+      "shape": "narrow",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 85,
+      "glyphBounds": [
+        5,
+        22,
+        183,
+        67
+      ],
+      "indicatorOnlyBounds": [
+        198,
+        22,
+        238,
+        63
+      ],
+      "allPixelBounds": [
+        5,
+        22,
+        238,
+        67
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "77e1f34b5bd4aa0f97baf6377f5e64353d67c8791d69a29bdc3211bb9595d9ff",
+      "path": "before-Georgia-700-narrow.png"
+    },
+    {
+      "name": "Bebas_Neue-400-wide",
+      "font": "Bebas Neue",
+      "fontWeight": 400,
+      "nativeWeight": 700,
+      "referenceWeight": 400,
+      "shape": "wide",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 960,
+      "viewHeight": 330,
+      "glyphBounds": [
+        16,
+        80,
+        738,
+        263
+      ],
+      "indicatorOnlyBounds": [
+        796,
+        84,
+        958,
+        246
+      ],
+      "allPixelBounds": [
+        16,
+        80,
+        958,
+        263
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "40473018ba7656043f9e588f78a11a87b04399b5da713a032b1888a786fcb48c",
+      "path": "before-Bebas_Neue-400-wide.png"
+    },
+    {
+      "name": "Bebas_Neue-400-narrow",
+      "font": "Bebas Neue",
+      "fontWeight": 400,
+      "nativeWeight": 700,
+      "referenceWeight": 400,
+      "shape": "narrow",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 85,
+      "glyphBounds": [
+        5,
+        22,
+        183,
+        67
+      ],
+      "indicatorOnlyBounds": [
+        198,
+        22,
+        238,
+        63
+      ],
+      "allPixelBounds": [
+        5,
+        22,
+        238,
+        67
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "40473018ba7656043f9e588f78a11a87b04399b5da713a032b1888a786fcb48c",
+      "path": "before-Bebas_Neue-400-narrow.png"
+    },
+    {
+      "name": "Bebas_Neue-700-wide",
+      "font": "Bebas Neue",
+      "fontWeight": 700,
+      "nativeWeight": 700,
+      "referenceWeight": 700,
+      "shape": "wide",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 960,
+      "viewHeight": 330,
+      "glyphBounds": [
+        16,
+        80,
+        738,
+        263
+      ],
+      "indicatorOnlyBounds": [
+        796,
+        84,
+        958,
+        246
+      ],
+      "allPixelBounds": [
+        16,
+        80,
+        958,
+        263
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "bca636de06613068c864f978709ef95c05d6bd6f54faadafe12f3bcbecca0a31",
+      "path": "before-Bebas_Neue-700-wide.png"
+    },
+    {
+      "name": "Bebas_Neue-700-narrow",
+      "font": "Bebas Neue",
+      "fontWeight": 700,
+      "nativeWeight": 700,
+      "referenceWeight": 700,
+      "shape": "narrow",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 85,
+      "glyphBounds": [
+        5,
+        22,
+        183,
+        67
+      ],
+      "indicatorOnlyBounds": [
+        198,
+        22,
+        238,
+        63
+      ],
+      "allPixelBounds": [
+        5,
+        22,
+        238,
+        67
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "bca636de06613068c864f978709ef95c05d6bd6f54faadafe12f3bcbecca0a31",
+      "path": "before-Bebas_Neue-700-narrow.png"
+    },
+    {
+      "name": "Plus_Jakarta_Sans-200-wide",
+      "font": "Plus Jakarta Sans",
+      "fontWeight": 200,
+      "nativeWeight": 700,
+      "referenceWeight": 200,
+      "shape": "wide",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 960,
+      "viewHeight": 330,
+      "glyphBounds": [
+        16,
+        80,
+        738,
+        263
+      ],
+      "indicatorOnlyBounds": [
+        796,
+        84,
+        958,
+        246
+      ],
+      "allPixelBounds": [
+        16,
+        80,
+        958,
+        263
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "884379117344bc0904ec5c31ff55982f4385a55c6d5272f2619210e6a7ef8c58",
+      "path": "before-Plus_Jakarta_Sans-200-wide.png"
+    },
+    {
+      "name": "Plus_Jakarta_Sans-200-narrow",
+      "font": "Plus Jakarta Sans",
+      "fontWeight": 200,
+      "nativeWeight": 700,
+      "referenceWeight": 200,
+      "shape": "narrow",
+      "showSeconds": true,
+      "literal": "08:34",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 85,
+      "glyphBounds": [
+        5,
+        22,
+        183,
+        67
+      ],
+      "indicatorOnlyBounds": [
+        198,
+        22,
+        238,
+        63
+      ],
+      "allPixelBounds": [
+        5,
+        22,
+        238,
+        67
+      ],
+      "glyphMaskSha256": "5b7f2b91e2d2a72ff2a8df1646a3c6b5a5f330c0a248b4b98ca330f0f8e94dd9",
+      "referenceMaskSha256": "884379117344bc0904ec5c31ff55982f4385a55c6d5272f2619210e6a7ef8c58",
+      "path": "before-Plus_Jakarta_Sans-200-narrow.png"
+    }
+  ],
+  "artifacts": [
+    "before-sans_serif_light-400-wide.png",
+    "before-sans_serif_light-400-narrow.png",
+    "before-sans_serif_light-700-wide.png",
+    "before-sans_serif_light-700-narrow.png",
+    "before-Courier_New-400-wide.png",
+    "before-Courier_New-400-narrow.png",
+    "before-Courier_New-700-wide.png",
+    "before-Courier_New-700-narrow.png",
+    "before-Georgia-400-wide.png",
+    "before-Georgia-400-narrow.png",
+    "before-Georgia-700-wide.png",
+    "before-Georgia-700-narrow.png",
+    "before-Bebas_Neue-400-wide.png",
+    "before-Bebas_Neue-400-narrow.png",
+    "before-Bebas_Neue-700-wide.png",
+    "before-Bebas_Neue-700-narrow.png",
+    "before-Plus_Jakarta_Sans-200-wide.png",
+    "before-Plus_Jakarta_Sans-200-narrow.png"
+  ],
+  "caseCount": 18,
+  "renderCount": 18,
+  "checkCount": 329,
+  "failureCount": 144,
+  "isolatedFailureCount": 0,
+  "passed": false,
+  "scope": "detached_canvas",
+  "windowProof": false,
+  "fpsProof": false,
+  "audioProof": false,
+  "generatedOnly": true,
+  "workBudgetMs": 15000,
+  "elapsedMs": 2646
+}
