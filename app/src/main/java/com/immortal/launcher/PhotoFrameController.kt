@@ -697,25 +697,34 @@ class PhotoFrameController(
                 password = source.pass,
             )
         io.execute {
-          val paths = if (src.connect()) src.listImages() else emptyList()
-          if (stopped || paths.isEmpty()) {
-            runCatching { src.close() }
-            if (!stopped) ui.post { if (!stopped) startWeb() }
-            return@execute
+          val queued = try {
+            prepareSlideshowSource(
+                source = src,
+                prepare = { connected ->
+                  if (connected.connect()) connected.listImages().takeIf { it.isNotEmpty() }
+                  else null
+                },
+                release = ::closeSmbSourceAsync,
+                handoff = { connected, paths, discard ->
+                  ui.postOwned(Runnable {
+                    if (stopped) {
+                      discard()
+                      return@Runnable
+                    }
+                    smbSource = connected
+                    remoteUrls = if (source.shuffle) paths.shuffled() else paths
+                    remoteFetch = { p, edge -> connected.openStream(p)?.use { decodeBoundedStream(it, edge) } }
+                    remoteMode = true
+                    remoteIndex = -1
+                    remoteFailStreak = 0
+                    advanceRemote(+1)
+                  }, onDiscard = discard)
+                })
+          } catch (error: Exception) {
+            Log.w(TAG, "SMB startup failed (${error.javaClass.simpleName}); using built-in photos")
+            false
           }
-          ui.postOwned(Runnable {
-            if (stopped) {
-              closeSmbSourceAsync(src)
-              return@Runnable
-            }
-            smbSource = src
-            remoteUrls = if (source.shuffle) paths.shuffled() else paths
-            remoteFetch = { p, edge -> src.openStream(p)?.use { decodeBoundedStream(it, edge) } }
-            remoteMode = true
-            remoteIndex = -1
-            remoteFailStreak = 0
-            advanceRemote(+1)
-          }, onDiscard = { closeSmbSourceAsync(src) })
+          if (!queued && !stopped) ui.post { if (!stopped) startWeb() }
         }
       }
       PhotoFrameSource.DefaultFeed -> {
