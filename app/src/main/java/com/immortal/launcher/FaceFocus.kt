@@ -11,8 +11,8 @@ package com.immortal.launcher
  * Focal-point math for face-aware screensaver framing.
  *
  * The detector (see [FaceFocusStore]) hands over raw face boxes; this reduces them to one
- * normalized point {fx, fy} — "the place a crop or pan should keep in frame". Pure and
- * detector-agnostic so the blend rules are unit-testable without ML Kit or a device.
+ * normalized point {fx, fy} and optionally their raw union bounds for crop consumers.
+ * Pure and detector-agnostic so the math is unit-testable without ML Kit or a device.
  */
 object FaceFocus {
 
@@ -25,8 +25,16 @@ object FaceFocus {
     val cy: Float get() = (top + bottom) / 2f
   }
 
-  /** A normalized focal point: fx/fy in 0..1, fractions of image width/height. */
-  data class Focus(val fx: Float, val fy: Float)
+  /** Raw normalized union of real face boxes; crop consumers choose their own padding. */
+  data class Bounds(val left: Float, val top: Float, val right: Float, val bottom: Float) {
+    internal fun isValid(): Boolean =
+        left.isFinite() && top.isFinite() && right.isFinite() && bottom.isFinite() &&
+            left >= 0f && top >= 0f && right <= 1f && bottom <= 1f &&
+            left < right && top < bottom
+  }
+
+  /** A normalized focal point, optionally accompanied by the region to keep in frame. */
+  data class Focus(val fx: Float, val fy: Float, val bounds: Bounds? = null)
 
   // Faces narrower than this fraction of the image's short side are treated as detector
   // noise — in a wall-display photo a real subject's face is never a few pixels wide.
@@ -38,6 +46,19 @@ object FaceFocus {
   // drowns out a group). Halfway keeps groups framed while favoring the real subject.
   // Equal-size faces have centroid == union center, so this never skews a balanced pair.
   private const val CENTROID_PULL = 0.5f
+
+  /** Union real boxes after clipping to the image, excluding noise and empty intersections. */
+  fun boundsFor(faces: List<Box>, w: Int, h: Int): Bounds? {
+    if (w <= 0 || h <= 0) return null
+    val minSide = minOf(w, h) * MIN_FACE_FRACTION
+    val real = faces.filter { it.width >= minSide && it.height >= minSide }.map {
+      Box(it.left.coerceIn(0, w), it.top.coerceIn(0, h),
+          it.right.coerceIn(0, w), it.bottom.coerceIn(0, h))
+    }.filter { it.width > 0 && it.height > 0 }
+    if (real.isEmpty()) return null
+    return Bounds(real.minOf { it.left }.toFloat() / w, real.minOf { it.top }.toFloat() / h,
+        real.maxOf { it.right }.toFloat() / w, real.maxOf { it.bottom }.toFloat() / h)
+  }
 
   /**
    * How "people-centric" a photo is, 0..1: 0 = no (real) faces, rising with face count and

@@ -90,7 +90,7 @@ class FaceFocusWorkActivityTest {
       work.start { request ->
         requests.add(request)
         if (requests.size == 1) {
-          request.commit { cache.record("complete", "0.2,0.3,0.8") }
+          request.commit { cache.record("complete", "0.2,0.3,0.8,0.1,0.2,0.4,0.5") }
           entered.countDown()
           awaitIgnoringInterrupts(release)
           request.commit { cache.record("pending", "") }
@@ -116,7 +116,7 @@ class FaceFocusWorkActivityTest {
       assertTrue(resumed.await(3, TimeUnit.SECONDS))
       assertSame(fresh, requests[1])
       assertEquals(listOf("pending"), remaining.toList())
-      assertEquals("0.2,0.3,0.8", cache.entry("complete"))
+      assertEquals("0.2,0.3,0.8,0.1,0.2,0.4,0.5", cache.entry("complete"))
       assertEquals("", cache.entry("pending"))
       assertFalse(work.start { fail("Resume reopened registration") })
     } finally { release.countDown(); work.close() }

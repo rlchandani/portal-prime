@@ -23,6 +23,52 @@ import org.mockito.Mockito
 class LegacySlideshowPreparationTest {
   @get:Rule val temporary = TemporaryFolder()
 
+  @Test fun `JSON omits invalid regions while preserving point formatting`() {
+    val invalid = listOf(FaceFocus.Bounds(Float.NaN, .2f, .7f, .9f),
+        FaceFocus.Bounds(.7f, .2f, .1f, .9f), FaceFocus.Bounds(-.1f, .2f, .7f, .9f),
+        FaceFocus.Bounds(.1f, .2f, .7f, 1.1f), FaceFocus.Bounds(.1f, .2f, .1f, .9f))
+    val photos = JSONArray(LegacySlideshowPreparation.photosJson(
+        invalid.indices.map { "fixture:$it" }, emptyMap(),
+        { key -> FaceFocus.Focus(.1234567f, .8765432f, invalid[key.substringAfter(":").toInt()]) },
+        { .7654f }))
+    for (i in invalid.indices) {
+      val photo = photos.getJSONObject(i)
+      assertEquals(setOf("url", "fx", "fy", "pw"), photo.keys().asSequence().toSet())
+      assertEquals(.123, photo.getDouble("fx"), 0.0)
+      assertEquals(.877, photo.getDouble("fy"), 0.0)
+      assertEquals(.77, photo.getDouble("pw"), 0.0)
+    }
+  }
+
+  @Test fun `persisted face region crosses JSON bridge without inward rounding`() {
+    temporary.root.resolve("face_focus.json").writeText(
+        """{"fixture:region":"0.1234567,0.8765432,0.7654,0.1234567,0.2345678,0.8765432,0.9876543"}""")
+    val context = Mockito.mock(Context::class.java)
+    Mockito.`when`(context.filesDir).thenReturn(temporary.root)
+    val store = FaceFocusStore(context)
+    try {
+      val json = LegacySlideshowPreparation.photosJson(
+          listOf("fixture:region", "fixture:none", "fixture:region"), emptyMap(),
+          store::focusFor, store::weightFor)
+      val photos = JSONArray(json)
+      assertEquals(listOf("fixture:region", "fixture:none", "fixture:region"),
+          (0 until photos.length()).map { photos.getJSONObject(it).getString("url") })
+      for (index in listOf(0, 2)) {
+        val photo = photos.getJSONObject(index)
+        val bounds = photo.getJSONArray("fb")
+        assertEquals(4, bounds.length())
+        assertEquals(.1234567f.toDouble(), bounds.getDouble(0), 0.0)
+        assertEquals(.2345678f.toDouble(), bounds.getDouble(1), 0.0)
+        assertEquals(.8765432f.toDouble(), bounds.getDouble(2), 0.0)
+        assertEquals(.9876543f.toDouble(), bounds.getDouble(3), 0.0)
+        assertEquals(.123, photo.getDouble("fx"), 0.0)
+        assertEquals(.877, photo.getDouble("fy"), 0.0)
+        assertEquals(.77, photo.getDouble("pw"), 0.0)
+      }
+      assertEquals(setOf("url"), photos.getJSONObject(1).keys().asSequence().toSet())
+    } finally { store.close() }
+  }
+
   @Test fun `cold persisted framing is read on the worker and admitted only on main`() {
     // Synthetic metadata only: no image files, image reads, transport or detector are involved.
     temporary.root.resolve("face_focus.json").writeText(

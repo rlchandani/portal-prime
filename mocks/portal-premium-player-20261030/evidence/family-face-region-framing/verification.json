@@ -1,0 +1,186 @@
+{
+  "pass_": true,
+  "scope": "Cached detected-face union framing in actual Panorama and Cinema Dream",
+  "syntheticPhotosOnly": true,
+  "fixtureSourceDimensions": [
+    2400,
+    800
+  ],
+  "cachedPoint": [
+    0.28,
+    0.425
+  ],
+  "cachedUnionBounds": [
+    0.04,
+    0.3,
+    0.86,
+    0.55
+  ],
+  "nativeHost": "PhotoDreamService",
+  "nativeDimensions": [
+    2160,
+    1440
+  ],
+  "nativeCasesPassed": 2,
+  "before": [
+    {
+      "red": {
+        "pixels": 248760,
+        "bbox": [
+          43,
+          432,
+          733,
+          791
+        ]
+      },
+      "blue": {
+        "pixels": 0,
+        "bbox": null
+      },
+      "mode": "panorama",
+      "host": "PhotoDreamService"
+    },
+    {
+      "red": {
+        "pixels": 151997,
+        "bbox": [
+          135,
+          495,
+          673,
+          776
+        ]
+      },
+      "blue": {
+        "pixels": 0,
+        "bbox": null
+      },
+      "mode": "cinema",
+      "host": "PhotoDreamService"
+    }
+  ],
+  "after": [
+    {
+      "red": {
+        "pixels": 69906,
+        "bbox": [
+          92,
+          567,
+          457,
+          757
+        ]
+      },
+      "blue": {
+        "pixels": 43739,
+        "bbox": [
+          1742,
+          567,
+          1970,
+          757
+        ]
+      },
+      "mode": "panorama",
+      "host": "PhotoDreamService"
+    },
+    {
+      "red": {
+        "pixels": 69906,
+        "bbox": [
+          92,
+          567,
+          457,
+          757
+        ]
+      },
+      "blue": {
+        "pixels": 43739,
+        "bbox": [
+          1742,
+          567,
+          1970,
+          757
+        ]
+      },
+      "mode": "cinema",
+      "host": "PhotoDreamService"
+    }
+  ],
+  "maximumSafeRenderedWidth": 2292.9936305732485,
+  "markerDimensionTolerancePixels": 2,
+  "markerFillRatio": 1.0,
+  "originalApkSha256": "bfc9430d5150c62dea647a48fcb02ade23aa3a76a0232c10eca0fa9a44aee974",
+  "installedApkSha256": "0e37dcb1fafac3b76b312ab7b0f802e27505996d99310b8b67ad82d94db0fd95",
+  "signingCertificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "unitTests": {
+    "tests": 3737,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 392
+  },
+  "unitGate": "Fresh execution before normalizer correction; up-to-date after assets-only correction",
+  "slideshowJavaScript": {
+    "tests": 296,
+    "passed": 296,
+    "failed": 0
+  },
+  "normalizerRegressionBefore": {
+    "tests": 15,
+    "passed": 6,
+    "failed": 9
+  },
+  "normalizerRegressionAfter": {
+    "tests": 15,
+    "passed": 15,
+    "failed": 0
+  },
+  "restore": {
+    "settingsExact": true,
+    "sourcesExact": true,
+    "accessibilityExact": true,
+    "systemPidUnchanged": true,
+    "fixturesRemoved": true,
+    "installedSha256": "0e37dcb1fafac3b76b312ab7b0f802e27505996d99310b8b67ad82d94db0fd95",
+    "brightnessPolicyExact": true,
+    "rawBrightnessExact": true,
+    "brightnessInvariantSatisfied": true,
+    "originalDreamRestored": true,
+    "generatedCacheEntryRemoved": true,
+    "noInstrumentation": true,
+    "noCollector": true,
+    "persistentPinExact": true,
+    "optimizedNonDebuggable": true,
+    "pass": true
+  },
+  "faceDetectorRecallMeasured": false,
+  "perFramePerformanceMeasured": false,
+  "panelFpsMeasured": false,
+  "opticalComfortMeasured": false,
+  "slotStartUtc": "2026-11-01T12:44:00Z",
+  "originalSlotDeadlineUtc": "2026-11-01T13:14:00Z",
+  "initialHorizontalNativeVerifiedWithinSeconds": 889,
+  "initialHorizontalNativeVerifiedByUtc": "2026-11-01T12:58:49Z",
+  "finalFocusedRegionTests": {
+    "tests": 17,
+    "passed": 17,
+    "failed": 0
+  },
+  "reviewVerticalRegressionBefore": {
+    "tests": 16,
+    "passed": 15,
+    "failed": 1
+  },
+  "reviewRoundoffRegressionBefore": {
+    "tests": 17,
+    "passed": 16,
+    "failed": 1
+  },
+  "alternateViewport": {
+    "dimensions": [
+      1920,
+      1080
+    ],
+    "coverage": "JavaScript scene geometry; not physical hardware"
+  },
+  "nativeRestorationVerifiedByUtc": "2026-11-01T13:04:40Z",
+  "nativeVerifiedWithinSeconds": 1240
+}

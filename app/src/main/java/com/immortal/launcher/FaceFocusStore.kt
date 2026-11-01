@@ -31,7 +31,8 @@ import java.util.concurrent.TimeUnit
 /**
  * Legacy engine focal points and people weights. Detection runs on a bounded, shared worker;
  * each frame owns a cancellable handle. Results still enter the engine's next-start fx/fy/pw
- * snapshot, and face_focus.json retains its URL -> "fx,fy,weight" / "" format.
+ * snapshot. face_focus.json retains URL -> comma-separated metadata / ""; new face results
+ * append the raw normalized bounds to the existing "fx,fy,weight" fields.
  */
 class FaceFocusStore(context: Context) : AutoCloseable {
   // A stalled SDK task may retain this store, but must never retain its Activity/Dream host.
@@ -47,7 +48,7 @@ class FaceFocusStore(context: Context) : AutoCloseable {
     if (parts.size < 2) return null
     val fx = parts[0].toFloatOrNull() ?: return null
     val fy = parts[1].toFloatOrNull() ?: return null
-    return FaceFocus.Focus(fx, fy)
+    return FaceFocus.Focus(fx, fy, cachedFaceBounds(parts))
   }
 
   /** The cached people-weight (0..1) for [url]; 0 if unanalyzed / no faces. */
@@ -79,7 +80,7 @@ class FaceFocusStore(context: Context) : AutoCloseable {
       urls: List<String>, authHeaders: Map<String, String>, request: FaceFocusRequest,
   ) {
     if (!request.current()) return
-    // Old two-field focal entries get one re-pass for people weighting. No-face stays final.
+    // Old focal/weighted entries get a bounded re-pass for face bounds. No-face stays final.
     val pending = urls.distinct().filter { cache.needsAnalysis(it) }
     if (pending.isEmpty() || !request.current()) return
     val detector = FaceDetection.getClient(
@@ -136,7 +137,9 @@ class FaceFocusStore(context: Context) : AutoCloseable {
       }
       val focus = FaceFocus.focalPoint(boxes, bmp.width, bmp.height) ?: return ""
       val weight = FaceFocus.peopleWeight(boxes, bmp.width, bmp.height)
-      return "${focus.fx},${focus.fy},$weight"
+      val point = "${focus.fx},${focus.fy},$weight"
+      val bounds = FaceFocus.boundsFor(boxes, bmp.width, bmp.height) ?: return ""
+      return "$point,${bounds.left},${bounds.top},${bounds.right},${bounds.bottom}"
     } finally {
       // Timeout/interruption does not cancel ML Kit. Park this one worker for safe disposal;
       // a stuck Task retains one bounded bitmap/client and at most one latest pending frame.
@@ -190,7 +193,7 @@ class FaceFocusStore(context: Context) : AutoCloseable {
 internal class FaceFocusCache(file: File) {
   private val state = states.computeIfAbsent(file.absoluteFile.normalize().path) { State(file) }
   fun entry(url: String): String? = state.entry(url)
-  fun needsAnalysis(url: String): Boolean = incomplete(entry(url))
+  fun needsAnalysis(url: String): Boolean = state.needsAnalysis(url)
   fun record(url: String, entry: String): Boolean = state.record(url, entry)
   fun persist() { state.persist() }
 
@@ -200,6 +203,9 @@ internal class FaceFocusCache(file: File) {
     private var version = 0L
     private var written = 0L
     private val diskLock = Any()
+    // A successful no-region re-pass must not erase legacy framing or repeat every warm-up.
+    // Shared for this process lifetime; decode/SDK failures remain retryable.
+    private val noRegionAttempts = HashSet<String>()
 
     @Synchronized private fun load() {
       if (loaded) return
@@ -215,10 +221,28 @@ internal class FaceFocusCache(file: File) {
       return entries[url]
     }
 
+    @Synchronized fun needsAnalysis(url: String): Boolean {
+      if (!loaded) load()
+      return url !in noRegionAttempts && incomplete(entries[url])
+    }
+
     @Synchronized fun record(url: String, entry: String): Boolean {
       if (!loaded) load()
-      if (!incomplete(entries[url])) return false // A complete peer result wins over late work.
+      val previous = entries[url]
+      if (previous != null && (previous.isEmpty() || previous.split(",").size >= 3)) {
+        val previousParts = previous.split(",")
+        val parts = entry.split(",")
+        val repairable = previousParts.size == 3 ||
+            (previousParts.size == 7 && !validFaceEntry(previousParts))
+        // Valid regions always win. Only another valid region may upgrade/repair metadata.
+        if (!repairable) return false
+        if (!validFaceEntry(parts)) {
+          if (entry.isEmpty()) noRegionAttempts.add(url)
+          return false // Preserve the point/weight, including against stale three-field work.
+        }
+      }
       entries[url] = entry
+      noRegionAttempts.remove(url)
       version++
       return true
     }
@@ -245,9 +269,31 @@ internal class FaceFocusCache(file: File) {
 
   private companion object {
     val states = ConcurrentHashMap<String, State>()
-    fun incomplete(entry: String?): Boolean =
-        entry == null || (entry.isNotEmpty() && entry.split(",").size < 3)
+    fun incomplete(entry: String?): Boolean {
+      if (entry == null) return true
+      if (entry.isEmpty()) return false
+      val parts = entry.split(",")
+      return parts.size <= 3 || (parts.size == 7 && !validFaceEntry(parts))
+    }
   }
+}
+
+private fun validFacePoint(parts: List<String>): Boolean =
+    parts.size >= 3 && parts.take(3).all { field ->
+      field.toFloatOrNull()?.let { it.isFinite() && it in 0f..1f } == true
+    }
+
+private fun validFaceEntry(parts: List<String>): Boolean =
+    validFacePoint(parts) && cachedFaceBounds(parts) != null
+
+/** Invalid region fields never invalidate the separately persisted legacy point/weight. */
+private fun cachedFaceBounds(parts: List<String>): FaceFocus.Bounds? {
+  if (parts.size != 7) return null
+  val left = parts[3].toFloatOrNull() ?: return null
+  val top = parts[4].toFloatOrNull() ?: return null
+  val right = parts[5].toFloatOrNull() ?: return null
+  val bottom = parts[6].toFloatOrNull() ?: return null
+  return FaceFocus.Bounds(left, top, right, bottom).takeIf { it.isValid() }
 }
 
 /** Logical cancellation is synchronous. Physical transport cleanup is exclusively off-thread. */

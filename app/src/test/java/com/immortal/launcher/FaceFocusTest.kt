@@ -16,6 +16,31 @@ class FaceFocusTest {
 
   private fun box(l: Int, t: Int, r: Int, b: Int) = FaceFocus.Box(l, t, r, b)
 
+  @Test fun `region unions real face boxes at image edges without adding padding`() {
+    val faces = listOf(box(-100, 50, 200, 250), box(650, 300, 1200, 600),
+        box(400, 0, 410, 10), box(400, 400, 300, 500), box(-200, -200, -100, -100))
+    assertEquals(FaceFocus.Bounds(0f, .1f, 1f, 1f), FaceFocus.boundsFor(faces, 1000, 500))
+  }
+
+  @Test fun `region uses four percent of image short side and includes threshold faces`() {
+    assertEquals(FaceFocus.Bounds(.07f, .08f, .08f, .12f),
+        FaceFocus.boundsFor(listOf(box(70, 20, 80, 30), box(800, 100, 809, 109)), 1000, 250))
+  }
+
+  @Test fun `region ignores empty reversed and entirely off-image boxes`() {
+    assertNull(FaceFocus.boundsFor(emptyList(), 1000, 1000))
+    assertNull(FaceFocus.boundsFor(listOf(box(0, 0, 100, 100)), 0, 1000))
+    assertNull(FaceFocus.boundsFor(
+        listOf(box(100, 100, 100, 200), box(200, 100, 100, 200), box(1000, 0, 1100, 200)),
+        1000, 1000))
+  }
+
+  @Test fun `focal point retains old point equality and carries no region`() {
+    val point = FaceFocus.focalPoint(listOf(box(100, 200, 300, 400)), 1000, 1000)
+    assertEquals(FaceFocus.Focus(.2f, .3f), point)
+    assertNull(point!!.bounds)
+  }
+
   @Test
   fun `no faces yields null focus`() {
     assertNull(FaceFocus.focalPoint(emptyList(), 1000, 1000))

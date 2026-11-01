@@ -52,6 +52,9 @@
     // Framing code reads these to keep faces in crops and open pans on them.
     fx: typeof p.fx === "number" ? p.fx : undefined,
     fy: typeof p.fy === "number" ? p.fy : undefined,
+    // Optional raw union bounds. The crop planner validates them; older host data
+    // keeps exactly the original photo shape and point-only framing.
+    ...(Array.isArray(p.fb) ? { fb: p.fb.slice() } : {}),
     // People-weight (0..1): how face-centric the photo is. Drives the presence-aware
     // deck bias (SS.peopleDeck) — people photos lead while someone is watching.
     pw: typeof p.pw === "number" ? p.pw : 0,

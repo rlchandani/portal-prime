@@ -642,7 +642,9 @@
         const rawAspect = aspect(p), ratio = Number.isFinite(rawAspect) && rawAspect > 0 ? rawAspect : ctx.W / ctx.H;
         // Bound the moving strip instead of making an extreme panorama many screens wide.
         // Fit its full height on matte; transform motion still reaches both horizontal edges.
-        const width = Math.min(ctx.W * 2, Math.max(ctx.W, ctx.H * ratio));
+        const baseWidth = Math.min(ctx.W * 2, Math.max(ctx.W, ctx.H * ratio));
+        const faceCrop = SS.faceCrop(p, baseWidth, ctx.W);
+        const width = faceCrop ? faceCrop.size : baseWidth;
         const height = Math.min(ctx.H, width / ratio), travel = (ctx.W - width) / width * 100;
         pan.style.width = width + "px"; pan.style.height = height + "px";
         pan.style.top = (ctx.H - height) / 2 + "px";
@@ -653,7 +655,8 @@
         pan.style.animation = moving ? `dolly ${duration}ms linear forwards` : "none";
         pan.style.willChange = moving ? "transform" : "auto";
         // A still strip uses the cached face or the middle of the admitted crop.
-        pan.style.transform = hasFace(p) || ctx.photoMotion === false ?
+        pan.style.transform = faceCrop ? `translateX(${-faceCrop.offset / width * 100}%)` :
+          hasFace(p) || ctx.photoMotion === false ?
           `translateX(${travel * SS.panStart(hasFace(p) ? p.fx : .5, width / ctx.W * 100)}%)` : "none";
         dissolve.present(root);
       });
@@ -1074,8 +1077,24 @@
           // Keep the immersive crop, but center the cached focal point rather than
           // confusing CSS edge alignment with the focal point's image coordinate.
           const renderedW = Math.max(ctx.W, scopeH * ratio), renderedH = renderedW / ratio;
-          image.style.backgroundPosition =
-            `${SS.panStart(p.fx, renderedW / ctx.W * 100) * 100}% ${SS.panStart(p.fy, renderedH / scopeH * 100) * 100}%`;
+          // Compare the cover constraints directly; division roundoff can make
+          // a height fitted exactly to scopeH appear to overflow it.
+          const vertical = ctx.W > scopeH * ratio;
+          const faceCrop = SS.faceCrop(p, vertical ? renderedH : renderedW,
+            vertical ? scopeH : ctx.W, vertical);
+          if (faceCrop) {
+            const safeWidth = vertical ? faceCrop.size * ratio : ctx.W;
+            const safeHeight = vertical ? scopeH : faceCrop.size / ratio;
+            image.style.width = safeWidth + "px";
+            image.style.height = safeHeight + "px";
+            image.style.left = (ctx.W - safeWidth) / 2 + "px";
+            image.style.top = (scopeH - safeHeight) / 2 + "px";
+            image.style.backgroundPosition = vertical ? `50% ${faceCrop.position * 100}%` :
+              `${faceCrop.position * 100}% 50%`;
+          } else {
+            image.style.backgroundPosition =
+              `${SS.panStart(p.fx, renderedW / ctx.W * 100) * 100}% ${SS.panStart(p.fy, renderedH / scopeH * 100) * 100}%`;
+          }
         } else if (wide && ctx.photoMotion !== false) {
           image.style.willChange = "transform";
           image.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;

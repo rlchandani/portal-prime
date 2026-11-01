@@ -1,0 +1,42 @@
+{
+  "pass_": false,
+  "reason": "photo_normalizer_dropped_fb",
+  "apkSha256": "009b08fe3bbd5ccd54d15b30ab68388767acdb7b512d409f60201f713a90e3be",
+  "actualCapturedGeometry": [
+    {
+      "red": {
+        "pixels": 248760,
+        "bbox": [
+          43,
+          432,
+          733,
+          791
+        ]
+      },
+      "blue": {
+        "pixels": 0,
+        "bbox": null
+      },
+      "mode": "panorama",
+      "host": "PhotoDreamService"
+    },
+    {
+      "red": {
+        "pixels": 151997,
+        "bbox": [
+          135,
+          495,
+          673,
+          776
+        ]
+      },
+      "blue": {
+        "pixels": 0,
+        "bbox": null
+      },
+      "mode": "cinema",
+      "host": "PhotoDreamService"
+    }
+  ],
+  "countedAsPassingCase": false
+}

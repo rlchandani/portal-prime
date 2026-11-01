@@ -407,3 +407,17 @@ not rerun. The original matrix has **9 strict passes, 16 marker-area failures,
 5 cases outside its axis-aligned contract, and 1 reproduced crop**; these are
 not 31 passing layouts. Other-style motion acceptance, natural brightness
 comfort and the broader goal remain incomplete.
+
+**Native face-region framing delivered:** [the bounded Family Area fix](portal-face-region-framing-2026-11-01.md)
+keeps the detected group visible in Panorama and Cinema. Both actual Dream
+captures change the second generated face region from **0** to **43,739**
+visible pixels, with full marker rectangles and the largest safe crop scale.
+The initial native attempt failed because the JavaScript photo normalizer
+dropped the new bounds; that failure is retained and the regression now
+exercises the actual normalizer. **296/296 JavaScript tests** and **3,737 fresh
+Kotlin tests** pass. Optimized APK **0e37dcb1…** is installed; all settings,
+sources, services, brightness policy and original Dream are restored.
+Final native verification finished within **20 minutes 40 seconds** of the original
+30-minute slot. This improves framing from cached detections, not detector
+recall or measured FPS. Natural-light brightness comfort and the broader goal
+remain incomplete.

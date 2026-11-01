@@ -146,6 +146,11 @@ internal class LegacySlideshowPreparation(
         focus?.let { f ->
           o.put("fx", String.format(Locale.US, "%.3f", f.fx).toDouble())
           o.put("fy", String.format(Locale.US, "%.3f", f.fy).toDouble())
+          f.bounds?.takeIf { it.isValid() }?.let { bounds ->
+            // Preserve the full region: focal-point rounding would move some edges inward.
+            o.put("fb", JSONArray().put(bounds.left.toDouble()).put(bounds.top.toDouble())
+                .put(bounds.right.toDouble()).put(bounds.bottom.toDouble()))
+          }
         }
         val weight = weightFor(u)
         checkpoint()

@@ -139,6 +139,27 @@
     return Math.min(1, Math.max(0, windowTop / (1 - visible)));
   };
 
+  // Largest crop on the overflowing axis retaining the padded union of faces. Older
+  // point-only cache entries deliberately keep their original framing.
+  window.SS.faceCrop = function (photo, renderedSize, viewportSize, vertical = false) {
+    const bounds = photo.fb;
+    if (!Number.isFinite(photo.fx) || !Number.isFinite(photo.fy) ||
+        photo.fx < 0 || photo.fx > 1 || photo.fy < 0 || photo.fy > 1 ||
+        !Array.isArray(bounds) || bounds.length !== 4 ||
+        !bounds.every(v => Number.isFinite(v) && v >= 0 && v <= 1) ||
+        bounds[0] >= bounds[2] || bounds[1] >= bounds[3]) return null;
+    const start = bounds[vertical ? 1 : 0], end = bounds[vertical ? 3 : 2];
+    const pad = (end - start) * .1;
+    const first = Math.max(0, start - pad), last = Math.min(1, end + pad);
+    const size = Math.max(viewportSize, Math.min(renderedSize, viewportSize / (last - first)));
+    const excess = size - viewportSize;
+    const minOffset = Math.max(0, size * last - viewportSize);
+    const maxOffset = Math.max(minOffset, Math.min(excess, size * first));
+    const focal = vertical ? photo.fy : photo.fx;
+    const offset = Math.min(maxOffset, Math.max(minOffset, size * focal - viewportSize / 2));
+    return { size, offset, position: excess > .000001 ? offset / excess : .5 };
+  };
+
   // How a photo should live in a cell. When the aspects roughly agree, a cover
   // crop loses little and the normal Ken Burns applies. Past MISMATCH the crop
   // discards most of the photo (a portrait in a wide cell keeps only a middle
