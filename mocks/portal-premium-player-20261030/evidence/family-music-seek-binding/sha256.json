@@ -1,0 +1,22 @@
+{
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/baseline-checks.json": "a43d16a2e0ab67bcb7b93c253b0109d30d889130cf32cb7003c8947e55bda8d2",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/original-dark-held.png": "eef4fd1c46420629b054676ef59ed0b525ddebf51425e44358f834963d0b3756",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/corrected-light-rebound.png": "76532bc01863037037e0310ef6b21eb3e868b0760f50a9f4a70bd7aa213859e5",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/checks.json": "7ca5fa7db3df69d913e6498a0f7e8914d16a9f0f0f71a523a98f5afbfe94a95b",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/corrected-light-held.png": "c2256384d41ac53f1b4c6c23445124a3cab2979af497ab5525e7ee1ac0184989",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/unit-gate.json": "2a2c684e7d584a8692e8c4c5f96b5a552bf85245b04e2fdcc4647f2567f6a32a",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/corrected-dark-rebound.png": "439a51f991ed5074e2f9ec56ba83de1f674fa84130ade20d6982d536af6721fe",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/corrected-dark-held.png": "eef4fd1c46420629b054676ef59ed0b525ddebf51425e44358f834963d0b3756",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/pixel-proof.json": "80a273e234d2a663532f1df026568b1887ac83b91817d8f0d20da17d292a7261",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/verification.json": "82ba46980fb777ece4308e141ad55de7a1e2c0c23a9b799679714557c835184d",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/original-light-held.png": "c2256384d41ac53f1b4c6c23445124a3cab2979af497ab5525e7ee1ac0184989",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/original-light-rebound.png": "e354be3a0d6cc3e4b847b1b0852bfd52271cf911dc46a5332b8ccedbf83285d6",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/original-dark-rebound.png": "08e412f5c4b6df2b2d3d2358830a2f85e4a1d2f097edfb8ee6e06ec4afc8f1b5",
+  "app/src/main/java/com/immortal/launcher/MusicPlayerUi.kt": "407ba34ac03ac24b3de0e5a3bd75627020c7ef277d0de198f4cbfb0b8280a64b",
+  "app/src/main/java/com/immortal/launcher/MusicRenderedAction.kt": "b7032aa95b3a759e72fcfe80363069f824bad730dc49d9aea0eb9ebd43dc7101",
+  "app/src/debug/java/com/immortal/launcher/MusicDesignPreviewActivity.kt": "a4e3e346c971d8d270da59e3d062a67819a499f2f4a57af1b6f5b38f065c1838",
+  "app/src/androidTest/java/com/immortal/launcher/MusicSeekBindingDeviceChecks.kt": "ae1c0289dd5e0d6240bd0f53978ee03fc0ae7dfe6f5af637700952693ba164a4",
+  "app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt": "e8f8fb9b3f32ac9b6364d8a5e49c161bd0083421bf77a3ca8fa7e328ff084eee",
+  "app/src/test/java/com/immortal/launcher/MusicRenderedActionTest.kt": "fe8049b47914401d4953172f6809f002dbc4b2f0d2dc20cb712ae561a1b80d36",
+  "mocks/portal-premium-player-20261030/evidence/family-music-seek-binding/post-health.json": "1afd1ac475d4d234e1feaf0c1add942ded30d44452410e44379218e8b09417f9"
+}

@@ -1,0 +1,890 @@
+{
+  "checks": [
+    {
+      "name": "dark.native_window",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.release_owned",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.release_owned",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.player.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.player.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.player.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.player.draft_binding",
+      "passed": false
+    },
+    {
+      "name": "dark.player.old_stream_binding",
+      "passed": false
+    },
+    {
+      "name": "dark.player.release_owned",
+      "passed": false
+    },
+    {
+      "name": "dark.player.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.draft_binding",
+      "passed": false
+    },
+    {
+      "name": "dark.queue.old_stream_binding",
+      "passed": false
+    },
+    {
+      "name": "dark.queue.release_owned",
+      "passed": false
+    },
+    {
+      "name": "dark.queue.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.duration.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.duration.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.duration.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.duration.draft_binding",
+      "passed": false
+    },
+    {
+      "name": "dark.duration.old_stream_binding",
+      "passed": false
+    },
+    {
+      "name": "dark.duration.release_owned",
+      "passed": false
+    },
+    {
+      "name": "dark.duration.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.native_window",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.release_owned",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.release_owned",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.player.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.player.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.player.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.player.draft_binding",
+      "passed": false
+    },
+    {
+      "name": "light.player.old_stream_binding",
+      "passed": false
+    },
+    {
+      "name": "light.player.release_owned",
+      "passed": false
+    },
+    {
+      "name": "light.player.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.queue.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.queue.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.queue.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.queue.draft_binding",
+      "passed": false
+    },
+    {
+      "name": "light.queue.old_stream_binding",
+      "passed": false
+    },
+    {
+      "name": "light.queue.release_owned",
+      "passed": false
+    },
+    {
+      "name": "light.queue.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.duration.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.duration.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.duration.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.duration.draft_binding",
+      "passed": false
+    },
+    {
+      "name": "light.duration.old_stream_binding",
+      "passed": false
+    },
+    {
+      "name": "light.duration.release_owned",
+      "passed": false
+    },
+    {
+      "name": "light.duration.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "owned_hosts_destroyed",
+      "passed": true
+    },
+    {
+      "name": "bounded_native_work",
+      "passed": true
+    }
+  ],
+  "samples": [
+    {
+      "palette": "dark",
+      "case": "unchanged",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "dark",
+      "case": "metadata",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "dark",
+      "case": "player",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "dark",
+      "case": "queue",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-b",
+          "currentQueue": "generated-queue-b",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-b",
+          "currentQueue": "generated-queue-b",
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "dark",
+      "case": "duration",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-b",
+          "currentQueue": "generated-queue-b",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-b",
+          "currentQueue": "generated-queue-b",
+          "accepted": true
+        },
+        {
+          "positionMs": 225574,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 112528,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "unchanged",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "metadata",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "player",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "queue",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-b",
+          "currentQueue": "generated-queue-b",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-b",
+          "currentQueue": "generated-queue-b",
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "duration",
+      "heldFraction": 0.64425284,
+      "reboundFraction": 0.64425284,
+      "continuedFraction": 0.7519157,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-b",
+          "currentPlayer": "ma:generated-player-b",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 180459,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-b",
+          "currentQueue": "generated-queue-b",
+          "accepted": true
+        },
+        {
+          "positionMs": 90022,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-b",
+          "currentQueue": "generated-queue-b",
+          "accepted": true
+        },
+        {
+          "positionMs": 225574,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        },
+        {
+          "positionMs": 112528,
+          "renderedPlayer": "ma:generated-player-a",
+          "currentPlayer": "ma:generated-player-a",
+          "renderedQueue": "generated-queue-a",
+          "currentQueue": "generated-queue-a",
+          "accepted": true
+        }
+      ]
+    }
+  ],
+  "passed": false,
+  "failureCount": 18,
+  "isolatedFailureCount": 0,
+  "caseCount": 10,
+  "elapsedMs": 8563,
+  "generatedOnly": true,
+  "providerProof": false,
+  "panelFpsProof": false
+}

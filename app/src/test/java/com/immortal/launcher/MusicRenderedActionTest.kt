@@ -31,6 +31,13 @@ class MusicRenderedActionTest {
         MusicPlayerUiAction.Previous, MusicPlayerUiAction.Seek(5_000),
         MusicPlayerUiAction.SelectQueueItem("queue-2")).forEach { assertTrue(allowed(old, now, it)) }
   }
+  @Test fun changedDurationInvalidatesTheRenderedSeekWithoutInvalidatingPauseOrSkip() {
+    val old = ready()
+    val now = old.copy(track = old.track!!.copy(durationMs = 240_000))
+    assertFalse(allowed(old, now, MusicPlayerUiAction.Seek(50_000)))
+    assertTrue(allowed(old, now, MusicPlayerUiAction.TogglePlayback))
+    assertTrue(allowed(old, now, MusicPlayerUiAction.Next))
+  }
   @Test fun anInterruptionRejectsPreviouslyRenderedStartSeekSkipAndQueuePlayback() {
     val old = ready()
     val interrupted = old.copy(audioOwnedByOther = true)

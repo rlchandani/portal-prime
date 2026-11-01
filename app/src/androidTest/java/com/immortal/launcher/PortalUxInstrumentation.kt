@@ -40,6 +40,15 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        if (options.getString("command") == "musicSeekBinding") {
+            val seek = try {
+                MusicSeekBindingDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply { putBoolean("musicSeekBindingPassed", false) }
+            }
+            finish(if (seek.getBoolean("musicSeekBindingPassed")) 0 else 1, seek)
+            return
+        }
         if (options.getString("command") == "slideshowDrag") {
             val drag = try {
                 SlideshowDragDeviceChecks.run(this)

@@ -437,34 +437,38 @@ private fun MusicProgress(
     MusicText("Track duration is unavailable", muted = true, size = 15)
     return
   }
-  var draft by remember(snapshot.sourceId, track.id) { mutableStateOf<Float?>(null) }
-  val enabled = musicCanSend(snapshot, MusicCommand.SEEK)
-  LaunchedEffect(enabled) { if (!enabled) draft = null }
   val position = LocalMusicVisiblePosition.current.value ?: return
-  val fraction = (position.toDouble() / duration).toFloat().coerceIn(0f, 1f)
-  Column(modifier) {
-    MusicSlider(
-        value = draft ?: fraction,
-        onValueChange = { if (enabled) draft = it },
-        onValueChangeFinished = {
-          val value = draft
-          draft = null
-          if (value != null && musicCanSend(snapshot, MusicCommand.SEEK)) {
-            onAction(MusicPlayerUiAction.Seek((value.toDouble() * duration).toLong()
-                .coerceIn(0, duration)))
-          }
-        },
-        enabled = enabled,
-        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-            .semantics { contentDescription = "Track position" },
-    )
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-      MusicText(musicTime(draft?.let { (it.toDouble() * duration).toLong() } ?: position),
+  // Retire the pointer stream with its playback binding, not just the displayed fraction.
+  key(snapshot.sourceId, snapshot.localSessionToken, snapshot.controlPlayerId,
+      snapshot.queueId, snapshot.presentationRevision, track.id, duration) {
+    var draft by remember { mutableStateOf<Float?>(null) }
+    val enabled = musicCanSend(snapshot, MusicCommand.SEEK)
+    LaunchedEffect(enabled) { if (!enabled) draft = null }
+    val fraction = (position.toDouble() / duration).toFloat().coerceIn(0f, 1f)
+    Column(modifier) {
+      MusicSlider(
+          value = draft ?: fraction,
+          onValueChange = { if (enabled) draft = it },
+          onValueChangeFinished = {
+            val value = draft
+            draft = null
+            if (value != null && musicCanSend(snapshot, MusicCommand.SEEK)) {
+              onAction(MusicPlayerUiAction.Seek((value.toDouble() * duration).toLong()
+                  .coerceIn(0, duration)))
+            }
+          },
+          enabled = enabled,
+          modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+              .semantics { contentDescription = "Track position" },
+      )
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        MusicText(musicTime(draft?.let { (it.toDouble() * duration).toLong() } ?: position),
+            muted = true, size = 14)
+        MusicText(musicTime(duration), muted = true, size = 14)
+      }
+      if (!snapshot.can(MusicCommand.SEEK)) MusicText("Seeking is unavailable",
           muted = true, size = 14)
-      MusicText(musicTime(duration), muted = true, size = 14)
     }
-    if (!snapshot.can(MusicCommand.SEEK)) MusicText("Seeking is unavailable",
-        muted = true, size = 14)
   }
 }
 

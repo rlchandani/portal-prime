@@ -2,7 +2,22 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — native crop dragging.**
+**Newest delivery, November 1 — held-seek ownership.**
+[The seek correction](portal-music-seek-binding-2026-11-01.md) retires the
+seek control with its playback binding and rejects stale duration commands.
+Actual Family Area checks change from **18 failures / 74 to 74/74 passing**
+across ten generated paused cases in both palettes. **Six** old releases
+accepted by the production rendered-command guard become **zero**; normal
+and title-only updates preserve gestures, and all ten fresh gestures work.
+A further MOVE confirms the old pointer stream cannot repopulate the draft.
+Native pixels corroborate the new authoritative position. **3,765
+fresh JVM tests** pass. Optimized APK **2c7dd413…** is installed with original
+configuration/Dream restored **17 minutes 45 seconds** into the
+original 30-minute slot. This verifies native UI/guard ownership, not real
+provider commands, audio, physical finger routing or FPS. The room-light
+check and previously parked issues remain open.
+
+**Previous delivery, November 1 — native crop dragging.**
 [The crop correction](portal-slideshow-drag-2026-11-01.md) uses the edited
 image's actual scale, translation and holder bounds. An **80 × 60 px** framed
 drag improves from **73.667 × 55.250 px to 80 × 60 px**. Full-screen reversal

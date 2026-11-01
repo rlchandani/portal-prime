@@ -36,6 +36,9 @@ internal fun musicRenderedActionIsCurrent(
   }
   if (trackBound && (rendered.track?.id.isNullOrBlank() ||
       rendered.track?.id != current.track?.id)) return false
+  // A held fraction belongs to the duration that was rendered when its gesture began.
+  if (action is MusicPlayerUiAction.Seek &&
+      rendered.track?.durationMs != current.track?.durationMs) return false
   if (action is MusicPlayerUiAction.SelectQueueItem &&
       (rendered.queueId.isNullOrBlank() || rendered.queueId != current.queueId ||
         rendered.queue.none { it.id == action.id && it.available } ||

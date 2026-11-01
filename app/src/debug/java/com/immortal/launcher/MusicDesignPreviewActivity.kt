@@ -46,9 +46,26 @@ class MusicDesignPreviewActivity : ComponentActivity() {
   private var lyricsFixtureActive by mutableStateOf(true)
   private var viewportFixture by mutableStateOf<MusicPlayerSnapshot?>(null)
   private var viewportLayout by mutableStateOf(MusicPlayerLayout.FULL)
+  private var seekBindingFixture by mutableStateOf<MusicPlayerSnapshot?>(null)
+  private val seekBindingReceipts = org.json.JSONArray()
   private val generatedLyrics = (0 until 80).map {
     MusicLyricLine(it * 1_000L, "Generated lyric line $it")
   }
+
+  fun updateMusicSeekBinding(player: String, queue: String, revision: Long, title: String,
+      duration: Long = 240_000) {
+    require(intent.getStringExtra("screen") == "seekbinding")
+    require(player.startsWith("ma:generated-") && queue.startsWith("generated-"))
+    seekBindingFixture = MusicPlayerSnapshot(
+        connection = MusicConnection.READY, sourceId = "ma:generated-seek",
+        track = MusicTrack("generated-seek-track", "ma:generated-seek", title,
+            durationMs = duration), playback = PlaybackState.PAUSED,
+        positionMs = 30_000, positionAtElapsedMs = SystemClock.elapsedRealtime(),
+        capabilities = MusicCapabilities(seek = true, queue = true),
+        queueId = queue, controlPlayerId = player, presentationRevision = revision)
+  }
+
+  fun musicSeekBindingReceipts(): String = seekBindingReceipts.toString()
 
   /** Generated silent lists; updates retain the same production player composition. */
   fun updateMusicViewportBinding(source: String, queue: String, revision: Long) {
@@ -106,6 +123,38 @@ class MusicDesignPreviewActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN or
         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    if (intent.getStringExtra("screen") == "seekbinding") {
+      val token = intent.getStringExtra("owned_probe")
+      if (token != null && token == cancelledSeekProbe) { finish(); return }
+      val deadline = intent.getLongExtra("owned_deadline_elapsed_ms", 0)
+      if (deadline > 0 && SystemClock.elapsedRealtime() >= deadline) { finish(); return }
+      updateMusicSeekBinding("ma:generated-player-a", "generated-queue-a", 1, "Generated paused track")
+      setContent {
+        val palette = if (intent.getStringExtra("theme") == "light")
+          ApprovedLightPalette else ApprovedDarkPalette
+        CompositionLocalProvider(LocalApprovedPalette provides palette) {
+          MaterialTheme(colorScheme = approvedColorScheme(palette === ApprovedDarkPalette)) {
+            seekBindingFixture?.let { rendered ->
+              MusicPlayerContent(rendered, MusicPlayerLayout.FULL, Modifier.fillMaxSize(),
+                  onDismiss = { finish() }, onLayoutChange = {}, onAction = { action ->
+                    if (action is MusicPlayerUiAction.Seek) {
+                      val current = checkNotNull(seekBindingFixture)
+                      seekBindingReceipts.put(org.json.JSONObject()
+                          .put("positionMs", action.positionMs)
+                          .put("renderedPlayer", rendered.controlPlayerId)
+                          .put("currentPlayer", current.controlPlayerId)
+                          .put("renderedQueue", rendered.queueId)
+                          .put("currentQueue", current.queueId)
+                          .put("accepted", musicRenderedActionIsCurrent(
+                              rendered, current, current.presentationRevision, action)))
+                    }
+                  })
+            }
+          }
+        }
+      }
+      return
+    }
     if (intent.getStringExtra("screen") == "viewport") {
       val deadline = intent.getLongExtra("owned_deadline_elapsed_ms", 0)
       if (deadline > 0 && SystemClock.elapsedRealtime() >= deadline) {
@@ -499,5 +548,10 @@ class MusicDesignPreviewActivity : ComponentActivity() {
     nightClock?.setActive(false)
     gallery?.stop()
     super.onDestroy()
+  }
+
+  companion object {
+    private var cancelledSeekProbe: String? = null
+    @JvmStatic fun cancelOwnedSeekProbe(token: String) { cancelledSeekProbe = token }
   }
 }
