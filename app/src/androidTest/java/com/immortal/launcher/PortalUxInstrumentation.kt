@@ -559,6 +559,7 @@ class PortalUxInstrumentation : Instrumentation() {
         request.delete()
         response.delete()
         val homeMonitor = addMonitor("com.immortal.launcher.HomeActivity", null, false)
+        val musicMonitor = addMonitor("com.immortal.launcher.MusicDesignPreviewActivity", null, false)
         targetContext.startActivity(Intent().setClassName(targetContext.packageName,
             "com.immortal.launcher.HomeActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         sendStatus(0, Bundle().apply { putBoolean("observerReady", true) })
@@ -643,6 +644,11 @@ class PortalUxInstrumentation : Instrumentation() {
                     continue
                 }
                 val snapshot = snapshotWindows(automation, active)
+                runOnMainSync {
+                    snapshot.put("fixturePhotoControllerIdentity",
+                        (musicMonitor.lastActivity as? MusicDesignPreviewActivity)
+                            ?.realPhotoControllerIdentityForChecks ?: 0)
+                }
                 File(folder, "$name.json").writeText(snapshot.toString())
                 automation.takeScreenshot()?.let { bitmap ->
                     try {
@@ -659,6 +665,7 @@ class PortalUxInstrumentation : Instrumentation() {
         }
         } finally {
             removeMonitor(homeMonitor)
+            removeMonitor(musicMonitor)
             // Opening the real pairing UI opts in. A test visit must preserve the prior opt-in.
             if (RemotePairing.isEnabled(targetContext) != remoteEnabledBefore) {
                 RemotePairing.setEnabled(targetContext, remoteEnabledBefore)

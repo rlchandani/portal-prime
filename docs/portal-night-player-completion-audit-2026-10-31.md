@@ -184,6 +184,16 @@ restored. The user cannot do the natural room-light check now, so that check
 and optical brightness comfort remain unverified. The full goal remains
 incomplete.
 
+**Real music-photo pause fix:** [the Family Area physical gate](portal-music-photo-pause-2026-11-01.md)
+passes **17/17 checks** using the real retained photo host rather than the earlier
+placeholder. Paused photo-region difference after Full falls from **66 to 0**;
+Full/Compact round trips retain the controller, photo and pause choice. Manual
+photo navigation and fresh Resume dwell pass. All **3,652 unit tests** and builds
+pass; optimized APK `8cd58604…` is installed on Family Area. Settings, sources,
+permissions, original Dream and test APK are restored, with no collector listeners.
+Provider/audio and physical FPS remain outside this gate. Ignored-setting recreation
+and pending SMB ownership remain parked; the broader goal is incomplete.
+
 [artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
 [artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json
 [local-artwork]: ../mocks/portal-premium-player-20261030/evidence/native-local-artwork/checks.json

@@ -33,6 +33,8 @@ import java.io.File
 
 /** Debug-only visual acceptance host. It never creates a player controller or audio output. */
 class MusicDesignPreviewActivity : ComponentActivity() {
+  internal var realPhotoControllerIdentityForChecks = 0
+    private set
   private var nightClock: QuietNightClockView? = null
   private var gallery: SlideshowStage? = null
   private var galleryControls: SlideshowViewerControls? = null
@@ -128,7 +130,9 @@ class MusicDesignPreviewActivity : ComponentActivity() {
       var playing by remember { mutableStateOf(false) }
       var position by remember { mutableLongStateOf(83_000L) }
       var changedAt by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
-      var layout by remember { mutableStateOf(MusicPlayerLayout.FULL) }
+      var layout by remember { mutableStateOf(MusicPlayerLayout.entries.firstOrNull {
+        it.name.equals(intent.getStringExtra("layout"), ignoreCase = true)
+      } ?: MusicPlayerLayout.FULL) }
       var browse by remember { mutableStateOf(intent.getStringExtra("screen")
           ?.takeIf { it == "library" || it == "playlists" }) }
       val libraryBrowseState = rememberMusicBrowseState()
@@ -168,6 +172,10 @@ class MusicDesignPreviewActivity : ComponentActivity() {
       val currentAlbum = item?.let { track ->
         albums.firstOrNull { album -> album.tracks.any { it.id == track.id } }
       }
+      // Opt in to the production retained photo host; ordinary visual fixtures stay synthetic.
+      val photos = if (intent.getBooleanExtra("real_photos", false))
+        rememberMusicPhotos(browse == null && collection == null && layout == MusicPlayerLayout.PHOTOS)
+      else null
       val snapshot = MusicPlayerSnapshot(connection = connection, sourceId = source,
           track = item?.let { MusicTrack(it.id, source, it.title, it.artist,
               currentAlbum?.title ?: "", it.artUrl, it.durationMs) },
@@ -267,7 +275,13 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                   changedAt = SystemClock.elapsedRealtime()
                 },
                 photoContent = { modifier ->
-                  Box(modifier.background(palette.surface)) {
+                  if (photos != null) {
+                    MusicPhotoHost(photos, modifier)
+                    SideEffect {
+                      realPhotoControllerIdentityForChecks = System.identityHashCode(photos.frame())
+                    }
+                  }
+                  else Box(modifier.background(palette.surface)) {
                     Text("Photo layout preview", color = palette.text,
                         modifier = Modifier.padding(24.dp))
                   }
@@ -292,6 +306,7 @@ class MusicDesignPreviewActivity : ComponentActivity() {
   }
 
   override fun onDestroy() {
+    realPhotoControllerIdentityForChecks = 0
     galleryControls?.stop()
     nightClock?.setActive(false)
     gallery?.stop()

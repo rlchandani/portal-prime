@@ -1,0 +1,124 @@
+{
+  "realPhotoIntegrationTested": true,
+  "audioProviderTested": false,
+  "performanceAccepted": false,
+  "checks": [
+    {
+      "name": "photo_engine_stays_lazy_in_full",
+      "pass": true
+    },
+    {
+      "name": "players_selected",
+      "pass": true
+    },
+    {
+      "name": "real_photo_and_current_track_visible",
+      "pass": true
+    },
+    {
+      "name": "explicit_photo_pause_visible",
+      "pass": true
+    },
+    {
+      "name": "full_retains_players_track",
+      "pass": true
+    },
+    {
+      "name": "same_controller_after_full",
+      "pass": true
+    },
+    {
+      "name": "pause_choice_after_full",
+      "pass": true
+    },
+    {
+      "name": "same_photo_after_full",
+      "pass": true,
+      "maxChannelDifference": 0
+    },
+    {
+      "name": "user_pause_survives_longer_than_interval",
+      "pass": true,
+      "maxChannelDifference": 0
+    },
+    {
+      "name": "compact_retains_controller_track",
+      "pass": true
+    },
+    {
+      "name": "same_controller_after_compact",
+      "pass": true
+    },
+    {
+      "name": "pause_choice_after_compact",
+      "pass": true
+    },
+    {
+      "name": "same_photo_after_compact",
+      "pass": true,
+      "maxChannelDifference": 0
+    },
+    {
+      "name": "manual_next_works_while_paused",
+      "pass": true
+    },
+    {
+      "name": "manual_previous_works_while_paused",
+      "pass": true
+    },
+    {
+      "name": "resume_keeps_fresh_photo_dwell",
+      "pass": true,
+      "maxChannelDifference": 0
+    },
+    {
+      "name": "resume_advances_same_engine",
+      "pass": true
+    }
+  ],
+  "observedPhotoHostBounds": [
+    36,
+    90,
+    1334,
+    1404
+  ],
+  "pass": true,
+  "fixtureApkSha256": "3632ab4d10d92206fd5c6c46a914e17071e70ded6e88c5a3f694fdbcad875bd4",
+  "controllerIdentityStable": true,
+  "observerStopped": true,
+  "ownedSnapshotCleanup": true,
+  "testApkRestored": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "originalOptimizedApkRestored": true,
+  "accessibilityExact": true,
+  "systemProcessUnchanged": true,
+  "collectorInactive": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "nativeCaptureCount": 16,
+  "elapsedSeconds": 112.282,
+  "sourceEditedByHardwareHelper": false,
+  "productionFixMade": true,
+  "unitTests": 3652,
+  "unitSuites": 386,
+  "unitFailures": 0,
+  "newTests": 27,
+  "baselineReturnedPhotoMaxDifference": 66,
+  "newReturnedPhotoMaxDifference": 0,
+  "optimizedApkSha256": "8cd58604c4c188cc7fcbb74a8e8bb4e25198202b7c2bf5879429f2ec35291f7d",
+  "optimizedInstalled": true,
+  "independentReview": "Findings corrected; no remaining findings in re-review",
+  "privateMediaPublished": false,
+  "fullGoalComplete": false,
+  "deployment": {
+    "initialWholePinComparisonFailed": true,
+    "persistentPinExact": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "systemProcessUnchanged": true,
+    "accessibilityExact": true,
+    "originalDreamRestored": true,
+    "pass": true
+  }
+}

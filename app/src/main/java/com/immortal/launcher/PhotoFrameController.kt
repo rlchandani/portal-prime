@@ -154,6 +154,13 @@ class PhotoFrameController(
   private lateinit var nativeStage: SlideshowStage
   private var galleryOverlayObserver: GalleryOverlayLayoutObserver? = null
   private val pixelBudget = SlideshowPixelBudget()
+  private val photoPause = SlideshowPhotoPause<List<SlideshowPhoto>>(
+      onHeldChanged = { photos ->
+        pixelBudget.setOwner("userPause", photos.orEmpty().map {
+          SlideshowPixelBudget.Entry(it.bitmap, it.bitmap.allocationByteCount.toLong())
+        })
+      },
+      onDiscard = { photos -> photos.forEach { if (!it.bitmap.isRecycled) it.bitmap.recycle() } })
   private val nativeLoaderDelegate = lazy {
     SlideshowLoader(context, pixelBudget, onCancelTransports = { cancelPhotoTransports() }, ui = ui)
   }
@@ -298,7 +305,8 @@ class PhotoFrameController(
   // on the fallback rather than re-fetching forever. [remoteReresolving] guards against
   // overlapping re-fetches.
   private var remoteReresolveStreak = 0
-  private var remoteReresolving = false
+  private val remoteRecovery = SlideshowRecoveryIntent()
+  private val remoteReresolving get() = remoteRecovery.resolving
   // Auth headers sent with each remote fetch (image download or video stream) — empty for
   // public shares, the x-api-key for Immich. Applied in [advanceRemote]/[downloadBitmap]/
   // [showRemoteVideo].
@@ -1265,6 +1273,7 @@ class PhotoFrameController(
     if (!value) {
       hostSuspendedAt = now
       hostActive = false
+      photoPause.setHostActive(false)
       legacyRemoteTransports?.cancelCurrent()
       legacyFaceStore?.setActive(false)
       ui.setActive(false)
@@ -1303,6 +1312,7 @@ class PhotoFrameController(
         if (!paused) runCatching { videoView.start() }
       }
       ui.setActive(true)
+      photoPause.setHostActive(true)
       if (!photosOnly) calendarTick.run()
       if (!photosOnly && settings.gestureWave) resumeGestureCamera()
       if (remoteMode) schedulePrefetch()
@@ -1377,6 +1387,7 @@ class PhotoFrameController(
     cancelPhotoTransports()
     cancelVideoPrefetchTransport()
     if (nativeLoaderDelegate.isInitialized()) nativeLoader.close()
+    photoPause.close()
     if (this::nativeStage.isInitialized) nativeStage.stop()
     clearNativeHistory()
     if (this::viewerControls.isInitialized) viewerControls.stop()
@@ -2012,6 +2023,7 @@ class PhotoFrameController(
     gen++
     afterNativeStartup = null
     nativeNavigation.cancelRequest()
+    photoPause.cancel()
     if (nativeLoaderDelegate.isInitialized()) nativeLoader.cancel()
     // Editing an old photo must not allow a pending video to take over later.
     if (videoView.visibility == View.VISIBLE) restorePhotoAfterVideo()
@@ -2051,18 +2063,19 @@ class PhotoFrameController(
     nativeStage.refreshGalleryOverlays(measuredNativeOcclusions())
   }
 
-  private fun presentNative(photos: List<SlideshowPhoto>) {
+  private fun presentNative(photos: List<SlideshowPhoto>, automatic: Boolean = true) {
     if (stopped) return
     nativeStage.visibility = View.VISIBLE
     photo.visibility = View.GONE
     photoBack.visibility = View.GONE
+    if (paused) nativeStage.pause() else nativeStage.resume()
     nativeStage.show(photos,
         settings.fit == ScreensaverConfig.FIT_FILL && settings.mode != ScreensaverConfig.MODE_WHOLE,
         settings.photoMotion && settings.mode != ScreensaverConfig.MODE_WHOLE,
         intervalMs(), measuredNativeOcclusions(),
         galleryPrint = settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT,
-        gallerySpread = settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD)
-    if (paused) nativeStage.pause() else nativeStage.resume()
+        gallerySpread = settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD,
+        automatic = automatic)
     viewerControls.photoChanged()
     Log.i("ImmortalSlideshow", "ready native scene: photos=${photos.size}, pixels=${photos.sumOf { it.bitmap.width.toLong() * it.bitmap.height }}")
   }
@@ -2077,6 +2090,7 @@ class PhotoFrameController(
   private fun setPaused(value: Boolean) {
     if (paused == value) return
     paused = value
+    val presentedHeldPhoto = photoPause.setPaused(value)
     legacyFaceStore?.setActive(hostActive && !value)
     nativeFilmstrip?.setPaused(value)
     hybridFilmstrip?.setPaused(value)
@@ -2088,10 +2102,12 @@ class PhotoFrameController(
       nativeStage.pause()
       if (videoView.visibility == View.VISIBLE) runCatching { videoView.pause() }
     } else {
-      nativeStage.resume()
+      if (videoView.visibility != View.VISIBLE) nativeStage.resume()
       if (hostActive && videoView.visibility == View.VISIBLE) runCatching { videoView.start() }
       val tick = when { localMode -> localTick; remoteMode -> remoteTick; else -> rotate }
-      armHold(tick, remainingHold.coerceAtLeast(100L))
+      // A still-decoding photo owns the next advance. Its delivery arms the full dwell.
+      if (!presentedHeldPhoto && !photoPause.pending)
+        armHold(tick, remainingHold.coerceAtLeast(100L))
     }
   }
 
@@ -2157,12 +2173,13 @@ class PhotoFrameController(
     if (deferNativeStartup { next() }) return
     viewerControls.cancelEdit()
     if (viewerControls.isEditing) return
+    photoPause.beforeManualNavigation(::cancelNativeRequest)
     when {
       nativeFilmstrip != null -> nativeFilmstrip?.next()
       engineActive -> webView?.evaluateJavascript("window.immortalSlideshow?.next()", null)
-      localMode -> advanceLocal(+1)
-      remoteMode -> advanceRemote(+1)
-      else -> webNext()
+      localMode -> advanceLocal(+1, automatic = false)
+      remoteMode -> advanceRemote(+1, automatic = false)
+      else -> webNext(automatic = false)
     }
   }
 
@@ -2171,11 +2188,12 @@ class PhotoFrameController(
     if (deferNativeStartup { prev() }) return
     viewerControls.cancelEdit()
     if (viewerControls.isEditing) return
+    photoPause.beforeManualNavigation(::cancelNativeRequest)
     when {
       nativeFilmstrip != null -> nativeFilmstrip?.previous()
       engineActive -> webView?.evaluateJavascript("window.immortalSlideshow?.previous()", null)
-      localMode -> advanceLocal(-1)
-      remoteMode -> advanceRemote(-1)
+      localMode -> advanceLocal(-1, automatic = false)
+      remoteMode -> advanceRemote(-1, automatic = false)
       else -> webPrev()
     }
   }
@@ -2188,13 +2206,13 @@ class PhotoFrameController(
         }
       }
 
-  private fun advanceLocal(dir: Int) {
+  private fun advanceLocal(dir: Int, automatic: Boolean = true) {
     if (stopped) return
-    if (deferNativeStartup { advanceLocal(dir) }) return
+    if (deferNativeStartup { advanceLocal(dir, automatic) }) return
     if (viewerControls.isEditing) return
     ui.removeCallbacks(localTick)
     if (playlist.isEmpty()) {
-      startWeb()
+      startWeb(automatic)
       return
     }
     gen++
@@ -2203,11 +2221,12 @@ class PhotoFrameController(
       localIndex = nativeNavigation.request(dir, localDeckKeys)
     } else localIndex = ((localIndex + dir) % playlist.size + playlist.size) % playlist.size
     val item = playlist[localIndex]
-    if (item.isVideo) showVideo(item.path, gen) else showLocalImage(item.path, gen)
+    if (item.isVideo) showVideo(item.path, gen, automatic) else showLocalImage(item.path, gen, automatic)
   }
 
-  private fun showLocalImage(path: String, g: Int) {
+  private fun showLocalImage(path: String, g: Int, automatic: Boolean) {
     if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      photoPause.requested(automatic)
       val anchor = localIndex
       val partners = (1 until minOf(playlist.size, 2)).map { offset ->
         (anchor + offset) % playlist.size
@@ -2220,15 +2239,17 @@ class PhotoFrameController(
               settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD, analyzePeople(),
           { photos, partner ->
             if (g != gen || stopped) return@load
-            nativeFailures = 0
-            stopVideo()
-            nativeNavigation.commit(photos.first().sourceKey, partner)
-            presentNative(photos)
-            loadCaptionForLocal(path, g)
-            armHold(localTick)
+            photoPause.deliver(photos) { ready ->
+              nativeFailures = 0
+              stopVideo()
+              nativeNavigation.commit(ready.first().sourceKey, partner)
+              presentNative(ready, automatic)
+              loadCaptionForLocal(path, g)
+              armHold(localTick)
+            }
           }, {
             nativeNavigation.skipFailed()
-            if (++nativeFailures >= playlist.size) startWeb() else advanceLocal(+1)
+            if (++nativeFailures >= playlist.size) startWeb(automatic) else advanceLocal(+1, automatic)
           }, nextAfterPartner = { key ->
             val at = localDeckKeys.indexOf(key)
             val nextAt = (at + 1) % playlist.size
@@ -2333,14 +2354,14 @@ class PhotoFrameController(
     return if (swap) h to w else w to h
   }
 
-  private fun showVideo(path: String, g: Int) {
+  private fun showVideo(path: String, g: Int, automatic: Boolean) {
     beginVideo(g, localDeckKeys.getOrNull(localIndex) ?: localKey(path)) { nativeFailures = 0 }
     fun failed() {
       if (g != gen || stopped) return
       restorePhotoAfterVideo()
       nativeNavigation.skipFailed()
-      if (ScreensaverConfig.isNativeStage(settings.mode) && ++nativeFailures >= playlist.size) startWeb()
-      else advanceLocal(+1)
+      if (ScreensaverConfig.isNativeStage(settings.mode) && ++nativeFailures >= playlist.size) startWeb(automatic)
+      else advanceLocal(+1, automatic)
     }
     runCatching {
           videoView.setOnPreparedListener { width, height ->
@@ -2376,6 +2397,7 @@ class PhotoFrameController(
     stopVideo()
     val native = ScreensaverConfig.isNativeStage(settings.mode)
     if (native) {
+      photoPause.cancel()
       nativeLoader.cancel()
       nativeStage.pause()
       if (nativeStage.currentPhoto != null) nativeStage.visibility = View.VISIBLE
@@ -2526,20 +2548,20 @@ class PhotoFrameController(
     } else remoteIndex = urls.indexOfFirst { it == oldUrl }
   }
 
-  private fun advanceRemote(dir: Int) {
+  private fun advanceRemote(dir: Int, automatic: Boolean = true) {
     if (stopped) return
-    if (deferNativeStartup { advanceRemote(dir) }) return
+    if (deferNativeStartup { advanceRemote(dir, automatic) }) return
     if (viewerControls.isEditing) return
     ui.removeCallbacks(remoteTick)
     if (remoteUrls.isEmpty()) {
-      startWeb()
+      startWeb(automatic)
       return
     }
     // One failure per URL = the whole album is unreachable. For a public-album share this
     // usually means its signed image URLs have simply expired, so try to re-mint fresh ones
     // before giving up to the built-in feed (see [reresolveOrFallback]).
     if (remoteFailStreak >= remoteUrls.size) {
-      reresolveOrFallback()
+      reresolveOrFallback(automatic)
       return
     }
     gen++
@@ -2554,14 +2576,16 @@ class PhotoFrameController(
       // the original this once and warm the cache in the background for the next loop.
       val cached = mediaCache?.getIfPresent(url, isVideo = true)
       if (cached != null) {
-        showRemoteVideo(android.net.Uri.fromFile(cached), emptyMap(), g, cachedFile = cached)
+        showRemoteVideo(android.net.Uri.fromFile(cached), emptyMap(), g, cachedFile = cached,
+            automatic = automatic)
       } else {
-        showRemoteVideo(android.net.Uri.parse(url), remoteHeaders, g)
+        showRemoteVideo(android.net.Uri.parse(url), remoteHeaders, g, automatic = automatic)
         schedulePrefetch()
       }
       return
     }
     if (ScreensaverConfig.isNativeStage(settings.mode)) {
+      photoPause.requested(automatic)
       val anchor = remoteIndex
       val deck = remoteUrls
       val partners = (1 until minOf(deck.size, 2)).map { offset -> deck[(anchor + offset) % deck.size] }
@@ -2573,13 +2597,15 @@ class PhotoFrameController(
               settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD, analyzePeople(),
           { photos, partner ->
             if (g != gen || stopped) return@load
-            stopVideo()
-            remoteFailStreak = 0; remoteReresolveStreak = 0
-            nativeNavigation.commit(photos.first().sourceKey, partner)
-            presentNative(photos)
-            if (smbSource != null) loadCaptionForSmb(url, g) else faceRenderer.setCaption(null, null)
-            armHold(remoteTick)
-          }, { nativeNavigation.skipFailed(); remoteFailStreak++; advanceRemote(+1) }, nextAfterPartner = { key ->
+            photoPause.deliver(photos) { ready ->
+              stopVideo()
+              remoteFailStreak = 0; remoteReresolveStreak = 0
+              nativeNavigation.commit(ready.first().sourceKey, partner)
+              presentNative(ready, automatic)
+              if (smbSource != null) loadCaptionForSmb(url, g) else faceRenderer.setCaption(null, null)
+              armHold(remoteTick)
+            }
+          }, { nativeNavigation.skipFailed(); remoteFailStreak++; advanceRemote(+1, automatic) }, nextAfterPartner = { key ->
             val at = deck.indexOfFirst { remoteKey(it) == key }
             deck.getOrNull((at + 1) % deck.size)?.takeUnless { it in remoteVideos }?.let(::remoteAsset)
           })
@@ -2624,6 +2650,7 @@ class PhotoFrameController(
       headers: Map<String, String>,
       g: Int,
       cachedFile: java.io.File? = null,
+      automatic: Boolean = true,
   ) {
     beginVideo(g, remoteKey(remoteUrls[remoteIndex])) {
       remoteFailStreak = 0
@@ -2642,7 +2669,7 @@ class PhotoFrameController(
       restorePhotoAfterVideo()
       nativeNavigation.skipFailed()
       remoteFailStreak++
-      advanceRemote(+1)
+      advanceRemote(+1, automatic)
     }
     runCatching {
           videoView.setOnPreparedListener { width, height ->
@@ -2685,39 +2712,43 @@ class PhotoFrameController(
    * [remoteReresolveStreak] caps consecutive re-resolves (reset on any successful photo) so a real,
    * sustained outage still settles on the fallback instead of re-fetching forever.
    */
-  private fun reresolveOrFallback() {
-    if (stopped || remoteReresolving) return
-    val shareUrl = settings.albumUrl
-    if (!settings.usesUrl || shareUrl.isNullOrBlank() || remoteReresolveStreak >= MAX_RERESOLVE) {
-      startWeb()
+  private fun reresolveOrFallback(automatic: Boolean = true) {
+    if (stopped) return
+    if (remoteReresolving) {
+      remoteRecovery.request(automatic)
       return
     }
-    remoteReresolving = true
+    val shareUrl = settings.albumUrl
+    if (!settings.usesUrl || shareUrl.isNullOrBlank() || remoteReresolveStreak >= MAX_RERESOLVE) {
+      startWeb(automatic)
+      return
+    }
+    remoteRecovery.request(automatic)
     remoteReresolveStreak++
     val m = context.resources.displayMetrics
     io.execute {
       val fresh = RemoteAlbum.fetch(shareUrl, m.widthPixels, m.heightPixels)
       val urls = fresh?.photoUrls.orEmpty()
       ui.post {
-        remoteReresolving = false
+        val recoveredAutomatic = remoteRecovery.finish()
         if (!remoteMode || stopped) return@post // raced with a source change / exit
         if (urls.isNotEmpty()) {
           applyRemoteManifest(if (settings.shuffle) urls.shuffled() else urls, fresh?.headers.orEmpty())
           remoteFailStreak = 0
-          advanceRemote(+1)
+          advanceRemote(+1, recoveredAutomatic)
         } else {
           // Album genuinely unreachable / unshared → don't leave the frame spinning.
-          startWeb()
+          startWeb(recoveredAutomatic)
         }
       }
     }
   }
 
   // --- web feed (default + fallback) ------------------------------------------
-  private fun startWeb() {
+  private fun startWeb(automatic: Boolean = true) {
     if (stopped) return
     if (engineActive || legacyFaceStore != null) retireLegacyEngine()
-    if (deferNativeStartup { startWeb() }) return
+    if (deferNativeStartup { startWeb(automatic) }) return
     if (ScreensaverConfig.isNativeStage(settings.mode)) {
       cancelNativeRequest()
       nativeNavigation.reset()
@@ -2734,28 +2765,29 @@ class PhotoFrameController(
     ui.removeCallbacks(remoteTick)
     ui.removeCallbacks(remoteRefresh)
     restorePhotoAfterVideo()
-    rotate.run()
+    webNext(automatic)
+    if (!ScreensaverConfig.isNativeStage(settings.mode)) ui.postDelayed(rotate, intervalMs())
   }
 
   /** Forward through history, loading a fresh photo when at the end. */
-  private fun webNext() {
+  private fun webNext(automatic: Boolean = true) {
     if (stopped || viewerControls.isEditing) return
-    if (deferNativeStartup { webNext() }) return
+    if (deferNativeStartup { webNext(automatic) }) return
     if (ScreensaverConfig.isNativeStage(settings.mode)) {
       ui.removeCallbacks(rotate)
       cancelNativeRequest()
       if (index in 0 until nativeHistory.lastIndex) {
         index++
-        presentNativeHistory(nativeHistory[index])
+        presentNativeHistory(nativeHistory[index], automatic)
         armHold(rotate)
-      } else loadFresh()
+      } else loadFresh(automatic)
       return
     }
     if (index in 0 until history.size - 1) {
       index++
       show(history[index])
     } else {
-      loadFresh()
+      loadFresh(automatic)
     }
   }
 
@@ -2767,7 +2799,7 @@ class PhotoFrameController(
       ui.removeCallbacks(rotate)
       cancelNativeRequest()
       if (index > 0) index--
-      nativeHistory.getOrNull(index)?.let(::presentNativeHistory)
+      nativeHistory.getOrNull(index)?.let { presentNativeHistory(it, automatic = false) }
       armHold(rotate)
       return
     }
@@ -2777,24 +2809,27 @@ class PhotoFrameController(
     }
   }
 
-  private fun presentNativeHistory(photo: SlideshowPhoto) {
+  private fun presentNativeHistory(photo: SlideshowPhoto, automatic: Boolean) {
     val regions = if (analyzePeople()) nativeLoader.cachedRegions(photo.key).orEmpty() else emptyList()
-    presentNative(listOf(photo.copy(regions = regions)))
+    presentNative(listOf(photo.copy(regions = regions)), automatic)
   }
 
-  private fun loadFresh() {
+  private fun loadFresh(automatic: Boolean = true) {
     if (ScreensaverConfig.isNativeStage(settings.mode)) {
       val g = ++gen
+      photoPause.requested(automatic)
       nativeLoader.load(SlideshowAsset("feed", { fetchWebPhoto() }, contentIdentity = true,
               identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } }),
           emptyList(), null, false, analyzePeople(),
           { photos, _ ->
             if (g != gen || stopped) return@load
-            stopVideo()
-            rememberNativePhoto(photos.first())
-            presentNative(photos)
-            armHold(rotate)
-          }, { if (g == gen && !stopped) armHold(rotate) })
+            photoPause.deliver(photos) { ready ->
+              stopVideo()
+              rememberNativePhoto(ready.first())
+              presentNative(ready, automatic)
+              armHold(rotate)
+            }
+          }, { if (g == gen && !stopped) { photoPause.cancel(); armHold(rotate) } })
       return
     }
     io.execute {

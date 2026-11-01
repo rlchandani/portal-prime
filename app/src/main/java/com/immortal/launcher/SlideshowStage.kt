@@ -34,20 +34,23 @@ internal class SlideshowStage(
   private data class Presentation(
       val photos: List<SlideshowPhoto>, val fill: Boolean, val motion: Boolean, val dwell: Long,
       val occupied: List<Rect>, val galleryPrint: Boolean, val gallerySpread: Boolean,
-      val editing: Boolean = false,
+      val editing: Boolean = false, val automatic: Boolean = true,
   ) {
     val galleryStyle: Boolean get() = galleryPrint || gallerySpread
   }
   private val layers = arrayOf(Composition(context, budget, "stage0"), Composition(context, budget, "stage1"))
   private var current = 0
   private var fade: ObjectAnimator? = null
+  private val dissolvePause = SlideshowDissolvePause { running ->
+    if (running) fade?.resume() else fade?.pause()
+  }
   private var revision = 0L
   private var pending: Presentation? = null
   private var shown: Presentation? = null
   private var editOriginal: Presentation? = null
   private var editSnapshot: Composition.Snapshot? = null
-  private var paused = false
-  private var hostActive = true
+  private val paused get() = dissolvePause.paused
+  private val hostActive get() = dissolvePause.hostActive
   var onPresented: (() -> Unit)? = null
   val currentPhoto: SlideshowPhoto? get() = shown?.photos?.firstOrNull()
   val photoCount: Int get() = shown?.photos?.size ?: 0
@@ -64,7 +67,7 @@ internal class SlideshowStage(
   fun show(
       photos: List<SlideshowPhoto>, fill: Boolean, motion: Boolean, dwell: Long,
       occupied: List<Rect> = emptyList(), galleryPrint: Boolean = false,
-      gallerySpread: Boolean = false,
+      gallerySpread: Boolean = false, automatic: Boolean = true,
   ) {
     if (photos.isEmpty() || photos.any { it.bitmap.isRecycled }) return
     // Retain one extra obstacle as an overflow sentinel; gallery styles then take their
@@ -73,7 +76,7 @@ internal class SlideshowStage(
     val measured = if (gallery) galleryOcclusions(occupied) else occupied.map(::Rect)
     val presentation = Presentation(photos.take(if (galleryPrint) 1 else 2),
         fill && !gallery, motion && !gallery, dwell, measured, galleryPrint,
-        gallerySpread && !galleryPrint)
+        gallerySpread && !galleryPrint, automatic = automatic)
     if (width <= 0 || height <= 0) {
       pending = presentation
       own("pending", presentation)
@@ -105,6 +108,7 @@ internal class SlideshowStage(
     editOriginal = null
     editSnapshot = null
     own("edit", null)
+    dissolvePause.end()
     fade?.removeAllListeners()
     fade?.cancel()
     fade = null
@@ -144,27 +148,25 @@ internal class SlideshowStage(
           if (ticket != revision) return
           layers[outgoing].clear()
           fade = null
+          dissolvePause.end()
         }
       })
       start()
-      if (!hostActive) pause()
     }
+    dissolvePause.begin(presentation.automatic)
     onPresented?.invoke()
   }
 
-  // Explicit navigation still completes its dissolve while paused, freeing the old slot.
-  fun pause() { paused = true; layers.forEach { it.pause() } }
-  fun resume() { paused = false; if (hostActive) layers.forEach { it.resume() } }
+  // Explicit navigation started while paused still frees the outgoing slot.
+  fun pause() { dissolvePause.setPaused(true); layers.forEach { it.pause() } }
+  fun resume() { dissolvePause.setPaused(false); if (hostActive) layers.forEach { it.resume() } }
 
   /** A covered host freezes the dissolve too; explicit user pause still permits navigation. */
   fun setHostActive(value: Boolean) {
     if (hostActive == value) return
-    hostActive = value
-    if (!value) { fade?.pause(); layers.forEach { it.pause() } }
-    else {
-      fade?.resume()
-      if (!paused) layers.forEach { it.resume() }
-    }
+    dissolvePause.setHostActive(value)
+    if (!value) layers.forEach { it.pause() }
+    else if (!paused) layers.forEach { it.resume() }
   }
 
   fun adjust(adjustment: SlideshowAdjustment?) {
@@ -182,6 +184,7 @@ internal class SlideshowStage(
     if (!entering && layers[current].updateAdjustment(first.bitmap, adjustment)) return
     // Editing is deliberate; it never triggers another scene dissolve or acquires an image.
     revision++
+    dissolvePause.end()
     fade?.removeAllListeners()
     fade?.cancel()
     fade = null
@@ -219,6 +222,7 @@ internal class SlideshowStage(
     editSnapshot = null
     own("pending", null)
     own("edit", null)
+    dissolvePause.end()
     fade?.removeAllListeners()
     fade?.cancel()
     fade = null
