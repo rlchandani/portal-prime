@@ -198,11 +198,7 @@ internal class SlideshowViewerControls(
       MotionEvent.ACTION_DOWN -> { dragX = event.x; dragY = event.y }
       MotionEvent.ACTION_MOVE -> {
         if (saving) return true
-        val bitmap = stage.currentPhoto?.bitmap ?: return true
-        val transform = draft.transform(bitmap.width, bitmap.height, stage.width, stage.height)
-        draft = draft.copy(
-            focusX = (draft.focusX - (event.x - dragX) / (bitmap.width * transform.scale)).coerceIn(0f, 1f),
-            focusY = (draft.focusY - (event.y - dragY) / (bitmap.height * transform.scale)).coerceIn(0f, 1f))
+        draft = stage.draggedAdjustment(event.x - dragX, event.y - dragY) ?: return true
         dragX = event.x; dragY = event.y
         if (!saving) stage.adjust(draft)
       }

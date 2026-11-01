@@ -193,6 +193,14 @@ internal class SlideshowStage(
     layers[current].alpha = 1f
   }
 
+  /** Resolve each gesture against the live edited view; a resize may replace that view. */
+  fun draggedAdjustment(dx: Float, dy: Float): SlideshowAdjustment? {
+    val edited = shown?.takeIf { it.editing } ?: return null
+    val photo = edited.photos.singleOrNull() ?: return null
+    val adjustment = photo.adjustment ?: return null
+    return layers[current].draggedAdjustment(photo.bitmap, adjustment, dx, dy)
+  }
+
   fun finishAdjustment(save: Boolean) {
     val original = editOriginal
     val snapshot = editSnapshot
@@ -396,6 +404,29 @@ internal class SlideshowStage(
       image.scaleX = transform.scale; image.scaleY = transform.scale
       image.translationX = transform.x; image.translationY = transform.y
       return true
+    }
+    fun draggedAdjustment(bitmap: Bitmap, adjustment: SlideshowAdjustment,
+        dx: Float, dy: Float): SlideshowAdjustment? {
+      if (childCount != 1 || !dx.isFinite() || !dy.isFinite()) return null
+      val holder = getChildAt(0) as? FrameLayout ?: return null
+      val image = holder.getChildAt(0) as? ImageView ?: return null
+      if ((image.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap !== bitmap) return null
+      val imageWidth = bitmap.width * image.scaleX
+      val imageHeight = bitmap.height * image.scaleY
+      val width = holder.layoutParams.width
+      val height = holder.layoutParams.height
+      if (!imageWidth.isFinite() || !imageHeight.isFinite() || imageWidth <= 0f ||
+          imageHeight <= 0f || width <= 0 || height <= 0 ||
+          !image.translationX.isFinite() || !image.translationY.isFinite()) return null
+      fun focus(position: Float, delta: Float, length: Float, viewport: Int, prior: Float): Float {
+        if (length <= viewport) return prior
+        val translated = (position + delta).coerceIn(viewport - length, 0f)
+        // Persist the visible edge, not hidden overshoot, so reversing responds immediately.
+        return ((viewport / 2f - translated) / length).coerceIn(0f, 1f)
+      }
+      return adjustment.copy(
+          focusX = focus(image.translationX, dx, imageWidth, width, adjustment.focusX),
+          focusY = focus(image.translationY, dy, imageHeight, height, adjustment.focusY))
     }
     private fun images(): List<ImageView> = (0 until childCount).mapNotNull {
       (getChildAt(it) as? FrameLayout)?.getChildAt(0) as? ImageView

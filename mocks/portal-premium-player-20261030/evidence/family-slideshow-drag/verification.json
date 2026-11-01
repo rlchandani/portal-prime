@@ -1,0 +1,33 @@
+{
+  "settingsExact": true,
+  "settingCount": 97,
+  "sourcesExact": true,
+  "accessibilityExact": true,
+  "systemPidUnchanged": true,
+  "testApkRestored": true,
+  "noInstrumentation": true,
+  "optimizedNonDebuggable": true,
+  "brightnessInvariantSatisfied": true,
+  "persistentPinExact": true,
+  "noCollector": true,
+  "originalDreamRestored": true,
+  "faceCacheExact": true,
+  "ownedEvidenceRemoved": true,
+  "installedCandidate": true,
+  "installedSha256": "658f61d5871f2f8520994f2aed938a0a1b1da78b2d21eded72754e2e6f9ae1a1",
+  "candidateSha256": "658f61d5871f2f8520994f2aed938a0a1b1da78b2d21eded72754e2e6f9ae1a1",
+  "debugSha256": "6c32fc254968690f621ecf23adea38a1a8b9e420b83e33651c280f0d432c7c8c",
+  "verifiedAtUtc": "2026-11-01T16:31:03.041360+00:00",
+  "elapsedSeconds": 42.377,
+  "markerShiftPixels": [
+    80.0,
+    60.0
+  ],
+  "originalMarkerShiftPixels": [
+    73.50099999999998,
+    55.03800000000001
+  ],
+  "originalSlotStartedUtc": "2026-11-01T16:17:11+00:00",
+  "originalSlotDeadlineUtc": "2026-11-01T16:47:11+00:00",
+  "slotElapsedSecondsAtVerification": 832.041
+}

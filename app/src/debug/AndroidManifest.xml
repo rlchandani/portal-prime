@@ -47,6 +47,12 @@
             android:label="Launcher fallback native check"
             android:theme="@style/Theme.SampleApp" />
         <activity
+            android:name=".SlideshowDragPreviewActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="Generated photo drag check"
+            android:theme="@style/Theme.SampleApp" />
+        <activity
             android:name=".FilmstripBackdropPreviewActivity"
             android:exported="true"
             android:label="Filmstrip backdrop native check"

@@ -40,6 +40,15 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        if (options.getString("command") == "slideshowDrag") {
+            val drag = try {
+                SlideshowDragDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply { putBoolean("slideshowDragPassed", false) }
+            }
+            finish(if (drag.getBoolean("slideshowDragPassed")) 0 else 1, drag)
+            return
+        }
         // Detached renderer admission with generated producer and UUID-owned preferences only.
         if (options.getString("command") == "musicViewport") {
             val viewport = try {

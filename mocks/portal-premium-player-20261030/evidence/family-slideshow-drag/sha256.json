@@ -1,0 +1,17 @@
+{
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-drag/baseline-checks.json": "c56d3bc8d7dcf41d93432388be4fa4e9ddc598f13da7bb3478c2d4a65766533e",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-drag/original-after.png": "0dc8797c85640310875c822024ecb610e9c0970661c10ecadd379ff88f7eb294",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-drag/corrected-before.png": "67ef057f916f1b21bc2aa4aad0631e7fc26ed87beaba82adfb5f660d5bc4abdb",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-drag/checks.json": "e577b8939d2d0c79d0da951408b087f1fb3c86f6851137b741034014446ea3ca",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-drag/unit-gate.json": "9570caefa1cb86f66640141b6d13530c05b366ef20571522bb1963110cbba9b4",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-drag/verification.json": "7ce867b0ac1d2797e1dac8f9f9d01e82c47674e4aadf0a1d2d01d4ffc7eda127",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-drag/original-before.png": "67ef057f916f1b21bc2aa4aad0631e7fc26ed87beaba82adfb5f660d5bc4abdb",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-drag/corrected-after.png": "195b8c6e77c11c97341d65adeb95ed0a13fb589af7d320fa43f8b005e13b0870",
+  "app/src/main/java/com/immortal/launcher/SlideshowStage.kt": "756ecf00223a866171eb6c1123fe6195d04cd5a447e9904173b9a21b21af9e11",
+  "app/src/main/java/com/immortal/launcher/SlideshowViewerControls.kt": "a7caf5f2f36b324e317ed271e922d4fb8fc01dfc42c135b9a296fc543898a001",
+  "app/src/debug/java/com/immortal/launcher/SlideshowDragPreviewActivity.kt": "2dd216df7e3c54439117d1708ff9b0c9b66378aad6abf7fda7e0a41e9ea54b4a",
+  "app/src/androidTest/java/com/immortal/launcher/SlideshowDragDeviceChecks.kt": "e52d45354df3ef057419eb6f5aab5a6392fe83364730a0cc03aec7686db531b2",
+  "app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt": "90a7129a0922240638abae9beb942333f8a5baa4bfb8ae893de6f265823b803f",
+  "app/src/debug/AndroidManifest.xml": "62b73defdc0fe6ec4e4cd23654038ae7930ce991195f0dfe0462d9262e91628c",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-drag/post-health.json": "1afd1ac475d4d234e1feaf0c1add942ded30d44452410e44379218e8b09417f9"
+}

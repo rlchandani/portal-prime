@@ -2,7 +2,22 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — music browsing continuity.**
+**Newest delivery, November 1 — native crop dragging.**
+[The crop correction](portal-slideshow-drag-2026-11-01.md) uses the edited
+image's actual scale, translation and holder bounds. An **80 × 60 px** framed
+drag improves from **73.667 × 55.250 px to 80 × 60 px**. Full-screen reversal
+after reaching an edge improves from **0 × 0 px to −80 × −60 px**. The same
+ordered Family Area assertions change from **21 failures / 73 to 73/73
+passing**, across five generated native cases with zero isolated failures.
+Independent captured marker displacement corroborates the correction;
+image views and bitmaps are retained. **3,764 fresh JVM tests** pass.
+Optimized APK **658f61d5…** is installed with original configuration/Dream
+restored **13 minutes 52 seconds** into the original 30-minute slot.
+This accepts software-injected native crop interactions, not physical finger
+routing, panel FPS or CPU savings. Natural-light fade acceptance and the
+parked black handoff remain open.
+
+**Previous delivery, November 1 — music browsing continuity.**
 [The Queue/Players correction](portal-music-viewport-2026-11-01.md) retains each
 list's viewport above removable tab/layout panes. Actual Family Area checks
 change from **18 failures / 49 assertions to 49/49 passing**, with the same
