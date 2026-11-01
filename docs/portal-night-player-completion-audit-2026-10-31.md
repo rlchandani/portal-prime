@@ -2,6 +2,18 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Newest verification, November 1 — legacy night-motion gap, parked.**
+[The full legacy matrix](portal-night-legacy-2026-11-01.md) completed all eleven
+styles at 2160 × 1440. Four passed; seven moving styles changed their transforms
+under the clock despite paused flags. The **1,267 assertions/observations include
+346 failures**; all eleven resume photo sequencing. A separate retained-animation
+sample check prevents accepting new-image motion as retained-motion recovery.
+Both earlier rejected fixture attempts are documented. No production playback
+change was made. Optimized APK **dcc2898e…**, all 97 settings, sources, services,
+pin, brightness, both face caches and Dream are restored **26 minutes 7 seconds**
+into the original slot; **3,765 JVM tests** pass. This gap remains open and parked
+under the 30-minute rule. Physical room-light acceptance is also pending.
+
 **Newest delivery, November 1 — slideshow resize continuity.**
 [The Family Area resize fix](portal-slideshow-resize-2026-11-01.md) preserves
 per-photo motion through geometry changes and measures rebuilt image holders.

@@ -1,0 +1,840 @@
+{
+  "passed": false,
+  "completed": false,
+  "elapsedMs": 68422,
+  "caseCount": 11,
+  "completedCaseCount": 11,
+  "performedCaseCount": 0,
+  "ownedActivitiesDestroyed": true,
+  "isolatedFailure": false,
+  "assertionFailure": true,
+  "checks": [
+    {
+      "name": "kenBurns_owned_activity_started",
+      "mode": "kenBurns",
+      "passed": true
+    },
+    {
+      "name": "kenBurns_controller_webview_attached",
+      "mode": "kenBurns",
+      "passed": false
+    },
+    {
+      "name": "kenBurns_controller_webview_attached_required",
+      "mode": "kenBurns",
+      "passed": false
+    },
+    {
+      "name": "kenBurns_controller_webview_attached_required",
+      "mode": "kenBurns",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "kenBurns_owned_activities_destroyed",
+      "mode": "kenBurns",
+      "passed": true
+    },
+    {
+      "name": "kenBurns_owned_generated_media_removed",
+      "mode": "kenBurns",
+      "passed": true
+    },
+    {
+      "name": "kenBurns_owned_preferences_removed",
+      "mode": "kenBurns",
+      "passed": true
+    },
+    {
+      "name": "diptych_owned_activity_started",
+      "mode": "diptych",
+      "passed": true
+    },
+    {
+      "name": "diptych_controller_webview_attached",
+      "mode": "diptych",
+      "passed": false
+    },
+    {
+      "name": "diptych_controller_webview_attached_required",
+      "mode": "diptych",
+      "passed": false
+    },
+    {
+      "name": "diptych_controller_webview_attached_required",
+      "mode": "diptych",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "diptych_owned_activities_destroyed",
+      "mode": "diptych",
+      "passed": true
+    },
+    {
+      "name": "diptych_owned_generated_media_removed",
+      "mode": "diptych",
+      "passed": true
+    },
+    {
+      "name": "diptych_owned_preferences_removed",
+      "mode": "diptych",
+      "passed": true
+    },
+    {
+      "name": "framed_owned_activity_started",
+      "mode": "framed",
+      "passed": true
+    },
+    {
+      "name": "framed_controller_webview_attached",
+      "mode": "framed",
+      "passed": false
+    },
+    {
+      "name": "framed_controller_webview_attached_required",
+      "mode": "framed",
+      "passed": false
+    },
+    {
+      "name": "framed_controller_webview_attached_required",
+      "mode": "framed",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "framed_owned_activities_destroyed",
+      "mode": "framed",
+      "passed": true
+    },
+    {
+      "name": "framed_owned_generated_media_removed",
+      "mode": "framed",
+      "passed": true
+    },
+    {
+      "name": "framed_owned_preferences_removed",
+      "mode": "framed",
+      "passed": true
+    },
+    {
+      "name": "galleryWall_owned_activity_started",
+      "mode": "galleryWall",
+      "passed": true
+    },
+    {
+      "name": "galleryWall_controller_webview_attached",
+      "mode": "galleryWall",
+      "passed": false
+    },
+    {
+      "name": "galleryWall_controller_webview_attached_required",
+      "mode": "galleryWall",
+      "passed": false
+    },
+    {
+      "name": "galleryWall_controller_webview_attached_required",
+      "mode": "galleryWall",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "galleryWall_owned_activities_destroyed",
+      "mode": "galleryWall",
+      "passed": true
+    },
+    {
+      "name": "galleryWall_owned_generated_media_removed",
+      "mode": "galleryWall",
+      "passed": true
+    },
+    {
+      "name": "galleryWall_owned_preferences_removed",
+      "mode": "galleryWall",
+      "passed": true
+    },
+    {
+      "name": "push_owned_activity_started",
+      "mode": "push",
+      "passed": true
+    },
+    {
+      "name": "push_controller_webview_attached",
+      "mode": "push",
+      "passed": false
+    },
+    {
+      "name": "push_controller_webview_attached_required",
+      "mode": "push",
+      "passed": false
+    },
+    {
+      "name": "push_controller_webview_attached_required",
+      "mode": "push",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "push_owned_activities_destroyed",
+      "mode": "push",
+      "passed": true
+    },
+    {
+      "name": "push_owned_generated_media_removed",
+      "mode": "push",
+      "passed": true
+    },
+    {
+      "name": "push_owned_preferences_removed",
+      "mode": "push",
+      "passed": true
+    },
+    {
+      "name": "memories_owned_activity_started",
+      "mode": "memories",
+      "passed": true
+    },
+    {
+      "name": "memories_controller_webview_attached",
+      "mode": "memories",
+      "passed": false
+    },
+    {
+      "name": "memories_controller_webview_attached_required",
+      "mode": "memories",
+      "passed": false
+    },
+    {
+      "name": "memories_controller_webview_attached_required",
+      "mode": "memories",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "memories_owned_activities_destroyed",
+      "mode": "memories",
+      "passed": true
+    },
+    {
+      "name": "memories_owned_generated_media_removed",
+      "mode": "memories",
+      "passed": true
+    },
+    {
+      "name": "memories_owned_preferences_removed",
+      "mode": "memories",
+      "passed": true
+    },
+    {
+      "name": "panorama_owned_activity_started",
+      "mode": "panorama",
+      "passed": true
+    },
+    {
+      "name": "panorama_controller_webview_attached",
+      "mode": "panorama",
+      "passed": false
+    },
+    {
+      "name": "panorama_controller_webview_attached_required",
+      "mode": "panorama",
+      "passed": false
+    },
+    {
+      "name": "panorama_controller_webview_attached_required",
+      "mode": "panorama",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "panorama_owned_activities_destroyed",
+      "mode": "panorama",
+      "passed": true
+    },
+    {
+      "name": "panorama_owned_generated_media_removed",
+      "mode": "panorama",
+      "passed": true
+    },
+    {
+      "name": "panorama_owned_preferences_removed",
+      "mode": "panorama",
+      "passed": true
+    },
+    {
+      "name": "polaroid_owned_activity_started",
+      "mode": "polaroid",
+      "passed": true
+    },
+    {
+      "name": "polaroid_controller_webview_attached",
+      "mode": "polaroid",
+      "passed": false
+    },
+    {
+      "name": "polaroid_controller_webview_attached_required",
+      "mode": "polaroid",
+      "passed": false
+    },
+    {
+      "name": "polaroid_controller_webview_attached_required",
+      "mode": "polaroid",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "polaroid_owned_activities_destroyed",
+      "mode": "polaroid",
+      "passed": true
+    },
+    {
+      "name": "polaroid_owned_generated_media_removed",
+      "mode": "polaroid",
+      "passed": true
+    },
+    {
+      "name": "polaroid_owned_preferences_removed",
+      "mode": "polaroid",
+      "passed": true
+    },
+    {
+      "name": "mosaic_owned_activity_started",
+      "mode": "mosaic",
+      "passed": true
+    },
+    {
+      "name": "mosaic_controller_webview_attached",
+      "mode": "mosaic",
+      "passed": false
+    },
+    {
+      "name": "mosaic_controller_webview_attached_required",
+      "mode": "mosaic",
+      "passed": false
+    },
+    {
+      "name": "mosaic_controller_webview_attached_required",
+      "mode": "mosaic",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "mosaic_owned_activities_destroyed",
+      "mode": "mosaic",
+      "passed": true
+    },
+    {
+      "name": "mosaic_owned_generated_media_removed",
+      "mode": "mosaic",
+      "passed": true
+    },
+    {
+      "name": "mosaic_owned_preferences_removed",
+      "mode": "mosaic",
+      "passed": true
+    },
+    {
+      "name": "cinema_owned_activity_started",
+      "mode": "cinema",
+      "passed": true
+    },
+    {
+      "name": "cinema_controller_webview_attached",
+      "mode": "cinema",
+      "passed": false
+    },
+    {
+      "name": "cinema_controller_webview_attached_required",
+      "mode": "cinema",
+      "passed": false
+    },
+    {
+      "name": "cinema_controller_webview_attached_required",
+      "mode": "cinema",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "cinema_owned_activities_destroyed",
+      "mode": "cinema",
+      "passed": true
+    },
+    {
+      "name": "cinema_owned_generated_media_removed",
+      "mode": "cinema",
+      "passed": true
+    },
+    {
+      "name": "cinema_owned_preferences_removed",
+      "mode": "cinema",
+      "passed": true
+    },
+    {
+      "name": "heroSidebar_owned_activity_started",
+      "mode": "heroSidebar",
+      "passed": true
+    },
+    {
+      "name": "heroSidebar_controller_webview_attached",
+      "mode": "heroSidebar",
+      "passed": false
+    },
+    {
+      "name": "heroSidebar_controller_webview_attached_required",
+      "mode": "heroSidebar",
+      "passed": false
+    },
+    {
+      "name": "heroSidebar_controller_webview_attached_required",
+      "mode": "heroSidebar",
+      "passed": false,
+      "failureClass": "CaseFailure"
+    },
+    {
+      "name": "heroSidebar_owned_activities_destroyed",
+      "mode": "heroSidebar",
+      "passed": true
+    },
+    {
+      "name": "heroSidebar_owned_generated_media_removed",
+      "mode": "heroSidebar",
+      "passed": true
+    },
+    {
+      "name": "heroSidebar_owned_preferences_removed",
+      "mode": "heroSidebar",
+      "passed": true
+    },
+    {
+      "name": "lifecycle_removed",
+      "passed": true
+    }
+  ],
+  "modes": [
+    {
+      "mode": "kenBurns",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 6063,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "diptych",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5688,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "framed",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5605,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "galleryWall",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5746,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "push",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5771,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "memories",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5664,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "panorama",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5682,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "polaroid",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5605,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "mosaic",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5649,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "cinema",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5659,
+      "performed": false,
+      "passed": false
+    },
+    {
+      "mode": "heroSidebar",
+      "checks": [
+        {
+          "name": "owned_activity_started",
+          "passed": true
+        },
+        {
+          "name": "controller_webview_attached",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false
+        },
+        {
+          "name": "controller_webview_attached_required",
+          "passed": false,
+          "failureClass": "CaseFailure"
+        },
+        {
+          "name": "owned_activities_destroyed",
+          "passed": true
+        },
+        {
+          "name": "owned_generated_media_removed",
+          "passed": true
+        },
+        {
+          "name": "owned_preferences_removed",
+          "passed": true
+        }
+      ],
+      "samples": [],
+      "elapsedMs": 5651,
+      "performed": false,
+      "passed": false
+    }
+  ],
+  "maxMainWaitMs": 739,
+  "mainWaitLimitMs": 2000,
+  "workLimitMs": 300000,
+  "teardownLimitMs": 15000,
+  "generatedPhotoCountPerCase": 16,
+  "photoIntervalMs": 5000,
+  "evidence": "controller fields and current DOM; no physical brightness or FPS measurement"
+}

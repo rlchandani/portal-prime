@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.app.Activity
+import android.content.ComponentCallbacks
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.SharedPreferences
@@ -44,6 +45,12 @@ class NightPhotoPreviewActivity : Activity() {
     val ownCache = File(files, "cache").apply { check(mkdir()) }
     val isolated = object : ContextWrapper(this) {
       override fun getApplicationContext(): Context = this
+      // Storage stays isolated, but framework callbacks belong to the real Application.
+      // Context's default registration follows applicationContext and would recurse here.
+      override fun registerComponentCallbacks(callback: ComponentCallbacks) =
+          this@NightPhotoPreviewActivity.applicationContext.registerComponentCallbacks(callback)
+      override fun unregisterComponentCallbacks(callback: ComponentCallbacks) =
+          this@NightPhotoPreviewActivity.applicationContext.unregisterComponentCallbacks(callback)
       override fun getFilesDir(): File = ownFiles
       override fun getCacheDir(): File = ownCache
       override fun getExternalFilesDir(type: String?): File = ownFiles
@@ -55,17 +62,23 @@ class NightPhotoPreviewActivity : Activity() {
       }
     }
     val motion = intent.getBooleanExtra("photo_motion", false)
+    val mode = intent.getStringExtra("slideshow_mode") ?: "smartFrame"
+    check(mode in setOf("smartFrame", "kenBurns", "diptych", "framed", "galleryWall",
+        "push", "memories", "panorama", "polaroid", "mosaic", "cinema", "heroSidebar"))
+    val native = mode == "smartFrame"
     val generatedKeys = mutableListOf<String>()
     val faceCache = SlideshowFaceCache(File(ownFiles, "slideshow_faces/metadata.bin"))
     val now = System.currentTimeMillis()
-    for (index in 0..2) {
-      val bitmap = Bitmap.createBitmap(160, 90, Bitmap.Config.ARGB_8888)
+    for (index in 0 until if (native) 3 else 16) {
+      val size = if (native) 160 to 90 else
+        listOf(1024 to 576, 600 to 960, 720 to 720, 1920 to 600)[index % 4]
+      val bitmap = Bitmap.createBitmap(size.first, size.second, Bitmap.Config.ARGB_8888)
       try {
-        bitmap.eraseColor(listOf(Color.RED, Color.GREEN, Color.BLUE)[index])
+        bitmap.eraseColor(listOf(Color.RED, Color.GREEN, Color.BLUE)[index % 3])
         File(files, "$index.png").outputStream().use {
           check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it))
         }
-        if (motion) {
+        if (motion && native) {
           val digest = MessageDigest.getInstance("SHA-256")
               .digest(File(files, "$index.png").readBytes())
               .joinToString("") { "%02x".format(it.toInt() and 255) }
@@ -77,14 +90,14 @@ class NightPhotoPreviewActivity : Activity() {
         }
       } finally { bitmap.recycle() }
     }
-    if (motion) {
+    if (motion && native) {
       faceCache.persist(now)
       warmFaces = SlideshowFaceStore(isolated)
     }
-    val patch = JSONObject().put("mode", "smartFrame").put("intervalSec", 5)
+    val patch = JSONObject().put("mode", mode).put("intervalSec", 5)
         .put("shuffle", false).put("includeVideo", false)
         .put("photo_motion", motion)
-        .put("keep_people_in_frame", motion).put("cacheEnabled", true)
+        .put("keep_people_in_frame", motion && native).put("cacheEnabled", true)
         .put("overnightEnabled", false).put("darkRoomClock", false).put("idleSleepMin", 0)
         .put("sleepTimerEnabled", false).put("welcomeEnabled", false).put("ambientDashboard", false)
         .put("gestureWave", false).put("soundscape", "off").put("showNowPlaying", false)
@@ -98,7 +111,7 @@ class NightPhotoPreviewActivity : Activity() {
       "weather":{"enabled":false},"nowPlaying":{"enabled":false},"battery":{"enabled":false},
       "caption":{"enabled":false}}"""))
     setContentView(frame.view)
-    if (!motion) frame.start() else {
+    if (!motion || !native) frame.start() else {
       val warmDeadline = android.os.SystemClock.uptimeMillis() + 5000
       startWhenWarm = Runnable {
         if (isFinishing || isDestroyed) return@Runnable
