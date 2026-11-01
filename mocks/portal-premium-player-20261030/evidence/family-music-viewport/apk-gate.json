@@ -1,0 +1,22 @@
+{
+  "allAssembliesCompleted": true,
+  "unitGateStillRunning": true,
+  "artifacts": [
+    {
+      "artifact": "app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "7aae786eb0a9b82c38a1d1086e99585e9c8e35ad583b87e60452acfde9456fe8",
+      "matchingCertificate": true
+    },
+    {
+      "artifact": "app/build/outputs/apk/performance/app-performance.apk",
+      "sha256": "ba65b2bea51581392d25d6c7fbe19045a196a56a0d311a8f755647cd87c7a60e",
+      "matchingCertificate": true
+    },
+    {
+      "artifact": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+      "sha256": "e6dee890ec2c4781980a42fd2bf7f08c7d087c03376dc994458dbd415d14af96",
+      "matchingCertificate": true
+    }
+  ],
+  "passed": true
+}

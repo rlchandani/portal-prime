@@ -1,0 +1,375 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.tab_open",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.scroll_action",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.off_top",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.alternate_tab",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.return_tab",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.tab_viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.COMPACT.viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.PHOTOS.viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.metadata_viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.new_queue_starts_at_top",
+      "passed": true
+    },
+    {
+      "name": "dark.player.tab_open",
+      "passed": true
+    },
+    {
+      "name": "dark.player.scroll_action",
+      "passed": true
+    },
+    {
+      "name": "dark.player.off_top",
+      "passed": true
+    },
+    {
+      "name": "dark.player.alternate_tab",
+      "passed": true
+    },
+    {
+      "name": "dark.player.return_tab",
+      "passed": true
+    },
+    {
+      "name": "dark.player.tab_viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "dark.player.COMPACT.viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "dark.player.PHOTOS.viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "dark.player.metadata_viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "dark.player.queue_change_preserves_viewport",
+      "passed": true
+    },
+    {
+      "name": "dark.player.new_source_starts_at_top",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.tab_after_source_change",
+      "passed": true
+    },
+    {
+      "name": "dark.queue.new_source_starts_at_top",
+      "passed": true
+    },
+    {
+      "name": "light.queue.tab_open",
+      "passed": true
+    },
+    {
+      "name": "light.queue.scroll_action",
+      "passed": true
+    },
+    {
+      "name": "light.queue.off_top",
+      "passed": true
+    },
+    {
+      "name": "light.queue.alternate_tab",
+      "passed": true
+    },
+    {
+      "name": "light.queue.return_tab",
+      "passed": true
+    },
+    {
+      "name": "light.queue.tab_viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "light.queue.COMPACT.viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "light.queue.PHOTOS.viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "light.queue.metadata_viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "light.queue.new_queue_starts_at_top",
+      "passed": true
+    },
+    {
+      "name": "light.player.tab_open",
+      "passed": true
+    },
+    {
+      "name": "light.player.scroll_action",
+      "passed": true
+    },
+    {
+      "name": "light.player.off_top",
+      "passed": true
+    },
+    {
+      "name": "light.player.alternate_tab",
+      "passed": true
+    },
+    {
+      "name": "light.player.return_tab",
+      "passed": true
+    },
+    {
+      "name": "light.player.tab_viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "light.player.COMPACT.viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "light.player.PHOTOS.viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "light.player.metadata_viewport_retained",
+      "passed": true
+    },
+    {
+      "name": "light.player.queue_change_preserves_viewport",
+      "passed": true
+    },
+    {
+      "name": "light.player.new_source_starts_at_top",
+      "passed": true
+    },
+    {
+      "name": "light.queue.tab_after_source_change",
+      "passed": true
+    },
+    {
+      "name": "light.queue.new_source_starts_at_top",
+      "passed": true
+    },
+    {
+      "name": "owned_activities_destroyed",
+      "passed": true
+    },
+    {
+      "name": "bounded_work",
+      "passed": true
+    }
+  ],
+  "artifacts": [
+    {
+      "relativePath": "cache/music-viewport-owned-8846cc00-d127-4ad9-a1f9-be3b0726e795-dark-queue.png",
+      "palette": "dark",
+      "list": "queue",
+      "visibleRows": [
+        {
+          "text": "Generated queue row 30",
+          "top": 275
+        },
+        {
+          "text": "Generated queue row 31",
+          "top": 366
+        },
+        {
+          "text": "Generated queue row 32",
+          "top": 457
+        },
+        {
+          "text": "Generated queue row 33",
+          "top": 548
+        },
+        {
+          "text": "Generated queue row 34",
+          "top": 639
+        },
+        {
+          "text": "Generated queue row 35",
+          "top": 730
+        },
+        {
+          "text": "Generated queue row 36",
+          "top": 821
+        },
+        {
+          "text": "Generated queue row 37",
+          "top": 912
+        },
+        {
+          "text": "Generated queue row 38",
+          "top": 1003
+        },
+        {
+          "text": "Generated queue row 39",
+          "top": 1094
+        },
+        {
+          "text": "Generated queue row 40",
+          "top": 1185
+        },
+        {
+          "text": "Generated queue row 41",
+          "top": 1276
+        }
+      ]
+    },
+    {
+      "relativePath": "cache/music-viewport-owned-8846cc00-d127-4ad9-a1f9-be3b0726e795-dark-player.png",
+      "palette": "dark",
+      "list": "player",
+      "visibleRows": [
+        {
+          "text": "Generated player row 29",
+          "top": 267
+        },
+        {
+          "text": "Generated player row 30",
+          "top": 522
+        },
+        {
+          "text": "Generated player row 31",
+          "top": 777
+        },
+        {
+          "text": "Generated player row 32",
+          "top": 1032
+        },
+        {
+          "text": "Generated player row 33",
+          "top": 1287
+        }
+      ]
+    },
+    {
+      "relativePath": "cache/music-viewport-owned-8846cc00-d127-4ad9-a1f9-be3b0726e795-light-queue.png",
+      "palette": "light",
+      "list": "queue",
+      "visibleRows": [
+        {
+          "text": "Generated queue row 30",
+          "top": 275
+        },
+        {
+          "text": "Generated queue row 31",
+          "top": 366
+        },
+        {
+          "text": "Generated queue row 32",
+          "top": 457
+        },
+        {
+          "text": "Generated queue row 33",
+          "top": 548
+        },
+        {
+          "text": "Generated queue row 34",
+          "top": 639
+        },
+        {
+          "text": "Generated queue row 35",
+          "top": 730
+        },
+        {
+          "text": "Generated queue row 36",
+          "top": 821
+        },
+        {
+          "text": "Generated queue row 37",
+          "top": 912
+        },
+        {
+          "text": "Generated queue row 38",
+          "top": 1003
+        },
+        {
+          "text": "Generated queue row 39",
+          "top": 1094
+        },
+        {
+          "text": "Generated queue row 40",
+          "top": 1185
+        },
+        {
+          "text": "Generated queue row 41",
+          "top": 1276
+        }
+      ]
+    },
+    {
+      "relativePath": "cache/music-viewport-owned-8846cc00-d127-4ad9-a1f9-be3b0726e795-light-player.png",
+      "palette": "light",
+      "list": "player",
+      "visibleRows": [
+        {
+          "text": "Generated player row 29",
+          "top": 267
+        },
+        {
+          "text": "Generated player row 30",
+          "top": 522
+        },
+        {
+          "text": "Generated player row 31",
+          "top": 777
+        },
+        {
+          "text": "Generated player row 32",
+          "top": 1032
+        },
+        {
+          "text": "Generated player row 33",
+          "top": 1287
+        }
+      ]
+    }
+  ],
+  "failureCount": 0,
+  "isolatedFailureCount": 0,
+  "caseCount": 2,
+  "renderCount": 4,
+  "elapsedMs": 12378,
+  "passed": true,
+  "generatedOnly": true,
+  "providerProof": false,
+  "audioProof": false
+}

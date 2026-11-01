@@ -1,0 +1,44 @@
+{
+  "scope": "browser_artifact_controls_and_image_loading",
+  "httpStatus": 200,
+  "cases": [
+    {
+      "theme": "dark",
+      "list": "queue",
+      "beforeAndAfterLoaded": true,
+      "detailDimensions": [
+        1060,
+        1440
+      ]
+    },
+    {
+      "theme": "dark",
+      "list": "player",
+      "beforeAndAfterLoaded": true,
+      "detailDimensions": [
+        1060,
+        1440
+      ]
+    },
+    {
+      "theme": "light",
+      "list": "queue",
+      "beforeAndAfterLoaded": true,
+      "detailDimensions": [
+        1060,
+        1440
+      ]
+    },
+    {
+      "theme": "light",
+      "list": "player",
+      "beforeAndAfterLoaded": true,
+      "detailDimensions": [
+        1060,
+        1440
+      ]
+    }
+  ],
+  "passed": true,
+  "productInteractionProof": false
+}

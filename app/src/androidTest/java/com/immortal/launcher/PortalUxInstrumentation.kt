@@ -41,6 +41,19 @@ class PortalUxInstrumentation : Instrumentation() {
 
     override fun onStart() {
         // Detached renderer admission with generated producer and UUID-owned preferences only.
+        if (options.getString("command") == "musicViewport") {
+            val viewport = try {
+                MusicViewportDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("musicViewportCompleted", false)
+                    putBoolean("musicViewportPassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (viewport.getBoolean("musicViewportPassed")) 0 else 1, viewport)
+            return
+        }
         if (options.getString("command") == "faceWeatherAdmission") {
             val weather = try {
                 FaceWeatherAdmissionDeviceChecks.run(this)

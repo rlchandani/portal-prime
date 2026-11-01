@@ -2,7 +2,20 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest verification, November 1 — actual API 29 warm Dream return.**
+**Newest delivery, November 1 — music browsing continuity.**
+[The Queue/Players correction](portal-music-viewport-2026-11-01.md) retains each
+list's viewport above removable tab/layout panes. Actual Family Area checks
+change from **18 failures / 49 assertions to 49/49 passing**, with the same
+ordered assertions, two palette cases and zero isolated failures. Native
+captures retain queue row **30** and player row **29**; new queue/source
+identities reset only the appropriate state. **3,764 fresh JVM tests** pass
+across **395 suites**. Optimized APK **ba65b2be…** is installed over wireless
+ADB with original configuration/Dream restored **11 minutes 1 second** into
+the original 30-minute slot. This verifies silent native UI continuity,
+not provider/audio, physical finger routing or measured FPS/CPU savings.
+The parked black handoff and natural-light fade acceptance remain open.
+
+**Previous verification, November 1 — actual API 29 warm Dream return.**
 [The Family Area check](portal-warm-dream-return-2026-11-01.md) verifies a
 deliberately paused viewer across a real OS Dream: same activity/process,
 Paused / Resume retained, **zero** changed photo-ROI channels, and **24**

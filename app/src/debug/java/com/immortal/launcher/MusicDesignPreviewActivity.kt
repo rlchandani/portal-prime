@@ -44,8 +44,39 @@ class MusicDesignPreviewActivity : ComponentActivity() {
   private var galleryControls: SlideshowViewerControls? = null
   private var lyricsFixture by mutableStateOf<MusicPlayerSnapshot?>(null)
   private var lyricsFixtureActive by mutableStateOf(true)
+  private var viewportFixture by mutableStateOf<MusicPlayerSnapshot?>(null)
+  private var viewportLayout by mutableStateOf(MusicPlayerLayout.FULL)
   private val generatedLyrics = (0 until 80).map {
     MusicLyricLine(it * 1_000L, "Generated lyric line $it")
+  }
+
+  /** Generated silent lists; updates retain the same production player composition. */
+  fun updateMusicViewportBinding(source: String, queue: String, revision: Long) {
+    require(intent.getStringExtra("screen") == "viewport")
+    require(source.startsWith("ma:generated-") && queue.startsWith("generated-"))
+    viewportFixture = MusicPlayerSnapshot(
+        connection = MusicConnection.READY, sourceId = source,
+        track = MusicTrack("generated-track", source, "Generated paused track",
+            durationMs = 240_000), playback = PlaybackState.PAUSED,
+        capabilities = MusicCapabilities(queue = true, rooms = true),
+        queue = (0 until 80).map { MusicQueueItem("generated-$it", "Generated queue row $it") },
+        rooms = (0 until 80).map {
+          MusicRoom("ma:generated-speaker-$it", "Generated player row $it", available = true)
+        },
+        queueId = queue, presentationRevision = revision,
+    )
+  }
+
+  fun updateMusicViewportLayout(layout: String) {
+    require(intent.getStringExtra("screen") == "viewport")
+    viewportLayout = MusicPlayerLayout.valueOf(layout)
+  }
+
+  fun updateMusicViewportMetadata() {
+    require(intent.getStringExtra("screen") == "viewport")
+    viewportFixture = viewportFixture?.let {
+      it.copy(track = it.track?.copy(title = "Updated generated paused track"), positionMs = 12_000)
+    }
   }
 
   /** Public debug fixture update; preserves the production player's existing composition. */
@@ -75,6 +106,32 @@ class MusicDesignPreviewActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN or
         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    if (intent.getStringExtra("screen") == "viewport") {
+      val deadline = intent.getLongExtra("owned_deadline_elapsed_ms", 0)
+      if (deadline > 0 && SystemClock.elapsedRealtime() >= deadline) {
+        finish()
+        return
+      }
+      updateMusicViewportBinding("ma:generated-viewport", "generated-queue-a", 1)
+      setContent {
+        val light = intent.getStringExtra("theme") == "light"
+        val palette = if (light) ApprovedLightPalette else ApprovedDarkPalette
+        CompositionLocalProvider(LocalApprovedPalette provides palette) {
+          MaterialTheme(colorScheme = approvedColorScheme(!light)) {
+            viewportFixture?.let { snapshot ->
+              MusicPlayerContent(snapshot, viewportLayout, Modifier.fillMaxSize(),
+                  onDismiss = { finish() }, onLayoutChange = { viewportLayout = it },
+                  onAction = {}, photoContent = {
+                    Box(it.background(palette.surface)) {
+                      Text("Generated photo placeholder", color = palette.secondary)
+                    }
+                  })
+            }
+          }
+        }
+      }
+      return
+    }
     if (intent.getStringExtra("screen") == "lyrics") {
       val ownedDeadline = intent.getLongExtra("owned_deadline_elapsed_ms", 0)
       if (ownedDeadline > 0 && SystemClock.elapsedRealtime() >= ownedDeadline) {

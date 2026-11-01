@@ -16,6 +16,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -100,6 +101,12 @@ fun MusicPlayerContent(
 ) {
   val palette = LocalApprovedPalette.current
   val panelState = rememberMusicPanel()
+  // UI viewports belong to the retained player, not its removable layout/tab panes.
+  // A command revision also changes on queue replacement, so it is not a Players key.
+  val queueState = key(snapshot.sourceId, snapshot.localSessionToken,
+      snapshot.controlPlayerId, snapshot.queueId) { rememberLazyListState() }
+  val roomState = key(snapshot.sourceId, snapshot.localSessionToken,
+      snapshot.controlPlayerId) { rememberLazyListState() }
   CompositionLocalProvider(
       LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = FontFamily.Default),
   ) {
@@ -108,7 +115,7 @@ fun MusicPlayerContent(
           snapshot, modifier, onDismiss, onLayoutChange, onAction)
       MusicPlayerLayout.FULL -> MusicPositionScope(snapshot) {
         MusicWorkspace(snapshot, modifier.background(palette.background),
-            onDismiss, onLayoutChange, onAction, panelState)
+            onDismiss, onLayoutChange, onAction, panelState, queueState, roomState)
       }
       MusicPlayerLayout.PHOTOS -> BoxWithConstraints(
           modifier.fillMaxSize().background(palette.background).padding(16.dp)) {
@@ -148,6 +155,8 @@ private fun MusicWorkspace(
     onLayoutChange: (MusicPlayerLayout) -> Unit,
     onAction: (MusicPlayerUiAction) -> Unit,
     panelState: MutableState<MusicPanel>,
+    queueState: LazyListState,
+    roomState: LazyListState,
 ) {
   BoxWithConstraints(modifier.fillMaxSize().padding(24.dp)) {
     val wide = maxWidth >= 760.dp
@@ -158,14 +167,14 @@ private fun MusicWorkspace(
         Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(48.dp)) {
           MusicCurrent(snapshot, Modifier.weight(1.1f).fillMaxHeight(), false, onAction)
           MusicSidePanel(snapshot, Modifier.weight(1f).fillMaxHeight(), onAction,
-              panelState)
+              panelState, queueState, roomState)
         }
       } else {
         // Each pane has a finite height: no LazyColumn inside an unbounded scroller.
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
           MusicCurrent(snapshot, Modifier.weight(1.1f).fillMaxWidth(), true, onAction)
           MusicSidePanel(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction,
-              panelState)
+              panelState, queueState, roomState)
         }
       }
     }
@@ -465,6 +474,8 @@ private fun MusicSidePanel(
     modifier: Modifier,
     onAction: (MusicPlayerUiAction) -> Unit,
     panelState: MutableState<MusicPanel>,
+    queueState: LazyListState,
+    roomState: LazyListState,
 ) {
   var panel by panelState
   Column(modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -495,9 +506,11 @@ private fun MusicSidePanel(
         MusicText("${snapshot.queue.size} tracks", muted = true, size = 14)
     }
     when (panel) {
-      MusicPanel.QUEUE -> MusicQueue(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction)
+      MusicPanel.QUEUE -> MusicQueue(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction,
+          listState = queueState)
       MusicPanel.LYRICS -> MusicLyrics(snapshot, Modifier.weight(1f).fillMaxWidth())
-      MusicPanel.ROOMS -> MusicRooms(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction)
+      MusicPanel.ROOMS -> MusicRooms(snapshot, Modifier.weight(1f).fillMaxWidth(), onAction,
+          listState = roomState)
     }
     if (musicCanBrowse(snapshot)) {
       MusicButton("Browse library", Modifier.fillMaxWidth(), quiet = true) {
@@ -544,6 +557,7 @@ internal fun MusicQueue(
     snapshot: MusicPlayerSnapshot,
     modifier: Modifier,
     onAction: (MusicPlayerUiAction) -> Unit,
+    listState: LazyListState = rememberLazyListState(),
 ) {
   if (!snapshot.can(MusicCommand.OPEN_QUEUE)) {
     MusicPanelMessage(if (snapshot.track?.isLive == true) "Live station" else "Queue unavailable",
@@ -557,7 +571,7 @@ internal fun MusicQueue(
   }
   val palette = LocalApprovedPalette.current
   val rowKeys = remember(snapshot.queue) { musicItemKeys(snapshot.queue) { it.id } }
-  LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(8.dp),
+  LazyColumn(modifier, state = listState, verticalArrangement = Arrangement.spacedBy(8.dp),
       contentPadding = PaddingValues(bottom = 12.dp)) {
     // Stable occurrence keys, with no eager artwork decode for the entire queue.
     itemsIndexed(snapshot.queue, key = { index, _ -> rowKeys[index] },
@@ -656,13 +670,14 @@ internal fun MusicRooms(
     snapshot: MusicPlayerSnapshot,
     modifier: Modifier,
     onAction: (MusicPlayerUiAction) -> Unit,
+    listState: LazyListState = rememberLazyListState(),
 ) {
   if (snapshot.rooms.isEmpty()) {
     MusicPanelMessage("No players available", "Choose or connect a player in Music settings.", modifier)
     return
   }
   val rowKeys = remember(snapshot.rooms) { musicItemKeys(snapshot.rooms) { it.id } }
-  LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(12.dp),
+  LazyColumn(modifier, state = listState, verticalArrangement = Arrangement.spacedBy(12.dp),
       contentPadding = PaddingValues(bottom = 12.dp)) {
     item(contentType = "heading") {
       MusicText("Choose a player. Available group controls are shown below.",

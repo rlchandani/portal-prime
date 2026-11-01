@@ -1,0 +1,162 @@
+{
+  "dark-queue": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "visibleRows": [
+      {
+        "text": "Generated queue row 0",
+        "top": 275
+      },
+      {
+        "text": "Generated queue row 1",
+        "top": 366
+      },
+      {
+        "text": "Generated queue row 2",
+        "top": 457
+      },
+      {
+        "text": "Generated queue row 3",
+        "top": 548
+      },
+      {
+        "text": "Generated queue row 4",
+        "top": 639
+      },
+      {
+        "text": "Generated queue row 5",
+        "top": 730
+      },
+      {
+        "text": "Generated queue row 6",
+        "top": 821
+      },
+      {
+        "text": "Generated queue row 7",
+        "top": 912
+      },
+      {
+        "text": "Generated queue row 8",
+        "top": 1003
+      },
+      {
+        "text": "Generated queue row 9",
+        "top": 1094
+      },
+      {
+        "text": "Generated queue row 10",
+        "top": 1185
+      },
+      {
+        "text": "Generated queue row 11",
+        "top": 1276
+      }
+    ]
+  },
+  "dark-player": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "visibleRows": [
+      {
+        "text": "Generated player row 0",
+        "top": 305
+      },
+      {
+        "text": "Generated player row 1",
+        "top": 560
+      },
+      {
+        "text": "Generated player row 2",
+        "top": 815
+      },
+      {
+        "text": "Generated player row 3",
+        "top": 1070
+      },
+      {
+        "text": "Generated player row 4",
+        "top": 1325
+      }
+    ]
+  },
+  "light-queue": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "visibleRows": [
+      {
+        "text": "Generated queue row 0",
+        "top": 275
+      },
+      {
+        "text": "Generated queue row 1",
+        "top": 366
+      },
+      {
+        "text": "Generated queue row 2",
+        "top": 457
+      },
+      {
+        "text": "Generated queue row 3",
+        "top": 548
+      },
+      {
+        "text": "Generated queue row 4",
+        "top": 639
+      },
+      {
+        "text": "Generated queue row 5",
+        "top": 730
+      },
+      {
+        "text": "Generated queue row 6",
+        "top": 821
+      },
+      {
+        "text": "Generated queue row 7",
+        "top": 912
+      },
+      {
+        "text": "Generated queue row 8",
+        "top": 1003
+      },
+      {
+        "text": "Generated queue row 9",
+        "top": 1094
+      },
+      {
+        "text": "Generated queue row 10",
+        "top": 1185
+      },
+      {
+        "text": "Generated queue row 11",
+        "top": 1276
+      }
+    ]
+  },
+  "light-player": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "visibleRows": [
+      {
+        "text": "Generated player row 0",
+        "top": 305
+      },
+      {
+        "text": "Generated player row 1",
+        "top": 560
+      },
+      {
+        "text": "Generated player row 2",
+        "top": 815
+      },
+      {
+        "text": "Generated player row 3",
+        "top": 1070
+      },
+      {
+        "text": "Generated player row 4",
+        "top": 1325
+      }
+    ]
+  }
+}

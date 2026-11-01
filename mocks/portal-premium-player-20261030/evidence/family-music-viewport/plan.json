@@ -1,0 +1,30 @@
+{
+  "slotStartedAtUtc": "2026-11-01T16:00:52+00:00",
+  "originalDeadlineUtc": "2026-11-01T16:30:52+00:00",
+  "capReset": false,
+  "issue": "Music Queue and Players lose browse viewport when their panes leave composition",
+  "acceptance": [
+    "Real API29 original component reproduces viewport loss",
+    "Same component retains queue/player row coordinates after alternate tabs, compact/photo layouts and metadata updates",
+    "Queue identity change resets queue but preserves Players",
+    "Source identity change resets both panes",
+    "Same old assertion names run before and after",
+    "Generated captures only; no provider/audio or panel FPS claim",
+    "Full unit gate and debug/optimized builds pass",
+    "Only Family updated; original config and Dream restored"
+  ],
+  "stateKeys": {
+    "queue": [
+      "sourceId",
+      "localSessionToken",
+      "controlPlayerId",
+      "queueId"
+    ],
+    "players": [
+      "sourceId",
+      "localSessionToken",
+      "controlPlayerId"
+    ]
+  },
+  "reviewDisposition": "Existing exposed source/target identity defines viewport owner; command revision is excluded because it also changes for queue-only rebinding; no host observer or backend change"
+}

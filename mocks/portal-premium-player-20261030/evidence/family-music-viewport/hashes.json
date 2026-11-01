@@ -1,0 +1,42 @@
+{
+  "publicFiles": {
+    "apk-gate.json": "70a244b5a4eff713048648db69e9c9386da9aa2f0c4cfe5b95ce925bf80fbe48",
+    "baseline-checks.json": "1afbd19907614775e2a63be551cbd4ebffa1e12710af3ca818cf87736af62c2e",
+    "baseline-geometry.json": "b024fdbd425854fb78f90c559ce53707bf31a5b2ebc8224f9353325703c93e1c",
+    "baseline-verification.json": "b0f40a5ca41c4faaa44df7b9201c5c500061fbb0cbe3109d1da9c748390f6eba",
+    "checks.json": "a8c04ee491ceb42b5e41e782e59913f067b29ade51986c3d8528e267401b4004",
+    "dark-player-after-detail.png": "b79fffc43e5ab1fa112a0726e738a8bdb8d1e52710de2f1862b1ac1d95195c8e",
+    "dark-player-after.png": "32d47f5783899ef10a242bcddfeffb83772e545b86866374f3ceb01ab440a23e",
+    "dark-player-before-detail.png": "5f2858091fffbcb6e607e35bb7ae9ef4b1b5cda2d36f1f29aa7a1c24aac67cc0",
+    "dark-player-before.png": "ad1026b1b1e19f9ed1b926232ae1b42ce11352a58f66ae70051be7183c476a3e",
+    "dark-queue-after-detail.png": "f46aeab36429faf04ea1fd1a50e865a07fa7ec7563692db96d4f1b1db2ae8e64",
+    "dark-queue-after.png": "d4dfcf709d6b0f2e4d70ec2224c0fef0758b39ff2e4369b3b2d13c2ec73c5732",
+    "dark-queue-before-detail.png": "802179ddae25509aa33328385f30c1b8cfe676071a1fcd1d280fb08f71526515",
+    "dark-queue-before.png": "7ab01ac06495f23c0f94ba8403498f9eea1cd6b8355a35eeb16516df457c94b0",
+    "delivery-time.json": "d78b3954a12cb13a7a77ba927c8e5ec6a20aacc9c6983dc305d7fae0cb108a04",
+    "gallery-checks.json": "4a2397d17735f8d9c00d00e0826a461c65f9077d37b6346fdaa14f463da12bfd",
+    "geometry.json": "e2be8bc6e36600c4b3dc8731e471febf33158819bb585e84a12e9cc3af0ca441",
+    "health.json": "9218bc60e4a2298eff6418ec166670fb357186789111a8721445d1650d53c9a9",
+    "images.json": "aa2848a5f68a27b957350f8213222886072c3fb8a721f47c6890adb39d1b3a08",
+    "implementation-scope.json": "a64711717063b08fa254b53a0b8c738f11a54a726ac2fa4676f2678128c8474c",
+    "light-player-after-detail.png": "4f6835c15d70b4c0f0b47491f68d2f146d80822cebbff31c80cc5319fa4d6cd9",
+    "light-player-after.png": "9d30354222e985085f716ce0f4cd9f472eaad17c883cc62607c5dfb06a1971e5",
+    "light-player-before-detail.png": "e0fe98e331f724af3007e51cd6054b4d4dde0b29ef1aa0d77516ed028aa8b363",
+    "light-player-before.png": "b5fe292ba7e027cecaccc7a7fa2275bd20937ee6848a4b547e1644ea2ff3f9f9",
+    "light-queue-after-detail.png": "fc7ce6ec066424fd928e2e5e5aa4c328f1987bae32505539fd6e7d9795a7714d",
+    "light-queue-after.png": "1bc91c4272db50e236c9223013abd66511b3bec36d31f1a181d9adda7e869eef",
+    "light-queue-before-detail.png": "d1a2d18e0305e13e844ed4e37a95d6c82cc4f63544aa5dce3c7f8e9d256b5a66",
+    "light-queue-before.png": "008eeeb0d18645b788c40592db4cbfcef3beac842e4f7ad38c456ba551f636da",
+    "outcome.json": "9305dc95705003bb1cb014a3d981b58da1bcfab1ffb646f6cc198206e25bbaaf",
+    "plan.json": "ef969499258cb5b7073cc381e5c6519be100df704aaf72faa5a7a4009eba6596",
+    "review.json": "9697424b4aef87d1ea0e3207beb66b33964aa0743d486060242547704a49be5c",
+    "unit-gate.json": "8697e42c2c7ea6a4c93426f36568ecebb14d8b4810864d7e2bb545221658305c",
+    "verification.json": "a186a5ff172e78fcf2feca4b2bd995fc807cc2b66dc2d721eb5b022efc998786"
+  },
+  "sourceFiles": {
+    "app/src/main/java/com/immortal/launcher/MusicPlayerUi.kt": "0e3455aff41f93c54ff420df242e7fca964e5d66432da7decedd5ca745664c74",
+    "app/src/debug/java/com/immortal/launcher/MusicDesignPreviewActivity.kt": "5cda65b4f5a9ae6235ca22baf5c026417860d45f8c1c14d735571301f31737e2",
+    "app/src/androidTest/java/com/immortal/launcher/MusicViewportDeviceChecks.kt": "62d121a927afa76bbf257f61abdee76b955be72de44259f82376419e01200144",
+    "app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt": "fb608032b0bc616bebde9b0be4e8c2239aee6f971e331019dade775f6791cabf"
+  }
+}

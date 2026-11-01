@@ -1,0 +1,14 @@
+{
+  "slotStartedAtUtc": "2026-11-01T16:00:52+00:00",
+  "originalDeadlineUtc": "2026-11-01T16:30:52+00:00",
+  "closedAtUtc": "2026-11-01T16:16:25.759710+00:00",
+  "elapsedSeconds": 933.76,
+  "capReset": false,
+  "runtimeFixDelivered": true,
+  "nativeAssertions": 49,
+  "baselineFailures": 18,
+  "finalFailures": 0,
+  "unitTests": 3764,
+  "broadGoalComplete": false,
+  "remaining": "Natural room-light acceptance and parked black Dream-to-Home handoff"
+}

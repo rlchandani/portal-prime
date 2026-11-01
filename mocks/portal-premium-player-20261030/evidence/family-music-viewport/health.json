@@ -1,0 +1,15 @@
+{
+  "scope": "read_only_independent_post_install_health",
+  "transport": "wireless_adb_and_fleet",
+  "checks": {
+    "familyIdentity": true,
+    "installedArtifact": true,
+    "optimizedNonDebuggable": true,
+    "systemPidUnchanged": true,
+    "noInstrumentation": true,
+    "noCollector": true,
+    "originalDreamRestored": true
+  },
+  "passed": true,
+  "verifiedAtUtc": "2026-11-01T16:14:18.312874+00:00"
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "palette": "dark",
+    "list": "queue",
+    "phase": "before",
+    "full": "dark-queue-before.png",
+    "detail": "dark-queue-before-detail.png"
+  },
+  {
+    "palette": "dark",
+    "list": "player",
+    "phase": "before",
+    "full": "dark-player-before.png",
+    "detail": "dark-player-before-detail.png"
+  },
+  {
+    "palette": "light",
+    "list": "queue",
+    "phase": "before",
+    "full": "light-queue-before.png",
+    "detail": "light-queue-before-detail.png"
+  },
+  {
+    "palette": "light",
+    "list": "player",
+    "phase": "before",
+    "full": "light-player-before.png",
+    "detail": "light-player-before-detail.png"
+  },
+  {
+    "palette": "dark",
+    "list": "queue",
+    "phase": "after",
+    "full": "dark-queue-after.png",
+    "detail": "dark-queue-after-detail.png"
+  },
+  {
+    "palette": "dark",
+    "list": "player",
+    "phase": "after",
+    "full": "dark-player-after.png",
+    "detail": "dark-player-after-detail.png"
+  },
+  {
+    "palette": "light",
+    "list": "queue",
+    "phase": "after",
+    "full": "light-queue-after.png",
+    "detail": "light-queue-after-detail.png"
+  },
+  {
+    "palette": "light",
+    "list": "player",
+    "phase": "after",
+    "full": "light-player-after.png",
+    "detail": "light-player-after-detail.png"
+  }
+]

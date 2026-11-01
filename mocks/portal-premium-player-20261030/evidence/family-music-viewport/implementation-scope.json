@@ -1,0 +1,21 @@
+{
+  "productionWriteSet": [
+    "app/src/main/java/com/immortal/launcher/MusicPlayerUi.kt"
+  ],
+  "runtimePolicy": "Two retained LazyListStates; no track/position/list-content keys; queue identity changes affect only Queue",
+  "memoryScope": "UI scroll state in existing content owner; list composition still removed when hidden",
+  "reconnectScope": "Same exposed logical identity retains browsing; interrupted provider rebinding with intermediate cleared snapshots is outside native acceptance",
+  "nativeInput": "Public semantics ScrollToIndex and tab actions; fixture layout setter drives the same production content composition",
+  "fixture": "80 unique queue entries and 80 players, PAUSED, blank artwork, generated photo placeholder",
+  "caseCount": 2,
+  "originalAssertionCount": 49,
+  "baselineFailureCount": 18,
+  "baselineIsolatedFailureCount": 0,
+  "claimLimits": [
+    "No provider/audio command proof",
+    "No physical finger-input claim",
+    "No FPS or CPU savings claim",
+    "No photo-host integration claim",
+    "No scroll persistence after dismissal or process death claim"
+  ]
+}

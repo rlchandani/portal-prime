@@ -1,0 +1,11 @@
+{
+  "scope": "read_only_production_and_native_fixture_review",
+  "blockingFindings": [],
+  "sourceIdentityKeysAccepted": true,
+  "separatePlayersQueueKeysAccepted": true,
+  "paneSpecificAssertionsAccepted": true,
+  "generatedOnlyCaptureAccepted": true,
+  "boundedCleanupAccepted": true,
+  "deviceCommandsRunByReviewer": false,
+  "sourceReviewIsRuntimeProof": false
+}

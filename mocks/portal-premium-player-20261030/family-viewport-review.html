@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Family Area · Music browsing continuity</title>
+<style>
+:root{color-scheme:dark;--bg:#111a22;--card:#1c2933;--ink:#f4f6f7;--muted:#b8c6cd;--edge:#3b4953}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+main{max-width:1440px;margin:auto;padding:32px}h1{font-size:clamp(28px,4vw,44px);line-height:1.15;letter-spacing:-.04em}
+p{max-width:900px;color:var(--muted)}nav{display:flex;gap:20px;flex-wrap:wrap;margin:28px 0}
+label{display:flex;gap:12px;align-items:center}select{font:inherit;background:var(--card);color:var(--ink);padding:10px 16px;border:1px solid var(--edge);border-radius:12px}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:24px}figure{margin:0;background:var(--card);border:1px solid var(--edge);border-radius:20px;overflow:hidden}
+figcaption{padding:18px 22px}strong{display:block;font-size:21px}img{display:block;width:100%;height:auto}a{color:inherit}
+.note{padding:14px 22px;margin:0;font-size:14px}
+@media(max-width:700px){main{padding:20px}.comparison{grid-template-columns:1fr}}
+</style>
+<main>
+<h1>Keep your place in music.</h1>
+<p>Actual Family Area captures. Queue and Players now retain their browsing position
+after switching tabs or returning from compact and photo layouts.</p>
+<p><b>49/49 native assertions pass</b>, replacing 18 baseline failures.
+Generated, paused data; no provider, audio or panel-FPS claim.</p>
+<nav aria-label="Capture selection">
+<label>Theme <select id="palette"><option value="dark">Dark</option><option value="light">Light</option></select></label>
+<label>List <select id="list"><option value="queue">Queue</option><option value="player">Players</option></select></label>
+</nav>
+<section class="comparison" aria-label="Before and after">
+<figure><figcaption><strong>Before · returns to the top</strong><span id="before-label"></span></figcaption>
+<img id="before" alt=""><p class="note"><a id="before-full">Open full native capture</a></p></figure>
+<figure><figcaption><strong>After · keeps your place</strong><span id="after-label"></span></figcaption>
+<img id="after" alt=""><p class="note"><a id="after-full">Open full native capture</a></p></figure>
+</section>
+<p>The detail crops show the native right pane. Full captures are 2160 × 1440.
+A new queue starts at the top without resetting Players; a different source resets both.</p>
+<p><a href="evidence/family-music-viewport/checks.json">Native results</a> ·
+<a href="evidence/family-music-viewport/baseline-checks.json">Original failures</a> ·
+<a href="evidence/family-music-viewport/unit-gate.json">3,764 fresh JVM tests</a> ·
+<a href="native-review.html">Music design review</a></p>
+</main>
+<script>
+const palette=document.querySelector("#palette"),list=document.querySelector("#list");
+function show(){
+  const light=palette.value==="light",player=list.value==="player";
+  document.documentElement.style.colorScheme=light?"light":"dark";
+  const colors=light?["#edf2f3","#fff","#182c39","#516773","#c5d0d4"]:["#111a22","#1c2933","#f4f6f7","#b8c6cd","#3b4953"];
+  ["--bg","--card","--ink","--muted","--edge"].forEach((name,i)=>document.documentElement.style.setProperty(name,colors[i]));
+  for(const phase of ["before","after"]){
+    const stem=`evidence/family-music-viewport/${palette.value}-${list.value}-${phase}`;
+    const image=document.querySelector("#"+phase);
+    image.src=stem+"-detail.png";
+    image.alt=`${phase==="before"?"Original":"Corrected"} ${player?"Players":"Queue"} viewport in ${palette.value} theme`;
+    document.querySelector("#"+phase+"-full").href=stem+".png";
+    document.querySelector("#"+phase+"-label").textContent=phase==="before"?"Row 0 after returning":`Retained row ${player?29:30}`;
+  }
+}
+palette.addEventListener("change",show);list.addEventListener("change",show);show();
+</script>
+</html>
