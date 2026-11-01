@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Legacy engine focal points and people weights. Detection runs on a bounded, shared worker;
- * each frame owns a cancellable handle. Results still enter the engine's next-start fx/fy/pw
- * snapshot. face_focus.json retains URL -> comma-separated metadata / ""; new face results
+ * each frame owns a cancellable handle. Initial snapshots and incoming preparations read
+ * the shared cache. face_focus.json retains URL -> comma-separated metadata / ""; new face results
  * append the raw normalized bounds to the existing "fx,fy,weight" fields.
  */
 class FaceFocusStore(context: Context) : AutoCloseable {
@@ -39,6 +39,9 @@ class FaceFocusStore(context: Context) : AutoCloseable {
   private val cacheFile = File(context.filesDir, "face_focus.json")
   private val cache by lazy { FaceFocusCache(cacheFile) }
   private val work = FaceFocusWork()
+
+  /** One atomic in-memory entry after photosJson has hydrated this store off Main. */
+  internal fun cachedMetadata(url: String): String = cache.entry(url).orEmpty()
 
   /** The cached focal point for [url], or null if unanalyzed / no faces found. */
   fun focusFor(url: String): FaceFocus.Focus? {

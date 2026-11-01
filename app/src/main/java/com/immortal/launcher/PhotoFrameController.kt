@@ -976,6 +976,10 @@ class PhotoFrameController(
                   mayRun = { hostActive && !paused },
                   startWarm = { faceStore.startWarmUp(urls, headers) },
               ).also { legacyWarmup = it }
+              val liveFocus = LegacyPhotoFocusBridge(urls,
+                  isCurrent = { !stopped && owner == legacyEngineRevision &&
+                      legacyFaceStore === faceStore && engineActive && webView === wv },
+                  cachedMetadata = faceStore::cachedMetadata)
               val styleReporter = SlideshowStyleReporter(
                   host = when (context) {
                     is PhotoFramePreviewActivity -> SlideshowStyleHost.PREVIEW
@@ -1009,6 +1013,8 @@ class PhotoFrameController(
                     @android.webkit.JavascriptInterface fun promoteNativeFilmstrip(incoming: String, outgoing: String, handoffId: Int): Boolean =
                         hybrid?.promote(incoming,outgoing,handoffId) ?: false
                     @android.webkit.JavascriptInterface fun getPhotos(): String = photosJson
+                    @android.webkit.JavascriptInterface
+                    fun getPhotoFocus(index: Int): String = liveFocus.read(index)
                     @android.webkit.JavascriptInterface fun getMode(): String = mode
                     // Per-photo dwell (seconds). The engine holds each photo this long instead of its old
                     // hardcoded ~9s step, so the user's interval actually takes effect in engine modes.

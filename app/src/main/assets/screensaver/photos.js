@@ -111,13 +111,39 @@
   // Only unknown photos need display-load metadata. Bound aliases because ready
   // derivative names can change after cache eviction; never retain image pixels here.
   const dimensionSources = new Map();
+  // Metadata aliases only: no pixels, timers or additional detector work. A completed
+  // display preparation consumes its alias before the mode calculates incoming geometry.
+  const faceSources = new Map();
   function sizeSource(p, url) {
+    faceSources.delete(url); faceSources.set(url, p);
+    if (faceSources.size > 64) faceSources.delete(faceSources.keys().next().value);
     if (!p.measured) {
       dimensionSources.delete(url); dimensionSources.set(url, p);
       if (dimensionSources.size > 64) dimensionSources.delete(dimensionSources.keys().next().value);
     }
     return url;
   }
+  window.refreshPhotoFocuses = function (urls) {
+    const host = window.Android;
+    for (const url of new Set(urls)) {
+      const p = faceSources.get(url);
+      faceSources.delete(url);
+      if (!p || !host || typeof host.getPhotoFocus !== "function" ||
+          !Number.isInteger(p.id) || PHOTOS[p.id] !== p) continue;
+      try {
+        const raw = host.getPhotoFocus(p.id);
+        if (typeof raw !== "string" || raw.length > 256) continue;
+        const fields = raw.split(",");
+        if (![2, 3, 7].includes(fields.length) || fields.some(v => !v.trim())) continue;
+        const values = fields.map(Number);
+        if (!values.every(v => Number.isFinite(v) && v >= 0 && v <= 1)) continue;
+        if (values.length === 7 && (values[3] >= values[5] || values[4] >= values[6])) continue;
+        p.fx = values[0]; p.fy = values[1];
+        if (values.length >= 3) p.pw = values[2];
+        if (values.length === 7) p.fb = values.slice(3);
+      } catch (_) { /* An unavailable optional bridge preserves the last trustworthy snapshot. */ }
+    }
+  };
   window.recordPhotoDimensions = function (url, width, height) {
     const p = dimensionSources.get(url);
     dimensionSources.delete(url);

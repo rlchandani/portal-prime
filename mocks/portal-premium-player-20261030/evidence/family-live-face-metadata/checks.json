@@ -1,0 +1,227 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "generated_local_fixture_url",
+      "passed": true
+    },
+    {
+      "name": "fixture_cache_entry_fresh",
+      "passed": true
+    },
+    {
+      "name": "point_only_seed_accepted",
+      "passed": true
+    },
+    {
+      "name": "new_uuid_activity_created",
+      "passed": true
+    },
+    {
+      "name": "initial_generated_point_only_scene",
+      "passed": true
+    },
+    {
+      "name": "initial_same_owned_activity_and_webview",
+      "passed": true
+    },
+    {
+      "name": "initial_native_region_nonblank",
+      "passed": true
+    },
+    {
+      "name": "late_region_seed_accepted",
+      "passed": true
+    },
+    {
+      "name": "cache_update_after_initial_pixels",
+      "passed": true
+    },
+    {
+      "name": "mid-hold_same_owned_activity_and_webview",
+      "passed": true
+    },
+    {
+      "name": "mid-hold_native_region_nonblank",
+      "passed": true
+    },
+    {
+      "name": "mid_hold_before_next_five_second_presentation",
+      "passed": true
+    },
+    {
+      "name": "mid_hold_fixture_source_unchanged",
+      "passed": true
+    },
+    {
+      "name": "mid_hold_displayed_style_unchanged",
+      "passed": true
+    },
+    {
+      "name": "mid_hold_native_region_hash_unchanged",
+      "passed": true
+    },
+    {
+      "name": "mid_hold_bridge_has_late_cache",
+      "passed": true
+    },
+    {
+      "name": "next-presentation_same_owned_activity_and_webview",
+      "passed": true
+    },
+    {
+      "name": "next-presentation_native_region_nonblank",
+      "passed": true
+    },
+    {
+      "name": "late_capture_after_next_five_second_presentation",
+      "passed": true
+    },
+    {
+      "name": "late_fixture_source_unchanged",
+      "passed": true
+    },
+    {
+      "name": "late_metadata_refreshed_same_owner",
+      "passed": true
+    },
+    {
+      "name": "late_presentation_style_changed",
+      "passed": true
+    },
+    {
+      "name": "draw_listeners_removed",
+      "passed": true
+    },
+    {
+      "name": "owned_activity_destroyed",
+      "passed": true
+    },
+    {
+      "name": "lifecycle_listener_unregistered",
+      "passed": true
+    },
+    {
+      "name": "inner_under_55_seconds",
+      "passed": true
+    }
+  ],
+  "artifacts": [
+    {
+      "phase": "initial",
+      "relativePath": "before.png",
+      "width": 2160,
+      "height": 1440,
+      "copiedElapsedMs": 2335,
+      "region": [
+        540,
+        360,
+        1080,
+        720
+      ],
+      "regionSha256": "e77b916505da03ac6f10e096d593c4e46c95e17e1434851a9eb7bb96d6932337",
+      "publicCrop": [
+        0,
+        0,
+        2160,
+        1100
+      ]
+    },
+    {
+      "phase": "mid-hold",
+      "relativePath": "hold.png",
+      "width": 2160,
+      "height": 1440,
+      "copiedElapsedMs": 3162,
+      "region": [
+        540,
+        360,
+        1080,
+        720
+      ],
+      "regionSha256": "e77b916505da03ac6f10e096d593c4e46c95e17e1434851a9eb7bb96d6932337",
+      "publicCrop": [
+        0,
+        0,
+        2160,
+        1100
+      ]
+    },
+    {
+      "phase": "next-presentation",
+      "relativePath": "after.png",
+      "width": 2160,
+      "height": 1440,
+      "copiedElapsedMs": 9439,
+      "region": [
+        540,
+        360,
+        1080,
+        720
+      ],
+      "regionSha256": "709ed67a903ad6c0dc43904d20b998a4a62fb560afc05313ab0d3d77702a2024",
+      "publicCrop": [
+        0,
+        0,
+        2160,
+        1100
+      ]
+    }
+  ],
+  "scenes": {
+    "initial": {
+      "bridgeCacheMatches": true,
+      "hasRegion": false,
+      "imageToken": 3025106421,
+      "liveLayers": 1,
+      "ownedDeck": true,
+      "pointMatches": true,
+      "ready": true,
+      "regionMatches": false,
+      "styleToken": 2251288924
+    },
+    "midHold": {
+      "bridgeCacheMatches": true,
+      "hasRegion": false,
+      "imageToken": 3025106421,
+      "liveLayers": 1,
+      "ownedDeck": true,
+      "pointMatches": true,
+      "ready": true,
+      "regionMatches": false,
+      "styleToken": 2251288924
+    },
+    "nextPresentation": {
+      "bridgeCacheMatches": true,
+      "hasRegion": true,
+      "imageToken": 3025106421,
+      "liveLayers": 1,
+      "ownedDeck": true,
+      "pointMatches": true,
+      "ready": true,
+      "regionMatches": true,
+      "styleToken": 2790822817
+    }
+  },
+  "timings": {
+    "cacheUpdateAfterInitialPixelsMs": 501,
+    "lateAfterInitialPixelsMs": 7104
+  },
+  "completed": true,
+  "passed": true,
+  "failureCount": 0,
+  "checkCount": 27,
+  "renderCount": 3,
+  "lastPhase": "next_presentation",
+  "sameActivity": true,
+  "sameWebView": true,
+  "generatedOnly": true,
+  "syntheticCachedResults": true,
+  "pixelGeometryVerified": false,
+  "mlRecallVerified": false,
+  "elapsedMs": 10287,
+  "relativeReportPath": "checks.json"
+}

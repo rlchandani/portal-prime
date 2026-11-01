@@ -64,7 +64,10 @@
         const loaded = await publish(() => Promise.all(Array.from(new Set([].concat(urls)))
           .map(u => window.preloadDecoded(u, controller.signal))));
         if (loaded === false) return false;
-        return publish(() => true);
+        return publish(() => {
+          if (typeof window.refreshPhotoFocuses === "function") window.refreshPhotoFocuses([].concat(urls));
+          return true;
+        });
       } catch (_) { return false; }
     }
     async function run(fn) {

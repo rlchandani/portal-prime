@@ -40,6 +40,21 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // UUID-owned generated photo window only; no UiAutomation or private diagnostics.
+        if (options.getString("command") == "liveFaceMetadata") {
+            val faces = try {
+                SlideshowLiveFaceDeviceChecks.run(this, options)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("liveFaceMetadataCompleted", false)
+                    putBoolean("liveFaceMetadataPassed", false)
+                    putBoolean("liveFaceMetadataNativePassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (faces.getBoolean("liveFaceMetadataPassed")) 0 else 1, faces)
+            return
+        }
         // Owned generated debug music windows; no UiAutomation or generic diagnostics.
         if (options.getString("command") == "musicRepeatedItems") {
             val music = try {

@@ -21,7 +21,8 @@ const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, decl
 }));
 
 export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = false,
-  mode = 'framed', W = 2160, H = 1440, ambientMs = 3500, random = .5, photoMotion } = {}) {
+  mode = 'framed', W = 2160, H = 1440, ambientMs = 3500, random = .5, photoMotion,
+  configureWindow } = {}) {
   let now = 0, nextId = 1, deferred = deferLoad;
   const pending = new Map(), loads = [], writes = [];
   function schedule(fn, ms) {
@@ -146,6 +147,7 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
       { filename: 'lib-engine.js' });
     window.preloadDecoded = loader;
   }
+  configureWindow?.(window, context);
   for (const file of ['modes.js', 'mode-impls.js']) {
     vm.runInContext(readFileSync(new URL(file, assets), 'utf8'), context, { filename: file });
   }
@@ -156,7 +158,8 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
   const cursor = { i: 0 }, resolutions = [];
   const cleanup = window.SS.MODES[mode].run({ root, cursor, W, H,
     photoMs, microMs: photoMs, motionMs: 5400, ambientMs, photoMotion, url: (photo, edge) => {
-      const url = 'generated://' + photo.seed + (changingUrls ? '-r' + (resolutions.length + 1) : '');
+      const url = window.photoUrl ? window.photoUrl(photo, edge) :
+        'generated://' + photo.seed + (changingUrls ? '-r' + (resolutions.length + 1) : '');
       resolutions.push({ photo, edge, url }); return url;
     } }, deck);
   function nodes(node = root) { return [node, ...node.children.flatMap(child => nodes(child))]; }

@@ -2,6 +2,20 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Newest delivery, November 1 — live cached face results.**
+[The Family Area fix](portal-live-face-metadata-2026-11-01.md) removes the
+engine-restart requirement for newly cached face metadata. The current photo
+stays steady; the next prepared presentation uses the new bounds. Actual
+Android 10 preview checks pass **27/27** in **10.287 seconds**, retaining the
+same activity/WebView. The second generated region changes from **0** to
+**105,000 visible pixels**, with both final marker rectangles complete.
+**331 JavaScript tests** and **3,761 fresh Android unit tests** pass.
+Optimized APK **880e1d48…** is installed with all settings, sources, face-cache
+bytes, services, pin and original Dream restored. Native validation and
+restoration finished within **11 minutes 32 seconds** of the original
+30-minute slot. This verifies synthetic cached-result integration, not model
+recall, Dream-specific behavior, optimized-artifact FPS or physical fade comfort.
+
 **Latest bounded delivery, November 1 — playing preview clock.**
 [The playing-control check](portal-music-playing-native-2026-11-01.md) reproduces
 and fixes a **15.112-second volume-induced rewind** in the debug preview.

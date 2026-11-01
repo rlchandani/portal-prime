@@ -42,8 +42,11 @@ region preserves the old weighted point and suppresses repeated attempts for
 that URL across handles **for the current process**; restart allows another
 attempt. Decode/SDK failures retain their existing retry behavior.
 
-Newly detected bounds enter the legacy engine's **next-start metadata snapshot**.
-This does not add live reframing of a photo already displayed.
+In this delivery, newly detected bounds entered the legacy engine's
+**next-start metadata snapshot**. The subsequent
+[live cache bridge](portal-live-face-metadata-2026-11-01.md) consumes new results
+on the next prepared presentation without a restart. Neither delivery adds
+live reframing of a photo already displayed.
 
 ## Native result
 
