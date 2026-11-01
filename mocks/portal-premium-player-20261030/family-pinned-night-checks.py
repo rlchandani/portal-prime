@@ -34,7 +34,7 @@ import urllib.request
 PKG = "com.immortal.launcher.debug"
 FILES = "me.zhanghai.android.files"
 PHYSICAL_SERIAL = "FAMILY_PORTAL_SERIAL"
-APK_PREFIX = "6c1adacc"
+APK_PREFIX = "e47d6e71"
 WIDTH, HEIGHT = 2160, 1440
 ROI = (604, 403, 1555, 950)
 EPS = 1e-6
@@ -784,7 +784,7 @@ def main():
                         help="Private authenticated JSON containing base and token")
     parser.add_argument("--serial", required=True, help="ADB transport; physical ro.serialno is separately guarded")
     parser.add_argument("--expected-apk-sha256", required=True,
-                        help="Full installed optimized APK SHA256 (6c1adacc...)")
+                        help=f"Full installed optimized APK SHA256 ({APK_PREFIX}...)")
     parser.add_argument("--private-dir", type=pathlib.Path, required=True,
                         help="NEW owner-only evidence directory outside all Git checkouts")
     parser.add_argument("--tap-in-night", action="store_true", help="Add a second night cover and center-tap case")
@@ -795,7 +795,7 @@ def main():
     if not re.fullmatch(r"[0-9a-f]{64}", args.expected_apk_sha256):
         parser.error("--expected-apk-sha256 must contain 64 hex digits")
     if not args.expected_apk_sha256.startswith(APK_PREFIX):
-        parser.error("--expected-apk-sha256 must identify the installed optimized 6c1adacc APK")
+        parser.error(f"--expected-apk-sha256 must identify the installed optimized {APK_PREFIX} APK")
     if not args.serial or args.serial.startswith("-") or any(char.isspace() for char in args.serial):
         parser.error("--serial must be one explicit ADB transport")
     os.umask(0o077)

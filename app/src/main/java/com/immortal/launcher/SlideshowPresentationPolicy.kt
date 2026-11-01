@@ -13,6 +13,11 @@ package com.immortal.launcher
 internal object SlideshowPresentationPolicy {
   const val MAX_OCCLUSIONS = 32
   private const val MAX_CANDIDATES = 16
+
+  /** Gallery reserves matte space for metadata; a full-width shade would darken the print. */
+  fun needsPhotoScrim(mode: String): Boolean =
+      mode != ScreensaverConfig.MODE_GALLERY_PRINT && mode != ScreensaverConfig.MODE_GALLERY_SPREAD
+
   data class Bounds(val left: Int, val top: Int, val right: Int, val bottom: Int) {
     val width: Int get() = right - left
     val height: Int get() = bottom - top

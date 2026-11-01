@@ -366,8 +366,8 @@ object SettingsDomains {
                       get = { it.antiBurnIn },
                       set = ScreensaverConfig::setAntiBurnIn,
                       visible = { _, _ -> false }),
-                  // NOTE: `showGradient` removed — the frame always draws a legibility scrim
-                  // (FaceRenderer), so the toggle never did anything. See settings-reimagining-audit.
+                  // NOTE: `showGradient` removed — FaceRenderer chooses legibility shading by
+                  // presentation; Gallery uses reserved matte space. The old toggle did nothing.
                   EnumSpec(
                       "presenceMode",
                       "Power",

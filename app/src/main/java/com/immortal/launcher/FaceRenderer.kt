@@ -219,34 +219,35 @@ class FaceRenderer(
 
     buildClockCluster(face.clock)
     val fullBleed = clockFace?.fullBleed == true
+    val screensaver = ScreensaverConfig.load(context)
 
     // Now-playing shows on EVERY face — including the full-bleed flip clock — whenever the user has
     // the setting on (it's high-value enough to be its own switch, not tied to face selection). It's
     // built BEFORE the caption so that when they share a cell (both default bottom-right) the
     // now-playing card sits on top and the smaller photo caption tucks beneath it. Self-hides until
     // music is playing.
-    if (ScreensaverConfig.load(context).showNowPlaying) buildNowPlaying(face.nowPlaying)
+    if (screensaver.showNowPlaying) buildNowPlaying(face.nowPlaying)
 
     // A full-bleed clock (e.g. the Fliqlo flip clock) owns the whole frame on its own near-black
     // background, so skip the scrim and the date/battery/weather widgets — none should overlay it.
     if (!fullBleed) {
-      // Premium legibility scrim: a tall 4-stop gradient covers ~45% of the screen height so
-      // clock text stays readable over bright photos regardless of the showGradient setting.
-      // The old 2-stop conditional scrim is replaced here — the heavier bottom stop (alpha 200)
-      // anchors the clock cluster while the top end fades to fully transparent.
-      val scrimHeight = (context.resources.displayMetrics.heightPixels * 0.45f).toInt()
-      val premiumScrim = View(context)
-      premiumScrim.background =
-          GradientDrawable(
-              GradientDrawable.Orientation.TOP_BOTTOM,
-              intArrayOf(
-                  Color.TRANSPARENT,
-                  Color.argb(80, 0, 0, 0),   // subtle at ~1/3 point
-                  Color.argb(160, 0, 0, 0),  // stronger at ~2/3
-                  Color.argb(200, 0, 0, 0),  // solid-ish at bottom
-              ),
-          )
-      view.addView(premiumScrim, 0, FrameLayout.LayoutParams(MATCH, scrimHeight, Gravity.BOTTOM))
+      // Gallery places metadata in reserved matte space. Shading the whole lower screen would
+      // needlessly alter its photo colors; other styles still need readability over photos.
+      if (SlideshowPresentationPolicy.needsPhotoScrim(screensaver.mode)) {
+        val scrimHeight = (context.resources.displayMetrics.heightPixels * 0.45f).toInt()
+        val premiumScrim = View(context)
+        premiumScrim.background =
+            GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                intArrayOf(
+                    Color.TRANSPARENT,
+                    Color.argb(80, 0, 0, 0),
+                    Color.argb(160, 0, 0, 0),
+                    Color.argb(200, 0, 0, 0),
+                ),
+            )
+        view.addView(premiumScrim, 0, FrameLayout.LayoutParams(MATCH, scrimHeight, Gravity.BOTTOM))
+      }
       buildStandaloneWidgets(face)
       // Photo caption is photo metadata, so (like the widgets) it's skipped on a full-bleed clock.
       if (face.caption.enabled) buildCaption(face.caption)

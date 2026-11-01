@@ -11,6 +11,19 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SlideshowPresentationPolicyTest {
+  @Test fun galleryMatteKeepsWholePhotoColorsWithoutAFullWidthClockScrim() {
+    assertFalse(SlideshowPresentationPolicy.needsPhotoScrim(ScreensaverConfig.MODE_GALLERY_PRINT))
+    assertFalse(SlideshowPresentationPolicy.needsPhotoScrim(ScreensaverConfig.MODE_GALLERY_SPREAD))
+  }
+
+  @Test fun photosBehindClockTextStillGetLegibilityProtection() {
+    listOf(ScreensaverConfig.MODE_SMART, ScreensaverConfig.MODE_WHOLE,
+        "filmstrip", "classic", "unknown-future-style").forEach { mode ->
+      assertTrue("Keep existing overlay readability for $mode",
+          SlideshowPresentationPolicy.needsPhotoScrim(mode))
+    }
+  }
+
   @Test fun gallerySpreadUsesMatchingPortraitTilesWithViewportMatteAndGap() {
     val plans = SlideshowPresentationPolicy.gallerySpread(
         listOf(800 to 1200, 1000 to 1600), 1280, 800)
