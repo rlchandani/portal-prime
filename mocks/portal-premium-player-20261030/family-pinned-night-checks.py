@@ -23,6 +23,7 @@ import os
 import pathlib
 import re
 import signal
+import struct
 import subprocess
 import time
 import urllib.error
@@ -33,7 +34,7 @@ import urllib.request
 PKG = "com.immortal.launcher.debug"
 FILES = "me.zhanghai.android.files"
 PHYSICAL_SERIAL = "FAMILY_PORTAL_SERIAL"
-APK_PREFIX = "199aa8a1"
+APK_PREFIX = "6c1adacc"
 WIDTH, HEIGHT = 2160, 1440
 ROI = (604, 403, 1555, 950)
 EPS = 1e-6
@@ -49,6 +50,22 @@ class CheckFailure(RuntimeError):
 def require(condition, code):
     if not condition:
         raise CheckFailure(code)
+
+
+def hardware_level(value):
+    """Match Java float multiplication before Android 10's integer truncation."""
+    require(math.isfinite(value) and 0 <= value <= 1, "effective_brightness_bounds")
+    value32 = struct.unpack("!f", struct.pack("!f", value))[0]
+    product32 = struct.unpack("!f", struct.pack("!f", value32 * 255))[0]
+    return int(product32)
+
+
+def required_intermediate_levels(start, target):
+    """API29 truncates overrides to 0..255; adjacent levels need no interior level."""
+    require(all(math.isfinite(level) and 0 <= level <= 1 for level in (start, target)),
+            "effective_brightness_bounds")
+    distance = abs(hardware_level(start) - hardware_level(target))
+    return min(4, max(0, distance - 1))
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -468,7 +485,12 @@ class Verifier:
         finally:
             self.deadline = main_deadline
 
-    def ramp(self, name, seed, target, direction, seconds=9):
+    def ramp(self, name, seed, target, direction, seconds=9, requested_at=None):
+        system = int(self.text("shell", "settings", "get", "system", "screen_brightness"))
+        require(0 <= system <= 255, "system_brightness_bounds")
+        effective_start = seed["brightness"] if seed["brightness"] >= 0 else system / 255
+        effective_target = target if target >= 0 else system / 255
+        minimum_intermediates = required_intermediate_levels(effective_start, effective_target)
         samples = [seed]
         self.save(name + "-start.json", seed)
         stop = min(self.deadline, time.monotonic() + seconds)
@@ -499,7 +521,8 @@ class Verifier:
                 require(all(sample["brightness"] == -1 for sample in samples[first_default:]),
                         name + "_default_must_stay_restored")
                 end = samples[first_default]
-                moved = next(sample for sample in positive if sample["brightness"] > .03 + EPS)
+                moved = next((sample for sample in positive
+                              if sample["brightness"] > .03 + EPS), None)
                 intermediate = [value for value in values if value > .03 + EPS]
             else:
                 first_explicit = next(index for index, sample in enumerate(samples)
@@ -516,22 +539,38 @@ class Verifier:
                 intermediate = [value for value in values if abs(value - target) > EPS
                                 and abs(value - seed["brightness"]) > EPS]
             distinct = len({round(value, 6) for value in intermediate})
+            low, high = sorted((hardware_level(effective_start), hardware_level(effective_target)))
+            interior_levels = {hardware_level(value) for value in values
+                               if low < hardware_level(value) < high}
             gaps = [b["seconds"] - a["seconds"] for a, b in zip(samples, samples[1:])]
-            duration = end["seconds"] - moved["seconds"]
+            require(moved is not None or requested_at is not None and minimum_intermediates == 0,
+                    name + "_visible_step_or_request_required")
+            duration = end["seconds"] - moved["seconds"] if moved is not None else None
+            progression_start = moved["seconds"] if moved is not None else requested_at
             progression = [sample for sample in samples
-                           if moved["seconds"] <= sample["seconds"] <= end["seconds"]]
+                           if progression_start <= sample["seconds"] <= end["seconds"]]
             progression_gaps = [b["seconds"] - a["seconds"]
                                 for a, b in zip(progression, progression[1:])]
             jumps = [abs(b - a) for a, b in zip(values, values[1:])]
             span = max(values) - min(values)
             receipt = dict(sampleCount=len(samples), intermediateCount=distinct,
-                           progressionSeconds=round(duration, 6),
+                           requiredIntermediateCount=minimum_intermediates,
+                           hardwareInteriorCount=len(interior_levels),
+                           effectiveStart=effective_start, effectiveTarget=effective_target,
+                           progressionSeconds=round(duration, 6) if duration is not None else None,
                            largestSampleGapSeconds=round(max(gaps, default=0), 6),
                            largestProgressionGapSeconds=round(max(progression_gaps, default=0), 6),
                            largestObservedStep=round(max(jumps, default=0), 6),
                            initialBrightness=seed["brightness"], finalBrightness=samples[-1]["brightness"])
+            # A coarse step can appear late in a perfectly continuous logical ramp.
+            # For live settings, measure from the actual request, not its first visible step.
+            checked_duration = duration
+            if requested_at is not None:
+                checked_duration = end["seconds"] - requested_at
+                receipt["requestToEndpointSeconds"] = round(checked_duration, 6)
             self.result[name] = receipt
-            require(distinct >= 4 and 1.8 <= duration <= 4 + max(progression_gaps, default=0)
+            require(len(interior_levels) >= minimum_intermediates
+                    and 1.8 <= checked_duration <= 4 + max(progression_gaps, default=0)
                     and max(jumps, default=0) <= max(.015, span * .45),
                     name + "_gradual_three_second_progression_required")
             return samples[-1]
@@ -631,14 +670,16 @@ class Verifier:
                     ("liveUp", 15, .15, 1), ("liveDown", 3, .03, -1)):
                 self.phase = name
                 seed = self.overlay_state()
+                requested_at = time.monotonic() - self.started
                 self.apply({"nightClockBrightness": level}, readback=False)
-                seed = self.ramp(name, seed, target, direction)
+                seed = self.ramp(name, seed, target, direction, requested_at=requested_at)
                 self.readback({"nightClockBrightness": level})
             self.result["liveBrightnessRampsExecuted"] = True
         self.phase = "registered-disable"
         seed = self.overlay_state()
+        requested_at = time.monotonic() - self.started
         self.apply({"darkRoomClock": False}, readback=False)
-        self.ramp("registeredDisable", seed, -1, 1)
+        self.ramp("registeredDisable", seed, -1, 1, requested_at=requested_at)
         self.readback({"darkRoomClock": False})
         returned = self.capture("returned-photo").crop(ROI)
         require(photo.tobytes() == returned.tobytes(), "same_native_photo_roi_required")
@@ -743,7 +784,7 @@ def main():
                         help="Private authenticated JSON containing base and token")
     parser.add_argument("--serial", required=True, help="ADB transport; physical ro.serialno is separately guarded")
     parser.add_argument("--expected-apk-sha256", required=True,
-                        help="Full installed optimized APK SHA256 (199aa8a1...)")
+                        help="Full installed optimized APK SHA256 (6c1adacc...)")
     parser.add_argument("--private-dir", type=pathlib.Path, required=True,
                         help="NEW owner-only evidence directory outside all Git checkouts")
     parser.add_argument("--tap-in-night", action="store_true", help="Add a second night cover and center-tap case")
@@ -754,7 +795,7 @@ def main():
     if not re.fullmatch(r"[0-9a-f]{64}", args.expected_apk_sha256):
         parser.error("--expected-apk-sha256 must contain 64 hex digits")
     if not args.expected_apk_sha256.startswith(APK_PREFIX):
-        parser.error("--expected-apk-sha256 must identify the installed optimized 199aa8a1 APK")
+        parser.error("--expected-apk-sha256 must identify the installed optimized 6c1adacc APK")
     if not args.serial or args.serial.startswith("-") or any(char.isspace() for char in args.serial):
         parser.error("--serial must be one explicit ADB transport")
     os.umask(0o077)
