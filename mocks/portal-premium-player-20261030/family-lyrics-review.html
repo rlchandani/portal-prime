@@ -1,0 +1,59 @@
+<!--
+Copyright (c) 2026 Starbright Lab.
+This source code is licensed under the MIT license found in the LICENSE file
+in the root directory of this source tree.
+-->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Immortal — Family Area lyrics review</title>
+<style>
+  :root{color-scheme:dark;font:16px system-ui;color:#f4f4f6;background:#14161b}
+  body{margin:0;padding:24px;max-width:1500px;margin-inline:auto}
+  h1{font-size:26px;margin:0 0 8px}p{max-width:75ch;color:#b8b8b8;line-height:1.5}
+  a{color:#d9e6ff}nav{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}
+  button{font:inherit;color:inherit;background:#2b2b2b;border:1px solid #484848;
+    border-radius:24px;padding:12px 18px;min-height:48px;cursor:pointer}
+  button[aria-pressed=true]{background:#414141;border-color:#b8b8b8}
+  button:focus-visible,a:focus-visible{outline:3px solid #b8ceff;outline-offset:4px}
+  figure{margin:0}img{width:100%;height:auto;display:block;border-radius:16px}
+  figcaption{color:#b8b8b8;margin-top:12px}
+</style>
+<h1>Lyrics on Family Area</h1>
+<p>Actual Android 10 Portal Window captures at 2160 × 1440. Generated paused metadata
+exercises the production player: automatic following, manual browsing and return to the current line.
+The debug header and placeholder cover are fixture controls; Home supplies the normal chrome.
+Provider setup, audio, optical animation quality and panel FPS are outside these checks.</p>
+<p>The final native check passes 88/88 assertions across both themes. Eight captured active lines
+have independently verified foreground pixels; two manual-browsing states intentionally leave
+that line off-screen. The original six semantics-reader failures remain in the evidence.</p>
+<p><a href="family-music-review.html">Music artwork and layout review</a> ·
+<a href="evidence/family-music-lyrics/checks.json">Final checks</a> ·
+<a href="evidence/family-music-lyrics/first-attempt-checks.json">First attempt</a> ·
+<a href="evidence/family-music-lyrics/geometry.json">Independent pixel checks</a></p>
+<nav aria-label="Family Area lyrics captures"></nav>
+<figure><img alt="Active lyric line 45 on Family Area" src="evidence/family-music-lyrics/dark-initial.png">
+<figcaption>Following · dark · line 45</figcaption></figure>
+<script>
+  const nav=document.querySelector("nav"),image=document.querySelector("img");
+  const caption=document.querySelector("figcaption");
+  fetch("evidence/family-music-lyrics/screens.json").then(r=>{
+    if(!r.ok)throw Error("Screen list unavailable");return r.json();
+  }).then(screens=>{
+    for(const {file,label} of screens){
+      const button=document.createElement("button");button.textContent=label;
+      button.setAttribute("aria-pressed","false");
+      button.onclick=()=>{
+        for(const item of nav.children)item.setAttribute("aria-pressed","false");
+        button.setAttribute("aria-pressed","true");
+        image.src=`evidence/family-music-lyrics/${file}`;
+        image.alt=label;caption.textContent=label;
+      };
+      nav.append(button);
+    }
+    nav.firstElementChild?.click();
+  }).catch(()=>{caption.textContent="Following · dark · line 45. Other captures are unavailable.";});
+</script>
+</html>

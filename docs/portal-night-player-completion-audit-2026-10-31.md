@@ -2,7 +2,22 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — Framed Print viewport recovery.**
+**Newest delivery, November 1 — music lyrics following.**
+[The player refinement](portal-music-lyrics-2026-11-01.md) keeps the active
+timed lyric visible, pauses following for manual browsing, and supplies a
+return button. It reuses the shared clock and lazy list, with source/track
+reset and page-visibility/lifecycle guards. The original native baseline
+has **12 failed assertions**; the final Family Area check passes **88/88**
+in **23.121 seconds** across both palettes, with ten Window captures and
+eight independently verified active-label regions. The first six
+semantics-reader failures remain recorded. **3,761 fresh JVM tests** pass.
+Optimized APK **f6e80841…** is installed, with all settings, sources, cache,
+services, pin, brightness policy and original Dream restored **21 minutes**
+into the original 30-minute slot. This accepts generated component behavior,
+not real provider timing, audio, Home's visibility wiring, panel FPS or
+natural brightness comfort.
+
+**Previous delivery, November 1 — Framed Print viewport recovery.**
 [The renderer fix](portal-framed-viewport-2026-11-01.md) resizes the retained
 print using the live scene dimensions. Narrowing and expanding the same
 WebView preserves the photo, document, deck and cursor, with **one decode and

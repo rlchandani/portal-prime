@@ -40,6 +40,21 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // UUID-owned generated lyrics windows; dispatch before acquiring UiAutomation.
+        if (options.getString("command") == "musicLyrics") {
+            val lyrics = try {
+                MusicLyricsDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("musicLyricsCompleted", false)
+                    putBoolean("musicLyricsPassed", false)
+                    putBoolean("musicLyricsNativePassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (lyrics.getBoolean("musicLyricsPassed")) 0 else 1, lyrics)
+            return
+        }
         // Owned offline Framed Print viewport resize; dispatch before acquiring UiAutomation.
         if (options.getString("command") == "framedViewport") {
             val framed = try {

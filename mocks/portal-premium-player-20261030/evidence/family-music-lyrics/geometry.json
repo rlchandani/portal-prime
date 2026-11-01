@@ -1,0 +1,118 @@
+{
+  "dark-initial": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 45,
+    "activeSelectedVisible": true,
+    "activeBounds": [
+      1156,
+      666,
+      2133,
+      707
+    ],
+    "activeForegroundPixels": 1899
+  },
+  "dark-advance": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 55,
+    "activeSelectedVisible": true,
+    "activeBounds": [
+      1156,
+      666,
+      2133,
+      707
+    ],
+    "activeForegroundPixels": 1910
+  },
+  "dark-manual-advance": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 5,
+    "activeSelectedVisible": false
+  },
+  "dark-follow": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 5,
+    "activeSelectedVisible": true,
+    "activeBounds": [
+      1156,
+      652,
+      2133,
+      693
+    ],
+    "activeForegroundPixels": 1772
+  },
+  "dark-track-reset": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 35,
+    "activeSelectedVisible": true,
+    "activeBounds": [
+      1156,
+      666,
+      2133,
+      707
+    ],
+    "activeForegroundPixels": 1906
+  },
+  "light-initial": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 45,
+    "activeSelectedVisible": true,
+    "activeBounds": [
+      1156,
+      666,
+      2133,
+      707
+    ],
+    "activeForegroundPixels": 1814
+  },
+  "light-advance": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 55,
+    "activeSelectedVisible": true,
+    "activeBounds": [
+      1156,
+      666,
+      2133,
+      707
+    ],
+    "activeForegroundPixels": 1824
+  },
+  "light-manual-advance": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 5,
+    "activeSelectedVisible": false
+  },
+  "light-follow": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 5,
+    "activeSelectedVisible": true,
+    "activeBounds": [
+      1156,
+      652,
+      2133,
+      693
+    ],
+    "activeForegroundPixels": 1692
+  },
+  "light-track-reset": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "activeIndex": 35,
+    "activeSelectedVisible": true,
+    "activeBounds": [
+      1156,
+      666,
+      2133,
+      707
+    ],
+    "activeForegroundPixels": 1819
+  }
+}

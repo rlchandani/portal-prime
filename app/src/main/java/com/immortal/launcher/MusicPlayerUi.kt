@@ -13,9 +13,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,6 +61,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runInterruptible
 
@@ -611,12 +615,38 @@ private fun MusicLyrics(snapshot: MusicPlayerSnapshot, modifier: Modifier) {
       position.value?.let { musicLyricIndex(lines.value, it) } ?: -1
     }
   }
-  // Subscribe to line changes only; the shared clock never invalidates the whole player.
-  LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(24.dp),
-      contentPadding = PaddingValues(vertical = 16.dp)) {
-    itemsIndexed(snapshot.lyrics, key = { index, line -> "${line.timeMs}:$index" }) { index, line ->
-      MusicText(line.text, size = 28, bold = true, maxLines = 6, muted = index != reached,
-          modifier = Modifier.fillMaxWidth().semantics { selected = index == reached })
+  val lifecycle = LocalLifecycleOwner.current.lifecycle
+  val pageActive = LocalApprovedLauncherPageActive.current
+  // Source/track replacement starts a new lyric viewport; metadata refreshes keep browsing.
+  key(snapshot.sourceId, snapshot.track?.id) {
+    val listState = rememberLazyListState()
+    var following by remember { mutableStateOf(true) }
+    LaunchedEffect(listState) {
+      listState.interactionSource.interactions.collect { interaction ->
+        if (interaction is DragInteraction.Start) following = false
+      }
+    }
+    // Subscribe to line changes only; no second progress clock or hidden scroll animation.
+    LaunchedEffect(lifecycle, pageActive, reached, following, snapshot.lyrics.size) {
+      if (pageActive && following && reached in snapshot.lyrics.indices) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+          val height = snapshotFlow { listState.layoutInfo.viewportSize.height }.first { it > 0 }
+          listState.animateScrollToItem(reached, -(height / 3))
+        }
+      }
+    }
+    Column(modifier) {
+      LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState,
+          verticalArrangement = Arrangement.spacedBy(24.dp),
+          contentPadding = PaddingValues(vertical = 16.dp)) {
+        itemsIndexed(snapshot.lyrics, key = { index, line -> "${line.timeMs}:$index" }) { index, line ->
+          MusicText(line.text, size = 28, bold = true, maxLines = 6, muted = index != reached,
+              modifier = Modifier.fillMaxWidth().semantics { selected = index == reached })
+        }
+      }
+      MusicButton(if (following) "Following lyrics" else "Follow lyrics",
+          Modifier.fillMaxWidth(), enabled = !following, quiet = following,
+          onClick = { following = true })
     }
   }
 }

@@ -42,11 +42,67 @@ class MusicDesignPreviewActivity : ComponentActivity() {
   private var nightClock: QuietNightClockView? = null
   private var gallery: SlideshowStage? = null
   private var galleryControls: SlideshowViewerControls? = null
+  private var lyricsFixture by mutableStateOf<MusicPlayerSnapshot?>(null)
+  private var lyricsFixtureActive by mutableStateOf(true)
+  private val generatedLyrics = (0 until 80).map {
+    MusicLyricLine(it * 1_000L, "Generated lyric line $it")
+  }
+
+  /** Public debug fixture update; preserves the production player's existing composition. */
+  fun updateMusicLyricsFixture(index: Int, trackId: String, sourceId: String) {
+    require(intent.getStringExtra("screen") == "lyrics")
+    require(index in 0..79 && trackId.startsWith("generated-") && sourceId.startsWith("fixture:"))
+    lyricsFixture = MusicPlayerSnapshot(
+        connection = MusicConnection.READY, sourceId = sourceId,
+        track = MusicTrack(trackId, sourceId, "Generated paused lyrics track",
+            "Generated artist", durationMs = 80_000L),
+        playback = PlaybackState.PAUSED, positionMs = index * 1_000L,
+        positionAtElapsedMs = SystemClock.elapsedRealtime(),
+        capabilities = MusicCapabilities(queue = true, lyrics = true),
+        queue = listOf(MusicQueueItem(trackId, "Generated paused lyrics track")),
+        queueId = "generated-lyrics-queue",
+        lyrics = generatedLyrics,
+    )
+  }
+
+  /** Reuses the launcher's real visibility local without replacing the player composition. */
+  fun updateMusicLyricsVisibility(active: Boolean) {
+    require(intent.getStringExtra("screen") == "lyrics")
+    lyricsFixtureActive = active
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN or
         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    if (intent.getStringExtra("screen") == "lyrics") {
+      val ownedDeadline = intent.getLongExtra("owned_deadline_elapsed_ms", 0)
+      if (ownedDeadline > 0 && SystemClock.elapsedRealtime() >= ownedDeadline) {
+        finish()
+        return
+      }
+      updateMusicLyricsFixture(45, "generated-lyrics-track-a", "fixture:generated-lyrics-a")
+      setContent {
+        val light = intent.getStringExtra("theme") == "light"
+        val palette = if (light) ApprovedLightPalette else ApprovedDarkPalette
+        CompositionLocalProvider(LocalApprovedPalette provides palette,
+            LocalApprovedLauncherPageActive provides lyricsFixtureActive) {
+          MaterialTheme(colorScheme = approvedColorScheme(!light)) {
+            Column(Modifier.fillMaxSize().background(palette.background)) {
+              Text("Generated lyrics · paused · ${if (light) "light" else "dark"}",
+                  color = palette.secondary,
+                  modifier = Modifier.padding(8.dp))
+              lyricsFixture?.let { snapshot ->
+                MusicPlayerContent(snapshot, MusicPlayerLayout.FULL,
+                    Modifier.weight(1f).fillMaxWidth(), onDismiss = { finish() },
+                    onLayoutChange = {}, onAction = {})
+              }
+            }
+          }
+        }
+      }
+      return
+    }
     if (intent.getStringExtra("screen") == "repeated-items") {
       repeatedItemsContent(intent.getStringExtra("list") ?: "tracks")
       return

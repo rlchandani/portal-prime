@@ -1,0 +1,50 @@
+[
+  {
+    "file": "before-dark.png",
+    "label": "Before \u00b7 dark \u00b7 active line 45 off-screen"
+  },
+  {
+    "file": "before-light.png",
+    "label": "Before \u00b7 light \u00b7 active line 45 off-screen"
+  },
+  {
+    "file": "dark-initial.png",
+    "label": "dark \u00b7 Following \u00b7 line 45"
+  },
+  {
+    "file": "dark-advance.png",
+    "label": "dark \u00b7 Position advance \u00b7 line 55"
+  },
+  {
+    "file": "dark-manual-advance.png",
+    "label": "dark \u00b7 Manual browsing \u00b7 line 5 off-screen by choice"
+  },
+  {
+    "file": "dark-follow.png",
+    "label": "dark \u00b7 Follow resumed \u00b7 line 5"
+  },
+  {
+    "file": "dark-track-reset.png",
+    "label": "dark \u00b7 New track \u00b7 line 35"
+  },
+  {
+    "file": "light-initial.png",
+    "label": "light \u00b7 Following \u00b7 line 45"
+  },
+  {
+    "file": "light-advance.png",
+    "label": "light \u00b7 Position advance \u00b7 line 55"
+  },
+  {
+    "file": "light-manual-advance.png",
+    "label": "light \u00b7 Manual browsing \u00b7 line 5 off-screen by choice"
+  },
+  {
+    "file": "light-follow.png",
+    "label": "light \u00b7 Follow resumed \u00b7 line 5"
+  },
+  {
+    "file": "light-track-reset.png",
+    "label": "light \u00b7 New track \u00b7 line 35"
+  }
+]

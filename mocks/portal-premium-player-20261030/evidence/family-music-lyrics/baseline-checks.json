@@ -1,0 +1,195 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "dark.actual_lyrics_tab_clicked",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.current_line_45_visible_selected",
+      "passed": false
+    },
+    {
+      "name": "dark.default_following_label_visible",
+      "passed": false
+    },
+    {
+      "name": "dark.default_following_button_disabled",
+      "passed": false
+    },
+    {
+      "name": "dark.initial.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.current_line_55_visible_selected",
+      "passed": false
+    },
+    {
+      "name": "dark.advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.current_line_35_visible_selected",
+      "passed": false
+    },
+    {
+      "name": "dark.track_change_resets_following",
+      "passed": false
+    },
+    {
+      "name": "dark.track-reset.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.actual_lyrics_tab_clicked",
+      "passed": true
+    },
+    {
+      "name": "light.initial.current_line_45_visible_selected",
+      "passed": false
+    },
+    {
+      "name": "light.default_following_label_visible",
+      "passed": false
+    },
+    {
+      "name": "light.default_following_button_disabled",
+      "passed": false
+    },
+    {
+      "name": "light.initial.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.initial.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.initial.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.initial.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.advance.current_line_55_visible_selected",
+      "passed": false
+    },
+    {
+      "name": "light.advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.advance.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.current_line_35_visible_selected",
+      "passed": false
+    },
+    {
+      "name": "light.track_change_resets_following",
+      "passed": false
+    },
+    {
+      "name": "light.track-reset.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "owned_activities_destroyed",
+      "passed": true
+    },
+    {
+      "name": "work_budget_respected",
+      "passed": true
+    },
+    {
+      "name": "total_budget_respected",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "palette": "dark",
+      "manualCasesSkipped": "follow_button_absent",
+      "completed": true
+    },
+    {
+      "palette": "light",
+      "manualCasesSkipped": "follow_button_absent",
+      "completed": true
+    }
+  ],
+  "caseCount": 2,
+  "renderCount": 6,
+  "checkCount": 42,
+  "failureCount": 12,
+  "isolatedFailureCount": 0,
+  "passed": false,
+  "generatedOnly": true,
+  "providerProof": false,
+  "audioProof": false,
+  "commandProof": false,
+  "elapsedMs": 17817
+}

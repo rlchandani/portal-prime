@@ -1,0 +1,2207 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "dark.actual_lyrics_tab_clicked",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.current_line_45_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.default_following_label_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.default_following_button_disabled",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.current_line_55_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.drag_shows_exact_follow_lyrics_button",
+      "passed": true
+    },
+    {
+      "name": "dark.local_touch_moves_lyric_viewport",
+      "passed": true
+    },
+    {
+      "name": "dark.manual_position_update_preserves_browse_viewport",
+      "passed": true
+    },
+    {
+      "name": "dark.manual_current_line_remains_offscreen",
+      "passed": true
+    },
+    {
+      "name": "dark.manual-advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.manual-advance.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.manual-advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.manual-advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.follow_button_click_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.current_line_5_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.follow_button_returns_to_following",
+      "passed": true
+    },
+    {
+      "name": "dark.following_button_disabled_after_resume",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.hidden_position_update_preserves_viewport",
+      "passed": true
+    },
+    {
+      "name": "dark.hidden_current_line_stays_offscreen",
+      "passed": true
+    },
+    {
+      "name": "dark.visible-resume.current_line_65_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.second_drag_disables_following",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.current_line_35_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.track_change_resets_following",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.drag_before_source_change_disables_following",
+      "passed": true
+    },
+    {
+      "name": "dark.source-reset.current_line_65_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.source_change_resets_following",
+      "passed": true
+    },
+    {
+      "name": "light.actual_lyrics_tab_clicked",
+      "passed": true
+    },
+    {
+      "name": "light.initial.current_line_45_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.default_following_label_visible",
+      "passed": true
+    },
+    {
+      "name": "light.default_following_button_disabled",
+      "passed": true
+    },
+    {
+      "name": "light.initial.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.initial.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.initial.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.initial.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.advance.current_line_55_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.advance.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.drag_shows_exact_follow_lyrics_button",
+      "passed": true
+    },
+    {
+      "name": "light.local_touch_moves_lyric_viewport",
+      "passed": true
+    },
+    {
+      "name": "light.manual_position_update_preserves_browse_viewport",
+      "passed": true
+    },
+    {
+      "name": "light.manual_current_line_remains_offscreen",
+      "passed": true
+    },
+    {
+      "name": "light.manual-advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.manual-advance.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.manual-advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.manual-advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.follow_button_click_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.follow.current_line_5_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.follow_button_returns_to_following",
+      "passed": true
+    },
+    {
+      "name": "light.following_button_disabled_after_resume",
+      "passed": true
+    },
+    {
+      "name": "light.follow.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.follow.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.follow.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.follow.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.hidden_position_update_preserves_viewport",
+      "passed": true
+    },
+    {
+      "name": "light.hidden_current_line_stays_offscreen",
+      "passed": true
+    },
+    {
+      "name": "light.visible-resume.current_line_65_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.second_drag_disables_following",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.current_line_35_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.track_change_resets_following",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.drag_before_source_change_disables_following",
+      "passed": true
+    },
+    {
+      "name": "light.source-reset.current_line_65_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.source_change_resets_following",
+      "passed": true
+    },
+    {
+      "name": "owned_activities_destroyed",
+      "passed": true
+    },
+    {
+      "name": "work_budget_respected",
+      "passed": true
+    },
+    {
+      "name": "total_budget_respected",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "palette": "dark",
+      "completed": true
+    },
+    {
+      "palette": "light",
+      "completed": true
+    }
+  ],
+  "artifacts": [
+    {
+      "palette": "dark",
+      "phase": "initial",
+      "activeIndex": 45,
+      "relativePath": "dark-initial.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": true,
+      "nativePixels": 435027,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 39",
+          "selected": false,
+          "bounds": [
+            1156,
+            294,
+            2133,
+            299
+          ]
+        },
+        {
+          "text": "Generated lyric line 40",
+          "selected": false,
+          "bounds": [
+            1156,
+            326,
+            2133,
+            367
+          ]
+        },
+        {
+          "text": "Generated lyric line 41",
+          "selected": false,
+          "bounds": [
+            1156,
+            394,
+            2133,
+            435
+          ]
+        },
+        {
+          "text": "Generated lyric line 42",
+          "selected": false,
+          "bounds": [
+            1156,
+            462,
+            2133,
+            503
+          ]
+        },
+        {
+          "text": "Generated lyric line 43",
+          "selected": false,
+          "bounds": [
+            1156,
+            530,
+            2133,
+            571
+          ]
+        },
+        {
+          "text": "Generated lyric line 44",
+          "selected": false,
+          "bounds": [
+            1156,
+            598,
+            2133,
+            639
+          ]
+        },
+        {
+          "text": "Generated lyric line 45",
+          "selected": true,
+          "bounds": [
+            1156,
+            666,
+            2133,
+            707
+          ]
+        },
+        {
+          "text": "Generated lyric line 46",
+          "selected": false,
+          "bounds": [
+            1156,
+            734,
+            2133,
+            775
+          ]
+        },
+        {
+          "text": "Generated lyric line 47",
+          "selected": false,
+          "bounds": [
+            1156,
+            802,
+            2133,
+            843
+          ]
+        },
+        {
+          "text": "Generated lyric line 48",
+          "selected": false,
+          "bounds": [
+            1156,
+            870,
+            2133,
+            911
+          ]
+        },
+        {
+          "text": "Generated lyric line 49",
+          "selected": false,
+          "bounds": [
+            1156,
+            938,
+            2133,
+            979
+          ]
+        },
+        {
+          "text": "Generated lyric line 50",
+          "selected": false,
+          "bounds": [
+            1156,
+            1006,
+            2133,
+            1047
+          ]
+        },
+        {
+          "text": "Generated lyric line 51",
+          "selected": false,
+          "bounds": [
+            1156,
+            1074,
+            2133,
+            1115
+          ]
+        },
+        {
+          "text": "Generated lyric line 52",
+          "selected": false,
+          "bounds": [
+            1156,
+            1142,
+            2133,
+            1183
+          ]
+        },
+        {
+          "text": "Generated lyric line 53",
+          "selected": false,
+          "bounds": [
+            1156,
+            1210,
+            2133,
+            1251
+          ]
+        },
+        {
+          "text": "Generated lyric line 54",
+          "selected": false,
+          "bounds": [
+            1156,
+            1278,
+            2133,
+            1319
+          ]
+        },
+        {
+          "text": "Generated lyric line 55",
+          "selected": false,
+          "bounds": [
+            1156,
+            1346,
+            2133,
+            1358
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Following lyrics"
+      ],
+      "sha256": "af28cd5af98c37b0dc3aeb9a5b971f5aaf6092e09e9620e310f5b17de06a86c3"
+    },
+    {
+      "palette": "dark",
+      "phase": "advance",
+      "activeIndex": 55,
+      "relativePath": "dark-advance.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": true,
+      "nativePixels": 435420,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 49",
+          "selected": false,
+          "bounds": [
+            1156,
+            294,
+            2133,
+            299
+          ]
+        },
+        {
+          "text": "Generated lyric line 50",
+          "selected": false,
+          "bounds": [
+            1156,
+            326,
+            2133,
+            367
+          ]
+        },
+        {
+          "text": "Generated lyric line 51",
+          "selected": false,
+          "bounds": [
+            1156,
+            394,
+            2133,
+            435
+          ]
+        },
+        {
+          "text": "Generated lyric line 52",
+          "selected": false,
+          "bounds": [
+            1156,
+            462,
+            2133,
+            503
+          ]
+        },
+        {
+          "text": "Generated lyric line 53",
+          "selected": false,
+          "bounds": [
+            1156,
+            530,
+            2133,
+            571
+          ]
+        },
+        {
+          "text": "Generated lyric line 54",
+          "selected": false,
+          "bounds": [
+            1156,
+            598,
+            2133,
+            639
+          ]
+        },
+        {
+          "text": "Generated lyric line 55",
+          "selected": true,
+          "bounds": [
+            1156,
+            666,
+            2133,
+            707
+          ]
+        },
+        {
+          "text": "Generated lyric line 56",
+          "selected": false,
+          "bounds": [
+            1156,
+            734,
+            2133,
+            775
+          ]
+        },
+        {
+          "text": "Generated lyric line 57",
+          "selected": false,
+          "bounds": [
+            1156,
+            802,
+            2133,
+            843
+          ]
+        },
+        {
+          "text": "Generated lyric line 58",
+          "selected": false,
+          "bounds": [
+            1156,
+            870,
+            2133,
+            911
+          ]
+        },
+        {
+          "text": "Generated lyric line 59",
+          "selected": false,
+          "bounds": [
+            1156,
+            938,
+            2133,
+            979
+          ]
+        },
+        {
+          "text": "Generated lyric line 60",
+          "selected": false,
+          "bounds": [
+            1156,
+            1006,
+            2133,
+            1047
+          ]
+        },
+        {
+          "text": "Generated lyric line 61",
+          "selected": false,
+          "bounds": [
+            1156,
+            1074,
+            2133,
+            1115
+          ]
+        },
+        {
+          "text": "Generated lyric line 62",
+          "selected": false,
+          "bounds": [
+            1156,
+            1142,
+            2133,
+            1183
+          ]
+        },
+        {
+          "text": "Generated lyric line 63",
+          "selected": false,
+          "bounds": [
+            1156,
+            1210,
+            2133,
+            1251
+          ]
+        },
+        {
+          "text": "Generated lyric line 64",
+          "selected": false,
+          "bounds": [
+            1156,
+            1278,
+            2133,
+            1319
+          ]
+        },
+        {
+          "text": "Generated lyric line 65",
+          "selected": false,
+          "bounds": [
+            1156,
+            1346,
+            2133,
+            1358
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Following lyrics"
+      ],
+      "sha256": "49e5c0a41a412f58264d02d6bd3271307ade471c2aa1ea5414ab7e210e93ff71"
+    },
+    {
+      "palette": "dark",
+      "phase": "manual-advance",
+      "activeIndex": 5,
+      "relativePath": "dark-manual-advance.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": false,
+      "nativePixels": 490809,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 47",
+          "selected": false,
+          "bounds": [
+            1156,
+            294,
+            2133,
+            334
+          ]
+        },
+        {
+          "text": "Generated lyric line 48",
+          "selected": false,
+          "bounds": [
+            1156,
+            361,
+            2133,
+            402
+          ]
+        },
+        {
+          "text": "Generated lyric line 49",
+          "selected": false,
+          "bounds": [
+            1156,
+            429,
+            2133,
+            470
+          ]
+        },
+        {
+          "text": "Generated lyric line 50",
+          "selected": false,
+          "bounds": [
+            1156,
+            497,
+            2133,
+            538
+          ]
+        },
+        {
+          "text": "Generated lyric line 51",
+          "selected": false,
+          "bounds": [
+            1156,
+            565,
+            2133,
+            606
+          ]
+        },
+        {
+          "text": "Generated lyric line 52",
+          "selected": false,
+          "bounds": [
+            1156,
+            633,
+            2133,
+            674
+          ]
+        },
+        {
+          "text": "Generated lyric line 53",
+          "selected": false,
+          "bounds": [
+            1156,
+            701,
+            2133,
+            742
+          ]
+        },
+        {
+          "text": "Generated lyric line 54",
+          "selected": false,
+          "bounds": [
+            1156,
+            769,
+            2133,
+            810
+          ]
+        },
+        {
+          "text": "Generated lyric line 55",
+          "selected": false,
+          "bounds": [
+            1156,
+            837,
+            2133,
+            878
+          ]
+        },
+        {
+          "text": "Generated lyric line 56",
+          "selected": false,
+          "bounds": [
+            1156,
+            905,
+            2133,
+            946
+          ]
+        },
+        {
+          "text": "Generated lyric line 57",
+          "selected": false,
+          "bounds": [
+            1156,
+            973,
+            2133,
+            1014
+          ]
+        },
+        {
+          "text": "Generated lyric line 58",
+          "selected": false,
+          "bounds": [
+            1156,
+            1041,
+            2133,
+            1082
+          ]
+        },
+        {
+          "text": "Generated lyric line 59",
+          "selected": false,
+          "bounds": [
+            1156,
+            1109,
+            2133,
+            1150
+          ]
+        },
+        {
+          "text": "Generated lyric line 60",
+          "selected": false,
+          "bounds": [
+            1156,
+            1177,
+            2133,
+            1218
+          ]
+        },
+        {
+          "text": "Generated lyric line 61",
+          "selected": false,
+          "bounds": [
+            1156,
+            1245,
+            2133,
+            1286
+          ]
+        },
+        {
+          "text": "Generated lyric line 62",
+          "selected": false,
+          "bounds": [
+            1156,
+            1313,
+            2133,
+            1354
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Follow lyrics"
+      ],
+      "sha256": "501e9af2c6497a9bcef67f15491f8794fca407737889df50a18b6d2c31ec7af9"
+    },
+    {
+      "palette": "dark",
+      "phase": "follow",
+      "activeIndex": 5,
+      "relativePath": "dark-follow.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": true,
+      "nativePixels": 434527,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 0",
+          "selected": false,
+          "bounds": [
+            1156,
+            312,
+            2133,
+            353
+          ]
+        },
+        {
+          "text": "Generated lyric line 1",
+          "selected": false,
+          "bounds": [
+            1156,
+            380,
+            2133,
+            421
+          ]
+        },
+        {
+          "text": "Generated lyric line 2",
+          "selected": false,
+          "bounds": [
+            1156,
+            448,
+            2133,
+            489
+          ]
+        },
+        {
+          "text": "Generated lyric line 3",
+          "selected": false,
+          "bounds": [
+            1156,
+            516,
+            2133,
+            557
+          ]
+        },
+        {
+          "text": "Generated lyric line 4",
+          "selected": false,
+          "bounds": [
+            1156,
+            584,
+            2133,
+            625
+          ]
+        },
+        {
+          "text": "Generated lyric line 5",
+          "selected": true,
+          "bounds": [
+            1156,
+            652,
+            2133,
+            693
+          ]
+        },
+        {
+          "text": "Generated lyric line 6",
+          "selected": false,
+          "bounds": [
+            1156,
+            720,
+            2133,
+            761
+          ]
+        },
+        {
+          "text": "Generated lyric line 7",
+          "selected": false,
+          "bounds": [
+            1156,
+            788,
+            2133,
+            829
+          ]
+        },
+        {
+          "text": "Generated lyric line 8",
+          "selected": false,
+          "bounds": [
+            1156,
+            856,
+            2133,
+            897
+          ]
+        },
+        {
+          "text": "Generated lyric line 9",
+          "selected": false,
+          "bounds": [
+            1156,
+            924,
+            2133,
+            965
+          ]
+        },
+        {
+          "text": "Generated lyric line 10",
+          "selected": false,
+          "bounds": [
+            1156,
+            992,
+            2133,
+            1033
+          ]
+        },
+        {
+          "text": "Generated lyric line 11",
+          "selected": false,
+          "bounds": [
+            1156,
+            1060,
+            2133,
+            1101
+          ]
+        },
+        {
+          "text": "Generated lyric line 12",
+          "selected": false,
+          "bounds": [
+            1156,
+            1128,
+            2133,
+            1169
+          ]
+        },
+        {
+          "text": "Generated lyric line 13",
+          "selected": false,
+          "bounds": [
+            1156,
+            1196,
+            2133,
+            1237
+          ]
+        },
+        {
+          "text": "Generated lyric line 14",
+          "selected": false,
+          "bounds": [
+            1156,
+            1264,
+            2133,
+            1305
+          ]
+        },
+        {
+          "text": "Generated lyric line 15",
+          "selected": false,
+          "bounds": [
+            1156,
+            1332,
+            2133,
+            1358
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Following lyrics"
+      ],
+      "sha256": "4c0ecce115b9a750813170ebc0116f8c645e0cf58c9b851c3c61ee216f2940f3"
+    },
+    {
+      "palette": "dark",
+      "phase": "track-reset",
+      "activeIndex": 35,
+      "relativePath": "dark-track-reset.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": true,
+      "nativePixels": 435065,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 29",
+          "selected": false,
+          "bounds": [
+            1156,
+            294,
+            2133,
+            299
+          ]
+        },
+        {
+          "text": "Generated lyric line 30",
+          "selected": false,
+          "bounds": [
+            1156,
+            326,
+            2133,
+            367
+          ]
+        },
+        {
+          "text": "Generated lyric line 31",
+          "selected": false,
+          "bounds": [
+            1156,
+            394,
+            2133,
+            435
+          ]
+        },
+        {
+          "text": "Generated lyric line 32",
+          "selected": false,
+          "bounds": [
+            1156,
+            462,
+            2133,
+            503
+          ]
+        },
+        {
+          "text": "Generated lyric line 33",
+          "selected": false,
+          "bounds": [
+            1156,
+            530,
+            2133,
+            571
+          ]
+        },
+        {
+          "text": "Generated lyric line 34",
+          "selected": false,
+          "bounds": [
+            1156,
+            598,
+            2133,
+            639
+          ]
+        },
+        {
+          "text": "Generated lyric line 35",
+          "selected": true,
+          "bounds": [
+            1156,
+            666,
+            2133,
+            707
+          ]
+        },
+        {
+          "text": "Generated lyric line 36",
+          "selected": false,
+          "bounds": [
+            1156,
+            734,
+            2133,
+            775
+          ]
+        },
+        {
+          "text": "Generated lyric line 37",
+          "selected": false,
+          "bounds": [
+            1156,
+            802,
+            2133,
+            843
+          ]
+        },
+        {
+          "text": "Generated lyric line 38",
+          "selected": false,
+          "bounds": [
+            1156,
+            870,
+            2133,
+            911
+          ]
+        },
+        {
+          "text": "Generated lyric line 39",
+          "selected": false,
+          "bounds": [
+            1156,
+            938,
+            2133,
+            979
+          ]
+        },
+        {
+          "text": "Generated lyric line 40",
+          "selected": false,
+          "bounds": [
+            1156,
+            1006,
+            2133,
+            1047
+          ]
+        },
+        {
+          "text": "Generated lyric line 41",
+          "selected": false,
+          "bounds": [
+            1156,
+            1074,
+            2133,
+            1115
+          ]
+        },
+        {
+          "text": "Generated lyric line 42",
+          "selected": false,
+          "bounds": [
+            1156,
+            1142,
+            2133,
+            1183
+          ]
+        },
+        {
+          "text": "Generated lyric line 43",
+          "selected": false,
+          "bounds": [
+            1156,
+            1210,
+            2133,
+            1251
+          ]
+        },
+        {
+          "text": "Generated lyric line 44",
+          "selected": false,
+          "bounds": [
+            1156,
+            1278,
+            2133,
+            1319
+          ]
+        },
+        {
+          "text": "Generated lyric line 45",
+          "selected": false,
+          "bounds": [
+            1156,
+            1346,
+            2133,
+            1358
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Following lyrics"
+      ],
+      "sha256": "ebbb702319bf32f0819b9e04866ed3444f589647934b60100c9284b5fe93da90"
+    },
+    {
+      "palette": "light",
+      "phase": "initial",
+      "activeIndex": 45,
+      "relativePath": "light-initial.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": true,
+      "nativePixels": 435059,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 39",
+          "selected": false,
+          "bounds": [
+            1156,
+            294,
+            2133,
+            299
+          ]
+        },
+        {
+          "text": "Generated lyric line 40",
+          "selected": false,
+          "bounds": [
+            1156,
+            326,
+            2133,
+            367
+          ]
+        },
+        {
+          "text": "Generated lyric line 41",
+          "selected": false,
+          "bounds": [
+            1156,
+            394,
+            2133,
+            435
+          ]
+        },
+        {
+          "text": "Generated lyric line 42",
+          "selected": false,
+          "bounds": [
+            1156,
+            462,
+            2133,
+            503
+          ]
+        },
+        {
+          "text": "Generated lyric line 43",
+          "selected": false,
+          "bounds": [
+            1156,
+            530,
+            2133,
+            571
+          ]
+        },
+        {
+          "text": "Generated lyric line 44",
+          "selected": false,
+          "bounds": [
+            1156,
+            598,
+            2133,
+            639
+          ]
+        },
+        {
+          "text": "Generated lyric line 45",
+          "selected": true,
+          "bounds": [
+            1156,
+            666,
+            2133,
+            707
+          ]
+        },
+        {
+          "text": "Generated lyric line 46",
+          "selected": false,
+          "bounds": [
+            1156,
+            734,
+            2133,
+            775
+          ]
+        },
+        {
+          "text": "Generated lyric line 47",
+          "selected": false,
+          "bounds": [
+            1156,
+            802,
+            2133,
+            843
+          ]
+        },
+        {
+          "text": "Generated lyric line 48",
+          "selected": false,
+          "bounds": [
+            1156,
+            870,
+            2133,
+            911
+          ]
+        },
+        {
+          "text": "Generated lyric line 49",
+          "selected": false,
+          "bounds": [
+            1156,
+            938,
+            2133,
+            979
+          ]
+        },
+        {
+          "text": "Generated lyric line 50",
+          "selected": false,
+          "bounds": [
+            1156,
+            1006,
+            2133,
+            1047
+          ]
+        },
+        {
+          "text": "Generated lyric line 51",
+          "selected": false,
+          "bounds": [
+            1156,
+            1074,
+            2133,
+            1115
+          ]
+        },
+        {
+          "text": "Generated lyric line 52",
+          "selected": false,
+          "bounds": [
+            1156,
+            1142,
+            2133,
+            1183
+          ]
+        },
+        {
+          "text": "Generated lyric line 53",
+          "selected": false,
+          "bounds": [
+            1156,
+            1210,
+            2133,
+            1251
+          ]
+        },
+        {
+          "text": "Generated lyric line 54",
+          "selected": false,
+          "bounds": [
+            1156,
+            1278,
+            2133,
+            1319
+          ]
+        },
+        {
+          "text": "Generated lyric line 55",
+          "selected": false,
+          "bounds": [
+            1156,
+            1346,
+            2133,
+            1358
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Following lyrics"
+      ],
+      "sha256": "c72924c3698f60411dd95a91b099791d57dea4093e61c1d3a7ea2fec4b7ca918"
+    },
+    {
+      "palette": "light",
+      "phase": "advance",
+      "activeIndex": 55,
+      "relativePath": "light-advance.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": true,
+      "nativePixels": 435452,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 49",
+          "selected": false,
+          "bounds": [
+            1156,
+            294,
+            2133,
+            299
+          ]
+        },
+        {
+          "text": "Generated lyric line 50",
+          "selected": false,
+          "bounds": [
+            1156,
+            326,
+            2133,
+            367
+          ]
+        },
+        {
+          "text": "Generated lyric line 51",
+          "selected": false,
+          "bounds": [
+            1156,
+            394,
+            2133,
+            435
+          ]
+        },
+        {
+          "text": "Generated lyric line 52",
+          "selected": false,
+          "bounds": [
+            1156,
+            462,
+            2133,
+            503
+          ]
+        },
+        {
+          "text": "Generated lyric line 53",
+          "selected": false,
+          "bounds": [
+            1156,
+            530,
+            2133,
+            571
+          ]
+        },
+        {
+          "text": "Generated lyric line 54",
+          "selected": false,
+          "bounds": [
+            1156,
+            598,
+            2133,
+            639
+          ]
+        },
+        {
+          "text": "Generated lyric line 55",
+          "selected": true,
+          "bounds": [
+            1156,
+            666,
+            2133,
+            707
+          ]
+        },
+        {
+          "text": "Generated lyric line 56",
+          "selected": false,
+          "bounds": [
+            1156,
+            734,
+            2133,
+            775
+          ]
+        },
+        {
+          "text": "Generated lyric line 57",
+          "selected": false,
+          "bounds": [
+            1156,
+            802,
+            2133,
+            843
+          ]
+        },
+        {
+          "text": "Generated lyric line 58",
+          "selected": false,
+          "bounds": [
+            1156,
+            870,
+            2133,
+            911
+          ]
+        },
+        {
+          "text": "Generated lyric line 59",
+          "selected": false,
+          "bounds": [
+            1156,
+            938,
+            2133,
+            979
+          ]
+        },
+        {
+          "text": "Generated lyric line 60",
+          "selected": false,
+          "bounds": [
+            1156,
+            1006,
+            2133,
+            1047
+          ]
+        },
+        {
+          "text": "Generated lyric line 61",
+          "selected": false,
+          "bounds": [
+            1156,
+            1074,
+            2133,
+            1115
+          ]
+        },
+        {
+          "text": "Generated lyric line 62",
+          "selected": false,
+          "bounds": [
+            1156,
+            1142,
+            2133,
+            1183
+          ]
+        },
+        {
+          "text": "Generated lyric line 63",
+          "selected": false,
+          "bounds": [
+            1156,
+            1210,
+            2133,
+            1251
+          ]
+        },
+        {
+          "text": "Generated lyric line 64",
+          "selected": false,
+          "bounds": [
+            1156,
+            1278,
+            2133,
+            1319
+          ]
+        },
+        {
+          "text": "Generated lyric line 65",
+          "selected": false,
+          "bounds": [
+            1156,
+            1346,
+            2133,
+            1358
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Following lyrics"
+      ],
+      "sha256": "7b7ea4eac45b142a712a12e44317cbc97316a44818852d00af0e4e3bc741fd5e"
+    },
+    {
+      "palette": "light",
+      "phase": "manual-advance",
+      "activeIndex": 5,
+      "relativePath": "light-manual-advance.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": false,
+      "nativePixels": 490841,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 47",
+          "selected": false,
+          "bounds": [
+            1156,
+            294,
+            2133,
+            334
+          ]
+        },
+        {
+          "text": "Generated lyric line 48",
+          "selected": false,
+          "bounds": [
+            1156,
+            361,
+            2133,
+            402
+          ]
+        },
+        {
+          "text": "Generated lyric line 49",
+          "selected": false,
+          "bounds": [
+            1156,
+            429,
+            2133,
+            470
+          ]
+        },
+        {
+          "text": "Generated lyric line 50",
+          "selected": false,
+          "bounds": [
+            1156,
+            497,
+            2133,
+            538
+          ]
+        },
+        {
+          "text": "Generated lyric line 51",
+          "selected": false,
+          "bounds": [
+            1156,
+            565,
+            2133,
+            606
+          ]
+        },
+        {
+          "text": "Generated lyric line 52",
+          "selected": false,
+          "bounds": [
+            1156,
+            633,
+            2133,
+            674
+          ]
+        },
+        {
+          "text": "Generated lyric line 53",
+          "selected": false,
+          "bounds": [
+            1156,
+            701,
+            2133,
+            742
+          ]
+        },
+        {
+          "text": "Generated lyric line 54",
+          "selected": false,
+          "bounds": [
+            1156,
+            769,
+            2133,
+            810
+          ]
+        },
+        {
+          "text": "Generated lyric line 55",
+          "selected": false,
+          "bounds": [
+            1156,
+            837,
+            2133,
+            878
+          ]
+        },
+        {
+          "text": "Generated lyric line 56",
+          "selected": false,
+          "bounds": [
+            1156,
+            905,
+            2133,
+            946
+          ]
+        },
+        {
+          "text": "Generated lyric line 57",
+          "selected": false,
+          "bounds": [
+            1156,
+            973,
+            2133,
+            1014
+          ]
+        },
+        {
+          "text": "Generated lyric line 58",
+          "selected": false,
+          "bounds": [
+            1156,
+            1041,
+            2133,
+            1082
+          ]
+        },
+        {
+          "text": "Generated lyric line 59",
+          "selected": false,
+          "bounds": [
+            1156,
+            1109,
+            2133,
+            1150
+          ]
+        },
+        {
+          "text": "Generated lyric line 60",
+          "selected": false,
+          "bounds": [
+            1156,
+            1177,
+            2133,
+            1218
+          ]
+        },
+        {
+          "text": "Generated lyric line 61",
+          "selected": false,
+          "bounds": [
+            1156,
+            1245,
+            2133,
+            1286
+          ]
+        },
+        {
+          "text": "Generated lyric line 62",
+          "selected": false,
+          "bounds": [
+            1156,
+            1313,
+            2133,
+            1354
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Follow lyrics"
+      ],
+      "sha256": "6c31dab0f3ea93d9a72bde87670bc82120e6ddce4fc5aba0326f04f76b33649f"
+    },
+    {
+      "palette": "light",
+      "phase": "follow",
+      "activeIndex": 5,
+      "relativePath": "light-follow.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": true,
+      "nativePixels": 434559,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 0",
+          "selected": false,
+          "bounds": [
+            1156,
+            312,
+            2133,
+            353
+          ]
+        },
+        {
+          "text": "Generated lyric line 1",
+          "selected": false,
+          "bounds": [
+            1156,
+            380,
+            2133,
+            421
+          ]
+        },
+        {
+          "text": "Generated lyric line 2",
+          "selected": false,
+          "bounds": [
+            1156,
+            448,
+            2133,
+            489
+          ]
+        },
+        {
+          "text": "Generated lyric line 3",
+          "selected": false,
+          "bounds": [
+            1156,
+            516,
+            2133,
+            557
+          ]
+        },
+        {
+          "text": "Generated lyric line 4",
+          "selected": false,
+          "bounds": [
+            1156,
+            584,
+            2133,
+            625
+          ]
+        },
+        {
+          "text": "Generated lyric line 5",
+          "selected": true,
+          "bounds": [
+            1156,
+            652,
+            2133,
+            693
+          ]
+        },
+        {
+          "text": "Generated lyric line 6",
+          "selected": false,
+          "bounds": [
+            1156,
+            720,
+            2133,
+            761
+          ]
+        },
+        {
+          "text": "Generated lyric line 7",
+          "selected": false,
+          "bounds": [
+            1156,
+            788,
+            2133,
+            829
+          ]
+        },
+        {
+          "text": "Generated lyric line 8",
+          "selected": false,
+          "bounds": [
+            1156,
+            856,
+            2133,
+            897
+          ]
+        },
+        {
+          "text": "Generated lyric line 9",
+          "selected": false,
+          "bounds": [
+            1156,
+            924,
+            2133,
+            965
+          ]
+        },
+        {
+          "text": "Generated lyric line 10",
+          "selected": false,
+          "bounds": [
+            1156,
+            992,
+            2133,
+            1033
+          ]
+        },
+        {
+          "text": "Generated lyric line 11",
+          "selected": false,
+          "bounds": [
+            1156,
+            1060,
+            2133,
+            1101
+          ]
+        },
+        {
+          "text": "Generated lyric line 12",
+          "selected": false,
+          "bounds": [
+            1156,
+            1128,
+            2133,
+            1169
+          ]
+        },
+        {
+          "text": "Generated lyric line 13",
+          "selected": false,
+          "bounds": [
+            1156,
+            1196,
+            2133,
+            1237
+          ]
+        },
+        {
+          "text": "Generated lyric line 14",
+          "selected": false,
+          "bounds": [
+            1156,
+            1264,
+            2133,
+            1305
+          ]
+        },
+        {
+          "text": "Generated lyric line 15",
+          "selected": false,
+          "bounds": [
+            1156,
+            1332,
+            2133,
+            1358
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Following lyrics"
+      ],
+      "sha256": "002ed9beb3f0bf240f07baa48bc3f9ff7d3272644dcd8ab7c76f17a0b6d5d89c"
+    },
+    {
+      "palette": "light",
+      "phase": "track-reset",
+      "activeIndex": 35,
+      "relativePath": "light-track-reset.png",
+      "width": 2160,
+      "height": 1440,
+      "activeLineVisibleSelected": true,
+      "nativePixels": 435097,
+      "visibleLyrics": [
+        {
+          "text": "Generated lyric line 29",
+          "selected": false,
+          "bounds": [
+            1156,
+            294,
+            2133,
+            299
+          ]
+        },
+        {
+          "text": "Generated lyric line 30",
+          "selected": false,
+          "bounds": [
+            1156,
+            326,
+            2133,
+            367
+          ]
+        },
+        {
+          "text": "Generated lyric line 31",
+          "selected": false,
+          "bounds": [
+            1156,
+            394,
+            2133,
+            435
+          ]
+        },
+        {
+          "text": "Generated lyric line 32",
+          "selected": false,
+          "bounds": [
+            1156,
+            462,
+            2133,
+            503
+          ]
+        },
+        {
+          "text": "Generated lyric line 33",
+          "selected": false,
+          "bounds": [
+            1156,
+            530,
+            2133,
+            571
+          ]
+        },
+        {
+          "text": "Generated lyric line 34",
+          "selected": false,
+          "bounds": [
+            1156,
+            598,
+            2133,
+            639
+          ]
+        },
+        {
+          "text": "Generated lyric line 35",
+          "selected": true,
+          "bounds": [
+            1156,
+            666,
+            2133,
+            707
+          ]
+        },
+        {
+          "text": "Generated lyric line 36",
+          "selected": false,
+          "bounds": [
+            1156,
+            734,
+            2133,
+            775
+          ]
+        },
+        {
+          "text": "Generated lyric line 37",
+          "selected": false,
+          "bounds": [
+            1156,
+            802,
+            2133,
+            843
+          ]
+        },
+        {
+          "text": "Generated lyric line 38",
+          "selected": false,
+          "bounds": [
+            1156,
+            870,
+            2133,
+            911
+          ]
+        },
+        {
+          "text": "Generated lyric line 39",
+          "selected": false,
+          "bounds": [
+            1156,
+            938,
+            2133,
+            979
+          ]
+        },
+        {
+          "text": "Generated lyric line 40",
+          "selected": false,
+          "bounds": [
+            1156,
+            1006,
+            2133,
+            1047
+          ]
+        },
+        {
+          "text": "Generated lyric line 41",
+          "selected": false,
+          "bounds": [
+            1156,
+            1074,
+            2133,
+            1115
+          ]
+        },
+        {
+          "text": "Generated lyric line 42",
+          "selected": false,
+          "bounds": [
+            1156,
+            1142,
+            2133,
+            1183
+          ]
+        },
+        {
+          "text": "Generated lyric line 43",
+          "selected": false,
+          "bounds": [
+            1156,
+            1210,
+            2133,
+            1251
+          ]
+        },
+        {
+          "text": "Generated lyric line 44",
+          "selected": false,
+          "bounds": [
+            1156,
+            1278,
+            2133,
+            1319
+          ]
+        },
+        {
+          "text": "Generated lyric line 45",
+          "selected": false,
+          "bounds": [
+            1156,
+            1346,
+            2133,
+            1358
+          ]
+        }
+      ],
+      "footerTexts": [
+        "Following lyrics"
+      ],
+      "sha256": "455d23cddcc62fc228bdef313eb0ddb3c688a40589dcb1f46674369068d8f2de"
+    }
+  ],
+  "caseCount": 2,
+  "renderCount": 10,
+  "checkCount": 88,
+  "failureCount": 0,
+  "isolatedFailureCount": 0,
+  "passed": true,
+  "generatedOnly": true,
+  "providerProof": false,
+  "audioProof": false,
+  "commandProof": false,
+  "workBudgetMs": 40000,
+  "totalBudgetMs": 55000,
+  "workElapsedMs": 22701,
+  "fixtureLineCount": 80,
+  "timingStepMs": 1000,
+  "fixturePlayback": "PAUSED",
+  "layout": "FULL",
+  "elapsedMs": 23121,
+  "relativeReportPath": "checks.json"
+}

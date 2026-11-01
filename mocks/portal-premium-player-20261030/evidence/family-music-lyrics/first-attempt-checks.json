@@ -1,0 +1,377 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "dark.actual_lyrics_tab_clicked",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.current_line_45_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.default_following_label_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.default_following_button_disabled",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.lyric_rows_do_not_overlap",
+      "passed": false
+    },
+    {
+      "name": "dark.initial.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.initial.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.current_line_55_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.lyric_rows_do_not_overlap",
+      "passed": false
+    },
+    {
+      "name": "dark.advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.drag_shows_exact_follow_lyrics_button",
+      "passed": true
+    },
+    {
+      "name": "dark.local_touch_moves_lyric_viewport",
+      "passed": true
+    },
+    {
+      "name": "dark.manual_position_update_preserves_browse_viewport",
+      "passed": true
+    },
+    {
+      "name": "dark.manual_current_line_remains_offscreen",
+      "passed": true
+    },
+    {
+      "name": "dark.manual-advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.manual-advance.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.manual-advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.manual-advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.follow_button_click_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.current_line_5_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.follow_button_returns_to_following",
+      "passed": true
+    },
+    {
+      "name": "dark.following_button_disabled_after_resume",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.follow.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.hidden_position_update_preserves_viewport",
+      "passed": true
+    },
+    {
+      "name": "dark.hidden_current_line_stays_offscreen",
+      "passed": true
+    },
+    {
+      "name": "dark.visible-resume.current_line_65_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.second_drag_disables_following",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.current_line_35_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.track_change_resets_following",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.lyric_rows_do_not_overlap",
+      "passed": false
+    },
+    {
+      "name": "dark.track-reset.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "dark.track-reset.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "dark.drag_before_source_change_disables_following",
+      "passed": true
+    },
+    {
+      "name": "dark.source-reset.current_line_65_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "dark.source_change_resets_following",
+      "passed": true
+    },
+    {
+      "name": "light.actual_lyrics_tab_clicked",
+      "passed": true
+    },
+    {
+      "name": "light.initial.current_line_45_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.default_following_label_visible",
+      "passed": true
+    },
+    {
+      "name": "light.default_following_button_disabled",
+      "passed": true
+    },
+    {
+      "name": "light.initial.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.initial.lyric_rows_do_not_overlap",
+      "passed": false
+    },
+    {
+      "name": "light.initial.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.initial.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.advance.current_line_55_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.advance.lyric_rows_do_not_overlap",
+      "passed": false
+    },
+    {
+      "name": "light.advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.drag_shows_exact_follow_lyrics_button",
+      "passed": true
+    },
+    {
+      "name": "light.local_touch_moves_lyric_viewport",
+      "passed": true
+    },
+    {
+      "name": "light.manual_position_update_preserves_browse_viewport",
+      "passed": true
+    },
+    {
+      "name": "light.manual_current_line_remains_offscreen",
+      "passed": true
+    },
+    {
+      "name": "light.manual-advance.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.manual-advance.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.manual-advance.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.manual-advance.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.follow_button_click_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.follow.current_line_5_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.follow_button_returns_to_following",
+      "passed": true
+    },
+    {
+      "name": "light.following_button_disabled_after_resume",
+      "passed": true
+    },
+    {
+      "name": "light.follow.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.follow.lyric_rows_do_not_overlap",
+      "passed": true
+    },
+    {
+      "name": "light.follow.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.follow.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.hidden_position_update_preserves_viewport",
+      "passed": true
+    },
+    {
+      "name": "light.hidden_current_line_stays_offscreen",
+      "passed": true
+    },
+    {
+      "name": "light.visible-resume.current_line_65_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.second_drag_disables_following",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.current_line_35_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.track_change_resets_following",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.generated_lyrics_visible",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.lyric_rows_do_not_overlap",
+      "passed": false
+    },
+    {
+      "name": "light.track-reset.footer_does_not_overlap_lyrics",
+      "passed": true
+    },
+    {
+      "name": "light.track-reset.native_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "light.drag_before_source_change_disables_following",
+      "passed": true
+    },
+    {
+      "name": "light.source-reset.current_line_65_visible_selected",
+      "passed": true
+    },
+    {
+      "name": "light.source_change_resets_following",
+      "passed": true
+    },
+    {
+      "name": "owned_activities_destroyed",
+      "passed": true
+    },
+    {
+      "name": "work_budget_respected",
+      "passed": true
+    },
+    {
+      "name": "total_budget_respected",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "palette": "dark",
+      "completed": true
+    },
+    {
+      "palette": "light",
+      "completed": true
+    }
+  ],
+  "caseCount": 2,
+  "renderCount": 10,
+  "checkCount": 88,
+  "failureCount": 6,
+  "isolatedFailureCount": 0,
+  "passed": false,
+  "generatedOnly": true,
+  "providerProof": false,
+  "audioProof": false,
+  "commandProof": false,
+  "elapsedMs": 23143
+}
