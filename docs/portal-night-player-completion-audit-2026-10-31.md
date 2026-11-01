@@ -194,6 +194,15 @@ permissions, original Dream and test APK are restored, with no collector listene
 Provider/audio and physical FPS remain outside this gate. Ignored-setting recreation
 and pending SMB ownership remain parked; the broader goal is incomplete.
 
+**Music settings continuity:** [the configuration gate](portal-music-config-continuity-2026-11-01.md)
+closes unrelated-settings controller recreation at **c88d9c91**. Family Area
+passes **14/14 checks**: calendar and night-tone edits retain the controller and
+exact photo pixels, while an interval edit still reconfigures playback. All
+**3,657 unit tests** and builds pass. Optimized APK `a85761a7…` is installed with
+settings, sources, persistent pin state and accessibility preserved. Two
+paused-view observer attempts timed out before settings edits, so that capture
+remains unverified. SMB ownership and the broader goal remain incomplete.
+
 [artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
 [artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json
 [local-artwork]: ../mocks/portal-premium-player-20261030/evidence/native-local-artwork/checks.json

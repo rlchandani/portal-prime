@@ -72,3 +72,11 @@ findings remain parked: ignored settings can recreate the music photo host,
 and pending hidden SMB startup needs stronger resource ownership.
 Natural room-light comfort, cold startup, animated-image residency,
 Home/Apps tails and the broader platform goal remain incomplete.
+
+**Subsequent delivery:** the
+[settings-continuity fix](portal-music-config-continuity-2026-11-01.md) closes
+the unrelated-settings controller replacement finding. Family Area passes
+14 configuration checks and retains exact photo pixels through calendar and
+night-tone edits; a photo interval edit still reconfigures playback. Paused-view
+observer capture remains unverified by that newer gate, and SMB ownership
+remains open.

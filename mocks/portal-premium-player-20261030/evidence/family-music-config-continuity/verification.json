@@ -1,0 +1,149 @@
+{
+  "productionFixMade": true,
+  "sourceCommit": "c88d9c91",
+  "fullGoalComplete": false,
+  "scope": "Music native Whole Photo controller continuity across unrelated settings edits; relevant interval updates still apply",
+  "device": "Family Area",
+  "apiLevel": 29,
+  "physicalResolution": [
+    2160,
+    1440
+  ],
+  "baselineCalendarControllerRetained": false,
+  "hardware": {
+    "pausedStateCaptured": false,
+    "sourceEditedByHardwareHelper": false,
+    "realPhotoIntegrationTested": true,
+    "audioProviderTested": false,
+    "performanceAccepted": false,
+    "checks": [
+      {
+        "name": "photo_engine_stays_lazy_in_full",
+        "pass": true
+      },
+      {
+        "name": "players_selected",
+        "pass": true
+      },
+      {
+        "name": "real_photo_and_current_track_visible",
+        "pass": true
+      },
+      {
+        "name": "calendar_hidden_controller_retained",
+        "pass": true
+      },
+      {
+        "name": "calendar_same_controller",
+        "pass": true
+      },
+      {
+        "name": "calendar_same_photo",
+        "pass": true,
+        "maxChannelDifference": 0
+      },
+      {
+        "name": "calendar_current_track_retained",
+        "pass": true
+      },
+      {
+        "name": "night-tone_hidden_controller_retained",
+        "pass": true
+      },
+      {
+        "name": "night-tone_same_controller",
+        "pass": true
+      },
+      {
+        "name": "night-tone_same_photo",
+        "pass": true,
+        "maxChannelDifference": 0
+      },
+      {
+        "name": "night-tone_current_track_retained",
+        "pass": true
+      },
+      {
+        "name": "photo_continuity_after_settings_changes",
+        "pass": true,
+        "maxChannelDifference": 0
+      },
+      {
+        "name": "relevant_interval_reconfigures_controller",
+        "pass": true
+      },
+      {
+        "name": "relevant_interval_retains_current_music",
+        "pass": true
+      }
+    ],
+    "observedPhotoHostBounds": [
+      36,
+      90,
+      1334,
+      1404
+    ],
+    "pass": true,
+    "fixtureApkSha256": "b25ec7c7f2c5c67b9625c93f2fd1aa9bf7e6b51dd5fe65edbdf5ec6f2de81952",
+    "controllerIdentityStableForUnrelatedSettings": true,
+    "observerStopped": true,
+    "ownedSnapshotCleanup": true,
+    "testApkRestored": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "originalOptimizedApkRestored": true,
+    "accessibilityExact": true,
+    "systemProcessUnchanged": true,
+    "collectorInactive": true,
+    "originalDreamRestored": true,
+    "restorationPass": true,
+    "nativeCaptureCount": 11,
+    "elapsedSeconds": 84.281
+  },
+  "unitGate": {
+    "tests": 3657,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 386
+  },
+  "newUnitTests": 5,
+  "focusedRed": {
+    "tests": 7,
+    "failed": 4
+  },
+  "focusedGreen": {
+    "tests": 7,
+    "failed": 0
+  },
+  "independentReview": "No findings in restart-key coverage",
+  "optimizedDeployment": {
+    "newApkSha256": "a85761a779a1862d4769fb0632c667a8bd263f085f66c148b5d1bc4a6f253316",
+    "oldApkSha256": "8cd58604c4c188cc7fcbb74a8e8bb4e25198202b7c2bf5879429f2ec35291f7d",
+    "originalDreamActive": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "systemProcessUnchanged": true,
+    "pass": true,
+    "accessibilityExact": true,
+    "originalDreamRestored": true,
+    "elapsedSeconds": 17.387
+  },
+  "pausedViewObserverCaptureVerified": false,
+  "initialPausedObserverAttempts": [
+    {
+      "result": "observer_response_timeout",
+      "settingsChangeReached": false,
+      "restorationVerifiedBySeparateRecovery": true
+    },
+    {
+      "result": "observer_response_timeout",
+      "settingsChangeReached": false,
+      "restorationVerified": true
+    }
+  ],
+  "privateMediaPublished": false,
+  "providerOrAudioAccepted": false,
+  "panelFpsAccepted": false
+}
