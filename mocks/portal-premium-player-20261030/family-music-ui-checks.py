@@ -111,6 +111,9 @@ class Snapshot:
             "bounds": f"[{box[0]},{box[1]}][{box[2]},{box[3]}]",
             **{key: str(data[key]).lower()
                for key in ("clickable", "enabled", "selected", "visible")},
+            **{key: str(data.get(key, False)).lower()
+               for key in ("checked", "checkable")},
+            "state-description": str(data.get("stateDescription", "")),
         })
         children = data.get("children", [])
         require(isinstance(children, list), "native_children_invalid")

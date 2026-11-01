@@ -127,6 +127,7 @@ class MusicDesignPreviewActivity : ComponentActivity() {
         }
       }
       var selected by remember { mutableIntStateOf(0) }
+      var previewVolumes by remember { mutableStateOf(emptyMap<String, Int>()) }
       var playing by remember { mutableStateOf(false) }
       var position by remember { mutableLongStateOf(83_000L) }
       var changedAt by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
@@ -185,7 +186,7 @@ class MusicDesignPreviewActivity : ComponentActivity() {
               next = true, seek = true, queue = true, rooms = true, volume = true),
           queue = tracks, queueId = "sample-queue",
           controlPlayerId = source,
-          rooms = if (groupPreview) listOf(
+          rooms = (if (groupPreview) listOf(
               MusicRoom("ma:design-preview", "Family Area", true, 35,
                   volumeControllable = true, canGroupWith = setOf("ma:kitchen")),
               MusicRoom("ma:kitchen", "Kitchen", true, 42,
@@ -193,7 +194,9 @@ class MusicDesignPreviewActivity : ComponentActivity() {
               MusicRoom("ma:bedroom", "Bedroom", true, 20, volumeControllable = true),
               MusicRoom("ma:office", "Office", false),
           ) else listOf(MusicRoom(source, "Family Area", true, 35,
-              volumeControllable = true)))
+              volumeControllable = true))).map { room ->
+            room.copy(volume = previewVolumes[room.id] ?: room.volume)
+          })
       CompositionLocalProvider(LocalApprovedPalette provides palette,
           LocalDensity provides Density(density.density, fontScale)) {
         MaterialTheme(colorScheme = approvedColorScheme(!light)) {
@@ -263,6 +266,10 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                       playing = false
                     }
                     is MusicPlayerUiAction.Seek -> position = action.positionMs
+                    is MusicPlayerUiAction.SetRoomVolume -> {
+                      previewVolumes = previewVolumes +
+                          (action.roomId to action.percent.coerceIn(0, 100))
+                    }
                     is MusicPlayerUiAction.SelectPlayer -> {
                       if (groupPreview) {
                         source = action.roomId

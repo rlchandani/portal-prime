@@ -836,7 +836,9 @@ private fun MusicSlider(
       onValueChangeFinished = onValueChangeFinished, enabled = enabled,
       valueRange = valueRange, colors = musicSliderColors(), modifier = modifier,
       thumb = {
-        Canvas(Modifier.size(16.dp)) {
+        // Material measures its gesture layout from the thumb/track, inside the outer
+        // minimum-size padding. Keep the painted circle small, but the input layout 48dp tall.
+        Canvas(Modifier.size(width = 16.dp, height = 48.dp)) {
           drawCircle(if (enabled) palette.text else palette.secondary)
         }
       },

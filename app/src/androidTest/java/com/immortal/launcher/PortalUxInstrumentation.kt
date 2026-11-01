@@ -21,6 +21,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 import java.io.File
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -907,6 +908,12 @@ class PortalUxInstrumentation : Instrumentation() {
             .put("clickable", node.isClickable).put("enabled", node.isEnabled)
             .put("selected", node.isSelected)
             .put("checked", node.isChecked).put("checkable", node.isCheckable)
+            .put("stateDescription", if (node.isPassword) "" else
+                AccessibilityNodeInfoCompat.wrap(node).stateDescription?.toString().orEmpty())
+            .put("range", node.rangeInfo?.let { range ->
+                JSONObject().put("minimum", range.min).put("maximum", range.max)
+                    .put("current", range.current)
+            } ?: JSONObject.NULL)
             .put("password", node.isPassword).put("visible", node.isVisibleToUser)
             .put("bounds", JSONArray(listOf(bounds.left, bounds.top, bounds.right, bounds.bottom)))
             .put("children", children)
