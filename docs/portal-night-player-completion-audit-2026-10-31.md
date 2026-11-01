@@ -2,7 +2,18 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Current handoff, November 1:** a fresh read verifies Family Area's installed
+**Newest read-only verification, November 1 — compositor timing capability.**
+[The bounded timing check](portal-compositor-timing-2026-11-01.md) records
+**150 fresh presented buffers** over a **30.417-second timestamp span**, with
+overlap in all 32 rolling samples. Family Area is now showing the photo-preview
+Activity, with no OS Dream active; that external state differs from the previous
+handoff. Animation intent was not captured, so this is neither an FPS pass nor
+verification of the Dream or optical brightness fade. Wireless ADB works,
+installed APK **872b6af7…** is unchanged and collectors/listeners are absent.
+No runtime change was made. The unavailable physical check and parked work
+remain open.
+
+**Previous handoff, November 1 — before the compositor check:** a fresh read verifies Family Area's installed
 optimized APK **872b6af7…**, Android API 29, no instrumentation and no collector
 thread or frame listeners. The branch is clean at **cddcb1cb** before this audit
 update. The physical final-fade check remains unavailable across the Classic
