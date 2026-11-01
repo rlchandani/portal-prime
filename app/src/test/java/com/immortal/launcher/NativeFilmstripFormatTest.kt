@@ -6,7 +6,9 @@
  */
 package com.immortal.launcher
 
+import java.io.File
 import java.util.zip.CRC32
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -280,7 +282,18 @@ class NativeFilmstripFormatTest {
       chunk("VP8 ", vp8()), chunk("EXIF", payload + bytes(0)))))
   }
 
-  private fun confirmed(encoded: ByteArray) = NativeFilmstripFormat.isConfirmedStatic(encoded)
+  private fun confirmed(encoded: ByteArray): Boolean {
+    val confirmed = NativeFilmstripFormat.isConfirmedStatic(encoded)
+    val file = File.createTempFile("native-filmstrip-parity-", ".jpg")
+    try {
+      file.writeBytes(encoded)
+      assertEquals("File admission must match ByteArray admission", confirmed,
+        NativeFilmstripFormat.isConfirmedStatic(file))
+    } finally {
+      file.delete()
+    }
+    return confirmed
+  }
 
   private fun bytes(vararg values: Int) = ByteArray(values.size) { values[it].toByte() }
   private fun ascii(value: String) = value.toByteArray(Charsets.US_ASCII)

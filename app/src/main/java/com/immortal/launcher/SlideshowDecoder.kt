@@ -48,9 +48,14 @@ object SlideshowDecoder {
     return try {
       val file = File(path)
       if (!file.isFile || file.length() !in 1..SlideshowDecodeBudget.MAX_ENCODED_BYTES.toLong()) null
-      else file.inputStream().use {
-        if (nativeFilmstrip) readEncoded(it)?.let { encoded -> nativeFilmstripBytes(encoded, maxEdge) }
-        else stream(it, maxEdge)
+      else {
+        if (nativeFilmstrip && !NativeFilmstripFormat.isConfirmedStatic(file))
+          throw NativeFilmstripUnsupportedFormat()
+        file.inputStream().use {
+          // Recheck the exact decoded bytes: an external file may change after preflight.
+          if (nativeFilmstrip) readEncoded(it)?.let { encoded -> nativeFilmstripBytes(encoded, maxEdge) }
+          else stream(it, maxEdge)
+        }
       }
     } catch (_: IOException) {
       null

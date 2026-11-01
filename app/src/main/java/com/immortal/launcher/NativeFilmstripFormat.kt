@@ -6,7 +6,8 @@
  */
 package com.immortal.launcher
 
-import java.util.zip.CRC32
+import java.io.File
+import java.io.RandomAccessFile
 
 /**
  * Conservative encoded-image admission for the native, single-frame Filmstrip decoder.
@@ -20,7 +21,20 @@ object NativeFilmstripFormat {
   private const val MAX_METADATA_BYTES = 256 * 1024L
   private const val MAX_CHUNKS = 4096
 
-  fun isConfirmedStatic(encoded: ByteArray): Boolean {
+  /** Worker-only inspection; the caller keeps ownership of the file and any IO failures. */
+  fun isConfirmedStatic(file: File): Boolean {
+    FilmstripEncodedFile.checkpoint()
+    if (!file.isFile || file.length() !in 1..SlideshowDecodeBudget.MAX_ENCODED_BYTES.toLong()) return false
+    return RandomAccessFile(file, "r").use { input ->
+      val size = input.length()
+      if (size !in 1..SlideshowDecodeBudget.MAX_ENCODED_BYTES.toLong()) false
+      else isConfirmedStatic(FilmstripEncodedFile(input, size.toInt()))
+    }
+  }
+
+  fun isConfirmedStatic(encoded: ByteArray): Boolean = isConfirmedStatic(FilmstripEncodedBytes(encoded))
+
+  private fun isConfirmedStatic(encoded: FilmstripEncodedInput): Boolean {
     if (encoded.size >= 3 && u8(encoded, 0) == 0xff &&
       u8(encoded, 1) == 0xd8 && u8(encoded, 2) == 0xff) return true
     if (encoded.size >= 8 && u8(encoded, 0) == 137 &&
@@ -30,7 +44,7 @@ object NativeFilmstripFormat {
     return false
   }
 
-  private fun staticPng(encoded: ByteArray): Boolean {
+  private fun staticPng(encoded: FilmstripEncodedInput): Boolean {
     var position = 8
     var metadataBytes = 8L
     var chunks = 0
@@ -54,7 +68,7 @@ object NativeFilmstripFormat {
       if (matches(encoded, type, "acTL") || matches(encoded, type, "fcTL") ||
         matches(encoded, type, "fdAT")) return false
       if (!isData) {
-        val crc = CRC32().apply { update(encoded, type, length.toInt() + 4) }.value
+        val crc = encoded.checksum(type, length.toInt() + 4)
         if (crc != be32(encoded, (end - 4L).toInt())) return false
       }
       if (chunks == 1 && !matches(encoded, type, "IHDR")) return false
@@ -101,7 +115,7 @@ object NativeFilmstripFormat {
     return false
   }
 
-  private fun staticWebp(encoded: ByteArray): Boolean {
+  private fun staticWebp(encoded: FilmstripEncodedInput): Boolean {
     if (le32(encoded, 4) != encoded.size.toLong() - 8L) return false
     var position = 12
     var metadataBytes = 12L
@@ -195,7 +209,7 @@ object NativeFilmstripFormat {
       ((flags and 0x10) == 0 || losslessImage || alphaSeen)
   }
 
-  private fun pngChunkName(encoded: ByteArray, position: Int): Boolean {
+  private fun pngChunkName(encoded: FilmstripEncodedInput, position: Int): Boolean {
     for (offset in 0 until 4) {
       val value = u8(encoded, position + offset)
       if (value !in 'A'.code..'Z'.code && value !in 'a'.code..'z'.code) return false
@@ -203,21 +217,21 @@ object NativeFilmstripFormat {
     return u8(encoded, position + 2) in 'A'.code..'Z'.code
   }
 
-  private fun matches(encoded: ByteArray, position: Int, value: String): Boolean {
+  private fun matches(encoded: FilmstripEncodedInput, position: Int, value: String): Boolean {
     for (index in value.indices) if (u8(encoded, position + index) != value[index].code) return false
     return true
   }
 
-  private fun u8(encoded: ByteArray, position: Int): Int = encoded[position].toInt() and 0xff
-  private fun be32(encoded: ByteArray, position: Int): Long =
+  private fun u8(encoded: FilmstripEncodedInput, position: Int): Int = encoded[position].toInt() and 0xff
+  private fun be32(encoded: FilmstripEncodedInput, position: Int): Long =
     (u8(encoded, position).toLong() shl 24) or (u8(encoded, position + 1).toLong() shl 16) or
       (u8(encoded, position + 2).toLong() shl 8) or u8(encoded, position + 3).toLong()
 
-  private fun le32(encoded: ByteArray, position: Int): Long =
+  private fun le32(encoded: FilmstripEncodedInput, position: Int): Long =
     u8(encoded, position).toLong() or (u8(encoded, position + 1).toLong() shl 8) or
       (u8(encoded, position + 2).toLong() shl 16) or (u8(encoded, position + 3).toLong() shl 24)
 
-  private fun le24(encoded: ByteArray, position: Int): Long =
+  private fun le24(encoded: FilmstripEncodedInput, position: Int): Long =
     u8(encoded, position).toLong() or (u8(encoded, position + 1).toLong() shl 8) or
       (u8(encoded, position + 2).toLong() shl 16)
 }

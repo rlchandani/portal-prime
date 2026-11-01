@@ -619,6 +619,12 @@ class PortalUxInstrumentation : Instrumentation() {
                 }
             }, 9, java.util.concurrent.TimeUnit.SECONDS)
             try {
+                if (command.optString("command") == "filmstripFileAdmission") {
+                    val report = FilmstripFileAdmissionDeviceChecks.run(targetContext)
+                    File(folder, "$name.json").writeText(report.toString())
+                    response.writeText(JSONObject().put("name", name).put("success", true).toString())
+                    continue
+                }
                 if (command.optString("command") == "iconProbe") {
                     val report = IconRendererDeviceRegression.verify(targetContext)
                     response.writeText(JSONObject().put("name", name).put("success", true)
