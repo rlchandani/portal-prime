@@ -1,0 +1,18 @@
+{
+  "issueStartedAtUtc": "2026-11-01T19:04:57+00:00",
+  "deadlineUtc": "2026-11-01T19:34:57+00:00",
+  "styles": [
+    "galleryPrint",
+    "gallerySpread"
+  ],
+  "warmupSec": 10,
+  "captureSec": 90,
+  "intervalSec": 5,
+  "minimumFrames": 300,
+  "minimumSceneRecords": 8,
+  "maximumP95Ms": 16.667,
+  "maximumP99Ms": 33.334,
+  "maximumOverBudgetRatio": 0.05,
+  "deliveredPanelFpsMeasured": false,
+  "productionChanged": false
+}

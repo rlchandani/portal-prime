@@ -1,0 +1,113 @@
+{
+  "device": "Family Area",
+  "api": 29,
+  "optimized": true,
+  "installedApkSha256": "872b6af7354b6616320b0081f0525d8c27c0bad29759c3bcc7a02a4a5d76ae10",
+  "productionChanged": false,
+  "deliveredPanelFpsMeasured": false,
+  "setupDelaySec": 10,
+  "decodedReadyBeforeCaptureVerified": false,
+  "cacheWarmthVerified": false,
+  "captureSec": 90,
+  "plan": {
+    "issueStartedAtUtc": "2026-11-01T19:04:57+00:00",
+    "deadlineUtc": "2026-11-01T19:34:57+00:00",
+    "styles": [
+      "galleryPrint",
+      "gallerySpread"
+    ],
+    "warmupSec": 10,
+    "captureSec": 90,
+    "intervalSec": 5,
+    "minimumFrames": 300,
+    "minimumSceneRecords": 8,
+    "maximumP95Ms": 16.667,
+    "maximumP99Ms": 33.334,
+    "maximumOverBudgetRatio": 0.05,
+    "deliveredPanelFpsMeasured": false,
+    "productionChanged": false
+  },
+  "cases": [
+    {
+      "mode": "galleryPrint",
+      "host": "PhotoDreamService@16666666",
+      "frames": 1046,
+      "firstDrawFrames": 0,
+      "sceneAdmissions": 18,
+      "p95Ms": 14.25,
+      "p99Ms": 21.75,
+      "maxMs": 44.505399,
+      "overBudget": 30,
+      "overBudgetRatio": 0.028680688336520075,
+      "over33_333Ms": 2,
+      "callbackDrops": 0,
+      "pssKiBAtEnd": 231398,
+      "graphicsKiBAtEnd": 73624,
+      "checks": {
+        "actual_dream_host": true,
+        "capture_terminal": true,
+        "minimum_300_frame_samples": true,
+        "minimum_8_scene_admissions": true,
+        "p95_within_16_667ms": true,
+        "p99_within_33_334ms": true,
+        "at_most_5_percent_over_budget": true,
+        "no_invalid_samples": true,
+        "no_callback_drops": true,
+        "no_invalid_scene_or_work_records": true,
+        "no_attach_or_tracking_failures": true,
+        "dream_active_at_capture_end": true
+      },
+      "passed": true
+    },
+    {
+      "mode": "gallerySpread",
+      "host": "PhotoDreamService@16666666",
+      "frames": 1060,
+      "firstDrawFrames": 0,
+      "sceneAdmissions": 18,
+      "p95Ms": 14,
+      "p99Ms": 22,
+      "maxMs": 33.023221,
+      "overBudget": 24,
+      "overBudgetRatio": 0.022641509433962263,
+      "over33_333Ms": 0,
+      "callbackDrops": 0,
+      "pssKiBAtEnd": 259927,
+      "graphicsKiBAtEnd": 78444,
+      "checks": {
+        "actual_dream_host": true,
+        "capture_terminal": true,
+        "minimum_300_frame_samples": true,
+        "minimum_8_scene_admissions": true,
+        "p95_within_16_667ms": true,
+        "p99_within_33_334ms": true,
+        "at_most_5_percent_over_budget": true,
+        "no_invalid_samples": true,
+        "no_callback_drops": true,
+        "no_invalid_scene_or_work_records": true,
+        "no_attach_or_tracking_failures": true,
+        "dream_active_at_capture_end": true
+      },
+      "passed": true
+    }
+  ],
+  "status": "verification; broader goal incomplete",
+  "passed": true,
+  "verifiedAtUtc": "2026-11-01T19:14:21.864284+00:00",
+  "issueElapsedSeconds": 564.864284,
+  "sourceSha256": {
+    "PhotoFrameController.kt": "767dbf88c0d7418678ae2dfb8fca13289cd16bd809d65698f1258bcd68f4a832",
+    "SlideshowStage.kt": "46c45dab9889650f9c990229bc19a01b045fca31e94bfda2dbc066e6f5c64b3c",
+    "SlideshowLoader.kt": "451aa014667a515eb4b3d2871af0867f447e210b69f5c9fd014ad939a8469455",
+    "FramePerformanceCapture.kt": "faf359af10f389b149b23b66e9662f596a16637be2ac6b6bf356bfcb54b7eb6d",
+    "FramePerformanceHistogram.kt": "db110a15b75957667b1507ddeb9e8f83e106eb403eb6ae748411c696217b8b7a"
+  },
+  "limits": [
+    "Window FrameMetrics callback cohort; not complete vsync/panel presentation or optical smoothness.",
+    "One generated local portrait-folder run per style, with existing clock/overlay settings; no cold or remote-source acceptance. Ten-second setup delay excluded; decoded-ready/cache-warm precondition was not independently checked.",
+    "Scene admission is not independent visible-photo advancement or presentation proof. Dream activity checked at start/end, not continuously.",
+    "End-of-run process/graphics memory is a snapshot, not a peak-residency or process-memory reduction result.",
+    "No before/after optimization comparison and no new production code.",
+    "Physical light comfort pending and parked issues remain open."
+  ]
+}

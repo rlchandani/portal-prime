@@ -1,0 +1,42 @@
+{
+  "productionChanged": false,
+  "cases": [
+    {
+      "mode": "galleryPrint",
+      "sessionId": 1,
+      "elapsedMs": 90000,
+      "deliveredFpsMeasured": false,
+      "dreamActiveAtCaptureEnd": true
+    },
+    {
+      "mode": "gallerySpread",
+      "sessionId": 2,
+      "elapsedMs": 90000,
+      "deliveredFpsMeasured": false,
+      "dreamActiveAtCaptureEnd": true
+    }
+  ],
+  "capturesCompleted": true,
+  "settingsExact": true,
+  "settingCount": 97,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "accessibilityExact": true,
+  "systemPidUnchanged": true,
+  "installedSha256": "872b6af7354b6616320b0081f0525d8c27c0bad29759c3bcc7a02a4a5d76ae10",
+  "apkUnchanged": true,
+  "testApkUnchanged": true,
+  "optimizedNonDebuggable": true,
+  "noInstrumentation": true,
+  "noCollector": true,
+  "brightnessPolicyExact": true,
+  "rawBrightnessExact": true,
+  "brightnessInvariantSatisfied": true,
+  "faceCacheExact": true,
+  "nativeFaceCacheExact": true,
+  "ownedFilesRemoved": true,
+  "originalDreamRestored": true,
+  "restorationPassed": true,
+  "verifiedAtUtc": "2026-11-01T19:14:21.864284+00:00",
+  "elapsedSeconds": 212.255
+}

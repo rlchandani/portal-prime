@@ -1,0 +1,590 @@
+{
+  "scope": "Immortal Window host metrics",
+  "deliveredFpsMeasured": false,
+  "sessionId": 1,
+  "phase": "slideshow",
+  "durationSec": 90,
+  "sampleMain": false,
+  "sampleSettingsWork": false,
+  "active": false,
+  "elapsedMs": 90000,
+  "collectorRunning": false,
+  "activeListeners": 0,
+  "untrackedHosts": 0,
+  "untrackedWindows": 0,
+  "attachFailures": 0,
+  "hosts": {
+    "HomeActivity@16666666": {
+      "frames": 0,
+      "invalidSamples": 0,
+      "callbackDrops": 0,
+      "firstDrawFrames": 0,
+      "steadyFrames": 0,
+      "steadyOverBudget": 0,
+      "overBudget": 0,
+      "overBudgetIncludesFirstDraw": true,
+      "over33_333Ms": 0,
+      "budgetMs": 16.666666,
+      "meanMs": null,
+      "maxMs": 0,
+      "overflowSamples": 0,
+      "binMs": 0.25,
+      "overflowFromMs": 500,
+      "p50Ms": null,
+      "p50AtLeastMs": null,
+      "p95Ms": null,
+      "p95AtLeastMs": null,
+      "p99Ms": null,
+      "p99AtLeastMs": null,
+      "components": {
+        "queued": {
+          "samples": 0,
+          "missing": 0,
+          "meanMs": null,
+          "maxMs": 0
+        },
+        "input": {
+          "samples": 0,
+          "missing": 0,
+          "meanMs": null,
+          "maxMs": 0
+        },
+        "animation": {
+          "samples": 0,
+          "missing": 0,
+          "meanMs": null,
+          "maxMs": 0
+        },
+        "layout": {
+          "samples": 0,
+          "missing": 0,
+          "meanMs": null,
+          "maxMs": 0
+        },
+        "draw": {
+          "samples": 0,
+          "missing": 0,
+          "meanMs": null,
+          "maxMs": 0
+        },
+        "sync": {
+          "samples": 0,
+          "missing": 0,
+          "meanMs": null,
+          "maxMs": 0
+        },
+        "commands": {
+          "samples": 0,
+          "missing": 0,
+          "meanMs": null,
+          "maxMs": 0
+        },
+        "swap": {
+          "samples": 0,
+          "missing": 0,
+          "meanMs": null,
+          "maxMs": 0
+        }
+      },
+      "detailedFrames": 0,
+      "invalidDetailSamples": 0,
+      "worstFrame": null,
+      "slowFrames": {
+        "maxRecords": 32,
+        "minTotalMs": 100,
+        "eligibleFrames": 0,
+        "omittedFrames": 0,
+        "frames": []
+      }
+    },
+    "PhotoDreamService@16666666": {
+      "frames": 1046,
+      "invalidSamples": 0,
+      "callbackDrops": 0,
+      "firstDrawFrames": 0,
+      "steadyFrames": 1046,
+      "steadyOverBudget": 30,
+      "overBudget": 30,
+      "overBudgetIncludesFirstDraw": true,
+      "over33_333Ms": 2,
+      "budgetMs": 16.666666,
+      "meanMs": 8.781689959847037,
+      "maxMs": 44.505399,
+      "overflowSamples": 0,
+      "binMs": 0.25,
+      "overflowFromMs": 500,
+      "p50Ms": 8.5,
+      "p50AtLeastMs": null,
+      "p95Ms": 14.25,
+      "p95AtLeastMs": null,
+      "p99Ms": 21.75,
+      "p99AtLeastMs": null,
+      "components": {
+        "queued": {
+          "samples": 1046,
+          "missing": 0,
+          "meanMs": 0.9887171768642448,
+          "maxMs": 15.965399
+        },
+        "input": {
+          "samples": 1046,
+          "missing": 0,
+          "meanMs": 0.05340091300191205,
+          "maxMs": 4.949323
+        },
+        "animation": {
+          "samples": 1046,
+          "missing": 0,
+          "meanMs": 0.5801649694072658,
+          "maxMs": 9.368855
+        },
+        "layout": {
+          "samples": 1046,
+          "missing": 0,
+          "meanMs": 0.26462286137667307,
+          "maxMs": 18.967396
+        },
+        "draw": {
+          "samples": 1046,
+          "missing": 0,
+          "meanMs": 0.09753359751434035,
+          "maxMs": 4.058489
+        },
+        "sync": {
+          "samples": 1046,
+          "missing": 0,
+          "meanMs": 0.2693437351816444,
+          "maxMs": 7.197865
+        },
+        "commands": {
+          "samples": 1046,
+          "missing": 0,
+          "meanMs": 3.796442274378585,
+          "maxMs": 22.368958
+        },
+        "swap": {
+          "samples": 1046,
+          "missing": 0,
+          "meanMs": 1.6619512877629063,
+          "maxMs": 17.29026
+        }
+      },
+      "detailedFrames": 1046,
+      "invalidDetailSamples": 0,
+      "worstFrame": {
+        "elapsedMs": 35253,
+        "totalMs": 44.505399,
+        "firstDraw": false,
+        "components": {
+          "queued": 15.965399,
+          "input": 0.03599,
+          "animation": 0.190833,
+          "layout": 1.739688,
+          "draw": 1.214375,
+          "sync": 0.392136,
+          "commands": 22.368958,
+          "swap": 2.235781
+        }
+      },
+      "slowFrames": {
+        "maxRecords": 32,
+        "minTotalMs": 100,
+        "eligibleFrames": 0,
+        "omittedFrames": 0,
+        "frames": []
+      }
+    }
+  },
+  "slideshowStyles": {
+    "measurement": "scene admission signal and guarded Main acceptance; not presentation or vsync",
+    "presentationTimeMeasured": false,
+    "photoAdvancementMeasured": false,
+    "styleBeforeFirstReportKnown": false,
+    "records": 18,
+    "invalidRecords": 0,
+    "discardedRecords": 0,
+    "maxRecords": 128,
+    "layerRecords": 0,
+    "invalidLayerRecords": 0,
+    "events": [
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 398,
+        "acceptedElapsedMs": 398,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 5411,
+        "acceptedElapsedMs": 5411,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 10421,
+        "acceptedElapsedMs": 10421,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 15433,
+        "acceptedElapsedMs": 15433,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 20443,
+        "acceptedElapsedMs": 20443,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 25459,
+        "acceptedElapsedMs": 25459,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 30477,
+        "acceptedElapsedMs": 30477,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 35485,
+        "acceptedElapsedMs": 35485,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 40491,
+        "acceptedElapsedMs": 40491,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 45502,
+        "acceptedElapsedMs": 45502,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 50526,
+        "acceptedElapsedMs": 50526,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 55564,
+        "acceptedElapsedMs": 55564,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 60571,
+        "acceptedElapsedMs": 60571,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 65578,
+        "acceptedElapsedMs": 65578,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 70589,
+        "acceptedElapsedMs": 70589,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 75602,
+        "acceptedElapsedMs": 75602,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 80610,
+        "acceptedElapsedMs": 80610,
+        "mainAdmissionDelayMs": 0
+      },
+      {
+        "host": "PhotoDreamService",
+        "style": "galleryPrint",
+        "receivedElapsedMs": 85616,
+        "acceptedElapsedMs": 85616,
+        "mainAdmissionDelayMs": 0
+      }
+    ],
+    "styles": {
+      "kenBurns": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "diptych": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "framed": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "galleryWall": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "push": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "memories": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "panorama": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "polaroid": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "mosaic": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "filmstrip": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "cinema": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "heroSidebar": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      },
+      "galleryPrint": {
+        "records": 18,
+        "previewRecords": 0,
+        "dreamRecords": 18,
+        "unknownHostRecords": 0
+      },
+      "gallerySpread": {
+        "records": 0,
+        "previewRecords": 0,
+        "dreamRecords": 0,
+        "unknownHostRecords": 0
+      }
+    }
+  },
+  "slideshowWork": {
+    "measurement": "elapsed wall time; overlapping spans; not CPU time",
+    "records": 0,
+    "invalidRecords": 0,
+    "discardedRecords": 0,
+    "maxRecords": 128,
+    "samples": [],
+    "stages": {
+      "metadataPreparation": {
+        "kind": "elapsed",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "webViewAdmission": {
+        "kind": "elapsed",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "enginePageFinished": {
+        "kind": "event",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "engineRetired": {
+        "kind": "event",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "controllerConstruction": {
+        "kind": "elapsed",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "viewBuild": {
+        "kind": "elapsed",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "controllerStart": {
+        "kind": "elapsed",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "webViewConstruction": {
+        "kind": "elapsed",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "nativeFilmstripPreparation": {
+        "kind": "elapsed",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      },
+      "nativeFilmstripAdmission": {
+        "kind": "elapsed",
+        "records": 0,
+        "mainThreadRecords": 0,
+        "otherThreadRecords": 0,
+        "totalMs": null,
+        "meanMs": null,
+        "maxMs": null,
+        "mainThreadTotalMs": null,
+        "mainThreadMeanMs": null,
+        "mainThreadMaxMs": null,
+        "otherThreadTotalMs": null,
+        "otherThreadMeanMs": null,
+        "otherThreadMaxMs": null
+      }
+    }
+  },
+  "memory": {
+    "pssKiB": 231398,
+    "nativeBytes": 59614040,
+    "javaBytes": 7075360,
+    "graphicsKiB": 73624
+  }
+}
