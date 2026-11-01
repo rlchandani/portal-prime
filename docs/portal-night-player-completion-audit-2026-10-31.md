@@ -2,7 +2,20 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — interrupted slideshow history.**
+**Newest delivery, November 1 — Framed Print viewport recovery.**
+[The renderer fix](portal-framed-viewport-2026-11-01.md) resizes the retained
+print using the live scene dimensions. Narrowing and expanding the same
+WebView preserves the photo, document, deck and cursor, with **one decode and
+one image request** throughout. Four source regressions now pass; the final
+broader JavaScript suite passes **350 tests**, with four unrelated Chrome
+checks skipped. Family Area passes **46/46 native assertions** in
+**4.176 seconds**; independent pixels show all four corner markers and a photo
+changing **1296 × 972 → 536 × 402 → 1296 × 972**. Optimized APK **a00d3abe…**
+is installed, with restoration verified **9 minutes 31 seconds** into the
+original 30-minute slot. This is owned WebView reflow evidence, not physical
+rotation, Dream-host acceptance, panel FPS or room-light fade comfort.
+
+**Previous delivery, November 1 — interrupted slideshow history.**
 [The history fix](portal-slideshow-history-2026-11-01.md) captures a pending
 history position before cancellation. Reversing a loading Previous no longer
 produces `[A, B, B]`; both cancellation directions and repeated requests are

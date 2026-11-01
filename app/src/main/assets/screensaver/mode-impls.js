@@ -443,19 +443,46 @@
       const root = el("ss-art retired"); const edge = el("ss-frameEdge", root); const mat = el("ss-mat", edge);
       const bevel = el("ss-bevel", mat); const photo = el("ss-print", bevel);
       photo.style.animation = "none"; photo.style.willChange = "auto";
-      return { root, photo };
+      return { root, photo, source: null };
     }
     const dissolve = makeSceneDissolve(ctx, t, arts.map(a => a.root), 2400, root => {
-      const photo = arts.find(a => a.root === root).photo;
+      const art = arts.find(a => a.root === root), photo = art.photo;
+      art.source = null;
       photo.style.backgroundImage = "none"; photo.style.animation = "none";
       photo.style.willChange = "auto";
     });
-    function sizeFor(p) { const maxW = ctx.W * 0.6, maxH = ctx.H * 0.72; const ar = aspect(p); let w = maxW, h = w / ar; if (h > maxH) { h = maxH; w = h * ar; } return { w: Math.round(w), h: Math.round(h) }; }
+    function printLimits() {
+      return { maxW: (ctx.root.clientWidth || ctx.W) * 0.6,
+        maxH: (ctx.root.clientHeight || ctx.H) * 0.72 };
+    }
+    function resizePrint(art, { maxW, maxH } = printLimits()) {
+      if (!art.source) return;
+      const ar = aspect(art.source);
+      let w = maxW, h = w / ar;
+      if (h > maxH) { h = maxH; w = h * ar; }
+      const width = Math.round(w) + "px", height = Math.round(h) + "px";
+      if (art.photo.style.width !== width) art.photo.style.width = width;
+      if (art.photo.style.height !== height) art.photo.style.height = height;
+    }
+    // Keep admitted photos/resources; coalesce viewport events into one pausable frame.
+    let resizePending = false;
+    function onResize() {
+      if (resizePending || !dissolve.active()) return;
+      resizePending = true;
+      t.frame(() => {
+        resizePending = false;
+        if (dissolve.active()) {
+          const limits = printLimits();
+          arts.forEach(art => resizePrint(art, limits));
+        }
+      });
+    }
+    if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 1800);
       if (!await t.load(u) || !dissolve.active()) return false;
-      const root = dissolve.next(), A = arts.find(a => a.root === root), { w, h } = sizeFor(p);
-      A.photo.style.width = w + "px"; A.photo.style.height = h + "px";
+      const root = dissolve.next(), A = arts.find(a => a.root === root);
+      A.source = p; resizePrint(A);
       // Frame geometry already follows the photo's aspect. Cached face hints keep
       // the complete print still; do not introduce a focal crop or another decode.
       bg(A.photo, u, ctx.photoMotion === false || hasFace(p) ? "contain" : "cover");
@@ -468,7 +495,13 @@
       dissolve.present(root);
     }
     t.start(step); t.every(step, ctx.photoMs);
-    return dissolve.cleanup;
+    const cleanup = () => {
+      if (typeof window.removeEventListener === "function") window.removeEventListener("resize", onResize);
+      dissolve.cleanup();
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => dissolve.cleanup.ready });
+    cleanup.pause = dissolve.cleanup.pause; cleanup.resume = dissolve.cleanup.resume;
+    return cleanup;
   }};
 
   // ---- 04 Living gallery wall (justified rows + swaps) ----------------------

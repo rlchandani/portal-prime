@@ -40,6 +40,21 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Owned offline Framed Print viewport resize; dispatch before acquiring UiAutomation.
+        if (options.getString("command") == "framedViewport") {
+            val framed = try {
+                FilmstripInputDeviceChecks.runFramedViewport(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("framedViewportCompleted", false)
+                    putBoolean("framedViewportPassed", false)
+                    putBoolean("framedViewportNativePassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (framed.getBoolean("framedViewportPassed")) 0 else 1, framed)
+            return
+        }
         // Owned offline scheduler history window; no UiAutomation or private diagnostics.
         if (options.getString("command") == "slideshowHistory") {
             val history = try {

@@ -1,0 +1,182 @@
+{
+  "before": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "centerRedPixels": 81,
+    "sampleCount": 81,
+    "photoPixelBounds": [
+      432,
+      234,
+      1728,
+      1206
+    ],
+    "photoPixelWidth": 1296,
+    "photoPixelHeight": 972,
+    "markers": [
+      {
+        "corner": 0,
+        "matchedPixels": 42436,
+        "bbox": [
+          432,
+          234,
+          638,
+          440
+        ],
+        "rectangleCoverage": 1.0
+      },
+      {
+        "corner": 1,
+        "matchedPixels": 42436,
+        "bbox": [
+          1522,
+          234,
+          1728,
+          440
+        ],
+        "rectangleCoverage": 1.0
+      },
+      {
+        "corner": 2,
+        "matchedPixels": 42436,
+        "bbox": [
+          432,
+          1000,
+          638,
+          1206
+        ],
+        "rectangleCoverage": 1.0
+      },
+      {
+        "corner": 3,
+        "matchedPixels": 42436,
+        "bbox": [
+          1522,
+          1000,
+          1728,
+          1206
+        ],
+        "rectangleCoverage": 1.0
+      }
+    ]
+  },
+  "narrow": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "centerRedPixels": 81,
+    "sampleCount": 81,
+    "photoPixelBounds": [
+      812,
+      519,
+      1348,
+      921
+    ],
+    "photoPixelWidth": 536,
+    "photoPixelHeight": 402,
+    "markers": [
+      {
+        "corner": 0,
+        "matchedPixels": 7225,
+        "bbox": [
+          812,
+          519,
+          897,
+          604
+        ],
+        "rectangleCoverage": 1.0
+      },
+      {
+        "corner": 1,
+        "matchedPixels": 7225,
+        "bbox": [
+          1263,
+          519,
+          1348,
+          604
+        ],
+        "rectangleCoverage": 1.0
+      },
+      {
+        "corner": 2,
+        "matchedPixels": 7225,
+        "bbox": [
+          812,
+          836,
+          897,
+          921
+        ],
+        "rectangleCoverage": 1.0
+      },
+      {
+        "corner": 3,
+        "matchedPixels": 7225,
+        "bbox": [
+          1263,
+          836,
+          1348,
+          921
+        ],
+        "rectangleCoverage": 1.0
+      }
+    ]
+  },
+  "after": {
+    "windowWidth": 2160,
+    "windowHeight": 1440,
+    "centerRedPixels": 81,
+    "sampleCount": 81,
+    "photoPixelBounds": [
+      432,
+      234,
+      1728,
+      1206
+    ],
+    "photoPixelWidth": 1296,
+    "photoPixelHeight": 972,
+    "markers": [
+      {
+        "corner": 0,
+        "matchedPixels": 42436,
+        "bbox": [
+          432,
+          234,
+          638,
+          440
+        ],
+        "rectangleCoverage": 1.0
+      },
+      {
+        "corner": 1,
+        "matchedPixels": 42436,
+        "bbox": [
+          1522,
+          234,
+          1728,
+          440
+        ],
+        "rectangleCoverage": 1.0
+      },
+      {
+        "corner": 2,
+        "matchedPixels": 42436,
+        "bbox": [
+          432,
+          1000,
+          638,
+          1206
+        ],
+        "rectangleCoverage": 1.0
+      },
+      {
+        "corner": 3,
+        "matchedPixels": 42436,
+        "bbox": [
+          1522,
+          1000,
+          1728,
+          1206
+        ],
+        "rectangleCoverage": 1.0
+      }
+    ]
+  }
+}

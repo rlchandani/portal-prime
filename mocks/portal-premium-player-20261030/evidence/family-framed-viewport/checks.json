@@ -1,0 +1,813 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "api29_window",
+      "passed": true
+    },
+    {
+      "name": "uuid_activity_created",
+      "passed": true
+    },
+    {
+      "name": "framed_shipped_ready",
+      "passed": true
+    },
+    {
+      "name": "framed_actual_decode",
+      "passed": true
+    },
+    {
+      "name": "framed_initial_landscape",
+      "passed": true
+    },
+    {
+      "name": "before_root_actual_native_size",
+      "passed": true
+    },
+    {
+      "name": "before_print_current_root_dimensions",
+      "passed": true
+    },
+    {
+      "name": "before_whole_frame_fits_root",
+      "passed": true
+    },
+    {
+      "name": "before_same_document_scene_photo",
+      "passed": true
+    },
+    {
+      "name": "before_no_deck_cursor_or_image_load",
+      "passed": true
+    },
+    {
+      "name": "before_native_center_red",
+      "passed": true
+    },
+    {
+      "name": "before_corner_0_visible",
+      "passed": true
+    },
+    {
+      "name": "before_corner_1_visible",
+      "passed": true
+    },
+    {
+      "name": "before_corner_2_visible",
+      "passed": true
+    },
+    {
+      "name": "before_corner_3_visible",
+      "passed": true
+    },
+    {
+      "name": "framed_narrow_portrait_geometry",
+      "passed": true
+    },
+    {
+      "name": "native_resize_892_delivered",
+      "passed": true
+    },
+    {
+      "name": "framed_narrow_same_activity_window_webview_url",
+      "passed": true
+    },
+    {
+      "name": "narrow_root_actual_native_size",
+      "passed": true
+    },
+    {
+      "name": "narrow_print_current_root_dimensions",
+      "passed": true
+    },
+    {
+      "name": "narrow_whole_frame_fits_root",
+      "passed": true
+    },
+    {
+      "name": "narrow_same_document_scene_photo",
+      "passed": true
+    },
+    {
+      "name": "narrow_no_deck_cursor_or_image_load",
+      "passed": true
+    },
+    {
+      "name": "framed_width_shrinks",
+      "passed": true
+    },
+    {
+      "name": "narrow_native_center_red",
+      "passed": true
+    },
+    {
+      "name": "narrow_corner_0_visible",
+      "passed": true
+    },
+    {
+      "name": "narrow_corner_1_visible",
+      "passed": true
+    },
+    {
+      "name": "narrow_corner_2_visible",
+      "passed": true
+    },
+    {
+      "name": "narrow_corner_3_visible",
+      "passed": true
+    },
+    {
+      "name": "native_resize_2160_delivered",
+      "passed": true
+    },
+    {
+      "name": "after_root_actual_native_size",
+      "passed": true
+    },
+    {
+      "name": "after_print_current_root_dimensions",
+      "passed": true
+    },
+    {
+      "name": "after_whole_frame_fits_root",
+      "passed": true
+    },
+    {
+      "name": "after_same_document_scene_photo",
+      "passed": true
+    },
+    {
+      "name": "after_no_deck_cursor_or_image_load",
+      "passed": true
+    },
+    {
+      "name": "framed_width_restored",
+      "passed": true
+    },
+    {
+      "name": "framed_same_activity_webview_url",
+      "passed": true
+    },
+    {
+      "name": "after_native_center_red",
+      "passed": true
+    },
+    {
+      "name": "after_corner_0_visible",
+      "passed": true
+    },
+    {
+      "name": "after_corner_1_visible",
+      "passed": true
+    },
+    {
+      "name": "after_corner_2_visible",
+      "passed": true
+    },
+    {
+      "name": "after_corner_3_visible",
+      "passed": true
+    },
+    {
+      "name": "owned_activity_destroyed",
+      "passed": true
+    },
+    {
+      "name": "exact_generated_files_removed",
+      "passed": true
+    },
+    {
+      "name": "inner_under_55_seconds",
+      "passed": true
+    }
+  ],
+  "artifacts": [
+    {
+      "phase": "before",
+      "relativePath": "before.png",
+      "width": 2160,
+      "height": 1440,
+      "redSamples": 81,
+      "fullWindowPixelCopy": true,
+      "geometry": {
+        "clientHeight": 1280,
+        "clientWidth": 1920,
+        "closed": false,
+        "contain": true,
+        "cursor": 1,
+        "decoded": 1,
+        "documentOwned": true,
+        "dpr": 1.125,
+        "frame": {
+          "height": 976,
+          "width": 1264,
+          "x": 328,
+          "y": 152
+        },
+        "initialHeight": 1280,
+        "initialWidth": 1920,
+        "innerHeight": 1280,
+        "innerWidth": 1920,
+        "loads": 1,
+        "noNativeBridge": true,
+        "print": {
+          "height": 864,
+          "width": 1152,
+          "x": 384,
+          "y": 208
+        },
+        "printOwners": 2,
+        "ready": true,
+        "resizes": 0,
+        "root": {
+          "height": 1280,
+          "width": 1920,
+          "x": 0,
+          "y": 0
+        },
+        "runs": 1,
+        "sameArt": true,
+        "sameCursor": true,
+        "sameDeck": true,
+        "sameDocument": true,
+        "samePrint": true,
+        "sameRoot": true,
+        "sameUrl": true,
+        "sceneOwners": 1,
+        "still": true,
+        "takes": 1
+      },
+      "nativeViewport": {
+        "x": 0,
+        "y": 0,
+        "width": 2160,
+        "height": 1440,
+        "windowWidth": 2160,
+        "windowHeight": 1440,
+        "density": 1.125
+      },
+      "markers": [
+        {
+          "corner": 0,
+          "x": 535,
+          "y": 337,
+          "sourceCenterX": 32,
+          "sourceCenterY": 32,
+          "r": 0,
+          "g": 255,
+          "b": 0,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        },
+        {
+          "corner": 1,
+          "x": 1624,
+          "y": 337,
+          "sourceCenterX": 368,
+          "sourceCenterY": 32,
+          "r": 0,
+          "g": 0,
+          "b": 255,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        },
+        {
+          "corner": 2,
+          "x": 535,
+          "y": 1102,
+          "sourceCenterX": 32,
+          "sourceCenterY": 268,
+          "r": 255,
+          "g": 255,
+          "b": 0,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        },
+        {
+          "corner": 3,
+          "x": 1624,
+          "y": 1102,
+          "sourceCenterX": 368,
+          "sourceCenterY": 268,
+          "r": 255,
+          "g": 0,
+          "b": 255,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        }
+      ],
+      "sha256": "336a43ef28c6e2852c35ed07cab70d3c3b9021b416c45d760b846cb0dacd361b"
+    },
+    {
+      "phase": "narrow",
+      "relativePath": "narrow.png",
+      "width": 2160,
+      "height": 1440,
+      "redSamples": 81,
+      "fullWindowPixelCopy": true,
+      "geometry": {
+        "clientHeight": 1280,
+        "clientWidth": 793,
+        "closed": false,
+        "contain": true,
+        "cursor": 1,
+        "decoded": 1,
+        "documentOwned": true,
+        "dpr": 1.125,
+        "frame": {
+          "height": 469,
+          "width": 588,
+          "x": 102.44444274902344,
+          "y": 405.5
+        },
+        "initialHeight": 1280,
+        "initialWidth": 1920,
+        "innerHeight": 1280,
+        "innerWidth": 793,
+        "loads": 1,
+        "noNativeBridge": true,
+        "print": {
+          "height": 357,
+          "width": 476,
+          "x": 158.44444274902344,
+          "y": 461.5
+        },
+        "printOwners": 2,
+        "ready": true,
+        "resizes": 1,
+        "root": {
+          "height": 1280,
+          "width": 792.888916015625,
+          "x": 0,
+          "y": 0
+        },
+        "runs": 1,
+        "sameArt": true,
+        "sameCursor": true,
+        "sameDeck": true,
+        "sameDocument": true,
+        "samePrint": true,
+        "sameRoot": true,
+        "sameUrl": true,
+        "sceneOwners": 1,
+        "still": true,
+        "takes": 1
+      },
+      "nativeViewport": {
+        "x": 634,
+        "y": 0,
+        "width": 892,
+        "height": 1440,
+        "windowWidth": 2160,
+        "windowHeight": 1440,
+        "density": 1.125
+      },
+      "markers": [
+        {
+          "corner": 0,
+          "x": 855,
+          "y": 562,
+          "sourceCenterX": 32,
+          "sourceCenterY": 32,
+          "r": 0,
+          "g": 255,
+          "b": 0,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        },
+        {
+          "corner": 1,
+          "x": 1304,
+          "y": 562,
+          "sourceCenterX": 368,
+          "sourceCenterY": 32,
+          "r": 0,
+          "g": 0,
+          "b": 255,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        },
+        {
+          "corner": 2,
+          "x": 855,
+          "y": 877,
+          "sourceCenterX": 32,
+          "sourceCenterY": 268,
+          "r": 255,
+          "g": 255,
+          "b": 0,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        },
+        {
+          "corner": 3,
+          "x": 1304,
+          "y": 877,
+          "sourceCenterX": 368,
+          "sourceCenterY": 268,
+          "r": 255,
+          "g": 0,
+          "b": 255,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        }
+      ],
+      "sha256": "d4d1fecaee06df5817f57b1954ee1d07fae8764d13e3d9b8f7d109e157a084f4"
+    },
+    {
+      "phase": "after",
+      "relativePath": "after.png",
+      "width": 2160,
+      "height": 1440,
+      "redSamples": 81,
+      "fullWindowPixelCopy": true,
+      "geometry": {
+        "clientHeight": 1280,
+        "clientWidth": 1920,
+        "closed": false,
+        "contain": true,
+        "cursor": 1,
+        "decoded": 1,
+        "documentOwned": true,
+        "dpr": 1.125,
+        "frame": {
+          "height": 976,
+          "width": 1264,
+          "x": 328,
+          "y": 152
+        },
+        "initialHeight": 1280,
+        "initialWidth": 1920,
+        "innerHeight": 1280,
+        "innerWidth": 1920,
+        "loads": 1,
+        "noNativeBridge": true,
+        "print": {
+          "height": 864,
+          "width": 1152,
+          "x": 384,
+          "y": 208
+        },
+        "printOwners": 2,
+        "ready": true,
+        "resizes": 2,
+        "root": {
+          "height": 1280,
+          "width": 1920,
+          "x": 0,
+          "y": 0
+        },
+        "runs": 1,
+        "sameArt": true,
+        "sameCursor": true,
+        "sameDeck": true,
+        "sameDocument": true,
+        "samePrint": true,
+        "sameRoot": true,
+        "sameUrl": true,
+        "sceneOwners": 1,
+        "still": true,
+        "takes": 1
+      },
+      "nativeViewport": {
+        "x": 0,
+        "y": 0,
+        "width": 2160,
+        "height": 1440,
+        "windowWidth": 2160,
+        "windowHeight": 1440,
+        "density": 1.125
+      },
+      "markers": [
+        {
+          "corner": 0,
+          "x": 535,
+          "y": 337,
+          "sourceCenterX": 32,
+          "sourceCenterY": 32,
+          "r": 0,
+          "g": 255,
+          "b": 0,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        },
+        {
+          "corner": 1,
+          "x": 1624,
+          "y": 337,
+          "sourceCenterX": 368,
+          "sourceCenterY": 32,
+          "r": 0,
+          "g": 0,
+          "b": 255,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        },
+        {
+          "corner": 2,
+          "x": 535,
+          "y": 1102,
+          "sourceCenterX": 32,
+          "sourceCenterY": 268,
+          "r": 255,
+          "g": 255,
+          "b": 0,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        },
+        {
+          "corner": 3,
+          "x": 1624,
+          "y": 1102,
+          "sourceCenterX": 368,
+          "sourceCenterY": 268,
+          "r": 255,
+          "g": 0,
+          "b": 255,
+          "matchingSamples": 25,
+          "totalSamples": 25
+        }
+      ],
+      "sha256": "336a43ef28c6e2852c35ed07cab70d3c3b9021b416c45d760b846cb0dacd361b"
+    }
+  ],
+  "completed": true,
+  "passed": true,
+  "failureCount": 0,
+  "elapsedMs": 4176,
+  "lastPhase": "framed_expanded",
+  "initialDecodedCount": 1,
+  "observations": [
+    {
+      "phase": "before",
+      "state": {
+        "clientHeight": 1280,
+        "clientWidth": 1920,
+        "closed": false,
+        "contain": true,
+        "cursor": 1,
+        "decoded": 1,
+        "documentOwned": true,
+        "dpr": 1.125,
+        "frame": {
+          "height": 976,
+          "width": 1264,
+          "x": 328,
+          "y": 152
+        },
+        "initialHeight": 1280,
+        "initialWidth": 1920,
+        "innerHeight": 1280,
+        "innerWidth": 1920,
+        "loads": 1,
+        "noNativeBridge": true,
+        "print": {
+          "height": 864,
+          "width": 1152,
+          "x": 384,
+          "y": 208
+        },
+        "printOwners": 2,
+        "ready": true,
+        "resizes": 0,
+        "root": {
+          "height": 1280,
+          "width": 1920,
+          "x": 0,
+          "y": 0
+        },
+        "runs": 1,
+        "sameArt": true,
+        "sameCursor": true,
+        "sameDeck": true,
+        "sameDocument": true,
+        "samePrint": true,
+        "sameRoot": true,
+        "sameUrl": true,
+        "sceneOwners": 1,
+        "still": true,
+        "takes": 1,
+        "nativePhotoRequests": 1
+      },
+      "nativeViewport": {
+        "x": 0,
+        "y": 0,
+        "width": 2160,
+        "height": 1440,
+        "windowWidth": 2160,
+        "windowHeight": 1440,
+        "density": 1.125
+      },
+      "expectedPrintWidth": 1152,
+      "expectedPrintHeight": 864,
+      "photoRequests": 1
+    },
+    {
+      "phase": "narrow",
+      "state": {
+        "clientHeight": 1280,
+        "clientWidth": 793,
+        "closed": false,
+        "contain": true,
+        "cursor": 1,
+        "decoded": 1,
+        "documentOwned": true,
+        "dpr": 1.125,
+        "frame": {
+          "height": 469,
+          "width": 588,
+          "x": 102.44444274902344,
+          "y": 405.5
+        },
+        "initialHeight": 1280,
+        "initialWidth": 1920,
+        "innerHeight": 1280,
+        "innerWidth": 793,
+        "loads": 1,
+        "noNativeBridge": true,
+        "print": {
+          "height": 357,
+          "width": 476,
+          "x": 158.44444274902344,
+          "y": 461.5
+        },
+        "printOwners": 2,
+        "ready": true,
+        "resizes": 1,
+        "root": {
+          "height": 1280,
+          "width": 792.888916015625,
+          "x": 0,
+          "y": 0
+        },
+        "runs": 1,
+        "sameArt": true,
+        "sameCursor": true,
+        "sameDeck": true,
+        "sameDocument": true,
+        "samePrint": true,
+        "sameRoot": true,
+        "sameUrl": true,
+        "sceneOwners": 1,
+        "still": true,
+        "takes": 1
+      },
+      "nativeViewport": {
+        "x": 634,
+        "y": 0,
+        "width": 892,
+        "height": 1440,
+        "windowWidth": 2160,
+        "windowHeight": 1440,
+        "density": 1.125
+      },
+      "expectedPrintWidth": 476,
+      "expectedPrintHeight": 357,
+      "photoRequests": 1
+    },
+    {
+      "phase": "after",
+      "state": {
+        "clientHeight": 1280,
+        "clientWidth": 1920,
+        "closed": false,
+        "contain": true,
+        "cursor": 1,
+        "decoded": 1,
+        "documentOwned": true,
+        "dpr": 1.125,
+        "frame": {
+          "height": 976,
+          "width": 1264,
+          "x": 328,
+          "y": 152
+        },
+        "initialHeight": 1280,
+        "initialWidth": 1920,
+        "innerHeight": 1280,
+        "innerWidth": 1920,
+        "loads": 1,
+        "noNativeBridge": true,
+        "print": {
+          "height": 864,
+          "width": 1152,
+          "x": 384,
+          "y": 208
+        },
+        "printOwners": 2,
+        "ready": true,
+        "resizes": 2,
+        "root": {
+          "height": 1280,
+          "width": 1920,
+          "x": 0,
+          "y": 0
+        },
+        "runs": 1,
+        "sameArt": true,
+        "sameCursor": true,
+        "sameDeck": true,
+        "sameDocument": true,
+        "samePrint": true,
+        "sameRoot": true,
+        "sameUrl": true,
+        "sceneOwners": 1,
+        "still": true,
+        "takes": 1
+      },
+      "nativeViewport": {
+        "x": 0,
+        "y": 0,
+        "width": 2160,
+        "height": 1440,
+        "windowWidth": 2160,
+        "windowHeight": 1440,
+        "density": 1.125
+      },
+      "expectedPrintWidth": 1152,
+      "expectedPrintHeight": 864,
+      "photoRequests": 1
+    }
+  ],
+  "generatedOnly": true,
+  "shippedAssets": true,
+  "photoRequests": 1,
+  "networkRequests": 0,
+  "photoWidth": 400,
+  "photoHeight": 300,
+  "markerSize": 64,
+  "photoMotion": false,
+  "fullWindowPixelCopy": true,
+  "centerRgb": [
+    255,
+    0,
+    0
+  ],
+  "generatedPhotoMarkers": [
+    {
+      "corner": 0,
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 64
+      },
+      "r": 0,
+      "g": 255,
+      "b": 0
+    },
+    {
+      "corner": 1,
+      "sourceRect": {
+        "x": 336,
+        "y": 0,
+        "width": 64,
+        "height": 64
+      },
+      "r": 0,
+      "g": 0,
+      "b": 255
+    },
+    {
+      "corner": 2,
+      "sourceRect": {
+        "x": 0,
+        "y": 236,
+        "width": 64,
+        "height": 64
+      },
+      "r": 255,
+      "g": 255,
+      "b": 0
+    },
+    {
+      "corner": 3,
+      "sourceRect": {
+        "x": 336,
+        "y": 236,
+        "width": 64,
+        "height": 64
+      },
+      "r": 255,
+      "g": 0,
+      "b": 255
+    }
+  ],
+  "sourceRegressions": {
+    "baselineApkSha256": "949374146dfe5cf7338254f0a12ce511657fa909e422cd1df82796c7c56b0eb0",
+    "finalTestSourceSha256": "490919c1f141df9a38312fa9bf4300c97bcc501b11277f9af99187925ef0e737",
+    "before": {
+      "passed": 0,
+      "failed": 4
+    },
+    "after": {
+      "passed": 4,
+      "failed": 0
+    },
+    "baselineAssetsExtractedFromInstalledApk": true
+  }
+}
