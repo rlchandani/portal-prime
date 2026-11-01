@@ -1,0 +1,146 @@
+{
+  "mode": "classic",
+  "checks": [
+    {
+      "name": "owned_activity_started",
+      "passed": true
+    },
+    {
+      "name": "initial_generated_photo_settled",
+      "passed": true
+    },
+    {
+      "name": "owned_io_blocker_exited",
+      "passed": true
+    },
+    {
+      "name": "file_events_balanced_and_200ms_quiet",
+      "passed": true
+    },
+    {
+      "name": "actual_png_open_count_one",
+      "passed": true
+    },
+    {
+      "name": "actual_png_close_count_one",
+      "passed": true
+    },
+    {
+      "name": "latest_png_was_last_opened",
+      "passed": true
+    },
+    {
+      "name": "queued_bitmap_count_one",
+      "passed": true
+    },
+    {
+      "name": "captured_bitmaps_never_displayed_before_admission",
+      "passed": true
+    },
+    {
+      "name": "latest_local_index_matches_burst",
+      "passed": true
+    },
+    {
+      "name": "latest_bitmap_matches_generated_dimensions",
+      "passed": true
+    },
+    {
+      "name": "latest_captured_bitmap_visibly_admitted",
+      "passed": true
+    },
+    {
+      "name": "latest_admitted_bitmap_unrecycled",
+      "passed": true
+    },
+    {
+      "name": "all_unpublished_captured_bitmaps_recycled",
+      "passed": true
+    },
+    {
+      "name": "ui_pending_zero_after_stop",
+      "passed": true
+    },
+    {
+      "name": "photo_drawable_cleared_by_stop",
+      "passed": true
+    },
+    {
+      "name": "photoBack_drawable_cleared_by_stop",
+      "passed": true
+    },
+    {
+      "name": "displayed_bitmaps_not_recycled_by_stop",
+      "passed": true
+    },
+    {
+      "name": "owned_activities_destroyed",
+      "passed": true
+    },
+    {
+      "name": "total_elapsed_within_60s",
+      "passed": true
+    }
+  ],
+  "mainWaitLimitMs": 2000,
+  "totalLimitMs": 60000,
+  "evidence": "owned PNG file opens/closes, native drawables and queue ownership; no physical FPS measurement",
+  "nativeWidth": 2160,
+  "nativeHeight": 1440,
+  "generatedPhotoCount": 16,
+  "requestCount": 12,
+  "initialLocalIndex": 0,
+  "expectedLocalIndex": 12,
+  "expectedFile": "6.png",
+  "expectedWidth": 720,
+  "expectedHeight": 720,
+  "actualLocalIndex": 12,
+  "fileEvents": {
+    "openCount": 1,
+    "closeCount": 1,
+    "lastOpenedFile": "6.png",
+    "opensByFile": {
+      "6.png": 1
+    },
+    "quietMs": 202
+  },
+  "fileObservationStable": true,
+  "uiPendingBeforeAdmission": 4,
+  "queuedBitmapCount": 1,
+  "queuedAllocationBytes": 2073600,
+  "queuedBitmaps": [
+    {
+      "identity": 72800880,
+      "allocationBytes": 2073600,
+      "byteCount": 2073600,
+      "width": 720,
+      "height": 720,
+      "recycled": false
+    }
+  ],
+  "drawablesBeforeStop": [
+    {
+      "identity": 187441315,
+      "bitmapIdentity": 72800880
+    },
+    {
+      "identity": 80592800,
+      "bitmapIdentity": 29198169
+    }
+  ],
+  "drawablesAfterStop": [
+    null,
+    null
+  ],
+  "uiPendingAfterStop": 0,
+  "capturedBitmapsRecycledAfterStop": 0,
+  "unpublishedCapturedBitmapCount": 0,
+  "baselineUnpublishedBitmapsRecycledByHarness": 0,
+  "passed": true,
+  "completed": true,
+  "isolatedFailure": false,
+  "assertionFailure": false,
+  "ownedActivitiesDestroyed": true,
+  "maxMainWaitMs": 1490,
+  "elapsedMs": 4607
+}

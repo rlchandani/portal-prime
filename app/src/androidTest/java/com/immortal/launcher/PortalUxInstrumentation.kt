@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        if (options.getString("command") == "classicBacklog") {
+            val backlog = try { ClassicPhotoBacklogDeviceChecks.run(this) }
+            catch (_: Throwable) { Bundle().apply { putBoolean("classicBacklogPassed", false) } }
+            finish(if (backlog.getBoolean("classicBacklogPassed")) 0 else 1, backlog)
+            return
+        }
         if (options.getString("command") == "classicCleanup") {
             val cleanup = try { ClassicPhotoCleanupDeviceChecks.run(this) }
             catch (_: Throwable) { Bundle().apply { putBoolean("classicCleanupPassed", false) } }

@@ -1,0 +1,68 @@
+{
+  "status": "delivered; broader goal incomplete",
+  "device": "Family Area",
+  "api": 29,
+  "nativeSize": [
+    2160,
+    1440
+  ],
+  "issueStartedAtUtc": "2026-11-01T18:54:42+00:00",
+  "verifiedAtUtc": "2026-11-01T19:03:33.608997+00:00",
+  "issueElapsedSeconds": 531.608997,
+  "checkCount": 20,
+  "baselineFailures": 3,
+  "finalFailures": 0,
+  "requestCount": 12,
+  "fileOpenCount": {
+    "before": 12,
+    "after": 1
+  },
+  "fileCloseCount": {
+    "before": 12,
+    "after": 1
+  },
+  "queuedBitmapCount": {
+    "before": 12,
+    "after": 1
+  },
+  "queuedAllocationBytes": {
+    "before": 33748992,
+    "after": 2073600
+  },
+  "nativeRunElapsedMs": {
+    "before": 4842,
+    "after": 4607
+  },
+  "unitResults": {
+    "tests": 3765,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 395,
+    "fresh": true
+  },
+  "productionSha256": {
+    "before": {
+      "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": "83243b8bd92078ffe013502d4e815d74eae54be57970b9e0b46ed95975c654dd",
+      "app/src/main/java/com/immortal/launcher/SlideshowLoader.kt": "451aa014667a515eb4b3d2871af0867f447e210b69f5c9fd014ad939a8469455",
+      "app/src/main/java/com/immortal/launcher/SlideshowStage.kt": "46c45dab9889650f9c990229bc19a01b045fca31e94bfda2dbc066e6f5c64b3c",
+      "app/src/main/java/com/immortal/launcher/PausableFrameCallbacks.kt": "f86cab61055191d7b557162c2b1ecb2b0659551e880a116641349fcdd3b8b1c7"
+    },
+    "after": {
+      "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": "767dbf88c0d7418678ae2dfb8fca13289cd16bd809d65698f1258bcd68f4a832",
+      "app/src/main/java/com/immortal/launcher/SlideshowLoader.kt": "451aa014667a515eb4b3d2871af0867f447e210b69f5c9fd014ad939a8469455",
+      "app/src/main/java/com/immortal/launcher/SlideshowStage.kt": "46c45dab9889650f9c990229bc19a01b045fca31e94bfda2dbc066e6f5c64b3c",
+      "app/src/main/java/com/immortal/launcher/PausableFrameCallbacks.kt": "f86cab61055191d7b557162c2b1ecb2b0659551e880a116641349fcdd3b8b1c7"
+    }
+  },
+  "fixtureSha256": "c4c8fec12baa5175cce107cc6c7fdd0bedebbaf884f2a65d9314494757ef17c0",
+  "installedApkSha256": "872b6af7354b6616320b0081f0525d8c27c0bad29759c3bcc7a02a4a5d76ae10",
+  "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "limits": [
+    "Generated local Classic folder with twelve requests queued behind a busy worker, then inactive UI admission.",
+    "Remote pre/post fetch guards reviewed but full remote-source flow not device exercised.",
+    "An already executing decode/download is not interrupted; this is not a latency, PSS or panel-FPS benchmark.",
+    "Physical room-light fade acceptance remains pending; legacy WebView night motion remains parked.",
+    "Living Area untouched."
+  ]
+}

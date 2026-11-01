@@ -294,7 +294,7 @@ class PhotoFrameController(
   private var localIndex = -1
   // Bumped on every advance so a slow image-decode or an old video's completion
   // callback can tell it's been superseded and bow out.
-  private var gen = 0
+  @Volatile private var gen = 0
 
   // Remote playback state (iCloud / Google Photos shared albums, or an Immich server).
   private var remoteMode = false
@@ -2290,7 +2290,10 @@ class PhotoFrameController(
     }
     stopVideo()
     io.execute {
+      // Navigation can supersede requests while they wait behind another decode.
+      if (g != gen || stopped) return@execute
       val bmp = runCatching { decodeCorrected(path) }.getOrNull()
+      if (g != gen || stopped) { bmp?.recycle(); return@execute }
       ui.postOwned(Runnable {
         if (g != gen || stopped) { bmp?.recycle(); return@Runnable }
         if (bmp == null) {
@@ -2642,7 +2645,9 @@ class PhotoFrameController(
     }
     stopVideo()
     io.execute {
+      if (g != gen || stopped) return@execute
       val bmp = runCatching { fetchRemoteImage(url) }.getOrNull()
+      if (g != gen || stopped) { bmp?.recycle(); return@execute }
       ui.postOwned(Runnable {
         if (g != gen || stopped) { bmp?.recycle(); return@Runnable }
         if (!remoteMode) { bmp?.recycle(); return@Runnable } // raced with startWeb() flipping us off

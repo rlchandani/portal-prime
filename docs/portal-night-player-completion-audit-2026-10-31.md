@@ -2,6 +2,20 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Newest delivery, November 1 — Classic navigation decode backlog.**
+[The backlog fix](portal-classic-photo-backlog-2026-11-01.md) changes the same
+Family Area check from **3 failures / 20 to 20/20 passing**. Twelve requests
+queued behind a busy worker now cause **1 PNG read instead of 12** and retain
+**1 bitmap instead of 12**. Their allocation changes from **33,748,992 to
+2,073,600 bytes**, with latest-photo admission and pixel safety preserved.
+All **3,765 fresh JVM tests** and builds pass. Optimized APK **872b6af7…**
+is installed with original configuration, both face caches and Dream preserved
+**8 minutes 52 seconds** into the original 30-minute slot. This verifies queued
+local work avoidance, not interruption of an active decode, remote-source flow,
+volatile visibility, process memory or panel FPS. Independent source review
+finds no actionable issue. Physical fade acceptance and the broader goal
+remain incomplete; the legacy night-motion issue stays parked.
+
 **Newest delivery, November 1 — Classic photo ownership on exit.**
 [The cleanup fix](portal-classic-photo-cleanup-2026-11-01.md) changes the same
 Family Area check from **3 failures / 16 to 16/16 passing**. A queued unpublished
