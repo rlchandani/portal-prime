@@ -1,5 +1,15 @@
 # Portal music design preview
 
+The [Family Area review](family-music-review.html) now includes actual Android 10
+Portal captures and a [223/223 physical UI receipt](evidence/family-music-native/checks.json).
+See [scope and restoration](../../docs/portal-music-physical-ui-2026-10-31.md).
+`family-music-ui-checks.py --help` describes the bounded physical verifier.
+It requires a parent-owned live native observer, the exact approved debug APK,
+and a new private evidence directory outside Git. The parent owns artifact,
+settings and Dream restoration; the helper never installs an APK or starts the
+observer. `--search-only` exercises the native dark-theme search route separately.
+The fixtures are silent; provider integration and audio remain deferred.
+
 A silent, functional browser mock for Portal Android 10 / API 29. Open `index.html` directly; no build, packages, external fonts, downloads, credentials or network services are required. Original local SVG artwork and fictional music metadata are bundled.
 
 For a local browser URL, run from this folder:

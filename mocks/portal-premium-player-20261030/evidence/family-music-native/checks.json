@@ -1,0 +1,2161 @@
+{
+  "success": true,
+  "scope": "Physical Family Area silent native UI components; not whole-platform completion",
+  "productSourceCommit": "cc8bc9de",
+  "fixtureApkSha256": "32430c11da44023ca88635cd3df0dd02dcbd680b9cf62dfe785aec4178bf64ec",
+  "restoredOptimizedApkSha256": "199aa8a171f400eb852ea4cac0e879ae179a623999f705fa09555f9d4b95ce29",
+  "apiLevel": 29,
+  "physicalSizePx": [
+    2160,
+    1440
+  ],
+  "densityDpi": 180,
+  "passed": 223,
+  "total": 223,
+  "primaryGate": {
+    "passed": 206,
+    "total": 206,
+    "caseCount": 6,
+    "nativeCaptures": 50,
+    "elapsedSeconds": 112.024
+  },
+  "searchGate": {
+    "passed": 17,
+    "total": 17,
+    "nativeCaptures": 9,
+    "elapsedSeconds": 22.169,
+    "searchExercised": true
+  },
+  "manualPixelReview": {
+    "completed": true,
+    "reviewedScenarios": [
+      "dark full",
+      "light full",
+      "selected queue",
+      "playlists",
+      "large text",
+      "compact",
+      "players",
+      "offline"
+    ],
+    "visibleOverlapObserved": false,
+    "all59CapturesIndividuallyReviewed": false
+  },
+  "nativeQueueSelectedFlag": {
+    "dark": false,
+    "light": false,
+    "currentPausedMarkerVerified": true
+  },
+  "limits": [
+    "Silent fixture, no audio/provider/group-control acceptance.",
+    "Photos mode has a test placeholder; actual-photo integration not accepted by this run.",
+    "Preview header/debug badge are test chrome; production Home chrome inspected separately in an empty state.",
+    "Slider visual bounds do not measure its enlarged touch envelope.",
+    "No performance or delivered panel FPS measurement.",
+    "Natural night brightness comfort remains pending."
+  ],
+  "restoration": {
+    "originalArtifactRestored": true,
+    "testArtifactRestored": true,
+    "profileExact": true,
+    "sourcesExact": true,
+    "collectorInactive": true,
+    "originalDreamRestored": true,
+    "observerStopped": true,
+    "ownedSnapshotCacheRemoved": true
+  },
+  "checks": [
+    {
+      "case": "dark-ready",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 528,
+      "topPx": 976,
+      "rightPx": 618,
+      "bottomPx": 1066,
+      "widthPx": 90,
+      "heightPx": 90
+    },
+    {
+      "case": "dark-ready",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 442,
+      "topPx": 990,
+      "rightPx": 505,
+      "bottomPx": 1053,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "dark-ready",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 641,
+      "topPx": 990,
+      "rightPx": 704,
+      "bottomPx": 1053,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "dark-ready",
+      "name": "Track position: native slider visual bounds",
+      "passed": true,
+      "frameNumber": 1,
+      "widthPx": 562,
+      "visualHeightPx": 18,
+      "expandedTouchHeightMeasured": false
+    },
+    {
+      "case": "dark-ready",
+      "name": "Minimize player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 1868,
+      "topPx": 103,
+      "rightPx": 1923,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Photos: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 1932,
+      "topPx": 103,
+      "rightPx": 1987,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Music settings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 1996,
+      "topPx": 103,
+      "rightPx": 2051,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Close player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 2060,
+      "topPx": 103,
+      "rightPx": 2115,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Queue: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 1160,
+      "topPx": 189,
+      "rightPx": 1474,
+      "bottomPx": 244,
+      "widthPx": 314,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Lyrics: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 1479,
+      "topPx": 189,
+      "rightPx": 1792,
+      "bottomPx": 244,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Players: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 1,
+      "leftPx": 1797,
+      "topPx": 189,
+      "rightPx": 2110,
+      "bottomPx": 244,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 1
+    },
+    {
+      "case": "dark-ready",
+      "name": "play changes native transport to Pause and Playing",
+      "passed": true,
+      "frameNumber": 2
+    },
+    {
+      "case": "dark-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 3
+    },
+    {
+      "case": "dark-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 4
+    },
+    {
+      "case": "dark-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 5
+    },
+    {
+      "case": "dark-ready",
+      "name": "Queue tab and six-track fixture",
+      "passed": true,
+      "frameNumber": 6
+    },
+    {
+      "case": "dark-ready",
+      "name": "Blue distance: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 6,
+      "leftPx": 1155,
+      "topPx": 438,
+      "rightPx": 2115,
+      "bottomPx": 523,
+      "widthPx": 960,
+      "heightPx": 85
+    },
+    {
+      "case": "dark-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 7
+    },
+    {
+      "case": "dark-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 7
+    },
+    {
+      "case": "dark-ready",
+      "name": "chosen queue row exposes its current paused marker",
+      "passed": true,
+      "frameNumber": 7
+    },
+    {
+      "case": "dark-ready",
+      "name": "observed slider drag seeks paused 257-second track",
+      "passed": true,
+      "frameNumber": 8,
+      "beforeSeconds": 0,
+      "afterSeconds": 181,
+      "durationSeconds": 257
+    },
+    {
+      "case": "dark-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 8
+    },
+    {
+      "case": "dark-ready",
+      "name": "paused seek position remains stationary",
+      "passed": true,
+      "frameNumber": 9,
+      "soughtSeconds": 181
+    },
+    {
+      "case": "dark-ready",
+      "name": "Players tab and Family Area selected player",
+      "passed": true,
+      "frameNumber": 10
+    },
+    {
+      "case": "dark-ready",
+      "name": "Players: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 10,
+      "leftPx": 1797,
+      "topPx": 189,
+      "rightPx": 2110,
+      "bottomPx": 244,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Family Area volume: native slider visual bounds",
+      "passed": true,
+      "frameNumber": 10,
+      "widthPx": 854,
+      "visualHeightPx": 18,
+      "expandedTouchHeightMeasured": false
+    },
+    {
+      "case": "dark-ready",
+      "name": "compact retains title and paused transport",
+      "passed": true,
+      "frameNumber": 11
+    },
+    {
+      "case": "dark-ready",
+      "name": "Open player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 11,
+      "leftPx": 1935,
+      "topPx": 95,
+      "rightPx": 1990,
+      "bottomPx": 150,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Photos: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 11,
+      "leftPx": 2004,
+      "topPx": 95,
+      "rightPx": 2059,
+      "bottomPx": 150,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 11,
+      "leftPx": 1801,
+      "topPx": 93,
+      "rightPx": 1860,
+      "bottomPx": 152,
+      "widthPx": 59,
+      "heightPx": 59
+    },
+    {
+      "case": "dark-ready",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 11,
+      "leftPx": 1740,
+      "topPx": 96,
+      "rightPx": 1794,
+      "bottomPx": 150,
+      "widthPx": 54,
+      "heightPx": 54
+    },
+    {
+      "case": "dark-ready",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 11,
+      "leftPx": 1867,
+      "topPx": 96,
+      "rightPx": 1921,
+      "bottomPx": 150,
+      "widthPx": 54,
+      "heightPx": 54
+    },
+    {
+      "case": "dark-ready",
+      "name": "compact -> full retains selected Players tab",
+      "passed": true,
+      "frameNumber": 12
+    },
+    {
+      "case": "dark-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 12
+    },
+    {
+      "case": "dark-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 12
+    },
+    {
+      "case": "dark-ready",
+      "name": "Photos fixture retains track and exposes its placeholder",
+      "passed": true,
+      "frameNumber": 13
+    },
+    {
+      "case": "dark-ready",
+      "name": "Full player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 13,
+      "leftPx": 1941,
+      "topPx": 94,
+      "rightPx": 1996,
+      "bottomPx": 149,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-ready",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 13,
+      "leftPx": 1713,
+      "topPx": 628,
+      "rightPx": 1772,
+      "bottomPx": 687,
+      "widthPx": 59,
+      "heightPx": 59
+    },
+    {
+      "case": "dark-ready",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 13,
+      "leftPx": 1652,
+      "topPx": 631,
+      "rightPx": 1706,
+      "bottomPx": 685,
+      "widthPx": 54,
+      "heightPx": 54
+    },
+    {
+      "case": "dark-ready",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 13,
+      "leftPx": 1779,
+      "topPx": 631,
+      "rightPx": 1833,
+      "bottomPx": 685,
+      "widthPx": 54,
+      "heightPx": 54
+    },
+    {
+      "case": "dark-ready",
+      "name": "Photos -> full retains selected Players tab",
+      "passed": true,
+      "frameNumber": 14
+    },
+    {
+      "case": "dark-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 14
+    },
+    {
+      "case": "dark-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 14
+    },
+    {
+      "case": "dark-browse",
+      "name": "playlist grid contains three generated collections",
+      "passed": true,
+      "frameNumber": 15
+    },
+    {
+      "case": "dark-browse",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 15,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 15,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Slow mornings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 15,
+      "leftPx": 50,
+      "topPx": 374,
+      "rightPx": 441,
+      "bottomPx": 527,
+      "widthPx": 391,
+      "heightPx": 153
+    },
+    {
+      "case": "dark-browse",
+      "name": "playlist -> collection exposes generated tracks",
+      "passed": true,
+      "frameNumber": 16
+    },
+    {
+      "case": "dark-browse",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 16,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 16,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Blue distance: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 16,
+      "leftPx": 50,
+      "topPx": 659,
+      "rightPx": 2110,
+      "bottomPx": 758,
+      "widthPx": 2060,
+      "heightPx": 99
+    },
+    {
+      "case": "dark-browse",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 17
+    },
+    {
+      "case": "dark-browse",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 17
+    },
+    {
+      "case": "dark-browse",
+      "name": "library grid exposes six supplied albums",
+      "passed": true,
+      "frameNumber": 18
+    },
+    {
+      "case": "dark-browse",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 18,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 18,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "The quiet hours: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 18,
+      "leftPx": 50,
+      "topPx": 374,
+      "rightPx": 322,
+      "bottomPx": 760,
+      "widthPx": 272,
+      "heightPx": 386
+    },
+    {
+      "case": "dark-browse",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 20
+    },
+    {
+      "case": "dark-browse",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 20
+    },
+    {
+      "case": "light-ready",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 528,
+      "topPx": 976,
+      "rightPx": 618,
+      "bottomPx": 1066,
+      "widthPx": 90,
+      "heightPx": 90
+    },
+    {
+      "case": "light-ready",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 442,
+      "topPx": 990,
+      "rightPx": 505,
+      "bottomPx": 1053,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "light-ready",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 641,
+      "topPx": 990,
+      "rightPx": 704,
+      "bottomPx": 1053,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "light-ready",
+      "name": "Track position: native slider visual bounds",
+      "passed": true,
+      "frameNumber": 21,
+      "widthPx": 562,
+      "visualHeightPx": 18,
+      "expandedTouchHeightMeasured": false
+    },
+    {
+      "case": "light-ready",
+      "name": "Minimize player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 1868,
+      "topPx": 103,
+      "rightPx": 1923,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Photos: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 1932,
+      "topPx": 103,
+      "rightPx": 1987,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Music settings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 1996,
+      "topPx": 103,
+      "rightPx": 2051,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Close player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 2060,
+      "topPx": 103,
+      "rightPx": 2115,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Queue: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 1160,
+      "topPx": 189,
+      "rightPx": 1474,
+      "bottomPx": 244,
+      "widthPx": 314,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Lyrics: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 1479,
+      "topPx": 189,
+      "rightPx": 1792,
+      "bottomPx": 244,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Players: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 21,
+      "leftPx": 1797,
+      "topPx": 189,
+      "rightPx": 2110,
+      "bottomPx": 244,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 21
+    },
+    {
+      "case": "light-ready",
+      "name": "play changes native transport to Pause and Playing",
+      "passed": true,
+      "frameNumber": 22
+    },
+    {
+      "case": "light-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 23
+    },
+    {
+      "case": "light-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 24
+    },
+    {
+      "case": "light-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 25
+    },
+    {
+      "case": "light-ready",
+      "name": "Queue tab and six-track fixture",
+      "passed": true,
+      "frameNumber": 26
+    },
+    {
+      "case": "light-ready",
+      "name": "Blue distance: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 26,
+      "leftPx": 1155,
+      "topPx": 438,
+      "rightPx": 2115,
+      "bottomPx": 523,
+      "widthPx": 960,
+      "heightPx": 85
+    },
+    {
+      "case": "light-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 27
+    },
+    {
+      "case": "light-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 27
+    },
+    {
+      "case": "light-ready",
+      "name": "chosen queue row exposes its current paused marker",
+      "passed": true,
+      "frameNumber": 27
+    },
+    {
+      "case": "light-ready",
+      "name": "observed slider drag seeks paused 257-second track",
+      "passed": true,
+      "frameNumber": 28,
+      "beforeSeconds": 0,
+      "afterSeconds": 189,
+      "durationSeconds": 257
+    },
+    {
+      "case": "light-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 28
+    },
+    {
+      "case": "light-ready",
+      "name": "paused seek position remains stationary",
+      "passed": true,
+      "frameNumber": 29,
+      "soughtSeconds": 189
+    },
+    {
+      "case": "light-ready",
+      "name": "Players tab and Family Area selected player",
+      "passed": true,
+      "frameNumber": 30
+    },
+    {
+      "case": "light-ready",
+      "name": "Players: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 30,
+      "leftPx": 1797,
+      "topPx": 189,
+      "rightPx": 2110,
+      "bottomPx": 244,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Family Area volume: native slider visual bounds",
+      "passed": true,
+      "frameNumber": 30,
+      "widthPx": 854,
+      "visualHeightPx": 18,
+      "expandedTouchHeightMeasured": false
+    },
+    {
+      "case": "light-ready",
+      "name": "compact retains title and paused transport",
+      "passed": true,
+      "frameNumber": 31
+    },
+    {
+      "case": "light-ready",
+      "name": "Open player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 31,
+      "leftPx": 1935,
+      "topPx": 95,
+      "rightPx": 1990,
+      "bottomPx": 150,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Photos: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 31,
+      "leftPx": 2004,
+      "topPx": 95,
+      "rightPx": 2059,
+      "bottomPx": 150,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 31,
+      "leftPx": 1801,
+      "topPx": 93,
+      "rightPx": 1860,
+      "bottomPx": 152,
+      "widthPx": 59,
+      "heightPx": 59
+    },
+    {
+      "case": "light-ready",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 31,
+      "leftPx": 1740,
+      "topPx": 96,
+      "rightPx": 1794,
+      "bottomPx": 150,
+      "widthPx": 54,
+      "heightPx": 54
+    },
+    {
+      "case": "light-ready",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 31,
+      "leftPx": 1867,
+      "topPx": 96,
+      "rightPx": 1921,
+      "bottomPx": 150,
+      "widthPx": 54,
+      "heightPx": 54
+    },
+    {
+      "case": "light-ready",
+      "name": "compact -> full retains selected Players tab",
+      "passed": true,
+      "frameNumber": 32
+    },
+    {
+      "case": "light-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 32
+    },
+    {
+      "case": "light-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 32
+    },
+    {
+      "case": "light-ready",
+      "name": "Photos fixture retains track and exposes its placeholder",
+      "passed": true,
+      "frameNumber": 33
+    },
+    {
+      "case": "light-ready",
+      "name": "Full player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 33,
+      "leftPx": 1941,
+      "topPx": 94,
+      "rightPx": 1996,
+      "bottomPx": 149,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-ready",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 33,
+      "leftPx": 1713,
+      "topPx": 628,
+      "rightPx": 1772,
+      "bottomPx": 687,
+      "widthPx": 59,
+      "heightPx": 59
+    },
+    {
+      "case": "light-ready",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 33,
+      "leftPx": 1652,
+      "topPx": 631,
+      "rightPx": 1706,
+      "bottomPx": 685,
+      "widthPx": 54,
+      "heightPx": 54
+    },
+    {
+      "case": "light-ready",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 33,
+      "leftPx": 1779,
+      "topPx": 631,
+      "rightPx": 1833,
+      "bottomPx": 685,
+      "widthPx": 54,
+      "heightPx": 54
+    },
+    {
+      "case": "light-ready",
+      "name": "Photos -> full retains selected Players tab",
+      "passed": true,
+      "frameNumber": 34
+    },
+    {
+      "case": "light-ready",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 34
+    },
+    {
+      "case": "light-ready",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 34
+    },
+    {
+      "case": "light-browse",
+      "name": "playlist grid contains three generated collections",
+      "passed": true,
+      "frameNumber": 35
+    },
+    {
+      "case": "light-browse",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 35,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "light-browse",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 35,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "light-browse",
+      "name": "Slow mornings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 35,
+      "leftPx": 50,
+      "topPx": 374,
+      "rightPx": 441,
+      "bottomPx": 527,
+      "widthPx": 391,
+      "heightPx": 153
+    },
+    {
+      "case": "light-browse",
+      "name": "playlist -> collection exposes generated tracks",
+      "passed": true,
+      "frameNumber": 36
+    },
+    {
+      "case": "light-browse",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 36,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "light-browse",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 36,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "light-browse",
+      "name": "Blue distance: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 36,
+      "leftPx": 50,
+      "topPx": 659,
+      "rightPx": 2110,
+      "bottomPx": 758,
+      "widthPx": 2060,
+      "heightPx": 99
+    },
+    {
+      "case": "light-browse",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 37
+    },
+    {
+      "case": "light-browse",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 37
+    },
+    {
+      "case": "light-browse",
+      "name": "library grid exposes six supplied albums",
+      "passed": true,
+      "frameNumber": 38
+    },
+    {
+      "case": "light-browse",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 38,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "light-browse",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 38,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "light-browse",
+      "name": "The quiet hours: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 38,
+      "leftPx": 50,
+      "topPx": 374,
+      "rightPx": 322,
+      "bottomPx": 760,
+      "widthPx": 272,
+      "heightPx": 386
+    },
+    {
+      "case": "light-browse",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 40
+    },
+    {
+      "case": "light-browse",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 40
+    },
+    {
+      "case": "dark-offline",
+      "name": "offline notice preserves last known fixture metadata",
+      "passed": true,
+      "frameNumber": 41
+    },
+    {
+      "case": "dark-offline",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 41
+    },
+    {
+      "case": "dark-offline",
+      "name": "Play: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 41
+    },
+    {
+      "case": "dark-offline",
+      "name": "Previous track: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 41
+    },
+    {
+      "case": "dark-offline",
+      "name": "Next track: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 41
+    },
+    {
+      "case": "dark-offline",
+      "name": "Track position: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 41
+    },
+    {
+      "case": "dark-offline",
+      "name": "Queue: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 41
+    },
+    {
+      "case": "dark-offline",
+      "name": "Lyrics: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 41
+    },
+    {
+      "case": "dark-offline",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 528,
+      "topPx": 1112,
+      "rightPx": 618,
+      "bottomPx": 1202,
+      "widthPx": 90,
+      "heightPx": 90
+    },
+    {
+      "case": "dark-offline",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 442,
+      "topPx": 1126,
+      "rightPx": 505,
+      "bottomPx": 1189,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "dark-offline",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 641,
+      "topPx": 1126,
+      "rightPx": 704,
+      "bottomPx": 1189,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "dark-offline",
+      "name": "Track position: native slider visual bounds",
+      "passed": true,
+      "frameNumber": 41,
+      "widthPx": 562,
+      "visualHeightPx": 18,
+      "expandedTouchHeightMeasured": false
+    },
+    {
+      "case": "dark-offline",
+      "name": "Minimize player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 1868,
+      "topPx": 103,
+      "rightPx": 1923,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-offline",
+      "name": "Photos: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 1932,
+      "topPx": 103,
+      "rightPx": 1987,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-offline",
+      "name": "Music settings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 1996,
+      "topPx": 103,
+      "rightPx": 2051,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-offline",
+      "name": "Close player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 2060,
+      "topPx": 103,
+      "rightPx": 2115,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-offline",
+      "name": "Queue: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 1160,
+      "topPx": 304,
+      "rightPx": 1474,
+      "bottomPx": 359,
+      "widthPx": 314,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-offline",
+      "name": "Lyrics: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 1479,
+      "topPx": 304,
+      "rightPx": 1792,
+      "bottomPx": 359,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-offline",
+      "name": "Players: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 41,
+      "leftPx": 1797,
+      "topPx": 304,
+      "rightPx": 2110,
+      "bottomPx": 359,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-offline",
+      "name": "Players informative tab remains enabled",
+      "passed": true,
+      "frameNumber": 41
+    },
+    {
+      "case": "dark-offline",
+      "name": "offline Players tab renders Family Area",
+      "passed": true,
+      "frameNumber": 42
+    },
+    {
+      "case": "dark-offline",
+      "name": "offline Family Area volume is semantically disabled",
+      "passed": true,
+      "frameNumber": 42
+    },
+    {
+      "case": "dark-offline",
+      "name": "offline browse is unavailable without selectable fixture playlists",
+      "passed": true,
+      "frameNumber": 43
+    },
+    {
+      "case": "dark-offline",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 43,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-offline",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 43,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "light-offline",
+      "name": "offline notice preserves last known fixture metadata",
+      "passed": true,
+      "frameNumber": 44
+    },
+    {
+      "case": "light-offline",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 44
+    },
+    {
+      "case": "light-offline",
+      "name": "Play: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 44
+    },
+    {
+      "case": "light-offline",
+      "name": "Previous track: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 44
+    },
+    {
+      "case": "light-offline",
+      "name": "Next track: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 44
+    },
+    {
+      "case": "light-offline",
+      "name": "Track position: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 44
+    },
+    {
+      "case": "light-offline",
+      "name": "Queue: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 44
+    },
+    {
+      "case": "light-offline",
+      "name": "Lyrics: offline semantic disabled",
+      "passed": true,
+      "frameNumber": 44
+    },
+    {
+      "case": "light-offline",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 528,
+      "topPx": 1112,
+      "rightPx": 618,
+      "bottomPx": 1202,
+      "widthPx": 90,
+      "heightPx": 90
+    },
+    {
+      "case": "light-offline",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 442,
+      "topPx": 1126,
+      "rightPx": 505,
+      "bottomPx": 1189,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "light-offline",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 641,
+      "topPx": 1126,
+      "rightPx": 704,
+      "bottomPx": 1189,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "light-offline",
+      "name": "Track position: native slider visual bounds",
+      "passed": true,
+      "frameNumber": 44,
+      "widthPx": 562,
+      "visualHeightPx": 18,
+      "expandedTouchHeightMeasured": false
+    },
+    {
+      "case": "light-offline",
+      "name": "Minimize player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 1868,
+      "topPx": 103,
+      "rightPx": 1923,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-offline",
+      "name": "Photos: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 1932,
+      "topPx": 103,
+      "rightPx": 1987,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-offline",
+      "name": "Music settings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 1996,
+      "topPx": 103,
+      "rightPx": 2051,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-offline",
+      "name": "Close player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 2060,
+      "topPx": 103,
+      "rightPx": 2115,
+      "bottomPx": 158,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-offline",
+      "name": "Queue: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 1160,
+      "topPx": 304,
+      "rightPx": 1474,
+      "bottomPx": 359,
+      "widthPx": 314,
+      "heightPx": 55
+    },
+    {
+      "case": "light-offline",
+      "name": "Lyrics: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 1479,
+      "topPx": 304,
+      "rightPx": 1792,
+      "bottomPx": 359,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "light-offline",
+      "name": "Players: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 44,
+      "leftPx": 1797,
+      "topPx": 304,
+      "rightPx": 2110,
+      "bottomPx": 359,
+      "widthPx": 313,
+      "heightPx": 55
+    },
+    {
+      "case": "light-offline",
+      "name": "Players informative tab remains enabled",
+      "passed": true,
+      "frameNumber": 44
+    },
+    {
+      "case": "light-offline",
+      "name": "offline Players tab renders Family Area",
+      "passed": true,
+      "frameNumber": 45
+    },
+    {
+      "case": "light-offline",
+      "name": "offline Family Area volume is semantically disabled",
+      "passed": true,
+      "frameNumber": 45
+    },
+    {
+      "case": "light-offline",
+      "name": "offline browse is unavailable without selectable fixture playlists",
+      "passed": true,
+      "frameNumber": 46
+    },
+    {
+      "case": "light-offline",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 46,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "light-offline",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 46,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 528,
+      "topPx": 1059,
+      "rightPx": 618,
+      "bottomPx": 1149,
+      "widthPx": 90,
+      "heightPx": 90
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 442,
+      "topPx": 1073,
+      "rightPx": 505,
+      "bottomPx": 1136,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 641,
+      "topPx": 1073,
+      "rightPx": 704,
+      "bottomPx": 1136,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Track position: native slider visual bounds",
+      "passed": true,
+      "frameNumber": 47,
+      "widthPx": 562,
+      "visualHeightPx": 18,
+      "expandedTouchHeightMeasured": false
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Minimize player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 1868,
+      "topPx": 123,
+      "rightPx": 1923,
+      "bottomPx": 178,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Photos: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 1932,
+      "topPx": 123,
+      "rightPx": 1987,
+      "bottomPx": 178,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Music settings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 1996,
+      "topPx": 123,
+      "rightPx": 2051,
+      "bottomPx": 178,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Close player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 2060,
+      "topPx": 123,
+      "rightPx": 2115,
+      "bottomPx": 178,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Queue: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 1160,
+      "topPx": 221,
+      "rightPx": 1474,
+      "bottomPx": 293,
+      "widthPx": 314,
+      "heightPx": 72
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Lyrics: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 1479,
+      "topPx": 221,
+      "rightPx": 1792,
+      "bottomPx": 293,
+      "widthPx": 313,
+      "heightPx": 72
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Players: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 47,
+      "leftPx": 1797,
+      "topPx": 221,
+      "rightPx": 2110,
+      "bottomPx": 293,
+      "widthPx": 313,
+      "heightPx": 72
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 47
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "activity-local 1.8 scale increases rendered title bounds",
+      "passed": true,
+      "frameNumber": 47,
+      "normalTitleHeightPx": 50,
+      "largeTitleHeightPx": 57
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "larger text increases the queue title bounds",
+      "passed": true,
+      "frameNumber": 47,
+      "normalQueueTitleHeightPx": 30,
+      "largeQueueTitleHeightPx": 46
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "large font playlist page retains navigation and search",
+      "passed": true,
+      "frameNumber": 48
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 48,
+      "leftPx": 50,
+      "topPx": 94,
+      "rightPx": 201,
+      "bottomPx": 165,
+      "widthPx": 151,
+      "heightPx": 71
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 48,
+      "leftPx": 1843,
+      "topPx": 94,
+      "rightPx": 2110,
+      "bottomPx": 165,
+      "widthPx": 267,
+      "heightPx": 71
+    },
+    {
+      "case": "dark-font-1_8",
+      "name": "Slow mornings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 48,
+      "leftPx": 50,
+      "topPx": 435,
+      "rightPx": 719,
+      "bottomPx": 609,
+      "widthPx": 669,
+      "heightPx": 174
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Play: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 528,
+      "topPx": 1059,
+      "rightPx": 618,
+      "bottomPx": 1149,
+      "widthPx": 90,
+      "heightPx": 90
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Previous track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 442,
+      "topPx": 1073,
+      "rightPx": 505,
+      "bottomPx": 1136,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Next track: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 641,
+      "topPx": 1073,
+      "rightPx": 704,
+      "bottomPx": 1136,
+      "widthPx": 63,
+      "heightPx": 63
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Track position: native slider visual bounds",
+      "passed": true,
+      "frameNumber": 49,
+      "widthPx": 562,
+      "visualHeightPx": 18,
+      "expandedTouchHeightMeasured": false
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Minimize player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 1868,
+      "topPx": 123,
+      "rightPx": 1923,
+      "bottomPx": 178,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Photos: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 1932,
+      "topPx": 123,
+      "rightPx": 1987,
+      "bottomPx": 178,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Music settings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 1996,
+      "topPx": 123,
+      "rightPx": 2051,
+      "bottomPx": 178,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Close player: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 2060,
+      "topPx": 123,
+      "rightPx": 2115,
+      "bottomPx": 178,
+      "widthPx": 55,
+      "heightPx": 55
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Queue: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 1160,
+      "topPx": 221,
+      "rightPx": 1474,
+      "bottomPx": 293,
+      "widthPx": 314,
+      "heightPx": 72
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Lyrics: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 1479,
+      "topPx": 221,
+      "rightPx": 1792,
+      "bottomPx": 293,
+      "widthPx": 313,
+      "heightPx": 72
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Players: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 49,
+      "leftPx": 1797,
+      "topPx": 221,
+      "rightPx": 2110,
+      "bottomPx": 293,
+      "widthPx": 313,
+      "heightPx": 72
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 49
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "activity-local 1.8 scale increases rendered title bounds",
+      "passed": true,
+      "frameNumber": 49,
+      "normalTitleHeightPx": 50,
+      "largeTitleHeightPx": 57
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "larger text increases the queue title bounds",
+      "passed": true,
+      "frameNumber": 49,
+      "normalQueueTitleHeightPx": 30,
+      "largeQueueTitleHeightPx": 46
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "large font playlist page retains navigation and search",
+      "passed": true,
+      "frameNumber": 50
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 50,
+      "leftPx": 50,
+      "topPx": 94,
+      "rightPx": 201,
+      "bottomPx": 165,
+      "widthPx": 151,
+      "heightPx": 71
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 50,
+      "leftPx": 1843,
+      "topPx": 94,
+      "rightPx": 2110,
+      "bottomPx": 165,
+      "widthPx": 267,
+      "heightPx": 71
+    },
+    {
+      "case": "light-font-1_8",
+      "name": "Slow mornings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 50,
+      "leftPx": 50,
+      "topPx": 435,
+      "rightPx": 719,
+      "bottomPx": 609,
+      "widthPx": 669,
+      "heightPx": 174
+    },
+    {
+      "case": "dark-browse",
+      "name": "playlist grid contains three generated collections",
+      "passed": true,
+      "frameNumber": 2
+    },
+    {
+      "case": "dark-browse",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 2,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 2,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Slow mornings: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 2,
+      "leftPx": 50,
+      "topPx": 374,
+      "rightPx": 441,
+      "bottomPx": 527,
+      "widthPx": 391,
+      "heightPx": 153
+    },
+    {
+      "case": "dark-browse",
+      "name": "search filters generated playlists",
+      "passed": true,
+      "frameNumber": 4
+    },
+    {
+      "case": "dark-browse",
+      "name": "playlist -> collection exposes generated tracks",
+      "passed": true,
+      "frameNumber": 5
+    },
+    {
+      "case": "dark-browse",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 5,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 5,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Blue distance: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 5,
+      "leftPx": 50,
+      "topPx": 659,
+      "rightPx": 2110,
+      "bottomPx": 758,
+      "widthPx": 2060,
+      "heightPx": 99
+    },
+    {
+      "case": "dark-browse",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 6
+    },
+    {
+      "case": "dark-browse",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 6
+    },
+    {
+      "case": "dark-browse",
+      "name": "library grid exposes six supplied albums",
+      "passed": true,
+      "frameNumber": 7
+    },
+    {
+      "case": "dark-browse",
+      "name": "Back: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 7,
+      "leftPx": 50,
+      "topPx": 86,
+      "rightPx": 175,
+      "bottomPx": 141,
+      "widthPx": 125,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "Now playing: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 7,
+      "leftPx": 1910,
+      "topPx": 86,
+      "rightPx": 2110,
+      "bottomPx": 141,
+      "widthPx": 200,
+      "heightPx": 55
+    },
+    {
+      "case": "dark-browse",
+      "name": "The quiet hours: observed target >=48dp",
+      "passed": true,
+      "frameNumber": 7,
+      "leftPx": 50,
+      "topPx": 374,
+      "rightPx": 322,
+      "bottomPx": 760,
+      "widthPx": 272,
+      "heightPx": 386
+    },
+    {
+      "case": "dark-browse",
+      "name": "current title/artist/album are coherent",
+      "passed": true,
+      "frameNumber": 9
+    },
+    {
+      "case": "dark-browse",
+      "name": "paused transport semantics",
+      "passed": true,
+      "frameNumber": 9
+    }
+  ]
+}

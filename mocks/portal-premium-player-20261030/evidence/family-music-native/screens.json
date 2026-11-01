@@ -1,0 +1,42 @@
+[
+  {
+    "file": "full-dark.png",
+    "label": "Full player \u2014 dark"
+  },
+  {
+    "file": "full-light.png",
+    "label": "Full player \u2014 light"
+  },
+  {
+    "file": "queue-selected.png",
+    "label": "Selected queue item"
+  },
+  {
+    "file": "players.png",
+    "label": "Players"
+  },
+  {
+    "file": "compact.png",
+    "label": "Compact player"
+  },
+  {
+    "file": "playlists.png",
+    "label": "Playlists"
+  },
+  {
+    "file": "playlist-detail.png",
+    "label": "Playlist detail"
+  },
+  {
+    "file": "library.png",
+    "label": "Library"
+  },
+  {
+    "file": "offline.png",
+    "label": "Offline"
+  },
+  {
+    "file": "large-font.png",
+    "label": "Larger text"
+  }
+]

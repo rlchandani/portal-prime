@@ -813,6 +813,7 @@ class PortalUxInstrumentation : Instrumentation() {
             .put("description", if (node.isPassword) "" else node.contentDescription?.toString().orEmpty())
             .put("class", node.className?.toString().orEmpty())
             .put("clickable", node.isClickable).put("enabled", node.isEnabled)
+            .put("selected", node.isSelected)
             .put("checked", node.isChecked).put("checkable", node.isCheckable)
             .put("password", node.isPassword).put("visible", node.isVisibleToUser)
             .put("bounds", JSONArray(listOf(bounds.left, bounds.top, bounds.right, bounds.bottom)))

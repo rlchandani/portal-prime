@@ -128,6 +128,16 @@ light-cycle acceptance, pinned-overlay physical acceptance and panel FPS remain
 open. The physical production music empty state was also inspected, but ready
 library/playback acceptance remains open. The full goal is still incomplete.
 
+**Physical music UI follow-up:** the
+[actual Portal verification](portal-music-physical-ui-2026-10-31.md) passes
+**223/223 assertions**, with 59 native captures across dark/light, offline,
+larger text, navigation, state continuity and search. Eight representative
+scenarios were visually reviewed without observed overlap. This is silent
+native UI acceptance, not live library/provider/playback acceptance or a new
+performance improvement. The original optimized build, all 97 settings and
+22 source fields were restored, with zero active collector listeners.
+The full goal remains incomplete.
+
 [artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
 [artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json
 [local-artwork]: ../mocks/portal-premium-player-20261030/evidence/native-local-artwork/checks.json
