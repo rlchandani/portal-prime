@@ -1,0 +1,1050 @@
+{
+  "sourceCommit": "9ad4934f",
+  "branch": "codex/slideshow-video-night-20261101",
+  "target": "Family Area",
+  "issueStartedUtc": "2026-11-01T09:05:38Z",
+  "issueHardLimitUtc": "2026-11-01T09:35:38Z",
+  "baseline": {
+    "pass": false,
+    "nativeProbe": {
+      "failure": {
+        "label": "retainedNightResumeDoesNotSeek",
+        "class": "Failure"
+      },
+      "ownedActivityClosed": true,
+      "ownedPlayerReleased": true,
+      "monitorRemoved": true,
+      "preferencesRestored": true,
+      "sourceRestored": true,
+      "ownedFixtureCleanup": true,
+      "pass": false,
+      "assertions": [
+        {
+          "name": "observer_thread_is_not_main",
+          "pass": true
+        },
+        {
+          "name": "fresh_fixture_directory",
+          "pass": true
+        },
+        {
+          "name": "tiny_photo_written",
+          "pass": true
+        },
+        {
+          "name": "owned_video_asset_written",
+          "pass": true
+        },
+        {
+          "name": "screensaver_registry_applied",
+          "pass": true
+        },
+        {
+          "name": "calendar_registry_applied",
+          "pass": true
+        },
+        {
+          "name": "atomic_owned_folder_source",
+          "pass": true
+        },
+        {
+          "name": "fresh_real_preview_created",
+          "pass": true
+        },
+        {
+          "name": "owned_activity_is_real_preview",
+          "pass": true
+        },
+        {
+          "name": "owned_photo_presented",
+          "pass": true
+        },
+        {
+          "name": "preparation_preserves_retained_photo",
+          "pass": true
+        },
+        {
+          "name": "native_player_prepared_while_user_paused",
+          "pass": true
+        },
+        {
+          "name": "prepared_video_keeps_photo_until_rendered",
+          "pass": true
+        },
+        {
+          "name": "actual_native_playback_and_rendering_begin",
+          "pass": true
+        },
+        {
+          "name": "only_owned_video_source",
+          "pass": true
+        },
+        {
+          "name": "long_fixture_duration",
+          "pass": true
+        },
+        {
+          "name": "clock_cover_settled",
+          "pass": true
+        },
+        {
+          "name": "night_does_not_set_user_pause",
+          "pass": true
+        },
+        {
+          "name": "night_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_0",
+          "pass": true
+        },
+        {
+          "name": "night_identity_1_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_1",
+          "pass": true
+        },
+        {
+          "name": "night_identity_2_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_2",
+          "pass": true
+        },
+        {
+          "name": "night_identity_3_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_3",
+          "pass": true
+        },
+        {
+          "name": "night_identity_4_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_4",
+          "pass": true
+        },
+        {
+          "name": "night_identity_5_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_5",
+          "pass": true
+        },
+        {
+          "name": "night_identity_6_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_6",
+          "pass": true
+        },
+        {
+          "name": "night_identity_7_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_7",
+          "pass": true
+        },
+        {
+          "name": "night_identity_8_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_8",
+          "pass": true
+        },
+        {
+          "name": "night_identity_9_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_9",
+          "pass": true
+        },
+        {
+          "name": "night_identity_10_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_10",
+          "pass": true
+        },
+        {
+          "name": "night_identity_11_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_11",
+          "pass": true
+        },
+        {
+          "name": "night_identity_12_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_12",
+          "pass": true
+        },
+        {
+          "name": "night_identity_13_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_13",
+          "pass": true
+        },
+        {
+          "name": "night_identity_14_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_14",
+          "pass": true
+        },
+        {
+          "name": "night_identity_15_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_uncover_resumes_native_player",
+          "pass": true
+        },
+        {
+          "name": "retainedNightResumeDoesNotSeek",
+          "pass": false
+        },
+        {
+          "name": "resume_retention_drift_within_one_cache_tick",
+          "pass": true
+        },
+        {
+          "name": "resume_starts_at_retained_cached_anchor",
+          "pass": true
+        },
+        {
+          "name": "resumed_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "resumed_native_and_cached_positions_advance",
+          "pass": true
+        },
+        {
+          "name": "explicit_user_pause_acknowledged",
+          "pass": true
+        },
+        {
+          "name": "clock_cover_settled",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_sample_0",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_identity_1_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_sample_1",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_identity_2_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_sample_2",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_identity_3_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "host_return_does_not_uncover_night",
+          "pass": true
+        },
+        {
+          "name": "clock_uncover_settled",
+          "pass": true
+        },
+        {
+          "name": "user_pause_survives_night_and_external_cover",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_0",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_1_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_1",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_2_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_2",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_3_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_3",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_4_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_4",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_5_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "only_explicit_resume_restarts_user_paused_video",
+          "pass": true
+        },
+        {
+          "name": "explicit_resume_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "owned_activity_destroyed",
+          "pass": true
+        },
+        {
+          "name": "owned_player_released",
+          "pass": true
+        },
+        {
+          "name": "exact_preference_values_and_key_presence_restored",
+          "pass": true
+        },
+        {
+          "name": "full_source_and_configuration_restored",
+          "pass": true
+        },
+        {
+          "name": "owned_photo_deleted",
+          "pass": true
+        },
+        {
+          "name": "owned_video_deleted",
+          "pass": true
+        },
+        {
+          "name": "owned_fixture_directory_deleted",
+          "pass": true
+        }
+      ],
+      "measurements": {
+        "clipDurationMs": 30000,
+        "initialNativePositionMs": 438,
+        "beforeNightSeekRevision": 0,
+        "beforeNightAppliedSeek": 0,
+        "nightPausedNativePositionMs": 461,
+        "nightRetainedCachedPositionMs": 434,
+        "nightCacheLagMs": 27,
+        "nightSampleCount": 15,
+        "nightSampleDurationMs": 3000,
+        "nightMaxNativeDriftMs": 0,
+        "nightMaxCachedDriftMs": 0,
+        "resumeNativePositionMs": 502,
+        "resumeNativeMinusPausedMs": 41,
+        "resumeNativeMinusRetainedCacheMs": 68,
+        "resumeCachedMinusPausedMs": 39,
+        "afterNightSeekRevision": 1,
+        "afterNightAppliedSeek": 1,
+        "nightResumeSeekRevisionDelta": 1,
+        "user_paused_external_coverSampleCount": 3,
+        "user_paused_external_coverSampleDurationMs": 600,
+        "user_paused_external_coverMaxNativeDriftMs": 0,
+        "user_paused_external_coverMaxCachedDriftMs": 0,
+        "user_paused_daySampleCount": 5,
+        "user_paused_daySampleDurationMs": 1000,
+        "user_paused_dayMaxNativeDriftMs": 0,
+        "user_paused_dayMaxCachedDriftMs": 0,
+        "elapsedMs": 20178,
+        "mainMeasurementCount": 209,
+        "workerMeasurementCount": 134,
+        "maxMainRendezvousMs": 351,
+        "maxWorkerRendezvousMs": 117,
+        "assertionCount": 85,
+        "checkBudgetMs": 60000,
+        "totalBudgetMs": 75000,
+        "cachedPositionSamplingMs": 250
+      },
+      "limitations": [
+        "Reflection contracts require the current controller and SlideshowVideoView",
+        "Native resume sample is the first bounded worker observation, not a seek-complete callback",
+        "No producer CPU, delivered FPS, moving-video pixel equality or hardware light-sensor claim",
+        "Face extras hide weather; the current controller still schedules its legacy weather fetch"
+      ]
+    },
+    "observerStopped": true,
+    "testApkRestored": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "originalOptimizedApkRestored": true,
+    "accessibilityExact": true,
+    "systemProcessUnchanged": true,
+    "collectorInactive": true,
+    "originalDreamRestored": true,
+    "restorationPass": true,
+    "elapsedSeconds": 60.579,
+    "checks": [
+      {
+        "name": "native_video_night_gate",
+        "pass": false
+      }
+    ]
+  },
+  "fixed": {
+    "pass": true,
+    "nativeProbe": {
+      "ownedActivityClosed": true,
+      "ownedPlayerReleased": true,
+      "monitorRemoved": true,
+      "preferencesRestored": true,
+      "sourceRestored": true,
+      "ownedFixtureCleanup": true,
+      "pass": true,
+      "assertions": [
+        {
+          "name": "observer_thread_is_not_main",
+          "pass": true
+        },
+        {
+          "name": "fresh_fixture_directory",
+          "pass": true
+        },
+        {
+          "name": "tiny_photo_written",
+          "pass": true
+        },
+        {
+          "name": "owned_video_asset_written",
+          "pass": true
+        },
+        {
+          "name": "screensaver_registry_applied",
+          "pass": true
+        },
+        {
+          "name": "calendar_registry_applied",
+          "pass": true
+        },
+        {
+          "name": "atomic_owned_folder_source",
+          "pass": true
+        },
+        {
+          "name": "fresh_real_preview_created",
+          "pass": true
+        },
+        {
+          "name": "owned_activity_is_real_preview",
+          "pass": true
+        },
+        {
+          "name": "owned_photo_presented",
+          "pass": true
+        },
+        {
+          "name": "preparation_preserves_retained_photo",
+          "pass": true
+        },
+        {
+          "name": "native_player_prepared_while_user_paused",
+          "pass": true
+        },
+        {
+          "name": "prepared_video_keeps_photo_until_rendered",
+          "pass": true
+        },
+        {
+          "name": "actual_native_playback_and_rendering_begin",
+          "pass": true
+        },
+        {
+          "name": "only_owned_video_source",
+          "pass": true
+        },
+        {
+          "name": "long_fixture_duration",
+          "pass": true
+        },
+        {
+          "name": "clock_cover_settled",
+          "pass": true
+        },
+        {
+          "name": "night_does_not_set_user_pause",
+          "pass": true
+        },
+        {
+          "name": "night_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_0",
+          "pass": true
+        },
+        {
+          "name": "night_identity_1_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_1",
+          "pass": true
+        },
+        {
+          "name": "night_identity_2_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_2",
+          "pass": true
+        },
+        {
+          "name": "night_identity_3_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_3",
+          "pass": true
+        },
+        {
+          "name": "night_identity_4_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_4",
+          "pass": true
+        },
+        {
+          "name": "night_identity_5_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_5",
+          "pass": true
+        },
+        {
+          "name": "night_identity_6_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_6",
+          "pass": true
+        },
+        {
+          "name": "night_identity_7_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_7",
+          "pass": true
+        },
+        {
+          "name": "night_identity_8_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_8",
+          "pass": true
+        },
+        {
+          "name": "night_identity_9_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_9",
+          "pass": true
+        },
+        {
+          "name": "night_identity_10_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_10",
+          "pass": true
+        },
+        {
+          "name": "night_identity_11_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_11",
+          "pass": true
+        },
+        {
+          "name": "night_identity_12_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_12",
+          "pass": true
+        },
+        {
+          "name": "night_identity_13_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_13",
+          "pass": true
+        },
+        {
+          "name": "night_identity_14_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_sample_14",
+          "pass": true
+        },
+        {
+          "name": "night_identity_15_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "night_uncover_resumes_native_player",
+          "pass": true
+        },
+        {
+          "name": "retainedNightResumeDoesNotSeek",
+          "pass": true
+        },
+        {
+          "name": "resume_retention_drift_within_one_cache_tick",
+          "pass": true
+        },
+        {
+          "name": "resume_starts_at_retained_cached_anchor",
+          "pass": true
+        },
+        {
+          "name": "resumed_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "resumed_native_and_cached_positions_advance",
+          "pass": true
+        },
+        {
+          "name": "explicit_user_pause_acknowledged",
+          "pass": true
+        },
+        {
+          "name": "clock_cover_settled",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_sample_0",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_identity_1_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_sample_1",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_identity_2_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_sample_2",
+          "pass": true
+        },
+        {
+          "name": "user_paused_external_cover_identity_3_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "host_return_does_not_uncover_night",
+          "pass": true
+        },
+        {
+          "name": "clock_uncover_settled",
+          "pass": true
+        },
+        {
+          "name": "user_pause_survives_night_and_external_cover",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_0",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_1_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_1",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_2_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_2",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_3_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_3",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_4_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_sample_4",
+          "pass": true
+        },
+        {
+          "name": "user_paused_day_identity_5_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "only_explicit_resume_restarts_user_paused_video",
+          "pass": true
+        },
+        {
+          "name": "explicit_resume_same_controller_source_player",
+          "pass": true
+        },
+        {
+          "name": "surface_recreation_pause_acknowledged",
+          "pass": true
+        },
+        {
+          "name": "surface_recreation_has_a_nonzero_anchor",
+          "pass": true
+        },
+        {
+          "name": "actual_surface_destroyed_and_player_released",
+          "pass": true
+        },
+        {
+          "name": "actual_replacement_surface_created",
+          "pass": true
+        },
+        {
+          "name": "replacement_player_restores_retained_position",
+          "pass": true
+        },
+        {
+          "name": "surface_recovery_keeps_the_controller_and_clip",
+          "pass": true
+        },
+        {
+          "name": "surface_recovery_requests_one_required_seek",
+          "pass": true
+        },
+        {
+          "name": "owned_activity_destroyed",
+          "pass": true
+        },
+        {
+          "name": "owned_player_released",
+          "pass": true
+        },
+        {
+          "name": "exact_preference_values_and_key_presence_restored",
+          "pass": true
+        },
+        {
+          "name": "full_source_and_configuration_restored",
+          "pass": true
+        },
+        {
+          "name": "owned_photo_deleted",
+          "pass": true
+        },
+        {
+          "name": "owned_video_deleted",
+          "pass": true
+        },
+        {
+          "name": "owned_fixture_directory_deleted",
+          "pass": true
+        }
+      ],
+      "measurements": {
+        "clipDurationMs": 30000,
+        "initialNativePositionMs": 471,
+        "beforeNightSeekRevision": 0,
+        "beforeNightAppliedSeek": 0,
+        "nightPausedNativePositionMs": 492,
+        "nightRetainedCachedPositionMs": 403,
+        "nightCacheLagMs": 89,
+        "nightSampleCount": 15,
+        "nightSampleDurationMs": 3000,
+        "nightMaxNativeDriftMs": 0,
+        "nightMaxCachedDriftMs": 0,
+        "resumeNativePositionMs": 545,
+        "resumeNativeMinusPausedMs": 53,
+        "resumeNativeMinusRetainedCacheMs": 142,
+        "resumeCachedMinusPausedMs": 1,
+        "afterNightSeekRevision": 0,
+        "afterNightAppliedSeek": 0,
+        "nightResumeSeekRevisionDelta": 0,
+        "user_paused_external_coverSampleCount": 3,
+        "user_paused_external_coverSampleDurationMs": 600,
+        "user_paused_external_coverMaxNativeDriftMs": 0,
+        "user_paused_external_coverMaxCachedDriftMs": 0,
+        "user_paused_daySampleCount": 5,
+        "user_paused_daySampleDurationMs": 1000,
+        "user_paused_dayMaxNativeDriftMs": 0,
+        "user_paused_dayMaxCachedDriftMs": 0,
+        "surfaceRecoveryAnchorMs": 1118,
+        "surfaceRecoveryNativePositionMs": 1118,
+        "surfaceRecoveryNativeMinusAnchorMs": 0,
+        "surfaceRecreationSeekRevisionDelta": 1,
+        "elapsedMs": 19933,
+        "mainMeasurementCount": 214,
+        "workerMeasurementCount": 139,
+        "maxMainRendezvousMs": 265,
+        "maxWorkerRendezvousMs": 55,
+        "assertionCount": 92,
+        "checkBudgetMs": 60000,
+        "totalBudgetMs": 75000,
+        "cachedPositionSamplingMs": 250
+      },
+      "limitations": [
+        "Reflection contracts require the current controller and SlideshowVideoView",
+        "Native resume sample is the first bounded worker observation, not a seek-complete callback",
+        "No producer CPU, delivered FPS, moving-video pixel equality or hardware light-sensor claim",
+        "Face extras hide weather; the current controller still schedules its legacy weather fetch"
+      ]
+    },
+    "candidateApkSha256": "11a82b8685b0ec24d97dfc0dce022f1ca814c14e4bb11f9708006b42a826fbac",
+    "observerStopped": true,
+    "testApkRestored": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "originalOptimizedApkRestored": true,
+    "accessibilityExact": true,
+    "systemProcessUnchanged": true,
+    "collectorInactive": true,
+    "originalDreamRestored": true,
+    "restorationPass": true,
+    "elapsedSeconds": 59.752,
+    "checks": [
+      {
+        "name": "native_video_night_gate",
+        "pass": true
+      },
+      {
+        "name": "preferences_restored_by_probe",
+        "pass": true
+      },
+      {
+        "name": "source_restored_by_probe",
+        "pass": true
+      },
+      {
+        "name": "owned_activity_closed",
+        "pass": true
+      },
+      {
+        "name": "owned_fixture_cleanup",
+        "pass": true
+      }
+    ]
+  },
+  "fullUnitGate": {
+    "tests": 3689,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 390
+  },
+  "newUnitTests": 5,
+  "buildsPassed": {
+    "debug": true,
+    "performance": true,
+    "androidTest": true
+  },
+  "reviewBlockers": 0,
+  "artifacts": {
+    "debugApkSha256": "11a82b8685b0ec24d97dfc0dce022f1ca814c14e4bb11f9708006b42a826fbac",
+    "debugApkBytes": 49734349,
+    "performanceApkSha256": "e80660a4e4ddb9ee3cd471e9c95790afd20be2c281a5e3731414d86f7139e117",
+    "performanceApkBytes": 25858942,
+    "androidTestApkSha256": "a893c0122bd61a2cb674912eb7f1321991901657358f28bf7dceca60c00f0d4e",
+    "androidTestApkBytes": 2408385,
+    "signingCertificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "deployment": {
+    "newApkSha256": "e80660a4e4ddb9ee3cd471e9c95790afd20be2c281a5e3731414d86f7139e117",
+    "oldApkSha256": "eafade20885a60b829457e06b010d868c18faa7502daf6b3499de48e2fdaebab",
+    "originalDreamActive": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "systemProcessUnchanged": true,
+    "pass": true,
+    "accessibilityExact": true,
+    "originalDreamRestored": true,
+    "elapsedSeconds": 16.778
+  },
+  "freshNativeHealth": {
+    "installedApkSha256": "e80660a4e4ddb9ee3cd471e9c95790afd20be2c281a5e3731414d86f7139e117",
+    "installedHashMatches": true,
+    "nonDebuggable": true,
+    "collectorInactive": true,
+    "activePerformanceListeners": 0,
+    "noActiveInstrumentation": true,
+    "originalDreamActive": true,
+    "pass": true
+  },
+  "initialAttempt": {
+    "probe": {
+      "failure": {
+        "label": "configure_timeout",
+        "class": "Failure"
+      },
+      "ownedActivityClosed": false,
+      "monitorRemoved": true,
+      "preferencesRestored": true,
+      "sourceRestored": true,
+      "ownedFixtureCleanup": true,
+      "pass": false,
+      "assertions": [
+        {
+          "name": "observer_thread_is_not_main",
+          "pass": true
+        },
+        {
+          "name": "fresh_fixture_directory",
+          "pass": true
+        },
+        {
+          "name": "tiny_photo_written",
+          "pass": true
+        },
+        {
+          "name": "owned_video_asset_written",
+          "pass": true
+        },
+        {
+          "name": "exact_preference_values_and_key_presence_restored",
+          "pass": true
+        },
+        {
+          "name": "full_source_and_configuration_restored",
+          "pass": true
+        },
+        {
+          "name": "owned_photo_deleted",
+          "pass": true
+        },
+        {
+          "name": "owned_video_deleted",
+          "pass": true
+        },
+        {
+          "name": "owned_fixture_directory_deleted",
+          "pass": true
+        }
+      ],
+      "measurements": {
+        "elapsedMs": 3292,
+        "mainMeasurementCount": 0,
+        "workerMeasurementCount": 0,
+        "maxMainRendezvousMs": 1201,
+        "maxWorkerRendezvousMs": 0,
+        "assertionCount": 9,
+        "checkBudgetMs": 60000,
+        "totalBudgetMs": 75000,
+        "cachedPositionSamplingMs": 250
+      },
+      "limitations": [
+        "Reflection contracts require the current controller and SlideshowVideoView",
+        "Native resume sample is the first bounded worker observation, not a seek-complete callback",
+        "No producer CPU, delivered FPS, moving-video pixel equality or hardware light-sensor claim",
+        "Face extras hide weather; the current controller still schedules its legacy weather fetch"
+      ]
+    },
+    "parentRestorationPass": false,
+    "parentCleanupFailure": "owned_detached",
+    "repair": {
+      "installedOriginalOptimizedHash": true,
+      "settingsExact": true,
+      "sourcesExact": true,
+      "accessibilityExact": true,
+      "systemProcessUnchangedDuringRepair": true,
+      "observerStopped": true,
+      "originalDreamRestored": true,
+      "pass": true
+    },
+    "initialFullSystemProcessContinuityRecorded": false,
+    "videoPlaybackMeasured": false,
+    "correctedBeforeNextRun": true,
+    "restartSolelyForObservationTimeout": false
+  },
+  "settingsCount": 97,
+  "photoSourceRecordCount": 22,
+  "fixture": {
+    "kind": "generated_silent_testsrc2",
+    "durationMs": 30000,
+    "width": 160,
+    "height": 90,
+    "framesPerSecond": 12,
+    "encodedBytes": 187563,
+    "sha256": "a6100cb86ffe2065fd88180502b6b79cf8aa2bf3bf5d5647de220edbe3859a4e"
+  },
+  "retainedNightSeekReductionAccepted": true,
+  "actualLocalVideoNightRetentionAccepted": true,
+  "actualSurfaceRecoveryAccepted": true,
+  "sourceReplacementPolicyUnitVerified": true,
+  "entireRepairedVideoSmokeSuiteExecuted": false,
+  "cpuOrFpsGainMeasured": false,
+  "opticalNightComfortAccepted": false,
+  "physicalSensorStimulusTestedInThisGate": false,
+  "remoteStreamingOrCameraCancellationAccepted": false,
+  "gifWebpPixelOrGpuResidencyAccepted": false,
+  "livingAreaTouched": false,
+  "musicAudioProviderDeferred": true,
+  "goalComplete": false,
+  "authoritativeResearchSources": [
+    "https://developer.android.com/reference/android/media/MediaPlayer"
+  ],
+  "deliveryVerifiedUtc": "2026-11-01T09:32:29Z",
+  "withinThirtyMinuteLimit": true
+}

@@ -2,6 +2,16 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Video night-return delivery, November 1:** the
+[actual Family video gate](portal-video-night-retention-2026-11-01.md) passes
+**92/92** checks. Returning to a retained player removes an extra seek
+(**1 → 0**), its position stays fixed through the clock hold, and real surface
+recreation recovers **1,118 → 1,118 ms** with one required seek. User pause is
+preserved. All **3,689 unit tests** pass and optimized APK **e80660a4…** is
+installed with configuration and original Dream preserved. This accepts the
+tested synthetic local-video path; remote/camera cancellation, optical comfort
+and panel FPS retain their limits.
+
 **Filmstrip admission delivery, November 1:** the
 [bounded file scanner](portal-filmstrip-file-admission-2026-11-01.md) avoids
 whole-file buffering before unsupported-format fallback. The JVM 16 MiB GIF
