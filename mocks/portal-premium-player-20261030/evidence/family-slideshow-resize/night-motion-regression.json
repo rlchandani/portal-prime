@@ -1,0 +1,1459 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "native_window",
+      "passed": true
+    },
+    {
+      "name": "shortest_interval_selected",
+      "passed": true
+    },
+    {
+      "name": "remaining_partial_dwell",
+      "passed": true
+    },
+    {
+      "name": "entry_generated_first_photo_ready",
+      "passed": true
+    },
+    {
+      "name": "motion_enabled_in_isolated_profile",
+      "passed": true
+    },
+    {
+      "name": "photo_motion_running_before_cover",
+      "passed": true
+    },
+    {
+      "name": "entry_immediately_suspends_photos",
+      "passed": true
+    },
+    {
+      "name": "motion_paused_at_entry",
+      "passed": true
+    },
+    {
+      "name": "night_sample_0",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_1",
+      "passed": true
+    },
+    {
+      "name": "night_sample_1",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_2",
+      "passed": true
+    },
+    {
+      "name": "night_sample_2",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_3",
+      "passed": true
+    },
+    {
+      "name": "night_sample_3",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_4",
+      "passed": true
+    },
+    {
+      "name": "night_sample_4",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_5",
+      "passed": true
+    },
+    {
+      "name": "night_sample_5",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_6",
+      "passed": true
+    },
+    {
+      "name": "night_sample_6",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_7",
+      "passed": true
+    },
+    {
+      "name": "night_sample_7",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_8",
+      "passed": true
+    },
+    {
+      "name": "night_sample_8",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_9",
+      "passed": true
+    },
+    {
+      "name": "night_sample_9",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_10",
+      "passed": true
+    },
+    {
+      "name": "night_sample_10",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_11",
+      "passed": true
+    },
+    {
+      "name": "night_sample_11",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_12",
+      "passed": true
+    },
+    {
+      "name": "night_sample_12",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_13",
+      "passed": true
+    },
+    {
+      "name": "night_sample_13",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_14",
+      "passed": true
+    },
+    {
+      "name": "night_sample_14",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_15",
+      "passed": true
+    },
+    {
+      "name": "night_sample_15",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_16",
+      "passed": true
+    },
+    {
+      "name": "night_sample_16",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_17",
+      "passed": true
+    },
+    {
+      "name": "night_sample_17",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_18",
+      "passed": true
+    },
+    {
+      "name": "night_sample_18",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_19",
+      "passed": true
+    },
+    {
+      "name": "night_sample_19",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_20",
+      "passed": true
+    },
+    {
+      "name": "night_sample_20",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_21",
+      "passed": true
+    },
+    {
+      "name": "night_sample_21",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_22",
+      "passed": true
+    },
+    {
+      "name": "night_sample_22",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_23",
+      "passed": true
+    },
+    {
+      "name": "night_sample_23",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_24",
+      "passed": true
+    },
+    {
+      "name": "night_sample_24",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_25",
+      "passed": true
+    },
+    {
+      "name": "night_sample_25",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_26",
+      "passed": true
+    },
+    {
+      "name": "night_sample_26",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_27",
+      "passed": true
+    },
+    {
+      "name": "night_sample_27",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_28",
+      "passed": true
+    },
+    {
+      "name": "night_sample_28",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_29",
+      "passed": true
+    },
+    {
+      "name": "night_sample_29",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_30",
+      "passed": true
+    },
+    {
+      "name": "night_sample_30",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_31",
+      "passed": true
+    },
+    {
+      "name": "night_sample_31",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_32",
+      "passed": true
+    },
+    {
+      "name": "night_sample_32",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_33",
+      "passed": true
+    },
+    {
+      "name": "night_sample_33",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_34",
+      "passed": true
+    },
+    {
+      "name": "night_sample_34",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_35",
+      "passed": true
+    },
+    {
+      "name": "night_sample_35",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_36",
+      "passed": true
+    },
+    {
+      "name": "night_sample_36",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_37",
+      "passed": true
+    },
+    {
+      "name": "night_sample_37",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_38",
+      "passed": true
+    },
+    {
+      "name": "night_sample_38",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_39",
+      "passed": true
+    },
+    {
+      "name": "night_sample_39",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_40",
+      "passed": true
+    },
+    {
+      "name": "night_sample_40",
+      "passed": true
+    },
+    {
+      "name": "motion_night_sample_41",
+      "passed": true
+    },
+    {
+      "name": "return_sample_0",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_1",
+      "passed": true
+    },
+    {
+      "name": "return_sample_1",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_2",
+      "passed": true
+    },
+    {
+      "name": "return_sample_2",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_3",
+      "passed": true
+    },
+    {
+      "name": "return_sample_3",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_4",
+      "passed": true
+    },
+    {
+      "name": "return_sample_4",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_5",
+      "passed": true
+    },
+    {
+      "name": "return_sample_5",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_6",
+      "passed": true
+    },
+    {
+      "name": "return_sample_6",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_7",
+      "passed": true
+    },
+    {
+      "name": "return_sample_7",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_8",
+      "passed": true
+    },
+    {
+      "name": "return_sample_8",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_9",
+      "passed": true
+    },
+    {
+      "name": "return_sample_9",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_10",
+      "passed": true
+    },
+    {
+      "name": "return_sample_10",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_11",
+      "passed": true
+    },
+    {
+      "name": "return_sample_11",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_12",
+      "passed": true
+    },
+    {
+      "name": "return_sample_12",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_13",
+      "passed": true
+    },
+    {
+      "name": "return_sample_13",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_14",
+      "passed": true
+    },
+    {
+      "name": "return_sample_14",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_15",
+      "passed": true
+    },
+    {
+      "name": "return_sample_15",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_16",
+      "passed": true
+    },
+    {
+      "name": "return_sample_16",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_17",
+      "passed": true
+    },
+    {
+      "name": "return_sample_17",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_18",
+      "passed": true
+    },
+    {
+      "name": "return_sample_18",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_19",
+      "passed": true
+    },
+    {
+      "name": "return_sample_19",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_20",
+      "passed": true
+    },
+    {
+      "name": "return_sample_20",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_21",
+      "passed": true
+    },
+    {
+      "name": "return_sample_21",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_22",
+      "passed": true
+    },
+    {
+      "name": "return_sample_22",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_23",
+      "passed": true
+    },
+    {
+      "name": "return_sample_23",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_24",
+      "passed": true
+    },
+    {
+      "name": "return_sample_24",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_25",
+      "passed": true
+    },
+    {
+      "name": "return_sample_25",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_26",
+      "passed": true
+    },
+    {
+      "name": "return_sample_26",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_27",
+      "passed": true
+    },
+    {
+      "name": "return_sample_27",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_28",
+      "passed": true
+    },
+    {
+      "name": "return_sample_28",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_29",
+      "passed": true
+    },
+    {
+      "name": "return_sample_29",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_30",
+      "passed": true
+    },
+    {
+      "name": "return_sample_30",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_31",
+      "passed": true
+    },
+    {
+      "name": "return_sample_31",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_32",
+      "passed": true
+    },
+    {
+      "name": "return_sample_32",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_33",
+      "passed": true
+    },
+    {
+      "name": "return_sample_33",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_34",
+      "passed": true
+    },
+    {
+      "name": "return_sample_34",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_35",
+      "passed": true
+    },
+    {
+      "name": "return_sample_35",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_36",
+      "passed": true
+    },
+    {
+      "name": "return_sample_36",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_37",
+      "passed": true
+    },
+    {
+      "name": "return_sample_37",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_38",
+      "passed": true
+    },
+    {
+      "name": "return_sample_38",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_39",
+      "passed": true
+    },
+    {
+      "name": "return_sample_39",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_40",
+      "passed": true
+    },
+    {
+      "name": "return_sample_40",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_41",
+      "passed": true
+    },
+    {
+      "name": "return_sample_41",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_42",
+      "passed": true
+    },
+    {
+      "name": "return_sample_42",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_43",
+      "passed": true
+    },
+    {
+      "name": "return_sample_43",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_44",
+      "passed": true
+    },
+    {
+      "name": "return_sample_44",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_45",
+      "passed": true
+    },
+    {
+      "name": "return_sample_45",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_46",
+      "passed": true
+    },
+    {
+      "name": "return_sample_46",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_47",
+      "passed": true
+    },
+    {
+      "name": "return_sample_47",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_48",
+      "passed": true
+    },
+    {
+      "name": "return_sample_48",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_49",
+      "passed": true
+    },
+    {
+      "name": "return_sample_49",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_50",
+      "passed": true
+    },
+    {
+      "name": "return_sample_50",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_51",
+      "passed": true
+    },
+    {
+      "name": "return_sample_51",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_52",
+      "passed": true
+    },
+    {
+      "name": "return_sample_52",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_53",
+      "passed": true
+    },
+    {
+      "name": "return_sample_53",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_54",
+      "passed": true
+    },
+    {
+      "name": "return_sample_54",
+      "passed": true
+    },
+    {
+      "name": "motion_return_sample_55",
+      "passed": true
+    },
+    {
+      "name": "return_sample_55",
+      "passed": true
+    },
+    {
+      "name": "motion_resumed_after_reveal",
+      "passed": true
+    },
+    {
+      "name": "motion_time_retained_at_resume",
+      "passed": true
+    },
+    {
+      "name": "motion_continues_before_next_photo",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "request_remainder_preserved",
+      "passed": true
+    },
+    {
+      "name": "dwell_remainder_preserved",
+      "passed": true
+    },
+    {
+      "name": "ordinary_autoplay_resumed_without_skipping",
+      "passed": true
+    },
+    {
+      "name": "automatic_dissolve_observed",
+      "passed": true
+    },
+    {
+      "name": "dissolve_paused_at_cover",
+      "passed": true
+    },
+    {
+      "name": "dissolve_composition_frozen_0",
+      "passed": true
+    },
+    {
+      "name": "dissolve_fraction_frozen_0",
+      "passed": true
+    },
+    {
+      "name": "dissolve_composition_frozen_1",
+      "passed": true
+    },
+    {
+      "name": "dissolve_fraction_frozen_1",
+      "passed": true
+    },
+    {
+      "name": "dissolve_composition_frozen_2",
+      "passed": true
+    },
+    {
+      "name": "dissolve_fraction_frozen_2",
+      "passed": true
+    },
+    {
+      "name": "dissolve_composition_frozen_3",
+      "passed": true
+    },
+    {
+      "name": "dissolve_fraction_frozen_3",
+      "passed": true
+    },
+    {
+      "name": "dissolve_composition_frozen_4",
+      "passed": true
+    },
+    {
+      "name": "dissolve_fraction_frozen_4",
+      "passed": true
+    },
+    {
+      "name": "dissolve_composition_frozen_5",
+      "passed": true
+    },
+    {
+      "name": "dissolve_fraction_frozen_5",
+      "passed": true
+    },
+    {
+      "name": "user_toggle_and_external_cover_keep_dissolve_frozen",
+      "passed": true
+    },
+    {
+      "name": "user_toggle_and_external_cover_keep_blend_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_composition_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_reveal_fraction_frozen",
+      "passed": true
+    },
+    {
+      "name": "user_pause_keeps_revealed_dissolve_frozen",
+      "passed": true
+    },
+    {
+      "name": "user_pause_keeps_revealed_blend_frozen",
+      "passed": true
+    },
+    {
+      "name": "user_pause_dissolve_stays_frozen",
+      "passed": true
+    },
+    {
+      "name": "user_pause_blend_stays_frozen",
+      "passed": true
+    },
+    {
+      "name": "dissolve_resumes_from_retained_fraction",
+      "passed": true
+    },
+    {
+      "name": "dissolve_continues_after_explicit_resume",
+      "passed": true
+    },
+    {
+      "name": "dissolve_retires_only_outgoing_layer",
+      "passed": true
+    },
+    {
+      "name": "external_cover_does_not_resume_night",
+      "passed": true
+    },
+    {
+      "name": "user_pause_survives_night",
+      "passed": true
+    },
+    {
+      "name": "user_paused_motion_survives_reveal",
+      "passed": true
+    },
+    {
+      "name": "user_paused_beyond_interval",
+      "passed": true
+    },
+    {
+      "name": "resume_under_night_keeps_cover",
+      "passed": true
+    },
+    {
+      "name": "resume_under_night_keeps_motion_frozen",
+      "passed": true
+    },
+    {
+      "name": "resume_under_night_keeps_photo",
+      "passed": true
+    },
+    {
+      "name": "resume_under_night_motion_after_interval",
+      "passed": true
+    },
+    {
+      "name": "resume_after_cover_keeps_same_photo",
+      "passed": true
+    },
+    {
+      "name": "autoplay_after_resume_under_cover",
+      "passed": true
+    },
+    {
+      "name": "owned_activity_destroyed",
+      "passed": true
+    },
+    {
+      "name": "owned_face_writer_quiescent",
+      "passed": true
+    },
+    {
+      "name": "generated_files_removed",
+      "passed": true
+    },
+    {
+      "name": "isolated_preferences_removed",
+      "passed": true
+    }
+  ],
+  "measurements": {
+    "motionBeforeCoverMs": 2017,
+    "nightHoldMs": 10353,
+    "nightSamples": 41,
+    "remainingDwellAtEntryMs": 2974,
+    "returnSamples": 56,
+    "motionAtResumeMs": 2067,
+    "motionContinuationMs": 266,
+    "firstAdvanceAfterRevealMs": 2993,
+    "firstRequestAfterRevealMs": 2942,
+    "dissolvePausedAtMs": 55,
+    "dissolvePausedFraction": 0.036666665,
+    "elapsedMs": 59354
+  },
+  "sensorStimulated": false,
+  "hardwareBrightnessTested": false,
+  "productionChanged": false,
+  "photoMotion": true
+}

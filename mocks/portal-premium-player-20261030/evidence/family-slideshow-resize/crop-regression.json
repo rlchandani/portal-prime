@@ -1,0 +1,380 @@
+{
+  "checks": [
+    {
+      "name": "native_window",
+      "passed": true
+    },
+    {
+      "name": "pair-save.initial_composition",
+      "passed": true
+    },
+    {
+      "name": "pair-save.editor_open",
+      "passed": true
+    },
+    {
+      "name": "pair-save.editor_uses_same_bitmap",
+      "passed": true
+    },
+    {
+      "name": "pair-save.editor_closed",
+      "passed": true
+    },
+    {
+      "name": "pair-save.composition_restored",
+      "passed": true
+    },
+    {
+      "name": "pair-save.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "pair-save.saved_position_only_on_first",
+      "passed": true
+    },
+    {
+      "name": "pair-save.normal_presentation_restored",
+      "passed": true
+    },
+    {
+      "name": "pair-save.saved_crop_rendered",
+      "passed": true
+    },
+    {
+      "name": "pair-save.companion_pose_retained",
+      "passed": true
+    },
+    {
+      "name": "pair-save.pause_retained",
+      "passed": true
+    },
+    {
+      "name": "pair-save.companion_animation_time",
+      "passed": true
+    },
+    {
+      "name": "pair-save.companion_resumes_from_held_time",
+      "passed": true
+    },
+    {
+      "name": "pair-save.subsequent_cancel_restores_composition",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.initial_composition",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.editor_open",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.editor_uses_same_bitmap",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.editor_closed",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.composition_restored",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.saved_position_only_on_first",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.normal_presentation_restored",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.saved_crop_rendered",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.companion_pose_retained",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.pause_retained",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.companion_animation_time",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.companion_resumes_from_held_time",
+      "passed": true
+    },
+    {
+      "name": "pair-cancel.subsequent_cancel_restores_composition",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.initial_composition",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.editor_open",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.editor_uses_same_bitmap",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.editor_closed",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.composition_restored",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.saved_position_only_on_first",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.normal_presentation_restored",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.saved_crop_rendered",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.companion_pose_retained",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.pause_retained",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.companion_animation_time",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.companion_resumes_from_held_time",
+      "passed": true
+    },
+    {
+      "name": "moving-pair-save.subsequent_cancel_restores_composition",
+      "passed": true
+    },
+    {
+      "name": "single-save.initial_composition",
+      "passed": true
+    },
+    {
+      "name": "single-save.editor_open",
+      "passed": true
+    },
+    {
+      "name": "single-save.editor_uses_same_bitmap",
+      "passed": true
+    },
+    {
+      "name": "single-save.editor_closed",
+      "passed": true
+    },
+    {
+      "name": "single-save.composition_restored",
+      "passed": true
+    },
+    {
+      "name": "single-save.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "single-save.saved_position_only_on_first",
+      "passed": true
+    },
+    {
+      "name": "single-save.normal_presentation_restored",
+      "passed": true
+    },
+    {
+      "name": "single-save.saved_crop_rendered",
+      "passed": true
+    },
+    {
+      "name": "single-save.companion_pose_retained",
+      "passed": true
+    },
+    {
+      "name": "single-save.pause_retained",
+      "passed": true
+    },
+    {
+      "name": "single-save.companion_animation_time",
+      "passed": true
+    },
+    {
+      "name": "single-save.companion_resumes_from_held_time",
+      "passed": true
+    },
+    {
+      "name": "single-save.subsequent_cancel_restores_composition",
+      "passed": true
+    },
+    {
+      "name": "print-save.initial_composition",
+      "passed": true
+    },
+    {
+      "name": "print-save.editor_open",
+      "passed": true
+    },
+    {
+      "name": "print-save.editor_uses_same_bitmap",
+      "passed": true
+    },
+    {
+      "name": "print-save.editor_closed",
+      "passed": true
+    },
+    {
+      "name": "print-save.composition_restored",
+      "passed": true
+    },
+    {
+      "name": "print-save.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "print-save.saved_position_only_on_first",
+      "passed": true
+    },
+    {
+      "name": "print-save.normal_presentation_restored",
+      "passed": true
+    },
+    {
+      "name": "print-save.saved_crop_rendered",
+      "passed": true
+    },
+    {
+      "name": "print-save.companion_pose_retained",
+      "passed": true
+    },
+    {
+      "name": "print-save.pause_retained",
+      "passed": true
+    },
+    {
+      "name": "print-save.companion_animation_time",
+      "passed": true
+    },
+    {
+      "name": "print-save.companion_resumes_from_held_time",
+      "passed": true
+    },
+    {
+      "name": "print-save.subsequent_cancel_restores_composition",
+      "passed": true
+    },
+    {
+      "name": "owned_hosts_destroyed",
+      "passed": true
+    },
+    {
+      "name": "bounded_native_work",
+      "passed": true
+    }
+  ],
+  "samples": [
+    {
+      "case": "pair-save",
+      "beforePhotos": 2,
+      "afterPhotos": 2,
+      "companionPoseBefore": [
+        1.8000001,
+        1.8000001,
+        -5.5000377,
+        0
+      ],
+      "companionPoseAfter": [
+        1.8000001,
+        1.8000001,
+        -5.5000377,
+        0
+      ]
+    },
+    {
+      "case": "pair-cancel",
+      "beforePhotos": 2,
+      "afterPhotos": 2,
+      "companionPoseBefore": [
+        1.8000001,
+        1.8000001,
+        -5.5000377,
+        0
+      ],
+      "companionPoseAfter": [
+        1.8000001,
+        1.8000001,
+        -5.5000377,
+        0
+      ]
+    },
+    {
+      "case": "moving-pair-save",
+      "beforePhotos": 2,
+      "afterPhotos": 2,
+      "companionPoseBefore": [
+        1.8345842,
+        1.8345842,
+        -15.875299,
+        -4.334568
+      ],
+      "companionTimeBeforeMs": 3200,
+      "companionTimeAfterMs": 3200,
+      "companionTimeResumedMs": 3233,
+      "companionPoseAfter": [
+        1.8345842,
+        1.8345842,
+        -15.875299,
+        -4.334568
+      ]
+    },
+    {
+      "case": "single-save",
+      "beforePhotos": 1,
+      "afterPhotos": 1
+    },
+    {
+      "case": "print-save",
+      "beforePhotos": 1,
+      "afterPhotos": 1
+    }
+  ],
+  "artifacts": [
+    {
+      "label": "before",
+      "relativePath": "cache/slideshow-commit-owned-cf7a5aa7-c489-4a28-867f-58d818ebaefb-before.png"
+    },
+    {
+      "label": "after",
+      "relativePath": "cache/slideshow-commit-owned-cf7a5aa7-c489-4a28-867f-58d818ebaefb-after.png"
+    }
+  ],
+  "passed": true,
+  "failureCount": 0,
+  "isolatedFailureCount": 0,
+  "caseCount": 5,
+  "elapsedMs": 3707,
+  "generatedOnly": true,
+  "providerProof": false,
+  "panelFpsProof": false
+}

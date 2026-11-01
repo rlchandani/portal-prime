@@ -10,6 +10,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -244,11 +245,11 @@ internal class SlideshowStage(
     if (w <= 0 || h <= 0) return
     val next = pending
     pending = null
-    if (next != null) { present(next); own("pending", null) }
-    else shown?.let {
-      layers[current].display(it, w, h)
-      if (paused || !hostActive) layers[current].pause()
+    if (next != null) {
+      present(next); own("pending", null)
+      layers.forEach { it.measureAfterRebind(w, h) }
     }
+    else layers.forEach { it.resize(w, h, paused || !hostActive) }
   }
 
   private fun own(name: String, presentation: Presentation?) {
@@ -266,6 +267,8 @@ internal class SlideshowStage(
     )
     private val moves = ArrayList<AnimatorSet>()
     private val movePhotos = ArrayList<Int>()
+    private val rememberedTimes = HashMap<Int, Long>()
+    private val paths = HashMap<Int, SlideshowGeometry.Motion>()
     private var displayed: Presentation? = null
     init { setBackgroundColor(MATTE); clipChildren = true }
 
@@ -325,6 +328,7 @@ internal class SlideshowStage(
         val manual = if (print != null) null else photo.adjustment?.transform(
             photo.bitmap.width, photo.bitmap.height, area.width(), area.height())
         val start = manual ?: path.start
+        if (manual == null) paths[index] = path
         image.scaleX = start.scale; image.scaleY = start.scale
         image.translationX = start.x; image.translationY = start.y
         if (manual == null && path.start != path.end &&
@@ -398,6 +402,23 @@ internal class SlideshowStage(
 
     fun pause() { moves.forEach { it.pause() } }
     fun resume() { moves.forEach { it.resume() } }
+    fun resize(width: Int, height: Int, suspended: Boolean) {
+      val presentation = displayed ?: return
+      val times = motionTimes()
+      display(presentation, width, height)
+      if (suspended) pause()
+      restoreMotionTimes(times)
+      measureAfterRebind(width, height)
+    }
+
+    fun measureAfterRebind(width: Int, height: Int) {
+      if (displayed == null) return
+      // onSizeChanged runs after the parent's measure pass. These replacement children
+      // need their own measurement before the imminent layout, including under a cover.
+      forceLayout()
+      measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+          MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+    }
     fun updateAdjustment(bitmap: Bitmap, adjustment: SlideshowAdjustment?): Boolean {
       if (adjustment == null || childCount != 1) return false
       val holder = getChildAt(0) as? FrameLayout ?: return false
@@ -435,24 +456,55 @@ internal class SlideshowStage(
     private fun images(): List<ImageView> = (0 until childCount).mapNotNull {
       (getChildAt(it) as? FrameLayout)?.getChildAt(0) as? ImageView
     }
+    private fun motionTimes(): Map<Int, Long> {
+      if (android.os.Build.VERSION.SDK_INT < 26) return emptyMap()
+      return rememberedTimes + movePhotos.zip(moves).associate { (index, move) ->
+        val children = move.childAnimations
+        // A completed AnimatorSet resets its frame clock; its children retain the end pose.
+        val completed = !move.isStarted && children.isNotEmpty() &&
+            children.all { it is ValueAnimator && it.animatedFraction == 1f }
+        index to if (completed) move.duration else move.currentPlayTime
+      }
+    }
+
+    private fun restoreMotionTimes(times: Map<Int, Long>, fromPhoto: Int = 0) {
+      if (android.os.Build.VERSION.SDK_INT < 26) return
+      val duration = (displayed?.dwell ?: return) + DISSOLVE_MS
+      rememberedTimes.clear()
+      times.filterKeys { it in fromPhoto until childCount }.forEach { (index, time) ->
+        rememberedTimes[index] = time.coerceIn(0L, duration)
+      }
+      movePhotos.zip(moves).forEach { (index, move) ->
+        rememberedTimes[index]?.let { move.currentPlayTime = it }
+      }
+      val pictures = images()
+      rememberedTimes.forEach { (index, time) ->
+        val path = paths[index] ?: return@forEach
+        val image = pictures.getOrNull(index) ?: return@forEach
+        // API 26-28 queue a started set's seek while paused. Apply the new geometry now,
+        // and leave its queued seek to continue from the same phase when resumed.
+        val transform = path.at(time.toFloat() / duration)
+        image.scaleX = transform.scale; image.scaleY = transform.scale
+        image.translationX = transform.x; image.translationY = transform.y
+      }
+    }
+
     fun snapshot(width: Int, height: Int) = Snapshot(width, height, images().map {
       SlideshowGeometry.Transform(it.scaleX, it.translationX, it.translationY)
-    }, if (android.os.Build.VERSION.SDK_INT >= 26)
-      movePhotos.zip(moves).associate { (index, move) -> index to move.currentPlayTime } else emptyMap())
+    }, motionTimes())
 
     fun restore(snapshot: Snapshot, width: Int, height: Int, fromPhoto: Int = 0) {
-      if (snapshot.width != width || snapshot.height != height) return
+      val sameViewport = snapshot.width == width && snapshot.height == height
       if (android.os.Build.VERSION.SDK_INT >= 26) {
-        movePhotos.zip(moves).forEach { (index, move) ->
-          if (index >= fromPhoto) snapshot.times[index]?.let { move.currentPlayTime = it }
-        }
-      } else {
+        restoreMotionTimes(snapshot.times, fromPhoto)
+      } else if (sameViewport) {
         // API-24/25 cannot seek an AnimatorSet. Hold the exact previous pose until the
         // next photo rather than restarting motion from its first endpoint.
         moves.forEach { it.cancel() }
         moves.clear()
         movePhotos.clear()
       }
+      if (!sameViewport) return
       images().zip(snapshot.transforms).forEachIndexed { index, (image, transform) ->
         if (index < fromPhoto) return@forEachIndexed
         image.scaleX = transform.scale; image.scaleY = transform.scale
@@ -464,6 +516,8 @@ internal class SlideshowStage(
       moves.forEach { it.cancel() }
       moves.clear()
       movePhotos.clear()
+      rememberedTimes.clear()
+      paths.clear()
       // Drawable references are released only after their visible layer is detached/cleared.
       // Do not recycle rendered bitmaps while Android may retain a display-list reference.
       removeAllViews()

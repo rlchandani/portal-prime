@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        if (options.getString("command") == "slideshowResize") {
+            val resize = try { SlideshowResizeDeviceChecks.run(this) }
+            catch (_: Throwable) { Bundle().apply { putBoolean("slideshowResizePassed", false) } }
+            finish(if (resize.getBoolean("slideshowResizePassed")) 0 else 1, resize)
+            return
+        }
         if (options.getString("command") == "nightPhotoMotion") {
             val night = try { NightPhotoPauseDeviceChecks.run(this, motion = true) }
             catch (_: Throwable) { Bundle().apply { putBoolean("nightPhotoPausePassed", false) } }

@@ -2,7 +2,21 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest verification, November 1 — moving photos under the night clock.**
+**Newest delivery, November 1 — slideshow resize continuity.**
+[The Family Area resize fix](portal-slideshow-resize-2026-11-01.md) preserves
+per-photo motion through geometry changes and measures rebuilt image holders.
+The same **172 native assertions** change from **72 failures to zero**, across
+six cases and 24 resize samples. Covered pair times retain **800/3,200 ms**;
+holders previously **0 × 0** become **589 × 800** in the first sample.
+All **73 crop Save** and **359 night-motion regression checks** pass,
+alongside **3,765 fresh JVM tests**. Bitmap accounting stays unchanged.
+Optimized APK **dcc2898e…** is installed with original configuration,
+both face caches and Dream restored **23 minutes 29 seconds** into the
+unchanged 30-minute slot. This accepts API 29 native resize continuity,
+not physical rotation, panel FPS or natural-light comfort. The human
+room-light check remains pending; Living Area was not changed.
+
+**Previous verification, November 1 — moving photos under the night clock.**
 [The Family Area motion check](portal-night-photo-motion-2026-11-01.md)
 passes **357/357 native assertions/observations**, including a moving crop
 and an interrupted automatic crossfade. Both retained compositions and

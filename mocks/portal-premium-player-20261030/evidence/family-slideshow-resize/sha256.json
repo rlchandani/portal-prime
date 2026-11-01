@@ -1,0 +1,14 @@
+{
+  "app/src/main/java/com/immortal/launcher/SlideshowStage.kt": "46c45dab9889650f9c990229bc19a01b045fca31e94bfda2dbc066e6f5c64b3c",
+  "app/src/androidTest/java/com/immortal/launcher/SlideshowResizeDeviceChecks.kt": "5353e1f28a0058ac39c805de4bff4b7dd0d860b4e2496e5e505a479fb46a7db6",
+  "app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt": "217c59749ef58918352c76208635cc0c2464096b390195bdff11554c09774a08",
+  "docs/portal-slideshow-resize-2026-11-01.md": "45fdc0388e317fa8a00a62c3338daa6b7b6cef8757828580e5816e7c81f31c42",
+  "docs/portal-night-player-completion-audit-2026-10-31.md": "61a41d51e6f1d981ab2a494433da0e5859e6f6da3e0e12e9121b8a59d0b91fd6",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-resize/baseline-checks.json": "f0353a1a5c6ee841dc6932a628f7ade6812d651de38c3d6065ef833dea012a9f",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-resize/baseline-verification.json": "1b763272427844c0d3e514ad62513d63ed83e2d9830bd3e3a2544b1ec1ba9113",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-resize/checks.json": "b99c5b1ed13df96ee029b8775a77ea00b0c5e4202452ed1c14fd365babd5e788",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-resize/crop-regression.json": "c526c56e2337623eb00705f8524f254a573e9b7b6f80521109efbb2ad5e1a6d1",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-resize/night-motion-regression.json": "f7177555f68a4edf8519a4878d4151cc58d7be4e877d054f48bdda3fc065fc2c",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-resize/unit-results.json": "fc954e92f9c229b8f0ea1f090f729dd04915cd0b2218842542a63af06131a2bc",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-resize/verification.json": "72e71c091174a97d36be64c63d7b2dac17eabb8fa173551259ac1ebfc2f50018"
+}

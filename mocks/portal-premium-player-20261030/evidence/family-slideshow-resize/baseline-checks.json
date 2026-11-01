@@ -1,0 +1,1533 @@
+{
+  "passed": false,
+  "checks": [
+    {
+      "name": "native_window",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.setup_motion",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.1200x800.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.1200x800.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.1200x800.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.1200x800.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.1200x800.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.1200x800.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.64x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.64x1440.animation_times_retained",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.64x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.64x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.64x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.64x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.1440x1000.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.1440x1000.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.1440x1000.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.1440x1000.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.1440x1000.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.1440x1000.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.2160x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.2160x1440.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.2160x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.2160x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.2160x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.2160x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "covered-pair.resume_enabled",
+      "passed": true
+    },
+    {
+      "name": "covered-pair.motion_continues_from_retained_times",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.setup_motion",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.1200x800.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.1200x800.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.1200x800.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.1200x800.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.1200x800.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.1200x800.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.64x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.64x1440.animation_times_retained",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.64x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.64x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.64x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.64x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.1440x1000.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.1440x1000.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.1440x1000.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.1440x1000.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.1440x1000.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.1440x1000.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.2160x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.2160x1440.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.2160x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.2160x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.2160x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.2160x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "user-paused-single.resume_enabled",
+      "passed": true
+    },
+    {
+      "name": "user-paused-single.motion_continues_from_retained_times",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.setup_motion",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.1200x800.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.1200x800.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.1200x800.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.1200x800.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.1200x800.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.1200x800.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.1200x800.retained_dissolve",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.64x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.64x1440.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.64x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.64x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.64x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.64x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.64x1440.retained_dissolve",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.1440x1000.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.1440x1000.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.1440x1000.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.1440x1000.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.1440x1000.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.1440x1000.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.1440x1000.retained_dissolve",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.2160x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.2160x1440.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.2160x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.2160x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.2160x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.2160x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.2160x1440.retained_dissolve",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.resume_enabled",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.motion_continues_from_retained_times",
+      "passed": false
+    },
+    {
+      "name": "covered-paired-dissolve.dissolve_continues",
+      "passed": true
+    },
+    {
+      "name": "covered-paired-dissolve.only_outgoing_retired",
+      "passed": true
+    },
+    {
+      "name": "completed-single.motion_completed_before_cover",
+      "passed": true
+    },
+    {
+      "name": "completed-single.setup_motion",
+      "passed": true
+    },
+    {
+      "name": "completed-single.1200x800.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "completed-single.1200x800.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "completed-single.1200x800.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "completed-single.1200x800.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "completed-single.1200x800.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "completed-single.1200x800.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "completed-single.64x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "completed-single.64x1440.animation_times_retained",
+      "passed": true
+    },
+    {
+      "name": "completed-single.64x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "completed-single.64x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "completed-single.64x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "completed-single.64x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "completed-single.1440x1000.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "completed-single.1440x1000.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "completed-single.1440x1000.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "completed-single.1440x1000.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "completed-single.1440x1000.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "completed-single.1440x1000.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "completed-single.2160x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "completed-single.2160x1440.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "completed-single.2160x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "completed-single.2160x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "completed-single.2160x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "completed-single.2160x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "completed-single.resume_enabled",
+      "passed": true
+    },
+    {
+      "name": "completed-single.completed_motion_does_not_restart",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.setup_motion",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.1200x800.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.1200x800.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.1200x800.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.1200x800.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.1200x800.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.1200x800.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.64x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.64x1440.animation_times_retained",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.64x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.64x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.64x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.64x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.1440x1000.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.1440x1000.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.1440x1000.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.1440x1000.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.1440x1000.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.1440x1000.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.2160x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.2160x1440.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.2160x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.2160x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.2160x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.2160x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "manual-first-pair.resume_enabled",
+      "passed": true
+    },
+    {
+      "name": "manual-first-pair.motion_continues_from_retained_times",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.setup_motion",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.1200x800.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.1200x800.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.1200x800.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.1200x800.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.1200x800.resized_images_measured",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.1200x800.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.64x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.64x1440.animation_times_retained",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.64x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.64x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.64x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.64x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.1440x1000.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.1440x1000.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.1440x1000.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.1440x1000.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.1440x1000.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.1440x1000.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.2160x1440.bitmaps_retained",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.2160x1440.animation_times_retained",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.2160x1440.animations_stay_paused",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.2160x1440.pixel_budget_unchanged",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.2160x1440.resized_images_measured",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.2160x1440.new_viewport_at_retained_progress",
+      "passed": false
+    },
+    {
+      "name": "edit-cancel-pair.resume_enabled",
+      "passed": true
+    },
+    {
+      "name": "edit-cancel-pair.motion_continues_from_retained_times",
+      "passed": false
+    },
+    {
+      "name": "owned_activity_destroyed",
+      "passed": true
+    },
+    {
+      "name": "bounded_work",
+      "passed": true
+    }
+  ],
+  "samples": [
+    {
+      "case": "covered-pair",
+      "width": 1200,
+      "height": 800,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0,
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          1,
+          -5.500009,
+          0
+        ],
+        [
+          0,
+          0,
+          1.03,
+          -14.500001,
+          -3.7600002
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 3840000
+    },
+    {
+      "case": "covered-pair",
+      "width": 64,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        []
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          0.034999996,
+          1.0728836e-06,
+          706
+        ],
+        [
+          0,
+          0,
+          0.034999996,
+          1.0728836e-06,
+          706
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 3840000
+    },
+    {
+      "case": "covered-pair",
+      "width": 1440,
+      "height": 1000,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0,
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          1.25,
+          -20.500011,
+          0
+        ],
+        [
+          0,
+          0,
+          1.2874999,
+          -31.749983,
+          -4.699977
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 3840000
+    },
+    {
+      "case": "covered-pair",
+      "width": 2160,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0,
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          1.8000001,
+          -5.5000377,
+          0
+        ],
+        [
+          0,
+          0,
+          1.854,
+          -21.700008,
+          -6.76801
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 3840000
+    },
+    {
+      "case": "user-paused-single",
+      "width": 1200,
+      "height": 800,
+      "beforeTimesMs": [
+        [
+          800
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          2,
+          0,
+          -384.00003
+        ]
+      ],
+      "retainedPixelBytes": 1920000,
+      "peakPixelBytes": 3840000
+    },
+    {
+      "case": "user-paused-single",
+      "width": 64,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          800
+        ]
+      ],
+      "afterTimesMs": [
+        []
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          0.10666666,
+          1.4603138e-06,
+          677.3333
+        ]
+      ],
+      "retainedPixelBytes": 1920000,
+      "peakPixelBytes": 3840000
+    },
+    {
+      "case": "user-paused-single",
+      "width": 1440,
+      "height": 1000,
+      "beforeTimesMs": [
+        [
+          800
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          2.4,
+          -5.00679e-05,
+          -440.80008
+        ]
+      ],
+      "retainedPixelBytes": 1920000,
+      "peakPixelBytes": 3840000
+    },
+    {
+      "case": "user-paused-single",
+      "width": 2160,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          800
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          3.6000001,
+          -7.510185e-05,
+          -691.2001
+        ]
+      ],
+      "retainedPixelBytes": 1920000,
+      "peakPixelBytes": 3840000
+    },
+    {
+      "case": "covered-paired-dissolve",
+      "width": 1200,
+      "height": 800,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ],
+        [
+          1000,
+          2400
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          800,
+          3200
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "holders": [
+        [
+          1069,
+          1440,
+          1.804854,
+          -6.956215,
+          -0.60836047
+        ],
+        [
+          1069,
+          1440,
+          1.8345842,
+          -15.875299,
+          -4.334568
+        ],
+        [
+          0,
+          0,
+          1,
+          -5.500009,
+          0
+        ],
+        [
+          0,
+          0,
+          1.03,
+          -14.500001,
+          -3.7600002
+        ]
+      ],
+      "retainedPixelBytes": 7680000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "covered-paired-dissolve",
+      "width": 64,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ],
+        [
+          1000,
+          2400
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          800,
+          3200
+        ],
+        []
+      ],
+      "holders": [
+        [
+          1069,
+          1440,
+          1.804854,
+          -6.956215,
+          -0.60836047
+        ],
+        [
+          1069,
+          1440,
+          1.8345842,
+          -15.875299,
+          -4.334568
+        ],
+        [
+          0,
+          0,
+          0.034999996,
+          1.0728836e-06,
+          706
+        ],
+        [
+          0,
+          0,
+          0.034999996,
+          1.0728836e-06,
+          706
+        ]
+      ],
+      "retainedPixelBytes": 7680000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "covered-paired-dissolve",
+      "width": 1440,
+      "height": 1000,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ],
+        [
+          1000,
+          2400
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          800,
+          3200
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "holders": [
+        [
+          1069,
+          1440,
+          1.804854,
+          -6.956215,
+          -0.60836047
+        ],
+        [
+          1069,
+          1440,
+          1.8345842,
+          -15.875299,
+          -4.334568
+        ],
+        [
+          0,
+          0,
+          1.25,
+          -20.500011,
+          0
+        ],
+        [
+          0,
+          0,
+          1.2874999,
+          -31.749983,
+          -4.699977
+        ]
+      ],
+      "retainedPixelBytes": 7680000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "covered-paired-dissolve",
+      "width": 2160,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ],
+        [
+          1000,
+          2400
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          800,
+          3200
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "holders": [
+        [
+          1069,
+          1440,
+          1.804854,
+          -6.956215,
+          -0.60836047
+        ],
+        [
+          1069,
+          1440,
+          1.8345842,
+          -15.875299,
+          -4.334568
+        ],
+        [
+          0,
+          0,
+          1.8000001,
+          -5.5000377,
+          0
+        ],
+        [
+          0,
+          0,
+          1.854,
+          -21.700008,
+          -6.76801
+        ]
+      ],
+      "retainedPixelBytes": 7680000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "completed-single",
+      "width": 1200,
+      "height": 800,
+      "beforeTimesMs": [
+        [
+          8900
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          2,
+          0,
+          -384.00003
+        ]
+      ],
+      "retainedPixelBytes": 1920000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "completed-single",
+      "width": 64,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          8900
+        ]
+      ],
+      "afterTimesMs": [
+        []
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          0.10666666,
+          1.4603138e-06,
+          677.3333
+        ]
+      ],
+      "retainedPixelBytes": 1920000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "completed-single",
+      "width": 1440,
+      "height": 1000,
+      "beforeTimesMs": [
+        [
+          8900
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          2.4,
+          -5.00679e-05,
+          -440.80008
+        ]
+      ],
+      "retainedPixelBytes": 1920000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "completed-single",
+      "width": 2160,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          8900
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          3.6000001,
+          -7.510185e-05,
+          -691.2001
+        ]
+      ],
+      "retainedPixelBytes": 1920000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "manual-first-pair",
+      "width": 1200,
+      "height": 800,
+      "beforeTimesMs": [
+        [
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          0.9816667,
+          0,
+          7.333313
+        ],
+        [
+          0,
+          0,
+          1.03,
+          -14.500001,
+          -3.7600002
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "manual-first-pair",
+      "width": 64,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        []
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          0.035,
+          0,
+          706
+        ],
+        [
+          0,
+          0,
+          0.034999996,
+          1.0728836e-06,
+          706
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "manual-first-pair",
+      "width": 1440,
+      "height": 1000,
+      "beforeTimesMs": [
+        [
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          1.1816666,
+          3.0517578e-05,
+          27.333344
+        ],
+        [
+          0,
+          0,
+          1.2874999,
+          -31.749983,
+          -4.699977
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "manual-first-pair",
+      "width": 2160,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          1.7816666,
+          0,
+          7.333374
+        ],
+        [
+          0,
+          0,
+          1.854,
+          -21.700008,
+          -6.76801
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "edit-cancel-pair",
+      "width": 1200,
+      "height": 800,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0,
+          0
+        ]
+      ],
+      "holders": [
+        [
+          589,
+          800,
+          1,
+          -5.500009,
+          0
+        ],
+        [
+          589,
+          800,
+          1.03,
+          -14.500001,
+          -3.7600002
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "edit-cancel-pair",
+      "width": 64,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        []
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          0.034999996,
+          1.0728836e-06,
+          706
+        ],
+        [
+          0,
+          0,
+          0.034999996,
+          1.0728836e-06,
+          706
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "edit-cancel-pair",
+      "width": 1440,
+      "height": 1000,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0,
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          1.25,
+          -20.500011,
+          0
+        ],
+        [
+          0,
+          0,
+          1.2874999,
+          -31.749983,
+          -4.699977
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 7680000
+    },
+    {
+      "case": "edit-cancel-pair",
+      "width": 2160,
+      "height": 1440,
+      "beforeTimesMs": [
+        [
+          800,
+          3200
+        ]
+      ],
+      "afterTimesMs": [
+        [
+          0,
+          0
+        ]
+      ],
+      "holders": [
+        [
+          0,
+          0,
+          1.8000001,
+          -5.5000377,
+          0
+        ],
+        [
+          0,
+          0,
+          1.854,
+          -21.700008,
+          -6.76801
+        ]
+      ],
+      "retainedPixelBytes": 3840000,
+      "peakPixelBytes": 7680000
+    }
+  ],
+  "caseCount": 6,
+  "isolatedFailure": false,
+  "generatedOnly": true,
+  "panelFpsProof": false,
+  "elapsedMs": 5244
+}
