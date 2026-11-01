@@ -48,6 +48,8 @@ class MusicDesignPreviewActivity : ComponentActivity() {
   private var viewportLayout by mutableStateOf(MusicPlayerLayout.FULL)
   private var seekBindingFixture by mutableStateOf<MusicPlayerSnapshot?>(null)
   private val seekBindingReceipts = org.json.JSONArray()
+  private var volumeBindingFixture by mutableStateOf<MusicPlayerSnapshot?>(null)
+  private val volumeBindingReceipts = org.json.JSONArray()
   private val generatedLyrics = (0 until 80).map {
     MusicLyricLine(it * 1_000L, "Generated lyric line $it")
   }
@@ -66,6 +68,23 @@ class MusicDesignPreviewActivity : ComponentActivity() {
   }
 
   fun musicSeekBindingReceipts(): String = seekBindingReceipts.toString()
+
+  /** Generated room observations; no source controller, audio or retained-photo host. */
+  fun updateMusicVolumeBinding(source: String, room: String, revision: Long, title: String,
+      volume: Int) {
+    require(intent.getStringExtra("screen") == "volumebinding")
+    require(source.startsWith("ma:generated-") && room.startsWith("ma:generated-"))
+    require(volume in 0..100)
+    volumeBindingFixture = MusicPlayerSnapshot(
+        connection = MusicConnection.READY, sourceId = source,
+        track = MusicTrack("generated-volume-track", source, title, durationMs = 240_000),
+        playback = PlaybackState.PAUSED, capabilities = MusicCapabilities(rooms = true, volume = true),
+        controlPlayerId = "ma:generated-control", presentationRevision = revision,
+        rooms = listOf(MusicRoom(room, "Generated speaker", true, volume,
+            volumeControllable = true)))
+  }
+
+  fun musicVolumeBindingReceipts(): String = volumeBindingReceipts.toString()
 
   /** Generated silent lists; updates retain the same production player composition. */
   fun updateMusicViewportBinding(source: String, queue: String, revision: Long) {
@@ -123,6 +142,37 @@ class MusicDesignPreviewActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN or
         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    if (intent.getStringExtra("screen") == "volumebinding") {
+      val token = intent.getStringExtra("owned_probe")
+      if (token != null && token == cancelledSeekProbe) { finish(); return }
+      val deadline = intent.getLongExtra("owned_deadline_elapsed_ms", 0)
+      if (deadline > 0 && SystemClock.elapsedRealtime() >= deadline) { finish(); return }
+      updateMusicVolumeBinding("ma:generated-source-a", "ma:generated-room-a", 1,
+          "Generated paused track", 35)
+      setContent {
+        val palette = if (intent.getStringExtra("theme") == "light")
+          ApprovedLightPalette else ApprovedDarkPalette
+        CompositionLocalProvider(LocalApprovedPalette provides palette) {
+          MaterialTheme(colorScheme = approvedColorScheme(palette === ApprovedDarkPalette)) {
+            volumeBindingFixture?.let { rendered ->
+              MusicPlayerContent(rendered, MusicPlayerLayout.FULL, Modifier.fillMaxSize(),
+                  onDismiss = { finish() }, onLayoutChange = {}, onAction = { action ->
+                    if (action is MusicPlayerUiAction.SetRoomVolume) {
+                      val current = checkNotNull(volumeBindingFixture)
+                      volumeBindingReceipts.put(org.json.JSONObject()
+                          .put("percent", action.percent).put("room", action.roomId)
+                          .put("renderedRevision", rendered.presentationRevision)
+                          .put("currentRevision", current.presentationRevision)
+                          .put("accepted", musicRenderedActionIsCurrent(
+                              rendered, current, current.presentationRevision, action)))
+                    }
+                  })
+            }
+          }
+        }
+      }
+      return
+    }
     if (intent.getStringExtra("screen") == "seekbinding") {
       val token = intent.getStringExtra("owned_probe")
       if (token != null && token == cancelledSeekProbe) { finish(); return }

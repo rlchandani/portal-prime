@@ -741,26 +741,29 @@ private fun MusicRoomVolume(
     volume: Int,
     onAction: (MusicPlayerUiAction) -> Unit,
 ) {
-  var draft by remember(snapshot.sourceId, room.id) { mutableStateOf<Float?>(null) }
-  val enabled = room.available && room.volumeControllable && room.id.isNotBlank() &&
-      musicCanSend(snapshot, MusicCommand.SET_VOLUME)
-  LaunchedEffect(enabled) { if (!enabled) draft = null }
-  Row(verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-    MusicIcon(MusicGlyph.VOLUME, LocalApprovedPalette.current.secondary, Modifier.size(24.dp))
-    MusicSlider(value = draft ?: volume.toFloat(), valueRange = 0f..100f,
-        onValueChange = { if (enabled) draft = it },
-        onValueChangeFinished = {
-          val value = draft
-          draft = null
-          if (value != null && enabled) onAction(
-              MusicPlayerUiAction.SetRoomVolume(room.id, value.toInt().coerceIn(0, 100)))
-        },
-        enabled = enabled,
-        modifier = Modifier.weight(1f).heightIn(min = 48.dp)
-            .semantics { contentDescription = "${room.name} volume" })
-    // Keep the displayed value server-confirmed; dragging never declares success.
-    MusicText(if (room.muted == true) "Muted" else "$volume%", muted = true, size = 14)
+  // The entire pointer stream belongs to this source/session observation and room.
+  key(snapshot.sourceId, snapshot.localSessionToken, snapshot.presentationRevision, room.id) {
+    var draft by remember { mutableStateOf<Float?>(null) }
+    val enabled = room.available && room.volumeControllable && room.id.isNotBlank() &&
+        musicCanSend(snapshot, MusicCommand.SET_VOLUME)
+    LaunchedEffect(enabled) { if (!enabled) draft = null }
+    Row(verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      MusicIcon(MusicGlyph.VOLUME, LocalApprovedPalette.current.secondary, Modifier.size(24.dp))
+      MusicSlider(value = draft ?: volume.toFloat(), valueRange = 0f..100f,
+          onValueChange = { if (enabled) draft = it },
+          onValueChangeFinished = {
+            val value = draft
+            draft = null
+            if (value != null && enabled) onAction(
+                MusicPlayerUiAction.SetRoomVolume(room.id, value.toInt().coerceIn(0, 100)))
+          },
+          enabled = enabled,
+          modifier = Modifier.weight(1f).heightIn(min = 48.dp)
+              .semantics { contentDescription = "${room.name} volume" })
+      // Keep the displayed value server-confirmed; dragging never declares success.
+      MusicText(if (room.muted == true) "Muted" else "$volume%", muted = true, size = 14)
+    }
   }
 }
 

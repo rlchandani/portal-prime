@@ -1,0 +1,1036 @@
+{
+  "checks": [
+    {
+      "name": "dark.native_window",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.release_owned",
+      "passed": true
+    },
+    {
+      "name": "dark.unchanged.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.release_owned",
+      "passed": true
+    },
+    {
+      "name": "dark.metadata.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.reported-volume.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.reported-volume.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.reported-volume.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.reported-volume.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.reported-volume.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.reported-volume.release_owned",
+      "passed": true
+    },
+    {
+      "name": "dark.reported-volume.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.revision.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.revision.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.revision.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.revision.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.revision.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.revision.release_owned",
+      "passed": true
+    },
+    {
+      "name": "dark.revision.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.source.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.source.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.source.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.source.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.source.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.source.release_owned",
+      "passed": true
+    },
+    {
+      "name": "dark.source.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "dark.room.down_routed",
+      "passed": true
+    },
+    {
+      "name": "dark.room.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "dark.room.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "dark.room.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.room.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "dark.room.release_owned",
+      "passed": true
+    },
+    {
+      "name": "dark.room.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.native_window",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.release_owned",
+      "passed": true
+    },
+    {
+      "name": "light.unchanged.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.release_owned",
+      "passed": true
+    },
+    {
+      "name": "light.metadata.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.reported-volume.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.reported-volume.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.reported-volume.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.reported-volume.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "light.reported-volume.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "light.reported-volume.release_owned",
+      "passed": true
+    },
+    {
+      "name": "light.reported-volume.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.revision.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.revision.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.revision.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.revision.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "light.revision.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "light.revision.release_owned",
+      "passed": true
+    },
+    {
+      "name": "light.revision.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.source.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.source.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.source.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.source.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "light.source.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "light.source.release_owned",
+      "passed": true
+    },
+    {
+      "name": "light.source.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "light.room.down_routed",
+      "passed": true
+    },
+    {
+      "name": "light.room.held_draft_visible",
+      "passed": true
+    },
+    {
+      "name": "light.room.no_action_while_held",
+      "passed": true
+    },
+    {
+      "name": "light.room.draft_binding",
+      "passed": true
+    },
+    {
+      "name": "light.room.old_stream_binding",
+      "passed": true
+    },
+    {
+      "name": "light.room.release_owned",
+      "passed": true
+    },
+    {
+      "name": "light.room.fresh_gesture_accepted",
+      "passed": true
+    },
+    {
+      "name": "owned_hosts_destroyed",
+      "passed": true
+    },
+    {
+      "name": "bounded_native_work",
+      "passed": true
+    }
+  ],
+  "samples": [
+    {
+      "palette": "dark",
+      "case": "unchanged",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.6463898,
+      "continuedFraction": 0.75120336,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "dark",
+      "case": "metadata",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.6463898,
+      "continuedFraction": 0.75120336,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "dark",
+      "case": "reported-volume",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.6463898,
+      "continuedFraction": 0.7493998,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 74,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "dark",
+      "case": "revision",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.35,
+      "continuedFraction": 0.35,
+      "acceptedFromOldRelease": 0,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 74,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 2,
+          "currentRevision": 2,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "dark",
+      "case": "source",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.35,
+      "continuedFraction": 0.35,
+      "acceptedFromOldRelease": 0,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 74,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 2,
+          "currentRevision": 2,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "dark",
+      "case": "room",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.35,
+      "continuedFraction": 0.35,
+      "acceptedFromOldRelease": 0,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 74,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 2,
+          "currentRevision": 2,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-b",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "unchanged",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.6463898,
+      "continuedFraction": 0.75120336,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "metadata",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.6463898,
+      "continuedFraction": 0.75120336,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "reported-volume",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.6463898,
+      "continuedFraction": 0.7493998,
+      "acceptedFromOldRelease": 1,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 74,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "revision",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.35,
+      "continuedFraction": 0.35,
+      "acceptedFromOldRelease": 0,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 74,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 2,
+          "currentRevision": 2,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "source",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.35,
+      "continuedFraction": 0.35,
+      "acceptedFromOldRelease": 0,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 74,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 2,
+          "currentRevision": 2,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "palette": "light",
+      "case": "room",
+      "heldFraction": 0.6463898,
+      "reboundFraction": 0.35,
+      "continuedFraction": 0.35,
+      "acceptedFromOldRelease": 0,
+      "receipts": [
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 75,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 74,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 2,
+          "currentRevision": 2,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-a",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        },
+        {
+          "percent": 38,
+          "room": "ma:generated-room-b",
+          "renderedRevision": 1,
+          "currentRevision": 1,
+          "accepted": true
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "palette": "dark",
+      "phase": "held",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "relativePath": "cache/music-volume-binding-owned-1a704418-e2bc-4c4a-b3b3-3cead5e80585-dark-held.png"
+    },
+    {
+      "palette": "dark",
+      "phase": "rebound",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "relativePath": "cache/music-volume-binding-owned-1a704418-e2bc-4c4a-b3b3-3cead5e80585-dark-rebound.png"
+    },
+    {
+      "palette": "light",
+      "phase": "held",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "relativePath": "cache/music-volume-binding-owned-1a704418-e2bc-4c4a-b3b3-3cead5e80585-light-held.png"
+    },
+    {
+      "palette": "light",
+      "phase": "rebound",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "relativePath": "cache/music-volume-binding-owned-1a704418-e2bc-4c4a-b3b3-3cead5e80585-light-rebound.png"
+    }
+  ],
+  "passed": true,
+  "failureCount": 0,
+  "isolatedFailureCount": 0,
+  "caseCount": 12,
+  "elapsedMs": 9548,
+  "generatedOnly": true,
+  "providerProof": false,
+  "panelFpsProof": false
+}

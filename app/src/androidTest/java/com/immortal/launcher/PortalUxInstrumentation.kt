@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        if (options.getString("command") == "musicVolumeBinding") {
+            val volume = try { MusicVolumeBindingDeviceChecks.run(this) }
+            catch (_: Throwable) { Bundle().apply { putBoolean("musicVolumeBindingPassed", false) } }
+            finish(if (volume.getBoolean("musicVolumeBindingPassed")) 0 else 1, volume)
+            return
+        }
         if (options.getString("command") == "nightPhotoPause") {
             val night = try { NightPhotoPauseDeviceChecks.run(this) }
             catch (_: Throwable) { Bundle().apply { putBoolean("nightPhotoPausePassed", false) } }

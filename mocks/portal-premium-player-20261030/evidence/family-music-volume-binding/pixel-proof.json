@@ -1,0 +1,103 @@
+{
+  "baseline": {
+    "dark-held": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "held",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "inkRightmostPixel": 1769
+    },
+    "dark-rebound": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "rebound",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "inkRightmostPixel": 1856
+    },
+    "light-held": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "held",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "inkRightmostPixel": 1769
+    },
+    "light-rebound": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "rebound",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "inkRightmostPixel": 1856
+    }
+  },
+  "corrected": {
+    "dark-held": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "held",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "inkRightmostPixel": 1769
+    },
+    "dark-rebound": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "rebound",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "inkRightmostPixel": 1523
+    },
+    "light-held": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "held",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "inkRightmostPixel": 1769
+    },
+    "light-rebound": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "rebound",
+      "sliderBounds": [
+        1204,
+        489,
+        2075,
+        543
+      ],
+      "inkRightmostPixel": 1523
+    }
+  },
+  "sameBounds": true
+}

@@ -2,7 +2,20 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest verification, November 1 — native night-photo dwell.**
+**Newest delivery, November 1 — volume-gesture ownership.**
+[The Family Area volume fix](portal-music-volume-binding-2026-11-01.md)
+retires the entire volume control with its source/session observation and room.
+The same **88 native assertions** change from **10 failures to 88/88 passing**
+across twelve cases in both palettes. Four old source/revision releases
+accepted before the fix become **zero**, while six ordinary releases and
+all twelve fresh gestures remain accepted. Captured pixels corroborate a
+return to the reported **35%** after a binding change. All **3,765 fresh
+JVM tests** pass. Optimized APK **3c15a465…** is installed, with original
+settings/sources/services/pin/Dream restored **10 minutes 31 seconds** into
+the original 30-minute slot. This verifies silent native UI ownership, not
+provider/audio commands or FPS; physical fade acceptance remains pending.
+
+**Previous verification, November 1 — native night-photo dwell.**
 [The controlled Family Area check](portal-night-photo-pause-2026-11-01.md)
 passes **125/125 assertions/observations** using the production native
 controller and generated photos. A **10.313-second** clock hold preserves
