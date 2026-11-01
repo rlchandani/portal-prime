@@ -116,6 +116,18 @@ transition is **df4405bb**, documented in the [crossfade record][night-crossfade
 
 [night-crossfade]: portal-night-crossfade-2026-10-31.md
 
+**Physical Dream follow-up:** USB authorization and wireless ADB are restored.
+The [Android 10 Dream fix](portal-dream-brightness-2026-10-31.md) is installed as
+optimized APK `199aa8a1…`. Actual Dream brightness ramps measured 3.001–3.204
+seconds, recorded content faded both ways, the same visible photo returned and
+one tap reached Home without Dream reappearance in a one-second check.
+All 97 settings and 22 source fields were restored; the collector has zero
+listeners. Fresh gates passed 3,615 tests / 381 suites and both builds.
+System display-power delivery is verified; optical comfort, complete natural
+light-cycle acceptance, pinned-overlay physical acceptance and panel FPS remain
+open. The physical production music empty state was also inspected, but ready
+library/playback acceptance remains open. The full goal is still incomplete.
+
 [artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
 [artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json
 [local-artwork]: ../mocks/portal-premium-player-20261030/evidence/native-local-artwork/checks.json

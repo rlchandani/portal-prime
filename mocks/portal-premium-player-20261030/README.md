@@ -437,3 +437,15 @@ artifact and scalar results. This is one warmed PhotoFramePreviewActivity
 cohort, not a before/after gain, delivered FPS, visible-pixel check or a pass for
 cold startup, the system DreamService, retained-app recovery or all styles.
 Home/Apps and physical night-clock acceptance remain open.
+
+## Actual Portal Dream brightness
+
+`family-dream-brightness-checks.py` verifies the real Android 10 Dream, separately
+from the preview Activity. Supply a private connection JSON (`base`, `token`),
+ADB transport serial, expected installed APK SHA-256 and a new evidence directory
+outside Git. It guards the physical identity/display/artifact, validates temporary
+registry settings, measures system window ramps and restores all settings/sources.
+Personal captures and credentials stay in that private directory.
+
+The [physical Dream record](../../docs/portal-dream-brightness-2026-10-31.md)
+documents the fixed WindowManager delivery, measured fades and remaining limits.

@@ -78,9 +78,12 @@ restored exactly and synced. The owned forward was removed and emulator exited.
 
 ## Limits
 
-Family Area has Fleet access but no available ADB connection. This delivery
-does **not** claim physical API 29 fade comfort, panel FPS, or rendered acceptance
-of the pinned-overlay path on the physical Portal. Android 9/10 exposes the selected system brightness
+Family Area's USB authorization and Wi-Fi ADB were subsequently restored.
+The [physical Dream fix and verification](portal-dream-brightness-2026-10-31.md)
+found that Android 10 required an explicit WindowManager update to deliver the
+brightness ramp. That fix is installed and actual Dream window/display-power
+delivery and recorded content fades are verified. Physical comfort, panel FPS
+and the pinned-overlay path on the Portal remain unverified. Android 9/10 exposes the selected system brightness
 but not a public measurement of the Portal's actual adaptive backlight. Restoring
 Android's default brightness policy can therefore still depend on firmware.
 The finite software transitions and native API 34 pixels are verified; the

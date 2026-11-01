@@ -30,6 +30,16 @@ class PhotoDreamService : DreamService() {
   private var lostPanelShown = false
   private var nightBrightness: NightWindowBrightness? = null
 
+  override fun onWindowAttributesChanged(attrs: WindowManager.LayoutParams) {
+    super.onWindowAttributesChanged(attrs)
+    val dreamWindow = window ?: return
+    val decor = dreamWindow.decorView
+    // DreamService's callback is empty on Android 9/10; unlike Activity, setting
+    // Window.attributes alone never delivers our brightness ramp to WindowManager.
+    // Attribute changes also occur before attach, when no system view exists yet.
+    if (decor.isAttachedToWindow) dreamWindow.windowManager.updateViewLayout(decor, attrs)
+  }
+
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
     frameStopped = false

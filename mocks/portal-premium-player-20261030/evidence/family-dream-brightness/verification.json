@@ -1,0 +1,80 @@
+{
+  "success": true,
+  "naturalBrightLightExitTested": false,
+  "opticalBacklightMeasured": false,
+  "panelFpsMeasured": false,
+  "limitations": "Natural bright exit was not captured. Display-power override is verified, optical luminance and delivered panel FPS are not. Personal video is private. Near-onset photo retention was checked by the parent analysis, not by the standalone verifier.",
+  "targetGuardPassed": true,
+  "apiLevel": 29,
+  "apkSha256": "199aa8a171f400eb852ea4cac0e879ae179a623999f705fa09555f9d4b95ce29",
+  "originalDreamActive": false,
+  "darkEntryIntermediateCount": 11,
+  "darkEntrySpanSeconds": 3.001,
+  "liveUpIntermediateCount": 11,
+  "liveUpSpanSeconds": 3.077,
+  "liveDownIntermediateCount": 11,
+  "liveDownSpanSeconds": 3.065,
+  "registeredDisableIntermediateCount": 12,
+  "registeredDisableSpanSeconds": 3.204,
+  "modifiedSettingsCount": 8,
+  "temporaryDreamExited": true,
+  "settingsRestored": true,
+  "profileCompareCount": 97,
+  "profileMismatchCount": 0,
+  "sourceCompareCount": 22,
+  "sourcesExact": true,
+  "sourceMismatchCount": 0,
+  "profileAndSourcesRestored": true,
+  "homeWithoutDream": true,
+  "elapsedSeconds": 40.804,
+  "retainedPhoto": {
+    "referenceTimeSeconds": 20.933333333333334,
+    "postFadeTimeSeconds": 35.5,
+    "rgbCosineSimilarity": 0.9999099046184559,
+    "sameVisiblePhotoConfirmed": true,
+    "exactPixelsClaimed": false,
+    "basis": "Same visible recorded photo near fade onset and after return; exact pixels not claimed."
+  },
+  "contentFade": {
+    "sampleRateFps": 12,
+    "intermediateFramesDown": 19,
+    "intermediateFramesUp": 19,
+    "tenToNinetySpanSecondsDown": 1.5,
+    "tenToNinetySpanSecondsUp": 1.5
+  },
+  "settledDisplayPower": {
+    "brightnessOverride": 7,
+    "adaptiveBrightnessApplied": false,
+    "windowOverrideApplied": true
+  },
+  "finalChecks": {
+    "installedHashVerified": true,
+    "profileExact": true,
+    "sourcesExact": true,
+    "collectorActive": false,
+    "activeListeners": 0,
+    "wirelessAdbSerialVerified": true
+  },
+  "build": {
+    "sha256": "199aa8a171f400eb852ea4cac0e879ae179a623999f705fa09555f9d4b95ce29",
+    "bytes": 25842558,
+    "sameSigningCertificate": true,
+    "unitTests": 3615,
+    "unitSuites": 381,
+    "unitFailures": 0,
+    "unitErrors": 0,
+    "unitSkipped": 0
+  },
+  "naturalLightWatch": {
+    "sampleCount": 94,
+    "elapsedSeconds": 59.91,
+    "nightStates": [
+      false
+    ],
+    "luxRange": [
+      97,
+      101
+    ],
+    "transitionCaptured": false
+  }
+}
