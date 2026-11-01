@@ -2,6 +2,17 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Latest delivery, November 1 — hardware-aware brightness updates.**
+[Actual Family verification](portal-night-brightness-delivery-2026-11-01.md) passes
+**18/18** checks. Near-dark fades send **6 window updates instead of 85** in
+each direction; default-policy return sends **7 instead of 84**. The logical
+three-second fade and exact endpoints remain intact. **3,715 unit tests** pass;
+optimized APK **6c1adacc…** is installed with settings, sources, pin/accessibility
+state and original Dream preserved. This accepts redundant-update reduction,
+not optical smoothness, comfort or FPS. The user cannot perform the physical
+check now; that acceptance remains pending. Earlier artifact references below
+describe historical deliveries.
+
 **1 November follow-on — HTTP source startup cancellation delivered.**
 [Matched Family verification](portal-http-source-discovery-2026-11-01.md) passes
 **36/36** actual controller/HTTP checks: four stalled Immich/WebDAV requests went

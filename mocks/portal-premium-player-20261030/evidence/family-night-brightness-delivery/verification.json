@@ -1,0 +1,279 @@
+{
+  "schemaVersion": 1,
+  "status": "verified_for_redundant_dream_window_updates",
+  "sourceCommit": "fa84f96855efa4bad0d0e54b0faf2b8f24e3c0aa",
+  "branch": "codex/night-brightness-delivery-20261101",
+  "device": "Family Area Portal+ Android 10 API 29",
+  "startedUtc": "2026-11-01T09:50:10Z",
+  "deadlineUtc": "2026-11-01T10:20:10Z",
+  "deliveryVerifiedUtc": "2026-11-01T10:04:44Z",
+  "baseline": {
+    "gate": {
+      "passed": 14,
+      "total": 17
+    },
+    "probe": {
+      "pass": false,
+      "assertions": [
+        {
+          "name": "OwnedDreamPresent",
+          "pass": true
+        },
+        {
+          "name": "DreamWindowAttached",
+          "pass": true
+        },
+        {
+          "name": "ActualApi29",
+          "pass": true
+        },
+        {
+          "name": "downExactEndpoint",
+          "pass": true
+        },
+        {
+          "name": "downRedundantWindowUpdatesSuppressed",
+          "pass": false
+        },
+        {
+          "name": "downHardwareEndpoint",
+          "pass": true
+        },
+        {
+          "name": "upExactEndpoint",
+          "pass": true
+        },
+        {
+          "name": "upRedundantWindowUpdatesSuppressed",
+          "pass": false
+        },
+        {
+          "name": "upHardwareEndpoint",
+          "pass": true
+        },
+        {
+          "name": "DefaultOwnerNightEndpoint",
+          "pass": true
+        },
+        {
+          "name": "DefaultPolicyRestored",
+          "pass": true
+        },
+        {
+          "name": "DefaultHardwareEndpoint",
+          "pass": true
+        },
+        {
+          "name": "DefaultReturnRedundantWindowUpdatesSuppressed",
+          "pass": false
+        },
+        {
+          "name": "WindowOverrideRestored",
+          "pass": true
+        },
+        {
+          "name": "OriginalCallbackRestored",
+          "pass": true
+        },
+        {
+          "name": "SameControllerRetained",
+          "pass": true
+        },
+        {
+          "name": "NightModeUnchanged",
+          "pass": true
+        }
+      ],
+      "measurements": {
+        "downWindowUpdates": 85,
+        "downElapsedMs": 3276,
+        "upWindowUpdates": 85,
+        "upElapsedMs": 3253,
+        "systemSelectedBrightness": 9,
+        "defaultReturnWindowUpdates": 84,
+        "probeDurationMs": 13236
+      },
+      "globalSettingsWritten": false,
+      "opticalComfortTested": false,
+      "screenshotsOrMediaExported": false
+    },
+    "restoration": {
+      "observerStopped": true,
+      "testApkRestored": true,
+      "settingsExact": true,
+      "sourcesExact": true,
+      "persistentPinExact": true,
+      "originalOptimizedApkRestored": true,
+      "accessibilityExact": true,
+      "systemProcessUnchanged": true,
+      "collectorInactive": true,
+      "originalDreamRestored": true,
+      "restorationPass": true
+    }
+  },
+  "fixed": {
+    "gate": {
+      "passed": 18,
+      "total": 18
+    },
+    "probe": {
+      "pass": true,
+      "assertions": [
+        {
+          "name": "OwnedDreamPresent",
+          "pass": true
+        },
+        {
+          "name": "DreamWindowAttached",
+          "pass": true
+        },
+        {
+          "name": "ActualApi29",
+          "pass": true
+        },
+        {
+          "name": "downExactEndpoint",
+          "pass": true
+        },
+        {
+          "name": "downRedundantWindowUpdatesSuppressed",
+          "pass": true
+        },
+        {
+          "name": "downHardwareEndpoint",
+          "pass": true
+        },
+        {
+          "name": "upExactEndpoint",
+          "pass": true
+        },
+        {
+          "name": "upRedundantWindowUpdatesSuppressed",
+          "pass": true
+        },
+        {
+          "name": "upHardwareEndpoint",
+          "pass": true
+        },
+        {
+          "name": "DefaultOwnerNightEndpoint",
+          "pass": true
+        },
+        {
+          "name": "DefaultPolicyRestored",
+          "pass": true
+        },
+        {
+          "name": "DefaultHardwareEndpoint",
+          "pass": true
+        },
+        {
+          "name": "DefaultReturnRedundantWindowUpdatesSuppressed",
+          "pass": true
+        },
+        {
+          "name": "WindowOverrideRestored",
+          "pass": true
+        },
+        {
+          "name": "OriginalCallbackRestored",
+          "pass": true
+        },
+        {
+          "name": "SameDreamRetained",
+          "pass": true
+        },
+        {
+          "name": "SameControllerRetained",
+          "pass": true
+        },
+        {
+          "name": "NightModeUnchanged",
+          "pass": true
+        }
+      ],
+      "measurements": {
+        "downWindowUpdates": 6,
+        "downElapsedMs": 3274,
+        "upWindowUpdates": 6,
+        "upElapsedMs": 3252,
+        "systemSelectedBrightness": 9,
+        "defaultReturnWindowUpdates": 7,
+        "probeDurationMs": 13625
+      },
+      "globalSettingsWritten": false,
+      "opticalComfortTested": false,
+      "screenshotsOrMediaExported": false
+    },
+    "restoration": {
+      "observerStopped": true,
+      "testApkRestored": true,
+      "settingsExact": true,
+      "sourcesExact": true,
+      "persistentPinExact": true,
+      "originalOptimizedApkRestored": true,
+      "accessibilityExact": true,
+      "systemProcessUnchanged": true,
+      "collectorInactive": true,
+      "originalDreamRestored": true,
+      "restorationPass": true
+    }
+  },
+  "comparisonNote": "Fixed adds a same-Dream identity assertion and strengthens controller presence to object identity. Window-update cases and endpoint checks remain the same.",
+  "unitTests": {
+    "tests": 3715,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 392
+  },
+  "builds": {
+    "debug": "passed",
+    "performance": "passed",
+    "androidTest": "passed"
+  },
+  "artifacts": {
+    "debug": {
+      "sha256": "cd946dd55b9c027b0efe4d6951ba194d4ac6d5e69989fff50e9671ed67546bb9",
+      "bytes": 49734349,
+      "certificateMatchesOriginal": true
+    },
+    "test": {
+      "sha256": "7b9b072ba02f8d2748858f415889be40a44a928906fe78b32099fddeaaf21080",
+      "bytes": 2426972
+    },
+    "performance": {
+      "sha256": "6c1adacccac9045f0c5988709d77c45268b49e17a0340b4129c2d59f7cc6d4ee",
+      "bytes": 25858942,
+      "certificateMatchesOriginal": true
+    }
+  },
+  "deployment": {
+    "newApkSha256": "6c1adacccac9045f0c5988709d77c45268b49e17a0340b4129c2d59f7cc6d4ee",
+    "oldApkSha256": "6f413f87990c329677f82ddbc98124f86115de436983ae935a393fbc4df38e77",
+    "originalDreamActive": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "systemProcessUnchanged": true,
+    "pass": true,
+    "accessibilityExact": true,
+    "originalDreamRestored": true,
+    "elapsedSeconds": 17.16
+  },
+  "freshHealth": {
+    "installedHashMatches": true,
+    "noActiveInstrumentation": true,
+    "noPerformanceCollector": true,
+    "originalDreamActive": true,
+    "familyIdentityVerified": true
+  },
+  "physicalComfortTested": false,
+  "opticalBrightnessCurveTested": false,
+  "panelFpsTested": false,
+  "newPinnedOverlayNativeTested": false,
+  "livingAreaChanged": false,
+  "audioProviderTested": false,
+  "wholeGoalComplete": false,
+  "reviewConcreteBlockers": 0
+}
