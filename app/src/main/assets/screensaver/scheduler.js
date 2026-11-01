@@ -164,11 +164,13 @@
       if (stopped || !deck.length || (paused && direction === "auto")) return false;
       if (outgoing || handoff) { queued = direction; return true; }
       disarm("beat");
+      const navigationIndex = incoming && incoming.historyIndex != null ?
+          incoming.historyIndex : historyIndex;
       if (incoming) { dispose(incoming); incoming = null; }
       if (promotionFrame != null) { cancelAnimationFrame(promotionFrame); promotionFrame = null; }
       let target = null, targetIndex = null;
-      if (direction === "previous" && historyIndex > 0) targetIndex = historyIndex - 1;
-      else if (direction === "next" && historyIndex >= 0 && historyIndex + 1 < history.length) targetIndex = historyIndex + 1;
+      if (direction === "previous" && navigationIndex > 0) targetIndex = navigationIndex - 1;
+      else if (direction === "next" && navigationIndex >= 0 && navigationIndex + 1 < history.length) targetIndex = navigationIndex + 1;
       if (targetIndex != null) target = history[targetIndex];
       if (direction === "previous" && !target && current) target = { modeId: current.modeId, start: Math.max(0, current.start - 1) };
       let modeId = target ? target.modeId : opts.mode && opts.mode !== "shuffle" ?

@@ -1,0 +1,332 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "api29_window",
+      "passed": true
+    },
+    {
+      "name": "uuid_activity_created",
+      "passed": true
+    },
+    {
+      "name": "history_initial_A_red",
+      "passed": true
+    },
+    {
+      "name": "history_actual_initial_decode",
+      "passed": true
+    },
+    {
+      "name": "no_native_bridge",
+      "passed": true
+    },
+    {
+      "name": "initial_A_stable",
+      "passed": true
+    },
+    {
+      "name": "initial_A_bounded_scene_owners",
+      "passed": true
+    },
+    {
+      "name": "before_native_center_red",
+      "passed": true
+    },
+    {
+      "name": "history_next_B_green",
+      "passed": true
+    },
+    {
+      "name": "history_next_new_owner",
+      "passed": true
+    },
+    {
+      "name": "next_B_outgoing_retired",
+      "passed": true
+    },
+    {
+      "name": "next_B_bounded_scene_owners",
+      "passed": true
+    },
+    {
+      "name": "history_successful_previous_A_decode_held",
+      "passed": true
+    },
+    {
+      "name": "history_held_source_A",
+      "passed": true
+    },
+    {
+      "name": "history_successful_held_decode_count",
+      "passed": true
+    },
+    {
+      "name": "history_original_abort_signal",
+      "passed": true
+    },
+    {
+      "name": "history_held_A_cannot_publish",
+      "passed": true
+    },
+    {
+      "name": "previous_A_held_bounded_scene_owners",
+      "passed": true
+    },
+    {
+      "name": "history_next_returns_B",
+      "passed": true
+    },
+    {
+      "name": "history_cancel_new_B_owner",
+      "passed": true
+    },
+    {
+      "name": "cancel_B_outgoing_retired",
+      "passed": true
+    },
+    {
+      "name": "cancel_returns_B_bounded_scene_owners",
+      "passed": true
+    },
+    {
+      "name": "history_obsolete_decode_released",
+      "passed": true
+    },
+    {
+      "name": "history_late_decode_cannot_promote",
+      "passed": true
+    },
+    {
+      "name": "history_old_root_disposed",
+      "passed": true
+    },
+    {
+      "name": "history_disposed_root_no_late_write",
+      "passed": true
+    },
+    {
+      "name": "late_decode_bounded_scene_owners",
+      "passed": true
+    },
+    {
+      "name": "historyPreviousA",
+      "passed": true
+    },
+    {
+      "name": "final_A_outgoing_retired",
+      "passed": true
+    },
+    {
+      "name": "final_A_bounded_scene_owners",
+      "passed": true
+    },
+    {
+      "name": "same_activity_webview_document",
+      "passed": true
+    },
+    {
+      "name": "after_native_center_red",
+      "passed": true
+    },
+    {
+      "name": "owned_activity_destroyed",
+      "passed": true
+    },
+    {
+      "name": "exact_generated_files_removed",
+      "passed": true
+    },
+    {
+      "name": "inner_under_55_seconds",
+      "passed": true
+    }
+  ],
+  "artifacts": [
+    {
+      "phase": "before",
+      "relativePath": "before.png",
+      "width": 2160,
+      "height": 1440,
+      "redSamples": 81,
+      "sha256": "5f35bbaa51fe0bd3e4e6def4c07feb80a3120c2d2143af4cd9dcb7ba6233d124"
+    },
+    {
+      "phase": "after",
+      "relativePath": "after.png",
+      "width": 2160,
+      "height": 1440,
+      "redSamples": 81,
+      "sha256": "5f35bbaa51fe0bd3e4e6def4c07feb80a3120c2d2143af4cd9dcb7ba6233d124"
+    }
+  ],
+  "completed": true,
+  "passed": true,
+  "failureCount": 0,
+  "elapsedMs": 9972,
+  "lastPhase": "history_previous_A",
+  "initialDecodedCount": 1,
+  "observations": [
+    {
+      "phase": "initial_A",
+      "state": {
+        "commits": 1,
+        "currentOwner": 0,
+        "decoded": 1,
+        "disposedOwners": 0,
+        "documentOwned": true,
+        "held": false,
+        "heldAborted": false,
+        "heldHasAbortSignal": false,
+        "heldIndex": -1,
+        "maxSceneOwners": 1,
+        "minSceneOwners": 1,
+        "noNativeBridge": true,
+        "oldRootDisposed": false,
+        "oldRootMutations": 0,
+        "ready": true,
+        "released": false,
+        "releasedFrames": false,
+        "releasedSettled": false,
+        "sameDocument": true,
+        "sceneOwners": 1,
+        "visibleIndex": 0
+      }
+    },
+    {
+      "phase": "next_B",
+      "state": {
+        "commits": 2,
+        "currentOwner": 1,
+        "decoded": 2,
+        "disposedOwners": 1,
+        "documentOwned": true,
+        "held": false,
+        "heldAborted": false,
+        "heldHasAbortSignal": false,
+        "heldIndex": -1,
+        "maxSceneOwners": 2,
+        "minSceneOwners": 1,
+        "noNativeBridge": true,
+        "oldRootDisposed": false,
+        "oldRootMutations": 0,
+        "ready": true,
+        "released": false,
+        "releasedFrames": false,
+        "releasedSettled": false,
+        "sameDocument": true,
+        "sceneOwners": 1,
+        "visibleIndex": 1
+      }
+    },
+    {
+      "phase": "previous_A_held",
+      "state": {
+        "commits": 2,
+        "currentOwner": 1,
+        "decoded": 3,
+        "disposedOwners": 1,
+        "documentOwned": true,
+        "held": true,
+        "heldAborted": false,
+        "heldHasAbortSignal": true,
+        "heldIndex": 0,
+        "maxSceneOwners": 2,
+        "minSceneOwners": 1,
+        "noNativeBridge": true,
+        "oldRootDisposed": false,
+        "oldRootMutations": 2,
+        "ready": true,
+        "released": false,
+        "releasedFrames": false,
+        "releasedSettled": false,
+        "sameDocument": true,
+        "sceneOwners": 2,
+        "visibleIndex": 1
+      }
+    },
+    {
+      "phase": "cancel_returns_B",
+      "state": {
+        "commits": 3,
+        "currentOwner": 3,
+        "decoded": 4,
+        "disposedOwners": 3,
+        "documentOwned": true,
+        "held": true,
+        "heldAborted": true,
+        "heldHasAbortSignal": true,
+        "heldIndex": 0,
+        "maxSceneOwners": 2,
+        "minSceneOwners": 1,
+        "noNativeBridge": true,
+        "oldRootDisposed": true,
+        "oldRootMutations": 8,
+        "ready": true,
+        "released": false,
+        "releasedFrames": false,
+        "releasedSettled": false,
+        "sameDocument": true,
+        "sceneOwners": 1,
+        "visibleIndex": 1
+      }
+    },
+    {
+      "phase": "late_decode",
+      "state": {
+        "commits": 3,
+        "currentOwner": 3,
+        "decoded": 4,
+        "disposedOwners": 3,
+        "documentOwned": true,
+        "held": false,
+        "heldAborted": true,
+        "heldHasAbortSignal": true,
+        "heldIndex": 0,
+        "maxSceneOwners": 2,
+        "minSceneOwners": 1,
+        "noNativeBridge": true,
+        "oldRootDisposed": true,
+        "oldRootMutations": 8,
+        "ready": true,
+        "released": true,
+        "releasedFrames": true,
+        "releasedSettled": true,
+        "sameDocument": true,
+        "sceneOwners": 1,
+        "visibleIndex": 1
+      }
+    },
+    {
+      "phase": "final_A",
+      "state": {
+        "commits": 4,
+        "currentOwner": 4,
+        "decoded": 5,
+        "disposedOwners": 4,
+        "documentOwned": true,
+        "held": false,
+        "heldAborted": true,
+        "heldHasAbortSignal": true,
+        "heldIndex": 0,
+        "maxSceneOwners": 2,
+        "minSceneOwners": 1,
+        "noNativeBridge": true,
+        "oldRootDisposed": true,
+        "oldRootMutations": 8,
+        "ready": true,
+        "released": true,
+        "releasedFrames": true,
+        "releasedSettled": true,
+        "sameDocument": true,
+        "sceneOwners": 1,
+        "visibleIndex": 0
+      }
+    }
+  ],
+  "generatedOnly": true,
+  "shippedAssets": true
+}

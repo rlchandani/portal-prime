@@ -96,7 +96,8 @@ See the [final receipt](../mocks/portal-premium-player-20261030/evidence/family-
 [native assertions](../mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/checks.json)
 and [pixel check](../mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/geometry.json).
 
-A separate audit reproduced interrupted Previous/Next history duplication;
-that is retained for the next bounded issue and was not changed here.
+A separate audit reproduced interrupted Previous/Next history duplication.
+It was not changed in this delivery; the subsequent
+[history fix](portal-slideshow-history-2026-11-01.md) now addresses it.
 The room-light brightness comfort check and broader performance goal remain
 incomplete. Music provider/audio wiring remains deferred.

@@ -1,0 +1,14 @@
+{
+  "before": {
+    "width": 2160,
+    "height": 1440,
+    "centerRedPixels": 81,
+    "sampleCount": 81
+  },
+  "after": {
+    "width": 2160,
+    "height": 1440,
+    "centerRedPixels": 81,
+    "sampleCount": 81
+  }
+}

@@ -30,18 +30,21 @@ import java.util.concurrent.atomic.AtomicReference
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** Owned offline Window/WebView, shipped Filmstrip renderer, and genuinely decoded color PNGs. */
+/** Owned offline Window/WebView, shipped renderers/scheduler, and genuinely decoded color PNGs. */
 internal object FilmstripInputDeviceChecks {
   private const val HOST = "com.immortal.launcher.MusicDesignPreviewActivity"
+  private const val HISTORY_REPORT_PREFIX = "slideshow-history-owned-"
 
   fun run(probe: Instrumentation): Bundle = Probe(probe).run()
+  fun runHistory(probe: Instrumentation): Bundle = Probe(probe, history = true).run()
 
-  private class Probe(private val probe: Instrumentation) {
+  private class Probe(private val probe: Instrumentation, private val history: Boolean = false) {
     private val began = SystemClock.elapsedRealtime()
     private val workDeadline = began + 48_000
     private val deadline = began + 55_000
     private val token = UUID.randomUUID().toString()
-    private val prefix = "filmstrip-input-owned-$token"
+    private val prefix = if (history) "$HISTORY_REPORT_PREFIX$token" else "filmstrip-input-owned-$token"
+    private val resultKey = if (history) "slideshowHistory" else "filmstripInput"
     private val folder = File(probe.targetContext.cacheDir, prefix)
     private val reportFile = File(probe.targetContext.cacheDir, "$prefix.json")
     private val handler = Handler(Looper.getMainLooper())
@@ -52,6 +55,7 @@ internal object FilmstripInputDeviceChecks {
     private val checks = JSONArray()
     private val artifacts = JSONArray()
     private val photos = JSONArray()
+    private val observations = JSONArray()
     private var web: WebView? = null
     private var registered = false
     private var failures = 0
@@ -125,7 +129,9 @@ internal object FilmstripInputDeviceChecks {
       return JSONObject(raw)
     }
 
-    private fun state(): JSONObject = js("window.filmstripInput ? filmstripInput.state() : ({})")
+    private fun state(): JSONObject = js(
+        if (history) "window.slideshowHistory ? slideshowHistory.state() : ({})"
+        else "window.filmstripInput ? filmstripInput.state() : ({})")
 
     private fun awaitState(label: String, predicate: (JSONObject) -> Boolean): JSONObject {
       val until = minOf(workDeadline, SystemClock.elapsedRealtime() + 8_000)
@@ -182,7 +188,7 @@ internal object FilmstripInputDeviceChecks {
           }
         }
         check(done.await(remaining(), TimeUnit.MILLISECONDS) && status == PixelCopy.SUCCESS)
-        // The center card is the actual red PNG, independently of JS center/Promise assertions.
+        // Native center pixels independently verify the generated red PNG at both endpoints.
         var red = 0
         for (y in height / 2 - 4..height / 2 + 4)
           for (x in width / 2 - 4..width / 2 + 4) {
@@ -265,6 +271,179 @@ internal object FilmstripInputDeviceChecks {
       </script></body></html>
     """.trimIndent()
 
+    private fun historyPage(): String = """
+      <!doctype html><html data-owned-probe="$token"><head><meta name="viewport" content="width=device-width,initial-scale=1">
+      <link rel="stylesheet" href="styles.css"></head><body><div id="stage"></div>
+      <script>window.PHOTOS=$photos;window.aspect=function(p){return p.w/p.h;};
+      window.photoUrl=function(p){return p.url;};window.shuffled=function(deck){return deck.slice();};</script>
+      <script src="lib-engine.js"></script><script src="modes.js"></script>
+      <script src="mode-impls.js"></script><script src="scheduler.js"></script><script>
+      (function(){
+        var stage=document.getElementById('stage'), doc=document, decoder=window.preloadDecoded;
+        var modeRun=SS.MODES.kenBurns.run, owners=[], decoded=0, commits=0, arm=false, gate=null;
+        var held=false, heldIndex=-1, heldSignal=null, heldOwner=null, released=false;
+        var releasedFrames=false, releasedSettled=false, minOwners=99, maxOwners=0;
+        function sample(){
+          var n=stage.querySelectorAll('.ss-beat').length;
+          minOwners=Math.min(minOwners,n);maxOwners=Math.max(maxOwners,n);
+        }
+        function current(){
+          // An incoming root is never evidence of publication. Outgoing roots retain .on,
+          // so select the latest committed beat and its admitted internal layer.
+          var beats=stage.querySelectorAll('.ss-beat.on');
+          return beats.length ? beats[beats.length-1] : null;
+        }
+        function index(root){
+          var hero=root && root.querySelector('.ss-layer.on .ss-hero');
+          if(!hero)return -1;
+          var source=hero.style.backgroundImage;
+          for(var i=0;i<PHOTOS.length;i++){
+            if(source==='url("'+PHOTOS[i].url+'")' || source==="url('"+PHOTOS[i].url+"')" ||
+                source==='url('+PHOTOS[i].url+')')return i;
+          }
+          return -1;
+        }
+        SS.MODES.kenBurns.run=function(ctx,deck){
+          var entry={root:ctx.root,disposed:false,mutations:0};
+          owners.push(entry);sample();
+          new MutationObserver(function(records){entry.mutations+=records.length;})
+            .observe(entry.root,{subtree:true,attributes:true,childList:true});
+          var cleanup=modeRun(ctx,deck);
+          var wrapped=function(){entry.disposed=true;cleanup();};
+          // Preserve the renderer's own ready getter and pause/resume contracts.
+          ['ready','pause','resume','next','previous','nativeToken','restore'].forEach(function(key){
+            var descriptor=Object.getOwnPropertyDescriptor(cleanup,key);
+            if(descriptor)Object.defineProperty(wrapped,key,descriptor);
+          });
+          return wrapped;
+        };
+        window.preloadDecoded=function(url,signal){
+          var hold=arm; if(hold)arm=false;
+          var entry=owners[owners.length-1];
+          // The shipped decoder receives the original abort signal and must succeed
+          // before its result is gated. The late result intentionally survives abort.
+          return decoder(url,signal).then(function(value){
+            decoded++;
+            if(!hold)return value;
+            held=true;heldIndex=PHOTOS.findIndex(function(p){return p.url===url;});
+            heldSignal=signal;heldOwner=entry;
+            return new Promise(function(resolve){
+              gate=function(){gate=null;held=false;released=true;resolve(value);};
+            }).then(function(value){releasedSettled=true;return value;});
+          });
+        };
+        var engine=SS.startEngine({stage:stage,mode:'kenBurns',intervalSec:600,
+          photoMotion:false,onReady:function(){commits++;sample();}});
+        new MutationObserver(sample).observe(stage,{childList:true});
+        window.slideshowHistory={
+          state:function(){
+            sample();var root=current();
+            return {ready:commits>0,visibleIndex:index(root),commits:commits,decoded:decoded,
+              sceneOwners:stage.querySelectorAll('.ss-beat').length,minSceneOwners:minOwners,
+              maxSceneOwners:maxOwners,currentOwner:owners.findIndex(function(o){return o.root===root;}),
+              disposedOwners:owners.filter(function(o){return o.disposed;}).length,
+              held:held,heldIndex:heldIndex,heldHasAbortSignal:!!heldSignal,
+              heldAborted:!!heldSignal && heldSignal.aborted,
+              oldRootDisposed:!!heldOwner && heldOwner.disposed && !heldOwner.root.isConnected,
+              oldRootMutations:heldOwner ? heldOwner.mutations : 0,
+              released:released,releasedSettled:releasedSettled,releasedFrames:releasedFrames,
+              sameDocument:document===doc,
+              documentOwned:document.documentElement.getAttribute('data-owned-probe')===${JSONObject.quote(token)},
+              noNativeBridge:typeof window.Android==='undefined'};
+          },
+          next:function(){engine.next();return this.state();},
+          pendingPrevious:function(){arm=true;engine.previous();return this.state();},
+          previous:function(){engine.previous();return this.state();},
+          release:function(){
+            if(gate)gate();
+            requestAnimationFrame(function(){requestAnimationFrame(function(){releasedFrames=true;});});
+            return this.state();
+          }
+        };
+        window.addEventListener('pagehide',function(){engine.stop();});
+      })();
+      </script></body></html>
+    """.trimIndent()
+
+    private fun retireHistoryFade(label: String): JSONObject {
+      // Scheduler retires the outgoing owner after its shipped 1600ms fade + 100ms.
+      check(remaining(2_000) >= 1_750)
+      SystemClock.sleep(1_750)
+      return awaitState(label) { it.optInt("sceneOwners") == 1 }
+    }
+
+    private fun observeHistory(label: String, value: JSONObject) {
+      observations.put(JSONObject().put("phase", label).put("state", value))
+      demand("${label}_bounded_scene_owners", value.getInt("minSceneOwners") in 1..2 &&
+          value.getInt("maxSceneOwners") in 1..2)
+    }
+
+    private fun historyScenario() {
+      phase = "history_initial_A"
+      val initial = awaitState("history_initial_A_red") {
+        it.optBoolean("ready") && it.optInt("visibleIndex", -1) == 0 && it.optInt("commits") == 1
+      }
+      initialDecodedCount = initial.getInt("decoded")
+      demand("history_actual_initial_decode", initialDecodedCount >= 1)
+      demand("no_native_bridge", initial.getBoolean("noNativeBridge"))
+      val owner = activity.get()
+      val browser = web
+      observeHistory("initial_A", retireHistoryFade("initial_A_stable"))
+      capture("before")
+
+      phase = "history_next_B"
+      js("slideshowHistory.next()")
+      val next = awaitState("history_next_B_green") {
+        it.optInt("visibleIndex", -1) == 1 && it.optInt("commits") == 2
+      }
+      demand("history_next_new_owner", next.getInt("currentOwner") != initial.getInt("currentOwner"))
+      observeHistory("next_B", retireHistoryFade("next_B_outgoing_retired"))
+
+      phase = "history_previous_A_held"
+      js("slideshowHistory.pendingPrevious()")
+      val held = awaitState("history_successful_previous_A_decode_held") { it.optBoolean("held") }
+      demand("history_held_source_A", held.getInt("heldIndex") == 0)
+      demand("history_successful_held_decode_count", held.getInt("decoded") > next.getInt("decoded"))
+      demand("history_original_abort_signal", held.getBoolean("heldHasAbortSignal") &&
+          !held.getBoolean("heldAborted"))
+      demand("history_held_A_cannot_publish", held.getInt("visibleIndex") == 1 &&
+          held.getInt("commits") == 2)
+      observeHistory("previous_A_held", held)
+
+      phase = "history_next_cancels_A"
+      js("slideshowHistory.next()")
+      val canceled = awaitState("history_next_returns_B") {
+        it.optInt("visibleIndex", -1) == 1 && it.optInt("commits") == 3 &&
+            it.optBoolean("oldRootDisposed") && it.optBoolean("heldAborted")
+      }
+      demand("history_cancel_new_B_owner", canceled.getInt("currentOwner") != next.getInt("currentOwner"))
+      val retired = retireHistoryFade("cancel_B_outgoing_retired")
+      observeHistory("cancel_returns_B", retired)
+
+      phase = "history_release_obsolete_decode"
+      js("slideshowHistory.release()")
+      val late = awaitState("history_obsolete_decode_released") {
+        it.optBoolean("releasedSettled") && it.optBoolean("releasedFrames")
+      }
+      demand("history_late_decode_cannot_promote", late.getInt("visibleIndex") == 1 &&
+          late.getInt("commits") == 3 && late.getInt("currentOwner") == retired.getInt("currentOwner"))
+      demand("history_old_root_disposed", late.getBoolean("oldRootDisposed") && late.getBoolean("heldAborted"))
+      demand("history_disposed_root_no_late_write",
+          late.getInt("oldRootMutations") == retired.getInt("oldRootMutations"))
+      observeHistory("late_decode", late)
+
+      phase = "history_previous_A"
+      js("slideshowHistory.previous()")
+      val final = awaitState("historyPreviousA") {
+        it.optInt("visibleIndex", -1) == 0 && it.optInt("commits") == 4
+      }
+      observeHistory("final_A", retireHistoryFade("final_A_outgoing_retired"))
+      demand("same_activity_webview_document", main {
+        activity.get() === owner && web === browser && browser?.isAttachedToWindow == true
+      } && final.getBoolean("sameDocument") && final.getBoolean("documentOwned"))
+      capture("after")
+    }
+
     fun run(): Bundle {
       try {
         demand("worker_off_main", Looper.myLooper() != Looper.getMainLooper())
@@ -304,52 +483,57 @@ internal object FilmstripInputDeviceChecks {
           }
           browser.webViewClient = WebViewClient()
           owner.setContentView(browser)
-          browser.loadDataWithBaseURL("file:///android_asset/screensaver/", page(), "text/html", "UTF-8", null)
+          browser.loadDataWithBaseURL("file:///android_asset/screensaver/",
+              if (history) historyPage() else page(), "text/html", "UTF-8", null)
         }
-        phase = "initial_decode"
-        val initial = awaitState("shipped_renderer_ready") { it.optBoolean("ready") }
-        initialDecodedCount = initial.getInt("decoded")
-        // The shipped viewport bound may leave offscreen cards undecoded.
-        demand("actual_initial_decodes", initialDecodedCount >= 1)
-        demand("initial_center_zero", initial.getInt("center") == 0)
-        demand("no_native_bridge", initial.getBoolean("noNativeBridge"))
-        val owner = activity.get()
-        val browser = web
-        // Initial go(0) also animates the shipped track from its CSS starting position.
-        check(remaining(2_000) >= 1_600)
-        SystemClock.sleep(1_600)
-        capture("before")
-        phase = "queued_input"
-        js("filmstripInput.begin()")
-        val held = awaitState("actual_navigation_decode_held") { it.optBoolean("held") }
-        demand("previous_pending_until_release", !held.getBoolean("previousDone"))
-        demand("next_pending_until_release", !held.getBoolean("firstDone"))
-        demand("no_center_publication_while_held", held.getInt("center") == 0)
-        js("filmstripInput.release()")
-        val final = awaitState("both_gestures_completed") {
-          it.optBoolean("firstDone") && it.optBoolean("previousDone")
+        if (history) {
+          historyScenario()
+        } else {
+          phase = "initial_decode"
+          val initial = awaitState("shipped_renderer_ready") { it.optBoolean("ready") }
+          initialDecodedCount = initial.getInt("decoded")
+          // The shipped viewport bound may leave offscreen cards undecoded.
+          demand("actual_initial_decodes", initialDecodedCount >= 1)
+          demand("initial_center_zero", initial.getInt("center") == 0)
+          demand("no_native_bridge", initial.getBoolean("noNativeBridge"))
+          val owner = activity.get()
+          val browser = web
+          // Initial go(0) also animates the shipped track from its CSS starting position.
+          check(remaining(2_000) >= 1_600)
+          SystemClock.sleep(1_600)
+          capture("before")
+          phase = "queued_input"
+          js("filmstripInput.begin()")
+          val held = awaitState("actual_navigation_decode_held") { it.optBoolean("held") }
+          demand("previous_pending_until_release", !held.getBoolean("previousDone"))
+          demand("next_pending_until_release", !held.getBoolean("firstDone"))
+          demand("no_center_publication_while_held", held.getInt("center") == 0)
+          js("filmstripInput.release()")
+          val final = awaitState("both_gestures_completed") {
+            it.optBoolean("firstDone") && it.optBoolean("previousDone")
+          }
+          demand("both_gestures_accepted", final.getBoolean("firstOK") && final.getBoolean("previousOK"))
+          demand("queued_previous_returns_initial", final.getInt("center") == 0)
+          demand("next_then_previous_order", final.getJSONArray("observed").toString() == "[1,0]")
+          demand("same_activity_webview_document", main {
+            activity.get() === owner && web === browser && browser?.isAttachedToWindow == true
+          } && final.getString("documentToken") == token)
+          // Allow shipped 1.4s card/track transitions to finish before independent native pixels.
+          check(remaining(2_000) >= 1_600)
+          SystemClock.sleep(1_600)
+          capture("after")
+          phase = "close_queue"
+          js("filmstripInput.closeBusy()")
+          awaitState("close_decode_held") { it.optBoolean("held") }
+          val closed = js("filmstripInput.dispose()")
+          js("filmstripInput.release()")
+          val late = awaitState("closed_queue_settled") {
+            it.opt("lateFirst") == false && it.opt("latePrevious") == false &&
+                it.optBoolean("releasedFrames")
+          }
+          demand("closed_queue_no_late_center_write", late.getInt("center") == closed.getInt("center"))
+          demand("closed_queue_no_late_dom_write", late.getInt("mutationCount") == closed.getInt("mutationCount"))
         }
-        demand("both_gestures_accepted", final.getBoolean("firstOK") && final.getBoolean("previousOK"))
-        demand("queued_previous_returns_initial", final.getInt("center") == 0)
-        demand("next_then_previous_order", final.getJSONArray("observed").toString() == "[1,0]")
-        demand("same_activity_webview_document", main {
-          activity.get() === owner && web === browser && browser?.isAttachedToWindow == true
-        } && final.getString("documentToken") == token)
-        // Allow shipped 1.4s card/track transitions to finish before independent native pixels.
-        check(remaining(2_000) >= 1_600)
-        SystemClock.sleep(1_600)
-        capture("after")
-        phase = "close_queue"
-        js("filmstripInput.closeBusy()")
-        awaitState("close_decode_held") { it.optBoolean("held") }
-        val closed = js("filmstripInput.dispose()")
-        js("filmstripInput.release()")
-        val late = awaitState("closed_queue_settled") {
-          it.opt("lateFirst") == false && it.opt("latePrevious") == false &&
-              it.optBoolean("releasedFrames")
-        }
-        demand("closed_queue_no_late_center_write", late.getInt("center") == closed.getInt("center"))
-        demand("closed_queue_no_late_dom_write", late.getInt("mutationCount") == closed.getInt("mutationCount"))
         completed = true
       } catch (_: Throwable) { expect("isolated_failure", false) }
       finally {
@@ -390,18 +574,20 @@ internal object FilmstripInputDeviceChecks {
           .put("completed", completed).put("passed", passed).put("failureCount", failures)
           .put("elapsedMs", SystemClock.elapsedRealtime() - began).put("lastPhase", phase)
           .put("initialDecodedCount", initialDecodedCount)
+          .put("observations", observations)
           .put("generatedOnly", true).put("shippedAssets", true)
       var written = false
       try { reportFile.writeText(report.toString(2)); written = reportFile.length() > 0 }
       catch (_: Throwable) { /* Only generated assertion labels and UUID-owned paths are returned. */ }
       return Bundle().apply {
-        putBoolean("filmstripInputCompleted", completed && written)
-        putBoolean("filmstripInputPassed", passed && written)
-        putBoolean("filmstripInputNativePassed", passed && written)
-        putInt("filmstripInputFailureCount", failures)
-        putString("filmstripInputReportRelativePath", "cache/${reportFile.name}")
-        putString("filmstripInputArtifactsJson", artifacts.toString())
-        putString("filmstripInputChecksJson", checks.toString())
+        putBoolean("${resultKey}Completed", completed && written)
+        putBoolean("${resultKey}Passed", passed && written)
+        putBoolean("${resultKey}NativePassed", passed && written)
+        putInt("${resultKey}FailureCount", failures)
+        putString("${resultKey}ReportRelativePath", "cache/${reportFile.name}")
+        putString("${resultKey}ArtifactsJson", artifacts.toString())
+        putString("${resultKey}ChecksJson", checks.toString())
+        if (history) putString("slideshowHistoryObservationsJson", observations.toString())
       }
     }
   }

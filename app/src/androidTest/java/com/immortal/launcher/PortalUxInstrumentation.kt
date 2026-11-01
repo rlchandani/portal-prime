@@ -40,6 +40,21 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Owned offline scheduler history window; no UiAutomation or private diagnostics.
+        if (options.getString("command") == "slideshowHistory") {
+            val history = try {
+                FilmstripInputDeviceChecks.runHistory(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("slideshowHistoryCompleted", false)
+                    putBoolean("slideshowHistoryPassed", false)
+                    putBoolean("slideshowHistoryNativePassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (history.getBoolean("slideshowHistoryPassed")) 0 else 1, history)
+            return
+        }
         // Owned offline Filmstrip Window/WebView only; no UiAutomation or settings mutations.
         if (options.getString("command") == "filmstripInput") {
             val filmstrip = try {

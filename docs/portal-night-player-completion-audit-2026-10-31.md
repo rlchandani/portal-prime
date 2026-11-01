@@ -2,7 +2,20 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — Filmstrip input during decoding.**
+**Newest delivery, November 1 — interrupted slideshow history.**
+[The history fix](portal-slideshow-history-2026-11-01.md) captures a pending
+history position before cancellation. Reversing a loading Previous no longer
+produces `[A, B, B]`; both cancellation directions and repeated requests are
+covered. Three source failures are corrected; the broader suite passes
+**346 JavaScript tests**, with four unrelated Chrome checks skipped.
+The Family Area owned Android WebView probe passes **36/36 assertions** in
+**9.972 seconds**, retaining one/two scene owners and rejecting obsolete decode
+publication. Native endpoint pixels confirm A. Optimized APK **94937414…**
+is installed, with exact restoration verified **6 minutes 25 seconds** into
+the original 30-minute slot. This is existing-history functionality evidence,
+not delivered panel FPS, Dream-host acceptance or room-light fade comfort.
+
+**Previous delivery, November 1 — Filmstrip input during decoding.**
 [The queue fix](portal-filmstrip-input-2026-11-01.md) retains one latest pending
 direction instead of dropping a swipe during another move. Three regressions
 change from failed to passing; the broader JavaScript suite passes **342 tests**
@@ -13,8 +26,8 @@ Optimized APK **ac3b46b7…** is installed, with exact configuration/cache/servi
 restoration verified **11 minutes 34 seconds** into the original 30-minute slot.
 The first harness-assumption and cleanup-observer failures are retained.
 This accepts shipped-renderer input admission, not panel FPS, the optimized
-artifact's native behavior or room-light fade comfort. A separate interrupted
-history duplication remains queued for the next bounded issue.
+artifact's native behavior or room-light fade comfort. The separate interrupted
+history duplication is now addressed by the newer delivery above.
 
 **Previous delivery, November 1 — live cached face results.**
 [The Family Area fix](portal-live-face-metadata-2026-11-01.md) removes the
