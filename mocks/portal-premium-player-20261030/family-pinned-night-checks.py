@@ -34,7 +34,7 @@ import urllib.request
 PKG = "com.immortal.launcher.debug"
 FILES = "me.zhanghai.android.files"
 PHYSICAL_SERIAL = "FAMILY_PORTAL_SERIAL"
-APK_PREFIX = "625e9f5d"
+APK_PREFIX = "bfc9430d"
 WIDTH, HEIGHT = 2160, 1440
 ROI = (604, 403, 1555, 950)
 EPS = 1e-6

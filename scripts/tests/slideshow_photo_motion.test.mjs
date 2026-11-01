@@ -161,50 +161,44 @@ test('still Panorama centers its bounded crop on matte and preserves cached face
   }
 });
 
-test('still Mosaic centers both horizontal and vertical bounded crops without changing BSP geometry', async () => {
+test('still Mosaic contains mismatched photos without changing BSP geometry', async () => {
   const r = fixture('mosaic', { photoMotion: false });
   try {
     await r.cleanup.ready;
     const cells = r.nodes().filter(node => node.classList.contains('ss-mcell'));
     assert.equal(cells.length, 9);
-    let horizontal = 0, vertical = 0;
+    const geometry = cells.map(cell => JSON.stringify(cell.style));
     for (const image of photos(r)) {
       const cell = image.parent.parent, W = parseFloat(cell.style.width), H = parseFloat(cell.style.height);
       const width = parseFloat(image.style.width), height = parseFloat(image.style.height);
-      assert.ok(width <= W * 2 && height <= H * 2);
+      const left = parseFloat(image.style.left), top = parseFloat(image.style.top);
+      assert.ok(left >= 0 && top >= 0 && left + width <= W && top + height <= H);
       assert.equal(image.style.backgroundSize, 'contain');
       assert.equal(r.computed(cell).background, '#1c1b19');
-      if (image.classList.contains('panh')) {
-        horizontal++;
-        assert.equal(Number(/translateX\(([^)]+)%\)/.exec(image.style.transform)?.[1]) * width / 100,
-          (W - width) / 2);
-      } else if (image.classList.contains('panv')) {
-        vertical++;
-        assert.equal(Number(/translateY\(([^)]+)%\)/.exec(image.style.transform)?.[1]) * height / 100,
-          (H - height) / 2);
-      } else {
-        assert.equal(parseFloat(image.style.left), W * .04);
-        assert.equal(parseFloat(image.style.top), H * .04);
-        assert.equal(image.style.transform, 'none');
-      }
+      assert.equal(image.style.transform, 'none');
       still(r, image);
     }
-    assert.ok(horizontal > 0 && vertical > 0, 'The composition exercises both pan axes');
+    await r.advanceTo(7500);
+    assert.deepEqual(cells.map(cell => JSON.stringify(cell.style)), geometry);
   } finally { r.cleanup(); }
 });
 
-test('still Mosaic retains face positions at both ends of each bounded pan axis', async () => {
-  for (const [w, h, axis] of [[10000, 1000, 'X'], [400, 16000, 'Y']]) {
+test('still Mosaic retains edge face points inside complete contained photos', async () => {
+  for (const [w, h] of [[10000, 1000], [400, 16000]]) {
     for (const focal of [0, .25, .5, .8, 1]) {
       const r = fixture('mosaic', { photoMotion: false,
         photos: [{ seed: 'face', w, h, fx: focal, fy: focal }] });
       try {
         await r.cleanup.ready;
-        const image = photos(r)[0], extent = parseFloat(image.style[axis === 'X' ? 'width' : 'height']);
-        const viewport = axis === 'X' ? 2160 : 1440;
-        const shift = Number(new RegExp(`translate${axis}\\(([^)]+)%\\)`).exec(image.style.transform)?.[1]) * extent / 100;
-        assert.ok(extent <= viewport * 2);
-        assert.ok(extent * focal + shift >= -.001 && extent * focal + shift <= viewport + .001);
+        const image = photos(r)[0], W = parseFloat(image.style.width), H = parseFloat(image.style.height);
+        const scale = Math.min(W / w, H / h);
+        const left = parseFloat(image.style.left) + (W - w * scale) / 2;
+        const top = parseFloat(image.style.top) + (H - h * scale) / 2;
+        const x = left + w * scale * focal, y = top + h * scale * focal;
+        assert.ok(left >= 0 && top >= 0 && left + w * scale <= 2160 && top + h * scale <= 1440);
+        assert.ok(x >= 0 && x <= 2160 && y >= 0 && y <= 1440);
+        assert.equal(image.style.backgroundSize, 'contain');
+        assert.equal(image.style.transform, 'none');
         still(r, image);
       } finally { r.cleanup(); }
     }

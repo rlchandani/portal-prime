@@ -66,6 +66,33 @@ test('Mosaic photo bounds never exceed two tile widths/heights, even for extreme
   } finally { r.cleanup(); }
 });
 
+test('Mosaic still photos fit inside their tiles instead of freezing a cropped pan', async () => {
+  for (const source of [{ seed: 'portrait', w: 800, h: 1200 },
+    { seed: 'panorama', w: 2400, h: 800 }]) {
+    for (const options of [
+      { photoMotion: false, photos: [source] },
+      { photoMotion: true, photos: [{ ...source, fx: .1, fy: .9 }] },
+    ]) {
+      const r = fixture(options);
+      try {
+        await r.cleanup.ready;
+        for (const cell of cells(r)) {
+          const image = cell.children.at(-1).children[0];
+          const W = parseFloat(cell.style.width), H = parseFloat(cell.style.height);
+          const w = parseFloat(image.style.width), h = parseFloat(image.style.height);
+          const x = parseFloat(image.style.left), y = parseFloat(image.style.top);
+          assert.ok(x >= 0 && y >= 0 && x + w <= W && y + h <= H,
+            'A still photo must remain fully inside its tile');
+          assert.equal(image.style.backgroundSize, 'contain');
+          assert.equal(image.style.transform, 'none');
+          assert.equal(image.style.animation, 'none');
+          assert.equal(image.style.willChange, 'auto');
+        }
+      } finally { r.cleanup(); }
+    }
+  }
+});
+
 test('the spotlight guides one active photo and visits every tile without reshaping the wall', async () => {
   const r = fixture();
   try {

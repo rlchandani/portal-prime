@@ -822,29 +822,28 @@
       const W = cell.rect.w, H = cell.rect.h, rawAspect = aspect(p);
       const ratio = Number.isFinite(rawAspect) && rawAspect > 0 ? rawAspect : W / H;
       const plan = SS.fitPlan(ratio, W / H);
+      const mayMove = ctx.photoMotion !== false && !hasFace(p);
       let width = W * .92, height = H * .92, left = W * .04, top = H * .04, travel = 0;
-      let animation = "cinematicDrift", axis = null, size = 100;
-      if (plan.mode === "panV") {
+      let animation = "cinematicDrift", axis = null;
+      if (mayMove && plan.mode === "panV") {
         height = Math.min(H * 2, Math.max(H, W / ratio)); width = Math.min(W, height * ratio);
         left = (W - width) / 2; top = 0; travel = (H - height) / height * 100;
-        animation = "panV"; axis = "translateY"; size = height / H * 100;
-      } else if (plan.mode === "panH") {
+        animation = "panV"; axis = "translateY";
+      } else if (mayMove && plan.mode === "panH") {
         width = Math.min(W * 2, Math.max(W, H * ratio)); height = Math.min(H, width / ratio);
         left = 0; top = (H - height) / 2; travel = (W - width) / width * 100;
-        animation = "panH"; axis = "translateX"; size = width / W * 100;
+        animation = "panH"; axis = "translateX";
       }
       image.className = "ss-img mosaic-photo " + (axis ? (plan.mode === "panV" ? "panv" : "panh") : "kb");
       image.style.width = width + "px"; image.style.height = height + "px";
       image.style.left = left + "px"; image.style.top = top + "px";
       image.style.right = "auto"; image.style.bottom = "auto";
       image.style.setProperty("--travel", travel + "%");
-      bg(image, url, "contain"); layer.moves = ctx.photoMotion !== false && !hasFace(p);
+      // A stopped pan must contain the whole photo, not retain its oversized crop.
+      bg(image, url, "contain"); layer.moves = mayMove;
       image.style.animation = layer.moves ?
         `${animation} ${Math.max(12000, ctx.motionMs)}ms ease-in-out infinite alternate` : "none";
-      const focal = plan.mode === "panV" ? p.fy : p.fx;
-      const start = SS.panStart(ctx.photoMotion === false && !hasFace(p) ? .5 : focal, size);
-      image.style.transform = axis && (hasFace(p) || ctx.photoMotion === false) ?
-        `${axis}(${travel * start}%)` : "none";
+      image.style.transform = "none";
       cell.photo = p; applySpot(cell); cell.dissolve.present(pane);
     }
     function wantFor(cellA) { return cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape"; }
