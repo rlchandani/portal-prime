@@ -2,6 +2,22 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Latest bounded delivery, November 1 — playing preview clock.**
+[The playing-control check](portal-music-playing-native-2026-11-01.md) reproduces
+and fixes a **15.112-second volume-induced rewind** in the debug preview.
+The final normal playing seek case passes **19/19** assertions; a late native
+volume receipt passes **20/20 offline analysis checks**, preserving the clock
+and emitting one action after release. The original eight-case runs remain
+failed/incomplete; light reverse and cancellation cases are parked. Source
+**05a127fb** changes only the preview producer and test tooling, with **3,722
+fresh unit tests passing**. The final parent's failed cleanup is retained;
+independent recovery and exact-file cleanup restore optimized APK **bfc9430d…**,
+97 settings, 22 sources and the original Dream. Baseline accessibility is
+verified against recovery, rather than an unavailable initial literal list.
+Fresh health is complete by **12:41:32 UTC**, **22 minutes 55 seconds** into
+the original 30-minute slot. No provider, panel-FPS or production runtime
+optimization is claimed.
+
 **Latest native verification, November 1 — slideshow sequences.**
 [The full legacy-style content pass](portal-slideshow-sequences-native-2026-11-01.md)
 checks **10,222 decoded frames in 16 recordings**: 12 legacy styles, then four

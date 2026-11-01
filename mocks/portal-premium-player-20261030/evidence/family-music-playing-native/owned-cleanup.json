@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "optimizedApkSha256": "bfc9430d5150c62dea647a48fcb02ade23aa3a76a0232c10eca0fa9a44aee974",
+  "exactOwnedFilesRemoved": 8,
+  "observerStarted": false,
+  "systemProcessUnchanged": true,
+  "baselineAccessibilityRestored": true,
+  "originalDreamRestored": true
+}

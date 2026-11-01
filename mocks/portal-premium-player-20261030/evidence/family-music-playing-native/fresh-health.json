@@ -1,0 +1,23 @@
+{
+  "optimizedApkExact": true,
+  "optimizedApkSha256": "bfc9430d5150c62dea647a48fcb02ade23aa3a76a0232c10eca0fa9a44aee974",
+  "testApkExact": true,
+  "allFourOwnedSnapshotPrefixesAbsent": true,
+  "ownedRemainingCount": 0,
+  "observerInactive": true,
+  "originalImmortalDreamRunning": true,
+  "baselineAccessibilityExactToRecovery": true,
+  "collectorInactive": true,
+  "pinClean": true,
+  "settingsExact": true,
+  "settingsCount": 97,
+  "sourcesExact": true,
+  "sourceCount": 22,
+  "brightnessPolicyExact": true,
+  "globalFontScaleExact": true,
+  "systemProcessUnchangedSinceRecovery": true,
+  "physicalFamilyIdentity": true,
+  "apiLevel": 29,
+  "nonDebuggable": true,
+  "success": true
+}

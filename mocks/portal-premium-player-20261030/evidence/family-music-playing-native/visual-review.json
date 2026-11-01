@@ -1,0 +1,14 @@
+{
+  "reviewedImages": [
+    "playing-seek.png",
+    "playing-volume-late.png"
+  ],
+  "theme": "dark",
+  "fontScale": 1.8,
+  "nativeWidth": 2160,
+  "nativeHeight": 1440,
+  "observedRowOverlap": false,
+  "allIntermediateFramesReviewed": false,
+  "productionChromeReviewed": false,
+  "generatedArtworkOnly": true
+}

@@ -1,0 +1,163 @@
+[
+  {
+    "case": "dark-seek-release",
+    "name": "observed native gesture area is at least 48dp",
+    "passed": true,
+    "frameNumber": 1,
+    "widthPx": 562,
+    "heightPx": 54
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "native gesture completed on the requested enabled control",
+    "passed": true,
+    "frameNumber": 2
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "playback clock visibly advances before the drag",
+    "passed": true,
+    "frameNumber": 2,
+    "elapsedMs": 2135,
+    "visibleAdvanceMs": 2010.998
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "playInitial: command count follows release-only contract",
+    "passed": true,
+    "frameNumber": 2,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "playAdvanced: command count follows release-only contract",
+    "passed": true,
+    "frameNumber": 2,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "initial: command count follows release-only contract",
+    "passed": true,
+    "frameNumber": 2,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "pressed: command count follows release-only contract",
+    "passed": true,
+    "frameNumber": 2,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "mid: command count follows release-only contract",
+    "passed": true,
+    "frameNumber": 2,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "held: command count follows release-only contract",
+    "passed": true,
+    "frameNumber": 2,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "beforeRelease: command count follows release-only contract",
+    "passed": true,
+    "frameNumber": 2,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "released: command count follows release-only contract",
+    "passed": true,
+    "frameNumber": 2,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "held thumb stays on the local draft while time passes",
+    "passed": true,
+    "frameNumber": 2,
+    "heldMs": 2249,
+    "midFraction": 0.4827586,
+    "heldFraction": 0.4827586
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "native drag reaches its endpoint before completion",
+    "passed": true,
+    "frameNumber": 2,
+    "beforeReleaseFraction": 0.85957855,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "final range agrees with terminal native observation",
+    "passed": true,
+    "frameNumber": 2
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "final counters match the requested completion",
+    "passed": true,
+    "frameNumber": 2
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "released control reaches requested value",
+    "passed": true,
+    "frameNumber": 2,
+    "finalFraction": 0.88068336,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "elapsed text agrees with playing native range",
+    "passed": true,
+    "frameNumber": 2,
+    "elapsedSeconds": 211,
+    "rangeSeconds": 211.364
+  },
+  {
+    "case": "dark-seek-release",
+    "name": "same selected track stays playing",
+    "passed": true,
+    "frameNumber": 2
+  },
+  {
+    "case": "dark-volume-release",
+    "name": "observed native gesture area is at least 48dp",
+    "passed": true,
+    "frameNumber": 4,
+    "widthPx": 827,
+    "heightPx": 54
+  }
+]

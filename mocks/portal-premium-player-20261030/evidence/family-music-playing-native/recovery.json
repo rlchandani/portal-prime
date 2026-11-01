@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "optimizedApkSha256": "bfc9430d5150c62dea647a48fcb02ade23aa3a76a0232c10eca0fa9a44aee974",
+  "testApkRestored": true,
+  "settingsCount": 97,
+  "sourceCount": 22,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "baselineAccessibilityRestored": true,
+  "originalAccessibilityExactNotIndependentlyRecorded": true,
+  "brightnessPolicyExact": true,
+  "globalFontScaleExact": true,
+  "systemProcessUnchangedDuringRecovery": true,
+  "observerTerminal": true,
+  "pinClean": true,
+  "collectorInactive": true,
+  "dreamRestored": true,
+  "lateGeneratedFiles": {
+    ".json": 18644,
+    ".png": 354219
+  }
+}

@@ -1,0 +1,416 @@
+{
+  "beforeClockFixVolume": {
+    "control": "Family Area volume",
+    "enabled": true,
+    "finishAction": "release",
+    "completed": true,
+    "moveEventCount": 24,
+    "playbackAdvancedBeforeGesture": true,
+    "phases": [
+      {
+        "phase": "playInitial",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 35
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.38805833
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 0
+      },
+      {
+        "phase": "playAdvanced",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 35
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.39645416
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2119
+      },
+      {
+        "phase": "initial",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 35
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.39645416
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2143
+      },
+      {
+        "phase": "pressed",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 35
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.39645416
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2250
+      },
+      {
+        "phase": "mid",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 48.856415
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.39855
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2659
+      },
+      {
+        "phase": "held",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 48.856415
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.40692917
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 4881
+      },
+      {
+        "phase": "beforeRelease",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 85.635315
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.40905
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 5409
+      },
+      {
+        "phase": "released",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 85
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.34608334
+        },
+        "seekCommands": 0,
+        "volumeCommands": 1,
+        "relativeElapsedMs": 5619
+      }
+    ]
+  },
+  "afterClockFixVolumeLate": {
+    "control": "Family Area volume",
+    "enabled": true,
+    "finishAction": "release",
+    "completed": true,
+    "moveEventCount": 24,
+    "playbackAdvancedBeforeGesture": true,
+    "phases": [
+      {
+        "phase": "playInitial",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 35
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.4089125
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 0
+      },
+      {
+        "phase": "playAdvanced",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 35
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.4172875
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2140
+      },
+      {
+        "phase": "initial",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 35
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.4172875
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2183
+      },
+      {
+        "phase": "pressed",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 35
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.4172875
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2299
+      },
+      {
+        "phase": "mid",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 48.856415
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.41937917
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2741
+      },
+      {
+        "phase": "held",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 48.856415
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.42984167
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 5013
+      },
+      {
+        "phase": "beforeRelease",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 85.635315
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.45127082
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 10484
+      },
+      {
+        "phase": "released",
+        "range": {
+          "minimum": 0,
+          "maximum": 100,
+          "current": 85
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.49505833
+        },
+        "seekCommands": 0,
+        "volumeCommands": 1,
+        "relativeElapsedMs": 20706
+      }
+    ]
+  },
+  "afterClockFixSeek": {
+    "control": "Track position",
+    "enabled": true,
+    "finishAction": "release",
+    "completed": true,
+    "moveEventCount": 24,
+    "playbackAdvancedBeforeGesture": true,
+    "phases": [
+      {
+        "phase": "playInitial",
+        "range": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.36694166
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.36694166
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 0
+      },
+      {
+        "phase": "playAdvanced",
+        "range": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.37532082
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.37532082
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2135
+      },
+      {
+        "phase": "initial",
+        "range": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.37532082
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.37532082
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2162
+      },
+      {
+        "phase": "pressed",
+        "range": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.37532082
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.37532082
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2265
+      },
+      {
+        "phase": "mid",
+        "range": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.4827586
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.4827586
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 2768
+      },
+      {
+        "phase": "held",
+        "range": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.4827586
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.4827586
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 5017
+      },
+      {
+        "phase": "beforeRelease",
+        "range": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.85957855
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.85957855
+        },
+        "seekCommands": 0,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 5564
+      },
+      {
+        "phase": "released",
+        "range": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.88068336
+        },
+        "trackRange": {
+          "minimum": 0,
+          "maximum": 1,
+          "current": 0.88068336
+        },
+        "seekCommands": 1,
+        "volumeCommands": 0,
+        "relativeElapsedMs": 10701
+      }
+    ]
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "classification": "offline_analysis_of_late_native_receipt",
+  "newDeviceInput": false,
+  "originalParentAcceptanceStillFailed": true,
+  "passed": 20,
+  "total": 20,
+  "checks": [
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "observed native gesture area is at least 48dp",
+      "passed": true,
+      "frameNumber": 4,
+      "widthPx": 827,
+      "heightPx": 54
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "native gesture completed on the requested enabled control",
+      "passed": true,
+      "frameNumber": 5
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "playback clock visibly advances before the drag",
+      "passed": true,
+      "frameNumber": 5,
+      "elapsedMs": 2140,
+      "visibleAdvanceMs": 2010.0
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "playInitial: command count follows release-only contract",
+      "passed": true,
+      "frameNumber": 5,
+      "seekCommands": 0,
+      "volumeCommands": 0,
+      "expectedSeekCommands": 0,
+      "expectedVolumeCommands": 0
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "playAdvanced: command count follows release-only contract",
+      "passed": true,
+      "frameNumber": 5,
+      "seekCommands": 0,
+      "volumeCommands": 0,
+      "expectedSeekCommands": 0,
+      "expectedVolumeCommands": 0
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "initial: command count follows release-only contract",
+      "passed": true,
+      "frameNumber": 5,
+      "seekCommands": 0,
+      "volumeCommands": 0,
+      "expectedSeekCommands": 0,
+      "expectedVolumeCommands": 0
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "pressed: command count follows release-only contract",
+      "passed": true,
+      "frameNumber": 5,
+      "seekCommands": 0,
+      "volumeCommands": 0,
+      "expectedSeekCommands": 0,
+      "expectedVolumeCommands": 0
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "mid: command count follows release-only contract",
+      "passed": true,
+      "frameNumber": 5,
+      "seekCommands": 0,
+      "volumeCommands": 0,
+      "expectedSeekCommands": 0,
+      "expectedVolumeCommands": 0
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "held: command count follows release-only contract",
+      "passed": true,
+      "frameNumber": 5,
+      "seekCommands": 0,
+      "volumeCommands": 0,
+      "expectedSeekCommands": 0,
+      "expectedVolumeCommands": 0
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "beforeRelease: command count follows release-only contract",
+      "passed": true,
+      "frameNumber": 5,
+      "seekCommands": 0,
+      "volumeCommands": 0,
+      "expectedSeekCommands": 0,
+      "expectedVolumeCommands": 0
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "released: command count follows release-only contract",
+      "passed": true,
+      "frameNumber": 5,
+      "seekCommands": 0,
+      "volumeCommands": 1,
+      "expectedSeekCommands": 0,
+      "expectedVolumeCommands": 1
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "held thumb stays on the local draft while time passes",
+      "passed": true,
+      "frameNumber": 5,
+      "heldMs": 2272,
+      "midFraction": 0.48856415,
+      "heldFraction": 0.48856415
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "volume drag leaves the playback clock advancing",
+      "passed": true,
+      "frameNumber": 5,
+      "elapsedMs": 2272,
+      "visibleAdvanceMs": 2511.0
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "native drag reaches its endpoint before completion",
+      "passed": true,
+      "frameNumber": 5,
+      "beforeReleaseFraction": 0.85635315,
+      "targetFraction": 0.85
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "final range agrees with terminal native observation",
+      "passed": true,
+      "frameNumber": 5
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "final counters match the requested completion",
+      "passed": true,
+      "frameNumber": 5
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "released control reaches requested value",
+      "passed": true,
+      "frameNumber": 5,
+      "finalFraction": 0.85,
+      "targetFraction": 0.85
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "volume completion does not rewind the playing clock",
+      "passed": true,
+      "frameNumber": 5,
+      "backwardMs": -10509.002
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "volume label agrees with native control",
+      "passed": true,
+      "frameNumber": 5,
+      "expectedPercent": 85
+    },
+    {
+      "case": "dark-volume-release-late-receipt-analysis",
+      "name": "same selected track stays playing",
+      "passed": true,
+      "frameNumber": 5
+    }
+  ]
+}

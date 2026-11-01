@@ -1,0 +1,9 @@
+{
+  "suiteCount": 392,
+  "tests": 3722,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "freshAfterPreviewClockChange": true,
+  "laterObserverOnlyBuildUnitTaskUpToDate": true
+}
