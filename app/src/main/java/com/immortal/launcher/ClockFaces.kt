@@ -34,6 +34,8 @@ interface ClockFaceView {
   val view: View
   /** Refresh for the current second. [blinkOn] drives the blink separator. */
   fun update(now: Date, blinkOn: Boolean)
+  /** Publish current time before a retained surface is revealed, without restarting work. */
+  fun refreshForReveal(now: Date, blinkOn: Boolean) { update(now, blinkOn) }
   /** True when [view] is a full-screen layer that positions itself (e.g. a WebView clock),
    *  rather than a small view placed in a grid bucket. */
   val fullBleed: Boolean

@@ -1,0 +1,73 @@
+{
+  "issue": "Stale retained photo time during night-clock return",
+  "device": "Family Area",
+  "androidApi": 29,
+  "nativeDisplayPixels": [2160, 1440],
+  "artifactSha256": "36188b2c9dbbaa01c5011d73f42ca3fd0b9bde4ae342e4b060f82c0eb36555bf",
+  "optimizedNonDebuggable": true,
+  "productionFixMade": true,
+  "unitTests": {
+    "suites": 383,
+    "tests": 3625,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "newTests": 10
+  },
+  "buildsPassed": ["debug", "performance"],
+  "independentStaticReview": "No actionable findings",
+  "cases": [
+    {
+      "mode": "wholePhoto",
+      "baselineTime": "12:24",
+      "returnTime": "12:25",
+      "visualRevealTime": "12:25",
+      "observedLux": 3,
+      "retainedPhotoMaxChannelDifference": 0,
+      "retainedPhotoMeanChannelDifference": 0,
+      "exactPhotoReturned": true,
+      "automatedPass": true,
+      "visualReviewPass": true
+    },
+    {
+      "mode": "kenBurns",
+      "baselineTime": "12:25",
+      "returnTime": "12:26",
+      "visualRevealTime": "12:26",
+      "observedLux": 3,
+      "retainedPhotoMaxChannelDifference": 0,
+      "retainedPhotoMeanChannelDifference": 0,
+      "exactPhotoReturned": true,
+      "automatedPass": true,
+      "visualReviewPass": true
+    }
+  ],
+  "hardwareWorkflowSeconds": 116.21,
+  "videoReview": {
+    "sampleHz": 6,
+    "framesPerCase": 28,
+    "reviewedSecondsPerCase": 4.666667,
+    "earliestLegibleTimeCorrect": true
+  },
+  "settingsRestored": 97,
+  "sourceFieldsRestored": 22,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "unpinnedRetained": true,
+  "accessibilityServiceListExact": true,
+  "systemProcessUnchangedDuringInstallation": true,
+  "originalDreamRestored": true,
+  "collectorInactive": true,
+  "deploymentQualification": {
+    "initialWholePinResponseAssertionFailed": true,
+    "reason": "Foreground diagnostics compared across Home and Dream",
+    "persistentPinFieldsUnchanged": true,
+    "secondInstallationPerformed": false
+  },
+  "naturalBrightExitTested": false,
+  "opticalBrightnessMeasured": false,
+  "panelFpsMeasured": false,
+  "privateMediaPublished": false,
+  "pass": true,
+  "broaderGoalComplete": false
+}

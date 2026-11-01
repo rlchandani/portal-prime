@@ -187,6 +187,16 @@ class SplitFlapClockFaceView(
         if (!active) cancelFlips()
     }
 
+    override fun refreshForReveal(now: Date, blinkOn: Boolean) {
+        if (disposed) return
+        cancelFlips()
+        val digits = timeFmt.format(now).toCharArray()
+        digits.copyInto(displayedDigits)
+        digits.copyInto(pendingDigits)
+        refreshImmediately = true
+        view.invalidate()
+    }
+
     private fun cancelFlips() {
         for (i in animators.indices) {
             animators[i]?.cancel()

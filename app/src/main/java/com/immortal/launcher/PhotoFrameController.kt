@@ -187,16 +187,24 @@ class PhotoFrameController(
   private var quietClock: QuietNightClockView? = null
   private var darkRoomObserver: DarkRoomObserver? = null
   private var nightSettingsReceiver: BroadcastReceiver? = null
+  private val revealClockRefresh = ClockRevealRefresh { wallClockMs ->
+    if (!photosOnly && faceRendererDelegate.isInitialized())
+      faceRenderer.refreshRetainedTime(Date(wallClockMs))
+  }
   private val nightTransitionHandler = android.os.Handler(android.os.Looper.getMainLooper())
   private val nightTransition = NightClockTransition(
       nowMs = android.os.SystemClock::uptimeMillis,
       postDelayed = { task, delay -> nightTransitionHandler.postDelayed(task, delay) },
       removeCallbacks = { task -> nightTransitionHandler.removeCallbacks(task) },
       onReveal = { level ->
+        // Photos remain suspended throughout the dissolve, but their clock is already visible.
+        if (!ambientNight && hostVisible && !stopped && level < 1f)
+          revealClockRefresh.update(System.currentTimeMillis())
         quietClock?.setReveal(level)
         if (level == 0f) quietClock?.visibility = View.GONE
       },
       onSettled = { night ->
+        revealClockRefresh.reset()
         quietClock?.setActive(night && hostVisible && !stopped)
         applyHostActive(hostVisible && !night && !stopped)
       })
@@ -1182,6 +1190,7 @@ class PhotoFrameController(
   /** Suspend a retained host without destroying its photo, WebView, or user pause choice. */
   @androidx.annotation.MainThread
   fun setHostActive(value: Boolean) {
+    if (hostVisible != value) revealClockRefresh.reset()
     hostVisible = value
     darkRoomObserver?.setActive(value && !stopped)
     quietClock?.setActive(value && (isNightClockShowing || nightTransition.coversPhotos) && !stopped)
@@ -1227,6 +1236,7 @@ class PhotoFrameController(
 
   private fun setAmbientNight(value: Boolean) {
     if (stopped || ambientNight == value) return
+    revealClockRefresh.reset()
     ambientNight = value
     val root = view as FrameLayout
     if (value && quietClock == null) {
@@ -1346,6 +1356,7 @@ class PhotoFrameController(
   @androidx.annotation.MainThread
   fun stop() {
     stopped = true
+    revealClockRefresh.reset()
     nightTransition.close()
     val receiver = nightSettingsReceiver
     nightSettingsReceiver = null

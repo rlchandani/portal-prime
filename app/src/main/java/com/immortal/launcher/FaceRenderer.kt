@@ -158,6 +158,13 @@ class FaceRenderer(
     if (work.isActive) resumeHostWork() else suspendHostWork()
   }
 
+  /** Refresh visible time/date for a returning cover; media, listeners and timers stay paused. */
+  fun refreshRetainedTime(now: Date) {
+    if (work.isStopped) return
+    clockFace?.refreshForReveal(now, blinkOn)
+    if (face.clock.showDate) dateView?.setMetadataText(face.clock.dateFormat.format(now))
+  }
+
   private fun resumeHostWork() {
     val token = work.token() ?: return
     clockFace?.setHostActive(true)

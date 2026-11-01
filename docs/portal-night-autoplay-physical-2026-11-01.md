@@ -55,7 +55,8 @@ FPS. Source inspection also identifies a possible legacy pause-command boundary
 race; these two observations do not prove that every asynchronous boundary is
 race-free.
 
-The recordings expose a separate quality issue: after the night clock crosses
-a minute boundary, the returning photo's smaller clock initially displays the
-old minute before refreshing. That issue remains to be fixed. The broader
+The recordings exposed a separate quality issue: after the night clock crossed
+a minute boundary, the returning photo's smaller clock initially displayed the
+old minute before refreshing. The [subsequent clock-reveal fix](portal-clock-reveal-physical-2026-11-01.md)
+is installed and passes both physical renderer checks. The broader
 platform/night/player goal remains incomplete.

@@ -169,8 +169,20 @@ Native logs show zero scene admissions while covered. All 97 settings and
 22 source fields were restored, with the optimized APK unchanged and zero
 collector listeners. Static local-photo retention is accepted for these two
 cases; moving-photo/video behavior, natural bright exit and optical comfort
-retain their existing qualifications. The recordings reveal a separate stale
-minute in the returning photo clock, which remains open.
+retain their existing qualifications. The recordings revealed a separate stale
+minute in the returning photo clock, addressed by the subsequent fix below.
+
+**Clock-reveal fix:** [the subsequent production change and physical checks](portal-clock-reveal-physical-2026-11-01.md)
+close the stale-minute finding for static local photos in Whole Photo and
+Ken Burns. Native recordings show the current minute from the earliest legible
+photo-clock frame throughout the return fade. Both retained photo regions match
+exactly, with zero pixel difference. **3,625 unit tests passed**, debug and
+optimized builds passed, and optimized APK `36188b2c…` is installed on Family
+Area. Time/date snapshots refresh without resuming hidden media or timers.
+All settings, sources, accessibility services and original Dream state were
+restored. The user cannot do the natural room-light check now, so that check
+and optical brightness comfort remain unverified. The full goal remains
+incomplete.
 
 [artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
 [artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json

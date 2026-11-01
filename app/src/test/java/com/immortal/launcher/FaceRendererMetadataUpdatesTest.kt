@@ -24,6 +24,23 @@ import org.mockito.Mockito
 
 /** Count writes at the real tick's TextView boundary, while preserving clock/timer updates. */
 class FaceRendererMetadataUpdatesTest {
+  @Test fun returningClockRefreshesAcrossMidnightWithoutResumingHiddenWork() = fixture { f ->
+    f.tick()
+    f.renderer.setHostActive(false)
+    Mockito.clearInvocations(f.clock, f.handler)
+    f.now += 86_400_000L
+    val refresh = f.renderer.javaClass.methods.singleOrNull { it.name == "refreshRetainedTime" }
+    assertNotNull("The retained clock must refresh before reveal without resuming media work", refresh)
+    refresh!!.invoke(f.renderer, Date(f.now))
+    assertEquals(listOf("2030-01-01", "2030-01-02"), f.date.writes)
+    val clockCalls = Mockito.mockingDetails(f.clock).invocations
+    val publication = clockCalls.single { it.method.name == "refreshForReveal" }
+    assertEquals(f.now, (publication.arguments[0] as Date).time)
+    assertFalse((field(f.renderer, "work").get(f.renderer) as FaceRendererWorkState).isActive)
+    Mockito.verify(f.clock, Mockito.never()).setHostActive(true)
+    Mockito.verify(f.handler, Mockito.never()).postDelayed(Mockito.any(Runnable::class.java), Mockito.anyLong())
+  }
+
   @Test fun sixtyUnchangedTicksWriteMetadataOnceButStillUpdateTheClockEverySecond() = fixture { f ->
     f.weather("Clear 21°")
     repeat(60) { f.tick() }
