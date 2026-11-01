@@ -251,9 +251,12 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                 onDismiss = { finish() }, onLayoutChange = { layout = it },
                 onAction = { action ->
                   message = "Silent design preview · sample music · no audio"
+                  val actionAt = SystemClock.elapsedRealtime()
+                  // Preserve the advancing timeline before changing its anchor. Seek
+                  // and track changes below intentionally replace this position.
+                  position = snapshot.visiblePositionMs(actionAt) ?: position
                   when (action) {
                     MusicPlayerUiAction.TogglePlayback -> {
-                      position = snapshot.visiblePositionMs(SystemClock.elapsedRealtime()) ?: position
                       playing = !playing
                     }
                     MusicPlayerUiAction.Next -> {
@@ -287,7 +290,7 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                     MusicPlayerUiAction.BrowseLibrary -> { browse = "library"; collection = null }
                     else -> message = "Design preview · provider controls are deferred · no audio"
                   }
-                  changedAt = SystemClock.elapsedRealtime()
+                  changedAt = actionAt
                 },
                 photoContent = { modifier ->
                   if (photos != null) {

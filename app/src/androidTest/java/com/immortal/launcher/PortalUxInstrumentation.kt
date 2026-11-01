@@ -619,6 +619,8 @@ class PortalUxInstrumentation : Instrumentation() {
                     }
                 }
             }, 9, java.util.concurrent.TimeUnit.SECONDS)
+            var musicGestureStage: String? =
+                if (command.optString("command") == "musicSliderGesture") "preview-binding" else null
             try {
                 if (command.optString("command") == "nightBrightnessDelivery") {
                     val report = NightBrightnessDeliveryDeviceChecks.run(this, automation)
@@ -715,7 +717,9 @@ class PortalUxInstrumentation : Instrumentation() {
                 capturePhase("accessibility-tree")
                 val musicGesture = if (command.optString("command") == "musicSliderGesture") {
                     musicSliderGesture(automation, active, command,
-                        checkNotNull(musicMonitor.lastActivity as? MusicDesignPreviewActivity))
+                        checkNotNull(musicMonitor.lastActivity as? MusicDesignPreviewActivity)) { stage ->
+                        musicGestureStage = stage
+                    }
                 } else null
                 val snapshot = snapshotWindows(automation,
                     if (musicGesture != null) root(automation) else active)
@@ -753,8 +757,10 @@ class PortalUxInstrumentation : Instrumentation() {
                     .put("success", true).toString())
             } catch (error: Throwable) {
                 capturePhase("error")
-                response.writeText(JSONObject().put("name", name).put("captureId", captureId).put("success", false)
-                    .put("errorType", error.javaClass.simpleName).toString())
+                val failure = JSONObject().put("name", name).put("captureId", captureId).put("success", false)
+                    .put("errorType", error.javaClass.simpleName)
+                musicGestureStage?.let { failure.put("gestureStage", it) }
+                response.writeText(failure.toString())
             } finally {
                 captureFinished.set(true)
                 stallProbe?.cancel(false)
@@ -775,51 +781,141 @@ class PortalUxInstrumentation : Instrumentation() {
         }
     }
 
-    /** Silent fixture only: one continuous pointer stream, with values/counters during the drag. */
+    /** Silent fixture only: one pointer stream, with optional observed playback and bounded holds. */
     private fun musicSliderGesture(
         automation: UiAutomation,
         active: AccessibilityNodeInfo,
         command: JSONObject,
         preview: MusicDesignPreviewActivity,
+        progress: (String) -> Unit,
     ): JSONObject {
+        progress("validate")
         check(active.packageName?.toString() == targetContext.packageName)
         val label = command.getString("control").also {
             require(it == "Track position" || it == "Family Area volume")
         }
-        val control = checkNotNull(find(active, label))
-        check(control.isVisibleToUser && control.className?.toString() == "android.widget.SeekBar")
-        val bounds = Rect().also(control::getBoundsInScreen)
-        val density = targetContext.resources.displayMetrics.density
-        check(bounds.width() >= 48 * density && bounds.height() >= 48 * density)
         val startFraction = command.getDouble("startFraction").also { require(it in 0.05..0.95) }
         val endFraction = command.getDouble("endFraction").also { require(it in 0.05..0.95) }
         val duration = command.optLong("moveMs", 480).also { require(it in 240..1_500) }
         val steps = command.optInt("steps", 24).also { require(it in 8..48) }
+        val startPlayback = command.optBoolean("startPlayback", false)
+        val pressHoldMs = command.optLong("pressHoldMs", 0).also { require(it in 0..2_500) }
+        val midHoldMs = command.optLong("midHoldMs", 0).also { require(it in 0..2_500) }
+        val finishWithCancel = command.optBoolean("finishWithCancel", false)
+        val playAdvanceMs = 2_100L
+        val pauseWaitMs = 1_500L
+        // Leave over nine seconds of the parent's 20-second allowance for native
+        // accessibility, idle synchronization and its final screenshot.
+        val plannedObservationMs = duration + pressHoldMs + midHoldMs + 200 +
+            if (startPlayback) playAdvanceMs + pauseWaitMs else 0L
+        require(plannedObservationMs <= 10_500)
         val initialWindowId = active.windowId
         val phases = JSONArray()
-        fun phase(name: String) {
-            val current = root(automation)
+        fun guardedRoot(current: AccessibilityNodeInfo = root(automation)): AccessibilityNodeInfo {
             check(current.windowId == initialWindowId &&
                 current.packageName?.toString() == targetContext.packageName)
+            runOnMainSync {
+                check(!preview.isFinishing && !preview.isDestroyed &&
+                    preview.window.decorView.hasWindowFocus())
+            }
+            return current
+        }
+        fun rangeJson(range: AccessibilityNodeInfo.RangeInfo): JSONObject =
+            JSONObject().put("minimum", range.min)
+                .put("maximum", range.max).put("current", range.current)
+        fun phase(name: String): JSONObject {
+            progress("sample-$name")
+            val current = guardedRoot()
             val node = checkNotNull(find(current, label))
             val range = checkNotNull(node.rangeInfo)
+            val trackRange = find(current, "Track position")?.rangeInfo
             val counters = IntArray(2)
+            val elapsed = LongArray(1)
             runOnMainSync {
                 check(!preview.isFinishing && !preview.isDestroyed &&
                     preview.window.decorView.hasWindowFocus())
                 counters[0] = preview.seekCommandCountForChecks
                 counters[1] = preview.volumeCommandCountForChecks
+                elapsed[0] = SystemClock.elapsedRealtime()
             }
-            phases.put(JSONObject().put("phase", name)
-                .put("range", JSONObject().put("minimum", range.min)
-                    .put("maximum", range.max).put("current", range.current))
-                .put("seekCommands", counters[0]).put("volumeCommands", counters[1]))
+            val sample = JSONObject().put("phase", name)
+                .put("elapsedRealtime", elapsed[0])
+                .put("range", rangeJson(range))
+                .put("trackRange", trackRange?.let(::rangeJson) ?: JSONObject.NULL)
+                .put("seekCommands", counters[0]).put("volumeCommands", counters[1])
+            phases.put(sample)
+            return sample
         }
+        var playbackAdvancedBeforeGesture: Boolean? = null
+        if (startPlayback) {
+            // Only the actual native semantic action starts the silent preview.
+            // A paused fixture is required, rather than toggling an already-playing one.
+            progress("play-find")
+            val play = checkNotNull(findClickable(guardedRoot(), "Play"))
+            check(play.isVisibleToUser && play.isEnabled && play.isClickable)
+            check(play.actionList.any { it.id == AccessibilityNodeInfo.ACTION_CLICK })
+            progress("play-click")
+            check(play.performAction(AccessibilityNodeInfo.ACTION_CLICK))
+            progress("play-await-pause")
+            val pauseDeadline = SystemClock.uptimeMillis() + pauseWaitMs
+            var pauseVisible = false
+            while (true) {
+                // Avoid root()'s separate retry budget here. Reacquire and refresh
+                // each native root while retaining the original preview guards.
+                val candidate = automation.rootInActiveWindow
+                if (candidate != null) {
+                    guardedRoot(candidate)
+                    // Root refresh does not recursively refresh API 29's cached
+                    // children. Re-read the exact button that received the action.
+                    val clickedButtonIsPause = play.refresh() &&
+                        play.windowId == initialWindowId && play.isVisibleToUser &&
+                        play.isEnabled && play.isClickable &&
+                        play.contentDescription?.toString() == "Pause"
+                    if (clickedButtonIsPause ||
+                        (candidate.refresh() &&
+                            findClickable(guardedRoot(candidate), "Pause") != null)) {
+                        pauseVisible = true
+                        break
+                    }
+                }
+                val remaining = pauseDeadline - SystemClock.uptimeMillis()
+                if (remaining <= 0) break
+                SystemClock.sleep(minOf(50L, remaining))
+            }
+            check(pauseVisible)
+            val initial = phase("playInitial")
+            val initialTrack = checkNotNull(initial.optJSONObject("trackRange"))
+            progress("play-wait-advance")
+            SystemClock.sleep(playAdvanceMs)
+            val advanced = phase("playAdvanced")
+            val advancedTrack = checkNotNull(advanced.optJSONObject("trackRange"))
+            progress("play-verify-advance")
+            playbackAdvancedBeforeGesture =
+                advanced.getLong("elapsedRealtime") - initial.getLong("elapsedRealtime") >= playAdvanceMs &&
+                advancedTrack.getDouble("minimum") == initialTrack.getDouble("minimum") &&
+                advancedTrack.getDouble("maximum") == initialTrack.getDouble("maximum") &&
+                advancedTrack.getDouble("current") > initialTrack.getDouble("current")
+            check(playbackAdvancedBeforeGesture == true)
+        }
+        // Playback may recompose the controls: acquire gesture bounds from a fresh,
+        // ownership-checked root after the advance observation.
+        progress("control-bounds")
+        val control = checkNotNull(find(guardedRoot(), label))
+        check(control.isVisibleToUser && control.className?.toString() == "android.widget.SeekBar")
+        val bounds = Rect().also(control::getBoundsInScreen)
+        val density = targetContext.resources.displayMetrics.density
+        check(bounds.width() >= 48 * density && bounds.height() >= 48 * density)
         val startX = (bounds.left + bounds.width() * startFraction).toFloat()
         val endX = (bounds.left + bounds.width() * endFraction).toFloat()
         val y = bounds.exactCenterY()
         val down = SystemClock.uptimeMillis()
         fun inject(action: Int, x: Float) {
+            progress(when (action) {
+                MotionEvent.ACTION_DOWN -> "inject-down"
+                MotionEvent.ACTION_MOVE -> "inject-move"
+                MotionEvent.ACTION_CANCEL -> "inject-cancel"
+                else -> "inject-up"
+            })
             val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, x, y, 0)
             event.source = InputDevice.SOURCE_TOUCHSCREEN
             try { check(automation.injectInputEvent(event, true)) } finally { event.recycle() }
@@ -830,24 +926,52 @@ class PortalUxInstrumentation : Instrumentation() {
             phase("initial")
             inject(MotionEvent.ACTION_DOWN, startX)
             pressed = true
-            SystemClock.sleep(50)
-            phase("pressed")
+            if (pressHoldMs > 0) {
+                phase("pressed")
+                progress("press-hold")
+                SystemClock.sleep(pressHoldMs)
+                phase("pressHeld")
+            } else {
+                SystemClock.sleep(50)
+                phase("pressed")
+            }
             repeat(steps) { index ->
                 inject(MotionEvent.ACTION_MOVE, startX + (endX - startX) * (index + 1) / steps)
                 SystemClock.sleep(duration / steps)
-                if (index + 1 == steps / 2) phase("mid")
+                if (index + 1 == steps / 2) {
+                    phase("mid")
+                    if (midHoldMs > 0) {
+                        progress("mid-hold")
+                        SystemClock.sleep(midHoldMs)
+                        phase("held")
+                    }
+                }
             }
             SystemClock.sleep(50)
             phase("beforeRelease")
-            inject(MotionEvent.ACTION_UP, endX)
+            inject(if (finishWithCancel) MotionEvent.ACTION_CANCEL else MotionEvent.ACTION_UP, endX)
             pressed = false
-            waitForIdleSync()
+            // A playing ticker need not become globally idle. The injected event is
+            // synchronous; the following native phase observes its applied result.
+            if (!startPlayback) waitForIdleSync()
             SystemClock.sleep(100)
-            phase("released")
+            phase(if (finishWithCancel) "cancelled" else "released")
         } finally {
-            if (pressed) runCatching { inject(MotionEvent.ACTION_CANCEL, endX) }
+            if (pressed) runCatching {
+                // Cleanup cancellation must not replace the failing stage.
+                val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(),
+                    MotionEvent.ACTION_CANCEL, endX, y, 0)
+                event.source = InputDevice.SOURCE_TOUCHSCREEN
+                try { automation.injectInputEvent(event, true) } finally { event.recycle() }
+            }
         }
+        progress("complete")
         return JSONObject().put("control", label).put("enabled", control.isEnabled)
+            .put("startPlayback", startPlayback)
+            .put("playbackAdvancedBeforeGesture", playbackAdvancedBeforeGesture ?: JSONObject.NULL)
+            .put("pressHoldMs", pressHoldMs).put("midHoldMs", midHoldMs)
+            .put("plannedObservationMs", plannedObservationMs)
+            .put("finishAction", if (finishWithCancel) "cancel" else "release")
             .put("moveEventCount", steps).put("completed", true).put("phases", phases)
     }
 
