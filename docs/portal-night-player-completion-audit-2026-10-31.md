@@ -161,6 +161,17 @@ visual Home return; it remains a qualified failed receipt. No production
 speed improvement was delivered in this bounded issue. Cold Shuffle startup
 is parked and remains incomplete.
 
+**Short-interval night follow-up:** [the actual Family gate](portal-night-autoplay-physical-2026-11-01.md)
+passes native Whole Photo and legacy Ken Burns at **five-second intervals**.
+After settled clock holds of **22.429 / 22.404 seconds**, both returned photo
+regions match exactly, with **zero pixel difference**, and autoplay resumes.
+Native logs show zero scene admissions while covered. All 97 settings and
+22 source fields were restored, with the optimized APK unchanged and zero
+collector listeners. Static local-photo retention is accepted for these two
+cases; moving-photo/video behavior, natural bright exit and optical comfort
+retain their existing qualifications. The recordings reveal a separate stale
+minute in the returning photo clock, which remains open.
+
 [artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
 [artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json
 [local-artwork]: ../mocks/portal-premium-player-20261030/evidence/native-local-artwork/checks.json

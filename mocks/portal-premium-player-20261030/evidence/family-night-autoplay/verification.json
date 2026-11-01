@@ -1,0 +1,61 @@
+{
+  "productionChangeMade": false,
+  "panelFpsMeasured": false,
+  "naturalBrightExitTested": false,
+  "pass": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "artifactUnchanged": true,
+  "collectorInactive": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "elapsedSeconds": 129.305,
+  "device": "Family Area",
+  "apiLevel": 29,
+  "source": "existing local folder",
+  "sourceFieldsCompared": 22,
+  "settingsValuesCompared": 97,
+  "installedApkSha256": "199aa8a171f400eb852ea4cac0e879ae179a623999f705fa09555f9d4b95ce29",
+  "photoMotionEnabledInTest": false,
+  "cases": [
+    {
+      "mode": "wholePhoto",
+      "intervalSeconds": 5,
+      "coverHoldSeconds": 22,
+      "observedLux": 3,
+      "actualCoverHoldSeconds": 22.429,
+      "returnPhotoMaxChannelDifference": 0,
+      "returnPhotoMeanChannelDifference": 0.0,
+      "exactPhotoReturned": true,
+      "resumedPhotoChanged": true,
+      "pass": true
+    },
+    {
+      "mode": "kenBurns",
+      "intervalSeconds": 5,
+      "coverHoldSeconds": 22,
+      "observedLux": 3,
+      "actualCoverHoldSeconds": 22.404,
+      "returnPhotoMaxChannelDifference": 0,
+      "returnPhotoMeanChannelDifference": 0.0,
+      "exactPhotoReturned": true,
+      "resumedPhotoChanged": true,
+      "pass": true
+    }
+  ],
+  "nativeSceneAdmissions": {
+    "beforeNight": 5,
+    "whilePhotosCovered": 0,
+    "firstAdmissionAfterLightReturnMs": 3782
+  },
+  "initialAttempt": {
+    "pass": false,
+    "reason": "Launching Home through ADB did not dismiss the existing Dream",
+    "changedSettings": false,
+    "restorationPass": true
+  },
+  "adaptiveAttempt": "One normal tap retires an existing owned Dream before each case",
+  "recordingsVisuallyReviewed": true,
+  "returnedPhotoClockMinuteStaleObserved": true,
+  "naturalOpticalComfortAccepted": false
+}
