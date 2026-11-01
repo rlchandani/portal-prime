@@ -2,6 +2,17 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Current-build pinned-overlay verification, November 1:** the
+[actual Family overlay gate](portal-pinned-brightness-delivery-2026-11-01.md)
+passes **five brightness-command ramps and two retained-app tap returns** on
+installed optimized APK **6c1adacc…**. Live request-to-endpoint observations are
+**3.164, 3.159 and 3.196 seconds**. The same Files activity/window/process
+survives both taps, and the default-photo interior returns with identical
+pixels. All 97 settings, 22 source records, pin/accessibility/global brightness
+state and original Dream are restored. The run took **75.734 seconds**, without
+an install or instrumentation. This closes the changed overlay path's native
+verification gap; it adds no runtime feature, optical-comfort or FPS claim.
+
 **Latest delivery, November 1 — hardware-aware brightness updates.**
 [Actual Family verification](portal-night-brightness-delivery-2026-11-01.md) passes
 **18/18** checks. Near-dark fades send **6 window updates instead of 85** in
