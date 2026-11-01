@@ -297,6 +297,183 @@ class PausableFrameCallbacksTest {
     override fun hashCode(): Int = 0
   }
 
+  /** Only the external disposable resource is faked; admission uses the real queue. */
+  private class Disposable {
+    val closes = AtomicInteger()
+    fun close() { closes.incrementAndGet() }
+  }
+
+  @Test fun ownedPostToClosedQueueDisposesWithoutAdmission() {
+    val transport = FakeTransport()
+    val queue = transport.queue()
+    val resource = Disposable()
+    queue.close()
+    assertFalse(queue.postOwned(Runnable { fail("Closed callback ran") }, resource::close))
+    queue.close()
+    transport.runDue()
+    assertEquals(1, resource.closes.get())
+  }
+
+  @Test fun ownedTransportRejectionDisposesWithoutReplay() {
+    val transport = FakeTransport()
+    val queue = transport.queue()
+    val resource = Disposable()
+    transport.accepting = false
+    assertFalse(queue.postOwned(Runnable { fail("Rejected callback ran") }, resource::close))
+    transport.accepting = true
+    queue.setActive(false)
+    queue.setActive(true)
+    queue.close()
+    transport.runDue()
+    assertEquals(1, resource.closes.get())
+  }
+
+  @Test fun ownedTransportThrowDisposesAndPreservesTheTransportFailure() {
+    val expected = IllegalStateException("transport failed")
+    val queue = PausableFrameCallbacks({ 0L }, { _, _ -> throw expected }, {})
+    val resource = Disposable()
+    try {
+      queue.postOwned(Runnable { fail("Failed callback ran") }, resource::close)
+      fail("Transport failure must escape")
+    } catch (actual: IllegalStateException) {
+      assertTrue(actual === expected)
+    }
+    queue.close()
+    assertEquals(1, resource.closes.get())
+  }
+
+  @Test fun resumeRejectionDisposesOnlyTheUnadmittedResource() {
+    val transport = FakeTransport()
+    var attempts = 0
+    val queue = PausableFrameCallbacks(
+        transport::clock,
+        { wrapper, delay -> ++attempts != 1 && transport.schedule(wrapper, delay) },
+        transport::cancel,
+    )
+    val rejected = Disposable()
+    val admitted = Disposable()
+    var calls = 0
+    queue.setActive(false)
+    queue.postOwned(Runnable { fail("Rejected callback ran") }, rejected::close)
+    queue.postOwned(Runnable { calls++; admitted.close() }, admitted::close)
+    queue.setActive(true)
+    transport.runDue()
+    queue.close()
+    assertEquals(1, calls)
+    assertEquals(1, rejected.closes.get())
+    assertEquals(1, admitted.closes.get())
+  }
+
+  @Test fun removalDisposesEveryOwnedPostOnceIncludingDetachedAndPausedEntries() {
+    for (paused in listOf(false, true)) {
+      val transport = FakeTransport()
+      val queue = transport.queue()
+      val first = Disposable()
+      val second = Disposable()
+      val callback = Runnable { fail("Removed callback ran") }
+      queue.postOwned(callback, first::close)
+      val detached = transport.takeDue()!!
+      if (paused) queue.setActive(false)
+      queue.postOwned(callback, second::close)
+      queue.removeCallbacks(callback)
+      queue.removeCallbacks(callback)
+      queue.setActive(true)
+      queue.close()
+      detached.run()
+      transport.wrappers.forEach { it.run() }
+      assertEquals(1, first.closes.get())
+      assertEquals(1, second.closes.get())
+    }
+  }
+
+  @Test fun closeDisposesQueuedAndPausedResourcesDespiteAThrowingDiscard() {
+    for (paused in listOf(false, true)) {
+      val transport = FakeTransport()
+      val queue = transport.queue()
+      val first = Disposable()
+      val second = Disposable()
+      queue.postOwned(Runnable { fail("Closed callback ran") }) {
+        first.close()
+        throw IllegalStateException("discard failed")
+      }
+      val detached = transport.takeDue()!!
+      if (paused) queue.setActive(false)
+      queue.postOwned(Runnable { fail("Closed callback ran") }, second::close)
+      try {
+        queue.close()
+      } catch (_: IllegalStateException) {
+        // Discard failures may escape, but every resource must still be released.
+      }
+      queue.close()
+      detached.run()
+      transport.wrappers.forEach { it.run() }
+      assertEquals(1, first.closes.get())
+      assertEquals(1, second.closes.get())
+    }
+  }
+
+  @Test(timeout = 5_000) fun discardCanWaitForWorkerReentryAndKeepItsReplacementQueued() {
+    val transport = FakeTransport()
+    val queue = transport.queue()
+    val worker = Executors.newSingleThreadExecutor()
+    val resource = Disposable()
+    var calls = 0
+    val removed = Runnable { fail("Removed callback ran") }
+    try {
+      queue.postOwned(removed) {
+        resource.close()
+        assertTrue(worker.submit<Boolean> {
+          queue.post(Runnable { calls++ })
+        }.get(2, TimeUnit.SECONDS))
+      }
+      queue.removeCallbacks(removed)
+      transport.runDue()
+      assertEquals(1, resource.closes.get())
+      assertEquals(1, calls)
+    } finally {
+      queue.close()
+      worker.shutdownNow()
+    }
+  }
+
+  @Test fun claimedOwnedCallbackCanRemoveAndCloseWithoutBeingDiscarded() {
+    val transport = FakeTransport()
+    val queue = transport.queue()
+    val resource = Disposable()
+    val callback = object : Runnable {
+      override fun run() {
+        queue.removeCallbacks(this)
+        queue.close()
+        resource.close()
+      }
+    }
+    queue.postOwned(callback, resource::close)
+    val wrapper = transport.takeDue()!!
+    wrapper.run()
+    wrapper.run()
+    queue.close()
+    assertEquals(1, resource.closes.get())
+  }
+
+  @Test fun staleOwnedWrapperCannotDiscardOrConsumeAResumedCallback() {
+    val transport = FakeTransport()
+    val queue = transport.queue()
+    val resource = Disposable()
+    var calls = 0
+    queue.postOwned(Runnable { calls++; resource.close() }, resource::close)
+    val stale = transport.takeDue()!!
+    queue.setActive(false)
+    stale.run()
+    assertEquals(0, resource.closes.get())
+    queue.setActive(true)
+    stale.run()
+    transport.runDue()
+    stale.run()
+    queue.close()
+    assertEquals(1, calls)
+    assertEquals(1, resource.closes.get())
+  }
+
   @Test fun removalCancelsEveryMatchingReferenceWithoutUsingEquals() {
     val transport = FakeTransport()
     val queue = transport.queue()
@@ -623,6 +800,8 @@ class PausableFrameCallbacksTest {
     val workers = Executors.newFixedThreadPool(2)
     var calls = 0
     val callback = Runnable { calls++ }
+    val queuedResource = Disposable()
+    val lateResource = Disposable()
     val queue = PausableFrameCallbacks(
         clock = transport::clock,
         schedule = { wrapper, delay ->
@@ -633,7 +812,7 @@ class PausableFrameCallbacksTest {
         cancel = transport::cancel,
     )
     try {
-      val posted = workers.submit<Boolean> { queue.post(callback) }
+      val posted = workers.submit<Boolean> { queue.postOwned(callback, queuedResource::close) }
       assertTrue(scheduling.await(2, TimeUnit.SECONDS))
       val closing = CountDownLatch(1)
       val closed = workers.submit {
@@ -646,9 +825,13 @@ class PausableFrameCallbacksTest {
       closed.get(2, TimeUnit.SECONDS)
       assertEquals(0, transport.pendingCount)
       transport.wrappers.forEach { it.run() }
-      assertFalse(workers.submit<Boolean> { queue.post(callback) }.get(2, TimeUnit.SECONDS))
+      assertFalse(workers.submit<Boolean> {
+        queue.postOwned(callback, lateResource::close)
+      }.get(2, TimeUnit.SECONDS))
       assertFalse(queue.postDelayed(callback, 10))
       assertEquals(0, calls)
+      assertEquals(1, queuedResource.closes.get())
+      assertEquals(1, lateResource.closes.get())
     } finally {
       release.countDown()
       queue.close()

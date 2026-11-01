@@ -703,10 +703,10 @@ class PhotoFrameController(
             if (!stopped) ui.post { if (!stopped) startWeb() }
             return@execute
           }
-          ui.post {
+          ui.postOwned(Runnable {
             if (stopped) {
-              Thread { runCatching { src.close() } }.start()
-              return@post
+              closeSmbSourceAsync(src)
+              return@Runnable
             }
             smbSource = src
             remoteUrls = if (source.shuffle) paths.shuffled() else paths
@@ -715,7 +715,7 @@ class PhotoFrameController(
             remoteIndex = -1
             remoteFailStreak = 0
             advanceRemote(+1)
-          }
+          }, onDiscard = { closeSmbSourceAsync(src) })
         }
       }
       PhotoFrameSource.DefaultFeed -> {
@@ -1417,7 +1417,7 @@ class PhotoFrameController(
     if (faceRendererDelegate.isInitialized()) faceRenderer.stop()
     if (this::videoView.isInitialized) videoView.close()
     // Close the SMB connection off-thread (network I/O) before the io executor is killed.
-    smbSource?.let { s -> Thread { runCatching { s.close() } }.start() }
+    smbSource?.let(::closeSmbSourceAsync)
     smbSource = null
     io.shutdownNow()
     metaIo.shutdownNow()
@@ -2759,7 +2759,7 @@ class PhotoFrameController(
     remoteHeaders = emptyMap()
     remoteVideos = emptySet()
     remoteFetch = null
-    smbSource?.let { s -> io.execute { runCatching { s.close() } } }
+    smbSource?.let(::closeSmbSourceAsync)
     smbSource = null
     ui.removeCallbacks(localTick)
     ui.removeCallbacks(remoteTick)
@@ -3119,6 +3119,13 @@ class PhotoFrameController(
   }
 
   // --- data -------------------------------------------------------------------
+  /** A rejected/retired callback must close even after the decode executor has shut down. */
+  private fun closeSmbSourceAsync(source: SmbSource) {
+    Thread({ runCatching { source.close() } }, "slideshow-close-smb").apply {
+      isDaemon = true
+    }.start()
+  }
+
   private fun photoRequestCurrent(generation: Long): Boolean =
       !stopped && generation == photoTransportGeneration.get() && !Thread.currentThread().isInterrupted
 
