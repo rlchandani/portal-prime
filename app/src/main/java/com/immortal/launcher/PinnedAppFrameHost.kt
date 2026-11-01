@@ -225,22 +225,27 @@ internal class PinnedAppFrameHost(private val service: AccessibilityService) : P
         return try {
             wm.addView(root, params)
             surface = cover
-            cover.brightness = NightBrightnessFade(
-                priorBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE,
-                readBrightness = { cover.params.screenBrightness },
-                readSystemBrightness = {
-                    android.provider.Settings.System.getInt(service.contentResolver,
-                        android.provider.Settings.System.SCREEN_BRIGHTNESS, 128) / 255f
-                },
-                writeBrightness = { level ->
+            val brightnessDelivery = NightBrightnessDelivery(
+                apiLevel = android.os.Build.VERSION.SDK_INT,
+                readWindow = { cover.params.screenBrightness },
+                writeWindow = { level ->
                     if (!closed && surface === cover) {
                         cover.params.screenBrightness = level
                         runCatching { wm.updateViewLayout(cover.root, cover.params) }
                     }
+                })
+            cover.brightness = NightBrightnessFade(
+                priorBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE,
+                readBrightness = brightnessDelivery::read,
+                readSystemBrightness = {
+                    android.provider.Settings.System.getInt(service.contentResolver,
+                        android.provider.Settings.System.SCREEN_BRIGHTNESS, 128) / 255f
                 },
+                writeBrightness = brightnessDelivery::write,
                 nowMs = SystemClock::uptimeMillis,
                 postDelayed = { task, delay -> main.postDelayed(task, delay) },
-                removeCallbacks = { task -> main.removeCallbacks(task) }).also {
+                removeCallbacks = { task -> main.removeCallbacks(task) },
+                settleBrightness = brightnessDelivery::settle).also {
                     it.setActive(true)
                 }
             reconcilePower(cover, cfg)

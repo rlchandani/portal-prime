@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -23,6 +24,7 @@ internal class NightBrightnessFade(
     private val nowMs: () -> Long,
     private val postDelayed: (Runnable, Long) -> Unit,
     private val removeCallbacks: (Runnable) -> Unit,
+    private val settleBrightness: ((Float) -> Unit)? = null,
 ) {
   private data class Ramp(
       val from: Float, val target: Float, val finalOverride: Float, val startedMs: Long)
@@ -50,7 +52,7 @@ internal class NightBrightnessFade(
           }
         }
         ramp = null
-        writeBrightness(current.finalOverride)
+        (settleBrightness ?: writeBrightness)(current.finalOverride)
         return
       }
       val progress = elapsed.toFloat() / DURATION_MS
@@ -64,9 +66,8 @@ internal class NightBrightnessFade(
       val targetPerceptual = current.target.toDouble().pow(1.0 / GAMMA)
       val level = (fromPerceptual + (targetPerceptual - fromPerceptual) * eased)
           .pow(GAMMA).toFloat().coerceIn(0f, 1f)
-      // Window brightness is a float, not the 8-bit global settings value.
-      // Discard only identical commands; 1/255 is a large relative step near dark.
-      // The fixed tick interval and finite duration bound the number of writes.
+      // Keep continuous logical progress here. The delivery boundary can discard
+      // commands that Android 10 would map to the same physical brightness level.
       if (level != readBrightness()) writeBrightness(level)
       postDelayed(this, minOf(STEP_MS, DURATION_MS - elapsed))
     }
@@ -93,10 +94,13 @@ internal class NightBrightnessFade(
     if (pending?.target == target && pending.finalOverride == finalOverride) return
     cancel()
     val actual = readBrightness()
-    if (actual == finalOverride) return
+    if (actual == finalOverride) {
+      settleBrightness?.invoke(finalOverride)
+      return
+    }
     val from = if (actual >= 0f && actual.isFinite()) actual.coerceIn(0f, 1f) else systemLevel()
     if (from == target) {
-      writeBrightness(finalOverride)
+      (settleBrightness ?: writeBrightness)(finalOverride)
       return
     }
     ramp = Ramp(from, target, finalOverride, nowMs())
@@ -128,20 +132,25 @@ internal class NightBrightnessFade(
 /** Both the native Dream and its retained preview use the same window-only transition. */
 internal class NightWindowBrightness(context: Context, private val window: Window) {
   private val handler = Handler(Looper.getMainLooper())
+  private val delivery = NightBrightnessDelivery(
+      apiLevel = Build.VERSION.SDK_INT,
+      readWindow = { window.attributes.screenBrightness },
+      writeWindow = { level ->
+        window.attributes = window.attributes.apply { screenBrightness = level }
+      })
   private val fade = NightBrightnessFade(
       priorBrightness = window.attributes.screenBrightness,
-      readBrightness = { window.attributes.screenBrightness },
+      readBrightness = delivery::read,
       readSystemBrightness = {
         // -1 is Android's policy sentinel, not a brightness level to interpolate towards.
         // Read the selected system level without changing global brightness or auto mode.
         Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS, 128) / 255f
       },
-      writeBrightness = { level ->
-        window.attributes = window.attributes.apply { screenBrightness = level }
-      },
+      writeBrightness = delivery::write,
       nowMs = SystemClock::uptimeMillis,
       postDelayed = { task, delay -> handler.postDelayed(task, delay) },
-      removeCallbacks = { task -> handler.removeCallbacks(task) })
+      removeCallbacks = { task -> handler.removeCallbacks(task) },
+      settleBrightness = delivery::settle)
 
   fun setNight(night: Boolean, brightnessPercent: Int) = fade.setNight(night, brightnessPercent / 100f)
   fun setActive(active: Boolean) = fade.setActive(active)
