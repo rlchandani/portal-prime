@@ -2,7 +2,22 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — crop Save composition.**
+**Newest verification, November 1 — native night-photo dwell.**
+[The controlled Family Area check](portal-night-photo-pause-2026-11-01.md)
+passes **125/125 assertions/observations** using the production native
+controller and generated photos. A **10.313-second** clock hold preserves
+the photo and generation. The recorded remainder is **2,979 ms**; the next
+request/photo is observed **2,984 ms** after reveal. User Pause survives night;
+Resume under the cover waits for reveal and ordered playback follows.
+**3,765 fresh JVM tests** pass. The first fixture's invalid key assertion
+and possible shared downloadable-cache purge remain documented, rather than
+being treated as production failures or silently omitted.
+There is **no production playback change**: optimized APK **28735244…**
+is restored with original configuration/Dream in under twelve minutes.
+This verifies the controlled native Smart Frame path, not natural-light
+comfort, other renderers, in-flight decode behavior or panel FPS.
+
+**Previous delivery, November 1 — crop Save composition.**
 [The completion fix](portal-slideshow-commit-2026-11-01.md) restores the
 normal paired composition after saving the first photo's crop. The
 original **8 failures / 53 assertions** become **53/53 passing**, with
@@ -351,7 +366,7 @@ Status is scoped to each row: **verified** means the stated evidence supports th
 
 ## Necessary remaining work
 
-1. **Natural lighting and optical comfort remain open:** continued brightness/clock jumps prompted the [three-second coordinated transition][night-crossfade] and subsequent [Android 10 Dream delivery fix](portal-dream-brightness-2026-10-31.md). The current optimized APK `199aa8a1…` has recorded physical Dream and [pinned-overlay checks](portal-pinned-night-physical-2026-10-31.md), including native content fades, command ramps, retained photo regions and taps to the retained app. All **97 settings and 22 source fields** were restored. The earlier human appearance/comfort report applies to an older artifact; natural bright-room exit, optical comfort, short-interval autoplay pause and delivered panel timing on the current build remain unaccepted.
+1. **Natural lighting and optical comfort remain open:** continued brightness/clock jumps prompted the [three-second coordinated transition][night-crossfade] and subsequent [Android 10 Dream delivery fix](portal-dream-brightness-2026-10-31.md). The current optimized APK `199aa8a1…` has recorded physical Dream and [pinned-overlay checks](portal-pinned-night-physical-2026-10-31.md), including native content fades, command ramps, retained photo regions and taps to the retained app. All **97 settings and 22 source fields** were restored. The earlier human appearance/comfort report applies to an older artifact; the [controlled native Smart Frame short-interval check](portal-night-photo-pause-2026-11-01.md) now verifies retained dwell and pause choice, while natural bright-room exit, optical comfort, other-renderer autoplay pause and delivered panel timing remain unaccepted.
 2. **Startup delivery is scoped:** the extra first-scene parent fade is removed and deployed within **01:02:44–01:32:44 UTC**. [Deployment/runtime receipt][first-reveal] retains the two-cycle helper’s stale three-cycle completion failure and independently validates the planned two observations without repeating the capture. [Actual API 34 Dream checks][dream-return] verify continuation retirement, one retained-Home return, deliberate paused-viewer retention and both `singleTask` intent-mode transitions; that emulator recording has zero near-black frames. [Actual Family API 29 warm checks](portal-warm-dream-return-2026-11-01.md) now corroborate lifecycle and pause retention, but the recovered continuation recording contains six near-black frames. Cold/panel presentation, physical-finger routing and seamless visual handoff remain open.
 3. **Address the documented platform performance gaps**, led by Home/Apps tails and the affected screensaver paths. [Local WebView misses][bounded-photos] wait off Main for prepared copies. [Remote loading][remote-photos] now streams authenticated input with a **32 MiB** cap, prepares static copies through the shared decoder, preserves PNG transparency and cancels retired owners. Fresh gates pass **3,561 tests**. Actual API 34 WebView checks verify a **31-megapixel** remote photo delivered as **2400×1800**, alpha preservation, corrupt/oversized 404, plus a final local regression. [Remote Family deployment][remote-deployment] verifies the installed APK and all **97 settings** unchanged. These resolve the identified local/remote static loading gaps; physical startup presentation, animated GIF/WebP pixel residency and complete GPU residency remain open. Use the existing hardware budget and matched accepted baselines; retain only supported improvements. The warmed Filmstrip pass does not require another speculative renderer/layer experiment.
 4. **Physical music UI acceptance is recorded** for artwork, controls, playlist presentation and full/compact continuity in the [223-check physical record](portal-music-physical-ui-2026-10-31.md). That historical gate used a photo placeholder; the separate [real-photo continuity delivery](portal-music-photo-pause-2026-11-01.md) passes **17/17 native checks**, and [configuration continuity](portal-music-config-continuity-2026-11-01.md) covers unrelated-setting changes. These are scoped observations, not blanket acceptance of every music/photo interaction. Backend/provider installation, credentials, real audio and provider-backed library wiring remain deliberately deferred; they are outside this goal’s remaining work.

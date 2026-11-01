@@ -40,6 +40,12 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        if (options.getString("command") == "nightPhotoPause") {
+            val night = try { NightPhotoPauseDeviceChecks.run(this) }
+            catch (_: Throwable) { Bundle().apply { putBoolean("nightPhotoPausePassed", false) } }
+            finish(if (night.getBoolean("nightPhotoPausePassed")) 0 else 1, night)
+            return
+        }
         if (options.getString("command") == "slideshowCommit") {
             val commit = try {
                 SlideshowCommitDeviceChecks.run(this)

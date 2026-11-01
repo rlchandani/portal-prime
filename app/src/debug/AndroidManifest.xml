@@ -53,6 +53,12 @@
             android:label="Generated photo drag check"
             android:theme="@style/Theme.SampleApp" />
         <activity
+            android:name=".NightPhotoPreviewActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:label="Generated night photo check"
+            android:theme="@style/Theme.SampleApp" />
+        <activity
             android:name=".FilmstripBackdropPreviewActivity"
             android:exported="true"
             android:label="Filmstrip backdrop native check"

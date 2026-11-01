@@ -1,0 +1,17 @@
+{
+  "suites": 395,
+  "tests": 3765,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "buildTail": [
+    "",
+    "BUILD SUCCESSFUL in 1m 33s",
+    "75 actionable tasks: 11 executed, 64 up-to-date",
+    "Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.4.1/userguide/configuration_cache_enabling.html"
+  ],
+  "subsequentInstrumentationBuild": {
+    "successful": true,
+    "durationSeconds": 22
+  }
+}

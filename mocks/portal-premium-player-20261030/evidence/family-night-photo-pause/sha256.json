@@ -1,0 +1,13 @@
+{
+  "app/src/debug/java/com/immortal/launcher/NightPhotoPreviewActivity.kt": "bdf859552882cbae5725b60f544de54633b645e5b8b35a59fca72e84d04416c2",
+  "app/src/androidTest/java/com/immortal/launcher/NightPhotoPauseDeviceChecks.kt": "dd6ab3858cfa745f27ef87cdf23ac64c38dc7ed93f59b0d7c27bc3ccfc3e5416",
+  "app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt": "5fad5213bf28e9ad6de14ba6aad1898f7e3bcc773b2c2af0d808a4ec435f3ec0",
+  "app/src/debug/AndroidManifest.xml": "69c5490dda8ac380de7542a93658ba43ce36de1c3cddff2b3d9e35b0e84ae45f",
+  "mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/discarded-fixture-checks.json": "cddf9e5ddc74358830decb4a23a6a73f2bb9ad84b093127758f33311533b909c",
+  "mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/discarded-fixture-restoration.json": "298d7d513de26edba53ff006405b77e0c49b164f48aff8372bb41a0bc649e05d",
+  "mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/checks.json": "a8a6e685a85a9fc11149d9fd93841f63fa890dc6006aad5541dd28faeaafbbdc",
+  "mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/unit-results.json": "6cac1d58c5331266dd35ca71825dfdb73f5ee03b33d1792a69a19c39d2b377ee",
+  "mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/verification.json": "f3c25d49a73cec3b7a6d407e0dcf52c3bd4f0b10aac6374161859c5bf70a5313",
+  "docs/portal-night-photo-pause-2026-11-01.md": "b56541e2563eed9def6dab1036f13c52be22a7888f171440c597bb53c1f03213",
+  "docs/portal-night-player-completion-audit-2026-10-31.md": "fba7e0e73d7a7a38a14b494574091247046e32589e698e0ff3a22fe722a74c16"
+}

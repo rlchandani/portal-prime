@@ -1,0 +1,496 @@
+{
+  "passed": false,
+  "checks": [
+    {
+      "name": "native_window",
+      "passed": true
+    },
+    {
+      "name": "shortest_interval_selected",
+      "passed": true
+    },
+    {
+      "name": "initial_five_second_dwell",
+      "passed": true
+    },
+    {
+      "name": "entry_immediately_suspends_photos",
+      "passed": true
+    },
+    {
+      "name": "night_sample_0",
+      "passed": true
+    },
+    {
+      "name": "night_sample_1",
+      "passed": true
+    },
+    {
+      "name": "night_sample_2",
+      "passed": true
+    },
+    {
+      "name": "night_sample_3",
+      "passed": true
+    },
+    {
+      "name": "night_sample_4",
+      "passed": true
+    },
+    {
+      "name": "night_sample_5",
+      "passed": true
+    },
+    {
+      "name": "night_sample_6",
+      "passed": true
+    },
+    {
+      "name": "night_sample_7",
+      "passed": true
+    },
+    {
+      "name": "night_sample_8",
+      "passed": true
+    },
+    {
+      "name": "night_sample_9",
+      "passed": true
+    },
+    {
+      "name": "night_sample_10",
+      "passed": true
+    },
+    {
+      "name": "night_sample_11",
+      "passed": true
+    },
+    {
+      "name": "night_sample_12",
+      "passed": true
+    },
+    {
+      "name": "night_sample_13",
+      "passed": true
+    },
+    {
+      "name": "night_sample_14",
+      "passed": true
+    },
+    {
+      "name": "night_sample_15",
+      "passed": true
+    },
+    {
+      "name": "night_sample_16",
+      "passed": true
+    },
+    {
+      "name": "night_sample_17",
+      "passed": true
+    },
+    {
+      "name": "night_sample_18",
+      "passed": true
+    },
+    {
+      "name": "night_sample_19",
+      "passed": true
+    },
+    {
+      "name": "night_sample_20",
+      "passed": true
+    },
+    {
+      "name": "night_sample_21",
+      "passed": true
+    },
+    {
+      "name": "night_sample_22",
+      "passed": true
+    },
+    {
+      "name": "night_sample_23",
+      "passed": true
+    },
+    {
+      "name": "night_sample_24",
+      "passed": true
+    },
+    {
+      "name": "night_sample_25",
+      "passed": true
+    },
+    {
+      "name": "night_sample_26",
+      "passed": true
+    },
+    {
+      "name": "night_sample_27",
+      "passed": true
+    },
+    {
+      "name": "night_sample_28",
+      "passed": true
+    },
+    {
+      "name": "night_sample_29",
+      "passed": true
+    },
+    {
+      "name": "night_sample_30",
+      "passed": true
+    },
+    {
+      "name": "night_sample_31",
+      "passed": true
+    },
+    {
+      "name": "night_sample_32",
+      "passed": true
+    },
+    {
+      "name": "night_sample_33",
+      "passed": true
+    },
+    {
+      "name": "night_sample_34",
+      "passed": true
+    },
+    {
+      "name": "night_sample_35",
+      "passed": true
+    },
+    {
+      "name": "night_sample_36",
+      "passed": true
+    },
+    {
+      "name": "night_sample_37",
+      "passed": true
+    },
+    {
+      "name": "night_sample_38",
+      "passed": true
+    },
+    {
+      "name": "night_sample_39",
+      "passed": true
+    },
+    {
+      "name": "night_sample_40",
+      "passed": true
+    },
+    {
+      "name": "return_sample_0",
+      "passed": true
+    },
+    {
+      "name": "return_sample_1",
+      "passed": true
+    },
+    {
+      "name": "return_sample_2",
+      "passed": true
+    },
+    {
+      "name": "return_sample_3",
+      "passed": true
+    },
+    {
+      "name": "return_sample_4",
+      "passed": true
+    },
+    {
+      "name": "return_sample_5",
+      "passed": true
+    },
+    {
+      "name": "return_sample_6",
+      "passed": true
+    },
+    {
+      "name": "return_sample_7",
+      "passed": true
+    },
+    {
+      "name": "return_sample_8",
+      "passed": true
+    },
+    {
+      "name": "return_sample_9",
+      "passed": true
+    },
+    {
+      "name": "return_sample_10",
+      "passed": true
+    },
+    {
+      "name": "return_sample_11",
+      "passed": true
+    },
+    {
+      "name": "return_sample_12",
+      "passed": true
+    },
+    {
+      "name": "return_sample_13",
+      "passed": true
+    },
+    {
+      "name": "return_sample_14",
+      "passed": true
+    },
+    {
+      "name": "return_sample_15",
+      "passed": true
+    },
+    {
+      "name": "return_sample_16",
+      "passed": true
+    },
+    {
+      "name": "return_sample_17",
+      "passed": true
+    },
+    {
+      "name": "return_sample_18",
+      "passed": true
+    },
+    {
+      "name": "return_sample_19",
+      "passed": true
+    },
+    {
+      "name": "return_sample_20",
+      "passed": true
+    },
+    {
+      "name": "return_sample_21",
+      "passed": true
+    },
+    {
+      "name": "return_sample_22",
+      "passed": true
+    },
+    {
+      "name": "return_sample_23",
+      "passed": true
+    },
+    {
+      "name": "return_sample_24",
+      "passed": true
+    },
+    {
+      "name": "return_sample_25",
+      "passed": true
+    },
+    {
+      "name": "return_sample_26",
+      "passed": true
+    },
+    {
+      "name": "return_sample_27",
+      "passed": true
+    },
+    {
+      "name": "return_sample_28",
+      "passed": true
+    },
+    {
+      "name": "return_sample_29",
+      "passed": true
+    },
+    {
+      "name": "return_sample_30",
+      "passed": true
+    },
+    {
+      "name": "return_sample_31",
+      "passed": true
+    },
+    {
+      "name": "return_sample_32",
+      "passed": true
+    },
+    {
+      "name": "return_sample_33",
+      "passed": true
+    },
+    {
+      "name": "return_sample_34",
+      "passed": true
+    },
+    {
+      "name": "return_sample_35",
+      "passed": true
+    },
+    {
+      "name": "return_sample_36",
+      "passed": true
+    },
+    {
+      "name": "return_sample_37",
+      "passed": true
+    },
+    {
+      "name": "return_sample_38",
+      "passed": true
+    },
+    {
+      "name": "return_sample_39",
+      "passed": true
+    },
+    {
+      "name": "return_sample_40",
+      "passed": true
+    },
+    {
+      "name": "return_sample_41",
+      "passed": true
+    },
+    {
+      "name": "return_sample_42",
+      "passed": true
+    },
+    {
+      "name": "return_sample_43",
+      "passed": true
+    },
+    {
+      "name": "return_sample_44",
+      "passed": true
+    },
+    {
+      "name": "return_sample_45",
+      "passed": true
+    },
+    {
+      "name": "return_sample_46",
+      "passed": true
+    },
+    {
+      "name": "return_sample_47",
+      "passed": true
+    },
+    {
+      "name": "return_sample_48",
+      "passed": true
+    },
+    {
+      "name": "return_sample_49",
+      "passed": true
+    },
+    {
+      "name": "return_sample_50",
+      "passed": true
+    },
+    {
+      "name": "return_sample_51",
+      "passed": true
+    },
+    {
+      "name": "return_sample_52",
+      "passed": true
+    },
+    {
+      "name": "return_sample_53",
+      "passed": true
+    },
+    {
+      "name": "return_sample_54",
+      "passed": true
+    },
+    {
+      "name": "return_sample_55",
+      "passed": true
+    },
+    {
+      "name": "return_sample_56",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "retained_dwell",
+      "passed": true
+    },
+    {
+      "name": "ordinary_autoplay_resumed_without_skipping",
+      "passed": false
+    },
+    {
+      "name": "external_cover_does_not_resume_night",
+      "passed": true
+    },
+    {
+      "name": "user_pause_survives_night",
+      "passed": true
+    },
+    {
+      "name": "user_paused_beyond_interval",
+      "passed": true
+    },
+    {
+      "name": "resume_under_night_keeps_cover",
+      "passed": true
+    },
+    {
+      "name": "resume_under_night_keeps_photo",
+      "passed": true
+    },
+    {
+      "name": "resume_after_cover_keeps_same_photo",
+      "passed": true
+    },
+    {
+      "name": "owned_activity_destroyed",
+      "passed": true
+    },
+    {
+      "name": "generated_files_removed",
+      "passed": true
+    },
+    {
+      "name": "isolated_preferences_removed",
+      "passed": true
+    }
+  ],
+  "measurements": {
+    "nightHoldMs": 10314,
+    "nightSamples": 41,
+    "remainingDwellAtEntryMs": 4978,
+    "returnSamples": 57,
+    "firstAdvanceAfterRevealMs": 4991,
+    "elapsedMs": 46341
+  },
+  "sensorStimulated": false,
+  "hardwareBrightnessTested": false,
+  "productionChanged": false
+}
