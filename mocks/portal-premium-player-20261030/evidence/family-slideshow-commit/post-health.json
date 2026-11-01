@@ -1,0 +1,10 @@
+{
+  "familyIdentity": true,
+  "optimizedArtifactInstalled": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "originalDreamActive": true,
+  "noInstrumentation": true,
+  "noPerformanceCollector": true,
+  "systemPidUnchanged": true
+}

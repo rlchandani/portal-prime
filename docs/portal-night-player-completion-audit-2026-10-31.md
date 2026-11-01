@@ -2,7 +2,21 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — held-seek ownership.**
+**Newest delivery, November 1 — crop Save composition.**
+[The completion fix](portal-slideshow-commit-2026-11-01.md) restores the
+normal paired composition after saving the first photo's crop. The
+original **8 failures / 53 assertions** become **53/53 passing**, with
+twenty additional rendering/animation checks making **73/73**. The generated companion
+goes from disappearing to retaining **1,069,000 captured pixels**
+and its own **3,200 ms** animation time. A subsequent edit/cancel retains
+both photos; all **73 crop-drag regressions** and **3,765 fresh unit tests**
+pass. The original bitmap allocations are retained; no FPS/CPU improvement
+is inferred. Optimized APK **28735244…** is installed with original
+configuration/Dream restored **14 minutes 43 seconds** into the
+original 30-minute slot. Natural-light comfort and prior parked work
+remain open.
+
+**Previous delivery, November 1 — held-seek ownership.**
 [The seek correction](portal-music-seek-binding-2026-11-01.md) retires the
 seek control with its playback binding and rejects stale duration commands.
 Actual Family Area checks change from **18 failures / 74 to 74/74 passing**

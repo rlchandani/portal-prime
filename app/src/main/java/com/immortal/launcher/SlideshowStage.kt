@@ -207,16 +207,18 @@ internal class SlideshowStage(
     val adjustment = shown?.photos?.firstOrNull()?.adjustment
     editOriginal = null
     editSnapshot = null
-    if (original != null && (!save || original.gallerySpread)) {
-      // Spread returns to its full pair after either editing outcome. Saved metadata remains
-      // available for explicit editing/other styles, while the spread itself always contains.
+    if (original != null) {
+      // Finish the temporary single-photo editor in the original normal composition.
       val restored = if (save) original.copy(photos = original.photos.mapIndexed { index, photo ->
         if (index == 0) photo.copy(adjustment = adjustment) else photo
       }) else original
       shown = restored
       layers[current].display(restored, width, height)
-      if (!save && snapshot != null) layers[current].restore(snapshot, width, height)
       if (paused || !hostActive) layers[current].pause()
+      // The saved photo uses its new crop; companions retain their prior pose and motion.
+      // Normal spread ignores crops, so every photo can keep its original presentation.
+      if (snapshot != null) layers[current].restore(snapshot, width, height,
+          fromPhoto = if (save && !original.gallerySpread) 1 else 0)
       layers[current].alpha = 1f
     }
     own("edit", null)
@@ -260,9 +262,10 @@ internal class SlideshowStage(
   ) : FrameLayout(context) {
     data class Snapshot(
         val width: Int, val height: Int,
-        val transforms: List<SlideshowGeometry.Transform>, val times: List<Long>,
+        val transforms: List<SlideshowGeometry.Transform>, val times: Map<Int, Long>,
     )
     private val moves = ArrayList<AnimatorSet>()
+    private val movePhotos = ArrayList<Int>()
     private var displayed: Presentation? = null
     init { setBackgroundColor(MATTE); clipChildren = true }
 
@@ -327,6 +330,7 @@ internal class SlideshowStage(
         if (manual == null && path.start != path.end &&
             animationsAllowed()) {
           val end = path.end
+          movePhotos.add(index)
           moves.add(AnimatorSet().apply {
             playTogether(
                 ObjectAnimator.ofFloat(image, View.SCALE_X, start.scale, end.scale),
@@ -433,19 +437,24 @@ internal class SlideshowStage(
     }
     fun snapshot(width: Int, height: Int) = Snapshot(width, height, images().map {
       SlideshowGeometry.Transform(it.scaleX, it.translationX, it.translationY)
-    }, if (android.os.Build.VERSION.SDK_INT >= 26) moves.map { it.currentPlayTime } else emptyList())
+    }, if (android.os.Build.VERSION.SDK_INT >= 26)
+      movePhotos.zip(moves).associate { (index, move) -> index to move.currentPlayTime } else emptyMap())
 
-    fun restore(snapshot: Snapshot, width: Int, height: Int) {
+    fun restore(snapshot: Snapshot, width: Int, height: Int, fromPhoto: Int = 0) {
       if (snapshot.width != width || snapshot.height != height) return
       if (android.os.Build.VERSION.SDK_INT >= 26) {
-        moves.zip(snapshot.times).forEach { (move, time) -> move.currentPlayTime = time }
+        movePhotos.zip(moves).forEach { (index, move) ->
+          if (index >= fromPhoto) snapshot.times[index]?.let { move.currentPlayTime = it }
+        }
       } else {
         // API-24/25 cannot seek an AnimatorSet. Hold the exact previous pose until the
         // next photo rather than restarting motion from its first endpoint.
         moves.forEach { it.cancel() }
         moves.clear()
+        movePhotos.clear()
       }
-      images().zip(snapshot.transforms).forEach { (image, transform) ->
+      images().zip(snapshot.transforms).forEachIndexed { index, (image, transform) ->
+        if (index < fromPhoto) return@forEachIndexed
         image.scaleX = transform.scale; image.scaleY = transform.scale
         image.translationX = transform.x; image.translationY = transform.y
       }
@@ -454,6 +463,7 @@ internal class SlideshowStage(
       displayed = null
       moves.forEach { it.cancel() }
       moves.clear()
+      movePhotos.clear()
       // Drawable references are released only after their visible layer is detached/cleared.
       // Do not recycle rendered bitmaps while Android may retain a display-list reference.
       removeAllViews()

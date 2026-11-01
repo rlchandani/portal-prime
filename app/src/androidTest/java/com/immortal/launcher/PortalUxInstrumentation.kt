@@ -40,6 +40,15 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        if (options.getString("command") == "slideshowCommit") {
+            val commit = try {
+                SlideshowCommitDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply { putBoolean("slideshowCommitPassed", false) }
+            }
+            finish(if (commit.getBoolean("slideshowCommitPassed")) 0 else 1, commit)
+            return
+        }
         if (options.getString("command") == "musicSeekBinding") {
             val seek = try {
                 MusicSeekBindingDeviceChecks.run(this)

@@ -1,0 +1,17 @@
+{
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/baseline-checks.json": "103d4c1ce9406914782c6c42e83e942e36e2f97edac4ec248e1a1a9672486e00",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/original-after.png": "9b8eb46316434e1bf73d37c795495f0c99344676863baf84043ccdba65933d54",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/corrected-before.png": "8e2b9a3151750ad5de7df8309e44afb4ad907bd57536e364c447d0a6a807d292",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/checks.json": "f09994b61fc5297ac2b5e8404dfb25247bd4baa5dd51ffd77e13ab8e4e653e5a",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/unit-gate.json": "32e2e866ede22f0b91cffe90e431cb38146d64fcff514cd97c09f9684c2992dd",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/pixel-proof.json": "909a9702cb2bf729c0e0ae8fad660d3fb3c31fd8b9b7e453985ce0505f1e51e8",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/verification.json": "005c31eaa4b2bd124b8dcea3ce32e4f587fe32f53ff8e0b09c7c4a1256db1d74",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/drag-regression.json": "a39533aa78a8b2a59d6a47ff19032e3644e0e7c851429a73a2c6dd84c24be2d1",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/original-before.png": "8e2b9a3151750ad5de7df8309e44afb4ad907bd57536e364c447d0a6a807d292",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/corrected-after.png": "ef0eca214a888bc1d8e1d382b664db93c380ed1c52128802d882e2806148f3aa",
+  "app/src/main/java/com/immortal/launcher/SlideshowStage.kt": "f0ea8443dbab007159b09b23bfaf64d35d5c1921eefbc80b8bff85c495b7f05a",
+  "app/src/debug/java/com/immortal/launcher/SlideshowDragPreviewActivity.kt": "025791d4445d203889830d1644823ef2f6964c44bfbe3372318acb8e81f2bd37",
+  "app/src/androidTest/java/com/immortal/launcher/SlideshowCommitDeviceChecks.kt": "c9a7e3a64bc057aa1e40f79a17a2546ef89906780c752d572fdd8d1027ef651a",
+  "app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt": "5d3cd32e72b6ef0c4df8e686ed0cf906a40846734fc398a5381dd57020d3c55c",
+  "mocks/portal-premium-player-20261030/evidence/family-slideshow-commit/post-health.json": "1afd1ac475d4d234e1feaf0c1add942ded30d44452410e44379218e8b09417f9"
+}

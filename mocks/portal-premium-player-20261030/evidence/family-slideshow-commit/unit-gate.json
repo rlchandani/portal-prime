@@ -1,0 +1,14 @@
+{
+  "command": ":app:assembleDebug :app:assemblePerformance :app:assembleDebugAndroidTest :app:testDebugUnitTest --rerun-tasks --no-daemon --max-workers=1 -Pkotlin.compiler.execution.strategy=in-process",
+  "tests": 3765,
+  "suites": 395,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "allReportFilesFresh": true,
+  "buildSummary": "4m 18s",
+  "passed": true,
+  "finalInstrumentationBuildSummary": "20s",
+  "productionSourceUnchangedAfterFullGate": true,
+  "finalInstrumentationReportBuildSummary": "22s"
+}

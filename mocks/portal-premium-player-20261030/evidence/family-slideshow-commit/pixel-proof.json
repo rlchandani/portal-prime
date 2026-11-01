@@ -1,0 +1,49 @@
+{
+  "original": {
+    "before": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "before",
+      "bluePixels": 1069000,
+      "bbox": [
+        1091,
+        100,
+        2159,
+        1099
+      ]
+    },
+    "after": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "after",
+      "bluePixels": 0,
+      "bbox": null
+    }
+  },
+  "corrected": {
+    "before": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "before",
+      "bluePixels": 1069000,
+      "bbox": [
+        1091,
+        100,
+        2159,
+        1099
+      ]
+    },
+    "after": {
+      "windowWidth": 2160,
+      "windowHeight": 1440,
+      "phase": "after",
+      "bluePixels": 1069000,
+      "bbox": [
+        1091,
+        100,
+        2159,
+        1099
+      ]
+    }
+  }
+}

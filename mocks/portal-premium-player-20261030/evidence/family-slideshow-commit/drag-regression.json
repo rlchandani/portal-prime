@@ -1,0 +1,505 @@
+{
+  "checks": [
+    {
+      "name": "physical_window_2160_1440",
+      "passed": true
+    },
+    {
+      "name": "full-2x.editor_open",
+      "passed": true
+    },
+    {
+      "name": "full-2x.drag_starts_inside_stage_outside_toolbar",
+      "passed": true
+    },
+    {
+      "name": "full-2x.forward.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "full-2x.forward.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "full-2x.forward.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "full-2x.reverse.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "full-2x.reverse.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "full-2x.reverse.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "full-2x.edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "full-2x.edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "full-2x.edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "full-2x.reverse-after-edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "full-2x.reverse-after-edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "full-2x.reverse-after-edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "print-2x.editor_open",
+      "passed": true
+    },
+    {
+      "name": "print-2x.drag_starts_inside_stage_outside_toolbar",
+      "passed": true
+    },
+    {
+      "name": "print-2x.forward.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-2x.forward.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-2x.forward.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "print-2x.reverse.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-2x.reverse.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-2x.reverse.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "print-2x.edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-2x.edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-2x.edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "print-2x.reverse-after-edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-2x.reverse-after-edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-2x.reverse-after-edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "print-3x.editor_open",
+      "passed": true
+    },
+    {
+      "name": "print-3x.drag_starts_inside_stage_outside_toolbar",
+      "passed": true
+    },
+    {
+      "name": "print-3x.forward.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-3x.forward.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-3x.forward.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "print-3x.reverse.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-3x.reverse.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-3x.reverse.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "print-3x.edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-3x.edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-3x.edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "print-3x.reverse-after-edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-3x.reverse-after-edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "print-3x.reverse-after-edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.editor_open",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.drag_starts_inside_stage_outside_toolbar",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.forward.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.forward.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.forward.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.reverse.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.reverse.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.reverse.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.reverse-after-edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.reverse-after-edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "small-print-2x.reverse-after-edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "whole-print.editor_open",
+      "passed": true
+    },
+    {
+      "name": "whole-print.drag_starts_inside_stage_outside_toolbar",
+      "passed": true
+    },
+    {
+      "name": "whole-print.forward.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "whole-print.forward.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "whole-print.forward.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "whole-print.reverse.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "whole-print.reverse.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "whole-print.reverse.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "whole-print.edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "whole-print.edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "whole-print.edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "whole-print.reverse-after-edge.x_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "whole-print.reverse-after-edge.y_tracks_finger",
+      "passed": true
+    },
+    {
+      "name": "whole-print.reverse-after-edge.same_view_and_bitmap",
+      "passed": true
+    },
+    {
+      "name": "owned_hosts_destroyed",
+      "passed": true
+    },
+    {
+      "name": "bounded_native_work",
+      "passed": true
+    }
+  ],
+  "samples": [
+    {
+      "case": "full-2x",
+      "direction": "forward",
+      "requestedX": 80,
+      "requestedY": 60,
+      "actualX": 80,
+      "actualY": 60,
+      "expectedX": 80,
+      "expectedY": 60
+    },
+    {
+      "case": "full-2x",
+      "direction": "reverse",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": -80,
+      "actualY": -60,
+      "expectedX": -80,
+      "expectedY": -60
+    },
+    {
+      "case": "full-2x",
+      "direction": "edge",
+      "requestedX": 1200,
+      "requestedY": 1000,
+      "actualX": 360,
+      "actualY": 720,
+      "expectedX": 360,
+      "expectedY": 720
+    },
+    {
+      "case": "full-2x",
+      "direction": "reverse-after-edge",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": -80,
+      "actualY": -60,
+      "expectedX": -80,
+      "expectedY": -60
+    },
+    {
+      "case": "print-2x",
+      "direction": "forward",
+      "requestedX": 80,
+      "requestedY": 60,
+      "actualX": 80,
+      "actualY": 60,
+      "expectedX": 80,
+      "expectedY": 60
+    },
+    {
+      "case": "print-2x",
+      "direction": "reverse",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": -80,
+      "actualY": -60,
+      "expectedX": -80,
+      "expectedY": -60
+    },
+    {
+      "case": "print-2x",
+      "direction": "edge",
+      "requestedX": 1200,
+      "requestedY": 1000,
+      "actualX": 303,
+      "actualY": 663,
+      "expectedX": 303,
+      "expectedY": 663
+    },
+    {
+      "case": "print-2x",
+      "direction": "reverse-after-edge",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": -80,
+      "actualY": -60,
+      "expectedX": -80,
+      "expectedY": -60
+    },
+    {
+      "case": "print-3x",
+      "direction": "forward",
+      "requestedX": 80,
+      "requestedY": 60,
+      "actualX": 80,
+      "actualY": 60,
+      "expectedX": 80,
+      "expectedY": 60
+    },
+    {
+      "case": "print-3x",
+      "direction": "reverse",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": -80,
+      "actualY": -60,
+      "expectedX": -80,
+      "expectedY": -60
+    },
+    {
+      "case": "print-3x",
+      "direction": "edge",
+      "requestedX": 1200,
+      "requestedY": 1000,
+      "actualX": 965.99994,
+      "actualY": 1000,
+      "expectedX": 966,
+      "expectedY": 1000
+    },
+    {
+      "case": "print-3x",
+      "direction": "reverse-after-edge",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": -79.99994,
+      "actualY": -60,
+      "expectedX": -80,
+      "expectedY": -60
+    },
+    {
+      "case": "small-print-2x",
+      "direction": "forward",
+      "requestedX": 80,
+      "requestedY": 60,
+      "actualX": 80,
+      "actualY": 60,
+      "expectedX": 80,
+      "expectedY": 60
+    },
+    {
+      "case": "small-print-2x",
+      "direction": "reverse",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": -80,
+      "actualY": -60,
+      "expectedX": -80,
+      "expectedY": -60
+    },
+    {
+      "case": "small-print-2x",
+      "direction": "edge",
+      "requestedX": 1200,
+      "requestedY": 1000,
+      "actualX": 324,
+      "actualY": 414,
+      "expectedX": 324,
+      "expectedY": 414
+    },
+    {
+      "case": "small-print-2x",
+      "direction": "reverse-after-edge",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": -80,
+      "actualY": -60,
+      "expectedX": -80,
+      "expectedY": -60
+    },
+    {
+      "case": "whole-print",
+      "direction": "forward",
+      "requestedX": 80,
+      "requestedY": 60,
+      "actualX": 0,
+      "actualY": 0,
+      "expectedX": 0,
+      "expectedY": 0
+    },
+    {
+      "case": "whole-print",
+      "direction": "reverse",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": 0,
+      "actualY": 0,
+      "expectedX": 0,
+      "expectedY": 0
+    },
+    {
+      "case": "whole-print",
+      "direction": "edge",
+      "requestedX": 1200,
+      "requestedY": 1000,
+      "actualX": 0,
+      "actualY": 0,
+      "expectedX": 0,
+      "expectedY": 0
+    },
+    {
+      "case": "whole-print",
+      "direction": "reverse-after-edge",
+      "requestedX": -80,
+      "requestedY": -60,
+      "actualX": 0,
+      "actualY": 0,
+      "expectedX": 0,
+      "expectedY": 0
+    }
+  ],
+  "passed": true,
+  "failureCount": 0,
+  "isolatedFailureCount": 0,
+  "caseCount": 5,
+  "elapsedMs": 3425,
+  "generatedOnly": true,
+  "physicalPanelFpsProof": false
+}
