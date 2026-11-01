@@ -18,6 +18,33 @@ internal object SlideshowPresentationPolicy {
   fun needsPhotoScrim(mode: String): Boolean =
       mode != ScreensaverConfig.MODE_GALLERY_PRINT && mode != ScreensaverConfig.MODE_GALLERY_SPREAD
 
+  /**
+   * Framed Print keeps a centered photo in a dark room. Its CSS frame adds 56 CSS pixels per
+   * side; include the maximum 1.06 photo motion as well. Keep the existing shade whenever an
+   * overlay could touch that conservative envelope, or its geometry is not known yet.
+   */
+  fun framedOverlaysNeedScrim(
+      viewportWidth: Int, viewportHeight: Int, density: Float,
+      occupied: List<Bounds>?,
+  ): Boolean {
+    if (viewportWidth <= 0 || viewportHeight <= 0 || !density.isFinite() || density <= 0f ||
+        occupied == null || occupied.size > MAX_OCCLUSIONS) return true
+    // The photo scales inside its fixed frame. Reserve whichever extends farther: the
+    // pale mat/frame itself, or the moving print when its maximum scale overflows the mat.
+    val photoHalfWidth = kotlin.math.ceil(viewportWidth * .60 / density) * density * .5
+    val photoHalfHeight = kotlin.math.ceil(viewportHeight * .72 / density) * density * .5
+    val halfWidth = maxOf(photoHalfWidth + 56 * density.toDouble(), photoHalfWidth * 1.06)
+    val halfHeight = maxOf(photoHalfHeight + 56 * density.toDouble(), photoHalfHeight * 1.06)
+    val left = viewportWidth * .5 - halfWidth
+    val right = viewportWidth * .5 + halfWidth
+    val top = viewportHeight * .5 - halfHeight
+    val bottom = viewportHeight * .5 + halfHeight
+    return occupied.any { area ->
+      area.left >= area.right || area.top >= area.bottom ||
+          (area.left <= right && area.right >= left && area.top <= bottom && area.bottom >= top)
+    }
+  }
+
   data class Bounds(val left: Int, val top: Int, val right: Int, val bottom: Int) {
     val width: Int get() = right - left
     val height: Int get() = bottom - top

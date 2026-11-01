@@ -16,6 +16,43 @@ class SlideshowPresentationPolicyTest {
     assertFalse(SlideshowPresentationPolicy.needsPhotoScrim(ScreensaverConfig.MODE_GALLERY_SPREAD))
   }
 
+  @Test fun framedCornerClockOnDarkRoomMatteKeepsWholePhotoColors() {
+    assertFalse(SlideshowPresentationPolicy.framedOverlaysNeedScrim(
+        2160, 1440, 1.125f, listOf(Bounds(32, 1190, 355, 1370))))
+  }
+
+  @Test fun framedCenteredClockAndWideMusicCardKeepReadabilityProtection() {
+    assertTrue(SlideshowPresentationPolicy.needsPhotoScrim("framed"))
+    listOf(Bounds(700, 600, 1460, 900), Bounds(1450, 1150, 2100, 1400),
+        Bounds(350, 1200, 430, 1350)).forEach { area ->
+      assertTrue(SlideshowPresentationPolicy.framedOverlaysNeedScrim(
+          2160, 1440, 1.125f, listOf(area)))
+    }
+  }
+
+  @Test fun framedUnknownInvalidAndExcessiveGeometryKeepsReadabilityProtection() {
+    assertTrue(SlideshowPresentationPolicy.framedOverlaysNeedScrim(2160, 1440, 1.125f, null))
+    assertTrue(SlideshowPresentationPolicy.framedOverlaysNeedScrim(0, 1440, 1.125f, emptyList()))
+    assertTrue(SlideshowPresentationPolicy.framedOverlaysNeedScrim(2160, 1440, Float.NaN, emptyList()))
+    assertTrue(SlideshowPresentationPolicy.framedOverlaysNeedScrim(
+        2160, 1440, 1.125f, listOf(Bounds(50, 50, 40, 60))))
+    val oversized = object : AbstractList<Bounds>() {
+      override val size = Int.MAX_VALUE
+      override fun get(index: Int): Bounds = error("oversized geometry must not be traversed")
+    }
+    assertTrue(SlideshowPresentationPolicy.framedOverlaysNeedScrim(2160, 1440, 1.125f, oversized))
+  }
+
+  @Test fun framedMotionOverflowBeyondItsFixedMatteRetainsProtection() {
+    assertTrue(SlideshowPresentationPolicy.framedOverlaysNeedScrim(
+        10000, 6000, 1.125f, listOf(Bounds(1850, 2000, 1900, 2100))))
+  }
+
+  @Test fun framedCssPixelRoundingCannotExposeAnOverlayAtTheMatteEdge() {
+    assertTrue(SlideshowPresentationPolicy.framedOverlaysNeedScrim(
+        1006, 1000, 1.125f, listOf(Bounds(130, 400, 138, 450))))
+  }
+
   @Test fun photosBehindClockTextStillGetLegibilityProtection() {
     listOf(ScreensaverConfig.MODE_SMART, ScreensaverConfig.MODE_WHOLE,
         "filmstrip", "classic", "unknown-future-style").forEach { mode ->

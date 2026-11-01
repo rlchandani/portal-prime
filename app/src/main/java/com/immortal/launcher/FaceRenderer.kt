@@ -24,6 +24,7 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -87,6 +88,36 @@ class FaceRenderer(
 
   // Position buckets (a vertical stack per used grid cell), created on demand.
   private val buckets = HashMap<GridPosition, LinearLayout>()
+  private var framedScrimListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+
+  private fun detachFramedScrimListener() {
+    framedScrimListener?.let { listener ->
+      if (view.viewTreeObserver.isAlive) view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+    }
+    framedScrimListener = null
+  }
+
+  private fun watchFramedScrim(scrim: View) {
+    val display = context.resources.displayMetrics
+    val listener = ViewTreeObserver.OnGlobalLayoutListener {
+      // A visible but unmeasured bucket is unknown, not an empty reservation. INVISIBLE keeps
+      // the scrim's own geometry stable; only a changed decision requests another layout.
+      val unknown = view.width <= 0 || view.height <= 0 || buckets.values.any { bucket ->
+        bucket.visibility == View.VISIBLE &&
+            (0 until bucket.childCount).any { bucket.getChildAt(it).visibility == View.VISIBLE } &&
+            (bucket.width <= 0 || bucket.height <= 0)
+      }
+      val occupied = if (unknown) null else photoOcclusions().map { area ->
+        SlideshowPresentationPolicy.Bounds(area.left, area.top, area.right, area.bottom)
+      }
+      val shade = SlideshowPresentationPolicy.framedOverlaysNeedScrim(
+          display.widthPixels, display.heightPixels, display.density, occupied)
+      val visibility = if (shade) View.VISIBLE else View.INVISIBLE
+      if (scrim.visibility != visibility) scrim.visibility = visibility
+    }
+    framedScrimListener = listener
+    view.viewTreeObserver.addOnGlobalLayoutListener(listener)
+  }
 
   /** Measured widget areas in window pixels, padded for the small burn-in drift. */
   fun photoOcclusions(): List<android.graphics.Rect> =
@@ -202,6 +233,7 @@ class FaceRenderer(
   /** Permanently release this renderer; neither [start] nor [setHostActive] can restart it. */
   fun stop() {
     if (!work.stop()) return
+    detachFramedScrimListener()
     suspendHostWork()
     clockFace?.dispose()
     io.shutdownNow()
@@ -209,6 +241,7 @@ class FaceRenderer(
 
   // --- overlay assembly -------------------------------------------------------
   private fun buildOverlay() {
+    detachFramedScrimListener()
     view.removeAllViews()
     buckets.clear()
     // Caption views are rebuilt below (or not, on a full-bleed face) — drop stale refs so a
@@ -247,6 +280,7 @@ class FaceRenderer(
                 ),
             )
         view.addView(premiumScrim, 0, FrameLayout.LayoutParams(MATCH, scrimHeight, Gravity.BOTTOM))
+        if (screensaver.mode == "framed") watchFramedScrim(premiumScrim)
       }
       buildStandaloneWidgets(face)
       // Photo caption is photo metadata, so (like the widgets) it's skipped on a full-bleed clock.
