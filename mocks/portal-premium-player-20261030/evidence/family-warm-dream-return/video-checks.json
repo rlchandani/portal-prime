@@ -1,0 +1,70 @@
+{
+  "scope": "all_encoded_frame_content_not_panel_fps",
+  "analysisSize": [
+    540,
+    360
+  ],
+  "region": [
+    108,
+    54,
+    432,
+    306
+  ],
+  "maximumClassMeanError": 16,
+  "classAdvantageRequired": 12,
+  "nearBlackDefinition": "At least 99 percent of ROI pixels have every RGB channel at most 8",
+  "clips": [
+    {
+      "case": "paused",
+      "frameCount": 8,
+      "firstTimestamp": 0.0,
+      "lastTimestamp": 9.753933,
+      "observedTimestampSpan": 9.753933,
+      "largestTimestampGap": 7.983189,
+      "nearBlackFrames": 0,
+      "classificationCounts": {
+        "photo": 8,
+        "home": 0,
+        "transition": 0
+      },
+      "firstHomeIndex": null,
+      "firstHomeTimestamp": null,
+      "photoFramesAfterFirstHome": null,
+      "nonHomeFramesAfterFirstHome": null,
+      "passed": true
+    },
+    {
+      "case": "continuation",
+      "frameCount": 14,
+      "firstTimestamp": 0.0,
+      "lastTimestamp": 1.368644,
+      "observedTimestampSpan": 1.368644,
+      "largestTimestampGap": 0.886456,
+      "nearBlackFrames": 6,
+      "classificationCounts": {
+        "photo": 4,
+        "home": 4,
+        "transition": 6
+      },
+      "firstHomeIndex": 10,
+      "firstHomeTimestamp": 1.153722,
+      "photoFramesAfterFirstHome": 0,
+      "nonHomeFramesAfterFirstHome": 0,
+      "passed": false
+    }
+  ],
+  "blackFirstToLastTimestampSeconds": 0.146977,
+  "blackFirstToFirstHomeTimestampSeconds": 0.163966,
+  "passed": false,
+  "recordingWallTimeSeconds": {
+    "paused": 10,
+    "continuation": 12
+  },
+  "limitations": [
+    "Encoded frames are not delivered panel frames",
+    "Sparse timestamps cannot prove continuous coverage",
+    "Continuation clip contains only 1.369 seconds of timestamp span despite 12 second recording wall time",
+    "No physical-finger input or optical comfort acceptance"
+  ],
+  "disposition": "visual handoff remains open; lifecycle results pass"
+}

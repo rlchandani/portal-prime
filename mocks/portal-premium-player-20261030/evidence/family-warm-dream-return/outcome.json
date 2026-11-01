@@ -1,0 +1,15 @@
+{
+  "slotStartedAtUtc": "2026-11-01T15:36:45+00:00",
+  "originalDeadlineUtc": "2026-11-01T16:06:45+00:00",
+  "closedAtUtc": "2026-11-01T16:00:37.398489+00:00",
+  "elapsedSeconds": 1432.398,
+  "capReset": false,
+  "lifecyclePassed": true,
+  "pausedPhotoContinuityPassed": true,
+  "seamlessVisualGatePassed": false,
+  "runtimeFixDelivered": false,
+  "remainingIssue": "six encoded near-black frames during continuation-to-Home handoff",
+  "disposition": "parked within original time cap; no additional capture or speculative runtime edit",
+  "naturalLightUserAcceptance": "pending; user unavailable",
+  "broadGoalComplete": false
+}

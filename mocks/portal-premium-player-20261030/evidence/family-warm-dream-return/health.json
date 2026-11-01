@@ -1,0 +1,20 @@
+{
+  "scope": "independent_read_only_post_restore_health",
+  "transport": "wireless_adb_and_fleet",
+  "checks": {
+    "settingsExact": true,
+    "sourcesExact": true,
+    "faceCacheExact": true,
+    "appUnchanged": true,
+    "testAppUnchanged": true,
+    "accessibilityExact": true,
+    "systemPidUnchanged": true,
+    "persistentPinExact": true,
+    "noInstrumentation": true,
+    "noCollector": true,
+    "originalDreamActive": true,
+    "brightnessPolicyExact": true
+  },
+  "passed": true,
+  "verifiedAtUtc": "2026-11-01T16:00:12.433174+00:00"
+}

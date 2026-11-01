@@ -1,0 +1,9 @@
+{
+  "command": "python3 -B -m unittest discover -s scripts -p test_portal_warm_dream_contract.py -v",
+  "tests": 10,
+  "failures": 0,
+  "errors": 0,
+  "passed": true,
+  "androidProductionSourceChanged": false,
+  "androidGateDisposition": "Retained prior fresh 3764 tests across 395 suites for unchanged Android source; not rerun in this slot"
+}

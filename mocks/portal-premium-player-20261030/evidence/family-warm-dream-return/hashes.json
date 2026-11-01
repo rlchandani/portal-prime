@@ -1,0 +1,27 @@
+{
+  "publicFiles": {
+    "analysis-attempts.json": "f62c3ff404c014bbd55a1b6c531c32e9eac21ee34d60a11d3e3ead105b9cec37",
+    "continuation-checks.json": "3832cf40dbc07a99a6889d8e1f10801c3ca1fb993dbe2522b0ec3ab3210c093f",
+    "continuation-encoded-frame-checks.json": "6bff0977ffe22dc563dce59791181cc16f2a0203cb23dd5d1cc4cd552d69ff85",
+    "continuation-observations.json": "992451860e1af98cdcde049d9deca053cfae72da756bc2e1a7484efadcca53cb",
+    "health.json": "1474fbd5d1a2cfb066ea8f4444fb20c5672ffa0fca2c6c776306f0e677b5b380",
+    "independent-activity-checks.json": "c959fa178970c0b06453aa86b3e67faa00bac7fbc9dc591dbb9816f738c5631c",
+    "initial-safe.json": "128eb35f5df2cb590ae371dae17b36cdc1350901b436aab22d9ab95818cbfbdc",
+    "outcome.json": "fe665c896b3cc53c9731ff28d9389658e73fb8667ff3ebdc637ccb2a23444fc6",
+    "paused-checks.json": "5aa8391af99f43e3fcffab5730e20cc0c4c785cb25e6828420bac677d9f7a83a",
+    "paused-encoded-frame-checks.json": "fe1632feb3af6af58b01ef7f425eddf71f3db4b43802b64cc61e3a3314fd588c",
+    "paused-labels-after.png": "1ef8ff37a72f42362c5e15e94f4d0ca34751715562d56dca3562aec7c6f7c345",
+    "paused-labels-before.png": "1ef8ff37a72f42362c5e15e94f4d0ca34751715562d56dca3562aec7c6f7c345",
+    "paused-observations.json": "b8b72711be726f1d329f502b819312fe43b1b9235bbf154f5a6e75e05bc50e41",
+    "paused-photo-after.png": "967839abd3aa7c812620724921c5b67bb410d004b52c7b17ccb9402e8ac6152e",
+    "paused-photo-before.png": "967839abd3aa7c812620724921c5b67bb410d004b52c7b17ccb9402e8ac6152e",
+    "unit-gate.json": "1d04e4b528863adc6ebf49c777e90a56232e33c8dc78dd2621b626190978a067",
+    "verification.json": "c1feeab2d1de3b494b10447987c7adc64ffc45c205ff05ddae3f62a0cb7f6af8",
+    "video-checks.json": "39ce2fc50546829c394f3aded607cea0a49ba1ca63c466d4b88bc5597cf3323a"
+  },
+  "privateRecordings": {
+    "paused-return-private.mp4": "a505ce0f63c0520090e123b224072a87e6aa0e6baa99dfcad556d0566ef0ef57",
+    "continuation-return-private.mp4": "5362b7652d8e26d46d1fd1980669c5edefffe8e2ae7e511a6a64826243bea5e6"
+  },
+  "privateRecordingsPublished": false
+}

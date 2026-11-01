@@ -1,0 +1,100 @@
+[
+  {
+    "timestamp": 0.0,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.379,
+    "dreamMeanError": 1.528
+  },
+  {
+    "timestamp": 0.886456,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.366,
+    "dreamMeanError": 1.532
+  },
+  {
+    "timestamp": 0.906044,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.414,
+    "dreamMeanError": 1.399
+  },
+  {
+    "timestamp": 0.931078,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.443,
+    "dreamMeanError": 1.381
+  },
+  {
+    "timestamp": 0.989756,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.803,
+    "dreamMeanError": 84.894
+  },
+  {
+    "timestamp": 1.019167,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.803,
+    "dreamMeanError": 84.894
+  },
+  {
+    "timestamp": 1.054989,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.803,
+    "dreamMeanError": 84.894
+  },
+  {
+    "timestamp": 1.074311,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.803,
+    "dreamMeanError": 84.894
+  },
+  {
+    "timestamp": 1.089,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.803,
+    "dreamMeanError": 84.894
+  },
+  {
+    "timestamp": 1.136733,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.803,
+    "dreamMeanError": 84.894
+  },
+  {
+    "timestamp": 1.153722,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.032,
+    "dreamMeanError": 41.635
+  },
+  {
+    "timestamp": 1.170344,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.038,
+    "dreamMeanError": 41.643
+  },
+  {
+    "timestamp": 1.202044,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.04,
+    "dreamMeanError": 41.649
+  },
+  {
+    "timestamp": 1.368644,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.041,
+    "dreamMeanError": 41.643
+  }
+]

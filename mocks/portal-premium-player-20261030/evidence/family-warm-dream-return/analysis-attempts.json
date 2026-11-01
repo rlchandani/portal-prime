@@ -1,0 +1,24 @@
+{
+  "attempts": [
+    {
+      "stage": "decoder invocation",
+      "passed": false,
+      "reason": "Installed ffmpeg rejects removed vsync option",
+      "decodedFrames": 0,
+      "disposition": "Changed offline invocation to fps_mode passthrough; no device recapture"
+    },
+    {
+      "stage": "complete encoded-frame analysis",
+      "decodePassed": true,
+      "visualGatePassed": false,
+      "reason": "Six near-black frames in recovered continuation to Home handoff",
+      "disposition": "Preserved failed visual result; no performance or seamless-return claim"
+    }
+  ],
+  "initialHomeCase": {
+    "validHomePrecondition": false,
+    "actualCaller": "Android resolver",
+    "reason": "Invalid debug package relative activity shorthand",
+    "disposition": "Used full source namespace; did not change default HOME preference"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "initialRealDream": true,
+  "observations": 12,
+  "dreamReappeared": false,
+  "allObservedResumesHome": false,
+  "rootDownObserved": true,
+  "rootUpObserved": true,
+  "userExitObserved": true,
+  "recoveryObserved": false
+}

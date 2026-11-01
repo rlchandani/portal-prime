@@ -1,0 +1,28 @@
+{
+  "scope": "actual_api29_os_dream_software_injected_tap_over_deliberate_paused_gallery_viewer",
+  "physicalTouchVerified": false,
+  "panelFpsMeasured": false,
+  "realDreamConfirmed": true,
+  "observationCount": 24,
+  "observedSeconds": 7.157,
+  "allObservedReturnsPreview": true,
+  "sameActivityToken": true,
+  "sameAppPid": true,
+  "allObservedDreamsStopped": true,
+  "sameSingleLiveViewer": true,
+  "rootDownObserved": true,
+  "rootUpObserved": true,
+  "userExitVerdictObserved": true,
+  "recoveryVerdictObserved": false,
+  "continuationRetired": false,
+  "continuationPreservedAsDeliberate": true,
+  "photoRegion": [
+    750,
+    300,
+    1650,
+    1150
+  ],
+  "maximumPhotoChannelDifference": 0,
+  "meanPhotoChannelDifference": 0.0,
+  "passed": true
+}

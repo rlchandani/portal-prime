@@ -1,0 +1,25 @@
+{
+  "cases": [
+    {
+      "case": "paused-return",
+      "observations": 24,
+      "passed": true,
+      "resumedKind": "preview",
+      "allIdentityMatches": true,
+      "liveHomeCount": 1,
+      "livePreviewCount": 1
+    },
+    {
+      "case": "continuation-return",
+      "observations": 30,
+      "passed": true,
+      "resumedKind": "home",
+      "allIdentityMatches": true,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0
+    }
+  ],
+  "totalObservations": 54,
+  "passed": true,
+  "rawTokensPublished": false
+}

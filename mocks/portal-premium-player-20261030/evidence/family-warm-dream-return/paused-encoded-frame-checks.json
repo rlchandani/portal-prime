@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": 0.0,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.379,
+    "dreamMeanError": 1.528
+  },
+  {
+    "timestamp": 0.641767,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.366,
+    "dreamMeanError": 1.532
+  },
+  {
+    "timestamp": 0.665344,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.414,
+    "dreamMeanError": 1.399
+  },
+  {
+    "timestamp": 0.704167,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.443,
+    "dreamMeanError": 1.381
+  },
+  {
+    "timestamp": 0.754556,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.974,
+    "dreamMeanError": 1.165
+  },
+  {
+    "timestamp": 0.936944,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.921,
+    "dreamMeanError": 1.163
+  },
+  {
+    "timestamp": 8.920133,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.891,
+    "dreamMeanError": 1.14
+  },
+  {
+    "timestamp": 9.753933,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.651,
+    "dreamMeanError": 0.929
+  }
+]

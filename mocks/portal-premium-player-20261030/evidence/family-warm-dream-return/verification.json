@@ -1,0 +1,22 @@
+{
+  "settingsExact": true,
+  "settingCount": 97,
+  "sourcesExact": true,
+  "faceCacheExact": true,
+  "faceCacheNeededRestore": false,
+  "apkUnchanged": true,
+  "testApkUnchanged": true,
+  "accessibilityExact": true,
+  "systemPidUnchanged": true,
+  "persistentPinExact": true,
+  "noInstrumentation": true,
+  "noCollector": true,
+  "ownedFixturesRemoved": true,
+  "brightnessPolicyExact": true,
+  "rawBrightnessExact": false,
+  "brightnessInvariantSatisfied": true,
+  "originalDreamRestored": true,
+  "installedSha256": "4ea7f4e83b9c333fc9554f723723dc1931088725701d032cdd773d2fa0e1e06f",
+  "verifiedAtUtc": "2026-11-01T15:54:20.150610+00:00",
+  "restored": true
+}
