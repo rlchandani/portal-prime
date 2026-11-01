@@ -1,0 +1,74 @@
+{
+  "sourceCommit": "f188e068",
+  "branch": "codex/slideshow-smb-listing-lifetime-20261101",
+  "target": "Family Area",
+  "issueStartedUtc": "2026-11-01T08:35:32Z",
+  "issueHardLimitUtc": "2026-11-01T09:05:32Z",
+  "targetRed": {
+    "tests": 10,
+    "failures": 9,
+    "errors": 0,
+    "skipped": 0,
+    "baselineKind": "behavior_equivalent_startup_scaffold"
+  },
+  "targetGreen": {
+    "tests": 53,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "fullUnitGate": {
+    "tests": 3678,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 388
+  },
+  "artifacts": {
+    "debugApkSha256": "0f98db5e2e680f48d6ca2919d797f4b387532422a84054e62ef769a58730c976",
+    "debugApkBytes": 49734349,
+    "performanceApkSha256": "eb6296d3005d435c8aa1519191cb5366f5cdf17a1f6294b40b9176fb7874ec37",
+    "performanceApkBytes": 25842558,
+    "signingCertificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "allBuildsPassed": true
+  },
+  "deployment": {
+    "newApkSha256": "eb6296d3005d435c8aa1519191cb5366f5cdf17a1f6294b40b9176fb7874ec37",
+    "oldApkSha256": "b79b56c7efd20fa9cfee492e7750fe0c5fbb56b0f8ab0cab959d1d22ef3f2dee",
+    "originalDreamActive": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "systemProcessUnchanged": true,
+    "pass": true,
+    "accessibilityExact": true,
+    "originalDreamRestored": true,
+    "elapsedSeconds": 18.022
+  },
+  "freshNativeHealth": {
+    "familyIdentity": true,
+    "optimizedHashMatches": true,
+    "nonDebuggable": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "accessibilityExact": true,
+    "originalDreamActive": true,
+    "collectorInactive": true,
+    "noActiveInstrumentation": true
+  },
+  "newRegressionCases": 10,
+  "realLoopbackSocketEofVerified": true,
+  "mockedSmbListingFailureCleanupVerified": true,
+  "independentReviewBlockers": 0,
+  "settingsCount": 97,
+  "photoSourceFieldCount": 22,
+  "actualNasConfigured": false,
+  "actualNasRecoveryAccepted": false,
+  "blockedSmbOperationCancellationAccepted": false,
+  "panelFpsAccepted": false,
+  "performanceImprovementMeasuredOnDevice": false,
+  "naturalRoomLightComfortAccepted": false,
+  "musicAudioProviderDeferred": true,
+  "livingAreaTouched": false,
+  "goalComplete": false
+}

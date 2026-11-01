@@ -59,3 +59,9 @@ The full platform/screensaver/night-clock/music goal is incomplete.
 
 See the [sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-smb-callback-cleanup/verification.json).
 Private configuration snapshots, credentials and rollback APKs remain outside Git.
+
+**Subsequent startup fix:** the
+[SMB preparation-failure guard](portal-smb-startup-failure-2026-11-01.md)
+also releases sources when listing or handoff throws before ownership is
+transferred. The combined gate passes 53/53 tests; blocked-operation
+cancellation and actual NAS recovery remain unverified.

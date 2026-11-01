@@ -10,6 +10,14 @@ capture timeout did not reproduce, so its cause is not declared fixed.
 Natural room-light comfort on the current transition remains pending; the
 user cannot perform that physical check now.
 
+**SMB startup delivery, November 1:** the
+[preparation-failure guard](portal-smb-startup-failure-2026-11-01.md) releases
+connections on listing/handoff failure and routes recoverable exceptions to
+fallback photos. The focused gate passes **53/53**, the full unit gate passes
+**3,678 tests**, and optimized APK **eb6296d3…** is verified on Family Area.
+No NAS source is configured there; actual NAS recovery, blocked-operation
+cancellation and measured FPS gains are not accepted by this delivery.
+
 **Subsequent user feedback:** brightness and clock changes still jumped.
 The [new coordinated night transition][night-crossfade] at **df4405bb**
 fixes the immediate clock visibility switch and pinned-overlay brightness
