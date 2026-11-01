@@ -64,6 +64,11 @@ that separate admission behavior is not classified as a failure here.
 The user cannot perform the room-light check now; it remains pending.
 The overall performance/night/music goal remains incomplete.
 
+The later [native motion check](portal-night-photo-motion-2026-11-01.md)
+accepts controlled Smart Frame pan/zoom and an interrupted dissolve with
+**357/357 observations/assertions**. Its fixed-size, synthetic-metadata scope
+does not replace the physical room-light check or establish other renderers.
+
 [Native checks](../mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/checks.json),
 [restoration](../mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/verification.json),
 [unit results](../mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/unit-results.json),

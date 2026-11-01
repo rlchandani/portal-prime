@@ -1,0 +1,11 @@
+{
+  "app/src/debug/java/com/immortal/launcher/NightPhotoPreviewActivity.kt": "7d66b8682e3b5615125ddfe20f4ae1d8b9cfe26e68a0bbd53c403e8a39ba9758",
+  "app/src/androidTest/java/com/immortal/launcher/NightPhotoPauseDeviceChecks.kt": "9fbb6f71d62accadfb3ba85352b0ce5150e64171debf09e41ac533370dee014f",
+  "app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt": "496c27ae30c6f47394c85b08c1e25c0ea325a53a56c2995d33935e3a738f5ec1",
+  "mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/checks.json": "72c5a8015c98794f12e9e1d5cffae419c46e0cc773a9e673d5603b026563cce3",
+  "mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/unit-results.json": "fc954e92f9c229b8f0ea1f090f729dd04915cd0b2218842542a63af06131a2bc",
+  "mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/verification.json": "114ae99abb16afaa212f59da582795a9a4a550b7e57133eab7220e3a4e4dd9d8",
+  "docs/portal-night-photo-motion-2026-11-01.md": "78a4397154cbb589c6dede3c5078685bd88b9311c43746ce384c083ff38365ac",
+  "docs/portal-night-photo-pause-2026-11-01.md": "151882aa8a7ce8dc8d49fcb6490c398e3c3b7f45ed8a5c1882dd078c7196b578",
+  "docs/portal-night-player-completion-audit-2026-10-31.md": "a638c27bb77c571f9bc91a8c0f5cc9fd5b64d7848598d070e67847824194338e"
+}

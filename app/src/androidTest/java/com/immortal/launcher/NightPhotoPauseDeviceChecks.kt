@@ -9,12 +9,16 @@ package com.immortal.launcher
 import android.app.Activity
 import android.app.Application
 import android.app.Instrumentation
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.widget.FrameLayout
+import android.widget.ImageView
 import java.io.File
 import java.util.UUID
 import java.util.concurrent.Callable
@@ -26,9 +30,9 @@ import org.json.JSONObject
 
 /** Shortest-interval real controller playback; no hardware sensor/brightness stimulus. */
 internal object NightPhotoPauseDeviceChecks {
-  fun run(probe: Instrumentation): Bundle {
+  fun run(probe: Instrumentation, motion: Boolean = false): Bundle {
     val began = SystemClock.elapsedRealtime()
-    var deadline = began + 70_000
+    var deadline = began + if (motion) 85_000 else 70_000
     val token = "night-photo-owned-${UUID.randomUUID()}"
     val name = "com.immortal.launcher.NightPhotoPreviewActivity"
     val app = probe.targetContext.applicationContext as Application
@@ -53,6 +57,30 @@ internal object NightPhotoPauseDeviceChecks {
         target.javaClass.getDeclaredField(key).apply { isAccessible = true }.get(target)
     fun controller(): PhotoFrameController = field(host!!, "frame") as PhotoFrameController
     fun stage(): SlideshowStage = field(controller(), "nativeStage") as SlideshowStage
+    fun layers(): List<FrameLayout> = (field(stage(), "layers") as Array<*>)
+        .map { it as FrameLayout }
+    @Suppress("UNCHECKED_CAST")
+    fun moves(): List<AnimatorSet> = layers().flatMap {
+      field(it, "moves") as List<AnimatorSet>
+    }
+    fun pose(): List<Number> = layers().flatMap { layer ->
+      buildList {
+        add(layer.alpha)
+        for (index in 0 until layer.childCount) {
+          val image = (layer.getChildAt(index) as FrameLayout).getChildAt(0) as ImageView
+          add(image.scaleX); add(image.scaleY)
+          add(image.translationX); add(image.translationY)
+        }
+        @Suppress("UNCHECKED_CAST")
+        val animations = field(layer, "moves") as List<AnimatorSet>
+        animations.forEach { add(it.currentPlayTime) }
+      }
+    }
+    fun freeze(label: String, reference: List<Number>, covered: Boolean = true) {
+      expect(label, pose() == reference && moves().isNotEmpty() &&
+          moves().all { it.isPaused } && (if (covered)
+            field(controller(), "hostActive") == false else field(controller(), "paused") == true))
+    }
     fun boolean(key: String, value: Boolean) {
       controller().javaClass.getDeclaredMethod(key, Boolean::class.javaPrimitiveType)
           .apply { isAccessible = true }.invoke(controller(), value)
@@ -87,7 +115,8 @@ internal object NightPhotoPauseDeviceChecks {
     try {
       main { app.registerActivityLifecycleCallbacks(lifecycle) }
       main { probe.targetContext.startActivity(Intent().setClassName(probe.targetContext, name)
-          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("owned_probe", token)) }
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("owned_probe", token)
+          .putExtra("photo_motion", motion)) }
       host = monitor.waitForActivityWithTimeout(5000)
       check(host != null)
       poll(8000) { main {
@@ -105,6 +134,7 @@ internal object NightPhotoPauseDeviceChecks {
       var expectedNext: String? = null
       var generation = 0
       var remaining = 0L
+      var retainedPose: List<Number> = emptyList()
       // Enter partway through a dwell: restarting a complete dwell must fail this check.
       SystemClock.sleep(2000)
       main {
@@ -120,10 +150,20 @@ internal object NightPhotoPauseDeviceChecks {
             field(controller(), "localMode") == true
         expect("entry_generated_first_photo_ready", ready)
         check(ready)
+        if (motion) {
+          expect("motion_enabled_in_isolated_profile", ScreensaverConfig.load(stage().context).photoMotion)
+          expect("photo_motion_running_before_cover", moves().isNotEmpty() &&
+              moves().all { it.isStarted && !it.isPaused && it.currentPlayTime > 1000 })
+          measurements.put("motionBeforeCoverMs", moves().firstOrNull()?.currentPlayTime)
+        }
         expectedNext = deck[1]
         boolean("setAmbientNight", true)
         generation = field(controller(), "gen") as Int
         expect("entry_immediately_suspends_photos", !(field(controller(), "hostActive") as Boolean))
+        if (motion) {
+          retainedPose = pose()
+          freeze("motion_paused_at_entry", retainedPose)
+        }
       }
       settle(true)
       val nightBegan = SystemClock.elapsedRealtime()
@@ -135,6 +175,7 @@ internal object NightPhotoPauseDeviceChecks {
               field(controller(), "gen") == generation &&
               !(field(controller(), "hostActive") as Boolean) &&
               !(field(controller(), "paused") as Boolean))
+          if (motion) freeze("motion_night_sample_$samples", retainedPose)
         }
         SystemClock.sleep(250)
       }
@@ -145,10 +186,31 @@ internal object NightPhotoPauseDeviceChecks {
       poll(5000) { main {
         expect("return_sample_${returnSamples++}", stage().currentPhoto!!.bitmap === retained &&
             field(controller(), "gen") == generation)
+        if (motion && field(controller(), "hostActive") == false)
+          freeze("motion_return_sample_$returnSamples", retainedPose)
         field(controller(), "hostActive") == true
       } }
       val resumed = SystemClock.elapsedRealtime()
       measurements.put("returnSamples", returnSamples)
+      if (motion) main {
+        expect("motion_resumed_after_reveal", moves().isNotEmpty() &&
+            moves().all { !it.isPaused })
+        measurements.put("motionAtResumeMs", moves().firstOrNull()?.currentPlayTime)
+        expect("motion_time_retained_at_resume",
+            (moves().first().currentPlayTime -
+                measurements.getLong("motionBeforeCoverMs")) in 0..150)
+      }
+      if (motion) {
+        val resumedPose = main { pose() }
+        val resumedTime = main { moves().first().currentPlayTime }
+        SystemClock.sleep(250)
+        main {
+          expect("motion_continues_before_next_photo", pose() != resumedPose &&
+              moves().first().currentPlayTime - resumedTime in 100..600 &&
+              stage().currentPhoto!!.bitmap === retained)
+          measurements.put("motionContinuationMs", moves().first().currentPlayTime - resumedTime)
+        }
+      }
       while (SystemClock.elapsedRealtime() - resumed < 2000) {
         main { expect("retained_dwell", stage().currentPhoto!!.bitmap === retained) }
         SystemClock.sleep(250)
@@ -166,6 +228,77 @@ internal object NightPhotoPauseDeviceChecks {
       expect("dwell_remainder_preserved", advanceMs in (remaining - 200)..(remaining + 600))
       expect("ordinary_autoplay_resumed_without_skipping", main {
         stage().currentPhoto!!.sourceKey == expectedNext })
+      if (motion) {
+        var blend: ObjectAnimator? = null
+        var blendPose: List<Number> = emptyList()
+        var blendTime = 0L
+        var blendFraction = 0f
+        main {
+          blend = field(stage(), "fade") as? ObjectAnimator
+          val activeBlend = blend
+          expect("automatic_dissolve_observed", activeBlend != null &&
+              activeBlend.animatedFraction < .95f && layers().all { it.childCount > 0 })
+          check(activeBlend != null && activeBlend.animatedFraction < .95f)
+          boolean("setAmbientNight", true)
+          blendTime = activeBlend.currentPlayTime
+          blendFraction = activeBlend.animatedFraction
+          blendPose = pose()
+          expect("dissolve_paused_at_cover", activeBlend.isPaused)
+          measurements.put("dissolvePausedAtMs", blendTime)
+              .put("dissolvePausedFraction", blendFraction)
+        }
+        settle(true)
+        repeat(6) { sample ->
+          main {
+            freeze("dissolve_composition_frozen_$sample", blendPose)
+            // API 29 ValueAnimator's currentPlayTime getter follows wall time while paused.
+            // Its retained fraction and actual layer alpha establish the frozen blend.
+            expect("dissolve_fraction_frozen_$sample", field(stage(), "fade") === blend &&
+                blend!!.animatedFraction == blendFraction && blend!!.isPaused &&
+                layers().all { it.childCount > 0 })
+          }
+          SystemClock.sleep(250)
+        }
+        main {
+          boolean("setPaused", true); boolean("setPaused", false); boolean("setPaused", true)
+          controller().setHostActive(false); controller().setHostActive(true)
+          freeze("user_toggle_and_external_cover_keep_dissolve_frozen", blendPose)
+          expect("user_toggle_and_external_cover_keep_blend_frozen",
+              field(stage(), "fade") === blend && blend!!.isPaused &&
+                  blend!!.animatedFraction == blendFraction)
+          boolean("setAmbientNight", false)
+        }
+        poll(5000) { main {
+          if (field(controller(), "hostActive") == false) {
+            freeze("dissolve_reveal_composition_frozen", blendPose)
+            expect("dissolve_reveal_fraction_frozen", blend!!.animatedFraction == blendFraction &&
+                field(stage(), "fade") === blend && blend!!.isPaused)
+          }
+          field(controller(), "hostActive") == true
+        } }
+        main {
+          freeze("user_pause_keeps_revealed_dissolve_frozen", blendPose, covered = false)
+          expect("user_pause_keeps_revealed_blend_frozen", blend!!.isPaused &&
+              blend!!.animatedFraction == blendFraction && field(stage(), "fade") === blend)
+        }
+        SystemClock.sleep(250)
+        main {
+          freeze("user_pause_dissolve_stays_frozen", blendPose, covered = false)
+          expect("user_pause_blend_stays_frozen", blend!!.animatedFraction == blendFraction)
+          boolean("setPaused", false)
+          expect("dissolve_resumes_from_retained_fraction", !blend!!.isPaused &&
+              blend!!.animatedFraction == blendFraction)
+        }
+        poll(1000) { main { blend!!.animatedFraction > blendFraction } }
+        expect("dissolve_continues_after_explicit_resume", main {
+          blend!!.animatedFraction > blendFraction })
+        poll(2000) { main { field(stage(), "fade") == null } }
+        main {
+          expect("dissolve_retires_only_outgoing_layer",
+              layers().count { it.childCount > 0 } == 1 &&
+                  stage().currentPhoto!!.sourceKey == expectedNext)
+        }
+      }
       main { boolean("setPaused", true); retained = stage().currentPhoto!!.bitmap
         boolean("setAmbientNight", true) }
       settle(true)
@@ -174,7 +307,9 @@ internal object NightPhotoPauseDeviceChecks {
         boolean("setAmbientNight", false) }
       settle(false)
       main { expect("user_pause_survives_night", field(controller(), "paused") == true &&
-          stage().currentPhoto!!.bitmap === retained) }
+          stage().currentPhoto!!.bitmap === retained)
+        if (motion) expect("user_paused_motion_survives_reveal",
+            moves().isNotEmpty() && moves().all { it.isPaused }) }
       SystemClock.sleep(5500)
       main {
         expect("user_paused_beyond_interval", stage().currentPhoto!!.bitmap === retained)
@@ -182,9 +317,14 @@ internal object NightPhotoPauseDeviceChecks {
       }
       settle(true)
       main { boolean("setPaused", false)
-        expect("resume_under_night_keeps_cover", field(controller(), "hostActive") == false) }
+        expect("resume_under_night_keeps_cover", field(controller(), "hostActive") == false)
+        if (motion) {
+          retainedPose = pose()
+          freeze("resume_under_night_keeps_motion_frozen", retainedPose)
+        } }
       SystemClock.sleep(5500)
       main { expect("resume_under_night_keeps_photo", stage().currentPhoto!!.bitmap === retained)
+        if (motion) freeze("resume_under_night_motion_after_interval", retainedPose)
         boolean("setAmbientNight", false) }
       settle(false)
       expect("resume_after_cover_keeps_same_photo", main { stage().currentPhoto!!.bitmap === retained })
@@ -197,8 +337,9 @@ internal object NightPhotoPauseDeviceChecks {
     } catch (error: Throwable) {
       failed = true
       measurements.put("failureClass", error.javaClass.simpleName)
+          .put("failureLine", error.stackTrace.firstOrNull()?.lineNumber)
     } finally {
-      deadline = began + 80_000
+      deadline = began + if (motion) 95_000 else 80_000
       try {
         closing.set(true)
         main {
@@ -207,6 +348,21 @@ internal object NightPhotoPauseDeviceChecks {
         }
         poll(5000) { main { owned.all { it.isDestroyed } } }
         expect("owned_activity_destroyed", main { owned.isNotEmpty() && owned.all { it.isDestroyed } })
+        if (motion) {
+          // Closing a face session queues a final cache write. Wait for that writer before
+          // retiring the generated tree; deletion alone could otherwise race its mkdir.
+          val worker = Class.forName("com.immortal.launcher.SlideshowFaceStore\$Worker")
+              .getDeclaredField("INSTANCE").apply { isAccessible = true }.get(null)
+          val lock = field(worker, "lock")!!
+          poll(5000) {
+            synchronized(lock) {
+              field(worker, "pumping") == false && field(worker, "copying") == false &&
+                  field(worker, "flight") == null && field(worker, "flushRequested") == false
+            }
+          }
+          expect("owned_face_writer_quiescent", true)
+          File(probe.targetContext.cacheDir, token).deleteRecursively()
+        }
         expect("generated_files_removed", !File(probe.targetContext.cacheDir, token).exists())
         val prefs = File(probe.targetContext.applicationInfo.dataDir, "shared_prefs")
         expect("isolated_preferences_removed", prefs.listFiles().orEmpty().none { it.name.startsWith(token) })
@@ -218,7 +374,8 @@ internal object NightPhotoPauseDeviceChecks {
     val file = File(probe.targetContext.cacheDir, "$token.json")
     file.writeText(JSONObject().put("passed", !failed).put("checks", checks)
         .put("measurements", measurements).put("sensorStimulated", false)
-        .put("hardwareBrightnessTested", false).put("productionChanged", false).toString(2))
+        .put("hardwareBrightnessTested", false).put("productionChanged", false)
+        .put("photoMotion", motion).toString(2))
     return Bundle().apply {
       putBoolean("nightPhotoPausePassed", !failed && SystemClock.elapsedRealtime() <= deadline)
       putString("nightPhotoPauseReportRelativePath", "cache/${file.name}")

@@ -2,7 +2,22 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — volume-gesture ownership.**
+**Newest verification, November 1 — moving photos under the night clock.**
+[The Family Area motion check](portal-night-photo-motion-2026-11-01.md)
+passes **357/357 native assertions/observations**, including a moving crop
+and an interrupted automatic crossfade. Both retained compositions and
+their motion/blend remain frozen under the clock. Explicit viewer Pause
+survives reveal; Resume actually advances motion and completes the blend.
+The retained dwell is **2,987 ms**, with the next photo observed
+**2,992 ms** after reveal. **3,765 fresh JVM tests** pass.
+There is **no production playback change**: the existing optimized
+APK **3c15a465…**, original settings, both face caches and Dream are
+restored **11 minutes 30 seconds** into the conservative original slot.
+This accepts controlled fixed-size native Smart Frame animation suspension,
+not natural-light comfort, physical touch, rotation, other renderers or FPS.
+The user cannot perform the room-light check now; it remains pending.
+
+**Previous delivery, November 1 — volume-gesture ownership.**
 [The Family Area volume fix](portal-music-volume-binding-2026-11-01.md)
 retires the entire volume control with its source/session observation and room.
 The same **88 native assertions** change from **10 failures to 88/88 passing**

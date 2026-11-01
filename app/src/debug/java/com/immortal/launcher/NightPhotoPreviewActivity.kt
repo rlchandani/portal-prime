@@ -17,6 +17,7 @@ import android.view.View
 import android.view.WindowManager
 import com.immortal.launcher.settings.SettingsRegistry
 import java.io.File
+import java.security.MessageDigest
 import org.json.JSONObject
 
 /** Real controller/loader with generated files and UUID-isolated preferences only. */
@@ -25,6 +26,8 @@ class NightPhotoPreviewActivity : Activity() {
     private set
   private var folder: File? = null
   private val preferences = linkedSetOf<String>()
+  private var warmFaces: SlideshowFaceStore? = null
+  private var startWhenWarm: Runnable? = null
 
   override fun onCreate(state: Bundle?) {
     super.onCreate(state)
@@ -40,6 +43,7 @@ class NightPhotoPreviewActivity : Activity() {
     val ownFiles = File(files, "files").apply { check(mkdir()) }
     val ownCache = File(files, "cache").apply { check(mkdir()) }
     val isolated = object : ContextWrapper(this) {
+      override fun getApplicationContext(): Context = this
       override fun getFilesDir(): File = ownFiles
       override fun getCacheDir(): File = ownCache
       override fun getExternalFilesDir(type: String?): File = ownFiles
@@ -50,6 +54,10 @@ class NightPhotoPreviewActivity : Activity() {
         return super.getSharedPreferences(ownedName, mode)
       }
     }
+    val motion = intent.getBooleanExtra("photo_motion", false)
+    val generatedKeys = mutableListOf<String>()
+    val faceCache = SlideshowFaceCache(File(ownFiles, "slideshow_faces/metadata.bin"))
+    val now = System.currentTimeMillis()
     for (index in 0..2) {
       val bitmap = Bitmap.createBitmap(160, 90, Bitmap.Config.ARGB_8888)
       try {
@@ -57,11 +65,26 @@ class NightPhotoPreviewActivity : Activity() {
         File(files, "$index.png").outputStream().use {
           check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it))
         }
+        if (motion) {
+          val digest = MessageDigest.getInstance("SHA-256")
+              .digest(File(files, "$index.png").readBytes())
+              .joinToString("") { "%02x".format(it.toInt() and 255) }
+          val key = "encoded:$digest"
+          generatedKeys.add(key)
+          faceCache.record(SlideshowFaceMetadata.Entry(
+              SlideshowFaceMetadata.key(key), SlideshowFaceMetadata.Status.FACES, now,
+              160, 90, listOf(SlideshowFaceMetadata.Bounds(.4f, .4f, .6f, .6f))), now)
+        }
       } finally { bitmap.recycle() }
     }
+    if (motion) {
+      faceCache.persist(now)
+      warmFaces = SlideshowFaceStore(isolated)
+    }
     val patch = JSONObject().put("mode", "smartFrame").put("intervalSec", 5)
-        .put("shuffle", false).put("includeVideo", false).put("photo_motion", false)
-        .put("keep_people_in_frame", false).put("cacheEnabled", true)
+        .put("shuffle", false).put("includeVideo", false)
+        .put("photo_motion", motion)
+        .put("keep_people_in_frame", motion).put("cacheEnabled", true)
         .put("overnightEnabled", false).put("darkRoomClock", false).put("idleSleepMin", 0)
         .put("sleepTimerEnabled", false).put("welcomeEnabled", false).put("ambientDashboard", false)
         .put("gestureWave", false).put("soundscape", "off").put("showNowPlaying", false)
@@ -75,7 +98,17 @@ class NightPhotoPreviewActivity : Activity() {
       "weather":{"enabled":false},"nowPlaying":{"enabled":false},"battery":{"enabled":false},
       "caption":{"enabled":false}}"""))
     setContentView(frame.view)
-    frame.start()
+    if (!motion) frame.start() else {
+      val warmDeadline = android.os.SystemClock.uptimeMillis() + 5000
+      startWhenWarm = Runnable {
+        if (isFinishing || isDestroyed) return@Runnable
+        if (generatedKeys.all { warmFaces?.regionsFor(it)?.isNotEmpty() == true }) frame.start()
+        else if (android.os.SystemClock.uptimeMillis() < warmDeadline)
+          frame.view.postDelayed(startWhenWarm!!, 25)
+        else finish()
+      }
+      frame.view.post(startWhenWarm!!)
+    }
   }
 
   override fun onStart() {
@@ -89,7 +122,9 @@ class NightPhotoPreviewActivity : Activity() {
   }
 
   override fun onDestroy() {
+    if (::frame.isInitialized) startWhenWarm?.let(frame.view::removeCallbacks)
     if (::frame.isInitialized) frame.stop()
+    warmFaces?.close()
     // Only the freshly-created, UUID-owned tree can be removed by this fixture.
     folder?.deleteRecursively()
     preferences.forEach(::deleteSharedPreferences)
