@@ -619,6 +619,12 @@ class PortalUxInstrumentation : Instrumentation() {
                 }
             }, 9, java.util.concurrent.TimeUnit.SECONDS)
             try {
+                if (command.optString("command") == "slideshowDiscovery") {
+                    val report = SlideshowDiscoveryDeviceChecks.run(this)
+                    File(folder, "$name.json").writeText(report.toString())
+                    response.writeText(JSONObject().put("name", name).put("success", true).toString())
+                    continue
+                }
                 if (command.optString("command") == "slideshowVideoNight") {
                     val report = SlideshowVideoNightDeviceChecks.run(this)
                     File(folder, "$name.json").writeText(report.toString())

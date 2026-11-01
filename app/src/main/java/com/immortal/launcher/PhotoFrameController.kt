@@ -136,6 +136,8 @@ class PhotoFrameController(
     private val nightClockOnly: Boolean = false,
 ) {
   private val io = Executors.newSingleThreadExecutor()
+  private val sourceDiscoveryDelegate = lazy { SlideshowSourceDiscovery() }
+  private val sourceDiscovery get() = sourceDiscoveryDelegate.value
   // Decode-once screen-sized copies of local photos for the engine (see [EngineScaledCache]).
   private val scaledCache = EngineScaledCache(java.io.File(context.cacheDir, "ss_scaled"))
   // A separate single-thread executor for caption work (EXIF read + the reverse-geocode
@@ -593,8 +595,9 @@ class PhotoFrameController(
       }
       is PhotoFrameSource.SharedAlbum -> {
         val m = context.resources.displayMetrics
-        io.execute {
-          val album = RemoteAlbum.fetch(source.url, m.widthPixels, m.heightPixels)
+        sourceDiscovery.load(
+            block = { RemoteAlbum.fetch(source.url, m.widthPixels, m.heightPixels) },
+            onResult = { album ->
           val urls = album?.photoUrls.orEmpty()
           ui.post {
             if (stopped) return@post
@@ -621,14 +624,17 @@ class PhotoFrameController(
               startWeb()
             }
           }
-        }
+        })
       }
       is PhotoFrameSource.Immich -> {
-        io.execute {
+        sourceDiscovery.load(block = {
           val media =
               ImmichSource.listMedia(source.url, source.key, source.albumId, source.includeVideo)
                   .orEmpty()
           if (!stopped && media.isNotEmpty() && !ScreensaverConfig.usesEngine(settings.mode)) enableMediaCache()
+          media
+        }, onResult = { discovered ->
+          val media = discovered.orEmpty()
           ui.post {
             if (stopped) return@post
             if (media.isNotEmpty()) {
@@ -655,14 +661,17 @@ class PhotoFrameController(
               startWeb()
             }
           }
-        }
+        })
       }
       is PhotoFrameSource.WebDav -> {
-        io.execute {
+        sourceDiscovery.load(block = {
           val media =
               DavSource.listMedia(source.url, source.user, source.pass, source.includeVideo)
                   .orEmpty()
           if (!stopped && media.isNotEmpty() && !ScreensaverConfig.usesEngine(settings.mode)) enableMediaCache()
+          media
+        }, onResult = { discovered ->
+          val media = discovered.orEmpty()
           ui.post {
             if (stopped) return@post
             if (media.isNotEmpty()) {
@@ -685,7 +694,7 @@ class PhotoFrameController(
               startWeb()
             }
           }
-        }
+        })
       }
       is PhotoFrameSource.Smb -> {
         val src =
@@ -1375,6 +1384,7 @@ class PhotoFrameController(
   @androidx.annotation.MainThread
   fun stop() {
     stopped = true
+    if (sourceDiscoveryDelegate.isInitialized()) sourceDiscovery.close()
     revealClockRefresh.reset()
     nightTransition.close()
     val receiver = nightSettingsReceiver
