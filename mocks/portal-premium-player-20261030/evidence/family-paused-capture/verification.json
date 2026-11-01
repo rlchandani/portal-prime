@@ -1,0 +1,241 @@
+{
+  "productionChangeMade": false,
+  "realPhotoIntegrationTested": true,
+  "audioProviderTested": false,
+  "performanceAccepted": false,
+  "checks": [
+    {
+      "name": "photo_engine_stays_lazy_in_full",
+      "pass": true
+    },
+    {
+      "name": "players_selected",
+      "pass": true
+    },
+    {
+      "name": "real_photo_and_current_track_visible",
+      "pass": true
+    },
+    {
+      "name": "explicit_photo_pause_visible",
+      "pass": true
+    },
+    {
+      "name": "paused_photo_stays_still",
+      "pass": true,
+      "maxChannelDifference": 0
+    },
+    {
+      "name": "full_retains_players_track",
+      "pass": true
+    },
+    {
+      "name": "same_controller_after_full",
+      "pass": true
+    },
+    {
+      "name": "pause_choice_after_full",
+      "pass": true
+    },
+    {
+      "name": "same_photo_after_full",
+      "pass": true,
+      "maxChannelDifference": 0
+    },
+    {
+      "name": "manual_next_works_while_paused",
+      "pass": true
+    }
+  ],
+  "captureTimings": [
+    {
+      "case": "full-initial",
+      "seconds": 2.274
+    },
+    {
+      "case": "players-selected",
+      "seconds": 1.888
+    },
+    {
+      "case": "actual-photos",
+      "seconds": 2.125
+    },
+    {
+      "case": "photo-controls",
+      "seconds": 2.415
+    },
+    {
+      "case": "photo-paused",
+      "seconds": 2.668
+    },
+    {
+      "case": "paused-long-hold",
+      "seconds": 2.399
+    },
+    {
+      "case": "full-hidden",
+      "seconds": 1.845
+    },
+    {
+      "case": "photos-return",
+      "seconds": 2.661
+    },
+    {
+      "case": "manual-next-paused",
+      "seconds": 2.334
+    }
+  ],
+  "observedPhotoHostBounds": [
+    36,
+    90,
+    1334,
+    1404
+  ],
+  "pass": true,
+  "fixtureApkSha256": "525ae2155baedaf1b514d21a869583ed166b226c0b619879b4efd768af7309e9",
+  "controllerIdentityStable": true,
+  "observerStopped": true,
+  "ownedSnapshotCleanup": true,
+  "testApkRestored": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "originalOptimizedApkRestored": true,
+  "accessibilityExact": true,
+  "systemProcessUnchanged": true,
+  "collectorInactive": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "nativeCaptureCount": 9,
+  "elapsedSeconds": 76.964,
+  "resolution": "focused_continuity_pass_prior_timeout_not_reproduced",
+  "diagnosticChangeOnly": true,
+  "traceCaptureOptIn": true,
+  "phaseMeasurements": [
+    {
+      "case": "full-initial",
+      "phaseDurationsMs": {
+        "accessibility-root": 131,
+        "accessibility-tree": 207,
+        "fixture-metadata": 2,
+        "snapshot-json": 11,
+        "screenshot": 330,
+        "screenshot-png": 394
+      }
+    },
+    {
+      "case": "players-selected",
+      "phaseDurationsMs": {
+        "accessibility-root": 48,
+        "accessibility-tree": 66,
+        "fixture-metadata": 2,
+        "snapshot-json": 12,
+        "screenshot": 70,
+        "screenshot-png": 353
+      }
+    },
+    {
+      "case": "actual-photos",
+      "phaseDurationsMs": {
+        "accessibility-root": 12,
+        "accessibility-tree": 53,
+        "fixture-metadata": 3,
+        "snapshot-json": 10,
+        "screenshot": 70,
+        "screenshot-png": 837
+      }
+    },
+    {
+      "case": "photo-controls",
+      "phaseDurationsMs": {
+        "accessibility-root": 30,
+        "accessibility-tree": 87,
+        "fixture-metadata": 1,
+        "snapshot-json": 5,
+        "screenshot": 82,
+        "screenshot-png": 737
+      }
+    },
+    {
+      "case": "photo-paused",
+      "phaseDurationsMs": {
+        "accessibility-root": 28,
+        "accessibility-tree": 92,
+        "fixture-metadata": 0,
+        "snapshot-json": 4,
+        "screenshot": 94,
+        "screenshot-png": 852
+      }
+    },
+    {
+      "case": "paused-long-hold",
+      "phaseDurationsMs": {
+        "accessibility-root": 36,
+        "accessibility-tree": 44,
+        "fixture-metadata": 2,
+        "snapshot-json": 9,
+        "screenshot": 73,
+        "screenshot-png": 850
+      }
+    },
+    {
+      "case": "full-hidden",
+      "phaseDurationsMs": {
+        "accessibility-root": 31,
+        "accessibility-tree": 41,
+        "fixture-metadata": 2,
+        "snapshot-json": 13,
+        "screenshot": 84,
+        "screenshot-png": 381
+      }
+    },
+    {
+      "case": "photos-return",
+      "phaseDurationsMs": {
+        "accessibility-root": 28,
+        "accessibility-tree": 53,
+        "fixture-metadata": 1,
+        "snapshot-json": 4,
+        "screenshot": 87,
+        "screenshot-png": 866
+      }
+    },
+    {
+      "case": "manual-next-paused",
+      "phaseDurationsMs": {
+        "accessibility-root": 33,
+        "accessibility-tree": 79,
+        "fixture-metadata": 1,
+        "snapshot-json": 8,
+        "screenshot": 88,
+        "screenshot-png": 672
+      }
+    }
+  ],
+  "stallReports": 0,
+  "stallProbeRuntimeAccepted": false,
+  "captureTimingsAreUiLatency": false,
+  "panelFpsAccepted": false,
+  "naturalRoomLightComfortAccepted": false,
+  "goalComplete": false,
+  "installedOptimizedApkSha256": "b79b56c7efd20fa9cfee492e7750fe0c5fbb56b0f8ab0cab959d1d22ef3f2dee",
+  "failedHelperAttempt": {
+    "reason": "private_helper_did_not_tolerate_absent_stall_file",
+    "nativeCapturesCompleted": 1,
+    "restorationPass": true,
+    "elapsedSeconds": 42.889
+  },
+  "freshNativeHealth": {
+    "optimizedHashMatches": true,
+    "nonDebuggable": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "accessibilityExact": true,
+    "originalDreamActive": true,
+    "collectorInactive": true,
+    "noActiveInstrumentation": true
+  },
+  "finalDiagnosticBuildPassed": true,
+  "finalDiagnosticReviewBlockers": 0,
+  "finalIdentityRevisionHardwareRetested": false
+}

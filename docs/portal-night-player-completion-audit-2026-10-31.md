@@ -2,6 +2,14 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Paused music-photo verification, November 1:** the
+[focused Family check](portal-paused-capture-2026-11-01.md) passed **10/10**
+checks across **nine captures**; paused pixels remained identical and manual
+Next responded. This adds opt-in test-observer diagnostics. The earlier
+capture timeout did not reproduce, so its cause is not declared fixed.
+Natural room-light comfort on the current transition remains pending; the
+user cannot perform that physical check now.
+
 **Subsequent user feedback:** brightness and clock changes still jumped.
 The [new coordinated night transition][night-crossfade] at **df4405bb**
 fixes the immediate clock visibility switch and pinned-overlay brightness

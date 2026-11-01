@@ -71,3 +71,8 @@ remain outside Git.
 closes the connected-resource ownership gap when a pending UI delivery is
 discarded. Actual NAS behavior and connection establishment/listing cancellation
 remain unverified.
+
+**Subsequent paused-view check:** the
+[focused physical observer run](portal-paused-capture-2026-11-01.md) passed
+10/10 continuity checks across nine captures, including Pause and manual
+Next. The prior timeout did not reproduce and is not claimed fixed.
