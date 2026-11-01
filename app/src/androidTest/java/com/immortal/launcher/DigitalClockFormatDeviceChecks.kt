@@ -47,6 +47,7 @@ internal object DigitalClockFormatDeviceChecks {
     var failed = 0
     var isolatedFailures = 0
     var casesRun = 0
+    val expectedRenderCount = 7
     val prefix = "digital-clock-format-owned-${UUID.randomUUID()}"
     val directory = instrumentation.targetContext.cacheDir
     val reportFile = File(directory, "$prefix.json")
@@ -147,6 +148,10 @@ internal object DigitalClockFormatDeviceChecks {
             it.copy(name = "narrow_portrait_pm", spec = it.spec.copy(sizeScale = 500))
           }, 240, 600),
           Triple(cases.first { it.name == "seconds_arc_20" }, 960, 480),
+          Triple(cases.first { it.name == "pm_with_suffix" }.let {
+            it.copy(name = "seconds_arc_narrow_pm_20",
+                spec = it.spec.copy(showSeconds = true, sizeScale = 500))
+          }, 240, 600),
       )
       for ((case, parentWidth, parentHeight) in renderCases) isolated("render.${case.name}") {
         val drawing = main {
@@ -164,6 +169,11 @@ internal object DigitalClockFormatDeviceChecks {
             val all = bounds(pixels, bitmap.width) { Color.alpha(it) > 0 }
             val glyph = bounds(pixels, bitmap.width, ::isGlyph)
             val glyphCount = pixels.count(::isGlyph)
+            val geometry = JSONObject().put("name", case.name)
+                .put("parentWidth", parentWidth).put("parentHeight", parentHeight)
+                .put("viewWidth", bitmap.width).put("viewHeight", bitmap.height)
+                .put("glyphPixels", glyphCount).put("glyphBounds", rectJson(glyph))
+                .put("allPixelBounds", rectJson(all))
             expect("render.${case.name}.glyph_pixels_present", glyphCount > 20 && glyph != null)
             expect("render.${case.name}.full_canvas_margin_2px", all != null &&
                 all.left >= 2 && all.top >= 2 &&
@@ -172,23 +182,66 @@ internal object DigitalClockFormatDeviceChecks {
               expect("render.${case.name}.literal_canvas_glyphs",
                   matchesLiteral(face, bitmap, case.expected))
             } else {
-              val bluePixels = pixels.count { Color.alpha(it) > 128 &&
-                  Color.blue(it) > Color.red(it) + 40 }
+              // Hide paints only: retain the actual view's layout, font and draw geometry.
+              // This isolates the full ring, including its translucent track and fringe.
+              val textPixels = pixelsWithout(face, "arcTrackPaint", "arcFillPaint")
+              val arcPixels = pixelsWithout(face, "timePaint")
+              val textBounds = bounds(textPixels, bitmap.width) { Color.alpha(it) > 0 }
+              val arcBounds = bounds(arcPixels, bitmap.width) { Color.alpha(it) > 0 }
+              val blueBounds = bounds(pixels, bitmap.width, ::isBlueFill)
+              val bluePixels = pixels.count(::isBlueFill)
               expect("render.${case.name}.seconds_arc_pixels_present", bluePixels > 0)
-              face.update(localTime(case.hour, 21), case.blinkOn)
-              expect("render.${case.name}.seconds_do_not_enter_text", displayed(face) == "01:34")
+              expect("render.${case.name}.full_indicator_right_of_text_gap_2px",
+                  separated(textBounds, arcBounds))
+              expect("render.${case.name}.blue_fill_right_of_text_gap_2px",
+                  separated(textBounds, blueBounds))
+              val firstWidth = view.measuredWidth
+              val firstHeight = view.measuredHeight
+              val firstDescription = view.contentDescription?.toString()
+              face.update(localTime(case.hour, case.second + 1), case.blinkOn)
+              expect("render.${case.name}.seconds_do_not_enter_text",
+                  displayed(face) == case.expected)
+              expect("render.${case.name}.seconds_accessibility_unchanged",
+                  firstDescription == "Clock ${case.accessible}" &&
+                      view.contentDescription?.toString() == firstDescription)
+              view.forceLayout()
+              measure(view, parentWidth, parentHeight)
+              val stable = view.measuredWidth == firstWidth && view.measuredHeight == firstHeight
+              expect("render.${case.name}.seconds_measured_dimensions_stable", stable)
+              check(stable)
               val next = draw(view)
               try {
                 val nextPixels = IntArray(pixels.size)
                 next.getPixels(nextPixels, 0, next.width, 0, 0, next.width, next.height)
-                expect("render.${case.name}.arc_changes_with_second", !pixels.contentEquals(nextPixels))
+                val nextTextPixels = pixelsWithout(face, "arcTrackPaint", "arcFillPaint")
+                val nextArcPixels = pixelsWithout(face, "timePaint")
+                val nextTextBounds = bounds(nextTextPixels, next.width) { Color.alpha(it) > 0 }
+                val nextArcBounds = bounds(nextArcPixels, next.width) { Color.alpha(it) > 0 }
+                val nextBlueBounds = bounds(nextPixels, next.width, ::isBlueFill)
+                expect("render.${case.name}.next_full_indicator_right_of_text_gap_2px",
+                    separated(nextTextBounds, nextArcBounds))
+                expect("render.${case.name}.next_blue_fill_right_of_text_gap_2px",
+                    separated(nextTextBounds, nextBlueBounds))
+                expect("render.${case.name}.time_glyph_pixels_unchanged",
+                    textPixels.contentEquals(nextTextPixels))
+                expect("render.${case.name}.arc_changes_with_second",
+                    !arcPixels.contentEquals(nextArcPixels))
+                expect("render.${case.name}.only_indicator_pixels_change",
+                    !pixels.contentEquals(nextPixels) && pixels.indices.all { index ->
+                      pixels[index] == nextPixels[index] ||
+                          Color.alpha(arcPixels[index]) > 0 || Color.alpha(nextArcPixels[index]) > 0
+                    })
+                geometry.put("timeOnlyBounds", rectJson(textBounds))
+                    .put("indicatorOnlyBounds", rectJson(arcBounds))
+                    .put("blueFillBounds", rectJson(blueBounds))
+                    .put("indicatorGapPixels", gap(textBounds, arcBounds))
+                    .put("nextSecond", case.second + 1)
+                    .put("nextTimeOnlyBounds", rectJson(nextTextBounds))
+                    .put("nextIndicatorOnlyBounds", rectJson(nextArcBounds))
+                    .put("nextBlueFillBounds", rectJson(nextBlueBounds))
+                    .put("nextIndicatorGapPixels", gap(nextTextBounds, nextArcBounds))
               } finally { next.recycle() }
             }
-            val geometry = JSONObject().put("name", case.name)
-                .put("parentWidth", parentWidth).put("parentHeight", parentHeight)
-                .put("viewWidth", bitmap.width).put("viewHeight", bitmap.height)
-                .put("glyphPixels", glyphCount).put("glyphBounds", rectJson(glyph))
-                .put("allPixelBounds", rectJson(all))
             Drawing(bitmap, geometry)
           } catch (failure: Throwable) {
             bitmap.recycle()
@@ -233,7 +286,7 @@ internal object DigitalClockFormatDeviceChecks {
         .put("caseCount", casesRun).put("checkCount", checks.length())
         .put("failureCount", failed).put("isolatedFailureCount", isolatedFailures)
         .put("artifacts", artifacts)
-        .put("passed", failed == 0 && casesRun == cases.size && renders.length() == 6)
+        .put("passed", failed == 0 && casesRun == cases.size && renders.length() == expectedRenderCount)
         .put("relativeReportPath", "cache/${reportFile.name}")
     isolated("owned_json") {
       reportFile.writeText(report.toString(2))
@@ -241,7 +294,8 @@ internal object DigitalClockFormatDeviceChecks {
     }
     return Bundle().apply {
       putBoolean("digitalClockFormatCompleted", true)
-      putBoolean("digitalClockFormatPassed", failed == 0 && casesRun == cases.size && renders.length() == 6)
+      putBoolean("digitalClockFormatPassed",
+          failed == 0 && casesRun == cases.size && renders.length() == expectedRenderCount)
       putString("digitalClockFormatChecksJson", checks.toString())
       putInt("digitalClockFormatCheckCount", checks.length())
       putInt("digitalClockFormatCaseCount", casesRun)
@@ -284,6 +338,32 @@ internal object DigitalClockFormatDeviceChecks {
 
   private fun isGlyph(color: Int): Boolean = Color.alpha(color) > 128 &&
       Color.red(color) > 220 && Color.green(color) > 220 && Color.blue(color) > 220
+
+  private fun isBlueFill(color: Int): Boolean = Color.alpha(color) > 128 &&
+      Color.blue(color) > Color.red(color) + 40
+
+  /** Render actual paint layers separately, without copying any production layout calculations. */
+  private fun pixelsWithout(face: PrimeDigitalClockFaceView, vararg paintNames: String): IntArray {
+    val paints = paintNames.map { field(face, it) as Paint }
+    val alphas = paints.map { it.alpha }
+    try {
+      paints.forEach { it.alpha = 0 }
+      val bitmap = draw(face.view)
+      try {
+        return IntArray(bitmap.width * bitmap.height).also {
+          bitmap.getPixels(it, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+        }
+      } finally { bitmap.recycle() }
+    } finally {
+      paints.forEachIndexed { index, paint -> paint.alpha = alphas[index] }
+    }
+  }
+
+  private fun separated(text: Rect?, indicator: Rect?): Boolean =
+      text != null && indicator != null && indicator.left - text.right >= 2
+
+  private fun gap(text: Rect?, indicator: Rect?): Any =
+      if (text == null || indicator == null) JSONObject.NULL else indicator.left - text.right
 
   private fun bounds(pixels: IntArray, width: Int, matches: (Int) -> Boolean): Rect? {
     var left = width

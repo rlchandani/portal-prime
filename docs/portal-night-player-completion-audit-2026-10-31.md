@@ -434,3 +434,16 @@ Native validation and cleanup completed in **12 minutes 33 seconds** of the
 original 30-minute slot. The disk-full build failure is retained separately;
 the rerun passed. These checks do not establish panel FPS or physical fade
 comfort. The user's brightness check and broader goal remain incomplete.
+
+**Canvas seconds indicator separated from the time:** [the bounded Family Area fix](portal-digital-clock-seconds-2026-11-01.md)
+replaces the overlapping center ring with a reserved trailing slot. The real
+Android detached Canvas probe goes from **9 failures / 156 checks** to
+**156/156 passing**. Its normal and narrow AM/PM indicator gaps change from
+**−172/−130 pixels** to **36/20 pixels**, and only indicator pixels change
+between consecutive seconds. All five seconds-off generated renders remain
+pixel-identical. **3,748 fresh Android unit tests** and all three builds pass.
+Optimized APK **e589298d…** is installed with all settings, sources, services,
+pin, brightness policy and original Dream restored. Native verification and
+cleanup completed in **6 minutes 59 seconds** of the original 30-minute slot.
+This is a clock layout improvement, not a panel FPS or physical fade-comfort
+result; those broader acceptance requirements remain incomplete.

@@ -62,4 +62,57 @@ class DigitalClockGeometryTest {
         assertTrue(result.textSize.isFinite())
         assertTrue(result.width <= 2040 && result.height <= 1320)
     }
+
+    @Test fun secondsIndicatorGetsItsOwnSpaceWithoutChangingTheNominalFontOrHeight() {
+        val plain = size(100)
+        val seconds = DigitalClockGeometry.measure(1.5f, 100, 2.8f, 1.2f, 2040, 1320, 3f,
+            showSeconds = true)
+        assertEquals(plain.textSize, seconds.textSize, 0f)
+        assertEquals(plain.height, seconds.height)
+        assertTrue("Indicator and gap need a separate trailing slot",
+            seconds.width - plain.width >= seconds.textSize * 0.8f)
+    }
+
+    @Test fun textAndSecondsSlotFitTogetherInTightAndLargeParents() {
+        for (width in listOf(60, 240, 1320, 2040)) {
+            for (height in listOf(20, 180, 1320)) {
+                for (scale in listOf(90, 100, 280, 380, 460, 500)) {
+                    val seconds = DigitalClockGeometry.measure(1.5f, scale, 2.8f, 1.2f,
+                        width, height, 3f, showSeconds = true)
+                    assertTrue(seconds.width <= width && seconds.height <= height)
+                    // Independent lower bound: text plus the visible ring and a gap.
+                    assertTrue("A ring cannot share the text's reserved width",
+                        seconds.textSize * 3.6f + 6f <= seconds.width + 0.001f)
+                    assertTrue(seconds.textSize * 1.2f + 6f <= seconds.height + 0.001f)
+                }
+            }
+        }
+    }
+
+    @Test fun explicitSecondsOffPreservesTheOriginalGeometryExactly() {
+        for (scale in listOf(90, 100, 280, 380, 460, 500)) {
+            assertEquals(size(scale), DigitalClockGeometry.measure(1.5f, scale, 2.8f, 1.2f,
+                2040, 1320, 3f, showSeconds = false))
+        }
+    }
+
+    @Test fun secondsKeepTheLargeFamilySizesDistinctInPortrait() {
+        val options = listOf(320, 430, 500).map {
+            DigitalClockGeometry.measure(1.5f, it, 2.8f, 1.2f, 1320, 2040, 3f,
+                showSeconds = true)
+        }
+        options.zipWithNext().forEach { (a, b) ->
+            assertTrue(a.width < b.width && a.height < b.height)
+        }
+        assertEquals(430f / 320f, options[1].textSize / options[0].textSize, 0.0001f)
+    }
+
+    @Test fun secondsRespectEmptyAndOversizedParents() {
+        assertEquals(DigitalClockGeometry.Size(0f, 0, 0),
+            DigitalClockGeometry.measure(1.5f, 500, 2.8f, 1.2f, 0, 0, 3f, showSeconds = true))
+        val result = DigitalClockGeometry.measure(1.5f, Int.MAX_VALUE, 2.8f, 1.2f,
+            2040, 1320, 3f, showSeconds = true)
+        assertTrue(result.textSize.isFinite() && result.width <= 2040 && result.height <= 1320)
+        assertTrue(result.textSize * 3.6f + 6f <= result.width + 0.001f)
+    }
 }

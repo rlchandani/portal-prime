@@ -1,0 +1,870 @@
+{
+  "checks": [
+    {
+      "name": "preflight.english_locale_and_literal_meridiem",
+      "passed": true
+    },
+    {
+      "name": "preflight.worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "12_colon_plain.on_main",
+      "passed": true
+    },
+    {
+      "name": "12_colon_plain.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "12_colon_plain.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "12_colon_plain.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "12_dot_plain.on_main",
+      "passed": true
+    },
+    {
+      "name": "12_dot_plain.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "12_dot_plain.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "12_dot_plain.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "12_none_plain.on_main",
+      "passed": true
+    },
+    {
+      "name": "12_none_plain.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "12_none_plain.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "12_none_plain.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "12_blink_plain.on_main",
+      "passed": true
+    },
+    {
+      "name": "12_blink_plain.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "12_blink_plain.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "12_blink_plain.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "12_colon_zero.on_main",
+      "passed": true
+    },
+    {
+      "name": "12_colon_zero.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "12_colon_zero.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "12_colon_zero.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "12_dot_zero.on_main",
+      "passed": true
+    },
+    {
+      "name": "12_dot_zero.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "12_dot_zero.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "12_dot_zero.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "12_none_zero.on_main",
+      "passed": true
+    },
+    {
+      "name": "12_none_zero.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "12_none_zero.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "12_none_zero.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "12_blink_zero.on_main",
+      "passed": true
+    },
+    {
+      "name": "12_blink_zero.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "12_blink_zero.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "12_blink_zero.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_colon_plain.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_colon_plain.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_colon_plain.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_colon_plain.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_dot_plain.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_dot_plain.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_dot_plain.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_dot_plain.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_none_plain.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_none_plain.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_none_plain.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_none_plain.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_blink_plain.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_blink_plain.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_blink_plain.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_blink_plain.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_colon_zero.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_colon_zero.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_colon_zero.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_colon_zero.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_dot_zero.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_dot_zero.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_dot_zero.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_dot_zero.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_none_zero.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_none_zero.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_none_zero.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_none_zero.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_blink_zero.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_blink_zero.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_blink_zero.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_blink_zero.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "am_with_suffix.on_main",
+      "passed": true
+    },
+    {
+      "name": "am_with_suffix.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "am_with_suffix.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "am_with_suffix.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "am_without_suffix.on_main",
+      "passed": true
+    },
+    {
+      "name": "am_without_suffix.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "am_without_suffix.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "am_without_suffix.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "pm_with_suffix.on_main",
+      "passed": true
+    },
+    {
+      "name": "pm_with_suffix.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "pm_with_suffix.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "pm_with_suffix.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "pm_without_suffix.on_main",
+      "passed": true
+    },
+    {
+      "name": "pm_without_suffix.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "pm_without_suffix.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "pm_without_suffix.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_pm_without_suffix.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_pm_without_suffix.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_pm_without_suffix.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_pm_without_suffix.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "24_pm_with_suffix.on_main",
+      "passed": true
+    },
+    {
+      "name": "24_pm_with_suffix.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "24_pm_with_suffix.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "24_pm_with_suffix.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "blink_off_pm.on_main",
+      "passed": true
+    },
+    {
+      "name": "blink_off_pm.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "blink_off_pm.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "blink_off_pm.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "seconds_arc_20.on_main",
+      "passed": true
+    },
+    {
+      "name": "seconds_arc_20.displayed_literal",
+      "passed": true
+    },
+    {
+      "name": "seconds_arc_20.raw_accessibility_literal",
+      "passed": true
+    },
+    {
+      "name": "seconds_arc_20.seconds_remain_arc",
+      "passed": true
+    },
+    {
+      "name": "render.12_colon_zero.at_most_parent",
+      "passed": true
+    },
+    {
+      "name": "render.12_colon_zero.glyph_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "render.12_colon_zero.full_canvas_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.12_colon_zero.literal_canvas_glyphs",
+      "passed": true
+    },
+    {
+      "name": "render.12_colon_zero.owned_png_written",
+      "passed": true
+    },
+    {
+      "name": "render.12_dot_plain.at_most_parent",
+      "passed": true
+    },
+    {
+      "name": "render.12_dot_plain.glyph_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "render.12_dot_plain.full_canvas_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.12_dot_plain.literal_canvas_glyphs",
+      "passed": true
+    },
+    {
+      "name": "render.12_dot_plain.owned_png_written",
+      "passed": true
+    },
+    {
+      "name": "render.12_none_zero.at_most_parent",
+      "passed": true
+    },
+    {
+      "name": "render.12_none_zero.glyph_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "render.12_none_zero.full_canvas_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.12_none_zero.literal_canvas_glyphs",
+      "passed": true
+    },
+    {
+      "name": "render.12_none_zero.owned_png_written",
+      "passed": true
+    },
+    {
+      "name": "render.blink_off_pm.at_most_parent",
+      "passed": true
+    },
+    {
+      "name": "render.blink_off_pm.glyph_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "render.blink_off_pm.full_canvas_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.blink_off_pm.literal_canvas_glyphs",
+      "passed": true
+    },
+    {
+      "name": "render.blink_off_pm.owned_png_written",
+      "passed": true
+    },
+    {
+      "name": "render.narrow_portrait_pm.at_most_parent",
+      "passed": true
+    },
+    {
+      "name": "render.narrow_portrait_pm.glyph_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "render.narrow_portrait_pm.full_canvas_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.narrow_portrait_pm.literal_canvas_glyphs",
+      "passed": true
+    },
+    {
+      "name": "render.narrow_portrait_pm.owned_png_written",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.at_most_parent",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.glyph_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.full_canvas_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.seconds_arc_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.full_indicator_right_of_text_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.blue_fill_right_of_text_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.seconds_do_not_enter_text",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.seconds_accessibility_unchanged",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.seconds_measured_dimensions_stable",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.next_full_indicator_right_of_text_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.next_blue_fill_right_of_text_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.time_glyph_pixels_unchanged",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.arc_changes_with_second",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.only_indicator_pixels_change",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_20.owned_png_written",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.at_most_parent",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.glyph_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.full_canvas_margin_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.seconds_arc_pixels_present",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.full_indicator_right_of_text_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.blue_fill_right_of_text_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.seconds_do_not_enter_text",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.seconds_accessibility_unchanged",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.seconds_measured_dimensions_stable",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.next_full_indicator_right_of_text_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.next_blue_fill_right_of_text_gap_2px",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.time_glyph_pixels_unchanged",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.arc_changes_with_second",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.only_indicator_pixels_change",
+      "passed": true
+    },
+    {
+      "name": "render.seconds_arc_narrow_pm_20.owned_png_written",
+      "passed": true
+    },
+    {
+      "name": "retained_blink.off_literal",
+      "passed": true
+    },
+    {
+      "name": "retained_blink.raw_accessibility_stable",
+      "passed": true
+    },
+    {
+      "name": "retained_blink.stable_measured_dimensions",
+      "passed": true
+    }
+  ],
+  "renders": [
+    {
+      "name": "12_colon_zero",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 287,
+      "viewHeight": 128,
+      "glyphPixels": 7208,
+      "glyphBounds": [
+        8,
+        32,
+        265,
+        101
+      ],
+      "allPixelBounds": [
+        7,
+        32,
+        265,
+        101
+      ],
+      "path": "after-12_colon_zero.png"
+    },
+    {
+      "name": "12_dot_plain",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 285,
+      "viewHeight": 128,
+      "glyphPixels": 4949,
+      "glyphBounds": [
+        5,
+        33,
+        198,
+        101
+      ],
+      "allPixelBounds": [
+        4,
+        33,
+        198,
+        101
+      ],
+      "path": "after-12_dot_plain.png"
+    },
+    {
+      "name": "12_none_zero",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 261,
+      "viewHeight": 128,
+      "glyphPixels": 6808,
+      "glyphBounds": [
+        8,
+        32,
+        240,
+        101
+      ],
+      "allPixelBounds": [
+        7,
+        32,
+        240,
+        101
+      ],
+      "path": "after-12_none_zero.png"
+    },
+    {
+      "name": "blink_off_pm",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 470,
+      "viewHeight": 128,
+      "glyphPixels": 11498,
+      "glyphBounds": [
+        8,
+        32,
+        436,
+        101
+      ],
+      "allPixelBounds": [
+        7,
+        32,
+        437,
+        101
+      ],
+      "path": "after-blink_off_pm.png"
+    },
+    {
+      "name": "narrow_portrait_pm",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 67,
+      "glyphPixels": 3023,
+      "glyphBounds": [
+        5,
+        18,
+        222,
+        52
+      ],
+      "allPixelBounds": [
+        4,
+        18,
+        223,
+        52
+      ],
+      "path": "after-narrow_portrait_pm.png"
+    },
+    {
+      "name": "seconds_arc_20",
+      "parentWidth": 960,
+      "parentHeight": 480,
+      "viewWidth": 366,
+      "viewHeight": 128,
+      "glyphPixels": 7208,
+      "glyphBounds": [
+        8,
+        32,
+        265,
+        101
+      ],
+      "allPixelBounds": [
+        7,
+        32,
+        363,
+        101
+      ],
+      "timeOnlyBounds": [
+        7,
+        32,
+        265,
+        101
+      ],
+      "indicatorOnlyBounds": [
+        301,
+        33,
+        363,
+        95
+      ],
+      "blueFillBounds": [
+        331,
+        33,
+        363,
+        80
+      ],
+      "indicatorGapPixels": 36,
+      "nextSecond": 21,
+      "nextTimeOnlyBounds": [
+        7,
+        32,
+        265,
+        101
+      ],
+      "nextIndicatorOnlyBounds": [
+        301,
+        33,
+        363,
+        95
+      ],
+      "nextBlueFillBounds": [
+        331,
+        33,
+        363,
+        82
+      ],
+      "nextIndicatorGapPixels": 36,
+      "path": "after-seconds_arc_20.png"
+    },
+    {
+      "name": "seconds_arc_narrow_pm_20",
+      "parentWidth": 240,
+      "parentHeight": 600,
+      "viewWidth": 240,
+      "viewHeight": 58,
+      "glyphPixels": 2255,
+      "glyphBounds": [
+        4,
+        16,
+        190,
+        45
+      ],
+      "allPixelBounds": [
+        4,
+        15,
+        238,
+        45
+      ],
+      "timeOnlyBounds": [
+        4,
+        16,
+        191,
+        45
+      ],
+      "indicatorOnlyBounds": [
+        211,
+        15,
+        238,
+        43
+      ],
+      "blueFillBounds": [
+        224,
+        16,
+        238,
+        36
+      ],
+      "indicatorGapPixels": 20,
+      "nextSecond": 21,
+      "nextTimeOnlyBounds": [
+        4,
+        16,
+        191,
+        45
+      ],
+      "nextIndicatorOnlyBounds": [
+        211,
+        15,
+        238,
+        43
+      ],
+      "nextBlueFillBounds": [
+        224,
+        16,
+        238,
+        37
+      ],
+      "nextIndicatorGapPixels": 20,
+      "path": "after-seconds_arc_narrow_pm_20.png"
+    }
+  ],
+  "caseCount": 24,
+  "checkCount": 156,
+  "failureCount": 0,
+  "isolatedFailureCount": 0,
+  "artifacts": [
+    "after-12_colon_zero.png",
+    "after-12_dot_plain.png",
+    "after-12_none_zero.png",
+    "after-blink_off_pm.png",
+    "after-narrow_portrait_pm.png",
+    "after-seconds_arc_20.png",
+    "after-seconds_arc_narrow_pm_20.png"
+  ],
+  "passed": true,
+  "relativeReportPath": "after-checks.json"
+}

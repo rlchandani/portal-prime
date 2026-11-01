@@ -11,6 +11,9 @@ import kotlin.math.ceil
 /** Clock geometry in physical pixels; font metrics are measured at one pixel. */
 internal object DigitalClockGeometry {
     data class Size(val textSize: Float, val width: Int, val height: Int)
+    const val SECONDS_GAP_RATIO = 0.18f
+    const val SECONDS_DIAMETER_RATIO = 0.64f
+    const val SECONDS_SLOT_RATIO = SECONDS_GAP_RATIO + SECONDS_DIAMETER_RATIO
 
     fun measure(
         density: Float,
@@ -20,6 +23,7 @@ internal object DigitalClockGeometry {
         maxWidth: Int,
         maxHeight: Int,
         padding: Float,
+        showSeconds: Boolean = false,
     ): Size {
         if (maxWidth <= 0 || maxHeight <= 0) return Size(0f, 0, 0)
         val inset = padding.coerceIn(0f, minOf(maxWidth, maxHeight) / 2f)
@@ -27,8 +31,12 @@ internal object DigitalClockGeometry {
         // Fit the whole large-clock family together. Otherwise Medium and Large both
         // saturate at the same width on portrait panels and the selector stops working.
         val familyScale = maxOf(if (scale > 100) 5f else 1f, selectedScale)
-        val widthUnit = widthPerPixel.coerceAtLeast(0.001f)
-        val heightUnit = heightPerPixel.coerceAtLeast(0.001f)
+        val widthUnit = widthPerPixel.coerceAtLeast(0.001f) +
+            if (showSeconds) SECONDS_SLOT_RATIO else 0f
+        val heightUnit = maxOf(
+            heightPerPixel.coerceAtLeast(0.001f),
+            if (showSeconds) SECONDS_DIAMETER_RATIO else 0f,
+        )
         val baseSize = minOf(
             85f * density,
             (maxWidth - inset * 2f) / (widthUnit * familyScale),
