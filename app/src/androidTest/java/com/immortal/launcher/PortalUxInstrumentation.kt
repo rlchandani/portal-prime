@@ -713,13 +713,25 @@ class PortalUxInstrumentation : Instrumentation() {
                     continue
                 }
                 capturePhase("accessibility-tree")
-                val snapshot = snapshotWindows(automation, active)
+                val musicGesture = if (command.optString("command") == "musicSliderGesture") {
+                    musicSliderGesture(automation, active, command,
+                        checkNotNull(musicMonitor.lastActivity as? MusicDesignPreviewActivity))
+                } else null
+                val snapshot = snapshotWindows(automation,
+                    if (musicGesture != null) root(automation) else active)
+                if (musicGesture != null) snapshot.put("musicSliderGesture", musicGesture)
                 capturePhase("fixture-metadata")
                 runOnMainSync {
                     currentPhase.set("fixture-metadata-running")
                     snapshot.put("fixturePhotoControllerIdentity",
                         (musicMonitor.lastActivity as? MusicDesignPreviewActivity)
                             ?.realPhotoControllerIdentityForChecks ?: 0)
+                    snapshot.put("fixtureMusicSeekCommandCount",
+                        (musicMonitor.lastActivity as? MusicDesignPreviewActivity)
+                            ?.seekCommandCountForChecks ?: 0)
+                    snapshot.put("fixtureMusicVolumeCommandCount",
+                        (musicMonitor.lastActivity as? MusicDesignPreviewActivity)
+                            ?.volumeCommandCountForChecks ?: 0)
                     currentPhase.set("fixture-metadata-finished")
                 }
                 capturePhase("snapshot-json")
@@ -761,6 +773,82 @@ class PortalUxInstrumentation : Instrumentation() {
                 }
             }
         }
+    }
+
+    /** Silent fixture only: one continuous pointer stream, with values/counters during the drag. */
+    private fun musicSliderGesture(
+        automation: UiAutomation,
+        active: AccessibilityNodeInfo,
+        command: JSONObject,
+        preview: MusicDesignPreviewActivity,
+    ): JSONObject {
+        check(active.packageName?.toString() == targetContext.packageName)
+        val label = command.getString("control").also {
+            require(it == "Track position" || it == "Family Area volume")
+        }
+        val control = checkNotNull(find(active, label))
+        check(control.isVisibleToUser && control.className?.toString() == "android.widget.SeekBar")
+        val bounds = Rect().also(control::getBoundsInScreen)
+        val density = targetContext.resources.displayMetrics.density
+        check(bounds.width() >= 48 * density && bounds.height() >= 48 * density)
+        val startFraction = command.getDouble("startFraction").also { require(it in 0.05..0.95) }
+        val endFraction = command.getDouble("endFraction").also { require(it in 0.05..0.95) }
+        val duration = command.optLong("moveMs", 480).also { require(it in 240..1_500) }
+        val steps = command.optInt("steps", 24).also { require(it in 8..48) }
+        val initialWindowId = active.windowId
+        val phases = JSONArray()
+        fun phase(name: String) {
+            val current = root(automation)
+            check(current.windowId == initialWindowId &&
+                current.packageName?.toString() == targetContext.packageName)
+            val node = checkNotNull(find(current, label))
+            val range = checkNotNull(node.rangeInfo)
+            val counters = IntArray(2)
+            runOnMainSync {
+                check(!preview.isFinishing && !preview.isDestroyed &&
+                    preview.window.decorView.hasWindowFocus())
+                counters[0] = preview.seekCommandCountForChecks
+                counters[1] = preview.volumeCommandCountForChecks
+            }
+            phases.put(JSONObject().put("phase", name)
+                .put("range", JSONObject().put("minimum", range.min)
+                    .put("maximum", range.max).put("current", range.current))
+                .put("seekCommands", counters[0]).put("volumeCommands", counters[1]))
+        }
+        val startX = (bounds.left + bounds.width() * startFraction).toFloat()
+        val endX = (bounds.left + bounds.width() * endFraction).toFloat()
+        val y = bounds.exactCenterY()
+        val down = SystemClock.uptimeMillis()
+        fun inject(action: Int, x: Float) {
+            val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, x, y, 0)
+            event.source = InputDevice.SOURCE_TOUCHSCREEN
+            try { check(automation.injectInputEvent(event, true)) } finally { event.recycle() }
+        }
+        var pressed = false
+        try {
+            // Verify ownership before the first input as well as each phase sample.
+            phase("initial")
+            inject(MotionEvent.ACTION_DOWN, startX)
+            pressed = true
+            SystemClock.sleep(50)
+            phase("pressed")
+            repeat(steps) { index ->
+                inject(MotionEvent.ACTION_MOVE, startX + (endX - startX) * (index + 1) / steps)
+                SystemClock.sleep(duration / steps)
+                if (index + 1 == steps / 2) phase("mid")
+            }
+            SystemClock.sleep(50)
+            phase("beforeRelease")
+            inject(MotionEvent.ACTION_UP, endX)
+            pressed = false
+            waitForIdleSync()
+            SystemClock.sleep(100)
+            phase("released")
+        } finally {
+            if (pressed) runCatching { inject(MotionEvent.ACTION_CANCEL, endX) }
+        }
+        return JSONObject().put("control", label).put("enabled", control.isEnabled)
+            .put("moveEventCount", steps).put("completed", true).put("phases", phases)
     }
 
     /** Functional QA only: real stationary hold, movement and release/cancel in Customize. */

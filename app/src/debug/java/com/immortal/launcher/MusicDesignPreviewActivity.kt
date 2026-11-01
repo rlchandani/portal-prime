@@ -35,6 +35,10 @@ import java.io.File
 class MusicDesignPreviewActivity : ComponentActivity() {
   internal var realPhotoControllerIdentityForChecks = 0
     private set
+  internal var seekCommandCountForChecks = 0
+    private set
+  internal var volumeCommandCountForChecks = 0
+    private set
   private var nightClock: QuietNightClockView? = null
   private var gallery: SlideshowStage? = null
   private var galleryControls: SlideshowViewerControls? = null
@@ -265,8 +269,12 @@ class MusicDesignPreviewActivity : ComponentActivity() {
                       position = 0
                       playing = false
                     }
-                    is MusicPlayerUiAction.Seek -> position = action.positionMs
+                    is MusicPlayerUiAction.Seek -> {
+                      seekCommandCountForChecks++
+                      position = action.positionMs
+                    }
                     is MusicPlayerUiAction.SetRoomVolume -> {
+                      volumeCommandCountForChecks++
                       previewVolumes = previewVolumes +
                           (action.roomId to action.percent.coerceIn(0, 100))
                     }

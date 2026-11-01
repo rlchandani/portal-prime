@@ -16,7 +16,7 @@ gesture layout from the custom thumb and track, leaving only **16 dp / 18 px**
 of native slider height on Family's 180 dpi display. All **16/16** sampled edge
 taps were ignored in the baseline.
 
-`PremiumSlider` now measures its thumb Canvas at **16 × 48 dp**. `drawCircle`
+`MusicSlider` now measures its thumb Canvas at **16 × 48 dp**. `drawCircle`
 still uses the shorter dimension, preserving the **16 dp / 18 px** painted thumb.
 The thin rail is unchanged. Material's inner gesture height becomes
 **48 dp / 54 px**, fitting the space already reserved by the caller.

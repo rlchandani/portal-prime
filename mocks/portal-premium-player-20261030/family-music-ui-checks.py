@@ -356,7 +356,7 @@ class Verifier:
                 and "isReadyForDisplay()=true" in actual[0], "fixture_window_not_visible")
         return window_id
 
-    def capture(self, case):
+    def capture(self, case, command=None):
         """Atomic request; bounded polling tolerates ONLY incomplete response JSON."""
         self.stage = case
         window_id = self.foreground()
@@ -366,14 +366,23 @@ class Verifier:
         require(self.adb("shell", "run-as", PACKAGE, "ls", "-ld",
                          f"{CACHE}/request.json", allow_failure=True).returncode != 0,
                 "observer_request_already_pending")
-        self.write_json(self.request_file, {"command": "snapshot", "name": name})
+        if command is not None:
+            require(isinstance(command, dict)
+                    and command.get("command") == "musicSliderGesture",
+                    "unsupported_native_capture_command")
+        request = dict(command or {"command": "snapshot"})
+        request["name"] = name
+        self.write_json(self.request_file, request)
         self.remote_owned = True
         self.adb("push", str(self.request_file), self.remote_request)
         self.cache_temp_owned = True
         self.adb("shell", "run-as", PACKAGE, "cp", self.remote_request, self.cache_temp)
         self.adb("shell", "run-as", PACKAGE, "mv", self.cache_temp, f"{CACHE}/request.json")
         self.cache_temp_owned = False
-        poll_deadline = min(time.monotonic() + 10, self.work_deadline)
+        # A gesture includes input, four phase observations, and the final capture.
+        # Keep its bounded allowance separate from ordinary screenshot requests.
+        poll_deadline = min(time.monotonic() + (20 if command is not None else 10),
+                            self.work_deadline)
         matched = False
         while time.monotonic() < poll_deadline:
             response = self.adb(
@@ -461,13 +470,13 @@ class Verifier:
                 node = snapshot.control(label, disabled=True)
                 left, top, right, bottom = bounds(node)
                 if node.get("class") == "android.widget.SeekBar":
-                    # Material exposes the thumb's visual height, not its enlarged
-                    # touch layout. Do not infer touch-target height from this node.
-                    self.check(case, f"{label}: native slider visual bounds", (
+                    # Native bounds describe this build's measured slider layout.
+                    # Geometry alone does not prove that an input point is admitted.
+                    self.check(case, f"{label}: native slider bounds", (
                         0 <= left < right <= WIDTH and 0 <= top < bottom <= HEIGHT
                         and right - left >= MIN_TARGET), snapshot,
-                        widthPx=right - left, visualHeightPx=bottom - top,
-                        expandedTouchHeightMeasured=False)
+                        widthPx=right - left, nativeHeightPx=bottom - top,
+                        touchInputVerified=False)
                     continue
                 passed = (0 <= left < right <= WIDTH and 0 <= top < bottom <= HEIGHT
                           and right - left >= MIN_TARGET and bottom - top >= MIN_TARGET)
