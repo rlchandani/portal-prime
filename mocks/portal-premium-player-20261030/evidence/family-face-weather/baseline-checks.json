@@ -1,0 +1,705 @@
+{
+  "checks": [
+    {
+      "name": "preflight.worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "preflight.owned_preferences_initialized",
+      "passed": true
+    },
+    {
+      "name": "big.actual_catalog_spec",
+      "passed": true
+    },
+    {
+      "name": "big.start_fetch_count",
+      "passed": false
+    },
+    {
+      "name": "big.start.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "big.start.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "big.start.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "big.start.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "big.start.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "big.start.weather_callback_matches_spec",
+      "passed": false
+    },
+    {
+      "name": "big.direct_active_refresh_fetch_count",
+      "passed": false
+    },
+    {
+      "name": "big.direct-refresh.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "big.direct-refresh.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "big.direct-refresh.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "big.direct-refresh.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "big.direct-refresh.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "big.direct-refresh.weather_callback_matches_spec",
+      "passed": false
+    },
+    {
+      "name": "big.hidden_fetch_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "big.hidden.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "big.hidden.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "big.hidden.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "big.hidden.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "big.hidden.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "big.hidden.weather_callback_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "big.hidden_weather_view_retained",
+      "passed": true
+    },
+    {
+      "name": "big.resume_fetch_count",
+      "passed": false
+    },
+    {
+      "name": "big.resume.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "big.resume.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "big.resume.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "big.resume.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "big.resume.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "big.resume.weather_callback_matches_spec",
+      "passed": false
+    },
+    {
+      "name": "big.overlay_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "big.clock_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "big.weather_view_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "big.producer_context_is_scoped",
+      "passed": true
+    },
+    {
+      "name": "big.producer_off_main",
+      "passed": true
+    },
+    {
+      "name": "big.stopped_fetch_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "big.worker_terminated",
+      "passed": true
+    },
+    {
+      "name": "big.stop_releases_receiver",
+      "passed": true
+    },
+    {
+      "name": "big.stop_releases_listener",
+      "passed": true
+    },
+    {
+      "name": "big.stop_clears_weather_request",
+      "passed": true
+    },
+    {
+      "name": "big.stop_removes_weather_callback",
+      "passed": true
+    },
+    {
+      "name": "bold.actual_catalog_spec",
+      "passed": true
+    },
+    {
+      "name": "bold.start_fetch_count",
+      "passed": false
+    },
+    {
+      "name": "bold.start.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "bold.start.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "bold.start.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "bold.start.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "bold.start.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "bold.start.weather_callback_matches_spec",
+      "passed": false
+    },
+    {
+      "name": "bold.direct_active_refresh_fetch_count",
+      "passed": false
+    },
+    {
+      "name": "bold.direct-refresh.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "bold.direct-refresh.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "bold.direct-refresh.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "bold.direct-refresh.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "bold.direct-refresh.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "bold.direct-refresh.weather_callback_matches_spec",
+      "passed": false
+    },
+    {
+      "name": "bold.hidden_fetch_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "bold.hidden.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "bold.hidden.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "bold.hidden.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "bold.hidden.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "bold.hidden.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "bold.hidden.weather_callback_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "bold.hidden_weather_view_retained",
+      "passed": true
+    },
+    {
+      "name": "bold.resume_fetch_count",
+      "passed": false
+    },
+    {
+      "name": "bold.resume.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "bold.resume.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "bold.resume.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "bold.resume.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "bold.resume.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "bold.resume.weather_callback_matches_spec",
+      "passed": false
+    },
+    {
+      "name": "bold.overlay_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "bold.clock_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "bold.weather_view_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "bold.producer_context_is_scoped",
+      "passed": true
+    },
+    {
+      "name": "bold.producer_off_main",
+      "passed": true
+    },
+    {
+      "name": "bold.stopped_fetch_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "bold.worker_terminated",
+      "passed": true
+    },
+    {
+      "name": "bold.stop_releases_receiver",
+      "passed": true
+    },
+    {
+      "name": "bold.stop_releases_listener",
+      "passed": true
+    },
+    {
+      "name": "bold.stop_clears_weather_request",
+      "passed": true
+    },
+    {
+      "name": "bold.stop_removes_weather_callback",
+      "passed": true
+    },
+    {
+      "name": "minimal.actual_catalog_spec",
+      "passed": true
+    },
+    {
+      "name": "minimal.start_fetch_count",
+      "passed": false
+    },
+    {
+      "name": "minimal.start.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "minimal.start.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "minimal.start.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "minimal.start.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "minimal.start.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "minimal.start.weather_callback_matches_spec",
+      "passed": false
+    },
+    {
+      "name": "minimal.direct_active_refresh_fetch_count",
+      "passed": false
+    },
+    {
+      "name": "minimal.direct-refresh.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "minimal.direct-refresh.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "minimal.direct-refresh.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "minimal.direct-refresh.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "minimal.direct-refresh.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "minimal.direct-refresh.weather_callback_matches_spec",
+      "passed": false
+    },
+    {
+      "name": "minimal.hidden_fetch_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "minimal.hidden.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "minimal.hidden.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "minimal.hidden.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "minimal.hidden.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "minimal.hidden.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "minimal.hidden.weather_callback_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "minimal.hidden_weather_view_retained",
+      "passed": true
+    },
+    {
+      "name": "minimal.resume_fetch_count",
+      "passed": false
+    },
+    {
+      "name": "minimal.resume.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "minimal.resume.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "minimal.resume.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "minimal.resume.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "minimal.resume.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "minimal.resume.weather_callback_matches_spec",
+      "passed": false
+    },
+    {
+      "name": "minimal.overlay_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "minimal.clock_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "minimal.weather_view_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "minimal.producer_context_is_scoped",
+      "passed": true
+    },
+    {
+      "name": "minimal.producer_off_main",
+      "passed": true
+    },
+    {
+      "name": "minimal.stopped_fetch_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "minimal.worker_terminated",
+      "passed": true
+    },
+    {
+      "name": "minimal.stop_releases_receiver",
+      "passed": true
+    },
+    {
+      "name": "minimal.stop_releases_listener",
+      "passed": true
+    },
+    {
+      "name": "minimal.stop_clears_weather_request",
+      "passed": true
+    },
+    {
+      "name": "minimal.stop_removes_weather_callback",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.actual_catalog_spec",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.start_fetch_count",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.start.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.start.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.start.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.start.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.start.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.start.weather_callback_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.hidden_fetch_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.hidden.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.hidden.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.hidden.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.hidden.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.hidden.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.hidden.weather_callback_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.hidden_weather_view_retained",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.resume_fetch_count",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.resume.weather_view_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.resume.no_now_playing_listener",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.resume.no_now_playing_card",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.resume.anti_burn_in_disabled",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.resume.detached_overlay",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.resume.weather_callback_matches_spec",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.overlay_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.clock_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.weather_view_identity_retained",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.latest_generated_completion",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.producer_context_is_scoped",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.producer_off_main",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.stopped_fetch_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.worker_terminated",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.stop_releases_receiver",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.stop_releases_listener",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.stop_clears_weather_request",
+      "passed": true
+    },
+    {
+      "name": "enabled-control.stop_removes_weather_callback",
+      "passed": true
+    },
+    {
+      "name": "cleanup.all_workers_terminated",
+      "passed": true
+    },
+    {
+      "name": "cleanup.owned_preferences_removed",
+      "passed": true
+    },
+    {
+      "name": "budget.within_15_seconds",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "name": "big",
+      "weatherEnabled": false,
+      "startCalls": 1,
+      "resumeCalls": 3,
+      "completed": true,
+      "producerCalls": 3
+    },
+    {
+      "name": "bold",
+      "weatherEnabled": false,
+      "startCalls": 1,
+      "resumeCalls": 3,
+      "completed": true,
+      "producerCalls": 3
+    },
+    {
+      "name": "minimal",
+      "weatherEnabled": false,
+      "startCalls": 1,
+      "resumeCalls": 3,
+      "completed": true,
+      "producerCalls": 3
+    },
+    {
+      "name": "enabled-control",
+      "weatherEnabled": true,
+      "startCalls": 1,
+      "resumeCalls": 2,
+      "completed": true,
+      "producerCalls": 2
+    }
+  ],
+  "caseCount": 4,
+  "checkCount": 163,
+  "failureCount": 18,
+  "isolatedFailureCount": 0,
+  "passed": false,
+  "scope": "detached_renderer_producer_admission",
+  "generatedProducer": true,
+  "networkProof": false,
+  "windowProof": false,
+  "fpsProof": false,
+  "audioProof": false,
+  "workBudgetMs": 12000,
+  "totalBudgetMs": 15000,
+  "elapsedMs": 1136,
+  "relativeReportPath": "cache/face-weather-admission-owned-07cab485-4777-4c91-95cc-bf324c90f967.json"
+}

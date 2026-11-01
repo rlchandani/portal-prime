@@ -40,6 +40,20 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Detached renderer admission with generated producer and UUID-owned preferences only.
+        if (options.getString("command") == "faceWeatherAdmission") {
+            val weather = try {
+                FaceWeatherAdmissionDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("faceWeatherAdmissionCompleted", false)
+                    putBoolean("faceWeatherAdmissionPassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (weather.getBoolean("faceWeatherAdmissionPassed")) 0 else 1, weather)
+            return
+        }
         // Detached generated Canvas/font fixtures only; never acquire UiAutomation.
         if (options.getString("command") == "digitalClockFont") {
             val fonts = try {

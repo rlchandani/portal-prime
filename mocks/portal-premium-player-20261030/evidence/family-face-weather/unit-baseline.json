@@ -1,0 +1,20 @@
+{
+  "tests": 3,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "faceWithoutWeatherDoesNotAdmitIoOrScheduleRefresh",
+      "passed": false
+    },
+    {
+      "name": "visibleWeatherKeepsItsExistingSingleInFlightRequestAndRefreshCadence",
+      "passed": true
+    },
+    {
+      "name": "hiddenHostDoesNotAdmitWeatherEvenWhenItsViewIsRetained",
+      "passed": true
+    }
+  ]
+}

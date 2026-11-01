@@ -49,6 +49,7 @@ import kotlin.math.abs
 class FaceRenderer(
     private val context: Context,
     private val weatherRefreshMs: Long = 30 * 60_000L,
+    private val weatherFetch: (Context) -> String = { Weather.fetch(it) },
 ) {
   private val io = Executors.newSingleThreadExecutor()
   private val ui = Handler(Looper.getMainLooper())
@@ -735,10 +736,12 @@ class FaceRenderer(
       object : Runnable {
         override fun run() {
           val token = work.token() ?: return
+          // Omitted weather has no consumer; do not admit IO or its periodic callback.
+          if (weatherView == null) return
           if (weatherRequest == null) {
             weatherRequest = io.submit {
               if (!work.isCurrent(token) || Thread.currentThread().isInterrupted) return@submit
-              val w = runCatching { Weather.fetch(context) }.getOrDefault("")
+              val w = runCatching { weatherFetch(context) }.getOrDefault("")
               if (!work.isCurrent(token) || Thread.currentThread().isInterrupted) return@submit
               ui.post {
                 if (work.isCurrent(token)) {

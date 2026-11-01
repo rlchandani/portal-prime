@@ -1,0 +1,14 @@
+{
+  "checks": {
+    "wirelessFamilyIdentity": true,
+    "installedArtifactMatches": true,
+    "optimizedNonDebuggable": true,
+    "systemPidUnchanged": true,
+    "noInstrumentation": true,
+    "noCollector": true
+  },
+  "passed": true,
+  "installedSha256": "4ea7f4e83b9c333fc9554f723723dc1931088725701d032cdd773d2fa0e1e06f",
+  "checkedAtUtc": "2026-11-01T15:35:27.343219+00:00",
+  "scope": "read_only_post_install_health"
+}

@@ -2,7 +2,23 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
-**Newest delivery, November 1 — photo-clock fonts.**
+**Newest delivery, November 1 — omitted-weather work.**
+[The admission fix](portal-face-weather-admission-2026-11-01.md) prevents
+Big, Bold and Minimal clock faces from loading weather or scheduling its
+callback when no weather view exists. The actual catalog faces change from
+**one start / three lifecycle calls to zero**, while the enabled control keeps
+**one start / two lifecycle calls**. All **163** original native assertions
+pass, replacing **18** baseline failures, with zero isolated exceptions and
+**0.938 seconds** of detached renderer work. **3,764 fresh JVM tests** pass.
+Optimized APK **4ea7f4e8…** is installed with settings, sources, cache, services,
+pin, brightness policy and original Dream restored about **12 minutes 20 seconds**
+into the original 30-minute slot. Wireless ADB targeted Family Area only.
+Raw brightness differed under automatic mode; its policy was preserved.
+These are generated-producer admission checks, not HTTP-traffic, CPU/FPS,
+Window/panel or room-light comfort measurements. Physical fade acceptance
+remains unavailable.
+
+**Previous delivery, November 1 — photo-clock fonts.**
 [The font correction](portal-digital-clock-fonts-2026-11-01.md) replaces the
 digital renderer's hardcoded bold font with the existing face font/weight.
 The shared resolver caches base assets by family and resolved Typefaces by

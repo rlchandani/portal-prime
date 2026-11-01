@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "face": "big",
+      "weatherEnabled": false,
+      "beforeStartCalls": 1,
+      "afterStartCalls": 0,
+      "beforeCallsAfterResume": 3,
+      "afterCallsAfterResume": 0
+    },
+    {
+      "face": "bold",
+      "weatherEnabled": false,
+      "beforeStartCalls": 1,
+      "afterStartCalls": 0,
+      "beforeCallsAfterResume": 3,
+      "afterCallsAfterResume": 0
+    },
+    {
+      "face": "minimal",
+      "weatherEnabled": false,
+      "beforeStartCalls": 1,
+      "afterStartCalls": 0,
+      "beforeCallsAfterResume": 3,
+      "afterCallsAfterResume": 0
+    },
+    {
+      "face": "enabled-control",
+      "weatherEnabled": true,
+      "beforeStartCalls": 1,
+      "afterStartCalls": 1,
+      "beforeCallsAfterResume": 2,
+      "afterCallsAfterResume": 2
+    }
+  ],
+  "all163AssertionsRetained": true,
+  "baselineFailures": 18,
+  "finalFailures": 0,
+  "generatedProducer": true,
+  "networkProof": false,
+  "windowProof": false,
+  "fpsProof": false,
+  "nativeMilliseconds": 938,
+  "issueStartUtc": "2026-11-01T15:21:56+00:00",
+  "verifiedAtUtc": "2026-11-01T15:34:15.814288+00:00",
+  "deliverySeconds": 739.814
+}
