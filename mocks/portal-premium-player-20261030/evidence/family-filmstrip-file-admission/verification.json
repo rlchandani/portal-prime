@@ -1,0 +1,152 @@
+{
+  "sourceCommit": "63d5fd4e",
+  "branch": "codex/filmstrip-file-admission-20261101",
+  "target": "Family Area",
+  "issueStartedUtc": "2026-11-01T08:46:43Z",
+  "issueHardLimitUtc": "2026-11-01T09:16:43Z",
+  "targetRed": {
+    "tests": 34,
+    "failures": 2,
+    "errors": 0,
+    "skipped": 0,
+    "baselineKind": "whole_file_admission_scaffold"
+  },
+  "targetGreen": {
+    "tests": 34,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "fullUnitGate": {
+    "tests": 3684,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 389
+  },
+  "jvmCallingThreadAllocation": {
+    "fixtureEncodedBytes": 16777216,
+    "beforeAllocatedJavaBytes": 16778976,
+    "afterAllocatedJavaBytes": 10024,
+    "oversizeAllocatedJavaBytes": 520,
+    "allocationLimitBytes": 131072,
+    "scannerWindowBytes": 8192
+  },
+  "nativeComparison": {
+    "fixture": "sparse_gif_signature_plus_padding_not_playable_animation",
+    "decoderEntryPoint": "SlideshowDecoder.nativeFilmstripFile",
+    "warmupsPerRun": 4,
+    "measuredInvocationsPerRun": 1,
+    "baseline": {
+      "candidateApkSha256": "0f98db5e2e680f48d6ca2919d797f4b387532422a84054e62ef769a58730c976",
+      "nativeProbe": {
+        "encodedBytes": 16777216,
+        "nativeFallbackSignal": true,
+        "processAllocatedJavaBytes": 50567776,
+        "allocationCounterSupported": true,
+        "elapsedNanos": 57781874,
+        "cleanupExact": true
+      },
+      "pass": true,
+      "observerStopped": true,
+      "testApkRestored": true,
+      "settingsExact": true,
+      "sourcesExact": true,
+      "persistentPinExact": true,
+      "originalOptimizedApkRestored": true,
+      "accessibilityExact": true,
+      "systemProcessUnchanged": true,
+      "collectorInactive": true,
+      "originalDreamRestored": true,
+      "restorationPass": true,
+      "nativeCaptureCount": 0,
+      "elapsedSeconds": 35.967,
+      "ownedInvalidCacheArtifactCleared": true
+    },
+    "fixed": {
+      "candidateApkSha256": "6c7e38fa9923c7a7e9db603ab42c136cbd0201278f0ace1df4b38a8a998b06a4",
+      "nativeProbe": {
+        "encodedBytes": 16777216,
+        "nativeFallbackSignal": true,
+        "processAllocatedJavaBytes": 0,
+        "allocationCounterSupported": true,
+        "elapsedNanos": 385625,
+        "cleanupExact": true
+      },
+      "pass": true,
+      "observerStopped": true,
+      "testApkRestored": true,
+      "settingsExact": true,
+      "sourcesExact": true,
+      "persistentPinExact": true,
+      "originalOptimizedApkRestored": true,
+      "accessibilityExact": true,
+      "systemProcessUnchanged": true,
+      "collectorInactive": true,
+      "originalDreamRestored": true,
+      "restorationPass": true,
+      "nativeCaptureCount": 0,
+      "elapsedSeconds": 35.361,
+      "ownedInvalidCacheArtifactCleared": true
+    },
+    "allocationCounterScope": "process_wide_cumulative_java_allocation_not_peak_heap",
+    "zeroDeltaMeansZeroAllocation": false,
+    "elapsedValuesArePercentiles": false,
+    "nativeProbeApksOptimized": false
+  },
+  "initialGuardFailure": {
+    "measuredInvocations": 0,
+    "terminal": true,
+    "deviceRestored": true,
+    "cause": "owned_missing_file_diagnostic_misread_as_request_content",
+    "correctedBeforeNextRun": true,
+    "observationTimeoutRestart": false
+  },
+  "artifacts": {
+    "performanceApkSha256": "eafade20885a60b829457e06b010d868c18faa7502daf6b3499de48e2fdaebab",
+    "performanceApkBytes": 25858942,
+    "signingCertificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "deployment": {
+    "newApkSha256": "eafade20885a60b829457e06b010d868c18faa7502daf6b3499de48e2fdaebab",
+    "oldApkSha256": "eb6296d3005d435c8aa1519191cb5366f5cdf17a1f6294b40b9176fb7874ec37",
+    "originalDreamActive": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "systemProcessUnchanged": true,
+    "pass": true,
+    "accessibilityExact": true,
+    "originalDreamRestored": true,
+    "elapsedSeconds": 17.557
+  },
+  "freshNativeHealth": {
+    "installedApkSha256": "eafade20885a60b829457e06b010d868c18faa7502daf6b3499de48e2fdaebab",
+    "installedHashMatches": true,
+    "collectorInactive": true,
+    "activePerformanceListeners": 0,
+    "noActiveInstrumentation": true,
+    "dreamActive": true,
+    "pass": true
+  },
+  "settingsCount": 97,
+  "photoSourceRecordCount": 22,
+  "buildsPassed": {
+    "debug": true,
+    "performance": true,
+    "androidTest": true
+  },
+  "formatParityVerified": true,
+  "fallbackRetained": true,
+  "boundedAdmissionAllocationAccepted": true,
+  "animatedPixelResidencyAccepted": false,
+  "gpuResidencyAccepted": false,
+  "panelFpsAccepted": false,
+  "zeroAllocationClaimed": false,
+  "naturalRoomLightComfortAccepted": false,
+  "livingAreaTouched": false,
+  "musicAudioProviderDeferred": true,
+  "goalComplete": false,
+  "deliveryVerifiedUtc": "2026-11-01T09:04:57Z",
+  "withinThirtyMinuteLimit": true
+}

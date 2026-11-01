@@ -2,6 +2,15 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Filmstrip admission delivery, November 1:** the
+[bounded file scanner](portal-filmstrip-file-admission-2026-11-01.md) avoids
+whole-file buffering before unsupported-format fallback. The JVM 16 MiB GIF
+probe falls from **16,778,976 to 10,024 allocated bytes**; one matched actual
+Family decoder probe falls from **57.78 to 0.39 ms**. The ART counter's recorded
+zero is not proof of zero allocation. All **3,684 unit tests** pass and optimized
+APK **eafade20…** is installed with settings, sources and original Dream preserved.
+Animated pixel/GPU residency, panel FPS and natural-light comfort remain open.
+
 **Paused music-photo verification, November 1:** the
 [focused Family check](portal-paused-capture-2026-11-01.md) passed **10/10**
 checks across **nine captures**; paused pixels remained identical and manual
