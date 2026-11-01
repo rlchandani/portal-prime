@@ -12,6 +12,13 @@ checkable/checked state. The historical run and qualifications below remain
 scoped to its original artifact; the follow-on closes those sampled interaction
 gaps, with dragging, real audio and panel FPS still outside acceptance.
 
+**Subsequent drag verification:** [429 focused checks](portal-music-drag-native-2026-11-01.md)
+pass across 20 native gestures. Both themes and font scales 1.0/1.8 cover forward
+and reverse paused seeking/volume, plus disabled controls. Native values progress
+during the drag and each enabled gesture emits one UI action after release.
+This closes those sampled dragging cases; playing-timer interaction, real audio
+and panel FPS remain outside that gate.
+
 | Gate | Passed | Native captures | Elapsed |
 | --- | ---: | ---: | ---: |
 | Six-case dark/light, ready/offline and 1.8 font matrix | 206/206 | 50 | 112.024 s |

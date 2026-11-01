@@ -1,0 +1,3646 @@
+[
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 2,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 2,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 2
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 3
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 3,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 3
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 3,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 3,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 3,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.4827586
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 3,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 3,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957855
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 3,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 3,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 3,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 3,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 3,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 3
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 3,
+    "initialFraction": 0.0,
+    "pressedFraction": 0.0,
+    "midFraction": 0.4827586,
+    "finalFraction": 0.85957587,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 3,
+    "beforeReleaseFraction": 0.85957855,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "Track position: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 3,
+    "releasedFraction": 0.85957587,
+    "finalFraction": 0.85957587,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_0-seek-forward",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 3,
+    "elapsedSeconds": 220,
+    "durationSeconds": 257
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 3,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 3,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 3
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 4
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 4,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 4
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 4,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 4,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 4,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.51724136
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 4,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 4,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042144
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 4,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 4,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042023
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 4,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 4,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042023
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 4,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 4
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 4,
+    "initialFraction": 0.85957587,
+    "pressedFraction": 0.85957587,
+    "midFraction": 0.51724136,
+    "finalFraction": 0.14042023,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 4,
+    "beforeReleaseFraction": 0.14042144,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "Track position: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 4,
+    "releasedFraction": 0.14042023,
+    "finalFraction": 0.14042023,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_0-seek-reverse",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 4,
+    "elapsedSeconds": 36,
+    "durationSeconds": 257
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 5,
+    "nativeGestureWidthPx": 854,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 5,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 5
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 6
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 6,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 6
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 6,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 6,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 6,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 48.89435
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 6,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 6,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85.61425
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 6,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 6,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 6,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 6,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 6,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 6
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 6,
+    "initialFraction": 0.35,
+    "pressedFraction": 0.35,
+    "midFraction": 0.48894350000000003,
+    "finalFraction": 0.85,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 6,
+    "beforeReleaseFraction": 0.8561425,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "Family Area volume: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 6,
+    "releasedFraction": 0.85,
+    "finalFraction": 0.85,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_0-volume-forward",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 6,
+    "expectedPercent": 85
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 6,
+    "nativeGestureWidthPx": 853,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 6,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 6
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 7
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 7,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 7
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 7,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 7,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 7,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 51.107014
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 7,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 7,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14.384988
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 7,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 7,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 7,
+    "seekCommands": 2,
+    "volumeCommands": 2,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 2
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 7,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 7,
+    "seekCommands": 2,
+    "volumeCommands": 2,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 2
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 7
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 7,
+    "initialFraction": 0.85,
+    "pressedFraction": 0.85,
+    "midFraction": 0.51107014,
+    "finalFraction": 0.14,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 7,
+    "beforeReleaseFraction": 0.14384987999999999,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "Family Area volume: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 7,
+    "releasedFraction": 0.14,
+    "finalFraction": 0.14,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_0-volume-reverse",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 7,
+    "expectedPercent": 14
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 9,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 9,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 9
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 10
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 10,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 10
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 10,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 10,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 10,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.4827586
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 10,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 10,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957855
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 10,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 10,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 10,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 10,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 10,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 10
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 10,
+    "initialFraction": 0.0,
+    "pressedFraction": 0.0,
+    "midFraction": 0.4827586,
+    "finalFraction": 0.85957587,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 10,
+    "beforeReleaseFraction": 0.85957855,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "Track position: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 10,
+    "releasedFraction": 0.85957587,
+    "finalFraction": 0.85957587,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_8-seek-forward",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 10,
+    "elapsedSeconds": 220,
+    "durationSeconds": 257
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 10,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 10,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 10
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 11
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 11,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 11
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 11,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 11,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 11,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.51724136
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 11,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 11,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042144
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 11,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 11,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042023
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 11,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 11,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042023
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 11,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 11
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 11,
+    "initialFraction": 0.85957587,
+    "pressedFraction": 0.85957587,
+    "midFraction": 0.51724136,
+    "finalFraction": 0.14042023,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 11,
+    "beforeReleaseFraction": 0.14042144,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "Track position: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 11,
+    "releasedFraction": 0.14042023,
+    "finalFraction": 0.14042023,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_8-seek-reverse",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 11,
+    "elapsedSeconds": 36,
+    "durationSeconds": 257
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 12,
+    "nativeGestureWidthPx": 827,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 12,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 12
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 13
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 13,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 13
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 13,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 13,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 13,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 48.856415
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 13,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 13,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85.635315
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 13,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 13,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 13,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 13,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 13,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 13
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 13,
+    "initialFraction": 0.35,
+    "pressedFraction": 0.35,
+    "midFraction": 0.48856415,
+    "finalFraction": 0.85,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 13,
+    "beforeReleaseFraction": 0.85635315,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "Family Area volume: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 13,
+    "releasedFraction": 0.85,
+    "finalFraction": 0.85,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "dark-font-1_8-volume-forward",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 13,
+    "expectedPercent": 85
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 13,
+    "nativeGestureWidthPx": 826,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 13,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 13
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 14
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 14,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 14
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 14,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 14,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 14,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 51.145042
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 14,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 14,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14.363872
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 14,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 14,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 14,
+    "seekCommands": 2,
+    "volumeCommands": 2,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 2
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 14,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 14,
+    "seekCommands": 2,
+    "volumeCommands": 2,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 2
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 14
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 14,
+    "initialFraction": 0.85,
+    "pressedFraction": 0.85,
+    "midFraction": 0.51145042,
+    "finalFraction": 0.14,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 14,
+    "beforeReleaseFraction": 0.14363872,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "Family Area volume: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 14,
+    "releasedFraction": 0.14,
+    "finalFraction": 0.14,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "dark-font-1_8-volume-reverse",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 14,
+    "expectedPercent": 14
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 15,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 15,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 15
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 16,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 16,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 16,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position pressed: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 16,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 16,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position mid: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 16,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 16,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position beforeRelease: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 16,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 16,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position released: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 16,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 16,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "Track position: disabled final range unchanged",
+    "passed": true,
+    "frameNumber": 16
+  },
+  {
+    "case": "dark-offline-seek-forward",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 16,
+    "elapsedSeconds": 83,
+    "durationSeconds": 240
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 17,
+    "nativeGestureWidthPx": 854,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 17,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 17
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 18,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 18,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 18,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume pressed: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 18,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 18,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume mid: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 18,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 18,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume beforeRelease: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 18,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 18,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume released: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 18,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 18,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "Family Area volume: disabled final range unchanged",
+    "passed": true,
+    "frameNumber": 18
+  },
+  {
+    "case": "dark-offline-volume-forward",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 18,
+    "expectedPercent": 35
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 20,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 20,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 20
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 21
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 21,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 21
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 21,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 21,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 21,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.4827586
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 21,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 21,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957855
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 21,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 21,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 21,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 21,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 21,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 21
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 21,
+    "initialFraction": 0.0,
+    "pressedFraction": 0.0,
+    "midFraction": 0.4827586,
+    "finalFraction": 0.85957587,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 21,
+    "beforeReleaseFraction": 0.85957855,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "Track position: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 21,
+    "releasedFraction": 0.85957587,
+    "finalFraction": 0.85957587,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_0-seek-forward",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 21,
+    "elapsedSeconds": 220,
+    "durationSeconds": 257
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 21,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 21,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 21
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 22
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 22,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 22
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 22,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 22,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 22,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.51724136
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 22,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 22,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042144
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 22,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 22,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042023
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 22,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 22,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042023
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 22,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 22
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 22,
+    "initialFraction": 0.85957587,
+    "pressedFraction": 0.85957587,
+    "midFraction": 0.51724136,
+    "finalFraction": 0.14042023,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 22,
+    "beforeReleaseFraction": 0.14042144,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "Track position: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 22,
+    "releasedFraction": 0.14042023,
+    "finalFraction": 0.14042023,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_0-seek-reverse",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 22,
+    "elapsedSeconds": 36,
+    "durationSeconds": 257
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 23,
+    "nativeGestureWidthPx": 854,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 23,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 23
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 24
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 24,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 24
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 24,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 24,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 24,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 48.89435
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 24,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 24,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85.61425
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 24,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 24,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 24,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 24,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 24,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 24
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 24,
+    "initialFraction": 0.35,
+    "pressedFraction": 0.35,
+    "midFraction": 0.48894350000000003,
+    "finalFraction": 0.85,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 24,
+    "beforeReleaseFraction": 0.8561425,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "Family Area volume: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 24,
+    "releasedFraction": 0.85,
+    "finalFraction": 0.85,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_0-volume-forward",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 24,
+    "expectedPercent": 85
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 24,
+    "nativeGestureWidthPx": 853,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 24,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 24
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 25
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 25,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 25
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 25,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 25,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 25,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 51.107014
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 25,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 25,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14.384988
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 25,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 25,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 25,
+    "seekCommands": 2,
+    "volumeCommands": 2,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 2
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 25,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 25,
+    "seekCommands": 2,
+    "volumeCommands": 2,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 2
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 25
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 25,
+    "initialFraction": 0.85,
+    "pressedFraction": 0.85,
+    "midFraction": 0.51107014,
+    "finalFraction": 0.14,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 25,
+    "beforeReleaseFraction": 0.14384987999999999,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "Family Area volume: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 25,
+    "releasedFraction": 0.14,
+    "finalFraction": 0.14,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_0-volume-reverse",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 25,
+    "expectedPercent": 14
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 27,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 27,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 27
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 28
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 28,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 28
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 28,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 28,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 28,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.4827586
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 28,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 28,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957855
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 28,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 28,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 28,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 28,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 28,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 28
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 28,
+    "initialFraction": 0.0,
+    "pressedFraction": 0.0,
+    "midFraction": 0.4827586,
+    "finalFraction": 0.85957587,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 28,
+    "beforeReleaseFraction": 0.85957855,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "Track position: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 28,
+    "releasedFraction": 0.85957587,
+    "finalFraction": 0.85957587,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_8-seek-forward",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 28,
+    "elapsedSeconds": 220,
+    "durationSeconds": 257
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 28,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 28,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 28
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 29
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 29,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 29
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 29,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.85957587
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 29,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 29,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.51724136
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 29,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 29,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042144
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 29,
+    "seekCommands": 1,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 1,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 29,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042023
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 29,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 29,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.14042023
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 29,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 29
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 29,
+    "initialFraction": 0.85957587,
+    "pressedFraction": 0.85957587,
+    "midFraction": 0.51724136,
+    "finalFraction": 0.14042023,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 29,
+    "beforeReleaseFraction": 0.14042144,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "Track position: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 29,
+    "releasedFraction": 0.14042023,
+    "finalFraction": 0.14042023,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_8-seek-reverse",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 29,
+    "elapsedSeconds": 36,
+    "durationSeconds": 257
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 30,
+    "nativeGestureWidthPx": 827,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 30,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 30
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 31
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 31,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 31
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 31,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 31,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 31,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 48.856415
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 31,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 31,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85.635315
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 31,
+    "seekCommands": 2,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 31,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 31,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 31,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 31,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 31
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 31,
+    "initialFraction": 0.35,
+    "pressedFraction": 0.35,
+    "midFraction": 0.48856415,
+    "finalFraction": 0.85,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 31,
+    "beforeReleaseFraction": 0.85635315,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "Family Area volume: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 31,
+    "releasedFraction": 0.85,
+    "finalFraction": 0.85,
+    "targetFraction": 0.85
+  },
+  {
+    "case": "light-font-1_8-volume-forward",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 31,
+    "expectedPercent": 85
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 31,
+    "nativeGestureWidthPx": 826,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 31,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 31
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 32
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 32,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 32
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 32,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 85
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 32,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 32,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 51.145042
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 32,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 32,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14.363872
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 32,
+    "seekCommands": 2,
+    "volumeCommands": 1,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 1
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 32,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 32,
+    "seekCommands": 2,
+    "volumeCommands": 2,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 2
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 32,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 14
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 32,
+    "seekCommands": 2,
+    "volumeCommands": 2,
+    "expectedSeekCommands": 2,
+    "expectedVolumeCommands": 2
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 32
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume: mid drag progresses toward endpoint",
+    "passed": true,
+    "frameNumber": 32,
+    "initialFraction": 0.85,
+    "pressedFraction": 0.85,
+    "midFraction": 0.51145042,
+    "finalFraction": 0.14,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume: beforeRelease reaches target",
+    "passed": true,
+    "frameNumber": 32,
+    "beforeReleaseFraction": 0.14363872,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "Family Area volume: release and final RangeInfo reach target",
+    "passed": true,
+    "frameNumber": 32,
+    "releasedFraction": 0.14,
+    "finalFraction": 0.14,
+    "targetFraction": 0.15
+  },
+  {
+    "case": "light-font-1_8-volume-reverse",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 32,
+    "expectedPercent": 14
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 33,
+    "nativeGestureWidthPx": 562,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position initial: coherent native range",
+    "passed": true,
+    "frameNumber": 33,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 33
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 34,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 34,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 34,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position pressed: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position mid: coherent native range",
+    "passed": true,
+    "frameNumber": 34,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 34,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position mid: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 34,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 34,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position beforeRelease: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position released: coherent native range",
+    "passed": true,
+    "frameNumber": 34,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 34,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position released: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position final: coherent native range",
+    "passed": true,
+    "frameNumber": 34,
+    "minimum": 0,
+    "maximum": 1,
+    "current": 0.34583333
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 34,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "Track position: disabled final range unchanged",
+    "passed": true,
+    "frameNumber": 34
+  },
+  {
+    "case": "light-offline-seek-forward",
+    "name": "paused elapsed text matches final native range",
+    "passed": true,
+    "frameNumber": 34,
+    "elapsedSeconds": 83,
+    "durationSeconds": 240
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume: observed native gesture bounds cover 48dp",
+    "passed": true,
+    "frameNumber": 35,
+    "nativeGestureWidthPx": 854,
+    "nativeGestureHeightPx": 54,
+    "minimumTargetPx": 54
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume initial: coherent native range",
+    "passed": true,
+    "frameNumber": 35,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "initial fixture command counters are nonnegative",
+    "passed": true,
+    "frameNumber": 35
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume: completed native 24-move gesture",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume receipt initial: coherent native range",
+    "passed": true,
+    "frameNumber": 36,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume: receipt initial belongs to observed slider",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume pressed: coherent native range",
+    "passed": true,
+    "frameNumber": 36,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume pressed: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 36,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume pressed: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume mid: coherent native range",
+    "passed": true,
+    "frameNumber": 36,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume mid: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 36,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume mid: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume beforeRelease: coherent native range",
+    "passed": true,
+    "frameNumber": 36,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume beforeRelease: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 36,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume beforeRelease: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume released: coherent native range",
+    "passed": true,
+    "frameNumber": 36,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume released: commands coalesced until release",
+    "passed": true,
+    "frameNumber": 36,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume released: disabled range unchanged",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume final: coherent native range",
+    "passed": true,
+    "frameNumber": 36,
+    "minimum": 0,
+    "maximum": 100,
+    "current": 35
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume: final counters match released receipt",
+    "passed": true,
+    "frameNumber": 36,
+    "seekCommands": 0,
+    "volumeCommands": 0,
+    "expectedSeekCommands": 0,
+    "expectedVolumeCommands": 0
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume: final RangeInfo matches released phase",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "Family Area volume: disabled final range unchanged",
+    "passed": true,
+    "frameNumber": 36
+  },
+  {
+    "case": "light-offline-volume-forward",
+    "name": "released volume label acknowledges native range",
+    "passed": true,
+    "frameNumber": 36,
+    "expectedPercent": 35
+  },
+  {
+    "case": "matrix",
+    "name": "all six cases and twenty gestures completed",
+    "passed": true,
+    "frameNumber": 36
+  }
+]

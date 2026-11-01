@@ -1,0 +1,46 @@
+{
+  "nativeCapturesReviewed": 4,
+  "nativeCapturesTotal": 36,
+  "generatedSilentFixtureOnly": true,
+  "allCapturesIndividuallyReviewed": false,
+  "panelFpsMeasured": false,
+  "productionHomeDockAccepted": false,
+  "reviewedCaptures": [
+    {
+      "case": "dark-font-1_8-seek-reverse-released",
+      "file": "dark-font-1_8-seek-reverse-released.png",
+      "pngSha256": "4e28bf78584fd993976b05f9645e29578997a2346c6d4c881fc2e038439e9f0e",
+      "widthPx": 2160,
+      "heightPx": 1440,
+      "visuallyReviewed": true,
+      "observedOverlap": false
+    },
+    {
+      "case": "dark-font-1_8-volume-reverse-released",
+      "file": "dark-font-1_8-volume-reverse-released.png",
+      "pngSha256": "66a18a76c3048ab8c530bc22e7e6d738602fa0182a37e37c93d2f339a7c46e59",
+      "widthPx": 2160,
+      "heightPx": 1440,
+      "visuallyReviewed": true,
+      "observedOverlap": false
+    },
+    {
+      "case": "light-font-1_8-seek-reverse-released",
+      "file": "light-font-1_8-seek-reverse-released.png",
+      "pngSha256": "18096b465f2ce7ca0d752b55a2e52eaac7ba4162876137c6e3f575a8c44e2949",
+      "widthPx": 2160,
+      "heightPx": 1440,
+      "visuallyReviewed": true,
+      "observedOverlap": false
+    },
+    {
+      "case": "light-font-1_8-volume-reverse-released",
+      "file": "light-font-1_8-volume-reverse-released.png",
+      "pngSha256": "169057480aef904ad2202d2cd4face5cc565700218013222e1cf905e1ec63bfa",
+      "widthPx": 2160,
+      "heightPx": 1440,
+      "visuallyReviewed": true,
+      "observedOverlap": false
+    }
+  ]
+}

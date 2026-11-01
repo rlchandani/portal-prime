@@ -1,0 +1,54 @@
+{
+  "success": false,
+  "complete": false,
+  "passed": 45,
+  "total": 45,
+  "gestureCount": 2,
+  "nativeFrameCount": 5,
+  "attemptedFrameCount": 6,
+  "failureCode": "observer_response_timeout",
+  "elapsedSeconds": 38.248,
+  "parentElapsedSeconds": 71.169,
+  "originalOptimizedAppRestored": true,
+  "restorationPass": true,
+  "originalDreamRestored": true,
+  "lateVolumeSnapshotCompleted": true,
+  "lateVolumePhaseCounts": [
+    {
+      "phase": "initial",
+      "seekCommands": 2,
+      "volumeCommands": 0,
+      "rangeCurrent": 35
+    },
+    {
+      "phase": "pressed",
+      "seekCommands": 2,
+      "volumeCommands": 0,
+      "rangeCurrent": 35
+    },
+    {
+      "phase": "mid",
+      "seekCommands": 2,
+      "volumeCommands": 0,
+      "rangeCurrent": 48.89435
+    },
+    {
+      "phase": "beforeRelease",
+      "seekCommands": 2,
+      "volumeCommands": 0,
+      "rangeCurrent": 85.61425
+    },
+    {
+      "phase": "released",
+      "seekCommands": 2,
+      "volumeCommands": 1,
+      "rangeCurrent": 85
+    }
+  ],
+  "lateSnapshotCacheCleanupRequired": true,
+  "ordinarySnapshotAllowanceSeconds": 10,
+  "gestureAllowanceSecondsAfterCorrection": 20,
+  "productionUiChanged": false,
+  "panelFpsMeasured": false,
+  "audioProviderTested": false
+}

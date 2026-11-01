@@ -1,0 +1,1197 @@
+{
+  "sourceCommit": "c2a578f0",
+  "gestureCount": 20,
+  "enabledGestureCount": 16,
+  "disabledGestureCount": 4,
+  "moveEventsInjected": 480,
+  "enabledMoveEventsInjected": 384,
+  "disabledMoveEventsInjected": 96,
+  "enabledSeekReleaseActions": 8,
+  "enabledVolumeReleaseActions": 8,
+  "actionsBeforeRelease": 0,
+  "productionUiChanged": false,
+  "panelFpsMeasured": false,
+  "providerAudioTested": false,
+  "gestures": [
+    {
+      "case": "dark-font-1_0-seek-forward-released",
+      "control": "Track position",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.4827586
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957855
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "dark-font-1_0-seek-reverse-released",
+      "control": "Track position",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.51724136
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.14042144
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.14042023
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "dark-font-1_0-volume-forward-released",
+      "control": "Family Area volume",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 48.89435
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85.61425
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        }
+      ]
+    },
+    {
+      "case": "dark-font-1_0-volume-reverse-released",
+      "control": "Family Area volume",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 51.107014
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 14.384988
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 14
+          },
+          "seekCommands": 2,
+          "volumeCommands": 2
+        }
+      ]
+    },
+    {
+      "case": "dark-font-1_8-seek-forward-released",
+      "control": "Track position",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.4827586
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957855
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "dark-font-1_8-seek-reverse-released",
+      "control": "Track position",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.51724136
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.14042144
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.14042023
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "dark-font-1_8-volume-forward-released",
+      "control": "Family Area volume",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 48.856415
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85.635315
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        }
+      ]
+    },
+    {
+      "case": "dark-font-1_8-volume-reverse-released",
+      "control": "Family Area volume",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 51.145042
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 14.363872
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 14
+          },
+          "seekCommands": 2,
+          "volumeCommands": 2
+        }
+      ]
+    },
+    {
+      "case": "dark-offline-seek-forward-released",
+      "control": "Track position",
+      "enabled": false,
+      "moveEventCount": 24,
+      "releasedActionDelta": 0,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "dark-offline-volume-forward-released",
+      "control": "Family Area volume",
+      "enabled": false,
+      "moveEventCount": 24,
+      "releasedActionDelta": 0,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "light-font-1_0-seek-forward-released",
+      "control": "Track position",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.4827586
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957855
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "light-font-1_0-seek-reverse-released",
+      "control": "Track position",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.51724136
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.14042144
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.14042023
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "light-font-1_0-volume-forward-released",
+      "control": "Family Area volume",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 48.89435
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85.61425
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        }
+      ]
+    },
+    {
+      "case": "light-font-1_0-volume-reverse-released",
+      "control": "Family Area volume",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 51.107014
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 14.384988
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 14
+          },
+          "seekCommands": 2,
+          "volumeCommands": 2
+        }
+      ]
+    },
+    {
+      "case": "light-font-1_8-seek-forward-released",
+      "control": "Track position",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.4827586
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957855
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "light-font-1_8-seek-reverse-released",
+      "control": "Track position",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.85957587
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.51724136
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.14042144
+          },
+          "seekCommands": 1,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.14042023
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "light-font-1_8-volume-forward-released",
+      "control": "Family Area volume",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 48.856415
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85.635315
+          },
+          "seekCommands": 2,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        }
+      ]
+    },
+    {
+      "case": "light-font-1_8-volume-reverse-released",
+      "control": "Family Area volume",
+      "enabled": true,
+      "moveEventCount": 24,
+      "releasedActionDelta": 1,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 85
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 51.145042
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 14.363872
+          },
+          "seekCommands": 2,
+          "volumeCommands": 1
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 14
+          },
+          "seekCommands": 2,
+          "volumeCommands": 2
+        }
+      ]
+    },
+    {
+      "case": "light-offline-seek-forward-released",
+      "control": "Track position",
+      "enabled": false,
+      "moveEventCount": 24,
+      "releasedActionDelta": 0,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 1,
+            "current": 0.34583333
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        }
+      ]
+    },
+    {
+      "case": "light-offline-volume-forward-released",
+      "control": "Family Area volume",
+      "enabled": false,
+      "moveEventCount": 24,
+      "releasedActionDelta": 0,
+      "phases": [
+        {
+          "phase": "initial",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "pressed",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "mid",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "beforeRelease",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        },
+        {
+          "phase": "released",
+          "range": {
+            "minimum": 0,
+            "maximum": 100,
+            "current": 35
+          },
+          "seekCommands": 0,
+          "volumeCommands": 0
+        }
+      ]
+    }
+  ]
+}
