@@ -65,3 +65,9 @@ timing outliers remain open. The full goal is incomplete.
 See the [sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-music-config-continuity/verification.json).
 Household photographs, credentials, original profiles and rollback APKs
 remain outside Git.
+
+**Subsequent delivery:** the
+[queued SMB connection cleanup](portal-smb-callback-cleanup-2026-11-01.md)
+closes the connected-resource ownership gap when a pending UI delivery is
+discarded. Actual NAS behavior and connection establishment/listing cancellation
+remain unverified.

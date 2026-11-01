@@ -203,6 +203,15 @@ settings, sources, persistent pin state and accessibility preserved. Two
 paused-view observer attempts timed out before settings edits, so that capture
 remains unverified. SMB ownership and the broader goal remain incomplete.
 
+**Queued SMB ownership:** [the callback cleanup fix](portal-smb-callback-cleanup-2026-11-01.md)
+at **aac4e9e8** releases connected sources whose pending UI deliveries are
+discarded. The targeted gate goes from **10 failures to 38/38 passing checks**,
+including two actual loopback TCP peer-EOF checks. All **3,668 unit tests** and
+builds pass. Optimized APK `b79b56c7…` is installed on Family Area with its
+configuration and original Dream preserved. No SMB server is configured there,
+so actual NAS behavior and establishment/listing cancellation remain unverified.
+This does not close the broader goal.
+
 [artwork-cache]: ../mocks/portal-premium-player-20261030/evidence/native-artwork-cache/checks.json
 [artwork-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-artwork-cache/verification.json
 [local-artwork]: ../mocks/portal-premium-player-20261030/evidence/native-local-artwork/checks.json

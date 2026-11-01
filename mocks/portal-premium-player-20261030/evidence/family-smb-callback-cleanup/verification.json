@@ -1,0 +1,51 @@
+{
+  "sourceCommit": "aac4e9e8",
+  "scope": "Connected SMB resources awaiting UI callback admission; rejection, removal and closed-host cleanup",
+  "productionFixMade": true,
+  "fullGoalComplete": false,
+  "newUnitTests": 11,
+  "targetedRed": {
+    "tests": 38,
+    "failures": 10,
+    "errors": 0
+  },
+  "targetedGreen": {
+    "tests": 38,
+    "failures": 0,
+    "errors": 0
+  },
+  "realLoopbackTcpCases": 2,
+  "realTcpPeerEofVerified": true,
+  "unitGate": {
+    "tests": 3668,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 387
+  },
+  "optimizedDeployment": {
+    "newApkSha256": "b79b56c7efd20fa9cfee492e7750fe0c5fbb56b0f8ab0cab959d1d22ef3f2dee",
+    "oldApkSha256": "a85761a779a1862d4769fb0632c667a8bd263f085f66c148b5d1bc4a6f253316",
+    "originalDreamActive": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "systemProcessUnchanged": true,
+    "pass": true,
+    "accessibilityExact": true,
+    "originalDreamRestored": true,
+    "elapsedSeconds": 18.609
+  },
+  "nativeHealth": {
+    "installedHashExact": true,
+    "optimizedNonDebuggable": true,
+    "originalDreamStillActive": true,
+    "collectorInactive": true,
+    "actualNasTested": false
+  },
+  "independentReview": "No findings",
+  "actualNasTested": false,
+  "smbConnectInFlightCancellationAccepted": false,
+  "panelFpsAccepted": false,
+  "privateMediaPublished": false
+}
