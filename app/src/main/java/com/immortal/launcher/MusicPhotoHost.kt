@@ -28,11 +28,11 @@ internal fun rememberMusicPhotos(visible: Boolean): MusicPhotoRetention<PhotoFra
     owner.lifecycle.addObserver(observer)
     onDispose { owner.lifecycle.removeObserver(observer) }
   }
-  // Typed settings refresh only on a layout/resume boundary, never on progress ticks.
-  val saved = remember(context, visible, resumeEpoch) {
-    musicPhotoSettings(ScreensaverConfig.load(context))
+  // Refresh effective photo inputs only on a layout/resume boundary, never on progress ticks.
+  val restartKey = remember(context, visible, resumeEpoch) {
+    musicPhotoRestartKey(ScreensaverConfig.load(context))
   }
-  val retained = remember(context, owner, saved) {
+  val retained = remember(context, owner, restartKey) {
     MusicPhotoRetention(
         create = { PhotoFrameController(context, interactivePreview = true, photosOnly = true) },
         start = { it.start() }, setActive = { frame, active -> frame.setHostActive(active) },
