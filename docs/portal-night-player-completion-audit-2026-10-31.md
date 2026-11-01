@@ -2,6 +2,15 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**1 November follow-on — HTTP source startup cancellation delivered.**
+[Matched Family verification](portal-http-source-discovery-2026-11-01.md) passes
+**36/36** actual controller/HTTP checks: four stalled Immich/WebDAV requests went
+from no observed disconnection within **2,000 ms** to **2–4 ms** after stop.
+**3,697 unit tests** pass. Optimized APK **6f413f87…** is installed with all
+settings/source records, pin/accessibility state and the original Dream preserved.
+This accepts those local HTTP discovery paths; it does not close DNS/TLS/live NAS,
+camera, optical comfort or whole-platform FPS acceptance. The full goal stays open.
+
 **Video night-return delivery, November 1:** the
 [actual Family video gate](portal-video-night-retention-2026-11-01.md) passes
 **92/92** checks. Returning to a retained player removes an extra seek

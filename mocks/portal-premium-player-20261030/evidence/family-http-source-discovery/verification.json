@@ -1,0 +1,470 @@
+{
+  "sourceCommit": "fc0a2ada",
+  "branch": "codex/slideshow-http-discovery-20261101",
+  "target": "Family Area",
+  "issueStartedUtc": "2026-11-01T09:33:06Z",
+  "issueHardLimitUtc": "2026-11-01T10:03:06Z",
+  "deliveryVerifiedUtc": "2026-11-01T09:46:44Z",
+  "withinThirtyMinuteLimit": true,
+  "baseline": {
+    "pass": false,
+    "nativeProbe": {
+      "pass": false,
+      "assertions": [
+        {
+          "name": "offMain",
+          "pass": true
+        },
+        {
+          "name": "ownedDirectory",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersRequestReachedRealAdapter",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersExpectedMethodAndAuthentication",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersDisconnectedBeforeReadTimeout",
+          "pass": false
+        },
+        {
+          "name": "immichHeadersNextDiscoveryWorkerAvailable",
+          "pass": false
+        },
+        {
+          "name": "immichHeadersNoLateRemoteAdmission",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersControllerWorkersRetired",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersPixelsReleased",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersFixtureWorkerRetired",
+          "pass": true
+        },
+        {
+          "name": "immichBodyRequestReachedRealAdapter",
+          "pass": true
+        },
+        {
+          "name": "immichBodyExpectedMethodAndAuthentication",
+          "pass": true
+        },
+        {
+          "name": "immichBodyDisconnectedBeforeReadTimeout",
+          "pass": false
+        },
+        {
+          "name": "immichBodyNextDiscoveryWorkerAvailable",
+          "pass": false
+        },
+        {
+          "name": "immichBodyNoLateRemoteAdmission",
+          "pass": true
+        },
+        {
+          "name": "immichBodyControllerWorkersRetired",
+          "pass": true
+        },
+        {
+          "name": "immichBodyPixelsReleased",
+          "pass": true
+        },
+        {
+          "name": "immichBodyFixtureWorkerRetired",
+          "pass": true
+        },
+        {
+          "name": "davHeadersRequestReachedRealAdapter",
+          "pass": true
+        },
+        {
+          "name": "davHeadersExpectedMethodAndAuthentication",
+          "pass": true
+        },
+        {
+          "name": "davHeadersDisconnectedBeforeReadTimeout",
+          "pass": false
+        },
+        {
+          "name": "davHeadersNextDiscoveryWorkerAvailable",
+          "pass": false
+        },
+        {
+          "name": "davHeadersNoLateRemoteAdmission",
+          "pass": true
+        },
+        {
+          "name": "davHeadersControllerWorkersRetired",
+          "pass": true
+        },
+        {
+          "name": "davHeadersPixelsReleased",
+          "pass": true
+        },
+        {
+          "name": "davHeadersFixtureWorkerRetired",
+          "pass": true
+        },
+        {
+          "name": "davBodyRequestReachedRealAdapter",
+          "pass": true
+        },
+        {
+          "name": "davBodyExpectedMethodAndAuthentication",
+          "pass": true
+        },
+        {
+          "name": "davBodyDisconnectedBeforeReadTimeout",
+          "pass": false
+        },
+        {
+          "name": "davBodyNextDiscoveryWorkerAvailable",
+          "pass": false
+        },
+        {
+          "name": "davBodyNoLateRemoteAdmission",
+          "pass": true
+        },
+        {
+          "name": "davBodyControllerWorkersRetired",
+          "pass": true
+        },
+        {
+          "name": "davBodyPixelsReleased",
+          "pass": true
+        },
+        {
+          "name": "davBodyFixtureWorkerRetired",
+          "pass": true
+        },
+        {
+          "name": "NextPhotoSourceRequestUnblocked",
+          "pass": true
+        },
+        {
+          "name": "OwnedDirectoryRemoved",
+          "pass": true
+        }
+      ],
+      "measurements": {
+        "immichHeadersMainStopRendezvousMs": 2,
+        "immichHeadersDisconnectMs": null,
+        "immichBodyMainStopRendezvousMs": 3,
+        "immichBodyDisconnectMs": null,
+        "davHeadersMainStopRendezvousMs": 2,
+        "davHeadersDisconnectMs": null,
+        "davBodyMainStopRendezvousMs": 2,
+        "davBodyDisconnectMs": null,
+        "probeDurationMs": 8396
+      },
+      "preferencesWritten": false,
+      "householdOrExternalMediaUsed": false,
+      "attachedWindowOrGpuTested": false,
+      "sharedAlbumDiscoveryTested": false
+    },
+    "observerStopped": true,
+    "testApkRestored": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "originalOptimizedApkRestored": true,
+    "accessibilityExact": true,
+    "systemProcessUnchanged": true,
+    "collectorInactive": true,
+    "originalDreamRestored": true,
+    "restorationPass": true,
+    "elapsedSeconds": 48.81,
+    "checks": [
+      {
+        "name": "native_http_discovery_gate",
+        "pass": false
+      }
+    ]
+  },
+  "fixed": {
+    "pass": true,
+    "nativeProbe": {
+      "pass": true,
+      "assertions": [
+        {
+          "name": "offMain",
+          "pass": true
+        },
+        {
+          "name": "ownedDirectory",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersRequestReachedRealAdapter",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersExpectedMethodAndAuthentication",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersDisconnectedBeforeReadTimeout",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersNextDiscoveryWorkerAvailable",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersNoLateRemoteAdmission",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersControllerWorkersRetired",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersPixelsReleased",
+          "pass": true
+        },
+        {
+          "name": "immichHeadersFixtureWorkerRetired",
+          "pass": true
+        },
+        {
+          "name": "immichBodyRequestReachedRealAdapter",
+          "pass": true
+        },
+        {
+          "name": "immichBodyExpectedMethodAndAuthentication",
+          "pass": true
+        },
+        {
+          "name": "immichBodyDisconnectedBeforeReadTimeout",
+          "pass": true
+        },
+        {
+          "name": "immichBodyNextDiscoveryWorkerAvailable",
+          "pass": true
+        },
+        {
+          "name": "immichBodyNoLateRemoteAdmission",
+          "pass": true
+        },
+        {
+          "name": "immichBodyControllerWorkersRetired",
+          "pass": true
+        },
+        {
+          "name": "immichBodyPixelsReleased",
+          "pass": true
+        },
+        {
+          "name": "immichBodyFixtureWorkerRetired",
+          "pass": true
+        },
+        {
+          "name": "davHeadersRequestReachedRealAdapter",
+          "pass": true
+        },
+        {
+          "name": "davHeadersExpectedMethodAndAuthentication",
+          "pass": true
+        },
+        {
+          "name": "davHeadersDisconnectedBeforeReadTimeout",
+          "pass": true
+        },
+        {
+          "name": "davHeadersNextDiscoveryWorkerAvailable",
+          "pass": true
+        },
+        {
+          "name": "davHeadersNoLateRemoteAdmission",
+          "pass": true
+        },
+        {
+          "name": "davHeadersControllerWorkersRetired",
+          "pass": true
+        },
+        {
+          "name": "davHeadersPixelsReleased",
+          "pass": true
+        },
+        {
+          "name": "davHeadersFixtureWorkerRetired",
+          "pass": true
+        },
+        {
+          "name": "davBodyRequestReachedRealAdapter",
+          "pass": true
+        },
+        {
+          "name": "davBodyExpectedMethodAndAuthentication",
+          "pass": true
+        },
+        {
+          "name": "davBodyDisconnectedBeforeReadTimeout",
+          "pass": true
+        },
+        {
+          "name": "davBodyNextDiscoveryWorkerAvailable",
+          "pass": true
+        },
+        {
+          "name": "davBodyNoLateRemoteAdmission",
+          "pass": true
+        },
+        {
+          "name": "davBodyControllerWorkersRetired",
+          "pass": true
+        },
+        {
+          "name": "davBodyPixelsReleased",
+          "pass": true
+        },
+        {
+          "name": "davBodyFixtureWorkerRetired",
+          "pass": true
+        },
+        {
+          "name": "NextPhotoSourceRequestUnblocked",
+          "pass": true
+        },
+        {
+          "name": "OwnedDirectoryRemoved",
+          "pass": true
+        }
+      ],
+      "measurements": {
+        "immichHeadersMainStopRendezvousMs": 4,
+        "immichHeadersDisconnectMs": 4,
+        "immichBodyMainStopRendezvousMs": 3,
+        "immichBodyDisconnectMs": 3,
+        "davHeadersMainStopRendezvousMs": 4,
+        "davHeadersDisconnectMs": 3,
+        "davBodyMainStopRendezvousMs": 2,
+        "davBodyDisconnectMs": 2,
+        "probeDurationMs": 549
+      },
+      "preferencesWritten": false,
+      "householdOrExternalMediaUsed": false,
+      "attachedWindowOrGpuTested": false,
+      "sharedAlbumDiscoveryTested": false
+    },
+    "candidateApkSha256": "3f5059f123e114dfd8a2684c5ec4a79ee28b88b355181de2dafe27f28c776401",
+    "observerStopped": true,
+    "testApkRestored": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "originalOptimizedApkRestored": true,
+    "accessibilityExact": true,
+    "systemProcessUnchanged": true,
+    "collectorInactive": true,
+    "originalDreamRestored": true,
+    "restorationPass": true,
+    "elapsedSeconds": 40.327,
+    "checks": [
+      {
+        "name": "native_http_discovery_gate",
+        "pass": true
+      }
+    ]
+  },
+  "fullUnitGate": {
+    "tests": 3697,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 391
+  },
+  "newUnitTests": 8,
+  "buildsPassed": {
+    "debug": true,
+    "performance": true,
+    "androidTest": true
+  },
+  "reviewBlockers": 0,
+  "artifacts": {
+    "debug": {
+      "sha256": "3f5059f123e114dfd8a2684c5ec4a79ee28b88b355181de2dafe27f28c776401",
+      "bytes": 49734349
+    },
+    "performance": {
+      "sha256": "6f413f87990c329677f82ddbc98124f86115de436983ae935a393fbc4df38e77",
+      "bytes": 25858942
+    },
+    "androidTest": {
+      "sha256": "1ed39df3e5a5489e1d48e1216f27b45df58385293b36b36d6c2358fa94351d09",
+      "bytes": 2418828
+    }
+  },
+  "deployment": {
+    "newApkSha256": "6f413f87990c329677f82ddbc98124f86115de436983ae935a393fbc4df38e77",
+    "oldApkSha256": "e80660a4e4ddb9ee3cd471e9c95790afd20be2c281a5e3731414d86f7139e117",
+    "originalDreamActive": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "persistentPinExact": true,
+    "systemProcessUnchanged": true,
+    "pass": true,
+    "accessibilityExact": true,
+    "originalDreamRestored": true,
+    "elapsedSeconds": 18.692
+  },
+  "freshNativeHealth": {
+    "installedApkSha256": "6f413f87990c329677f82ddbc98124f86115de436983ae935a393fbc4df38e77",
+    "installedHashMatches": true,
+    "nonDebuggable": true,
+    "collectorInactive": true,
+    "activePerformanceListeners": 0,
+    "noActiveInstrumentation": true,
+    "originalDreamActive": true,
+    "pass": true
+  },
+  "earlierAttempts": {
+    "defaultLoopbackAddressMismatch": {
+      "productionCancellationEvidence": false,
+      "restorationPass": true
+    },
+    "earlyValidProbe": {
+      "restorationPass": true,
+      "threeStallsExceededTwoSeconds": true,
+      "oneImmichBodyDisconnectMs": 4,
+      "cleanupDidNotYetAwaitNativeLoaderWorker": true
+    },
+    "desktopJdkBodyGate": {
+      "failedTests": 1,
+      "realDesktopSocketClosureAccepted": false,
+      "replacedWithOwnershipContract": true,
+      "actualAndroidSocketClosureGatePassed": true
+    }
+  },
+  "settingsCount": 97,
+  "photoSourceRecordCount": 22,
+  "scope": {
+    "actualControllerStartAndStop": true,
+    "realDavAndImmichHttp": true,
+    "stalledHeadersAndBodies": true,
+    "nextSharedDiscoveryWorkerAvailable": true,
+    "sharedAlbumWiringInspected": true,
+    "sharedAlbumLiveServiceVerified": false,
+    "physicalNightComfortAccepted": false,
+    "realNasDnsTlsAndInternetOutagesVerified": false,
+    "cameraCancellationVerified": false,
+    "attachedWindowOrGpuVerified": false,
+    "cpuOrFpsGainMeasured": false,
+    "livingAreaTouched": false,
+    "musicAudioProviderDeferred": true
+  },
+  "goalComplete": false,
+  "authoritativeResearchSources": [
+    "https://developer.android.com/reference/java/net/HttpURLConnection"
+  ]
+}
