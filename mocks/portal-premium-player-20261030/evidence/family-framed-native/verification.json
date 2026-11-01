@@ -1,0 +1,258 @@
+{
+  "productionSourceChanged": false,
+  "appInstalled": false,
+  "syntheticPhotosOnly": true,
+  "opticalComfortTested": false,
+  "panelFpsTested": false,
+  "coldStartupBenchmarked": false,
+  "cases": [
+    {
+      "name": "framed-landscape",
+      "host": "PhotoDreamService",
+      "mode": "framed",
+      "geometry": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              432,
+              288,
+              1728,
+              1152
+            ],
+            "photoWidth": 1296,
+            "photoHeight": 864,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                432,
+                288,
+                587,
+                391
+              ],
+              "tr": [
+                1573,
+                288,
+                1728,
+                391
+              ],
+              "bl": [
+                432,
+                1049,
+                587,
+                1152
+              ],
+              "br": [
+                1573,
+                1049,
+                1728,
+                1152
+              ]
+            },
+            "markerAreas": {
+              "tl": 15965,
+              "tr": 15965,
+              "bl": 15965,
+              "br": 15965
+            }
+          }
+        ]
+      },
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "framed-portrait",
+      "host": "PhotoDreamService",
+      "mode": "framed",
+      "geometry": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              735,
+              203,
+              1425,
+              1238
+            ],
+            "photoWidth": 690,
+            "photoHeight": 1035,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                735,
+                203,
+                817,
+                327
+              ],
+              "tr": [
+                1343,
+                203,
+                1425,
+                327
+              ],
+              "bl": [
+                735,
+                1114,
+                817,
+                1238
+              ],
+              "br": [
+                1343,
+                1114,
+                1425,
+                1238
+              ]
+            },
+            "markerAreas": {
+              "tl": 10168,
+              "tr": 10168,
+              "bl": 10168,
+              "br": 10168
+            }
+          }
+        ]
+      },
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    }
+  ],
+  "originalDreamActive": true,
+  "ownedFixturesRemoved": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "pinCleanupSettled": true,
+  "apkUnchanged": true,
+  "accessibilityExact": true,
+  "systemProcessUnchanged": true,
+  "globalBrightnessPolicyUnchanged": true,
+  "collectorInactive": true,
+  "instrumentationAbsent": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "pass": true,
+  "elapsedSeconds": 11.121
+}

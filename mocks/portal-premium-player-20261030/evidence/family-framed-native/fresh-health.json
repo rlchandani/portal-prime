@@ -1,0 +1,22 @@
+{
+  "installedApkSha256": "625e9f5d33e9e0767593374870b23ea3c880b76294762aba4fd9537c700b604a",
+  "physicalSerialVerified": true,
+  "apiLevel": 29,
+  "nonDebuggable": true,
+  "settingCount": 97,
+  "settingsExact": true,
+  "sourceFieldCount": 22,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "pinClean": true,
+  "noInstrumentation": true,
+  "collectorInactive": true,
+  "accessibilityExact": true,
+  "brightnessPolicyExact": true,
+  "globalFontScaleExact": true,
+  "originalDreamRestored": true,
+  "panelFpsMeasured": false,
+  "physicalComfortTested": false,
+  "audioProviderTested": false,
+  "pass": true
+}

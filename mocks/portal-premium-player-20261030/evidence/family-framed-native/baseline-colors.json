@@ -1,0 +1,128 @@
+[
+  {
+    "name": "framed-landscape",
+    "photoBoundsFromTopMarkersAndSourceAspect": [
+      432,
+      288,
+      1728,
+      1152
+    ],
+    "cornerSamples": {
+      "tl": {
+        "expected": [
+          224,
+          48,
+          96
+        ],
+        "actual": [
+          224,
+          48,
+          96
+        ],
+        "maxChannelError": 0
+      },
+      "tr": {
+        "expected": [
+          48,
+          196,
+          160
+        ],
+        "actual": [
+          48,
+          196,
+          160
+        ],
+        "maxChannelError": 0
+      },
+      "bl": {
+        "expected": [
+          64,
+          120,
+          232
+        ],
+        "actual": [
+          36,
+          67,
+          129
+        ],
+        "maxChannelError": 103
+      },
+      "br": {
+        "expected": [
+          232,
+          176,
+          48
+        ],
+        "actual": [
+          129,
+          98,
+          27
+        ],
+        "maxChannelError": 103
+      }
+    }
+  },
+  {
+    "name": "framed-portrait",
+    "photoBoundsFromTopMarkersAndSourceAspect": [
+      735,
+      203,
+      1425,
+      1238
+    ],
+    "cornerSamples": {
+      "tl": {
+        "expected": [
+          224,
+          48,
+          96
+        ],
+        "actual": [
+          224,
+          48,
+          96
+        ],
+        "maxChannelError": 0
+      },
+      "tr": {
+        "expected": [
+          48,
+          196,
+          160
+        ],
+        "actual": [
+          48,
+          196,
+          160
+        ],
+        "maxChannelError": 0
+      },
+      "bl": {
+        "expected": [
+          64,
+          120,
+          232
+        ],
+        "actual": [
+          29,
+          54,
+          104
+        ],
+        "maxChannelError": 128
+      },
+      "br": {
+        "expected": [
+          232,
+          176,
+          48
+        ],
+        "actual": [
+          104,
+          79,
+          21
+        ],
+        "maxChannelError": 128
+      }
+    }
+  }
+]

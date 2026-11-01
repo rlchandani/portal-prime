@@ -2,6 +2,18 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Latest delivery, November 1 — Framed Print colors.** The
+[actual Family print check](portal-framed-print-native-2026-11-01.md) passes
+**22/22 native image assertions** and **3,722 unit tests**. The lower blue
+portrait marker improves from **29,54,104 to its original 64,120,232**.
+A measured overlay guard removes the clock shade only when the photo/mat
+are clear; overlapping or unknown overlays retain protection. Optimized APK
+**625e9f5d…** is installed, with all settings/source fields, brightness policy,
+accessibility configuration and original Dream restored. Final native health
+was confirmed **14 minutes 8 seconds** into the original 30-minute slot.
+Centered/wide overlay fallback is unit-tested, not pixel-captured. Optical
+comfort, other legacy layouts and whole-platform performance remain open.
+
 **Latest verification, November 1 — music dragging.** The
 [actual Family drag check](portal-music-drag-native-2026-11-01.md) passes
 **429/429 assertions across 20 gestures**. Enabled controls emit one UI action

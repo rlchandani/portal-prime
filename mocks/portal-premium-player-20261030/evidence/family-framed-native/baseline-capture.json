@@ -1,0 +1,120 @@
+{
+  "productionSourceChanged": false,
+  "appInstalled": false,
+  "syntheticPhotosOnly": true,
+  "opticalComfortTested": false,
+  "panelFpsTested": false,
+  "coldStartupBenchmarked": false,
+  "cases": [
+    {
+      "name": "framed-landscape",
+      "host": "PhotoDreamService",
+      "mode": "framed",
+      "geometry": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": false,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": null,
+            "cornerBBoxes": {}
+          }
+        ]
+      },
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "framed-portrait",
+      "host": "PhotoDreamService",
+      "mode": "framed",
+      "geometry": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": false,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": null,
+            "cornerBBoxes": {}
+          }
+        ]
+      },
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    }
+  ],
+  "originalDreamActive": true,
+  "ownedFixturesRemoved": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "pinCleanupSettled": true,
+  "apkUnchanged": true,
+  "accessibilityExact": true,
+  "systemProcessUnchanged": true,
+  "globalBrightnessPolicyUnchanged": true,
+  "collectorInactive": true,
+  "instrumentationAbsent": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "pass": true,
+  "elapsedSeconds": 17.251
+}

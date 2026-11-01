@@ -1,0 +1,16 @@
+{
+  "nativeChecks": 22,
+  "nativeChecksPassed": 22,
+  "nativeRunSeconds": 11.121,
+  "syntheticImagesOnly": true,
+  "panelFpsMeasured": false,
+  "physicalComfortTested": false,
+  "sourceCommit": "0160eb32",
+  "slotStartedUtc": "2026-11-01T11:20:16Z",
+  "slotDeadlineUtc": "2026-11-01T11:50:16Z",
+  "finalDeviceHealthConfirmedUtc": "2026-11-01T11:34:24Z",
+  "elapsedToConfirmationSeconds": 848,
+  "slotReset": false,
+  "centerAndWideOverlayFallback": "unit-tested; not pixel-captured on device",
+  "reviewedBoundsIncludeCssRoundingAndPhotoMotion": true
+}

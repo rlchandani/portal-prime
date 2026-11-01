@@ -1,0 +1,116 @@
+[
+  {
+    "name": "framed-landscape",
+    "cornerSamples": {
+      "tl": {
+        "expected": [
+          224,
+          48,
+          96
+        ],
+        "actual": [
+          224,
+          48,
+          96
+        ],
+        "maxChannelError": 0
+      },
+      "tr": {
+        "expected": [
+          48,
+          196,
+          160
+        ],
+        "actual": [
+          48,
+          196,
+          160
+        ],
+        "maxChannelError": 0
+      },
+      "bl": {
+        "expected": [
+          64,
+          120,
+          232
+        ],
+        "actual": [
+          64,
+          120,
+          232
+        ],
+        "maxChannelError": 0
+      },
+      "br": {
+        "expected": [
+          232,
+          176,
+          48
+        ],
+        "actual": [
+          232,
+          176,
+          48
+        ],
+        "maxChannelError": 0
+      }
+    }
+  },
+  {
+    "name": "framed-portrait",
+    "cornerSamples": {
+      "tl": {
+        "expected": [
+          224,
+          48,
+          96
+        ],
+        "actual": [
+          224,
+          48,
+          96
+        ],
+        "maxChannelError": 0
+      },
+      "tr": {
+        "expected": [
+          48,
+          196,
+          160
+        ],
+        "actual": [
+          48,
+          196,
+          160
+        ],
+        "maxChannelError": 0
+      },
+      "bl": {
+        "expected": [
+          64,
+          120,
+          232
+        ],
+        "actual": [
+          64,
+          120,
+          232
+        ],
+        "maxChannelError": 0
+      },
+      "br": {
+        "expected": [
+          232,
+          176,
+          48
+        ],
+        "actual": [
+          232,
+          176,
+          48
+        ],
+        "maxChannelError": 0
+      }
+    }
+  }
+]
