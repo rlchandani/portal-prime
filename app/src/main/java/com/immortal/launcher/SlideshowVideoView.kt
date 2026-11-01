@@ -54,7 +54,16 @@ internal class SlideshowVideoView(context: Context) : SurfaceView(context), Auto
       }
       override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) = Unit
       override fun surfaceDestroyed(holder: SurfaceHolder) {
-        change { it.copy(surface = null, surfaceRevision = it.surfaceRevision + 1) }
+        val retained = VideoPlaybackRetention(request.sourceRevision, request.surfaceRevision, currentPosition)
+        change {
+          val revision = it.surfaceRevision + 1
+          val recover = it.source != null && retained.needsSeek(it.sourceRevision, revision)
+          // Carry recovery through an invalid-surface release until the replacement prepares.
+          // Source replacement resets both seek fields, so an old clip cannot leak its position.
+          it.copy(surface = null, surfaceRevision = revision,
+              seekRevision = if (recover) it.seekRevision + 1 else it.seekRevision,
+              seekMs = if (recover) retained.positionMs else it.seekMs)
+        }
       }
     })
   }

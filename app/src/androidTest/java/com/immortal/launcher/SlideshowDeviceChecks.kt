@@ -30,7 +30,6 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.VideoView
 import androidx.exifinterface.media.ExifInterface
 import com.immortal.launcher.settings.SettingsRegistry
 import java.io.File
@@ -818,7 +817,8 @@ internal object SlideshowDeviceChecks {
       demand("paused_video_preparation_retains_photo", main { stage().visibility == View.VISIBLE })
       tap("Resume")
       poll("synthetic_video_first_frame_rendered", 15_000) { main {
-        (readField(controller(), "videoView") as VideoView).isPlaying &&
+        readField(controller(), "videoReady") == true &&
+          (readField(controller(), "videoView") as SlideshowVideoView).currentPosition > 0 &&
             stage().visibility != View.VISIBLE
       } }
       tap("Pause")
@@ -838,7 +838,7 @@ internal object SlideshowDeviceChecks {
       poll("corrupt_video_error_recovers_to_owned_photo") { main {
         stage().visibility == View.VISIBLE && stage().currentPhoto?.key?.let {
           it != original && ownedKey(it)
-        } == true && (readField(controller(), "videoView") as VideoView).visibility != View.VISIBLE
+        } == true && (readField(controller(), "videoView") as SlideshowVideoView).visibility != View.VISIBLE
       } }
       state("video_error_recovered")
       doneExits()

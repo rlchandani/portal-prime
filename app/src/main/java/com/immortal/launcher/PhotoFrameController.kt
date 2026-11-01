@@ -1316,7 +1316,7 @@ class PhotoFrameController(
       kenBurns?.resume(); kenBurnsBack?.resume(); photoFade?.resume()
       faceRenderer.setHostActive(true)
       if (videoView.visibility == View.VISIBLE) {
-        if (retainedVideoPosition > 0) videoView.seekTo(retainedVideoPosition)
+        // A retained player resumes directly; SlideshowVideoView owns surface-loss recovery.
         retainedVideoPosition = 0
         if (!paused) runCatching { videoView.start() }
       }
@@ -2379,7 +2379,6 @@ class PhotoFrameController(
             if (g == gen) {
               applyVideoFit(width, height)
               if (hostActive && !paused && !stopped) {
-                if (retainedVideoPosition > 0) videoView.seekTo(retainedVideoPosition)
                 videoView.start()
               }
             }
@@ -2687,7 +2686,6 @@ class PhotoFrameController(
             if (g == gen) {
               applyVideoFit(width, height)
               if (hostActive && !paused && !stopped) {
-                if (retainedVideoPosition > 0) videoView.seekTo(retainedVideoPosition)
                 videoView.start()
               }
             }
