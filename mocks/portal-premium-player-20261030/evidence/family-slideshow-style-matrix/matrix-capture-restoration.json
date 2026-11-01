@@ -1,0 +1,387 @@
+{
+  "productionSourceChanged": false,
+  "appInstalled": false,
+  "syntheticPhotosOnly": true,
+  "opticalComfortTested": false,
+  "panelFpsTested": false,
+  "coldStartupBenchmarked": false,
+  "cases": [
+    {
+      "name": "kenBurns-landscape",
+      "host": "PhotoDreamService",
+      "mode": "kenBurns",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "kenBurns-portrait",
+      "host": "PhotoDreamService",
+      "mode": "kenBurns",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "diptych-landscape",
+      "host": "PhotoDreamService",
+      "mode": "diptych",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "diptych-portrait",
+      "host": "PhotoDreamService",
+      "mode": "diptych",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "framed-landscape",
+      "host": "PhotoDreamService",
+      "mode": "framed",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "framed-portrait",
+      "host": "PhotoDreamService",
+      "mode": "framed",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "galleryWall-landscape",
+      "host": "PhotoDreamService",
+      "mode": "galleryWall",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "galleryWall-portrait",
+      "host": "PhotoDreamService",
+      "mode": "galleryWall",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "push-landscape",
+      "host": "PhotoDreamService",
+      "mode": "push",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "push-portrait",
+      "host": "PhotoDreamService",
+      "mode": "push",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "memories-landscape",
+      "host": "PhotoDreamService",
+      "mode": "memories",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "memories-portrait",
+      "host": "PhotoDreamService",
+      "mode": "memories",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "panorama-landscape",
+      "host": "PhotoDreamService",
+      "mode": "panorama",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "panorama-portrait",
+      "host": "PhotoDreamService",
+      "mode": "panorama",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "polaroid-landscape",
+      "host": "PhotoDreamService",
+      "mode": "polaroid",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "polaroid-portrait",
+      "host": "PhotoDreamService",
+      "mode": "polaroid",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-landscape",
+      "host": "PhotoDreamService",
+      "mode": "mosaic",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-portrait",
+      "host": "PhotoDreamService",
+      "mode": "mosaic",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "filmstrip-landscape",
+      "host": "PhotoDreamService",
+      "mode": "filmstrip",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "filmstrip-portrait",
+      "host": "PhotoDreamService",
+      "mode": "filmstrip",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "cinema-landscape",
+      "host": "PhotoDreamService",
+      "mode": "cinema",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "cinema-portrait",
+      "host": "PhotoDreamService",
+      "mode": "cinema",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "heroSidebar-landscape",
+      "host": "PhotoDreamService",
+      "mode": "heroSidebar",
+      "sourceDimensions": [
+        [
+          1200,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "heroSidebar-portrait",
+      "host": "PhotoDreamService",
+      "mode": "heroSidebar",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "diptych-pair",
+      "host": "PhotoDreamService",
+      "mode": "diptych",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ],
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "galleryWall-pair",
+      "host": "PhotoDreamService",
+      "mode": "galleryWall",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ],
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "polaroid-pair",
+      "host": "PhotoDreamService",
+      "mode": "polaroid",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ],
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-pair",
+      "host": "PhotoDreamService",
+      "mode": "mosaic",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ],
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "heroSidebar-pair",
+      "host": "PhotoDreamService",
+      "mode": "heroSidebar",
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ],
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "panorama-panorama",
+      "host": "PhotoDreamService",
+      "mode": "panorama",
+      "sourceDimensions": [
+        [
+          2400,
+          800
+        ]
+      ]
+    },
+    {
+      "name": "cinema-panorama",
+      "host": "PhotoDreamService",
+      "mode": "cinema",
+      "sourceDimensions": [
+        [
+          2400,
+          800
+        ]
+      ]
+    }
+  ],
+  "originalDreamActive": true,
+  "ownedFixturesRemoved": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "pinCleanupSettled": true,
+  "apkUnchanged": true,
+  "accessibilityExact": true,
+  "systemProcessUnchanged": true,
+  "globalBrightnessPolicyUnchanged": true,
+  "collectorInactive": true,
+  "instrumentationAbsent": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "pass": true,
+  "elapsedSeconds": 180.851
+}

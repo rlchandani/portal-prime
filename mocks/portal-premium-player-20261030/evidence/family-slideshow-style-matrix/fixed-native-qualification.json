@@ -1,0 +1,315 @@
+{
+  "productionSourceChanged": false,
+  "appInstalled": false,
+  "syntheticPhotosOnly": true,
+  "opticalComfortTested": false,
+  "panelFpsTested": false,
+  "coldStartupBenchmarked": false,
+  "cases": [
+    {
+      "name": "mosaic-portrait",
+      "host": "PhotoDreamService",
+      "mode": "mosaic",
+      "geometry": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              638,
+              58,
+              1521,
+              1382
+            ],
+            "photoWidth": 883,
+            "photoHeight": 1324,
+            "aspectError": 0.000378,
+            "cornerBBoxes": {
+              "tl": [
+                638,
+                58,
+                743,
+                216
+              ],
+              "tr": [
+                1416,
+                58,
+                1521,
+                216
+              ],
+              "bl": [
+                638,
+                1223,
+                744,
+                1382
+              ],
+              "br": [
+                1415,
+                1224,
+                1521,
+                1382
+              ]
+            },
+            "markerAreas": {
+              "tl": 16590,
+              "tr": 16590,
+              "bl": 16853,
+              "br": 16748
+            }
+          }
+        ],
+        "nativeGeometryQualification": {
+          "accepted": true,
+          "strictContractPass": false,
+          "failedChecks": [
+            "markerArea"
+          ],
+          "markerEdgeDiagnostics": [
+            {
+              "photoId": "A",
+              "corner": "tl",
+              "totalRejectedPixels": 0,
+              "rejectedInteriorPixels": 0,
+              "excludedEdgePixels": 1
+            },
+            {
+              "photoId": "A",
+              "corner": "tr",
+              "totalRejectedPixels": 0,
+              "rejectedInteriorPixels": 0,
+              "excludedEdgePixels": 1
+            },
+            {
+              "photoId": "A",
+              "corner": "bl",
+              "totalRejectedPixels": 1,
+              "rejectedInteriorPixels": 0,
+              "excludedEdgePixels": 1
+            },
+            {
+              "photoId": "A",
+              "corner": "br",
+              "totalRejectedPixels": 0,
+              "rejectedInteriorPixels": 0,
+              "excludedEdgePixels": 1
+            }
+          ]
+        }
+      },
+      "sourceDimensions": [
+        [
+          800,
+          1200
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-panorama",
+      "host": "PhotoDreamService",
+      "mode": "mosaic",
+      "geometry": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              86,
+              388,
+              2074,
+              1051
+            ],
+            "photoWidth": 1988,
+            "photoHeight": 663,
+            "aspectError": 0.000503,
+            "cornerBBoxes": {
+              "tl": [
+                86,
+                388,
+                323,
+                466
+              ],
+              "tr": [
+                1837,
+                388,
+                2074,
+                466
+              ],
+              "bl": [
+                86,
+                973,
+                323,
+                1051
+              ],
+              "br": [
+                1837,
+                973,
+                2074,
+                1051
+              ]
+            },
+            "markerAreas": {
+              "tl": 18486,
+              "tr": 18486,
+              "bl": 18486,
+              "br": 18486
+            }
+          }
+        ],
+        "nativeGeometryQualification": {
+          "accepted": true,
+          "strictContractPass": true
+        }
+      },
+      "sourceDimensions": [
+        [
+          2400,
+          800
+        ]
+      ]
+    }
+  ],
+  "originalDreamActive": true,
+  "ownedFixturesRemoved": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "pinCleanupSettled": true,
+  "apkUnchanged": true,
+  "accessibilityExact": true,
+  "systemProcessUnchanged": true,
+  "globalBrightnessPolicyUnchanged": true,
+  "collectorInactive": true,
+  "instrumentationAbsent": true,
+  "originalDreamRestored": true,
+  "restorationPass": true,
+  "pass": true,
+  "elapsedSeconds": 11.48
+}

@@ -1,0 +1,21 @@
+{
+  "newApkSha256": "bfc9430d5150c62dea647a48fcb02ade23aa3a76a0232c10eca0fa9a44aee974",
+  "oldApkSha256": "625e9f5d33e9e0767593374870b23ea3c880b76294762aba4fd9537c700b604a",
+  "audioProviderTested": false,
+  "panelFpsMeasured": false,
+  "physicalComfortTested": false,
+  "originalDreamActive": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "rawBrightnessExact": true,
+  "brightnessPolicyExact": true,
+  "brightnessInvariantSatisfied": true,
+  "automaticBrightnessMode": true,
+  "globalFontScaleExact": true,
+  "systemProcessUnchanged": true,
+  "pass": true,
+  "accessibilityExact": true,
+  "originalDreamRestored": true,
+  "elapsedSeconds": 18.931
+}

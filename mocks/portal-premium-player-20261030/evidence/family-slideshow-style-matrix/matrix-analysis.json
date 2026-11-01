@@ -1,0 +1,3424 @@
+{
+  "sourceCommit": "8645cbcc",
+  "capturedApkSha256": "625e9f5d33e9e0767593374870b23ea3c880b76294762aba4fd9537c700b604a",
+  "staticSyntheticCases": 31,
+  "counts": {
+    "strict-pass": 9,
+    "strict-marker-area-failure": 16,
+    "outside-axis-aligned-contract": 5,
+    "missing-corners": 1
+  },
+  "results": [
+    {
+      "name": "diptych-landscape",
+      "qualified": false,
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              43,
+              379,
+              1066,
+              1061
+            ],
+            "photoWidth": 1023,
+            "photoHeight": 682,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                43,
+                379,
+                165,
+                460
+              ],
+              "tr": [
+                944,
+                379,
+                1066,
+                460
+              ],
+              "bl": [
+                43,
+                980,
+                165,
+                1061
+              ],
+              "br": [
+                944,
+                980,
+                1066,
+                1061
+              ]
+            },
+            "markerAreas": {
+              "tl": 9882,
+              "tr": 9882,
+              "bl": 9882,
+              "br": 9882
+            }
+          }
+        ]
+      },
+      "classification": "strict-pass"
+    },
+    {
+      "name": "diptych-portrait",
+      "qualified": false,
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              1154,
+              43,
+              2057,
+              1397
+            ],
+            "photoWidth": 903,
+            "photoHeight": 1354,
+            "aspectError": 0.000369,
+            "cornerBBoxes": {
+              "tl": [
+                1154,
+                43,
+                1262,
+                205
+              ],
+              "tr": [
+                1949,
+                43,
+                2057,
+                205
+              ],
+              "bl": [
+                1154,
+                1235,
+                1262,
+                1397
+              ],
+              "br": [
+                1949,
+                1235,
+                2057,
+                1397
+              ]
+            },
+            "markerAreas": {
+              "tl": 17496,
+              "tr": 17496,
+              "bl": 17496,
+              "br": 17496
+            }
+          }
+        ]
+      },
+      "classification": "strict-pass"
+    },
+    {
+      "name": "galleryWall-landscape",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              648,
+              432,
+              1512,
+              1008
+            ],
+            "photoWidth": 864,
+            "photoHeight": 576,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                648,
+                432,
+                751,
+                501
+              ],
+              "tr": [
+                1409,
+                432,
+                1512,
+                501
+              ],
+              "bl": [
+                648,
+                939,
+                751,
+                1008
+              ],
+              "br": [
+                1409,
+                939,
+                1512,
+                1008
+              ]
+            },
+            "markerAreas": {
+              "tl": 7095,
+              "tr": 7095,
+              "bl": 7095,
+              "br": 7095
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "galleryWall-portrait",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              888,
+              432,
+              1272,
+              1008
+            ],
+            "photoWidth": 384,
+            "photoHeight": 576,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                888,
+                432,
+                934,
+                501
+              ],
+              "tr": [
+                1226,
+                432,
+                1272,
+                501
+              ],
+              "bl": [
+                888,
+                939,
+                934,
+                1008
+              ],
+              "br": [
+                1226,
+                939,
+                1272,
+                1008
+              ]
+            },
+            "markerAreas": {
+              "tl": 3162,
+              "tr": 3162,
+              "bl": 3162,
+              "br": 3162
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "memories-landscape",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              108,
+              72,
+              2052,
+              1368
+            ],
+            "photoWidth": 1944,
+            "photoHeight": 1296,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                108,
+                72,
+                341,
+                227
+              ],
+              "tr": [
+                1819,
+                72,
+                2052,
+                227
+              ],
+              "bl": [
+                108,
+                1213,
+                341,
+                1368
+              ],
+              "br": [
+                1819,
+                1213,
+                2052,
+                1368
+              ]
+            },
+            "markerAreas": {
+              "tl": 36115,
+              "tr": 36115,
+              "bl": 28416,
+              "br": 36115
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "memories-portrait",
+      "qualified": false,
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              648,
+              72,
+              1512,
+              1368
+            ],
+            "photoWidth": 864,
+            "photoHeight": 1296,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                648,
+                72,
+                751,
+                227
+              ],
+              "tr": [
+                1409,
+                72,
+                1512,
+                227
+              ],
+              "bl": [
+                648,
+                1213,
+                751,
+                1368
+              ],
+              "br": [
+                1409,
+                1213,
+                1512,
+                1368
+              ]
+            },
+            "markerAreas": {
+              "tl": 15965,
+              "tr": 15965,
+              "bl": 15965,
+              "br": 15965
+            }
+          }
+        ]
+      },
+      "classification": "strict-pass"
+    },
+    {
+      "name": "polaroid-landscape",
+      "qualified": true,
+      "reason": "rotated-card layout",
+      "axisAlignedWholePhotoAccepted": false,
+      "classification": "outside-axis-aligned-contract"
+    },
+    {
+      "name": "polaroid-portrait",
+      "qualified": true,
+      "reason": "rotated-card layout",
+      "axisAlignedWholePhotoAccepted": false,
+      "classification": "outside-axis-aligned-contract"
+    },
+    {
+      "name": "mosaic-landscape",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              87,
+              58,
+              2073,
+              1382
+            ],
+            "photoWidth": 1986,
+            "photoHeight": 1324,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                87,
+                58,
+                325,
+                216
+              ],
+              "tr": [
+                1835,
+                58,
+                2073,
+                216
+              ],
+              "bl": [
+                87,
+                1224,
+                325,
+                1382
+              ],
+              "br": [
+                1835,
+                1224,
+                2073,
+                1382
+              ]
+            },
+            "markerAreas": {
+              "tl": 37604,
+              "tr": 37604,
+              "bl": 29901,
+              "br": 37604
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "mosaic-portrait",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": false,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": null,
+            "cornerBBoxes": {}
+          }
+        ]
+      },
+      "classification": "missing-corners"
+    },
+    {
+      "name": "filmstrip-landscape",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              330,
+              221,
+              1830,
+              1221
+            ],
+            "photoWidth": 1500,
+            "photoHeight": 1000,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                330,
+                221,
+                509,
+                340
+              ],
+              "tr": [
+                1650,
+                221,
+                1829,
+                340
+              ],
+              "bl": [
+                330,
+                1101,
+                510,
+                1221
+              ],
+              "br": [
+                1650,
+                1101,
+                1830,
+                1220
+              ]
+            },
+            "markerAreas": {
+              "tl": 21266,
+              "tr": 21275,
+              "bl": 21557,
+              "br": 21282
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "filmstrip-portrait",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              747,
+              221,
+              1413,
+              1221
+            ],
+            "photoWidth": 666,
+            "photoHeight": 1000,
+            "aspectError": 0.001,
+            "cornerBBoxes": {
+              "tl": [
+                747,
+                221,
+                826,
+                340
+              ],
+              "tr": [
+                1333,
+                221,
+                1413,
+                340
+              ],
+              "bl": [
+                747,
+                1101,
+                826,
+                1221
+              ],
+              "br": [
+                1333,
+                1101,
+                1413,
+                1220
+              ]
+            },
+            "markerAreas": {
+              "tl": 9370,
+              "tr": 9487,
+              "bl": 9441,
+              "br": 9489
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "cinema-landscape",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              238,
+              158,
+              1922,
+              1281
+            ],
+            "photoWidth": 1684,
+            "photoHeight": 1123,
+            "aspectError": 0.000297,
+            "cornerBBoxes": {
+              "tl": [
+                238,
+                158,
+                439,
+                292
+              ],
+              "tr": [
+                1721,
+                158,
+                1922,
+                292
+              ],
+              "bl": [
+                238,
+                1147,
+                440,
+                1281
+              ],
+              "br": [
+                1720,
+                1147,
+                1922,
+                1281
+              ]
+            },
+            "markerAreas": {
+              "tl": 26884,
+              "tr": 26876,
+              "bl": 25286,
+              "br": 26997
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "cinema-portrait",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              706,
+              159,
+              1454,
+              1281
+            ],
+            "photoWidth": 748,
+            "photoHeight": 1122,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                706,
+                159,
+                795,
+                293
+              ],
+              "tr": [
+                1365,
+                159,
+                1454,
+                293
+              ],
+              "bl": [
+                706,
+                1147,
+                795,
+                1281
+              ],
+              "br": [
+                1365,
+                1147,
+                1454,
+                1281
+              ]
+            },
+            "markerAreas": {
+              "tl": 11903,
+              "tr": 11905,
+              "bl": 11926,
+              "br": 11926
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "heroSidebar-landscape",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              34,
+              23,
+              2127,
+              1418
+            ],
+            "photoWidth": 2093,
+            "photoHeight": 1395,
+            "aspectError": 0.000239,
+            "cornerBBoxes": {
+              "tl": [
+                34,
+                23,
+                284,
+                190
+              ],
+              "tr": [
+                1877,
+                23,
+                2127,
+                190
+              ],
+              "bl": [
+                34,
+                1251,
+                285,
+                1418
+              ],
+              "br": [
+                1876,
+                1251,
+                2127,
+                1418
+              ]
+            },
+            "markerAreas": {
+              "tl": 41750,
+              "tr": 41750,
+              "bl": 36297,
+              "br": 41917
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "heroSidebar-portrait",
+      "qualified": false,
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              615,
+              23,
+              1545,
+              1418
+            ],
+            "photoWidth": 930,
+            "photoHeight": 1395,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                615,
+                23,
+                726,
+                190
+              ],
+              "tr": [
+                1434,
+                23,
+                1545,
+                190
+              ],
+              "bl": [
+                615,
+                1251,
+                726,
+                1418
+              ],
+              "br": [
+                1434,
+                1251,
+                1545,
+                1418
+              ]
+            },
+            "markerAreas": {
+              "tl": 18537,
+              "tr": 18537,
+              "bl": 18537,
+              "br": 18537
+            }
+          }
+        ]
+      },
+      "classification": "strict-pass"
+    },
+    {
+      "name": "diptych-pair",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "B"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              103,
+              43,
+              1006,
+              1397
+            ],
+            "photoWidth": 903,
+            "photoHeight": 1354,
+            "aspectError": 0.000369,
+            "cornerBBoxes": {
+              "tl": [
+                103,
+                43,
+                211,
+                205
+              ],
+              "tr": [
+                898,
+                43,
+                1006,
+                205
+              ],
+              "bl": [
+                103,
+                1235,
+                211,
+                1397
+              ],
+              "br": [
+                898,
+                1235,
+                1006,
+                1397
+              ]
+            },
+            "markerAreas": {
+              "tl": 17496,
+              "tr": 17496,
+              "bl": 14751,
+              "br": 17496
+            }
+          },
+          {
+            "id": "B",
+            "photoBounds": [
+              1154,
+              43,
+              2057,
+              1397
+            ],
+            "photoWidth": 903,
+            "photoHeight": 1354,
+            "aspectError": 0.000369,
+            "cornerBBoxes": {
+              "tl": [
+                1154,
+                43,
+                1262,
+                205
+              ],
+              "tr": [
+                1949,
+                43,
+                2057,
+                205
+              ],
+              "bl": [
+                1154,
+                1235,
+                1262,
+                1397
+              ],
+              "br": [
+                1949,
+                1235,
+                2057,
+                1397
+              ]
+            },
+            "markerAreas": {
+              "tl": 17496,
+              "tr": 17496,
+              "bl": 17496,
+              "br": 17496
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "galleryWall-pair",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "B"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "B"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              690,
+              433,
+              1073,
+              1008
+            ],
+            "photoWidth": 383,
+            "photoHeight": 575,
+            "aspectError": 0.00087,
+            "cornerBBoxes": {
+              "tl": [
+                690,
+                433,
+                736,
+                502
+              ],
+              "tr": [
+                1027,
+                433,
+                1073,
+                502
+              ],
+              "bl": [
+                690,
+                939,
+                736,
+                1008
+              ],
+              "br": [
+                1027,
+                939,
+                1073,
+                1008
+              ]
+            },
+            "markerAreas": {
+              "tl": 3167,
+              "tr": 3167,
+              "bl": 3162,
+              "br": 3162
+            }
+          },
+          {
+            "id": "B",
+            "photoBounds": [
+              1087,
+              433,
+              1470,
+              1008
+            ],
+            "photoWidth": 383,
+            "photoHeight": 575,
+            "aspectError": 0.00087,
+            "cornerBBoxes": {
+              "tl": [
+                1087,
+                433,
+                1133,
+                502
+              ],
+              "tr": [
+                1424,
+                433,
+                1470,
+                502
+              ],
+              "bl": [
+                1087,
+                939,
+                1133,
+                1008
+              ],
+              "br": [
+                1424,
+                939,
+                1470,
+                1008
+              ]
+            },
+            "markerAreas": {
+              "tl": 3167,
+              "tr": 3166,
+              "bl": 3162,
+              "br": 3162
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "polaroid-pair",
+      "qualified": true,
+      "reason": "rotated-card layout",
+      "axisAlignedWholePhotoAccepted": false,
+      "classification": "outside-axis-aligned-contract"
+    },
+    {
+      "name": "mosaic-pair",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "B"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "B"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              1178,
+              58,
+              2061,
+              1382
+            ],
+            "photoWidth": 883,
+            "photoHeight": 1324,
+            "aspectError": 0.000378,
+            "cornerBBoxes": {
+              "tl": [
+                1178,
+                58,
+                1283,
+                216
+              ],
+              "tr": [
+                1956,
+                58,
+                2061,
+                216
+              ],
+              "bl": [
+                1178,
+                1223,
+                1284,
+                1382
+              ],
+              "br": [
+                1955,
+                1224,
+                2061,
+                1382
+              ]
+            },
+            "markerAreas": {
+              "tl": 16590,
+              "tr": 16590,
+              "bl": 16853,
+              "br": 16748
+            }
+          },
+          {
+            "id": "B",
+            "photoBounds": [
+              98,
+              58,
+              981,
+              1382
+            ],
+            "photoWidth": 883,
+            "photoHeight": 1324,
+            "aspectError": 0.000378,
+            "cornerBBoxes": {
+              "tl": [
+                98,
+                58,
+                203,
+                216
+              ],
+              "tr": [
+                876,
+                58,
+                981,
+                216
+              ],
+              "bl": [
+                98,
+                1224,
+                204,
+                1382
+              ],
+              "br": [
+                875,
+                1223,
+                981,
+                1382
+              ]
+            },
+            "markerAreas": {
+              "tl": 16590,
+              "tr": 16590,
+              "bl": 13483,
+              "br": 16853
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "heroSidebar-pair",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "B"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "B"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "B"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              1414,
+              177,
+              2138,
+              1263
+            ],
+            "photoWidth": 724,
+            "photoHeight": 1086,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                1414,
+                177,
+                1500,
+                307
+              ],
+              "tr": [
+                2052,
+                177,
+                2138,
+                307
+              ],
+              "bl": [
+                1414,
+                1133,
+                1500,
+                1263
+              ],
+              "br": [
+                2052,
+                1133,
+                2138,
+                1263
+              ]
+            },
+            "markerAreas": {
+              "tl": 11180,
+              "tr": 11180,
+              "bl": 11180,
+              "br": 11180
+            }
+          },
+          {
+            "id": "B",
+            "photoBounds": [
+              244,
+              23,
+              1174,
+              1418
+            ],
+            "photoWidth": 930,
+            "photoHeight": 1395,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                244,
+                23,
+                355,
+                190
+              ],
+              "tr": [
+                1063,
+                23,
+                1174,
+                190
+              ],
+              "bl": [
+                244,
+                1251,
+                355,
+                1418
+              ],
+              "br": [
+                1063,
+                1251,
+                1174,
+                1418
+              ]
+            },
+            "markerAreas": {
+              "tl": 18537,
+              "tr": 18537,
+              "bl": 16677,
+              "br": 18537
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "panorama-panorama",
+      "qualified": true,
+      "reason": "intentional panoramic crop",
+      "axisAlignedWholePhotoAccepted": false,
+      "classification": "outside-axis-aligned-contract"
+    },
+    {
+      "name": "cinema-panorama",
+      "qualified": true,
+      "reason": "intentional panoramic crop",
+      "axisAlignedWholePhotoAccepted": false,
+      "classification": "outside-axis-aligned-contract"
+    },
+    {
+      "name": "kenBurns-portrait",
+      "qualified": false,
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              629,
+              43,
+              1532,
+              1397
+            ],
+            "photoWidth": 903,
+            "photoHeight": 1354,
+            "aspectError": 0.000369,
+            "cornerBBoxes": {
+              "tl": [
+                629,
+                43,
+                737,
+                205
+              ],
+              "tr": [
+                1424,
+                43,
+                1532,
+                205
+              ],
+              "bl": [
+                629,
+                1235,
+                737,
+                1397
+              ],
+              "br": [
+                1424,
+                1235,
+                1532,
+                1397
+              ]
+            },
+            "markerAreas": {
+              "tl": 17496,
+              "tr": 17496,
+              "bl": 17496,
+              "br": 17496
+            }
+          }
+        ]
+      },
+      "classification": "strict-pass"
+    },
+    {
+      "name": "kenBurns-landscape",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              65,
+              43,
+              2096,
+              1397
+            ],
+            "photoWidth": 2031,
+            "photoHeight": 1354,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                65,
+                43,
+                308,
+                205
+              ],
+              "tr": [
+                1853,
+                43,
+                2096,
+                205
+              ],
+              "bl": [
+                65,
+                1235,
+                308,
+                1397
+              ],
+              "br": [
+                1853,
+                1235,
+                2096,
+                1397
+              ]
+            },
+            "markerAreas": {
+              "tl": 39366,
+              "tr": 39366,
+              "bl": 31552,
+              "br": 39366
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "framed-portrait",
+      "qualified": false,
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              735,
+              203,
+              1425,
+              1238
+            ],
+            "photoWidth": 690,
+            "photoHeight": 1035,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                735,
+                203,
+                817,
+                327
+              ],
+              "tr": [
+                1343,
+                203,
+                1425,
+                327
+              ],
+              "bl": [
+                735,
+                1114,
+                817,
+                1238
+              ],
+              "br": [
+                1343,
+                1114,
+                1425,
+                1238
+              ]
+            },
+            "markerAreas": {
+              "tl": 10168,
+              "tr": 10168,
+              "bl": 10168,
+              "br": 10168
+            }
+          }
+        ]
+      },
+      "classification": "strict-pass"
+    },
+    {
+      "name": "framed-landscape",
+      "qualified": false,
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              432,
+              288,
+              1728,
+              1152
+            ],
+            "photoWidth": 1296,
+            "photoHeight": 864,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                432,
+                288,
+                587,
+                391
+              ],
+              "tr": [
+                1573,
+                288,
+                1728,
+                391
+              ],
+              "bl": [
+                432,
+                1049,
+                587,
+                1152
+              ],
+              "br": [
+                1573,
+                1049,
+                1728,
+                1152
+              ]
+            },
+            "markerAreas": {
+              "tl": 15965,
+              "tr": 15965,
+              "bl": 15965,
+              "br": 15965
+            }
+          }
+        ]
+      },
+      "classification": "strict-pass"
+    },
+    {
+      "name": "push-portrait",
+      "qualified": false,
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              648,
+              72,
+              1512,
+              1368
+            ],
+            "photoWidth": 864,
+            "photoHeight": 1296,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                648,
+                72,
+                751,
+                227
+              ],
+              "tr": [
+                1409,
+                72,
+                1512,
+                227
+              ],
+              "bl": [
+                648,
+                1213,
+                751,
+                1368
+              ],
+              "br": [
+                1409,
+                1213,
+                1512,
+                1368
+              ]
+            },
+            "markerAreas": {
+              "tl": 15965,
+              "tr": 15965,
+              "bl": 15965,
+              "br": 15965
+            }
+          }
+        ]
+      },
+      "classification": "strict-pass"
+    },
+    {
+      "name": "push-landscape",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              108,
+              72,
+              2052,
+              1368
+            ],
+            "photoWidth": 1944,
+            "photoHeight": 1296,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                108,
+                72,
+                341,
+                227
+              ],
+              "tr": [
+                1819,
+                72,
+                2052,
+                227
+              ],
+              "bl": [
+                108,
+                1213,
+                341,
+                1368
+              ],
+              "br": [
+                1819,
+                1213,
+                2052,
+                1368
+              ]
+            },
+            "markerAreas": {
+              "tl": 36115,
+              "tr": 36115,
+              "bl": 28416,
+              "br": 36115
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    },
+    {
+      "name": "panorama-portrait",
+      "qualified": false,
+      "result": {
+        "pass": true,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              600,
+              0,
+              1560,
+              1440
+            ],
+            "photoWidth": 960,
+            "photoHeight": 1440,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                600,
+                0,
+                715,
+                172
+              ],
+              "tr": [
+                1445,
+                0,
+                1560,
+                172
+              ],
+              "bl": [
+                600,
+                1268,
+                715,
+                1440
+              ],
+              "br": [
+                1445,
+                1268,
+                1560,
+                1440
+              ]
+            },
+            "markerAreas": {
+              "tl": 19780,
+              "tr": 19780,
+              "bl": 19780,
+              "br": 19780
+            }
+          }
+        ]
+      },
+      "classification": "strict-pass"
+    },
+    {
+      "name": "panorama-landscape",
+      "qualified": false,
+      "result": {
+        "pass": false,
+        "checks": [
+          {
+            "name": "boundedInputs",
+            "pass": true
+          },
+          {
+            "name": "chromaticCornerPalette",
+            "pass": true
+          },
+          {
+            "name": "validInputs",
+            "pass": true
+          },
+          {
+            "name": "tlMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "trMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "blMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "brMarkerPresent",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerArea",
+            "pass": false,
+            "photoId": "A"
+          },
+          {
+            "name": "boundedViewport",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "sourceAspect",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "markerDimensions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "cornerPositions",
+            "pass": true,
+            "photoId": "A"
+          },
+          {
+            "name": "distinctCorners",
+            "pass": true,
+            "photoId": "A"
+          }
+        ],
+        "perPhoto": [
+          {
+            "id": "A",
+            "photoBounds": [
+              0,
+              0,
+              2160,
+              1440
+            ],
+            "photoWidth": 2160,
+            "photoHeight": 1440,
+            "aspectError": 0.0,
+            "cornerBBoxes": {
+              "tl": [
+                0,
+                0,
+                258,
+                172
+              ],
+              "tr": [
+                1902,
+                0,
+                2160,
+                172
+              ],
+              "bl": [
+                0,
+                1268,
+                259,
+                1440
+              ],
+              "br": [
+                1901,
+                1268,
+                2160,
+                1440
+              ]
+            },
+            "markerAreas": {
+              "tl": 44376,
+              "tr": 44376,
+              "bl": 40694,
+              "br": 44548
+            }
+          }
+        ]
+      },
+      "classification": "strict-marker-area-failure"
+    }
+  ],
+  "qualification": "Capture completeness is not equivalent to all layout checks passing. Black shade may vary spatially; strict marker interiors remain fully rectangular."
+}

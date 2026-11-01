@@ -357,3 +357,17 @@ This does not close the broader goal.
 [metadata-deployment]: ../mocks/portal-premium-player-20261030/evidence/family-face-metadata/verification.json
 [clock-work]: ../mocks/portal-premium-player-20261030/evidence/native-clock-work/checks.json
 [clock-pending]: ../mocks/portal-premium-player-20261030/evidence/family-clock-work/pending.json
+
+**Native legacy-style survey and still Mosaic fix:**
+[the bounded Family Area delivery](portal-slideshow-style-matrix-2026-11-01.md)
+at **8645cbcc** captures **31 static cases** and fixes a reproduced stopped-pan
+crop. The delivered portrait and wide panorama retain all four corners with
+aspect error below **0.06%**. The portrait's one border-pixel strict failure
+remains recorded separately from its accepted whole-photo geometry; the
+panorama passes strictly. **279 slideshow JavaScript tests pass**, both Android
+builds pass, and optimized APK **bfc9430d…** is installed with all settings,
+sources and original Dream restored. The full Kotlin gate was up-to-date,
+not rerun. The original matrix has **9 strict passes, 16 marker-area failures,
+5 cases outside its axis-aligned contract, and 1 reproduced crop**; these are
+not 31 passing layouts. Other-style motion acceptance, natural brightness
+comfort and the broader goal remain incomplete.
