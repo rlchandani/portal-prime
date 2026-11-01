@@ -1,0 +1,12 @@
+{
+  "debug": {
+    "sha256": "ee32694ab62665913913faea26578d209531397478331f0f1b91c0276e035c2d",
+    "bytes": 49734349,
+    "certificateMatchesOriginal": true
+  },
+  "performance": {
+    "sha256": "e47d6e71d0fdd78f588c421506d2d0dbd800ee66cb0dc630e478b0ba58e137e5",
+    "bytes": 25858942,
+    "certificateMatchesOriginal": true
+  }
+}

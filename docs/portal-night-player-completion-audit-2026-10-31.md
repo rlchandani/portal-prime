@@ -2,6 +2,18 @@
 
 **Overall status: incomplete.** Current source and recorded checks support substantial delivery across all four requested areas. Family Area’s earlier physical check passed for clock appearance, comfortable brightness and smooth same-photo return on the older tested artifact. This audit combines recorded checks with that scoped human report; the full performance/music goal remains incomplete.
 
+**Latest delivery, November 1 — Gallery photo colors.** The
+[actual Family Gallery check](portal-gallery-native-2026-11-01.md) found and fixed
+the clock gradient darkening Gallery's photos. Optimized APK **e47d6e71…** is
+installed. **80/80 native image/geometry assertions** cover landscape and portrait
+prints, a matched portrait spread, and its pinned overlay. Both spread photos
+return with byte-identical pixels after the night clock; one tap preserves the
+same Files activity/window/process. **3,717 unit tests** pass. Delivery and fresh
+health verification finished **15 minutes 29 seconds** into the original
+30-minute slot. All 97 settings, 22 source fields and original Dream are restored.
+This accepts those compositions and retention, not panel FPS or physical
+brightness comfort. Earlier APK references below describe historical checks.
+
 **Current-build pinned-overlay verification, November 1:** the
 [actual Family overlay gate](portal-pinned-brightness-delivery-2026-11-01.md)
 passes **five brightness-command ramps and two retained-app tap returns** on

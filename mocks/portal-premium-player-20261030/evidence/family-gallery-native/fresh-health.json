@@ -1,0 +1,15 @@
+{
+  "wirelessTransportReady": true,
+  "physicalSerialMatches": true,
+  "installedApkSha256": "e47d6e71d0fdd78f588c421506d2d0dbd800ee66cb0dc630e478b0ba58e137e5",
+  "nonDebuggable": true,
+  "settingsCount": 97,
+  "sourceFieldCount": 22,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "pinInactive": true,
+  "collectorInactive": true,
+  "instrumentationAbsent": true,
+  "originalDreamActive": true,
+  "pass": true
+}

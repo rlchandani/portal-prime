@@ -1,0 +1,14 @@
+{
+  "newApkSha256": "e47d6e71d0fdd78f588c421506d2d0dbd800ee66cb0dc630e478b0ba58e137e5",
+  "oldApkSha256": "95c6bbfffcb0d78b5df880cbb5dd89d21c820a7c0e992dfa8c4a2069d1609972",
+  "originalDreamActive": true,
+  "settingsExact": true,
+  "sourcesExact": true,
+  "persistentPinExact": true,
+  "globalBrightnessUnchanged": true,
+  "systemProcessUnchanged": true,
+  "pass": true,
+  "accessibilityExact": true,
+  "originalDreamRestored": true,
+  "elapsedSeconds": 17.621
+}

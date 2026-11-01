@@ -1,5 +1,11 @@
 # Native Gallery print
 
+**November 1 target-device follow-up:** [actual Family verification](portal-gallery-native-2026-11-01.md)
+fixes the clock gradient darkening the print. Landscape and portrait prints plus
+Gallery spread pass whole-image/color checks on Android 10 hardware. Both spread
+photos also survive the night clock with byte-identical pixels. That bounded gate
+does not establish panel FPS or physical brightness comfort.
+
 Gallery print (`galleryPrint`) displays one complete photo in a warm charcoal matte.
 The inset is four percent of the available short edge, capped at 56dp. Tiny viewports
 retain at least one pixel of usable space. The image preserves its aspect ratio and
