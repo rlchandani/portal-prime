@@ -565,6 +565,11 @@ class PortalUxInstrumentation : Instrumentation() {
         sendStatus(0, Bundle().apply { putBoolean("observerReady", true) })
         val remoteEnabledBefore = RemotePairing.isEnabled(targetContext)
         val deadline = SystemClock.uptimeMillis() + 45 * 60_000L
+        val captureProbe = lazy {
+            java.util.concurrent.Executors.newSingleThreadScheduledExecutor { task ->
+                Thread(task, "portal-capture-probe").apply { isDaemon = true }
+            }
+        }
         try {
         while (SystemClock.uptimeMillis() < deadline) {
             if (!request.exists()) {
@@ -575,6 +580,44 @@ class PortalUxInstrumentation : Instrumentation() {
             request.delete()
             if (command.optString("command") == "stop") return
             val name = command.optString("name", "latest").replace(Regex("[^a-zA-Z0-9_-]"), "_")
+            val phases = if (command.optBoolean("traceCapture", false)) JSONArray() else null
+            val currentPhase = java.util.concurrent.atomic.AtomicReference("capture-start")
+            val captureFinished = java.util.concurrent.atomic.AtomicBoolean(false)
+            val captureId = if (phases == null) null else java.util.UUID.randomUUID().toString()
+            val stallFile = captureId?.let { File(folder, "$name-$it-stall.json") }
+            if (phases != null) {
+                runCatching { File(folder, "$name-phase.json").delete() }
+            }
+            fun capturePhase(stage: String) {
+                val history = phases ?: return
+                currentPhase.set(stage)
+                runCatching {
+                    history.put(JSONObject().put("stage", stage).put("uptimeMillis", SystemClock.uptimeMillis()))
+                    File(folder, "$name-phase.json").writeText(
+                        JSONObject().put("name", name).put("captureId", captureId)
+                            .put("stallFile", stallFile?.name).put("phases", history).toString())
+                }
+            }
+            val observingThread = Thread.currentThread()
+            val stallProbe = if (phases == null) null else captureProbe.value.schedule({
+                runCatching {
+                    if (captureFinished.get()) return@schedule
+                    val stage = currentPhase.get()
+                    val sampledAt = SystemClock.uptimeMillis()
+                    val threads = JSONArray()
+                    for (thread in listOf(android.os.Looper.getMainLooper().thread, observingThread)) {
+                        threads.put(JSONObject().put("name", thread.name).put("state", thread.state.name)
+                            .put("stack", JSONArray(thread.stackTrace.take(32).map { it.toString() })))
+                    }
+                    if (!captureFinished.get()) {
+                        // A delayed write belongs only to this capture ID. Cleanup never waits
+                        // for diagnostic I/O, and a reused request name cannot overwrite it.
+                        stallFile?.writeText(JSONObject().put("name", name).put("captureId", captureId)
+                            .put("sampledAtUptimeMillis", sampledAt)
+                            .put("stage", stage).put("threads", threads).toString())
+                    }
+                }
+            }, 9, java.util.concurrent.TimeUnit.SECONDS)
             try {
                 if (command.optString("command") == "iconProbe") {
                     val report = IconRendererDeviceRegression.verify(targetContext)
@@ -614,6 +657,7 @@ class PortalUxInstrumentation : Instrumentation() {
                     response.writeText(JSONObject().put("name", name).put("success", true).toString())
                     continue
                 }
+                capturePhase("accessibility-root")
                 val active = root(automation)
                 if (command.optString("command") == "recreateHome") {
                     val home = checkNotNull(homeMonitor.lastActivity)
@@ -643,27 +687,44 @@ class PortalUxInstrumentation : Instrumentation() {
                     response.writeText(JSONObject().put("name", name).put("success", true).toString())
                     continue
                 }
+                capturePhase("accessibility-tree")
                 val snapshot = snapshotWindows(automation, active)
+                capturePhase("fixture-metadata")
                 runOnMainSync {
+                    currentPhase.set("fixture-metadata-running")
                     snapshot.put("fixturePhotoControllerIdentity",
                         (musicMonitor.lastActivity as? MusicDesignPreviewActivity)
                             ?.realPhotoControllerIdentityForChecks ?: 0)
+                    currentPhase.set("fixture-metadata-finished")
                 }
+                capturePhase("snapshot-json")
                 File(folder, "$name.json").writeText(snapshot.toString())
-                automation.takeScreenshot()?.let { bitmap ->
-                    try {
+                capturePhase("screenshot")
+                val capturedBitmap = automation.takeScreenshot()
+                try {
+                    capturePhase("screenshot-png")
+                    capturedBitmap?.let { bitmap ->
                         File(folder, "$name.png").outputStream().use {
                             check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it))
                         }
-                    } finally { bitmap.recycle() }
+                    }
+                } finally {
+                    capturedBitmap?.recycle()
                 }
-                response.writeText(JSONObject().put("name", name).put("success", true).toString())
+                capturePhase("response")
+                response.writeText(JSONObject().put("name", name).put("captureId", captureId)
+                    .put("success", true).toString())
             } catch (error: Throwable) {
-                response.writeText(JSONObject().put("name", name).put("success", false)
+                capturePhase("error")
+                response.writeText(JSONObject().put("name", name).put("captureId", captureId).put("success", false)
                     .put("errorType", error.javaClass.simpleName).toString())
+            } finally {
+                captureFinished.set(true)
+                stallProbe?.cancel(false)
             }
         }
         } finally {
+            if (captureProbe.isInitialized()) captureProbe.value.shutdownNow()
             removeMonitor(homeMonitor)
             removeMonitor(musicMonitor)
             // Opening the real pairing UI opts in. A test visit must preserve the prior opt-in.
