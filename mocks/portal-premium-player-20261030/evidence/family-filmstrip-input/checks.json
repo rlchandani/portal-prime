@@ -1,0 +1,130 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "api29_window",
+      "passed": true
+    },
+    {
+      "name": "uuid_activity_created",
+      "passed": true
+    },
+    {
+      "name": "shipped_renderer_ready",
+      "passed": true
+    },
+    {
+      "name": "actual_initial_decodes",
+      "passed": true
+    },
+    {
+      "name": "initial_center_zero",
+      "passed": true
+    },
+    {
+      "name": "no_native_bridge",
+      "passed": true
+    },
+    {
+      "name": "before_native_center_red",
+      "passed": true
+    },
+    {
+      "name": "actual_navigation_decode_held",
+      "passed": true
+    },
+    {
+      "name": "previous_pending_until_release",
+      "passed": true
+    },
+    {
+      "name": "next_pending_until_release",
+      "passed": true
+    },
+    {
+      "name": "no_center_publication_while_held",
+      "passed": true
+    },
+    {
+      "name": "both_gestures_completed",
+      "passed": true
+    },
+    {
+      "name": "both_gestures_accepted",
+      "passed": true
+    },
+    {
+      "name": "queued_previous_returns_initial",
+      "passed": true
+    },
+    {
+      "name": "next_then_previous_order",
+      "passed": true
+    },
+    {
+      "name": "same_activity_webview_document",
+      "passed": true
+    },
+    {
+      "name": "after_native_center_red",
+      "passed": true
+    },
+    {
+      "name": "close_decode_held",
+      "passed": true
+    },
+    {
+      "name": "closed_queue_settled",
+      "passed": true
+    },
+    {
+      "name": "closed_queue_no_late_center_write",
+      "passed": true
+    },
+    {
+      "name": "closed_queue_no_late_dom_write",
+      "passed": true
+    },
+    {
+      "name": "owned_activity_destroyed",
+      "passed": true
+    },
+    {
+      "name": "exact_generated_files_removed",
+      "passed": true
+    },
+    {
+      "name": "inner_under_55_seconds",
+      "passed": true
+    }
+  ],
+  "artifacts": [
+    {
+      "phase": "before",
+      "relativePath": "before.png",
+      "width": 2160,
+      "height": 1440,
+      "redSamples": 81,
+      "sha256": "c7ac43d1274945aed0116ab9b93341edc544bdf66752f592d6321e3f2a6b8ae2"
+    },
+    {
+      "phase": "after",
+      "relativePath": "after.png",
+      "width": 2160,
+      "height": 1440,
+      "redSamples": 81,
+      "sha256": "c7ac43d1274945aed0116ab9b93341edc544bdf66752f592d6321e3f2a6b8ae2"
+    }
+  ],
+  "completed": true,
+  "passed": true,
+  "failureCount": 0,
+  "elapsedMs": 6539,
+  "lastPhase": "close_queue",
+  "initialDecodedCount": 2,
+  "generatedOnly": true,
+  "shippedAssets": true
+}

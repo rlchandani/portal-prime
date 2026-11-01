@@ -134,6 +134,56 @@ test('native next/previous and micro-timer share acknowledged navigation without
   await f.tick(1); assert.equal(f.commands.filter(c=>c.action==='next').length, 2);
   assert.equal(scene.cursor.i,12); scene.cleanup();
 });
+test('a manual direction waits behind the admitted native move instead of being dropped', async () => {
+  const f = fixture({ autoCommands: false }), scene = f.run('queued-move');
+  try {
+    await f.flush(); await admit(f); await scene.cleanup.ready;
+    const first = scene.cleanup.next(); await f.flush();
+    const next = f.commands.at(-1);
+    let settled = false;
+    const second = scene.cleanup.previous().then(ok => { settled = true; return ok; });
+    await f.flush();
+    assert.equal(settled, false, 'The latest gesture must remain pending during the first acknowledgement');
+    assert.equal(f.commands.filter(c => c.action === 'previous').length, 0);
+    f.context.SS.nativeFilmstripCommandDone(next.token, next.requestId, true); await f.flush();
+    const previous = f.commands.at(-1);
+    assert.equal(previous.action, 'previous');
+    f.context.SS.nativeFilmstripCommandDone(previous.token, previous.requestId, true);
+    assert.equal(await first, true); assert.equal(await second, true);
+    assert.equal(scene.cursor.i, 12);
+  } finally { scene.cleanup(); }
+});
+test('rapid gestures retain only the latest pending native direction', async () => {
+  const f = fixture({ autoCommands: false }), scene = f.run('latest-move');
+  try {
+    await f.flush(); await admit(f); await scene.cleanup.ready;
+    const first = scene.cleanup.next(); await f.flush(); const next = f.commands.at(-1);
+    const superseded = scene.cleanup.next();
+    let latestSettled = false;
+    const latest = scene.cleanup.previous().then(ok => { latestSettled = true; return ok; });
+    await f.flush();
+    assert.equal(await superseded, false);
+    assert.equal(latestSettled, false);
+    f.context.SS.nativeFilmstripCommandDone(next.token, next.requestId, true); await f.flush();
+    const previous = f.commands.at(-1); assert.equal(previous.action, 'previous');
+    f.context.SS.nativeFilmstripCommandDone(previous.token, previous.requestId, true);
+    assert.equal(await first, true); assert.equal(await latest, true);
+    assert.deepEqual(f.commands.map(c => c.action), ['next', 'previous']);
+  } finally { scene.cleanup(); }
+});
+test('queued native gestures settle on disposal and cannot issue late commands', async () => {
+  const f = fixture({ autoCommands: false }), scene = f.run('retired-move');
+  await f.flush(); await admit(f); await scene.cleanup.ready;
+  const first = scene.cleanup.next(); await f.flush(); const next = f.commands.at(-1);
+  let queuedSettled = false;
+  const queued = scene.cleanup.previous().then(ok => { queuedSettled = true; return ok; });
+  await f.flush(); assert.equal(queuedSettled, false);
+  scene.cleanup();
+  assert.equal(await first, false); assert.equal(await queued, false);
+  f.context.SS.nativeFilmstripCommandDone(next.token, next.requestId, true); await f.flush();
+  assert.equal(f.commands.some(c => c.action === 'previous'), false);
+  assert.equal(f.timers.size, 0);
+});
 test('later preparation failure cannot release admitted native scene', async () => {
   const f = fixture(), scene = f.run('resize'); await f.flush(); await admit(f); await scene.cleanup.ready;
   f.context.SS.nativeFilmstripPrepared('resize', false); await f.flush();

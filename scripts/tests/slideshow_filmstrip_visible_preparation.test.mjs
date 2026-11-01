@@ -160,8 +160,14 @@ test('entering decode holds the complete previous scene and busy navigation cann
     const next = r.cleanup.next(); await r.flush();
     await r.finishExcept(q => q.url.startsWith('generated://3/1400/'));
     assert.equal(r.snapshot(), before); assert.equal(r.current(), 0);
-    assert.equal(await r.cleanup.previous(), false);
-    await r.finishExcept(); assert.equal(await next, true); assert.equal(r.current(), 1);
+    const requests = r.requests.length;
+    let reversed = false;
+    const previous = r.cleanup.previous().then(ok => { reversed = true; return ok; });
+    await r.flush();
+    assert.equal(reversed, false);
+    assert.equal(r.requests.length, requests, 'Retained input must not overlap the current batch');
+    await r.finishExcept(); assert.equal(await next, true); assert.equal(await previous, true);
+    assert.equal(r.current(), 0);
     r.assertExposure(0, 1);
   } finally { r.cleanup(); }
 });

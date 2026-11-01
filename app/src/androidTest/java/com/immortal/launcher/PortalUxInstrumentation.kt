@@ -40,6 +40,21 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Owned offline Filmstrip Window/WebView only; no UiAutomation or settings mutations.
+        if (options.getString("command") == "filmstripInput") {
+            val filmstrip = try {
+                FilmstripInputDeviceChecks.run(this)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("filmstripInputCompleted", false)
+                    putBoolean("filmstripInputPassed", false)
+                    putBoolean("filmstripInputNativePassed", false)
+                    putBoolean("isolatedFailure", true)
+                }
+            }
+            finish(if (filmstrip.getBoolean("filmstripInputPassed")) 0 else 1, filmstrip)
+            return
+        }
         // UUID-owned generated photo window only; no UiAutomation or private diagnostics.
         if (options.getString("command") == "liveFaceMetadata") {
             val faces = try {

@@ -44,6 +44,7 @@
   function makeTimers(ctx) {
     const controller = new AbortController(), tasks = new Set(), frames = new Set();
     let active = true, paused = false, started = false, busy = false, waiters = [];
+    let pendingNavigation = null, navigating = null;
     let ready = Promise.resolve(false);
     function running() {
       if (!active) return Promise.resolve(false);
@@ -81,7 +82,18 @@
         if (active && result !== false && ctx.cursor.i !== start && ctx.record) ctx.record(start);
         return active && result !== false;
       } catch (_) { return false; }
-      finally { busy = false; }
+      finally { busy = false; drainNavigation(); }
+    }
+    function drainNavigation() {
+      if (!active || paused || !started || busy || navigating || !pendingNavigation) return;
+      const request = pendingNavigation;
+      pendingNavigation = null; navigating = request;
+      run(request.fn).then(ok => {
+        if (ok) tasks.forEach(task => {
+          if (task.repeat) { clearTimeout(task.id); task.id = null; task.remaining = task.ms; schedule(task); }
+        });
+        request.resolve(ok);
+      }).finally(() => { navigating = null; drainNavigation(); });
     }
     function schedule(task) {
       if (!active || paused || task.running || (!started && !task.preparation)) return;
@@ -112,6 +124,9 @@
     }
     function clear() {
       active = false; controller.abort();
+      if (pendingNavigation) pendingNavigation.resolve(false);
+      if (navigating) navigating.resolve(false);
+      pendingNavigation = null;
       tasks.forEach(task => clearTimeout(task.id)); tasks.clear();
       frames.forEach(cancelAnimationFrame); frames.clear();
       waiters.splice(0).forEach(resolve => resolve(false));
@@ -128,6 +143,7 @@
     cleanup.resume = () => {
       if (!paused || !active) return;
       paused = false; waiters.splice(0).forEach(resolve => resolve(true));
+      drainNavigation();
       tasks.forEach(task => { if (task.id == null) schedule(task); });
     };
     return {
@@ -136,16 +152,20 @@
       every: (fn, ms) => add(fn, ms, true), after: (fn, ms) => add(fn, ms, false),
       // Bridge deadlines run before readiness, but consume only active playback time.
       deadline: (fn, ms) => add(fn, ms, false, true),
-      async navigate(fn) {
-        const ok = await run(fn);
-        if (ok) tasks.forEach(task => {
-          if (task.repeat) { clearTimeout(task.id); task.id = null; task.remaining = task.ms; schedule(task); }
+      navigate(fn) {
+        if (!active) return Promise.resolve(false);
+        if (pendingNavigation) pendingNavigation.resolve(false);
+        return new Promise(resolve => {
+          pendingNavigation = { fn, resolve };
+          drainNavigation();
         });
-        return ok;
       },
       start(fn) {
         ready = run(fn).then(ok => {
-          if (ok) { started = true; tasks.forEach(task => { if (task.id == null) schedule(task); }); }
+          if (ok) {
+            started = true; drainNavigation();
+            tasks.forEach(task => { if (task.id == null) schedule(task); });
+          }
           return ok;
         });
       },

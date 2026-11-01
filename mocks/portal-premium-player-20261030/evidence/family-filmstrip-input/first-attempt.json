@@ -1,0 +1,65 @@
+{
+  "checks": [
+    {
+      "name": "worker_off_main",
+      "passed": true
+    },
+    {
+      "name": "api29_window",
+      "passed": true
+    },
+    {
+      "name": "uuid_activity_created",
+      "passed": true
+    },
+    {
+      "name": "shipped_renderer_ready",
+      "passed": true
+    },
+    {
+      "name": "actual_initial_decodes",
+      "passed": false
+    },
+    {
+      "name": "isolated_failure",
+      "passed": false
+    },
+    {
+      "name": "owned_activity_destroyed",
+      "passed": true
+    },
+    {
+      "name": "exact_generated_files_removed",
+      "passed": true
+    },
+    {
+      "name": "inner_under_55_seconds",
+      "passed": true
+    }
+  ],
+  "artifacts": [],
+  "completed": false,
+  "passed": false,
+  "failureCount": 2,
+  "elapsedMs": 2386,
+  "lastPhase": "initial_decode",
+  "generatedOnly": true,
+  "shippedAssets": true,
+  "restoration": {
+    "appRestored": true,
+    "testRestored": true,
+    "settingsExact": true,
+    "sourcesExact": true,
+    "accessibilityExact": true,
+    "pinExact": true,
+    "noInstrumentation": true,
+    "systemPidUnchanged": true,
+    "dreamRestored": true,
+    "faceCacheExact": true,
+    "ownedEvidenceRemoved": true,
+    "brightnessPolicyExact": true,
+    "noCollector": true
+  },
+  "observerError": "Final run-as cleanup check was invalid on restored non-debuggable APK; Fleet/fs/list and independent restoration checks passed.",
+  "testCorrection": "Readiness does not require all offscreen photos decoded; actual counter is now reported and center PixelCopy assertions remain strict."
+}
