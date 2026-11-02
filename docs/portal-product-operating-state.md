@@ -14,7 +14,7 @@ The updated whole-product objective is
 ## Current delivery and boundaries
 
 - **Latest APK transfer delivery:** both rooms contain exact optimized **1.87/code81**. Store/self-update transfer failures retain the cached file through shared staging;3,981 JVM/416 suites and debug/optimized/R8/vital-lint passed. Family actual optimized Store-facade shell checks improved4/9→9/9; valid-package installation and appContext remain unverified. Full saved configuration unchanged; normal frame restored. See [receipt](portal-apk-download-publication-2026-11-02.md).
-- **Next priority:** post-replacement Home-app chooser observed on Family; no causal verdict or default-preference mutation. Its first-observation clock is22:26:30.941464–22:56:30.941464UTC. Continue that separate queued deployment unit within its retained clock. This is not the parked Calls/dream handoff issue.
+- **Latest fleet screen-return delivery:** host helper c5b5f652 adds optional `--after-install leave|home|screensaver`, preserving default leave.60/60 methods (23 added) passed in10.096s, including real slow-header TCP; three review findings corrected. The same chooser existed beneath the frame before update. Final Family replacement/return passed in15,105.550ms with exact1.87 readback and complete settings/default state unchanged; both destinations were visually reviewed at the documented phases. No Android default assignment, automatic OTA/flicker fix or new Living runtime delivery. Original22:26:30.941464–22:56:30.941464UTC clock retained; owned registry and workers cleaned. [Scoped receipt](portal-deploy-screen-return-2026-11-02.md).
 
 - **Latest Quick controls setup review:** a source-grounded functional mock proposes one shared setup destination for widget heading and Customize Settings, linking to the existing dashboard editor and Apps. Five inventory examples, address Save/Cancel/Escape and Back/Forward are clickable; handoffs remain simulations. Final43 browser interaction assertions and12 viewport/theme/text combinations passed; two actual browser captures were visually reviewed. Independent review corrections preserve focus and reject representative malformed addresses. Native routes, software and deployment are unchanged and require this design sign-off; no Portal performance claim. [Scope and acceptance](design/portal-quick-controls-setup-review-2026-11-02.md) / [interactive mock](http://127.0.0.1:8891/quick-controls-review.html).
 
@@ -92,7 +92,7 @@ The updated whole-product objective is
   profile/screensaver/layout baselines passed on both rooms. Family’s original
   photo Dream was observed again after cleanup. [Receipt](portal-pwa-connection-status-delivery-2026-11-02.md).
 - **Browser tab branding is delivered:** one explicit favicon link reuses the existing public 64 × 64 PNG. Actual Family paired/unpaired browser sessions naturally requested the public icon without authorization, with zero default favicon requests; management authentication, manifest/touch icons and original pairing were preserved. Both rooms have exact 1.70 APK readbacks, unchanged full profile/screensaver/layout, and Family's original photo Dream was restored. [Receipt](portal-pwa-tab-branding-delivery-2026-11-02.md).
-- Gradle and `version.json` both currently declare **1.82 / versionCode 76**.
+- Gradle and `version.json` both currently declare **1.87 / versionCode 81**.
   These identify the verified local device iteration, not a published release.
 - **Completed parallel maintenance units:** native settings editor classification/projection
   coverage and native phone music-compatibility coverage. Nine focused Portal
@@ -757,3 +757,17 @@ Roadmap: **50 tasks:22 delivered,20 scoped verified,5 parked,2 approval,1 queued
 Exact1.87/code81 is installed in both rooms with full hash proof.29 new JVM cases within3,981/416 suites, all signed build gates and Family optimized Store facade9/9 passed. Old native4/9 confirms cached-file corruption on interrupted transfers. No arbitrary APK cap or whole-app speed claim; temporary disk cost, context/installer and cleanup limits remain in the receipt. Both complete profiles are unchanged, Family photo frame visibly restored, all owned fixtures/registry removed and workers closed. Original22:11:39–22:41:39UTC clock retained.
 
 Roadmap: **52 tasks:23 delivered,20 scoped verified,5 parked,2 approval,2 queued**. The new queued item is the actually observed post-replacement Home chooser, with its original22:26:30.941464UTC clock. Physical phone, human music sign-in, proposed Quick Controls and parked Weather acceptance remain separate. Full product goal remains open.
+
+## Fleet screen-return unit — 2026-11-02
+
+Host helper `c5b5f652 delivered; Portal1.87 remains unchanged in both rooms.
+Explicit return avoids leaving Family on its preexisting Home chooser after a
+selected deployment. Default Home XML/resolution stays unchanged. The missing
+default origin and automatic OTA behavior remain unverified; no silent preference
+repair or older Calls issue reopening. Both workers closed and owned token registry
+removed. The final full60-method test and exact Family postflight passed.
+
+Roadmap: **52 tasks:24 delivered,20 scoped verified,5 parked,2 approval,1 queued**.
+Weather approval does not reopen its exhausted native geometry unit. Music playback
+requires normal human sign-in; continue authorized independent product discovery.
+The complete product goal remains open.

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T22:29:33.612629+00:00",
-  "updatedLabel": "APK transfer integrity delivered in exact1.87 to both rooms; Family9/9 native cases accepted",
+  "updatedAt": "2026-11-02T22:51:53.222897+00:00",
+  "updatedLabel": "Explicit fleet screen return verified on Family;60/60 helper tests;Portal1.87 unchanged",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "apk-download-publication",
+  "defaultTask": "post-update-home-chooser",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms contain exact optimized Portal1.87/code81. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
@@ -54,39 +54,49 @@
         "Home-app chooser observed after replacement and frame restored through its explicit existing action; default-launcher preference was not changed or newly verified. Separate queued issue retains first-observation clock.",
         "Physical companion, music sign-in and parked Weather/performance work retain their separate boundaries."
       ],
-      "next": "Retain transfer guard. Investigate the separately observed post-replacement Home chooser within its original22:26:30.941464UTC clock."
+      "next": "Retain transfer guard. The separately clocked chooser follow-up delivered explicit host-fleet return; see that task for its limits."
     },
     {
       "id": "post-update-home-chooser",
-      "title": "Self-replacement: restore the Home destination cleanly",
-      "summary": "Family showed Select a Home app after1.87 replacement. The photo frame was restored; root cause and default-preference behavior remain unverified.",
-      "description": "Determine why app replacement exposes Android Home selection and restore the pre-update destination without changing owner preference or reworking the parked Calls/dream navigation.",
-      "status": "queued",
-      "verification": "Actual ResolverActivity and native chooser observed \u00b7not diagnosed",
+      "title": "Fleet replacement: request Home or screensaver after install",
+      "summary": "Optional explicit return is verified on Family. The same chooser existed before replacement; default preference remains unchanged.",
+      "description": "After exact installed-APK verification, request the selected Immortal screen using the existing fleet token. Leave remains the default; no automatic destination inference or Android default assignment.",
+      "status": "delivered",
+      "verification": "60/60 helper methods \u00b723 added \u00b7actual Family return \u00b7unchanged defaults/configuration",
       "kind": "Deployment recovery",
       "platforms": [
         "portal",
         "fleet"
       ],
       "owner": "Release engineering / Family QA",
-      "deployment": "No fix or new artifact; current1.87 transfer release is verified.",
-      "state": "Original first-observation clock 2026-11-02T22:26:30.941464+00:00 to 2026-11-02T22:56:30.941464+00:00 retained. Current normal frame restored.",
+      "deployment": "Local host helper committed at c5b5f652. Portal1.87/code81 unchanged; final Family replacement fully read back. Living runtime unchanged.",
+      "state": "Original22:26:30.941464\u201322:56:30.941464UTC clock retained. Family normal manual frame restored; owned registry removed and both workers closed.",
       "acceptance": [
-        "Use the existing observed chooser and actual launcher/default state to identify cause.",
-        "Preserve owner preference and saved configuration; avoid instrumentation/accessibility reconnect.",
-        "Implement only a grounded fix within the original30-minute slot; otherwise park with evidence."
+        "Compare exact activity records and current Home resolution; distinguish an existing chooser from an update-created activity.",
+        "Preserve owner settings and default selection; require complete exact process identity before installation with a return option.",
+        "Request the selected screen only after installed APK verification; strict acknowledgment, absolute10s/64KiB budget, no navigation retry.",
+        "Preserve installation proof on uncertain return, continue other rooms, and exit nonzero.",
+        "Pass offline/real-TCP regressions, bounded independent review, actual Family return and final full installed hash/configuration checks."
       ],
       "evidence": [
         {
-          "text": "Observed post-replacement chooser and explicit frame recovery are recorded in the APK transfer receipt; native captures remain private.",
-          "source": "docs/portal-apk-download-publication-2026-11-02.md"
+          "text": "Diagnosis, implementation, exact Family acceptance, review and limitations.",
+          "source": "docs/portal-deploy-screen-return-2026-11-02.md"
+        },
+        {
+          "text": "Sanitized source/test/native proof, unchanged runtime and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/deploy-screen-return-verification.json"
         }
       ],
       "limits": [
-        "No causal diagnosis, default-preference comparison or fix yet.",
-        "Not a fresh slot for the previously exhausted Calls/dream handoff investigation."
+        "Explicit selected return, not automatic destination detection or generic OTA recovery.",
+        "No Android default selection, preference mutation, accessibility reconnect or instrumentation.",
+        "No intermediate flicker, unrelated app-task or music continuity guarantee.",
+        "Final Home navigation was observed before the later identity-guard-only refinement; final guarded screensaver replacement is separately checked.",
+        "Living has unchanged exact1.87 from the prior release; no duplicated native QA or new runtime deployment in this host-only unit.",
+        "No general latency, memory, FPS or whole-product acceptance claim."
       ],
-      "next": "Continue this separate deployment issue within retained22:56:30.941464UTC deadline; do not reset its clock."
+      "next": "Use an explicit --after-install destination on future self-deployments. Automatic OTA recovery and the origin of the absent Home default are outside this delivered mitigation."
     },
     {
       "id": "store-metadata-budget",

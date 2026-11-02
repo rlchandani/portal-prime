@@ -1,0 +1,118 @@
+{
+  "scope": "Explicit host-fleet screen return after verified self-replacement; not an Android-default or automatic-OTA fix",
+  "originalClock": {
+    "startedAt": "2026-11-02T22:26:30.941464+00:00",
+    "deadline": "2026-11-02T22:56:30.941464+00:00"
+  },
+  "sourceFiles": {
+    "provisioning/room-fleet.py": "2bdc79f2ca8530cc810d9ee6c57e01683198ee8809f45b58e07dc80864ec505a",
+    "provisioning/test_room_fleet.py": "8adff64e3e9510d08f0ef650eb1c4efb986b296282843a85580341ff7f0eb940"
+  },
+  "runtime": {
+    "versionName": "1.87",
+    "versionCode": 81,
+    "package": "com.immortal.launcher.debug",
+    "apkBytes": 25861122,
+    "apkSha256": "67d0bd131046b2bba6f7b264f64d316cc60584fb26e0999f7fc2c93045c7f502",
+    "unchangedArtifact": true
+  },
+  "diagnosis": {
+    "sameChooserRecordBeforeAndAfter": true,
+    "preexistingChooserUncovered": true,
+    "preferredHomeXmlEmpty": true,
+    "currentMainHomeResolvesToChooser": true,
+    "originOfMissingDefault": "Unverified"
+  },
+  "tests": {
+    "originalMethods": 37,
+    "newMethods": 23,
+    "finalMethods": 60,
+    "initialRedMethods": 52,
+    "initialRedFailureRecords": 41,
+    "unterminatedIdentityRedFailureRecords": 1,
+    "finalStatus": "60/60 passed; 0 failures/errors",
+    "finalElapsedSeconds": 10.096
+  },
+  "family": {
+    "beforeOldHelper": "Verified replacement ended on the preexisting Home chooser",
+    "homeReturn": "Observed HomeActivity and visually reviewed actual Home after intermediate helper replacement",
+    "screensaverReturn": "Observed PhotoFramePreviewActivity and visually reviewed actual owner slideshow after guarded helper replacement",
+    "finalChecks": {
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "sourcesUnchanged": true,
+      "screensaverUnchanged": true,
+      "expectedVersionAndDevMode": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "preferred-homeUnchanged": true,
+      "home-resolutionUnchanged": true,
+      "manualFrameForeground": true,
+      "fullInstalledApkMatches": true
+    },
+    "ownerCapturesPublished": false,
+    "finalReplacement": {
+      "exit": 0,
+      "elapsedMs": 15105.55,
+      "helperSha256": "2bdc79f2ca8530cc810d9ee6c57e01683198ee8809f45b58e07dc80864ec505a"
+    }
+  },
+  "limits": [
+    "Explicit selected return, not automatic destination detection or generic OTA recovery.",
+    "No Android default selection, preference mutation, accessibility reconnect or instrumentation.",
+    "No intermediate flicker, unrelated app-task or music continuity guarantee.",
+    "Final Home navigation was observed before the later identity-guard-only refinement; final guarded screensaver replacement is separately checked.",
+    "Living has unchanged exact1.87 from the prior release; no duplicated native QA or new runtime deployment in this host-only unit.",
+    "No general latency, memory, FPS or whole-product acceptance claim."
+  ],
+  "sourceCommit": "c5b5f6521cfec926018dab483ea9c117b3c1655b",
+  "independentReview": {
+    "blockingFindingsAddressed": 3,
+    "finalVerdict": "No remaining blocker in bounded static review",
+    "reviewTestsOrDevicesRun": false
+  },
+  "cleanup": {
+    "ownedRegistryRemoved": true,
+    "nativeHandlesTerminal": [
+      58347,
+      76088,
+      93985,
+      16010,
+      53761
+    ],
+    "testHandlesTerminal": [
+      67425,
+      78950
+    ],
+    "postflightHandlesTerminal": [
+      24336,
+      87258,
+      80893,
+      64000
+    ],
+    "workersClosed": [
+      "Kant",
+      "Lovelace"
+    ],
+    "newAdbReverseOrPushFixtures": false,
+    "originalConnectionsPreserved": true,
+    "originalPreexistingScriptsPycachePreserved": true
+  },
+  "roadmapBrowser": {
+    "layouts": [
+      {
+        "width": 1600,
+        "height": 1000,
+        "horizontalOverflow": false
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "horizontalOverflow": false
+      }
+    ],
+    "selectedDeliveredTaskAnd60TestsVisible": true,
+    "weatherParkedStillVisible": true,
+    "receiptHttpStatus": 200
+  }
+}

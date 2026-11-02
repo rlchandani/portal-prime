@@ -31,4 +31,4 @@ Interfaces: `deploy(..., after_install="leave")`;
 - [x] Implement the optional argument, self-target guard and bounded strict dispatch.
 - [x] Run the complete room-helper suite and independently review the changed code.
 - [x] Replace Family's exact current APK through the changed helper; verify installed bytes, visible return and unchanged defaults/configuration.
-- [ ] Record limitations, remove owned secrets, update the roadmap and commit focused paths.
+- [x] Record limitations, remove owned secrets, update the roadmap and commit focused paths.
