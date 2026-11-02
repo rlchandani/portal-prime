@@ -1,5 +1,7 @@
 # Portal product operating state
 
+- Phone settings confirmation: source-only domain/type gaps queued for the original19:08–19:38UTC slot; no native correction claimed yet. See `portal-companion-settings-confirmation-audit-2026-11-02.md`.
+
 Snapshot: **2026-11-02 UTC**. Original inventory inspected
 `codex/portal-hi-widget-fixes-20261102` at base
 `137608262e39d72498a9de57b6d7bdc3ff7fffe2`; subsequent deliveries and maintenance

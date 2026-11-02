@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T19:08:43.113261+00:00",
+  "updatedAt": "2026-11-02T19:14:56.663908+00:00",
   "updatedLabel": "2 November2026 \u00b7 Quick controls setup review ready",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,38 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "companion-settings-confirmation",
+      "title": "Phone settings: verify the acknowledged section",
+      "summary": "Source audit found incomplete domain/type checks. Reproduction and correction pending in the original half-hour slot.",
+      "description": "Confirm literal success, matching domain identity and all requested keys before reporting a settings write as confirmed.",
+      "status": "queued",
+      "verification": "Source findings only; runtime reproduction pending",
+      "kind": "Native settings outcome correctness",
+      "platforms": [
+        "companion"
+      ],
+      "owner": "Phone engineering / independent source review / isolated native QA",
+      "deployment": "No new APK. Companion1.7.3/code15 remains the current emulator candidate; physical-phone installation open.",
+      "state": "Original issue clock19:08\u201319:38UTC, including cleanup. Do not reset this clock.",
+      "acceptance": [
+        "Reproduce wrong/missing domain and non-Boolean success before changing production code.",
+        "Require matching domain and complete requested keys; preserve explicit rejection,401 and cancellation.",
+        "Do not automatically repeat an uncertain write.",
+        "Run scoped JVM/build and owned companion UI checks; preserve the source AVD."
+      ],
+      "evidence": [
+        {
+          "text": "Independent source findings, wire contract and original issue deadline.",
+          "source": "docs/portal-companion-settings-confirmation-audit-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Source findings do not establish that the installed Portal sends malformed replies.",
+        "No runtime fix, device writes, performance claim or whole-product acceptance."
+      ],
+      "next": "Reproduce and fix within the original deadline; otherwise park."
+    },
     {
       "id": "companion-photo-upload-confirmation",
       "title": "Phone photo upload: confirm the destination",
