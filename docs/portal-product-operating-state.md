@@ -13,6 +13,17 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Latest fleet CLI command confirmation:** source `18730fdb` requires HTTP2xx,
+  complete unambiguous object and literal success for known JSON paths. Failed
+  pause/upload stops later update stages for that room without retry; opaque
+  raw/file/text compatibility remains. Final **23Rust +23HTTP +47helper** tests
+  passed;58 old-binary fixture failures reproduced. Family **7/7 read-only**
+  commands passed with complete saved configuration unchanged. Exact676920-byte
+  local optimized CLI installed; private registry removed and workers closed.
+  No Android change/install or Living action; both rooms remain1.87/code81.
+  Original23:15:37–23:45:37UTC first-observation clock retained.
+  [Scoped receipt](portal-fleet-command-status-2026-11-02.md).
+
 - **Latest APK transfer delivery:** both rooms contain exact optimized **1.87/code81**. Store/self-update transfer failures retain the cached file through shared staging;3,981 JVM/416 suites and debug/optimized/R8/vital-lint passed. Family actual optimized Store-facade shell checks improved4/9→9/9; valid-package installation and appContext remain unverified. Full saved configuration unchanged; normal frame restored. See [receipt](portal-apk-download-publication-2026-11-02.md).
 - **Latest fleet screen-return delivery:** host helper c5b5f652 adds optional `--after-install leave|home|screensaver`, preserving default leave.60/60 methods (23 added) passed in10.096s, including real slow-header TCP; three review findings corrected. The same chooser existed beneath the frame before update. Final Family replacement/return passed in15,105.550ms with exact1.87 readback and complete settings/default state unchanged; both destinations were visually reviewed at the documented phases. No Android default assignment, automatic OTA/flicker fix or new Living runtime delivery. Original22:26:30.941464–22:56:30.941464UTC clock retained; owned registry and workers cleaned. [Scoped receipt](portal-deploy-screen-return-2026-11-02.md).
 

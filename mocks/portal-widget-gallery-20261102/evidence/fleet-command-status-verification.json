@@ -1,0 +1,129 @@
+{
+  "scope": "Known JSON CLI confirmation and failed dev-update stage stops",
+  "sourceCommit": "18730fdb15285901e53aaa388e4921e8128524f1",
+  "originalClock": {
+    "startedAt": "2026-11-02T23:15:37+00:00",
+    "deadline": "2026-11-02T23:45:37+00:00",
+    "scope": "Known-JSON fleet CLI command outcomes and failed dev-update stages; opaque raw/text unchanged",
+    "status": "verified"
+  },
+  "reproduction": {
+    "originalHttp200OkFalseExit": 0,
+    "focusedOldBinaryFailures": 58,
+    "focusedMethods": 2,
+    "fixtureErrors": 0
+  },
+  "gates": {
+    "rustTests": 23,
+    "rustFailures": 0,
+    "httpMethods": 23,
+    "httpSeconds": 1.506,
+    "httpFailures": 0,
+    "newHttpMethods": 6,
+    "backupRestoreMethods": 47,
+    "helperSeconds": 23.798,
+    "helperFailures": 0,
+    "optimizedCompilation": "passed",
+    "whitespace": "passed",
+    "independentStaticReview": "no scoped blocker"
+  },
+  "family": {
+    "loopbackTestsSeparate": true,
+    "room": "Family Area",
+    "readOnly": true,
+    "writeCommands": 0,
+    "commands": [
+      {
+        "command": "info",
+        "exit": 0,
+        "literalOk": true,
+        "elapsedMs": 343.166
+      },
+      {
+        "command": "apps",
+        "exit": 0,
+        "literalOk": true,
+        "elapsedMs": 219.958
+      },
+      {
+        "command": "diag",
+        "exit": 0,
+        "literalOk": true,
+        "elapsedMs": 409.51
+      },
+      {
+        "command": "calendar",
+        "exit": 0,
+        "literalOk": true,
+        "elapsedMs": 220.338
+      },
+      {
+        "command": "screensaver",
+        "exit": 0,
+        "literalOk": true,
+        "elapsedMs": 219.987
+      },
+      {
+        "command": "dev",
+        "exit": 0,
+        "literalOk": true,
+        "elapsedMs": 220.238
+      },
+      {
+        "command": "ls",
+        "exit": 0,
+        "literalOk": true,
+        "elapsedMs": 240.112
+      }
+    ],
+    "savedConfigurationUnchanged": true,
+    "passed": true,
+    "ownedRegistryRemoved": true
+  },
+  "localBinary": {
+    "localBinaryInstalled": true,
+    "sourceSha256": "4f8e4438ab63ca92603ea53ebae458d44e84bd8b1275ea4d9b93fa805223e511",
+    "installedSha256": "4f8e4438ab63ca92603ea53ebae458d44e84bd8b1275ea4d9b93fa805223e511",
+    "bytes": 676920
+  },
+  "deployment": {
+    "hostLocalTool": "installed exact verified binary; git ignored",
+    "androidSourceChanged": false,
+    "portalInstallations": 0,
+    "livingOperations": 0,
+    "portalVersion": "1.87/code81",
+    "hostedCiObserved": false
+  },
+  "limits": [
+    "Envelope confirmation is not independent side-effect or APK identity verification.",
+    "Raw responses remain HTTP-only by design.",
+    "Failed live owner deployments and multi-device deployment were not exercised.",
+    "No general performance or whole-product acceptance claim."
+  ],
+  "updatedAt": "2026-11-02T23:41:37.891378+00:00",
+  "browserRoadmap": {
+    "selectedTask": "fleet-command-status",
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "horizontalOverflow": false,
+    "correctPlatformLabel": true,
+    "proofHttpStatus": 200,
+    "platformMetadataCorrections": 5
+  },
+  "cleanup": {
+    "ownedNativeRegistryRemoved": true,
+    "ownedPythonCacheRemoved": true,
+    "preexistingScriptCachePreserved": true,
+    "workersClosed": 2,
+    "privateConnectionsPreserved": true,
+    "noPortalWrites": true
+  }
+}

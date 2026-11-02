@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T23:30:31.917444+00:00",
-  "updatedLabel": "App restore integrity:24/24 restore+23/23 backup tests;Family6/27 live plan;Portal1.87 unchanged",
+  "updatedAt": "2026-11-02T23:41:37.891378+00:00",
+  "updatedLabel": "Fleet CLI confirmation:23Rust+23HTTP+47helper tests;7Family reads;local tool installed;Portal1.87 unchanged",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "fleet-restore-apps",
+  "defaultTask": "fleet-command-status",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms contain exact optimized Portal1.87/code81. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
@@ -13,6 +13,52 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-command-status",
+      "title": "Fleet CLI: confirm command results and stop failed update stages",
+      "summary": "HTTP200 rejection originally exited0. Final23Rust+23HTTP+47helper tests passed;7Family read-only commands accepted,configuration unchanged.",
+      "description": "Known JSON commands require literal ok:true in a complete unambiguous object. Unconfirmed pause/upload stops later update stages for that room; other selected rooms can continue. Opaque raw/file/text behavior stays compatible.",
+      "status": "delivered",
+      "verification": "23Rust \u00b723HTTP \u00b747helper \u00b77Family reads \u00b758 old-binary failures reproduced",
+      "kind": "Host fleet command reliability",
+      "platforms": [
+        "tooling",
+        "portal"
+      ],
+      "owner": "Fleet engineering / parallel fixture writer / independent static review / Family read-only QA",
+      "deployment": "Local source 18730fdb committed;exact676920-byte optimized CLI installed in this worktree. No Android APK/install;both rooms remain1.87/code81.",
+      "state": "Original23:15:37\u201323:45:37UTC first-observation clock retained;private native registry removed,workers closed,preexisting owner connections preserved.",
+      "acceptance": [
+        "Reproduce HTTP200 ok:false incorrectly returning zero.",
+        "Require HTTP2xx,complete object,literal success and unique response fields for known JSON commands.",
+        "Keep opaque raw/file/logcat/binary compatibility.",
+        "Stop dev update before later stages after unconfirmed pause/upload;never auto-retry.",
+        "Compile and verify public socket fixtures plus read-only Family commands within original deadline."
+      ],
+      "evidence": [
+        {
+          "text": "Scope,regressions,native reads and limitations.",
+          "source": "docs/portal-fleet-command-status-2026-11-02.md"
+        },
+        {
+          "text": "Sanitized tests,artifact,original clock and unchanged configuration.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/fleet-command-status-verification.json"
+        }
+      ],
+      "limits": [
+        "Envelope confirmation is not independent side-effect or APK identity verification.",
+        "Raw responses remain HTTP-only by design.",
+        "Failed live owner deployments and multi-device deployment were not exercised.",
+        "No general performance or whole-product acceptance claim."
+      ],
+      "next": "Continue independent authorized backlog. Keep actual failed native deployments,bulk update per-item outcomes and APK identity separate.",
+      "issueClock": {
+        "startedAt": "2026-11-02T23:15:37+00:00",
+        "deadline": "2026-11-02T23:45:37+00:00",
+        "scope": "Known-JSON fleet CLI command outcomes and failed dev-update stages; opaque raw/text unchanged",
+        "status": "verified"
+      }
+    },
     {
       "id": "fleet-restore-apps",
       "title": "Fleet app restore: correct selection, one Portal and confirmed presence",
@@ -22,7 +68,7 @@
       "verification": "24/24 restore \u00b723/23 backup \u00b7Family6/27 plan \u00b7zero owner installs/restores",
       "kind": "Host restore data integrity",
       "platforms": [
-        "fleet",
+        "tooling",
         "portal"
       ],
       "owner": "Fleet engineering / independent fixtures and static review / Family read-only planning QA",
@@ -65,7 +111,7 @@
       "verification": "23/23 methods \u00b7Family43/43 XML maps \u00b7private permissions \u00b7unchanged saved configuration",
       "kind": "Host backup data integrity",
       "platforms": [
-        "fleet",
+        "tooling",
         "portal"
       ],
       "owner": "Fleet engineering / independent fixture and static-review workers / Family read-only QA",
@@ -111,7 +157,7 @@
         "portal",
         "browser",
         "companion",
-        "fleet"
+        "tooling"
       ],
       "owner": "Store/update engineering / independent helper and fixture workers / Family QA",
       "deployment": "Exact optimized1.87/code81 installed in both rooms, complete installed hashes verified. Browser/companion contracts and builds unchanged.",
@@ -152,7 +198,7 @@
       "kind": "Deployment recovery",
       "platforms": [
         "portal",
-        "fleet"
+        "tooling"
       ],
       "owner": "Release engineering / Family QA",
       "deployment": "Local host helper committed at c5b5f652. Portal1.87/code81 unchanged; final Family replacement fully read back. Living runtime unchanged.",
