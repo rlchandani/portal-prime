@@ -1,6 +1,6 @@
 {
-  "versionCode": 75,
-  "versionName": "1.81",
+  "versionCode": 76,
+  "versionName": "1.82",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Photo imports with unreadable acknowledgments now report completion as unconfirmed. Refresh to check storage before retrying; explicit upload rejections remain failures."
+  "notes": "Photo deletion now confirms the selected file before reporting success. Unexpected acknowledgments prompt review while preserving the existing single photo-list refresh."
 }

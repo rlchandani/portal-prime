@@ -32,6 +32,7 @@ async function fixture(t, { empty = false } = {}) {
   const reads = [], uploads = [], deletes = [], readPlans = [], uploadModes = new Map();
   const heldReads = [], heldUploads = [], heldDeletes = [];
   let holdDelete = false, rejectDelete = false;
+  let deleteMode = 'confirmed';
   const h = await browserHarness({ saved, routes: {
     '/remote/photos': ({ url, opts, response }) => {
       const parsed = new URL(url), path = parsed.searchParams.get('path');
@@ -108,8 +109,16 @@ async function fixture(t, { empty = false } = {}) {
       deletes.push({ base: parsed.origin, path });
       const complete = () => {
         if (rejectDelete) return response({ ok: false, error: 'public_delete_failure' }, 503);
+        if (deleteMode === 'wrong-path')
+          return response({ ok: true, path: `${destination}/different.png` });
+        if (deleteMode === 'missing-path') return response({ ok: true });
+        if (deleteMode === 'missing-ok') return response({ path });
+        if (deleteMode === 'invalid-ok') return response({ ok: 'true', path });
+        if (deleteMode === 'false-ack') return response(false);
+        if (deleteMode === 'zero-ack') return response(0);
+        if (deleteMode === 'empty-string-ack') return response('');
         files.set(parsed.origin, files.get(parsed.origin).filter(row => row.path !== path));
-        return response({ ok: true });
+        return response({ ok: true, path });
       };
       if (holdDelete) return new Promise(resolve => {
         let finished = false;
@@ -135,6 +144,7 @@ async function fixture(t, { empty = false } = {}) {
     h, reads, uploads, deletes, readPlans, uploadModes, heldReads, heldUploads, heldDeletes,
     holdDelete: () => { holdDelete = true; },
     rejectDelete: () => { rejectDelete = true; },
+    deleteMode: value => { deleteMode = value; },
     async refreshPending() {
       readPlans.push('hold');
       h.document.getElementById('refresh-button').click();
@@ -505,7 +515,21 @@ test('a confirmed Delete replaces a listing started before deletion and does not
   assert.equal(f.reads.length, 3);
   assert.equal(old.signal.aborted, true);
   assert.deepEqual(galleryNames(h), ['Preview other.png']);
+  assert.match(h.document.getElementById('notice').textContent, /Photo deleted/);
 });
+
+for (const mode of ['wrong-path', 'missing-path', 'missing-ok', 'invalid-ok', 'false-ack', 'zero-ack', 'empty-string-ack']) {
+  test(`a ${mode} Delete acknowledgment cannot claim the selected photo was deleted`, async t => {
+    const f = await fixture(t), { h } = f;
+    f.deleteMode(mode);
+    await f.deleteOld();
+    assert.equal(f.deletes.length, 1, 'Unconfirmed deletion must never be retried automatically');
+    assert.equal(f.reads.length, 2, 'Keep the existing single metadata review');
+    assert.ok(galleryNames(h).includes('Preview old.png'));
+    assert.doesNotMatch(h.document.getElementById('notice').textContent, /Photo deleted/);
+    assert.match(h.document.getElementById('notice').textContent, /did not confirm.*deletion/i);
+  });
+}
 
 test('a rejected Delete preserves the photo and does not replace a useful pending listing', async t => {
   const f = await fixture(t), { h } = f;

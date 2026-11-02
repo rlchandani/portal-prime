@@ -3861,9 +3861,15 @@ function photoPreview(file, ticket) {
           'delete-photo',
           `/remote/photo?path=${encodeURIComponent(file.path)}`,
           undefined,
-          { method: 'DELETE', ticket, success: 'Photo deleted.' },
+          { method: 'DELETE', ticket, success: '' },
         );
-        if (response) loadPhotos({ force: true });
+        if (response != null) {
+          const confirmed = response.ok === true && response.path === file.path;
+          toast(confirmed ? 'Photo deleted.'
+            : 'The Portal did not confirm this deletion. Refresh and review your photos before retrying.',
+            !confirmed);
+          loadPhotos({ force: true });
+        }
       },
       'Delete',
       ticket,

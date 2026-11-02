@@ -1,18 +1,63 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T18:10:25.000132+00:00",
-  "updatedLabel": "2 November 2026 \u00b7 Photo import acknowledgment fix delivered",
+  "updatedAt": "2026-11-02T18:21:35.422818+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 Photo deletion confirmation delivered",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "photo-upload-acknowledgment",
+  "defaultTask": "photo-delete-confirmation",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact optimized1.81/code75. Earlier receipts retain their original acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
+    "Both rooms have exact optimized1.82/code76. Earlier receipts retain their original acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-delete-confirmation",
+      "title": "Photo deletion: confirm the selected file before success",
+      "summary": "Delivered in both rooms. Unexpected acknowledgments prompt review; only explicit success for the selected path shows Photo deleted.",
+      "description": "Preserve session retirement and existing one-read photo refresh; never retry Delete automatically. Validate exact acknowledgment identity before success.",
+      "status": "delivered",
+      "verification": "703 browser /3869 JVM passed \u00b7 Family controlled/real deletion proof \u00b7 exact both-room APKs",
+      "kind": "Browser destructive-action outcome correctness",
+      "platforms": [
+        "browser",
+        "portal"
+      ],
+      "owner": "Browser engineering / independent review / Family acceptance",
+      "deployment": "Exact optimized1.82/code76 fully read back in both rooms; no publication.",
+      "state": "Only bundled browser acknowledgment behavior and version change. Real test-image deletion passed; complete room configurations preserved and scratch removed.",
+      "acceptance": [
+        "Confirm literal ok:true and exact selected path before showing success.",
+        "Show review for malformed replies, while rejecting retired or unavailable results.",
+        "Retain one metadata read; never resend deletion automatically.",
+        "Check original wrong outcome and new guard on Family, then a real valid deletion.",
+        "Preserve settings/layout/screensaver, pairing, services and original task; identical final APKs and owned cleanup."
+      ],
+      "evidence": [
+        {
+          "text": "Reproduced regression, actual paired PWA negative/positive controls and delivery limits.",
+          "source": "docs/portal-photo-delete-confirmation-2026-11-02.md"
+        },
+        {
+          "text": "Structured gate/artifact/native/restoration proof.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-delete-verification.json"
+        },
+        {
+          "text": "Actual corrected review notice crop.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-delete-new.png"
+        }
+      ],
+      "limits": [
+        "Controlled negative responses establish client behavior, not a firmware deletion defect.",
+        "Server and native companion unchanged; no physical phone acceptance.",
+        "No universal latency/FPS, process retention or natural Dream claim.",
+        "Living receives same exact APK; functional acceptance focused on Family.",
+        "Exhausted Weather/keyboard/performance issues remain parked."
+      ],
+      "next": "Retain guard. Continue independent authorized whole-product work; native companion parity is separate from browser proof."
+    },
     {
       "id": "photo-upload-acknowledgment",
       "title": "Photo imports: truthful acknowledgment outcomes",

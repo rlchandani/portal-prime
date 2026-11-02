@@ -11,6 +11,8 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Latest browser deletion delivery:** exact optimized1.82/code76 is installed and fully read back in both rooms. Browser Photo deleted now requires literal success and the selected path; unexpected object/primitive acknowledgments show review and retain exactly one metadata refresh, with no retry. Seven new regressions passed within703 browser /3,869 JVM406 suites and both builds/R8/vital lint. Family's actual1.81 false-success and1.82 guarded outcomes were observed with controlled replies; the77-byte owned original remained exact, then a real valid UI deletion returned matching path and removed it. Full configurations preserved, owned directory removed, Family font/accessibility/Chrome/manual frame retained. No server/native-phone change or general speedup claimed. Living transport closed during self-replacement; complete installed APK verified delivery. [Receipt](portal-photo-delete-confirmation-2026-11-02.md).
+
 - **Latest browser import delivery:** exact optimized1.81/code75 is installed and fully read back in both rooms. Posted unreadable acknowledgments now remain Completion unconfirmed; readable rejection stays Failed, and confirmation requires literal ok:true plus exact path/bytes. 696 browser /3,869 JVM406 suites and both builds/R8/vital lint passed. Family's actual1.80 wrong outcome and1.81 corrected outcomes were observed with real77-byte stores and controlled reply damage: zero automatic retries, zero pre-Refresh metadata reads, one manual Refresh, real409 and valid-success controls. Four originals matched exactly and owned scratch was removed. Complete room configurations and Family font/accessibility/Chrome/manual frame retained. No broad performance claim. Living transport closed during self-replacement; full APK readback verified success. Reload open browser tabs for the new controller. [Receipt](portal-photo-upload-acknowledgment-2026-11-02.md).
 
 - **Latest native source-form acceptance:** WebDAV/SMB/Immich generated secret drafts are masked; Cancel/reopen restores originals, and WebDAV Android Back also discards its draft. All captured complete profiles match baseline. A real SMB keyboard defect was reproduced: Home clips and actions are covered. Candidate1.81 with three manifest resize flags passed3,869 JVM tests/406 suites and both builds, but failed native acceptance under Portal's immersive fullscreen policy. Candidate/source/version changes withdrawn; Family restored and both rooms fully read back as exact1.80, complete configurations preserved, Family font/accessibility/Chrome/manual frame restored. No delivered keyboard fix or speedup. The issue is parked under this unit's half-hour boundary. [Receipt](portal-settings-native-source-drafts-2026-11-02.md).
@@ -79,7 +81,7 @@ The updated whole-product objective is
   profile/screensaver/layout baselines passed on both rooms. Family’s original
   photo Dream was observed again after cleanup. [Receipt](portal-pwa-connection-status-delivery-2026-11-02.md).
 - **Browser tab branding is delivered:** one explicit favicon link reuses the existing public 64 × 64 PNG. Actual Family paired/unpaired browser sessions naturally requested the public icon without authorization, with zero default favicon requests; management authentication, manifest/touch icons and original pairing were preserved. Both rooms have exact 1.70 APK readbacks, unchanged full profile/screensaver/layout, and Family's original photo Dream was restored. [Receipt](portal-pwa-tab-branding-delivery-2026-11-02.md).
-- Gradle and `version.json` both currently declare **1.81 / versionCode 75**.
+- Gradle and `version.json` both currently declare **1.82 / versionCode 76**.
   These identify the verified local device iteration, not a published release.
 - **Completed parallel maintenance units:** native settings editor classification/projection
   coverage and native phone music-compatibility coverage. Nine focused Portal
@@ -98,7 +100,7 @@ The updated whole-product objective is
   `docs/companion-compatibility-validation-2026-11-02.md` in the isolated Toolkit
   checkout. Original 540 companion tests were unchanged and passed against the
   candidate; no separate unmodified-base run or physical phone check is claimed.
-- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents thirty-eight
+- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents thirty-nine
   tracked items with acceptance/evidence/limits and actual cropped clock captures.
   It is a saved priority-queue snapshot, not live telemetry or an exhaustive
   product acceptance report. Browser interactions passed at desktop/mobile

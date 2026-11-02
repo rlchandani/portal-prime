@@ -1,0 +1,128 @@
+{
+  "recordedAtUtc": "2026-11-02T18:21:35.422818+00:00",
+  "sourceBranch": "codex/photo-delete-confirmation-20261102",
+  "versions": {
+    "before": "1.81/code75",
+    "after": "1.82/code76"
+  },
+  "gates": {
+    "browserTests": 703,
+    "newDeletionCases": 7,
+    "jvm": {
+      "tests": 3869,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 406
+    },
+    "finalGradleSeconds": 31
+  },
+  "artifacts": {
+    "artifacts": [
+      {
+        "variant": "debug",
+        "versionName": "1.82",
+        "versionCode": 76,
+        "bytes": 46767636,
+        "sha256": "bdd4650c18a1f1dbb8f199007ab1d8517fe041e88787f15f511fefd19a56a657"
+      },
+      {
+        "variant": "performance",
+        "versionName": "1.82",
+        "versionCode": 76,
+        "bytes": 25860990,
+        "sha256": "25ebd04107d0dfbf0b116a5992a547e83f182c0de98ae43e3bfaf36a9fc11939"
+      }
+    ],
+    "jvm": {
+      "tests": 3869,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 406
+    },
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "assetMatchesCurrentSource": true
+  },
+  "familyBrowser": {
+    "viewport": "390x844",
+    "originalFixtureBytes": 77,
+    "before": {
+      "fault": "controlled wrong-path response; no server deletion",
+      "notice": "Photo deleted.",
+      "photoStillPresent": true
+    },
+    "after": {
+      "controlledWrongPath": {
+        "reviewWarning": true,
+        "deleteAttempts": 1,
+        "metadataReads": 1,
+        "photoStillPresent": true
+      },
+      "controlledFalseJsonSettled": {
+        "reviewWarning": true,
+        "deleteAttempts": 1,
+        "metadataReads": 1,
+        "photoStillPresent": true
+      },
+      "realDeletion": {
+        "httpStatus": 200,
+        "matchedSuccessAndPath": true,
+        "deleteAttempts": 1,
+        "metadataReads": 1,
+        "successNotice": true,
+        "photoTiles": 0
+      }
+    },
+    "automaticRetries": 0,
+    "horizontalOverflow": false,
+    "measurementCorrection": "Early count preceded false-JSON completion; fresh response barrier confirmed exactly1 metadata read."
+  },
+  "preservation": {
+    "rooms": {
+      "family": {
+        "checks": {
+          "profile": true,
+          "layout": true,
+          "screensaver": true,
+          "installedApkMatchesCandidate": true
+        },
+        "installedSha256": "25ebd04107d0dfbf0b116a5992a547e83f182c0de98ae43e3bfaf36a9fc11939",
+        "bytes": 25860990
+      },
+      "living": {
+        "checks": {
+          "profile": true,
+          "layout": true,
+          "screensaver": true,
+          "installedApkMatchesCandidate": true
+        },
+        "installedSha256": "25ebd04107d0dfbf0b116a5992a547e83f182c0de98ae43e3bfaf36a9fc11939",
+        "bytes": 25860990
+      }
+    },
+    "familyStateChecks": {
+      "originalChromeTaskRetained": true,
+      "manualFrameResumed": true,
+      "enabledServicesAndBindingRetained": true,
+      "fontRetained": true,
+      "ownedTestPhotoRemoved": true
+    },
+    "assetMatchesCurrentSource": true,
+    "originalAfterUnconfirmedReplies": {
+      "bytes": 77,
+      "sha256": "d25cf32a53ab2f14f71e7f17d0f2890d476352ec9d56882db13502e9224b4195",
+      "matchesOriginal": true
+    },
+    "host": "Family manual PhotoFramePreviewActivity",
+    "notClaimed": "natural Dream recovery, process retention, universal performance or physical phone acceptance"
+  },
+  "review": "Independent initial diff/source review found primitive edge; final guard assessment based on reported change. Coordinator final source/execution checks passed.",
+  "limits": [
+    "Controlled negative responses establish client behavior, not a firmware deletion defect.",
+    "Server and native companion unchanged; no physical phone acceptance.",
+    "No universal latency/FPS, process retention or natural Dream claim.",
+    "Living receives same exact APK; functional acceptance focused on Family.",
+    "Exhausted Weather/keyboard/performance issues remain parked."
+  ]
+}
