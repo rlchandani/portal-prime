@@ -1,6 +1,6 @@
 {
-  "versionCode": 59,
-  "versionName": "1.65",
+  "versionCode": 60,
+  "versionName": "1.66",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Home widgets: Photo Memory settings open photo sources directly, and alarm countdowns refresh while visible with accurate remaining minutes."
+  "notes": "World clock widgets fit complete city rows to their available height and text scale, with a clear count of remaining cities."
 }

@@ -1554,7 +1554,7 @@ internal fun WorldClockScreen(onBack: () -> Unit) {
   SettingsScaffold(
       title = "World clock",
       subtitle =
-          "Choose locations for the World Clock widget. The first four (in the order you pick them) are shown.",
+          "Choose locations in display order. The widget fits complete clocks, up to four.",
       onBack = onBack,
   ) { WorldClockContent() }
 }
@@ -1614,7 +1614,7 @@ internal fun WorldClockContent() {
       }
       }
       Text(
-          "Tip: the widget shows up to four clocks. Re-pick a city to move it to the end of the order.",
+          "Tip: resize the widget to see more clocks. Re-pick a city to move it to the end of the order.",
           color = IosSecondary,
           fontSize = Sizes.rowSub,
           modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),

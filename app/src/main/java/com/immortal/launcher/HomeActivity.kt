@@ -2873,6 +2873,7 @@ private fun ImmortalWidgetShell(
     openPage: String,
     modifier: Modifier = Modifier,
     onOpen: (() -> Unit)? = null,
+    scrollContent: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
   val context = androidx.compose.ui.platform.LocalContext.current
@@ -2892,7 +2893,8 @@ private fun ImmortalWidgetShell(
       if (onOpen != null) onOpen() else context.openApprovedHomeSettings(openPage)
     }
     Spacer(Modifier.height(22.dp))
-    Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) { content() }
+    Column(Modifier.weight(1f).fillMaxWidth().then(
+        if (scrollContent) Modifier.verticalScroll(rememberScrollState()) else Modifier)) { content() }
   }
 
 }
@@ -3391,20 +3393,45 @@ private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
   }
   val format = remember(use24) { SimpleDateFormat(if (use24) "HH:mm" else "h:mm a", Locale.getDefault()) }
   val selected = remember(zones) { zones.take(4) }
-  ImmortalWidgetShell(title = "World clock", openPage = "world", modifier = modifier) {
-    if (selected.isEmpty()) ApprovedHomeWidgetMessage("Add cities to see their local time.")
-    Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
-      selected.forEach { zone ->
-        val display = remember(zone, now, use24) {
-          format.timeZone = TimeZone.getTimeZone(zone)
-          val weekday = SimpleDateFormat("EEEE", Locale.getDefault()).apply { timeZone = format.timeZone }
-          format.format(now) to "${worldClockCity(zone)} · ${weekday.format(now)}"
+  ImmortalWidgetShell(title = "World clock", openPage = "world", modifier = modifier,
+      scrollContent = false) {
+    if (selected.isEmpty()) {
+      ApprovedHomeWidgetMessage("Add cities to see their local time.")
+    } else BoxWithConstraints(Modifier.fillMaxSize()) {
+      val density = androidx.compose.ui.platform.LocalDensity.current
+      val availableHeight = maxHeight
+      val fontScale = androidx.compose.ui.platform.LocalConfiguration.current.fontScale
+      // Portal firmware's SP conversion can under-budget enlarged text. Keep the
+      // configured scale explicit and reserve at least its linear line height.
+      val rowHeight = maxOf(with(density) { 52.sp.toDp().value }, 52f * fontScale) +
+          maxOf(with(density) { 26.sp.toDp().value }, 26f * fontScale) + 2f
+      val footerHeight = maxOf(with(density) { 24.sp.toDp().value }, 24f * fontScale)
+      val visibleCount = remember(zones.size, availableHeight, rowHeight, footerHeight) {
+        homeWorldClockVisibleCount(zones.size, availableHeight.value,
+            rowHeight, footerHeight)
+      }
+      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        selected.take(visibleCount).forEach { zone ->
+          val display = remember(zone, now, use24) {
+            format.timeZone = TimeZone.getTimeZone(zone)
+            val weekday = SimpleDateFormat("EEEE", Locale.getDefault()).apply { timeZone = format.timeZone }
+            format.format(now) to "${worldClockCity(zone)} · ${weekday.format(now)}"
+          }
+          Column {
+            Text(display.first, color = ApprovedHomePalette.Text, fontSize = 48.sp, lineHeight = 52.sp,
+                fontWeight = FontWeight.Normal, letterSpacing = (-1).sp, maxLines = 1,
+                overflow = TextOverflow.Ellipsis)
+            Text(display.second, color = ApprovedHomePalette.Secondary,
+                fontSize = 20.sp, lineHeight = 26.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 2.dp))
+          }
         }
-        Column {
-          Text(display.first, color = ApprovedHomePalette.Text, fontSize = 48.sp, lineHeight = 100.sp,
-              fontWeight = FontWeight.Normal, letterSpacing = (-1).sp)
-          Text(display.second, color = ApprovedHomePalette.Secondary,
-              fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 12.dp))
+        val remaining = zones.size - visibleCount
+        if (remaining > 0 && availableHeight.value >= footerHeight) {
+          Text(if (visibleCount == 0) "$remaining ${if (remaining == 1) "city" else "cities"}"
+              else "$remaining more ${if (remaining == 1) "city" else "cities"}",
+              color = ApprovedHomePalette.Secondary, fontSize = 18.sp, lineHeight = 24.sp,
+              maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
       }
     }
