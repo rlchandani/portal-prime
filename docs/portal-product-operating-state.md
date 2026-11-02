@@ -429,6 +429,31 @@ real music output or universal performance. Toolkit's
 The existing24-item roadmap retains10 delivered/implemented,8 scoped verified,
 2 awaiting approval,3 parked and1 queued.
 
+## Weather correctness and concrete design review — 2 November 2026
+
+The next bounded Weather unit found a real exact-hour parser discrepancy:
+at13:00, the prior one-hour lookback can select12:00 as **Now**. Three
+regressions failed on the original source. The location-hour cutoff correction
+passed **3,843 JVM tests /403 suites** plus debug assembly in48s; independent
+review found no introduced defect. The final strengthened offset assertion,
+including local13:45, passed in the subsequent18/18 Weather run in7s.
+See [correction and limits](portal-weather-hour-correction-2026-11-02.md).
+
+This is a source fix on `codex/weather-forecast-hour-20261102`, not an installed
+release or performance improvement. Both rooms retain exact1.72/code66.
+A versioned optimized/signer-checked update remains the next release gate.
+Family's pending normal YouTube sign-in must be preserved during any update.
+
+The [Weather review](http://127.0.0.1:8891/weather-review.html) makes the next
+design decision concrete: current fields and adaptive-size work are mapped,
+manual location is separate, and browser/native fonts and hardware acceptance
+remain explicit. The review page and four existing mock routes passed bounded
+desktop/mobile checks. An asynchronous Weather-only sign-off is pending;
+the whole gallery has not been approved. The25-task roadmap now has10
+delivered/implemented,9 scoped verified,2 approval,3 parked and1 queued.
+The clock-format producer concern remains open; it has not been reproduced or
+fixed by this parser correction. No exhausted issue was reopened.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:

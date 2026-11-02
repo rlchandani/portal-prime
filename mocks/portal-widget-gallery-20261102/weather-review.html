@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Weather · Implementation review</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    .weather-review{max-width:900px;padding:36px 24px;margin:auto}
+    .weather-review h1{margin:24px 0 16px}
+    .weather-review p,.weather-review li{max-width:72ch}
+    .weather-review nav{display:flex;gap:16px;flex-wrap:wrap}
+    .weather-review a{text-decoration:underline;text-underline-offset:4px}
+    .weather-review section{margin:32px 0}
+    .weather-review figure{margin:24px 0}
+    .weather-review img{display:block;width:100%;max-width:580px;height:auto;border-radius:22px}
+    .weather-review figcaption{color:var(--muted);font-size:14px;margin-top:12px}
+    .weather-review ul{padding-left:22px}
+    .weather-review li{margin:10px 0}
+    .review-status{padding:16px 20px;background:var(--card);border-radius:16px}
+    .review-links{display:flex;flex-wrap:wrap;gap:12px 20px;margin:16px 0}
+    .review-links a{display:inline-flex;align-items:center;min-height:48px}
+  </style>
+</head>
+<body>
+  <main class="weather-review">
+    <nav aria-label="Review navigation">
+      <a href="./?widget=weather&amp;size=medium&amp;state=normal&amp;view=portal&amp;theme=dark&amp;text=1">Interactive Weather mock</a>
+      <a href="./roadmap/#task=widget-gallery">Roadmap</a>
+    </nav>
+    <h1>A clearer Weather widget.</h1>
+    <p>Keep the temperature easy to read, with a calm condition label and a forecast that fits the space. This is a proposed Portal design using the Weather data already available in Immortal.</p>
+    <p class="review-status"><strong>Design approval pending.</strong> The image is a browser mock with example data. Native visual fidelity and performance still require Portal verification.</p>
+    <figure>
+      <img src="./evidence/weather-medium-review.png" width="580" height="372" alt="Proposed Weather card with 21 degrees, partly cloudy, example city, high and low, three hourly entries and a Weather settings button.">
+      <figcaption>Actual capture of the existing medium mock. Open the interactive version to change size, state, theme and text size.</figcaption>
+    </figure>
+    <section aria-labelledby="data-title">
+      <h2 id="data-title">What we can display with today's data</h2>
+      <ul>
+        <li>Current temperature, city and a condition label derived from the existing weather code.</li>
+        <li>Today's high and low when daily forecast data is available.</li>
+        <li>Hourly temperatures or daily highs/lows, using the existing forecast mode.</li>
+        <li>Existing Celsius/Fahrenheit and 12/24-hour preferences.</li>
+      </ul>
+      <p>No account, Home Assistant service, Google services or new weather provider is needed for these fields.</p>
+    </section>
+    <section aria-labelledby="scope-title">
+      <h2 id="scope-title">Recommended first implementation</h2>
+      <p>Implement the existing-data Weather design: current conditions, hourly and daily forecasts, forecast off, missing forecast, loading and unavailable states. Preserve automatic location lookup and the existing Weather settings destination.</p>
+      <p>Small, medium and large describe proposed content variants. The native widget will adapt to its actual saved width and height; saved placement, order and dimensions stay authoritative. The current renderer uses one layout at every size, so this adaptation must be implemented and verified.</p>
+      <p>The mock's <strong>“Choose a weather location”</strong> state is a separate proposal. The current app has no manual location editor and collapses lookup errors into unavailable data. A location picker is <strong>outside this first implementation</strong> and needs its own complete interaction design.</p>
+      <div class="review-links">
+        <a href="./?widget=weather&amp;size=small&amp;state=normal&amp;view=portal&amp;theme=dark&amp;text=1">Small</a>
+        <a href="./?widget=weather&amp;size=medium&amp;state=normal&amp;view=portal&amp;theme=dark&amp;text=1">Medium</a>
+        <a href="./?widget=weather&amp;size=large&amp;state=forecast_daily&amp;view=portal&amp;theme=dark&amp;text=1">Large daily forecast</a>
+        <a href="./?widget=weather&amp;size=medium&amp;state=forecast_missing&amp;view=portal&amp;theme=dark&amp;text=1.5">Missing forecast at 150% text</a>
+      </div>
+    </section>
+    <section aria-labelledby="quality-title">
+      <h2 id="quality-title">Required before release</h2>
+      <ul>
+        <li>Compare native screenshots with the approved design in both themes and at standard and 150% text. Browser and Android default fonts currently differ, so the mock is not yet a pixel-match receipt.</li>
+        <li>Verify resize, forecast mode, missing data and settings return on Family Area, without changing saved widget identities or placement.</li>
+        <li>Keep existing background IO and inactive-page pause behavior. Changing the presentation must not add requests or restart loading merely because the widget is resized.</li>
+        <li>Compare the same native scenarios before and after: request count, layout/draw time and memory. Reject a performance regression; Mac browser timings do not prove Portal performance.</li>
+        <li>Build and test the accepted iteration, verify it on Family, then install the exact accepted APK on Living.</li>
+      </ul>
+    </section>
+    <section aria-labelledby="limits-title">
+      <h2 id="limits-title">Source limits kept visible</h2>
+      <p>IP-based location can resolve to an ISP city. Current fields do not include humidity, wind, feels-like temperature or freshness timestamps. Forecast failures currently remove the forecast; this review does not promise offline forecast persistence.</p>
+      <p>A separate source review found two correctness concerns: hourly labels can retain the old clock format until refresh, and the exact-hour cutoff could select the previous hour as “Now.” The cutoff correction has a separate test receipt; the clock-format concern remains open.</p>
+    </section>
+  </main>
+</body>
+</html>

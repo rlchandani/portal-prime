@@ -195,3 +195,11 @@ companion APK: **168 distinct methods in 22 classes across five scoped runs**
 match the source inventory; four live Portal UI methods remain excluded.
 No new feature, Android build, room mutation or physical-phone acceptance is
 implied. The24-item queue retains its existing status counts.
+
+The Weather checkpoint adds one actual source correction, bringing the queue
+to25 tasks:10 delivered/implemented,9 scoped verified,2 approval,3 parked and1
+queued. Its exact-hour selection bug has three original failing assertions,
+full3843 JVM/debug proof and a final strengthened18/18 Weather run. It is not
+installed; the current rooms remain1.72/code66. The Weather-only design review
+uses a public sample capture, maps current data and keeps manual-location,
+font fidelity and native performance limits explicit. Sign-off is pending.

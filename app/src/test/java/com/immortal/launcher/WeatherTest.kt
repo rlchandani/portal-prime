@@ -93,7 +93,7 @@ class WeatherTest {
 
   @Test
   fun `hourly drops past hours, labels Now then clock, caps at 12`() {
-    // now = 13:30 -> cutoff 12:30, so 10/11/12:00 are dropped; 13:00 is the first kept.
+    // now = 13:30 -> current hour starts at 13:00; earlier hours are dropped.
     val hours = Weather.parseForecast(sample, utc("2026-06-07T13:30")).hours
     assertEquals(12, hours.size) // 15 candidates from 13:00, capped to 12
 
@@ -107,6 +107,41 @@ class WeatherTest {
     // 12th kept entry is 00:00 the next day.
     assertEquals("12 AM", hours.last().label)
     assertEquals(3, hours.last().code)
+  }
+
+  @Test
+  fun `Now selects the current hour at an exact hour boundary`() {
+    val hours = Weather.parseForecast(sample, utc("2026-06-07T13:00")).hours
+    assertEquals("Now", hours.first().label)
+    assertEquals(60, hours.first().temp)
+    assertEquals(61, hours.first().code)
+    assertEquals("2 PM", hours[1].label)
+  }
+
+  @Test
+  fun `current hour follows whole half and quarter hour location offsets`() {
+    for (offset in listOf(0, -25200, 19800, 20700)) {
+      val local = sample.replace("\"daily\": {", "\"utc_offset_seconds\": $offset, \"daily\": {")
+      for (minute in listOf(0, 45)) {
+        val now = utc("2026-06-07T13:00") - offset * 1000L + minute * 60_000L
+        val hours = Weather.parseForecast(local, now).hours
+        assertEquals("offset=$offset minute=$minute", 60, hours.first().temp)
+        assertEquals("offset=$offset minute=$minute", 61, hours.first().code)
+        assertEquals("offset=$offset minute=$minute", "2 PM", hours[1].label)
+      }
+    }
+  }
+
+  @Test
+  fun `Now advances at midnight but retains the current hour just before it`() {
+    val before = Weather.parseForecast(sample, utc("2026-06-08T00:00") - 1).hours
+    assertEquals(71, before.first().temp)
+    assertEquals("12 AM", before[1].label)
+    val after = Weather.parseForecast(sample, utc("2026-06-08T00:00")).hours
+    assertEquals("Now", after.first().label)
+    assertEquals(72, after.first().temp)
+    assertEquals(3, after.first().code)
+    assertEquals("1 AM", after[1].label)
   }
 
   @Test

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 168 scoped companion UI checks passed; music playback pending (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 Weather current-hour correction locally verified; design review pending (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "music-without-ha",
+  "defaultTask": "weather-current-hour",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact 1.72 / code 66. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
@@ -306,6 +306,10 @@
         {
           "text": "Gallery checkpoint explicitly preserves unapproved status and distinguishes platform interpretations.",
           "source": "docs/portal-widget-gallery-checkpoint-2026-11-02.md; ../"
+        },
+        {
+          "text": "Weather-only implementation review maps current fields and adaptive-size work, excludes the separate manual-location proposal and states browser/native font and hardware acceptance limits. Existing sample mock has a public capture and checked desktop/mobile review routes. Design sign-off has been requested; no approval or native redesign is inferred.",
+          "source": "../weather-review.html; ../evidence/weather-review-validation.json"
         }
       ],
       "limits": [
@@ -1006,6 +1010,39 @@
         "No YouTube Premium playback, current native/companion controls, retention or performance acceptance."
       ],
       "next": "Start its bounded actual-playback unit only after normal human sign-in is confirmed; continue independent authorized work while pending."
+    },
+    {
+      "id": "weather-current-hour",
+      "title": "Weather: Now selects the current hour",
+      "summary": "Fixed the exact-hour boundary that could call the previous hour Now. Three red assertions reproduced it; 3,843 JVM tests/debug build passed, then final strengthened Weather18/18. Not installed.",
+      "description": "The hourly parser now starts at the current hour in the weather response timezone, preserving half-/quarter-hour offsets and midnight behavior. This correctness change is separate from proposed widget presentation.",
+      "status": "verified",
+      "verification": "Implemented / locally verified \u00b7 not deployed",
+      "kind": "Weather correctness fix",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Native / QA",
+      "deployment": "Source correction on codex/weather-forecast-hour-20261102. Both rooms retain exact1.72/code66; the debug verification APK is not a versioned release.",
+      "state": "Original Weather18 tests had3 failures. Full3843/403 JVM gate plus debug APK passed in48s; final strengthened focused18/18 passed in7s.",
+      "acceptance": [
+        "At an exact hour boundary, Now selects that hour\u2019s temperature and condition, not the previous hour.",
+        "Use the response location timezone for whole-, half- and quarter-hour offsets; keep the current hour just before midnight and advance at midnight.",
+        "Preserve existing rounding, labels,12-entry cap, request count and refresh cadence."
+      ],
+      "evidence": [
+        {
+          "text": "Private red/green XML verifies three original assertion failures. Independent source review found no introduced correction defect and a test-strengthening opportunity, which is included in the final focused passing run.",
+          "source": "docs/portal-weather-hour-correction-2026-11-02.md; private local-verification.json"
+        }
+      ],
+      "limits": [
+        "Local parser correctness and debug compilation only; no installed-room or native visual/performance verdict.",
+        "The current debug candidate retains the existing version number; it must be packaged as a new versioned optimized release before deployment.",
+        "Hourly labels retaining a former12/24-hour preference remains a separate open producer issue.",
+        "The whole widget gallery and proposed Weather layout still require user approval."
+      ],
+      "next": "Prepare a versioned optimized release with signer/local gates and preserve Family\u2019s pending normal browser sign-in during any update; then verify exact installed identity in both rooms."
     }
   ]
 }

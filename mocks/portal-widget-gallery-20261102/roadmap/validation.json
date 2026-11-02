@@ -403,5 +403,29 @@
     "newEvidenceAndLimitsVisible": true,
     "pageErrors": 0,
     "limits": "Saved roadmap presentation only. Independently parsed native logs/source inventory match 168 unique fixture methods across five scoped runs; four live UI methods excluded. No physical Pixel, real provider playback, cold reconnect or general performance proof."
+  },
+  "weatherSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T12:48:01.721752+00:00",
+    "taskCount": 25,
+    "counts": {
+      "delivered": 10,
+      "verified": 9,
+      "approval": 2,
+      "parked": 3,
+      "queued": 1
+    },
+    "newWeatherAndUpdatedGalleryDetailsCheckedAtDesktopAndMobile": true,
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "pageErrors": 0,
+    "sourceFixNotDeployedAndDesignPendingVisible": true,
+    "limits": "Four updated-detail saved-page checks only. Independent parser red/green/build and separate Weather review-page proofs have their own receipts; no installed-room or hardware-performance claim."
   }
 }

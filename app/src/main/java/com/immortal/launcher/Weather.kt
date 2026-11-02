@@ -286,8 +286,13 @@ object Weather {
     // 24-hour: a bare hour ("13", "00"); 12-hour: "1 PM".
     val hourFmt = SimpleDateFormat(if (use24Hour) "HH" else "h a", Locale.getDefault())
         .apply { timeZone = zone }
-    // Show the current hour onward; everything before "now" is in the past.
-    val cutoff = nowMillis - 60L * 60 * 1000
+    // Include the current location hour, but never label the previous hour "Now".
+    val cutoff = Calendar.getInstance(zone).apply {
+      timeInMillis = nowMillis
+      set(Calendar.MINUTE, 0)
+      set(Calendar.SECOND, 0)
+      set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
     val out = ArrayList<HourForecast>(12)
     var first = true
     for (i in 0 until time.length()) {

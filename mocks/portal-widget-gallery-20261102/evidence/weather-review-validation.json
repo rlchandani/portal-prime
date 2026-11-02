@@ -1,0 +1,28 @@
+{
+  "checkedAtUtc": "2026-11-02T12:45:47.649643+00:00",
+  "reviewPageViewports": [
+    [
+      1600,
+      1000
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "reviewImagePixels": [
+    580,
+    372
+  ],
+  "horizontalOverflow": false,
+  "scopeAndNativeFidelityLimitsVisible": true,
+  "linkedMockStatesChecked": [
+    "small/normal",
+    "medium/normal",
+    "large/forecast_daily",
+    "medium/forecast_missing/text1.5"
+  ],
+  "pageErrors": 0,
+  "mockCropVisuallyReviewed": true,
+  "limits": "Review page and four existing preview routes only. No native design approval, real weather provider, Portal rendering or hardware-performance proof."
+}
