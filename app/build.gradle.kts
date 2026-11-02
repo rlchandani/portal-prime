@@ -34,7 +34,12 @@ android {
     targetSdk = 36
     versionCode = 70
     versionName = "1.76"
-    testInstrumentationRunner = "com.immortal.launcher.PortalUxInstrumentation"
+    // AGP rewrites the test manifest's instrumentation name from this setting.
+    // The opt-in runner uses framework APIs against optimized targets; app builds are unchanged.
+    testInstrumentationRunner =
+        if (providers.gradleProperty("portalPlatformInstallerFixture").orNull == "true")
+            "com.immortal.launcher.PlatformInstallerInstrumentation"
+        else "com.immortal.launcher.PortalUxInstrumentation"
 
     // Controlled A/B candidate; normal builds keep WebView preparation dormant.
     buildConfigField("boolean", "PORTAL_WEBVIEW_BACKGROUND_STARTUP",
