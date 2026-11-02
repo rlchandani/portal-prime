@@ -1,7 +1,8 @@
 # Home widget fixes — local device delivery 1.65
 
 This is a small device iteration under the whole-product objective, on
-`codex/portal-hi-widget-fixes-20261102`, based on `6c018dc8`.
+`codex/portal-hi-widget-fixes-20261102`, based on `6c018dc8`; native delivery commit
+`d9fce1fb`.
 It does not implement the unapproved gallery redesign or close the ongoing goal.
 No GitHub authentication, hooks, push, tag or public release occurred.
 

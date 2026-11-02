@@ -36,7 +36,7 @@
 - [x] Reproduce by source trace and device edit action; record current destination.
 - [x] Change the existing destination to `sources`.
 - [x] Verify actual edit action opens Photo sources, Back returns correctly, and source controls are available with idle slideshow off. Restore any temporary test configuration. No source credentials or selection were changed.
-- [ ] Commit the bounded fix; build/test, route evidence and limitations are recorded in `docs/portal-widget-fixes-release-2026-11-02.md`.
+- [x] Commit the bounded fix (`d9fce1fb`); build/test, route evidence and limitations are recorded in `docs/portal-widget-fixes-release-2026-11-02.md`.
 
 ### Unit 2: Current alarm timing
 
@@ -49,7 +49,7 @@
 - [x] Integrate a minute-boundary producer using `produceHomeState`; no minute loop when disabled; refresh immediately after Home becomes active.
 - [x] Verify live saved enable changes and add a preference observer through the existing snapshot helper, scoped to active Home. Existing 12-hour rendering observed; separate native 24-hour/time-edit cases remain unverified and are outside this minute-caption acceptance.
 - [x] Verify native armed/off/countdown behavior and repeated Home/Apps/return; keep the actual alarm disabled except during a controlled observation and restore original config.
-- [ ] Commit; build, required tests, independent review and evidence are recorded.
+- [x] Commit (`d9fce1fb`); build, required tests, independent review and evidence are recorded.
 
 ### QA and release gate
 
