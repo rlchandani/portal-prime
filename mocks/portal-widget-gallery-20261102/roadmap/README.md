@@ -246,3 +246,14 @@ and both exact1.75 room APKs are unchanged. This is a verified measurement, not 
 new speedup. Only the two changed Fleet details were checked at390×844 and
 1600×1000:28 rows, phase clarification visible, no horizontal overflow or missing
 labels, and zero page errors. Earlier broad interaction checks retain their scope.
+
+
+The installer snapshot has30 tasks:13 delivered/implemented,10 scoped verified,
+2 approval,3 parked and2 queued. Both rooms have exact1.76/code70. Family native
+API cleanup ran in matching debug after optimized-test ABI failure; final
+optimized/original test APKs were restored. Optimized invalid-APK failure left
+zero sessions. The new test-only Java/framework fixture remains a queued proposal.
+Only installer, proposed optimized-fixture and Weather-clock details were checked
+at390×844 and1600×1000:30 rows, correct1.76/code70 footer, no horizontal overflow,
+undefined labels or page errors. This is saved-page presentation, not native UI
+performance or broad historical interaction reacceptance.

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-02T14:16:47.884352+00:00",
+  "sourceCommit": "95872586",
+  "versionName": "1.76",
+  "versionCode": 70,
+  "artifact": {
+    "bytes": 25860686,
+    "sha256": "85ae519f439ab0d6e0f66565b6bfa291ae5ab470efea9fe9bb75e0869ba96fcd",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "jvm": {
+    "tests": 3858,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 405
+  },
+  "originalRed": {
+    "tests": 7,
+    "failures": 5,
+    "errors": 0
+  },
+  "correlationRed": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0
+  },
+  "familyNativeApi": {
+    "checkedAtUtc": "2026-11-02T14:08:12.014657+00:00",
+    "nativeRuntime": "Matching debug1.76 on Family API29; optimized runtime fixture failed before helper due absent Kotlin Intrinsics",
+    "nativeChecks": 17,
+    "nativeFailures": 0,
+    "originalOwnedSessionCount": 1,
+    "otherOriginalSessionCount": 0,
+    "finalOwnedSessionCount": 0,
+    "oldSessionAbsentFromActiveDumpsys": true,
+    "scratchSessionRemoved": true,
+    "finalOptimizedFullReadbackMatches": true,
+    "finalOptimizedSha256": "85ae519f439ab0d6e0f66565b6bfa291ae5ab470efea9fe9bb75e0869ba96fcd",
+    "priorTestApkRestoredExactly": true,
+    "noHomeOrUiAutomationRequested": true,
+    "limit": "Native API cleanup ran in debug; optimized failed-install runtime check remains separate. Zero other original sessions means native preservation case was empty."
+  },
+  "familyOptimizedFailure": {
+    "checkedAtUtc": "2026-11-02T14:09:47.752896+00:00",
+    "runtime": "Exact optimized1.76/code70 Family API29",
+    "request": "One deliberately invalid public APK; actual Fleet dialog/headless path",
+    "responseStatus": 200,
+    "declaredInstallFailure": true,
+    "elapsedMs": 191.273542,
+    "ownedSessionCountBefore": 0,
+    "ownedSessionCountAfter": 0,
+    "limits": "One terminal invalid-APK failure; no actual 120s timeout or two-package overlap on device.",
+    "ownedFixtureFileRemoved": true
+  },
+  "familyState": {
+    "checkedAtUtc": "2026-11-02T14:10:52.503242+00:00",
+    "versionName": "1.76",
+    "versionCode": 70,
+    "wholeProfileUnchanged": true,
+    "wholeScreensaverConfigUnchanged": true,
+    "devModePreserved": true,
+    "originalChromeTask27174Retained": true,
+    "limit": "Task retention is not foreground, browser process or playback continuity acceptance."
+  },
+  "livingState": {
+    "checkedAtUtc": "2026-11-02T14:11:34.176361+00:00",
+    "helperTerminalExit": 0,
+    "versionName": "1.76",
+    "versionCode": 70,
+    "wholeProfileUnchanged": true,
+    "wholeScreensaverConfigUnchanged": true,
+    "devModePreserved": true,
+    "installDispatches": 1,
+    "limit": "Final artifact/state delivery only; no duplicate Living native interaction run.",
+    "fullInstalledApkSha256VerifiedByHelper": true,
+    "installedApkSha256": "85ae519f439ab0d6e0f66565b6bfa291ae5ab470efea9fe9bb75e0869ba96fcd"
+  },
+  "limits": [
+    "Native ownership cleanup ran on matching debug APK; optimized fixture failed because test package expected R8-removed Kotlin Intrinsics. Final optimized/original test APKs restored exactly.",
+    "Zero other original sessions: native unrelated-install preservation was an empty case.",
+    "Actual120-second timeout, two-package overlap and successful/pending confirmation on new optimized code were not run.",
+    "No duplicate Living interaction, native UI/FPS, provider playback or physical phone acceptance."
+  ]
+}

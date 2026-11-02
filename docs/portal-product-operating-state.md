@@ -11,9 +11,11 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Latest transport delivery:** exact optimized **1.75/code69** is installed in both rooms. Family7/7 HTTP cases passed; stalled rejection changed from no reply within3s to median217ms measured through EOF. One70001-byte upload/readback and cleanup passed, with complete room settings unchanged. [Scoped receipt](portal-fleet-error-response-2026-11-02.md). The [phase follow-up](portal-fleet-response-timing-2026-11-02.md) found normal identity-body completion at median23ms; the extra wait is after the body. The strict CLI still waits through EOF. No TCP tuning, new APK or general UI speedup is claimed.
+- **Latest installer maintenance:** exact optimized **1.76/code70** is installed in both rooms. Failed attempts abandon only their created session, with exact callback-session correlation.3858 JVM/405 suites passed. Family17 matching-debug native API checks cleared the old session; optimized invalid-APK failure left0 sessions. Original test APK and final optimized APK were fully restored/read back; both room settings are unchanged. [Scoped receipt](portal-installer-session-cleanup-2026-11-02.md). Actual timeout/overlap/success-on-new-code and native UI performance remain separate.
 
-- **Latest Weather clock-format maintenance:** exact optimized **1.74/code68** is installed in both rooms; complete settings are unchanged.3845 JVM tests and274 Family debug-runtime formatter checks passed. Actual Home/settings-return UI acceptance is still open. See [scoped receipt](portal-weather-clock-format-2026-11-02.md). Older versioned receipts below keep their historical scope.
+- **Retained transport delivery:** the1.75 correction remains included in current1.76. Original Family7/7 HTTP cases passed; stalled rejection changed from no reply within3s to median217ms measured through EOF. One70001-byte upload/readback and cleanup passed. [Scoped receipt](portal-fleet-error-response-2026-11-02.md). The [phase follow-up](portal-fleet-response-timing-2026-11-02.md) found normal identity-body completion at median23ms; the extra wait is after the body. The strict CLI still waits through EOF. No TCP tuning or general UI speedup is claimed.
+
+- **Retained Weather clock-format maintenance:** current1.76 retains the1.74 correction. Original3845 JVM tests and274 Family debug-runtime formatter checks passed. Actual Home/settings-return UI acceptance is still open. See [scoped receipt](portal-weather-clock-format-2026-11-02.md). Older versioned receipts below keep their historical scope.
 
 - The active goal covers the whole existing product: Portal, native Android
   companion, browser remote, fleet/provisioning, integrations, UX, reliability,
@@ -529,3 +531,23 @@ Current28-item saved roadmap: **12 delivered/implemented,10 scoped verified,
 2 awaiting approval,3 parked and1 queued**. Weather/gallery design approval,
 ordinary YouTube sign-in/playback, stale installer cleanup and physical-phone
 acceptance retain their separate boundaries. No exhausted issue was reopened.
+
+
+## Installer cleanup checkpoint — 2 November 2026
+
+Source95872586 is delivered in exact optimized1.76/code70 in both rooms.
+Final3858 JVM/405 suites and signed debug/test/optimized gates passed. Family
+matching-debug native API cleanup passed17 checks and cleared the old owned
+session1→0; its optimized invalid-APK check left0→0 sessions in191ms. The
+optimized fixture's Kotlin ABI failure is explicitly retained; original test and
+final optimized APKs were fully restored. Whole room profiles/screensaver settings
+are unchanged and original Family Chrome task27174 remains listed. Living had one
+verified final-artifact deployment without repeated native interactions.
+See [scoped receipt](portal-installer-session-cleanup-2026-11-02.md).
+
+The saved30-task roadmap now has13 delivered/implemented,10 scoped verified,
+2 approval,3 parked and2 queued. A new independent test-only candidate addresses
+the actual optimized fixture ABI failure using Java/framework APIs, preserving
+production APK/R8/configuration and every parked issue. It has not started or
+passed. Music login/playback, design approval and physical phone acceptance remain
+separate; the installer cleanup itself is closed.

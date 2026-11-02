@@ -526,5 +526,37 @@
     "undefinedLabels": false,
     "pageErrors": 0,
     "limits": "Only two changed saved-page details and rendered row count; not all detail/filter checks, native performance or new production delivery."
+  },
+  "installerSessionCleanupSnapshot": {
+    "checkedAtUtc": "2026-11-02T14:18:18.073917+00:00",
+    "tasks": 30,
+    "counts": {
+      "delivered": 13,
+      "verified": 10,
+      "approval": 2,
+      "parked": 3,
+      "queued": 2
+    },
+    "selectedTaskIds": [
+      "installer-owned-sessions",
+      "qa-optimized-platform-fixture",
+      "weather-clock-format"
+    ],
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "changedDetailsChecked": 6,
+    "horizontalOverflow": false,
+    "undefinedLabels": false,
+    "versionFooterCorrect": true,
+    "pageErrors": 0,
+    "limits": "Only three changed saved-page details and row count; no native UI/performance or broad repeat acceptance."
   }
 }

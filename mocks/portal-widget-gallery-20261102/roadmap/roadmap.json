@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 Fleet timing phases verified: normal info body median 23ms; both rooms retain exact 1.75 (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 Installer cleanup delivered as1.76 in both rooms; Family owned session1\u21920 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "fleet-small-response-latency",
+  "defaultTask": "installer-owned-sessions",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact optimized 1.75 / code 69. Earlier task receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
+    "Both rooms have exact optimized1.76/code70. Earlier task receipts retain their acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -73,7 +73,7 @@
     {
       "id": "settings-contract",
       "title": "Native settings editor contract",
-      "summary": "Settings editor classification and projection tests passed; maintenance is included in current 1.73. Every-editor native acceptance remains separate.",
+      "summary": "Settings editor classification and projection tests passed; maintenance is included in current 1.76. Every-editor native acceptance remains separate.",
       "description": "Replace the obsolete inline-string prohibition with classification and projection coverage for the renderer's actual supported editors. This protects the existing settings behavior.",
       "status": "verified",
       "verification": "Locally verified \u00b7 included in deployed APK",
@@ -82,7 +82,7 @@
         "portal"
       ],
       "owner": "Settings QA / Main",
-      "deployment": "Current exact 1.72 includes the maintenance in both rooms; the original scoped Slideshow proof does not establish every editor.",
+      "deployment": "Current exact 1.76 includes the maintenance in both rooms; the original scoped Slideshow proof does not establish every editor.",
       "state": "Terminal local gates passed in 3m 58s",
       "acceptance": [
         "Cover real registry editor selection, including inline and Activity-backed strings, fleet name and dashboard URL.",
@@ -121,7 +121,7 @@
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Current exact 1.72 preserves the accepted 1.67 timer fix in both rooms; original feature acceptance remains scoped to its named receipt.",
+      "deployment": "Current exact 1.76 preserves the accepted 1.67 timer fix in both rooms; original feature acceptance remains scoped to its named receipt.",
       "state": "Accepted in the 30-minute slot; original Family layout, Home page and screensaver configuration restored.",
       "acceptance": [
         "Reproduce the widget/editor behavior on the existing owner path before labeling it a runtime defect.",
@@ -322,7 +322,7 @@
     {
       "id": "world-clock",
       "title": "World Clock: complete rows & city counts",
-      "summary": "Complete city rows and counts passed normal and 150% native checks; the accepted fix is preserved in current 1.73 on both rooms.",
+      "summary": "Complete city rows and counts passed normal and 150% native checks; the accepted fix is preserved in current 1.76 on both rooms.",
       "description": "The existing 488 \u00d7 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
       "status": "delivered",
       "verification": "Device proof \u00b7 both rooms",
@@ -331,7 +331,7 @@
         "portal"
       ],
       "owner": "Native / QA",
-      "deployment": "Current exact 1.72 preserves the accepted 1.66 World Clock fix in both rooms; original normal/150% proof is separately recorded.",
+      "deployment": "Current exact 1.76 preserves the accepted 1.66 World Clock fix in both rooms; original normal/150% proof is separately recorded.",
       "state": "Delivered within bounded acceptance",
       "acceptance": [
         "Family normal text: two complete cities; three cities show \u201c1 more city\u201d; four show \u201c2 more cities.\u201d",
@@ -362,7 +362,7 @@
     {
       "id": "photo-alarm",
       "title": "Photo Memory routing & alarm countdown",
-      "summary": "Scoped native Photo Memory routing and alarm countdown checks passed; both fixes are preserved in current 1.73 on both rooms.",
+      "summary": "Scoped native Photo Memory routing and alarm countdown checks passed; both fixes are preserved in current 1.76 on both rooms.",
       "description": "Photo Memory editing opens Photo sources even with idle slideshow disabled. The active-page alarm caption observes saved configuration, rounds partial minutes up and refreshes at minute boundaries.",
       "status": "delivered",
       "verification": "Device proof \u00b7 both rooms",
@@ -371,7 +371,7 @@
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Current exact 1.72 preserves the accepted 1.65 routing/caption fixes in both rooms; original acceptance limits remain.",
+      "deployment": "Current exact 1.76 preserves the accepted 1.65 routing/caption fixes in both rooms; original acceptance limits remain.",
       "state": "Scoped native acceptance passed",
       "acceptance": [
         "Family source entry works with idle slideshow disabled and enabled; Back returns through Photos to Home.",
@@ -533,7 +533,7 @@
         "portal"
       ],
       "owner": "Browser QA / Main",
-      "deployment": "Current exact 1.72 preserves the accepted 1.69 status fix in both rooms; the six-trial browser proof retains its original 1.69 scope.",
+      "deployment": "Current exact 1.76 preserves the accepted 1.69 status fix in both rooms; the six-trial browser proof retains its original 1.69 scope.",
       "state": "Full 40/676 JS, 161 Python, 3,800 JVM / 399 suites and optimized/signing gates passed. Both rooms\u2019 saved profiles, screensaver settings and layout remain unchanged.",
       "acceptance": [
         "Initial cancellation cannot mark a successor page/room Offline; missing metadata is requested before the next poll.",
@@ -749,7 +749,7 @@
         "tooling"
       ],
       "owner": "Portal storage / fleet engineering",
-      "deployment": "Current exact 1.72/code66 preserves the accepted 1.71 upload fix in both rooms. Original 13-case acceptance remains scoped to its receipt; the later JSON unit rechecked complete and interrupted binary uploads.",
+      "deployment": "Current exact 1.76/code66 preserves the accepted 1.71 upload fix in both rooms. Original 13-case acceptance remains scoped to its receipt; the later JSON unit rechecked complete and interrupted binary uploads.",
       "state": "Implemented on codex/fleet-upload-integrity-20261102. Fresh3,821 JVM/401 suites,716 JS,161 Python and optimized gates passed. Family13 API checks passed; owned scratch removed and slideshow resumed.",
       "acceptance": [
         "Reproduce cancellation and complete-upload behavior with isolated public scratch files.",
@@ -1081,9 +1081,9 @@
         "Native fixtures ran on the temporary debug build, not the optimized Home renderer.",
         "Actual Home/settings return, request counts, deadline measurement, physical visual judgement and latency/FPS are unverified.",
         "Weather/gallery redesign approval and normal Google sign-in remain separate; no HA service or account automation.",
-        "Family retains one sealed installer session from the failed automatic confirmation. Its dialog is no longer foreground; original Chrome task27174 is resumed. Shell abandonment was rejected because the session belongs to the app. Session cleanup remains open."
+        "The original1.74 delivery left a sealed app-owned session. Separate1.76 cleanup removed it on Family; actual Home/settings-return UI acceptance remains open."
       ],
-      "next": "Resolve the stale app-owned installer session in a separate bounded slot, then verify Home/settings-return UI without interrupting the normal music sign-in."
+      "next": "Installer cleanup is delivered in1.76. Actual Home/settings-return UI remains separate; preserve pending human music sign-in."
     },
     {
       "id": "fleet-error-response",
@@ -1125,7 +1125,7 @@
         "Baseline 3s is a no-response lower bound, not a 30s timing measurement or before median.",
         "The four-worker pool and 30-second drainage timeout are unchanged; this does not solve pool exhaustion from an uncooperative peer.",
         "No repeated Living interaction run, physical phone, optical FPS or general product performance claim.",
-        "Prior Family installer-session cleanup and actual Weather settings-return UI remain open.",
+        "Installer cleanup is separately delivered in1.76; actual Weather settings-return UI remains open.",
         "Later phase measurements show the earlier ~217ms completion includes EOF; selected rejection body median6.233ms. It is not a normal-client UI latency measurement."
       ],
       "next": "Retain prompt rejection. The separate phase follow-up is verified; no new transport tuning or APK."
@@ -1145,7 +1145,7 @@
         "tooling"
       ],
       "owner": "Main / performance QA",
-      "deployment": "No socket tuning, CLI source change or new APK. Both rooms retain exact optimized 1.75/code69.",
+      "deployment": "No transport tuning or CLI source change. Original phase evidence was collected on1.75; both rooms now have independently delivered1.76 installer maintenance.",
       "state": "12 phase requests, 3 normal HTTP and 3 current CLI calls passed their selected status/body/version checks. No writes, account operations or UI navigation.",
       "acceptance": [
         "Separate complete headers, complete body and EOF using nonmutating Family requests.",
@@ -1170,6 +1170,83 @@
         "Previously exhausted issues remain parked."
       ],
       "next": "Close this measurement candidate. Continue independent product work; Weather design approval, normal YouTube sign-in/playback and physical-phone acceptance remain separate."
+    },
+    {
+      "id": "installer-owned-sessions",
+      "title": "Installer: clean up failed sessions safely",
+      "summary": "Delivered in both rooms. Family stale owned session1\u21920;17 matching-debug API checks passed. Optimized failed-APK check left0 sessions. Original test APK restored.",
+      "description": "Failed and timed-out attempts abandon only the session they created. Exact callback IDs stop another install\u2019s result from completing or cancelling this attempt. Successful attempts skip abandonment.",
+      "status": "delivered",
+      "verification": "Family scoped native/optimized proof \u00b7 both exact APKs",
+      "kind": "Installer reliability",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "Main / QA",
+      "deployment": "Exact optimized1.76/code70 installed/read back in both rooms. Family final optimized APK and original test APK restored; Living single Fleet deploy verified full installed SHA-256.",
+      "state": "3858 JVM/405 suites pass. Complete room profiles/screensaver configuration unchanged; Dev mode retained. Original Family Chrome task27174 remains listed.",
+      "acceptance": [
+        "Abandon only the failed attempt\u2019s created session; preserve observed success and cleanup disarming/receiver release.",
+        "Ignore foreign or missing session IDs before status changes or confirmation navigation.",
+        "Clear the explicitly prevalidated old app-owned session and owned scratch; restore exact original test/final optimized APKs.",
+        "Verify optimized failure returns and creates no leftover owned session; preserve both rooms\u2019 complete configuration."
+      ],
+      "evidence": [
+        {
+          "text": "Seven initial fixtures had five missing-abandonment failures; coordinated foreign-result case failed before correlation. Final3858/405 JVM gate and all signed artifacts passed.",
+          "source": "docs/portal-installer-session-cleanup-2026-11-02.md"
+        },
+        {
+          "text": "API29 matching-debug cleanup:17 checks,0 failures; original owned1\u21920. Final dumpsys agrees. Optimized invalid APK returned expected failure in191.274ms; owned0\u21920; generated file removed.",
+          "source": "../evidence/installer-session-cleanup-verification.json"
+        },
+        {
+          "text": "Both rooms\u2019 installed optimized APK SHA-25685ae519f439ab0d6e0f66565b6bfa291ae5ab470efea9fe9bb75e0869ba96fcd; complete settings unchanged. Original test APK restored exactly.",
+          "source": "docs/portal-installer-session-cleanup-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "The first optimized fixture crashed on absent Kotlin Intrinsics; native API cleanup passed in matching debug runtime. Final optimized APK is restored.",
+        "No other original sessions existed; native unrelated-session preservation was an empty case.",
+        "Actual120s timeout, two-package overlap and successful/pending confirmation on new optimized code remain untested; local guards cover selected cases.",
+        "One191ms terminal failure is not a general performance benchmark. No duplicate Living interaction, physical phone or native UI/FPS claim.",
+        "Process termination during self-update can bypass finally, as before."
+      ],
+      "next": "Keep this fix. Next independent QA item is a platform-only fixture compatible with optimized runtime, without APK swaps or production keep-rule changes."
+    },
+    {
+      "id": "qa-optimized-platform-fixture",
+      "title": "Native QA: platform fixture on the optimized APK",
+      "summary": "Queued from actual failure: Kotlin Intrinsics absent in optimized target. A small Java/Android-API-only fixture could avoid temporary debug-APK swaps.",
+      "description": "Improve installer/system API verification without requiring the debug-targeted Kotlin UI fixture ABI. Keep product code, R8 rules, signing and current1.76 APK unchanged.",
+      "status": "queued",
+      "verification": "Actual fixture ABI failure \u00b7 proposed correction unbuilt",
+      "kind": "Native QA infrastructure",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "Native QA",
+      "deployment": "No new fixture/runtime change. Both rooms retain exact1.76; original Family test package restored.",
+      "state": "Actual first optimized test process failed on kotlin.jvm.internal.Intrinsics; matching-debug rerun passed17 checks and final artifacts were restored.",
+      "acceptance": [
+        "Use only Java/framework APIs for a bounded installer fixture; avoid product/R8/source-version changes.",
+        "Run against actual optimized1.76 on Family without replacing its application APK.",
+        "Use only freshly created owned temporary sessions, retain an unrelated owned guard session while checking targeted abandonment, and remove every owned resource.",
+        "Restore the original test APK and verify full installed app hash/configuration; keep parked UI/performance investigations closed."
+      ],
+      "evidence": [
+        {
+          "text": "Optimized test ABI failure and successful matching-debug API check are recorded with exact final restoration.",
+          "source": "docs/portal-installer-session-cleanup-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Proposal only; no Java fixture, compiler/runtime acceptance or success rate claimed.",
+        "This does not make every Kotlin UI fixture optimized-compatible or reopen parked native performance/legacy-style work."
+      ],
+      "next": "One independent30-minute test-only unit. Family only; no new Portal APK or Living test-package deployment."
     }
   ]
 }
