@@ -1,0 +1,36 @@
+{
+  "model": {
+    "exit": 0,
+    "value": "Portal+"
+  },
+  "android_api": {
+    "exit": 0,
+    "value": "29"
+  },
+  "platform": {
+    "exit": 0,
+    "value": "qcs605"
+  },
+  "screen": {
+    "exit": 0,
+    "value": "Physical size: 2160x1440"
+  },
+  "density": {
+    "exit": 0,
+    "value": "Physical density: 180"
+  },
+  "memory": {
+    "exit": 0,
+    "value": "MemTotal:        2848792 kB\nMemAvailable:     655308 kB"
+  },
+  "gpu": {
+    "exit": 0,
+    "value": "GLES: Qualcomm, Adreno (TM) 615, OpenGL ES 3.2 V@415.0 (GIT@6fec18e925, I6763ffc824, 1773055671) (Date:03/09/26)"
+  },
+  "activity": {
+    "exit": 0,
+    "value": "mResumedActivity: ActivityRecord{f0fe9c u0 com.immortal.launcher.debug/com.immortal.launcher.PhotoFramePreviewActivity t27155}"
+  },
+  "scope": "Read-only readiness check; no native widget or performance test",
+  "recordedAtUtc": "2026-11-02T05:46:53.732860+00:00"
+}

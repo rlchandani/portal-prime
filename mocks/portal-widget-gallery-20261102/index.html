@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Immortal · Widget studio</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">i</span> immortal <span class="brand-detail">Widget studio</span></a>
+    <div class="top-actions">
+      <span class="review-tag">Design review · 01</span>
+      <button id="theme" type="button" aria-label="Switch to light theme"></button>
+    </div>
+  </header>
+  <div class="workspace">
+    <aside class="sidebar" aria-label="Widget selection">
+      <div class="sidebar-heading"><span>YOUR WIDGETS</span><span id="widget-count"></span></div>
+      <label class="search-label"><span class="sr-only">Find a widget</span><input id="search" type="search" placeholder="Find a widget" autocomplete="off"></label>
+      <nav id="widget-list" aria-label="Widgets"></nav>
+      <p class="sidebar-note">14 built-in widgets.<br>One home for installed widgets.</p>
+    </aside>
+    <main>
+      <div class="intro">
+        <div><p class="eyebrow">GLANCE. UNDERSTAND. ACT.</p><h1 id="title">Widget gallery</h1><p id="description" class="description"></p></div>
+        <div class="view-switch" role="group" aria-label="Preview view"><button type="button" data-view="compare">Compare</button><button type="button" data-view="portal">Portal</button></div>
+      </div>
+      <section class="controls" aria-label="Preview controls">
+        <div><span class="control-label">Size</span><div id="size-controls" class="segmented" role="group" aria-label="Widget size"></div></div>
+        <label class="state-label"><span class="control-label">State</span><select id="state" aria-label="Widget state"></select></label>
+        <label class="text-label"><span class="control-label">Text size</span><select id="text-size" aria-label="Preview text size"><option value="1">Standard</option><option value="1.25">125%</option><option value="1.5">150%</option></select></label>
+      </section>
+      <div class="state-note"><span id="state-origin"></span><span>Illustrative data · no live commands</span></div>
+      <section id="previews" class="previews" aria-label="Platform previews"></section>
+      <div class="review-details">
+        <section class="rationale"><p class="eyebrow">WHY THIS SIZE</p><h2 id="size-title"></h2><p id="rationale"></p></section>
+        <section class="source"><p class="eyebrow">IMPLEMENTATION CHECK</p><h2 id="implementation-title"></h2><p id="source"></p><p class="reference-note">Android &amp; iOS are reference interpretations. Portal is a proposed Compose layout. Device verification follows approval.</p></section>
+      </div>
+      <section class="coverage"><div><p class="eyebrow">COVERAGE</p><h2>Every widget, every source-backed state.</h2></div><p id="coverage-summary"></p><details><summary>View state inventory</summary><div id="coverage-table"></div></details></section>
+      <footer><span>Neutral Meta palette · adaptive hierarchy · no backdrop blur</span><a href="./research.html">Research &amp; acceptance criteria ↗</a></footer>
+    </main>
+  </div>
+  <dialog id="action-dialog"><div class="dialog-content"><span class="eyebrow">PREVIEW ACTION</span><h2 id="action-title"></h2><p id="action-description"></p><button id="close-dialog" class="primary" type="button">Done</button></div></dialog>
+  <div id="status" class="sr-only" role="status"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

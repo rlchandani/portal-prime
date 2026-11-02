@@ -1,0 +1,18 @@
+{
+  "five": "05:00",
+  "paused": "05:00",
+  "resumed": "05:00",
+  "refreshing": "refreshing",
+  "refreshed": "normal",
+  "before": "Off",
+  "after": "On",
+  "bedroom": "Bedroom lampOn",
+  "daily": "Mon24°16°Tue25°17°Wed26°18°",
+  "offForecast": 0,
+  "missingForecast": 0,
+  "missingHighLow": false,
+  "alarmSizes": {
+    "small": true,
+    "large": true
+  }
+}

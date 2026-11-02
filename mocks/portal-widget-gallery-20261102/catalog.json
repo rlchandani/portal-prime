@@ -1,0 +1,939 @@
+[
+  {
+    "id": "weather",
+    "name": "Weather",
+    "description": "Generated fixture; no live data. Current conditions and hourly or daily forecast.",
+    "source": "app/src/main/java/com/immortal/launcher/ApprovedHomeWeather.kt",
+    "sourceSymbol": "ApprovedHomeWeather",
+    "local": false,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small current temperature; medium current plus three forecast items; large five-item forecast and high/low. Current renderer uses one layout, 94 sp temperature and up to five forecast items; saved 2x2 resolves to 1x2.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Hourly forecast",
+        "headline": "Weather",
+        "value": "21°",
+        "detail": "Generated fixture; no live data. Example City · H: 24° · L: 16°. WIDGET_HOURLY renders up to five hour labels, condition icons and temperatures; anonymous example: Now 21°, 11 AM 22°, 12 PM 23°, 1 PM 24°, 2 PM 22°.",
+        "action": "Weather settings",
+        "implemented": true
+      },
+      {
+        "id": "forecast_daily",
+        "label": "Daily forecast",
+        "headline": "Weather",
+        "value": "21°",
+        "detail": "Generated fixture; no live data. Example City · H: 24° · L: 16°. WIDGET_DAILY renders up to five days with condition icons and high/low: Today 24°/16°, Tue 23°/15°, Wed 22°/14°, Thu 24°/15°, Fri 25°/16°. These are generated examples, not a forecast.",
+        "action": "Weather settings",
+        "implemented": true
+      },
+      {
+        "id": "forecast_off",
+        "label": "Forecast strip off",
+        "headline": "Weather",
+        "value": "21°",
+        "detail": "Generated fixture; no live data. Example City · H: 24° · L: 16°. WIDGET_OFF hides only the hourly/daily strip; current weather remains, and high/low still appears if forecast.days has data. The renderer still runs its forecast producer.",
+        "action": "Weather settings",
+        "implemented": true
+      },
+      {
+        "id": "forecast_missing",
+        "label": "Current conditions without forecast",
+        "headline": "Weather",
+        "value": "21°",
+        "detail": "Generated fixture; no live data. Example City. Current conditions are available but forecast is null: high/low and forecast items disappear. This also covers initial forecast loading or fetch failure; no dedicated forecast-error message or inline retry is rendered.",
+        "action": "Weather settings",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No location configured · proposed",
+        "headline": "Choose a weather location",
+        "value": "—",
+        "detail": "Generated fixture; no live data. Proposed setup state. Current code has no separate location-setup branch; null data uses Weather unavailable.",
+        "action": "Weather settings",
+        "implemented": false
+      },
+      {
+        "id": "loading",
+        "label": "Loading / shared placeholder",
+        "headline": "Weather unavailable",
+        "value": "—",
+        "detail": "Generated fixture; no live data. Initial null current renders this same placeholder and weather icon. Loading is not distinguished from failure.",
+        "action": "Weather settings",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Unavailable / shared placeholder",
+        "headline": "Weather unavailable",
+        "value": "—",
+        "detail": "Generated fixture; no live data. A failed current fetch uses this same null-data branch. There is no inline retry; forecast rows can disappear independently.",
+        "action": "Weather settings",
+        "implemented": true
+      }
+    ]
+  },
+  {
+    "id": "world_clock",
+    "name": "World clock",
+    "description": "Generated fixture; no live data. Selected cities and their local time.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ImmortalWorldClockWidget",
+    "local": true,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small one city; medium two cities; large four cities with weekdays. Current code always takes the first four and uses the same scrolling digital layout; saved 2x2 resolves to 1x2.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Selected cities",
+        "headline": "World clock",
+        "value": "10:30 AM",
+        "detail": "Generated fixture; no live data. Example UTC city · Monday. Fixture time is fixed; production reads local time and selected zones.",
+        "action": "Choose cities",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No cities",
+        "headline": "Add cities to see their local time.",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual empty selection branch. No network or offline-error state applies.",
+        "action": "Choose cities",
+        "implemented": true
+      }
+    ]
+  },
+  {
+    "id": "timers",
+    "name": "Timers",
+    "description": "Generated fixture; no live data. Local countdown presets, pause, reset and alarm stop.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ImmortalTimersWidget",
+    "local": true,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small countdown plus primary action; medium countdown with pause/reset; large presets and custom duration when ready. Current code uses one scrollable shell and FlowRow; saved 2x2 resolves to 1x2.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Running",
+        "headline": "Set a timer",
+        "value": "12:34",
+        "detail": "Generated fixture; no live data. Actual running countdown branch; Pause and Reset are available.",
+        "action": "Pause",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "Ready / no timer",
+        "headline": "Set a timer",
+        "value": "Ready",
+        "detail": "Generated fixture; no live data. Actual zero-remaining, non-ringing branch offers 5m, 10m, 30m and Custom.",
+        "action": "Custom",
+        "implemented": true
+      },
+      {
+        "id": "paused",
+        "label": "Paused",
+        "headline": "Set a timer",
+        "value": "12:34",
+        "detail": "Generated fixture; no live data. Actual paused timer branch; Start and Reset are available.",
+        "action": "Start",
+        "implemented": true
+      },
+      {
+        "id": "ringing",
+        "label": "Alarm ringing",
+        "headline": "Stop the alarm",
+        "value": "Time's up",
+        "detail": "Generated fixture; no live data. Actual ringing branch.",
+        "action": "Stop",
+        "implemented": true
+      }
+    ]
+  },
+  {
+    "id": "calendar",
+    "name": "Calendar",
+    "description": "Generated fixture; no live data. Upcoming events from the configured calendar feed.",
+    "source": "app/src/main/java/com/immortal/launcher/ApprovedHomeCalendar.kt",
+    "sourceSymbol": "ApprovedHomeCalendar",
+    "local": false,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small next event; medium next two events; large grouped agenda and refresh. Current renderer retains one LazyColumn event anatomy at every size; saved 2x2 resolves to 1x2.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Upcoming events",
+        "headline": "Calendar",
+        "value": "Design session",
+        "detail": "Generated fixture; no live data. Today · 10:30 AM. Anonymous event title; production uses grouped event rows.",
+        "action": "Refresh",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No events",
+        "headline": "No upcoming events",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual configured feed with no rows and no error.",
+        "action": "Refresh",
+        "implemented": true
+      },
+      {
+        "id": "setup",
+        "label": "No calendar linked",
+        "headline": "Add your calendar",
+        "value": "",
+        "detail": "Generated fixture; no live data. See your upcoming events here. Actual missing-URL branch.",
+        "action": "Add calendar",
+        "implemented": true
+      },
+      {
+        "id": "loading",
+        "label": "Loading",
+        "headline": "Loading calendar…",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual initial refresh with no rows. The Refreshing action is disabled while busy.",
+        "action": "Refreshing…",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Feed unavailable",
+        "headline": "Calendar unavailable",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual unavailable result without rows.",
+        "action": "Try again",
+        "implemented": true
+      },
+      {
+        "id": "stale",
+        "label": "Saved events after failure",
+        "headline": "Couldn’t refresh. Showing saved events.",
+        "value": "Design session",
+        "detail": "Generated fixture; no live data. Actual unavailable result with saved rows; anonymous example event.",
+        "action": "Try again",
+        "implemented": true
+      },
+      {
+        "id": "refreshing",
+        "label": "Refreshing saved content",
+        "headline": "Calendar",
+        "value": "Design session",
+        "detail": "Generated fixture; no live data. Actual existing rows retained while refresh is in progress; the action is disabled.",
+        "action": "Refreshing…",
+        "implemented": true
+      }
+    ]
+  },
+  {
+    "id": "alarm",
+    "name": "Alarm",
+    "description": "Generated fixture; no live data. Local wake-up time, repeat schedule and enabled state.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ImmortalAlarmWidget",
+    "local": true,
+    "sizes": [
+      "medium"
+    ],
+    "sizeRationale": "Medium only: the current data model exposes one configured alarm, so smaller/larger density choices would not reveal another meaningful set of alarms or details. Keep its time, single label/countdown and enable control together. Current renderer uses one 48 sp time layout and scrollable shell; saved 2x2 resolves to 1x2. Multiple-alarm lists are not implemented.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Enabled",
+        "headline": "Alarm",
+        "value": "7:00 AM",
+        "detail": "Generated fixture; no live data. Example alarm · in 8 hr 30 min. Production shows cfg.label or the fallback Weekdays before the countdown, not both a label and a repeat summary. Next-trigger relative text has no continuous ticker. Disable denotes the existing inline toggle; it is not a literal text button.",
+        "action": "Disable",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "Disabled",
+        "headline": "No alarm set",
+        "value": "7:00 AM",
+        "detail": "Generated fixture; no live data. Actual disabled branch still displays the configured time; No alarm set also appears when an enabled alarm has no next trigger. Enable denotes the inline toggle rather than a literal text button. No network/offline-error state is coded.",
+        "action": "Enable",
+        "implemented": true
+      }
+    ]
+  },
+  {
+    "id": "crypto",
+    "name": "Crypto",
+    "description": "Generated fixture; no live data. Configured coin prices, daily changes and sparklines.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ImmortalCryptoWidget",
+    "local": false,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small one quote; medium three quotes; large six quotes with sparklines. Current code only scales row count from saved spanY and keeps one row anatomy; saved 2x2 resolves to 1x2.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Quotes",
+        "headline": "Crypto",
+        "value": "BTC · $43,210",
+        "detail": "Generated fixture; no live data. Synthetic quote, not a market price · +1.2%. Sparkline and change pill are coded.",
+        "action": "Edit coins",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No returned quotes",
+        "headline": "Add coins to track",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual empty quote-list branch, including unconfigured coins or failed uncached fetch/parse.",
+        "action": "Edit coins",
+        "implemented": true
+      },
+      {
+        "id": "loading",
+        "label": "Loading",
+        "headline": "Loading…",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual null initial quote state.",
+        "action": "Edit coins",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Fetch failure recovery · proposed",
+        "headline": "Quotes unavailable",
+        "value": "—",
+        "detail": "Generated fixture; no live data. Proposed distinct error and retry. Current failure is conflated with Add coins to track; cached data has no stale-age indicator.",
+        "action": "Try again",
+        "implemented": false
+      }
+    ]
+  },
+  {
+    "id": "todo",
+    "name": "To-do",
+    "description": "Generated fixture; no live data. Local checklist with completion toggles and remaining count.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ImmortalTodoWidget",
+    "local": true,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small top task and count; medium three tasks; large six tasks and completion summary. Current code caps saved-height rows and truncates every task to one line; saved 2x2 resolves to 1x2.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Open tasks",
+        "headline": "To-do",
+        "value": "Review example plan",
+        "detail": "Generated fixture; no live data. Anonymous task fixture · 2 to do. Actual rows toggle completion and open items sort first.",
+        "action": "Edit items",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No items",
+        "headline": "No items — tap to add",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual empty saved list.",
+        "action": "Add items",
+        "implemented": true
+      },
+      {
+        "id": "complete",
+        "label": "All completed",
+        "headline": "All done 🎉",
+        "value": "Review example plan",
+        "detail": "Generated fixture; no live data. Actual completed rows are dimmed and struck through; remaining count is zero.",
+        "action": "Edit items",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Local storage read/action failure",
+        "headline": "To-do unavailable",
+        "value": "",
+        "detail": "Generated fixture; no live data. Saved items couldn't be loaded. Try again. This is the rendered local Result failure from read/toggle/reload, not an offline state.",
+        "action": "Try again",
+        "implemented": true
+      }
+    ]
+  },
+  {
+    "id": "news",
+    "name": "News",
+    "description": "Generated fixture; no live data. Round-robin headlines from configured RSS or Atom feeds.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ImmortalNewsWidget",
+    "local": false,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small one headline; medium three headlines; large six grouped headlines. Current rows have two-line ellipsis and a saved-height cap; saved 2x2 resolves to 1x2.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Headlines",
+        "headline": "News",
+        "value": "A new public garden opens",
+        "detail": "Generated fixture; no live data. Anonymous generated article title. Actual title click opens its link; no article is fetched by this gallery.",
+        "action": "Open article",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No headlines",
+        "headline": "No headlines",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual configured feeds with empty results; failed uncached network/parse also reaches this branch.",
+        "action": "Edit feeds",
+        "implemented": true
+      },
+      {
+        "id": "setup",
+        "label": "No feeds",
+        "headline": "Add a feed to see headlines",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual empty configured-feed list.",
+        "action": "Add feed",
+        "implemented": true
+      },
+      {
+        "id": "loading",
+        "label": "Loading",
+        "headline": "Loading…",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual null initial headline state with feeds configured.",
+        "action": "Edit feeds",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Feed failure recovery · proposed",
+        "headline": "Headlines unavailable",
+        "value": "",
+        "detail": "Generated fixture; no live data. Proposed separate failure/retry state. Current UI does not distinguish fetch/parse failure, stale content or partial feeds.",
+        "action": "Try again",
+        "implemented": false
+      }
+    ]
+  },
+  {
+    "id": "stocks",
+    "name": "Stocks",
+    "description": "Generated fixture; no live data. Tracked Alpaca stock quotes and daily percentage changes.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ImmortalStocksWidget",
+    "local": false,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small one quote; medium three quotes; large six quotes and status. Current code varies capped row count, not layout; saved 2x2 resolves to 1x2. Market/freshness status is not implemented.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Quotes",
+        "headline": "Stocks",
+        "value": "EXAMPLE · $123.45",
+        "detail": "Generated fixture; no live data. Synthetic ticker and quote, not a traded instrument or current price · +0.8%.",
+        "action": "Edit tickers",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No tickers",
+        "headline": "Add tickers to track",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual empty tracked-ticker list after connection.",
+        "action": "Add tickers",
+        "implemented": true
+      },
+      {
+        "id": "setup",
+        "label": "Not connected",
+        "headline": "Tap to connect Alpaca",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual AlpacaConfig.isConfigured false branch.",
+        "action": "Connect Alpaca",
+        "implemented": true
+      },
+      {
+        "id": "loading",
+        "label": "Loading",
+        "headline": "Loading…",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual null initial quote state with credentials and tickers configured.",
+        "action": "Edit tickers",
+        "implemented": true
+      },
+      {
+        "id": "no_quotes",
+        "label": "No returned quotes",
+        "headline": "No quotes",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual empty quote result; HTTP failure also reaches this branch.",
+        "action": "Edit tickers",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Quote failure recovery · proposed",
+        "headline": "Quotes unavailable",
+        "value": "—",
+        "detail": "Generated fixture; no live data. Proposed separate HTTP/authentication error and retry; current widget has no such rendered recovery state.",
+        "action": "Try again",
+        "implemented": false
+      }
+    ]
+  },
+  {
+    "id": "options",
+    "name": "Options",
+    "description": "Generated fixture; no live data. Option-contract shortlist filtered by configured delta band.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ImmortalOptionsWidget",
+    "local": false,
+    "sizes": [
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery density variants: medium one or two readable contract details including underlying, strike/type, expiry, delta and optional mid-price; large an expanded contract list with the delta band. A small preview would omit information needed to interpret a contract, so it is not offered. Current renderer varies the saved-height row cap rather than selecting separate layouts; saved 2x2 resolves to 1x2. Catalog choice is advanced-settings gated.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Scan hits",
+        "headline": "Options",
+        "value": "EXAMPLE 125C 12/18",
+        "detail": "Generated fixture; no live data. Synthetic contract and premium · Δ0.25 · $1.20 · 0.20–0.30 delta band.",
+        "action": "Edit scanner",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No matches",
+        "headline": "No contracts in band",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual empty scan result; failed/empty chains can produce the same result.",
+        "action": "Edit scanner",
+        "implemented": true
+      },
+      {
+        "id": "setup",
+        "label": "Not connected",
+        "headline": "Tap to connect Alpaca",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual credentials-not-configured branch.",
+        "action": "Connect Alpaca",
+        "implemented": true
+      },
+      {
+        "id": "no_tickers",
+        "label": "No underlyings",
+        "headline": "Add tickers to scan",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual empty configured-underlying list.",
+        "action": "Add tickers",
+        "implemented": true
+      },
+      {
+        "id": "loading",
+        "label": "Scanning",
+        "headline": "Scanning…",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual null initial hits.",
+        "action": "Edit scanner",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Scan failure recovery · proposed",
+        "headline": "Scan unavailable",
+        "value": "",
+        "detail": "Generated fixture; no live data. Proposed distinct failure/retry and partial-scan notice; not rendered by the current widget.",
+        "action": "Try again",
+        "implemented": false
+      }
+    ]
+  },
+  {
+    "id": "ha",
+    "name": "Home Assistant",
+    "description": "Generated fixture; no live data. Pinned Home Assistant entities or configured dashboard handoff.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ImmortalHaWidget",
+    "local": false,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small one entity; medium two actionable lights; large those controls plus a sensor and scene status. Current code uses two columns, 150 dp minimum tiles and saved-height row cap; saved 2x2 resolves to 1x2. Room grouping is not introduced.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Entity controls",
+        "headline": "Home Assistant",
+        "value": "Example lamp · On",
+        "detail": "Generated fixture; no live data. Anonymous entity. Actual toggle is optimistic and reconciled on the 30-second poll.",
+        "action": "Toggle",
+        "implemented": true
+      },
+      {
+        "id": "off",
+        "label": "Known entity off",
+        "headline": "Home Assistant",
+        "value": "Example lamp · Off",
+        "detail": "Generated fixture; no live data. HaTile renders Off when a fetched non-momentary entity is inactive. The existing toggle handler applies; no new API or backend is required.",
+        "action": "Toggle",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No pinned entities",
+        "headline": "Add entities to control",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual configured connection with no pinned entities.",
+        "action": "Choose entities",
+        "implemented": true
+      },
+      {
+        "id": "setup",
+        "label": "Not connected",
+        "headline": "Connect your home",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual unconfigured HaConfig branch.",
+        "action": "Set up Home Assistant",
+        "implemented": true
+      },
+      {
+        "id": "dashboard",
+        "label": "Dashboard configured",
+        "headline": "Your home dashboard",
+        "value": "",
+        "detail": "Generated fixture; no live data. Open your rooms, devices and scenes. Actual HomeDashboardConfig branch overrides entity tiles.",
+        "action": "Open dashboard",
+        "implemented": true
+      },
+      {
+        "id": "unknown",
+        "label": "Unknown entity state",
+        "headline": "Example lamp",
+        "value": "—",
+        "detail": "Generated fixture; no live data. Actual unknown placeholder covers loading, missing entity and fetch failure; no separate failure banner.",
+        "action": "Toggle",
+        "implemented": true
+      },
+      {
+        "id": "scene",
+        "label": "Momentary scene",
+        "headline": "Example scene",
+        "value": "Scene",
+        "detail": "Generated fixture; no live data. Actual scene tile runs activation rather than a persistent on/off toggle.",
+        "action": "Run scene",
+        "implemented": true
+      },
+      {
+        "id": "sensor",
+        "label": "Read-only value",
+        "headline": "Example sensor",
+        "value": "22 °C",
+        "detail": "Generated fixture; no live data. Synthetic reading. Actual sensor tile opens the HA dashboard instead of toggling.",
+        "action": "Open dashboard",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Control/fetch failure recovery · proposed",
+        "headline": "Home controls unavailable",
+        "value": "—",
+        "detail": "Generated fixture; no live data. Proposed distinct failure and retry. Current toggle/activate return values are not surfaced; no action-pending UI.",
+        "action": "Try again",
+        "implemented": false
+      }
+    ]
+  },
+  {
+    "id": "today",
+    "name": "Today",
+    "description": "Generated fixture; no live data. Calendar, weather, sun and moon with optional local summaries.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "TodayStripWidget",
+    "local": false,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small next event; medium event plus weather; large weather, event and alarm/countdown/task summaries. Current composite uses one scrollable shell; saved 2x1 resolves to 1x2. Per-section freshness is not shown.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Daily summary",
+        "headline": "Today",
+        "value": "Design session",
+        "detail": "Generated fixture; no live data. Anonymous event · 10:30 AM · Feels like 21°. Event and weather are independent source sections.",
+        "action": "Calendar settings",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No upcoming event",
+        "headline": "No upcoming events",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual linked-calendar empty state. Weather and other summary rows can remain visible.",
+        "action": "Calendar settings",
+        "implemented": true
+      },
+      {
+        "id": "setup",
+        "label": "No calendar linked",
+        "headline": "Add your calendar",
+        "value": "",
+        "detail": "Generated fixture; no live data. See your upcoming events here. Actual calendar section setup branch.",
+        "action": "Add calendar",
+        "implemented": true
+      },
+      {
+        "id": "loading",
+        "label": "Calendar loading",
+        "headline": "Loading calendar…",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual refreshing calendar without an event; weather has its independent unavailable fallback.",
+        "action": "Calendar settings",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Calendar unavailable",
+        "headline": "Calendar unavailable",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual unavailable calendar with no event; retry goes through TodayCalendarRefreshGate.",
+        "action": "Try again",
+        "implemented": true
+      },
+      {
+        "id": "stale",
+        "label": "Saved event after failure",
+        "headline": "Design session",
+        "value": "Saved event · Until 11:00 AM",
+        "detail": "Generated fixture; no live data. Actual unavailable calendar result with a saved event: the detail prefixes Saved event to Until plus the end time. This anonymous event runs 10:30–11:00 AM; other Today sections are unaffected.",
+        "action": "Try again",
+        "implemented": true
+      },
+      {
+        "id": "weather_unavailable",
+        "label": "Weather unavailable",
+        "headline": "Today",
+        "value": "Weather unavailable",
+        "detail": "Generated fixture; no live data. Actual null current-weather fallback; not a unified failure of all Today sections.",
+        "action": "Calendar settings",
+        "implemented": true
+      }
+    ]
+  },
+  {
+    "id": "quick_controls",
+    "name": "Quick controls",
+    "description": "Generated fixture; no live data. Assistant, dashboard and companion-app launch shortcuts.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "QuickControlsWidget",
+    "local": true,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small primary launch; medium two launches; large four launches. Current code always chunks in pairs with 150 dp minimum tiles; saved 2x1 resolves to 1x2. These are launchers, not direct entity controls.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Available shortcuts",
+        "headline": "Quick controls",
+        "value": "Lights · Scenes · Climate · Home",
+        "detail": "Generated fixture; no live data. Actual HA companion labels all launch the same app. Generated discovery fixture; no installed-app information is read here.",
+        "action": "Open Home Assistant",
+        "implemented": true
+      },
+      {
+        "id": "assistant_only",
+        "label": "Assistant only",
+        "headline": "Quick controls",
+        "value": "Hey Jarvis",
+        "detail": "Generated fixture; no live data. A generated discovery set has only launchable com.portal.assistant, no HA companion and no configured dashboard. The actual one-tile branch says Open your assistant and calls triggerJarvis, which uses JarvisHandoff.launch. No device inventory is read by the gallery.",
+        "action": "Open assistant",
+        "implemented": true
+      },
+      {
+        "id": "assistant_error",
+        "label": "Assistant handoff failure toast",
+        "headline": "Jarvis couldn’t be opened.",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual triggerJarvis fallback when JarvisHandoff.launch returns false. Production displays a long Toast; this fixture represents that message, not an implemented inline recovery panel or retry button.",
+        "action": "",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No available companion",
+        "headline": "Add an assistant or Home Assistant app to use quick controls.",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual empty tile list also covers initial package discovery. Heading opens display settings; edit Settings opens quickbar.",
+        "action": "Settings",
+        "implemented": true
+      },
+      {
+        "id": "dashboard",
+        "label": "Configured dashboard",
+        "headline": "Quick controls",
+        "value": "Home dashboard",
+        "detail": "Generated fixture; no live data. Actual configured-dashboard shortcut.",
+        "action": "Open dashboard",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Inline app-launch failure recovery · proposed",
+        "headline": "Couldn’t open app",
+        "value": "",
+        "detail": "Generated fixture; no live data. Proposed generic inline failure/retry for app-launch shortcuts. The HA companion launch helper swallows runCatching failures; assistant handoff separately has the coded Jarvis failure toast represented by assistant_error. No generic inline error or retry UI is currently rendered.",
+        "action": "Try again",
+        "implemented": false
+      }
+    ]
+  },
+  {
+    "id": "photo_memory",
+    "name": "Photo memory",
+    "description": "Generated fixture; no live data. Hero image from the selected source or photo-preview handoff.",
+    "source": "app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt",
+    "sourceSymbol": "ApprovedHomePhoto",
+    "local": false,
+    "sizes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "sizeRationale": "Proposed gallery variants: small cropped thumbnail; medium image with caption; large hero with caption. Current code crops the same image and keeps a fixed bottom overlay; saved 2x1 resolves to 2x4. Gallery must use generated art, never household photos.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Photo loaded",
+        "headline": "Photo memory",
+        "value": "",
+        "detail": "Generated fixture; no live data. Your selected photo source. With no configured active source, the loader decodes the bundled fallback JPEG and uses this same loaded-image caption. Generated artwork stands in for either image; no image URL or household image is included.",
+        "action": "Open photos",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No bitmap / shared placeholder",
+        "headline": "Photo memory",
+        "value": "",
+        "detail": "Generated fixture; no live data. Open your photos. Actual non-web null-bitmap branch covers a selected source with no usable image, initial loading and failed access/decode/fetch. No configured source instead attempts the bundled fallback JPEG; it is not inherently an empty state, although this placeholder appears while that image loads or if decoding fails.",
+        "action": "Open photos",
+        "implemented": true
+      },
+      {
+        "id": "web",
+        "label": "Web source selected",
+        "headline": "Photo memory",
+        "value": "",
+        "detail": "Generated fixture; no live data. Open your selected web page. Actual web-source handoff still launches PhotoFramePreviewActivity; there is no embedded live web preview or separate browser/deep-link API in this widget.",
+        "action": "Open web page",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Source failure recovery · proposed",
+        "headline": "Photos unavailable",
+        "value": "",
+        "detail": "Generated fixture; no live data. Proposed distinct error/retry. Current code retains a same-source bitmap on refresh failure without stale status; otherwise shows Open your photos.",
+        "action": "Try again",
+        "implemented": false
+      }
+    ]
+  },
+  {
+    "id": "appwidget",
+    "name": "Android app widget",
+    "description": "Generated fixture; no live data. Hosted installed Android provider category, not a fifteenth custom kind.",
+    "source": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+    "sourceSymbol": "ApprovedHostedWidget",
+    "local": false,
+    "sizes": [
+      "medium"
+    ],
+    "sizeRationale": "Medium is a category preview only. Actual allowed dimensions and resize capabilities depend on the installed provider; the gallery does not promise small/medium/large provider variants. Current host estimates initial spans from provider minimum dp /128, clamped to 2–4, honors explicit spans and reports actual cell dimensions through AppWidget options. This host path does not enforce provider resizeMode or minResize dimensions.",
+    "states": [
+      {
+        "id": "normal",
+        "label": "Provider hosted",
+        "headline": "Android app widget",
+        "value": "Example provider",
+        "detail": "Generated fixture; no live data. Generated provider shell only. Production RemoteViews content and its states belong to the installed provider; implemented describes the hosting path, not these fictional provider contents. Widget settings is the existing edit-mode action, not a universal button inside provider content.",
+        "action": "Widget settings",
+        "implemented": true
+      },
+      {
+        "id": "empty",
+        "label": "No installed providers",
+        "headline": "No app widgets installed.",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual provider-library empty branch, with library Refresh action; this is not an empty RemoteViews content state.",
+        "action": "Refresh",
+        "implemented": true
+      },
+      {
+        "id": "loading",
+        "label": "Discovering providers",
+        "headline": "Loading installed app widgets…",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual provider-library null inventory branch when no provider cards are available; this is not a provider-content loading state.",
+        "action": "",
+        "implemented": true
+      },
+      {
+        "id": "error",
+        "label": "Provider unavailable",
+        "headline": "Widget unavailable",
+        "value": "Example provider package",
+        "detail": "Generated fixture; no live data. Actual host AppWidgetInfo-null branch. Label is anonymous; no installed package identity is exposed.",
+        "action": "",
+        "implemented": true
+      },
+      {
+        "id": "configuration_error",
+        "label": "Settings launch failure",
+        "headline": "Widget settings couldn’t be opened.",
+        "value": "",
+        "detail": "Generated fixture; no live data. Actual edit Settings launch-failure toast, represented here as a fixture; production uses a transient toast, not an inline provider panel or configuration-result error.",
+        "action": "",
+        "implemented": true
+      }
+    ]
+  }
+]

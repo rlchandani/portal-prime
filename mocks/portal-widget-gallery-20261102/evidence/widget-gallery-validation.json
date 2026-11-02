@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-11-02T05:41:49.193Z",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+  "categories": 15,
+  "states": 78,
+  "results": [
+    {
+      "width": 390,
+      "cases": 2568,
+      "failures": []
+    },
+    {
+      "width": 768,
+      "cases": 2568,
+      "failures": []
+    },
+    {
+      "width": 1440,
+      "cases": 2568,
+      "failures": []
+    },
+    {
+      "width": 2160,
+      "cases": 2568,
+      "failures": []
+    }
+  ],
+  "contrast": {
+    "checked": 456,
+    "failures": []
+  },
+  "render": {
+    "samples": 30,
+    "twoRafP50Ms": 33.30000019073486,
+    "twoRafP95Ms": 34.200000286102295,
+    "maxMs": 34.299999713897705,
+    "scope": "Local browser two-rAF scheduling estimate; no native Portal performance claim"
+  },
+  "errors": []
+}
