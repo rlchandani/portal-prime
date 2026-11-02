@@ -2,6 +2,48 @@
 
 Immortal is hosted from its own GitHub repo. Two files drive what devices see.
 
+## Check local readiness without publishing
+
+Use the separate local checker when building or verifying a candidate:
+
+```sh
+python3 scripts/portal_release_readiness.py \
+  --baseline-apk /path/to/previous-accepted.apk \
+  --variant performance \
+  --sdk "$ANDROID_HOME" \
+  --output app/build/release-readiness/my-candidate
+```
+
+The baseline must be a trusted, signed local APK of the **same package**.
+`release` (the default) expects `com.immortal.launcher`; `performance` and `debug`
+expect `com.immortal.launcher.debug`. A missing baseline or changed certificate
+fails; there is no first-release exception. This command does not read a keystore
+or require a GitHub connection.
+
+The checker runs version sync, slideshow/bundled JavaScript tests, Portal Python
+tests, fresh JVM tests and the selected APK build with offline Gradle. It verifies
+the built package/version and all signing digests, records source/build-input and
+APK hashes, and copies the inspected APK to `candidate.apk`. Different before/after
+source-input snapshots, or changed baseline/artifact bytes, invalidate readiness.
+It explicitly requests TAP output rather than depending on Node's default reporter.
+
+Python 3.12+, Node 22+, the Android SDK's `aapt`/`apksigner` and cached Gradle
+dependencies are required. The checker currently runs on macOS/Linux; Windows
+provisioning checks remain separate. The selected SDK is passed to the build.
+Missing offline dependencies fail honestly. Prior JVM XML reports are archived
+in the output before the forced test task, so they cannot satisfy a fresh check.
+`--timeout-seconds` controls the whole check (default 900, maximum 1800);
+timed-out command groups are stopped. Output must be a **new directory**, either
+outside the repository or under `app/build`. Existing evidence is never overwritten.
+
+Inspect `receipt.json` and its named gate logs. `status: "ready"` means **local
+artifact readiness**, with `published: false` and `deployed: false`; it does not
+prove clean-main/tag eligibility, hosted CI, provisioning compatibility, phone or
+hardware acceptance. After output creation, a failed check writes
+`status: "failed"` and returns nonzero. Preflight refusals preserve existing files.
+No source bump, authentication, Git fetch, tag, push, publication or device install
+is performed. The publishing workflow below remains a separate explicit operation.
+
 ## Cutting a release (the one safe command)
 
 ```sh

@@ -72,5 +72,23 @@
     "servedJsonExactlyMatchesFile": true,
     "screenshotsVisuallyReviewed": true,
     "limits": "Saved roadmap browser checks only; actual Portal/PWA acceptance and independent companion gates are in the named delivery receipt."
+  },
+  "localReadinessSnapshotUpdate": {
+    "version": "1.68",
+    "taskCount": 14,
+    "localReadiness": "implemented / actual local gates verified; no deployment",
+    "all14MobileDetailsCheckedAfterReload": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "consoleErrorsObserved": 0,
+    "screenshotsVisuallyReviewed": true,
+    "limits": "Saved roadmap browser checks only; build/test/artifact verification is in the named local-readiness delivery receipt."
   }
 }

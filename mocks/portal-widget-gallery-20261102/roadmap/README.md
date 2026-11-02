@@ -53,3 +53,12 @@ preflight correction (564 tests, uninstalled). Current version and queue copy
 were refreshed. All thirteen mobile detail panels and the desktop update fit
 without horizontal overflow; served JSON matched the source file. Earlier
 filter/Portal-viewport checks above retain their original snapshot scope.
+
+The local-readiness snapshot adds the verified local-only checker and a queued
+browser connection-status investigation. It contains fourteen tasks. The actual
+checker passed 40 slideshow JS, 654 bundled JS, 161 Python and 3,800 JVM tests
+in 152,626 ms; no installation/publication occurred. The actual performance APK
+retains the accepted 1.68 identity. See the local-readiness delivery receipt.
+All fourteen mobile detail panels and the desktop update fit without horizontal
+overflow after reload; screenshots were visually reviewed and console errors
+were zero. Earlier filter and simulated-Portal checks retain their earlier scope.

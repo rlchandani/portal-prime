@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 visibility delivered; companion preflight locally verified (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 local release readiness verified; browser status reproduction next (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "settings-visibility",
+  "defaultTask": "local-readiness",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact 1.68 / code 62. Family scoped settings acceptance passed; phone maintenance remains uninstalled.",
@@ -206,18 +206,18 @@
     {
       "id": "local-readiness",
       "title": "Local-only release readiness",
-      "summary": "Prepare an honest local evidence gate without authentication or publication.",
-      "description": "The existing release script couples useful checks with forbidden publication steps and omits the unit gate. A local-only readiness path must keep missing evidence visible.",
-      "status": "queued",
-      "verification": "Specified next work \u00b7 not implemented",
+      "summary": "Real check passed in 2m33s: 40/654 JS, 161 Python, 3,800 JVM tests and optimized APK/signature checks. No authentication or publication.",
+      "description": "A separate standard-library CLI runs existing local gates and verifies the resulting APK against a mandatory accepted local baseline. It records source/build-input and artifact identities without invoking the publication script.",
+      "status": "delivered",
+      "verification": "Implemented / real local gates verified \u00b7 no publication",
       "kind": "Delivery tooling",
       "platforms": [
         "portal",
         "tooling"
       ],
       "owner": "Release engineering",
-      "deployment": "No public release authorized",
-      "state": "Requires decomposition",
+      "deployment": "Tooling runs locally; no device install or published release. Candidate matches existing1.68 APK.",
+      "state": "Real terminal status=ready, all15processes exit0; 399 prior JVM reports archived and replaced by fresh results.",
       "acceptance": [
         "Produce candidate version, source and artifact identity, local signing-baseline comparison and check receipts.",
         "Fail honestly when evidence is missing; never print credentials or invoke hooks.",
@@ -225,15 +225,24 @@
       ],
       "evidence": [
         {
-          "text": "cut-release.sh has no local-only mode and does not run the unit gate.",
-          "source": "docs/releasing.md; scripts/cut-release.sh; docs/portal-product-operating-state.md"
+          "text": "21 checker methods cover valid readiness and rejection of stale APK/reports, missing/unsigned/different signers, wrong packages, invalid output paths, source changes, SDK propagation, reporter defaults and timed-out process groups.",
+          "source": "scripts/test_portal_release_readiness.py; scripts/test_portal_release_readiness_edges.py"
+        },
+        {
+          "text": "Actual SDK/optimized run exited0 in152,626ms. Full161 Python, 40/654JS and3,800JVM/399suites passed. Candidate25860666bytes hash271d3b1dc5b4dab2e57fb686ad7c19bf015d126b22271e536044cadca1e8e343 matches existing1.68.",
+          "source": "docs/portal-local-readiness-delivery-2026-11-02.md"
+        },
+        {
+          "text": "First real Node24 run exited failed because its default reporter did not supply TAP counts. Receipt preserved; explicit TAP regression passed and the fresh-output real rerun reached ready. Independent review found prior-report reuse and the exact reproduction now fails correctly.",
+          "source": "docs/portal-local-readiness-review-2026-11-02.md"
         }
       ],
       "limits": [
-        "Source version agreement alone is not artifact, signature or release verification.",
-        "GitHub authentication, push, tags and publication are forbidden in this session."
+        "Local readiness does not establish publication, deployment, clean-main/tag eligibility, provisioning or physical phone/hardware acceptance.",
+        "Real performance-variant acceptance only; no fresh real release/debug-variant build is claimed in this unit.",
+        "Source checks compare selected before/after snapshots; they are not a continuous filesystem monitor. The execution receipt honestly records the uncommitted tooling state."
       ],
-      "next": "Specify and review the local-only contract. Do not invoke the existing publication script."
+      "next": "Reproduce the observed PWA Offline banner during successful settings interactions in a fresh 30-minute unit."
     },
     {
       "id": "quick-controls",
@@ -498,6 +507,38 @@
         "Live music providers/auth/audio/groups and final Living acceptance retain the music ledger's qualifications."
       ],
       "next": "Keep parked. Continue the tracked correctness queue without silently extending old issue slots."
+    },
+    {
+      "id": "pwa-connection-status",
+      "title": "Browser connection status after tab navigation",
+      "summary": "Observed Offline banner while settings actions succeeded. Reproduction and a targeted fix are next.",
+      "description": "Check whether cancellation of a previous tab request can incorrectly mark the current paired room offline. Distinguish that hypothesis from genuine network, authentication or server failure.",
+      "status": "queued",
+      "verification": "Observed discrepancy \u00b7 root cause unverified",
+      "kind": "Browser UX/reliability",
+      "platforms": [
+        "browser",
+        "portal"
+      ],
+      "owner": "Browser QA / Main",
+      "deployment": "No change built or deployed",
+      "state": "Queued after local release-readiness cleanup for one fresh 30-minute slot.",
+      "acceptance": [
+        "Reproduce status transitions in the actual paired mobile PWA without reconnecting.",
+        "Preserve genuine network/authentication failure reporting and current-room request ownership.",
+        "Run meaningful regression guards and verify the affected interaction; restore settings/session state."
+      ],
+      "evidence": [
+        {
+          "text": "Family visibility checks succeeded against the actual server, but a mobile screenshot displayed Offline. Navigation included one aborted companion request; successful management responses were also observed.",
+          "source": "docs/portal-settings-visibility-delivery-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "No definitive root cause, production patch or general connectivity fix is claimed.",
+        "Do not infer companion phone behavior from browser evidence."
+      ],
+      "next": "Reproduce within a new bounded unit after the current checker is delivered."
     }
   ]
 }
