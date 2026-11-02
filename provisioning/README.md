@@ -343,6 +343,22 @@ After reinstalling the new build and re-registering the agent
 ./fleet-restore.sh "Portal Mini" --apps --dry-run # preview what would run
 ```
 
+Restore requires Python 3 and exactly one registered Portal. It resolves
+friendly names case-insensitively and rejects `all` or ambiguous serial/name
+matches before any action, including dry-run. App restoration validates the entire saved `apps.json`
+before any install or preference write. Selection is independent of JSON
+formatting/key order and excludes both release and debug Immortal launchers.
+Ambiguous duplicate JSON fields are rejected. Real commands use a private,
+single-record registry copy for the run, then remove it on exit; changes to the
+original registry cannot expand a restore to other rooms.
+A real install must return literal success for the selected package with result
+`installed`, then a fresh `/apps` reply must show that package installed. An
+unconfirmed result stops the command before later app/pref operations, without
+an automatic retry. Check the device's partial state before rerunning.
+`--apps --dry-run` validates and prints the plan without contacting a Portal.
+This reinstalls from the current catalog; it does not restore original APK bytes
+or guarantee the former app version.
+
 By default restore reinstalls the third-party apps that were present and pushes the
 saved `shared_prefs` back **verbatim** (full fidelity, including stored credentials),
 skipping `fleet_agent.xml` so the freshly-provisioned token is kept, then reboots so

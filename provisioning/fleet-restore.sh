@@ -23,26 +23,27 @@
 #   ./fleet-restore.sh "Portal Mini" --config --dry-run
 #   ./fleet-restore.sh 819LCM01Z09E4D12 --backup backups/819LCM01Z09E4D12/20260620-200000
 set -euo pipefail
+umask 077
+trap '' PIPE
+report() { printf '%s\n' "$*" || true; }
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$here"
 FLEETCTL="${FLEETCTL:-./fleetctl}"
 FLEET_DIR="${IMMORTAL_FLEET_DIR:-./fleet}"
+PYTHON3="${PYTHON3:-python3}"
 PREFS_DIR="/data/data/com.immortal.launcher/shared_prefs"
 
 usage() { sed -n '2,30p' "$0"; exit 2; }
 
 target="${1:-}"; [ -n "$target" ] || usage; shift || true
 
-# Map a friendly name to its serial (backups are keyed by serial).
-serial="$target"
-if [ ! -f "$FLEET_DIR/$serial.json" ]; then
-  for f in "$FLEET_DIR"/*.json; do
-    [ -e "$f" ] || continue
-    nm="$(sed -n 's/.*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$f" | head -1)"
-    [ "$nm" = "$target" ] && serial="$(basename "$f" .json)"
-  done
-fi
+# Resolve one unambiguous CLI selector locally before any restore can mutate data.
+command -v "$PYTHON3" >/dev/null 2>&1 || {
+  report "error: Python 3 is required to validate restore data" >&2
+  exit 1
+}
+serial="$("$PYTHON3" "$here/fleet-backup-data.py" restore-target "$FLEET_DIR" "$target")" || exit 1
 
 backup="backups/$serial/latest"
 do_apps=0; do_prefs=0; do_config=0; dry=0
@@ -62,23 +63,51 @@ done
 [ -d "$backup" ] || { echo "error: backup not found: $backup" >&2; exit 1; }
 [ -x "$FLEETCTL" ] || { echo "error: $FLEETCTL not built (rustc -O fleet.rs -o fleetctl)" >&2; exit 1; }
 
-echo "restoring '$serial' from $backup  (apps=$do_apps prefs=$do_prefs config=$do_config dry-run=$dry)"
-run() { if [ $dry -eq 1 ]; then echo "  + $*"; else "$@"; fi; }
+pkgs=""
+scratch=""
+cleanup() { if [ -n "$scratch" ]; then rm -rf "$scratch"; fi; }
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+if [ $do_apps -eq 1 ]; then
+  # Validate the entire plan before any install or preference write can begin.
+  pkgs="$("$PYTHON3" "$here/fleet-backup-data.py" restore-packages "$backup/apps.json")" || exit 1
+fi
+if [ $dry -eq 0 ]; then
+  scratch="$(mktemp -d "${TMPDIR:-/tmp}/immortal-restore-apps.XXXXXX")" || exit 1
+  frozen="$("$PYTHON3" "$here/fleet-backup-data.py" restore-target "$FLEET_DIR" "$serial" "$scratch/registry")" || exit 1
+  [ "$frozen" = "$serial" ] || exit 1
+  # Fleetctl reloads its registry on every call. Keep this run pinned to the
+  # validated single record even if the original registry changes mid-restore.
+  export IMMORTAL_FLEET_DIR="$scratch/registry"
+fi
+
+report "restoring '$serial' from $backup  (apps=$do_apps prefs=$do_prefs config=$do_config dry-run=$dry)"
+run() { if [ $dry -eq 1 ]; then report "  + $*"; else "$@"; fi; }
 
 # 1) Reinstall third-party apps (never Immortal itself). apps.json lists the whole
-#    catalog with an "installed" marker (false = not installed, else a versionCode),
-#    so we keep only the ones that were actually installed.
-if [ $do_apps -eq 1 ] && [ -f "$backup/apps.json" ]; then
-  echo "-- apps --"
-  pkgs="$(awk '
-    /"packageName"/ { line=$0; sub(/.*"packageName"[ \t]*:[ \t]*"/,"",line); sub(/".*/,"",line); pkg=line }
-    /"installed"/   { if ($0 !~ /false/ && pkg != "") print pkg }
-  ' "$backup/apps.json" | grep -vx 'com.immortal.launcher' | sort -u)"
-  if [ -z "$pkgs" ]; then echo "  (no third-party apps were installed)"; fi
+#    catalog with a Boolean or legacy versionCode marker, independently of formatting.
+if [ $do_apps -eq 1 ]; then
+  report "-- apps --"
+  if [ -z "$pkgs" ]; then report "  (no third-party apps were installed)"; fi
   while IFS= read -r p; do
     [ -n "$p" ] || continue
-    echo "  install $p"
-    run "$FLEETCTL" install "$p" --device "$serial"
+    report "  install $p"
+    if [ $dry -eq 1 ]; then
+      run "$FLEETCTL" install "$p" --device "$serial"
+      continue
+    fi
+    if ! "$FLEETCTL" install "$p" --device "$serial" > "$scratch/install.json" 2> "$scratch/install-errors.log" ||
+       ! "$PYTHON3" "$here/fleet-backup-data.py" install-result "$scratch/install.json" "$p"; then
+      report "error: installation unconfirmed for $p; inspect the device before retrying" >&2
+      exit 1
+    fi
+    if ! "$FLEETCTL" apps --device "$serial" > "$scratch/presence.json" 2> "$scratch/presence-errors.log" ||
+       ! "$PYTHON3" "$here/fleet-backup-data.py" installed-presence "$scratch/presence.json" "$p"; then
+      report "error: installed presence unconfirmed for $p; inspect the device before retrying" >&2
+      exit 1
+    fi
+    report "  confirmed present: $p"
   done <<< "$pkgs"
 fi
 
@@ -137,4 +166,4 @@ if [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" 
   echo "        use --prefs for those."
 fi
 
-echo "done."
+report "done."
