@@ -453,5 +453,25 @@
     "pageErrors": 0,
     "desktopScreenshotVisuallyReviewed": true,
     "limits": "Four changed-detail presentation checks only; older all-detail/filter/image proofs retain their original scopes. Exact room deployment and parser gates have separate receipts; no native visual or general performance verdict."
+  },
+  "clockFormatSnapshot": {
+    "date": "2026-11-02",
+    "taskCount": 26,
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        1600,
+        1000
+      ]
+    ],
+    "changedTask": "weather-clock-format",
+    "horizontalOverflow": false,
+    "homeUiLimitVisible": true,
+    "installerCleanupLimitVisible": true,
+    "scope": "Changed task detail and current version presentation; earlier all-task/filter proofs retain their scope.",
+    "desktopScreenshotVisuallyReviewed": true
   }
 }

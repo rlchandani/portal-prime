@@ -217,3 +217,12 @@ passed with25 rendered queue rows, visible version/approval boundaries, zero
 horizontal overflow and no page errors. The desktop screenshot was visually
 reviewed. This is saved-page presentation evidence, not native visual or
 performance acceptance. See `weatherReleaseSnapshotUpdate` in `validation.json`.
+
+The26-task clock-format snapshot adds locally/native-formatter verified maintenance
+in exact optimized1.74/code68 on both rooms. It retains actual Home/settings-return
+UI and performance limits, and Family installer recovery rather than claiming
+automatic confirmation succeeded. Earlier browser/native proofs retain their scope.
+
+Fresh changed-detail checks at390×844 and1600×1000 show26 rows, no horizontal
+overflow, and visible Home-return/session-cleanup limits. The desktop screenshot
+was visually reviewed. This does not repeat all-task/native acceptance.

@@ -1,0 +1,58 @@
+{
+  "scope": "Cached Weather formatter correctness; actual Home/settings-return UI and performance remain unverified.",
+  "sourceCommit": "86e83486",
+  "versionName": "1.74",
+  "versionCode": 68,
+  "artifact": {
+    "bytes": 25860686,
+    "sha256": "2443d2fd3f3634f73117de02cbc75c6463735413adef6886f98ceb5664dd8189"
+  },
+  "jvm": {
+    "tests": 3845,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 403
+  },
+  "native": {
+    "checksPassed": 274,
+    "checksTotal": 274,
+    "cachedFormatChecks": 108,
+    "apiLevel": 29,
+    "variant": "temporary debug build; original test APK restored"
+  },
+  "rooms": {
+    "family": {
+      "app": {
+        "versionCode": 68,
+        "versionName": "1.74"
+      },
+      "completeProfileUnchanged": true,
+      "screensaverSettingsUnchanged": true,
+      "devMode": true,
+      "installProof": "full installed APK byte/hash readback"
+    },
+    "living": {
+      "app": {
+        "versionCode": 68,
+        "versionName": "1.74"
+      },
+      "completeProfileUnchanged": true,
+      "screensaverSettingsUnchanged": true,
+      "devMode": true,
+      "installProof": "native helper terminal exit0 with full installed APK SHA256 check"
+    }
+  },
+  "familyAutomaticConfirmation": "failed terminally; one observed confirmation tap did not complete; one later shell recovery succeeded",
+  "limits": [
+    "Actual Home/settings return and request/deadline measurements unverified",
+    "No visual layout change approved or implemented",
+    "No performance improvement claimed"
+  ],
+  "familyRecovery": {
+    "originalChromeTaskResumed": true,
+    "staleOwnedInstallSessionRemains": true,
+    "shellAbandonRejected": true,
+    "cleanupComplete": false
+  }
+}

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 Weather correction installed as 1.73 in both rooms; design approval pending (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 Weather clock-format correction in 1.74 on both rooms; Home/settings return acceptance open (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "weather-current-hour",
+  "defaultTask": "weather-clock-format",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact 1.73 / code 67. Earlier task receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
+    "Both rooms have exact optimized 1.74 / code 68. Earlier receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -1043,10 +1043,47 @@
       "limits": [
         "Parser regression and exact installed artifact proof; no physical panel exact-hour observation or native visual/performance verdict.",
         "Living foreground was not inspected through ADB; Family browser foreground was preserved.",
-        "Hourly labels retaining a former12/24-hour preference remains a separate open producer issue.",
+        "Cached12/24-hour labels have a separate source/native formatter correction in1.74; actual Home/settings return acceptance remains open.",
         "The whole widget gallery and proposed Weather layout still require user approval."
       ],
-      "next": "Await Weather-only design approval. Keep physical visual/performance acceptance and the separate clock-format producer concern open."
+      "next": "Await Weather-only design approval. Preserve the original parser acceptance scope; see the separate clock-format correction for its limits."
+    },
+    {
+      "id": "weather-clock-format",
+      "title": "Weather: cached labels follow 12/24-hour settings",
+      "summary": "Corrected cached forecast presentation.3,845 JVM tests and 274 native formatter checks passed; exact optimized 1.74 installed in both rooms. Home/settings return UI acceptance remains open.",
+      "description": "Home re-reads the clock preference on resume and derives labels from retained forecast timestamps and location offsets. A settings change no longer needs a forecast download to format cached labels. Network producer keys and refresh cadence are unchanged.",
+      "status": "verified",
+      "verification": "Source/native formatter verified \u00b7 both rooms installed \u00b7 Home return UI open",
+      "kind": "Weather presentation correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Native / QA",
+      "deployment": "Exact optimized 1.74/code68 installed in both rooms. Family needed one shell recovery after a terminal automatic-confirmation failure; Living deploy helper exited0 with installed hash proof.",
+      "state": "Final 3,845 / 403 JVM gate and signed debug/test/optimized artifacts passed. Family debug-runtime fixtures passed 274/274 including 108 cached-label checks; original test APK restored. Complete room profiles/screensaver settings unchanged.",
+      "acceptance": [
+        "Switch retained forecast labels 12\u219224\u219212 without changing temperatures, conditions, Now or day data.",
+        "Preserve location offsets, midnight and timestamp-free legacy entries.",
+        "Verify actual Home\u2192Settings\u2192Home label refresh separately; do not infer UI/performance acceptance from pure formatter fixtures."
+      ],
+      "evidence": [
+        {
+          "text": "Two red assertions on a neutral presentation scaffold; final 20/20 Weather tests and 3,845 / 403 full JVM gate. Independent review found no concrete blocking defect.",
+          "source": "docs/portal-weather-clock-format-2026-11-02.md"
+        },
+        {
+          "text": "Family API29 debug runtime passed 274/274 public fixtures, including 108 cached format checks. Original test package restored; final optimized APK SHA-256 2443d2fd3f3634f73117de02cbc75c6463735413adef6886f98ceb5664dd8189, 25,860,686 bytes.",
+          "source": "../evidence/weather-clock-format-verification.json"
+        }
+      ],
+      "limits": [
+        "Native fixtures ran on the temporary debug build, not the optimized Home renderer.",
+        "Actual Home/settings return, request counts, deadline measurement, physical visual judgement and latency/FPS are unverified.",
+        "Weather/gallery redesign approval and normal Google sign-in remain separate; no HA service or account automation.",
+        "Family retains one sealed installer session from the failed automatic confirmation. Its dialog is no longer foreground; original Chrome task27174 is resumed. Shell abandonment was rejected because the session belongs to the app. Session cleanup remains open."
+      ],
+      "next": "Resolve the stale app-owned installer session in a separate bounded slot, then verify Home/settings-return UI without interrupting the normal music sign-in."
     }
   ]
 }

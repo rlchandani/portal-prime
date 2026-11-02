@@ -11,6 +11,8 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Latest Weather clock-format maintenance:** exact optimized **1.74/code68** is installed in both rooms; complete settings are unchanged.3845 JVM tests and274 Family debug-runtime formatter checks passed. Actual Home/settings-return UI acceptance is still open. See [scoped receipt](portal-weather-clock-format-2026-11-02.md). Older versioned receipts below keep their historical scope.
+
 - The active goal covers the whole existing product: Portal, native Android
   companion, browser remote, fleet/provisioning, integrations, UX, reliability,
   performance and delivery automation. Research and backlog items are not
