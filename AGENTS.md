@@ -33,6 +33,15 @@ ASCII guard), `docs.yml`, `release-guard.yml`.
 The debug build uses a `.debug` application-id suffix so it installs alongside a provisioned
 release.
 
+## Ongoing product delivery
+
+Resume from [`docs/portal-product-operating-state.md`](docs/portal-product-operating-state.md)
+before creating new backlog items. Keep source inspection, implementation, automated checks,
+device acceptance, deployment and publication statuses separate. Preserve parked issues and
+the user's per-issue time limit. Parallel workers need disjoint write scopes; the coordinator
+owns shared-file integration and device operations. A matching signed APK and an install
+acknowledgment do not replace post-install identity and functional checks.
+
 ## Repository layout
 
 ```

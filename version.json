@@ -1,6 +1,6 @@
 {
-  "versionCode": 58,
-  "versionName": "1.64",
+  "versionCode": 59,
+  "versionName": "1.65",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Media cache fixes: cached videos keep their true aspect ratio (no black bars), corrupt entries self-heal, and cache warming stops cleanly when the storage limit is reached. Adds diagnostics logging."
+  "notes": "Home widgets: Photo Memory settings open photo sources directly, and alarm countdowns refresh while visible with accurate remaining minutes."
 }

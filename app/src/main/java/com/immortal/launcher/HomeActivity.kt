@@ -704,7 +704,7 @@ private fun ApprovedWidgetCell(
                 else -> context.openApprovedHomeSettings(when (widget.kind) {
                   HomeWidgetStore.KIND_WORLD_CLOCK -> "world"
                   HomeWidgetStore.KIND_TODAY -> "calendar"
-                  HomeWidgetStore.KIND_PHOTO_MEMORY -> "screensaver"
+                  HomeWidgetStore.KIND_PHOTO_MEMORY -> "sources"
                   HomeWidgetStore.KIND_QUICK_CONTROLS -> "quickbar"
                   else -> widget.kind
                 })
@@ -3562,7 +3562,26 @@ private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
     cfg = AlarmConfig.load(context)
     use24 = ImmortalSettings.use24HourClock(context)
   }
-  val next = remember(cfg) { AlarmConfig.nextTrigger(cfg) }
+  val active = LocalApprovedLauncherPageActive.current
+  DisposableEffect(context, active) {
+    val stop = if (active) AlarmConfig.observeSnapshot(context) {
+      cfg = AlarmConfig.load(context)
+    } else null
+    if (active) cfg = AlarmConfig.load(context)
+    onDispose { stop?.invoke() }
+  }
+  val minuteTick by produceHomeState(initialValue = 0L, cfg.enabled) {
+    if (!cfg.enabled) return@produceHomeState
+    while (true) {
+      val now = System.currentTimeMillis()
+      value = now
+      delay(homeAlarmWidgetRefreshDelayMs(now))
+    }
+  }
+  // The tick invalidates the caption; use current wall time on edits and visibility changes too.
+  val remainingMinutes = remember(cfg, minuteTick, active) {
+    homeAlarmRemainingMinutes(cfg, System.currentTimeMillis())
+  }
   val open: () -> Unit = { context.openApprovedHomeSettings("alarm") }
   // Preserve the editable alarm time and inline enabled control within the approved card.
   ImmortalWidgetShell(title = "Alarm", openPage = "alarm", modifier = modifier.tvFocusableRow { open() }) {
@@ -3590,10 +3609,9 @@ private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
     }
     Text(
         when {
-          cfg.enabled && next != null -> {
-            val mins = ((next - System.currentTimeMillis()) / 60_000L).coerceAtLeast(0)
+          cfg.enabled && remainingMinutes != null -> {
             val lead = cfg.label.ifBlank { "Weekdays" }
-            "$lead · in ${mins / 60} hr ${mins % 60} min"
+            "$lead · in ${remainingMinutes / 60} hr ${remainingMinutes % 60} min"
           }
           else -> "No alarm set"
         },

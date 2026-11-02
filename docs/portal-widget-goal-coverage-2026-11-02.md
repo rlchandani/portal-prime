@@ -1,7 +1,11 @@
 # Widget refinement goal — requirement and evidence ledger
 
 Authoritative objective: `~/.codex/attachments/e84e082e-eaf4-40fb-b0da-7db93d939182/goal-objective.md`.
-Status: full goal active. This ledger does not amend or narrow the objective.
+Status: historical objective, superseded by the whole-product goal at
+`~/.codex/attachments/4832b00e-0492-44a6-a521-a970bf2ea968/goal-objective.md`.
+The checkpoints below describe that earlier objective at its review handoff; they do not
+declare the unimplemented redesign complete. Resume from
+[the product operating state](portal-product-operating-state.md) for current priorities.
 
 The roles in the goal are working responsibilities. The deliverable is improved Immortal software, not a claim that a staffed organization, recurring meetings or a telemetry product has been built. Android/iOS gallery columns are design interpretations, as documented in the review; the implemented product target is the existing Android Portal app. The current objective removed the earlier charging/parking additions. No Home Assistant music-server deployment belongs to this iteration.
 
