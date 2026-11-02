@@ -410,6 +410,25 @@ Do not repeat this artifact probe or claim newer compatibility without new
 exact-server evidence. Account, host and parked receiver/performance boundaries
 remain unresolved; no HA or other server deployment occurred.
 
+## Remaining companion workflow acceptance — 2 November 2026
+
+The bounded unit beginning **12:24:57 UTC** passed the remaining120 reviewed
+callback UI methods on the unchanged exact companion1.7.1/code13 APK:
+**56/56 in84.387s**, then **64/64 in107.5s**. It covers photo loading/pagination
+and recovery, music/playback callbacks, mirror gestures, app confirmations,
+draft recreation, management, remote acknowledgements and scene revisions.
+Independent log/source comparison matches **168 unique methods in22 fixture
+classes across five scoped runs**; four live Portal UI methods are excluded.
+
+The actual installed APK readback matched the accepted bytes/hash. Owned runner
+cleanup exited130, preserved the complete source AVD and retained both Family
+transports. No production source, APK version, room config or account changed.
+This closes the reviewed callback UI matrix, not physical Pixel, cold reconnect,
+real music output or universal performance. Toolkit's
+`docs/companion-qa-isolation-validation-2026-11-02.md` records the scope.
+The existing24-item roadmap retains10 delivered/implemented,8 scoped verified,
+2 awaiting approval,3 parked and1 queued.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:

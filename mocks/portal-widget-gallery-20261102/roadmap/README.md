@@ -188,3 +188,10 @@ The two changed companion/music details passed desktop/mobile checks. Actual
 mobile joined-word headings were reproduced, corrected with literal whitespace
 and checked at both sizes while preserving desktop line breaks. The music
 source follow-up found no exact2.10.9 artifact/contract; no guard was weakened.
+
+The workflow checkpoint completes the reviewed callback UI matrix on the same
+companion APK: **168 distinct methods in 22 classes across five scoped runs**
+(33+7+8+56+64). The newest groups passed in84.387s and107.5s. Actual log pairs
+match the source inventory; four live Portal UI methods remain excluded.
+No new feature, Android build, room mutation or physical-phone acceptance is
+implied. The24-item queue retains its existing status counts.

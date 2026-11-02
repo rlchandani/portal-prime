@@ -379,5 +379,29 @@
       "desktopBrPreserved": true
     },
     "limits": "Four changed-detail and two heading checks only; no new native app feature, physical phone, cold transport, music playback or performance acceptance. Eight additional actual native callback methods have independent receipts."
+  },
+  "companionWorkflowSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T12:33:33.193446+00:00",
+    "taskCount": 24,
+    "counts": {
+      "delivered": 10,
+      "verified": 8,
+      "approval": 2,
+      "parked": 3,
+      "queued": 1
+    },
+    "changedCompanionDetailCheckedAtDesktopAndMobile": true,
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "newEvidenceAndLimitsVisible": true,
+    "pageErrors": 0,
+    "limits": "Saved roadmap presentation only. Independently parsed native logs/source inventory match 168 unique fixture methods across five scoped runs; four live UI methods excluded. No physical Pixel, real provider playback, cold reconnect or general performance proof."
   }
 }

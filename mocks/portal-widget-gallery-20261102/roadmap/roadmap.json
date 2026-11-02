@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 48 scoped companion UI checks passed; music playback pending (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 168 scoped companion UI checks passed; music playback pending (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -593,8 +593,8 @@
     },
     {
       "id": "companion-native-ui",
-      "title": "Android companion: rendered settings, menus and Tools",
-      "summary": "48 unique rendered UI methods passed across three current-APK runs:33+7+8. Includes large-text management and compact Tools; physical Pixel and cold reconnect remain open.",
+      "title": "Android companion: rendered settings, photos, music and Tools",
+      "summary": "168 unique rendered UI methods passed across five current-APK runs: 33+7+8+56+64. Covers 22 reviewed fixture classes; physical Pixel, cold reconnect and real playback remain open.",
       "description": "Exercise the built companion after its compatibility/preflight changes. Check disabled-parent settings, viewing versus destinations, input admission and dropdown/overlap regression smoke with explicit fixture/live evidence boundaries.",
       "status": "verified",
       "verification": "Emulator UI verified \u00b7 strict two-room fixture",
@@ -605,7 +605,7 @@
       ],
       "owner": "Companion QA",
       "deployment": "Companion 1.7.1-music-preview / code 13 installed and full APK readback verified in owned API 34 emulator only; no physical phone update.",
-      "state": "Same exact1.7.1/code13 APK. Latest8 compact Tools/Advanced cases passed in11.157s; owned cleanup and source preservation verified.",
+      "state": "Same exact 1.7.1/code13 APK. Latest groups passed 56 methods in 84.387s and 64 in 107.5s; owned cleanup and source preservation verified.",
       "acceptance": [
         "Verify exact candidate identity and actual composed settings/menu behavior in an isolated Android environment.",
         "Exercise captured multi-room destinations, disabled-parent metadata, acknowledgement and invalid input admission through the real UI/VM/repository pipeline with an explicitly simulated transport.",
@@ -628,14 +628,19 @@
         {
           "text": "Eight additional existing Android UI methods passed in11.157s. Two narrow Advanced action layouts at1.3\u00d7; six short Tools cases, including four at1.3\u00d7/2\u00d7,48dp actions,200-item list reachability and keyboard confirmation/running guards. Aggregate logs independently contain48 distinct class/method pairs across33+7+8 runs.",
           "source": "docs/portal-product-operating-state.md; private scoped-ui-aggregate.json and instrumentation.log in /private/tmp/portal-companion-compact-tools-20261102/"
+        },
+        {
+          "text": "The remaining 120 reviewed callback methods passed in two groups: 56/56 in 84.387s and 64/64 in 107.5s. Photos, music/playback, mirror gestures, app confirmations, drafts, management, remote acknowledgements and scene revisions use synthetic state. Independent log/source comparison matches 168 unique methods in 22 fixture classes; four live Portal methods are excluded.",
+          "source": "docs/portal-product-operating-state.md; Toolkit docs/companion-qa-isolation-validation-2026-11-02.md; private scoped-ui-aggregate.json in /private/tmp/portal-companion-workflow-ui-20261102/"
         }
       ],
       "limits": [
         "The two-room transport is in-memory; no live Family/Living write or current pairing is established by these tests.",
         "No physical Pixel installation, folded/unfolded layout, touch, audible playback, FPS or hardware-performance acceptance.",
-        "The numeric fixture uses the supported asText editor branch; it does not prove real Portal metadata. An optional manual five-tab smoke check was not completed and is not counted."
+        "The numeric fixture uses the supported asText editor branch; it does not prove real Portal metadata. An optional manual five-tab smoke check was not completed and is not counted.",
+        "168 is an aggregate across five scoped runs, not one full-suite run. Four live UI methods are excluded; fixtures do not prove real imports, uninstalls, speaker output or provider access."
       ],
-      "next": "Rendered fixtures and subsequent warm live numeric settings are verified separately. Cold reconnect and physical Pixel acceptance remain open."
+      "next": "The reviewed callback UI matrix is complete on this APK. Preserve separate warm live evidence; cold reconnect, physical Pixel and real provider playback remain open."
     },
     {
       "id": "companion-live-pairing",
