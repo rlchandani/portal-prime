@@ -1,0 +1,21 @@
+{
+  "selections": 1284,
+  "widgets": 15,
+  "states": 78,
+  "textChecks": 19314,
+  "controlChecks": 3600,
+  "inactiveSkipped": 468,
+  "failures": [],
+  "unsupported": [],
+  "themes": [
+    "dark",
+    "light"
+  ],
+  "scales": [
+    "1",
+    "1.25",
+    "1.5"
+  ],
+  "scope": "Rendered widget text, enabled control names and 48px targets in all three preview platforms.",
+  "limitations": "Browser review only. Does not audit native controls, screen readers, focus order, placeholders, icons, illustrations or full WCAG conformance. Background images and group opacity are recorded as unsupported rather than counted as passing."
+}
