@@ -24,6 +24,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from urllib.parse import urlencode
 
@@ -423,9 +424,85 @@ def own_apk(room, package, deadline=math.inf):
     return path, entries[0]["mtime"]
 
 
-def deploy(cli, registry, rooms, apk, package):
+def deploy_screen_return(room, action):
+    """Request one explicit app screen; never infer a default or retry uncertainty."""
+    if action not in {"home", "screensaver"}:
+        raise FleetError("invalid screen return action")
+    deadline = time.monotonic() + 10
+    connection = http.client.HTTPConnection(
+        room.data["ip"], room.data["agentPort"], timeout=remaining(deadline, 10)
+    )
+    response = None
+    watchdog = None
+    try:
+        connection.connect()
+        sock = connection.sock
+        sock.settimeout(remaining(deadline, 10))
+
+        def interrupt_read():
+            # Socket timeouts limit idle time, not slowly arriving HTTP framing.
+            try:
+                sock.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+
+        watchdog = threading.Timer(remaining(deadline, 10), interrupt_read)
+        watchdog.daemon = True
+        watchdog.start()
+        connection.request("POST", "/remote/key",
+                           body=json.dumps({"action": action}).encode("utf-8"),
+                           headers={
+                               "Authorization": "Bearer " + room.data["token"],
+                               "Content-Type": "application/json",
+                               "Connection": "close",
+                           })
+        sock.settimeout(remaining(deadline, 10))
+        response = connection.getresponse()
+        remaining(deadline, 10)
+        if response.status != 200:
+            raise FleetError(f"screen return HTTP {response.status}")
+        body = bytearray()
+        limit = 64 * 1024
+        while True:
+            sock.settimeout(remaining(deadline, 10))
+            chunk = response.read1(min(8192, limit + 1 - len(body)))
+            remaining(deadline, 10)
+            body.extend(chunk)
+            if len(body) > limit:
+                raise FleetError("screen return response exceeds size limit")
+            if not chunk and getattr(response, "length", None) not in (None, 0):
+                raise FleetError("incomplete screen return response")
+            if not chunk or getattr(response, "length", None) == 0:
+                break
+        try:
+            result = json.loads(body)
+        except (ValueError, UnicodeError):
+            raise FleetError("invalid screen return response") from None
+        if not isinstance(result, dict) or result.get("ok") is not True or result.get("action") != action:
+            raise FleetError("screen return not acknowledged")
+        acknowledged = (
+            result.get("dispatched") is True if action == "home"
+            else result.get("result") in ("legacy_frame_requested", "shown")
+        )
+        if not acknowledged:
+            raise FleetError("screen return not acknowledged")
+        remaining(deadline, 10)
+    except (OSError, http.client.HTTPException):
+        raise FleetError("screen return connection interrupted") from None
+    finally:
+        if watchdog is not None:
+            watchdog.cancel()
+            watchdog.join()
+        if response is not None:
+            response.close()
+        connection.close()
+
+
+def deploy(cli, registry, rooms, apk, package, after_install="leave"):
     if not re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+", package, re.ASCII):
         raise FleetError("invalid package name")
+    if after_install not in {"leave", "home", "screensaver"}:
+        raise FleetError("invalid after-install screen")
     digest, size = hashlib.sha256(), 0
     try:
         with Path(apk).open("rb") as stream:
@@ -441,6 +518,14 @@ def deploy(cli, registry, rooms, apk, package):
         try:
             verify_info(room, room.data["ip"], room.data["agentPort"], 5)
             before = own_apk(room, package)
+            if after_install != "leave":
+                if before is None:
+                    raise FleetError("screen return requires the running agent package")
+                command = deploy_get(room, "/fs/read?" + urlencode({"path": "/proc/self/cmdline"}),
+                                     64 * 1024, 5, raw=True)
+                process_name, terminator, _ = command.partition(b"\0")
+                if not terminator or process_name != package.encode("utf-8"):
+                    raise FleetError("screen return requires the running agent package")
             result = subprocess.run(
                 [str(cli), "dev", "update", str(apk), "--package", package,
                  "--device", room.data["name"]],
@@ -485,6 +570,15 @@ def deploy(cli, registry, rooms, apk, package):
             reason = str(error) if isinstance(error, FleetError) else "invalid deploy response or I/O failure"
             print(f'{room.data["name"]}: deploy failed ({reason})')
             failed = True
+            continue
+        if after_install != "leave":
+            try:
+                deploy_screen_return(room, after_install)
+                print(f'{room.data["name"]}: {after_install} return requested (verify foreground separately)')
+            except (FleetError, OSError, ValueError, KeyError, TypeError, AttributeError) as error:
+                reason = str(error) if isinstance(error, FleetError) else "invalid screen return response or I/O failure"
+                print(f'{room.data["name"]}: screen return unconfirmed (APK installed; {reason})')
+                failed = True
     return int(failed)
 
 
@@ -501,8 +595,9 @@ def main(argv=None):
             "Put helper options before COMMAND; native options after it.\n"
             "refresh [--device NAME|SERIAL|all]  rediscover, authenticate, update IP/port\n"
             "status  [--device NAME|SERIAL|all]  check cached endpoints individually\n"
-            "deploy APK [--package PKG] [--device NAME|all]  verify installation per room\n"
+            "deploy APK [--package PKG] [--device NAME|all] [--after-install leave|home|screensaver]\n"
             "deploy defaults to com.immortal.launcher.debug; self recovery waits at most 90s.\n"
+            "Screen return is optional, bounded to 10s and does not assign a default Home app.\n"
             "Other commands pass to fleetctl, defaulting to --device all.\n"
             "No automatic refresh. dev update requires JSON success for every target.\n\n"
             "Examples:\n"
@@ -544,6 +639,8 @@ def main(argv=None):
             if command[0] == "deploy":
                 room_parser.add_argument("apk")
                 room_parser.add_argument("--package", default="com.immortal.launcher.debug")
+                room_parser.add_argument("--after-install", choices=("leave", "home", "screensaver"),
+                                         default="leave")
             selection = room_parser.parse_args(command[1:])
         registry = Path(options.registry).expanduser().resolve()
         rooms = load_rooms(registry)
@@ -551,7 +648,8 @@ def main(argv=None):
             if command[0] == "deploy":
                 return deploy(Path(options.cli).expanduser(), registry,
                               select_rooms(rooms, selection.device),
-                              Path(selection.apk).expanduser(), selection.package)
+                               Path(selection.apk).expanduser(), selection.package,
+                               selection.after_install)
             return report_rooms(select_rooms(rooms, selection.device), options.timeout,
                                 refresh=command[0] == "refresh")
         return forward(Path(options.cli).expanduser(), registry, rooms, command)

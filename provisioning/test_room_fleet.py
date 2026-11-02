@@ -4,19 +4,22 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Offline regression checks: all discovery, HTTP, and CLI calls are faked."""
+"""Offline regression checks: synthetic HTTP fixtures, including loopback TCP."""
 
 from contextlib import redirect_stderr, redirect_stdout
 import importlib.util
 import hashlib
 import http.client
 import io
+import inspect
 import json
 from pathlib import Path
 import socket
 import stat
 import subprocess
 import tempfile
+import threading
+import time
 import unittest
 from urllib.parse import parse_qs, urlsplit
 from unittest.mock import patch
@@ -429,31 +432,38 @@ class RoomFleetTest(unittest.TestCase):
 
     def deploy_fixture(self, before, after, remote=None, returncode=1, stdout=None,
                        info_losses=0, failed_room=None, maps_override=None, bad_listing=False,
-                       hash_elapsed=0, stderr=None):
+                       hash_elapsed=0, stderr=None, after_install=None, return_responses=None,
+                       cmdline_override=None):
         """Fake only HTTP, CLI, and time; run real ownership, hashing, and deployment."""
         package = "com.immortal.launcher.debug"
         apk = self.registry / "upload.apk"
         payload = b"same-version APK fixture"
         apk.write_bytes(payload)
         output, errors = io.StringIO(), io.StringIO()
-        observed = {"time": 0.0, "commands": [], "reads": [], "timeouts": [], "paths": []}
+        observed = {"time": 0.0, "commands": [], "reads": [], "timeouts": [], "paths": [],
+                    "returns": [], "events": [], "return_limits": []}
         installed = set()
         losses = [info_losses]
         case = self
 
         class Response:
-            def __init__(response, body, proc=False):
-                response.status = 200
+            def __init__(response, body, proc=False, status=200):
+                response.status = status
                 response.fp = io.BytesIO(body)
                 response.proc = proc
+                response.length = None
 
             def read(response, limit):
                 # Match the real procfs Content-Length:0 peculiarity.
                 return b"" if response.proc else response.fp.read(limit)
 
             def read1(response, limit):
-                observed["reads"].append(limit)
-                observed["time"] += hash_elapsed
+                if getattr(response, "screen_return", False):
+                    observed["return_limits"].append(limit)
+                else:
+                    observed["reads"].append(limit)
+                    observed["events"].append("hash")
+                    observed["time"] += hash_elapsed
                 return response.fp.read(limit)
 
             def close(response):
@@ -465,27 +475,53 @@ class RoomFleetTest(unittest.TestCase):
                 connection.sock = connection
                 observed["timeouts"].append(timeout)
 
+            def connect(connection):
+                pass
+
             def settimeout(connection, timeout):
                 observed["timeouts"].append(timeout)
 
-            def request(connection, method, path, headers):
-                case.assertEqual(method, "GET")
+            def request(connection, method, path, body=None, headers=None):
                 case.assertEqual(headers["Authorization"],
                                  "Bearer " + connection.room.data["token"])
                 connection.path = path
                 observed["paths"].append(path)
+                if method == "POST":
+                    case.assertEqual(path, "/remote/key")
+                    action = json.loads(body)["action"]
+                    observed["returns"].append((connection.room.data["name"], action,
+                                                output.getvalue()))
+                    observed["events"].append("return")
+                else:
+                    case.assertEqual(method, "GET")
 
             def getresponse(connection):
                 name = connection.room.data["name"]
                 changed = name in installed
                 artifact = after if changed else before
                 route = urlsplit(connection.path)
+                if route.path == "/remote/key":
+                    status, body = (return_responses or {}).get(name, (
+                        200, {"ok": True, "action": after_install, "dispatched": True,
+                              "result": "legacy_frame_requested"},
+                    ))
+                    if isinstance(body, Exception):
+                        raise body
+                    response = Response(body if isinstance(body, bytes) else
+                                        json.dumps(body).encode(), status=status)
+                    response.screen_return = True
+                    return response
                 if route.path == "/info":
                     if changed and losses[0]:
                         losses[0] -= 1
                         raise http.client.RemoteDisconnected("fake-family-secret")
                     return Response(json.dumps({"ok": True, "name": name}).encode())
                 path = parse_qs(route.query)["path"][0]
+                if path == "/proc/self/cmdline":
+                    case.assertEqual(route.path, "/fs/read")
+                    observed["events"].append("cmdline")
+                    return Response(package.encode("utf-8") + b"\0" if cmdline_override is None
+                                    else cmdline_override, proc=True)
                 if path == "/proc/self/maps":
                     if maps_override is not None:
                         body = maps_override
@@ -517,6 +553,7 @@ class RoomFleetTest(unittest.TestCase):
             ])
             case.assertEqual(kwargs["env"]["IMMORTAL_FLEET_DIR"], str(self.registry))
             observed["commands"].append(name)
+            observed["events"].append("install")
             installed.add(name)
             if name == failed_room:
                 return subprocess.CompletedProcess(command, 0, '{"ok":false}\n', "")
@@ -535,8 +572,377 @@ class RoomFleetTest(unittest.TestCase):
                 patch.object(fleet.time, "monotonic", side_effect=lambda: observed["time"]), \
                 patch.object(fleet.time, "sleep", side_effect=sleep), \
                 redirect_stdout(output), redirect_stderr(errors):
-            result = fleet.deploy("/fake/fleetctl", self.registry, self.rooms, apk, package)
+            if after_install is None:
+                result = fleet.deploy("/fake/fleetctl", self.registry, self.rooms, apk, package)
+            else:
+                self.assertIn("after_install", inspect.signature(fleet.deploy).parameters,
+                              "deploy is missing the after_install contract")
+                result = fleet.deploy("/fake/fleetctl", self.registry, self.rooms, apk, package,
+                                      after_install=after_install)
         return result, output.getvalue() + errors.getvalue(), observed
+
+    def screen_return_fixture(self, action, status=200, body=None, failure=None,
+                              header_elapsed=0, chunk_elapsed=0, socket_disappears=False,
+                              failure_stage="read", declared_length=None):
+        """Run the real helper against a bounded HTTPConnection boundary."""
+        helper = getattr(fleet, "deploy_screen_return", None)
+        self.assertTrue(callable(helper), "deploy_screen_return has not been implemented")
+        observed = {"requests": [], "closed": False, "response_closed": False,
+                    "limits": [], "timeouts": [], "time": 0.0, "bytes": 0}
+        room, case = self.rooms[0], self
+        payload = json.dumps(body).encode() if not isinstance(body, bytes) else body
+
+        class Response:
+            length = None
+
+            def __init__(response):
+                response.stream = io.BytesIO(payload)
+                response.length = declared_length
+
+            def read1(response, limit):
+                observed["limits"].append(limit)
+                case.assertGreater(limit, 0)
+                case.assertLessEqual(limit, 64 * 1024 + 1)
+                observed["time"] += chunk_elapsed
+                if failure and failure_stage == "read":
+                    raise failure
+                chunk = response.stream.read(min(limit, 8192))
+                observed["bytes"] += len(chunk)
+                if response.length is not None:
+                    response.length -= len(chunk)
+                if not chunk:
+                    observed["eof_length"] = response.length
+                return chunk
+
+            def close(response):
+                observed["response_closed"] = True
+                response.stream.close()
+
+        Response.status = status
+
+        class Connection:
+            def __init__(connection, ip, port, timeout):
+                case.assertEqual((ip, port), ("192.0.2.10", 8723))
+                case.assertGreater(timeout, 0)
+                case.assertLessEqual(timeout, 10)
+                observed["timeouts"].append(timeout)
+                connection.sock = connection
+
+            def connect(connection):
+                pass
+
+            def settimeout(connection, timeout):
+                case.assertGreater(timeout, 0)
+                case.assertLessEqual(timeout, 10)
+                observed["timeouts"].append(timeout)
+
+            def request(connection, method, path, body=None, headers=None):
+                case.assertEqual(headers["Authorization"], "Bearer " + room.data["token"])
+                case.assertEqual(headers["Content-Type"], "application/json")
+                observed["requests"].append((method, path, json.loads(body)))
+                if failure and failure_stage == "request":
+                    raise failure
+
+            def getresponse(connection):
+                observed["time"] += header_elapsed
+                if failure and failure_stage == "headers":
+                    raise failure
+                if socket_disappears:
+                    connection.sock = None
+                return Response()
+
+            def close(connection):
+                observed["closed"] = True
+
+        output = io.StringIO()
+        with patch.object(fleet.http.client, "HTTPConnection", Connection), \
+                patch.object(fleet.time, "monotonic", side_effect=lambda: observed["time"]), \
+                redirect_stdout(output), redirect_stderr(output):
+            try:
+                helper(room, action)
+            except fleet.FleetError as error:
+                observed["error"] = str(error)
+        self.assertEqual(observed["requests"], [("POST", "/remote/key", {"action": action})])
+        self.assertTrue(observed["closed"])
+        if failure_stage not in ("headers", "request") or not failure:
+            self.assertTrue(observed["response_closed"])
+        self.assertLessEqual(observed["bytes"], 64 * 1024 + 1)
+        self.assertNotIn(room.data["token"], output.getvalue() + observed.get("error", ""))
+        return observed
+
+    def test_screen_return_accepts_literal_home_acknowledgment(self):
+        observed = self.screen_return_fixture(
+            "home", body={"ok": True, "action": "home", "dispatched": True})
+        self.assertNotIn("error", observed)
+
+    def test_screen_return_accepts_only_recognized_screensaver_acknowledgments(self):
+        for result in ("legacy_frame_requested", "shown"):
+            with self.subTest(result=result):
+                observed = self.screen_return_fixture("screensaver", body={
+                    "ok": True, "action": "screensaver", "result": result,
+                    "available": True, "pinned": True, "covered": True,
+                })
+                self.assertNotIn("error", observed)
+
+    def test_screen_return_rejects_truthy_and_incomplete_home_acknowledgments(self):
+        for body in (
+            {"ok": 1, "action": "home", "dispatched": True},
+            {"ok": "true", "action": "home", "dispatched": True},
+            {"ok": True, "action": "screensaver", "dispatched": True},
+            {"ok": True, "action": "home", "dispatched": 1},
+            {"ok": True, "action": "home", "dispatched": False},
+            {"ok": True, "action": "home"},
+            {"ok": False, "action": "home", "dispatched": True},
+        ):
+            with self.subTest(body=body):
+                self.assertIn("error", self.screen_return_fixture("home", body=body))
+
+    def test_screen_return_rejects_unrecognized_screensaver_acknowledgments(self):
+        for body in (
+            {"ok": True, "action": "home", "result": "shown"},
+            {"ok": 1, "action": "screensaver", "result": "shown"},
+            {"ok": True, "action": "screensaver", "result": "completion_unconfirmed"},
+            {"ok": True, "action": "screensaver", "result": "pinned_return_unavailable"},
+            {"ok": True, "action": "screensaver"},
+            {"ok": True, "action": "screensaver", "result": "navigation_requested"},
+        ):
+            with self.subTest(body=body):
+                self.assertIn("error", self.screen_return_fixture("screensaver", body=body))
+
+    def test_screen_return_wrongtyped_screensaver_result_is_a_safe_fleet_error(self):
+        for result in (["shown"], {"result": "shown"}, [], {}, None, 1, True):
+            with self.subTest(result=result):
+                observed = self.screen_return_fixture("screensaver", body={
+                    "ok": True, "action": "screensaver", "result": result,
+                })
+                self.assertIn("error", observed)
+
+    def test_screen_return_rejects_valid_json_when_declared_body_is_truncated(self):
+        ack = b'{"ok":true,"action":"home","dispatched":true}'
+        complete = self.screen_return_fixture("home", body=ack, declared_length=len(ack))
+        self.assertNotIn("error", complete)
+        truncated = self.screen_return_fixture("home", body=ack, declared_length=len(ack) + 5)
+        self.assertEqual(truncated["bytes"], len(ack))
+        self.assertEqual(truncated["eof_length"], 5)
+        self.assertIn("error", truncated)
+
+    def test_screen_return_rejects_non200_without_retry_or_secret_echo(self):
+        for status in (202, 204, 401, 500):
+            with self.subTest(status=status):
+                self.assertIn("error", self.screen_return_fixture("home", status=status, body={
+                    "ok": True, "action": "home", "dispatched": True,
+                    "token": "fake-family-secret",
+                }))
+
+    def test_screen_return_rejects_empty_malformed_and_oversized_responses(self):
+        for body in (b"", b"not JSON fake-family-secret", b"[]", b"null",
+                     b'{"ok":true'):
+            with self.subTest(length=len(body)):
+                self.assertIn("error", self.screen_return_fixture("home", body=body))
+
+    def test_screen_return_http_errors_and_timeouts_are_not_retried_or_echoed(self):
+        for failure in (TimeoutError("fake-family-secret"),
+                        OSError("fake-family-secret"),
+                        http.client.RemoteDisconnected("fake-family-secret")):
+            for stage in ("request", "headers", "read"):
+                with self.subTest(failure=type(failure).__name__, stage=stage):
+                    self.assertIn("error", self.screen_return_fixture(
+                        "home", body=b"{}", failure=failure, failure_stage=stage))
+
+    def test_screen_return_enforces_64kib_limit_on_otherwise_valid_json(self):
+        ack = b'{"ok":true,"action":"home","dispatched":true}'
+        for size, accepted in ((64 * 1024, True), (64 * 1024 + 1, False)):
+            with self.subTest(size=size):
+                observed = self.screen_return_fixture("home", body=ack.ljust(size, b" "))
+                self.assertEqual("error" not in observed, accepted)
+
+    def test_screen_return_total_deadline_includes_response_headers(self):
+        observed = self.screen_return_fixture(
+            "home", body={"ok": True, "action": "home", "dispatched": True},
+            header_elapsed=10.1)
+        self.assertIn("error", observed)
+        self.assertFalse(observed["limits"], "expired header budget must prevent body reads")
+
+    def test_screen_return_checks_total_deadline_after_each_chunk(self):
+        ack = b'{"ok":true,"action":"home","dispatched":true}'
+        observed = self.screen_return_fixture(
+            "home", body=ack.ljust(32 * 1024, b" "), chunk_elapsed=4)
+        self.assertIn("error", observed)
+        self.assertLessEqual(observed["time"], 12)
+
+    def test_screen_return_uses_captured_socket_after_connection_detaches_it(self):
+        observed = self.screen_return_fixture(
+            "home", body={"ok": True, "action": "home", "dispatched": True},
+            socket_disappears=True)
+        self.assertNotIn("error", observed)
+
+    def test_screen_return_absolute_deadline_stops_real_tcp_slow_header_drip(self):
+        listener = socket.socket()
+        listener.bind(("127.0.0.1", 0))
+        listener.listen(1)
+        listener.settimeout(2)
+        stop = threading.Event()
+        requests, drips = [], []
+
+        def serve():
+            try:
+                connection, _ = listener.accept()
+                with connection:
+                    connection.settimeout(2)
+                    request = bytearray()
+                    while b"\r\n\r\n" not in request and len(request) < 8192:
+                        chunk = connection.recv(1024)
+                        if not chunk:
+                            return
+                        request.extend(chunk)
+                    requests.append(bytes(request).split(b"\r\n", 1)[0])
+                    connection.sendall(b"HTTP/1.1 200 OK\r\n")
+                    hard_stop = time.monotonic() + 12.5
+                    while not stop.is_set() and time.monotonic() < hard_stop:
+                        connection.sendall(b"X-Drip: x\r\n")
+                        drips.append(time.monotonic())
+                        if stop.wait(0.25):
+                            break
+            except OSError:
+                pass  # The watchdog closes the client socket during the header drip.
+
+        worker = threading.Thread(target=serve, daemon=True)
+        worker.start()
+        room = self.rooms[0]
+        room.data["ip"], room.data["agentPort"] = listener.getsockname()
+        started = time.monotonic()
+        try:
+            with self.assertRaises(fleet.FleetError) as error:
+                fleet.deploy_screen_return(room, "home")
+            elapsed = time.monotonic() - started
+            self.assertGreaterEqual(elapsed, 9)
+            self.assertLess(elapsed, 11.5, "socket idle timeout cannot bound dripping headers")
+            self.assertNotIn(room.data["token"], str(error.exception))
+            self.assertEqual(requests, [b"POST /remote/key HTTP/1.1"])
+            self.assertGreater(len(drips), 20)
+        finally:
+            stop.set()
+            worker.join(2)
+            listener.close()
+        self.assertFalse(worker.is_alive())
+
+    def test_deploy_default_leave_never_returns_screen(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        result, _, observed = self.deploy_fixture(before, after)
+        self.assertEqual(result, 0)
+        self.assertFalse(observed["returns"])
+
+    def test_deploy_explicit_leave_never_returns_screen(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        result, _, observed = self.deploy_fixture(before, after, after_install="leave")
+        self.assertEqual(result, 0)
+        self.assertFalse(observed["returns"])
+
+    def test_deploy_screen_return_follows_verified_hash_and_installed_output(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        for action in ("home", "screensaver"):
+            with self.subTest(action=action):
+                result, output, observed = self.deploy_fixture(before, after, after_install=action)
+                self.assertEqual(result, 0)
+                self.assertEqual([(name, selected) for name, selected, _ in observed["returns"]],
+                                 [("Family Area", action)])
+                self.assertLess(observed["events"].index("hash"),
+                                observed["events"].index("return"))
+                self.assertIn("verified installed APK SHA-256", observed["returns"][0][2])
+                self.assertIn("installed", observed["returns"][0][2])
+                self.assertNotIn("fake-family-secret", output)
+
+    def test_deploy_nonself_screen_return_refused_before_cli(self):
+        for action in ("home", "screensaver"):
+            with self.subTest(action=action):
+                result, _, observed = self.deploy_fixture(None, None, after_install=action)
+                self.assertEqual(result, 1)
+                self.assertFalse(observed["commands"])
+                self.assertFalse(observed["returns"])
+
+    def test_deploy_foreign_process_mapping_target_apk_cannot_authorize_screen_return(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        for cmdline in (
+            b"other.app\0com.immortal.launcher.debug\0",
+            b"com.immortal.launcher.debug",
+            b"com.immortal.launcher.debug.extra\0",
+            b"com.immortal.launcher.debug:worker\0",
+            b"com.immortal.launcher.debug \0",
+            b"\xff\0", b"", b"x" * (64 * 1024),
+        ):
+            with self.subTest(cmdline=cmdline[:64]):
+                result, output, observed = self.deploy_fixture(
+                    before, after, after_install="screensaver", cmdline_override=cmdline)
+                self.assertEqual(result, 1)
+                self.assertIn("cmdline", observed["events"])
+                self.assertFalse(observed["commands"], "foreign APK maps do not prove process identity")
+                self.assertFalse(observed["returns"])
+                self.assertNotIn("fake-family-secret", output)
+
+    def test_deploy_failed_install_or_hash_never_returns_screen(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        for options in ({"failed_room": "Family Area"}, {"remote": b"wrong APK"}):
+            with self.subTest(options=options):
+                result, _, observed = self.deploy_fixture(before, after, after_install="home", **options)
+                self.assertEqual(result, 1)
+                self.assertFalse(observed["returns"])
+
+    def test_deploy_return_failure_preserves_install_success_and_continues_next_room(self):
+        self.write_room(dict(self.data, serial="living-serial", name="Living Area",
+                             ip="192.0.2.11", token="fake-living-secret"))
+        self.rooms = fleet.load_rooms(self.registry)
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        result, output, observed = self.deploy_fixture(
+            before, after, after_install="home",
+            return_responses={"Family Area": (202, {
+                "ok": True, "result": "completion_unconfirmed", "action": "home",
+                "token": "fake-family-secret",
+            })},
+        )
+        self.assertEqual(result, 1)
+        self.assertEqual(observed["commands"], ["Family Area", "Living Area"])
+        self.assertEqual([(name, action) for name, action, _ in observed["returns"]],
+                         [("Family Area", "home"), ("Living Area", "home")])
+        self.assertIn("verified installed APK SHA-256", output)
+        self.assertIn("Family Area: screen return unconfirmed", output)
+        self.assertNotIn("Family Area: deploy failed", output)
+        self.assertNotIn("fake-family-secret", output)
+
+    def test_deploy_rejects_invalid_after_install_before_cli(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        with self.assertRaises(fleet.FleetError):
+            self.deploy_fixture(before, after, after_install="choose-default")
+
+    def test_parser_after_install_choices_and_default_leave(self):
+        observed = []
+
+        def deploy(cli, registry, rooms, apk, package, after_install="leave"):
+            observed.append(after_install)
+            return 0
+
+        for args, expected in (
+            ([], "leave"), (["--after-install", "leave"], "leave"),
+            (["--after-install", "home"], "home"),
+            (["--after-install", "screensaver"], "screensaver"),
+        ):
+            with self.subTest(args=args), patch.object(fleet, "deploy", side_effect=deploy):
+                with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                    result = fleet.main(["--registry", str(self.registry), "deploy", "app.apk", *args])
+                self.assertEqual(result, 0)
+                self.assertEqual(observed[-1], expected)
+        with patch.object(fleet, "deploy") as deploy_call:
+            with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                result = fleet.main(["--registry", str(self.registry), "deploy", "app.apk",
+                                     "--after-install", "choose-default"])
+            self.assertEqual(result, 2)
+            deploy_call.assert_not_called()
 
     def test_hash_stream_finishes_when_content_length_closes_the_socket(self):
         payload = b"complete installed APK"

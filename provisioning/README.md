@@ -212,6 +212,25 @@ is **only honoured while dev mode is on** (otherwise `/install` returns
 `dev update` enables it for you. Dev mode itself pauses `UpdateManager` and nothing
 else.
 
+For registered rooms, the host helper can request a specific Immortal screen
+after it verifies the installed APK:
+
+```bash
+python3 room-fleet.py deploy /path/to/signed.apk --device "Living Room" \
+  --package com.immortal.launcher.debug --after-install screensaver
+```
+
+`--after-install home` opens Immortal Home; the default `leave` sends no navigation
+request. These options apply only when replacing the running agent's own package.
+They reuse the existing fleet token and do not select Android's default Home app.
+This is useful if replacement uncovers Android's Home chooser. A return request
+is bounded to ten seconds and is never retried automatically. If its completion
+is unclear, the helper reports **screen return unconfirmed**, retains the verified
+installation result, continues other rooms and exits nonzero. A dispatch
+acknowledgment still needs a separate foreground-screen check; it does not promise
+that replacement has no intermediate flicker or that automatic OTA updates use
+this host-helper behavior.
+
 #### The `fleetctl` CLI
 
 `fleetctl` is a fast, **zero-dependency** CLI — a single-file Rust program (standard
