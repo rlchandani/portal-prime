@@ -20,7 +20,7 @@
 // `--device NAME|serial|all` (name match is case-insensitive); a lone registered
 // device is used by default.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs;
 use std::io::{Read, Write};
@@ -694,6 +694,43 @@ fn show(status: u16, body: Vec<u8>) -> i32 {
     }
 }
 
+// Fleet JSON commands require application success as well as transport success.
+// Keep opaque raw/file responses on show(): their data need not be an envelope.
+fn json_success(status: u16, body: &[u8]) -> bool {
+    fn unique_fields(value: &Json) -> bool {
+        match value {
+            Json::Obj(fields) => {
+                let mut seen = HashSet::new();
+                fields.iter().all(|(key, value)| seen.insert(key) && unique_fields(value))
+            }
+            Json::Arr(values) => values.iter().all(unique_fields),
+            _ => true,
+        }
+    }
+    if !(200..300).contains(&status) {
+        return false;
+    }
+    match Json::parse(body) {
+        Ok(value @ Json::Obj(_)) => {
+            unique_fields(&value) && matches!(value.get("ok"), Some(Json::Bool(true)))
+        }
+        _ => false,
+    }
+}
+
+fn show_json(status: u16, body: Vec<u8>) -> i32 {
+    let success = json_success(status, &body);
+    let transport_result = show(status, body);
+    if success {
+        0
+    } else {
+        if transport_result == 0 {
+            eprintln!("command failed: response did not confirm ok: true");
+        }
+        1
+    }
+}
+
 fn fanout<F: Fn(&Device) -> i32>(targets: &[Device], f: F) -> i32 {
     let mut rc = 0;
     let multi = targets.len() > 1;
@@ -824,7 +861,7 @@ fn simple_get(args: &Args, path: &'static str) -> i32 {
     let targets = resolve_targets(args);
     fanout(&targets, |d| {
         let (s, b) = request(d, "GET", path, &[], None);
-        show(s, b)
+        show_json(s, b)
     })
 }
 
@@ -832,7 +869,7 @@ fn post_json(args: &Args, path: &'static str, body: String) -> i32 {
     let targets = resolve_targets(args);
     fanout(&targets, |d| {
         let (s, b) = request(d, "POST", path, &[], Some(body.as_bytes()));
-        show(s, b)
+        show_json(s, b)
     })
 }
 
@@ -989,7 +1026,7 @@ fn cmd_ls(args: &Args) -> i32 {
     let targets = resolve_targets(args);
     fanout(&targets, |d| {
         let (s, b) = request(d, "GET", "/fs/list", &[("path", path.clone())], None);
-        show(s, b)
+        show_json(s, b)
     })
 }
 
@@ -1053,7 +1090,7 @@ fn cmd_push(args: &Args) -> i32 {
     let targets = resolve_targets(args);
     fanout(&targets, |d| {
         let (s, b) = request(d, "POST", "/fs/write", &[("path", remote.clone())], Some(&data));
-        show(s, b)
+        show_json(s, b)
     })
 }
 
@@ -1094,19 +1131,22 @@ fn cmd_dev_update(args: &Args) -> i32 {
         // 1. Pause the official self-updater so the dev build sticks.
         if !no_pause {
             let body = build_obj(&[("enabled", Field::B(true))]);
-            let (s, _) = request(d, "POST", "/dev", &[], Some(body.as_bytes()));
-            if (200..300).contains(&s) {
+            let (s, b) = request(d, "POST", "/dev", &[], Some(body.as_bytes()));
+            if json_success(s, &b) {
                 println!("dev mode: on (official updates paused)");
             } else {
-                eprintln!("warning: could not enable dev mode (status {})", s);
+                eprintln!("could not confirm dev mode; stopping this device (status {})", s);
+                show_json(s, b);
                 rc = 1;
+                continue;
             }
         }
         // 2. Push the local APK to the device.
         println!("pushing {} ({} bytes) -> {}", apk, data.len(), remote);
         let (s, b) = request(d, "POST", "/fs/write", &[("path", remote.clone())], Some(&data));
-        if !(200..300).contains(&s) {
-            eprintln!("push failed (status {}): {}", s, String::from_utf8_lossy(&b));
+        if !json_success(s, &b) {
+            eprintln!("could not confirm push; stopping this device (status {})", s);
+            show_json(s, b);
             rc = 1;
             continue;
         }
@@ -1117,7 +1157,7 @@ fn cmd_dev_update(args: &Args) -> i32 {
             ("packageName", Field::S(pkg.clone())),
         ]);
         let (s2, b2) = request(d, "POST", "/install", &[], Some(body.as_bytes()));
-        let r = show(s2, b2);
+        let r = show_json(s2, b2);
         if r != 0 {
             rc = r;
         }

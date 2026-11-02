@@ -57,8 +57,12 @@ agentPort, token}`.
 token gets `401`. The per-device token lives in `fleet/<serial>.json`, which is **git-ignored
 and a secret** (the repo is public). Never print token values or commit that folder.
 
-**Exit codes:** `0` success · `1` HTTP/transport error (non-2xx or device down) · `2` usage
-error. Default agent port is `8723`.
+**Exit codes:** `0` success · `1` HTTP/transport or unconfirmed application result ·
+`2` usage error. Known JSON commands require HTTP 2xx and a complete object with
+literal `ok:true` and unique fields. Raw/file/text commands retain HTTP-only
+status checks. `dev update` stops the current device before later stages if
+pausing updates or uploading is unconfirmed; it does not automatically retry.
+Default agent port is `8723`.
 
 ## Commands
 

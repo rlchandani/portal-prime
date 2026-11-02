@@ -200,6 +200,9 @@ test build. Dev mode + the local-install path handle both:
 device, and installs it over Immortal via the same silent path the store uses — no
 cable, no `version.json`, no catalog/versionCode gate. `--package`/`--path` override
 the defaults (`com.immortal.launcher` and a temp path in the app's files dir).
+An unconfirmed pause or upload stops that device before subsequent stages. The
+command continues to other selected devices, returns failure overall and never
+automatically retries a stage.
 
 **Sign with the same key.** An in-place update is signature-checked by Android, so
 your local build must be signed with the **same key** as the installed Immortal (the
@@ -244,7 +247,10 @@ cargo build --release             # produces target/release/fleetctl
 ```
 
 The CLI rejects interrupted HTTP responses before reporting success or replacing
-a downloaded file. Legacy zero-length procfs diagnostics require a clean close;
+a downloaded file. Known JSON commands also require a complete object with
+literal `ok:true` and unique fields; HTTP 200 alone is insufficient. Opaque
+`raw`, file and text responses retain HTTP-only status checks.
+Legacy zero-length procfs diagnostics require a clean close;
 ordinary files still require their declared length. Run the local transport gates
 against a freshly built binary on macOS/Linux:
 

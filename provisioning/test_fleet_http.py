@@ -75,6 +75,145 @@ class FleetHttpTest(unittest.TestCase):
             env=self.env, capture_output=True, timeout=5,
         )
 
+    @staticmethod
+    def json_reply(body, status=200):
+        return (f"HTTP/1.1 {status} Fixture\r\nContent-Length: {len(body)}\r\n\r\n"
+                .encode("ascii") + body)
+
+    @contextlib.contextmanager
+    def sequence_server(self, replies):
+        requests, errors = [], []
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            listener.listen(3)
+            listener.settimeout(5)
+
+            def serve():
+                try:
+                    for status, body in replies:
+                        try:
+                            connection, _ = listener.accept()
+                        except socket.timeout:
+                            break  # A failed stage must stop the remaining requests.
+                        with connection:
+                            connection.settimeout(5)
+                            incoming = b""
+                            while b"\r\n\r\n" not in incoming:
+                                chunk = connection.recv(4096)
+                                if not chunk:
+                                    raise AssertionError("Incomplete client request")
+                                incoming += chunk
+                            header, payload = incoming.split(b"\r\n\r\n", 1)
+                            length = 0
+                            for line in header.split(b"\r\n")[1:]:
+                                key, _, value = line.partition(b":")
+                                if key.lower() == b"content-length":
+                                    length = int(value)
+                            while len(payload) < length:
+                                chunk = connection.recv(4096)
+                                if not chunk:
+                                    raise AssertionError("Incomplete client upload")
+                                payload += chunk
+                            method, path, _ = header.split(b"\r\n", 1)[0].split(b" ")
+                            requests.append((method.decode("ascii"), path.decode("ascii"), payload))
+                            connection.sendall(self.json_reply(body, status))
+                        listener.settimeout(0.3)
+                except Exception as error:
+                    errors.append(error)
+
+            worker = threading.Thread(target=serve, daemon=True)
+            worker.start()
+            try:
+                yield listener.getsockname()[1], requests
+            finally:
+                worker.join(6)
+                self.assertFalse(worker.is_alive(), "Sequence server did not terminate")
+                if errors:
+                    raise errors[0]
+
+    def json_commands(self):
+        upload = self.root / "public-upload.bin"
+        upload.write_bytes(b"PUBLIC UPLOAD")
+        return (
+            ("info",), ("install", "org.example.public"), ("ls", "/public"),
+            ("push", str(upload), "/public/upload.bin"), ("config",),
+            ("action", "identify"),
+        )
+
+    def test_json_commands_require_literal_unambiguous_success_object(self):
+        for command in self.json_commands():
+            for body in (
+                b'{"ok":false}', b'{}', b'{"ok":1}', b'{"ok":"true"}',
+                b'not JSON', b'[]', b'{"ok":true,"ok":false}',
+                b'{"ok":false,"ok":true}', b'{"ok":true,"metadata":{"x":1,"x":1}}',
+            ):
+                with self.subTest(command=command[0], body=body):
+                    with self.server(self.json_reply(body)) as (port, requests):
+                        result = self.run_cli(port, *command)
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                    self.assertEqual(len(requests), 1)
+
+    def test_json_commands_accept_literal_success_object(self):
+        body = b'{"ok":true,"public":"fixture"}'
+        for command in self.json_commands():
+            with self.subTest(command=command[0]):
+                with self.server(self.json_reply(body)) as (port, _):
+                    result = self.run_cli(port, *command)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(result.stdout), json.loads(body))
+
+    def test_opaque_raw_get_json_remains_http_only(self):
+        body = b'{"ok":false,"data":"public opaque value"}'
+        with self.server(self.json_reply(body)) as (port, requests):
+            result = self.run_cli(port, "raw", "GET", "/public/data")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), json.loads(body))
+        self.assertTrue(requests[0].startswith(b"GET /public/data "))
+
+    def test_plaintext_logcat_cat_and_pull_remain_http_only(self):
+        body = b"PUBLIC TEXT ok=false\n"
+        for command in (("logcat",), ("cat", "/public/text"), ("pull", "/public/text", "-")):
+            with self.subTest(command=command[0]):
+                with self.server(self.json_reply(body)) as (port, _):
+                    result = self.run_cli(port, *command)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout, body)
+
+    def test_dev_update_failed_stage_stops_without_later_posts(self):
+        apk = self.root / "public-dummy.apk"
+        apk.write_bytes(b"PUBLIC DUMMY APK BYTES")
+        expected = [("POST", "/dev"), ("POST", "/fs/write?path=%2Fpublic%2Fdummy.apk"),
+                    ("POST", "/install")]
+        for failed_stage in (0, 1, 2):
+            for status, body in ((200, b'{"ok":false}'), (503, b'{"ok":true}')):
+                with self.subTest(failed_stage=failed_stage, status=status):
+                    replies = [(200, b'{"ok":true}')] * 3
+                    replies[failed_stage] = (status, body)
+                    with self.sequence_server(replies) as (port, requests):
+                        result = self.run_cli(
+                            port, "dev", "update", str(apk), "--path", "/public/dummy.apk",
+                            "--package", "org.example.public")
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                    self.assertEqual([(method, path) for method, path, _ in requests],
+                                     expected[:failed_stage + 1])
+
+    def test_dev_update_success_posts_exact_three_stage_sequence(self):
+        apk = self.root / "public-dummy.apk"
+        apk.write_bytes(b"PUBLIC DUMMY APK BYTES")
+        with self.sequence_server([(200, b'{"ok":true}')] * 3) as (port, requests):
+            result = self.run_cli(
+                port, "dev", "update", str(apk), "--path", "/public/dummy.apk",
+                "--package", "org.example.public")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual([(method, path) for method, path, _ in requests], [
+            ("POST", "/dev"), ("POST", "/fs/write?path=%2Fpublic%2Fdummy.apk"),
+            ("POST", "/install"),
+        ])
+        self.assertEqual(json.loads(requests[0][2]), {"enabled": True})
+        self.assertEqual(requests[1][2], apk.read_bytes())
+        self.assertEqual(json.loads(requests[2][2]),
+                         {"path": "/public/dummy.apk", "packageName": "org.example.public"})
+
     def test_complete_info_returns_success_and_authenticates(self):
         body = b'{"ok":true,"name":"Public fixture"}'
         reply = b"HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n" % len(body) + body
