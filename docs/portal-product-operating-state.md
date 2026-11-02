@@ -551,3 +551,20 @@ the actual optimized fixture ABI failure using Java/framework APIs, preserving
 production APK/R8/configuration and every parked issue. It has not started or
 passed. Music login/playback, design approval and physical phone acceptance remain
 separate; the installer cleanup itself is closed.
+
+## Optimized platform QA checkpoint — 2 November 2026
+
+Source `85547f76` fixes the observed optimized-test ABI boundary with an opt-in
+Java/framework-only runner. Family's unchanged optimized1.76 passed two15-check
+normal runs; an injected failure correctly stayed failed while cleaning both
+fresh sessions. Exact original test APK, full application APK and complete
+settings/screensaver comparisons passed. Independent cleanup review passed.
+Normal debug/test builds and the existing3858-test/405-suite up-to-date JVM
+gate remain green. See [scoped receipt](portal-optimized-platform-qa-2026-11-02.md).
+
+The30-item saved roadmap now has13 delivered/implemented,11 scoped verified,
+2 awaiting approval,3 parked and1 queued. This is a test-harness correction,
+not a new Portal release, full Kotlin UI compatibility or a performance gain.
+Living remains on its previously verified1.76 artifact without any new test
+deployment. Music sign-in/playback, Weather/gallery approval, physical phone and
+all parked issue limits remain separate.

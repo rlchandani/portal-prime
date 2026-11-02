@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 Installer cleanup delivered as1.76 in both rooms; Family owned session1\u21920 (UTC)",
+  "updatedAt": "2026-11-02T14:26:58.532964+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 optimized platform QA verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "installer-owned-sessions",
+  "defaultTask": "qa-optimized-platform-fixture",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact optimized1.76/code70. Earlier task receipts retain their acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
@@ -393,7 +393,7 @@
         "Living did not receive a duplicate physical interaction run.",
         "Observer counts and equivalent-scenario performance comparisons remain unverified."
       ],
-      "next": "Keep the original scoped acceptance receipt; current room artifact is 1.72. Broader native acceptance remains separate."
+      "next": "Keep the original scoped acceptance receipt; current room artifact is1.76. Broader native acceptance remains separate."
     },
     {
       "id": "ci-regressions",
@@ -1213,23 +1213,23 @@
         "One191ms terminal failure is not a general performance benchmark. No duplicate Living interaction, physical phone or native UI/FPS claim.",
         "Process termination during self-update can bypass finally, as before."
       ],
-      "next": "Keep this fix. Next independent QA item is a platform-only fixture compatible with optimized runtime, without APK swaps or production keep-rule changes."
+      "next": "Retain the installer fix and now-verified optimized Java/framework fixture. Actual timeout, valid-install overlap/confirmation and broader native UI acceptance remain separate."
     },
     {
       "id": "qa-optimized-platform-fixture",
       "title": "Native QA: platform fixture on the optimized APK",
-      "summary": "Queued from actual failure: Kotlin Intrinsics absent in optimized target. A small Java/Android-API-only fixture could avoid temporary debug-APK swaps.",
-      "description": "Improve installer/system API verification without requiring the debug-targeted Kotlin UI fixture ABI. Keep product code, R8 rules, signing and current1.76 APK unchanged.",
-      "status": "queued",
-      "verification": "Actual fixture ABI failure \u00b7 proposed correction unbuilt",
+      "summary": "Framework-only installer fixture now runs on optimized1.76 without swapping the app APK. Two15/15 runs and intentional-failure cleanup passed.",
+      "description": "Correct the actual test-runner ABI failure with Java/framework APIs and an opt-in test-build runner selector. Product sources, version and R8 rules stay unchanged.",
+      "status": "verified",
+      "verification": "Family optimized API29 \u00b7 2\u00d715/15 \u00b7 injected failure cleaned up",
       "kind": "Native QA infrastructure",
       "platforms": [
         "portal",
         "tooling"
       ],
       "owner": "Native QA",
-      "deployment": "No new fixture/runtime change. Both rooms retain exact1.76; original Family test package restored.",
-      "state": "Actual first optimized test process failed on kotlin.jvm.internal.Intrinsics; matching-debug rerun passed17 checks and final artifacts were restored.",
+      "deployment": "Test-only fixture verified on Family; exact original test APK restored. Application1.76 unchanged; Living received no update.",
+      "state": "Normal and repeat runs passed, and deliberate failure stayed failed while removing both fresh sessions. Full application/test APK readbacks and complete settings/screensaver comparisons match.",
       "acceptance": [
         "Use only Java/framework APIs for a bounded installer fixture; avoid product/R8/source-version changes.",
         "Run against actual optimized1.76 on Family without replacing its application APK.",
@@ -1238,15 +1238,21 @@
       ],
       "evidence": [
         {
-          "text": "Optimized test ABI failure and successful matching-debug API check are recorded with exact final restoration.",
-          "source": "docs/portal-installer-session-cleanup-2026-11-02.md"
+          "text": "Actual optimized normal15/15, repeat15/15 and injected-failure cleanup; full original-artifact restoration, configuration equality and independent review.",
+          "source": "docs/portal-optimized-platform-qa-2026-11-02.md"
+        },
+        {
+          "text": "Selected public checks and explicit execution/deployment boundaries.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/optimized-platform-qa-verification.json"
         }
       ],
       "limits": [
-        "Proposal only; no Java fixture, compiler/runtime acceptance or success rate claimed.",
-        "This does not make every Kotlin UI fixture optimized-compatible or reopen parked native performance/legacy-style work."
+        "Framework fixture only; existing Kotlin UI ABI compatibility remains unproved.",
+        "Fresh empty guard session; no concurrent valid-install/timeout/confirmation acceptance.",
+        "API29 Family only; no phone, API28, native UX/FPS or music playback claim.",
+        "JVM gate used up-to-date3858-test/405-suite results. No new Portal release or performance gain."
       ],
-      "next": "One independent30-minute test-only unit. Family only; no new Portal APK or Living test-package deployment."
+      "next": "Reuse this scoped fixture when warranted. Normal Google sign-in/Premium playback and UI approvals remain separate; keep parked investigations closed."
     }
   ]
 }

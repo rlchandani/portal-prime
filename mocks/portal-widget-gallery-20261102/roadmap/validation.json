@@ -558,5 +558,28 @@
     "versionFooterCorrect": true,
     "pageErrors": 0,
     "limits": "Only three changed saved-page details and row count; no native UI/performance or broad repeat acceptance."
+  },
+  "optimizedPlatformFixtureSnapshotUpdate": {
+    "taskIds": [
+      "qa-optimized-platform-fixture",
+      "installer-owned-sessions"
+    ],
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "detailChecks": 4,
+    "renderedRows": 30,
+    "currentVersionFooter": "1.76 / code70",
+    "horizontalOverflow": false,
+    "missingLabels": false,
+    "pageErrors": 0,
+    "scope": "Changed saved-page detail presentation only; no broad historical/native UX or performance acceptance."
   }
 }

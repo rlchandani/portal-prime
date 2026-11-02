@@ -257,3 +257,11 @@ Only installer, proposed optimized-fixture and Weather-clock details were checke
 at390×844 and1600×1000:30 rows, correct1.76/code70 footer, no horizontal overflow,
 undefined labels or page errors. This is saved-page presentation, not native UI
 performance or broad historical interaction reacceptance.
+
+The optimized platform-fixture checkpoint keeps30 tasks:13 delivered/implemented,
+11 scoped verified,2 approval,3 parked and1 queued. A Java/framework-only
+test runner now passes against Family's unchanged optimized1.76 without swapping
+its app APK. Two normal15/15 runs and deliberate failing-run cleanup passed;
+the original test package and full application/configuration readbacks match.
+This does not make all Kotlin UI fixtures compatible or claim a new product
+feature, release or performance improvement.

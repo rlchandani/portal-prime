@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "85547f76",
+  "scope": "Java/framework-only installer fixture on Family optimized1.76/API29",
+  "normalChecks": 15,
+  "normalFailures": 0,
+  "repeatChecks": 15,
+  "repeatFailures": 0,
+  "injectedFailureCorrectlyFailed": true,
+  "injectedFailureCleanupPassed": true,
+  "allRunBaselinesRestored": true,
+  "originalTestApkRestoredExactly": true,
+  "optimizedAppApkUnchanged": true,
+  "completeSettingsProfileUnchanged": true,
+  "screensaverConfigUnchanged": true,
+  "currentApp": {
+    "versionCode": 70,
+    "versionName": "1.76"
+  },
+  "independentStaticReview": "passed after cleanup correction",
+  "jvmGate": {
+    "tests": 3858,
+    "suites": 405,
+    "failures": 0,
+    "execution": "up-to-date; unchanged JVM inputs"
+  },
+  "normalAndOptInTestBuilds": "passed",
+  "productionSourcesAndR8Changed": false,
+  "newPortalAppDeployment": false,
+  "livingFixtureDeployment": false,
+  "limits": [
+    "Framework fixture only; existing Kotlin UI ABI compatibility remains unproved.",
+    "Fresh empty guard session; no concurrent valid-install/timeout/confirmation acceptance.",
+    "API29 Family only; no phone, API28, native UX/FPS or music playback claim."
+  ]
+}
