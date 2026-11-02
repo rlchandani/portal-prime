@@ -11,6 +11,8 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Latest phone photo-deletion consistency:** companion1.7.2-music-preview/code14 is built, signed and fully read back in an ownedAPI34 emulator. Positive deletion replies require literal success plus the exact selected wire path; unconfirmed replies show review and retain last known photos without automatic replay/refresh. Seven old regressions failed; final573 JVM/75 suites, app/test builds and4/4 actual panel/repository/client fixture cases passed. Physical Pixel/live-network and whole-app snackbar acceptance remain open; no speedup claimed. Original AVD unchanged and owned emulator cleaned up. Both exact Portal1.82 APKs, complete room configuration and Family runtime state retained; zero Portal writes/installs. [Scoped receipt](portal-companion-photo-delete-2026-11-02.md).
+
 - **Latest browser deletion delivery:** exact optimized1.82/code76 is installed and fully read back in both rooms. Browser Photo deleted now requires literal success and the selected path; unexpected object/primitive acknowledgments show review and retain exactly one metadata refresh, with no retry. Seven new regressions passed within703 browser /3,869 JVM406 suites and both builds/R8/vital lint. Family's actual1.81 false-success and1.82 guarded outcomes were observed with controlled replies; the77-byte owned original remained exact, then a real valid UI deletion returned matching path and removed it. Full configurations preserved, owned directory removed, Family font/accessibility/Chrome/manual frame retained. No server/native-phone change or general speedup claimed. Living transport closed during self-replacement; complete installed APK verified delivery. [Receipt](portal-photo-delete-confirmation-2026-11-02.md).
 
 - **Latest browser import delivery:** exact optimized1.81/code75 is installed and fully read back in both rooms. Posted unreadable acknowledgments now remain Completion unconfirmed; readable rejection stays Failed, and confirmation requires literal ok:true plus exact path/bytes. 696 browser /3,869 JVM406 suites and both builds/R8/vital lint passed. Family's actual1.80 wrong outcome and1.81 corrected outcomes were observed with real77-byte stores and controlled reply damage: zero automatic retries, zero pre-Refresh metadata reads, one manual Refresh, real409 and valid-success controls. Four originals matched exactly and owned scratch was removed. Complete room configurations and Family font/accessibility/Chrome/manual frame retained. No broad performance claim. Living transport closed during self-replacement; full APK readback verified success. Reload open browser tabs for the new controller. [Receipt](portal-photo-upload-acknowledgment-2026-11-02.md).
@@ -100,7 +102,7 @@ The updated whole-product objective is
   `docs/companion-compatibility-validation-2026-11-02.md` in the isolated Toolkit
   checkout. Original 540 companion tests were unchanged and passed against the
   candidate; no separate unmodified-base run or physical phone check is claimed.
-- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents thirty-nine
+- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents forty-one
   tracked items with acceptance/evidence/limits and actual cropped clock captures.
   It is a saved priority-queue snapshot, not live telemetry or an exhaustive
   product acceptance report. Browser interactions passed at desktop/mobile
@@ -613,3 +615,7 @@ The32-task saved roadmap has14 delivered/implemented,11 scoped verified,
 the actual visible Family prompt and terminal `ok:false` response, with no proven
 cause or software change yet. Preserve its fresh30-minute boundary, normal
 music sign-in/playback, UI approvals and all exhausted issue boundaries.
+
+## Next independent native photo-transfer unit
+
+Native upload confirmation currently checks bytes after the general coercing success parser, without validating literal success or exact destination. This is source evidence, not a freshly reproduced runtime outcome. The41-item saved roadmap queues a separate bounded client/repository/group unit; reproduce first, preserve streaming/cleanup and401, and avoid any automatic image replay. This does not reopen exhausted work or claim physical-phone acceptance.

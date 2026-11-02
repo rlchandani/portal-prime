@@ -1,0 +1,80 @@
+{
+  "jvm": {
+    "tests": 573,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": 75,
+  "app-debug.apk": {
+    "bytes": 14722589,
+    "sha256": "c9f7e2beb6fdd1f95a78993bfbd70558fdc2cec5dde4d9c23fff431a85d54d6a"
+  },
+  "app-debug-androidTest.apk": {
+    "bytes": 1683563,
+    "sha256": "24a6953e4052baa35d3a28eda599e4ca647d19798985e80727acd3942ac2dabd"
+  },
+  "emulatorInstalled": {
+    "bytes": 14722589,
+    "sha256": "c9f7e2beb6fdd1f95a78993bfbd70558fdc2cec5dde4d9c23fff431a85d54d6a",
+    "matches": true
+  },
+  "schemaVersion": 1,
+  "scope": "Native panel/repository/client fixture; emulator only, no physical phone or live-network deletion acceptance",
+  "phoneVersion": "1.7.2-music-preview /code14",
+  "initialJvm": {
+    "tests": 9,
+    "failures": 7
+  },
+  "rendered": {
+    "tests": 4,
+    "passed": 4,
+    "seconds": 4.773,
+    "apiLevel": 34,
+    "viewportDp": [
+      360,
+      800
+    ]
+  },
+  "sourceAvd": {
+    "ready": true,
+    "sourceUnchanged": true,
+    "ownedResourcesRemoved": true
+  },
+  "roomRetention": {
+    "rooms": {
+      "family": {
+        "checks": {
+          "profileUnchanged": true,
+          "layoutUnchanged": true,
+          "screensaverUnchanged": true,
+          "current182ArtifactUnchanged": true
+        },
+        "installedApkBytes": 25860990,
+        "installedSha256": "25ebd04107d0dfbf0b116a5992a547e83f182c0de98ae43e3bfaf36a9fc11939"
+      },
+      "living": {
+        "checks": {
+          "profileUnchanged": true,
+          "layoutUnchanged": true,
+          "screensaverUnchanged": true,
+          "current182ArtifactUnchanged": true
+        },
+        "installedApkBytes": 25860990,
+        "installedSha256": "25ebd04107d0dfbf0b116a5992a547e83f182c0de98ae43e3bfaf36a9fc11939"
+      }
+    },
+    "family": {
+      "fontUnchanged": true,
+      "servicesUnchanged": true,
+      "noPendingBinding": true,
+      "originalChromeRetained": true,
+      "manualPhotoFrameResumed": true
+    },
+    "portalWrites": 0,
+    "portalInstalls": 0
+  },
+  "performanceScope": "No automatic delete replay or unconfirmed metadata retry; valid deletion retains one refresh. No speedup/FPS claim.",
+  "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "companionCommit": "00c48d27963638b9b72a5d3cdbb1f4c37b00d4ea"
+}

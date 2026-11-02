@@ -752,5 +752,26 @@
     "footerVersion": "1.82/code76",
     "actualFamilyPwa": "old false success; final review for mismatched/falsy replies; real valid deletion passed",
     "verificationNote": "Initial text scan matched a literal implementation term; acceptance wording was made user-facing and unchanged verifier then passed."
+  },
+  "companionPhotoDeleteSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T18:34:32.369426+00:00",
+    "taskCount": 41,
+    "all41DetailsCheckedDesktopAndMobile": true,
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        1600,
+        1000
+      ]
+    ],
+    "horizontalOverflow": false,
+    "missingLabels": false,
+    "pageErrors": 0,
+    "structuredProofHttpStatus": 200,
+    "footerVersions": "Portal1.82/code76; Companion1.7.2/code14 candidate",
+    "limits": "Roadmap content verification only; native fixture, gates, exact installed emulator artifact and unchanged Portal readbacks have separate receipts."
   }
 }
