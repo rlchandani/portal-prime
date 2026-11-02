@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-02T20:50:29.179703+00:00",
+  "scope": "Explicit local debug/performance preview readiness; no publication or device deployment",
+  "status": "verified",
+  "issueClock": {
+    "startedAt": "2026-11-02T20:30:00Z",
+    "deadline": "2026-11-02T21:00:00Z",
+    "scope": "Explicit preview version policy in existing local readiness gate",
+    "firstSourceAuditClockRetained": true,
+    "clockBasis": "Conservative clock retained from the earlier source-readiness inspection during the metadata unit"
+  },
+  "cliMethodsPassed": 34,
+  "newCliMethods": 10,
+  "originalCore": {
+    "methods": 3,
+    "failures": 1,
+    "errors": 1,
+    "strictDefaultControlPassed": true
+  },
+  "negativeActualModes": {
+    "cases": [
+      {
+        "case": "actual-strict",
+        "exitCode": 1,
+        "status": "failed",
+        "error": "Gradle and version.json versions disagree.",
+        "externalCheckCount": 0,
+        "published": false,
+        "deployed": false
+      },
+      {
+        "case": "actual-release-preview",
+        "exitCode": 1,
+        "status": "failed",
+        "error": "Local preview requires debug or performance; release manifest checks remain mandatory.",
+        "externalCheckCount": 0,
+        "published": false,
+        "deployed": false
+      }
+    ],
+    "manifestSha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+    "manifestUnchanged": true
+  },
+  "actualPreview": {
+    "status": "ready",
+    "published": false,
+    "deployed": false,
+    "versionPolicy": "local-preview",
+    "version": {
+      "versionCode": 79,
+      "versionName": "1.85"
+    },
+    "releaseManifestVersion": {
+      "versionCode": 77,
+      "versionName": "1.83"
+    },
+    "source": {
+      "sha256": "35ba9db3ac92d2c4e96380a909ef5517525ab5b81e104454fe6797f7455d7566",
+      "fileCount": 1373,
+      "head": "a69302f89dc72702c0d8c229ec0d5fad96f86d9b",
+      "dirty": true
+    },
+    "tools": {
+      "python": "3.13.7",
+      "androidBuildTools": "36.0.0",
+      "node": "v24.13.0"
+    },
+    "javascript": {
+      "slideshow-js": 354,
+      "remote-js": 715
+    },
+    "pythonTests": 196,
+    "jvm": {
+      "tests": 3920,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 412
+    },
+    "archivedPriorJvmReports": 412,
+    "artifact": {
+      "package": "com.immortal.launcher.debug",
+      "versionCode": 79,
+      "versionName": "1.85",
+      "signerSha256": [
+        "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+      ],
+      "bytes": 25861122,
+      "sha256": "e2c93a3c2d2b187a5f47f45cf7120a69da4321be9590d452671c400c273fe974",
+      "file": "candidate.apk",
+      "variant": "performance"
+    },
+    "durationMs": 162080,
+    "startedAt": "2026-11-02T20:46:53.715051+00:00",
+    "finishedAt": "2026-11-02T20:49:35.794168+00:00"
+  },
+  "allActualProcessesExitedZero": true,
+  "actualProcesses": 14,
+  "candidateIndependentlyHashed": true,
+  "candidateMatchesPreviouslyAcceptedPortal185": true,
+  "independentReview": "Separate negative-contract worker reviewed final single-parse version policy; no remaining concrete defect",
+  "restoration": {
+    "publicationManifestUnchanged": true,
+    "noDeviceOrPhoneInteraction": true,
+    "noOwnedServerStarted": true,
+    "independentAgentClosed": true
+  },
+  "limits": [
+    "Debug/performance preview exercised; no new real debug/release build acceptance.",
+    "Fresh JVM reports forced; unchanged optimized build tasks may be up to date.",
+    "No hostedCI, publication eligibility, device health, UI, playback or performance improvement claim.",
+    "Current Portal1.85 and companion1.7.5 acceptance retain their own receipts and limits."
+  ]
+}

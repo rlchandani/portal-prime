@@ -108,19 +108,31 @@ def source_inputs(checks):
     return {"sha256": h.hexdigest(), "fileCount": count}
 
 
-def version(root):
+def version(root, local_preview=False):
+    return version_metadata(root, local_preview)[0]
+
+
+def version_metadata(root, local_preview=False):
     try:
         manifest = json.loads((root / "version.json").read_text())
+        if not isinstance(manifest, dict):
+            raise CheckFailed("The release manifest must contain an object.")
         gradle = (root / "app/build.gradle.kts").read_text()
         code = re.findall(r"^\s*versionCode\s*=\s*(\d+)\s*$", gradle, re.M)
         name = re.findall(r'^\s*versionName\s*=\s*"([^"]+)"\s*$', gradle, re.M)
         if len(code) != 1 or len(name) != 1:
             raise CheckFailed("Gradle must declare exactly one versionCode and versionName.")
+        if int(code[0]) < 1 or not name[0].strip():
+            raise CheckFailed("Gradle must declare a positive versionCode and nonempty versionName.")
         if (type(manifest.get("versionCode")) is not int or manifest["versionCode"] < 1
-                or manifest["versionCode"] != int(code[0])
-                or manifest.get("versionName") != name[0]):
+                or not isinstance(manifest.get("versionName"), str)
+                or not manifest["versionName"].strip()):
+            raise CheckFailed("The release manifest must contain valid version metadata.")
+        if not local_preview and (manifest["versionCode"] != int(code[0])
+                                 or manifest["versionName"] != name[0]):
             raise CheckFailed("Gradle and version.json versions disagree.")
-        return {"versionCode": int(code[0]), "versionName": name[0]}
+        return ({"versionCode": int(code[0]), "versionName": name[0]},
+                {key: manifest[key] for key in ("versionCode", "versionName")})
     except (OSError, ValueError) as error:
         raise CheckFailed("Could not read valid local version metadata.") from error
 
@@ -195,8 +207,13 @@ def execute(args, receipt):
         raise CheckFailed("This checker currently requires macOS/Linux for process-group cleanup.")
     if not args.baseline_apk.is_file():
         raise CheckFailed("The mandatory local baseline APK is missing.")
-    receipt["version"] = version(root)
-    checks.run("version-sync", ["bash", "scripts/check-version-sync.sh"])
+    receipt["versionPolicy"] = "local-preview" if args.local_preview else "release-manifest"
+    if args.local_preview and args.variant == "release":
+        raise CheckFailed("Local preview requires debug or performance; release manifest checks remain mandatory.")
+    receipt["version"], receipt["releaseManifestVersion"] = version_metadata(
+        root, local_preview=args.local_preview)
+    if not args.local_preview:
+        checks.run("version-sync", ["bash", "scripts/check-version-sync.sh"])
     top = checks.run("git-root", GIT + ["rev-parse", "--show-toplevel"], capture=True).strip()
     if Path(top).resolve() != root:
         raise CheckFailed("--repo-root must be the repository root.")
@@ -279,6 +296,9 @@ def main():
     parser.add_argument("--output", type=Path, required=True,
                         help="New directory for private logs, candidate and receipt; never overwritten.")
     parser.add_argument("--variant", choices=PACKAGES, default="release")
+    parser.add_argument("--local-preview", action="store_true",
+                        help="Debug/performance only: use Gradle version without requiring publication "
+                             "manifest synchronization; all other readiness gates remain mandatory.")
     parser.add_argument("--sdk", type=Path, default=Path(os.environ.get("ANDROID_HOME")
                         or os.environ.get("ANDROID_SDK_ROOT") or str(Path.home() / "Library/Android/sdk")))
     parser.add_argument("--timeout-seconds", type=float, default=900)

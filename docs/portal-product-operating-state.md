@@ -689,3 +689,22 @@ approval, ordinary music sign-in/playback and physical companion acceptance
 remain separate. Metadata request timings do not establish slideshow FPS or
 actual cloud-account acceptance. Original unit clock **20:23:05–20:53:05 UTC**
 includes cleanup; no parked issue was restarted.
+
+## 2026-11-02 — Explicit local preview readiness verified
+
+The release checker now supports explicit `--local-preview` for debug/performance
+versions without modifying publication metadata. Default mode still requires
+manifest synchronization; release mode rejects the flag. Actual current mismatch
+and release-preview refusal were verified before external gates, and the full
+real preview run passed in **162,080 ms**: 354 slideshow JS, 715 browser JS,
+196 Python and 3,920 fresh JVM /412 suites. The verified optimized candidate is
+byte-identical to the accepted 1.85, so no reinstall was needed.
+All34 readiness methods and independent final source review passed.
+See [the tooling receipt](portal-local-preview-readiness-2026-11-02.md).
+
+Current saved roadmap: **47 tracked tasks: 21 delivered/implemented,
+18 scoped verified, 5 parked, 2 awaiting approval and 1 queued**. This is tooling
+acceptance, not hostedCI, publication or whole-product completion. Both rooms
+retain exact1.85/code79; companion1.7.5 remains physically uninstalled.
+The original **20:30–21:00UTC** source-audit clock is retained. No GitHub,
+Home Assistant, owner credential or device interaction occurred.

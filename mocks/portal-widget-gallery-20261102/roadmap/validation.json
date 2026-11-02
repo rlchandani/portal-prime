@@ -941,5 +941,30 @@
     "receiptHttpStatus": 200,
     "footerVersion": "1.85 / code 79",
     "scope": "Updated metadata detail, row count, footer and public receipt only; no all46 workflow or native visual acceptance inferred."
+  },
+  "localPreviewReadinessUpdate": {
+    "checkedAt": "2026-11-02T20:50:58.763280+00:00",
+    "tasks": 47,
+    "statuses": {
+      "delivered": 21,
+      "verified": 18,
+      "parked": 5,
+      "approval": 2,
+      "queued": 1
+    },
+    "selectedTask": "local-preview-readiness",
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "pageErrors": 0,
+    "receiptHttpStatus": 200,
+    "footerVersion": "1.85 / code 79",
+    "scope": "Updated tooling detail,47row count,footer and public receipt only; no all47 workflows/native or physical-phone acceptance."
   }
 }

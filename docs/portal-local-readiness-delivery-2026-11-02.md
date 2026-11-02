@@ -96,3 +96,9 @@ local readiness, not proof of clean-main or publication eligibility.
 Tools: Python3.13.7, Node24.13.0, Android build-tools36.0.0.
 The real performance variant was verified; other variant choices have no fresh
 real-build acceptance in this unit.
+
+The subsequent [explicit local preview policy](portal-local-preview-readiness-2026-11-02.md)
+permits Gradle/publication-manifest divergence only for opt-in debug/performance
+checks. Default and release synchronization remain required. Its separate
+receipt records the current actual pipeline; this earlier delivery history is
+preserved.

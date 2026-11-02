@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T20:43:32.902060+00:00",
-  "updatedLabel": "Photo metadata guard delivered \u00b7 Portal 1.85 in both rooms",
+  "updatedAt": "2026-11-02T20:50:29.179703+00:00",
+  "updatedLabel": "Local preview readiness verified \u00b7 Portal 1.85 retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "photo-source-response-budget",
+  "defaultTask": "local-preview-readiness",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms retain exact optimized Portal 1.85 / code 79. Companion 1.7.5 / code 17 text candidate verified in an isolated Android emulator; earlier settings/upload/deletion receipts retain their original versions. Physical-phone installation remains open.",
@@ -13,6 +13,48 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "local-preview-readiness",
+      "title": "Delivery tooling: verify local previews independently",
+      "description": "The current app version1.85 differs from publication metadata1.83, blocking the existing local checker. Add an explicit debug/performance preview policy while preserving strict default and release synchronization.",
+      "summary": "The real explicit preview pipeline passed in2m42s. Default/release policies remain strict; publication metadata and installed devices are unchanged.",
+      "status": "verified",
+      "verification": "34CLI methods \u00b7354slideshowJS \u00b7715remoteJS \u00b7196Python \u00b73920freshJVM",
+      "kind": "Release automation and traceability",
+      "platforms": [
+        "tooling"
+      ],
+      "owner": "Release engineering / independent negative-contract reviewer",
+      "deployment": "Tooling only; both rooms retain exact1.85/code79. No device install or publication.",
+      "state": "Original20:30\u201321:00UTC source clock retained. Actual default/release negative modes passed; manifest preserved and worker closed.",
+      "acceptance": [
+        "Require explicit --local-preview for debug/performance; release variant refuses it.",
+        "Keep default publication-manifest synchronization required.",
+        "Retain actual Gradle APK identity, baseline signer, fresh JVM reports, source consistency and timeout cleanup.",
+        "Record preview policy and publication-manifest version in the receipt.",
+        "Run actual local preview pipeline; do not alter publication metadata or device configuration."
+      ],
+      "evidence": [
+        {
+          "text": "Policy, real pipeline, independent review and limits.",
+          "source": "docs/portal-local-preview-readiness-2026-11-02.md"
+        },
+        {
+          "text": "Sanitized actual gates, version policy, candidate hash and preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/local-preview-readiness-verification.json"
+        }
+      ],
+      "limits": [
+        "No publication, hostedCI, device health, UI or performance improvement claim.",
+        "A local ready receipt does not grant publication eligibility."
+      ],
+      "next": "Use the explicit preview option for local iterations. Publication still requires strict manifest synchronization and separate authorization.",
+      "issueClock": {
+        "startedAt": "2026-11-02T20:30:00Z",
+        "deadline": "2026-11-02T21:00:00Z",
+        "firstSourceAuditClockRetained": true
+      }
+    },
     {
       "id": "photo-source-response-budget",
       "title": "Photo sources: bound metadata downloads",
