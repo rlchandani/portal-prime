@@ -1,18 +1,58 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T21:41:20.985577+00:00",
-  "updatedLabel": "Companion display-image budgets \u00b7 native candidate verified",
+  "updatedAt": "2026-11-02T22:09:03.513839+00:00",
+  "updatedLabel": "Store metadata guard delivered in exact1.86 to both rooms; native normal catalog and saved configuration accepted",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "companion-display-images",
+  "defaultTask": "store-metadata-budget",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms retain exact optimized Portal1.85/code79. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
+    "Both rooms contain exact optimized Portal1.86/code80. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "store-metadata-budget",
+      "title": "App store: bound catalog and version metadata",
+      "summary": "4 MiB metadata ceiling and incomplete-response rejection delivered in exact1.86 to both rooms; normal Family catalog remains27 apps.",
+      "description": "Apply a 4 MiB decoded UTF-8 response budget to existing catalog, F-Droid and version requests. Reject incomplete/oversized bodies, retain catalog fallback and skip unconfirmed update versions. APK downloads retain streaming.",
+      "status": "delivered",
+      "verification": "3,952 JVM \u00b732 new checks \u00b7 exact two-room delivery",
+      "kind": "App-store reliability and memory guard",
+      "platforms": [
+        "portal",
+        "browser",
+        "companion"
+      ],
+      "owner": "Store engineering / independent stream worker / Family QA",
+      "deployment": "Both rooms contain exact optimized1.86/code80, verified by full installed APK SHA256. Companion contract/build remains unchanged.",
+      "state": "Original30-minute clock retained; both-room saved configuration and Family font/accessibility preserved; normal photo frame restored.",
+      "acceptance": [
+        "Reproduce old default StoreCatalog version transport using generated real TCP oversized bodies and ordinary UTF-8 control.",
+        "Bound actual decoded response bytes at 4 MiB; reject announced oversize before acquiring a stream and unknown oversize after at most budget+1 bytes.",
+        "Reject incomplete declared bodies; close streams/disconnect connections on success and failure; preserve interrupts and request headers/timeouts/redirects.",
+        "Retain catalog fallback, version pins and APK streaming; use existing native/browser/companion contracts.",
+        "Pass full JVM/debug/optimized/R8/lint, exact signing/readback and safe Family catalog checks; final exact artifact to Living without duplicated native QA."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, original failures, final gates, native scope, delivery and preservation.",
+          "source": "docs/portal-store-metadata-budget-2026-11-02.md"
+        },
+        {
+          "text": "Structured final result and exact artifact identity; no owner captures or credentials.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/store-metadata-budget-verification.json"
+        }
+      ],
+      "limits": [
+        "Generated JVM HTTP regressions do not reproduce an actual owner OOM or prove whole-app heap/FPS.",
+        "No native oversized-body injection route is presently identified. Native verdict must describe actual checks rather than infer a full provider test.",
+        "Weather clipping and other exhausted investigations stay parked; music account and UI approvals remain separate."
+      ],
+      "next": "Keep scoped acceptance limits. Continue independent authorized backlog; carry the successful compiler heap flag into the next full-source local build."
+    },
     {
       "id": "companion-display-images",
       "title": "Phone photos and app icons: decode only display-sized bitmaps",
@@ -948,7 +988,7 @@
         "No shipped native iOS application is identified.",
         "Mock screenshots do not prove native behavior."
       ],
-      "next": "Implement only the approved Weather scope in a fresh bounded unit; broader gallery approval remains pending."
+      "next": "Weather approval is recorded; its daily-geometry acceptance unit remains parked under the original time limit. Broader gallery approval is still pending."
     },
     {
       "id": "world-clock",

@@ -740,3 +740,11 @@ closed. See [receipt](portal-companion-display-images-2026-11-02.md).
 Roadmap:49tasks,21delivered,20scoped verified,5parked,2approval,1queued. Both
 Portals retain1.85/code79. No Portal/config/owner-photo/GitHub/HA operation.
 Original21:14:39–21:44:39UTC clock includes all discovery, fixtures and cleanup.
+
+## 2026-11-02 — App-store metadata guard delivered
+
+Exact optimized **1.86/code80** is installed in both rooms with full hash proof. Store catalog/F-Droid/version metadata now has a **4 MiB decoded-response ceiling**, incomplete-body rejection and connection cleanup; APK streaming retains its existing path. Three original real TCP failures,32 new regression methods and **3,952 JVM/414 suites**, debug/optimized/R8/vital-lint gates passed. Family normal native catalog and both consumer APIs show27 apps. Complete profiles/layouts/sources/screensaver configuration are unchanged in both rooms; Family font/accessibility and original Chrome task remain, and its normal photo frame is visibly restored. Owned registry removed; independent worker closed. See [receipt](portal-store-metadata-budget-2026-11-02.md).
+
+The compiler's2 GiB heap was observed at99.99% occupancy with572.822sec fullGC; the owned build was stopped143. Per-invocation `-Pkotlin.daemon.jvmargs=-Xmx6144m` completed the same final gates in124sec. Carry that flag into the next full-source local multi-variant build; persistent configuration was not changed. This is build evidence, not Portal FPS or whole-heap proof. Native oversized/gzip failures, real provider update resolution and physical phone remain unverified.
+
+Roadmap: **50 tasks:22 delivered,20 scoped verified,5 parked,2 approval,1 queued**. Companion remains1.7.7/code19 emulator candidate. Weather approval is retained while daily-geometry acceptance stays parked. No exhausted issue reopened, GitHub authentication/publication or HA change. Original **21:43:20–22:13:20 UTC** includes all discovery, recovery and cleanup.

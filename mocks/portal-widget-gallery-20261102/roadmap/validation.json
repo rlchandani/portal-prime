@@ -1012,5 +1012,28 @@
     "selectedDetailHasFinal651TestsAndCandidate177": true,
     "receiptAndBothImageComponentsHttp200": true,
     "scope": "Selected task and evidence availability only; no all-task workflow or physical phone claim"
+  },
+  "storeMetadataScopedReview": {
+    "checkedAt": "2026-11-02T22:10:57.596599+00:00",
+    "url": "http://127.0.0.1:8891/roadmap/?snapshot=store-metadata-final#task=store-metadata-budget",
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844,
+        "taskRows": 50,
+        "horizontalOverflow": false,
+        "selectedDetailHasTestsAndVersion": true
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "taskRows": 50,
+        "horizontalOverflow": false,
+        "selectedDetailHasTestsAndVersion": true
+      }
+    ],
+    "proofHttpStatus": 200,
+    "proofSourceAndArtifactVerified": true,
+    "scope": "Selected store metadata receipt and mobile/desktop layout only; no full roadmap interaction claim."
   }
 }

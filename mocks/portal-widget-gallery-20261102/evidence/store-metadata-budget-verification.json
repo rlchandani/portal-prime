@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-02T22:09:03.513839+00:00",
+  "scope": "App-store metadata response budget, current Family normal catalog and exact two-room artifact delivery",
+  "status": "delivered",
+  "sourceCommit": "148b6a2677f694bebbee20f9d3ec04ab08dc7a88",
+  "issueClock": {
+    "startedAt": "2026-11-02T21:43:20Z",
+    "deadline": "2026-11-02T22:13:20Z",
+    "firstDiscoveryClockRetained": true,
+    "scope": "Bound app-store catalog/version/F-Droid JSON response reads while retaining catalog fallback and APK transfer behavior"
+  },
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.86",
+    "versionCode": 80,
+    "bytes": 25861122,
+    "sha256": "6cc4ec5b4f9e75021d3d8bd39830b11cb1d2c1cbdff9cdb70bc230964289b485",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "signerMatchesAccepted185": true
+  },
+  "originalTransport": {
+    "tests": 4,
+    "failures": 3,
+    "errors": 0,
+    "skipped": 0,
+    "cases": [
+      {
+        "name": "declaredOversizedVersionDoesNotOfferAnUpdate",
+        "failed": true
+      },
+      {
+        "name": "chunkedOversizedVersionDoesNotOfferAnUpdate",
+        "failed": true
+      },
+      {
+        "name": "ordinaryChunkedUtf8VersionRetainsItsMeaning",
+        "failed": false
+      },
+      {
+        "name": "ordinaryVersionCanRecoverAfterRejectedOversize",
+        "failed": true
+      }
+    ]
+  },
+  "finalJvm": {
+    "tests": 3952,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 414
+  },
+  "newRegressionMethods": {
+    "stream": 24,
+    "tcpAndFixture": 8
+  },
+  "handlerFaultNegativeControlExecuted": true,
+  "metadataBudgetBytes": 4194304,
+  "unknownBodyReadCeiling": "budget plus one byte; generated huge-stream and real TCP cases",
+  "catalogHeadroom": {
+    "rootBytes": 24043,
+    "rootEntries": 26,
+    "bundledBytes": 18989,
+    "bundledEntries": 22
+  },
+  "builds": {
+    "debug": true,
+    "optimizedPerformance": true,
+    "r8": true,
+    "vitalLint": true,
+    "terminalExit": 0,
+    "successfulRunSeconds": 124,
+    "firstFinalAttemptStoppedExit": 143,
+    "observedCompilerHeapMiB": 2048,
+    "observedHeapOccupancyPercent": 99.99,
+    "observedFullGcSeconds": 572.822,
+    "retryCompilerHeapMiB": 6144,
+    "perInvocationFlag": "-Pkotlin.daemon.jvmargs=-Xmx6144m",
+    "persistentBuildConfigurationChanged": false
+  },
+  "review": {
+    "independentIntegrationReview": true,
+    "productionDefectFound": false,
+    "fixtureFaultPropagationCorrected": true,
+    "finalCorrectionReviewed": true,
+    "agentClosed": true
+  },
+  "nativeFamily": {
+    "apiLevel": 29,
+    "originalNativeCatalogEntries": 27,
+    "finalNativeCatalogEntries": 27,
+    "settledStoreVisuallyReviewed": true,
+    "normalCatalogContracts": [
+      {
+        "route": "/remote/catalog",
+        "entries": 27,
+        "literalSuccess": true,
+        "distinctPackageIds": true
+      },
+      {
+        "route": "/apps",
+        "entries": 27,
+        "literalSuccess": true,
+        "distinctPackageIds": true
+      }
+    ],
+    "privateActivityOpenedThroughExistingAppsButton": true,
+    "permissionsAndExportsUnchanged": true,
+    "nativeOversizeOrGzipInjection": false,
+    "initialTransitionCapturesRetainedWithoutPerformanceClaim": true
+  },
+  "delivery": {
+    "familyExactInstalledHashVerified": true,
+    "livingExactInstalledHashVerified": true,
+    "livingScope": "Final artifact/version and configuration only; no repeated functional QA"
+  },
+  "restoration": {
+    "family": {
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "sourcesUnchanged": true,
+      "screensaverUnchanged": true,
+      "exactExpectedVersion": true,
+      "devModeRetained": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "catalogContracts": [
+        {
+          "route": "/remote/catalog",
+          "entries": 27,
+          "literalSuccess": true,
+          "distinctPackageIds": true
+        },
+        {
+          "route": "/apps",
+          "entries": 27,
+          "literalSuccess": true,
+          "distinctPackageIds": true
+        }
+      ]
+    },
+    "living": {
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "sourcesUnchanged": true,
+      "screensaverUnchanged": true,
+      "exactExpectedVersion": true,
+      "devModeRetained": true
+    },
+    "familyNormalPhotoFrameActivityRestored": true,
+    "originalChromeTask27174StillListed": true,
+    "chromeProcessRetentionOrForegroundNotInferred": true,
+    "bothInstalledHashesVerifiedByExistingDeployer": true,
+    "ownedAgentClosed": true,
+    "noPortalInstrumentationOrAccessibilityReconnect": true,
+    "ownedRegistryRemoved": true,
+    "familyNormalPhotoFrameVisuallyReviewed": true
+  },
+  "limits": [
+    "No native oversized-body or gzip rejection injection, owner OOM, total-heap reduction, FPS or total request-deadline proof.",
+    "No catalog-app installation, real F-Droid version resolution or physical phone acceptance.",
+    "APK streaming/source semantics and catalog fallback retained; current normal metadata acceptance does not verify every provider failure.",
+    "Companion remains1.7.7 emulator candidate; Weather and exhausted issues retain their separate parked boundaries."
+  ],
+  "sources": [
+    "https://developer.android.com/reference/java/net/HttpURLConnection",
+    "documents/developer.android.com/reference/java/net/HttpURLConnection"
+  ]
+}
