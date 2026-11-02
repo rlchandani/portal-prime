@@ -40,6 +40,21 @@ class PortalUxInstrumentation : Instrumentation() {
     }
 
     override fun onStart() {
+        // Explicit owned-session cleanup only; dispatch before acquiring UiAutomation.
+        if (options.getString("command") == "installerCleanup") {
+            val cleanup = try {
+                InstallSessionCleanupDeviceChecks.run(this, options)
+            } catch (_: Throwable) {
+                Bundle().apply {
+                    putBoolean("installerCleanupPassed", false)
+                    putBoolean("unexpectedExceptionsAbsent", false)
+                    putInt("installerCleanupUnexpectedExceptionCount", 1)
+                    putInt("installerCleanupFailureCount", 1)
+                }
+            }
+            finish(if (cleanup.getBoolean("installerCleanupPassed")) 0 else 1, cleanup)
+            return
+        }
         if (options.getString("command") == "classicBacklog") {
             val backlog = try { ClassicPhotoBacklogDeviceChecks.run(this) }
             catch (_: Throwable) { Bundle().apply { putBoolean("classicBacklogPassed", false) } }

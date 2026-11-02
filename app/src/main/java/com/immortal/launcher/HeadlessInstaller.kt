@@ -19,6 +19,7 @@ import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Installs an APK via [PackageInstaller] with NO foreground UI of our own: when the
@@ -40,9 +41,14 @@ object HeadlessInstaller {
     val app = context.applicationContext
     val latch = CountDownLatch(1)
     val ok = AtomicBoolean(false)
+    val ownedSessionId = AtomicInteger(-1)
     val receiver =
         object : BroadcastReceiver() {
           override fun onReceive(c: Context, intent: Intent) {
+            // Different package installs can overlap, but their result action is shared.
+            val sessionId = ownedSessionId.get()
+            if (sessionId < 0 ||
+                intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1) != sessionId) return
             when (intent.getIntExtra(PackageInstaller.EXTRA_STATUS, Int.MIN_VALUE)) {
               PackageInstaller.STATUS_PENDING_USER_ACTION -> {
                 val confirm =
@@ -89,7 +95,7 @@ object HeadlessInstaller {
           } else null
       val pi = app.packageManager.packageInstaller
       val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
-      val sessionId = pi.createSession(params)
+      val sessionId = pi.createSession(params).also(ownedSessionId::set)
       pi.openSession(sessionId).use { session ->
         session.openWrite("base.apk", 0, apk.length()).use { out ->
           apk.inputStream().use { it.copyTo(out) }
@@ -117,6 +123,14 @@ object HeadlessInstaller {
       Log.w(TAG, "headless install of $pkg failed", t)
       false
     } finally {
+      // Closing the handle does not delete Android's staged install. A failed or timed-out
+      // attempt must abandon its own session, without sweeping other pending installs.
+      if (!ok.get()) {
+        ownedSessionId.get().takeIf { it >= 0 }?.let { sessionId ->
+          runCatching { app.packageManager.packageInstaller.abandonSession(sessionId) }
+              .onFailure { Log.w(TAG, "couldn't abandon failed installer session $sessionId", it) }
+        }
+      }
       InstallAutoConfirm.disarm()
       runCatching { app.unregisterReceiver(receiver) }
     }

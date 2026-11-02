@@ -32,8 +32,8 @@ android {
     applicationId = "com.immortal.launcher"
     minSdk = 24
     targetSdk = 36
-    versionCode = 69
-    versionName = "1.75"
+    versionCode = 70
+    versionName = "1.76"
     testInstrumentationRunner = "com.immortal.launcher.PortalUxInstrumentation"
 
     // Controlled A/B candidate; normal builds keep WebView preparation dormant.

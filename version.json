@@ -1,6 +1,6 @@
 {
-  "versionCode": 69,
-  "versionName": "1.75",
+  "versionCode": 70,
+  "versionName": "1.76",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Local Portal iteration: Fleet errors are sent before waiting for an unread upload body. Successful uploads, request validation and authentication are preserved."
+  "notes": "Failed or timed-out headless installs now abandon only the session created by that attempt. Successful and unrelated pending installs are preserved."
 }
