@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import java.io.EOFException
 import java.io.File
 import java.net.Inet4Address
 import java.net.NetworkInterface
@@ -508,11 +509,10 @@ class FleetRoutes(private val context: Context) {
     val path = req.queryParam("path") ?: return resp(400, err("path_required"))
     val f = File(path)
     return try {
-      f.parentFile?.mkdirs()
-      val written = f.outputStream().use { req.streamBodyTo(it) }
+      val written = FleetUploadWriter.write(f, req::streamBodyTo)
       resp(200, ok().put("path", f.absolutePath).put("bytes", written))
     } catch (t: Throwable) {
-      resp(200, err("write_failed").put("detail", t.message ?: ""))
+      resp(if (t is EOFException) 400 else 500, err("write_failed").put("detail", t.message ?: ""))
     }
   }
 

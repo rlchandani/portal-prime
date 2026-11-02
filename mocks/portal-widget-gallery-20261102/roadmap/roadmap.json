@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 · fleet download integrity fixed and locally verified; native cold reconnect remains open (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 upload integrity fixed; exact 1.71 installed in both rooms (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "fleet-local-gates",
+  "defaultTask": "fleet-upload-integrity",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact 1.70 / code 64. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
+    "Both rooms have exact 1.71 / code 65. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -19,7 +19,7 @@
       "summary": "564 JVM tests / 74 suites passed. Inactive-settings preflight is included in 1.7.1; rendered checks now passed in an isolated emulator.",
       "description": "Protect capability fallback and stale room/session responses. Multi-room settings validation now reads complete per-domain inactive metadata while display reads remain visibility-filtered.",
       "status": "verified",
-      "verification": "Locally verified · not deployed",
+      "verification": "Locally verified \u00b7 not deployed",
       "kind": "Regression protection",
       "platforms": [
         "companion",
@@ -76,13 +76,13 @@
       "summary": "3,800 tests / 399 suites passed; maintenance is included in installed 1.70. Scoped Slideshow UI acceptance is separate from every-editor acceptance.",
       "description": "Replace the obsolete inline-string prohibition with classification and projection coverage for the renderer's actual supported editors. This protects the existing settings behavior.",
       "status": "verified",
-      "verification": "Locally verified · included in deployed APK",
+      "verification": "Locally verified \u00b7 included in deployed APK",
       "kind": "Maintenance",
       "platforms": [
         "portal"
       ],
       "owner": "Settings QA / Main",
-      "deployment": "Current exact 1.70 includes the maintenance in both rooms; the original scoped Slideshow proof does not establish every editor.",
+      "deployment": "Current exact 1.71 includes the maintenance in both rooms; the original scoped Slideshow proof does not establish every editor.",
       "state": "Terminal local gates passed in 3m 58s",
       "acceptance": [
         "Cover real registry editor selection, including inline and Activity-backed strings, fleet name and dashboard URL.",
@@ -115,13 +115,13 @@
       "summary": "Fixed and installed in both rooms. Family verified shared countdown, controls, custom duration, alarm Stop and both editor entry points.",
       "description": "On Family 1.66, starting 5m in the Home editor created a kitchen timer while the widget stayed Ready. The Home editor now uses the existing shared countdown. Tools keeps its kitchen-timer collection.",
       "status": "delivered",
-      "verification": "Family native acceptance · both exact APK readbacks",
+      "verification": "Family native acceptance \u00b7 both exact APK readbacks",
       "kind": "Correctness fix",
       "platforms": [
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Current exact 1.70 preserves the accepted 1.67 timer fix in both rooms; original feature acceptance remains scoped to its named receipt.",
+      "deployment": "Current exact 1.71 preserves the accepted 1.67 timer fix in both rooms; original feature acceptance remains scoped to its named receipt.",
       "state": "Accepted in the 30-minute slot; original Family layout, Home page and screensaver configuration restored.",
       "acceptance": [
         "Reproduce the widget/editor behavior on the existing owner path before labeling it a runtime defect.",
@@ -160,10 +160,10 @@
     {
       "id": "settings-visibility",
       "title": "Screensaver settings: consistent parent visibility",
-      "summary": "Delivered in both rooms. Disabled schema 16 → 1; actual mobile PWA 11 → 1. Saved choices and validated inactive writes preserved.",
+      "summary": "Delivered in both rooms. Disabled schema 16 \u2192 1; actual mobile PWA 11 \u2192 1. Saved choices and validated inactive writes preserved.",
       "description": "Twenty-four registered parent predicates now align generic screensaver visibility. Advanced keeps inactive children hidden; calendar remains independent. Native, API and mobile checks passed on Family.",
       "status": "delivered",
-      "verification": "Family native/API/mobile acceptance · exact APK in both rooms",
+      "verification": "Family native/API/mobile acceptance \u00b7 exact APK in both rooms",
       "kind": "Shared settings correctness",
       "platforms": [
         "portal",
@@ -171,16 +171,16 @@
         "companion"
       ],
       "owner": "Settings architecture",
-      "deployment": "Exact1.70 preserves accepted1.68 Portal/PWA visibility in both rooms. Companion1.7.1 includes the preflight correction and has emulator fixture proof; live companion/physical acceptance remains open.",
+      "deployment": "Exact1.71 preserves accepted1.68 Portal/PWA visibility in both rooms. Companion1.7.1 includes the preflight correction and has emulator fixture proof; live companion/physical acceptance remains open.",
       "state": "3,800 JVM tests / 399 suites, both APK builds and 654 JS tests passed; all 36 Family configuration fields restored.",
       "acceptance": [
         "Document intended shared-setting exceptions and presentation eligibility.",
-        "Cover enabled/disabled × Advanced × source/style in real registered-domain projections and schemas.",
+        "Cover enabled/disabled \u00d7 Advanced \u00d7 source/style in real registered-domain projections and schemas.",
         "Preserve saved inactive values and intended validated API writes."
       ],
       "evidence": [
         {
-          "text": "Installed 1.67 baseline: disabled ordinary schema exposed 16 controls; the actual 390 × 844 mobile PWA exposed 11 ordinary settings rows, excluding category. Original settings were restored exactly.",
+          "text": "Installed 1.67 baseline: disabled ordinary schema exposed 16 controls; the actual 390 \u00d7 844 mobile PWA exposed 11 ordinary settings rows, excluding category. Original settings were restored exactly.",
           "source": "Private API/browser baseline receipts, 2026-11-02"
         },
         {
@@ -217,7 +217,7 @@
       "summary": "Real check passed in 2m33s: 40/654 JS, 161 Python, 3,800 JVM tests and optimized APK/signature checks. No authentication or publication.",
       "description": "A separate standard-library CLI runs existing local gates and verifies the resulting APK against a mandatory accepted local baseline. It records source/build-input and artifact identities without invoking the publication script.",
       "status": "delivered",
-      "verification": "Implemented / real local gates verified · no publication",
+      "verification": "Implemented / real local gates verified \u00b7 no publication",
       "kind": "Delivery tooling",
       "platforms": [
         "portal",
@@ -289,7 +289,7 @@
       "summary": "Separate browser mock. Portal / Android / iOS interpretations remain unapproved.",
       "description": "The gallery is a review artifact for possible future widget presentation. Its platform columns are design interpretations, not shipped platform implementations.",
       "status": "approval",
-      "verification": "Design mock · unapproved",
+      "verification": "Design mock \u00b7 unapproved",
       "kind": "Design",
       "platforms": [
         "design"
@@ -319,19 +319,19 @@
       "id": "world-clock",
       "title": "World Clock: complete rows & city counts",
       "summary": "World Clock normal and 150% acceptance passed on 1.66; the fix is preserved in current 1.70 on both rooms.",
-      "description": "The existing 488 × 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
+      "description": "The existing 488 \u00d7 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
       "status": "delivered",
-      "verification": "Device proof · both rooms",
+      "verification": "Device proof \u00b7 both rooms",
       "kind": "Visible correctness fix",
       "platforms": [
         "portal"
       ],
       "owner": "Native / QA",
-      "deployment": "Current exact 1.70 preserves the accepted 1.66 World Clock fix in both rooms; original normal/150% proof is separately recorded.",
+      "deployment": "Current exact 1.71 preserves the accepted 1.66 World Clock fix in both rooms; original normal/150% proof is separately recorded.",
       "state": "Delivered within bounded acceptance",
       "acceptance": [
-        "Family normal text: two complete cities; three cities show “1 more city”; four show “2 more cities.”",
-        "Family 150% text live and cold: one complete city row and an unclipped “2 more cities” caption.",
+        "Family normal text: two complete cities; three cities show \u201c1 more city\u201d; four show \u201c2 more cities.\u201d",
+        "Family 150% text live and cold: one complete city row and an unclipped \u201c2 more cities\u201d caption.",
         "Restore original city order, font scale, Home page and all 36 original screensaver fields; preserve grid spans/order."
       ],
       "evidence": [
@@ -361,13 +361,13 @@
       "summary": "1.65 scoped native acceptance passed; both fixes are preserved in current 1.70 on both rooms.",
       "description": "Photo Memory editing opens Photo sources even with idle slideshow disabled. The active-page alarm caption observes saved configuration, rounds partial minutes up and refreshes at minute boundaries.",
       "status": "delivered",
-      "verification": "Device proof · both rooms",
+      "verification": "Device proof \u00b7 both rooms",
       "kind": "Visible correctness fixes",
       "platforms": [
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Current exact 1.70 preserves the accepted 1.65 routing/caption fixes in both rooms; original acceptance limits remain.",
+      "deployment": "Current exact 1.71 preserves the accepted 1.65 routing/caption fixes in both rooms; original acceptance limits remain.",
       "state": "Scoped native acceptance passed",
       "acceptance": [
         "Family source entry works with idle slideshow disabled and enabled; Back returns through Photos to Home.",
@@ -435,7 +435,7 @@
       "summary": "Issue slot exhausted. No candidate retained; further work needs a new explicit decision.",
       "description": "The zero-black-frame candidate delayed complete Home to 1,169 ms versus 418 ms. The old handoff investigation remains parked.",
       "status": "parked",
-      "verification": "Parked · 30-minute rule",
+      "verification": "Parked \u00b7 30-minute rule",
       "kind": "Exhausted experiment",
       "platforms": [
         "portal"
@@ -464,7 +464,7 @@
       "summary": "Legacy motion work remains parked after rejected candidates and failed native cases.",
       "description": "The seven legacy night-style investigations retain their exhausted status. Three reopened motion candidates were rejected; the final run retained two native failures and only 5/11 strict cases.",
       "status": "parked",
-      "verification": "Parked · 30-minute rule",
+      "verification": "Parked \u00b7 30-minute rule",
       "kind": "Exhausted experiment",
       "platforms": [
         "portal"
@@ -493,7 +493,7 @@
       "summary": "Cold Shuffle, rejected Home / Apps / settings experiments and incomplete gesture cases stay parked.",
       "description": "Earlier rejected and timed-out investigations keep their original receipts and boundaries. Current correctness and maintenance results do not resolve these separate performance questions.",
       "status": "parked",
-      "verification": "Parked · evidence limits retained",
+      "verification": "Parked \u00b7 evidence limits retained",
       "kind": "Exhausted experiments",
       "platforms": [
         "portal"
@@ -519,18 +519,18 @@
     {
       "id": "pwa-connection-status",
       "title": "Browser connection status after tab navigation",
-      "summary": "Fixed false Offline after cancelled startup reads. Six Family reproductions passed; metadata appeared 119–175ms after clicks. Connected tab changes add no status requests.",
+      "summary": "Fixed false Offline after cancelled startup reads. Six Family reproductions passed; metadata appeared 119\u2013175ms after clicks. Connected tab changes add no status requests.",
       "description": "An unowned initial-status continuation bypassed the existing page/request guards. It is removed; navigation and visibility resume replace missing metadata promptly through the normal owned reader.",
       "status": "delivered",
-      "verification": "Family installed-browser acceptance · exact APK both rooms",
+      "verification": "Family installed-browser acceptance \u00b7 exact APK both rooms",
       "kind": "Browser UX/reliability",
       "platforms": [
         "browser",
         "portal"
       ],
       "owner": "Browser QA / Main",
-      "deployment": "Current exact 1.70 preserves the accepted 1.69 status fix in both rooms; the six-trial browser proof retains its original 1.69 scope.",
-      "state": "Full 40/676 JS, 161 Python, 3,800 JVM / 399 suites and optimized/signing gates passed. Both rooms’ saved profiles, screensaver settings and layout remain unchanged.",
+      "deployment": "Current exact 1.71 preserves the accepted 1.69 status fix in both rooms; the six-trial browser proof retains its original 1.69 scope.",
+      "state": "Full 40/676 JS, 161 Python, 3,800 JVM / 399 suites and optimized/signing gates passed. Both rooms\u2019 saved profiles, screensaver settings and layout remain unchanged.",
       "acceptance": [
         "Initial cancellation cannot mark a successor page/room Offline; missing metadata is requested before the next poll.",
         "Real transport failure retains Retry;401 retains Pair again and stops automatic reads.",
@@ -542,7 +542,7 @@
           "source": "docs/portal-pwa-connection-status-delivery-2026-11-02.md"
         },
         {
-          "text": "Six installed Family mobile trials: zero false Offline traces, two initial/replacement GETs per trial,119–175ms click-to-metadata. Six connected tab switches add zero status GETs. Controlled transport/401 recovery passed.",
+          "text": "Six installed Family mobile trials: zero false Offline traces, two initial/replacement GETs per trial,119\u2013175ms click-to-metadata. Six connected tab switches add zero status GETs. Controlled transport/401 recovery passed.",
           "source": "docs/portal-pwa-connection-status-delivery-2026-11-02.md"
         },
         {
@@ -560,10 +560,10 @@
     {
       "id": "browser-tab-icon",
       "title": "Browser tab icon: reuse the public app branding",
-      "summary": "Delivered in both rooms. Paired/unpaired browser uses the public 64 × 64 PNG; zero default favicon requests and management auth preserved.",
+      "summary": "Delivered in both rooms. Paired/unpaired browser uses the public 64 \u00d7 64 PNG; zero default favicon requests and management auth preserved.",
       "description": "Reuse the already public Immortal app-icon endpoint in the HTML head; avoid a new endpoint or any authentication-policy change.",
       "status": "delivered",
-      "verification": "Family paired/unpaired browser proof · exact APK both rooms",
+      "verification": "Family paired/unpaired browser proof \u00b7 exact APK both rooms",
       "kind": "Small browser polish",
       "platforms": [
         "browser"
@@ -581,7 +581,7 @@
           "source": "docs/portal-pwa-connection-status-delivery-2026-11-02.md"
         },
         {
-          "text": "3,800 JVM / 399 suites, 716 JS, 161 Python and optimized/signing gates passed. Actual mobile paired/unpaired icon requests were200 without Authorization, with no default favicon request; original pairing and public manifest/touch icons worked. Exact APK hash 6157a890… verified in both rooms.",
+          "text": "3,800 JVM / 399 suites, 716 JS, 161 Python and optimized/signing gates passed. Actual mobile paired/unpaired icon requests were200 without Authorization, with no default favicon request; original pairing and public manifest/touch icons worked. Exact APK hash 6157a890\u2026 verified in both rooms.",
           "source": "docs/portal-pwa-tab-branding-delivery-2026-11-02.md"
         }
       ],
@@ -597,7 +597,7 @@
       "summary": "564 unit tests + 33 rendered UI tests passed. Disconnected category guidance fixed; live rooms and physical Pixel remain separate.",
       "description": "Exercise the built companion after its compatibility/preflight changes. Check disabled-parent settings, viewing versus destinations, input admission and dropdown/overlap regression smoke with explicit fixture/live evidence boundaries.",
       "status": "verified",
-      "verification": "Emulator UI verified · strict two-room fixture",
+      "verification": "Emulator UI verified \u00b7 strict two-room fixture",
       "kind": "Functional and UI verification",
       "platforms": [
         "companion",
@@ -605,7 +605,7 @@
       ],
       "owner": "Companion QA",
       "deployment": "Companion 1.7.1-music-preview / code 13 installed and full APK readback verified in owned API 34 emulator only; no physical phone update.",
-      "state": "09:27:30–09:57:30 UTC slot. 33/33 UI tests in 40.425s; owned read-only emulator stopped at09:50:04. Source AVD and original connections preserved.",
+      "state": "09:27:30\u201309:57:30 UTC slot. 33/33 UI tests in 40.425s; owned read-only emulator stopped at09:50:04. Source AVD and original connections preserved.",
       "acceptance": [
         "Verify exact candidate identity and actual composed settings/menu behavior in an isolated Android environment.",
         "Exercise captured multi-room destinations, disabled-parent metadata, acknowledgement and invalid input admission through the real UI/VM/repository pipeline with an explicitly simulated transport.",
@@ -635,7 +635,7 @@
       "summary": "Five live check families passed, including native two-room Shuffle. Cold reconnect failed; native numeric check remains unrun.",
       "description": "Close the gap between successful rendered fixtures and actual paired Portal HTTP behavior. Discover valid normal onboarding first; do not infer credentials or live acceptance from Fleet or fixture results.",
       "status": "verified",
-      "verification": "Partially verified · warm live checks passed",
+      "verification": "Partially verified \u00b7 warm live checks passed",
       "kind": "End-to-end integration",
       "platforms": [
         "companion",
@@ -643,7 +643,7 @@
       ],
       "owner": "Companion / integration QA",
       "deployment": "Exact companion1.7.1/code13 tested in disposable API34 emulator with existing sessions. No Portal APK or physical phone update.",
-      "state": "Bounded09:53:31–10:23:31UTC slot. Warm direct-LAN writes/readbacks passed. Later direct/relay cold transport failed; no speculative app patch. Owned emulator/relay closed and complete room baselines restored.",
+      "state": "Bounded09:53:31\u201310:23:31UTC slot. Warm direct-LAN writes/readbacks passed. Later direct/relay cold transport failed; no speculative app patch. Owned emulator/relay closed and complete room baselines restored.",
       "acceptance": [
         "Use normal authorized pairing with secrets kept private; independently verify current client and room identity.",
         "Capture complete per-room settings before writes. Exercise disabled-parent group preflight and exact confirmed key readback through native UI.",
@@ -678,14 +678,14 @@
       "summary": "Incomplete replies now fail without overwriting downloaded files; complete diagnostics and binary downloads keep working.",
       "description": "Real TCP and compiled-CLI tests reproduced false success and file replacement on the old binary. The shared reader now validates response framing, preserves the existing zero-length procfs stream convention, and the JSON parser keeps numeric-leading diagnostic text intact.",
       "status": "verified",
-      "verification": "Locally verified · actual CLI and both-room read-only checks",
+      "verification": "Locally verified \u00b7 actual CLI and both-room read-only checks",
       "kind": "Reliability and continuous verification",
       "platforms": [
         "tooling",
         "portal"
       ],
       "owner": "Fleet / release engineering",
-      "deployment": "Workstation CLI built and used for read-only acceptance. No Portal or phone APK deployment; both rooms remain1.70/code64.",
+      "deployment": "Workstation CLI built and used for read-only acceptance. This tooling unit made no Portal or phone APK deployment; the later upload fix delivered exact1.71/code65 to both rooms.",
       "state": "Implemented on codex/fleet-response-integrity-20261102. Final23 Rust /17 actual CLI /33 room-helper checks passed;38 Calls-access checks and local syntax/ASCII gates passed. Complete room configurations unchanged.",
       "acceptance": [
         "Interrupted downloads preserve an existing file, create no new file, emit no partial stdout payload and return failure across rooms.",
@@ -712,23 +712,23 @@
         "No fresh provisioning, reboot-persistence or all-model acceptance; no GitHub authentication/publication or device config mutation.",
         "Tooling-only correctness checks do not establish general app performance. Native cold reconnect remains open."
       ],
-      "next": "Next independent30-minute unit: reproduce interrupted upload behavior using a public scratch file before choosing an atomic-write fix."
+      "next": "Upload integrity is now independently delivered. A separate future tooling unit should reproduce the observed deploy-helper false negative without reinstalling an already verified APK."
     },
     {
       "id": "fleet-upload-integrity",
       "title": "Fleet uploads: preserve files when interrupted",
-      "summary": "Next data-integrity candidate: confirm whether a cancelled upload replaces an existing destination with partial content.",
-      "description": "Source inspection shows fsWrite opens the destination before streamBodyTo completes. This is a source-supported hypothesis, not yet a reproduced runtime defect. Use an isolated public scratch file on Family and clean it up; never use personal photos or application configuration as test data.",
-      "status": "queued",
-      "verification": "Queued · interruption not yet reproduced",
+      "summary": "Cancelled uploads now preserve the original; exact1.71 is installed in Family and Living with unchanged settings.",
+      "description": "A real Family1.70 test declared100 bytes, sent6 and replaced a21-byte original while reporting success. The request now rejects incomplete bodies; a unique same-directory staging file is closed and renamed only after completion. Original files remain available until the upload succeeds.",
+      "status": "delivered",
+      "verification": "Delivered \u00b7 Family API checks and exact APK in both rooms",
       "kind": "Reliability and data integrity",
       "platforms": [
         "portal",
         "tooling"
       ],
       "owner": "Portal storage / fleet engineering",
-      "deployment": "No implementation or deployment yet. Both rooms retain1.70/code64.",
-      "state": "Not started. One fresh30-minute unit including cleanup; parked screensaver/performance and native cold reconnect are not reopened.",
+      "deployment": "Exact optimized1.71/code65, package com.immortal.launcher.debug, installed on Family and Living. Installed bytes/SHA-256 match the accepted candidate; complete room settings and screensaver configuration unchanged.",
+      "state": "Implemented on codex/fleet-upload-integrity-20261102. Fresh3,821 JVM/401 suites,716 JS,161 Python and optimized gates passed. Family13 API checks passed; owned scratch removed and slideshow resumed.",
       "acceptance": [
         "Reproduce cancellation and complete-upload behavior with isolated public scratch files.",
         "If reproduced, failed uploads preserve the prior destination and leave no temporary or partial replacement.",
@@ -737,15 +737,58 @@
       ],
       "evidence": [
         {
-          "text": "fsWrite opens f.outputStream() before req.streamBodyTo completes, and returns write_failed if streaming throws. Current cancellation behavior has not been exercised.",
-          "source": "app/src/main/java/com/immortal/launcher/FleetRoutes.kt:507; docs/portal-fleet-response-integrity-delivery-2026-11-02.md"
+          "text": "Actual interrupted overwrite reproduced on1.70;14 failures in21 focused JVM cases before correction. Final3,821 JVM tests have zero failures/errors/skips; independent source review found no concrete defects.",
+          "source": "docs/portal-fleet-upload-integrity-delivery-2026-11-02.md; FleetUploadRequestTest; FleetUploadWriterTest"
+        },
+        {
+          "text": "Family13 API checks cover incomplete existing/new/empty uploads, pending visibility, complete binary, deliberate empty replacement, directory commit failure, exact readback and no staging leftovers.",
+          "source": "Private device-upload-acceptance.json and scratch-cleanup.json in /private/tmp/portal-fleet-upload-integrity-20261102/"
+        },
+        {
+          "text": "Same8MB LAN upload median157.54ms before /157.01ms after, three samples each. Both installed APKs exactly match25,860,686bytes and SHA-256e98b6514\u2026; full profile/screensaver configs equal before/after.",
+          "source": "Private readiness, installed-APK, configuration and timing receipts; named delivery document"
         }
       ],
       "limits": [
-        "No observed upload corruption is claimed yet.",
-        "No destructive owner-data test or GitHub publication; Living delivery requires a final accepted artifact if an Android change is made."
+        "Three LAN samples show essentially unchanged latency; no general app speedup or universal hardware acceptance is claimed.",
+        "API24-compatible java.io, with Family Android10 runtime checks. Android9, process-kill staging recovery and power-loss durability remain untested.",
+        "Living install helper initially reported failure; independent exact installed-APK readback proved successful delivery. No second install attempted; helper false negative remains separate.",
+        "No owner-data corruption tests, GitHub publication, companion change or reopening of exhausted native issues."
       ],
-      "next": "Inspect the request streaming and write boundary, then perform one controlled cancellation on a named public scratch file."
+      "next": "Next independent30-minute unit: test truncated JSON request bodies at the pure request boundary; reproduce first, then choose a focused correction."
+    },
+    {
+      "id": "fleet-json-body-integrity",
+      "title": "Fleet JSON requests: reject incomplete bodies",
+      "summary": "Next bounded investigation: prevent a complete JSON prefix from being accepted when the declared request is incomplete.",
+      "description": "Request.bodyText currently breaks at EOF and returns the bytes received. A syntactically complete prefix may therefore reach a route despite an incomplete declared body. This is source-supported evidence; no runtime settings corruption is claimed. Start with pure Request tests and leave owner settings untouched.",
+      "status": "queued",
+      "verification": "Queued \u00b7 source finding; runtime behavior unverified",
+      "kind": "Reliability and request integrity",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "Portal API / fleet engineering",
+      "deployment": "No new implementation or deployment. Both rooms retain the verified1.71/code65 upload fix.",
+      "state": "A new independent30-minute slot is available. Pure reader tests first; no personal photos, owner configuration or old exhausted issue is a test target.",
+      "acceptance": [
+        "Reproduce an incomplete declared body containing a complete JSON prefix with an actual Request object.",
+        "If reproduced, incomplete or capped bodies cannot silently become successful mutating requests.",
+        "Complete UTF-8 JSON and supported empty-body behavior retain explicit compatibility; error status is truthful.",
+        "Run regression/build gates and applicable Family verification before any final delivery; preserve whole room configuration."
+      ],
+      "evidence": [
+        {
+          "text": "bodyText uses if(n==-1) break and returns the received prefix; streamBodyTo is now strict after the delivered upload correction.",
+          "source": "app/src/main/java/com/immortal/launcher/FleetHttpServer.kt:71; docs/portal-fleet-upload-integrity-delivery-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Source evidence does not establish a reproduced runtime defect or a passing fix.",
+        "No settings mutation, token changes, GitHub publication or exhausted native issue reopening is authorized through this test."
+      ],
+      "next": "Create failing pure Request cases for early EOF and body-size limits before deciding whether and where to reject the request."
     }
   ]
 }

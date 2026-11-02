@@ -106,3 +106,12 @@ Fresh 18-item snapshot browser check: every detail opened at 390 × 844 without 
 The19-task fleet checkpoint records an implemented CLI transport/JSON correction with23 Rust,17 actual CLI and33 room-helper tests; both-room identity/config readbacks and Family procfs acceptance passed. Windows/hosted gates remain open. Interrupted uploads are a new source-supported candidate queued for isolated reproduction, not a claimed defect.
 
 Fresh19-task checks opened every detail at390×844 and1600×1000 without horizontal overflow, undefined platform labels or page errors. Fleet local verification/Windows limits and the queued upload hypothesis were visibly preserved. This is saved-page presentation evidence only.
+
+The upload-integrity snapshot records exact **1.71/code65** in both rooms,
+Family13 API checks, complete configuration preservation and verified owned
+scratch cleanup. Three8MB medians remain essentially unchanged. It has20 tasks
+with a separate source-supported JSON body hypothesis queued; the Living deploy
+helper false negative is visible beside independent exact installed-APK proof.
+All20 detail panels were checked at390×844 and1600×1000 without horizontal
+overflow, undefined labels or page errors. The updated current-version footer
+was visible. These are saved-page checks, not repeat native/phone acceptance.

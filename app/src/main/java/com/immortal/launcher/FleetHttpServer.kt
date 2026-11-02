@@ -10,6 +10,7 @@ package com.immortal.launcher
 import android.util.Log
 import java.io.ByteArrayOutputStream
 import java.io.Closeable
+import java.io.EOFException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetAddress
@@ -88,12 +89,14 @@ class FleetHttpServer(
       var total = 0L
       while (remaining > 0) {
         val n = input.read(buf, 0, minOf(buf.size.toLong(), remaining).toInt())
-        if (n == -1) break
-        out.write(buf, 0, n)
+        if (n == -1) throw EOFException("Incomplete upload body")
+        // Track consumed input even if the destination write fails, so draining
+        // never reads beyond the remaining request body.
+        consumed += n
         remaining -= n
         total += n
+        out.write(buf, 0, n)
       }
-      consumed += total.toInt()
       return total
     }
 

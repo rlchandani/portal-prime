@@ -191,5 +191,25 @@
     "fleetLocalVerificationAndWindowsLimitsVisible": true,
     "uploadQueuedAndHypothesisVisible": true,
     "limits": "Saved roadmap browser presentation only. Actual compiled CLI and real room GET evidence is recorded independently; no hosted/Windows, APK or app performance acceptance."
+  },
+  "fleetUploadSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T10:55:28.640355+00:00",
+    "portalVersion": "1.71 / code65",
+    "taskCount": 20,
+    "all20DesktopAndMobileDetailsCheckedAfterReload": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "missingPlatformLabels": false,
+    "roadmapPageErrors": 0,
+    "deliveredUploadAndHelperFailureVisible": true,
+    "nextSourceHypothesisVisible": true,
+    "limits": "Saved roadmap presentation only. Actual13 Family API checks, installed APK identity and both-room configuration equality have independent receipts. No full UI/phone/performance acceptance."
   }
 }

@@ -208,6 +208,34 @@ hypothesis until safely reproduced against a named public scratch file. This
 requires its own30-minute unit and cleanup; no new unit has started and the old
 native cold reconnect/screensaver/performance slots are not reopened.
 
+## Latest fleet upload checkpoint — 2 November 2026
+
+The10:37:50–11:07:50UTC unit reproduced actual interrupted-upload corruption on
+Family1.70 using public disposable bytes. The corrected request/writer boundary
+preserves the original until a completed upload is closed and renamed, reports
+HTTP400 for incomplete bodies, and removes staging files on failure. The14/21
+red baseline became21 passing focused cases within the fresh **3,821 JVM /401
+suites** run. **716 JS /161 Python**, optimized APK/R8/vital lint, version,
+signature and independent review gates passed.
+
+**Current exact1.71/code65 is installed on both rooms.** Family's13 controlled
+API checks passed; actual installed APK bytes/hash/signature match. Living's
+helper returned an invalid install result, but subsequent own-process installed
+APK readback independently matched the exact accepted artifact. No second
+install was attempted. Both complete settings profiles and screensaver configs
+are unchanged. Owned Family scratch cleanup is verified, and its slideshow
+activity is resumed. Three8MB upload samples have essentially unchanged medians:
+157.54ms before /157.01ms after. This does not establish general app performance.
+See [delivery and limits](portal-fleet-upload-integrity-delivery-2026-11-02.md).
+
+The20-task saved roadmap records the delivered upload correction and queues a
+separate request-body integrity investigation: `bodyText` currently stops at EOF
+and can return a complete JSON prefix from an incomplete declared body. This is
+source evidence; no settings mutation or runtime failure is claimed. Use pure
+request-boundary tests before considering a fix. The deployment helper's false
+negative is also recorded for a future independent tooling slot. Exhausted
+native cold reconnect/screensaver/performance units remain parked.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:

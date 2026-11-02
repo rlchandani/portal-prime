@@ -1,6 +1,6 @@
 {
-  "versionCode": 64,
-  "versionName": "1.70",
+  "versionCode": 65,
+  "versionName": "1.71",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Local Portal iteration: the browser control center uses Immortal's existing public app icon for its tab, avoiding the default protected favicon request. Manifest, home-screen icons, pairing and management authentication are preserved."
+  "notes": "Local Portal iteration: interrupted fleet uploads preserve the original file and return failure. Completed uploads publish exact bytes through a same-directory staging file, using the existing 64 KB streaming buffer."
 }
