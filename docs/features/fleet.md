@@ -44,6 +44,25 @@ You're prompted for a friendly name (e.g. "Living Room Left") unless you preset 
 After a reboot the agent comes back on its own — nothing to re-arm. The default agent port is
 `8723`.
 
+## App update results
+
+`POST /update` uses the existing Store update discovery and installer. A completed
+batch retains `count` and the ordered `updated` package/result array, and adds
+`installedCount` and `failedCount`. Overall `ok:true` requires every selected
+package to report terminal `installed`. Failed, busy, paused, unknown and timeout
+results remain visible and make the batch unsuccessful. Selected packages are
+attempted once; there is no automatic retry or rollback.
+
+Discovery and installation selection use one catalog snapshot. Malformed bodies,
+missing selectors and an unready catalog are rejected before scanning. If the
+discovery completion wait expires, the route returns `503` with
+`update_check_unconfirmed` and installs nothing; a completed empty scan remains a
+successful no-op. This completion check retains the Store's existing provider
+scan semantics and does not independently prove every provider was reachable.
+
+The CLI checks per-package receipts, including responses from older agents that
+always report top-level success. A failed or incomplete batch exits with failure
+while preserving its printed results.
 
 ## Timed rendering diagnostics
 

@@ -250,6 +250,10 @@ The CLI rejects interrupted HTTP responses before reporting success or replacing
 a downloaded file. Known JSON commands also require a complete object with
 literal `ok:true` and unique fields; HTTP 200 alone is insufficient. Opaque
 `raw`, file and text responses retain HTTP-only status checks.
+For app updates, the CLI also validates the complete per-package batch, even on
+older agents that send `ok:true` with failed entries. The `count` must match the
+distinct result entries, and every installation must report `installed`.
+`update --check` requires a complete discovery array with package/version entries.
 Legacy zero-length procfs diagnostics require a clean close;
 ordinary files still require their declared length. Run the local transport gates
 against a freshly built binary on macOS/Linux:

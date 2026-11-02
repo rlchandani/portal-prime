@@ -243,26 +243,30 @@ class FleetRoutes(private val context: Context) {
   }
 
   private fun update(req: FleetHttpServer.Request): FleetHttpServer.Response {
-    val body = parseJson(req.bodyText()) ?: JSONObject()
-    val updates = findUpdatesBlocking(catalog)
-    if (body.optBoolean("dryRun", false)) {
+    val body = parseJson(req.bodyText()) ?: return resp(400, err("bad_json"))
+    val dryRun = body.optBoolean("dryRun", false)
+    val all = body.optBoolean("all", false)
+    val packageName = body.optString("packageName").ifBlank { null }
+    if (!dryRun && !all && packageName == null) return resp(400, err("specify_all_or_packageName"))
+    val entries = catalog
+    if (entries.isEmpty()) return resp(503, err("catalog_not_ready"))
+    val updates = findUpdatesBlocking(entries)
+        ?: return resp(503, err("update_check_unconfirmed"))
+    if (dryRun) {
       val arr = JSONArray()
       updates.forEach { (p, v) -> arr.put(JSONObject().put("packageName", p).put("latest", v)) }
       return resp(200, ok().put("updates", arr))
     }
     val targets =
         when {
-          body.optBoolean("all", false) -> updates.keys.toList()
-          body.optString("packageName").isNotBlank() ->
-              body.getString("packageName").let { if (updates.containsKey(it)) listOf(it) else emptyList() }
-          else -> return resp(400, err("specify_all_or_packageName"))
+          all -> updates.keys.toList()
+          packageName != null && updates.containsKey(packageName) -> listOf(packageName)
+          else -> emptyList()
         }
-    val results = JSONArray()
-    for (p in targets) {
-      val app = catalog.firstOrNull { it.packageName == p } ?: continue
-      results.put(JSONObject().put("packageName", p).put("result", doInstall(app)))
-    }
-    return resp(200, ok().put("count", targets.size).put("updated", results))
+    return resp(200, updateResult(targets) { p ->
+      val app = entries.firstOrNull { it.packageName == p }
+      if (app == null) "catalog_entry_missing" else doInstall(app)
+    })
   }
 
   /**
@@ -463,7 +467,7 @@ class FleetRoutes(private val context: Context) {
     }
   }
 
-  private fun findUpdatesBlocking(apps: List<CatalogApp>, timeoutMs: Long = 30_000): Map<String, Long> {
+  private fun findUpdatesBlocking(apps: List<CatalogApp>, timeoutMs: Long = 30_000): Map<String, Long>? {
     val latch = CountDownLatch(1)
     val ref = AtomicReference<Map<String, Long>>(emptyMap())
     val cancel = StoreCatalog.findUpdates(context, apps) {
@@ -471,8 +475,7 @@ class FleetRoutes(private val context: Context) {
       latch.countDown()
     }
     return try {
-      latch.await(timeoutMs, TimeUnit.MILLISECONDS)
-      ref.get()
+      completedUpdates(latch.await(timeoutMs, TimeUnit.MILLISECONDS), ref.get())
     } finally {
       cancel()
     }
@@ -594,6 +597,27 @@ class FleetRoutes(private val context: Context) {
     /** Derive the install-mode label reported in /info and gating /install. Pure. */
     internal fun modeFor(daemonAvailable: Boolean, paused: Boolean): String =
         InstallLifecycle.modeFor(daemonAvailable, paused)
+
+    /** Preserve each selected package's terminal result in the bulk wire response. */
+    internal fun updateResult(targets: List<String>, install: (String) -> String): JSONObject {
+      val results = JSONArray()
+      var installedCount = 0
+      targets.forEach { pkg ->
+        val result = install(pkg)
+        if (result == "installed") installedCount++
+        results.put(JSONObject().put("packageName", pkg).put("result", result))
+      }
+      return JSONObject()
+          .put("ok", installedCount == targets.size)
+          .put("count", targets.size)
+          .put("installedCount", installedCount)
+          .put("failedCount", targets.size - installedCount)
+          .put("updated", results)
+    }
+
+    /** The HTTP waiter must distinguish completed discovery from an expired wait. */
+    internal fun completedUpdates(completed: Boolean, updates: Map<String, Long>): Map<String, Long>? =
+        if (completed) updates else null
 
     /** A downloader/installer may publish after its HTTP waiter has already timed out. */
     internal fun terminalResultAndInvalidate(

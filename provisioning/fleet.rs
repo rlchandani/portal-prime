@@ -884,7 +884,8 @@ fn cmd_install(args: &Args) -> i32 {
 }
 
 fn cmd_update(args: &Args) -> i32 {
-    let body = if args.has("check") {
+    let check_only = args.has("check");
+    let body = if check_only {
         build_obj(&[("dryRun", Field::B(true))])
     } else if args.has("all") {
         build_obj(&[("all", Field::B(true))])
@@ -893,7 +894,57 @@ fn cmd_update(args: &Args) -> i32 {
     } else {
         die("update: pass --all, --check, or a package name");
     };
-    post_json(args, "/update", body)
+    let targets = resolve_targets(args);
+    fanout(&targets, |d| {
+        let (status, response) = request(d, "POST", "/update", &[], Some(body.as_bytes()));
+        let confirmed = update_success(status, &response, check_only);
+        let transport_result = show(status, response);
+        if confirmed {
+            0
+        } else {
+            if transport_result == 0 {
+                eprintln!("update failed: response did not confirm complete results");
+            }
+            1
+        }
+    })
+}
+
+// Older agents can send ok:true even when a batch contains failed installations.
+fn update_success(status: u16, body: &[u8], check_only: bool) -> bool {
+    if !json_success(status, body) {
+        return false;
+    }
+    let value = match Json::parse(body) {
+        Ok(value) => value,
+        _ => return false,
+    };
+    let entries = match value.get(if check_only { "updates" } else { "updated" }) {
+        Some(Json::Arr(entries)) => entries,
+        _ => return false,
+    };
+    if !check_only {
+        match value.get("count") {
+            Some(Json::Num(count)) if *count == entries.len() as f64 => {}
+            _ => return false,
+        }
+    }
+    let mut packages = HashSet::new();
+    entries.iter().all(|entry| {
+        let package = match entry.get("packageName").and_then(Json::as_str) {
+            Some(package) if !package.is_empty() => package,
+            _ => return false,
+        };
+        if !packages.insert(package) {
+            return false;
+        }
+        if check_only {
+            matches!(entry.get("latest"), Some(Json::Num(version))
+                if version.is_finite() && *version > 0.0 && version.fract() == 0.0)
+        } else {
+            entry.get("result").and_then(Json::as_str) == Some("installed")
+        }
+    })
 }
 
 fn cmd_config(args: &Args) -> i32 {

@@ -85,6 +85,12 @@ App install / update:
 ./fleetctl update org.videolan.vlc       # update one package
 ```
 
+Bulk update success requires the reported count to match distinct package
+receipts and every result to be `installed`; the CLI checks older agents too.
+Inspect printed partial results before manually rerunning. The API reports
+installed/failed counts, and an expired discovery wait is unconfirmed, not an
+empty success. No automatic retries or rollback are provided.
+
 Config (Immortal's free-form agent config):
 
 ```bash

@@ -214,6 +214,91 @@ class FleetHttpTest(unittest.TestCase):
         self.assertEqual(json.loads(requests[2][2]),
                          {"path": "/public/dummy.apk", "packageName": "org.example.public"})
 
+    def test_update_batch_rejects_failed_rows_despite_root_success(self):
+        for outcome in ("failed", "busy", "timeout", "unknown_result",
+                        "Downloading…", "Installing…", "paused"):
+            with self.subTest(outcome=outcome):
+                body = json.dumps({
+                    "ok": True, "count": 1,
+                    "updated": [{"packageName": "org.public.app", "result": outcome}],
+                }).encode("utf-8")
+                with self.server(self.json_reply(body)) as (port, requests):
+                    result = self.run_cli(port, "update", "--all")
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(len(requests), 1)
+                self.assertTrue(requests[0].startswith(b"POST /update "))
+
+    def test_update_batch_rejects_malformed_incomplete_or_ambiguous_receipts(self):
+        installed = {"packageName": "org.public.app", "result": "installed"}
+        for receipt in (
+            {"ok": True, "count": 0, "updated": [installed]},
+            {"ok": True, "count": 2, "updated": [installed]},
+            {"ok": True, "count": 1, "updated": []},
+            {"ok": True, "updated": [installed]},
+            {"ok": True, "count": True, "updated": [installed]},
+            {"ok": True, "count": "1", "updated": [installed]},
+            {"ok": True, "count": 1.5, "updated": [installed]},
+            {"ok": True, "count": -1, "updated": []},
+            {"ok": True, "count": 2, "updated": [installed, installed]},
+            {"ok": True, "count": 1},
+            {"ok": True, "count": 1, "updated": {}},
+            {"ok": True, "count": 1, "updated": None},
+            {"ok": True, "count": 1, "updated": ["installed"]},
+            {"ok": True, "count": 1, "updated": [{"packageName": "org.public.app"}]},
+            {"ok": True, "count": 1, "updated": [{"packageName": "org.public.app", "result": True}]},
+            {"ok": True, "count": 1, "updated": [{"result": "installed"}]},
+            {"ok": True, "count": 1, "updated": [{"packageName": "", "result": "installed"}]},
+            b'{"ok":true,"count":1,"updated":[',
+        ):
+            with self.subTest(receipt=receipt):
+                body = receipt if isinstance(receipt, bytes) else json.dumps(receipt).encode("utf-8")
+                with self.server(self.json_reply(body)) as (port, requests):
+                    result = self.run_cli(port, "update", "--all")
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(len(requests), 1)
+
+    def test_update_batch_accepts_empty_or_exact_distinct_installed_receipts(self):
+        for receipt in (
+            {"ok": True, "count": 0, "updated": []},
+            {"ok": True, "count": 2, "updated": [
+                {"packageName": "org.public.zebra", "result": "installed"},
+                {"packageName": "org.public.alpha", "result": "installed"},
+            ]},
+        ):
+            with self.subTest(receipt=receipt):
+                body = json.dumps(receipt).encode("utf-8")
+                with self.server(self.json_reply(body)) as (port, requests):
+                    result = self.run_cli(port, "update", "--all")
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(result.stdout), receipt)
+                self.assertEqual(len(requests), 1)
+
+    def test_update_check_requires_updates_array(self):
+        for receipt in (
+            {"ok": True},
+            {"ok": True, "updates": {}},
+            {"ok": True, "updates": None},
+            {"ok": True, "updates": "public"},
+        ):
+            with self.subTest(receipt=receipt):
+                body = json.dumps(receipt).encode("utf-8")
+                with self.server(self.json_reply(body)) as (port, requests):
+                    result = self.run_cli(port, "update", "--check")
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(len(requests), 1)
+
+    def test_update_check_accepts_normal_or_empty_discovery_array(self):
+        for updates in ([], [{"packageName": "org.public.app", "latest": 2}]):
+            with self.subTest(updates=updates):
+                receipt = {"ok": True, "updates": updates}
+                body = json.dumps(receipt).encode("utf-8")
+                with self.server(self.json_reply(body)) as (port, requests):
+                    result = self.run_cli(port, "update", "--check")
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(result.stdout), receipt)
+                self.assertEqual(len(requests), 1)
+                self.assertTrue(requests[0].startswith(b"POST /update "))
+
     def test_complete_info_returns_success_and_authenticates(self):
         body = b'{"ok":true,"name":"Public fixture"}'
         reply = b"HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n" % len(body) + body
