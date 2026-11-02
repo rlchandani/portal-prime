@@ -291,7 +291,11 @@ object StoreCatalog {
   // --- net helpers ------------------------------------------------------------
   private fun httpGet(spec: String): String {
     val c = open(spec)
-    return c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
+    return try {
+      StoreMetadataHttp.readText(c)
+    } finally {
+      c.disconnect()
+    }
   }
 
   /** Download [spec] to [dest]. Internal so the fleet agent's headless install can
