@@ -1,0 +1,85 @@
+{
+  "command": "ANDROID_HOME=/opt/homebrew/share/android-commandlinetools ./gradlew :app:testDebugUnitTest --tests com.immortal.launcher.settings.SettingsDomainTest --tests 'com.immortal.launcher.ApprovedSettings*Test' --no-daemon --console=plain",
+  "exitCode": 0,
+  "suites": [
+    {
+      "class": "com.immortal.launcher.ApprovedSettingsBackDispatcherTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "timeSeconds": 0.012
+    },
+    {
+      "class": "com.immortal.launcher.ApprovedSettingsContinuityTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "timeSeconds": 0.055
+    },
+    {
+      "class": "com.immortal.launcher.ApprovedSettingsHistoryTest",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "timeSeconds": 0.007
+    },
+    {
+      "class": "com.immortal.launcher.ApprovedSettingsLazyProjectionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "timeSeconds": 0.002
+    },
+    {
+      "class": "com.immortal.launcher.ApprovedSettingsSearchBreadcrumbTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "timeSeconds": 0.002
+    },
+    {
+      "class": "com.immortal.launcher.ApprovedSettingsSearchMatchingTest",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "timeSeconds": 0.013
+    },
+    {
+      "class": "com.immortal.launcher.ApprovedSettingsSearchRoutingTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "timeSeconds": 0.005
+    },
+    {
+      "class": "com.immortal.launcher.ApprovedSettingsViewportMemoryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "timeSeconds": 0.001
+    },
+    {
+      "class": "com.immortal.launcher.settings.SettingsDomainTest",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "timeSeconds": 0.61
+    }
+  ],
+  "totals": {
+    "tests": 98,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "scope": "Existing JVM settings registry/history/search/continuity/viewport/projection tests; no native UI runtime verification"
+}

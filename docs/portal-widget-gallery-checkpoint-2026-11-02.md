@@ -14,6 +14,12 @@ screensaver investigation. This checkpoint does not complete the full goal.
   dark/light themes, text scaling, state selection, shareable URLs and Back/Forward history.
 - Local demonstrations for timers, alarms, tasks and entity values; other actions explain the
   existing destination. No live account or service commands.
+- Full settings navigation ledger: 8 categories, 54 unique registered pages, 39 local bodies,
+  15 external-editor routes and 16 Advanced destinations.
+- Registry audit: 12 domains, 108 source-derived specifications, explicit conditional gates
+  and exclusions, and a recorded native/remote disabled-parent visibility mismatch.
+- Searchable browser settings coverage page and an objective-to-evidence ledger preserving
+  unfinished native implementation, settings restructuring, verification and release work.
 
 ## Verified evidence
 
@@ -29,6 +35,10 @@ Evidence is under `mocks/portal-widget-gallery-20261102/evidence/`.
 | Additional interaction checks | Alarm, task and entity toggle; theme; dialog/Escape; URL reload; search; browser Back/Forward; visible enabled controls at least 48 px | Browser tests before final matrix |
 | Render scheduling sample | 30 samples; two-rAF median 33.3 ms, p95 34.2 ms | Chrome 156 on this Mac; refresh-cycle scheduling estimate, not native latency |
 | Family hardware readiness | Wi-Fi ADB reachable, API 29, QCS605, Adreno 615, 2160×1440, density 180, MemTotal 2,848,792 KiB | Read-only device observations; current foreground was the photo preview |
+| Settings navigation structure | Unique page IDs, valid overview references and dispatch coverage passed for all 54 registered pages | Source metadata; not native reachability |
+| Settings coverage browser | Search/filter counts passed; 144 layout combinations without horizontal overflow | Four widths, two themes, nine category choices, Advanced included/excluded; not native settings controls |
+| Registry audit provenance | Source hashes and domain/spec/exclusion totals independently checked | Expanded declaration counts, not visible device-control counts |
+| Existing settings JVM contracts | 98 tests across 9 suites passed; 0 failures/errors/skips | Registry plus history/search/continuity/viewport/projection; not whole-device UI or complete native/remote parity |
 
 The layout sweep checks dimensions and presence, not every visual overlap, real data refresh,
 service failure, or device runtime combination. The contrast scope is explicitly sampled.

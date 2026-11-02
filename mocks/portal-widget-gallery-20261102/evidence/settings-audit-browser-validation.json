@@ -1,0 +1,41 @@
+{
+  "checks": [
+    {
+      "label": "All registered pages",
+      "actual": 54
+    },
+    {
+      "label": "Ordinary pages",
+      "actual": 38
+    },
+    {
+      "label": "Advanced destinations",
+      "actual": 16
+    },
+    {
+      "label": "All three Home Assistant destinations",
+      "actual": 3
+    },
+    {
+      "label": "Weather destination",
+      "actual": 1
+    },
+    {
+      "label": "No results",
+      "actual": 0
+    }
+  ],
+  "layouts": 144,
+  "widths": [
+    390,
+    768,
+    1440,
+    2160
+  ],
+  "themes": [
+    "dark",
+    "light"
+  ],
+  "categoryOptions": 9,
+  "limitation": "Source audit filtering and horizontal layout; not native control or device verification"
+}

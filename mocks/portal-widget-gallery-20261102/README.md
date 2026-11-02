@@ -23,6 +23,9 @@ not native builds. Browser dimensions are review dimensions, not measured Portal
   reduced motion and focus styles. Light-theme positive text uses `#216F4D` to meet contrast;
   the approved neutral surface colors stay unchanged.
 - `research.html`: source links, design rationale and validation/release gates.
+- `settings-audit.html`: searchable coverage of all 54 registered settings destinations,
+  with Advanced filtering and current editor boundaries. This is a source audit, not a
+  native settings simulation.
 
 Useful sizes reflect available information. The alarm has one size; Options has medium and
 large; installed providers have one illustrative size with actual dimensions provider-owned.
@@ -39,3 +42,8 @@ See `docs/superpowers/specs/2026-11-02-portal-widget-gallery-design.md`,
 `docs/design/portal-widget-settings-map-2026-11-02.md`.
 Design acceptance, native build/tests, Family Area measurements and release verification remain
 separate gates. A browser check is not evidence of native performance or provider compatibility.
+
+Full settings audits are in `docs/design/portal-settings-navigation-audit-2026-11-02.md`
+and `docs/design/portal-settings-registry-audit-2026-11-02.md`. The objective-to-evidence
+ledger is `docs/portal-widget-goal-coverage-2026-11-02.md`; it preserves the full remaining
+native, settings, testing and release scope.

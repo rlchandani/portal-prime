@@ -1,0 +1,829 @@
+{
+  "basis": "Source navigation and detail dispatcher; not device runtime coverage",
+  "categoryCount": 8,
+  "pageCount": 54,
+  "overviewRowCount": 44,
+  "categories": [
+    {
+      "id": "appearance",
+      "title": "Appearance",
+      "pages": [
+        "display",
+        "appearance",
+        "wallpaper"
+      ]
+    },
+    {
+      "id": "photos",
+      "title": "Photos & screensaver",
+      "pages": [
+        "screensaver",
+        "faces",
+        "clock",
+        "sources"
+      ]
+    },
+    {
+      "id": "home",
+      "title": "Home & widgets",
+      "pages": [
+        "widgets",
+        "weather",
+        "calendar",
+        "alarm",
+        "quickbar"
+      ]
+    },
+    {
+      "id": "sound",
+      "title": "Sound & wake",
+      "pages": [
+        "touch",
+        "chime",
+        "welcome",
+        "sunrise",
+        "alarm",
+        "lamp"
+      ]
+    },
+    {
+      "id": "connections",
+      "title": "Connections",
+      "pages": [
+        "ha",
+        "phone",
+        "intercom"
+      ]
+    },
+    {
+      "id": "access",
+      "title": "Input & accessibility",
+      "pages": [
+        "touch",
+        "system",
+        "quickbar"
+      ]
+    },
+    {
+      "id": "device",
+      "title": "Device",
+      "pages": [
+        "device",
+        "sleep",
+        "health",
+        "help",
+        "system"
+      ]
+    },
+    {
+      "id": "advanced",
+      "title": "Advanced",
+      "pages": [
+        "almanac",
+        "immich",
+        "albums",
+        "smb",
+        "dav",
+        "web",
+        "multiroom",
+        "mqtt",
+        "boot",
+        "alpaca",
+        "options",
+        "speed",
+        "apk",
+        "managed",
+        "debug"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "id": "touch",
+      "title": "Touch sounds",
+      "ownerCategory": "sound",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 123,
+      "overviewCategories": [
+        "sound",
+        "access"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "display",
+      "title": "Display",
+      "ownerCategory": "appearance",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 124,
+      "overviewCategories": [
+        "appearance"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "appearance",
+      "title": "App appearance",
+      "ownerCategory": "appearance",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 125,
+      "overviewCategories": [
+        "appearance"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "wallpaper",
+      "title": "Wallpaper",
+      "ownerCategory": "appearance",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 126,
+      "overviewCategories": [
+        "appearance"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "screensaver",
+      "title": "Slideshow",
+      "ownerCategory": "photos",
+      "externalActivity": null,
+      "standaloneWrapper": "ScreensaverSettingsActivity",
+      "sourceLine": 127,
+      "overviewCategories": [
+        "photos"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "sources",
+      "title": "Photo sources",
+      "ownerCategory": "photos",
+      "externalActivity": null,
+      "standaloneWrapper": "ScreensaverSourcesActivity",
+      "sourceLine": 128,
+      "overviewCategories": [
+        "photos"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "styles",
+      "title": "Screensaver style",
+      "ownerCategory": "photos",
+      "externalActivity": null,
+      "standaloneWrapper": "ScreensaverModeActivity",
+      "sourceLine": 129,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "faces",
+      "title": "Photo clock faces",
+      "ownerCategory": "photos",
+      "externalActivity": null,
+      "standaloneWrapper": "FacePickerActivity",
+      "sourceLine": 130,
+      "overviewCategories": [
+        "photos"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "clock",
+      "title": "Digital clock",
+      "ownerCategory": "photos",
+      "externalActivity": null,
+      "standaloneWrapper": "ClockSettingsActivity",
+      "sourceLine": 131,
+      "overviewCategories": [
+        "photos"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "dismiss",
+      "title": "Open when you tap to exit",
+      "ownerCategory": "photos",
+      "externalActivity": null,
+      "standaloneWrapper": "ScreensaverDismissAppActivity",
+      "sourceLine": 132,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "folder",
+      "title": "Choose photo folder",
+      "ownerCategory": "photos",
+      "externalActivity": "FolderPickerActivity",
+      "standaloneWrapper": "FolderPickerActivity",
+      "sourceLine": 133,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": false
+    },
+    {
+      "id": "album",
+      "title": "Shared album link",
+      "ownerCategory": "photos",
+      "externalActivity": "AlbumUrlEntryActivity",
+      "standaloneWrapper": "AlbumUrlEntryActivity",
+      "sourceLine": 134,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": false
+    },
+    {
+      "id": "immich",
+      "title": "Connect Immich",
+      "ownerCategory": "photos",
+      "externalActivity": "ImmichConnectActivity",
+      "standaloneWrapper": "ImmichConnectActivity",
+      "sourceLine": 135,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": false
+    },
+    {
+      "id": "albums",
+      "title": "Choose Immich album",
+      "ownerCategory": "photos",
+      "externalActivity": "ImmichConnectActivity",
+      "standaloneWrapper": "ImmichConnectActivity",
+      "sourceLine": 137,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": false
+    },
+    {
+      "id": "smb",
+      "title": "Connect SMB / NAS",
+      "ownerCategory": "photos",
+      "externalActivity": "SmbConnectActivity",
+      "standaloneWrapper": "SmbConnectActivity",
+      "sourceLine": 138,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": false
+    },
+    {
+      "id": "dav",
+      "title": "Connect WebDAV",
+      "ownerCategory": "photos",
+      "externalActivity": "DavConnectActivity",
+      "standaloneWrapper": "DavConnectActivity",
+      "sourceLine": 139,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": false
+    },
+    {
+      "id": "web",
+      "title": "Web page",
+      "ownerCategory": "photos",
+      "externalActivity": "WebUrlEntryActivity",
+      "standaloneWrapper": "WebUrlEntryActivity",
+      "sourceLine": 140,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": false
+    },
+    {
+      "id": "widgets",
+      "title": "Home dashboard",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 141,
+      "overviewCategories": [
+        "home"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "cameras",
+      "title": "Cameras",
+      "ownerCategory": "home",
+      "externalActivity": "CameraViewerActivity",
+      "standaloneWrapper": "CameraViewerActivity",
+      "sourceLine": 142,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": false
+    },
+    {
+      "id": "weather",
+      "title": "Weather",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 143,
+      "overviewCategories": [
+        "home"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "calendar",
+      "title": "Calendar",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 144,
+      "overviewCategories": [
+        "home"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "almanac",
+      "title": "Almanac",
+      "ownerCategory": "photos",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 145,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": true
+    },
+    {
+      "id": "calendar-url",
+      "title": "Calendar feed",
+      "ownerCategory": "home",
+      "externalActivity": "CalendarUrlEntryActivity",
+      "standaloneWrapper": "CalendarUrlEntryActivity",
+      "sourceLine": 146,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": false
+    },
+    {
+      "id": "world",
+      "title": "World clock",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": "WorldClockActivity",
+      "sourceLine": 147,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "countdowns",
+      "title": "Countdowns",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": "CountdownSettingsActivity",
+      "sourceLine": 148,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "quickbar",
+      "title": "Quick buttons",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 149,
+      "overviewCategories": [
+        "home",
+        "access"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "alarm",
+      "title": "Alarm",
+      "ownerCategory": "sound",
+      "externalActivity": null,
+      "standaloneWrapper": "AlarmSettingsActivity",
+      "sourceLine": 150,
+      "overviewCategories": [
+        "home",
+        "sound"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "crypto",
+      "title": "Crypto",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": "CryptoSettingsActivity",
+      "sourceLine": 151,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "todo",
+      "title": "To-do",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": "TodoSettingsActivity",
+      "sourceLine": 152,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "news",
+      "title": "News",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": "NewsSettingsActivity",
+      "sourceLine": 153,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "stocks",
+      "title": "Stocks",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": "StocksSettingsActivity",
+      "sourceLine": 154,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "alpaca",
+      "title": "Alpaca account",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": "StocksSettingsActivity",
+      "sourceLine": 156,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": true
+    },
+    {
+      "id": "options",
+      "title": "Options scanner",
+      "ownerCategory": "home",
+      "externalActivity": null,
+      "standaloneWrapper": "OptionsSettingsActivity",
+      "sourceLine": 157,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": true
+    },
+    {
+      "id": "chime",
+      "title": "Sounds",
+      "ownerCategory": "sound",
+      "externalActivity": null,
+      "standaloneWrapper": "ChimeSettingsActivity",
+      "sourceLine": 158,
+      "overviewCategories": [
+        "sound"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "welcome",
+      "title": "Welcome greeting",
+      "ownerCategory": "sound",
+      "externalActivity": null,
+      "standaloneWrapper": "WelcomeSettingsActivity",
+      "sourceLine": 159,
+      "overviewCategories": [
+        "sound"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "sunrise",
+      "title": "Sunrise & wake",
+      "ownerCategory": "sound",
+      "externalActivity": null,
+      "standaloneWrapper": "SunriseSettingsActivity",
+      "sourceLine": 160,
+      "overviewCategories": [
+        "sound"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "lamp",
+      "title": "Lamp",
+      "ownerCategory": "sound",
+      "externalActivity": "LampActivity",
+      "standaloneWrapper": "LampActivity",
+      "sourceLine": 161,
+      "overviewCategories": [
+        "sound"
+      ],
+      "advanced": false,
+      "localBody": false
+    },
+    {
+      "id": "multiroom",
+      "title": "Multi-room audio",
+      "ownerCategory": "connections",
+      "externalActivity": null,
+      "standaloneWrapper": "MultiRoomActivity",
+      "sourceLine": 162,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": true
+    },
+    {
+      "id": "mqtt",
+      "title": "MQTT publishing",
+      "ownerCategory": "connections",
+      "externalActivity": null,
+      "standaloneWrapper": "MqttActivity",
+      "sourceLine": 163,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": true
+    },
+    {
+      "id": "ha",
+      "title": "Home Assistant dashboard",
+      "ownerCategory": "connections",
+      "externalActivity": null,
+      "standaloneWrapper": "HaSettingsActivity",
+      "sourceLine": 164,
+      "overviewCategories": [
+        "connections"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "ha-entities",
+      "title": "Choose Home Assistant entities",
+      "ownerCategory": "connections",
+      "externalActivity": "HaSettingsActivity",
+      "standaloneWrapper": "HaSettingsActivity",
+      "sourceLine": 165,
+      "overviewCategories": [],
+      "advanced": true,
+      "localBody": false
+    },
+    {
+      "id": "ha-dashboard",
+      "title": "Home Assistant",
+      "ownerCategory": "connections",
+      "externalActivity": "HaDashboardActivity",
+      "standaloneWrapper": "HaDashboardActivity",
+      "sourceLine": 166,
+      "overviewCategories": [],
+      "advanced": false,
+      "localBody": false
+    },
+    {
+      "id": "phone",
+      "title": "Phone remote",
+      "ownerCategory": "connections",
+      "externalActivity": "RemotePairActivity",
+      "standaloneWrapper": "RemotePairActivity",
+      "sourceLine": 167,
+      "overviewCategories": [
+        "connections"
+      ],
+      "advanced": false,
+      "localBody": false
+    },
+    {
+      "id": "intercom",
+      "title": "Intercom",
+      "ownerCategory": "connections",
+      "externalActivity": null,
+      "standaloneWrapper": "IntercomActivity",
+      "sourceLine": 168,
+      "overviewCategories": [
+        "connections"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "boot",
+      "title": "Start on boot",
+      "ownerCategory": "device",
+      "externalActivity": null,
+      "standaloneWrapper": "BootAppsActivity",
+      "sourceLine": 169,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": true
+    },
+    {
+      "id": "device",
+      "title": "Device name",
+      "ownerCategory": "device",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 170,
+      "overviewCategories": [
+        "device"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "sleep",
+      "title": "Sleep timer",
+      "ownerCategory": "device",
+      "externalActivity": null,
+      "standaloneWrapper": "SleepSettingsActivity",
+      "sourceLine": 171,
+      "overviewCategories": [
+        "device"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "health",
+      "title": "About & device health",
+      "ownerCategory": "device",
+      "externalActivity": null,
+      "standaloneWrapper": "DeviceHealthActivity",
+      "sourceLine": 172,
+      "overviewCategories": [
+        "device"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "apk",
+      "title": "Install an APK",
+      "ownerCategory": "device",
+      "externalActivity": "ApkBrowserActivity",
+      "standaloneWrapper": "ApkBrowserActivity",
+      "sourceLine": 173,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": false
+    },
+    {
+      "id": "help",
+      "title": "Welcome to Immortal",
+      "ownerCategory": "device",
+      "externalActivity": "HelpActivity",
+      "standaloneWrapper": "HelpActivity",
+      "sourceLine": 174,
+      "overviewCategories": [
+        "device"
+      ],
+      "advanced": false,
+      "localBody": false
+    },
+    {
+      "id": "speed",
+      "title": "Speed test",
+      "ownerCategory": "connections",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 175,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": true
+    },
+    {
+      "id": "system",
+      "title": "Android & Portal settings",
+      "ownerCategory": "device",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 176,
+      "overviewCategories": [
+        "access",
+        "device"
+      ],
+      "advanced": false,
+      "localBody": true
+    },
+    {
+      "id": "managed",
+      "title": "Automatically managed settings",
+      "ownerCategory": "advanced",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 177,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": true
+    },
+    {
+      "id": "debug",
+      "title": "Diagnostics",
+      "ownerCategory": "advanced",
+      "externalActivity": null,
+      "standaloneWrapper": null,
+      "sourceLine": 178,
+      "overviewCategories": [
+        "advanced"
+      ],
+      "advanced": true,
+      "localBody": true
+    }
+  ],
+  "sharedOverviewPages": [
+    {
+      "page": "touch",
+      "categories": [
+        "sound",
+        "access"
+      ]
+    },
+    {
+      "page": "quickbar",
+      "categories": [
+        "home",
+        "access"
+      ]
+    },
+    {
+      "page": "alarm",
+      "categories": [
+        "home",
+        "sound"
+      ]
+    },
+    {
+      "page": "system",
+      "categories": [
+        "access",
+        "device"
+      ]
+    }
+  ],
+  "secondaryOrSearchPages": [
+    "styles",
+    "dismiss",
+    "folder",
+    "album",
+    "cameras",
+    "calendar-url",
+    "world",
+    "countdowns",
+    "crypto",
+    "todo",
+    "news",
+    "stocks",
+    "ha-entities",
+    "ha-dashboard"
+  ],
+  "advancedPageCount": 16,
+  "externalActivityPageCount": 15,
+  "localBodyPageCount": 39
+}

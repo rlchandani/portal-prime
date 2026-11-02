@@ -1,0 +1,268 @@
+{
+  "status": "source_inspected; existing focused JVM contracts passed",
+  "method": "Comment-aware constructor scan and source review; calendarpacks expands one BoolSpec constructor over three AVAILABLE packs. Not runtime reflection or hardware evidence.",
+  "sources": {
+    "app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt": "de366051ad676a3b8f555f828dda45fba334f72ba7364d344a62dc8d2d4f13a6",
+    "app/src/main/java/com/immortal/launcher/settings/SettingSpec.kt": "756ab777e09c9ae44362f0ec2484027eb5159a42cbc287549b876113265b1c85",
+    "app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt": "c6437ba23d20d7d747e6a5bcb6dc70f8df6317c05ae0041b2a5f5846470612cf",
+    "app/src/main/java/com/immortal/launcher/CalendarPacks.kt": "eb56f3b408c70bdd98006e4f8d311b3b178a7f2a201f2e5e5351b35a85a0701f",
+    "app/src/main/java/com/immortal/launcher/settings/SettingsPresentation.kt": "6545c544dfce3a9263ebbeccfd3585889faf28a0c5a1b17b4504bbc4956473ef",
+    "app/src/main/java/com/immortal/launcher/SettingsVisibilityPreparation.kt": "75ab835407ebb97bb771005b5e41eb9f73dd9bf151c6ef9e07a1a85bd9950bdc"
+  },
+  "domain_count": 12,
+  "spec_constructor_sites": 106,
+  "expanded_spec_instances": 108,
+  "type_totals": {
+    "StringSpec": 12,
+    "BoolSpec": 44,
+    "EnumSpec": 20,
+    "IntSpec": 21,
+    "DerivedSpec": 8,
+    "NavSpec": 3
+  },
+  "domains": [
+    {
+      "id": "calendar",
+      "specs": 10,
+      "types": {
+        "StringSpec": 1,
+        "BoolSpec": 1,
+        "EnumSpec": 2,
+        "IntSpec": 1,
+        "DerivedSpec": 5
+      }
+    },
+    {
+      "id": "screensaver",
+      "specs": 39,
+      "types": {
+        "BoolSpec": 18,
+        "EnumSpec": 5,
+        "NavSpec": 3,
+        "DerivedSpec": 3,
+        "IntSpec": 10
+      }
+    },
+    {
+      "id": "immortal",
+      "specs": 15,
+      "types": {
+        "BoolSpec": 4,
+        "EnumSpec": 5,
+        "StringSpec": 5,
+        "IntSpec": 1
+      }
+    },
+    {
+      "id": "mqtt",
+      "specs": 7,
+      "types": {
+        "BoolSpec": 3,
+        "StringSpec": 3,
+        "IntSpec": 1
+      }
+    },
+    {
+      "id": "quickbar",
+      "specs": 2,
+      "types": {
+        "BoolSpec": 2
+      }
+    },
+    {
+      "id": "fleet",
+      "specs": 1,
+      "types": {
+        "StringSpec": 1
+      }
+    },
+    {
+      "id": "chime",
+      "specs": 9,
+      "types": {
+        "BoolSpec": 4,
+        "StringSpec": 1,
+        "IntSpec": 4
+      }
+    },
+    {
+      "id": "sunrise",
+      "specs": 5,
+      "types": {
+        "BoolSpec": 2,
+        "IntSpec": 3
+      }
+    },
+    {
+      "id": "digitalclock",
+      "specs": 11,
+      "types": {
+        "BoolSpec": 3,
+        "EnumSpec": 8
+      }
+    },
+    {
+      "id": "welcome",
+      "specs": 5,
+      "types": {
+        "IntSpec": 1,
+        "BoolSpec": 4
+      }
+    },
+    {
+      "id": "home_dashboard",
+      "specs": 1,
+      "types": {
+        "StringSpec": 1
+      }
+    },
+    {
+      "id": "calendarpacks",
+      "specs": 3,
+      "types": {
+        "BoolSpec": 3
+      }
+    }
+  ],
+  "always_hidden_writable_keys": [
+    "screensaver.albumRefreshMin",
+    "screensaver.cacheBudgetGb",
+    "screensaver.antiBurnIn",
+    "immortal.maUsername",
+    "immortal.maPassword",
+    "mqtt.validateCert",
+    "chime.spokenVoice",
+    "digitalclock.style",
+    "digitalclock.color",
+    "digitalclock.font",
+    "digitalclock.glow"
+  ],
+  "registered_advanced_keys": [
+    "calendarpacks.irish",
+    "calendarpacks.prayer",
+    "calendarpacks.romanian",
+    "digitalclock.color",
+    "digitalclock.font",
+    "digitalclock.glow",
+    "digitalclock.style",
+    "immortal.hideStatusBar",
+    "immortal.maApiToken",
+    "immortal.maPassword",
+    "immortal.maPlayerId",
+    "immortal.maPort",
+    "immortal.maUsername",
+    "immortal.multiRoomEnabled",
+    "immortal.snapcastHost",
+    "mqtt.enabled",
+    "mqtt.host",
+    "mqtt.password",
+    "mqtt.port",
+    "mqtt.useTls",
+    "mqtt.username",
+    "mqtt.validateCert",
+    "screensaver.albumRefreshMin",
+    "screensaver.ambientDashboard",
+    "screensaver.antiBurnIn",
+    "screensaver.batterySaver",
+    "screensaver.cacheBudgetGb",
+    "screensaver.cacheEnabled",
+    "screensaver.closeAppOnSleep",
+    "screensaver.darkRoomLux",
+    "screensaver.gestureWave",
+    "screensaver.idleSleepMin",
+    "screensaver.presenceMode",
+    "welcome.durationMs"
+  ],
+  "parent_or_source_gated_specs": 46,
+  "capability_gate": {
+    "key": "screensaver.batterySaver",
+    "predicate": "DreamPolicy.hasBattery(c)",
+    "source_line": 345
+  },
+  "setting_spec_classes": 6,
+  "settings_domain_test_methods": 26,
+  "verification": {
+    "command": "ANDROID_HOME=/opt/homebrew/share/android-commandlinetools ./gradlew :app:testDebugUnitTest --tests com.immortal.launcher.settings.SettingsDomainTest --tests 'com.immortal.launcher.ApprovedSettings*Test' --no-daemon --console=plain",
+    "exit_code": 0,
+    "result": "98 tests in 9 suites passed; no failures, errors or skips. Existing SDK provided through ANDROID_HOME; no build configuration changed.",
+    "tests_executed": 98,
+    "registry_tests_executed": 26,
+    "device_browser_verification": "No native device or remote-renderer verification; separate browser source-ledger checks are recorded in settings-audit-browser-validation.json."
+  },
+  "snapshot_field_exclusions": {
+    "ScreensaverConfig.Settings": [
+      "immichUrl",
+      "immichKey",
+      "immichAlbumId",
+      "immichAlbumName",
+      "smbHost",
+      "smbShare",
+      "smbPath",
+      "smbUser",
+      "smbPass",
+      "davUrl",
+      "davUser",
+      "davPass",
+      "webUrl",
+      "facesEnabled",
+      "faceId",
+      "faceSizeIndex",
+      "dismissAppComponent",
+      "dismissHaDashboard",
+      "calendarUrl",
+      "calendarEnabled",
+      "calendarRange",
+      "calendarSize",
+      "calendarSide"
+    ],
+    "ImmortalSettings.Settings": [
+      "constrainPageWidth"
+    ],
+    "WelcomeConfig.Settings": [
+      "greetingNight",
+      "greetingMorning",
+      "greetingAfternoon",
+      "greetingEvening",
+      "userName",
+      "greetingColor",
+      "clockColor",
+      "dateColor",
+      "backgroundOpacity",
+      "textScale",
+      "greetingLetterSpacing",
+      "ttsVoice"
+    ],
+    "SunriseConfig.Config": [
+      "days"
+    ]
+  },
+  "snapshot_field_exclusion_count": 37,
+  "synthetic_specs": [
+    "digitalclock.face"
+  ],
+  "whole_config_exceptions": [
+    "CameraConfig",
+    "TimerConfig",
+    "CountdownConfig",
+    "NotesConfig",
+    "AlarmConfig",
+    "CryptoConfig",
+    "NewsConfig",
+    "StocksConfig",
+    "AlpacaConfig",
+    "OptionsScanConfig",
+    "HaConfig"
+  ],
+  "global_config_filename_gate": {
+    "direct_config_files": 20,
+    "registered": 9,
+    "excepted": 11
+  },
+  "initial_verification_attempt": {
+    "command": "./gradlew :app:testDebugUnitTest --tests com.immortal.launcher.settings.SettingsDomainTest --no-daemon --console=plain",
+    "exit_code": 1,
+    "result": "Failed before tests: SDK location not found; local.properties has no SDK configuration and the standard ~/Library/Android/sdk path is absent. No configuration changes made.",
+    "tests_executed": 0,
+    "device_browser_verification": "not performed"
+  }
+}
