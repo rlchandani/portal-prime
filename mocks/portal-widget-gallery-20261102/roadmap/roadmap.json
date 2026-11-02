@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T14:26:58.532964+00:00",
-  "updatedLabel": "2 November 2026 \u00b7 optimized platform QA verified",
+  "updatedAt": "2026-11-02T14:41:42.337744+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 confirmation ownership delivered in1.77",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "qa-optimized-platform-fixture",
+  "defaultTask": "installer-confirm-ownership",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact optimized1.76/code70. Earlier task receipts retain their acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
@@ -1253,6 +1253,78 @@
         "JVM gate used up-to-date3858-test/405-suite results. No new Portal release or performance gain."
       ],
       "next": "Reuse this scoped fixture when warranted. Normal Google sign-in/Premium playback and UI approvals remain separate; keep parked investigations closed."
+    },
+    {
+      "id": "installer-confirm-ownership",
+      "title": "Fleet installs: preserve each confirmation window",
+      "summary": "One completed install could disarm another waiting install. Each attempt now releases only its own30-second lease.",
+      "description": "Correct the global auto-confirm ownership race while preserving the existing expiry and dormant behavior. No UI, preference or API-contract change.",
+      "status": "delivered",
+      "verification": "3869 JVM \u00b7 overlap red\u2192green \u00b7 Family failure/session checks",
+      "kind": "Core reliability",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "Core Android / QA",
+      "deployment": "Exact optimized1.77/code71 in both rooms. Family used wireless ADB after failed Fleet confirmation; Living Fleet verified the full installed hash.",
+      "state": "Source race corrected; independent review and full signed gates passed. Two native invalid-APK requests and15 framework checks passed, and all resources/settings were restored.",
+      "acceptance": [
+        "A completed attempt releases only its own confirmation lease; reproduce two waiting/completing worker lifetimes before and after.",
+        "Keep30-second per-lease expiry; verify both release orders, duplicates, expired/foreign release and reacquisition.",
+        "Pass full JVM/debug/optimized/R8/lint/version/signature gates and verify exact installed artifacts.",
+        "Preserve complete room settings, remove owned fixture resources and restore the original Family test APK."
+      ],
+      "evidence": [
+        {
+          "text": "Actual source race, green gates, both-room artifacts and explicit native limits.",
+          "source": "docs/portal-installer-confirm-ownership-2026-11-02.md"
+        },
+        {
+          "text": "Selected public verification and Family fallback boundary.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/installer-confirm-ownership-verification.json"
+        }
+      ],
+      "limits": [
+        "No native two-valid-install confirmation, expiry/timeout or general performance verdict.",
+        "Family automatic confirmation on1.77 is still unverified; actual prior visible prompt/failure is queued separately.",
+        "Framework session check does not inspect the production lease map or prove complete UI behavior.",
+        "No API28 or physical-phone acceptance."
+      ],
+      "next": "Retain the lease fix. Independently inspect Family automatic-confirmation service readiness; keep UI/physical-phone/music and parked boundaries."
+    },
+    {
+      "id": "installer-confirm-service-readiness",
+      "title": "Family fleet installs: verify automatic confirmation",
+      "summary": "Family1.76 left a visible Install prompt and returned failure during the authorized update; wireless ADB delivered1.77.",
+      "description": "Cause-first readiness check of enabled/bound accessibility service and actual installer events on Family. Existing overlap source fix does not establish why its earlier prompt was missed.",
+      "status": "queued",
+      "verification": "Observed native prompt/failure \u00b7 cause unproved",
+      "kind": "Native reliability",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "Android runtime / QA",
+      "deployment": "No new readiness correction or OS configuration. Both rooms currently have exact1.77; Living updated normally.",
+      "state": "Family automatic confirmation on1.77 remains unverified. Prior valid self-update missed its prompt; no inactive-service, event-filter or expiry cause is assumed.",
+      "acceptance": [
+        "Inspect current enabled/bound service state and actual foreground installer component before choosing a correction.",
+        "Use one fresh30-minute Family-only unit; preserve configuration, original test package and pending browser account work.",
+        "If warranted, verify the actual confirmation lifecycle with a bounded owned public fixture and restore it.",
+        "Publish a measured cause/fix or a precise unverified boundary; do not claim success from enabled-setting metadata alone."
+      ],
+      "evidence": [
+        {
+          "text": "Failed Family Fleet update, visible prompt, terminal fallback and successful Living deployment are recorded.",
+          "source": "docs/portal-installer-confirm-ownership-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Queued; no proven cause, source correction or new native acceptance.",
+        "No repeated Living native tests or reopened screensaver/performance experiments."
+      ],
+      "next": "Read enabled/bound-service and installer-event evidence on Family, then select the smallest justified correction within the original30-minute unit."
     }
   ]
 }

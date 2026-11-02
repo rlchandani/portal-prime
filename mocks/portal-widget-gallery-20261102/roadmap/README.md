@@ -265,3 +265,12 @@ its app APK. Two normal15/15 runs and deliberate failing-run cleanup passed;
 the original test package and full application/configuration readbacks match.
 This does not make all Kotlin UI fixtures compatible or claim a new product
 feature, release or performance improvement.
+
+The confirmation ownership checkpoint has32 tasks:14 delivered/implemented,
+11 scoped verified,2 approval,3 parked and2 queued. Exact1.77/code71 is installed
+in both rooms. The two-worker source race, ten independent expiry/ownership cases
+and full3869-test/406-suite gate passed. Family's concurrent native failure-path
+requests and15 framework checks passed with restored resources/configuration.
+Family required wireless ADB after a missed Fleet confirmation; Living's final
+Fleet deployment verified the full installed hash. That missed confirmation now
+has a separate cause-first queued readiness item, with no assumed root cause.

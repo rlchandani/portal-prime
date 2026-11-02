@@ -11,11 +11,13 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Latest installer maintenance:** exact optimized **1.76/code70** is installed in both rooms. Failed attempts abandon only their created session, with exact callback-session correlation.3858 JVM/405 suites passed. Family17 matching-debug native API checks cleared the old session; optimized invalid-APK failure left0 sessions. Original test APK and final optimized APK were fully restored/read back; both room settings are unchanged. [Scoped receipt](portal-installer-session-cleanup-2026-11-02.md). Actual timeout/overlap/success-on-new-code and native UI performance remain separate.
+- **Latest auto-confirm ownership maintenance:** exact optimized **1.77/code71** is installed in both rooms, source `f107d33b`. Completing one overlapping install now releases only its own30-second confirmation lease.3869 JVM/406 suites passed, including a reproduced two-worker race and10 expiry/ownership cases. Family's two concurrent invalid-APK requests and15-check session cleanup passed; original test package and complete settings were preserved. Family required wireless ADB after a failed Fleet confirmation; Living's Fleet update verified the full installed hash. [Scoped receipt](portal-installer-confirm-ownership-2026-11-02.md). Family automatic service readiness and native two-valid-install confirmation remain unverified.
 
-- **Retained transport delivery:** the1.75 correction remains included in current1.76. Original Family7/7 HTTP cases passed; stalled rejection changed from no reply within3s to median217ms measured through EOF. One70001-byte upload/readback and cleanup passed. [Scoped receipt](portal-fleet-error-response-2026-11-02.md). The [phase follow-up](portal-fleet-response-timing-2026-11-02.md) found normal identity-body completion at median23ms; the extra wait is after the body. The strict CLI still waits through EOF. No TCP tuning or general UI speedup is claimed.
+- **Retained installer session maintenance:** current1.77 includes the1.76 fix. Failed attempts abandon only their created session, with exact callback-session correlation. Original3858 JVM/405 suites passed. Family17 matching-debug native API checks cleared the old session; optimized invalid-APK failure left0 sessions. Original test APK and final optimized APK were fully restored/read back; both room settings were unchanged. [Scoped receipt](portal-installer-session-cleanup-2026-11-02.md). Its historical native limits retain their scope.
 
-- **Retained Weather clock-format maintenance:** current1.76 retains the1.74 correction. Original3845 JVM tests and274 Family debug-runtime formatter checks passed. Actual Home/settings-return UI acceptance is still open. See [scoped receipt](portal-weather-clock-format-2026-11-02.md). Older versioned receipts below keep their historical scope.
+- **Retained transport delivery:** the1.75 correction remains included in current1.77. Original Family7/7 HTTP cases passed; stalled rejection changed from no reply within3s to median217ms measured through EOF. One70001-byte upload/readback and cleanup passed. [Scoped receipt](portal-fleet-error-response-2026-11-02.md). The [phase follow-up](portal-fleet-response-timing-2026-11-02.md) found normal identity-body completion at median23ms; the extra wait is after the body. The strict CLI still waits through EOF. No TCP tuning or general UI speedup is claimed.
+
+- **Retained Weather clock-format maintenance:** current1.77 retains the1.74 correction. Original3845 JVM tests and274 Family debug-runtime formatter checks passed. Actual Home/settings-return UI acceptance is still open. See [scoped receipt](portal-weather-clock-format-2026-11-02.md). Older versioned receipts below keep their historical scope.
 
 - The active goal covers the whole existing product: Portal, native Android
   companion, browser remote, fleet/provisioning, integrations, UX, reliability,
@@ -57,7 +59,7 @@ The updated whole-product objective is
   profile/screensaver/layout baselines passed on both rooms. Family’s original
   photo Dream was observed again after cleanup. [Receipt](portal-pwa-connection-status-delivery-2026-11-02.md).
 - **Browser tab branding is delivered:** one explicit favicon link reuses the existing public 64 × 64 PNG. Actual Family paired/unpaired browser sessions naturally requested the public icon without authorization, with zero default favicon requests; management authentication, manifest/touch icons and original pairing were preserved. Both rooms have exact 1.70 APK readbacks, unchanged full profile/screensaver/layout, and Family's original photo Dream was restored. [Receipt](portal-pwa-tab-branding-delivery-2026-11-02.md).
-- Gradle and `version.json` both currently declare **1.70 / versionCode 64**.
+- Gradle and `version.json` both currently declare **1.77 / versionCode 71**.
   These identify the verified local device iteration, not a published release.
 - **Completed parallel maintenance units:** native settings editor classification/projection
   coverage and native phone music-compatibility coverage. Nine focused Portal
@@ -76,7 +78,7 @@ The updated whole-product objective is
   `docs/companion-compatibility-validation-2026-11-02.md` in the isolated Toolkit
   checkout. Original 540 companion tests were unchanged and passed against the
   candidate; no separate unmodified-base run or physical phone check is claimed.
-- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents nineteen
+- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents thirty-two
   tracked items with acceptance/evidence/limits and actual cropped clock captures.
   It is a saved priority-queue snapshot, not live telemetry or an exhaustive
   product acceptance report. Browser interactions passed at desktop/mobile
@@ -92,7 +94,11 @@ The updated whole-product objective is
   `git -c core.hooksPath=/dev/null --no-optional-locks`; GitHub authentication,
   push and publication remain forbidden.
 
-## Product and platform inventory
+## Initial product and platform inventory
+
+The rows below retain the initial discovery scope. Current artifacts, native
+checks and subsequent platform acceptance are recorded above and in the dated
+checkpoints below; do not reuse an initial “unverified” finding as a new issue.
 
 | Component | Purpose, dependencies and inspected evidence | Verification/release procedure and current limits |
 | --- | --- | --- |
@@ -568,3 +574,20 @@ not a new Portal release, full Kotlin UI compatibility or a performance gain.
 Living remains on its previously verified1.76 artifact without any new test
 deployment. Music sign-in/playback, Weather/gallery approval, physical phone and
 all parked issue limits remain separate.
+
+## Installer confirmation ownership checkpoint — 2 November 2026
+
+Source `f107d33b` is delivered in exact1.77/code71 in both rooms. The actual
+two-worker JVM race is corrected;10 owner/expiry tests and full3869 JVM/406 suites,
+debug/optimized/R8/lint/signature gates passed. Family's current headless failure
+path handled two simultaneous invalid-APK requests, and the15-check system probe
+found0 remaining owned sessions. Original test APK and full room profiles/
+screensaver configuration were preserved. Family deployment used wireless ADB
+after a missed Fleet confirmation; Living's final Fleet deployment verified
+the entire installed APK hash. No automatic Family confirmation proof is inferred.
+
+The32-task saved roadmap has14 delivered/implemented,11 scoped verified,
+2 awaiting approval,3 parked and2 queued. The new queued readiness check follows
+the actual visible Family prompt and terminal `ok:false` response, with no proven
+cause or software change yet. Preserve its fresh30-minute boundary, normal
+music sign-in/playback, UI approvals and all exhausted issue boundaries.

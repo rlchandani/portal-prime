@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "f107d33b",
+  "scope": "Per-attempt auto-confirm ownership; existing30-second expiry retained",
+  "versionName": "1.77",
+  "versionCode": 71,
+  "apkBytes": 25860686,
+  "apkSha256": "5df871735ada5aae37375a6cd6129aa9fcb13329c982441a0cc90db2fd4f383e",
+  "jvmTests": 3869,
+  "jvmSuites": 406,
+  "jvmFailures": 0,
+  "overlapRegression": "Failed before; passed after",
+  "independentWindowCases": 10,
+  "debugOptimizedR8LintSigning": "passed",
+  "independentReview": "passed",
+  "familyFailureRequests": [
+    {
+      "status": 200,
+      "expectedFailure": true,
+      "elapsedMs": 181.201
+    },
+    {
+      "status": 200,
+      "expectedFailure": true,
+      "elapsedMs": 187.185
+    }
+  ],
+  "familyOwnedSessionBaseline": 0,
+  "familyOwnedSessionFinal": 0,
+  "familyFrameworkChecks": 15,
+  "familyFrameworkFailures": 0,
+  "scratchFilesRemoved": true,
+  "originalTestApkRestoredExactly": true,
+  "bothRoomProfilesUnchanged": true,
+  "bothRoomScreensaverConfigsUnchanged": true,
+  "familyDeployment": "Failed Fleet confirmation followed by terminal-process wireless ADB fallback; full installed hash verified",
+  "livingDeployment": "One Fleet deployment, zero exit and full installed hash verified",
+  "limits": [
+    "No native two-valid-install confirmation, expiry/timeout or general performance verdict.",
+    "Family automatic confirmation on1.77 is still unverified; actual prior visible prompt/failure is queued separately.",
+    "Framework session check does not inspect the production lease map or prove complete UI behavior.",
+    "No API28 or physical-phone acceptance."
+  ]
+}
