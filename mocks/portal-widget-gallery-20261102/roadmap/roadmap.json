@@ -1,18 +1,63 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T20:21:26.198560+00:00",
-  "updatedLabel": "Browser keyboard confirmation delivered \u00b7 Portal1.84",
+  "updatedAt": "2026-11-02T20:43:32.902060+00:00",
+  "updatedLabel": "Photo metadata guard delivered \u00b7 Portal 1.85 in both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "browser-text-confirmation",
+  "defaultTask": "photo-source-response-budget",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms retain exact optimized Portal 1.84 / code 78. Companion 1.7.5 / code 17 text candidate verified in an isolated Android emulator; earlier settings/upload/deletion receipts retain their original versions. Physical-phone installation remains open.",
+    "Both rooms retain exact optimized Portal 1.85 / code 79. Companion 1.7.5 / code 17 text candidate verified in an isolated Android emulator; earlier settings/upload/deletion receipts retain their original versions. Physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-source-response-budget",
+      "title": "Photo sources: bound metadata downloads",
+      "description": "Protect public albums, Immich and WebDAV from unbounded metadata bodies while retaining request policy and existing source-failure handling.",
+      "summary": "Delivered to both rooms. Decoded metadata is bounded at 16 MiB; incomplete bodies are rejected. All six generated Family API cases and preservation checks passed.",
+      "status": "delivered",
+      "verification": "4 original failures \u00b7 33 new checks \u00b7 3920 JVM \u00b7 6 Family API cases \u00b7 exact APK both rooms",
+      "kind": "Photo reliability and bounded resource use",
+      "platforms": [
+        "portal",
+        "browser"
+      ],
+      "owner": "Portal engineering / independent provider workers / Family native API QA",
+      "deployment": "Optimized Portal 1.85 / code 79; complete installed APK hash verified by the existing deployer in Family and Living.",
+      "state": "Original 20:23:05\u201320:53:05 UTC audit clock retained. Full room profiles/layouts/sources/screensaver unchanged; Family runtime restored; owned fixture and temporary credentials removed.",
+      "acceptance": [
+        "Reproduce oversized valid-looking metadata being accepted through actual provider entry points.",
+        "Bound decoded metadata to 16 MiB; reject oversized declarations and incomplete bodies.",
+        "Preserve UTF-8, request headers/methods/timeouts, cookie reuse and provider-specific partial/failure behavior.",
+        "Close streams and disconnect connections; retain cancellation ownership.",
+        "Run final gates and actual Family Android generated-response acceptance before exact artifact deployment to Living."
+      ],
+      "evidence": [
+        {
+          "text": "Production change, provider coverage, native evidence, deployment and limits.",
+          "source": "docs/portal-photo-source-response-budget-2026-11-02.md"
+        },
+        {
+          "text": "Generated native responses, final gates, exact artifact and restoration.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-source-response-budget-verification.json"
+        }
+      ],
+      "limits": [
+        "This is a metadata bound, not an image size/quality limit.",
+        "No normal slideshow FPS, total heap reduction, real cloud-account acceptance or universal photo-loading speed claim.",
+        "Native coverage is unsaved Immich discovery; WebDAV/public Synology have TCP JVM coverage. Google/iCloud owner accounts remain unverified.",
+        "Living received artifact/configuration verification only; no physical-phone or UI acceptance."
+      ],
+      "next": "This metadata guard is delivered. Continue the independent backlog; existing approvals, physical acceptance and exhausted issue clocks retain their boundaries.",
+      "issueClock": {
+        "startedAt": "2026-11-02T20:23:05Z",
+        "deadline": "2026-11-02T20:53:05Z",
+        "firstAuditClockRetained": true
+      }
+    },
     {
       "id": "companion-text-confirmation",
       "title": "Phone keyboard: keep unconfirmed drafts",
@@ -25,7 +70,7 @@
         "companion"
       ],
       "owner": "Phone engineering / independent review / owned native QA",
-      "deployment": "Companion1.7.5/code17 remains emulator-verified; physical Pixel open. Both Portals now1.84.",
+      "deployment": "Companion1.7.5/code17 remains emulator-verified; physical Pixel open. Both Portals now1.85.",
       "state": "Original 19:45:25\u201320:15:25 UTC clock retained. Original AVD unchanged, owned clone removed and original device transports retained.",
       "acceptance": [
         "Reproduce incomplete/type-coerced application results being treated as confirmation.",

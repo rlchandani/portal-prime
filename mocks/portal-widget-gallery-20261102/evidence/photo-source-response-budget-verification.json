@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-02T20:43:32.902060+00:00",
+  "scope": "Decoded photo-source metadata response budget; no image-quality or whole-product performance claim",
+  "issueClock": {
+    "startedAt": "2026-11-02T20:23:05Z",
+    "deadline": "2026-11-02T20:53:05Z",
+    "scope": "Bound metadata responses for public albums, Immich and WebDAV; preserve caller fallback and request policy",
+    "firstAuditClockRetained": true
+  },
+  "artifact": {
+    "versionName": "1.85",
+    "versionCode": 79,
+    "package": "com.immortal.launcher.debug",
+    "bytes": 25861122,
+    "sha256": "e2c93a3c2d2b187a5f47f45cf7120a69da4321be9590d452671c400c273fe974",
+    "signerMatchesAccepted": true
+  },
+  "reproduction": {
+    "tests": 6,
+    "originalFailures": 4,
+    "transport": "Actual ImmichSource entry points with real local TCP responses"
+  },
+  "newRegressionTests": {
+    "reader": 18,
+    "immich": 6,
+    "webdav": 5,
+    "publicSynologyPath": 4
+  },
+  "focusedGates": {
+    "tests": 95,
+    "suites": 10,
+    "failures": 0,
+    "errors": 0
+  },
+  "finalJvmGates": {
+    "tests": 3920,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 412
+  },
+  "builds": {
+    "debug": true,
+    "optimizedPerformance": true,
+    "r8": true,
+    "vitalLint": true,
+    "seconds": 121,
+    "incrementalCompilation": false
+  },
+  "nativeFamily": {
+    "surface": "Installed Android 10 unsaved /remote/immich/albums API",
+    "generatedMetadataOnly": true,
+    "cases": [
+      {
+        "mode": "good",
+        "httpStatus": 200,
+        "milliseconds": 37.46,
+        "responseMatchesExpected": true,
+        "generatedMetadataOnly": true
+      },
+      {
+        "mode": "gzip",
+        "httpStatus": 200,
+        "milliseconds": 18.471,
+        "responseMatchesExpected": true,
+        "generatedMetadataOnly": true
+      },
+      {
+        "mode": "oversized-header",
+        "httpStatus": 502,
+        "milliseconds": 36.893,
+        "responseMatchesExpected": true,
+        "generatedMetadataOnly": true
+      },
+      {
+        "mode": "over-chunked",
+        "httpStatus": 502,
+        "milliseconds": 474.961,
+        "responseMatchesExpected": true,
+        "generatedMetadataOnly": true
+      },
+      {
+        "mode": "short",
+        "httpStatus": 502,
+        "milliseconds": 36.704,
+        "responseMatchesExpected": true,
+        "generatedMetadataOnly": true
+      },
+      {
+        "mode": "good",
+        "httpStatus": 200,
+        "milliseconds": 33.591,
+        "responseMatchesExpected": true,
+        "generatedMetadataOnly": true
+      }
+    ],
+    "savedSourcesWritten": false
+  },
+  "delivery": {
+    "Family Area": "Full installed APK SHA256 verified by existing deployer",
+    "Living Area": "Full installed APK SHA256 verified by existing deployer; artifact/configuration checks only",
+    "lostAcknowledgementBranchObserved": false
+  },
+  "restoration": {
+    "family.profile": true,
+    "family.layout": true,
+    "family.screensaver": true,
+    "family.sources": true,
+    "living.profile": true,
+    "living.layout": true,
+    "living.screensaver": true,
+    "living.sources": true,
+    "accessibilityUnchanged": true,
+    "fontUnchanged": true,
+    "normalPhotoPreviewRestored": true,
+    "chromeTask27174Preserved": true,
+    "familyExactApkVerifiedByDeployer": true,
+    "livingExactApkVerifiedByDeployer": true,
+    "ownedTemporaryFleetRegistryRemoved": true,
+    "ownedFixtureClosed": true
+  },
+  "independentReview": "Separate stream/helper and provider workers; no concrete production defect reported",
+  "limits": [
+    "Metadata only; no image resolution or quality reduction.",
+    "No actual owner cloud-account acceptance, heap reduction, FPS or universal loading-speed claim.",
+    "Existing connection/read timeouts preserved; no total request deadline.",
+    "Native coverage is Immich discovery; WebDAV and public Synology use real TCP JVM fixtures.",
+    "No physical companion installation, UI redesign, GitHub or Home Assistant change."
+  ]
+}

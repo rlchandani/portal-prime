@@ -667,3 +667,25 @@ not reopened.
 ## 2026-11-02 — Browser keyboard confirmation delivered
 
 Portal1.84/code78 exact optimized artifact is installed in both rooms. Browser text now requires literal applied confirmation; uncertainty retains the draft and requests screen review before an explicit resend. Original19:56:33–20:26:33 clock retained.12focused,711earlier remoteJS,3887JVM and24actual Chrome command cases passed. Family served-assets/rejection accepted; live successful insertion and Android WebView remain unclaimed. Full room profiles/layouts/screensaver unchanged; Family photo preview/Chrome/accessibility/font retained. See `portal-browser-text-confirmation-2026-11-02.md` and structured evidence.
+
+## 2026-11-02 — Photo metadata response budget delivered
+
+Both rooms now contain the exact optimized **1.85 / code79** APK, confirmed by
+the existing full-hash deployer. Public albums, Immich and WebDAV share a
+16 MiB decoded metadata budget; images retain their existing quality.
+Four original provider failures, 33 new regression checks, 95 focused checks
+and **3,920 JVM /412 suites** plus debug/optimized/R8/lint gates are recorded.
+Family's installed unsaved discovery API passed all six generated response cases,
+including Android transparent gzip and successful recovery after rejection.
+Full room profiles/layouts/sources/screensaver settings and Family runtime
+state were preserved; the owned fixture and temporary registry are removed.
+See [the scoped receipt](portal-photo-source-response-budget-2026-11-02.md).
+
+The saved roadmap now contains **46 tracked tasks: 21 delivered/implemented,
+17 scoped verified, 5 parked, 2 awaiting approval and 1 queued**. These counts
+are a maintained backlog, not whole-product completion. Weather approval is
+retained, but its exhausted daily-clipping unit stays parked; Quick Controls
+approval, ordinary music sign-in/playback and physical companion acceptance
+remain separate. Metadata request timings do not establish slideshow FPS or
+actual cloud-account acceptance. Original unit clock **20:23:05–20:53:05 UTC**
+includes cleanup; no parked issue was restarted.

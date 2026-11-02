@@ -162,30 +162,45 @@ object ImmichSource {
   // --- HTTP (mirrors the app's other best-effort fetchers) --------------------
   private fun httpGet(spec: String, headers: Map<String, String>): String? {
     val c = URL(spec).openPhotoSourceConnection()
-    c.connectTimeout = 8000
-    c.readTimeout = 10000
-    headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
-    return if (c.responseCode in 200..299) c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-    else null.also { logHttpFailure("GET", spec, c) }
+    try {
+      c.connectTimeout = 8000
+      c.readTimeout = 10000
+      headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
+      return if (c.responseCode in 200..299) PhotoSourceHttp.readText(c)
+      else null.also { logHttpFailure("GET", spec, c) }
+    } finally {
+      runCatching { c.disconnect() }
+    }
   }
 
   private fun httpPostJson(spec: String, headers: Map<String, String>, json: String): String? {
     val c = URL(spec).openPhotoSourceConnection()
-    c.connectTimeout = 8000
-    c.readTimeout = 12000
-    c.requestMethod = "POST"
-    c.doOutput = true
-    c.setRequestProperty("Content-Type", "application/json")
-    headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
-    c.outputStream.use { it.write(json.toByteArray(Charsets.UTF_8)) }
-    return if (c.responseCode in 200..299) c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-    else null.also { logHttpFailure("POST", spec, c) }
+    try {
+      c.connectTimeout = 8000
+      c.readTimeout = 12000
+      c.requestMethod = "POST"
+      c.doOutput = true
+      c.setRequestProperty("Content-Type", "application/json")
+      headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
+      c.outputStream.use { it.write(json.toByteArray(Charsets.UTF_8)) }
+      return if (c.responseCode in 200..299) PhotoSourceHttp.readText(c)
+      else null.also { logHttpFailure("POST", spec, c) }
+    } finally {
+      runCatching { c.disconnect() }
+    }
   }
 
   /** A rejected request is the one clue a user report can carry — keep the server's own words. */
   private fun logHttpFailure(method: String, spec: String, c: HttpURLConnection) {
     val detail =
-        runCatching { c.errorStream?.use { it.readBytes().toString(Charsets.UTF_8).take(300) } }
+        runCatching {
+          c.errorStream?.reader(Charsets.UTF_8)?.use { reader ->
+            // Read a diagnostic prefix, never buffer an arbitrary error body.
+            val chars = CharArray(300)
+            val count = reader.read(chars)
+            if (count > 0) String(chars, 0, count) else null
+          }
+        }
             .getOrNull()
     Log.w(TAG, "$method $spec -> HTTP ${c.responseCode}${detail?.let { ": $it" } ?: ""}")
   }

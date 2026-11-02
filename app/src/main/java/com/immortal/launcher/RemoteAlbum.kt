@@ -222,26 +222,26 @@ object RemoteAlbum {
     val c =
         URL("https://$firstGuess/$token/sharedstreams/webstream").openPhotoSourceConnection()
             as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 8000
-    c.requestMethod = "POST"
-    c.doOutput = true
-    c.setRequestProperty("Content-Type", "application/json")
-    c.setRequestProperty("User-Agent", USER_AGENT)
-    c.setRequestProperty("Origin", "https://www.icloud.com")
-    c.outputStream.use { it.write("{\"streamCtag\":null}".toByteArray()) }
-    val code = runCatching { c.responseCode }.getOrDefault(0)
-    val redirect = c.getHeaderField("X-Apple-MMe-Host")
     return try {
+      c.connectTimeout = 8000
+      c.readTimeout = 8000
+      c.requestMethod = "POST"
+      c.doOutput = true
+      c.setRequestProperty("Content-Type", "application/json")
+      c.setRequestProperty("User-Agent", USER_AGENT)
+      c.setRequestProperty("Origin", "https://www.icloud.com")
+      c.outputStream.use { it.write("{\"streamCtag\":null}".toByteArray()) }
+      val code = runCatching { c.responseCode }.getOrDefault(0)
+      val redirect = c.getHeaderField("X-Apple-MMe-Host")
       when {
         code == 200 -> {
-          val body = c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
+          val body = PhotoSourceHttp.readText(c)
           firstGuess to body
         }
         code == 330 && !redirect.isNullOrBlank() -> redirect to null
         else -> null
       }
-    } catch (_: Throwable) {
+    } catch (_: Exception) {
       null
     } finally {
       runCatching { c.disconnect() }
@@ -499,16 +499,20 @@ object RemoteAlbum {
 
   private fun postForm(spec: String, body: String): String? {
     val c = URL(spec).openPhotoSourceConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 10000
-    c.requestMethod = "POST"
-    c.doOutput = true
-    c.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-    c.setRequestProperty("User-Agent", USER_AGENT)
-    return runCatching {
-      c.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
-      c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-    }.getOrNull()
+    return try {
+      c.connectTimeout = 8000
+      c.readTimeout = 10000
+      c.requestMethod = "POST"
+      c.doOutput = true
+      c.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+      c.setRequestProperty("User-Agent", USER_AGENT)
+      runCatching {
+        c.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
+        PhotoSourceHttp.readText(c)
+      }.getOrNull()
+    } finally {
+      runCatching { c.disconnect() }
+    }
   }
 
   internal fun isGoogleAvatarUrl(url: String): Boolean {
@@ -691,20 +695,22 @@ object RemoteAlbum {
     var current = spec
     repeat(maxHops) {
       val c = URL(current).openPhotoSourceConnection() as HttpURLConnection
-      c.connectTimeout = 8000
-      c.readTimeout = 8000
-      c.instanceFollowRedirects = false
-      c.requestMethod = "GET"
-      c.setRequestProperty("User-Agent", USER_AGENT)
-      val code = runCatching { c.responseCode }.getOrDefault(0)
-      if (code in 300..399) {
-        val loc = c.getHeaderField("Location")
+      try {
+        c.connectTimeout = 8000
+        c.readTimeout = 8000
+        c.instanceFollowRedirects = false
+        c.requestMethod = "GET"
+        c.setRequestProperty("User-Agent", USER_AGENT)
+        val code = runCatching { c.responseCode }.getOrDefault(0)
+        if (code in 300..399) {
+          val loc = c.getHeaderField("Location")
+          if (loc.isNullOrBlank()) return current
+          current = if (loc.startsWith("http")) loc else URL(URL(current), loc).toString()
+        } else {
+          return current
+        }
+      } finally {
         runCatching { c.disconnect() }
-        if (loc.isNullOrBlank()) return current
-        current = if (loc.startsWith("http")) loc else URL(URL(current), loc).toString()
-      } else {
-        runCatching { c.disconnect() }
-        return current
       }
     }
     return current
@@ -721,37 +727,44 @@ object RemoteAlbum {
       headers: Map<String, String> = emptyMap(),
   ): HttpResponse? {
     val c = URL(spec).openPhotoSourceConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 10000
-    c.instanceFollowRedirects = true
-    c.setRequestProperty("User-Agent", USER_AGENT)
-    c.setRequestProperty("Accept-Language", "en-US,en;q=0.9")
-    headers.forEach { (key, value) -> c.setRequestProperty(key, value) }
-    return runCatching {
-          val body = c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-          val cookies =
-              c.headerFields.entries
-                  .filter { (key, _) -> key.equals("Set-Cookie", ignoreCase = true) }
-                  .flatMap { it.value.orEmpty() }
-          HttpResponse(body, cookies)
-        }
-        .getOrNull()
-        .also { runCatching { c.disconnect() } }
+    return try {
+      c.connectTimeout = 8000
+      c.readTimeout = 10000
+      c.instanceFollowRedirects = true
+      c.setRequestProperty("User-Agent", USER_AGENT)
+      c.setRequestProperty("Accept-Language", "en-US,en;q=0.9")
+      headers.forEach { (key, value) -> c.setRequestProperty(key, value) }
+      runCatching {
+            val body = PhotoSourceHttp.readText(c)
+            val cookies =
+                c.headerFields.entries
+                    .filter { (key, _) -> key.equals("Set-Cookie", ignoreCase = true) }
+                    .flatMap { it.value.orEmpty() }
+            HttpResponse(body, cookies)
+          }
+          .getOrNull()
+    } finally {
+      runCatching { c.disconnect() }
+    }
   }
 
   private fun postJson(spec: String, body: String): String? {
     val c = URL(spec).openPhotoSourceConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 10000
-    c.requestMethod = "POST"
-    c.doOutput = true
-    c.setRequestProperty("Content-Type", "application/json")
-    c.setRequestProperty("User-Agent", USER_AGENT)
-    c.setRequestProperty("Origin", "https://www.icloud.com")
-    return runCatching {
-          c.outputStream.use { it.write(body.toByteArray()) }
-          c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
-        }
-        .getOrNull()
+    return try {
+      c.connectTimeout = 8000
+      c.readTimeout = 10000
+      c.requestMethod = "POST"
+      c.doOutput = true
+      c.setRequestProperty("Content-Type", "application/json")
+      c.setRequestProperty("User-Agent", USER_AGENT)
+      c.setRequestProperty("Origin", "https://www.icloud.com")
+      runCatching {
+            c.outputStream.use { it.write(body.toByteArray()) }
+            PhotoSourceHttp.readText(c)
+          }
+          .getOrNull()
+    } finally {
+      runCatching { c.disconnect() }
+    }
   }
 }

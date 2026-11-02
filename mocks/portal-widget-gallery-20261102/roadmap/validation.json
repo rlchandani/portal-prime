@@ -916,5 +916,30 @@
     },
     "receiptHttpStatus": 200,
     "scope": "Current browser text task only; no all45workflow or whole-product quality claim"
+  },
+  "photoSourceResponseBudgetUpdate": {
+    "checkedAt": "2026-11-02T20:43:55.814318+00:00",
+    "tasks": 46,
+    "statuses": {
+      "delivered": 21,
+      "verified": 17,
+      "parked": 5,
+      "approval": 2,
+      "queued": 1
+    },
+    "selectedTask": "photo-source-response-budget",
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "pageErrors": 0,
+    "receiptHttpStatus": 200,
+    "footerVersion": "1.85 / code 79",
+    "scope": "Updated metadata detail, row count, footer and public receipt only; no all46 workflow or native visual acceptance inferred."
   }
 }
