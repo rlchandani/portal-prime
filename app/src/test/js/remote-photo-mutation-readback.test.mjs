@@ -73,7 +73,19 @@ async function fixture(t, { empty = false } = {}) {
       uploads.push({ base: parsed.origin, name, path, signal: opts.signal });
       const complete = mode => {
         if (mode === 'failed') return response({ ok: false, error: 'file_exists' }, 409);
+        if (mode === 'readable-invalid-response')
+          return response({ ok: false, error: 'invalid_response' }, 400);
+        if (mode === 'malformed-auth')
+          return new Response('<html>pairing expired</html>', { status: 401 });
         files.get(parsed.origin).push(fileRow(path));
+        if (mode === 'malformed-success')
+          return new Response('{"ok":true,"path":', { status: 200 });
+        if (mode === 'empty-success')
+          return new Response('', { status: 200 });
+        if (mode === 'malformed-gateway')
+          return new Response('<html>upstream reply lost</html>', { status: 502 });
+        if (mode === 'missing-ok') return response({ path, bytes: opts.body.size });
+        if (mode === 'invalid-ok') return response({ ok: 'false', path, bytes: opts.body.size });
         return response({ ok: true, path, bytes: mode === 'unconfirmed' ? 1 : opts.body.size });
       };
       const mode = uploadModes.get(name);
@@ -252,6 +264,65 @@ for (const mode of ['failed', 'unconfirmed']) {
     await h.settle();
   });
 }
+
+for (const mode of ['malformed-success', 'empty-success', 'malformed-gateway']) {
+  test(`a ${mode} upload acknowledgment remains unconfirmed until the user refreshes`, async t => {
+    const f = await fixture(t), { h } = f;
+    f.uploadModes.set('new.png', mode);
+    await f.import();
+    assert.match(importStatus(h), /new.png: Completion unconfirmed/);
+    assert.doesNotMatch(importStatus(h), /new.png: Failed|Stored and confirmed/);
+    assert.match(h.document.getElementById('notice').textContent, /unconfirmed.*refresh/i);
+    assert.equal(f.uploads.length, 1, 'An ambiguous acknowledgment must never cause an automatic resend');
+    assert.equal(f.reads.length, 1, 'Unconfirmed storage retains the existing manual-review boundary');
+    h.document.getElementById('refresh-button').click();
+    await h.settle();
+    assert.ok(galleryNames(h).includes('Preview new.png'));
+    assert.match(importStatus(h), /Completion unconfirmed/, 'A listing is not an upload acknowledgment');
+  });
+}
+
+test('an ambiguous reply preserves the next file and its independently confirmed outcome', async t => {
+  const f = await fixture(t), { h } = f;
+  f.uploadModes.set('uncertain.png', 'malformed-success');
+  await f.import(['uncertain.png', 'confirmed.png']);
+  assert.match(importStatus(h), /uncertain.png: Completion unconfirmed/);
+  assert.match(importStatus(h), /confirmed.png: Stored and confirmed/);
+  assert.match(importStatus(h), /1 of 2 uploaded/);
+  assert.equal(f.uploads.length, 2);
+  assert.equal(f.reads.length, 2, 'The one confirmed file retains the single batch readback');
+});
+
+test('a readable invalid_response rejection remains failed and never counts as stored', async t => {
+  const f = await fixture(t), { h } = f;
+  f.uploadModes.set('new.png', 'readable-invalid-response');
+  await f.import();
+  assert.match(importStatus(h), /new.png: Failed/);
+  assert.doesNotMatch(importStatus(h), /Completion unconfirmed|Stored and confirmed/);
+  assert.match(importStatus(h), /0 of 1 uploaded/);
+});
+
+for (const mode of ['missing-ok', 'invalid-ok']) {
+  test(`matching path and bytes with ${mode} cannot confirm an upload`, async t => {
+    const f = await fixture(t), { h } = f;
+    f.uploadModes.set('new.png', mode);
+    await f.import();
+    assert.match(importStatus(h), /new.png: Completion unconfirmed/);
+    assert.doesNotMatch(importStatus(h), /Stored and confirmed/);
+    assert.match(importStatus(h), /0 of 1 uploaded/);
+  });
+}
+
+test('an unreadable 401 acknowledgment stops queued imports and preserves transfer outcomes', async t => {
+  const f = await fixture(t), { h } = f;
+  f.uploadModes.set('first.png', 'malformed-auth');
+  await f.import(['first.png', 'queued.png']);
+  assert.equal(f.uploads.length, 1);
+  assert.equal(h.eval('connectionState'), 'expired');
+  assert.deepEqual(Array.from(h.eval('upload.items.map(item => item.state)')), ['unconfirmed', 'cancelled']);
+  assert.equal(h.eval('upload.completed'), 0);
+  assert.match(h.document.getElementById('connection').textContent, /Pair again/);
+});
 
 test('failed post-import readback retains confirmed upload status and the gallery with usable Retry', async t => {
   const f = await fixture(t), { h } = f;

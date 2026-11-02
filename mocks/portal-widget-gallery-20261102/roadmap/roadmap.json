@@ -1,18 +1,63 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T17:59:28.379993+00:00",
-  "updatedLabel": "2 November 2026 \u00b7 Native credential drafts checked; keyboard candidate withdrawn",
+  "updatedAt": "2026-11-02T18:10:25.000132+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 Photo import acknowledgment fix delivered",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "settings-native-source-drafts",
+  "defaultTask": "photo-upload-acknowledgment",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact optimized 1.80 / code 74. Earlier receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical-phone installation remains open.",
+    "Both rooms have exact optimized1.81/code75. Earlier receipts retain their original acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-upload-acknowledgment",
+      "title": "Photo imports: truthful acknowledgment outcomes",
+      "summary": "Delivered in both rooms. Unreadable replies stay unconfirmed; explicit rejection stays Failed; only valid success counts as stored.",
+      "description": "An image may commit before its reply is damaged. Keep existing transfer history and manual review, without retrying or adding polling. Validate literal success plus exact path/bytes.",
+      "status": "delivered",
+      "verification": "696 browser /3869 JVM passed \u00b7 actual Family old/new proof \u00b7 both exact APKs",
+      "kind": "Browser photo-import correctness and bounded work",
+      "platforms": [
+        "browser",
+        "portal"
+      ],
+      "owner": "Browser engineering / independent source review / Family acceptance",
+      "deployment": "Exact optimized1.81/code75 installed and fully read back in Family and Living. No GitHub publication.",
+      "state": "Final patch changes acknowledgment validation/outcome only. Source and user configuration preserved; previous keyboard candidate remains withdrawn.",
+      "acceptance": [
+        "Unreadable posted replies remain unconfirmed, with no automatic resend.",
+        "Readable rejection stays failed; valid confirmation requires literal ok:true and exact path/bytes.",
+        "Malformed401 stops queued files; mixed outcomes remain independent.",
+        "Manual Refresh shows files without falsely confirming their previous upload.",
+        "Verify real Family behavior, identical both-room artifacts and full saved configuration; remove owned test files."
+      ],
+      "evidence": [
+        {
+          "text": "Actual1.80/1.81 browser outcome comparison; four exact77-byte original readbacks and cleanup.",
+          "source": "docs/portal-photo-upload-acknowledgment-2026-11-02.md"
+        },
+        {
+          "text": "Build/test/artifact/native proof and restoration.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-upload-ack-verification.json"
+        },
+        {
+          "text": "Actual generated-name transfer-panel comparison.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-upload-ack-new.png"
+        }
+      ],
+      "limits": [
+        "No universal latency/FPS speedup",
+        "No physical phone, process retention or natural Dream acceptance",
+        "Living receives identical APK; new functional acceptance focused on Family",
+        "Malformed gateway/auth cases are controlled automated browser regressions",
+        "Living install command lost acknowledgment during self-replacement; complete installed hash proves success."
+      ],
+      "next": "Retain acknowledgment guards. Continue independent authorized product work; exhausted investigations and human music sign-in remain separate."
+    },
     {
       "id": "photo-preview-recovery",
       "title": "Browser photos: recover interrupted previews",

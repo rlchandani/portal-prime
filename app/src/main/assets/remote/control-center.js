@@ -4032,14 +4032,15 @@ async function startUpload(files, path, ticket) {
           timeout: 90000,
         },
       );
-      if (response.path !== `${path}/${file.name}` || response.bytes !== file.size)
+      if (response?.ok !== true || response.path !== `${path}/${file.name}` || response.bytes !== file.size)
         throw new ApiError('upload_unconfirmed');
       item.state = 'confirmed';
       transfer.completed++;
       transfer.bytes += file.size;
     } catch (error) {
       const uncertain =
-        posted && ['aborted', 'timeout', 'unreachable', 'upload_unconfirmed'].includes(error.code);
+        posted && (['aborted', 'timeout', 'unreachable', 'upload_unconfirmed'].includes(error.code) ||
+          (error.code === 'invalid_response' && !error.data));
       item.state = uncertain ? 'unconfirmed' : 'failed';
       item.error = uncertain ? 'incomplete_upload' : error.code;
       transfer.failures.push({ name: file.name, error: item.error });

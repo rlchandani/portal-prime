@@ -1,0 +1,130 @@
+{
+  "recordedAtUtc": "2026-11-02T18:10:25.000132+00:00",
+  "sourceBranch": "codex/photo-upload-acknowledgment-20261102",
+  "versions": {
+    "before": "1.80/code74",
+    "after": "1.81/code75"
+  },
+  "gates": {
+    "browserTests": 696,
+    "newBrowserCases": 8,
+    "jvm": {
+      "tests": 3869,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 406
+    },
+    "finalGradleSeconds": 43
+  },
+  "artifacts": {
+    "artifacts": [
+      {
+        "variant": "debug",
+        "versionName": "1.81",
+        "versionCode": 75,
+        "bytes": 46767603,
+        "sha256": "1d39e960efe67596c85b01589feb693083b66686321253feddc364c9b328afd4"
+      },
+      {
+        "variant": "performance",
+        "versionName": "1.81",
+        "versionCode": 75,
+        "bytes": 25860922,
+        "sha256": "6456706f6648e4da67f22936a681b9e0b7413a191d2eccf90d905483f67a0032"
+      }
+    ],
+    "jvm": {
+      "tests": 3869,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 406
+    },
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "familyBrowser": {
+    "viewport": "390x844",
+    "realStoredFixtureBytes": 77,
+    "controlledFault": "response-only damage after real successful upload",
+    "beforeOutcome": "Failed",
+    "afterOutcomes": [
+      "unconfirmed after empty reply",
+      "unconfirmed after invalid success flag",
+      "failed for explicit409/collision",
+      "confirmed for valid success"
+    ],
+    "uncertainBatch": {
+      "uploads": 2,
+      "automaticRetries": 0,
+      "metadataReadsBeforeRefresh": 0,
+      "manualRefreshReads": 1,
+      "ledgerStillUnconfirmedAfterRefresh": true
+    },
+    "horizontalOverflow": false
+  },
+  "preservation": {
+    "rooms": {
+      "family": {
+        "checks": {
+          "profile": true,
+          "layout": true,
+          "screensaver": true,
+          "installedApkMatchesCandidate": true
+        },
+        "installedSha256": "6456706f6648e4da67f22936a681b9e0b7413a191d2eccf90d905483f67a0032",
+        "bytes": 25860922
+      },
+      "living": {
+        "checks": {
+          "profile": true,
+          "layout": true,
+          "screensaver": true,
+          "installedApkMatchesCandidate": true
+        },
+        "installedSha256": "6456706f6648e4da67f22936a681b9e0b7413a191d2eccf90d905483f67a0032",
+        "bytes": 25860922
+      }
+    },
+    "familyStateChecks": {
+      "originalChromeTaskRetained": true,
+      "manualFrameResumed": true,
+      "enabledServicesAndBindingRetained": true,
+      "fontRetained": true,
+      "ownedTestFilesRemoved": true
+    },
+    "storedOriginals": [
+      {
+        "name": "qa-ack-old-20261102.png",
+        "bytes": 77,
+        "sha256": "d25cf32a53ab2f14f71e7f17d0f2890d476352ec9d56882db13502e9224b4195"
+      },
+      {
+        "name": "qa-ack-new-20261102.png",
+        "bytes": 77,
+        "sha256": "d25cf32a53ab2f14f71e7f17d0f2890d476352ec9d56882db13502e9224b4195"
+      },
+      {
+        "name": "qa-ack-flag-20261102.png",
+        "bytes": 77,
+        "sha256": "d25cf32a53ab2f14f71e7f17d0f2890d476352ec9d56882db13502e9224b4195"
+      },
+      {
+        "name": "qa-ack-confirmed-20261102.png",
+        "bytes": 77,
+        "sha256": "d25cf32a53ab2f14f71e7f17d0f2890d476352ec9d56882db13502e9224b4195"
+      }
+    ],
+    "assetMatchesCurrentSource": true,
+    "livingInstallCommand": "transport failed during self-replacement; authoritative full installed APK readback decides success",
+    "host": "Family manual PhotoFramePreviewActivity",
+    "notClaimed": "natural Dream recovery, process retention, universal performance or physical phone acceptance"
+  },
+  "independentReview": "source-only; final diff has no actionable finding",
+  "limits": [
+    "No universal latency/FPS speedup",
+    "No physical phone, process retention or natural Dream acceptance",
+    "Living receives identical APK; new functional acceptance focused on Family",
+    "Malformed gateway/auth cases are controlled automated browser regressions"
+  ]
+}

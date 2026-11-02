@@ -723,5 +723,19 @@
     "evidenceAssetHttp200": 4,
     "footerVersion": "1.80/code74",
     "nativeKeyboardFix": "failed; candidate withdrawn"
+  },
+  "photoUploadAcknowledgment20261102": {
+    "recordedAtUtc": "2026-11-02T18:11:16.671042+00:00",
+    "viewports": [
+      "390x844",
+      "1600x1000"
+    ],
+    "taskRows": 38,
+    "detail": "photo-upload-acknowledgment",
+    "horizontalOverflow": false,
+    "undefinedOrObjectText": false,
+    "evidenceAssetHttp200": 4,
+    "footerVersion": "1.81/code75",
+    "actualFamilyPwa": "old wrong Failed; final unconfirmed/explicit409/valid success observed"
   }
 }
