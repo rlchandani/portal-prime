@@ -88,3 +88,21 @@ YouTube playback or Living interaction occurred.
 Slot **11:53:49–12:23:49 UTC**, including cleanup. Private probe, screenshots,
 native XML and complete baseline receipts:
 `/private/tmp/portal-music-standalone-review-20261102/`.
+
+## Bounded exact-protocol source follow-up
+
+An independent source review mapped the consumed authentication, player/queue,
+volume/group commands, correlated partial replies and update events. The
+[official API page](https://www.music-assistant.io/api/) matches selected
+`player_queues/items` arguments and directs clients to each running server's
+generated `/api-docs`. Its unversioned HTTP examples do not establish the actual
+2.10.9 WebSocket greeting/schema, authentication, command results or events.
+
+Both exact-version PyPI endpoints returned404:
+[`music-assistant`](https://pypi.org/pypi/music-assistant/2.10.9/json) and
+[`music-assistant-server`](https://pypi.org/pypi/music-assistant-server/2.10.9/json).
+No exact artifact or model dependency version was obtained, and no external
+package was executed. No narrowly justified compatibility patch follows from
+these sources; the current guard remains unchanged. Do not repeat the same
+probe without a new exact artifact or authorized server-contract observation.
+This remains research evidence, not newer-server or account playback acceptance.

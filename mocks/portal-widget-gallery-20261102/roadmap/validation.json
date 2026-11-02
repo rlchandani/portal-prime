@@ -348,5 +348,36 @@
     "newEvidenceVisible": true,
     "desktopScreenshotVisuallyReviewed": true,
     "limits": "Four changed-detail checks only; previous all-detail/filter/image checks retain their original scope. Seven additional actual native callback fixtures passed independently; no physical phone, cold transport or performance acceptance."
+  },
+  "compactToolsSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T12:22:39.919732+00:00",
+    "taskCount": 24,
+    "updatedCompanionAndMusicDetailsCheckedAtDesktopAndMobile": true,
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "all24QueueRowsRendered": true,
+    "pageErrors": 0,
+    "newEvidenceVisible": true,
+    "mobileScreenshotVisuallyReviewed": true,
+    "headingWordSpacing": {
+      "beforeMobile": [
+        "A clock you canactually read.",
+        "Clearer settings.Tested controls."
+      ],
+      "afterMobileAndDesktop": [
+        "A clock you can actually read.",
+        "Clearer settings. Tested controls."
+      ],
+      "mobileBrHidden": true,
+      "desktopBrPreserved": true
+    },
+    "limits": "Four changed-detail and two heading checks only; no new native app feature, physical phone, cold transport, music playback or performance acceptance. Eight additional actual native callback methods have independent receipts."
   }
 }

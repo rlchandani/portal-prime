@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 seven additional companion layout tests passed; music playback pending (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 48 scoped companion UI checks passed; music playback pending (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -593,8 +593,8 @@
     },
     {
       "id": "companion-native-ui",
-      "title": "Android companion: rendered settings and menus",
-      "summary": "Earlier 564 unit and 33 rendered tests passed. Seven additional selector/management layout tests now pass; physical Pixel and cold reconnect remain open.",
+      "title": "Android companion: rendered settings, menus and Tools",
+      "summary": "48 unique rendered UI methods passed across three current-APK runs:33+7+8. Includes large-text management and compact Tools; physical Pixel and cold reconnect remain open.",
       "description": "Exercise the built companion after its compatibility/preflight changes. Check disabled-parent settings, viewing versus destinations, input admission and dropdown/overlap regression smoke with explicit fixture/live evidence boundaries.",
       "status": "verified",
       "verification": "Emulator UI verified \u00b7 strict two-room fixture",
@@ -605,7 +605,7 @@
       ],
       "owner": "Companion QA",
       "deployment": "Companion 1.7.1-music-preview / code 13 installed and full APK readback verified in owned API 34 emulator only; no physical phone update.",
-      "state": "Unchanged exact1.7.1/code13: four selector cases at1.3\u00d7 and three management cases at1.3\u00d7/2\u00d7 passed in11.174s on an owned API34 emulator.",
+      "state": "Same exact1.7.1/code13 APK. Latest8 compact Tools/Advanced cases passed in11.157s; owned cleanup and source preservation verified.",
       "acceptance": [
         "Verify exact candidate identity and actual composed settings/menu behavior in an isolated Android environment.",
         "Exercise captured multi-room destinations, disabled-parent metadata, acknowledgement and invalid input admission through the real UI/VM/repository pipeline with an explicitly simulated transport.",
@@ -624,6 +624,10 @@
         {
           "text": "Seven additional existing Android UI tests passed in11.174s, separately from the earlier33. Selector alignment/theme/draft callbacks at1.3\u00d7; management action glyph fit/pagination/callbacks at1.3\u00d7 and2\u00d7. No live transport or physical-phone verdict.",
           "source": "docs/portal-product-operating-state.md; Toolkit docs/companion-qa-isolation-validation-2026-11-02.md"
+        },
+        {
+          "text": "Eight additional existing Android UI methods passed in11.157s. Two narrow Advanced action layouts at1.3\u00d7; six short Tools cases, including four at1.3\u00d7/2\u00d7,48dp actions,200-item list reachability and keyboard confirmation/running guards. Aggregate logs independently contain48 distinct class/method pairs across33+7+8 runs.",
+          "source": "docs/portal-product-operating-state.md; private scoped-ui-aggregate.json and instrumentation.log in /private/tmp/portal-companion-compact-tools-20261102/"
         }
       ],
       "limits": [
@@ -947,6 +951,10 @@
         {
           "text": "Complete Family profile and screensaver reads matched the baseline. Temporary tab/server/reverse/XML cleaned up; original browser tabs preserved; YouTube tab intentionally retained for login.",
           "source": "Private configuration-preservation.json; native cleanup capture"
+        },
+        {
+          "text": "Bounded exact-protocol follow-up: official API HTTP examples match selected queue-items arguments, but no actual2.10.9 greeting/schema/full WebSocket proof. Both exact-version PyPI endpoints404; no artifact obtained and no guard relaxation.",
+          "source": "docs/music-standalone-readiness-2026-11-02.md; https://www.music-assistant.io/api/"
         }
       ],
       "limits": [
@@ -954,7 +962,8 @@
         "Browser route does not supply the full custom native library/queue/room UI. Local native MediaSession controls cannot reconstruct those features.",
         "Native MA client accepts only 2.10.7/schema65; current docs advertise2.10.9. Actual newer API compatibility remains untested.",
         "Full native route still needs an authorized supported standalone host and server-side source setup; HA remains excluded.",
-        "Legacy receiver/audio/performance investigations remain parked."
+        "Legacy receiver/audio/performance investigations remain parked.",
+        "Do not repeat the failed exact-artifact probe or change the version guard without new exact-server contract evidence."
       ],
       "next": "Normal human Google sign-in is pending in Family\u2019s browser. After it, perform the separately scoped official-browser Premium playback and local native-session checks."
     },

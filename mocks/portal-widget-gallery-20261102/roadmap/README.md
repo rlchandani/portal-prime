@@ -181,3 +181,10 @@ The unchanged1.7.1 APK matched actual installed bytes. Ctrl+C cleanup of the
 owned runner preserved the complete original AVD and both Family transports.
 Only the two changed details were checked at desktop/mobile sizes this unit;
 no whole-app, physical Pixel, cold transport or performance verdict.
+
+The compact Tools checkpoint adds8 existing rendered methods in11.157s to the
+same companion APK:48 unique class/method pairs across33+7+8 separate runs.
+The two changed companion/music details passed desktop/mobile checks. Actual
+mobile joined-word headings were reproduced, corrected with literal whitespace
+and checked at both sizes while preserving desktop line breaks. The music
+source follow-up found no exact2.10.9 artifact/contract; no guard was weakened.

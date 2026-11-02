@@ -385,6 +385,31 @@ app version, Portal UI/configuration or music account was changed. The existing
 items. The remaining account, approval, cold-reconnect and physical-phone
 boundaries retain their original scope.
 
+## Compact companion Tools and music source checkpoint — 2 November 2026
+
+Eight additional existing compact Tools/Advanced rendered methods passed in
+**11.157 seconds** on the unchanged exact companion1.7.1 APK. Two narrow
+mirror/app-action cases use1.3× text; six short Tools cases include keyboard
+confirmation/running guards,48dp actions and bounded200-item scrolling.
+Four of the Tools cases exercise both1.3× and2×. They are callback fixtures,
+including the shared Files/Logcat layout, not real room/file/command workflows.
+The earlier33, subsequent7 and current8 are **48 unique methods across three
+separate current-APK runs**, not a single full-suite or performance verdict.
+Owned emulator/source cleanup passed again; no Android code or Portal changed.
+The roadmap's mobile proof headings joined words when desktop `<br>` elements
+were hidden. Literal spaces now fix both headings; mobile/desktop browser checks
+preserve word boundaries, desktop line breaks and zero horizontal overflow.
+
+A disjoint bounded music source review verified the official docs advertise
+2.10.9 and their unversioned HTTP queue example matches selected client
+arguments. The two exact-version PyPI endpoints returned404; no exact server
+artifact, greeting/schema or full WebSocket contract was obtained. The source
+guard remains unchanged. See the
+[readiness follow-up](music-standalone-readiness-2026-11-02.md).
+Do not repeat this artifact probe or claim newer compatibility without new
+exact-server evidence. Account, host and parked receiver/performance boundaries
+remain unresolved; no HA or other server deployment occurred.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:
