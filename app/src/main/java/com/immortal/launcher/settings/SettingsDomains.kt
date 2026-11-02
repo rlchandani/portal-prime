@@ -306,12 +306,14 @@ object SettingsDomains {
                       format = { "${it}s" },
                       help = "Seconds between photos, from 5 to 600.",
                       visible = { _, s -> s.enabled }),
-                  BoolSpec("shuffle", "Shuffle", get = { it.shuffle }, set = ScreensaverConfig::setShuffle),
+                  BoolSpec("shuffle", "Shuffle", get = { it.shuffle }, set = ScreensaverConfig::setShuffle,
+                      visible = { _, s -> s.enabled }),
                   BoolSpec(
                       "includeVideo",
                       "Play videos",
                       get = { it.includeVideo },
-                      set = ScreensaverConfig::setIncludeVideo),
+                      set = ScreensaverConfig::setIncludeVideo,
+                      visible = { _, s -> s.enabled }),
                   // On-device cache: only meaningful for a network source that re-fetches the same
                   // assets every loop (Immich / WebDAV). Hidden for a local folder or the built-in
                   // feed, where there's nothing to save a round-trip on.
@@ -325,7 +327,7 @@ object SettingsDomains {
                               "this device on every loop instead of fetching it again. Videos are " +
                               "shrunk to fit the screen. The frame loads faster and your server does " +
                               "far less work; it uses some of this device's storage.",
-                      visible = { _, s -> s.usesImmich || s.usesDav }),
+                      visible = { _, s -> s.enabled && (s.usesImmich || s.usesDav) }),
                   IntSpec(
                       "cacheBudgetGb",
                       "Storage limit",
@@ -350,13 +352,14 @@ object SettingsDomains {
                       help =
                           "Unplugged, keep showing photos while someone's nearby and sleep when the room " +
                               "empties (saves the battery). Off: the frame stays on, on battery too.",
-                      visible = { c, _ -> DreamPolicy.hasBattery(c) }),
+                      visible = { c, s -> s.enabled && DreamPolicy.hasBattery(c) }),
                   BoolSpec(
                       "showNowPlaying",
                       "Show now playing",
                       get = { it.showNowPlaying },
                       set = ScreensaverConfig::setShowNowPlaying,
-                      help = "Overlay the current track and cover art on the photo frame while music is playing."),
+                      help = "Overlay the current track and cover art on the photo frame while music is playing.",
+                      visible = { _, s -> s.enabled }),
                   // On-by-default and auto-managed: hidden on-device (settings-reimagining Phase 5).
                   // Burn-in reduction should always be on for an always-on frame; the phone remote
                   // can still toggle it if ever needed.
@@ -380,7 +383,8 @@ object SettingsDomains {
                       coerce = { FleetScreensaver.coercePresenceMode(it)?.name },
                       help =
                           "Follow presence: photos while someone's around, screen off (and multi-room " +
-                              "music paused) when the room empties. Always on: a permanent frame on mains power."),
+                              "music paused) when the room empties. Always on: a permanent frame on mains power.",
+                      visible = { _, s -> s.enabled }),
                   IntSpec(
                       "idleSleepMin",
                       "Idle screen-off",
@@ -392,13 +396,15 @@ object SettingsDomains {
                       format = { if (it <= 0) "Off" else "$it min" },
                       help =
                           "After the screensaver shows this long with no touch, the screen turns off; " +
-                              "tap to wake. A simple timer - it can't tell whether someone's in the room."),
+                              "tap to wake. A simple timer - it can't tell whether someone's in the room.",
+                      visible = { _, s -> s.enabled }),
                   BoolSpec(
                       "overnightEnabled",
                       "Overnight screen-off",
                       get = { it.overnightEnabled },
                       set = ScreensaverConfig::setOvernightEnabled,
-                      help = "Keep the screen off (or show a dim night clock) between two times every night."),
+                      help = "Keep the screen off (or show a dim night clock) between two times every night.",
+                      visible = { _, s -> s.enabled }),
                   IntSpec(
                       "overnightStartMin",
                       "Off from",
@@ -410,7 +416,7 @@ object SettingsDomains {
                       wrap = true,
                       timeOfDay = true,
                       format = ::hhmm,
-                      visible = { _, s -> s.overnightEnabled }),
+                      visible = { _, s -> s.enabled && s.overnightEnabled }),
                   IntSpec(
                       "overnightEndMin",
                       "Off until",
@@ -422,20 +428,21 @@ object SettingsDomains {
                       wrap = true,
                       timeOfDay = true,
                       format = ::hhmm,
-                      visible = { _, s -> s.overnightEnabled }),
+                      visible = { _, s -> s.enabled && s.overnightEnabled }),
                   BoolSpec(
                       "overnightNightClock",
                       "Show a dim night clock",
                       get = { it.overnightNightClock },
                       set = ScreensaverConfig::setOvernightNightClock,
-                      visible = { _, s -> s.overnightEnabled }),
+                      visible = { _, s -> s.enabled && s.overnightEnabled }),
                   BoolSpec(
                       "darkRoomClock",
                       "Clock when the room is dark",
                       get = { it.darkRoomClock },
                       set = ScreensaverConfig::setDarkRoomClock,
                       help = "A dim clock replaces photos after 20 seconds of darkness. Photos resume " +
-                          "when the lights return. Requires a light sensor; no camera is used."),
+                          "when the lights return. Requires a light sensor; no camera is used.",
+                      visible = { _, s -> s.enabled }),
                   IntSpec(
                       "darkRoomLux",
                       "Darkness threshold",
@@ -443,7 +450,7 @@ object SettingsDomains {
                       set = ScreensaverConfig::setDarkRoomLux,
                       min = 1, max = 20, step = 1,
                       format = { "$it lux" },
-                      visible = { _, s -> s.darkRoomClock }),
+                      visible = { _, s -> s.enabled && s.darkRoomClock }),
                   IntSpec(
                       "nightClockBrightness",
                       "Night clock brightness",
@@ -451,7 +458,8 @@ object SettingsDomains {
                       set = ScreensaverConfig::setNightClockBrightness,
                       min = 1, max = 15, step = 1,
                       format = { "$it%" },
-                      visible = { _, s -> s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock) }),
+                      visible = { _, s -> s.enabled &&
+                          (s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock)) }),
                   EnumSpec(
                       "nightClockTone",
                       "Night clock colour",
@@ -459,7 +467,8 @@ object SettingsDomains {
                       set = ScreensaverConfig::setNightClockTone,
                       options = listOf("warm" to "Warm", "red" to "Red"),
                       coerce = { it.takeIf { value -> value == "warm" || value == "red" } },
-                      visible = { _, s -> s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock) }),
+                      visible = { _, s -> s.enabled &&
+                          (s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock)) }),
                   // NOTE: `feed` (Photo feed picker) removed — PhotoFrameController hardcodes the
                   // built-in source chain and never read the setting. See settings-reimagining-audit.
                   BoolSpec(
@@ -467,7 +476,8 @@ object SettingsDomains {
                       "Sleep timer",
                       get = { it.sleepTimerEnabled },
                       set = ScreensaverConfig::setSleepTimerEnabled,
-                      help = "Turn the screensaver off after a set time."),
+                      help = "Turn the screensaver off after a set time.",
+                      visible = { _, s -> s.enabled }),
                   IntSpec(
                       "sleepTimerMin",
                       "Sleep after",
@@ -477,19 +487,19 @@ object SettingsDomains {
                       max = 240,
                       step = 5,
                       format = { "$it min" },
-                      visible = { _, s -> s.sleepTimerEnabled }),
+                      visible = { _, s -> s.enabled && s.sleepTimerEnabled }),
                   BoolSpec(
                       "pauseAudioOnSleep",
                       "Pause audio on sleep",
                       get = { it.pauseAudioOnSleep },
                       set = ScreensaverConfig::setPauseAudioOnSleep,
-                      visible = { _, s -> s.sleepTimerEnabled }),
+                      visible = { _, s -> s.enabled && s.sleepTimerEnabled }),
                   BoolSpec(
                       "closeAppOnSleep",
                       "Close app on sleep",
                       get = { it.closeAppOnSleep },
                       set = ScreensaverConfig::setCloseAppOnSleep,
-                      visible = { _, s -> s.sleepTimerEnabled }),
+                      visible = { _, s -> s.enabled && s.sleepTimerEnabled }),
                   EnumSpec(
                       "soundscape",
                       "Ambient sound",
@@ -497,7 +507,8 @@ object SettingsDomains {
                       set = ScreensaverConfig::setSoundscape,
                       options = ScreensaverConfig.SOUNDSCAPES.map { it to ScreensaverConfig.soundscapeLabel(it) },
                       coerce = { v -> v.takeIf { it in ScreensaverConfig.SOUNDSCAPES } },
-                      help = "Synthesised ambient sound played while the screensaver shows."),
+                      help = "Synthesised ambient sound played while the screensaver shows.",
+                      visible = { _, s -> s.enabled }),
                   IntSpec(
                       "soundscapeVolume",
                       "Soundscape volume",
@@ -507,22 +518,25 @@ object SettingsDomains {
                       max = 100,
                       step = 5,
                       format = { "$it%" },
-                      visible = { _, s -> s.soundscape != ScreensaverConfig.SOUND_OFF }),
+                      visible = { _, s -> s.enabled && s.soundscape != ScreensaverConfig.SOUND_OFF }),
                   BoolSpec(
                       "ambientDashboard",
                       "Ambient dashboard",
                       get = { it.ambientDashboard },
-                      set = ScreensaverConfig::setAmbientDashboard),
+                      set = ScreensaverConfig::setAmbientDashboard,
+                      visible = { _, s -> s.enabled }),
                   BoolSpec(
                       "gestureWave",
                       "Gesture wave to wake",
                       get = { it.gestureWave },
-                      set = ScreensaverConfig::setGestureWave),
+                      set = ScreensaverConfig::setGestureWave,
+                      visible = { _, s -> s.enabled }),
                   BoolSpec(
                       "welcomeEnabled",
                       "Welcome screen",
                       get = { it.welcomeEnabled },
-                      set = ScreensaverConfig::setWelcomeEnabled),
+                      set = ScreensaverConfig::setWelcomeEnabled,
+                      visible = { _, s -> s.enabled }),
               ),
           sections =
               mapOf(

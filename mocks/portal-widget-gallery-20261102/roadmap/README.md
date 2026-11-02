@@ -46,3 +46,10 @@ See `validation.json` for the bounded browser receipt. This is not native device
 acceptance or a complete accessibility/performance audit.
 
 The later timer snapshot adds the accepted native timer fix and a dialog-only native capture (`images/timer-editor-native.png`). Browser data updates do not imply repeat acceptance of older features.
+
+The visibility snapshot records exact 1.68 / code 62 in both rooms, Family scoped
+settings acceptance, 3,800 JVM / 654 JS tests, and the separate committed phone
+preflight correction (564 tests, uninstalled). Current version and queue copy
+were refreshed. All thirteen mobile detail panels and the desktop update fit
+without horizontal overflow; served JSON matched the source file. Earlier
+filter/Portal-viewport checks above retain their original snapshot scope.

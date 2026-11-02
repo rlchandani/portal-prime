@@ -53,5 +53,24 @@
     "horizontalOverflow": false,
     "nativeDialogImageHttpStatus": 200,
     "limits": "Original broader filter/desktop checks above belong to the earlier snapshot; no native timer acceptance is inferred from browser checks."
+  },
+  "settingsVisibilitySnapshotUpdate": {
+    "version": "1.68",
+    "taskCount": 13,
+    "portalTask": "delivered",
+    "companionPreflight": "locally verified; uninstalled",
+    "all13MobileDetailsCheckedAfterReload": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "servedJsonExactlyMatchesFile": true,
+    "screenshotsVisuallyReviewed": true,
+    "limits": "Saved roadmap browser checks only; actual Portal/PWA acceptance and independent companion gates are in the named delivery receipt."
   }
 }

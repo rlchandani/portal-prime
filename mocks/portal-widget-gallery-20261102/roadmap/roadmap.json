@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 1.67 delivered to both rooms (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 visibility delivered; companion preflight locally verified (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "timer-ownership",
+  "defaultTask": "settings-visibility",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact 1.67 / code 61. Family timer acceptance passed; phone maintenance is not installed.",
+    "Both rooms have exact 1.68 / code 62. Family scoped settings acceptance passed; phone maintenance remains uninstalled.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -16,8 +16,8 @@
     {
       "id": "companion-compat",
       "title": "Android companion compatibility guards",
-      "summary": "555 tests / 73 suites passed. Debug and test APKs built; physical phone acceptance remains open.",
-      "description": "Protect capability fallback and reject stale responses when a phone switches rooms or sessions. Work is isolated on codex/companion-compat-20261102, using the preserved companion source.",
+      "summary": "564 tests / 74 suites passed. Multi-room inactive-settings preflight is corrected; the phone APK is not installed.",
+      "description": "Protect capability fallback and stale room/session responses. Multi-room settings validation now reads complete per-domain inactive metadata while display reads remain visibility-filtered.",
       "status": "verified",
       "verification": "Locally verified \u00b7 not deployed",
       "kind": "Regression protection",
@@ -27,7 +27,7 @@
       ],
       "owner": "Companion lead",
       "deployment": "Local 1.7.0-music-preview / code 12 APK built; no phone installation",
-      "state": "Final full gate exited 0; 555 tests / 73 suites, no failures/errors/skips",
+      "state": "Latest full JVM/debug gate exited 0; 564 tests / 74 suites, no failures, errors or skips.",
       "acceptance": [
         "Cover 404 / 405 / 501 capability fallback without treating authentication, network or schema failures as unsupported capability.",
         "Reject a delayed response from a former room or session.",
@@ -49,6 +49,10 @@
         {
           "text": "Maintenance committed as 610899f7074323e24832caa9f0d52e3db8a7b5fd. Debug APK SHA-256: 9ce56c077517e5a92ec5e10858926fe70b3c54aceb7ea46b873d40e5c1b1359e. Neither APK was installed or run.",
           "source": "Toolkit docs/companion-compatibility-validation-2026-11-02.md"
+        },
+        {
+          "text": "Group-preflight fix committed as d2ab33982af13693a8a984912e921cbf2f41802f. Nine new tests, 33 focused and 564 full JVM tests passed; debug APK SHA-256 e319fb1486e6ad06dfa4bb3418a469acc75ee815c1688ec1bafba06c4cec0d9b. APK is uninstalled.",
+          "source": "docs/portal-settings-visibility-web-review-2026-11-02.md"
         }
       ],
       "limits": [
@@ -56,12 +60,12 @@
         "Historical phone receipts do not prove current native UI, installed identity or end-to-end playback.",
         "No phone rewrite or HA music service setup is included."
       ],
-      "next": "Phone maintenance is committed but uninstalled. Keep live playback/native phone checks separate; settings visibility is next."
+      "next": "Physical companion installation and native/live acceptance remain open. Local-only release readiness is next."
     },
     {
       "id": "settings-contract",
       "title": "Native settings editor contract",
-      "summary": "3,796 tests / 398 suites passed; maintenance is included in installed 1.67. Fresh settings UI acceptance remains open.",
+      "summary": "3,800 tests / 399 suites passed; maintenance is included in installed 1.68. Scoped Slideshow UI acceptance is separate from every-editor acceptance.",
       "description": "Replace the obsolete inline-string prohibition with classification and projection coverage for the renderer's actual supported editors. This protects the existing settings behavior.",
       "status": "verified",
       "verification": "Locally verified \u00b7 included in deployed APK",
@@ -70,7 +74,7 @@
         "portal"
       ],
       "owner": "Settings QA / Main",
-      "deployment": "Included in exact 1.67 APK in both rooms; no fresh native settings interaction run",
+      "deployment": "Included in exact1.68 APK in both rooms; scoped Slideshow checks do not establish every editor.",
       "state": "Terminal local gates passed in 3m 58s",
       "acceptance": [
         "Cover real registry editor selection, including inline and Activity-backed strings, fleet name and dashboard URL.",
@@ -93,10 +97,9 @@
       ],
       "limits": [
         "Classification and projection tests do not prove composed controls or native interaction.",
-        "Built APKs are local verification artifacts; neither room has this maintenance increment deployed.",
         "No new visible feature or widget redesign is claimed."
       ],
-      "next": "Keep renderer UI acceptance distinct from classification tests. Shared visibility policy is next."
+      "next": "Keep full renderer UI acceptance separate from classification tests; shared screensaver visibility is now delivered."
     },
     {
       "id": "timer-ownership",
@@ -110,7 +113,7 @@
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Exact optimized 1.67 / code 61 in Family Area and Living Area",
+      "deployment": "Preserved in exact1.68 APK in both rooms; original feature acceptance remains scoped to its named receipt.",
       "state": "Accepted in the 30-minute slot; original Family layout, Home page and screensaver configuration restored.",
       "acceptance": [
         "Reproduce the widget/editor behavior on the existing owner path before labeling it a runtime defect.",
@@ -148,19 +151,20 @@
     },
     {
       "id": "settings-visibility",
-      "title": "Agree disabled-parent settings visibility",
-      "summary": "Next: settle native / browser disabled-parent presentation policy, then align the shared setting surfaces.",
-      "description": "Native preparation hides disabled screensaver children while the remote schema can expose ordinary children through spec predicates. The intended shared policy needs to be explicit.",
-      "status": "queued",
-      "verification": "Policy pending \u00b7 source only",
-      "kind": "Shared settings policy",
+      "title": "Screensaver settings: consistent parent visibility",
+      "summary": "Delivered in both rooms. Disabled schema 16 \u2192 1; actual mobile PWA 11 \u2192 1. Saved choices and validated inactive writes preserved.",
+      "description": "Twenty-four registered parent predicates now align generic screensaver visibility. Advanced keeps inactive children hidden; calendar remains independent. Native, API and mobile checks passed on Family.",
+      "status": "delivered",
+      "verification": "Family native/API/mobile acceptance \u00b7 exact APK in both rooms",
+      "kind": "Shared settings correctness",
       "platforms": [
         "portal",
-        "browser"
+        "browser",
+        "companion"
       ],
       "owner": "Settings architecture",
-      "deployment": "No change built or deployed",
-      "state": "Queued next after accepted timer delivery and restored test state.",
+      "deployment": "Exact optimized 1.68 / code 62 installed on Family and Living; the separate phone fix is not installed.",
+      "state": "3,800 JVM tests / 399 suites, both APK builds and 654 JS tests passed; all 36 Family configuration fields restored.",
       "acceptance": [
         "Document intended shared-setting exceptions and presentation eligibility.",
         "Cover enabled/disabled \u00d7 Advanced \u00d7 source/style in real registered-domain projections and schemas.",
@@ -168,16 +172,36 @@
       ],
       "evidence": [
         {
-          "text": "prepareSettingsVisibility and SettingsDomain.schemaJson use different presentation paths.",
-          "source": "docs/design/portal-settings-registry-audit-2026-11-02.md; docs/portal-product-operating-state.md"
+          "text": "Installed 1.67 baseline: disabled ordinary schema exposed 16 controls; the actual 390 \u00d7 844 mobile PWA exposed 11 ordinary settings rows, excluding category. Original settings were restored exactly.",
+          "source": "Private API/browser baseline receipts, 2026-11-02"
+        },
+        {
+          "text": "Four registered-domain assertion failures reproduced missing parent gates. Four candidate tests now pass, including 532 enabled/tier/source/style combinations, inactive writes, preservation and calendar checks.",
+          "source": "ScreensaverVisibilityParityTest.kt; private red/green XML"
+        },
+        {
+          "text": "Two shipped PWA-controller guards passed; all 654 JS tests passed. An in-memory stale-control mutation failed both guards. Synthetic fixtures do not prove Kotlin or live HTTP.",
+          "source": "docs/portal-settings-visibility-web-review-2026-11-02.md"
+        },
+        {
+          "text": "Live 1.68: disabled ordinary schema and mobile basic/Advanced states expose one control. Inactive metadata and complete profile retain 33 controls; a valid hidden shuffle write applied and invalid brightness 99 was rejected.",
+          "source": "docs/portal-settings-visibility-delivery-2026-11-02.md"
+        },
+        {
+          "text": "Native two-pane hide/re-enable passed. All 36 saved fields and Home page 1 of 2 were restored. Both installed APKs match SHA-256 271d3b1dc5b4dab2e57fb686ad7c19bf015d126b22271e536044cadca1e8e343, 25,860,666 bytes.",
+          "source": "Family acceptance and both-room installed readback receipts, 2026-11-02"
+        },
+        {
+          "text": "Companion preflight fix d2ab3398 passed 33 focused and 564 full JVM tests plus debug assembly. Main reviewed the diff and fresh XML totals. Phone installation and native acceptance are unverified.",
+          "source": "docs/portal-settings-visibility-web-review-2026-11-02.md"
         }
       ],
       "limits": [
-        "No reproduced native/browser runtime failure is claimed.",
-        "Presentation alignment does not imply a blanket apply restriction.",
-        "Offline schema checks and later native/browser checks are separate gates."
+        "Companion group preflight is corrected and locally verified (564 tests); that phone APK is not installed. Older clients should enable selected rooms before editing children.",
+        "The live PWA capture showed an Offline banner despite successful management responses; this discrepancy is outside the visibility fix.",
+        "Separate calendar/bespoke editors retain their owners; no storage migration or general performance claim."
       ],
-      "next": "Record the shared policy, then test the real domain visibility matrix before changing presentation."
+      "next": "Local-only release readiness is next. Physical companion installation/acceptance remains open; exhausted issues stay parked."
     },
     {
       "id": "local-readiness",
@@ -277,7 +301,7 @@
     {
       "id": "world-clock",
       "title": "World Clock: complete rows & city counts",
-      "summary": "World Clock normal and 150% acceptance passed on 1.66; the fix is preserved in current 1.67 on both rooms.",
+      "summary": "World Clock normal and 150% acceptance passed on 1.66; the fix is preserved in current 1.68 on both rooms.",
       "description": "The existing 488 \u00d7 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
       "status": "delivered",
       "verification": "Device proof \u00b7 both rooms",
@@ -286,7 +310,7 @@
         "portal"
       ],
       "owner": "Native / QA",
-      "deployment": "Delivered previously; preserved in current exact 1.67 / code 61 on both rooms. Original native acceptance is recorded separately.",
+      "deployment": "Preserved in exact1.68 APK in both rooms; original feature acceptance remains scoped to its named receipt.",
       "state": "Delivered within bounded acceptance",
       "acceptance": [
         "Family normal text: two complete cities; three cities show \u201c1 more city\u201d; four show \u201c2 more cities.\u201d",
@@ -317,7 +341,7 @@
     {
       "id": "photo-alarm",
       "title": "Photo Memory routing & alarm countdown",
-      "summary": "1.65 scoped native acceptance passed; both fixes are preserved in current 1.67 on both rooms.",
+      "summary": "1.65 scoped native acceptance passed; both fixes are preserved in current 1.68 on both rooms.",
       "description": "Photo Memory editing opens Photo sources even with idle slideshow disabled. The active-page alarm caption observes saved configuration, rounds partial minutes up and refreshes at minute boundaries.",
       "status": "delivered",
       "verification": "Device proof \u00b7 both rooms",
@@ -326,7 +350,7 @@
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Delivered previously; preserved in current exact 1.67 / code 61 on both rooms. Original native acceptance is recorded separately.",
+      "deployment": "Preserved in exact1.68 APK in both rooms; original feature acceptance remains scoped to its named receipt.",
       "state": "Scoped native acceptance passed",
       "acceptance": [
         "Family source entry works with idle slideshow disabled and enabled; Back returns through Photos to Home.",
@@ -353,7 +377,7 @@
     {
       "id": "ci-regressions",
       "title": "Bundled JavaScript & Python CI guards",
-      "summary": "Implemented / locally verified: 652 JS and 140 Python tests. Hosted execution unobserved.",
+      "summary": "Implemented and locally verified: latest full JS suite 654 tests; Python gate receipt 140 tests. Hosted execution remains unobserved.",
       "description": "The workflow now includes all 29 existing bundled-JavaScript regression modules and seven Portal Python modules, alongside retained JVM and slideshow gates.",
       "status": "delivered",
       "verification": "Implemented / locally verified",

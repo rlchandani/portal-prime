@@ -1,6 +1,6 @@
 {
-  "versionCode": 61,
-  "versionName": "1.67",
+  "versionCode": 62,
+  "versionName": "1.68",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "World clock widgets fit complete city rows to their available height and text scale, with a clear count of remaining cities."
+  "notes": "Screensaver settings consistently hide dependent controls when disabled, while preserving saved choices and validated inactive updates."
 }
