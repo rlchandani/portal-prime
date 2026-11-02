@@ -1,18 +1,64 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T21:12:20.708358+00:00",
-  "updatedLabel": "Companion backup preview \u00b7 verified native cancellation",
+  "updatedAt": "2026-11-02T21:41:20.985577+00:00",
+  "updatedLabel": "Companion display-image budgets \u00b7 native candidate verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "companion-backup-preview",
+  "defaultTask": "companion-display-images",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms retain exact optimized Portal1.85/code79. Companion1.7.6/code18 backup preview is verified in an isolated Android emulator; earlier receipts retain their versions. Physical-phone installation remains open.",
+    "Both rooms retain exact optimized Portal1.85/code79. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "companion-display-images",
+      "title": "Phone photos and app icons: decode only display-sized bitmaps",
+      "status": "verified",
+      "summary": "Oversized native bitmap allocations bounded.651JVM and13native methods/14executions pass; normal pixels remain identical. Physical phone and universal flake elimination remain unproved.",
+      "description": "The current compressed-byte cache limits do not limit decoded bitmap dimensions. Add bounds-first sampling for grid photos, previews and app icons while retaining existing original bytes, session ownership and UI.",
+      "verification": "651JVM \u00b713native methods/14executions \u00b748MiB\u21920.75MiB generated grid case",
+      "kind": "Native companion memory and rendering performance",
+      "platforms": [
+        "companion"
+      ],
+      "owner": "Companion engineering / independent sampling worker / native Android QA",
+      "deployment": "Candidate1.7.7/code19 fully read back only in ownedAPI34 clone, now removed. Both Portals remain1.85/code79; physical phone open.",
+      "state": "Final decoder and100%/130% preview checks pass. Earlier spinner failures retained; exact root cause not claimed. Both clones/source AVD cleanup passed.",
+      "acceptance": [
+        "Measure the generated compressed4096\u00d73072 photo through the existing raw decoder and bounded candidate.",
+        "Cap decoded grid sides at512px, preview at1024px and app icons at256px; preserve small image dimensions and alpha.",
+        "Use Long-safe ceiling rounding and the Android power-of-two decoder contract.",
+        "Retain photo crop/fit, error/Retry, cancellation, session-owned network/cache and original image bytes.",
+        "Run JVM/build/native image and preview workflows; prove exact installed candidate and source-AVD cleanup."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped implementation, metrics, earlier failures and final verification.",
+          "source": "docs/portal-companion-display-images-2026-11-02.md"
+        },
+        {
+          "text": "Actual generated bitmap/normal control metrics and exact final artifact.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/companion-display-images-verification.json"
+        }
+      ],
+      "limits": [
+        "Current Portal already generates bounded512px photo thumbnails; ordinary current-server photos are not claimed to use less memory.",
+        "Large JPEG allocation benefits apply to oversized/older or incorrect endpoint responses; no owner image or OOM was reproduced.",
+        "Single large-image decode samples and five normal control pairs are emulator observations, not FPS, whole heap, GPU texture or physical Pixel acceptance.",
+        "Earlier spinner timeouts and a font readiness mismatch remain in private logs; final strengthened candidate passed, but universal elimination of intermittency is not claimed.",
+        "No actual icon-list, live photo-server or whole-app UI acceptance; native decoder targets and generated preview workflow are scoped."
+      ],
+      "next": "Install exact companion candidate when a physical phone is available; preserve the documented native scope and earlier failure history.",
+      "issueClock": {
+        "startedAt": "2026-11-02T21:14:39Z",
+        "deadline": "2026-11-02T21:44:39Z",
+        "firstDiscoveryClockRetained": true,
+        "scope": "Bound native companion photo-thumbnail, photo-preview and app-icon bitmap decoding; retain bytes/session cache and existing UI"
+      }
+    },
     {
       "id": "companion-backup-preview",
       "title": "Phone backup preview: cancel safely and bound archive work",

@@ -724,3 +724,19 @@ Roadmap: **48tracked tasks:21delivered/implemented,19scoped verified,5parked,
 retain Portal1.85/code79; Weather approval is retained while its exhausted clipping
 unit stays parked. No publication, HA or Portal command was performed. Original
 **20:51:32–21:21:32UTC** discovery clock includes cleanup.
+
+## 2026-11-02 — Companion display-image budgets verified
+
+Companion1.7.7/code19 bounds decoded grid/preview/icon sides at512/1024/256px and
+observes preview state at its owning composition. Generated oversized fixture:
+48MiB raw→0.75MiB grid,3MiB preview,0.1875MiB icon. Current Portal thumbnails
+are already bounded; ordinary control pixels/allocation are identical.651JVM/
+81suites and final13native methods/14executions passed. Earlier UI failures and
+font mismatch are retained; exact root cause/universal intermittency removal,
+physical phone/live server/full app acceptance remain unproved. Exact installed
+emulator APK and both owned-clone/source-AVD cleanup passed; independent agent
+closed. See [receipt](portal-companion-display-images-2026-11-02.md).
+
+Roadmap:49tasks,21delivered,20scoped verified,5parked,2approval,1queued. Both
+Portals retain1.85/code79. No Portal/config/owner-photo/GitHub/HA operation.
+Original21:14:39–21:44:39UTC clock includes all discovery, fixtures and cleanup.

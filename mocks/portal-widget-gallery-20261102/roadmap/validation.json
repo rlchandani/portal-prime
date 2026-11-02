@@ -993,5 +993,24 @@
     "servedSnapshotMatchesSource": true,
     "snapshotSha256": "b8b776deb23e7ad730aa841ff62d22b3c8b6a62b54c2a66d3da4745bf42da60b",
     "scope": "Updated backup task,48rows,version footer and public evidence only; not all48workflows, full Devices pixels or physical-phone acceptance."
+  },
+  "displayImagesScopedReview": {
+    "checkedAt": "2026-11-02T21:43:04.282150+00:00",
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        1600,
+        1000
+      ]
+    ],
+    "taskRows": 49,
+    "horizontalOverflow": false,
+    "selectedTask": "companion-display-images",
+    "selectedDetailHasFinal651TestsAndCandidate177": true,
+    "receiptAndBothImageComponentsHttp200": true,
+    "scope": "Selected task and evidence availability only; no all-task workflow or physical phone claim"
   }
 }

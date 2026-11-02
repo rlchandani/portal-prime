@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-02T21:41:20.981058+00:00",
+  "scope": "Native companion display bitmap budgets and generated photo dialog workflows",
+  "status": "verified",
+  "issueClock": {
+    "startedAt": "2026-11-02T21:14:39Z",
+    "deadline": "2026-11-02T21:44:39Z",
+    "firstDiscoveryClockRetained": true,
+    "scope": "Bound native companion photo-thumbnail, photo-preview and app-icon bitmap decoding; retain bytes/session cache and existing UI"
+  },
+  "artifact": {
+    "package": "com.portalinstaller",
+    "versionCode": 19,
+    "versionName": "1.7.7-music-preview",
+    "bytes": 14738973,
+    "sha256": "1fae356ced42470f0775eb382bf64fcacde4c7f88ebe0072f64f818a1e08aa47",
+    "signerMatchesAccepted176": true
+  },
+  "jvm": {
+    "tests": 651,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 81
+  },
+  "newJvmMethods": 19,
+  "policyBoundaryMatrixCases": 2890,
+  "native": {
+    "uniqueMethods": 13,
+    "acceptedExecutions": 14,
+    "decodeMethods": 5,
+    "normalPreviewMethods": 8,
+    "largeTextPreviewMethods": 1,
+    "actualPreviewFontScales": [
+      1.0,
+      1.3
+    ],
+    "generatedAllocation": {
+      "compressedBytes": 273259,
+      "baseline": {
+        "width": 4096,
+        "height": 3072,
+        "allocationBytes": 50331648,
+        "decodeNanos": 27830291
+      },
+      "displaySamples": [
+        {
+          "width": 512,
+          "height": 384,
+          "allocationBytes": 786432,
+          "decodeNanos": 2581708,
+          "maxEdge": 512
+        },
+        {
+          "width": 1024,
+          "height": 768,
+          "allocationBytes": 3145728,
+          "decodeNanos": 3430792,
+          "maxEdge": 1024
+        },
+        {
+          "width": 256,
+          "height": 192,
+          "allocationBytes": 196608,
+          "decodeNanos": 2581042,
+          "maxEdge": 256
+        }
+      ]
+    },
+    "ordinaryThumbnailControl": {
+      "pixelsIdentical": true,
+      "samplesPerDecoder": 5,
+      "baselineMedianMs": 0.196334,
+      "boundedMedianMs": 0.210958,
+      "allocationBytes": 786432
+    },
+    "actualPreviewImageCapturesReviewed": true,
+    "pixelsScope": "Generated image component only; not the full phone page/dialog or physical phone"
+  },
+  "baseline": {
+    "mode": "Source-equivalent existing raw BitmapFactory call in a neutral native decoder scaffold",
+    "nativeBudgetFailureObserved": true,
+    "historicalOldApkUiOrOomReproduced": false
+  },
+  "review": {
+    "productionAndParentObservationReviewed": true,
+    "concreteProductionRiskFound": false,
+    "rootCauseOfEarlierSpinnerTimeoutsProven": false,
+    "initialUiFailuresRetained": true,
+    "renderedFontMismatchNegativeControlCaught": true,
+    "fixtureNowAwaitsRenderedResourcesAndIoCompletion": true,
+    "ioCompletionAloneDoesNotProveImagePublication": true
+  },
+  "restoration": {
+    "ownedCloneCount": 2,
+    "bothSourceUnchanged": true,
+    "bothOwnedResourcesRemoved": true,
+    "bothRunnerTerminalExit": 130,
+    "unrelatedEmulatorRetained": true,
+    "familyTransportsRetained": true,
+    "independentAgentClosed": true
+  },
+  "deployment": {
+    "ownedEmulatorOnly": true,
+    "physicalPhoneInstalled": false,
+    "portalSourceApkConfigurationChanged": false
+  },
+  "limits": [
+    "Current Portal already generates bounded512px photo thumbnails; ordinary current-server photos are not claimed to use less memory.",
+    "Large JPEG allocation benefits apply to oversized/older or incorrect endpoint responses; no owner image or OOM was reproduced.",
+    "Single large-image decode samples and five normal control pairs are emulator observations, not FPS, whole heap, GPU texture or physical Pixel acceptance.",
+    "Earlier spinner timeouts and a font readiness mismatch remain in private logs; final strengthened candidate passed, but universal elimination of intermittency is not claimed.",
+    "No actual icon-list, live photo-server or whole-app UI acceptance; native decoder targets and generated preview workflow are scoped."
+  ],
+  "references": [
+    "https://developer.android.com/topic/performance/graphics/load-bitmap",
+    "https://developer.android.com/develop/ui/compose/graphics/images/optimization"
+  ],
+  "sourceCommit": "099b22dc71b877c979fc756b0a598dc8028841a1"
+}
