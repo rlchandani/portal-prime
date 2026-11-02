@@ -26,9 +26,11 @@ internal fun ApprovedHomeWeather(modifier: Modifier = Modifier) {
   val context = LocalContext.current
   var fahrenheit by remember { mutableStateOf(ImmortalSettings.useFahrenheit(context)) }
   var mode by remember { mutableStateOf(ImmortalSettings.load(context).weatherWidget) }
+  var use24Hour by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
   OnResume {
     fahrenheit = ImmortalSettings.useFahrenheit(context)
     mode = ImmortalSettings.load(context).weatherWidget
+    use24Hour = ImmortalSettings.use24HourClock(context)
   }
   val current by produceHomeState<Weather.Current?>(null, fahrenheit) {
     while (true) {
@@ -42,6 +44,7 @@ internal fun ApprovedHomeWeather(modifier: Modifier = Modifier) {
       homeRefreshDelay(if (value == null) 60_000L else 30L * 60 * 1000)
     }
   }
+  val hourLabels = remember(forecast, use24Hour) { forecast?.hourLabels(use24Hour).orEmpty() }
   Column(modifier.padding(30.dp)) {
     ApprovedHomeWidgetHeading("Weather", "weather") { context.openApprovedHomeSettings("weather") }
     Spacer(Modifier.height(22.dp))
@@ -66,9 +69,9 @@ internal fun ApprovedHomeWeather(modifier: Modifier = Modifier) {
       if (mode != ImmortalSettings.WIDGET_OFF) {
         Spacer(Modifier.height(18.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          if (mode == ImmortalSettings.WIDGET_HOURLY) forecast?.hours?.take(5)?.forEach {
+          if (mode == ImmortalSettings.WIDGET_HOURLY) forecast?.hours?.take(5)?.forEachIndexed { index, it ->
             Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(it.label, color = ApprovedHomePalette.Secondary, fontSize = 18.sp, lineHeight = 24.sp)
+              Text(hourLabels[index], color = ApprovedHomePalette.Secondary, fontSize = 18.sp, lineHeight = 24.sp)
               Text(Weather.emoji(it.code), fontSize = 24.sp, lineHeight = 32.sp)
               Text("${it.temp}°", color = ApprovedHomePalette.Text, fontSize = 22.sp, lineHeight = 30.sp)
             }

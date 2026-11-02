@@ -206,6 +206,35 @@ class WeatherTest {
     assertEquals("14", hours[1].label)
   }
 
+  @Test
+  fun `cached forecast follows both clock formats without replacing weather data`() {
+    val forecast = Weather.parseForecast(sample, utc("2026-06-07T13:30"), false)
+    val original = forecast.hours.toList()
+
+    assertEquals("Now", forecast.hourLabels(true).first())
+    assertEquals("14", forecast.hourLabels(true)[1])
+    assertEquals("00", forecast.hourLabels(true).last())
+    assertEquals("2 PM", forecast.hourLabels(false)[1])
+    assertEquals("12 AM", forecast.hourLabels(false).last())
+    assertEquals(original, forecast.hours)
+
+    val initially24 = Weather.parseForecast(sample, utc("2026-06-07T13:30"), true)
+    assertEquals("2 PM", initially24.hourLabels(false)[1])
+    assertEquals("14", initially24.hourLabels(true)[1])
+  }
+
+  @Test
+  fun `cached hourly formatting retains provider time after device timezone changes`() {
+    val json = sample.replace("\"daily\": {", "\"utc_offset_seconds\": 20700, \"daily\": {")
+    val forecast = Weather.parseForecast(json, utc("2026-06-07T07:45"), false)
+    TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"))
+
+    assertEquals("14", forecast.hourLabels(true)[1])
+    assertEquals("00", forecast.hourLabels(true).last())
+    assertEquals("2 PM", forecast.hourLabels(false)[1])
+    assertEquals("12 AM", forecast.hourLabels(false).last())
+  }
+
   @Test(expected = IllegalArgumentException::class)
   fun `out of range provider offset is rejected`() {
     Weather.parseSunTimes(solar(1000000, "2026-06-07T06:30", "2026-06-07T20:30"))

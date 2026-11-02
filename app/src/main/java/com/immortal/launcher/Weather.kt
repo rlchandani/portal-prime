@@ -211,11 +211,33 @@ object Weather {
   data class DayForecast(val label: String, val code: Int, val hi: Int, val lo: Int)
 
   /** One hour of the hourly forecast. [label] is "Now" then "1 PM", "2 PM", … */
-  data class HourForecast(val label: String, val code: Int, val temp: Int)
+  data class HourForecast(
+      val label: String,
+      val code: Int,
+      val temp: Int,
+      internal val instantMillis: Long? = null,
+      internal val utcOffsetSeconds: Int = 0,
+  )
 
   /** A combined forecast: both views are fetched in one call so the home-screen
    * widget can switch between hourly and 7-day without re-hitting the network. */
-  data class Forecast(val days: List<DayForecast>, val hours: List<HourForecast>)
+  data class Forecast(val days: List<DayForecast>, val hours: List<HourForecast>) {
+    /** Presentation of retained hourly data; does not fetch or replace the forecast. */
+    fun hourLabels(use24Hour: Boolean): List<String> {
+      val format = SimpleDateFormat(if (use24Hour) "HH" else "h a", Locale.getDefault())
+      var offset: Int? = null
+      return hours.map { hour ->
+        if (hour.label == "Now" || hour.instantMillis == null) hour.label
+        else {
+          if (offset != hour.utcOffsetSeconds) {
+            offset = hour.utcOffsetSeconds
+            format.timeZone = SimpleTimeZone(hour.utcOffsetSeconds * 1000, "Weather location")
+          }
+          format.format(java.util.Date(hour.instantMillis))
+        }
+      }
+    }
+  }
 
   /**
    * Fetches a 7-day daily forecast and the next ~12 hours of hourly forecast from
@@ -302,7 +324,9 @@ object Weather {
           HourForecast(
               label = if (first) "Now" else hourFmt.format(java.util.Date(t)),
               code = code.getInt(i),
-              temp = temp.getDouble(i).roundToInt()))
+              temp = temp.getDouble(i).roundToInt(),
+              instantMillis = t,
+              utcOffsetSeconds = zone.getOffset(t) / 1000))
       first = false
       if (out.size >= 12) break
     }

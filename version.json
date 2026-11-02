@@ -1,6 +1,6 @@
 {
-  "versionCode": 67,
-  "versionName": "1.73",
+  "versionCode": 68,
+  "versionName": "1.74",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Local Portal iteration: hourly Weather forecasts select the current location hour at exact hour boundaries and midnight, preserving whole-, half- and quarter-hour timezone offsets. Requests, refresh cadence, saved widget placement and Weather settings are unchanged."
+  "notes": "Local Portal iteration: cached Home Weather hour labels follow the current 12/24-hour clock setting without fetching again. Provider location offsets, forecast data and refresh cadence are preserved."
 }

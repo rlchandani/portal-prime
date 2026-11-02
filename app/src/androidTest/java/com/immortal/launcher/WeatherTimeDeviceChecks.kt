@@ -95,8 +95,9 @@ internal object WeatherTimeDeviceChecks {
                 sun.minuteOfDay(sun.sunriseMillis)..sun.minuteOfDay(sun.sunsetMillis))
       }
       stage("${scenario.name}.hours") {
-        val hours = Weather.parseForecast(hourlyJson.toString(), scenario.forecastNowUtc,
-            use24Hour = true).hours
+        val forecast = Weather.parseForecast(hourlyJson.toString(), scenario.forecastNowUtc,
+            use24Hour = true)
+        val hours = forecast.hours
         expect("${scenario.name}.hours_cap", 12, hours.size)
         expect("${scenario.name}.current_hour_label", "Now", hours.first().label)
         expect("${scenario.name}.current_hour_temperature", 103, hours.first().temp)
@@ -109,6 +110,18 @@ internal object WeatherTimeDeviceChecks {
           expect("${scenario.name}.hour_${index}_code", inputIndex % 4, hours[index].code)
         }
         expect("${scenario.name}.next_midnight_24h_label", hourLabel(0), hours.last().label)
+        for ((pass, use24) in listOf(false, true, false).withIndex()) {
+          val labels = forecast.hourLabels(use24)
+          for (index in labels.indices) {
+            val hour = (13 + index) % 24
+            val expected = if (index == 0) "Now" else {
+              val fmt = SimpleDateFormat(if (use24) "HH" else "h a", deviceLocale)
+                  .apply { timeZone = TimeZone.getTimeZone("UTC") }
+              fmt.format(Date(utc(2026, 6, 7, hour, 0)))
+            }
+            expect("${scenario.name}.cached_label_${pass}_$index", expected, labels[index])
+          }
+        }
         val past = Weather.parseForecast(hourlyJson.toString(), utc(2030, 1, 1, 0, 0),
             use24Hour = true).hours
         expect("${scenario.name}.all_past_hours_empty", 0, past.size)
