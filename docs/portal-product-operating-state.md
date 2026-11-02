@@ -11,7 +11,7 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Latest transport delivery:** exact optimized **1.75/code69** is installed in both rooms. Family7/7 HTTP cases passed; stalled rejection changed from no reply within3s to median217ms. One70001-byte upload/readback and cleanup passed, with complete room settings unchanged. [Scoped receipt](portal-fleet-error-response-2026-11-02.md). The remaining200–268ms completion is a separate queued hypothesis; no root cause or further tuning is claimed.
+- **Latest transport delivery:** exact optimized **1.75/code69** is installed in both rooms. Family7/7 HTTP cases passed; stalled rejection changed from no reply within3s to median217ms measured through EOF. One70001-byte upload/readback and cleanup passed, with complete room settings unchanged. [Scoped receipt](portal-fleet-error-response-2026-11-02.md). The [phase follow-up](portal-fleet-response-timing-2026-11-02.md) found normal identity-body completion at median23ms; the extra wait is after the body. The strict CLI still waits through EOF. No TCP tuning, new APK or general UI speedup is claimed.
 
 - **Latest Weather clock-format maintenance:** exact optimized **1.74/code68** is installed in both rooms; complete settings are unchanged.3845 JVM tests and274 Family debug-runtime formatter checks passed. Actual Home/settings-return UI acceptance is still open. See [scoped receipt](portal-weather-clock-format-2026-11-02.md). Older versioned receipts below keep their historical scope.
 
@@ -513,3 +513,19 @@ complete profiles/screensaver settings. No prior installer/Weather/parked slot
 was reopened. The28-task roadmap records12 delivered,9 scoped verified,2 approval,
 3 parked and2 queued. Next is a separate cause-first small-response timing check;
 Nagle is a hypothesis, not an established finding.
+
+
+## Fleet timing phase checkpoint — 2 November 2026
+
+The independent read-only follow-up starting13:45:54UTC is closed as scoped
+measurement verified, with no production change. Normal HTTP identity-body
+completion median23.028ms; selected raw identity body24.102ms versus EOF227.300ms.
+The freshly compiled strict CLI wall median237.703ms includes startup and EOF.
+Connection-close cause and Portal/phone UI benefit remain unproved; preserve
+excess-byte, incomplete-download and procfs protections. Both rooms retain exact
+1.75/code69. See [measurement receipt](portal-fleet-response-timing-2026-11-02.md).
+
+Current28-item saved roadmap: **12 delivered/implemented,10 scoped verified,
+2 awaiting approval,3 parked and1 queued**. Weather/gallery design approval,
+ordinary YouTube sign-in/playback, stale installer cleanup and physical-phone
+acceptance retain their separate boundaries. No exhausted issue was reopened.

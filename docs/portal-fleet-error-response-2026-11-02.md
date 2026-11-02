@@ -81,3 +81,9 @@ The samples also show200–268ms completion for the selected small replies. A
 separate bounded investigation can distinguish response-body arrival from EOF
 and transport buffering before proposing a TCP optimization. This is an observed
 candidate, not a proven Nagle root cause or an implemented speedup.
+
+The subsequent [phase measurement](portal-fleet-response-timing-2026-11-02.md)
+resolved that measurement ambiguity: rejection body median6.233ms, identity body
+median24.102ms and normal HTTP identity completion median23.028ms. The earlier
+200ms figures include EOF after the complete body. No further production change
+was warranted by that result.

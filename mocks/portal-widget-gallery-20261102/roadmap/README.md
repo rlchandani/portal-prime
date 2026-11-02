@@ -237,3 +237,12 @@ Fresh changed-detail presentation checks opened both new tasks at390×844 and
 1600×1000:28 rows, no horizontal overflow/missing labels, and visible limits.
 The desktop detail screenshot was visually reviewed. Existing all-task/filter
 proofs retain their earlier scope; this is not native product acceptance.
+
+
+The phase-measurement snapshot keeps28 tasks:12 delivered/implemented,10 scoped
+verified,2 approval,3 parked and1 queued. Complete normal HTTP identity bodies
+arrived at median23ms; the prior200ms measurements included EOF. The strict CLI
+and both exact1.75 room APKs are unchanged. This is a verified measurement, not a
+new speedup. Only the two changed Fleet details were checked at390×844 and
+1600×1000:28 rows, phase clarification visible, no horizontal overflow or missing
+labels, and zero page errors. Earlier broad interaction checks retain their scope.

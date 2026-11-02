@@ -496,5 +496,35 @@
     "scope": "Two changed details and task count; older all-task/filter proofs retain their scope.",
     "limitsVisible": true,
     "desktopScreenshotVisuallyReviewed": true
+  },
+  "fleetResponsePhaseSnapshot": {
+    "checkedAtUtc": "2026-11-02T13:51:32.352038+00:00",
+    "tasks": 28,
+    "counts": {
+      "delivered": 12,
+      "verified": 10,
+      "approval": 2,
+      "parked": 3,
+      "queued": 1
+    },
+    "selectedTaskIds": [
+      "fleet-small-response-latency",
+      "fleet-error-response"
+    ],
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "changedDetailsChecked": 4,
+    "horizontalOverflow": false,
+    "undefinedLabels": false,
+    "pageErrors": 0,
+    "limits": "Only two changed saved-page details and rendered row count; not all detail/filter checks, native performance or new production delivery."
   }
 }

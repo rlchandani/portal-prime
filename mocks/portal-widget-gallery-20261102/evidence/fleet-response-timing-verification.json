@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-02T13:50:34.025753+00:00",
+  "scope": "Read-only Family HTTP timing and unchanged current CLI; no UI performance acceptance or production change.",
+  "versionName": "1.75",
+  "versionCode": 69,
+  "rawPhaseChecks": 12,
+  "rows": [
+    {
+      "case": "header-only",
+      "sample": 1,
+      "status": 204,
+      "responseBytes": 0,
+      "headerMs": 9.83,
+      "bodyMs": 9.83,
+      "eofMs": 11.103,
+      "afterHeaderBodyMs": 0.0
+    },
+    {
+      "case": "header-only",
+      "sample": 2,
+      "status": 204,
+      "responseBytes": 0,
+      "headerMs": 5.266,
+      "bodyMs": 5.266,
+      "eofMs": 5.915,
+      "afterHeaderBodyMs": 0.0
+    },
+    {
+      "case": "header-only",
+      "sample": 3,
+      "status": 204,
+      "responseBytes": 0,
+      "headerMs": 5.141,
+      "bodyMs": 5.141,
+      "eofMs": 5.47,
+      "afterHeaderBodyMs": 0.0
+    },
+    {
+      "case": "small-401",
+      "sample": 1,
+      "status": 401,
+      "responseBytes": 35,
+      "headerMs": 6.517,
+      "bodyMs": 8.125,
+      "eofMs": 210.31,
+      "afterHeaderBodyMs": 1.608
+    },
+    {
+      "case": "small-401",
+      "sample": 2,
+      "status": 401,
+      "responseBytes": 35,
+      "headerMs": 5.896,
+      "bodyMs": 6.114,
+      "eofMs": 215.082,
+      "afterHeaderBodyMs": 0.218
+    },
+    {
+      "case": "small-401",
+      "sample": 3,
+      "status": 401,
+      "responseBytes": 35,
+      "headerMs": 5.863,
+      "bodyMs": 6.233,
+      "eofMs": 215.286,
+      "afterHeaderBodyMs": 0.37
+    },
+    {
+      "case": "identity",
+      "sample": 1,
+      "status": 200,
+      "responseBytes": 1059,
+      "headerMs": 33.512,
+      "bodyMs": 33.742,
+      "eofMs": 237.427,
+      "afterHeaderBodyMs": 0.23
+    },
+    {
+      "case": "identity",
+      "sample": 2,
+      "status": 200,
+      "responseBytes": 1059,
+      "headerMs": 20.889,
+      "bodyMs": 21.388,
+      "eofMs": 227.3,
+      "afterHeaderBodyMs": 0.499
+    },
+    {
+      "case": "identity",
+      "sample": 3,
+      "status": 200,
+      "responseBytes": 1059,
+      "headerMs": 22.782,
+      "bodyMs": 24.102,
+      "eofMs": 226.986,
+      "afterHeaderBodyMs": 1.319
+    },
+    {
+      "case": "profile",
+      "sample": 1,
+      "status": 200,
+      "responseBytes": 27338,
+      "headerMs": 41.145,
+      "bodyMs": 44.382,
+      "eofMs": 257.074,
+      "afterHeaderBodyMs": 3.237
+    },
+    {
+      "case": "profile",
+      "sample": 2,
+      "status": 200,
+      "responseBytes": 27338,
+      "headerMs": 27.795,
+      "bodyMs": 31.098,
+      "eofMs": 236.85,
+      "afterHeaderBodyMs": 3.303
+    },
+    {
+      "case": "profile",
+      "sample": 3,
+      "status": 200,
+      "responseBytes": 27338,
+      "headerMs": 25.902,
+      "bodyMs": 29.976,
+      "eofMs": 235.085,
+      "afterHeaderBodyMs": 4.074
+    }
+  ],
+  "medians": {
+    "header-only": {
+      "headerMs": 5.266,
+      "bodyMs": 5.266,
+      "eofMs": 5.915,
+      "afterHeaderBodyMs": 0.0
+    },
+    "small-401": {
+      "headerMs": 5.896,
+      "bodyMs": 6.233,
+      "eofMs": 215.082,
+      "afterHeaderBodyMs": 0.37
+    },
+    "identity": {
+      "headerMs": 22.782,
+      "bodyMs": 24.102,
+      "eofMs": 227.3,
+      "afterHeaderBodyMs": 0.499
+    },
+    "profile": {
+      "headerMs": 27.795,
+      "bodyMs": 31.098,
+      "eofMs": 236.85,
+      "afterHeaderBodyMs": 3.303
+    }
+  },
+  "normalHttpClient": [
+    {
+      "headerMs": 25.675,
+      "bodyMs": 25.854,
+      "bytes": 1059
+    },
+    {
+      "headerMs": 22.363,
+      "bodyMs": 23.028,
+      "bytes": 1059
+    },
+    {
+      "headerMs": 20.637,
+      "bodyMs": 20.7,
+      "bytes": 1059
+    }
+  ],
+  "medianNormalHttpBodyMs": 23.028,
+  "freshCurrentCli": [
+    {
+      "sample": 1,
+      "exit": 0,
+      "wallMs": 387.805125,
+      "versionName": "1.75",
+      "versionCode": 69
+    },
+    {
+      "sample": 2,
+      "exit": 0,
+      "wallMs": 235.620375,
+      "versionName": "1.75",
+      "versionCode": 69
+    },
+    {
+      "sample": 3,
+      "exit": 0,
+      "wallMs": 237.703375,
+      "versionName": "1.75",
+      "versionCode": 69
+    }
+  ],
+  "medianCliWallMs": 237.703375,
+  "decision": "Complete bodies arrive before delayed EOF; preserve strict EOF-dependent CLI/download checks. No socket tuning or APK change warranted by these selected measurements.",
+  "limits": [
+    "Connection-close root cause not established.",
+    "No browser/phone UI, playback, physical panel or general FPS result.",
+    "CLI wall time includes process startup.",
+    "Three samples per selected case; no general network claim.",
+    "No Living repeat or configuration mutation."
+  ]
+}
