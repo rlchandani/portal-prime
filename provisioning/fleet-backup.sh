@@ -3,7 +3,7 @@
 # fleet-backup.sh — snapshot a Portal's Immortal state before a risky operation
 # (e.g. a debug-key reinstall, which wipes app data). Pairs with fleet-restore.sh.
 #
-# For each target it saves, under backups/<serial>/<timestamp>/:
+# For each target it saves, under backups/<serial>/<timestamp>-<unique-id>/:
 #   info.json       — /info (identity, version, install state, installed apps)
 #   apps.json       — /apps (catalog + what's installed → the reinstall list)
 #   registry.json   — the local fleet/<serial>.json (host/port/token)
@@ -23,13 +23,25 @@
 # The backups/ tree holds tokens + passwords in cleartext — it is git-ignored;
 # keep it private and treat it like any other secret store.
 set -euo pipefail
+umask 077
+# A closed progress-output pipe must not stop capture or reverse a committed result.
+trap '' PIPE
+report() { printf '%s\n' "$*" || true; }
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$here"
 FLEETCTL="${FLEETCTL:-./fleetctl}"
 FLEET_DIR="${IMMORTAL_FLEET_DIR:-./fleet}"
-PREFS_DIR="/data/data/com.immortal.launcher/shared_prefs"
+PYTHON3="${PYTHON3:-python3}"
+APP_PACKAGE="${IMMORTAL_BACKUP_PACKAGE-com.immortal.launcher}"
+PREFS_DIR="/data/data/$APP_PACKAGE/shared_prefs"
 STAMP="$(date +%Y%m%d-%H%M%S)"
+
+command -v "$PYTHON3" >/dev/null 2>&1 || {
+  echo "error: Python 3 is required to validate backup data" >&2
+  exit 1
+}
+"$PYTHON3" "$here/fleet-backup-data.py" package "$APP_PACKAGE" || exit 1
 
 [ -x "$FLEETCTL" ] || {
   echo "error: $FLEETCTL not found/executable — build it first:" >&2
@@ -57,50 +69,55 @@ else
 fi
 [ ${#serials[@]} -gt 0 ] || { echo "error: no device matching '$target' in $FLEET_DIR" >&2; exit 1; }
 
+stage=""
+cleanup() { if [ -n "$stage" ]; then rm -rf "$stage"; fi; }
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+capture() {
+  local serial="$1" n
+  "$FLEETCTL" info --device "$serial" > "$stage/info.json" 2>/dev/null || return 1
+  "$PYTHON3" "$here/fleet-backup-data.py" json info "$stage/info.json" || return 1
+  "$FLEETCTL" apps --device "$serial" > "$stage/apps.json" 2>/dev/null || return 1
+  "$PYTHON3" "$here/fleet-backup-data.py" json apps "$stage/apps.json" || return 1
+  cp "$FLEET_DIR/$serial.json" "$stage/registry.json" || return 1
+  "$FLEETCTL" ls "$PREFS_DIR" --device "$serial" > "$stage/listing.json" 2>/dev/null || return 1
+  "$PYTHON3" "$here/fleet-backup-data.py" names "$stage/listing.json" "$PREFS_DIR" > "$stage/preferences.txt" || return 1
+  while IFS= read -r n; do
+    "$FLEETCTL" pull "$PREFS_DIR/$n" "$stage/shared_prefs/$n" --device "$serial" >/dev/null 2>&1 || return 1
+    "$PYTHON3" "$here/fleet-backup-data.py" xml "$stage/shared_prefs/$n" || return 1
+  done < "$stage/preferences.txt"
+  "$PYTHON3" "$here/fleet-backup-data.py" manifest "$stage" "$serial" "$STAMP" "$APP_PACKAGE" || return 1
+}
+
+prepare() {
+  local serial="$1"
+  "$PYTHON3" "$here/fleet-backup-data.py" directory "backups/$serial" || return 1
+  stage="$(mktemp -d "backups/$serial/.partial-$STAMP.XXXXXX")" || return 1
+  mkdir "$stage/shared_prefs" || return 1
+}
+
 backed_up=0
+failed=0
+"$PYTHON3" "$here/fleet-backup-data.py" directory backups || exit 1
 for serial in "${serials[@]}"; do
-  echo "=== backing up $serial ==="
-  out="backups/$serial/$STAMP"
-  mkdir -p "$out/shared_prefs"
-
-  "$FLEETCTL" info --device "$serial" > "$out/info.json" 2>/dev/null \
-    || { echo "  warn: /info unreachable — skipping $serial"; rm -rf "$out"; continue; }
-  "$FLEETCTL" apps --device "$serial" > "$out/apps.json" 2>/dev/null || echo "  warn: /apps failed"
-  cp "$FLEET_DIR/$serial.json" "$out/registry.json" 2>/dev/null || true
-
-  names="$("$FLEETCTL" ls "$PREFS_DIR" --device "$serial" 2>/dev/null \
-            | sed -n 's/.*"name"[[:space:]]*:[[:space:]]*"\([^"]*\.xml\)".*/\1/p')"
-  if [ -z "$names" ]; then
-    echo "  warn: no readable shared_prefs on $serial"
+  case "$serial" in
+    ""|"."|".."|*/*|*\\*) report "error: invalid registry filename" >&2; failed=1; continue;;
+  esac
+  report "=== backing up $serial ==="
+  if prepare "$serial" && capture "$serial" && "$PYTHON3" "$here/fleet-backup-data.py" publish "$stage" "$STAMP"; then
+    stage=""
+    backed_up=$((backed_up + 1))
   else
-    while IFS= read -r n; do
-      [ -n "$n" ] || continue
-      if "$FLEETCTL" pull "$PREFS_DIR/$n" "$out/shared_prefs/$n" --device "$serial" >/dev/null 2>&1; then
-        echo "  saved shared_prefs/$n"
-      else
-        echo "  warn: could not pull $n"
-      fi
-    done <<< "$names"
+    report "  error: backup incomplete; previous snapshot retained" >&2
+    cleanup
+    stage=""
+    failed=1
   fi
-
-  {
-    echo "device:  $serial"
-    echo "stamp:   $STAMP"
-    grep -E '"versionCode"|"versionName"|"model"' "$out/info.json" 2>/dev/null | sed 's/^[[:space:]]*//'
-    echo "installed apps:"
-    awk '
-      /"packageName"/ { line=$0; sub(/.*"packageName"[ \t]*:[ \t]*"/,"",line); sub(/".*/,"",line); pkg=line }
-      /"installed"/   { if ($0 !~ /false/ && pkg != "") print "  " pkg }
-    ' "$out/apps.json" 2>/dev/null | sort -u
-    echo "shared_prefs:"
-    ls -1 "$out/shared_prefs" 2>/dev/null | sed 's/^/  /'
-  } > "$out/MANIFEST.txt"
-
-  ln -sfn "$STAMP" "backups/$serial/latest"
-  echo "  -> $out"
-  backed_up=$((backed_up + 1))
 done
 
-echo
-echo "backed up $backed_up device(s) to $here/backups/"
-echo "WARNING: these files contain tokens and cleartext credentials — keep private (git-ignored)."
+report ""
+report "backed up $backed_up device(s) to $here/backups/"
+report "WARNING: these files contain tokens and cleartext credentials — keep private (git-ignored)."
+exit "$failed"

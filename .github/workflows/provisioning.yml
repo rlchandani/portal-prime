@@ -25,6 +25,9 @@ on:
       - "provisioning/room-fleet.py"
       - "provisioning/test_room_fleet.py"
       - "provisioning/test_fleet_http.py"
+      - "provisioning/fleet-backup.sh"
+      - "provisioning/fleet-backup-data.py"
+      - "provisioning/test_fleet_backup.py"
       - "scripts/provision-access.test.mjs"
       - "scripts/test-provision-access.ps1"
   push:
@@ -38,6 +41,9 @@ on:
       - "provisioning/room-fleet.py"
       - "provisioning/test_room_fleet.py"
       - "provisioning/test_fleet_http.py"
+      - "provisioning/fleet-backup.sh"
+      - "provisioning/fleet-backup-data.py"
+      - "provisioning/test_fleet_backup.py"
       - "scripts/provision-access.test.mjs"
       - "scripts/test-provision-access.ps1"
 
@@ -73,6 +79,11 @@ jobs:
 
       - name: Run room fleet tests
         run: python provisioning/test_room_fleet.py -v
+
+      - name: Run private backup integrity tests
+        run: |
+          bash -n provisioning/fleet-backup.sh
+          python provisioning/test_fleet_backup.py -v
 
   lint:
     runs-on: ubuntu-latest

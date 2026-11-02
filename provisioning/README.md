@@ -311,12 +311,28 @@ apps you'd installed. `fleet-backup.sh` snapshots all of that first, and
 ./fleet-backup.sh "Portal Mini"   # …or one (by name or serial)
 ```
 
-Each run writes `backups/<serial>/<timestamp>/` with `info.json`, `apps.json`
+The backup command requires Python 3 (`PYTHON3=/path/to/python3` can select it).
+Each successful capture writes `backups/<serial>/<timestamp>-<unique-id>/` with `info.json`, `apps.json`
 (the installed-app list), `registry.json` (host/port/token), and every readable
 `shared_prefs/*.xml` — the agent runs *as* Immortal, so it reads its own
 `/data/data/.../shared_prefs` over `/fs/read`, no root or adb needed. **The
 `backups/` tree holds tokens and cleartext credentials, so it is git-ignored —
-keep it private.**
+keep it private.** New backup directories use mode `0700` and new files are
+created under umask `077`. Existing backup parents must be directories owned by
+the current user; symlink parents are rejected.
+
+The command validates the success replies, exact preference listing and every
+listed XML preference map before replacing the room's `latest` link. A failed
+capture removes its partial directory and retains the previous snapshot. Other
+rooms continue, and any failed room makes the command exit nonzero. Runs in the
+same second get distinct folders. This captures preferences and install metadata,
+not photo files, other apps' data or an atomic view of concurrently changing
+preferences.
+
+The default package is `com.immortal.launcher`. For an agent running in the debug
+package, use `IMMORTAL_BACKUP_PACKAGE=com.immortal.launcher.debug`. This selects
+the backup's preference path only; the existing raw restore still targets the
+release package and is not a cross-package migration tool.
 
 After reinstalling the new build and re-registering the agent
 (`./provision.sh --fleet` over USB, which mints a fresh token):
