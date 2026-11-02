@@ -1,0 +1,418 @@
+diff --git a/app/src/main/java/com/immortal/launcher/PhotoDreamService.kt b/app/src/main/java/com/immortal/launcher/PhotoDreamService.kt
+index de45deba..a48c4247 100644
+--- a/app/src/main/java/com/immortal/launcher/PhotoDreamService.kt
++++ b/app/src/main/java/com/immortal/launcher/PhotoDreamService.kt
+@@ -9,0 +10 @@ package com.immortal.launcher
++import android.app.Application
+@@ -31,0 +33 @@ class PhotoDreamService : DreamService() {
++  private var cancelCallerReturn: (() -> Unit)? = null
+@@ -72 +74,4 @@ class PhotoDreamService : DreamService() {
+-    frame.onExit = {
++    frame.onExit = exit@ {
++      if (cancelCallerReturn != null) return@exit
++      var retiredContinuation = false
++      var launchedApp = false
+@@ -80 +85 @@ class PhotoDreamService : DreamService() {
+-            ScreensaverDismiss.launchChosenApp(this)
++            launchedApp = ScreensaverDismiss.launchChosenApp(this)
+@@ -84,0 +90 @@ class PhotoDreamService : DreamService() {
++            retiredContinuation = retired
+@@ -92 +98,7 @@ class PhotoDreamService : DreamService() {
+-            finish()
++            if (retiredContinuation && !launchedApp) {
++              cancelCallerReturn = awaitDreamCallerFrame(applicationContext as Application) { reason ->
++                cancelCallerReturn = null
++                Log.i(TAG, "onExit: retained caller ready=$reason")
++                finish()
++              }
++            } else finish()
+@@ -132,0 +145,2 @@ class PhotoDreamService : DreamService() {
++    cancelCallerReturn?.invoke()
++    cancelCallerReturn = null
+diff --git a/app/src/main/java/com/immortal/launcher/PhotoFramePreviewActivity.kt b/app/src/main/java/com/immortal/launcher/PhotoFramePreviewActivity.kt
+index cfea40bb..a385dddf 100644
+--- a/app/src/main/java/com/immortal/launcher/PhotoFramePreviewActivity.kt
++++ b/app/src/main/java/com/immortal/launcher/PhotoFramePreviewActivity.kt
+@@ -178,0 +179,9 @@ class PhotoFramePreviewActivity : ComponentActivity() {
++  @Suppress("DEPRECATION")
++  override fun finish() {
++    super.finish()
++    // A recovered frame can sit underneath an OS Dream. The Dream's window-animation
++    // policy does not cover this Activity; reveal the retained caller without Android's
++    // separate Activity-close transition. Supported on every Portal API we target.
++    overridePendingTransition(0, 0)
++  }
++
+diff --git a/app/src/main/java/com/immortal/launcher/DreamCallerFrame.kt b/app/src/main/java/com/immortal/launcher/DreamCallerFrame.kt
+new file mode 100644
+index 00000000..8049ab50
+--- /dev/null
++++ b/app/src/main/java/com/immortal/launcher/DreamCallerFrame.kt
+@@ -0,0 +1,92 @@
++/*
++ * Copyright (c) 2026 Starbright Lab.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++package com.immortal.launcher
++
++import android.app.Activity
++import android.app.Application
++import android.os.Build
++import android.os.Bundle
++import android.os.Handler
++import android.os.Looper
++import android.view.FrameMetrics
++import android.view.Window
++
++/**
++ * Keep the Dream's frozen surface while its retained caller resumes and submits a frame.
++ * A bounded fallback prevents a missing caller from stranding the user in the Dream.
++ * Cancellation removes every observer without delivering the completion callback.
++ */
++internal fun awaitDreamCallerFrame(application: Application, complete: (String) -> Unit): () -> Unit {
++    val handler = Handler(Looper.getMainLooper())
++    val requestedAt = System.nanoTime()
++    var finished = false
++    var observedWindow: Window? = null
++    var frameListener: Window.OnFrameMetricsAvailableListener? = null
++    lateinit var lifecycle: Application.ActivityLifecycleCallbacks
++    lateinit var timeout: Runnable
++
++    fun clearWindow() {
++        if (Build.VERSION.SDK_INT >= 24) {
++            frameListener?.let { listener -> observedWindow?.removeOnFrameMetricsAvailableListener(listener) }
++        }
++        frameListener = null
++        observedWindow = null
++    }
++
++    fun cleanup() {
++        handler.removeCallbacks(timeout)
++        application.unregisterActivityLifecycleCallbacks(lifecycle)
++        clearWindow()
++    }
++
++    fun finish(reason: String) {
++        if (finished) return
++        finished = true
++        cleanup()
++        complete(reason)
++    }
++
++    lifecycle = object : Application.ActivityLifecycleCallbacks {
++        override fun onActivityResumed(activity: Activity) {
++            if (activity is PhotoFramePreviewActivity || finished) return
++            clearWindow()
++            val caller = activity.window
++            if (!caller.decorView.isAttachedToWindow || Build.VERSION.SDK_INT < 26) return
++            lateinit var listener: Window.OnFrameMetricsAvailableListener
++            listener = Window.OnFrameMetricsAvailableListener { window, metrics, _ ->
++                // Ignore queued reports belonging to frames produced before this tap.
++                if (observedWindow === window && frameListener === listener &&
++                    metrics.getMetric(FrameMetrics.INTENDED_VSYNC_TIMESTAMP) >= requestedAt) {
++                    finish("caller-frame")
++                }
++            }
++            observedWindow = caller
++            frameListener = listener
++            caller.addOnFrameMetricsAvailableListener(listener, handler)
++            caller.decorView.postInvalidateOnAnimation()
++        }
++        override fun onActivityPaused(activity: Activity) {
++            if (observedWindow === activity.window) clearWindow()
++        }
++        override fun onActivityDestroyed(activity: Activity) {
++            if (observedWindow === activity.window) clearWindow()
++        }
++        override fun onActivityCreated(activity: Activity, state: Bundle?) = Unit
++        override fun onActivityStarted(activity: Activity) = Unit
++        override fun onActivityStopped(activity: Activity) = Unit
++        override fun onActivitySaveInstanceState(activity: Activity, state: Bundle) = Unit
++    }
++    timeout = Runnable { finish("caller-timeout") }
++    application.registerActivityLifecycleCallbacks(lifecycle)
++    handler.postDelayed(timeout, 1_000L)
++    return {
++        if (!finished) {
++            finished = true
++            cleanup()
++        }
++    }
++}
+diff --git a/app/src/test/java/com/immortal/launcher/DreamCallerFrameTest.kt b/app/src/test/java/com/immortal/launcher/DreamCallerFrameTest.kt
+new file mode 100644
+index 00000000..e6ffe817
+--- /dev/null
++++ b/app/src/test/java/com/immortal/launcher/DreamCallerFrameTest.kt
+@@ -0,0 +1,269 @@
++/*
++ * Copyright (c) 2026 Starbright Lab.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++package com.immortal.launcher
++
++import android.app.Activity
++import android.app.Application
++import android.os.Build
++import android.os.Handler
++import android.os.Looper
++import android.view.FrameMetrics
++import android.view.View
++import android.view.Window
++import org.junit.Assert.assertEquals
++import org.junit.Assert.assertTrue
++import org.junit.Test
++import org.mockito.ArgumentCaptor
++import org.mockito.Mockito
++import org.mockito.Mockito.`when`
++import sun.misc.Unsafe
++
++/** Exercise caller ownership and Android callback races without a device or real scheduler. */
++class DreamCallerFrameTest {
++  @Test fun freshCallerFrameCompletesOnceAfterEveryObserverIsRemoved() = fixture { f ->
++    val caller = Caller()
++    val listener = f.resume(caller)
++    f.beforeComplete = { f.assertCleaned(caller, listener) }
++    assertTrue(f.reasons.isEmpty())
++    Mockito.verify(caller.decor).postInvalidateOnAnimation()
++
++    f.report(caller, listener)
++    f.report(caller, listener)
++    f.timeout.run()
++    f.cancel()
++
++    assertEquals(listOf("caller-frame"), f.reasons)
++    f.assertCleaned(caller, listener)
++  }
++
++  @Test fun cancellationRevokesQueuedFramesTimeoutAndFutureResumesWithoutCompleting() = fixture { f ->
++    val caller = Caller()
++    val listener = f.resume(caller)
++
++    f.cancel()
++    f.cancel()
++    f.report(caller, listener)
++    f.timeout.run()
++    val laterCaller = Caller()
++    f.lifecycle.onActivityResumed(laterCaller.activity)
++
++    assertTrue(f.reasons.isEmpty())
++    f.assertCleaned(caller, listener)
++    Mockito.verify(laterCaller.window, Mockito.never()).addOnFrameMetricsAvailableListener(
++        Mockito.any(Window.OnFrameMetricsAvailableListener::class.java), Mockito.any(Handler::class.java))
++  }
++
++  @Test fun timeoutRemovesCallerObserversAndWinsOnlyOnceAgainstLateFrames() = fixture { f ->
++    val caller = Caller()
++    val listener = f.resume(caller)
++    f.beforeComplete = { f.assertCleaned(caller, listener) }
++
++    f.timeout.run()
++    f.report(caller, listener)
++    f.timeout.run()
++    f.cancel()
++
++    assertEquals(listOf("caller-timeout"), f.reasons)
++    f.assertCleaned(caller, listener)
++  }
++
++  @Test fun missingCallerHasAFallbackBoundedToOneSecond() = fixture { f ->
++    assertTrue("Fallback must be scheduled within one second", f.timeoutDelay in 1L..1_000L)
++    assertTrue(f.reasons.isEmpty())
++
++    f.timeout.run()
++    f.timeout.run()
++
++    assertEquals(listOf("caller-timeout"), f.reasons)
++    f.assertCleaned()
++  }
++
++  @Test fun previewAndUnattachedActivitiesCannotSupplyTheCallerFrame() = fixture { f ->
++    val preview = Mockito.mock(PhotoFramePreviewActivity::class.java)
++    f.lifecycle.onActivityResumed(preview)
++    Mockito.verify(preview, Mockito.never()).getWindow()
++
++    val detached = Caller(attached = false)
++    f.lifecycle.onActivityResumed(detached.activity)
++    Mockito.verify(detached.window, Mockito.never()).addOnFrameMetricsAvailableListener(
++        Mockito.any(Window.OnFrameMetricsAvailableListener::class.java), Mockito.any(Handler::class.java))
++    assertTrue(f.reasons.isEmpty())
++
++    val attached = Caller()
++    f.report(attached, f.resume(attached))
++    assertEquals(listOf("caller-frame"), f.reasons)
++  }
++
++  @Test fun queuedFrameFromBeforeTheRequestCannotRevealTheCaller() = fixture { f ->
++    val caller = Caller()
++    val listener = f.resume(caller)
++
++    f.report(caller, listener, fresh = false)
++
++    assertTrue(f.reasons.isEmpty())
++    Mockito.verify(f.application, Mockito.never()).unregisterActivityLifecycleCallbacks(f.lifecycle)
++    Mockito.verify(caller.window, Mockito.never()).removeOnFrameMetricsAvailableListener(listener)
++    f.report(caller, listener)
++    assertEquals(listOf("caller-frame"), f.reasons)
++  }
++
++  @Test fun pausedCallerCannotCompleteThroughAnAlreadyQueuedFrameReport() = fixture { f ->
++    val caller = Caller()
++    val listener = f.resume(caller)
++
++    f.lifecycle.onActivityPaused(caller.activity)
++    Mockito.verify(caller.window).removeOnFrameMetricsAvailableListener(listener)
++    f.report(caller, listener)
++
++    assertTrue("A paused caller no longer owns the reveal", f.reasons.isEmpty())
++    f.timeout.run()
++    assertEquals(listOf("caller-timeout"), f.reasons)
++  }
++
++  @Test fun destroyedCallerCannotCompleteThroughAnAlreadyQueuedFrameReport() = fixture { f ->
++    val caller = Caller()
++    val listener = f.resume(caller)
++
++    f.lifecycle.onActivityDestroyed(caller.activity)
++    Mockito.verify(caller.window).removeOnFrameMetricsAvailableListener(listener)
++    f.report(caller, listener)
++
++    assertTrue("A destroyed caller no longer owns the reveal", f.reasons.isEmpty())
++    f.timeout.run()
++    assertEquals(listOf("caller-timeout"), f.reasons)
++  }
++
++  @Test fun replacementCallerMustSupplyItsOwnFrameRatherThanAQueuedPredecessorFrame() = fixture { f ->
++    val oldCaller = Caller()
++    val oldListener = f.resume(oldCaller)
++    val replacement = Caller()
++    val replacementListener = f.resume(replacement)
++    Mockito.verify(oldCaller.window).removeOnFrameMetricsAvailableListener(oldListener)
++
++    f.report(oldCaller, oldListener)
++    assertTrue("The retired window cannot complete the replacement's wait", f.reasons.isEmpty())
++    f.report(replacement, replacementListener)
++
++    assertEquals(listOf("caller-frame"), f.reasons)
++    f.assertCleaned(replacement, replacementListener)
++  }
++
++  @Test fun resumingTheSameWindowDoesNotReadmitItsRetiredFrameListener() = fixture { f ->
++    val caller = Caller()
++    val oldListener = f.resume(caller)
++    f.lifecycle.onActivityPaused(caller.activity)
++    f.lifecycle.onActivityResumed(caller.activity)
++    val listeners = ArgumentCaptor.forClass(Window.OnFrameMetricsAvailableListener::class.java)
++    Mockito.verify(caller.window, Mockito.times(2)).addOnFrameMetricsAvailableListener(
++        listeners.capture(), Mockito.same(f.handler))
++    val currentListener = listeners.allValues.last()
++
++    f.report(caller, oldListener)
++    assertTrue("A new resume owns a new listener even when the window is unchanged", f.reasons.isEmpty())
++    f.report(caller, currentListener)
++
++    assertEquals(listOf("caller-frame"), f.reasons)
++    f.assertCleaned(caller, currentListener)
++    Mockito.verify(caller.window, Mockito.times(1)).removeOnFrameMetricsAvailableListener(oldListener)
++  }
++
++  @Test fun unrelatedActivityPauseDoesNotRevokeTheCurrentCaller() = fixture { f ->
++    val caller = Caller()
++    val listener = f.resume(caller)
++
++    f.lifecycle.onActivityPaused(Caller().activity)
++    Mockito.verify(caller.window, Mockito.never()).removeOnFrameMetricsAvailableListener(listener)
++    f.report(caller, listener)
++
++    assertEquals(listOf("caller-frame"), f.reasons)
++  }
++
++  private class Caller(attached: Boolean = true) {
++    val activity = Mockito.mock(Activity::class.java)
++    val window = Mockito.mock(Window::class.java)
++    val decor = Mockito.mock(View::class.java)
++
++    init {
++      `when`(activity.window).thenReturn(window)
++      `when`(window.decorView).thenReturn(decor)
++      `when`(decor.isAttachedToWindow).thenReturn(attached)
++    }
++  }
++
++  private class Fixture(val application: Application, val handler: Handler,
++      val cancel: () -> Unit, val reasons: MutableList<String>, val scheduled: List<Pair<Runnable, Long>>) {
++    val lifecycle: Application.ActivityLifecycleCallbacks
++    val timeout: Runnable get() = scheduled.single().first
++    val timeoutDelay: Long get() = scheduled.single().second
++    var beforeComplete: (() -> Unit)? = null
++
++    init {
++      val callback = ArgumentCaptor.forClass(Application.ActivityLifecycleCallbacks::class.java)
++      Mockito.verify(application).registerActivityLifecycleCallbacks(callback.capture())
++      lifecycle = callback.value
++    }
++
++    fun resume(caller: Caller): Window.OnFrameMetricsAvailableListener {
++      lifecycle.onActivityResumed(caller.activity)
++      val listener = ArgumentCaptor.forClass(Window.OnFrameMetricsAvailableListener::class.java)
++      Mockito.verify(caller.window).addOnFrameMetricsAvailableListener(listener.capture(), Mockito.same(handler))
++      return listener.value
++    }
++
++    fun report(caller: Caller, listener: Window.OnFrameMetricsAvailableListener, fresh: Boolean = true) {
++      val metrics = Mockito.mock(FrameMetrics::class.java)
++      `when`(metrics.getMetric(FrameMetrics.INTENDED_VSYNC_TIMESTAMP))
++          .thenReturn(if (fresh) System.nanoTime() else Long.MIN_VALUE)
++      listener.onFrameMetricsAvailable(caller.window, metrics, 0)
++    }
++
++    fun assertCleaned(caller: Caller? = null, listener: Window.OnFrameMetricsAvailableListener? = null) {
++      Mockito.verify(application, Mockito.times(1)).unregisterActivityLifecycleCallbacks(lifecycle)
++      Mockito.verify(handler, Mockito.times(1)).removeCallbacks(timeout)
++      if (caller != null && listener != null)
++        Mockito.verify(caller.window, Mockito.times(1)).removeOnFrameMetricsAvailableListener(listener)
++    }
++  }
++
++  private fun fixture(test: (Fixture) -> Unit) {
++    // Mockable android.jar initializes SDK_INT to zero. Exercise Portal API 29 and restore
++    // this final static field even on failure; no Android runtime or production seam is added.
++    val unsafeField = Unsafe::class.java.getDeclaredField("theUnsafe").apply { isAccessible = true }
++    val unsafe = unsafeField.get(null) as Unsafe
++    val sdkField = Build.VERSION::class.java.getDeclaredField("SDK_INT")
++    val sdkBase = unsafe.staticFieldBase(sdkField)
++    val sdkOffset = unsafe.staticFieldOffset(sdkField)
++    val previousSdk = sdkField.getInt(null) // Initialize Build.VERSION before overriding it.
++    unsafe.putIntVolatile(sdkBase, sdkOffset, 29)
++    try {
++      assertEquals(29, Build.VERSION.SDK_INT)
++      val main = Mockito.mock(Looper::class.java)
++      Mockito.mockStatic(Looper::class.java).use { loopers ->
++        loopers.`when`<Looper> { Looper.getMainLooper() }.thenReturn(main)
++        val scheduled = mutableListOf<Pair<Runnable, Long>>()
++        Mockito.mockConstruction(Handler::class.java) { handler, _ ->
++          Mockito.doAnswer { call ->
++            scheduled += call.getArgument<Runnable>(0) to call.getArgument<Long>(1)
++            true
++          }.`when`(handler).postDelayed(Mockito.any(Runnable::class.java), Mockito.anyLong())
++        }.use { handlers ->
++          val application = Mockito.mock(Application::class.java)
++          val reasons = mutableListOf<String>()
++          lateinit var f: Fixture
++          val cancel = awaitDreamCallerFrame(application) { reason ->
++            f.beforeComplete?.invoke()
++            reasons += reason
++          }
++          f = Fixture(application, handlers.constructed().single(), cancel, reasons, scheduled)
++          try { test(f) } finally { cancel() }
++        }
++      }
++    } finally {
++      unsafe.putIntVolatile(sdkBase, sdkOffset, previousSdk)
++    }
++  }
++}

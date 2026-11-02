@@ -1,0 +1,18 @@
+{
+  "case": "candidate2",
+  "scope": "all_encoded_frame_content_not_panel_fps",
+  "frameCount": 174,
+  "referenceDistance": 41.66260859625057,
+  "nearBlackFrames": 5,
+  "counts": {
+    "photo": 4,
+    "home": 165,
+    "transition": 5
+  },
+  "firstHomeTimestamp": 1.008389,
+  "photoFramesAfterFirstHome": 0,
+  "nonHomeFramesAfterFirstHome": 0,
+  "timestampSpanSeconds": 3.942856,
+  "largestTimestampGapSeconds": 0.806978,
+  "passed": false
+}

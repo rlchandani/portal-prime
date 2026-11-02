@@ -1,0 +1,28 @@
+{
+  "case": "candidate5",
+  "accepted": false,
+  "reason": "The generated photo did not satisfy the bounded steady-photo readiness check; no exit recording was started.",
+  "readinessSamples": [
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.779,
+        41.783,
+        42.055,
+        41.87,
+        41.868,
+        41.874,
+        41.809,
+        41.815,
+        41.815,
+        42.114,
+        41.782,
+        41.782,
+        41.784,
+        0.0,
+        0.0
+      ],
+      "generatedPhotoVisible": false
+    }
+  ]
+}

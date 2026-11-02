@@ -1,0 +1,361 @@
+{
+  "audit": "independent activity-dump contract",
+  "auditedReturnDumpCount": 30,
+  "capture": "candidate2",
+  "createdAtUtc": "2026-11-02T01:08:26.369622+00:00",
+  "expectedReturnDumpCount": 30,
+  "mainActivityCheckAgreement": {
+    "continuationRecovered": true,
+    "continuationRetired": true,
+    "firstCompleteHomeIndex": true,
+    "observationCount": true,
+    "oneLiveHomeRetained": true,
+    "originalHomeTokenRetained": true,
+    "stableHomeAfterFirstComplete": true
+  },
+  "mainObservationDisagreements": [],
+  "mainObservationMetadataCount": 30,
+  "observations": [
+    {
+      "captureTimeSeconds": 0.235,
+      "completeHomeReturn": true,
+      "index": 0,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 0.519,
+      "completeHomeReturn": true,
+      "index": 1,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 0.779,
+      "completeHomeReturn": true,
+      "index": 2,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 1.099,
+      "completeHomeReturn": true,
+      "index": 3,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 1.398,
+      "completeHomeReturn": true,
+      "index": 4,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 1.691,
+      "completeHomeReturn": true,
+      "index": 5,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 1.989,
+      "completeHomeReturn": true,
+      "index": 6,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 2.271,
+      "completeHomeReturn": true,
+      "index": 7,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 2.583,
+      "completeHomeReturn": true,
+      "index": 8,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 2.883,
+      "completeHomeReturn": true,
+      "index": 9,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 3.155,
+      "completeHomeReturn": true,
+      "index": 10,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 3.446,
+      "completeHomeReturn": true,
+      "index": 11,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 3.74,
+      "completeHomeReturn": true,
+      "index": 12,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 4.017,
+      "completeHomeReturn": true,
+      "index": 13,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 4.282,
+      "completeHomeReturn": true,
+      "index": 14,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 4.554,
+      "completeHomeReturn": true,
+      "index": 15,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 4.823,
+      "completeHomeReturn": true,
+      "index": 16,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 5.098,
+      "completeHomeReturn": true,
+      "index": 17,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 5.388,
+      "completeHomeReturn": true,
+      "index": 18,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 5.673,
+      "completeHomeReturn": true,
+      "index": 19,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 5.984,
+      "completeHomeReturn": true,
+      "index": 20,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 6.291,
+      "completeHomeReturn": true,
+      "index": 21,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 6.611,
+      "completeHomeReturn": true,
+      "index": 22,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 6.919,
+      "completeHomeReturn": true,
+      "index": 23,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 7.24,
+      "completeHomeReturn": true,
+      "index": 24,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 7.523,
+      "completeHomeReturn": true,
+      "index": 25,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 7.831,
+      "completeHomeReturn": true,
+      "index": 26,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 8.135,
+      "completeHomeReturn": true,
+      "index": 27,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 8.429,
+      "completeHomeReturn": true,
+      "index": 28,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    },
+    {
+      "captureTimeSeconds": 8.741,
+      "completeHomeReturn": true,
+      "index": 29,
+      "liveHomeCount": 1,
+      "livePreviewCount": 0,
+      "originalHomeResumed": true,
+      "originalHomeStillLive": true,
+      "resumedKind": "home"
+    }
+  ],
+  "package": "com.immortal.launcher.debug",
+  "parser": "scripts/portal_warm_dream_contract.py",
+  "passed": true,
+  "recoveredContinuation": {
+    "liveHomeCount": 1,
+    "livePreviewCount": 1,
+    "originalHomeStillLive": true,
+    "passed": true,
+    "resumedKind": "preview"
+  },
+  "reference": {
+    "exactlyOneOriginalHomeLive": true,
+    "liveHomeCount": 1,
+    "livePreviewCount": 0,
+    "resumedKind": "home"
+  },
+  "returnAggregate": {
+    "allHaveOneLiveHome": true,
+    "allHaveZeroLivePreviews": true,
+    "allKeepOriginalHomeLive": true,
+    "allResumeOriginalHome": true,
+    "distinctLiveHomeIdentityCount": 1,
+    "firstCompleteHomeIndex": 0,
+    "resumedKinds": {
+      "home": 30
+    },
+    "stableHomeAfterFirstComplete": true
+  },
+  "schemaVersion": 1,
+  "scope": {
+    "activityDumpsAudited": true,
+    "buildOrDeviceOperationsPerformed": false,
+    "dreamStateIndependentlyAudited": false,
+    "logsIndependentlyAudited": false,
+    "rawIdentitiesSerialized": false,
+    "timingIndependentlyMeasured": false,
+    "timingSource": "existing capture observation metadata",
+    "videoClassificationPerformed": false,
+    "visualFixAccepted": false,
+    "visualVerdictSource": "main task reported candidate2 visual failure"
+  }
+}

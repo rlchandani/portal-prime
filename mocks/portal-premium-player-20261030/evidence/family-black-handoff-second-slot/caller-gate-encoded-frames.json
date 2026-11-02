@@ -1,0 +1,1836 @@
+[
+  {
+    "timestamp": 0.0,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.379,
+    "photoMeanError": 1.528
+  },
+  {
+    "timestamp": 0.423122,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.365,
+    "photoMeanError": 1.532
+  },
+  {
+    "timestamp": 0.439456,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.413,
+    "photoMeanError": 1.399
+  },
+  {
+    "timestamp": 0.456067,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.442,
+    "photoMeanError": 1.381
+  },
+  {
+    "timestamp": 0.471967,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.973,
+    "photoMeanError": 1.166
+  },
+  {
+    "timestamp": 0.489278,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.92,
+    "photoMeanError": 1.164
+  },
+  {
+    "timestamp": 0.505022,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.889,
+    "photoMeanError": 1.141
+  },
+  {
+    "timestamp": 0.522167,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.649,
+    "photoMeanError": 0.93
+  },
+  {
+    "timestamp": 0.538567,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.63,
+    "photoMeanError": 0.923
+  },
+  {
+    "timestamp": 0.555333,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.633,
+    "photoMeanError": 0.915
+  },
+  {
+    "timestamp": 0.571578,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.638,
+    "photoMeanError": 0.909
+  },
+  {
+    "timestamp": 0.589611,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.639,
+    "photoMeanError": 0.912
+  },
+  {
+    "timestamp": 0.605478,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.636,
+    "photoMeanError": 0.912
+  },
+  {
+    "timestamp": 0.621856,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.6392,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.656544,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.671978,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.690322,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.706189,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.723533,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.74,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.756467,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.7743,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.789844,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.806544,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.822133,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.838778,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.856044,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.872322,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.8894,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.905544,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.924867,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 0.975511,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 0.989067,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.008222,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.045189,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.065811,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.076233,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.124156,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.1421,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.156444,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.172189,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.192044,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.210256,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.222944,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.255322,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.271978,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.289189,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.307,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.323644,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.340189,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.356922,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.377333,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.390156,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.406033,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.422344,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.439222,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.463878,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.476533,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.493822,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.507267,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.522011,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.558467,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.572956,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.591356,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.607722,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.628033,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.642756,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.656511,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.689256,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.706,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.722311,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.738511,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.755833,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.772267,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.790667,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.805344,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.823711,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.840478,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.856222,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.871778,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.889144,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.905456,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.921889,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.938911,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.962511,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 1.9759,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 1.992356,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.641,
+    "photoMeanError": 0.91
+  },
+  {
+    "timestamp": 2.024933,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 41.64,
+    "photoMeanError": 0.911
+  },
+  {
+    "timestamp": 2.043233,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.038,
+    "photoMeanError": 41.663
+  },
+  {
+    "timestamp": 2.057822,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.074944,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.668
+  },
+  {
+    "timestamp": 2.091356,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 2.108844,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.123811,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 2.142433,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.046,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.1608,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 2.171778,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.206867,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.222244,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.242633,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 2.256367,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.272656,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 2.291256,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.306289,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.323544,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.339444,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 2.356222,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.373144,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 2.388989,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.405733,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.422656,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.44,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 2.456667,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.471833,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 2.490422,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.506,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.522478,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.539889,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 2.556533,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.589989,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 2.605978,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.6262,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.641089,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.656933,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 2.672256,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.691244,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 2.708978,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.722411,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.739056,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.756211,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 2.772111,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.790722,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 2.806011,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.823478,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.841433,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.8562,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 2.872578,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.890789,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 2.912989,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.923456,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 2.940133,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 2.972922,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 2.994667,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.006844,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.040444,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.062567,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.072356,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.105611,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 3.123044,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.139311,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.157156,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.172933,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.1905,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.212311,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 3.2237,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.240978,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.256289,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.272344,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.2955,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.307922,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 3.323833,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.339744,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.356467,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.3725,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.390711,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.406533,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 3.424456,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.440444,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.456722,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.472656,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.491811,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.507156,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 3.522756,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.540878,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.561567,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.572667,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.590389,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.606467,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 3.623344,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.640222,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.657367,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.673011,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.689589,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.709767,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 3.722178,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.757044,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.7736,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.789667,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.806044,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.825167,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 3.840833,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.856278,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.872833,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.890689,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.905978,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.922767,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 3.939133,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.957444,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 3.973133,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 3.991289,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.006567,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.030433,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.044789,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.056333,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 4.073044,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.0891,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.109244,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.1218,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.139422,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.156178,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 4.172256,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.189456,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.205967,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.223122,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.240278,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.257433,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 4.272711,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.289022,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.311289,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.322133,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.339233,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.3727,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 4.391511,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.406056,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.439667,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.456867,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.472922,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.491089,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 4.5072,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.523578,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.5413,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.555744,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.580533,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.5957,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 4.6076,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.639367,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.656633,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.674044,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.689178,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.705867,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 4.722556,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.740322,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.756833,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.772922,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.790633,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.806289,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 4.823178,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.839344,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.856811,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.876856,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.891222,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.906078,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 4.922722,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.939189,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 4.957911,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 4.972767,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.656
+  },
+  {
+    "timestamp": 4.989333,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 5.0072,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.043,
+    "photoMeanError": 41.658
+  },
+  {
+    "timestamp": 5.022178,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 10.5391,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.657
+  },
+  {
+    "timestamp": 10.556622,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.044,
+    "photoMeanError": 41.659
+  }
+]

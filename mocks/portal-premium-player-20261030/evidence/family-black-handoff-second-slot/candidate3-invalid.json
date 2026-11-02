@@ -1,0 +1,31 @@
+{
+  "case": "candidate3",
+  "accepted": false,
+  "reason": "Photo and Home screenshot references are not separable; the visual precondition failed.",
+  "lifecycle": {
+    "scope": "actual_api29_warm_home_return_from_os_dream_over_recovered_continuation",
+    "physicalTouchVerified": false,
+    "panelFpsMeasured": false,
+    "coldStartupTested": false,
+    "realInterruptedDream": true,
+    "continuationRecovered": true,
+    "interruptionRedreamVerdict": true,
+    "interruptionHadNoTouch": true,
+    "realDreamOverContinuation": true,
+    "observationCount": 30,
+    "observedSeconds": 8.819,
+    "firstCompleteHomeIndex": 0,
+    "firstCompleteHomeDelaySeconds": 0.262,
+    "stableHomeAfterFirstComplete": true,
+    "originalHomeTokenRetained": true,
+    "sameAppPid": true,
+    "oneLiveHomeRetained": true,
+    "rootDownObserved": true,
+    "rootUpObserved": true,
+    "tapExitCount": 1,
+    "userExitVerdictObserved": true,
+    "recoveryAfterTap": false,
+    "continuationRetired": true,
+    "passed": true
+  }
+}

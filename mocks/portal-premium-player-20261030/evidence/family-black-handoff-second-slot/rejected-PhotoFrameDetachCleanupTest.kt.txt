@@ -1,0 +1,95 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+package com.immortal.launcher
+
+import android.view.View
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.Mockito
+import org.mockito.Mockito.`when`
+
+class PhotoFrameDetachCleanupTest {
+  @Test fun alreadyDetachedStopsImmediatelyWithoutRegisteringListener() {
+    val view = Mockito.mock(View::class.java)
+    `when`(view.isAttachedToWindow).thenReturn(false)
+    var stops = 0
+
+    stopPhotoFrameAfterDetach(view) { stops++ }
+
+    assertEquals(1, stops)
+    Mockito.verify(view, Mockito.never()).addOnAttachStateChangeListener(
+        Mockito.any(View.OnAttachStateChangeListener::class.java))
+    Mockito.verify(view, Mockito.never()).removeOnAttachStateChangeListener(
+        Mockito.any(View.OnAttachStateChangeListener::class.java))
+  }
+
+  @Test fun attachedFrameStopsOnlyAfterDetachment() {
+    val view = Mockito.mock(View::class.java)
+    `when`(view.isAttachedToWindow).thenReturn(true)
+    var stops = 0
+
+    stopPhotoFrameAfterDetach(view) { stops++ }
+    val listener = registeredListener(view)
+
+    assertEquals(0, stops)
+    Mockito.verify(view, Mockito.never()).removeOnAttachStateChangeListener(listener)
+    listener.onViewDetachedFromWindow(view)
+    assertEquals(1, stops)
+    Mockito.verify(view).removeOnAttachStateChangeListener(listener)
+  }
+
+  @Test fun repeatedDetachmentStopsExactlyOnceAndRemovesListenerBeforeStopping() {
+    val view = Mockito.mock(View::class.java)
+    `when`(view.isAttachedToWindow).thenReturn(true)
+    var stops = 0
+    var listenerRemoved = false
+    Mockito.doAnswer {
+      listenerRemoved = true
+      null
+    }.`when`(view).removeOnAttachStateChangeListener(
+        Mockito.any(View.OnAttachStateChangeListener::class.java))
+
+    stopPhotoFrameAfterDetach(view) {
+      assertTrue("Remove the listener before retiring the photo surface", listenerRemoved)
+      stops++
+    }
+    val listener = registeredListener(view)
+
+    listener.onViewDetachedFromWindow(view)
+    listener.onViewDetachedFromWindow(view)
+
+    assertEquals(1, stops)
+    Mockito.verify(view, Mockito.times(1)).removeOnAttachStateChangeListener(listener)
+  }
+
+  @Test fun attachCallbacksNeverStopOrDisarmPendingCleanup() {
+    val view = Mockito.mock(View::class.java)
+    `when`(view.isAttachedToWindow).thenReturn(true)
+    var stops = 0
+
+    stopPhotoFrameAfterDetach(view) { stops++ }
+    val listener = registeredListener(view)
+
+    listener.onViewAttachedToWindow(view)
+    assertEquals(0, stops)
+    Mockito.verify(view, Mockito.never()).removeOnAttachStateChangeListener(listener)
+
+    listener.onViewDetachedFromWindow(view)
+    listener.onViewAttachedToWindow(view)
+    listener.onViewDetachedFromWindow(view)
+    assertEquals(1, stops)
+    Mockito.verify(view, Mockito.times(1)).removeOnAttachStateChangeListener(listener)
+  }
+
+  private fun registeredListener(view: View): View.OnAttachStateChangeListener {
+    val listener = ArgumentCaptor.forClass(View.OnAttachStateChangeListener::class.java)
+    Mockito.verify(view).addOnAttachStateChangeListener(listener.capture())
+    return listener.value
+  }
+}

@@ -2,6 +2,20 @@
 
 **Overall status: incomplete.** The user now accepts Family Area’s natural brightness/photo-clock fades on current optimized APK **872b6af7…**. The explicitly reopened legacy-motion slot tested three candidates; none passed both the native and strict retained-motion checks, so the original software and configuration are restored. Other recorded delivery remains scoped to its stated evidence. Legacy recovery and parked startup/performance gaps keep the broader goal incomplete.
 
+**Newest bounded result, November 2 — second black-handoff slot.**
+The [freshly authorized slot](portal-black-handoff-second-slot-2026-11-02.md)
+records **9 near-black frames / 196** on original software and **5 / 174** with
+the Activity close animation suppressed. The final caller-frame observer records
+**0 / 262**, but exits through its **1,026 ms fallback**; first complete Home is
+observed after **1,169 ms**, versus **418 ms** in the baseline. That delay fails
+acceptance. Four candidate builds covering three approaches are installed; none is retained.
+All **3,776 fresh JVM tests / 396 suites** and both builds pass for the final
+prototype, which does not prove a successful device fix. Invalid visual/readiness
+attempts are preserved. Original optimized APK **872b6af7…**, production source,
+all 97 settings, sources, both caches, services, pin, brightness and photo preview
+are restored **22 minutes 37 seconds** into the unchanged thirty-minute slot.
+Living Area is untouched. The issue and broader goal remain incomplete and parked.
+
 **Newest bounded result, November 1–2 — reopened black-handoff slot.**
 The [newly authorized slot](portal-black-handoff-reopened-2026-11-01.md)
 reproduces **6 near-black frames / 16 encoded frames** on current **872b6af7…**.

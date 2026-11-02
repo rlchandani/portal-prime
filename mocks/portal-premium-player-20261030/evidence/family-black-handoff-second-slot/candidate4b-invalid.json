@@ -1,0 +1,182 @@
+{
+  "case": "candidate4b",
+  "accepted": false,
+  "reason": "The generated photo did not satisfy the bounded steady-photo readiness check; no exit recording was started.",
+  "readinessSamples": [
+    {
+      "referenceMeanErrors": [
+        41.78
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868,
+        87.95,
+        41.817,
+        41.817,
+        41.814,
+        84.894,
+        41.78
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868,
+        87.95,
+        41.817,
+        41.817,
+        41.814,
+        84.894,
+        41.78,
+        41.782
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868,
+        87.95,
+        41.817,
+        41.817,
+        41.814,
+        84.894,
+        41.78,
+        41.782,
+        41.78
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868,
+        87.95,
+        41.817,
+        41.817,
+        41.814,
+        84.894,
+        41.78,
+        41.782,
+        41.78,
+        6.63
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868,
+        87.95
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868,
+        87.95,
+        41.817
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868,
+        87.95,
+        41.817,
+        41.817
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868,
+        87.95,
+        41.817,
+        41.817,
+        41.814
+      ],
+      "generatedPhotoVisible": false
+    },
+    {
+      "referenceMeanErrors": [
+        41.78,
+        41.78,
+        42.034,
+        41.859,
+        41.868,
+        87.95,
+        41.817,
+        41.817,
+        41.814,
+        84.894
+      ],
+      "generatedPhotoVisible": false
+    }
+  ]
+}

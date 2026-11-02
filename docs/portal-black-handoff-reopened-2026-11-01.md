@@ -1,5 +1,9 @@
 # Family Area black screensaver handoff — reopened November 1
 
+The [second authorized slot](portal-black-handoff-second-slot-2026-11-02.md)
+supersedes this handoff: builds succeed, but no candidate meets device acceptance.
+Original software and configuration are restored within that fresh thirty-minute slot.
+
 **Incomplete; no runtime fix is deployed.** The current optimized software reproduces
 six near-black encoded frames when an OS Dream retires a recovered screensaver
 continuation and reveals Home. A proposed Activity-transition change was prepared,
