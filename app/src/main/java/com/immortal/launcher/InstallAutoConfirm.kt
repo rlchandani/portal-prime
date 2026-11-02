@@ -19,28 +19,47 @@ import android.os.SystemClock
  * Store yourself. It would tap through / dismiss that dialog before you could read it, which the
  * system reports as STATUS_FAILURE_ABORTED (status 3): installs appeared to "flash and vanish".
  *
- * Fix: the service only acts while this window is armed. [HeadlessInstaller] arms it right before
- * committing a fleet session and disarms it when the install finishes. Interactive installs never
- * arm it, so their dialogs behave normally and wait for a real tap.
+ * The service only acts while an owned window is armed. [HeadlessInstaller] acquires a window
+ * for its fleet session and releases that same window when the install finishes. Overlapping
+ * attempts cannot release each other's windows. Interactive installs never acquire one.
  */
 object InstallAutoConfirm {
-
-  // How long an arm lasts if not explicitly disarmed (a safety cap so a crashed headless install
-  // can't leave the auto-clicker live forever). The system dialog appears within a second or two.
-  private const val ARM_TTL_MS = 30_000L
-
-  @Volatile private var armedUntil: Long = 0L
+  private val window = InstallAutoConfirmWindow(SystemClock::elapsedRealtime)
 
   /** Arm the auto-confirm window for a fleet/headless install about to commit. */
-  fun arm() {
-    armedUntil = SystemClock.elapsedRealtime() + ARM_TTL_MS
-  }
+  internal fun arm(): InstallAutoConfirmWindow.Lease = window.arm()
 
-  /** Disarm once the headless install reaches a terminal state. */
-  fun disarm() {
-    armedUntil = 0L
-  }
+  /** Release only this install's window once it reaches a terminal state. */
+  internal fun disarm(lease: InstallAutoConfirmWindow.Lease) = window.disarm(lease)
 
   /** True only while a headless install is in flight — the service is a no-op otherwise. */
-  fun isArmed(): Boolean = SystemClock.elapsedRealtime() < armedUntil
+  fun isArmed(): Boolean = window.isArmed()
+}
+
+/** Independent expiry retains the existing safety cap without extending an older attempt. */
+internal class InstallAutoConfirmWindow(
+    private val clock: () -> Long,
+    private val ttlMs: Long = 30_000L,
+) {
+  class Lease internal constructor()
+  private val deadlines = mutableMapOf<Lease, Long>()
+
+  @Synchronized fun arm(): Lease {
+    val now = clock()
+    removeExpired(now)
+    return Lease().also { deadlines[it] = now + ttlMs }
+  }
+
+  @Synchronized fun disarm(lease: Lease) {
+    deadlines.remove(lease)
+  }
+
+  @Synchronized fun isArmed(): Boolean {
+    removeExpired(clock())
+    return deadlines.isNotEmpty()
+  }
+
+  private fun removeExpired(now: Long) {
+    deadlines.entries.removeAll { it.value <= now }
+  }
 }

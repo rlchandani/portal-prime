@@ -33,6 +33,56 @@ import org.mockito.Mockito.`when`
 class HeadlessInstallerCleanupTest {
   @get:Rule val files = TemporaryFolder()
 
+  @Test fun finishingOneInstallCannotDisarmAnotherAwaitingInstall() {
+    fun armed(): Boolean = Mockito.mockStatic(SystemClock::class.java).use {
+      InstallAutoConfirm.isArmed()
+    }
+    val committed = CountDownLatch(1)
+    val finished = CountDownLatch(1)
+    val callback = AtomicReference<Pair<Context, BroadcastReceiver>>()
+    val failure = AtomicReference<Throwable>()
+    val worker = Thread {
+      try {
+        withInstaller(terminalStatus = null, timeoutMs = 5_000,
+            onCommit = { context, receiver ->
+              callback.set(context to receiver)
+              committed.countDown()
+            }) { _, _, _, install ->
+          assertTrue(install())
+        }
+      } catch (t: Throwable) {
+        failure.set(t)
+      } finally {
+        finished.countDown()
+      }
+    }
+    worker.start()
+    try {
+      assertTrue("Second install must be waiting for its own result",
+          committed.await(5, TimeUnit.SECONDS))
+      assertTrue(armed())
+      withInstaller(terminalStatus = PackageInstaller.STATUS_FAILURE_INVALID) {
+          _, _, _, install -> assertFalse(install())
+      }
+      assertTrue("The remaining install must retain its auto-confirm window",
+          armed())
+    } finally {
+      callback.get()?.let { (context, receiver) ->
+        val success = Mockito.mock(Intent::class.java)
+        `when`(success.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1)).thenReturn(37)
+        `when`(success.getIntExtra(PackageInstaller.EXTRA_STATUS, Int.MIN_VALUE))
+            .thenReturn(PackageInstaller.STATUS_SUCCESS)
+        receiver.onReceive(context, success)
+      }
+      assertTrue("Waiting install must finish and release its resources",
+          finished.await(6, TimeUnit.SECONDS))
+      worker.join(1_000)
+      assertFalse("All completed installs must leave auto-confirm dormant",
+          armed())
+    }
+    failure.get()?.let { throw AssertionError("Waiting install failed", it) }
+  }
+
   @Test fun timeoutAbandonsOnlyTheSessionCreatedByThisAttempt() =
       withInstaller(terminalStatus = null) { context, installer, session, install ->
         assertFalse(install())
@@ -165,7 +215,7 @@ class HeadlessInstallerCleanupTest {
     val session = Mockito.mock(PackageInstaller.Session::class.java)
     val sender = Mockito.mock(IntentSender::class.java)
     val pending = Mockito.mock(PendingIntent::class.java)
-    val apk = files.newFile("public-fixture.apk").apply { writeBytes(byteArrayOf(1, 2, 3)) }
+    val apk = files.newFile().apply { writeBytes(byteArrayOf(1, 2, 3)) }
     `when`(context.applicationContext).thenReturn(context)
     `when`(context.packageName).thenReturn("com.immortal.launcher.debug")
     `when`(context.packageManager).thenReturn(packages)

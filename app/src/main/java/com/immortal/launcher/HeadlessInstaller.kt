@@ -77,7 +77,7 @@ object HeadlessInstaller {
     // Arm the auto-confirm accessibility service for the life of THIS headless install only, so
     // it taps "Install" on the system dialog. Disarmed in `finally` so it can never dismiss an
     // interactive install the user later triggers themselves.
-    InstallAutoConfirm.arm()
+    val confirmationLease = InstallAutoConfirm.arm()
     return try {
       // This experiment is restricted to our own package on the profile format's supported APIs.
       // Prepare before opening a session: invalid metadata must fail, never silently measure APK-only.
@@ -131,7 +131,7 @@ object HeadlessInstaller {
               .onFailure { Log.w(TAG, "couldn't abandon failed installer session $sessionId", it) }
         }
       }
-      InstallAutoConfirm.disarm()
+      InstallAutoConfirm.disarm(confirmationLease)
       runCatching { app.unregisterReceiver(receiver) }
     }
   }
